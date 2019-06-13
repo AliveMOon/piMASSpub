@@ -1,27 +1,7 @@
-//~ MIT License
-//
-//~ Copyright (c) 2019 AliveMOon
-//
-//~ Permission is hereby granted, free of charge, to any person obtaining a copy
-//~ of this software and associated documentation files (the "Software"), to deal
-//~ in the Software without restriction, including without limitation the rights
-//~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//~ copies of the Software, and to permit persons to whom the Software is
-//~ furnished to do so, subject to the following conditions:
-//
-//~ The above copyright notice and this permission notice shall be included in all
-//~ copies or substantial portions of the Software.
-//
-//~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//~ SOFTWARE.
-
-#include "piMASS.h"
-
+#include <exception>
+#include <string>
+#include <iostream>
+#include <SDL.h>
 
 class InitError : public std::exception
 {
@@ -56,8 +36,8 @@ const char * InitError::what() const throw()
 
 class SDL
 {
-    SDL_Window * pSDLwin;
-    SDL_Renderer * pSDLrndr;
+    SDL_Window * m_window;
+    SDL_Renderer * m_renderer;
 public:
     SDL( U4 flags = 0 );
     virtual ~SDL();
@@ -70,25 +50,25 @@ SDL::SDL( U4 flags )
         throw InitError();
 
     if ( SDL_CreateWindowAndRenderer( 640, 480, SDL_WINDOW_SHOWN,
-                                      &pSDLwin, &pSDLrndr ) != 0 )
+                                      &m_window, &m_renderer ) != 0 )
         throw InitError();
 }
 
 SDL::~SDL()
 {
-    SDL_DestroyWindow( pSDLwin );
-    SDL_DestroyRenderer( pSDLrndr );
+    SDL_DestroyWindow( m_window );
+    SDL_DestroyRenderer( m_renderer );
     SDL_Quit();
 }
 
 void SDL::draw()
 {
     // Clear the window with a black background
-    SDL_SetRenderDrawColor( pSDLrndr, 0, 0, 0, 255 );
-    SDL_RenderClear( pSDLrndr );
+    SDL_SetRenderDrawColor( m_renderer, 0, 0, 0, 255 );
+    SDL_RenderClear( m_renderer );
 
     // Show the window
-    SDL_RenderPresent( pSDLrndr );
+    SDL_RenderPresent( m_renderer );
 
     int rgb[] = { 203, 203, 203, // Gray
                   254, 254,  31, // Yellow
@@ -106,22 +86,17 @@ void SDL::draw()
     // Render a new color bar every 0.5 seconds
     for ( int i = 0; i != sizeof rgb / sizeof *rgb; i += 3, colorBar.x += 90 )
     {
-        SDL_SetRenderDrawColor( pSDLrndr, rgb[i], rgb[i + 1], rgb[i + 2], 255 );
-        SDL_RenderFillRect( pSDLrndr, &colorBar );
-        SDL_RenderPresent( pSDLrndr );
+        SDL_SetRenderDrawColor( m_renderer, rgb[i], rgb[i + 1], rgb[i + 2], 255 );
+        SDL_RenderFillRect( m_renderer, &colorBar );
+        SDL_RenderPresent( m_renderer );
         SDL_Delay( 500 );
     }
 }
 
-int main( int nA, char *paA[] )
+int main( int argc, char * argv[] )
 {
     try
     {
-		for( int i = 0; i < nA; i++ )
-		{
-			cout << paA[i] << endl;
-		}
-
         SDL sdl( SDL_INIT_VIDEO | SDL_INIT_TIMER );
         sdl.draw();
 
