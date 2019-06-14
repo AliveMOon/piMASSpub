@@ -112,15 +112,57 @@ void SDL::draw()
         SDL_Delay( 500 );
     }
 }
+char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
+	 gpsEXEname[0x100],
+	 gpsMASSpath[gpeMXPATH], *gppMASSfile = gpsMASSpath,
+	 gpsMASSname[0x100];
 
-int main( int nA, char *paA[] )
+gpcLAZY gpMASS;
+
+int main( int nA, char *apA[] )
 {
+	if( nA > 0 )
+	{
+		gppEXEfile = strrchr( strcpy( gpsEXEpath, apA[0] ), '/' );
+		if( !gppEXEfile)
+			gppEXEfile = gpsEXEpath;
+		else if( *gppEXEfile == '/' )
+			gppEXEfile++;
+		strcpy( gpsEXEname, gppEXEfile );
+		*gppEXEfile = 0;
+
+		cout << "Start in:" << gpsEXEpath << endl;
+		cout << "Exe is:" << gpsEXEname << endl;
+		*gppMASSfile = 0;
+	}
+
+
     try
     {
-		for( int i = 0; i < nA; i++ )
+		for( int i = 1; i < nA; i++ )
 		{
-			cout << paA[i] << endl;
+			cout << apA[i] << endl;
+			if( strstr( apA[i], ".mass" ) )
+			{
+				strcpy( gpsMASSpath, apA[i] );
+				gppMASSfile = strrchr( gpsMASSpath, '/' );
+				if( !gppMASSfile )
+					gppMASSfile = gpsMASSpath;
+				else if( *gppMASSfile == '/' )
+					gppMASSfile++;
+				strcpy( gpsMASSname, gppMASSfile );
+				cout << "MASS is:" << gpsMASSname << endl;
+				continue;
+			}
 		}
+
+		if( !*gpsMASSname )
+		{
+			strcpy( gpsMASSname, "pi.mass" );
+		}
+		U8 s;
+		gpMASS.lazy_read( gpsMASSpath, s = -1, -1 );
+
 
         SDL sdl( SDL_INIT_VIDEO | SDL_INIT_TIMER );
         sdl.draw();

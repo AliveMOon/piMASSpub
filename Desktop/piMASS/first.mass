@@ -1,0 +1,18 @@
+ 
+.name == "main"
+.aPIC[] = piclist.a0:a100 // ez valami fügőleges lista 
+   
+ unsel color  
+if( main.qc+1 )		// ha tmr.qc hamis azaz páráros megszakítja a végrehajtást 
+	break;
+.name == "gomb"
+.bt == ((mlb%2) + 1) * ( globp = 304 ) * globb
+.pic == aPIC[bt+main.bt]
+ 
+.mini == "
+  SAV_MSK
+"   
+
+ 
+if( gomb.bt+1 )
+	break;
