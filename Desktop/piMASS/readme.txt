@@ -1,5 +1,5 @@
 gate:
 >gatelist
-a
-b
-c
+aa
+bb
+cc
