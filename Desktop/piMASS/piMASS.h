@@ -23,7 +23,7 @@
 //~ SOFTWARE.
 
 #include <exception>
-
+#include <mysys.h>
 #include <errno.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -31,7 +31,11 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
-#include <raspicam/raspicam.h>
+
+#ifdef gpdSYSpi
+    #include <raspicam/raspicam.h>
+#endif // gpdSYSpi
+
 #include <unistd.h> // for usleep()
 #include <inttypes.h>
 #include <sys/stat.h>
