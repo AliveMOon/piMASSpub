@@ -14,6 +14,7 @@
 				<Option parameters="first.mass" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="./" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -24,6 +25,7 @@
 				<Option parameters="first.mass" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -40,6 +42,11 @@
 			<Add library="GLEW" />
 			<Add library="SDL2" />
 		</Linker>
+		<Unit filename="gpcLAZY.cpp" />
+		<Unit filename="gpcSRC.cpp" />
+		<Unit filename="gpcSRC.h" />
+		<Unit filename="gpcU14.cpp" />
+		<Unit filename="gpcU44.cpp" />
 		<Unit filename="piMASS.h" />
 		<Unit filename="piMASS_main.cpp" />
 		<Extensions>

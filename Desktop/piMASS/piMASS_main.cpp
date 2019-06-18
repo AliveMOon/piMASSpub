@@ -21,7 +21,7 @@
 //~ SOFTWARE.
 
 #include "piMASS.h"
-
+#include "gpcSRC.h"
 
 class InitError : public std::exception
 {

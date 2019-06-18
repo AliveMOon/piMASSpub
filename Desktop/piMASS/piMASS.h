@@ -772,6 +772,249 @@ inline void* gp_memcmp( void* pA, void* pB, U8 n )
 	return (void*)(pAu1+n);
 }
 
+class U14
+{
+public:
+    union
+    {
+        struct
+        {
+            U1 x,y,z,w;
+        };
+        struct
+        {
+            U1 aXYZW[4];
+        };
+        struct
+        {
+            U4 u4;
+        };
+    };
+    U14(){};
+    U14( U4 b )
+    {
+        u4 = b;
+    }
+    U14( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    U14& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
+};
+
+class U44
+{
+public:
+    union
+    {
+        struct
+        {
+            U4 x,y,z,w;
+        };
+        struct
+        {
+            U4 aXYZW[4];
+        };
+    };
+    U44(){};
+    U44& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
+    U44( U4 _x, U4 _y = 0, U4 _z = 0, U4 _w = 0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    U44& operator = ( U4 b )
+    {
+        x = y = z = w = b;
+    }
+    U44& operator = ( I4 b )
+    {
+        x = y = z = w = abs(b);
+    }
+    U44& src2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
+
+	U4 tree_add( U4 u4, U4 n_t )
+	{
+		// x érték, y mama, z kicsiegyenlõ, w nagyobb
+		this[n_t].null().x = u4;
+		if( !n_t )
+			return 1;
+
+		U4 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == u4 )
+				return n_t;
+
+			if( this[i].x < u4 )
+			{
+				if( !this[i].z )
+				{
+					this[i].z = n_t;
+					this[n_t].y = i;
+					n_t++;
+					return n_t;
+				}
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+			{
+				this[i].w = n_t;
+				this[n_t].y = i;
+				n_t++;
+				return n_t;
+			}
+			i = this[i].w;
+		}
+		return n_t;
+	}
+	U4 tree_fnd( U4 u4, U4 n_t )
+	{
+		// figyelem/WARNING
+		// visza térési érték, az, ameddig eljutott a fában
+		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
+		U4 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == u4 )
+				return i;
+
+			if( this[i].x < u4 )
+			{
+				if( !this[i].z )
+					return i;
+
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+				return i;
+
+			i = this[i].w;
+		}
+		return n_t;
+	}
+};
+class U84
+{
+public:
+    union
+    {
+        struct
+        {
+            U8 x,y,z,w;
+        };
+        struct
+        {
+            U8 aXYZW[4];
+        };
+        struct
+        {
+            gpeALF labe;
+            U8 mom, up, nx;
+        };
+    };
+    U84(){};
+    U84( U8 _x, U8 _y = 0, U8 _z = 0, U8 _w = 0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    U84& operator = ( U8 b )
+    {
+        x = y = z = w = b;
+    }
+    U84& operator = ( I8 b )
+    {
+        x = y = z = w = abs(b);
+    }
+};
+
+class I44
+{
+public:
+    I4 x,y,z,w;
+    I44(){};
+    I44( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+};
+
+class double4
+{
+public:
+    double x,y,z,w;
+    double4(){};
+    double4( I4 _x, I4 _y, I4 _z, I4 _w )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    double4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    double4( double* pD )
+    {
+        gpmMEMCPY( this, pD, 1 );
+    }
+    double sum( void ) const
+    {
+        return x+y+z+w;
+    }
+    double sum_xyz( void ) const
+    {
+        return x+y+z;
+    }
+    double qlen( void ) const
+    {
+        return x*x+y*y+z*z+w*w;
+    }
+    double qlen_xyz( void ) const
+    {
+        return x*x+y*y+z*z;
+    }
+    double4 norm_xyz( void ) const
+	{
+        double l = sqrt(qlen_xyz());
+		return double4( x/l, y/l, z/l );
+	}
+	double dot_xyz( double4 b ) const
+	{
+        return x*b.x + y*b.y + z*b.z;
+	}
+    double4 cross_xyz( double4 b ) const
+	{
+		return double4(
+						y * b.z - z * b.y,
+						z * b.x - x * b.z,
+						x * b.y - y * b.x
+				);
+	}
+	double4 operator + ( const double4& b ) const
+	{
+        return double4( x+b.x, y+b.y, z+b.z, w+b.w );
+	}
+	double4 operator - ( const double4& b ) const
+	{
+        return double4( x-b.x, y-b.y, z-b.z, w-b.w );
+	}
+};
+/*class gpcSRC
+{
+    public:
+        U1  *pS0, *pS1;
+        U4  w, h;
+        U4  nSRC;
+};
+class gpcMASS
+{
+    public:
+
+};*/
 class gpcLAZY
 {
 public:
