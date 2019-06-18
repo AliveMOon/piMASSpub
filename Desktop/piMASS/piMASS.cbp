@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="first.sht" />
+				<Option parameters="first.mass" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -21,7 +21,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="first.sht" />
+				<Option parameters="first.mass" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -31,11 +31,14 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="`sdl2-config --cflags`" />
 			<Add option="-Wall" />
+			<Add option="`sdl2-config --cflags`" />
 		</Compiler>
 		<Linker>
 			<Add option="`sdl2-config --libs`" />
+			<Add library="GL" />
+			<Add library="GLEW" />
+			<Add library="SDL2" />
 		</Linker>
 		<Unit filename="piMASS.h" />
 		<Unit filename="piMASS_main.cpp" />

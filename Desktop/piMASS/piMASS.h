@@ -61,6 +61,8 @@
 #include <linux/limits.h>
 //#include <bits/stdc++.h>
 
+#include <GL/glew.h>
+
 using namespace std;
 typedef unsigned char	U1;
 typedef volatile U1		vU1;
