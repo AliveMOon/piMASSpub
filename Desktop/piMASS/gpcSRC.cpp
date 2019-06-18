@@ -2,6 +2,7 @@
 
 gpcSRC::gpcSRC()
 {
+    // na mi lesz
     //ctor
 }
 
