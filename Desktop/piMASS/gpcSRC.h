@@ -1,7 +1,6 @@
 #ifndef GPCSRC_H
 #define GPCSRC_H
 
-
 class gpcSRC
 {
 public:
