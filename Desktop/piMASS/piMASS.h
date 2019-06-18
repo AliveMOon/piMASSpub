@@ -770,6 +770,18 @@ inline void* gp_memcmp( void* pA, void* pB, U8 n )
 	return (void*)(pAu1+n);
 }
 
+/*class gpcSRC
+{
+    public:
+        U1  *pS0, *pS1;
+        U4  w, h;
+        U4  nSRC;
+};
+class gpcMASS
+{
+    public:
+
+};*/
 class gpcLAZY
 {
 public:

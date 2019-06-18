@@ -362,7 +362,7 @@
 1560761767 source:/home/dezso/Asztal/piMASSpub/Desktop/piMASS/piMASS_main.cpp
 	"piMASS.h"
 
-1560764127 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/piMASS.h
+1560806877 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -403,4 +403,9 @@
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
+
+1560807231 source:/home/dezso/Asztal/piMASSpub/Desktop/piMASS/gpcSRC.cpp
+	"gpcSRC.h"
+
+1560813998 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/gpcSRC.h
 

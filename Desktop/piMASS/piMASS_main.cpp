@@ -21,7 +21,7 @@
 //~ SOFTWARE.
 
 #include "piMASS.h"
-
+#include "gpcSRC.h"
 
 class InitError : public std::exception
 {
@@ -118,7 +118,7 @@ char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 	 gpsMASSname[0x100];
 
 gpcLAZY gpMASS;
-
+gpcSRC gpaIZE;
 int main( int nA, char *apA[] )
 {
 	if( nA > 0 )

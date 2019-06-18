@@ -11,9 +11,10 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="first.sht" />
+				<Option parameters="first.mass" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="./" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -21,9 +22,10 @@
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="first.sht" />
+				<Option parameters="first.mass" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="./" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -31,12 +33,15 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="`sdl2-config --cflags`" />
 			<Add option="-Wall" />
+			<Add option="`sdl2-config --cflags`" />
+			<Add directory="/home/dezso/Asztal/piMASSpub/Desktop/piMASS/" />
 		</Compiler>
 		<Linker>
 			<Add option="`sdl2-config --libs`" />
 		</Linker>
+		<Unit filename="gpcSRC.cpp" />
+		<Unit filename="gpcSRC.h" />
 		<Unit filename="piMASS.h" />
 		<Unit filename="piMASS_main.cpp" />
 		<Extensions>
