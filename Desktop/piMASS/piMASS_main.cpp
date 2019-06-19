@@ -163,6 +163,7 @@ int main( int nA, char *apA[] )
 		U8 s;
 		gpMASS.lazy_read( gpsMASSpath, s = -1, -1 );
 
+		gpcSRCcache* pSRCc = new gpcSRCcache( gpMASS.p_alloc, gpMASS.n_load );
 
         SDL sdl( SDL_INIT_VIDEO | SDL_INIT_TIMER );
         sdl.draw();

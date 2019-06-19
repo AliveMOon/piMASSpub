@@ -157,20 +157,95 @@ class gpcSRC
 {
 public:
     U1  *pA, *pB;
-    U4	nA;
+    U8	nL, nA;
     gpcSRC();
     virtual ~gpcSRC();
+	U8 iB( void )
+	{
+		if( !pA || !nL )
+			return 0;
 
+		if( pB < pA )
+			pB = pA;
+
+		U8 i = pB-pA;
+		if( i )
+		if( i >= nL )
+		{
+			if( i == nL )
+				return nL; // ezzel jelezük, ha valaki már kereste
+							// azaz nem 0
+
+			pB = ( pA ? pA+nL : NULL );
+			return nL;
+		}
+
+		if( pB[i] == '\a' )
+			return i;	// ez a fasza
+
+		// még van esély keressük meg, hátha há
+		U8 nLEN;
+		i = gpfVAN( pA, (U1*)"\a", nLEN );
+		if( i )
+		if( i >= nL )
+		{
+			if( i == nL )
+				return nL;	// i = nL -> ezzel jelezük, hogy kerestük de biza nem vót // szar
+
+			pB = ( pA ? pA+nL : NULL );
+			return nL;
+		}
+
+		// na meguszta talált egyet
+		pB = pA+i;
+		return i;
+	}
+	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC );
+    gpcSRC( gpcSRC& B );
+    gpcSRC& operator = ( gpcSRC& B );
 protected:
 private:
-    gpcSRC(const gpcSRC& other){}
-    gpcSRC& operator=(const gpcSRC& b)
-    {
-        if( this == &b )
-            return *this; // handle self assignment
-        //assignment operator
-        return *this;
-    }
+};
+
+class gpcSRCcache
+{
+	gpcLAZY	*p_cache,
+				*p_lst;
+	U4			nLST, xFND, nALLOC;
+	gpcSRC		*pFND;
+	gpcSRC** ppSRC( void )
+	{
+		return (gpcSRC**)(p_cache ? p_cache->p_alloc : NULL);
+	}
+public:
+	gpcSRCcache( const U1* pU, U8 nU );
+	virtual ~gpcSRCcache();
+
+	gpcSRC* fnd( U4 xfnd )
+	{
+		if(!this)
+			return NULL;
+
+		if( nLST )
+		if( xFND == xfnd )
+			return pFND;
+
+		U4 iFND = p_lst->tree_fnd(xfnd, nLST);
+		if(iFND >= nLST)
+			return NULL;
+
+		gpcSRC** ppS = ppSRC();
+		if( ppS ? !ppS[iFND] : true )
+			return pFND;
+
+		pFND = ppS[iFND];
+		xFND = xfnd;
+
+		return pFND;
+	}
+
+	gpcSRC* add_fnd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
+
 };
 
 #endif // GPCSRC_H

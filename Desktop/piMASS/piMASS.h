@@ -1003,18 +1003,7 @@ public:
         return double4( x-b.x, y-b.y, z-b.z, w-b.w );
 	}
 };
-/*class gpcSRC
-{
-    public:
-        U1  *pS0, *pS1;
-        U4  w, h;
-        U4  nSRC;
-};
-class gpcMASS
-{
-    public:
 
-};*/
 class gpcLAZY
 {
 public:
