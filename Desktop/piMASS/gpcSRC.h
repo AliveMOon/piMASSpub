@@ -3,13 +3,13 @@
 
 #include "piMASS.h"
 
-inline U4 gpfUTF8( const U1* pU, U1** ppU )
+inline U4 gpfUTF8( const U1* pS, U1** ppS )
 {
-	U4 utf8 = *pU;
+	U4 utf8 = *pS;
 	if( !(utf8&0x80) )
 	{
-		if( ppU )
-			(*ppU) = ((U1*)pU) + (!!utf8);
+		if( ppS )
+			(*ppS) = ((U1*)pS) + (!!utf8);
 		return utf8;
 	}
 
@@ -18,40 +18,41 @@ inline U4 gpfUTF8( const U1* pU, U1** ppU )
 		// azaz hibás 0x40-nek igaznak kéne lenie
 		while( (utf8&0xc0) == 0x80 )
 		{
-			pU++;
-			utf8 = *pU;
+			pS++;
+			utf8 = *pS;
 			if( !utf8 )
 			{
-				if( !ppU )
+				if( !ppS )
 					return 0;
 
-				*ppU = (U1*)pU;
+				*ppS = (U1*)pS;
 				return 0;
 			}
 		}
 
-		if( !ppU )
+		if( !ppS )
 			return '.';
 
-		*ppU = (U1*)pU;
+		*ppS = (U1*)pS;
 		return '.';
 	}
 
 	U4	u0 = utf8<<1, n = 0;
-	U4	static const aADD[] = { 0,0x80, 0x800, 0x10000 };
+	U4	static const aADD[] = { 0, 0x80, 0x800, 0x10000, 0x200000 };
 
 	while( u0&0x80 )
 	{
 		n++;
 		u0 <<= 1;
 		utf8 <<= 6;
-		utf8 |= pU[n]&0x3f;
+		utf8 |= pS[n]&0x3f;
 	}
 	utf8 += aADD[n];
-	if( !ppU )
+	utf8 &= aADD[n+1]-1;
+	if( !ppS )
 		return utf8;
-	pU += n+1;
-	*ppU = (U1*)pU;
+	pS += n+1;
+	*ppS = (U1*)pS;
 	return utf8;
 }
 inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
@@ -60,22 +61,24 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
 	if( pU ? !*pU : true )
 		return 0;
 
-	U1 *pN = (U1*)pU;
+	U1 *pS = (U1*)pU;
 	if( !pVAN )
 	{
 		// strlen!!
-		while( *pN )
+		while( *pS )
 		{
-			if( (*pN&0xc0) != 0x80 )
+			if( (*pS&0xc0) != 0x80 )
 				nLEN++;	// csak a 0x80 asokat nem számoljuk bele mert azok tötike karakterek
-			pN++;
+			pS++;
 		}
-		return pN-pU;
+		return pS-pU;
 	}
 	U8 nVAN = gpfVAN( pVAN, NULL, nLEN ); // utf8len
 	bool abVAN[0x80];
 	gpmZ( abVAN );
 	*abVAN = true;
+	gpcLAZY* pTREE = NULL;
+	U4 u4, nT = 0;
 
 	if( nVAN == nLEN )
 	{
@@ -84,34 +87,47 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
 		{
 			abVAN[pVAN[v]] = true;
 		}
-		while( !abVAN[*pN] )
-			pN++;
-
-		return nLEN = pN-pU;
-	}
-	U4 u4, nT = 0;
-	U1	*pV = (U1*)pVAN,
-		*pE = pV+nVAN;
-	gpcLAZY* pTREE = NULL;
-	while( pV < pE )
-	{
-		u4 = gpfUTF8( pV, &pV );
-		if( u4 < 0x80 )
+		while( *pS )
 		{
-			abVAN[u4] = true;
-			continue;
+			if( *pS >= 0x80 )
+				break;
+			if( abVAN[*pS] )
+				return nLEN = pS-pU;
+
+			pS++;
+		}
+		nLEN = pS-pU;
+		if( !*pS )
+			return nLEN;
+
+	} else {
+		U1	*pV = (U1*)pVAN,
+			*pE = pV+nVAN;
+		while( pV < pE )
+		{
+			u4 = gpfUTF8( pV, &pV );
+			if( u4 < 0x80 )
+			{
+				abVAN[u4] = true;
+				continue;
+			}
+
+			pTREE = pTREE->tree_add( u4, nT );
 		}
 
-		pTREE = pTREE->tree_add( u4, nT );
+		nLEN = 0;
 	}
-
-	nLEN = 0;
-	while( *pN )
+	while( *pS )
 	{
-		u4 = gpfUTF8( pN, &pN );
+		u4 = gpfUTF8( pS, &pS );
 		if( u4 < 0x80 )
-		if( abVAN[u4] )
-				break;
+		{
+			if( abVAN[u4] )
+					break;
+
+			nLEN++;
+			continue;
+		}
 
 		if( pTREE->tree_fnd(u4, nT) < nT )
 			break;
@@ -119,7 +135,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
 		nLEN++;
 	}
 
-	return pN-pU;
+	return pS-pU;
 }
 I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 {
