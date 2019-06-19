@@ -38,7 +38,8 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS )
 	}
 
 	U4	u0 = utf8<<1, n = 0;
-	U4	static const aADD[] = { 0, 0x80, 0x800, 0x10000, 0x200000 };
+	U4	static const aADD[] = { 0, 		0x80,	0x800,	0x10000, 0x200000 };
+	U4	static const aMSK[] = { 0x7F, 	0x7FF,	0xFFFF, 0x1FFFFF };
 
 	while( u0&0x80 )
 	{
@@ -48,7 +49,7 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS )
 		utf8 |= pS[n]&0x3f;
 	}
 	utf8 += aADD[n];
-	utf8 &= aADD[n+1]-1;
+	utf8 &= aMSK[n];
 	if( !ppS )
 		return utf8;
 	pS += n+1;

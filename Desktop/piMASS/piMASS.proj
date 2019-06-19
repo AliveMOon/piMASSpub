@@ -28,9 +28,12 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=1
+current_page=5
 FILE_NAME_0=1141;C++;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2FDesktop%2FpiMASS%2FpiMASS_main.cpp;0;4
 FILE_NAME_1=1718;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FpiMASS%2FpiMASS.h;0;4
+FILE_NAME_2=3039;C++;0;EUTF-8;1;1;0;%2Frun%2Fuser%2F1000%2Fgvfs%2Fsmb-share%3Aserver%3D192.168.0.157%2Cshare%3Dgpubi%2FDokumentumok%2FGPGL1%2FGPGL%2Fsrc%2FCommon.cpp;0;4
+FILE_NAME_3=23740;C++;0;EUTF-8;1;1;0;%2Frun%2Fuser%2F1000%2Fgvfs%2Fsmb-share%3Aserver%3D192.168.0.157%2Cshare%3Dgpubi%2FDokumentumok%2FGPGL1%2FGPGL%2Finclude%2FCommon.h;0;4
+FILE_NAME_4=39538;C++;0;EISO-8859-1;1;1;0;%2Frun%2Fuser%2F1000%2Fgvfs%2Fsmb-share%3Aserver%3D192.168.0.157%2Cshare%3Dgpubi%2FDokumentumok%2FGP_ENGINEx64%2FGP_ENGINEx64%2FGP_COMMON%2FGP_ASM.cpp;0;4
 
 [VTE]
 last_dir=/home/pi
