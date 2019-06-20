@@ -5,12 +5,14 @@
 enum gpeMASSsw:U8
 {
 	gpeMASSzero,
-	gpeMASSsub = 0,
+	gpeMASSsub = gpeMASSzero,
 	gpeMASSret,
 	gpeMASSentr,
 	gpeMASSunsel,
 	gpeMASSin,
 	gpeMASSpass,
+
+	gpeMASSclr,
 
 	gpeMASSsubMSK = 1<<gpeMASSsub,
 	gpeMASSretMSK = 1<<gpeMASSret,
@@ -18,6 +20,8 @@ enum gpeMASSsw:U8
 	gpeMASSunselMSK = 1<<gpeMASSunsel,
 	gpeMASSinMSK = 1<<gpeMASSin,
 	gpeMASSpassMSK = 1<<gpeMASSpass,
+
+	gpeMASSclrMSK = (1<<gpeMASSclr)-1,
 
 };
 inline U4 gpfUTF8( const U1* pS, U1** ppS )
@@ -165,12 +169,13 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 
 	return pS-pU;
 }
+#define gpmVAN( d, v, l ) gpfVAN( (d), (U1*)v, l )
 I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 {
 	if( !p_str )
 		return 0;
 	U8 nLEN;
-    p_str += gpfVAN(p_str, (U1*)"+-0123456789xXbBdD", nLEN );
+    p_str += gpmVAN(p_str, "+-0123456789xXbBdD", nLEN );
 	I8 i8 = strtol( (char*)p_str, (char**)&p_str, 10 );
 	if( !i8 )
 	{
