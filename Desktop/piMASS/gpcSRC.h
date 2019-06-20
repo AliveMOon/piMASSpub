@@ -9,7 +9,7 @@ enum gpeMASSsw:U8
 	gpeMASSret,
 	gpeMASSentr,
 	gpeMASSunsel,
-	gpeMASSin,
+	gpeMASSinp,
 	gpeMASSpass,
 
 	gpeMASSalert,
@@ -18,7 +18,7 @@ enum gpeMASSsw:U8
 	gpeMASSretMSK = 1<<gpeMASSret,
 	gpeMASSentrMSK = 1<<gpeMASSentr,
 	gpeMASSunselMSK = 1<<gpeMASSunsel,
-	gpeMASSinMSK = 1<<gpeMASSin,
+	gpeMASSinpMSK = 1<<gpeMASSinp,
 	gpeMASSpassMSK = 1<<gpeMASSpass,
 	gpeMASSclrMSK = (1<<gpeMASSalert)-1,
 	gpeMASSalertMSK,
@@ -208,7 +208,9 @@ public:
     U1  *pA, *pB;
     U8	nL, nA, bSW;
     U44	space;
-    U4	retIX;
+    U4	retIX, nTG;
+    gpeALF* pTG;
+
     bool qBLD( void )
     {
 		if( nVER > nBLD )
@@ -218,65 +220,65 @@ public:
 		return false; // mi kérjük elösször
     }
 
-    bool bSUB( void )
+    bool bSUB( gpcMASS& mass )
     {
 		if( !this )
 			return false;
 
-		hd();
+		hd( mass );
 
 		// beljebb lép
 		return bSW&gpeMASSsubMSK;
     }
-    bool bRET( void )
+    bool bRET( gpcMASS& mass )
     {
 		if( !this )
 			return false;
 
-		hd();
+		hd( mass );
 
 		// kijebb lép
 		return bSW&gpeMASSretMSK;
     }
-    bool bENTR( void )
+    bool bENTR( gpcMASS& mass )
     {
 		if( !this )
 			return false;
 
-		hd();
+		hd( mass );
 
 		// új sort kezd a táblázatban
 		return bSW&gpeMASSentrMSK;
     }
-    bool bUNsel( void )
+    bool bUNsel( gpcMASS& mass )
     {
 		if( !this )
 			return false;
 
-		hd();
+		hd( mass );
 
 		// pointerrel ne lehessen kijelölni
 		// pl. rajzolásnál hasznos, meg gombnál
 		return bSW&gpeMASSunselMSK;
     }
 
-	bool bIN( void )
+	bool bIN( gpcMASS& mass )
     {
 		if( !this )
 			return false;
 
 		// input rublika
-		hd();
+		hd( mass );
 
-		return bSW&gpeMASSinMSK;
+		return bSW&gpeMASSinpMSK;
     }
 
-    bool bPASS( void )
+    bool bPASS( gpcMASS& mass )
     {
 		if( !this )
 			return false;
 
-		hd();
+		hd( mass );
 
 		// csillagokat kell írni a betű helyett?
 
@@ -289,8 +291,8 @@ public:
 
 		return bSW&gpeMASSalertMSK;
     }
-    void hd( void );
-    void build( void );
+    void hd( gpcMASS& mass, gpeALF* pTGpub = NULL );
+    void build( gpcMASS& mass );
 
     gpcSRC();
     virtual ~gpcSRC();
@@ -344,20 +346,20 @@ private:
 
 class gpcMASS
 {
-	gpcLAZY	*p_cache,
-			*p_lst;
+	gpcLAZY	*pSRCc,
+			*pSRCl;
 	U4		nLST, xFND, nALLOC, nSP,
 			aSPix[0x100];
 	gpcSRC	*pFND,
 			*apSP[0x100];
 	U44 	aSP44[0x100];
 
-
 	gpcSRC** ppSRC( void )
 	{
-		return (gpcSRC**)(p_cache ? p_cache->p_alloc : NULL);
+		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
+	gpeALF	aTGwip[0x100];
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();
 
@@ -370,7 +372,7 @@ public:
 		if( xFND == xfnd )
 			return pFND;
 
-		U4 iFND = p_lst->tree_fnd(xfnd, nLST);
+		U4 iFND = pSRCl->tree_fnd(xfnd, nLST);
 		if(iFND >= nLST)
 			return NULL;
 

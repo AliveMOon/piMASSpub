@@ -94,7 +94,7 @@ class U82;
 class U84;
 class I44;
 class I84;
-
+class gpcMASS;
 
 #define gpdGT_NoDALEY 1
 #define INVALID_SOCKET  (SOCKET)(~0)
@@ -337,6 +337,7 @@ typedef enum gpeALF: I8
 	gpeALF_GXT = gpdABC('G', 'X', 'T'),
 	gpeALF_HUD = gpdABC('H', 'U', 'D'),
 	gpeALF_INC = gpdABC('I', 'N', 'C'),
+	gpeALF_INP = gpdABC('I', 'N', 'P'),
 	gpeALF_INT = gpdABC('I', 'N', 'T'),
 	gpeALF_JPG = gpdABC('J', 'P', 'G'),
 	gpeALF_JOY = gpdABC('J', 'O', 'Y'),
@@ -362,13 +363,15 @@ typedef enum gpeALF: I8
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
 	gpeALF_REF = gpdABC('R', 'E', 'F'),
 	gpeALF_REN = gpdABC('R', 'E', 'N'),
+	gpeALF_RET = gpdABC('R', 'E', 'T'),
 	gpeALF_RUN = gpdABC('R', 'U', 'N'),
 	gpeALF_SIN = gpdABC('S', 'I', 'N'),
 	gpeALF_SIT = gpdABC('S', 'I', 'T'),
 	gpeALF_SRC = gpdABC('S', 'R', 'C'),
 	gpeALF_STR = gpdABC('S', 'T', 'R'),
-	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
+	gpeALF_SUB = gpdABC('S', 'U', 'B'),
 	gpeALF_SUM = gpdABC('S', 'U', 'M'),
+	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
 	gpeALF_VEC = gpdABC('V', 'E', 'C'),
 	gpeALF_VOX = gpdABC('V', 'O', 'X'),
 	gpeALF_WIN = gpdABC('W', 'I', 'N'),

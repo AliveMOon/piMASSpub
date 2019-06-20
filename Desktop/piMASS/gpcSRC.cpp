@@ -21,6 +21,13 @@ U1* gpf_aALF_init( void )
 }
 gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 {
+	if( p_end < pS )
+	{
+		if( ppS )
+			*ppS = p_end;
+		return gpeALF_zero;
+	}
+
 	if( pS ? !*pS : true )
 	{
 		if( ppS )
@@ -29,10 +36,8 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 		return gpeALF_zero;
 	}
 
-	I8 alf = 0;
+	U8 alf = 0;
 	U1 c;
-	if( p_end < pS )
-		p_end = pS + gpmSTRLEN(pS);
 
 	while( pS < p_end)
 	{
@@ -81,11 +86,6 @@ U8 gpfALFA2STR(char* p_out, I8 d0)
 		d0 = (d0-1)/gpdALF;
 		p_buff--;
 		*p_buff = (d1-d0*gpdALF)+'\`';
-		//d1 = d0%gpdALF;
-		//d1 += '@';
-		//p_buff--;
-		//*p_buff = d1;
-		//d0 /= gpdALF;
 	}
 
 	if( b_minus )
@@ -219,16 +219,16 @@ gpcSRC::~gpcSRC()
 
 gpcMASS::~gpcMASS()
 {
-	gpcSRC** ppSRC = (gpcSRC**)(p_cache ? p_cache->p_alloc : NULL);
+	gpcSRC** ppS = ppSRC();
 
-	if( ppSRC )
-	for( U4 n = p_cache->n_load/sizeof(U14*), i = 0; i < n; i++ )
+	if( ppS )
+	for( U4 n = pSRCc->n_load/sizeof(U14*), i = 0; i < n; i++ )
 	{
-		gpmDEL( ppSRC[i] );
+		gpmDEL( ppS[i] );
 	}
 
-	gpmDEL(p_cache);
-	gpmDEL(p_lst);
+	gpmDEL(pSRCc);
+	gpmDEL(pSRCl);
 }
 
 
@@ -238,7 +238,7 @@ gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 
 	if( nLST )
 	{
-		is = p_lst->tree_fnd(xfnd, nLST);
+		is = pSRCl->tree_fnd(xfnd, nLST);
 		if( is < nLST )
 		{
 			gpcSRC	**ppS = ppSRC(); //,
@@ -268,7 +268,7 @@ gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 		// akkor hozzá fog adni
 	}
 
-	p_lst = p_lst->tree_add(xfnd, nLST);
+	pSRCl = pSRCl->tree_add(xfnd, nLST);
 	n = nLST;
 	if( is >= nLST ) // is és nLST - ha továbbra is egyenlő akkor nem tudta hozzá adni
 		return NULL;
@@ -300,7 +300,7 @@ gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 	xFND = xfnd;
 	pFND = new gpcSRC( *pSRC );
 
-	p_cache = p_cache->lazy_add( &pFND, sizeof(pFND), s = -1);
+	pSRCc = pSRCc->lazy_add( &pFND, sizeof(pFND), s = -1);
 	return pFND;
 }
 
@@ -324,13 +324,13 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		if(!tmp.nL)
 			continue;
 
-		if( tmp.bSUB() )
+		if( tmp.bSUB( *this ) )
 		{
 			mom = nSP;
             nSP++;
             aSP44[nSP].null();
 		}
-		else if( tmp.bENTR() )
+		else if( tmp.bENTR( *this ) )
 		{
 			aSP44[nSP].x = 0;
 			aSP44[nSP].y++;
@@ -344,7 +344,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		tmp.space = aSP44[nSP];
         apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
 
-		while( apSP[nSP]->bRET() )
+		while( apSP[nSP]->bRET( *this ) )
 		{
 			apSP[mom]->space = aSP44[mom];
 			apSP[mom]->retIX = aSPix[nSP];
