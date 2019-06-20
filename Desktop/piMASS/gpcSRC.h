@@ -2,7 +2,24 @@
 #define GPCSRC_H
 
 #include "piMASS.h"
+enum gpeMASSsw:U8
+{
+	gpeMASSzero,
+	gpeMASSsub = 0,
+	gpeMASSret,
+	gpeMASSentr,
+	gpeMASSunsel,
+	gpeMASSin,
+	gpeMASSpass,
 
+	gpeMASSsubMSK = 1<<gpeMASSsub,
+	gpeMASSretMSK = 1<<gpeMASSret,
+	gpeMASSentrMSK = 1<<gpeMASSentr,
+	gpeMASSunselMSK = 1<<gpeMASSunsel,
+	gpeMASSinMSK = 1<<gpeMASSin,
+	gpeMASSpassMSK = 1<<gpeMASSpass,
+
+};
 inline U4 gpfUTF8( const U1* pS, U1** ppS )
 {
 	U4 utf8 = *pS;
@@ -184,7 +201,67 @@ class gpcSRC
 {
 public:
     U1  *pA, *pB;
-    U8	nL, nA;
+    U8	nL, nA, bSW;
+    U44	bld;
+    bool qBLD( void )
+    {
+		if( nVER > nBLD )
+		{
+			return true;
+		}
+		nVER = nBLD+1;
+		return false;
+    }
+
+    bool bSUB( void )
+    {
+		if( nVER != nBLD )
+            build();
+		// beljebb lép
+		return bSW&gpeMASSsubMSK;
+    }
+    bool bRET( void )
+    {
+		if( nVER != nBLD )
+            build();
+		// kijebb lép
+		return bSW&gpeMASSretMSK;
+    }
+    bool bENTR( void )
+    {
+		if( nVER != nBLD )
+            build();
+		// új sort kezd a táblázatban
+		return bSW&gpeMASSentrMSK;
+    }
+    bool bUNsel( void )
+    {
+		if( nVER != nBLD )
+            build();
+		// pointerrel ne lehessen kijelölni
+		// pl. rajzolásnál hasznos, meg gombnál
+		return bSW&gpeMASSunselMSK;
+    }
+
+	bool bIN( void )
+    {
+		if( nVER != nBLD )
+            build();
+
+		return bSW&gpeMASSinMSK;
+    }
+
+    bool bPASS( void )
+    {
+		if( nVER != nBLD )
+            build();
+
+		// csillagokat kell írni a betű helyett?
+
+		return bSW&gpeMASSpassMSK;
+    }
+    void build( void );
+
     gpcSRC();
     virtual ~gpcSRC();
 	U8 iB( void )
@@ -231,22 +308,28 @@ public:
     gpcSRC( gpcSRC& B );
     gpcSRC& operator = ( gpcSRC& B );
 protected:
+    U4	nVER, nBLD;
 private:
 };
 
-class gpcSRCcache
+class gpcMASS
 {
 	gpcLAZY	*p_cache,
-				*p_lst;
-	U4			nLST, xFND, nALLOC;
-	gpcSRC		*pFND;
+			*p_lst;
+	U4		nLST, xFND, nALLOC, nSP,
+			aSPix[0x100];
+	gpcSRC	*pFND,
+			*apSP[0x100];
+	U44 	aSP44[0x100];
+
+
 	gpcSRC** ppSRC( void )
 	{
 		return (gpcSRC**)(p_cache ? p_cache->p_alloc : NULL);
 	}
 public:
-	gpcSRCcache( const U1* pU, U8 nU );
-	virtual ~gpcSRCcache();
+	gpcMASS( const U1* pU, U8 nU );
+	virtual ~gpcMASS();
 
 	gpcSRC* fnd( U4 xfnd )
 	{
@@ -271,7 +354,7 @@ public:
 		return pFND;
 	}
 
-	gpcSRC* add_fnd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
+	gpcSRC* add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
 
 };
 

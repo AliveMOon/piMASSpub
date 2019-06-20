@@ -117,7 +117,7 @@ gpcSRC::~gpcSRC()
 
 
 
-gpcSRCcache::~gpcSRCcache()
+gpcMASS::~gpcMASS()
 {
 	gpcSRC** ppSRC = (gpcSRC**)(p_cache ? p_cache->p_alloc : NULL);
 
@@ -132,7 +132,7 @@ gpcSRCcache::~gpcSRCcache()
 }
 
 
-gpcSRC* gpcSRCcache::add_fnd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
+gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 {
 	n = is = nLST;
 
@@ -204,7 +204,7 @@ gpcSRC* gpcSRCcache::add_fnd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 	return pFND;
 }
 
-gpcSRCcache::gpcSRCcache( const U1* pU, U8 nU )
+gpcMASS::gpcMASS( const U1* pU, U8 nU )
 {
 	gpmCLR;
 	if(!nU)
@@ -215,13 +215,42 @@ gpcSRCcache::gpcSRCcache( const U1* pU, U8 nU )
 	U1	*pS = (U1*)pU,
 		*pSe = pS+nU;
 	gpcSRC tmp;
-	U4 is, n, xadd = 0;
+	U4 is, n, xadd = 1, id, mom = 0;
+	nSP = 1;
+
 	while( pS < pSe ? *pS : false )
 	{
 		tmp.reset( pS, pSe, &pS );
 		if(!tmp.nL)
 			continue;
-		add_fnd( &tmp, xadd, is, n );
+
+		if( tmp.bSUB() )
+		{
+			mom = nSP;
+            nSP++;
+            aSP44[nSP].null();
+		}
+		else if( tmp.bENTR() )
+		{
+			aSP44[nSP].x = 0;
+			aSP44[nSP].y++;
+			if( aSP44[mom].w < aSP44[nSP].y )
+				aSP44[mom].w = aSP44[nSP].y;
+		} else {
+			aSP44[nSP].x++;
+			if( aSP44[mom].z < aSP44[nSP].x )
+				aSP44[mom].z = aSP44[nSP].x;
+		}
+		tmp.bld = aSP44[nSP];
+        apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
+
+		if( apSP[nSP]->bRET() )
+		{
+			apSP[mom].bld.z = aSPix[nSP];
+			mom--;
+			nSP--;
+		}
+
 		xadd++;
 
 	}
