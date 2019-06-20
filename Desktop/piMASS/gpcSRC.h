@@ -8,8 +8,10 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS )
 	U4 utf8 = *pS;
 	if( !(utf8&0x80) )
 	{
-		if( ppS )
-			(*ppS) = ((U1*)pS) + (!!utf8);
+		if( !ppS )
+			return utf8;
+
+		*ppS = ((U1*)pS) + (!!utf8);
 		return utf8;
 	}
 
@@ -56,7 +58,7 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS )
 	*ppS = (U1*)pS;
 	return utf8;
 }
-inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
+inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 {
 	nLEN = 0;
 	if( pU ? !*pU : true )
@@ -84,10 +86,12 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
 	if( nVAN == nLEN )
 	{
 		//van-ban nincsen UTF8 akkor turbó
-		for( U8 v = 0; v < nLEN; v++ )
+		abVAN[pVAN[0]] = true;
+		for( U8 v = 1; v < nLEN; v++ )
 		{
 			abVAN[pVAN[v]] = true;
 		}
+
 		while( *pS )
 		{
 			if( *pS >= 0x80 )
@@ -97,9 +101,13 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
 
 			pS++;
 		}
+
 		nLEN = pS-pU;
 		if( !*pS )
 			return nLEN;
+
+		if( bDBG )
+			nLEN = pS-pU;
 
 	} else {
 		U1	*pV = (U1*)pVAN,
@@ -118,14 +126,15 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
 
 		nLEN = 0;
 	}
+	U1* pSS;
 	while( *pS )
 	{
-		u4 = gpfUTF8( pS, &pS );
+		u4 = gpfUTF8( pS, &pSS );
 		if( u4 < 0x80 )
 		{
 			if( abVAN[u4] )
-					break;
-
+				break;
+			pS++;
 			nLEN++;
 			continue;
 		}
@@ -133,6 +142,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN )
 		if( pTREE->tree_fnd(u4, nT) < nT )
 			break;
 
+		pS = pSS;
 		nLEN++;
 	}
 

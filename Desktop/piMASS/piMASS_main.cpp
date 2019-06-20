@@ -123,13 +123,15 @@ int main( int nA, char *apA[] )
 {
 	if( nA > 0 )
 	{
-		gppEXEfile = strrchr( strcpy( gpsEXEpath, apA[0] ), '/' );
+		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, apA[0] );
+
+		/*strrchr( strcpy( gpsEXEpath, apA[0] ), '/' );
 		if( !gppEXEfile)
 			gppEXEfile = gpsEXEpath;
 		else if( *gppEXEfile == '/' )
 			gppEXEfile++;
 		strcpy( gpsEXEname, gppEXEfile );
-		*gppEXEfile = 0;
+		*gppEXEfile = 0;*/
 
 		cout << "Start in:" << gpsEXEpath << endl;
 		cout << "Exe is:" << gpsEXEname << endl;
@@ -144,13 +146,15 @@ int main( int nA, char *apA[] )
 			cout << apA[i] << endl;
 			if( strstr( apA[i], ".mass" ) )
 			{
-				strcpy( gpsMASSpath, apA[i] );
+				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, apA[i] );
+
+				/*strcpy( gpsMASSpath, apA[i] );
 				gppMASSfile = strrchr( gpsMASSpath, '/' );
 				if( !gppMASSfile )
 					gppMASSfile = gpsMASSpath;
 				else if( *gppMASSfile == '/' )
 					gppMASSfile++;
-				strcpy( gpsMASSname, gppMASSfile );
+				strcpy( gpsMASSname, gppMASSfile );*/
 				cout << "MASS is:" << gpsMASSname << endl;
 				continue;
 			}
@@ -160,6 +164,7 @@ int main( int nA, char *apA[] )
 		{
 			strcpy( gpsMASSname, "pi.mass" );
 		}
+		strcpy( gppMASSfile, gpsMASSname );
 		U8 s;
 		gpMASS.lazy_read( gpsMASSpath, s = -1, -1 );
 

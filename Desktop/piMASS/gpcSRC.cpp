@@ -8,23 +8,35 @@ gpcSRC::gpcSRC()
 gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS )
 {
 	gpmCLR;
-	U8 anLEN[4];
-	pA = (pS += gpfVAN( pS, (U1*)"\a", anLEN[0] ));
-	if( *pA == '\a' )									//...A
+	if( pS ? !*pS : true )
 	{
-		pA++;											//...aA
-		pB = pA+gpfVAN( pA, (U1*)"\a", anLEN[0] );		//...aA..B
-		if( *pB == '\a' )
-		{
-			pS = pB+1;									//...aA..BS
-			pS += gpfVAN( pS, (U1*)"\a", anLEN[1] );	//...aA..B... . .   . . ...S
-		} else
-			pS = pB;
-	}
-	nL = pS-pA;
-	if( ppS )
-		*ppS = pS;
+		if( !ppS )
+		return *this;
 
+		*ppS = pS;
+		return *this;
+	}
+	U8 anLEN[4];
+	//pS += gpfVAN( pS, (U1*)"\a", anLEN[0] );
+	pA = pS;
+	if( *pA == '\a' )									//...A\a
+		pA++;											//...\aA
+	pS = (pB = pA + gpfVAN( pA, (U1*)"\a", anLEN[0] ));	//...\aA..B
+	if( *pB == '\a' )
+		pS++;											//...\aA..B\aS
+	nL = gpfVAN( pS, (U1*)"\a", anLEN[1] );
+	if( !pS[nL] )
+		pS+=nL;											//...\aA..B\a... . .   . . ...S0
+	else if( pS[nL] != '\a' )
+		pS += gpfVAN( pS, (U1*)"\a", anLEN[1], true );	//...\aA..B\a... . .   . . ...S?
+	else
+		pS+=nL;											//...\aA..B\a... . .   . . ...S\a
+
+	nL = pS-pA;
+	if( !ppS )
+		return *this;
+
+	*ppS = pS;
 	return *this;
 }
 
@@ -191,6 +203,7 @@ gpcSRC* gpcSRCcache::add_fnd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 	p_cache = p_cache->lazy_add( &pFND, sizeof(pFND), s = -1);
 	return pFND;
 }
+
 gpcSRCcache::gpcSRCcache( const U1* pU, U8 nU )
 {
 	gpmCLR;
@@ -202,13 +215,14 @@ gpcSRCcache::gpcSRCcache( const U1* pU, U8 nU )
 	U1	*pS = (U1*)pU,
 		*pSe = pS+nU;
 	gpcSRC tmp;
-	U4 is, n, xfnd = 0;
+	U4 is, n, xadd = 0;
 	while( pS < pSe ? *pS : false )
 	{
 		tmp.reset( pS, pSe, &pS );
 		if(!tmp.nL)
 			continue;
-		add_fnd( &tmp, xfnd, is, n );
-		xfnd = n;
+		add_fnd( &tmp, xadd, is, n );
+		xadd++;
+
 	}
 }

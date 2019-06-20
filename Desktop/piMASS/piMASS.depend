@@ -1,9 +1,9 @@
 # depslib dependency file v1.0
-1560905755 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
+1561022110 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
 	"piMASS.h"
 	"gpcSRC.h"
 
-1560886184 /home/pi/Desktop/piMASS/piMASS.h
+1561021287 /home/pi/Desktop/piMASS/piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -406,10 +406,10 @@
 
 1560813998 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/gpcSRC.h
 
-1560908733 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
+1561024143 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
 	"gpcSRC.h"
 
-1560917903 /home/pi/Desktop/piMASS/gpcSRC.h
+1561026644 /home/pi/Desktop/piMASS/gpcSRC.h
 	"piMASS.h"
 
 1560880111 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp

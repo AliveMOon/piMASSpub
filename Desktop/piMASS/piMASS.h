@@ -735,6 +735,21 @@ bool inline gpfMKDR( char* p_buff, const char* p_new )
 	}
 	return p_last == p_first;
 }
+inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
+{
+	I1* pC = strrchr( (I1*)pS, c );
+
+	if( !pC )
+		strcpy( (p2P+=sprintf(p2P,".%c",c)), pS ); // nincsen path
+	else {
+		pC++;
+		p2P = strcpy( p2P, pS ) + (pC-pS);
+	}
+
+	strcpy( p2F, p2P );
+	*p2P = 0;
+	return p2P;
+}
 inline void* gp_memcmp( void* pA, void* pB, U8 n )
 {
 	if( !pA || !pB )
