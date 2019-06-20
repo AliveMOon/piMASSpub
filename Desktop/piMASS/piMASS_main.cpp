@@ -121,6 +121,8 @@ gpcLAZY gpMASS;
 
 int main( int nA, char *apA[] )
 {
+	gpf_aALF_init();
+
 	if( nA > 0 )
 	{
 		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, apA[0] );

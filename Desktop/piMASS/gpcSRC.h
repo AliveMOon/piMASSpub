@@ -12,7 +12,7 @@ enum gpeMASSsw:U8
 	gpeMASSin,
 	gpeMASSpass,
 
-	gpeMASSclr,
+	gpeMASSalert,
 
 	gpeMASSsubMSK = 1<<gpeMASSsub,
 	gpeMASSretMSK = 1<<gpeMASSret,
@@ -20,8 +20,8 @@ enum gpeMASSsw:U8
 	gpeMASSunselMSK = 1<<gpeMASSunsel,
 	gpeMASSinMSK = 1<<gpeMASSin,
 	gpeMASSpassMSK = 1<<gpeMASSpass,
-
-	gpeMASSclrMSK = (1<<gpeMASSclr)-1,
+	gpeMASSclrMSK = (1<<gpeMASSalert)-1,
+	gpeMASSalertMSK,
 
 };
 inline U4 gpfUTF8( const U1* pS, U1** ppS )
@@ -88,7 +88,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 	U1 *pS = (U1*)pU;
 	if( !pVAN )
 	{
-		// strlen!!
+		// gpmSTRLEN!!
 		while( *pS )
 		{
 			if( (*pS&0xc0) != 0x80 )
@@ -212,11 +212,10 @@ public:
     bool qBLD( void )
     {
 		if( nVER > nBLD )
-		{
-			return true;
-		}
-		nVER = nBLD+1;
-		return false;
+			return true;	// már kérte valaki
+
+		nVER = max( nHD, nBLD )+1;
+		return false; // mi kérjük elösször
     }
 
     bool bSUB( void )
@@ -224,8 +223,8 @@ public:
 		if( !this )
 			return false;
 
-		if( nVER != nBLD )
-            build();
+		hd();
+
 		// beljebb lép
 		return bSW&gpeMASSsubMSK;
     }
@@ -234,8 +233,8 @@ public:
 		if( !this )
 			return false;
 
-		if( nVER != nBLD )
-            build();
+		hd();
+
 		// kijebb lép
 		return bSW&gpeMASSretMSK;
     }
@@ -244,8 +243,8 @@ public:
 		if( !this )
 			return false;
 
-		if( nVER != nBLD )
-            build();
+		hd();
+
 		// új sort kezd a táblázatban
 		return bSW&gpeMASSentrMSK;
     }
@@ -254,8 +253,8 @@ public:
 		if( !this )
 			return false;
 
-		if( nVER != nBLD )
-            build();
+		hd();
+
 		// pointerrel ne lehessen kijelölni
 		// pl. rajzolásnál hasznos, meg gombnál
 		return bSW&gpeMASSunselMSK;
@@ -267,8 +266,7 @@ public:
 			return false;
 
 		// input rublika
-		if( nVER != nBLD )
-            build();
+		hd();
 
 		return bSW&gpeMASSinMSK;
     }
@@ -278,13 +276,20 @@ public:
 		if( !this )
 			return false;
 
-		if( nVER != nBLD )
-            build();
+		hd();
 
 		// csillagokat kell írni a betű helyett?
 
 		return bSW&gpeMASSpassMSK;
     }
+    bool bALERT( void )
+    {
+		if( !this )
+			return false;
+
+		return bSW&gpeMASSalertMSK;
+    }
+    void hd( void );
     void build( void );
 
     gpcSRC();
@@ -333,7 +338,7 @@ public:
     gpcSRC( gpcSRC& B );
     gpcSRC& operator = ( gpcSRC& B );
 protected:
-    U4	nVER, nBLD;
+    U4	nVER, nBLD, nHD;
 private:
 };
 

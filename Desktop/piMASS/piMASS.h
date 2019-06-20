@@ -114,7 +114,7 @@ class I84;
 #define COSSIN45 0.70710678118654752440084436210485
 #define gpdSQRT2 1.4142135623730950488016887242097
 #define gpdSQRT3 1.7320508075688772935274463415059f
-#define gpdNINCS	strspn
+#define gpmNINCS( s, v )	strspn( (char*)(s), (char*)(v) )
 #define gpdVAN		strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
 #define gpmCLR	memset( this, 0, sizeof(*this) )
@@ -689,7 +689,7 @@ typedef enum gpeALF: I8
 } GPT_ALFA;
 
 U1*		gpf_aALF_init(void);
-gpeALF	gpfSTR2ALF( char* p_str, char* p_end, char** pp_str = NULL );
+gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
 int inline gpfACE( const I1* p_file, I4 mode )
 {
 	//	00	Existence only
@@ -727,7 +727,7 @@ bool inline gpfMKDR( char* p_buff, const char* p_new )
 	while( p_last < p_first )
 	{
 		*p_last = '\\';
-		p_last += strlen( p_last );
+		p_last += gpmSTRLEN( p_last );
 		if( gpfACE( p_buff, 0 ) > -1 )
 			break;
 		mi = mkdir( p_buff, S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH );

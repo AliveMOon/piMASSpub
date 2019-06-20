@@ -1,5 +1,102 @@
 #include "gpcSRC.h"
+U1 gpaALFadd[0x100];
+U1* gpf_aALF_init( void )
+{
+	for( int i = 0; i < 0x100; i++ )
+	{
+		if( i >= 'A' && i <= 'Z')
+		{
+			// egész biztos kisbetüt többet használnak
+			gpaALFadd[i] = 'A'-1;//GPD_UP;
+			continue;
+		}
+		else if( i >= 'a' && i <= 'z' )
+		{
+			gpaALFadd[i] = 'a'-1;
+			continue;
+		}
+		gpaALFadd[i] = 0;
+	}
+	return gpaALFadd;
+}
+gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
+{
+	if( pS ? !*pS : true )
+	{
+		if( ppS )
+			*ppS = pS;
 
+		return gpeALF_zero;
+	}
+
+	I8 alf = 0;
+	U1 c;
+	if( p_end < pS )
+		p_end = pS + gpmSTRLEN(pS);
+
+	while( pS < p_end)
+	{
+		c = *(U1*)pS;
+		if( !gpaALFadd[c] )
+			break;
+		c -= gpaALFadd[c];
+
+		alf *= gpdALF;
+		alf += c;
+
+		pS++;
+	}
+
+	if (ppS)
+		*ppS = pS;
+
+	return (gpeALF)alf;
+}
+
+U8 gpfALFA2STR(char* p_out, I8 d0)
+{
+	if( !p_out )
+		return 0;
+	if( !d0 )
+	{
+		*p_out = 0;
+		return 0;
+	}
+	char	lx_s_buff[0x40],
+            *p_buff = lx_s_buff + 0x3f,
+            *p_end = p_buff;
+
+	*p_end = 0;
+	bool b_minus = false;
+	if( d0 < 0 )
+	{
+		b_minus = true;
+		d0 *= -1;
+	}
+
+	I8 d1;
+	while( d0 )
+	{
+		d1 = d0;
+		d0 = (d0-1)/gpdALF;
+		p_buff--;
+		*p_buff = (d1-d0*gpdALF)+'\`';
+		//d1 = d0%gpdALF;
+		//d1 += '@';
+		//p_buff--;
+		//*p_buff = d1;
+		//d0 /= gpdALF;
+	}
+
+	if( b_minus )
+	{
+		p_buff--;
+		*p_buff = '-';
+	}
+	U2 n = p_end-p_buff;
+	memcpy( p_out, p_buff, n+1 );
+	return n;
+}
 gpcSRC::gpcSRC()
 {
     //ctor
@@ -32,6 +129,7 @@ gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS )
 	else
 		pS+=nL;											//...\aA..B\a... . .   . . ...S\a
 
+
 	nL = pS-pA;
 	if( !ppS )
 		return *this;
@@ -44,6 +142,9 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 {
 	if( this == &B )
 		return *this; // handle self assignment
+	//assignment operator
+
+	qBLD();
 
 	nL = &B ? B.nL : 0;
 	if( !nL )	// B kampec;
@@ -55,7 +156,6 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 	U8 i = B.iB();
 	// fontos, hogy itt legyenek, mielött a pA-val kezdünk valamit
 
-	//assignment operator
 	if( nA < (nL+2) )
 	{
 		// ha nA == 0 volt azt jelenti nem foglalva volt, ha nem valahonnan kölcsönözve
