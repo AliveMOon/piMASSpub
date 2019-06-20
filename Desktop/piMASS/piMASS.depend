@@ -409,7 +409,7 @@
 1561045648 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
 	"gpcSRC.h"
 
-1561045648 /home/pi/Desktop/piMASS/gpcSRC.h
+1561048252 /home/pi/Desktop/piMASS/gpcSRC.h
 	"piMASS.h"
 
 1560880111 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
@@ -423,4 +423,47 @@
 
 1561045649 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
 	"gpcSRC.h"
+
+1561030723 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
+	"gpcND.h"
+
+1561045730 /home/pi/Desktop/piMASS/include/gpcND.h
+	"gpcSRC.h"
+
+1561048252 /home/pi/Desktop/piMASS//gpcSRC.h
+	"piMASS.h"
+
+1561021287 /home/pi/Desktop/piMASS//piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<raspicam/raspicam.h>
+	<unistd.h>
+	<inttypes.h>
+	<sys/stat.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<stdarg.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<netdb.h>
+	<SDL.h>
+	<SDL2/SDL_image.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<GL/glew.h>
 

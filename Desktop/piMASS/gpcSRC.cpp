@@ -241,12 +241,13 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 			if( aSP44[mom].z < aSP44[nSP].x )
 				aSP44[mom].z = aSP44[nSP].x;
 		}
-		tmp.bld = aSP44[nSP];
+		tmp.space = aSP44[nSP];
         apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
 
-		if( apSP[nSP]->bRET() )
+		while( apSP[nSP]->bRET() )
 		{
-			apSP[mom].bld.z = aSPix[nSP];
+			apSP[mom]->space = aSP44[mom];
+			apSP[mom]->retIX = aSPix[nSP];
 			mom--;
 			nSP--;
 		}

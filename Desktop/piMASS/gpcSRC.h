@@ -202,7 +202,8 @@ class gpcSRC
 public:
     U1  *pA, *pB;
     U8	nL, nA, bSW;
-    U44	bld;
+    U44	space;
+    U4	retIX;
     bool qBLD( void )
     {
 		if( nVER > nBLD )
@@ -215,6 +216,9 @@ public:
 
     bool bSUB( void )
     {
+		if( !this )
+			return false;
+
 		if( nVER != nBLD )
             build();
 		// beljebb lép
@@ -222,6 +226,9 @@ public:
     }
     bool bRET( void )
     {
+		if( !this )
+			return false;
+
 		if( nVER != nBLD )
             build();
 		// kijebb lép
@@ -229,6 +236,9 @@ public:
     }
     bool bENTR( void )
     {
+		if( !this )
+			return false;
+
 		if( nVER != nBLD )
             build();
 		// új sort kezd a táblázatban
@@ -236,6 +246,9 @@ public:
     }
     bool bUNsel( void )
     {
+		if( !this )
+			return false;
+
 		if( nVER != nBLD )
             build();
 		// pointerrel ne lehessen kijelölni
@@ -245,6 +258,10 @@ public:
 
 	bool bIN( void )
     {
+		if( !this )
+			return false;
+
+		// input rublika
 		if( nVER != nBLD )
             build();
 
@@ -253,6 +270,9 @@ public:
 
     bool bPASS( void )
     {
+		if( !this )
+			return false;
+
 		if( nVER != nBLD )
             build();
 
