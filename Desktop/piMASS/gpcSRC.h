@@ -11,8 +11,14 @@ enum gpeMASSsw:U8
 	gpeMASSunsel,
 	gpeMASSinp,
 	gpeMASSpass,
+	gpeMASSoff,
 
 	gpeMASSalert,
+	gpeMASSprg,
+	gpeMASSgpu,
+	gpeMASScrsL,
+	gpeMASScrsR,
+
 
 	gpeMASSsubMSK = 1<<gpeMASSsub,
 	gpeMASSretMSK = 1<<gpeMASSret,
@@ -20,8 +26,13 @@ enum gpeMASSsw:U8
 	gpeMASSunselMSK = 1<<gpeMASSunsel,
 	gpeMASSinpMSK = 1<<gpeMASSinp,
 	gpeMASSpassMSK = 1<<gpeMASSpass,
+	gpeMASSoffMSK = 1<<gpeMASSoff,
 	gpeMASSclrMSK = (1<<gpeMASSalert)-1,
 	gpeMASSalertMSK,
+	gpeMASSprgMSK = 1<<gpeMASSprg,
+	gpeMASSgpuMSK = 1<<gpeMASSgpu,
+	gpeMASScrslMSK = 1<<gpeMASScrsL,
+	gpeMASScrsrMSK = 1<<gpeMASScrsR,
 
 };
 inline U4 gpfUTF8( const U1* pS, U1** ppS )

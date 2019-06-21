@@ -89,6 +89,14 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			case gpeALF_PASS:
 				bSW |= gpeMASSpassMSK;
 				continue;
+			case gpeALF_OFF: // keret kikapcsolás
+				bSW |= gpeMASSoffMSK;
+				continue;
+			case gpeALF_CRSL: // bal oldali cursor jele				bSW |= gpeMASScrslMSK;
+				continue;
+			case gpeALF_CRSR: // jobb oldali cursor jele
+				bSW |= gpeMASScrsrMSK;
+				continue;
 		}
 	}
 
