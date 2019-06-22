@@ -107,7 +107,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			if( pTGdie[i] < gpeALF_A )
 				continue;
 			// kiszedni a teg listából az SRC-t
-			mass.TGsub( pTGdie[i], IX );
+			mass.tag_sub( pTGdie[i], IX );
 		}
 		gpmDELary(pTGdie);
 	}
@@ -122,7 +122,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				continue;
 			pTG[nTG] = pTGpub[i];
 			// betenni a teg listába az SRC-t
-			mass.TGadd( pTG[nTG], IX );
+			mass.tag_add( pTG[nTG], IX );
 			nTG++;
 		}
 		if( !nTG )

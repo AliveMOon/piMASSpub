@@ -16,9 +16,9 @@ protected:
 	gpeALF	alfND;
 	gpcND	*pFND;
 
-	void** ppND( void )
+	gpcND** ppND( void )
 	{
-		return (void**)( pND ? pND->p_alloc : NULL );
+		return (gpcND**)( pND ? pND->p_alloc : NULL );
 	}
 public:
 	gpcND* fnd( gpeALF alf )
@@ -39,7 +39,7 @@ public:
 			return pFND;
 
 		pFND = ppS[iFND];
-		alfND = xfnd;
+		alfND = alf;
 
 		return pFND;
 	}

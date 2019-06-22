@@ -136,8 +136,8 @@ class gpcMASS;
 
 #define gpmSTRLEN( s )			((s)? strlen((char*)(s)) : 0)
 
-#define gpmDEL( p ){ if( p ){ delete p; p = NULL; } }
-#define gpmDELary( p ){ if( p ){ delete[] p; p = NULL; } }
+#define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
+#define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
 
 #define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
 #define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = NULL; } }
