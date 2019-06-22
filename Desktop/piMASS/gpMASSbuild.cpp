@@ -14,7 +14,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	pTG = NULL;
 	nTG = 0;
 
-	while( pB-pS )
+	while( pB-pS )	// #TAG
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pB <= pS )
@@ -104,10 +104,10 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	{
 		for( U4 i = 0; i < nTGdie; i++ )
 		{
-			if( pTGdie[i] < gpeALF_zero )
+			if( pTGdie[i] < gpeALF_A )
 				continue;
 			// kiszedni a teg listából az SRC-t
-			mass.tg_sub( pTGdie[i], IX );
+			mass.TGsub( pTGdie[i], IX );
 		}
 		gpmDELary(pTGdie);
 	}
@@ -118,11 +118,11 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		nTGdie = nTG;
 		for( U4 i = nTG = 0; i < nTGdie; i++ )
 		{
-			if( pTGpub[i] < gpeALF_zero )
+			if( pTGpub[i] < gpeALF_A )
 				continue;
 			pTG[nTG] = pTGpub[i];
 			// betenni a teg listába az SRC-t
-
+			mass.TGadd( pTG[nTG], IX );
 			nTG++;
 		}
 		if( !nTG )

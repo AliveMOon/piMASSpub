@@ -355,9 +355,104 @@ protected:
 private:
 };
 
+class gpcMOM
+{
+
+	gpcLAZY	**ppKID,
+			*pLST, *pFND;
+	U8	nLST, nALLOC,
+		idFND, iFND;
+
+	gpcLAZY** ppKID( void )
+	{
+		return (gpcLAZY**)(ppKID ? ppKID->p_alloc : NULL);
+	}
+	gpcMOM( I8 id )
+	{
+		gpmCLR;
+		I8 n = 0;
+		pLST = pLST->tree_add( id, n );
+
+	}
+public:
+	gpcMOM( void )
+	{
+		gpmCLR;
+	}
+
+	gpcLAZY* pGET( I8 ix )
+	{
+		if( ix >= nLST )
+			return NULL;
+		gpcLAZY** ppK = ppKID();
+		return ppK ? ppK[ix] : NULL;
+	}
+	gpcLAZY** ppGET( I8 ix )
+	{
+		if( ix >= nLST )
+			return NULL;
+		gpcLAZY** ppK = ppKID();
+		return ppK ? ppK[ix]+ix : NULL;
+	}
+	gpcLAZY* fnd( I8 idKID )
+	{
+		if(!this)
+			return NULL;
+
+		if( nLST )
+		if( idFND == idKID )
+			return pFND;
+
+		iFND = pLST->tree_fnd(idKID, nLST);
+		if(iFND >= nLST)
+			return NULL;
+
+		gpcLAZY* pKID = get( iFND );
+		if( !pKID )
+			return NULL;
+
+		idFND = idKID;
+		return pFND = pKID;
+	}
+
+	gpcMOM* add( I8 id, U8& is, U8& n )
+	{
+		if( !id )
+		{
+			n = this ? nLST: 0;
+			id = n;
+			return this;
+		}
+		if( !this )
+		{
+			gpcMOM* pMOM = new gpcMOM(id);
+			return pMOM;
+		}
+
+		is = pLST->tree_fnd( id, nLST );
+		if( is < nLST )
+		{
+			n = nLST;
+			return get( is );
+		}
+
+		pLST = pLST->tree_add(id, nLST);
+		n = nLST;
+		if( is >= nLST ) // is és nLST - ha továbbra is egyenlő akkor nem tudta hozzá adni
+			return this;
+
+		if( nALLOC > is )
+			return this;
+
+		nALLOC = nLST;
+		ppKID = ppKID->lazy_add( NULL, sizeof(*pFND), U8 s = -1);
+		return this;
+	}
+}
 
 class gpcMASS
 {
+	gpcMOM	*pTG;
 	gpcLAZY	*pSRCc,
 			*pLST;
 	U4		nLST, xFND, nALLOC, nSP,
@@ -371,6 +466,46 @@ class gpcMASS
 		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
+	void TGadd( gpeALF tg, U4 ix )
+	{
+		I8 i, n;
+        pTG = pTG->add( tg, i, n );
+        I8 i = pTG->fnd( tg );
+		gpcLAZY* pLZY = pTG->pGET( i );
+		if( !pLZY )
+		{
+			*pTG->ppGET( i ) = pLZY = new gpcLAZY;
+		}
+		pLZY->lazy_add( (U4*)ix, sizeof(U4), U8 s = -1, -1 );
+	}
+	void TGsub( gpeALF tg, U4 ix )
+	{
+		if( !pTG )
+			return;
+		I8 i = pTG->fnd( tg );
+		gpcLAZY* pLZY = pTG->pGET( i );
+		if( !pLZY )
+			return;
+
+		I8	*pIX = (I8*)pLZY->p_alloc,
+			nIX = pLZY->n_load/sizeof(ix);
+		for( U8 i = 0; i < nIX; i++ )
+		{
+			if( pIX[i] != ix )
+				continue;
+			nIX--;
+			if( !nIX )
+				continue;
+
+			pIX[i] = pIX[nIX];
+		}
+		if( !nIX )
+		{
+			gpmDEL( pTG->ppGET( i ) );
+			return;
+		}
+		pLZY->n_load = nIX*sizeof(ix);
+	}
 	gpeALF	aTGwip[0x100];
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();

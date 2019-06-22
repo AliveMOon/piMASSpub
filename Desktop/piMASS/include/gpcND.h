@@ -5,20 +5,44 @@
 
 class gpcND
 {
+public:
+	gpeALF	alfIS;
+	U8		typeIS;
+protected:
 	gpcLAZY	*pND,
 			*pLST;
 	U4		nLST, nALLOC;
-	U8		alf;
-	void	*pFND;
+
+	gpeALF	alfND;
+	gpcND	*pFND;
 
 	void** ppND( void )
 	{
 		return (void**)( pND ? pND->p_alloc : NULL );
 	}
 public:
+	gpcND* fnd( gpeALF alf )
+	{
+		if(!this)
+			return NULL;
 
+		if( nLST )
+		if( alfND == alf )
+			return pFND;
 
+		U8 iFND = pLST->tree_fnd((U8)alf, nLST);
+		if(iFND >= nLST)
+			return NULL;
 
+		gpcND** ppS = ppND();
+		if( ppS ? !ppS[iFND] : true )
+			return pFND;
+
+		pFND = ppS[iFND];
+		alfND = xfnd;
+
+		return pFND;
+	}
 
 	gpcND();
 	virtual ~gpcND();

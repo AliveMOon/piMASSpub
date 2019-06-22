@@ -951,6 +951,11 @@ public:
     {
         x = y = z = w = abs(b);
     }
+    U8x4& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
     U8 tree_add( U8 u8, U8 n_t )
 	{
 		// x érték, y mama, z kicsiegyenlõ, w nagyobb
@@ -1058,6 +1063,11 @@ public:
     {
         x = y = z = w = b;
     }
+    I8x4& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
     I8 tree_add( gpeALF alf, I8 n_t )
     {
 		return tree_add( (I8)alf, n_t );
@@ -1639,8 +1649,12 @@ szasz:
 	}
 	U4 tree_fnd( U4 id, U4& n );
 	gpcLAZY* tree_add( U4 id, U4& n );
-	U8 tree_fnd8( U8 id, U8& n );
-	gpcLAZY* tree_add8( U8 id, U8& n );
+	U8 tree_fnd( U8 id, U8& n );
+	gpcLAZY* tree_add( U8 id, U8& n );
+	I8 tree_fnd( I8 id, I8& n );
+	gpcLAZY* tree_add( I8 id, I8& n );
+
+	//U8 gpcLAZY::tree_fnd( U8 id, U8& n )
 };
 
 #endif // piMASS_H_INCLUDED

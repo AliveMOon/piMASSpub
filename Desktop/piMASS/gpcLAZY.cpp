@@ -75,41 +75,41 @@ gpcLAZY* gpcLAZY::tree_add( U8 id, U8& n )
 	n_load = s*sizeof(*p_u84);
 	return this;
 }
-/*U8 gpcLAZY::tree_fnd8( U8 id, U8& n )
+
+I8 gpcLAZY::tree_fnd( I8 id, I8& n )
 {
 	if( !this )
 		return n = 0;
 
 	n = n_load/sizeof(U8x4);
-	U8x4* p_u84 = (U8x4*)p_alloc;
-	U4 fnd = p_u84->tree_fnd( id, n );
+	I8x4* p_i84 = (I8x4*)p_alloc;
+	I8 fnd = p_i84->tree_fnd( id, n );
 
-	if( p_u84[fnd].x == id )
+	if( p_i84[fnd].x == id )
 		return fnd;
 
 	return n;
 }
-gpcLAZY* gpcLAZY::tree_add8( U8 id, U8& n )
+gpcLAZY* gpcLAZY::tree_add( I8 id, I8& n )
 {
 	U8 s = -1;
 	if( !this )
 	{
-		gpcLAZY* p_this = lazy_add( NULL, sizeof(U8x4), s, 8 );
+		gpcLAZY* p_this = lazy_add( NULL, sizeof(I8x4), s = -1, 8 );
 		if( !p_this )
 			return NULL;
 
 		n = 1;
-		((U8x4*)p_this->p_alloc)->null().x = id;
+		((I8x4*)p_this->p_alloc)->null().x = id;
 		return p_this;
 	}
-	lazy_add( NULL, sizeof(U8x4), s );
-	U8x4* p_u84 = (U8x4*)p_alloc;
-	n = s/sizeof(*p_u84);
-	s = p_u84->tree_add( id, n );
+	lazy_add( NULL, sizeof(I8x4), s );
+	I8x4* p_i84 = (I8x4*)p_alloc;
+	n = s/sizeof(*p_i84);
+	s = p_i84->tree_add( id, n );
 	if( s == n )
 		return this;
-
 	n = s;
-	n_load = s*sizeof(*p_u84);
+	n_load = s*sizeof(*p_i84);
 	return this;
-}*/
+}
