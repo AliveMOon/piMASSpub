@@ -1,5 +1,5 @@
 #include "gpcSRC.h"
-U44& U44::src2date( U1* p_str, U1* p_end, U1** pp_str )
+U4x4& U4x4::src2date( U1* p_str, U1* p_end, U1** pp_str )
 {
 	gpmCLR;
 	U1 i = 0;

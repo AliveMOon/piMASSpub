@@ -88,12 +88,12 @@ class float3;
 class float4;
 class float4x4;
 class double4;
-class U24;
-class U44;
-class U82;
-class U84;
-class I44;
-class I84;
+class U2x4;
+class U4x4;
+class U8x2;
+class U8x4;
+class I4x4;
+class I8x4;
 class gpcMASS;
 
 #define gpdGT_NoDALEY 1
@@ -792,7 +792,7 @@ inline void* gp_memcmp( void* pA, void* pB, U8 n )
 	return (void*)(pAu1+n);
 }
 
-class U14
+class U1x4
 {
 public:
     union
@@ -810,19 +810,19 @@ public:
             U4 u4;
         };
     };
-    U14(){};
-    U14( U4 b )
+    U1x4(){};
+    U1x4( U4 b )
     {
         u4 = b;
     }
-    U14( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 )
+    U1x4( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
-    U14& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
+    U1x4& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
 };
 
-class U44
+class U4x4
 {
 public:
     union
@@ -836,25 +836,25 @@ public:
             U4 aXYZW[4];
         };
     };
-    U44(){};
-    U44& null( void )
+    U4x4(){};
+    U4x4& null( void )
 	{
 		gpmCLR;
 		return *this;
 	}
-    U44( U4 _x, U4 _y = 0, U4 _z = 0, U4 _w = 0 )
+    U4x4( U4 _x, U4 _y = 0, U4 _z = 0, U4 _w = 0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
-    U44& operator = ( U4 b )
+    U4x4& operator = ( U4 b )
     {
         x = y = z = w = b;
     }
-    U44& operator = ( I4 b )
+    U4x4& operator = ( I4 b )
     {
         x = y = z = w = abs(b);
     }
-    U44& src2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
+    U4x4& src2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
 
 	U4 tree_add( U4 u4, U4 n_t )
 	{
@@ -919,7 +919,7 @@ public:
 		return n_t;
 	}
 };
-class U84
+class U8x4
 {
 public:
     union
@@ -938,30 +938,196 @@ public:
             U8 mom, up, nx;
         };
     };
-    U84(){};
-    U84( U8 _x, U8 _y = 0, U8 _z = 0, U8 _w = 0 )
+    U8x4(){};
+    U8x4( U8 _x, U8 _y = 0, U8 _z = 0, U8 _w = 0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
-    U84& operator = ( U8 b )
+    U8x4& operator = ( U8 b )
     {
         x = y = z = w = b;
     }
-    U84& operator = ( I8 b )
+    U8x4& operator = ( I8 b )
     {
         x = y = z = w = abs(b);
     }
+    U8 tree_add( U8 u8, U8 n_t )
+	{
+		// x érték, y mama, z kicsiegyenlõ, w nagyobb
+		this[n_t].null().x = u8;
+		if( !n_t )
+			return 1;
+
+		U8 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == u8 )
+				return n_t;
+
+			if( this[i].x < u8 )
+			{
+				if( !this[i].z )
+				{
+					this[i].z = n_t;
+					this[n_t].y = i;
+					n_t++;
+					return n_t;
+				}
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+			{
+				this[i].w = n_t;
+				this[n_t].y = i;
+				n_t++;
+				return n_t;
+			}
+			i = this[i].w;
+		}
+		return n_t;
+	}
+	U8 tree_fnd( U8 u8, U8 n_t )
+	{
+		// figyelem/WARNING
+		// visza térési érték, az, ameddig eljutott a fában
+		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
+		U8 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == u8 )
+				return i;
+
+			if( this[i].x < u8 )
+			{
+				if( !this[i].z )
+					return i;
+
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+				return i;
+
+			i = this[i].w;
+		}
+		return n_t;
+	}
 };
 
-class I44
+class I4x4
 {
 public:
     I4 x,y,z,w;
-    I44(){};
-    I44( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )
+    I4x4(){};
+    I4x4( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
+};
+
+class I8x4
+{
+public:
+    union
+    {
+        struct
+        {
+            I8 x,y,z,w;
+        };
+        struct
+        {
+            I8 aXYZW[4];
+        };
+        struct
+        {
+            gpeALF labe;
+            I8 mom, up, nx;
+        };
+    };
+    I8x4(){};
+    I8x4( I8 _x, I8 _y = 0, I8 _z = 0, I8 _w = 0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    I8x4& operator = ( U8 b )
+    {
+        x = y = z = w = min( b, 0x7fffffffFFFFFFFF );
+    }
+    I8x4& operator = ( I8 b )
+    {
+        x = y = z = w = b;
+    }
+    I8 tree_add( gpeALF alf, I8 n_t )
+    {
+		return tree_add( (I8)alf, n_t );
+    }
+    I8 tree_add( I8 i8, I8 n_t )
+	{
+		// x érték, y mama, z kicsiegyenlõ, w nagyobb
+		this[n_t].null().x = i8;
+		if( !n_t )
+			return 1;
+
+		I8 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == i8 )
+				return n_t;
+
+			if( this[i].x < i8 )
+			{
+				if( !this[i].z )
+				{
+					this[i].z = n_t;
+					this[n_t].y = i;
+					n_t++;
+					return n_t;
+				}
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+			{
+				this[i].w = n_t;
+				this[n_t].y = i;
+				n_t++;
+				return n_t;
+			}
+			i = this[i].w;
+		}
+		return n_t;
+	}
+	I8 tree_fnd( gpeALF alf, I8 n_t )
+    {
+		return tree_fnd( (I8)alf, n_t );
+    }
+	I8 tree_fnd( I8 i8, I8 n_t )
+	{
+		// figyelem/WARNING
+		// visza térési érték, az, ameddig eljutott a fában
+		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
+		I8 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == i8 )
+				return i;
+
+			if( this[i].x < i8 )
+			{
+				if( !this[i].z )
+					return i;
+
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+				return i;
+
+			i = this[i].w;
+		}
+		return n_t;
+	}
 };
 
 class double4

@@ -1,6 +1,6 @@
 #include "gpcSRC.h"
 
-U14& U14::str2time( U1* p_str, U1* p_end, U1** pp_str )
+U1x4& U1x4::str2time( U1* p_str, U1* p_end, U1** pp_str )
 {
 	gpmCLR;
 	U1 i = 0;

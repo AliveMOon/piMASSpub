@@ -222,13 +222,13 @@ gpcMASS::~gpcMASS()
 	gpcSRC** ppS = ppSRC();
 
 	if( ppS )
-	for( U4 n = pSRCc->n_load/sizeof(U14*), i = 0; i < n; i++ )
+	for( U4 n = pSRCc->n_load/sizeof(U1x4*), i = 0; i < n; i++ )
 	{
 		gpmDEL( ppS[i] );
 	}
 
 	gpmDEL(pSRCc);
-	gpmDEL(pSRCl);
+	gpmDEL(pLST);
 }
 
 
@@ -238,7 +238,7 @@ gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 
 	if( nLST )
 	{
-		is = pSRCl->tree_fnd(xfnd, nLST);
+		is = pLST->tree_fnd(xfnd, nLST);
 		if( is < nLST )
 		{
 			gpcSRC	**ppS = ppSRC(); //,
@@ -268,7 +268,7 @@ gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 		// akkor hozzá fog adni
 	}
 
-	pSRCl = pSRCl->tree_add(xfnd, nLST);
+	pLST = pLST->tree_add(xfnd, nLST);
 	n = nLST;
 	if( is >= nLST ) // is és nLST - ha továbbra is egyenlő akkor nem tudta hozzá adni
 		return NULL;
@@ -323,7 +323,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		tmp.reset( pS, pSe, &pS );
 		if(!tmp.nL)
 			continue;
-
+		tmp.IX = nLST;
 		if( tmp.bSUB( *this ) )
 		{
 			mom = nSP;

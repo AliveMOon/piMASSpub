@@ -216,10 +216,10 @@ I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 class gpcSRC
 {
 public:
-    U1  *pA, *pB;
-    U8	nL, nA, bSW;
-    U44	space;
-    U4	retIX, nTG;
+    U1  	*pA, *pB;
+    U8		nL, nA, bSW;
+    U4x4	space;
+    U4		IX, retIX, nTG;
     gpeALF* pTG;
 
     bool qBLD( void )
@@ -355,15 +355,16 @@ protected:
 private:
 };
 
+
 class gpcMASS
 {
 	gpcLAZY	*pSRCc,
-			*pSRCl;
+			*pLST;
 	U4		nLST, xFND, nALLOC, nSP,
 			aSPix[0x100];
 	gpcSRC	*pFND,
 			*apSP[0x100];
-	U44 	aSP44[0x100];
+	U4x4 	aSP44[0x100];
 
 	gpcSRC** ppSRC( void )
 	{
@@ -373,7 +374,13 @@ public:
 	gpeALF	aTGwip[0x100];
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();
-
+	gpcSRC* get( U4 i )
+	{
+		if( i >= nLST )
+			return NULL;
+		gpcSRC** ppS = ppSRC();
+		return ppS ? ppS[i] : NULL;
+	}
 	gpcSRC* fnd( U4 xfnd )
 	{
 		if(!this)
@@ -383,7 +390,7 @@ public:
 		if( xFND == xfnd )
 			return pFND;
 
-		U4 iFND = pSRCl->tree_fnd(xfnd, nLST);
+		U4 iFND = pLST->tree_fnd(xfnd, nLST);
 		if(iFND >= nLST)
 			return NULL;
 

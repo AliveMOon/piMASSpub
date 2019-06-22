@@ -5,29 +5,31 @@
 
 class gpcND
 {
+	gpcLAZY	*pND,
+			*pLST;
+	U4		nLST, nALLOC;
+	U8		alf;
+	void	*pFND;
 
-		void** ppND( void )
-		{
-			return (void**)( pND ? pND->p_alloc : NULL );
-		}
-	public:
-
-		gpcLAZY	*pND,
-				*pLST;
-		U4		nLST, xFND, nALLOC;
-		void	*pFND;
-
-
-		gpcND();
-		virtual ~gpcND();
-		gpcND(const gpcND& other);
-		gpcND& operator=(const gpcND& other);
+	void** ppND( void )
+	{
+		return (void**)( pND ? pND->p_alloc : NULL );
+	}
+public:
 
 
 
-	protected:
 
-	private:
+	gpcND();
+	virtual ~gpcND();
+	gpcND(const gpcND& other);
+	gpcND& operator=(const gpcND& other);
+
+
+
+protected:
+
+private:
 };
 
 #endif // GPCND_H

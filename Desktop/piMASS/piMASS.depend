@@ -3,7 +3,7 @@
 	"piMASS.h"
 	"gpcSRC.h"
 
-1561073702 /home/pi/Desktop/piMASS/piMASS.h
+1561148350 /home/pi/Desktop/piMASS/piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -406,19 +406,19 @@
 
 1560813998 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/gpcSRC.h
 
-1561062976 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
+1561154053 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
 	"gpcSRC.h"
 
-1561073763 /home/pi/Desktop/piMASS/gpcSRC.h
+1561158379 /home/pi/Desktop/piMASS/gpcSRC.h
 	"piMASS.h"
 
 1560880111 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
 	"piMASS.h"
 
-1560880509 source:/home/pi/Desktop/piMASS/gpcU14.cpp
+1561147480 source:/home/pi/Desktop/piMASS/gpcU14.cpp
 	"gpcSRC.h"
 
-1560880678 source:/home/pi/Desktop/piMASS/gpcU44.cpp
+1561147640 source:/home/pi/Desktop/piMASS/gpcU44.cpp
 	"gpcSRC.h"
 
 1561045649 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
@@ -427,13 +427,13 @@
 1561030723 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
 	"gpcND.h"
 
-1561045730 /home/pi/Desktop/piMASS/include/gpcND.h
+1561194763 /home/pi/Desktop/piMASS/include/gpcND.h
 	"gpcSRC.h"
 
-1561066101 /home/pi/Desktop/piMASS//gpcSRC.h
+1561158379 /home/pi/Desktop/piMASS//gpcSRC.h
 	"piMASS.h"
 
-1561066324 /home/pi/Desktop/piMASS//piMASS.h
+1561148350 /home/pi/Desktop/piMASS//piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>

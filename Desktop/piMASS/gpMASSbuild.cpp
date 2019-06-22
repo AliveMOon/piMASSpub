@@ -107,7 +107,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			if( pTGdie[i] < gpeALF_zero )
 				continue;
 			// kiszedni a teg listából az SRC-t
-
+			mass.tg_sub( pTGdie[i], IX );
 		}
 		gpmDELary(pTGdie);
 	}
