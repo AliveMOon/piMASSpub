@@ -180,6 +180,38 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 
 	return pS-pU;
 }
+U8 inline gpfABC( U1* p_str, U1* pE, U8& nLEN );
+
+I8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
+{
+	if( !p_str )
+		return 0;
+	U8 u8 = strtol( (char*)p_str, (char**)&p_str, 10 );
+	if( !u8 )
+	{
+		switch( *p_str )
+		{
+			case 'x':
+			case 'X':
+				p_str++;
+				u8 = strtol( (char*)p_str, (char**)&p_str, 16 );
+				break;
+			case 'b':
+			case 'B':
+				p_str++;
+				u8 = strtol( (char*)p_str, (char**)&p_str, 2 );
+				break;
+			case 'd':
+			case 'D':
+				p_str++;
+				u8 = strtol( (char*)p_str, (char**)&p_str, 10 );
+				break;
+		}
+	}
+	if( pp_str )
+		*pp_str = p_str;
+	return u8;
+}
 #define gpmVAN( d, v, l ) gpfVAN( (d), (U1*)v, l )
 I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 {
@@ -475,6 +507,7 @@ class gpcMASS
 	gpcSRC	*pFND,
 			*apSP[0x100];
 	U4x4 	aSP44[0x100];
+	U1		aSPbld[0x10000];
 
 	gpcSRC** ppSRC( void )
 	{

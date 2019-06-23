@@ -1,4 +1,86 @@
 #include "gpcSRC.h"
+U1 gpaALFadd[0x100];
+U1* gpf_aALF_init( void )
+{
+	for( int i = 0; i < 0x100; i++ )
+	{
+		if( i >= 'A' && i <= 'Z')
+		{
+			// egész biztos kisbetüt többet használnak
+			gpaALFadd[i] = 'A'-1;//GPD_UP;
+			continue;
+		}
+		else if( i >= 'a' && i <= 'z' )
+		{
+			gpaALFadd[i] = 'a'-1;
+			continue;
+		}
+		gpaALFadd[i] = 0;
+	}
+	return gpaALFadd;
+}
+U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nLEN )
+{
+	nLEN = 0;
+	if( (p_str < pE) ? !*p_str : true )
+		return 0;
+
+	U1* pS = p_str;
+	while( pS < pE )
+	{
+		if( (*pS)&0x80 )
+		{
+			if( (*pS)&0x40 )
+				nLEN++;
+			pS++;
+			continue;
+		}
+		if( !gpaALFadd[*pS] )
+			break;
+
+		nLEN++;
+		pS++;
+	}
+	return pS-p_str;
+}
+gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
+{
+	if( p_end < pS )
+	{
+		if( ppS )
+			*ppS = p_end;
+		return gpeALF_zero;
+	}
+
+	if( pS ? !*pS : true )
+	{
+		if( ppS )
+			*ppS = pS;
+
+		return gpeALF_zero;
+	}
+
+	U8 alf = 0;
+	U1 c;
+
+	while( pS < p_end)
+	{
+		c = *(U1*)pS;
+		if( !gpaALFadd[c] )
+			break;
+		c -= gpaALFadd[c];
+
+		alf *= gpdALF;
+		alf += c;
+
+		pS++;
+	}
+
+	if (ppS)
+		*ppS = pS;
+
+	return (gpeALF)alf;
+}
 
 void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 {
@@ -14,13 +96,13 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	pTG = NULL;
 	nTG = 0;
 
-	while( pB-pS )	// #TAG
+	while( pB-pS )
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pB <= pS )
 			break;
 		nX = *pS = '#';
-		if( nX )
+		if( nX )	// #TAG
 		{
 			pS++;
 			if( pB <= pS )
@@ -132,12 +214,209 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 	nHD = nVER;
 }
+
+
 void gpcSRC::build( gpcMASS& mass )
 {
 	hd( mass );
-	U1* pS = pB;
-	while( pS-pA < nL )
+	U1* pS = pB, *pE = pA+nL, *pSTR = NULL;
+	char sVAN[] = ".";
+	U4 nN = n, utf8;
+
+	bool bSIGN = false;
+	I8 i8 = 0, nMUL = 0, nADD;
+	U8 u8 = 0, nVAN = 0, nSTR, nLEN;
+	U2 nSP = 0;
+	U1* pSP = mass.aSPbld;
+	double d = 0;
+	while( pS < pE )
 	{
+		pS += gpfNINCS( pS, " \t\r\n" );
+		if( pS >= pE )
+		{
+			// feldolgozni ami még van
+			break;
+		}
+        U1 c = *pS;
+        if( c < 0x80 ? gpaALFadd[c] : true )
+        {
+			// UTF8!
+			nSTR = gpfABCnincs( pSTR = pS, pE, nLEN );
+        }
+		sVAN[0] = *pS;
+		pS++;
+		nVAN = gpfVAN( pS, sVAN );
+		if( c < 0x40 )
+		{
+			if( c < 0x20 )
+			{
+
+			} else {
+				if( c < 0x30 )
+				{
+					// 20-2F
+					switch(c)
+					{
+						case ' ':
+							break;
+						case '!':
+							break;
+						case '#':
+							break;
+						case '$':
+							break;
+						case '%':
+							break;
+						case '&':
+							break;
+
+						case '\"':
+							pSP[nSP] = c;
+							pSTR = pS+nVAN;
+                            nVAN += gpfVAN( pSTR, sVAN );
+                            nSTR = (pS+nVAN)-pSTR;
+
+
+							break;
+						case '\'':
+							pSP[nSP] = c;
+							utf8 = gpfUTF8( pS+nVAN, NULL );
+                            nVAN += gpfVAN( pS+nVAN, sVAN );
+                            break;
+
+
+
+
+						case '(':
+							memset( pSP+nSP, c, nVAN );
+							nSP += nVAN;
+							break;
+						case ')':
+							pSP[nSP] = c;
+							nSP--;
+							nVAN = 1;
+							break;
+
+
+
+
+						case '+':
+							nADD += nVAN;
+							break;
+						case '-':
+							nADD -= nVAN;
+							break;
+
+						case '*':
+							nMUL += nVAN;
+							break;
+						case '/':
+							nMUL -= nVAN;
+							break;
+
+						case ',':
+							// berakjuk ami létrejött a sorba
+
+							break;
+						case '.':
+
+							break;
+
+					}
+				}
+				else if( c < 0x3A )
+				{
+					// 30-39 // számok 0-9
+                    u8 = gpfSTR2U8( pS, pE, &pS );
+					if( *pS == '.' )
+                    {
+						d = strtod( pS, &pS )+u8;
+						if( nADD < 0 )
+							d *= -1;
+                    } else {
+						if( nADD < 0 )
+							i8 = -U8;
+						else
+							i8 = 0;
+						d = 0;
+                    }
+
+				}
+				else switch(c)
+				{
+					// 3A-3F
+					case ':':
+						break;
+					case ';':
+						break;
+
+					case '<':
+						break;
+					case '=':
+						break;
+					case '>':
+						break;
+
+					case '?':
+						break;
+				}
+			}
+		} else {
+			// 40-7F
+			switch(c)
+			{
+				// 3A-3F
+				case '@':
+					break;
+				case '\'':
+					break;
+
+
+
+
+
+				case '[':
+					memset( pSP+nSP, c, nVAN );
+					nSP += nVAN;
+					break;
+				case ']':
+					pSP[nSP] = c;
+					nSP--;
+					nVAN = 1;
+					break;
+
+				case '{':
+					memset( pSP+nSP, c, nVAN );
+					nSP += nVAN;
+					break;
+				case '}':
+					pSP[nSP] = c;
+					nSP--;
+					nVAN = 1;
+					break;
+
+
+
+
+
+				case '|':
+					break;
+				case '\\':
+					break;
+
+				case '^':
+					break;
+				case '_':
+					break;
+
+				case '~':
+					break;
+				case 0x7f:
+					break;
+			}
+		}
+
+		pS += nVAN;
 
 	}
 	nBLD = nVER;
