@@ -281,7 +281,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pSPb[nSP].nSTR << endl;
 
 			}
-
+			pS += pSPb[nSP].nSTR;
+			continue;
         }
 		sVAN[0] = *pS;
 		pS++;
@@ -425,7 +426,31 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pSPb[nSP].d = 0;
                     }
                     nVAN = 0;
+					if( bDBG )
+					{
+						if( pSPb[nSP].nADD > 0 )
+							cout << " + ";
+						else if( pSPb[nSP].nADD < 0 )
+							cout << " - ";
+						if( pSPb[nSP].nMUL > 0 )
+							cout << "*";
+						else if( pSPb[nSP].nMUL < 0 )
+							cout << "/";
 
+						switch( pSPb[nSP].typ )
+						{
+							case gpeALF_U:
+								cout << pSPb[nSP].u8;
+								break;
+							case gpeALF_I:
+								cout << pSPb[nSP].i8;
+								break;
+							case gpeALF_D:
+								cout << pSPb[nSP].d;
+								break;
+						}
+					}
+					cout << endl;
 				}
 				else switch(c)
 				{

@@ -87,6 +87,22 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 		return *this; // handle self assignment
 	//assignment operator
 
+	/// elopunk mindent most
+	pALFtg = B.pALFtg;	B.pALFtg = NULL;
+	nALFtg = B.nALFtg;	B.nALFtg = 0;
+	IX = B.IX;
+	retIX = B.retIX;
+	space = B.space;
+	bSW = B.bSW;
+	pEXE = B.pEXE; B.pEXE = NULL;
+	pRES = B.pRES; B.pRES = NULL;
+	pMINI = B.pMINI; B.pMINI = NULL;
+	pBIG = B.pBIG; B.pBIG = NULL;
+	nVER = B.nVER;
+	nBLD = B.nBLD;
+	nHD = B.nHD;
+
+
 	qBLD();
 
 	nL = &B ? B.nL : 0;
@@ -287,7 +303,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		tmp.space = aSP44[nSP];
         apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
 
-		apSP[nSP]->bMAIN( *this );
+		apSP[nSP]->bMAIN( *this, true );
 
 		while( apSP[nSP]->bRET( *this ) )
 		{
