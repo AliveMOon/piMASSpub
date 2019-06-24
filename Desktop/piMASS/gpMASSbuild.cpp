@@ -84,8 +84,17 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 
 void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 {
-	if( nHD == nVER )
+	if( !this )
 		return;
+
+	if( nHD == nVER )
+	{
+		if( !nVER )
+			nVER = 1;
+		else
+			return;
+	}
+
 
 	U1* pS = pA;
 	U8	oSW = bSW;
@@ -138,8 +147,9 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				nTGdie--;
 				if( i == nTGdie )
 				{
-					nTGdie;
+					nTGdie = 0;
 					gpmDELary(pTGdie);
+					break;
 				}
 				pTGdie[i] = pTGdie[nTGdie];
 				i--;
@@ -203,6 +213,12 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			if( pTGpub[i] < gpeALF_A )
 				continue;
 			pTG[nTG] = pTGpub[i];
+			switch( pTG[nTG] )
+			{
+				case gpeALF_MAIN:
+					bSW |= gpeMASSmainMSK;
+					break;
+			}
 			// betenni a teg listába az SRC-t
 			mass.tag_add( pTG[nTG], IX );
 			nTG++;
@@ -216,7 +232,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 }
 
 
-void gpcSRC::build( gpcMASS& mass )
+void gpcSRC::cmpi( gpcMASS& mass )
 {
 	hd( mass );
 

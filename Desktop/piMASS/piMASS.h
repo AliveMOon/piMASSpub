@@ -434,6 +434,7 @@ typedef enum gpeALF: I8
 	gpeALF_LINE = gpdABCD('L', 'I', 'N', 'E'),
 	gpeALF_LEFT = gpdABCD('L', 'E', 'F', 'T'),
 	gpeALF_LOOP = gpdABCD('L', 'O', 'O', 'P'),
+	gpeALF_MAIN = gpdABCD('M','A',  'I', 'N'),
 	gpeALF_MINI = gpdABCD('M', 'I', 'N', 'I'),
 
 	gpeALF_MONO = gpdABCD('M', 'O', 'N', 'O'),

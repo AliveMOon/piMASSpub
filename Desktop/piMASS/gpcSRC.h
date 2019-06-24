@@ -12,6 +12,7 @@ enum gpeMASSsw:U8
 	gpeMASSinp,
 	gpeMASSpass,
 	gpeMASSoff,
+	gpeMASSmain,
 
 	gpeMASSalert,
 	gpeMASSprg,
@@ -27,6 +28,8 @@ enum gpeMASSsw:U8
 	gpeMASSinpMSK = 1<<gpeMASSinp,
 	gpeMASSpassMSK = 1<<gpeMASSpass,
 	gpeMASSoffMSK = 1<<gpeMASSoff,
+	gpeMASSmainMSK = 1<<gpeMASSmain,
+
 	gpeMASSclrMSK = (1<<gpeMASSalert)-1,
 	gpeMASSalertMSK,
 	gpeMASSprgMSK = 1<<gpeMASSprg,
@@ -265,7 +268,8 @@ public:
     gpeALF* pTG;
 	gpcLAZY	*pEXE,
 			*pRES,
-			*pMINI;
+			*pMINI,
+			*pBIG;
 
     bool qBLD( void )
     {
@@ -347,8 +351,22 @@ public:
 
 		return bSW&gpeMASSalertMSK;
     }
+    bool bMAIN( gpcMASS& mass )
+    {
+		if( !this )
+			return false;
+		hd( mass );
+
+		bool bM = bSW&gpeMASSmainMSK;
+		if( !bM )
+			return false;
+
+		cmpi( mass );
+
+		return true;
+    }
     void hd( gpcMASS& mass, gpeALF* pTGpub = NULL );
-    void build( gpcMASS& mass );
+    void cmpi( gpcMASS& mass );
 
     gpcSRC();
     virtual ~gpcSRC();

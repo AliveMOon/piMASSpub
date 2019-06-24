@@ -287,6 +287,8 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		tmp.space = aSP44[nSP];
         apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
 
+		apSP[nSP]->bMAIN( *this );
+
 		while( apSP[nSP]->bRET( *this ) )
 		{
 			apSP[mom]->space = aSP44[mom];
