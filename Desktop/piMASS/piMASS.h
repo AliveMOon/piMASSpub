@@ -62,6 +62,7 @@
 //#include <bits/stdc++.h>
 
 #include <GL/glew.h>
+#include <math.h>
 
 using namespace std;
 typedef unsigned char	U1;
@@ -115,7 +116,9 @@ class gpcMASS;
 #define gpdSQRT2 1.4142135623730950488016887242097
 #define gpdSQRT3 1.7320508075688772935274463415059f
 #define gpmNINCS( s, v )	strspn( (char*)(s), (char*)(v) )
-#define gpdVAN		strcspn
+#define gpmSTR2D( p )	strtod( (char*)(p), (char**)&(p) )
+#define gpmSTR2U8( p, r )	strtol( (char*)(p), (char**)&(p), (r) )
+#define gpdVAN	strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
 #define gpmCLR	memset( this, 0, sizeof(*this) )
 #define gpmZ( p ) memset( &p, 0, sizeof(p) )
@@ -299,6 +302,7 @@ typedef enum gpeALF: I8
 	gpeALF_ARJ = gpdABC('A', 'R', 'J'),
 	gpeALF_ASM = gpdABC('A', 'S', 'M'),
 	gpeALF_BIN = gpdABC('B', 'I', 'N'),
+	gpeALF_BLK = gpdABC('B', 'L', 'K'),
 	gpeALF_BOB = gpdABC('B', 'O', 'B'),
 	gpeALF_BOX = gpdABC('B', 'O', 'X'),
 	gpeALF_CAM = gpdABC('C', 'A', 'M'),
@@ -324,9 +328,9 @@ typedef enum gpeALF: I8
 	gpeALF_FKA = gpdABC('F', 'K', 'A'),
 	gpeALF_FKL = gpdABC('F', 'K', 'L'),
 
-	gpeALF_FPS = gpdABC('F', 'P', 'S'),
 	gpeALF_FMX = gpdABC('F', 'M', 'X'),
 	gpeALF_FMY = gpdABC('F', 'M', 'Y'),
+	gpeALF_FPS = gpdABC('F', 'P', 'S'),
 	gpeALF_GET = gpdABC('G', 'E', 'T'),
 	gpeALF_GIM = gpdABC('G', 'I', 'M'),
 	gpeALF_GIO = gpdABC('G', 'I', 'O'),
@@ -369,6 +373,7 @@ typedef enum gpeALF: I8
 	gpeALF_SIT = gpdABC('S', 'I', 'T'),
 	gpeALF_SRC = gpdABC('S', 'R', 'C'),
 	gpeALF_STR = gpdABC('S', 'T', 'R'),
+	gpeALF_STK = gpdABC('S', 'T', 'K'),
 	gpeALF_SUB = gpdABC('S', 'U', 'B'),
 	gpeALF_SUM = gpdABC('S', 'U', 'M'),
 	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
@@ -404,6 +409,7 @@ typedef enum gpeALF: I8
 	gpeALF_FILE = gpdABCD('F', 'I', 'L', 'E'),
 	gpeALF_FIND = gpdABCD('F', 'I', 'N', 'D'),
 	gpeALF_FSEC = gpdABCD('F', 'S', 'E', 'C'),
+	gpeALF_FUNC = gpdABCD('F', 'U', 'N', 'C'),
 	gpeALF_GOLD = gpdABCD('G', 'O', 'L', 'D'),
 
 
@@ -695,6 +701,28 @@ typedef enum gpeALF: I8
 
 U1*		gpf_aALF_init(void);
 gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
+inline void* gpfMEMSET( void* pD, U8 n, void* pS, U8 nS )
+{
+	memcpy( pD, pS, nS );
+	if( n < 2 )
+		return pD;
+	U1 	*p_a = (U1*)pD,
+		*p_b = p_a+nS,
+		*p_e = p_a+n*nS;
+
+	U8 a,b;
+	while( p_b < p_e )
+	{
+		a = p_b-p_a;
+		b = p_e-p_b;
+		if( a > b )
+			a = b;
+
+        memcpy( p_b, p_a, a );
+        p_b += a;
+	}
+	return pD;
+}
 int inline gpfACE( const I1* p_file, I4 mode )
 {
 	//	00	Existence only

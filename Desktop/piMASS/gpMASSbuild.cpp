@@ -219,33 +219,41 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 void gpcSRC::build( gpcMASS& mass )
 {
 	hd( mass );
-	U1* pS = pB, *pE = pA+nL, *pSTR = NULL;
+
+	U1* pS = pB, *pSe, *pE = pA+nL, *pSTR = NULL;
 	char sVAN[] = ".";
-	U4 nN = n, utf8;
+	U4 	//nN = n,
+		utf8;
 
 	bool bSIGN = false;
-	I8 i8 = 0, nMUL = 0, nADD;
-	U8 u8 = 0, nVAN = 0, nSTR, nLEN;
+	//I8	i8 = 0, nMUL = 0, nADD;
+	U8 	nN,
+		nVAN = 0;
+		//, nSTR, nLEN;
+
 	U2 nSP = 0;
-	U1* pSP = mass.aSPbld;
+	U1		*pSPc = mass.aSPc, c;
+	gpcOPCD	*pSPb = mass.aSPb;
+
 	double d = 0;
 	while( pS < pE )
 	{
-		pS += gpfNINCS( pS, " \t\r\n" );
+		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pS >= pE )
 		{
 			// feldolgozni ami még van
 			break;
 		}
-        U1 c = *pS;
+
+        c = *pS;
         if( c < 0x80 ? gpaALFadd[c] : true )
         {
 			// UTF8!
-			nSTR = gpfABCnincs( pSTR = pS, pE, nLEN );
+			pSPb[nSP].nSTR = gpfABCnincs( pSPb[nSP].pSTR = pS, pE, pSPb[nSP].nLEN );
         }
 		sVAN[0] = *pS;
 		pS++;
-		nVAN = gpfVAN( pS, sVAN );
+		nVAN = gpmNINCS( pS, sVAN );
 		if( c < 0x40 )
 		{
 			if( c < 0x20 )
@@ -271,47 +279,57 @@ void gpcSRC::build( gpcMASS& mass )
 							break;
 
 						case '\"':
-							pSP[nSP] = c;
-							pSTR = pS+nVAN;
-                            nVAN += gpfVAN( pSTR, sVAN );
-                            nSTR = (pS+nVAN)-pSTR;
+							pSPc[nSP] = c;
+							pSPb[nSP].typ = gpeALF_STR;
+							pSPb[nSP].pSTR = pS+nVAN;
 
+                            nVAN += gpmVAN( pSPb[nSP].pSTR, sVAN, pSPb[nSP].nLEN );
+                            pSPb[nSP].nSTR = (pS+nVAN) - pSPb[nSP].pSTR;
 
 							break;
 						case '\'':
-							pSP[nSP] = c;
-							utf8 = gpfUTF8( pS+nVAN, NULL );
-                            nVAN += gpfVAN( pS+nVAN, sVAN );
+							pSPc[nSP] = c;
+							pSPb[nSP].typ = gpeALF_U;
+							pSPb[nSP].u8 = gpfUTF8( pS+nVAN, NULL );
+
+                            nVAN += gpmVAN( pS+nVAN, sVAN, nN );
                             break;
 
 
 
 
 						case '(':
-							memset( pSP+nSP, c, nVAN );
+							memset( pSPc+nSP, c, nVAN+1 );
+							pSPb[nSP].typ = pSPb[nSP].lab ? gpeALF_FUNC : gpeALF_STK;
+							nSP++;
+							pSPb[nSP].null();
+							if( !nVAN )
+								break;
+							pSPb[nSP].typ = gpeALF_STK;
+							gpfMEMSET( &pSPb[nSP+1], nVAN-1, &pSPb[nSP], sizeof(*pSPb) );
 							nSP += nVAN;
 							break;
 						case ')':
-							pSP[nSP] = c;
+							pSPc[nSP] = c;
 							nSP--;
-							nVAN = 1;
+							nVAN = 0;
 							break;
 
 
 
 
 						case '+':
-							nADD += nVAN;
+							pSPb[nSP].nADD += nVAN+1;
 							break;
 						case '-':
-							nADD -= nVAN;
+							pSPb[nSP].nADD -= nVAN+1;
 							break;
 
 						case '*':
-							nMUL += nVAN;
+							pSPb[nSP].nMUL += nVAN+1;
 							break;
 						case '/':
-							nMUL -= nVAN;
+							pSPb[nSP].nMUL -= nVAN+1;
 							break;
 
 						case ',':
@@ -327,19 +345,24 @@ void gpcSRC::build( gpcMASS& mass )
 				else if( c < 0x3A )
 				{
 					// 30-39 // számok 0-9
-                    u8 = gpfSTR2U8( pS, pE, &pS );
+                    pSPb[nSP].u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
 					if( *pS == '.' )
                     {
-						d = strtod( pS, &pS )+u8;
-						if( nADD < 0 )
-							d *= -1;
+						pSPb[nSP].typ = gpeALF_D;
+						pSPb[nSP].d = gpmSTR2D( pS ) + (double)pSPb[nSP].u8;		///
+						if( pSPb[nSP].nADD < 0 )
+							pSPb[nSP].d *= -1;
                     } else {
-						if( nADD < 0 )
-							i8 = -U8;
+						if( pSPb[nSP].nADD < 0 )
+						{
+							pSPb[nSP].typ = gpeALF_I;
+							pSPb[nSP].i8 = -pSPb[nSP].u8;							///
+						}
 						else
-							i8 = 0;
-						d = 0;
+							pSPb[nSP].typ = gpeALF_U;
+						pSPb[nSP].d = 0;
                     }
+                    nVAN = 0;
 
 				}
 				else switch(c)
@@ -376,23 +399,32 @@ void gpcSRC::build( gpcMASS& mass )
 
 
 				case '[':
-					memset( pSP+nSP, c, nVAN );
-					nSP += nVAN;
+					pSPc[nSP] = c;
+					pSPb[nSP].typ = gpeALF_A;
+					nSP++;
+					pSPb[nSP].null();
 					break;
 				case ']':
-					pSP[nSP] = c;
+					pSPc[nSP] = c;
 					nSP--;
-					nVAN = 1;
+					nVAN = 0;
 					break;
 
 				case '{':
-					memset( pSP+nSP, c, nVAN );
+					memset( pSPc+nSP, c, nVAN+1 );
+					pSPb[nSP].typ = gpeALF_BLK;
+					nSP++;
+					pSPb[nSP].null();
+					if( !nVAN )
+						break;
+					pSPb[nSP].typ = gpeALF_BLK;
+					gpfMEMSET( &pSPb[nSP+1], nVAN-1, &pSPb[nSP], sizeof(*pSPb) );
 					nSP += nVAN;
 					break;
 				case '}':
-					pSP[nSP] = c;
+					pSPc[nSP] = c;
 					nSP--;
-					nVAN = 1;
+					nVAN = 0;
 					break;
 
 

@@ -182,7 +182,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 }
 U8 inline gpfABC( U1* p_str, U1* pE, U8& nLEN );
 
-I8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
+U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
 {
 	if( !p_str )
 		return 0;
@@ -205,6 +205,16 @@ I8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
 			case 'D':
 				p_str++;
 				u8 = strtol( (char*)p_str, (char**)&p_str, 10 );
+				break;
+		}
+	} else {
+		u8 = (U8)log2(u8);
+		switch( *p_str ) /// 1 2 4 8 16
+		{
+			case 'x':
+			case 'X':
+				p_str++;
+				u8 = ((gpmSTR2U8( p_str, 16 )<<1)|1) << u8;
 				break;
 		}
 	}
@@ -253,6 +263,9 @@ public:
     U4x4	space;
     U4		IX, retIX, nTG;
     gpeALF* pTG;
+	gpcLAZY	*pEXE,
+			*pRES,
+			*pMINI;
 
     bool qBLD( void )
     {
@@ -497,6 +510,21 @@ public:
 	}
 };
 
+class gpcOPCD
+{
+public:
+	I8		nADD, nMUL, i8;
+	U8		u8, nSTR, nLEN;
+	gpeALF	lab, typ;
+	U1		*pSTR;
+	double	d;
+	gpcOPCD(){};
+
+	gpcOPCD& null()
+	{
+		gpmCLR;
+	}
+};
 class gpcMASS
 {
 	gpcMOM	*pTG;
@@ -507,13 +535,15 @@ class gpcMASS
 	gpcSRC	*pFND,
 			*apSP[0x100];
 	U4x4 	aSP44[0x100];
-	U1		aSPbld[0x10000];
 
 	gpcSRC** ppSRC( void )
 	{
 		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
+	gpeALF	aTGwip[0x100];
+	gpcOPCD	aSPb[0x1000];
+	U1		aSPc[0x1000];
 	void tag_add( gpeALF tg, U4 ix )
 	{
 		U8 i, n, s = -1;
@@ -555,7 +585,7 @@ public:
 		}
 		pLZY->n_load = nIX*sizeof(ix);
 	}
-	gpeALF	aTGwip[0x100];
+
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();
 	gpcSRC* get( U4 i )

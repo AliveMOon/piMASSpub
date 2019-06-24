@@ -3,7 +3,7 @@
 	"piMASS.h"
 	"gpcSRC.h"
 
-1561241314 /home/pi/Desktop/piMASS/piMASS.h
+1561336257 /home/pi/Desktop/piMASS/piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -36,6 +36,7 @@
 	<X11/Xcursor/Xcursor.h>
 	<linux/limits.h>
 	<GL/glew.h>
+	<math.h>
 
 1551380987 /usr/include/SDL2/SDL.h
 	"SDL_main.h"
@@ -406,10 +407,10 @@
 
 1560813998 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/gpcSRC.h
 
-1561154053 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
+1561310140 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
 	"gpcSRC.h"
 
-1561241355 /home/pi/Desktop/piMASS/gpcSRC.h
+1561330772 /home/pi/Desktop/piMASS/gpcSRC.h
 	"piMASS.h"
 
 1561221840 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
@@ -421,19 +422,19 @@
 1561147640 source:/home/pi/Desktop/piMASS/gpcU44.cpp
 	"gpcSRC.h"
 
-1561221626 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
+1561336354 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
 	"gpcSRC.h"
 
 1561030723 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
 	"gpcND.h"
 
-1561203754 /home/pi/Desktop/piMASS/include/gpcND.h
+1561241811 /home/pi/Desktop/piMASS/include/gpcND.h
 	"gpcSRC.h"
 
-1561221695 /home/pi/Desktop/piMASS//gpcSRC.h
+1561330772 /home/pi/Desktop/piMASS//gpcSRC.h
 	"piMASS.h"
 
-1561206933 /home/pi/Desktop/piMASS//piMASS.h
+1561336257 /home/pi/Desktop/piMASS//piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -466,4 +467,5 @@
 	<X11/Xcursor/Xcursor.h>
 	<linux/limits.h>
 	<GL/glew.h>
+	<math.h>
 
