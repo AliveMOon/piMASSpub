@@ -703,7 +703,15 @@ U1*		gpf_aALF_init(void);
 gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
 inline void* gpfMEMSET( void* pD, U8 n, void* pS, U8 nS )
 {
-	memcpy( pD, pS, nS );
+	if( !n || !nS )
+		return pD;
+
+	if( nS == 1 )
+		return memset( pD, *(U1*)pS, n );
+
+	if( pD != pS )
+		memcpy( pD, pS, nS );
+
 	if( n < 2 )
 		return pD;
 	U1 	*p_a = (U1*)pD,
