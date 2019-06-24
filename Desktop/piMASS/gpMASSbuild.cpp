@@ -110,14 +110,14 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pB <= pS )
 			break;
-		nX = *pS = '#';
+		nX = *pS == '#';
 		if( nX )	// #TAG
 		{
 			pS++;
 			if( pB <= pS )
 				break;
 
-			nX += gpmNINCS( pS, "#" );
+			nX = gpmNINCS( pS, "#" );
 			if( pB <= pS+nX )
 				break;
 			pS += nX;
