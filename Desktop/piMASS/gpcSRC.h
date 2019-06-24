@@ -351,7 +351,7 @@ public:
 
 		return bSW&gpeMASSalertMSK;
     }
-    bool bMAIN( gpcMASS& mass )
+    bool bMAIN( gpcMASS& mass, bool bDBG = false )
     {
 		if( !this )
 			return false;
@@ -361,12 +361,12 @@ public:
 		if( !bM )
 			return false;
 
-		cmpi( mass );
+		cmpi( mass, bDBG );
 
 		return true;
     }
     void hd( gpcMASS& mass, gpeALF* pTGpub = NULL );
-    void cmpi( gpcMASS& mass );
+    void cmpi( gpcMASS& mass, bool bDBG );
 
     gpcSRC();
     virtual ~gpcSRC();
@@ -580,7 +580,8 @@ public:
 class gpcOPCD
 {
 public:
-	I8		nADD, nMUL, i8;
+	I4		nADD, nMUL;
+	I8		i8;
 	U8		u8, nSTR, nLEN;
 	gpeALF	lab, typ;
 	U1		*pSTR;

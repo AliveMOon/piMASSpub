@@ -136,6 +136,12 @@ class gpcMASS;
 				? ( memcpy( (d), (s), ((n)*sizeof(*(d))) ) )		\
 				: ( (void*)d )  									\
 			)
+#define gpmSTRnCPY( d, s, n ) \
+			(														\
+				( (n)&&(d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\
+				? ( strncpy( (char*)(d), (char*)(s), (n) ))  		\
+				: ( (char*)d )  									\
+			)
 
 #define gpmSTRLEN( s )			((s)? strlen((char*)(s)) : 0)
 
@@ -365,6 +371,7 @@ typedef enum gpeALF: I8
 	gpeALF_PMX = gpdABC('P', 'M', 'X'),
 	gpeALF_PMY = gpdABC('P', 'M', 'Y'),
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
+	gpeALF_PRG = gpdABC('P', 'R', 'G'),
 	gpeALF_REF = gpdABC('R', 'E', 'F'),
 	gpeALF_REN = gpdABC('R', 'E', 'N'),
 	gpeALF_RET = gpdABC('R', 'E', 'T'),

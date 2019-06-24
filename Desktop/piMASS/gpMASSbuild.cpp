@@ -204,6 +204,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		gpmDELary(pTGdie);
 	}
 
+	U8 bOFF = ~(gpeMASSmainMSK||gpeMASSprgMSK);
 	if( pTGpub )
 	{
 		pALFtg = new gpeALF[nALFtg+1];
@@ -218,6 +219,11 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			{
 				case gpeALF_MAIN:
 					bSW |= gpeMASSmainMSK;
+					bOFF |= gpeMASSmainMSK;
+					break;
+				case gpeALF_PRG:
+					bSW |= gpeMASSprgMSK;
+					bOFF |= gpeMASSprgMSK;
 					break;
 			}
 			// betenni a teg listába az SRC-t
@@ -228,12 +234,12 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			gpmDELary(pALFtg);
 		gpmDELary(pTGdie);
 	}
-
+	bSW &= bOFF;
 	nHD = nVER;
 }
 
-
-void gpcSRC::cmpi( gpcMASS& mass )
+char gpsSTRpub[0x1000];
+void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 {
 	hd( mass );
 
@@ -241,14 +247,15 @@ void gpcSRC::cmpi( gpcMASS& mass )
 	char sVAN[] = ".";
 	U4 	//nN = n,
 		utf8;
-
+	I4 nCHK;
 	bool bSIGN = false;
 	//I8	i8 = 0, nMUL = 0, nADD;
-	U8 	nN,
+	U8 	nN, nSKIP,
 		nVAN = 0;
 		//, nSTR, nLEN;
 
 	U2 nSP = 0;
+	gpmZ( mass.aSPc );
 	U1		*pSPc = mass.aSPc, c;
 	gpcOPCD	*pSPb = mass.aSPb;
 
@@ -267,6 +274,14 @@ void gpcSRC::cmpi( gpcMASS& mass )
         {
 			// UTF8!
 			pSPb[nSP].nSTR = gpfABCnincs( pSPb[nSP].pSTR = pS, pE, pSPb[nSP].nLEN );
+			if( pSPb[nSP].nSTR )
+			{
+				gpmSTRnCPY( gpsSTRpub, pSPb[nSP].pSTR, pSPb[nSP].nSTR )[pSPb[nSP].nSTR] = 0;
+				if( bDBG ) 	///
+					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pSPb[nSP].nSTR << endl;
+
+			}
+
         }
 		sVAN[0] = *pS;
 		pS++;
@@ -328,6 +343,8 @@ void gpcSRC::cmpi( gpcMASS& mass )
 							break;
 						case ')':
 							pSPc[nSP] = c;
+							if( bDBG ) 	///
+								cout << pSPc[nSP] << endl;
 							nSP--;
 							nVAN = 0;
 							break;
@@ -343,17 +360,45 @@ void gpcSRC::cmpi( gpcMASS& mass )
 							break;
 
 						case '*':
+							nCHK = pSPb[nSP].nMUL;
 							pSPb[nSP].nMUL += nVAN+1;
+							if( nCHK < 0 )
+							if( (pSPb[nSP].nMUL-nCHK) > 1 )
+							{
+								// ez biza /*..//** vagy valami ilyesmi
+								U1* pSS = (U1*)strstr( (char*)pS, "*/" ); // megkeressük a végét
+								nSKIP = pSS ? (pSS-pS)+2 : (pE-pS);
+								nSKIP += gpmNINCS( pS+nSKIP, "*/" );
+								if( nSKIP > pE-pS )
+									nVAN = pE-pS;
+								else
+									nVAN = nSKIP;
+								break;
+							}
 							break;
 						case '/':
 							pSPb[nSP].nMUL -= nVAN+1;
+							if( pSPb[nSP].nMUL < -2 )
+							{
+								pSPb[nSP].nMUL = 0;
+								/// comment skip next line
+								nSKIP = gpmVAN( pS, "\r\n\a", nN );
+								nSKIP += gpmNINCS( pS+nSKIP, "\r\n" );
+								if( nSKIP > pE-pS )
+									nVAN = pE-pS;
+								else
+									nVAN = nSKIP;
+
+								break;
+							}
+
 							break;
 
-						case ',':
+						case ',':	// vessző
 							// berakjuk ami létrejött a sorba
 
 							break;
-						case '.':
+						case '.':	// pont
 
 							break;
 
@@ -388,6 +433,8 @@ void gpcSRC::cmpi( gpcMASS& mass )
 					case ':':
 						break;
 					case ';':
+						// comment
+						nVAN += gpmVAN( pS, "\r\n", nN );
 						break;
 
 					case '<':
@@ -423,6 +470,8 @@ void gpcSRC::cmpi( gpcMASS& mass )
 					break;
 				case ']':
 					pSPc[nSP] = c;
+					if( bDBG ) 	///
+						cout << pSPc[nSP] << endl;
 					nSP--;
 					nVAN = 0;
 					break;
@@ -440,6 +489,8 @@ void gpcSRC::cmpi( gpcMASS& mass )
 					break;
 				case '}':
 					pSPc[nSP] = c;
+					if( bDBG ) 	///
+						cout << pSPc[nSP] << endl;
 					nSP--;
 					nVAN = 0;
 					break;
