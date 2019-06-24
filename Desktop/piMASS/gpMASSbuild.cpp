@@ -99,11 +99,11 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	U1* pS = pA;
 	U8	oSW = bSW;
 	bSW &= ~gpeMASSclrMSK;
-	gpeALF alf, *pTGdie = pTG;
-	U4 nX, nTGdie = nTG;
+	gpeALF alf, *pTGdie = pALFtg;
+	U4 nX, nTGdie = nALFtg;
 
-	pTG = NULL;
-	nTG = 0;
+	pALFtg = NULL;
+	nALFtg = 0;
 
 	while( pB-pS )
 	{
@@ -128,7 +128,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			if( !pTGpub )
 				pTGpub = mass.aTGwip;
 
-			for( U4 i = 0; i < nTG; i++ )
+			for( U4 i = 0; i < nALFtg; i++ )
 			{
 				if( pTGpub[i] != alf )
 					continue;
@@ -155,8 +155,8 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				i--;
             }
 
-			pTGpub[nTG] = alf;
-            nTG++;
+			pTGpub[nALFtg] = alf;
+            nALFtg++;
 			continue;
 		}
 
@@ -206,25 +206,26 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 	if( pTGpub )
 	{
-		pTG = new gpeALF[nTG+1];
-		nTGdie = nTG;
-		for( U4 i = nTG = 0; i < nTGdie; i++ )
+		pALFtg = new gpeALF[nALFtg+1];
+		nTGdie = nALFtg;
+		nALFtg = 0;
+		for( U4 i = 0; i < nTGdie; i++ )
 		{
 			if( pTGpub[i] < gpeALF_A )
 				continue;
-			pTG[nTG] = pTGpub[i];
-			switch( pTG[nTG] )
+			pALFtg[nALFtg] = pTGpub[i];
+			switch( pALFtg[nALFtg] )
 			{
 				case gpeALF_MAIN:
 					bSW |= gpeMASSmainMSK;
 					break;
 			}
 			// betenni a teg listába az SRC-t
-			mass.tag_add( pTG[nTG], IX );
-			nTG++;
+			mass.tag_add( pALFtg[nALFtg], IX );			///
+			nALFtg++;
 		}
-		if( !nTG )
-			gpmDELary(pTG);
+		if( !nALFtg )
+			gpmDELary(pALFtg);
 		gpmDELary(pTGdie);
 	}
 

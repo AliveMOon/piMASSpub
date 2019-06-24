@@ -120,9 +120,9 @@ class gpcMASS;
 #define gpmSTR2U8( p, r )	strtol( (char*)(p), (char**)&(p), (r) )
 #define gpdVAN	strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
-#define gpmCLR	memset( this, 0, sizeof(*this) )
-#define gpmZ( p ) memset( &p, 0, sizeof(p) )
-#define gpmZn( p, n ) memset( p, 0, n*sizeof(*p) )
+#define gpmCLR	bzero( this, sizeof(*this) )
+#define gpmZ( p ) bzero( &p, sizeof(p) )
+#define gpmZn( p, n ) bzero( (p), (n)*sizeof(*(p)) )
 
 #define gpmSTRCPY( d, s ) \
 			(												\
