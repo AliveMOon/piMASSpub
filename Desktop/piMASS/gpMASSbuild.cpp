@@ -237,7 +237,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	bSW &= bOFF;
 	nHD = nVER;
 }
-
+char gpsPRG[] = " \t\r\n\a .,!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ";
 char gpsSTRpub[0x1000];
 void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 {
@@ -276,15 +276,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			pSPb[nSP].nSTR = gpfABCnincs( pSPb[nSP].pSTR = pS, pE, pSPb[nSP].nLEN );
 			if( pSPb[nSP].nSTR )
 			{
+				pSPb[nSP].nSTR += gpmVAN( pSPb[nSP].pSTR+pSPb[nSP].nSTR, gpsPRG, nN );
+				pSPb[nSP].nLEN += nN;
 				gpmSTRnCPY( gpsSTRpub, pSPb[nSP].pSTR, pSPb[nSP].nSTR )[pSPb[nSP].nSTR] = 0;
 				if( bDBG ) 	///
 					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pSPb[nSP].nSTR << endl;
 
+				pS += pSPb[nSP].nSTR;
+				continue;
 			}
-			pS += pSPb[nSP].nSTR;
-			continue;
+
         }
-		sVAN[0] = *pS;
+		sVAN[0] = c;
+		cout << (char*)sVAN << ".";
 		pS++;
 		nVAN = gpmNINCS( pS, sVAN );
 		if( c < 0x40 )
@@ -318,7 +322,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
                             nVAN += gpmVAN( pSPb[nSP].pSTR, sVAN, pSPb[nSP].nLEN );
                             pSPb[nSP].nSTR = (pS+nVAN) - pSPb[nSP].pSTR;
-
+							if( pS[nVAN] == c )
+								nVAN++;
 							break;
 						case '\'':
 							pSPc[nSP] = c;
@@ -326,7 +331,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pSPb[nSP].u8 = gpfUTF8( pS+nVAN, NULL );
 
                             nVAN += gpmVAN( pS+nVAN, sVAN, nN );
-                            break;
+                            if( pS[nVAN] == c )
+								nVAN++;
+							break;
 
 
 
@@ -459,12 +466,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						break;
 					case ';':
 						// comment
-						nVAN += gpmVAN( pS, "\r\n", nN );
+						nVAN += gpmVAN( pS, "\r\n\a", nN );
 						break;
 
 					case '<':
 						break;
 					case '=':
+
 						break;
 					case '>':
 						break;
