@@ -458,27 +458,28 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						}
 					}
 					cout << endl;
-				}
-				else switch(c)
-				{
-					// 3A-3F
-					case ':':
-						break;
-					case ';':
-						// comment
-						nVAN += gpmVAN( pS, "\r\n\a", nN );
-						break;
+				} else {
+					switch(c)
+					{
+						// 3A-3F
+						case ':':
+							break;
+						case ';':
+							// comment
+							nVAN += gpmVAN( pS, "\r\n\a", nN );
+							break;
 
-					case '<':
-						break;
-					case '=':
+						case '<':
+							break;
+						case '=':
 
-						break;
-					case '>':
-						break;
+							break;
+						case '>':
+							break;
 
-					case '?':
-						break;
+						case '?':
+							break;
+					}
 				}
 			}
 		} else {
