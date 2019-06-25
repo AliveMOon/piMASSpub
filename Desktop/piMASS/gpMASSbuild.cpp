@@ -237,7 +237,10 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	bSW &= bOFF;
 	nHD = nVER;
 }
+
 char gpsPRG[] = " \t\r\n\a .,!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ";
+char gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
+	 *gppTAB = gpsTAB+strlen(gpsTAB);
 char gpsSTRpub[0x1000];
 void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 {
@@ -280,7 +283,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				pSPb[nSP].nLEN += nN;
 				gpmSTRnCPY( gpsSTRpub, pSPb[nSP].pSTR, pSPb[nSP].nSTR )[pSPb[nSP].nSTR] = 0;
 				if( bDBG ) 	///
-					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pSPb[nSP].nSTR << endl;
+					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pSPb[nSP].nSTR << endl << gppTAB-nSP;
 
 				pS += pSPb[nSP].nSTR;
 				continue;
@@ -288,7 +291,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
         }
 		sVAN[0] = c;
-		cout << (char*)sVAN << ".";
+		cout << (char*)sVAN;
 		pS++;
 		nVAN = gpmNINCS( pS, sVAN );
 		if( c < 0x40 )
@@ -352,7 +355,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						case ')':
 							pSPc[nSP] = c;
 							if( bDBG ) 	///
-								cout << pSPc[nSP] << endl;
+								cout << pSPc[nSP] << endl  << gppTAB-nSP;
 							nSP--;
 							nVAN = 0;
 							break;
@@ -457,7 +460,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								break;
 						}
 					}
-					cout << endl;
+					cout << endl  << gppTAB-nSP;
 				} else {
 					switch(c)
 					{
@@ -505,7 +508,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				case ']':
 					pSPc[nSP] = c;
 					if( bDBG ) 	///
-						cout << pSPc[nSP] << endl;
+						cout << pSPc[nSP] << endl << gppTAB-nSP;
 					nSP--;
 					nVAN = 0;
 					break;
@@ -524,7 +527,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				case '}':
 					pSPc[nSP] = c;
 					if( bDBG ) 	///
-						cout << pSPc[nSP] << endl;
+						cout << pSPc[nSP] << endl << gppTAB-nSP;
 					nSP--;
 					nVAN = 0;
 					break;
