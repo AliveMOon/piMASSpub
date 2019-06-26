@@ -452,6 +452,8 @@ public:
 	gpcOPCD		aSPb[0x1000];
 	U1			aSPc[0x1000], nSPdct;
 	gpcLZYdct	*apSPdct[0x100];
+	gpcLAZY		*apSPdtcOPCD[0x100];
+
 	U4			anSPdct[0x100];
 	void tag_add( gpeALF tg, U4 iKID )
 	{

@@ -390,6 +390,11 @@ typedef enum gpeALF: I8
 	gpeALF_SUB = gpdABC('S', 'U', 'B'),
 	gpeALF_SUM = gpdABC('S', 'U', 'M'),
 	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
+
+	gpeALF_TYF = gpdABC('T', 'Y', 'F'),
+	gpeALF_TYI = gpdABC('T', 'Y', 'I'),
+	gpeALF_TYU = gpdABC('T', 'Y', 'U'),
+
 	gpeALF_VEC = gpdABC('V', 'E', 'C'),
 	gpeALF_VOX = gpdABC('V', 'O', 'X'),
 	gpeALF_WIN = gpdABC('W', 'I', 'N'),
@@ -499,6 +504,7 @@ typedef enum gpeALF: I8
 	gpeALF_BUBLE = gpdABCDE('B', 'U', 'B', 'L', 'E'),
 	gpeALF_CACHE = gpdABCDE('C', 'A', 'C', 'H', 'E'),
 	gpeALF_COLOR = gpdABCDE('C', 'O', 'L', 'O', 'R'),
+	gpeALF_CLASS = gpdABCDE('C', 'L', 'A', 'S', 'S'),
 	gpeALF_CONST = gpdABCDE('C', 'O', 'N', 'S', 'T'),
 	gpeALF_COUNT = gpdABCDE('C', 'O', 'U', 'N', 'T'),
 	gpeALF_CROSS = gpdABCDE('C', 'R', 'O', 'S', 'S'),
@@ -1698,44 +1704,55 @@ public:
 	{
 		gpmCLR;
 	}
-	U4 dict_find( char* p_str, U8 n_str, U4& n )
+	U4 dict_find( char* pS, U8 nS, U4& nIX )
 	{
 		if( !this )
 		{
-			n = 0;
+			nIX = 0;
 			return 0;
 		}
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
-		str.lazy_add( p_str, n+1, aSTRT[0] = -1 );
+		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
 		char* p_str0 = ((char*)str.p_alloc);
-		p_str = p_str0+aSTRT[0];
-		if( p_str[n] )
-			p_str[n] = 0;
+		pS = p_str0+aSTRT[0];
+		if( pS[nS] )
+			pS[nS] = 0;
 
+		ix.lazy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		nIX = (aSTRT[1]/sizeof(U4x4));
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
-		n = nIX();
 
-		U4 i = p_ix0->dict_find( p_str0, p_ix0[n] );
-		return i;
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nS;
+
+		U4 iIX = p_ix0->dict_find( p_str0, *pIX );
+
+		// UNDOza a bejegyzést
+		str.n_load = aSTRT[0];
+		ix.n_load = aSTRT[1];
+		pIX = p_ix0+iIX;
+		return iIX;
 	}
-	gpcLZYdct* dict_add( char* p_str, U8 n )
+	gpcLZYdct* dict_add( char* pS, U8 nS )
 	{
 		if( !this )
 		{
 			gpcLZYdct* p_this = new gpcLZYdct(0);
 
-			return p_this->dict_add( p_str, n );
+			return p_this->dict_add( pS, nS );
 		}
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
-		str.lazy_add( p_str, n+1, aSTRT[0] = -1 );
+		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
 		char* p_str0 = ((char*)str.p_alloc);
-		p_str = p_str0+aSTRT[0];
-		if( p_str[n] )
-			p_str[n] = 0;
+		pS = p_str0+aSTRT[0];
+		if( pS[nS] )
+			pS[nS] = 0;
 
 		ix.lazy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
@@ -1744,7 +1761,7 @@ public:
 		pIX = p_ix0 + nIX;
 		pIX->null();
 		pIX->x = aSTRT[0];
-		pIX->y = n;
+		pIX->y = nS;
 		U4 iIX, nADD = p_ix0->dict_add( p_str0, iIX, *pIX );
 
 		if( nIX == nADD )

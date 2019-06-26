@@ -2,27 +2,9 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="gpcSRC.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/gpcOPCD.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="65" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="43" />
-		</Folding>
-	</File>
-	<File name="gpMASSbuild.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="376" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4665" topLine="260" />
-		</Cursor>
-	</File>
-	<File name="piMASS_main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1183" topLine="15" />
-		</Cursor>
-	</File>
-	<File name="gpcLAZY.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="262" topLine="0" />
+			<Cursor1 position="297" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="gpcU14.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -30,24 +12,79 @@
 			<Cursor1 position="31" topLine="0" />
 		</Cursor>
 	</File>
+	<File name="gpMASSbuild.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="376" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8785" topLine="355" />
+		</Cursor>
+		<Folding>
+			<Collapse line="301" />
+			<Collapse line="316" />
+		</Folding>
+	</File>
+	<File name="gpcSRC.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="234" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="gpcSRC.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7306" topLine="417" />
+		</Cursor>
+	</File>
+	<File name="include/gpcSCHL.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1234" topLine="23" />
+		</Cursor>
+	</File>
+	<File name="piMASS.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3572" topLine="100" />
+		</Cursor>
+		<Folding>
+			<Collapse line="916" />
+			<Collapse line="952" />
+			<Collapse line="983" />
+			<Collapse line="1020" />
+			<Collapse line="1056" />
+			<Collapse line="1084" />
+			<Collapse line="1095" />
+			<Collapse line="1204" />
+			<Collapse line="1280" />
+			<Collapse line="1289" />
+			<Collapse line="1294" />
+			<Collapse line="1298" />
+			<Collapse line="1307" />
+			<Collapse line="1312" />
+			<Collapse line="1339" />
+			<Collapse line="1363" />
+			<Collapse line="1426" />
+			<Collapse line="1430" />
+			<Collapse line="1454" />
+			<Collapse line="1539" />
+			<Collapse line="1551" />
+			<Collapse line="1559" />
+			<Collapse line="1565" />
+			<Collapse line="1613" />
+		</Folding>
+	</File>
 	<File name="include/gpcND.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="123" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="gpcSRC.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="gpcLAZY.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="20" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="piMASS.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4083" topLine="93" />
+			<Cursor1 position="967" topLine="6" />
 		</Cursor>
 	</File>
 	<File name="gpcU44.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="20" topLine="0" />
+			<Cursor1 position="1410" topLine="90" />
+		</Cursor>
+	</File>
+	<File name="piMASS_main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3408" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

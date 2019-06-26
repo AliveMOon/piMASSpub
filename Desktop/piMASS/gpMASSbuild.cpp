@@ -365,16 +365,16 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 	0.0, gpeALF_CONST },
 	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 	0.0, gpeALF_CONST },
 
-	{ gpaOPCi,	"U1", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_U },
-	{ gpaOPCi,	"U2", 	0, 0, 0, sizeof(U2), 		0.0, gpeALF_U },
-	{ gpaOPCi,	"U4", 	0, 0, 0, sizeof(U4), 		0.0, gpeALF_U },
-	{ gpaOPCi,	"U8", 	0, 0, 0, sizeof(U8), 		0.0, gpeALF_U },
-	{ gpaOPCi,	"I1", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_I },
-	{ gpaOPCi,	"I2", 	0, 0, 0, sizeof(U2), 		0.0, gpeALF_I },
-	{ gpaOPCi,	"I4", 	0, 0, 0, sizeof(U4), 		0.0, gpeALF_I },
-	{ gpaOPCi,	"I8", 	0, 0, 0, sizeof(U8), 		0.0, gpeALF_I },
-	{ gpaOPCi,	"F4", 	0, 0, 0, sizeof(float),		0.0, gpeALF_F },
-	{ gpaOPCi,	"F8", 	0, 0, 0, sizeof(double),	0.0, gpeALF_D },
+	{ gpaOPCi,	"U1", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYU },
+	{ gpaOPCi,	"U2", 	0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYU },
+	{ gpaOPCi,	"U4", 	0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYU },
+	{ gpaOPCi,	"U8", 	0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYU },
+	{ gpaOPCi,	"I1", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYI },
+	{ gpaOPCi,	"I2", 	0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYI },
+	{ gpaOPCi,	"I4", 	0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYI },
+	{ gpaOPCi,	"I8", 	0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYI },
+	{ gpaOPCi,	"F4", 	0, 0, 0, sizeof(float),		0.0, gpeALF_TYF },
+	{ gpaOPCi,	"F8", 	0, 0, 0, sizeof(double),	0.0, gpeALF_TYF },
 
 	{ gpaOPCi,	"sizeof", 		0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"if", 			0, 0, 0, 0,	0.0, gpeALF_FUNC },
@@ -386,10 +386,12 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"class",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"pud",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"prot",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"new",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"del",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
 
-	{ gpaOPCi,	"SYS",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"GT",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"PIC",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"SYS",		0, 0, 0, 0,	0.0, gpeALF_CLASS },
+	{ gpaOPCi,	"GT",		0, 0, 0, 0,	0.0, gpeALF_CLASS },
+	{ gpaOPCi,	"PIC",		0, 0, 0, 0,	0.0, gpeALF_CLASS },
 
 
 };
@@ -424,11 +426,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	if( !mass.nSPdct )
 	{
-        for( U4 i = 0; i < gpmN(gpaOPCi); i++ )
+        for( U4 i = 0, in = gpmN(gpaOPCi); i < in; i++ )
         {
 			*mass.apSPdct = (*mass.apSPdct)->dict_add( (char*)gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
         }
-		*anSPdct = (*mass.apSPdct)->nIX();
+		*mass.anSPdct = (*mass.apSPdct)->nIX();
+		*apSPdtcOPCD = (*apSPdtcOPCD)-lazy_add( gpaOPCi, sizeof(gpaOPCi), nN = -1, 1 );
 	}
 
 	U2	nSP = 0,
@@ -478,13 +481,33 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					// ez mi ez?
                     // hol van mekkor a stb...
                     // jó ez most nekünk?
+
+                    gpcOPCD* pOPCD = apSPdtcOPCD[sp] ? apSPdtcOPCD[sp]->p_alloc : NULL;
+					if( !pOPCD )
+						continue;
+
+
+                    switch( pOPCD->typ )
+                    {
+						case gpeALF_TYU:
+							// unsign type
+						case gpeALF_TYI:
+							// signed
+						case gpeALF_TYF:
+							// float
+
+						case gpeALF_CLASS:
+							// osztály azaz vegyi gyümi
+                    }
 					break;
 				}
+
 				if( sp >= nSPdct )
 				{
 					sp = nSPdct-1;
 					// most agyunk nekie
 					ixDCT = ppSPdct[sp]->dict_add( gpsSTRpub, pSPb[nSP].nSTR )->x();
+					mass.anSPdct[sp] = mass.apSPdct[sp]->nIX();
 				}
 				continue;
 			}
