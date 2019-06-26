@@ -1,53 +1,18 @@
 #include "gpcSRC.h"
 
 
-U8 gpfALFA2STR(char* p_out, I8 d0)
-{
-	if( !p_out )
-		return 0;
-	if( !d0 )
-	{
-		*p_out = 0;
-		return 0;
-	}
-	char	lx_s_buff[0x40],
-            *p_buff = lx_s_buff + 0x3f,
-            *p_end = p_buff;
 
-	*p_end = 0;
-	bool b_minus = false;
-	if( d0 < 0 )
-	{
-		b_minus = true;
-		d0 *= -1;
-	}
-
-	I8 d1;
-	while( d0 )
-	{
-		d1 = d0;
-		d0 = (d0-1)/gpdALF;
-		p_buff--;
-		*p_buff = (d1-d0*gpdALF)+'\`';
-	}
-
-	if( b_minus )
-	{
-		p_buff--;
-		*p_buff = '-';
-	}
-	U2 n = p_end-p_buff;
-	memcpy( p_out, p_buff, n+1 );
-	return n;
-}
 gpcSRC::gpcSRC()
 {
     //ctor
     gpmCLR;
 }
-gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS )
+gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& spc )
 {
 	gpmCLR;
+	space = spc;
+	spc.x++;
+
 	if( pS ? !*pS : true )
 	{
 		if( !ppS )
@@ -263,57 +228,4 @@ gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 	return pFND;
 }
 
-gpcMASS::gpcMASS( const U1* pU, U8 nU )
-{
-	gpmCLR;
-	if(!nU)
-		return;
-	if( pU ? !*pU : true )
-		return;
 
-	U1	*pS = (U1*)pU,
-		*pSe = pS+nU;
-	gpcSRC tmp;
-	U4 is, n, xadd = 1, id, mom = 0;
-	nSP = 1;
-
-	while( pS < pSe ? *pS : false )
-	{
-		tmp.reset( pS, pSe, &pS );
-		if(!tmp.nL)
-			continue;
-		tmp.IX = nLST;
-		if( tmp.bSUB( *this ) )
-		{
-			mom = nSP;
-            nSP++;
-            aSP44[nSP].null();
-		}
-		else if( tmp.bENTR( *this ) )
-		{
-			aSP44[nSP].x = 0;
-			aSP44[nSP].y++;
-			if( aSP44[mom].w < aSP44[nSP].y )
-				aSP44[mom].w = aSP44[nSP].y;
-		} else {
-			aSP44[nSP].x++;
-			if( aSP44[mom].z < aSP44[nSP].x )
-				aSP44[mom].z = aSP44[nSP].x;
-		}
-		tmp.space = aSP44[nSP];
-        apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
-
-		apSP[nSP]->bMAIN( *this, true );
-
-		while( apSP[nSP]->bRET( *this ) )
-		{
-			apSP[mom]->space = aSP44[mom];
-			apSP[mom]->retIX = aSPix[nSP];
-			mom--;
-			nSP--;
-		}
-
-		xadd++;
-
-	}
-}

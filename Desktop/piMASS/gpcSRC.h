@@ -2,6 +2,9 @@
 #define GPCSRC_H
 
 #include "piMASS.h"
+#include "gpcSCHL.h"
+#include "gpcOPCD.h"
+
 enum gpeMASSsw:U8
 {
 	gpeMASSzero,
@@ -300,15 +303,24 @@ public:
 		// kijebb lép
 		return bSW&gpeMASSretMSK;
     }
-    bool bENTR( gpcMASS& mass )
+    bool bENTR( gpcMASS& mass, U4x4& spc, U4 x = 0 )
     {
 		if( !this )
 			return false;
 
+
 		hd( mass );
 
 		// új sort kezd a táblázatban
-		return bSW&gpeMASSentrMSK;
+		if( !(bSW&gpeMASSentrMSK) )
+			return false;
+
+		space.x = x;
+		space.y++;
+		spc = space;
+		spc.x++;
+		return true;
+
     }
     bool bUNsel( gpcMASS& mass )
     {
@@ -410,7 +422,7 @@ public:
 		pB = pA+i;
 		return i;
 	}
-	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC );
+	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spc );
     gpcSRC( gpcSRC& B );
     gpcSRC& operator = ( gpcSRC& B );
 protected:
@@ -418,200 +430,29 @@ protected:
 private:
 };
 
-class gpeSCHL
-{
 
-	gpcLAZY	*pCLASS,
-			*pLST, *pFND;
-	I8	nLST, nCLASS,
-		idFND, ixFND;
 
-	gpcLAZY** ppCLASS( I8 ix )
-	{
-		if( ix >= nLST )
-			return NULL;
-
-		gpcLAZY** ppC = NULL;
-		if( pCLASS )
-			ppC = (gpcLAZY**)pCLASS->p_alloc;
-
-		nCLASS = ppC ? pCLASS->n_load/sizeof(pFND) : 0;
-
-		if( nCLASS <= ix )
-		{
-			I8	nALL = pCLASS ? pCLASS->n_alloc/sizeof(pFND) : 0,
-				nADD;
-			if( nALL <= ix )
-			{
-				nALL = ix+1;
-				nADD = nALL-nCLASS;
-
-				U8 s = -1;
-
-				pCLASS = pCLASS->lazy_add( NULL, nADD*sizeof(pFND), s );
-				ppC = NULL;
-				if( pCLASS )
-					ppC = (gpcLAZY**)pCLASS->p_alloc;
-				else
-					return NULL;
-
-				if( !ppC )
-					return NULL;
-
-				gpmZn( ppC+nCLASS, nADD );
-				nCLASS = pCLASS->n_load/sizeof(pFND) ;
-			}
-		}
-		return ppC+ix;
-	}
-	gpeSCHL( I8 id )
-	{
-		gpmCLR;
-		I8 n = 0;
-		pLST = pLST->tree_add( id, n );
-		if( !pLST )
-			return;
-
-		nLST = n;
-	}
-public:
-	gpeSCHL( void )
-	{
-		gpmCLR;
-	}
-
-	gpcLAZY* pGET( I8 ix )
-	{
-		if( ix >= nLST )
-			return NULL;
-
-		gpcLAZY** ppC = ppCLASS( ix );
-		if( !ppC )
-			return NULL;
-
-		return *ppC;
-	}
-	gpcLAZY** ppGET( I8 ix )
-	{
-		if( ix >= nLST )
-			return NULL;
-
-		return ppCLASS( ix );
-	}
-
-	I8 fnd( I8 id )
-	{
-		if( id ? !this : true )
-			return nLST;
-
-		if( nLST )
-		if( idFND == id )
-			return ixFND;
-
-		return pLST->tree_fnd(id, nLST);
-	}
-	gpcLAZY* p_fnd( I8 id, I8& ix )
-	{
-		ix = 0;
-		if( id ? !this : true )
-			return NULL;
-		if( !nLST )
-			return 0;
-
-		if( idFND == id )
-		{
-			ix = ixFND;
-			return pFND;
-		}
-
-		ix = pLST->tree_fnd(id, nLST);
-		if(ix >= nLST)
-			return NULL;
-
-		gpcLAZY** ppC = ppCLASS( ix );
-		if( ppC ? !*ppC : true )
-		{
-			ix = nLST;
-			return NULL;
-		}
-
-		ixFND = ix;
-		idFND = id;
-		return pFND = *ppC;
-	}
-	gpeSCHL* add( I8 id, I8& ix, I8& n )
-	{
-		if( !id )
-		{
-			ix = n = (this ? nLST: 0);
-			return this;
-		}
-		if( !this )
-		{
-			gpeSCHL* pSCHL = new gpeSCHL(id); ///
-			ix = 0;
-			n = 1;
-			return pSCHL;
-		}
-
-		ix = pLST->tree_fnd( id, nLST );
-		if( ix < nLST )
-		{
-			n = nLST;
-			return this;
-		}
-
-		pLST = pLST->tree_add(id, nLST);
-		n = nLST;
-		/*if( ix >= nLST ) // is és nLST - ha továbbra is egyenlő akkor nem tudta hozzá adni
-			return this;
-
-		ppCLASS( ix );
-		if( nCLASS > ix )
-			return this;
-
-		U8 s = -1;
-		nALLOC = nLST;
-		pKIDS = pKIDS->lazy_add( NULL, sizeof(*pKIDS), s );*/
-		return this;
-	}
-};
-
-class gpcOPCD
-{
-public:
-	I4		nADD, nMUL;
-	I8		i8;
-	U8		u8, nSTR, nLEN;
-	gpeALF	lab, typ;
-	U1		*pSTR;
-	double	d;
-	gpcOPCD(){};
-
-	gpcOPCD& null()
-	{
-		gpmCLR;
-	}
-};
 class gpcMASS
 {
-	gpeSCHL	*pTG;
-	gpcLAZY	*pSRCc,
-			*pLST;
-	U4		nLST, xFND, nALLOC, nSP,
-			aSPix[0x100];
-	gpcSRC	*pFND,
-			*apSP[0x100];
-	U4x4 	aSP44[0x100];
+	gpeSCHL		*pTG;
+	gpcLAZY		*pSRCc,
+				*pLST;
+	U4			nLST, xFND, nALLOC, nSP,
+				aSPix[0x100];
+	gpcSRC		*pFND,
+				*apSP[0x100];
+	U4x4 		aSP44[0x100];
 
 	gpcSRC** ppSRC( void )
 	{
 		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
-	gpeALF	aTGwip[0x100];
-	gpcOPCD	aSPb[0x1000];
-	U1		aSPc[0x1000];
+	gpeALF		aTGwip[0x100];
+	gpcOPCD		aSPb[0x1000];
+	U1			aSPc[0x1000], nSPdct;
+	gpcLZYdct	*apSPdct[0x100];
+	U4			anSPdct[0x100];
 	void tag_add( gpeALF tg, U4 iKID )
 	{
 		I8 ix, n;
@@ -624,7 +465,7 @@ public:
 		{
 			*pTG->ppGET( ix ) = pLZY = new gpcLAZY;
 		}
-		pLZY->lazy_add( (U4*)iKID, sizeof(U4), s, -1 );
+		pLZY->lazy_add( (U4*)&iKID, sizeof(U4), s, 8 );
 	}
 	void tag_sub( gpeALF tg, U4 iKID )
 	{
@@ -635,17 +476,17 @@ public:
 		if( !pLZY )
 			return;
 
-		U4	*pCLASS = (U4*)pLZY->p_alloc;
+		U4	*paLZY = (U4*)pLZY->p_alloc;
 		U8 nKID = pLZY->n_load/sizeof(ix);
 		for( U8 i = 0; i < nKID; i++ )
 		{
-			if( pCLASS[i] != iKID )
+			if( paLZY[i] != iKID )
 				continue;
 			nKID--;
 			if( !nKID )
 				continue;
 
-			pCLASS[i] = pCLASS[nKID];
+			paLZY[i] = paLZY[nKID];
 			i--;
 		}
 		if( !nKID )

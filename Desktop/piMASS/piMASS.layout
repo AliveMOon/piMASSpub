@@ -2,42 +2,27 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="gpcLAZY.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="gpcSRC.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="262" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="include/gpcND.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="123" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="gpcU44.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="20" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="gpMASSbuild.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="376" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4050" topLine="275" />
-		</Cursor>
-	</File>
-	<File name="gpcSRC.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4709" topLine="253" />
-		</Cursor>
-	</File>
-	<File name="piMASS.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4083" topLine="93" />
+			<Cursor1 position="65" topLine="0" />
 		</Cursor>
 		<Folding>
-			<Collapse line="223" />
+			<Collapse line="43" />
 		</Folding>
+	</File>
+	<File name="gpMASSbuild.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="376" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4665" topLine="260" />
+		</Cursor>
 	</File>
 	<File name="piMASS_main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2050" topLine="66" />
+			<Cursor1 position="1183" topLine="15" />
+		</Cursor>
+	</File>
+	<File name="gpcLAZY.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="262" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="gpcU14.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -45,18 +30,24 @@
 			<Cursor1 position="31" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="gpcSRC.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/gpcND.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5772" topLine="220" />
+			<Cursor1 position="123" topLine="0" />
 		</Cursor>
-		<Folding>
-			<Collapse line="41" />
-			<Collapse line="303" />
-			<Collapse line="313" />
-			<Collapse line="325" />
-			<Collapse line="336" />
-			<Collapse line="347" />
-			<Collapse line="373" />
-		</Folding>
+	</File>
+	<File name="gpcSRC.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="piMASS.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4083" topLine="93" />
+		</Cursor>
+	</File>
+	<File name="gpcU44.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20" topLine="0" />
+		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

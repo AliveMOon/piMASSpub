@@ -43,6 +43,45 @@ U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nLEN )
 	}
 	return pS-p_str;
 }
+U8 gpfALF2STR(char* p_out, I8 d0)
+{
+	if( !p_out )
+		return 0;
+	if( !d0 )
+	{
+		*p_out = 0;
+		return 0;
+	}
+	char	lx_s_buff[0x40],
+            *p_buff = lx_s_buff + 0x3f,
+            *p_end = p_buff;
+
+	*p_end = 0;
+	bool b_minus = false;
+	if( d0 < 0 )
+	{
+		b_minus = true;
+		d0 *= -1;
+	}
+
+	I8 d1;
+	while( d0 )
+	{
+		d1 = d0;
+		d0 = (d0-1)/gpdALF;
+		p_buff--;
+		*p_buff = (d1-d0*gpdALF)+'\`';
+	}
+
+	if( b_minus )
+	{
+		p_buff--;
+		*p_buff = '-';
+	}
+	U2 n = p_end-p_buff;
+	memcpy( p_out, p_buff, n+1 );
+	return n;
+}
 gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 {
 	if( p_end < pS )
@@ -81,12 +120,14 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 
 	return (gpeALF)alf;
 }
-
+char gpsHD[0x1000], *psHD;
 void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 {
 	if( !this )
 		return;
 
+	psHD = gpsHD;
+	psHD[0] = 0;
 	if( nHD == nVER )
 	{
 		if( !nVER )
@@ -94,7 +135,6 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		else
 			return;
 	}
-
 
 	U1* pS = pA;
 	U8	oSW = bSW;
@@ -104,6 +144,10 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 	pALFtg = NULL;
 	nALFtg = 0;
+
+	psHD += sprintf( psHD, "\r\nHD: %s V:%d H:%d C:%d \r\nbSW:0x%0.8x",
+						space.str( psHD+0x100, "," ), nVER, nHD, nBLD,
+						bSW );
 
 	while( pB-pS )
 	{
@@ -204,17 +248,21 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		gpmDELary(pTGdie);
 	}
 
-	U8 bOFF = ~(gpeMASSmainMSK||gpeMASSprgMSK);
+	U8 bOFF = ~(gpeMASSmainMSK|gpeMASSprgMSK);
 	if( pTGpub )
 	{
 		pALFtg = new gpeALF[nALFtg+1];
 		nTGdie = nALFtg;
 		nALFtg = 0;
+		psHD += sprintf( psHD, "\r\nnTG:%d", nTGdie );
+
 		for( U4 i = 0; i < nTGdie; i++ )
 		{
 			if( pTGpub[i] < gpeALF_A )
 				continue;
 			pALFtg[nALFtg] = pTGpub[i];
+			psHD += sprintf( psHD, " #" );
+			psHD += gpfALF2STR( psHD, (I8)pTGpub[i] );
 			switch( pALFtg[nALFtg] )
 			{
 				case gpeALF_MAIN:
@@ -230,40 +278,170 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			mass.tag_add( pALFtg[nALFtg], IX );			///
 			nALFtg++;
 		}
+
+
 		if( !nALFtg )
 			gpmDELary(pALFtg);
 		gpmDELary(pTGdie);
 	}
+	psHD += sprintf( psHD, "\r\nOFF:0x%0.8x",
+						bOFF );
 	bSW &= bOFF;
 	nHD = nVER;
+	psHD += sprintf( psHD, "\r\nbSW:0x%0.8x",
+						bSW );
+	if( psHD > gpsHD )
+		cout << gpsHD;
+	cout << "." ;
 }
 
 char gpsPRG[] = " \t\r\n\a .,!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ";
 char gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
+
 	 *gppTAB = gpsTAB+strlen(gpsTAB);
+/*gpcOPCD::gpcOPCD( const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t )
+{
+	pSTR = (U1*)pS;
+	nADD = a;
+	nMUL = m;
+	i8 = i;
+	u8 = u;
+	d = _d;
+	typ = t;
+
+	nSTR = gpmVAN( pSTR, gpsPRG, nLEN );
+
+}*/
+
+
+/*gpcOPCD gpaOPC[] = {
+	{ "false", 	0, 0, 0, size(U1), 		0.0, gpeALF_U },
+	{ "true", 	0, 0, 0, size(U1), 		0.0, gpeALF_U },
+
+	{ "U2", 	0, 0, 0, size(U2), 		0.0, gpeALF_U },
+
+	{ "U1", 	0, 0, 0, size(U1), 		0.0, gpeALF_U },
+	{ "U2", 	0, 0, 0, size(U2), 		0.0, gpeALF_U },
+	{ "U4", 	0, 0, 0, size(U4), 		0.0, gpeALF_U },
+	{ "U8", 	0, 0, 0, size(U8), 		0.0, gpeALF_U },
+	{ "I1", 	0, 0, 0, size(U1), 		0.0, gpeALF_I },
+	{ "I2", 	0, 0, 0, size(U2), 		0.0, gpeALF_I },
+	{ "I4", 	0, 0, 0, size(U4), 		0.0, gpeALF_I },
+	{ "I8", 	0, 0, 0, size(U8), 		0.0, gpeALF_I },
+	{ "F4", 	0, 0, 0, size(F4), 		0.0, gpeALF_F },
+	{ "F8", 	0, 0, 0, size(double),	0.0, gpeALF_D },
+
+	{ "if", 		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "for", 		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "while", 		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "switch",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "break",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "continue",	0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "class",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "pud",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "prot",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+
+	{ "SYS",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "GT",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ "PIC",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+
+
+};*/
+gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t )
+{
+	pSTR = (U1*)pS;
+	nADD = a;
+	nMUL = m;
+	i8 = (this-pTHIS)+i;
+	u8 = u;
+	d = _d;
+	typ = t;
+
+	nSTR = gpmVAN( pSTR, gpsPRG, nLEN );
+
+}
+
+static const gpcOPCD gpaOPCi[] = {
+	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 	0.0, gpeALF_CONST },
+	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 	0.0, gpeALF_CONST },
+
+	{ gpaOPCi,	"U1", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_U },
+	{ gpaOPCi,	"U2", 	0, 0, 0, sizeof(U2), 		0.0, gpeALF_U },
+	{ gpaOPCi,	"U4", 	0, 0, 0, sizeof(U4), 		0.0, gpeALF_U },
+	{ gpaOPCi,	"U8", 	0, 0, 0, sizeof(U8), 		0.0, gpeALF_U },
+	{ gpaOPCi,	"I1", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_I },
+	{ gpaOPCi,	"I2", 	0, 0, 0, sizeof(U2), 		0.0, gpeALF_I },
+	{ gpaOPCi,	"I4", 	0, 0, 0, sizeof(U4), 		0.0, gpeALF_I },
+	{ gpaOPCi,	"I8", 	0, 0, 0, sizeof(U8), 		0.0, gpeALF_I },
+	{ gpaOPCi,	"F4", 	0, 0, 0, sizeof(float),		0.0, gpeALF_F },
+	{ gpaOPCi,	"F8", 	0, 0, 0, sizeof(double),	0.0, gpeALF_D },
+
+	{ gpaOPCi,	"sizeof", 		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"if", 			0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"for", 			0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"while", 		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"switch",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"break",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"continue",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"class",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"pud",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"prot",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
+
+	{ gpaOPCi,	"SYS",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"GT",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"PIC",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+
+
+};
 char gpsSTRpub[0x1000];
 void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 {
 	hd( mass );
 
-	U1* pS = pB, *pSe, *pE = pA+nL, *pSTR = NULL;
+	psHD = gpsHD;
+	psHD[0] = 0;
+	psHD += sprintf( 	psHD, "\r\nComPI: %s V:%d H:%d B:%d \r\nbSW:0x%0.8x",
+						space.str( psHD+0x100), nVER, nHD, nBLD,
+						bSW );
+	if( psHD > gpsHD )
+	{
+		cout << gpsHD;
+		psHD = gpsHD;
+		psHD[0] = 0;
+	}
+	cout << "." ;
+
+	U1	*pS = *pB == '\a' ? pB+1 : pB,
+		*pSe, *pE = pA+nL, *pSTR = NULL;
 	char sVAN[] = ".";
-	U4 	//nN = n,
+	U4 	nALF,
 		utf8;
 	I4 nCHK;
-	bool bSIGN = false;
-	//I8	i8 = 0, nMUL = 0, nADD;
+	bool bSIGN = false, bALF;
+
 	U8 	nN, nSKIP,
 		nVAN = 0;
-		//, nSTR, nLEN;
 
-	U2 nSP = 0;
+	if( !mass.nSPdct )
+	{
+        for( U4 i = 0; i < gpmN(gpaOPCi); i++ )
+        {
+			*mass.apSPdct = (*mass.apSPdct)->dict_add( (char*)gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
+        }
+		*anSPdct = (*mass.apSPdct)->nIX();
+	}
+
+	U2	nSP = 0,
+		nSPdct = mass.nSPdct+1;
+
+
+
 	gpmZ( mass.aSPc );
 	U1		*pSPc = mass.aSPc, c;
 	gpcOPCD	*pSPb = mass.aSPb;
-
+	gpcLZYdct	**ppSPdct = mass.apSPdct;
 	double d = 0;
-	while( pS < pE )
+	while( pS < pE )				/// 	COMPILER
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pS >= pE )
@@ -275,17 +453,39 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
         c = *pS;
         if( c < 0x80 ? gpaALFadd[c] : true )
         {
+			U4 ixDCT = -1, nDCT;
+
 			// UTF8!
-			pSPb[nSP].nSTR = gpfABCnincs( pSPb[nSP].pSTR = pS, pE, pSPb[nSP].nLEN );
-			if( pSPb[nSP].nSTR )
+			nALF = gpfABCnincs( pSPb[nSP].pSTR = pS, pE, pSPb[nSP].nLEN );
+			if( nALF )
 			{
-				pSPb[nSP].nSTR += gpmVAN( pSPb[nSP].pSTR+pSPb[nSP].nSTR, gpsPRG, nN );
+				// ALF esélyes ?
+				bALF = (nALF == pSPb[nSP].nLEN);
+
+                pSPb[nSP].nSTR = nALF + gpmVAN( pSPb[nSP].pSTR+nALF, gpsPRG, nN );
 				pSPb[nSP].nLEN += nN;
 				gpmSTRnCPY( gpsSTRpub, pSPb[nSP].pSTR, pSPb[nSP].nSTR )[pSPb[nSP].nSTR] = 0;
+				pS += pSPb[nSP].nSTR;
+
 				if( bDBG ) 	///
 					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pSPb[nSP].nSTR << endl << gppTAB-nSP;
-
-				pS += pSPb[nSP].nSTR;
+				U2 sp;
+				for( sp = nSPdct-1; sp < nSPdct ; sp-- )
+				{
+					ixDCT = ppSPdct[sp]->dict_find( gpsSTRpub, pSPb[nSP].nSTR, nDCT );
+					if( ixDCT >= nDCT )
+						continue; //nincsen;
+					// ez mi ez?
+                    // hol van mekkor a stb...
+                    // jó ez most nekünk?
+					break;
+				}
+				if( sp >= nSPdct )
+				{
+					sp = nSPdct-1;
+					// most agyunk nekie
+					ixDCT = ppSPdct[sp]->dict_add( gpsSTRpub, pSPb[nSP].nSTR )->x();
+				}
 				continue;
 			}
 

@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="first.mass" />
+				<Option parameters="piCAM.mass" />
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="./" />
@@ -51,6 +51,8 @@
 		<Unit filename="gpcU14.cpp" />
 		<Unit filename="gpcU44.cpp" />
 		<Unit filename="include/gpcND.h" />
+		<Unit filename="include/gpcOPCD.h" />
+		<Unit filename="include/gpcSCHL.h" />
 		<Unit filename="piMASS.h" />
 		<Unit filename="piMASS_main.cpp" />
 		<Unit filename="src/gpcND.cpp" />
