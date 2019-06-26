@@ -381,8 +381,10 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"for", 			0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"while", 		0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"switch",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+
 	{ gpaOPCi,	"break",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"continue",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
+
 	{ gpaOPCi,	"class",		0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"pud",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"prot",			0, 0, 0, 0,	0.0, gpeALF_FUNC },
@@ -431,7 +433,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			*mass.apSPdct = (*mass.apSPdct)->dict_add( (char*)gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
         }
 		*mass.anSPdct = (*mass.apSPdct)->nIX();
-		*apSPdtcOPCD = (*apSPdtcOPCD)-lazy_add( gpaOPCi, sizeof(gpaOPCi), nN = -1, 1 );
+		*mass.apSPdtcOPCD = (*mass.apSPdtcOPCD)->lazy_add( gpaOPCi, sizeof(gpaOPCi), nN = -1, 1 );
 	}
 
 	U2	nSP = 0,
@@ -482,23 +484,34 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
                     // hol van mekkor a stb...
                     // jó ez most nekünk?
 
-                    gpcOPCD* pOPCD = apSPdtcOPCD[sp] ? apSPdtcOPCD[sp]->p_alloc : NULL;
+                    gpcOPCD* pOPCD = mass.apSPdtcOPCD[sp] ? (gpcOPCD*)mass.apSPdtcOPCD[sp]->p_alloc : NULL;
 					if( !pOPCD )
 						continue;
+					else {
 
+						switch( pOPCD[ixDCT].typ )
+						{
+							case gpeALF_TYU:
+								// unsign type
+								cout << "TYPE UNSIGN";
+								break;
+							case gpeALF_TYI:
+								// signed
+								cout << "TYPE SIGN";
+								break;
+							case gpeALF_TYF:
+								// float
+								cout << "TYPE FLOAT";
+								break;
 
-                    switch( pOPCD->typ )
-                    {
-						case gpeALF_TYU:
-							// unsign type
-						case gpeALF_TYI:
-							// signed
-						case gpeALF_TYF:
-							// float
+							case gpeALF_CLASS:
+								// osztály azaz vegyi gyümi
+								cout << "CLASS";
 
-						case gpeALF_CLASS:
-							// osztály azaz vegyi gyümi
-                    }
+								break;
+						}
+						cout << pOPCD[ixDCT].pSTR;
+					}
 					break;
 				}
 
