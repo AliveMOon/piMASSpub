@@ -349,6 +349,8 @@ char gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 };*/
 gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t )
 {
+	gpmCLR;
+
 	pSTR = (U1*)pS;
 	nADD = a;
 	nMUL = m;
@@ -362,6 +364,7 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 }
 
 static const gpcOPCD gpaOPCi[] = {
+	// this,	pS,			a, m, i, u,				d,		t;
 	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 	0.0, gpeALF_CONST },
 	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 	0.0, gpeALF_CONST },
 
@@ -436,14 +439,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		*mass.apSPdtcOPCD = (*mass.apSPdtcOPCD)->lazy_add( gpaOPCi, sizeof(gpaOPCi), nN = -1, 1 );
 	}
 
-	U2	nSP = 0,
+	U2	iPC = 0,
 		nSPdct = mass.nSPdct+1;
-
+	U4 iDAT;
 
 
 	gpmZ( mass.aSPc );
-	U1		*pSPc = mass.aSPc, c;
-	gpcOPCD	*pSPb = mass.aSPb;
+	U1		*psPRG = mass.aSPc, c;
+	gpcOPCD	*pPRG = mass.aSPb;
 	gpcLZYdct	**ppSPdct = mass.apSPdct;
 	double d = 0;
 	while( pS < pE )				/// 	COMPILER
@@ -461,23 +464,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			U4 ixDCT = -1, nDCT;
 
 			// UTF8!
-			nALF = gpfABCnincs( pSPb[nSP].pSTR = pS, pE, pSPb[nSP].nLEN );
+			nALF = gpfABCnincs( pPRG[iPC].pSTR = pS, pE, pPRG[iPC].nLEN );
 			if( nALF )
 			{
 				// ALF esélyes ?
-				bALF = (nALF == pSPb[nSP].nLEN);
+				bALF = (nALF == pPRG[iPC].nLEN);
 
-                pSPb[nSP].nSTR = nALF + gpmVAN( pSPb[nSP].pSTR+nALF, gpsPRG, nN );
-				pSPb[nSP].nLEN += nN;
-				gpmSTRnCPY( gpsSTRpub, pSPb[nSP].pSTR, pSPb[nSP].nSTR )[pSPb[nSP].nSTR] = 0;
-				pS += pSPb[nSP].nSTR;
+                pPRG[iPC].nSTR = nALF + gpmVAN( pPRG[iPC].pSTR+nALF, gpsPRG, nN );
+				pPRG[iPC].nLEN += nN;
+				gpmSTRnCPY( gpsSTRpub, pPRG[iPC].pSTR, pPRG[iPC].nSTR )[pPRG[iPC].nSTR] = 0;
+				pS += pPRG[iPC].nSTR;
 
 				if( bDBG ) 	///
-					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pSPb[nSP].nSTR << endl << gppTAB-nSP;
+					cout << "STR: " << gpsSTRpub << " nSTR:" <<  pPRG[iPC].nSTR << endl << gppTAB-iPC;
 				U2 sp;
 				for( sp = nSPdct-1; sp < nSPdct ; sp-- )
 				{
-					ixDCT = ppSPdct[sp]->dict_find( gpsSTRpub, pSPb[nSP].nSTR, nDCT );
+					ixDCT = ppSPdct[sp]->dict_find( gpsSTRpub, pPRG[iPC].nSTR, nDCT );
 					if( ixDCT >= nDCT )
 						continue; //nincsen;
 					// ez mi ez?
@@ -493,22 +496,47 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						{
 							case gpeALF_TYU:
 								// unsign type
+								pPRG[iPC].nWIP = 0;
+
 								cout << "TYPE UNSIGN";
 								break;
 							case gpeALF_TYI:
 								// signed
+								pPRG[iPC].nWIP = 0;
 								cout << "TYPE SIGN";
 								break;
 							case gpeALF_TYF:
 								// float
+								pPRG[iPC].nWIP = 0;
 								cout << "TYPE FLOAT";
 								break;
 
 							case gpeALF_CLASS:
 								// osztály azaz vegyi gyümi
+								pPRG[iPC].nWIP = 0;
 								cout << "CLASS";
 
 								break;
+							case gpeALF_CONST:
+								pPRG[iPC] = pOPCD[ixDCT];
+								pPRG[iPC].nWIP = 2;
+								break;
+						}
+						switch( pPRG[iPC].nWIP )
+						{
+							case 0:
+								// TYPE
+								pPRG[iPC].typ = pOPCD[ixDCT].typ;
+								pPRG[iPC].i8 = iDAT;
+								pPRG[iPC].u8 = pOPCD[ixDCT].u8;
+								pPRG[iPC].nWIP = 1;
+								break;
+							case 1:
+								// NAME // alloc
+                                iDAT += pPRG[iPC].u8;
+								break;
+
+
 						}
 						cout << pOPCD[ixDCT].pSTR;
 					}
@@ -519,7 +547,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				{
 					sp = nSPdct-1;
 					// most agyunk nekie
-					ixDCT = ppSPdct[sp]->dict_add( gpsSTRpub, pSPb[nSP].nSTR )->x();
+					ixDCT = ppSPdct[sp]->dict_add( gpsSTRpub, pPRG[iPC].nSTR )->x();
 					mass.anSPdct[sp] = mass.apSPdct[sp]->nIX();
 				}
 				continue;
@@ -555,19 +583,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 
 						case '\"':
-							pSPc[nSP] = c;
-							pSPb[nSP].typ = gpeALF_STR;
-							pSPb[nSP].pSTR = pS+nVAN;
+							psPRG[iPC] = c;
+							pPRG[iPC].typ = gpeALF_STR;
+							pPRG[iPC].pSTR = pS+nVAN;
 
-                            nVAN += gpmVAN( pSPb[nSP].pSTR, sVAN, pSPb[nSP].nLEN );
-                            pSPb[nSP].nSTR = (pS+nVAN) - pSPb[nSP].pSTR;
+                            nVAN += gpmVAN( pPRG[iPC].pSTR, sVAN, pPRG[iPC].nLEN );
+                            pPRG[iPC].nSTR = (pS+nVAN) - pPRG[iPC].pSTR;
 							if( pS[nVAN] == c )
 								nVAN++;
 							break;
 						case '\'':
-							pSPc[nSP] = c;
-							pSPb[nSP].typ = gpeALF_U;
-							pSPb[nSP].u8 = gpfUTF8( pS+nVAN, NULL );
+							psPRG[iPC] = c;
+							pPRG[iPC].typ = gpeALF_U;
+							pPRG[iPC].u8 = gpfUTF8( pS+nVAN, NULL );
 
                             nVAN += gpmVAN( pS+nVAN, sVAN, nN );
                             if( pS[nVAN] == c )
@@ -578,21 +606,21 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 
 						case '(':
-							memset( pSPc+nSP, c, nVAN+1 );
-							pSPb[nSP].typ = pSPb[nSP].lab ? gpeALF_FUNC : gpeALF_STK;
-							nSP++;
-							pSPb[nSP].null();
+							memset( psPRG+iPC, c, nVAN+1 );
+							pPRG[iPC].typ = pPRG[iPC].lab ? gpeALF_FUNC : gpeALF_STK;
+							iPC++;
+							pPRG[iPC].null();
 							if( !nVAN )
 								break;
-							pSPb[nSP].typ = gpeALF_STK;
-							gpfMEMSET( &pSPb[nSP+1], nVAN-1, &pSPb[nSP], sizeof(*pSPb) );
-							nSP += nVAN;
+							pPRG[iPC].typ = gpeALF_STK;
+							gpfMEMSET( &pPRG[iPC+1], nVAN-1, &pPRG[iPC], sizeof(*pPRG) );
+							iPC += nVAN;
 							break;
 						case ')':
-							pSPc[nSP] = c;
+							psPRG[iPC] = c;
 							if( bDBG ) 	///
-								cout << pSPc[nSP] << endl  << gppTAB-nSP;
-							nSP--;
+								cout << psPRG[iPC] << endl  << gppTAB-iPC;
+							iPC--;
 							nVAN = 0;
 							break;
 
@@ -600,17 +628,17 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 
 						case '+':
-							pSPb[nSP].nADD += nVAN+1;
+							pPRG[iPC].nADD += nVAN+1;
 							break;
 						case '-':
-							pSPb[nSP].nADD -= nVAN+1;
+							pPRG[iPC].nADD -= nVAN+1;
 							break;
 
 						case '*':
-							nCHK = pSPb[nSP].nMUL;
-							pSPb[nSP].nMUL += nVAN+1;
+							nCHK = pPRG[iPC].nMUL;
+							pPRG[iPC].nMUL += nVAN+1;
 							if( nCHK < 0 )
-							if( (pSPb[nSP].nMUL-nCHK) > 1 )
+							if( (pPRG[iPC].nMUL-nCHK) > 1 )
 							{
 								// ez biza /*..//** vagy valami ilyesmi
 								U1* pSS = (U1*)strstr( (char*)pS, "*/" ); // megkeressük a végét
@@ -624,10 +652,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							}
 							break;
 						case '/':
-							pSPb[nSP].nMUL -= nVAN+1;
-							if( pSPb[nSP].nMUL < -2 )
+							pPRG[iPC].nMUL -= nVAN+1;
+							if( pPRG[iPC].nMUL < -2 )
 							{
-								pSPb[nSP].nMUL = 0;
+								pPRG[iPC].nMUL = 0;
 								/// comment skip next line
 								nSKIP = gpmVAN( pS, "\r\n\a", nN );
 								nSKIP += gpmNINCS( pS+nSKIP, "\r\n" );
@@ -643,7 +671,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						case ',':	// vessző
 							// berakjuk ami létrejött a sorba
+							if( pPRG[iPC].nWIP == 1 )
+							{
 
+							}
 							break;
 						case '.':	// pont
 
@@ -654,49 +685,49 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				else if( c < 0x3A )
 				{
 					// 30-39 // számok 0-9
-                    pSPb[nSP].u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
+                    pPRG[iPC].u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
 					if( *pS == '.' )
                     {
-						pSPb[nSP].typ = gpeALF_D;
-						pSPb[nSP].d = gpmSTR2D( pS ) + (double)pSPb[nSP].u8;		///
-						if( pSPb[nSP].nADD < 0 )
-							pSPb[nSP].d *= -1;
+						pPRG[iPC].typ = gpeALF_D;
+						pPRG[iPC].d = gpmSTR2D( pS ) + (double)pPRG[iPC].u8;		///
+						if( pPRG[iPC].nADD < 0 )
+							pPRG[iPC].d *= -1;
                     } else {
-						if( pSPb[nSP].nADD < 0 )
+						if( pPRG[iPC].nADD < 0 )
 						{
-							pSPb[nSP].typ = gpeALF_I;
-							pSPb[nSP].i8 = -pSPb[nSP].u8;							///
+							pPRG[iPC].typ = gpeALF_I;
+							pPRG[iPC].i8 = -pPRG[iPC].u8;							///
 						}
 						else
-							pSPb[nSP].typ = gpeALF_U;
-						pSPb[nSP].d = 0;
+							pPRG[iPC].typ = gpeALF_U;
+						pPRG[iPC].d = 0;
                     }
                     nVAN = 0;
 					if( bDBG )
 					{
-						if( pSPb[nSP].nADD > 0 )
+						if( pPRG[iPC].nADD > 0 )
 							cout << " + ";
-						else if( pSPb[nSP].nADD < 0 )
+						else if( pPRG[iPC].nADD < 0 )
 							cout << " - ";
-						if( pSPb[nSP].nMUL > 0 )
+						if( pPRG[iPC].nMUL > 0 )
 							cout << "*";
-						else if( pSPb[nSP].nMUL < 0 )
+						else if( pPRG[iPC].nMUL < 0 )
 							cout << "/";
 
-						switch( pSPb[nSP].typ )
+						switch( pPRG[iPC].typ )
 						{
 							case gpeALF_U:
-								cout << pSPb[nSP].u8;
+								cout << pPRG[iPC].u8;
 								break;
 							case gpeALF_I:
-								cout << pSPb[nSP].i8;
+								cout << pPRG[iPC].i8;
 								break;
 							case gpeALF_D:
-								cout << pSPb[nSP].d;
+								cout << pPRG[iPC].d;
 								break;
 						}
 					}
-					cout << endl  << gppTAB-nSP;
+					cout << endl  << gppTAB-iPC;
 				} else {
 					switch(c)
 					{
@@ -736,35 +767,35 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 
 				case '[':
-					pSPc[nSP] = c;
-					pSPb[nSP].typ = gpeALF_A;
-					nSP++;
-					pSPb[nSP].null();
+					psPRG[iPC] = c;
+					pPRG[iPC].typ = gpeALF_A;
+					iPC++;
+					pPRG[iPC].null();
 					break;
 				case ']':
-					pSPc[nSP] = c;
+					psPRG[iPC] = c;
 					if( bDBG ) 	///
-						cout << pSPc[nSP] << endl << gppTAB-nSP;
-					nSP--;
+						cout << psPRG[iPC] << endl << gppTAB-iPC;
+					iPC--;
 					nVAN = 0;
 					break;
 
 				case '{':
-					memset( pSPc+nSP, c, nVAN+1 );
-					pSPb[nSP].typ = gpeALF_BLK;
-					nSP++;
-					pSPb[nSP].null();
+					memset( psPRG+iPC, c, nVAN+1 );
+					pPRG[iPC].typ = gpeALF_BLK;
+					iPC++;
+					pPRG[iPC].null();
 					if( !nVAN )
 						break;
-					pSPb[nSP].typ = gpeALF_BLK;
-					gpfMEMSET( &pSPb[nSP+1], nVAN-1, &pSPb[nSP], sizeof(*pSPb) );
-					nSP += nVAN;
+					pPRG[iPC].typ = gpeALF_BLK;
+					gpfMEMSET( &pPRG[iPC+1], nVAN-1, &pPRG[iPC], sizeof(*pPRG) );
+					iPC += nVAN;
 					break;
 				case '}':
-					pSPc[nSP] = c;
+					psPRG[iPC] = c;
 					if( bDBG ) 	///
-						cout << pSPc[nSP] << endl << gppTAB-nSP;
-					nSP--;
+						cout << psPRG[iPC] << endl << gppTAB-iPC;
+					iPC--;
 					nVAN = 0;
 					break;
 

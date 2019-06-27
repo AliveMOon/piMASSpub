@@ -6,7 +6,7 @@
 class gpcOPCD
 {
 public:
-	I2		nADD, nMUL;
+	I2		nADD, nMUL, nWIP;
 	I8		i8;
 	U8		u8, nSTR, nLEN;
 	gpeALF	lab, typ;
