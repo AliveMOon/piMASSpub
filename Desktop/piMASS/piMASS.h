@@ -64,6 +64,10 @@
 #include <GL/glew.h>
 #include <math.h>
 
+
+/*#include "gpcSCHL.h"
+#include "gpcOPCD.h"*/
+
 using namespace std;
 typedef unsigned char	U1;
 typedef volatile U1		vU1;
@@ -88,7 +92,7 @@ class float2;
 class float3;
 class float4;
 class float4x4;
-class double4;
+class D4;
 class U2x4;
 class U4x4;
 class U8x2;
@@ -120,9 +124,10 @@ class gpcMASS;
 #define gpmSTR2U8( p, r )	strtol( (char*)(p), (char**)&(p), (r) )
 #define gpdVAN	strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
-#define gpmCLR	memset( this, 0, sizeof(*this) )
-#define gpmZ( p ) memset( &p, 0, sizeof(p) )
-#define gpmZn( p, n ) memset( p, 0, n*sizeof(*p) )
+#define gpmCLR	bzero( this, sizeof(*this) )
+#define gpmN( p ) ( sizeof(p)/sizeof(*p) )
+#define gpmZ( p ) bzero( &p, sizeof(p) )
+#define gpmZn( p, n ) bzero( (p), (n)*sizeof(*(p)) )
 
 #define gpmSTRCPY( d, s ) \
 			(												\
@@ -135,6 +140,12 @@ class gpcMASS;
 				( (n)&&(d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\
 				? ( memcpy( (d), (s), ((n)*sizeof(*(d))) ) )		\
 				: ( (void*)d )  									\
+			)
+#define gpmSTRnCPY( d, s, n ) \
+			(														\
+				( (n)&&(d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\
+				? ( strncpy( (char*)(d), (char*)(s), (n) ))  		\
+				: ( (char*)d )  									\
 			)
 
 #define gpmSTRLEN( s )			((s)? strlen((char*)(s)) : 0)
@@ -219,6 +230,7 @@ enum gpeLX:U8
     gpeZERO,
     gpeMXPATH = gpmPAD( PATH_MAX, 0x10 ) , //0x10*0x11,
 };
+
 typedef enum gpeALF: I8
 {
 	gpeALF_zero = 0,
@@ -365,6 +377,7 @@ typedef enum gpeALF: I8
 	gpeALF_PMX = gpdABC('P', 'M', 'X'),
 	gpeALF_PMY = gpdABC('P', 'M', 'Y'),
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
+	gpeALF_PRG = gpdABC('P', 'R', 'G'),
 	gpeALF_REF = gpdABC('R', 'E', 'F'),
 	gpeALF_REN = gpdABC('R', 'E', 'N'),
 	gpeALF_RET = gpdABC('R', 'E', 'T'),
@@ -377,6 +390,11 @@ typedef enum gpeALF: I8
 	gpeALF_SUB = gpdABC('S', 'U', 'B'),
 	gpeALF_SUM = gpdABC('S', 'U', 'M'),
 	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
+
+	gpeALF_TYF = gpdABC('T', 'Y', 'F'),
+	gpeALF_TYI = gpdABC('T', 'Y', 'I'),
+	gpeALF_TYU = gpdABC('T', 'Y', 'U'),
+
 	gpeALF_VEC = gpdABC('V', 'E', 'C'),
 	gpeALF_VOX = gpdABC('V', 'O', 'X'),
 	gpeALF_WIN = gpdABC('W', 'I', 'N'),
@@ -434,6 +452,7 @@ typedef enum gpeALF: I8
 	gpeALF_LINE = gpdABCD('L', 'I', 'N', 'E'),
 	gpeALF_LEFT = gpdABCD('L', 'E', 'F', 'T'),
 	gpeALF_LOOP = gpdABCD('L', 'O', 'O', 'P'),
+	gpeALF_MAIN = gpdABCD('M','A',  'I', 'N'),
 	gpeALF_MINI = gpdABCD('M', 'I', 'N', 'I'),
 
 	gpeALF_MONO = gpdABCD('M', 'O', 'N', 'O'),
@@ -484,7 +503,9 @@ typedef enum gpeALF: I8
 	gpeALF_BOBER = gpdABCDE('B', 'O', 'B', 'E', 'R'),
 	gpeALF_BUBLE = gpdABCDE('B', 'U', 'B', 'L', 'E'),
 	gpeALF_CACHE = gpdABCDE('C', 'A', 'C', 'H', 'E'),
+	gpeALF_CLASS = gpdABCDE('C', 'L', 'A', 'S', 'S'),
 	gpeALF_COLOR = gpdABCDE('C', 'O', 'L', 'O', 'R'),
+	gpeALF_CONST = gpdABCDE('C', 'O', 'N', 'S', 'T'),
 	gpeALF_COUNT = gpdABCDE('C', 'O', 'U', 'N', 'T'),
 	gpeALF_CROSS = gpdABCDE('C', 'R', 'O', 'S', 'S'),
 	gpeALF_DEBUG = gpdABCDE('D', 'E', 'B', 'U', 'G'),
@@ -700,10 +721,19 @@ typedef enum gpeALF: I8
 } GPT_ALFA;
 
 U1*		gpf_aALF_init(void);
+U8		gpfALF2STR(char* p_out, I8 d0);
 gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
 inline void* gpfMEMSET( void* pD, U8 n, void* pS, U8 nS )
 {
-	memcpy( pD, pS, nS );
+	if( !n || !nS )
+		return pD;
+
+	if( nS == 1 )
+		return memset( pD, *(U1*)pS, n );
+
+	if( pD != pS )
+		memcpy( pD, pS, nS );
+
 	if( n < 2 )
 		return pD;
 	U1 	*p_a = (U1*)pD,
@@ -882,7 +912,12 @@ public:
     {
         x = y = z = w = abs(b);
     }
-    U4x4& src2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
+    U4x4& str2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
+    char* str( char* pBUFF, const char* pSP = ", "  )
+    {
+		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
+		return pBUFF;
+    }
 
 	U4 tree_add( U4 u4, U4 n_t )
 	{
@@ -946,7 +981,11 @@ public:
 		}
 		return n_t;
 	}
+
+	U4	dict_add( char* p_src, U4& m, U4x4& w );
+	U4  dict_find( char* p_src, U4x4& w );
 };
+
 class U8x4
 {
 public:
@@ -1168,20 +1207,20 @@ public:
 	}
 };
 
-class double4
+class D4
 {
 public:
     double x,y,z,w;
-    double4(){};
-    double4( I4 _x, I4 _y, I4 _z, I4 _w )
+    D4(){};
+    D4( I4 _x, I4 _y, I4 _z, I4 _w )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
-    double4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 )
+    D4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
-    double4( double* pD )
+    D4( double* pD )
     {
         gpmMEMCPY( this, pD, 1 );
     }
@@ -1201,30 +1240,30 @@ public:
     {
         return x*x+y*y+z*z;
     }
-    double4 norm_xyz( void ) const
+    D4 norm_xyz( void ) const
 	{
         double l = sqrt(qlen_xyz());
-		return double4( x/l, y/l, z/l );
+		return D4( x/l, y/l, z/l );
 	}
-	double dot_xyz( double4 b ) const
+	double dot_xyz( D4 b ) const
 	{
         return x*b.x + y*b.y + z*b.z;
 	}
-    double4 cross_xyz( double4 b ) const
+    D4 cross_xyz( D4 b ) const
 	{
-		return double4(
+		return D4(
 						y * b.z - z * b.y,
 						z * b.x - x * b.z,
 						x * b.y - y * b.x
 				);
 	}
-	double4 operator + ( const double4& b ) const
+	D4 operator + ( const D4& b ) const
 	{
-        return double4( x+b.x, y+b.y, z+b.z, w+b.w );
+        return D4( x+b.x, y+b.y, z+b.z, w+b.w );
 	}
-	double4 operator - ( const double4& b ) const
+	D4 operator - ( const D4& b ) const
 	{
-        return double4( x-b.x, y-b.y, z-b.z, w-b.w );
+        return D4( x-b.x, y-b.y, z-b.z, w-b.w );
 	}
 };
 
@@ -1258,40 +1297,6 @@ public:
 		aWIP[gpeLZYwip] = aWIP[gpeLZYwipSTK];
 	}
 	gpcLAZY* qEVENT(void);
-	/*{
-		if(!this)
-			return NULL;
-		if(aWIP[gpeLZYwip] >= gpeWIP_esc)
-			return NULL;
-
-		U4 nREP = 10, nLOCK = 0;
-		while( nREP )
-		{
-			nREP--;
-			if( aWIP[gpeLZYwip] != gpeWIP_done )
-			{
-				usleep(100);
-				continue;
-			}
-			nLOCK++;
-			aWIP[gpeLZYwipSTK] = aWIP[gpeLZYwip];
-			if( !n_load )
-			{
-				DO();
-				return NULL;
-			}
-
-			//gt_wip_stk = gt_wip;
-			aWIP[gpeLZYwip] = gpeWIP_idle;
-			return this;
-		}
-		if( !nLOCK )
-			return NULL;
-
-		DO();
-		return NULL;
-	}*/
-
 	gpcLAZY( void )
 	{
 		gpmCLR;
@@ -1683,6 +1688,121 @@ szasz:
 	gpcLAZY* tree_add( I8 id, I8& n );
 
 	//U8 gpcLAZY::tree_fnd( U8 id, U8& n )
+};
+
+
+class gpcLZYdct
+{
+	U4x4*		pIX;
+public:
+	gpcLAZY		str,
+				ix;
+	U8			ver;
+
+	gpcLZYdct(){};
+	gpcLZYdct(U8 i)
+	{
+		gpmCLR;
+	}
+	U4 dict_find( char* pS, U8 nS, U4& nIX )
+	{
+		if( !this )
+		{
+			nIX = 0;
+			return 0;
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !str.p_alloc )
+			ver = 0;
+		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
+		char* p_str0 = ((char*)str.p_alloc);
+		pS = p_str0+aSTRT[0];
+		if( pS[nS] )
+			pS[nS] = 0;
+
+		ix.lazy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nS;
+
+		U4 iIX = p_ix0->dict_find( p_str0, *pIX );
+
+		// UNDOza a bejegyzést
+		str.n_load = aSTRT[0];
+		ix.n_load = aSTRT[1];
+		pIX = p_ix0+iIX;
+		return iIX;
+	}
+	gpcLZYdct* dict_add( char* pS, U8 nS )
+	{
+		if( !this )
+		{
+			gpcLZYdct* p_this = new gpcLZYdct(0);
+
+			return p_this->dict_add( pS, nS );
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !str.p_alloc )
+			ver = 0;
+		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
+		char* p_str0 = ((char*)str.p_alloc);
+		pS = p_str0+aSTRT[0];
+		if( pS[nS] )
+			pS[nS] = 0;
+
+		ix.lazy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		U4 nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nS;
+		U4 iIX, nADD = p_ix0->dict_add( p_str0, iIX, *pIX );
+
+		if( nIX == nADD )
+		{
+			// UNDOza a bejegyzést
+			str.n_load = aSTRT[0];
+			ix.n_load = aSTRT[1];
+			pIX = p_ix0+iIX;
+			return this;
+		}
+		ver++;
+		pIX = p_ix0+nIX;
+		return this;
+	}
+	U4 x( void )
+	{
+		if( this ? !ix.n_load : true )
+			return 0;
+
+		return pIX-(U4x4*)ix.p_alloc;
+	}
+	U4 i_str(void)
+	{
+		if( !pIX )
+			return str.n_load;
+
+		return pIX->x;
+	}
+	char* p_str( void )
+	{
+		return (char*)str.p_alloc+pIX->x;
+	}
+	U8 nIX(void)
+	{
+		return ix.n_load / sizeof(U4x4);
+	}
+	char* sSTRix( U8 iX )
+	{
+		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+		return (char*)(str.p_alloc + p_ix0[iX].x);
+	}
 };
 
 #endif // piMASS_H_INCLUDED

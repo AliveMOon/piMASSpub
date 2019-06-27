@@ -1,8 +1,54 @@
- 
-.name == "main"
-U4.aPIC[]; 
-   
- unsel color  
+ #main 
+sMINI == print( "
+
+A cél az ökör húgyozás kezelése! :) Szopassd ha tudod!
+
+Legyen benne valami 
+ékezetes izé bizé,
+na de jó!
+%s ", shun );
+
+for( U1 i = 0; i < 11; i++ )
+{
+	// csordulj túl
+	( i&0x1 ? pic : nempic ) += i&0x1 ? 1+1 : 10;
+	if( pic < 100 )
+		continue;
+	
+	pic = 4;
+	break;
+}
+
+U1 pic, nempic; // hopsz jaj késöbb deklaráltam, nem baj igazából tök mindegy
+
+U4 aPIC[pic] == cam( "rpi", 1 )	; comment keres egy kamerát "rpi" névvel, aztán meg 1 para, mondjuk exp 
+
+; karakter készletet beálítja mini.png-re
+aPIC[char] == pic( "\mini.png" )	; komment  
+								 
+U8	qc == msec/2,
+	bt = pic+1,
+	
+U4x4 sHUN = "	aábc	AÁBC
+				cs		CS
+				d		D
+				dz		DZ
+				dzs		DZS
+				eéfg	EÉFG
+				gy		GY
+				hií		HIÍ
+				jkl		JKL
+				ly		LY
+				oóöő	OÓÖŐ
+				pqrs	PQRS
+				sz		SZ
+				t		T
+				ty		TY
+				uúüű	UÚÜŰ
+				vwxyz	VWXYZ
+				zs		ZS"
+ 
+ enter enter unsel color  
 if( main.qc+1 )		// ha main.qc hamis azaz páros megszakítja a végrehajtást 
 	break;
 .name == "gomb"
@@ -19,7 +65,10 @@ if( pic < 0 )
   SAV_MSK
 "   
 
- 
-if( gomb.bt+1 )
-	break;
-.trg == 
+ 
+enter enter 
+	
+ 
+enter enter ABCDe	f					
+enter enter 0123-10	 111.1, 222.2, 333.3, 
+enter enter  Na jól van má elég lesz má ne piMASS

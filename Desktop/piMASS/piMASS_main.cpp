@@ -119,6 +119,59 @@ char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 
 gpcLAZY gpMASS;
 
+gpcMASS::gpcMASS( const U1* pU, U8 nU )
+{
+	gpmCLR;
+	if(!nU)
+		return;
+	if( pU ? !*pU : true )
+		return;
+
+	U1	*pS = (U1*)pU,
+		*pSe = pS+nU;
+	gpcSRC tmp;
+	U4 is, n, xadd = 1, id, mom = 0;
+	nSP = 1;
+
+	while( pS < pSe ? *pS : false )
+	{
+		tmp.reset( pS, pSe, &pS, aSP44[nSP] );
+		if(!tmp.nL)
+			continue;
+		tmp.IX = nLST;
+		if( tmp.bSUB( *this ) )
+		{
+			mom = nSP;
+            nSP++;
+            aSP44[nSP].null();
+		}
+		else if( tmp.bENTR( *this, aSP44[nSP] ) )
+		{
+			cout << "[ENTER]" << endl;
+		}
+
+		if( aSP44[mom].z < aSP44[nSP].x )
+				aSP44[mom].z = aSP44[nSP].x;
+		if( aSP44[mom].w < aSP44[nSP].y )
+				aSP44[mom].w = aSP44[nSP].y;
+
+        apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
+
+		apSP[nSP]->bMAIN( *this, true );
+
+		while( apSP[nSP]->bRET( *this ) )
+		{
+			//apSP[mom]->space = aSP44[mom];
+			apSP[mom]->retIX = aSPix[nSP];
+			mom--;
+			nSP--;
+		}
+
+		xadd++;
+
+	}
+}
+
 int main( int nA, char *apA[] )
 {
 	gpf_aALF_init();
