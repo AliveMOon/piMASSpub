@@ -606,6 +606,8 @@ typedef enum gpeALF: I8
 	gpeALF_ACCOUNT = gpdABCDEFG('A', 'C', 'C', 'O', 'U', 'N', 'T'),
 	gpeALF_CAMLIST = gpdABCDEFG('C', 'A', 'M', 'L', 'I', 'S', 'T'),
 	gpeALF_CONNECT = gpdABCDEFG('C', 'O', 'N', 'N', 'E', 'C', 'T'),
+	gpeALF_COMMAND = gpdABCDEFG('C', 'O', 'M', 'M', 'A', 'N', 'D'),
+
 
 	gpeALF_FAVICON = gpdABCDEFG('F', 'A', 'V', 'I', 'C', 'O', 'N'),
 

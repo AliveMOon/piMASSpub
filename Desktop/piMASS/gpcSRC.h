@@ -213,7 +213,7 @@ U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
 				u8 = strtol( (char*)p_str, (char**)&p_str, 10 );
 				break;
 		}
-	} else {
+	} /*else {
 		u8 = (U8)log2(u8);
 		switch( *p_str ) /// 1 2 4 8 16
 		{
@@ -223,7 +223,7 @@ U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
 				u8 = ((gpmSTR2U8( p_str, 16 )<<1)|1) << u8;
 				break;
 		}
-	}
+	}*/
 	if( pp_str )
 		*pp_str = p_str;
 	return u8;
@@ -434,7 +434,7 @@ private:
 
 class gpcMASS
 {
-	gpeSCHL		*pTG;
+	gpcCLASS	*pTG;
 	gpcLAZY		*pSRCc,
 				*pLST;
 	U4			nLST, xFND, nALLOC, nSP,
@@ -449,12 +449,13 @@ class gpcMASS
 	}
 public:
 	gpeALF		aTGwip[0x100];
-	gpcOPCD		aSPb[0x1000];
-	U1			aSPc[0x1000], nSPdct;
-	gpcLZYdct	*apSPdct[0x100];
-	gpcLAZY		*apSPdtcOPCD[0x100];
+	gpcOPCD		aPRG[0x1000];
+	U1			asPRG[0x1000]; //, nDICT;
 
-	U4			anSPdct[0x100];
+	gpcLZYdct	*apDICT[0x1000];
+	gpcLAZY		*apDICTopcd[0x1000];
+	U4			lD, anDICT[0x1000];
+
 	void tag_add( gpeALF tg, U4 iKID )
 	{
 		I8 ix, n;

@@ -1,5 +1,12 @@
   Hello Word! 
 #main enter enter 
+	class U1x4
+	{
+		U1 x,y,z,w;
+	};
+	
+	U1x4 xyzw;
+	
 	U1	a = 10,		// a = 10
 		b = 0,
 		a1D[10];
@@ -12,5 +19,5 @@
 	for( U4 i = 0; i < 10; i++ )
 	{
 		a += ++b * 10 + i;
-		a1D[i%sizeof(a1D[10])] = a;
+		a1D[i%sizeof(a1D)] = a;
 	}	

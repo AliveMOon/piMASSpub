@@ -4,7 +4,7 @@
 #include "piMASS.h"
 //#include "gpcSRC.h"
 
-class gpeSCHL
+class gpcCLASS
 {
 
 	gpcLAZY	*paLZY,
@@ -50,7 +50,7 @@ class gpeSCHL
 		}
 		return ppC+ix;
 	}
-	gpeSCHL( I8 id )
+	gpcCLASS( I8 id )
 	{
 		gpmCLR;
 		I8 n = 0;
@@ -61,7 +61,7 @@ class gpeSCHL
 		nLST = n;
 	}
 public:
-	gpeSCHL( void )
+	gpcCLASS( void )
 	{
 		gpmCLR;
 	}
@@ -125,7 +125,7 @@ public:
 		idFND = id;
 		return pFND = *ppC;
 	}
-	gpeSCHL* add( I8 id, I8& ix, I8& n )
+	gpcCLASS* add( I8 id, I8& ix, I8& n )
 	{
 		if( !id )
 		{
@@ -134,7 +134,7 @@ public:
 		}
 		if( !this )
 		{
-			gpeSCHL* pSCHL = new gpeSCHL(id); ///
+			gpcCLASS* pSCHL = new gpcCLASS(id); ///
 			ix = 0;
 			n = 1;
 			return pSCHL;
