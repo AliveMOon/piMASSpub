@@ -35,14 +35,14 @@ public:
 
 	I8		i8;
 	U8		u8, nSTR, nLEN;
-	gpeALF	lab, typ, aTYP[gpePRG_end];
+	gpeALF	lab, typ, def, aTYP[gpePRG_end];
 	U1		*pSTR,
 			*apSTR[gpePRG_end],
 			iSTR;
 	double	d;
 	gpcOPCD(){};
 	//gpcOPCD( const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t );
-	gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t );
+	gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t, gpeALF df = gpeALF_zero );
 
 	gpcOPCD& null()
 	{
@@ -55,7 +55,7 @@ public:
 class gpcCMPL
 {
 public:
-	gpeALF	typ;
+	gpeALF	typ, wip;
 	U4		iPC, mPC,
 			i_dat, n_dat,
 			i_str, n_str;

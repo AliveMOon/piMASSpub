@@ -1,7 +1,4 @@
 #include "gpcSRC.h"
-<<<<<<< HEAD
-
-=======
 U1 gpaALFadd[0x100];
 U1* gpf_aALF_init( void )
 {
@@ -126,7 +123,6 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 	return (gpeALF)alf;
 }
 char gpsHD[0x1000], *psHD;
->>>>>>> 11d5ed1eddd0cbdb7e509d0bfcd871249b3b5667
 void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 {
 	if( !this )
@@ -160,13 +156,8 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pB <= pS )
 			break;
-<<<<<<< HEAD
-		nX = (*pS == '#');
-		if( nX )
-=======
 		nX = *pS == '#';
 		if( nX )	// #TAG
->>>>>>> 11d5ed1eddd0cbdb7e509d0bfcd871249b3b5667
 		{
 			pS++;
 			if( pB <= pS )
@@ -244,6 +235,8 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			case gpeALF_CRSR: // jobb oldali cursor jele
 				bSW |= gpeMASScrsrMSK;
 				continue;
+			default:
+					break;
 		}
 	}
 
@@ -284,6 +277,8 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 					bSW |= gpeMASSprgMSK;
 					bOFF |= gpeMASSprgMSK;
 					break;
+				default:
+					break;
 			}
 			// betenni a teg listába az SRC-t
 			mass.tag_add( pALFtg[nALFtg], IX );			///
@@ -305,14 +300,6 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		cout << gpsHD;
 	cout << "." ;
 }
-<<<<<<< HEAD
-void gpcSRC::build( gpcMASS& mass )
-{
-	hd( mass );
-	U1* pS = pB;
-	while( pS-pA < nL )
-	{
-=======
 
 char gpsPRG[] = " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ";
 char gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
@@ -366,7 +353,7 @@ char gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 
 
 };*/
-gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t )
+gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t, gpeALF df )
 {
 	gpmCLR;
 
@@ -379,6 +366,8 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 	typ = t;
 	nDAT = u;
 
+	def = df;
+
 	nSTR = gpmVAN( pSTR, gpsPRG, nLEN );
 
 
@@ -389,16 +378,16 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_zero },
 	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_CONST },
 
-	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_TYPE },
-	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYPE, gpeALF_U },
+	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYPE, gpeALF_U },
+	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYPE, gpeALF_U },
+	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYPE, gpeALF_U },
+	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_TYPE, gpeALF_I },
+	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_TYPE, gpeALF_I },
+	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_TYPE, gpeALF_I },
+	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_TYPE, gpeALF_I },
+	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_TYPE, gpeALF_D },
+	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_TYPE, gpeALF_D },
 
 	{ gpaOPCi,	"sizeof", 	0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"if", 		0, 0, 0, 0,					0.0, gpeALF_FUNC },
@@ -409,7 +398,7 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"break",	0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"continue",	0, 0, 0, 0,					0.0, gpeALF_FUNC },
 
-	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_CLASS },
+	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_TYPE },
 	{ gpaOPCi,	"pud",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
@@ -512,6 +501,7 @@ void gpcMASS::reset( void )
 			if( !pPC )
 				continue;
 			pPC->typ = gpaOPCi[i].typ;
+			pPC->wip = gpaOPCi[i].def;
 			pPC->n_dat = gpaOPCi[i].nDAT;
 		}
 		iLEV++;
@@ -567,7 +557,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	char sVAN[] = ".";
 	U4 	nALF,
-		utf8, iDAT = 0, nPC, iPC, &iLEV = mass.iLEV;
+		utf8, iDAT = 0, nPC, iPC, &iLEV = mass.iLEV, alLEV = iLEV;
 	I4 nCHK;
 	bool bSIGN = false, bALF;
 
@@ -584,7 +574,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	mass.reset();
 	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
 	// és azon keresztül érhetik el
-
+	cout << endl << "fnd [mom:iPC iD:nD]";
 	gpcCMPL	com = 0, *pFND, *pMOM = NULL, *pPRNT;
 	while( pS < pE )				/// 	COMPILER
 	{
@@ -618,8 +608,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 				nPC = com.nPC( &mass.CMPL );
 				iPC = pMOM->cmpl_find( &mass.CMPL, pSTR, nSTR );
-				pFND = //mass.PC.
-						pFND->pPC( &mass.CMPL, iPC );
+				pFND = pFND->pPC( &mass.CMPL, iPC );
 
 				if( pFND )
 				{
@@ -641,14 +630,16 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 											pPRNT = pFND;
 											pFND->i_str = pSTR-gpsSTRpub;
 											pFND->n_str = nSTR;
-											pFND->typ = gpeALF_TYPE;
-											//pFND->mPC = pMOM->mPC;
+											pFND->wip = gpeALF_DEC; //com.typ;
+											pFND->typ = com.wip; //gpeALF_TYPE;
+
 											iLEV++;
+
 											com.mPC = nPC;
 											pMOM = NULL;
 											break;
-										case gpeALF_TYPE:
 
+										case gpeALF_TYPE:
 											pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
 											pFND = pMOM->pPC( &mass.CMPL, nPC );
 											if( !pFND )
@@ -656,8 +647,18 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 											pPRNT = pFND;
 											pFND->i_str = pSTR-gpsSTRpub;
 											pFND->n_str = nSTR;
-											pFND->typ = com.typ;
-											pFND->n_dat = com.n_dat;
+											pFND->typ = pFND->wip = com.wip;
+											if( pFND->n_dat = com.n_dat )
+											{
+												gpcCMPL* pM = pM->pPC( &mass.CMPL, pFND->mPC);
+												while( pM ? (pM->iPC != pM->mPC) : false )
+												{
+													pM->n_dat += pFND->n_dat;
+													pM = pM->pPC( &mass.CMPL, pM->mPC);
+												}
+											}
+											break;
+										default:
 											break;
 
 									}
@@ -666,7 +667,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							}
 							break;
 						case gpeALF_CLASS:
-							// deklarál;
+							// deklarál egy osztályt;
 							if( iLEV )
 							{
 								iLEV--;
@@ -674,23 +675,29 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							}
 							com.null();
 							com.typ = pFND->typ;
+							com.wip = pFND->wip;
 							com.mPC = mass.aPC[mass.iLEV];
 							pPRNT = &com;
+
 
 							break;
 						case gpeALF_TYPE:
 							//com.null();
 							com.typ = pFND->typ;
+							com.wip = pFND->wip;
 							com.mPC = mass.aPC[mass.iLEV];
 							com.n_dat =	pFND->n_dat;
 							pPRNT = &com;
+							break;
+						default:
 							break;
 					}
 
 					if( pPRNT )
 					{
-						U2 n = sprintf( (char*)pPUB, "%d iPC[%d:%d %d:%d]%s%s ", iPC, iDAT, pPRNT->iPC, pPRNT->mPC, pPRNT->n_dat, (gppTAB-iLEV), pSTR ); //  );
-						iDAT += pPRNT->n_dat;
+						U2 n = sprintf( (char*)pPUB, "%d iPC[%d:%d %d:%d]%s%s ", iPC, pPRNT->iPC, pPRNT->mPC, iDAT, pPRNT->n_dat, (gppTAB-iLEV), pSTR ); //  );
+						if( pPRNT->wip == gpeALF_DEF  )
+							iDAT += pPRNT->n_dat;
 						gpfVAN( pPUB, NULL, nLEN );
 						nLEN += gpfVANn( pPUB, (U1*)"\t" )*3;
 						cout << endl << (char*)pPUB << ( gppTAB-(8-min(8, (nLEN/4))) ) << "//";
@@ -1116,6 +1123,8 @@ void gpcSRC::cmpi_trash( gpcMASS& mass, bool bDBG )
 				case gpeALF_D:
 						cout << (gppTAB-iLEV) << pPRG[iPC].d << endl;
 						break;
+				default:
+					break;
 				/*default:
 						psPRG[iPC+1] = 0;
 						cout << (gppTAB-iLEV) << (char*)psPRG+iPC << endl;*/
@@ -1391,7 +1400,6 @@ void gpcSRC::cmpi_trash( gpcMASS& mass, bool bDBG )
 		}
 
 		pS += nVAN;
->>>>>>> 11d5ed1eddd0cbdb7e509d0bfcd871249b3b5667
 
 		if( prevLEV > iLEV )
 		{
