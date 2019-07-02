@@ -135,8 +135,13 @@ gpcSRC::gpcSRC( gpcSRC& B )
 
 gpcSRC::~gpcSRC()
 {
-	gpmDELary(pA);
-    //dtor
+	if( nA )
+		gpmDELary(pA);
+	gpmDELary(pALFtg);
+	gpmDELary(pEXE);
+	gpmDELary(pRES);
+	gpmDELary(pMINI);
+	gpmDELary(pBIG);
 }
 
 

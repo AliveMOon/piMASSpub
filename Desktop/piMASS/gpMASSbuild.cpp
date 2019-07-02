@@ -44,7 +44,7 @@ U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nLEN )
 	}
 	return pS-p_str;
 }
-U8 gpfALF2STR(char* p_out, I8 d0)
+U8 gpfALF2STR( char* p_out, I8 d0 )
 {
 
 	if( !p_out )
@@ -297,7 +297,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	cout << "." ;
 }
 
-char gpsPRG[] = " \t\r\n\a .,!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ";
+char gpsPRG[] = " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ";
 char gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 
 	 *gppTAB = gpsTAB+strlen(gpsTAB);
@@ -360,7 +360,7 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 	i8 = (this-pTHIS)+i;
 
 	typ = t;
-	nDT = u;
+	nDAT = u;
 
 	nSTR = gpmVAN( pSTR, gpsPRG, nLEN );
 
@@ -369,19 +369,19 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 
 static const gpcOPCD gpaOPCi[] = {
 	// this,	pS,			a, m, i, nDT,				d,		t;
-	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_CONST },
+	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_zero },
 	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_CONST },
 
-	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYU },
-	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYU },
-	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYU },
-	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYU },
-	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYI },
-	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYI },
-	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYI },
-	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYI },
-	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_TYF },
-	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_TYF },
+	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_TYPE },
+	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_TYPE },
 
 	{ gpaOPCi,	"sizeof", 	0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"if", 		0, 0, 0, 0,					0.0, gpeALF_FUNC },
@@ -392,7 +392,7 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"break",	0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"continue",	0, 0, 0, 0,					0.0, gpeALF_FUNC },
 
-	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_COMMAND },
+	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_CLASS },
 	{ gpaOPCi,	"pud",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
 	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
@@ -404,9 +404,455 @@ static const gpcOPCD gpaOPCi[] = {
 
 
 };
-char gpsSTRpub[0x10000];
+U4 gpcCMPL::cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS )
+{
+	if( this ? !pCMPL : true )
+		return 0;
+
+	gpcCMPL** ppC = (gpcCMPL**)(pCMPL->n_load ? pCMPL->p_alloc : NULL);
+	if( !ppC )
+		return 0;
+
+	gpcCMPL* pC = this;
+	U4 ifPC, nPC, *pPC = NULL;
+
+	while( pC )
+	{
+		ifPC = pC->p_kid->dict_find( pS, nS, nPC );
+
+		if( ifPC >= nPC )
+		{
+			if( pC->mPC == pC->iPC )
+				return 0;
+			pC = ppC[pC->mPC];
+			continue;
+		}
+		U4x4 *p_ix0 = ((U4x4*)pC->p_kid->ix.p_alloc);
+		if( p_ix0[ifPC].y != nS )
+		{
+			if( pC->mPC == pC->iPC )
+				return 0;
+			pC = ppC[pC->mPC];
+			continue;
+		}
+
+		if( pC->p_iPC ? !pC->p_iPC->p_alloc : true )
+			return 0;
+
+		return ((U4*)pC->p_iPC->p_alloc)[ifPC];
+	}
+	return 0;
+}
+gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
+{
+
+	U4 fnd = cmpl_find( pCMPL, pS, nS );
+	if( fnd )
+		return pCMPL;
+
+	if( this ? !pCMPL : true )
+		return pCMPL;
+
+	U4 w = p_kid->nIX();
+	p_kid = p_kid->dict_add( pS, nS );
+	if( w >= p_kid->nIX() )
+		return pCMPL;
+
+	U8 iPC8 = -1;
+
+	pCMPL = pCMPL->lazy_add( NULL, sizeof(this), iPC8 );
+	gpcCMPL	**ppC = (gpcCMPL**)pCMPL->p_alloc;
+	if( !ppC )
+	{
+		return pCMPL;
+	}
+	gpcCMPL* pC = new gpcCMPL( iPC );
+	if( !pC )
+		return pCMPL;
+
+	pC->iPC = iPC8/sizeof(this);
+	ppC[pC->iPC] = pC;
+
+
+	p_iPC = p_iPC->lazy_add( &pC->iPC, sizeof(pC->iPC), iPC8 = -1 );
+
+	return pCMPL;
+}
+
+void gpcMASS::reset( void )
+{
+	gpmZ( asPRG );
+	if( !iLEV )
+	{
+		U8 s8;
+		PC.reset( &CMPL );
+		aPC[0] = 0;
+		PC.pPC( &CMPL, 0 );
+		for( U4 i = 1, iN = gpmN(gpaOPCi), nwLEV = iLEV; i < iN; i++ )
+		{
+			PC.pPC( &CMPL, 0 )->cmpl_add( &CMPL, gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
+			gpcCMPL* pPC = PC.pPC( &CMPL, i );
+			if( !pPC )
+				continue;
+			pPC->typ = gpaOPCi[i].typ;
+			pPC->n_dat = gpaOPCi[i].nDAT;
+		}
+		iLEV++;
+	}
+}
+void gpcMASS::reset_o( void )
+{
+	gpmZ( asPRG );
+	if( !iLEV )
+	{
+		U8 s8;
+
+		anDICTix[iLEV] = 0;
+		for( U4 i = 0, iN = gpmN(gpaOPCi), nwLEV = iLEV; i < iN; i++ )
+		{
+			apDICTix[nwLEV] = apDICTix[nwLEV]->dict_add( gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
+			if( anDICTix[nwLEV] >= apDICTix[nwLEV]->nIX() )
+				continue;
+
+			apDICTopcd[nwLEV] = apDICTopcd[nwLEV]->lazy_add( &gpaOPCi[anDICTix[nwLEV]], sizeof(*gpaOPCi), s8 = -1, 1 );
+			gpcOPCD	&OPCD = *((gpcOPCD*)(apDICTopcd[nwLEV]->p_alloc+s8));
+			OPCD.lab = gpfSTR2ALF( OPCD.pSTR, OPCD.pSTR+OPCD.nSTR );
+
+			anDICTix[nwLEV] = apDICTix[nwLEV]->nIX();
+		}
+		incLEV();
+	}
+	rstLEV = iLEV;
+}
+U1 gpsSTRpub[0x10000];
 
 void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
+{
+	hd( mass );
+
+	psHD = gpsHD;
+	psHD[0] = 0;
+	psHD += sprintf( 	psHD, "\r\nComPI: %s V:%d H:%d B:%d \r\nbSW:0x%0.8x",
+						space.str( psHD+0x100), nVER, nHD, nBLD,
+						bSW );
+	if( psHD > gpsHD )
+	{
+		cout << gpsHD;
+		psHD = gpsHD;
+		psHD[0] = 0;
+	}
+	cout << "." << endl ;
+
+	U1	*pS = *pB == '\a' ? pB+1 : pB,
+		*pSe, *pE = pA+nL, *pSTR = NULL,
+		*psPRG = mass.asPRG, c,
+		*pPUB = gpsSTRpub;
+
+	char sVAN[] = ".";
+	U4 	nALF,
+		utf8, iDAT = 0, nPC, iPC, &iLEV = mass.iLEV;
+	I4 nCHK;
+	bool bSIGN = false, bALF;
+
+	U8 	nN, nSKIP, nLEN, nSTR,
+		nVAN = 0, s8;
+
+	I2 nADD = 0;
+	U8 u8;
+	I8 i8;
+	double d;
+	gpeALF typ;
+
+
+	mass.reset();
+	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
+	// és azon keresztül érhetik el
+
+	gpcCMPL	com = 0, *pFND, *pMOM = NULL, *pPRNT;
+	while( pS < pE )				/// 	COMPILER
+	{
+		pS += gpmNINCS( pS, " \t\r\n" );
+		if( pS >= pE )
+		{
+			// feldolgozni ami még van
+			break;
+		}
+
+		sVAN[0] = c = *pS;
+        if( c < 0x80 ? gpaALFadd[c] : true )
+        {
+			// UTF8!
+			nALF = gpfABCnincs( pSTR = pS, pE, nLEN );
+			if( nALF )
+			{
+				pPRNT = NULL;
+				// ALF esélyes ?
+				bALF = (nALF == nLEN);
+
+
+                nSTR = nALF + gpmVAN( pSTR+nALF, gpsPRG, nVAN );
+				nLEN += nVAN;
+
+				gpmSTRnCPY( pPUB, pSTR, nSTR )[nSTR] = 0;
+				pSTR = pPUB;
+				pPUB += nSTR+1;
+				if( !pMOM )
+					pMOM = mass.PC.pPC( &mass.CMPL, com.mPC ); //mass.aPC[mass.iLEV] );
+
+				nPC = com.nPC( &mass.CMPL );
+				iPC = pMOM->cmpl_find( &mass.CMPL, pSTR, nSTR );
+				pFND = //mass.PC.
+						pFND->pPC( &mass.CMPL, iPC );
+
+				if( pFND )
+				{
+					switch( pFND->typ )
+					{
+						case gpeALF_zero:
+							{
+								if( pMOM )
+								{
+									switch( com.typ )
+									{
+										case gpeALF_CLASS:
+
+											pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
+											pFND = pMOM->pPC( &mass.CMPL, nPC );
+											if( !pFND )
+												break; // nem jött létre?
+
+											pPRNT = pFND;
+											pFND->i_str = pSTR-gpsSTRpub;
+											pFND->n_str = nSTR;
+											pFND->typ = gpeALF_TYPE;
+											//pFND->mPC = pMOM->mPC;
+											iLEV++;
+											com.mPC = nPC;
+											pMOM = NULL;
+											break;
+										case gpeALF_TYPE:
+
+											pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
+											pFND = pMOM->pPC( &mass.CMPL, nPC );
+											if( !pFND )
+												break; // nem jött létre?
+											pPRNT = pFND;
+											pFND->i_str = pSTR-gpsSTRpub;
+											pFND->n_str = nSTR;
+											pFND->typ = com.typ;
+											pFND->n_dat = com.n_dat;
+											break;
+
+									}
+
+								}
+							}
+							break;
+						case gpeALF_CLASS:
+							// deklarál;
+							if( iLEV )
+							{
+								iLEV--;
+								pMOM = NULL;
+							}
+							com.null();
+							com.typ = pFND->typ;
+							com.mPC = mass.aPC[mass.iLEV];
+							pPRNT = &com;
+
+							break;
+						case gpeALF_TYPE:
+							//com.null();
+							com.typ = pFND->typ;
+							com.mPC = mass.aPC[mass.iLEV];
+							com.n_dat =	pFND->n_dat;
+							pPRNT = &com;
+							break;
+					}
+
+					if( pPRNT )
+					{
+						U2 n = sprintf( (char*)pPUB, "%d iPC[%d:%d %d:%d]%s%s ", iPC, iDAT, pPRNT->iPC, pPRNT->mPC, pPRNT->n_dat, (gppTAB-iLEV), pSTR ); //  );
+						iDAT += pPRNT->n_dat;
+						gpfVAN( pPUB, NULL, nLEN );
+						nLEN += gpfVANn( pPUB, (U1*)"\t" )*3;
+						cout << endl << (char*)pPUB << ( gppTAB-(8-min(8, (nLEN/4))) ) << "//";
+					}
+				}
+				pS += nSTR;
+			}
+		}
+
+		pS++;
+		nVAN = gpmNINCS( pS, sVAN );
+		if( pS + nVAN > pE )
+			nVAN = pE-pS;
+
+		if( c < 0x40 )
+		{
+			if( c < 0x20 )
+			{
+
+			} else {
+				if( c < 0x30 )
+				{
+					// 20-2F
+					switch(c)
+					{
+						case ' ':
+							break;
+						case '!':
+							break;
+						case '#':
+							break;
+						case '$':
+							break;
+						case '%':
+							break;
+						case '&':
+							break;
+
+						case '\"':
+							break;
+						case '\'':
+							break;
+
+
+						case '(':
+							break;
+
+						case ')':
+							break;
+
+
+
+
+						case '+':
+							break;
+						case '-':
+							break;
+
+						case '*':
+
+							break;
+						case '/':
+							if( pS[nVAN] == '*'  )
+							if( U1* pCOM = (U1*)strstr( (char*)pS+nVAN+1, "*/" ) )
+							{
+								nVAN = (pCOM-pS)+2;
+								break;
+							} else {
+								nVAN = 0;
+								pS = pE;
+								break;
+							}
+							break;
+
+						case ',':	// vessző
+							// berakjuk ami létrejött a sorba
+
+							break;
+						case '.':	// pont
+
+							break;
+					}
+				}
+				else if( c < 0x3A )
+				{
+					// 30-39 // számok 0-9
+
+					u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
+					if( *pS == '.' )
+                    {
+						typ = gpeALF_D;
+						d = gpmSTR2D( pS ) + (double)u8;		///
+					} else {
+						if( nADD < 0 )
+						{
+							typ = gpeALF_I;
+							i8 = -u8;							///
+						}
+						else
+							typ = gpeALF_U;
+						d = 0;
+                    }
+                    nVAN = 0;
+
+
+				} else {
+					switch(c)
+					{
+						// 3A-3F
+						case ':':
+							break;
+						case ';':
+							// comment
+							nVAN = 0;
+							break;
+
+						case '<':
+							break;
+						case '=':
+
+							break;
+						case '>':
+							break;
+
+						case '?':
+							break;
+					}
+				}
+			}
+		} else {
+			// 40-7F
+			switch(c)
+			{
+				// 3A-3F
+				case '@':
+					break;
+				case '\'':
+					break;
+
+				case '[':
+
+					nVAN = 0;
+					break;
+				case ']':
+					nVAN = 0;
+					break;
+
+				case '{':
+					nVAN = 0;
+					break;
+				case '}':
+					nVAN = 0;
+					break;
+
+
+
+
+
+				case '|':
+					break;
+				case '\\':
+					break;
+
+				case '^':
+					break;
+				case '_':
+					break;
+
+				case '~':
+					break;
+				case 0x7f:
+					break;
+			}
+		}
+
+		pS += nVAN;
+	}	/// while( pS < pE )
+}
+void gpcSRC::cmpi_trash( gpcMASS& mass, bool bDBG )
 {
 	hd( mass );
 
@@ -431,41 +877,50 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	I4 nCHK;
 	bool bSIGN = false, bALF;
 
-	U8 	nN, nSKIP,
+	U8 	nN, nSKIP, nLEN,
 		nVAN = 0, s8;
 
-	if( !mass.lD )
+	mass.reset();
+	/*gpmZ( mass.asPRG );
+	if( !mass.iLEV )
 	{
 
-		mass.anDICT[mass.lD] = 0;
-        for( U4 i = 0, in = gpmN(gpaOPCi), mlD = mass.lD; i < in; i++ )
+		mass.anDICTix[mass.iLEV] = 0;
+        for( U4 i = 0, in = gpmN(gpaOPCi), mlD = mass.iLEV; i < in; i++ )
         {
-			mass.apDICT[mlD] = mass.apDICT[mlD]->dict_add( (char*)gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
-			if( mass.anDICT[mlD] >= mass.apDICT[mlD]->nIX() )
+			mass.apDICTix[mlD] = mass.apDICTix[mlD]->dict_add( (char*)gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
+			if( mass.anDICTix[mlD] >= mass.apDICTix[mlD]->nIX() )
 				continue;
 
-			mass.apDICTopcd[mlD] = mass.apDICTopcd[mlD]->lazy_add( &gpaOPCi[mass.anDICT[mlD]], sizeof(*gpaOPCi), s8 = -1, 1 );
+			mass.apDICTopcd[mlD] = mass.apDICTopcd[mlD]->lazy_add( &gpaOPCi[mass.anDICTix[mlD]], sizeof(*gpaOPCi), s8 = -1, 1 );
 			gpcOPCD	&OPCD = *((gpcOPCD*)(mass.apDICTopcd[mlD]->p_alloc+s8));
 			OPCD.lab = gpfSTR2ALF( OPCD.pSTR, OPCD.pSTR+OPCD.nSTR );
 
 
-			mass.anDICT[mlD] = mass.apDICT[mlD]->nIX();
+			mass.anDICTix[mlD] = mass.apDICTix[mlD]->nIX();
 		}
-		mass.lD++;
+		mass.iLEV++;
 	}
+	mass.nLEV = mass.iLEV+1;*/
 
-	U4	iPC0 = 0, iPC = iPC0+1,
-		iDT = 0,
-		lvDCT, ixDCT, nDCT = 0,
-		nDICT = mass.lD+1, nDICTmn = nDICT;
+	U4	iPC0 = 0, iPC = iPC0,
+		iDAT = 0, ixDCT, nDCT = 0,
+		iL,
 
+		&iLEV = mass.iLEV, &nLEV = mass.nLEV, prevLEV;
 
-	gpmZ( mass.asPRG );
+	endD = (strtD = iLEV)+1;
+
 	U1		*psPRG = mass.asPRG, c,
-			*pPUB = (U1*)gpsSTRpub;
+			*pPUB = gpsSTRpub;
 
-	gpcOPCD	*pPRG = mass.aPRG;
-	gpcLZYdct	**ppDICT = mass.apDICT;
+	gpcOPCD		*pPRG = mass.aPRG;
+
+	gpcLAZY		**ppDICTopcd = mass.apDICTopcd;
+	gpcLZYdct	**ppDICTix = mass.apDICTix;
+	U4	*pnDICTix = mass.anDICTix,
+		*pLEVsp = mass.aLEVsp;
+
 	double d = 0;
 	while( pS < pE )				/// 	COMPILER
 	{
@@ -475,10 +930,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			// feldolgozni ami még van
 			break;
 		}
+		prevLEV = iLEV;
 
-		lvDCT = nDICT-1;
+		//iLEV = nLEV-1;
 
-        c = *pS;
+		sVAN[0] = c = *pS;
         if( c < 0x80 ? gpaALFadd[c] : true )
         {
 			// UTF8!
@@ -486,28 +942,109 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			if( nALF )
 			{
 				// ALF esélyes ?
-				gpcOPCD	&prg = pPRG[iPC];
+				bALF = (nALF == pPRG[iPC].nLEN);
 
-				bALF = (nALF == prg.nLEN);
-                prg.nSTR = nALF + gpmVAN( prg.pSTR+nALF, gpsPRG, nVAN );
-				pS += prg.nSTR;
-				prg.nLEN += nVAN;
 
-				gpmSTRnCPY( pPUB, prg.pSTR, prg.nSTR )[prg.nSTR] = 0;
-				prg.apSTR[prg.nWIP] = pPUB;
-				prg.alvDCT[0] = lvDCT;
-				prg.nWIP++;
+                pPRG[iPC].nSTR = nALF + gpmVAN( pPRG[iPC].pSTR+nALF, gpsPRG, nVAN );
+				pS += pPRG[iPC].nSTR;
+				pPRG[iPC].nLEN += nVAN;
 
-				if( bDBG ) 	///
-					cout << (gppTAB-lvDCT) << pPUB << endl;
+				gpmSTRnCPY( pPUB, pPRG[iPC].pSTR, pPRG[iPC].nSTR )[pPRG[iPC].nSTR] = 0;
+				iL = iLEV;
 
-				pPUB += prg.nSTR+1;
+				if( pPRG[iPC].nWIP == gpePRG_newclass )
+				{
+					U4 ixDCT = pnDICTix[iL];
+					ppDICTix[iL] = ppDICTix[iL]->dict_add( pPRG[iPC].pSTR, pPRG[iPC].nSTR );
+					if( ixDCT >= ppDICTix[iL]->nIX() )
+					{
+						// nem sikerült
+						continue;
+					}
+					// egyébként opcd-t is kap
+                    ppDICTopcd[ iL ] = ppDICTopcd[ iL ]->lazy_add( &pPRG[iPC], sizeof(&pPRG[iPC]), s8 = -1, 1 );
+					gpcOPCD	&nwOPCD = *((gpcOPCD*)(ppDICTopcd[iL]->p_alloc+s8));
+					nwOPCD.lab = gpfSTR2ALF( nwOPCD.pSTR, nwOPCD.pSTR+nwOPCD.nSTR );
+					pnDICTix[iL] = ppDICTix[iL]->nIX();
+
+				} else {
+
+					for( ; iL <= iLEV; iL-- )
+					{
+						ixDCT = ppDICTix[iL]->dict_find( pPUB, pPRG[iPC].nSTR, pnDICTix[iL] );
+						if( ixDCT >= pnDICTix[iL] )
+							continue;
+
+						if(
+							gpcOPCD* pOPCD = 	ppDICTopcd[iL]->p_alloc
+												? ((gpcOPCD*)ppDICTopcd[iL]->p_alloc)+ixDCT
+												: NULL
+						)
+						{
+							gpcOPCD& opcd = *pOPCD;
+							if( pPRG[iPC].nSTR != opcd.nSTR )
+								continue;
+
+							pPRG[iPC].typ = opcd.typ;
+							pPRG[iPC].nDAT = opcd.nDAT;
+							switch( opcd.typ )
+							{
+								case gpeALF_COMMAND:
+									pPRG[iPC].nWIP = gpePRG_newclass;
+									pPRG[iPC].nDAT = 0;
+									mass.incLEV();
+									pLEVsp[iLEV] = iPC;
+									break;
+								case gpeALF_TYPE:
+									pPRG[iPC].nWIP = gpePRG_typ_name;
+									pLEVsp[iLEV] = iPC;
+									break;
+								case gpeALF_VAR:
+									pPRG[iPC].nWIP = gpePRG_var_name;
+									break;
+								default:
+									pPRG[iPC].nWIP = 0;
+
+							}
+							pPRG[iPC].nDAT = opcd.nDAT;
+						}
+
+						break;
+					}
+				}
+				iPC0 = pLEVsp[ iLEV ];
+
+
+				if( iPC0 != iPC )
+				if( iL >= iLEV )
+				{
+					// nem talált
+					pPRG[iPC].nWIP	= pPRG[iPC0].nWIP; // gpePRG_var_name;
+					pPRG[iPC].typ	= pPRG[iPC0].typ;
+					pPRG[iPC].nDAT	= pPRG[iPC0].nDAT;
+					pPRG[iPC].iSTR	= pPRG[iPC0].iSTR;
+					for( U2 w = 0, we = min(gpePRG_end, pPRG[iPC].iSTR ); w < we; w++ )
+					{
+						pPRG[iPC].aTYP[w] = pPRG[iPC0].aTYP[w];
+					}
+				}
+
+				pPRG[iPC].aTYP[pPRG[iPC].iSTR] = pPRG[iPC].typ;
+				pPRG[iPC].apSTR[pPRG[iPC].iSTR] = pPUB;
+				pPRG[iPC].iDAT = iDAT;
+				pPRG[iPC].iLEV = iL;
+				pPRG[iPC].ixDCT = ixDCT;
+				pPRG[iPC].iSTR++;
+
+				pPUB += pPRG[iPC].nSTR+1;
 				continue;
 			}
 
         }
-		if( pPRG[iPC].nWIP )
+
+		if( pPRG[iPC].iSTR )
         {
+
 			if( pPRG[iPC].nADD > 0 )
 				cout << " + ";
 			else if( pPRG[iPC].nADD < 0 )
@@ -516,36 +1053,70 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				cout << "*";
 			else if( pPRG[iPC].nMUL < 0 )
 				cout << "/";
+			U2 n = sprintf( (char*)pPUB, "iPC[%d:%d %d:%d]%s", iPC, iLEV, iDAT, pPRG[iPC].nDAT, (gppTAB-iLEV)  );
+			iDAT += pPRG[iPC].nDAT;
+			//cout << endl << "iPC[" << iPC << ":" << iLEV << "]" << (gppTAB-iLEV) ;
+			for( U2 w = 0, we = min(gpePRG_end, pPRG[iPC].iSTR+1 ); w < we; w++ )
+			{
+				if( !pPRG[iPC].apSTR[w] )
+				{
+					//cout << sVAN << endl;
+					//if( pPRG[iPC].pSTR )
+					//	cout << pPRG[iPC].pSTR;
+					continue;
+				}
+				n += sprintf( (char*)pPUB+n, "%s ", pPRG[iPC].apSTR[w] );
+				//cout << pPRG[iPC].apSTR[w] << " " ;
+			}
+			gpfVAN( pPUB, NULL, nLEN );
+			nLEN += gpfVANn( pPUB, (U1*)"\t" )*3;
+			cout << endl << (char*)pPUB << ( gppTAB-(8-min(8, (nLEN/4))) ) << "//";
 
-			if( pPRG[iPC].nWIP == 1 )
+			for( U2 w = 0, we = min(gpePRG_end, pPRG[iPC].iSTR+1 ); w < we; w++ )
+			if( pPRG[iPC].aTYP[w] )
+			{
+				gpmALF2STR( pPUB,pPRG[iPC].aTYP[w] );
+				pPUB[3] = 0;
+				cout << (char*)pPUB;
+
+			}
+
+			//cout << endl;
+
+
+
 			switch( pPRG[iPC].typ )
 			{
 				case gpeALF_STR:
-						cout << (gppTAB-lvDCT) << "\"...\"" << endl;
+						cout << (gppTAB-iLEV) << "\"...\"" << endl;
 						break;
 				case gpeALF_I:
-						cout << (gppTAB-lvDCT) << pPRG[iPC].i8 << endl;
+						cout << (gppTAB-iLEV) << pPRG[iPC].i8 << endl;
 						break;
 				case gpeALF_U:
-						cout << (gppTAB-lvDCT) << pPRG[iPC].u8 << endl;
+						cout << (gppTAB-iLEV) << pPRG[iPC].u8 << endl;
 						break;
 				case gpeALF_D:
-						cout << (gppTAB-lvDCT) << pPRG[iPC].d << endl;
+						cout << (gppTAB-iLEV) << pPRG[iPC].d << endl;
 						break;
 				/*default:
 						psPRG[iPC+1] = 0;
-						cout << (gppTAB-lvDCT) << (char*)psPRG+iPC << endl;*/
+						cout << (gppTAB-iLEV) << (char*)psPRG+iPC << endl;*/
 			}
+
+
 			iPC++;
 			pPRG[iPC].null();
-			pPRG[iPC].alvDCT[0] = lvDCT;
-			cout << "iPC" << iPC << ":" << endl;
+			pPRG[iPC].iLEV = iLEV;
+
         }
 
-		sVAN[0] = c;
-		cout << (gppTAB-lvDCT) << (char*)sVAN << endl;
+		//cout << (gppTAB-iLEV) << (char*)sVAN << endl;
 		pS++;
 		nVAN = gpmNINCS( pS, sVAN );
+		if( pS + nVAN > pE )
+			nVAN = pE-pS;
+
 		if( c < 0x40 )
 		{
 			if( c < 0x20 )
@@ -598,8 +1169,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							psPRG[iPC] = c;
 							pPRG[iPC].typ = gpeALF_FUNC;
 
-							nDICT++;
-							lvDCT = nDICT-1;
+							mass.incLEV();
+
 							pPRG[iPC].nWIP = 1;
 							nVAN = 0;
 							break;
@@ -607,11 +1178,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						case ')':
 							psPRG[iPC] = c;
 							pPRG[iPC].typ = gpeALF_FUNC;
-							if( nDICT > nDICTmn )
-							{
-								nDICT--;
-								lvDCT = nDICT-1;
-							}
+
+							mass.decLEV();
+
 							pPRG[iPC].nWIP = 1;
 							nVAN = 0;
 							break;
@@ -644,8 +1213,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							}
 							break;
 						case '/':
+							if( pS[nVAN] == '*'  )
+							if( U1* pCOM = (U1*)strstr( (char*)pS+nVAN+1, "*/" ) )
+							{
+								nVAN = (pCOM-pS)+2;
+								break;
+							} else {
+								nVAN = 0;
+								pS = pE;
+								break;
+							}
+
 							pPRG[iPC].nMUL -= nVAN+1;
-							if( pPRG[iPC].nMUL < -1 )
+							/*if( pPRG[iPC].nMUL < -1 )
 							{
 								pPRG[iPC].nMUL = 0;
 								/// comment skip next line
@@ -657,15 +1237,17 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									nVAN = nSKIP;
 
 								break;
-							}
+							}*/
 
 							break;
 
 						case ',':	// vessző
 							// berakjuk ami létrejött a sorba
+							psPRG[iPC] = c;
 
 							break;
 						case '.':	// pont
+							psPRG[iPC] = c;
 
 							break;
 
@@ -692,30 +1274,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pPRG[iPC].d = 0;
                     }
                     nVAN = 0;
-					/*if( bDBG )
-					{
-						if( pPRG[iPC].nADD > 0 )
-							cout << " + ";
-						else if( pPRG[iPC].nADD < 0 )
-							cout << " - ";
-						if( pPRG[iPC].nMUL > 0 )
-							cout << "*";
-						else if( pPRG[iPC].nMUL < 0 )
-							cout << "/";
 
-						switch( pPRG[iPC].typ )
-						{
-							case gpeALF_U:
-								cout << pPRG[iPC].u8;
-								break;
-							case gpeALF_I:
-								cout << pPRG[iPC].i8;
-								break;
-							case gpeALF_D:
-								cout << pPRG[iPC].d;
-								break;
-						}
-					}*/
 					pPRG[iPC].nWIP = 1;
 				} else {
 					switch(c)
@@ -759,19 +1318,17 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					psPRG[iPC] = c;
 					pPRG[iPC].typ = gpeALF_FUNC;
 
-					nDICT++;
-					lvDCT = nDICT-1;
+					mass.incLEV();
+
 					pPRG[iPC].nWIP = 1;
 					nVAN = 0;
 					break;
 				case ']':
 					psPRG[iPC] = c;
 					pPRG[iPC].typ = gpeALF_FUNC;
-					if( nDICT > nDICTmn )
-					{
-						nDICT--;
-						lvDCT = nDICT-1;
-					}
+
+					mass.decLEV();
+
 					pPRG[iPC].nWIP = 1;
 					nVAN = 0;
 					break;
@@ -780,19 +1337,17 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					psPRG[iPC] = c;
 					pPRG[iPC].typ = gpeALF_FUNC;
 
-					nDICT++;
-					lvDCT = nDICT-1;
+					mass.incLEV();
+
 					pPRG[iPC].nWIP = 1;
 					nVAN = 0;
 					break;
 				case '}':
 					psPRG[iPC] = c;
 					pPRG[iPC].typ = gpeALF_FUNC;
-					if( nDICT > nDICTmn )
-					{
-						nDICT--;
-						lvDCT = nDICT-1;
-					}
+
+					mass.decLEV();
+
 					pPRG[iPC].nWIP = 1;
 					nVAN = 0;
 					break;
@@ -819,6 +1374,16 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		}
 
 		pS += nVAN;
+
+		if( prevLEV > iLEV )
+		{
+			iPC0 = pLEVsp[ iLEV ];
+			pPRG[iPC0].nDAT = iDAT-pPRG[iPC0].iDAT;
+			U2 n = sprintf( (char*)pPUB, "RET[%d:%d %d:%d]%s", iPC0, iLEV, iDAT, pPRG[iPC0].nDAT, (gppTAB-iLEV)  );
+			gpfVAN( pPUB, NULL, nLEN );
+			nLEN += gpfVANn( pPUB, (U1*)"\t" )*3;
+			cout << endl << (char*)pPUB << ( gppTAB-(8-min(8, (nLEN/4))) ) << "//";
+		}
 
 	}
 	nBLD = nVER;

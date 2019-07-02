@@ -15,7 +15,7 @@ U4x4& U4x4::str2date( U1* p_str, U1* p_end, U1** pp_str )
 	return *this;
 }
 
-U4  U4x4::dict_add( char* p_src, U4& m, U4x4& w )
+U4  U4x4::dict_add( U1* p_src, U4& m, U4x4& w )
 {
 	m = 0;
 	U4x4* p_w = this;
@@ -27,7 +27,7 @@ U4  U4x4::dict_add( char* p_src, U4& m, U4x4& w )
 		mx = 0,
 		o = 0;
 
-	char	*pS = p_src+w.x,
+	U1	*pS = p_src+w.x,
 			*p_d;
 
 
@@ -104,7 +104,7 @@ U4  U4x4::dict_add( char* p_src, U4& m, U4x4& w )
 
 	return n_w;
 }
-U4  U4x4::dict_find( char* p_src, U4x4& w )
+U4  U4x4::dict_find( U1* p_src, U4x4& w )
 {
 	U4x4* p_w = this;
 	U4	n_w = &w-p_w;
@@ -112,8 +112,8 @@ U4  U4x4::dict_find( char* p_src, U4x4& w )
 		return 0;
 
 	U4	cd = 0, e, i, m = 0, mx = 0, o = n_w;
-	char	*pS = p_src+w.x,
-			*p_d;
+	U1	*pS = p_src+w.x,
+		*p_d;
 
 	while( cd < n_w )
 	{

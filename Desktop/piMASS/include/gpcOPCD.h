@@ -4,9 +4,9 @@
 #include "gpcSRC.h"
 enum gpePRG : I2
 {
-	gpePRG_reset,	//r0
-	gpePRG_class,	//r1
-	gpePRG_type,	//r2
+	gpePRG_newclass = -1,	//r0
+	gpePRG_typ_name,	//r1
+	gpePRG_var_name,	//r2
 	gpePRG_typec,	//r3
 	gpePRG_name,	//r4
 	gpePRG_ready,	//r5
@@ -20,25 +20,25 @@ enum gpePRG : I2
 	gpePRG_r0xD,
 	gpePRG_r0xE,
 	gpePRG_r0xF,
-	gpePRG_all,		//r0x10
+	gpePRG_end,		//r0x10
 };
 
 class gpcOPCD
 {
 public:
 	I2		nADD, nMUL;
-	//gpePRG
+
 	I2		nWIP;
 
-	U4		alvDCT[2],
-			aixDCT[2],
-			iDT, nDT;
+	U4		iLEV, ixDCT,
+			iDAT, nDAT;
 
 	I8		i8;
 	U8		u8, nSTR, nLEN;
-	gpeALF	lab, typ;
+	gpeALF	lab, typ, aTYP[gpePRG_end];
 	U1		*pSTR,
-			*apSTR[gpePRG_all];
+			*apSTR[gpePRG_end],
+			iSTR;
 	double	d;
 	gpcOPCD(){};
 	//gpcOPCD( const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t );
@@ -52,3 +52,57 @@ public:
 
 
 #endif // GPCOPCD_H_INCLUDED
+class gpcCMPL
+{
+public:
+	gpeALF	typ;
+	U4		iPC, mPC,
+			i_dat, n_dat,
+			i_str, n_str;
+
+
+	I2		nADD, nMUL, nASS;
+
+	gpcLZYdct	*p_kid;
+	gpcLAZY		*p_iPC;
+
+	gpcLAZY* reset( gpcLAZY* pCMPL )
+	{
+		pCMPL = cmpl_add( pCMPL, (U1*)"false", strlen("false") );
+
+		return pCMPL;
+	}
+	gpcCMPL& null( void )
+	{
+		gpmCLR;
+	}
+	gpcCMPL(){};
+	gpcCMPL( I8 mom )
+	{
+		gpmCLR;
+		mPC = mom;
+	}
+	U4 nPC( gpcLAZY* pCMPL )
+	{
+		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
+		if( !ppC )
+			return 0;
+
+		return pCMPL->n_load/sizeof(this);
+
+	}
+	gpcCMPL* pPC( gpcLAZY* pCMPL, U4 pc )
+	{
+		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
+		if( !ppC )
+			return NULL;
+		if( pc < pCMPL->n_load/sizeof(this) )
+			return ppC[pc];
+		return NULL;
+	}
+	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
+	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
+
+
+
+};

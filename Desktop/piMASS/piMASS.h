@@ -135,6 +135,12 @@ class gpcMASS;
 				? ( strcpy( ((char*)(d)), ((char*)(s)) ) ) 	\
 				: ( (char*)(d) ) 							\
 			)
+
+#define gpmALF2STR( d, alf ) \
+			(												\
+				(d) ? gpfALF2STR( (char*)(d), (gpeALF)alf )	\
+					: 0 									\
+			)
 #define gpmMEMCPY( d, s, n ) \
 			(														\
 				( (n)&&(d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\
@@ -395,6 +401,7 @@ typedef enum gpeALF: I8
 	gpeALF_TYI = gpdABC('T', 'Y', 'I'),
 	gpeALF_TYU = gpdABC('T', 'Y', 'U'),
 
+	gpeALF_VAR = gpdABC('V', 'A', 'R'),
 	gpeALF_VEC = gpdABC('V', 'E', 'C'),
 	gpeALF_VOX = gpdABC('V', 'O', 'X'),
 	gpeALF_WIN = gpdABC('W', 'I', 'N'),
@@ -491,6 +498,8 @@ typedef enum gpeALF: I8
 	gpeALF_STOW = gpdABCD('S', 'T', 'O', 'W'),
 	gpeALF_SQRT = gpdABCD('S', 'Q', 'R', 'T'),
 	gpeALF_TURN = gpdABCD('T', 'U', 'R', 'N'),
+
+	gpeALF_TYPE = gpdABCD('T', 'Y', 'P', 'E'),
 
 	gpeALF_USER = gpdABCD('U', 'S', 'E', 'R'),
 
@@ -984,8 +993,8 @@ public:
 		return n_t;
 	}
 
-	U4	dict_add( char* p_src, U4& m, U4x4& w );
-	U4  dict_find( char* p_src, U4x4& w );
+	U4	dict_add( U1* p_src, U4& m, U4x4& w );
+	U4  dict_find( U1* p_src, U4x4& w );
 };
 
 class U8x4
@@ -1088,16 +1097,279 @@ public:
 		return n_t;
 	}
 };
+class I4x2
+{
+public:
+    I4 x,y;
+
+    I4x2(){};
+    I4x2( I4 _x, I4 _y = 0 )
+    {
+        x = _x; y = _y;
+    }
+	// cnt = fract * U42(1, w);
+	I4x2& cnt2fract(U4 w, U8 cnt)
+	{
+		U1 lg = log2(w * w);
+		w = 1<<(lg/2);
+		U8 X = w * w;
+		cnt %= X;
+		null();
+
+		while( cnt )
+		{
+			w >>= 1;
+			switch(cnt&3)
+			{
+				case 1:
+					x += w;
+					y += w;
+					break;
+				case 2:
+					x += w;
+					break;
+				case 3:
+					y += w;
+					break;
+			}
+			cnt >>= 2;
+		}
+		return *this;
+	}
+	I8 operator * (const I4x2& b) const
+	{
+		return (I8)x*b.x + (I8)y * b.y;
+	}
+
+	I4x2& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
+
+	I8 sum( void ) const
+	{
+		return (I8)x+y;
+	}
+
+	I8 area_xy( void )
+	{
+		return x*y;
+	}
+
+};
 
 class I4x4
 {
 public:
-    I4 x,y,z,w;
+	union
+    {
+        struct
+        {
+			I4 x,y,z,w;
+		};
+		struct
+        {
+			I4x2 a4x2[2];
+		};
+
+	};
     I4x4(){};
     I4x4( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
+
+	U8 operator * (const I4x2& b) const
+	{
+		return a4x2[0]*b + a4x2[2]*b;
+	}
+	I4x4& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
+
+	I8 sum( void ) const
+	{
+		return (I8)x + y + z + w;
+	}
+
+	I8 area_xy( void )
+	{
+		return x*y*z*w;
+	}
+
+	I4x4* index( U4 n_i )
+	{
+		if( !this )
+		{
+			I4x4* p_this = new I4x4[n_i+1];
+			if( !p_this )
+				return NULL;
+
+			return p_this->index( n_i );
+		}
+
+		for( U4 i = 0; i < n_i; i++ )
+		{
+			this[i] = i;
+			//this[i].y = 0;
+		}
+		return this;
+	}
+	U4 histi( U1* p_src, U4 n_src )
+	{
+		for( U4 i = 0; i < n_src; i++ )
+			this[p_src[i]].y++;
+
+		U2 mx = 0x100;
+		for( U2 i = 0; i < 0x100; i++ )
+		{
+			if( !this[i].y )
+				continue;
+			mx = i;
+		}
+		return mx;
+	}
+
+
+	I4 median( U4 n, bool b_inc = false )
+	{
+		// b_inc == true - incrementált növekvő sorban leszenk
+		// b_inc == false - dekrementáslt csökkenő sorban leszenk (nem definiálod akkor ez, azaz csökenő )
+		if( !this || n < 1 )
+			return 0;
+
+		if( n < 2 )
+			return this->y;
+
+		U4	i, j, l, r;
+		I4x4	*p_tree = new I4x4[n+1],
+				x;
+
+		r = n;
+		while( r >= 1 )
+		{
+			// az öszes elem számát "r" elosztom 2-tővel kerekítés nélkül
+			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "l" lesz a küszöb
+			l = ldiv( r, 2 ).quot;
+			while( r > 0 )
+			{
+				// a következő elemet berakom az x-be
+				x = this[r-1];
+
+				i = r;
+				if ( i*2 <= n )
+				{
+					// i mutatja majd azt a helyet ahonva az x et be akarnám rakni
+					while( i*2 <= n )
+					{
+						j = i*2;
+						// azt jelenti, hogy az i nek van ága
+						if( j+1 <= n )
+						if( p_tree[j+1].y < p_tree[j].y )
+							j++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
+
+						if( x.y > p_tree[j].y )
+						{
+							// azt jelenti hogy az x nagyobb volt mint az ág ezért lejebb rakom a tartalmát
+							p_tree[i] = p_tree[j];
+							// és következő ciklusban az ágról akarom folytatni
+							i = j;
+						} else {
+							// azt jelenti, nincs ennél magasabb szám az ágakon
+							break;
+						}
+					}//while
+					p_tree[i] = x;
+				} else {
+					p_tree[r] = x;
+				}
+
+				// r-et csökkentem jöhet a következő elem
+				r--;
+			}
+		}
+		l = ldiv( r, 2).quot;
+		r = n;
+		i = 1;
+		while ( r >= 1 )
+		{
+			x = p_tree[r];
+			p_tree[r] = p_tree[1];
+			r--;
+			l = 1;
+			while ( l <= r )
+			{
+				i = l*2;
+				if ( i <= r )
+				{
+					if ( i+1 <= r )
+						if ( p_tree[i+1].y < p_tree[i].y )
+							i++;
+
+					if ( x.y > p_tree[i].y )
+					{
+						p_tree[l] = p_tree[i];
+					} else {
+						p_tree[l] = x;
+						break;
+					}
+				} else {
+					p_tree[l] = x;
+					break;
+				}
+				l = i;
+			}//while
+
+		}
+
+		if( b_inc )
+		{
+			for( U4 i = 0; i < n; i++ )
+			{
+				this[i] = p_tree[n-i];
+			}
+			gpmDELary( p_tree );
+			if( n < 3 )
+				return average( n );
+
+			return this[n/2].y;
+		}
+
+		I4x4* p_src = p_tree+1;
+		for( U4 i = 0; i < n; i++ )
+		{
+			this[i] = p_src[i];
+		}
+		gpmDELary( p_tree );
+		if( n < 3 )
+			return average( n );
+
+		return this[n/2].y;
+	}
+	I4 average( U4 n )
+	{
+		// vigyázz ez sorrendezi az értékeket
+		if( !this || n < 1 )
+			return 0;
+
+		if( n < 2 )
+		{
+			return this[0].y;
+		}
+		else if( n < 3 )
+		{
+			return (this[1].y+this[0].y)/2;
+		}
+
+		I8 avgr = 0;
+		for( U4 j = 0; j < n; j++ )
+			avgr += this[j].y;
+
+		return avgr / n;
+	}
 };
 
 class I8x4
@@ -1706,7 +1978,7 @@ public:
 	{
 		gpmCLR;
 	}
-	U4 dict_find( char* pS, U8 nS, U4& nIX )
+	U4 dict_find( U1* pS, U8 nS, U4& nIX )
 	{
 		if( !this )
 		{
@@ -1717,7 +1989,7 @@ public:
 		if( !str.p_alloc )
 			ver = 0;
 		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
-		char* p_str0 = ((char*)str.p_alloc);
+		U1* p_str0 = str.p_alloc;
 		pS = p_str0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
@@ -1739,7 +2011,7 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	gpcLZYdct* dict_add( char* pS, U8 nS )
+	gpcLZYdct* dict_add( U1* pS, U8 nS )
 	{
 		if( !this )
 		{
@@ -1751,7 +2023,7 @@ public:
 		if( !str.p_alloc )
 			ver = 0;
 		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
-		char* p_str0 = ((char*)str.p_alloc);
+		U1* p_str0 = str.p_alloc;
 		pS = p_str0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
@@ -1798,7 +2070,7 @@ public:
 	}
 	U8 nIX(void)
 	{
-		return ix.n_load / sizeof(U4x4);
+		return this ? (ix.n_load / sizeof(U4x4)) : 0;
 	}
 	char* sSTRix( U8 iX )
 	{

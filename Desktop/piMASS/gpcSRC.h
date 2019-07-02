@@ -186,6 +186,38 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 
 	return pS-pU;
 }
+inline U8 gpfVANn( U1* pS, const U1* pVAN )
+{
+	if( !pVAN )
+		return 0;
+	U2 nV = strlen( (char*)pVAN );
+	if( !nV )
+		return 0;
+
+	U4 n = 0, nVAN[0x80];
+	gpmZ( nVAN );
+
+	while( *pS )
+	{
+		if( *pS < 0x80 )
+		{
+			nVAN[*pS]++;
+			pS++;
+			continue;
+		}
+
+		(*nVAN)++;
+		pS++;
+	}
+
+	for( U8 i = 0; i < nV; i++  )
+	{
+		if( pVAN[i] < 0x80 )
+			n += nVAN[pVAN[i]];
+	}
+
+	return n;
+}
 U8 inline gpfABC( U1* p_str, U1* pE, U8& nLEN );
 
 U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
@@ -267,8 +299,8 @@ public:
     U1  	*pA, *pB;
     U8		nL, nA, bSW;
     U4x4	space;
-    U4		IX, retIX, nALFtg;
-    gpeALF* pALFtg;
+    U4		IX, retIX, nALFtg, strtD, endD;
+    gpeALF	*pALFtg;
 	gpcLAZY	*pEXE,
 			*pRES,
 			*pMINI,
@@ -379,6 +411,7 @@ public:
     }
     void hd( gpcMASS& mass, gpeALF* pTGpub = NULL );
     void cmpi( gpcMASS& mass, bool bDBG );
+    void cmpi_trash( gpcMASS& mass, bool bDBG );
 
     gpcSRC();
     virtual ~gpcSRC();
@@ -448,14 +481,50 @@ class gpcMASS
 		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
+
 	gpeALF		aTGwip[0x100];
 	gpcOPCD		aPRG[0x1000];
 	U1			asPRG[0x1000]; //, nDICT;
 
-	gpcLZYdct	*apDICT[0x1000];
-	gpcLAZY		*apDICTopcd[0x1000];
-	U4			lD, anDICT[0x1000];
+	// CPLD ----------------------------
+	gpcLAZY		CMPL;
+	gpcCMPL		PC;
+	U4			aPC[0x100], iPC;
+	// CPLD ----------------------------
 
+
+
+	gpcLAZY		*apDICTopcd[0x1000];
+	gpcLZYdct	*apDICTix[0x1000];
+	U4			 anDICTix[0x1000],
+				aLEVsp[0x100],
+				rstLEV, iLEV, nLEV, topLEV;
+
+
+	U4 incLEV( void )
+	{
+		aLEVsp[ nLEV ] = aLEVsp[ iLEV ];
+
+		iLEV++;
+		nLEV = iLEV+1;
+		if( topLEV < nLEV )
+			topLEV = nLEV;
+
+		return iLEV;
+	};
+	U4 decLEV( void )
+	{
+		if( iLEV > rstLEV )
+			iLEV--;
+		else
+			iLEV = rstLEV;
+
+		nLEV = iLEV+1;
+		return iLEV;
+	};
+
+	void reset_o( void );
+	void reset(void);
 	void tag_add( gpeALF tg, U4 iKID )
 	{
 		I8 ix, n;
