@@ -1,4 +1,7 @@
 #include "gpcSRC.h"
+<<<<<<< HEAD
+
+=======
 U1 gpaALFadd[0x100];
 U1* gpf_aALF_init( void )
 {
@@ -123,6 +126,7 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 	return (gpeALF)alf;
 }
 char gpsHD[0x1000], *psHD;
+>>>>>>> 11d5ed1eddd0cbdb7e509d0bfcd871249b3b5667
 void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 {
 	if( !this )
@@ -156,8 +160,13 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pB <= pS )
 			break;
+<<<<<<< HEAD
+		nX = (*pS == '#');
+		if( nX )
+=======
 		nX = *pS == '#';
 		if( nX )	// #TAG
+>>>>>>> 11d5ed1eddd0cbdb7e509d0bfcd871249b3b5667
 		{
 			pS++;
 			if( pB <= pS )
@@ -296,6 +305,14 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		cout << gpsHD;
 	cout << "." ;
 }
+<<<<<<< HEAD
+void gpcSRC::build( gpcMASS& mass )
+{
+	hd( mass );
+	U1* pS = pB;
+	while( pS-pA < nL )
+	{
+=======
 
 char gpsPRG[] = " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ";
 char gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
@@ -1374,6 +1391,7 @@ void gpcSRC::cmpi_trash( gpcMASS& mass, bool bDBG )
 		}
 
 		pS += nVAN;
+>>>>>>> 11d5ed1eddd0cbdb7e509d0bfcd871249b3b5667
 
 		if( prevLEV > iLEV )
 		{
