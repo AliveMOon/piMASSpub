@@ -150,8 +150,8 @@ class gpcMASS;
 #define gpmSTRnCPY( d, s, n ) \
 			(														\
 				( (n)&&(d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\
-				? ( strncpy( (char*)(d), (char*)(s), (n) ))  		\
-				: ( (char*)d )  									\
+				? ( (U1*)strncpy( (char*)(d), (char*)(s), (n) ) )  		\
+				: ( (U1*)d )  									\
 			)
 
 #define gpmSTRLEN( s )			((s)? strlen((char*)(s)) : 0)

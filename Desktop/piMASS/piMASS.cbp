@@ -47,6 +47,7 @@
 		</Linker>
 		<Unit filename="gpMASSbuild.cpp" />
 		<Unit filename="gpcLAZY.cpp" />
+		<Unit filename="gpcOPCD.cpp" />
 		<Unit filename="gpcSRC.cpp" />
 		<Unit filename="gpcSRC.h" />
 		<Unit filename="gpcU14.cpp" />

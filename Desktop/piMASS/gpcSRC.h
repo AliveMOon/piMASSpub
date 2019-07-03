@@ -489,7 +489,9 @@ public:
 	// CPLD ----------------------------
 	gpcLAZY		CMPL;
 	gpcCMPL		PC;
-	U4			aPC[0x100], iPC;
+	U4			aPC[0x100], iPC,
+				aiDAT[0x100], alDAT;
+
 	// CPLD ----------------------------
 
 
@@ -500,9 +502,22 @@ public:
 				aLEVsp[0x100],
 				rstLEV, iLEV, nLEV, topLEV;
 
-
+	U4 relLEV( void )
+	{
+		return iLEV-rstLEV;
+	}
 	U4 incLEV( void )
 	{
+		U4 i = aiDAT[iLEV];
+		iLEV++;
+
+		aiDAT[iLEV] = i;
+		aPC[iLEV] = iPC;
+
+		nLEV = iLEV+1;
+		return iLEV;
+
+
 		aLEVsp[ nLEV ] = aLEVsp[ iLEV ];
 
 		iLEV++;
@@ -514,6 +529,7 @@ public:
 	};
 	U4 decLEV( void )
 	{
+		iPC = aPC[iLEV];
 		if( iLEV > rstLEV )
 			iLEV--;
 		else

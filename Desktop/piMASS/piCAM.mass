@@ -3,9 +3,16 @@
 	class U1x4
 	{
 		U1 x,y,z,w;
+		U1x4( U1 X, Y, Z, W )
+		{
+			x = X;
+			y = Y;
+			z = Z;
+			w = W;
+		}
 	};
 	
-	U1x4 xyzw;
+	U1x4 xyzw( 0, 1, 2, 3 );
 	
 	U1	a = 10,		// a = 10
 		b = 0,
