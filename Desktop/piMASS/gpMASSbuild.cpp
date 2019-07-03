@@ -328,7 +328,7 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 static const gpcOPCD gpaOPCi[] = {
 	// this,	pS,			a, m, i, nDT,				d,		t;
 	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_zero },
-	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_CONST },
+	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TRUE },
 
 	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYPE, gpeALF_U },
 	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYPE, gpeALF_U },
@@ -458,7 +458,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
 	// és azon keresztül érhetik el
 	cout << endl << "lv fn[mo:iP]nD				// iD/alD";
-	gpcCMPL	com = 0, *pFND, *pMOM = NULL, *pPRNT, *pNEW;
+	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL;
 	while( pS < pE )				/// 	COMPILER
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
@@ -476,7 +476,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			if( nALF )
 			{
 				bool bCNTI = false;
-				pPRNT = NULL;
+
 				// ALF esélyes ?
 				bALF = (nALF == nLEN);
 
@@ -514,6 +514,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				nPC = com.nPC( &mass.CMPL );
 				iPC = pMOM->cmpl_find( &mass.CMPL, pSTR, nSTR );
 				pFND = pFND->pPC( &mass.CMPL, iPC );
+				com.iLEV = iLEV;
 
 				bool bFND = true;
 				if( pFND )
@@ -540,13 +541,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									pNEW->n_str = nSTR;
 									pNEW->wip = gpeALF_DEC; //com.typ;
 									pNEW->typ = com.wip; //gpeALF_TYPE;
-
+									pNEW->iLEV = iLEV;
 
 									com.mPC = iPC = nPC;
 									com.i_str = pSTR-gpsSTRpub;
 									com.n_str = nSTR;
 
-									mass.incLEV();
+									//mass.incLEV();
 									pMOM = NULL;
 									break;
 
@@ -562,6 +563,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									pNEW->n_str = nSTR;
 
 									pNEW->typ = pNEW->wip = com.wip;
+									pNEW->iLEV = iLEV;
 
 									if( pNEW->n_dat = com.n_dat )
 									{
@@ -569,6 +571,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 										while( pM ? (pM->iPC != pM->mPC) : false )
 										{
 											pM->n_dat += pNEW->n_dat;
+											if( pM->typ == gpeALF_FUNC )
+											{
+												pPRNT->pINFO = (char*)pPUB;
+												pPUB += sprintf( pPRNT->pINFO, "f(para)" );
+
+												break;
+											}
+
 											pM = pM->pPC( &mass.CMPL, pM->mPC);
 										}
 									}
@@ -581,9 +591,28 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									if( !pNEW )
 										break; // nem jött létre?
 									pPRNT = pNEW;
+									nN = memcmp( pSTR, gpsSTRpub+pMOM->i_str, nSTR-1 );
 
+									// azt kell megoldani, hogy paraméter listát akarjon készíteni
+									pNEW->i_str = pSTR-gpsSTRpub;
+									pNEW->n_str = nSTR;
+									pNEW->wip = ( nN ) ? gpeALF_DEC : gpeALF_CONSTR;
+									pNEW->typ = gpeALF_FUNC;
+									pNEW->iLEV = iLEV;
 
+									com.mPC = iPC = nPC;
+									com.i_str = pSTR-gpsSTRpub;
+									com.n_str = nSTR;
 
+									pMOM = NULL;
+									if( nN )
+										break;
+
+									pPRNT->pINFO = (char*)pPUB;
+									pPUB += sprintf( pPRNT->pINFO, "c{constr()}" );
+
+									// amikor a zárójelet bezárják akkorra kell lenie egy listának a szinten,
+									// és rákeresni a lista alapján egy változatra
 									break;
 
 								default:
@@ -600,7 +629,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								break;
 							case gpeALF_CLASS:
 								// deklarál egy osztályt;
-								mass.incLEV();
+								//mass.incLEV();
 								pPRNT = &com;
 
 								com.null();
@@ -645,8 +674,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						{
 							bFND = true; /// construktor?
 						}
-						U2 n = sprintf( (char*)pPUB, "%d %d[%d:%d]%db%s%s",
-																			iLEV, iPC,
+						*pPUB = 0;
+						pPUB++;
+						U2 n = sprintf( (char*)pPUB, "%d %d[%d:%d]%db %s%s",
+																			pPRNT->iLEV, iPC,
 																			pPRNT->mPC, pPRNT->iPC,
 																			pPRNT->n_dat,
 																			(gppTAB-mass.relLEV()), pSTR
@@ -655,16 +686,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 																			); //  );
 						if( pPRNT->typ == pPRNT->wip )
 							mass.aiDAT[iLEV] += pPRNT->n_dat;
+
 						if( mass.alDAT < mass.aiDAT[iLEV] )
 						{
 							mass.alDAT = mass.aiDAT[iLEV];
 						}
+
 						gpfVAN( pPUB, NULL, nLEN );
 						nLEN += gpfVANn( pPUB, (U1*)"\t" )*3;
 						cout 	<< endl
 								<< (char*)pPUB << ( gppTAB-(8-min(8, (nLEN/4) )) )
 								<< "//"<< ((pPRNT->typ == pPRNT->wip ) ? "*": "" ) << mass.aiDAT[iLEV]
-								<< ":" << mass.alDAT;
+								<< "/" << mass.alDAT << " - ";
+
+						if( pPRNT->pINFO )
+							cout << pPRNT->pINFO;
+
+						pPRNT = NULL;
 					}
 				}
 				pS += nSKIP;

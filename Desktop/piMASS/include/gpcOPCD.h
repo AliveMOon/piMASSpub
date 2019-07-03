@@ -56,12 +56,13 @@ class gpcCMPL
 {
 public:
 	gpeALF	typ, wip;
-	U4		iPC, mPC,
+	U4		iPC, mPC, iLEV,
 			i_dat, n_dat,
 			i_str, n_str;
 
 
 	I2		nADD, nMUL, nASS;
+	char*	pINFO;
 
 	gpcLZYdct	*p_kid;
 	gpcLAZY		*p_iPC;

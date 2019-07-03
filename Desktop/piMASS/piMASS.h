@@ -401,6 +401,7 @@ typedef enum gpeALF: I8
 	gpeALF_TYI = gpdABC('T', 'Y', 'I'),
 	gpeALF_TYU = gpdABC('T', 'Y', 'U'),
 
+	gpeALF_VAL = gpdABC('V', 'A', 'L'),
 	gpeALF_VAR = gpdABC('V', 'A', 'R'),
 	gpeALF_VEC = gpdABC('V', 'E', 'C'),
 	gpeALF_VOX = gpdABC('V', 'O', 'X'),
@@ -497,6 +498,8 @@ typedef enum gpeALF: I8
 	gpeALF_STON = gpdABCD('S', 'T', 'O', 'N'),
 	gpeALF_STOW = gpdABCD('S', 'T', 'O', 'W'),
 	gpeALF_SQRT = gpdABCD('S', 'Q', 'R', 'T'),
+
+	gpeALF_TRUE = gpdABCD('T', 'R', 'U', 'E'),
 	gpeALF_TURN = gpdABCD('T', 'U', 'R', 'N'),
 
 	gpeALF_TYPE = gpdABCD('T', 'Y', 'P', 'E'),
@@ -580,6 +583,7 @@ typedef enum gpeALF: I8
 	gpeALF_ACCEPT = gpdABCDEF('A', 'C', 'C', 'E', 'P', 'T'),
 	gpeALF_ABOARD = gpdABCDEF('A', 'B', 'O', 'A', 'R', 'D'),
 	gpeALF_BUBLER = gpdABCDEF('B', 'U', 'B', 'L', 'E', 'R'),
+	gpeALF_CONSTR = gpdABCDEF('C', 'O', 'N', 'S', 'T', 'R'),
 	gpeALF_ELAPSE = gpdABCDEF('E', 'L', 'A', 'P', 'S', 'E'),
 	gpeALF_FERIKE = gpdABCDEF('F', 'E', 'R', 'I', 'K', 'E'),
 	gpeALF_FLINCH = gpdABCDEF('F', 'L', 'I', 'N', 'C', 'H'),
