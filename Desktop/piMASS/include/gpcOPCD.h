@@ -58,7 +58,8 @@ public:
 	gpeALF	typ, wip;
 	U4		iPC, mPC, iLEV,
 			i_dat, n_dat,
-			i_str, n_str;
+			i_str, n_str,
+			iDEF;
 
 
 	I2		nADD, nMUL, nASS;

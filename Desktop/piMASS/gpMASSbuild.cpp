@@ -458,7 +458,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
 	// és azon keresztül érhetik el
 	cout << endl << "lv fn[mo:iP]nD				// iD/alD";
-	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL;
+	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pPAR;
 	while( pS < pE )				/// 	COMPILER
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
@@ -497,10 +497,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				switch( c )
 				{
 					case '(':
-						com.typ = gpeALF_FUNC;
+						// el kell dönteni, hogy ez most fügvény
+						// vagy a konstruktorát akarja meghívni
+						// hogy inicializálja a példányt
+						pPAR = mass.PC.pPC( &mass.CMPL, com.mPC );
+						cout << endl;
+						com.typ = pPAR->wip == gpeALF_DEC	? gpeALF_FUNC : gpeALF_TYPE;
+						com.wip = com.typ == gpeALF_FUNC	? gpeALF_FUNC : gpeALF_INIT;
 						*pPUB = c;
 						pPUB++;
-						nSTR++;
+						if( com.wip == gpeALF_INIT )
+						{
+							//com.iINI = com.mPC;
+							break;
+						}
+
+						if( com.typ == gpeALF_FUNC )
+							nSTR++;
 						break;
 					default:
 						break;
@@ -561,8 +574,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 									pNEW->i_str = pSTR-gpsSTRpub;
 									pNEW->n_str = nSTR;
+									if( com.wip == gpeALF_INIT )
+									{
+										pPAR = pMOM->pPC( &mass.CMPL, com.iDEF );
+										pNEW->wip = pNEW->typ = pPAR->typ;
+										//pPAR->wip;
+										pNEW->iDEF = pPAR->iPC;
+										pNEW->n_dat = pPAR->n_dat;
+										pNEW->mPC = com.mPC;
+										pPRNT->pINFO = (char*)pPUB;
+										pPUB += sprintf( pPRNT->pINFO, "stuff(" );
+									} else
+										pNEW->typ = pNEW->wip = com.wip;
 
-									pNEW->typ = pNEW->wip = com.wip;
 									pNEW->iLEV = iLEV;
 
 									if( pNEW->n_dat = com.n_dat )
@@ -651,8 +675,18 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									com.typ = pFND->typ;
 								pPRNT = &com;
 
+								if( pFND->wip == gpeALF_DEC )
+								{
+									if( pFND->iDEF != pFND->iPC )
+										pFND->iDEF = pFND->iPC;
+									pFND->wip = gpeALF_DEF;
+								}
+
 								com.wip = pFND->wip;
+											//gpeALF_DEF;
+								com.iDEF = pFND->iDEF;
 								com.mPC = mass.aPC[mass.iLEV];
+								pMOM = NULL;
 								com.i_str = pSTR-gpsSTRpub;
 								com.n_str = nSTR;
 								com.n_dat =	pFND->n_dat;
