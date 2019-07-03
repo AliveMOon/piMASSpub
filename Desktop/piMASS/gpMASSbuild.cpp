@@ -789,6 +789,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						case ')':
 							mass.decLEV();
+							/*if( pPRNT = pPRNT->pPC( &mass.CMPL, iPC ) )
+							{
+
+								U2 n = sprintf( (char*)pPUB, "RT%d %d[%d:%d]%db %s%s",
+																						iLEV, iPC,
+																						pPRNT->mPC, pPRNT->iPC,
+																						pPRNT->n_dat,
+																						(gppTAB-mass.relLEV()), gpsSTRpub+pPRNT->i_str
+
+
+																						);
+								cout << endl << (char*)pPUB;
+							}*/
 							nVAN = 0;
 							break;
 
@@ -834,14 +847,17 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
                     {
 						typ = gpeALF_D;
 						d = gpmSTR2D( pS ) + (double)u8;		///
+						cout << endl << (gppTAB-iLEV)  << d;
 					} else {
 						if( nADD < 0 )
 						{
 							typ = gpeALF_I;
 							i8 = -u8;							///
-						}
-						else
+							cout << endl << (gppTAB-iLEV) << i8;
+						} else {
+							cout << endl << (gppTAB-iLEV) << u8;
 							typ = gpeALF_U;
+						}
 						d = 0;
                     }
                     nVAN = 0;
@@ -887,6 +903,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					break;
 				case ']':
 					mass.decLEV();
+					/*if( pPRNT = pPRNT->pPC( &mass.CMPL, iPC ) )
+					{
+
+						U2 n = sprintf( (char*)pPUB, "RT%d %d[%d:%d]%db %s%s",
+																				iLEV, iPC,
+																				pPRNT->mPC, pPRNT->iPC,
+																				pPRNT->n_dat,
+																				(gppTAB-mass.relLEV()), gpsSTRpub+pPRNT->i_str
+
+
+																				);
+						cout << endl << (char*)pPUB;
+					}*/
 					nVAN = 0;
 					break;
 
@@ -896,6 +925,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					break;
 				case '}':
 					mass.decLEV();
+					/*if( pPRNT = pPRNT->pPC( &mass.CMPL, iPC ) )
+					{
+
+						U2 n = sprintf( (char*)pPUB, "RT%d %d[%d:%d]%db %s%s",
+																				iLEV, iPC,
+																				pPRNT->mPC, pPRNT->iPC,
+																				pPRNT->n_dat,
+																				(gppTAB-mass.relLEV()), gpsSTRpub+pPRNT->i_str
+
+
+																				);
+						cout << endl << (char*)pPUB;
+					}*/
 					nVAN = 0;
 					break;
 
