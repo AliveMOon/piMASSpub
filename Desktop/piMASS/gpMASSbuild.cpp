@@ -812,7 +812,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						}
 						*pPUB = 0;
 						pPUB++;
-						U2 n = sprintf( (char*)pPUB, "%d %d[%d:%d]%db %s%s",
+						U2 n = 0;
+
+						/*if( !pDEF )
+						{
+							pDEF = pPRNT;
+						}*/
+
+						n = sprintf( (char*)pPUB, "%d %d[%d:%d]%db %s%s",
 																			pPRNT->iLEV, iPC,
 																			pPRNT->mPC, pPRNT->iPC,
 																			pPRNT->n_dat,
