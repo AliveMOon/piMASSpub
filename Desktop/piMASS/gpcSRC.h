@@ -5,6 +5,8 @@
 #include "gpcSCHL.h"
 #include "gpcOPCD.h"
 
+#define gpdPRGsep " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} "
+
 enum gpeMASSsw:U8
 {
 	gpeMASSzero,

@@ -301,11 +301,11 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	cout << "." ;
 }
 
-char	gpsPRG[] = " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
+char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
 		gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 		*gppTAB = gpsTAB+strlen(gpsTAB);
 
-gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t, gpeALF df )
+/*gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t, gpeALF df )
 {
 	gpmCLR;
 
@@ -341,20 +341,23 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_TYPE, gpeALF_D },
 	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_TYPE, gpeALF_D },
 
-	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"for(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"while(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"switch(",	0, 0, 0, 0,					0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
+	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_IF },
+	{ gpaOPCi,	"for(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_FOR },
+	{ gpaOPCi,	"while(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_WHILE },
+	{ gpaOPCi,	"switch(",	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SWITCH },
 
-	{ gpaOPCi,	"break",	0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"continue",	0, 0, 0, 0,					0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"break",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
+	{ gpaOPCi,	"continue",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_CONTINUE },
+	{ gpaOPCi,	"return",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_RETURN },
+	{ gpaOPCi,	"discard",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
 
 	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_TYPE },
-	{ gpaOPCi,	"pub",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
-	{ gpaOPCi,	"del",		0, 0, 0, 0,					0.0, gpeALF_FUNC },
+	{ gpaOPCi,	"pub",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_FUNC },
+	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
+
+	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_NEW },
+	{ gpaOPCi,	"del",		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_DEL },
 
 	{ gpaOPCi,	"SYS",		0, 0, 0, 0,					0.0, gpeALF_CLASS },
 	{ gpaOPCi,	"GT",		0, 0, 0, 0,					0.0, gpeALF_CLASS },
@@ -386,7 +389,8 @@ void gpcMASS::reset( void )
 		iLEV++;
 	}
 	rstLEV = iLEV;
-}
+}*/
+
 /*void gpcMASS::reset_o( void )
 {
 	gpmZ( asPRG );
@@ -502,8 +506,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						// hogy inicializálja a példányt
 						pPAR = mass.PC.pPC( &mass.CMPL, com.mPC );
 						cout << endl;
-						com.typ = pPAR->wip == gpeALF_DEC	? gpeALF_FUNC : gpeALF_TYPE;
+
+						*pPUB = c;
+						pPUB++;
+						if( pPAR->wip == gpeALF_DEC )
+						{
+							com.wip = com.typ = gpeALF_FUNC;
+							nSTR++;
+						} else {
+							com.typ = gpeALF_TYPE;
+							com.wip = gpeALF_INIT;
+						}
+						break;
+
+
+						/*com.typ = pPAR->wip == gpeALF_DEC	? gpeALF_FUNC : gpeALF_TYPE;
 						com.wip = com.typ == gpeALF_FUNC	? gpeALF_FUNC : gpeALF_INIT;
+
 						*pPUB = c;
 						pPUB++;
 						if( com.wip == gpeALF_INIT )
@@ -514,7 +533,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						if( com.typ == gpeALF_FUNC )
 							nSTR++;
-						break;
+						break;*/
 					default:
 						break;
 				}
@@ -817,15 +836,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 							break;
 						case '/':
-							if( pS[nVAN] == '*'  )
+							if( pS[nVAN] != '*'  )
+							{
+								if( !nVAN )
+								{
+									com.nMUL--;
+									break;
+								}
+
+								nVAN += gpmVAN( pS+nVAN, "\r\n", nLEN );
+								break;
+							}
 							if( U1* pCOM = (U1*)strstr( (char*)pS+nVAN+1, "*/" ) )
 							{
 								nVAN = (pCOM-pS)+2;
-								break;
 							} else {
 								nVAN = 0;
 								pS = pE;
-								break;
 							}
 							break;
 
