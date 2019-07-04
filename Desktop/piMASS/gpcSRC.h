@@ -536,7 +536,12 @@ public:
 			iLEV--;
 		else
 			iLEV = rstLEV;
-
+		while( asPRG[iLEV] == ')' )
+		{
+			asPRG[iLEV] = 0;
+			if( iLEV > rstLEV )
+				iLEV--;
+		}
 		nLEV = iLEV+1;
 		return iLEV;
 	};

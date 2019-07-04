@@ -734,26 +734,28 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							case gpeALF_DEC:
 								// deklarál egy osztályt;
 								//mass.incLEV();
-
 								com.null();
+								if( !pFND->n_dat )
+								{
 /// 0. STEP // DEC new CLASS ------------------------
-								pPRNT = &com;
+									pPRNT = &com;
 
-								com.iDEC = 0; 			// false?
-								com.wip = pFND->wip;	// DEC new
-								com.typ = pFND->typ;	// CLASS
+									com.iDEC = 0; 			// false?
+									com.wip = gpeALF_DEC; // pFND->wip;	// DEC new
+									com.typ = pFND->typ;	// CLASS
 
-								com.mPC = mass.aPC[mass.iLEV];	//
-								com.i_str = pSTR-gpsSTRpub;
-								com.n_str = nSTR;
+									com.mPC = mass.aPC[mass.iLEV];	//
+									com.i_str = pSTR-gpsSTRpub;
+									com.n_str = nSTR;
 
 
-								break;
+									break;
+								}
 							case gpeALF_DEF:
 /// 2. STEP // DEFINE CLASS -------------------
 								pPRNT = &com;
 
-								com.wip = pFND->wip;	// DEF
+								com.wip = gpeALF_DEF; //pFND->wip;	// DEF
 								com.typ = pFND->typ;	// CLASS/FUNC
 								com.iDEF = pFND->iPC;	// iDEF pl: U1
 								/// com.iDEC -- ne bátsd?
@@ -888,7 +890,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 
 						case ')':
-							mass.decLEV();
+							mass.asPRG[iLEV] = c;
+							//nSKIP = gpmNINCS( pS, " \t\r\n" );
+							//c = pS[nSKIP];
+
+							//mass.decLEV();
 							/*if( pPRNT = pPRNT->pPC( &mass.CMPL, iPC ) )
 							{
 
