@@ -1,7 +1,7 @@
 #include "gpcSRC.h"
 
 
-gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t, gpeALF df )
+gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF wp, gpeALF ty )
 {
 	gpmCLR;
 
@@ -11,10 +11,10 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 	d = _d;
 	i8 = (this-pTHIS)+i;
 
-	typ = t;
+	typ = ty;
+	wip = wp;
 	nDAT = u;
 
-	def = df;
 
 	nSTR = gpmVAN( pSTR,
 					gpdPRGsep, //gpsPRG,
@@ -24,20 +24,20 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 }
 
 static const gpcOPCD gpaOPCi[] = {
-	// this,	pS,			a, m, i, nDT,				d,		t;
+	// this,	pS,			a, m, i, nDT,				d,		wip, typ;
 	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_zero },
 	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TRUE },
 
-	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_TYPE, gpeALF_U },
-	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_TYPE, gpeALF_U },
-	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_TYPE, gpeALF_U },
-	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_TYPE, gpeALF_U },
-	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_TYPE, gpeALF_I },
-	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_TYPE, gpeALF_I },
-	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_TYPE, gpeALF_I },
-	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_TYPE, gpeALF_I },
-	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_TYPE, gpeALF_D },
-	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_TYPE, gpeALF_D },
+	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_DEF, gpeALF_CLASS },
 
 	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
 	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_IF },
@@ -50,12 +50,12 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"return",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_RETURN },
 	{ gpaOPCi,	"discard",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
 
-	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_TYPE },
-	{ gpaOPCi,	"pub",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_FUNC },
+	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"pub",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
 	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
 
-	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_NEW },
-	{ gpaOPCi,	"del",		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_DEL },
+	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_NEW, gpeALF_MEM },
+	{ gpaOPCi,	"del",		0, 0, 0, 0,					0.0, gpeALF_DEL, gpeALF_MEM },
 
 	{ gpaOPCi,	"SYS",		0, 0, 0, 0,					0.0, gpeALF_CLASS },
 	{ gpaOPCi,	"GT",		0, 0, 0, 0,					0.0, gpeALF_CLASS },
@@ -81,7 +81,7 @@ void gpcMASS::reset( void )
 			if( !pPC )
 				continue;
 			pPC->typ = gpaOPCi[i].typ;
-			pPC->wip = gpaOPCi[i].def;
+			pPC->wip = gpaOPCi[i].wip;
 			pPC->n_dat = gpaOPCi[i].nDAT;
 		}
 		iLEV++;

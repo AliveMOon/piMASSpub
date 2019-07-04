@@ -35,7 +35,7 @@ public:
 
 	I8		i8;
 	U8		u8, nSTR, nLEN;
-	gpeALF	lab, typ, def, aTYP[gpePRG_end];
+	gpeALF	lab, typ, wip, aTYP[gpePRG_end];
 	U1		*pSTR,
 			*apSTR[gpePRG_end],
 			iSTR;
@@ -59,7 +59,7 @@ public:
 	U4		iPC, mPC, iLEV,
 			i_dat, n_dat,
 			i_str, n_str,
-			iDEF;
+			iDEF, iDEC, iINI;
 
 
 	I2		nADD, nMUL, nASS;

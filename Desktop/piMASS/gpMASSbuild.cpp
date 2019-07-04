@@ -462,7 +462,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
 	// és azon keresztül érhetik el
 	cout << endl << "lv fn[mo:iP]nD				// iD/alD";
-	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pPAR;
+	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pDEF, *pPAR;
 	while( pS < pE )				/// 	COMPILER
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
@@ -504,36 +504,28 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						// el kell dönteni, hogy ez most fügvény
 						// vagy a konstruktorát akarja meghívni
 						// hogy inicializálja a példányt
-						pPAR = mass.PC.pPC( &mass.CMPL, com.mPC );
+						pMOM = mass.PC.pPC( &mass.CMPL, com.mPC );
 						cout << endl;
 
 						*pPUB = c;
 						pPUB++;
-						if( pPAR->wip == gpeALF_DEC )
+
+						com.wip = pMOM->wip;
+						if( com.wip == gpeALF_DEC )
 						{
-							com.wip = com.typ = gpeALF_FUNC;
+							// csak deklarálva van még a mama
+							nN = memcmp( pSTR, gpsSTRpub+pMOM->i_str, nSTR );
+
+							com.typ = nN ? gpeALF_FUNC : gpeALF_CONSTR;
 							nSTR++;
 						} else {
-							com.typ = gpeALF_TYPE;
 							com.wip = gpeALF_INIT;
+							com.typ = gpeALF_CLASS;
 						}
+
+
 						break;
 
-
-						/*com.typ = pPAR->wip == gpeALF_DEC	? gpeALF_FUNC : gpeALF_TYPE;
-						com.wip = com.typ == gpeALF_FUNC	? gpeALF_FUNC : gpeALF_INIT;
-
-						*pPUB = c;
-						pPUB++;
-						if( com.wip == gpeALF_INIT )
-						{
-							//com.iINI = com.mPC;
-							break;
-						}
-
-						if( com.typ == gpeALF_FUNC )
-							nSTR++;
-						break;*/
 					default:
 						break;
 				}
@@ -551,38 +543,106 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				bool bFND = true;
 				if( pFND )
 				{
-					if( !pFND->typ )
+					if( !pFND->wip )
 					{
 						bFND = false;
 						// nem talált újat akar
 						if( pMOM )
 						{
 							// van valami mama
-							switch( com.typ )
+							switch( com.wip )
 							{
-								case gpeALF_CLASS:
+								case gpeALF_DEC:
 
 									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
 									pNEW = pMOM->pPC( &mass.CMPL, nPC );
 									if( !pNEW )
 										break; // nem jött létre?
 									pPRNT = pNEW;
-
-
-									pNEW->i_str = pSTR-gpsSTRpub;
-									pNEW->n_str = nSTR;
-									pNEW->wip = gpeALF_DEC; //com.typ;
-									pNEW->typ = com.wip; //gpeALF_TYPE;
+									if( com.typ == gpeALF_CONSTR )
+									{
+										pPRNT->pINFO = (char*)pPUB;
+										pPUB += sprintf( pPRNT->pINFO, "c{constr()}" );
+									}
+/// 1. STEP // DECLARED CLASS -------------------
+									pNEW->wip = com.wip; 	// DEC
+									pNEW->typ = com.typ; 	// CLASS
 									pNEW->iLEV = iLEV;
+									pNEW->i_str = pSTR-gpsSTRpub;	// name
+									pNEW->n_str = nSTR;
 
-									com.mPC = iPC = nPC;
-									com.i_str = pSTR-gpsSTRpub;
-									com.n_str = nSTR;
+									/// pNEW->iDEF = 0;
+
+									com.mPC = iPC = // nPC;	/// remélem ugyan az mint a com.iDEC = pNEW->iPC
+															/// akkor // nPC
+									com.iDEC = pNEW->iPC;	// DEC pc
+									com.i_str = pNEW->i_str;
+									com.n_str = pNEW->n_str;
 
 									//mass.incLEV();
 									pMOM = NULL;
 									break;
+								case gpeALF_INIT:
 
+								case gpeALF_DEF:
+									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
+									pNEW = com.pPC( &mass.CMPL, nPC );
+									if( !pNEW )
+										break; // nem jött létre?
+/// 3. STEP // DEFINE STUFF x,y,z,etc.... -------------------
+									pPRNT = pNEW;
+									pDEF = com.pPC( &mass.CMPL, com.iDEF );
+
+									pNEW->wip = gpeALF_DEF; // ? pDEF->wip;
+									pNEW->typ = pDEF->typ;
+									pNEW->iLEV = iLEV;
+
+									pNEW->iDEF = pDEF->iPC;
+									if( com.wip == gpeALF_INIT )
+									{
+/// 4. STEP // DEFINE&INIT STUFF x,y,z,etc.... -------------------
+										pNEW->iINI = pNEW->iDEF;
+									}
+									/// com.iDEC -- ha 2.-nél ne bátottuk?
+									/// ugyan az mint a mass.aPC[iLEV]?
+									pNEW->mPC = mass.aPC[iLEV];
+
+									if( pNEW->n_dat = pDEF->n_dat )
+									{
+										gpcCMPL* pM = pM->pPC( &mass.CMPL, pNEW->mPC);
+										while( pM ? (pM->iPC != pM->mPC) : false )
+										{
+											pM->n_dat += pNEW->n_dat;
+											if( pM->wip != gpeALF_DEC )
+											{
+												pM = pM->pPC( &mass.CMPL, pM->mPC);
+												continue;
+											}
+
+											pPRNT->pINFO = (char*)pPUB;
+											pPUB += sprintf( pPRNT->pINFO, pPRNT->typ == gpeALF_FUNC ? "f(para)" : "stuff" );
+											break;
+										}
+									}
+
+									break;
+								/*case gpeALF_INIT:
+									// DEC+INIT ize( U1 x,y,z,w )
+									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
+									pNEW = pMOM->pPC( &mass.CMPL, nPC );
+									if( !pNEW )
+										break; // nem jött létre?
+									pPRNT = pNEW;
+									pDEF = pMOM->pPC( &mass.CMPL, com.iDEF );
+
+									pNEW->wip = pNEW->typ = pPAR->typ;
+									//pPAR->wip;
+									pNEW->iDEF = pPAR->iPC;
+									pNEW->n_dat = pPAR->n_dat;
+									pNEW->mPC = com.mPC;
+									pPRNT->pINFO = (char*)pPUB;
+									pPUB += sprintf( pPRNT->pINFO, "stuff(" );
+									break;*/
 
 								case gpeALF_TYPE:
 									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
@@ -665,23 +725,44 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						}
 					} else {
-						switch( pFND->typ )
+						/// ismerte WIP megmondja mit akar csinálni
+						switch( pFND->wip )
 						{
 							case gpeALF_zero:
 								bFND = true; /// ez mit keres itt?
 								break;
-							case gpeALF_CLASS:
+							case gpeALF_DEC:
 								// deklarál egy osztályt;
 								//mass.incLEV();
-								pPRNT = &com;
 
 								com.null();
-								com.typ = pFND->typ;
-								com.wip = pFND->wip;
-								com.mPC = mass.aPC[mass.iLEV];
+/// 0. STEP // DEC new CLASS ------------------------
+								pPRNT = &com;
+
+								com.iDEC = 0; 			// false?
+								com.wip = pFND->wip;	// DEC new
+								com.typ = pFND->typ;	// CLASS
+
+								com.mPC = mass.aPC[mass.iLEV];	//
 								com.i_str = pSTR-gpsSTRpub;
 								com.n_str = nSTR;
 
+
+								break;
+							case gpeALF_DEF:
+/// 2. STEP // DEFINE CLASS -------------------
+								pPRNT = &com;
+
+								com.wip = pFND->wip;	// DEF
+								com.typ = pFND->typ;	// CLASS/FUNC
+								com.iDEF = pFND->iPC;	// iDEF pl: U1
+								/// com.iDEC -- ne bátsd?
+
+
+								com.mPC = mass.aPC[mass.iLEV];
+								com.i_str = pSTR-gpsSTRpub;
+								com.n_str = nSTR;
+								com.iLEV = mass.iLEV;
 
 								break;
 							case gpeALF_TYPE:
@@ -737,7 +818,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 
 																			); //  );
-						if( pPRNT->typ == pPRNT->wip )
+						if( pPRNT != &com )
 							mass.aiDAT[iLEV] += pPRNT->n_dat;
 
 						if( mass.alDAT < mass.aiDAT[iLEV] )
