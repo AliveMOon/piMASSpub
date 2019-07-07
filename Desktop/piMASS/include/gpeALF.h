@@ -99,6 +99,7 @@ typedef enum gpeALF: I8
 	gpeALF_ADR = gpdABC('A', 'D', 'R'),
 	gpeALF_AIN = gpdABC('A', 'I', 'N'),
 	gpeALF_ARJ = gpdABC('A', 'R', 'J'),
+	gpeALF_ARR = gpdABC('A', 'R', 'R'),
 	gpeALF_ASM = gpdABC('A', 'S', 'M'),
 	gpeALF_BIN = gpdABC('B', 'I', 'N'),
 	gpeALF_BLK = gpdABC('B', 'L', 'K'),

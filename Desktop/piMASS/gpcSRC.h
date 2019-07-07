@@ -508,6 +508,10 @@ public:
 	{
 		return iLEV-rstLEV;
 	}
+	gpcCMPL* piLEVpc( void )
+	{
+		return PC.pPC( &CMPL, aPC[iLEV] );
+	}
 	U4 incLEV( void )
 	{
 		U4 i = aiDAT[iLEV];
