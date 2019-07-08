@@ -486,7 +486,8 @@ public:
 
 	gpeALF		aTGwip[0x100];
 	gpcOPCD		aPRG[0x1000];
-	U1			asPRG[0x1000]; //, nDICT;
+	U1			asPRG[0x1000],
+				*pPUB; //, nDICT;
 
 	// CPLD ----------------------------
 	gpcLAZY		CMPL;
@@ -514,10 +515,12 @@ public:
 	}
 	U4 incLEV( void )
 	{
-		U4 i = aiDAT[iLEV];
+		//iPC = aPC[iLEV];
+		U4 iDT = aiDAT[iLEV];
+
 		iLEV++;
 
-		aiDAT[iLEV] = i;
+		aiDAT[iLEV] = iDT;
 		aPC[iLEV] = iPC;
 
 		nLEV = iLEV+1;
@@ -551,8 +554,8 @@ public:
 		return iLEV;
 	};
 
-	void reset_o( void );
-	void reset(void);
+	//void reset_o( void );
+	U1* reset( U1* pPUB );
 	void tag_add( gpeALF tg, U4 iKID )
 	{
 		I8 ix, n;

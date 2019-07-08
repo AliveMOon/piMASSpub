@@ -327,10 +327,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	U1	*pS = *pB == '\a' ? pB+1 : pB,
 		*pSe, *pE = pA+nL, *pSTR = NULL,
-		*psPRG = mass.asPRG, c,
-		*pPUB = gpsSTRpub;
+		*psPRG = mass.asPRG, c;
 
-	char sVAN[] = ".";
+	char sVAN[] = ".", *pINFO;
 	U4 	nALF,
 		utf8,
 		&iLEV = mass.iLEV, alLEV = iLEV,
@@ -349,10 +348,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	gpeALF typ;
 
 
-	mass.reset();
+	U1* pPUB = mass.reset( gpsSTRpub );
 	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
 	// és azon keresztül érhetik el
-	cout << endl << "lv fn[mo:iP]nD				// iD/alD";
+	cout << endl << "lv fn[iP:mm]nD				// iD/alD";
 	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pDEF, *pPAR;
 	while( pS < pE )				/// 	COMPILER
 	{
@@ -384,6 +383,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				pPUB += nSTR;
 				pS += nSTR;
 
+
 				nSKIP = gpmNINCS( pS, " \t\r\n" );
 				c = pS[nSKIP];
 				bCNTI =  c < 0x80 ? gpaALFadd[c] : true;
@@ -413,22 +413,28 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 							com.typ = nN ? gpeALF_FUNC : gpeALF_CONSTR;
 							nSTR++;
+							// DEC
+							// FUNC / CONSTR
 						} else {
 							com.wip = gpeALF_INIT;
 							com.typ = gpeALF_CLASS;
+							// INIT
+							// CLASS
 						}
 
 
 						break;
 
 					case '[':
-						// ez tömböt akar
+						// forrás tömböt akar
 						*pPUB = c;
 						pPUB++;
 
 						nSTR++;
 
 						com.typ = gpeALF_ARR;
+						// DEF
+						// ARRAY
 						break;
 
 					default:
@@ -443,12 +449,15 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				pFND = pFND->pPC( &mass.CMPL, iPC );
 				com.iLEV = iLEV;
 
-				bool bFND = true;
+				//bool bFND = true;
 				if( pFND )
 				{
 					if( !pFND->wip )
 					{
-						bFND = false;
+//--------------------------------------------------------
+//					NEM talált
+//--------------------------------------------------------
+						//bFND = false;
 						// nem talált újat akar
 						if( pMOM )
 						{
@@ -456,7 +465,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							switch( com.wip )
 							{
 								case gpeALF_DEC:
-
 									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
 									pNEW = pMOM->pPC( &mass.CMPL, nPC );
 									if( !pNEW )
@@ -476,28 +484,32 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 									/// pNEW->iDEF = 0;
 
-									com.mPC = iPC = // nPC;	/// remélem ugyan az mint a com.iDEC = pNEW->iPC
-															/// akkor // nPC
+									com.mPC = iPC =
 									com.iDEC = pNEW->iPC;	// DEC pc
 									com.i_str = pNEW->i_str;
 									com.n_str = pNEW->n_str;
 
 									pMOM = NULL;
 									break;
-								case gpeALF_INIT:
 
+
+
+								case gpeALF_INIT:
 								case gpeALF_DEF:
 									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
 									pNEW = com.pPC( &mass.CMPL, nPC );
 									if( !pNEW )
 										break; // nem jött létre?
-/// 3. STEP // DEFINE STUFF x,y,z,etc.... -------------------
 									pPRNT = pNEW;
 									pDEF = com.pPC( &mass.CMPL, com.iDEF );
 
+
+/// 3. STEP // DEFINE STUFF x,y,z,etc.... -------------------
 									pNEW->wip = gpeALF_DEF; // ? pDEF->wip;
 									pNEW->typ = pDEF->typ;
 									pNEW->iLEV = iLEV;
+									pNEW->i_str = pSTR-gpsSTRpub;	// name
+									pNEW->n_str = nSTR;
 
 									pNEW->iDEF = pDEF->iPC;
 									if( com.wip == gpeALF_INIT )
@@ -507,6 +519,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									}
 									/// com.iDEC -- ha 2.-nél ne bátottuk?
 									/// ugyan az mint a mass.aPC[iLEV]?
+									iPC = pNEW->iPC;
 									pNEW->mPC = mass.aPC[iLEV];
 
 									if( pNEW->n_dat = pDEF->n_dat )
@@ -522,87 +535,21 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 											}
 
 											pPRNT->pINFO = (char*)pPUB;
-											pPUB += sprintf( pPRNT->pINFO, pPRNT->typ == gpeALF_FUNC ? "f(para)" : "stuff" );
+											pPUB += sprintf(
+																pPRNT->pINFO,
+
+																pMOM->typ == gpeALF_FUNC
+																|| pMOM->typ == gpeALF_CONSTR
+
+																? "f(para)"
+																: "stuff"
+
+															);
 											break;
 										}
 									}
 
 									break;
-
-
-/*								case gpeALF_TYPE:
-									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
-									pNEW = pMOM->pPC( &mass.CMPL, nPC );
-									if( !pNEW )
-										break; // nem jött létre?
-									pPRNT = pNEW;
-
-									pNEW->i_str = pSTR-gpsSTRpub;
-									pNEW->n_str = nSTR;
-									if( com.wip == gpeALF_INIT )
-									{
-										pPAR = pMOM->pPC( &mass.CMPL, com.iDEF );
-										pNEW->wip = pNEW->typ = pPAR->typ;
-										//pPAR->wip;
-										pNEW->iDEF = pPAR->iPC;
-										pNEW->n_dat = pPAR->n_dat;
-										pNEW->mPC = com.mPC;
-										pPRNT->pINFO = (char*)pPUB;
-										pPUB += sprintf( pPRNT->pINFO, "stuff(" );
-									} else
-										pNEW->typ = pNEW->wip = com.wip;
-
-									pNEW->iLEV = iLEV;
-
-									if( pNEW->n_dat = com.n_dat )
-									{
-										gpcCMPL* pM = pM->pPC( &mass.CMPL, pNEW->mPC);
-										while( pM ? (pM->iPC != pM->mPC) : false )
-										{
-											pM->n_dat += pNEW->n_dat;
-											if( pM->typ == gpeALF_FUNC )
-											{
-												pPRNT->pINFO = (char*)pPUB;
-												pPUB += sprintf( pPRNT->pINFO, "f(para)" );
-
-												break;
-											}
-
-											pM = pM->pPC( &mass.CMPL, pM->mPC);
-										}
-									}
-									break;
-
-
-								case gpeALF_FUNC:
-									pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
-									pNEW = pMOM->pPC( &mass.CMPL, nPC );
-									if( !pNEW )
-										break; // nem jött létre?
-									pPRNT = pNEW;
-									nN = memcmp( pSTR, gpsSTRpub+pMOM->i_str, nSTR-1 );
-
-									// azt kell megoldani, hogy paraméter listát akarjon készíteni
-									pNEW->i_str = pSTR-gpsSTRpub;
-									pNEW->n_str = nSTR;
-									pNEW->wip = ( nN ) ? gpeALF_DEC : gpeALF_CONSTR;
-									pNEW->typ = gpeALF_FUNC;
-									pNEW->iLEV = iLEV;
-
-									com.mPC = iPC = nPC;
-									com.i_str = pSTR-gpsSTRpub;
-									com.n_str = nSTR;
-
-									pMOM = NULL;
-									if( nN )
-										break;
-
-									pPRNT->pINFO = (char*)pPUB;
-									pPUB += sprintf( pPRNT->pINFO, "c{constr()}" );
-
-									// amikor a zárójelet bezárják akkorra kell lenie egy listának a szinten,
-									// és rákeresni a lista alapján egy változatra
-									break;*/
 
 								default:
 									break;
@@ -611,11 +558,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						}
 					} else {
-						/// ismerte WIP megmondja mit akar csinálni
+//--------------------------------------------------------
+//					IGEN talált
+//--------------------------------------------------------
+/// ismerte WIP megmondja mit akar csinálni
 						switch( pFND->wip )
 						{
 							case gpeALF_zero:
-								bFND = true; /// ez mit keres itt?
 								break;
 							case gpeALF_DEC:
 								// deklarál egy osztályt;
@@ -651,34 +600,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								com.i_str = pSTR-gpsSTRpub;
 								com.n_str = nSTR;
 								com.iLEV = mass.iLEV;
-
-								break;
-							case gpeALF_TYPE:
-								//com.null();
-								if( iPC == mass.aPC[iLEV] )
-								{
-									bFND = true; /// construktor?
-									com.typ = gpeALF_FUNC;
-								} else
-									com.typ = pFND->typ;
-								pPRNT = &com;
-
-								if( pFND->wip == gpeALF_DEC )
-								{
-									if( pFND->iDEF != pFND->iPC )
-										pFND->iDEF = pFND->iPC;
-									pFND->wip = gpeALF_DEF;
-								}
-
-								com.wip = pFND->wip;
-											//gpeALF_DEF;
-								com.iDEF = pFND->iDEF;
-								com.mPC = mass.aPC[mass.iLEV];
-								pMOM = NULL;
-								com.i_str = pSTR-gpsSTRpub;
-								com.n_str = nSTR;
-								com.n_dat =	pFND->n_dat;
-							if( com.typ == pFND->typ )
 								break;
 
 							case gpeALF_FUNC:
@@ -692,15 +613,15 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 					if( pPRNT )
 					{
-						if( iPC ? iPC == pPRNT->mPC : false )
+						/*if( iPC ? iPC == pPRNT->mPC : false )
 						{
 							bFND = true; /// construktor?
-						}
+						}*/
 						*pPUB = 0;
 						pPUB++;
 						U2 n = sprintf( (char*)pPUB, "%0.2d %0.2d[%0.2d:%0.2d]%0.2db %s%s",
 											pPRNT->iLEV, iPC,
-											pPRNT->mPC, pPRNT->iPC,
+											pPRNT->iPC, pPRNT->mPC,
 											pPRNT->n_dat,
 											(gppTAB-mass.relLEV()), pSTR
 										);
@@ -773,11 +694,25 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 
 						case ')':
-							if( gpcOPCD* pDWN = mass.piLEVpc() )
+							if( gpcCMPL* pDWN = mass.piLEVpc() )
 							{
+								pDWN->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
+								if( *pPUB )
+									cout << endl << pPUB;
+
+								if( pDWN->wip == gpeALF_DEF )
+								if( pDWN->iDEF )
+								if(	gpcCMPL* pDEF = pDEF->pPC( &mass.CMPL, pDWN->iDEF ) )
+								{
+									pDEF->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
+									if( *pPUB )
+										cout << endl << pPUB;
+
+								}
 
 							}
 							mass.asPRG[iLEV] = c;
+							iPC = mass.aPC[iLEV];
 							nVAN = 0;
 							break;
 
@@ -815,10 +750,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						case ',':	// vessző
 							// berakjuk ami létrejött a sorba
-							if( gpcOPCD* pDWN = mass.piLEVpc() )
-							{
 
-							}
 							nVAN = 0;
 							break;
 						case '.':	// pont
@@ -856,17 +788,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					{
 						// 3A-3F
 						case ':':
-							if( gpcOPCD* pDWN = mass.piLEVpc() )
-							{
-
-							}
 							nVAN = 0;
 							break;
 						case ';':
-							if( gpcOPCD* pDWN = mass.piLEVpc() )
-							{
-
-							}
 							// comment
 							nVAN = 0;
 							break;
@@ -880,10 +804,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 
 						case '?':
-							if( gpcOPCD* pDWN = mass.piLEVpc() )
-							{
-
-							}
 							nVAN = 0;
 							break;
 					}
@@ -904,8 +824,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					nVAN = 0;
 					break;
 				case ']':
-					if( gpcOPCD* pDWN = mass.piLEVpc() )
+					if( gpcCMPL* pDWN = mass.piLEVpc() )
 					{
+						pDWN->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
+						if( *pPUB )
+							cout << endl << pPUB;
 
 					}
 					mass.decLEV();
@@ -917,6 +840,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					nVAN = 0;
 					break;
 				case '}':
+					if( gpcCMPL* pDWN = mass.piLEVpc() )
+					{
+						pDWN->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
+						if( *pPUB )
+							cout << endl  << pPUB;
+
+					}
 					mass.decLEV();
 					nVAN = 0;
 					break;

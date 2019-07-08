@@ -268,6 +268,7 @@ typedef enum gpeALF: I8
 	gpeALF_OVER = gpdABCD('O', 'V', 'E', 'R'),
 
 	gpeALF_PACK = gpdABCD('P', 'A', 'C', 'K'),
+	gpeALF_PARA = gpdABCD('P', 'A', 'R', 'A'),
 	gpeALF_PASS = gpdABCD('P', 'A', 'S', 'S'),
 
 	gpeALF_PIXN = gpdABCD('P', 'I', 'X', 'N'),

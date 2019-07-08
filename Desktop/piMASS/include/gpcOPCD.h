@@ -50,8 +50,23 @@ public:
 	}
 };
 
+enum gpeKID:U1
+{
+	gpeKIDstuff,
+	gpeKIDcons,
+	gpeKIDfunc,
+	gpeKIDpara,
+	gpeKIDn,
+};
 
 #endif // GPCOPCD_H_INCLUDED
+class gpcKID
+{
+public:
+	gpcLZYdct	*p_kid;
+	gpcLAZY		*p_iPC;
+
+};
 class gpcCMPL
 {
 public:
@@ -68,9 +83,25 @@ public:
 	gpcLZYdct	*p_kid;
 	gpcLAZY		*p_iPC;
 
-	gpcLAZY* reset( gpcLAZY* pCMPL )
+	gpeKID kid( gpeALF t )
 	{
-		pCMPL = cmpl_add( pCMPL, (U1*)"false", strlen("false") );
+		switch(t)
+		{
+			case gpeALF_FUNC:
+				return gpeKIDfunc;
+			case gpeALF_CONSTR:
+				return gpeKIDcons;
+			case gpeALF_PARA:
+				return gpeKIDpara;
+			default:
+				return gpeKIDstuff;
+		}
+		return gpeKIDstuff;
+	}
+
+	gpcLAZY* reset( gpcLAZY* pCMPL, U1* pPUB )
+	{
+		pCMPL = cmpl_add( pCMPL, pPUB, strlen((char*)pPUB) );
 
 		return pCMPL;
 	}
@@ -84,6 +115,18 @@ public:
 		gpmCLR;
 		mPC = mom;
 	}
+
+	U4 nKID( void )
+	{
+		if( !this )
+			return 0;
+
+		U4 n = p_iPC ? p_iPC->n_load/sizeof(U4) : 0;
+		return n;
+	}
+
+	U4 iKID( gpcLAZY* pCMPL, U4 i );
+
 	U4 nPC( gpcLAZY* pCMPL )
 	{
 		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
@@ -105,6 +148,6 @@ public:
 	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
 	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
 
-
+	U1*  pLIST( gpcLAZY* pCMPL, U1* pSTR0, U1* pPUB );
 
 };

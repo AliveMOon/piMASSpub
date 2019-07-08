@@ -20,6 +20,12 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 					gpdPRGsep, //gpsPRG,
 					nLEN );
 
+	return;
+
+	/// off
+	if( pSTR[nSTR] == '(' )
+		nSTR++;
+
 
 }
 
@@ -65,21 +71,34 @@ static const gpcOPCD gpaOPCi[] = {
 };
 
 
-void gpcMASS::reset( void )
+U1* gpcMASS::reset( U1* pSTR )
 {
 	gpmZ( asPRG );
-	if( !iLEV )
+	if( !pPUB )
 	{
+
+		pPUB = (U1*)strcpy( (char*)pSTR, "false" );
+
 		U8 s8;
-		PC.reset( &CMPL );
+		PC.reset( &CMPL, pPUB );
 		aPC[0] = 0;
-		PC.pPC( &CMPL, 0 );
+		gpcCMPL* pPC = PC.pPC( &CMPL, 0 );
+		//pPC->i_str = 0;
+		pPUB += pPC->n_str+1;
+
 		for( U4 i = 1, iN = gpmN(gpaOPCi), nwLEV = iLEV; i < iN; i++ )
 		{
-			PC.pPC( &CMPL, 0 )->cmpl_add( &CMPL, gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
-			gpcCMPL* pPC = PC.pPC( &CMPL, i );
+			gpmMEMCPY( pPUB, gpaOPCi[i].pSTR, gpaOPCi[i].nSTR );
+			pPUB[gpaOPCi[i].nSTR] = 0;
+
+			PC.pPC( &CMPL, 0 )->cmpl_add( &CMPL, pPUB, gpaOPCi[i].nSTR );
+			pPC = PC.pPC( &CMPL, i );
 			if( !pPC )
 				continue;
+			pPC->i_str = pPUB-pSTR;
+			//pPC->n_str = gpaOPCi[i].nSTR;
+
+			pPUB += pPC->n_str+1;
 			pPC->typ = gpaOPCi[i].typ;
 			pPC->wip = gpaOPCi[i].wip;
 			pPC->n_dat = gpaOPCi[i].nDAT;
@@ -87,8 +106,51 @@ void gpcMASS::reset( void )
 		iLEV++;
 	}
 	rstLEV = iLEV;
+	return pPUB;
 }
+U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
+{
+	if( !this )
+		return nPC(pCMPL);
 
+	U4 n = p_iPC ? p_iPC->n_load/sizeof(U4) : 0;
+	if( i >= n )
+		return nPC( pCMPL );
+
+	return ((U4*)p_iPC->p_alloc)[i];
+}
+U1* gpcCMPL::pLIST( gpcLAZY* pCMPL, U1* pSTR0, U1* pPUB )
+{
+	*pPUB = 0;
+
+	U4 n = nKID();
+	if( !n )
+		return pPUB;
+
+	gpcCMPL	*p_stuff, *p_def;
+	for( U4 i = 0; i < n; i++ )
+	{
+		p_stuff = pPC( pCMPL, iKID( pCMPL, i ) );
+		if( !p_stuff  )
+			continue;
+		p_def = pPC( pCMPL, p_stuff->iDEF );
+
+
+		pPUB += true ?	sprintf(
+									(char*)pPUB, "%0.2d:%s:%s,",
+									p_stuff->iPC, pSTR0+p_def->i_str,
+									pSTR0+p_stuff->i_str
+								)
+						:
+						sprintf(
+									(char*)pPUB, "%0.2d:%s:%0.2d:%s,",
+									p_stuff->iPC, pSTR0+p_def->i_str,
+									p_stuff->n_dat, pSTR0+p_stuff->i_str
+								);
+	}
+	*pPUB = 0;
+	return pPUB;
+}
 U4 gpcCMPL::cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS )
 {
 	if( this ? !pCMPL : true )
@@ -156,8 +218,8 @@ gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
 		return pCMPL;
 
 	pC->iPC = iPC8/sizeof(this);
+	pC->n_str = nS;
 	ppC[pC->iPC] = pC;
-
 
 	p_iPC = p_iPC->lazy_add( &pC->iPC, sizeof(pC->iPC), iPC8 = -1 );
 
