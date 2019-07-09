@@ -131,6 +131,28 @@ I1 gpcCMPL::sOP( char* pS )
 	o++;
 	return o;
 }
+I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* p_str0, char* pTAB, char* pSTR )
+{
+	if( !this )
+		return 0;
+	if( !op )
+	{
+		*pPUB = 0;
+		return 0;
+	}
+	///sDST
+	char	*pOP = (char*)pPUB, *pINFO = pOP,
+			o = sOP( pOP );
+
+	sprintf( pINFO = pOP+o, "%0.2d %0.2d[%0.2d:%0.2d]%0.2db %s %s %s %s",
+						iLEV, iFND,
+						iPC, mPC,
+						n_dat,
+						pTAB, p_str0 ? p_str0+i_str : "", pOP, pSTR
+
+					);
+	return o;
+}
 U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
 {
 	if( !this )

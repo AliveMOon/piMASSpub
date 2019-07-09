@@ -100,6 +100,7 @@ public:
 		return gpeKIDstuff;
 	}
 	I1 sOP( char* pPUB );
+	I1 sDST( U1* pPUB, U4 iFND, char* p_str0, char* pTAB  = "", char* pSTR = "" );
 	gpcLAZY* reset( gpcLAZY* pCMPL, U1* pPUB )
 	{
 		pCMPL = cmpl_add( pCMPL, pPUB, strlen((char*)pPUB) );

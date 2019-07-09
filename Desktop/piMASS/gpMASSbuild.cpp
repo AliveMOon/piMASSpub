@@ -612,8 +612,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								com.n_str = nSTR;
 								com.iLEV = mass.iLEV;
 
-								if( pDST )
+								if( I1 o = pDST->sDST( pPUB, iPC, (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
 								{
+									cout << endl << pPUB+o;
+									pPRNT = NULL;
+								}
+								/*if( pDST )
+								{
+
 									char	*pOP = (char*)pPUB, *pINFO = pOP,
 											o = pDST->sOP( pOP );
 									sprintf( pINFO = pOP+o, "%0.2d %0.2d[%0.2d:%0.2d]%0.2db %s %s %s %s",
@@ -626,7 +632,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									cout << endl << pINFO;
 									pPRNT = NULL;
 									//cout << endl << pDST->iLEV << "[" << pDST->iPC << ":" << pDST->mPC << "]" << (gppTAB - pDST->iLEV) << "=" ;
-								}
+								}*/
 								break;
 
 							case gpeALF_FUNC:
@@ -721,6 +727,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 
 						case ')':
+							if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
+							{
+								cout << endl << pPUB+o;
+								pPRNT = NULL;
+							}
 							if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST( gpsSTRpub, pPUB, &mass.CMPL, c ) )
 							{
 								if( *pPUB )
@@ -794,6 +805,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								break;
 							}
 
+							if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
+							{
+								cout << endl << pPUB+o;
+								pPRNT = NULL;
+							}
 							pDST->op = 0;
 							pDST = NULL;
 							nVAN = 0;
@@ -807,7 +823,15 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				{
 					// 30-39 // számok 0-9
 					//if( pDST )
+					pPRNT = pDST ? pDST : &com;
+					pPRNT->op |= pPRNT->op ? 0 : 1;
+					if( I1 o = pPRNT->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()) ) )
 					{
+						cout << endl << pPUB+o;
+						pPRNT->op = 0;
+						pPRNT = NULL;
+					}
+					/*{
 						pPRNT = pDST ? pDST : &com;
 						char	*pOP = (char*)pPUB, *pINFO = pOP,
 								o = pPRNT->sOP( pOP );
@@ -821,7 +845,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						cout << endl << pINFO;
 						pPRNT = NULL;
 						//cout << endl << pDST->iLEV << "[" << pDST->iPC << ":" << pDST->mPC << "]" << (gppTAB - pDST->iLEV) << "=" ;
-					}
+					}*/
+
 					/*
 					if( pDST )
 						cout << endl << pDST->iLEV << "[" << pDST->iPC << ":" << pDST->mPC << "]" << (gppTAB - pDST->iLEV) << "=" ;
@@ -867,6 +892,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								break;
 							}
 
+							if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
+							{
+								cout << endl << pPUB+o;
+								pPRNT = NULL;
+							}
 							pDST->op = 0;
 							pDST = NULL;
 							nVAN = 0;
