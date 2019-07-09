@@ -119,37 +119,47 @@ U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
 
 	return ((U4*)p_iPC->p_alloc)[i];
 }
-U1* gpcCMPL::pLIST( gpcLAZY* pCMPL, U1* pSTR0, U1* pPUB )
+gpcCMPL* gpcCMPL::pLIST( U1* pSTR0, U1* pPUB, gpcLAZY* pCMPL, char c )
 {
+	if( !pSTR0 )
+		return NULL;
+	if( !pPUB )
+		pPUB = pSTR0;
+
 	*pPUB = 0;
+	if( this ? !pCMPL : true )
+		return this;
 
 	U4 n = nKID();
 	if( !n )
-		return pPUB;
+		return this;
 
 	gpcCMPL	*p_stuff, *p_def;
+	if( c )
+		pPUB += sprintf(
+							(char*)pPUB, "%s[%0.2d]%c ",
+							pSTR0+i_str,
+							iPC,
+							c
+						);
 	for( U4 i = 0; i < n; i++ )
 	{
 		p_stuff = pPC( pCMPL, iKID( pCMPL, i ) );
 		if( !p_stuff  )
 			continue;
-		p_def = pPC( pCMPL, p_stuff->iDEF );
+		p_def = pPC( pCMPL, p_stuff->iDEF ? p_stuff->iDEF : p_stuff->iDEC );
 
 
-		pPUB += true ?	sprintf(
-									(char*)pPUB, "%0.2d:%s:%s,",
-									p_stuff->iPC, pSTR0+p_def->i_str,
-									pSTR0+p_stuff->i_str
-								)
-						:
-						sprintf(
-									(char*)pPUB, "%0.2d:%s:%0.2d:%s,",
-									p_stuff->iPC, pSTR0+p_def->i_str,
-									p_stuff->n_dat, pSTR0+p_stuff->i_str
-								);
+		pPUB += sprintf(
+							(char*)pPUB, "%s[%0.2d]%s,",
+							pSTR0+p_def->i_str,
+							p_stuff->iPC,
+							pSTR0+p_stuff->i_str
+						);
+
 	}
 	*pPUB = 0;
-	return pPUB;
+	return this;
 }
 U4 gpcCMPL::cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS )
 {

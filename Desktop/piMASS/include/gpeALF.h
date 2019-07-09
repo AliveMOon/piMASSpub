@@ -3,6 +3,7 @@
 
 #include "piMASS.h"
 
+#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 #define gpdUP ('a'-'A')
 #define gpdUP_CASE(a){ if( a >= 'a' && a <= 'z' ){ a -= gpdUP; }}
 #define gpdALF 								('Z'-'@')

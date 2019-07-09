@@ -545,7 +545,7 @@ public:
 			iLEV = rstLEV;
 		while( asPRG[iLEV] == ')' )
 		{
-			cout << ")";
+			//cout << ")";
 			asPRG[iLEV] = 0;
 			if( iLEV > rstLEV )
 				iLEV--;

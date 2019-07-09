@@ -336,7 +336,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		*piDAT = mass.aiDAT, &alDAT = mass.alDAT,
 		&iPC = mass.iPC, nPC;
 	I4 nCHK;
-	bool bSIGN = false, bALF;
+	bool bSIGN = false, bALF, bABC;
 
 	U8 	nN, nSKIP, nLEN, nSTR,
 		nVAN = 0, s8;
@@ -363,14 +363,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		}
 
 		sVAN[0] = c = *pS;
-        if( c < 0x80 ? gpaALFadd[c] : true )
+        if( bABC = gpmbABC(c) )
         {
 			// UTF8!
 			nALF = gpfABCnincs( pSTR = pS, pE, nLEN );
 			if( nALF )
 			{
-				bool bCNTI = false;
-
 				// ALF esélyes ?
 				bALF = (nALF == nLEN);
 
@@ -386,7 +384,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 				nSKIP = gpmNINCS( pS, " \t\r\n" );
 				c = pS[nSKIP];
-				bCNTI =  c < 0x80 ? gpaALFadd[c] : true;
+				bABC = gpmbABC(c);
+				if( pMOM ? (com.mPC != pMOM->iPC) : false  )
+					pMOM = NULL;
 
 				if( !pMOM )
 				{
@@ -396,7 +396,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						cout << endl << "mom:" << pMOM->iPC << (char*)gpsSTRpub+pMOM->i_str;
 					}
 				}
-				if( !bCNTI )
+
+				if( !bABC )
 				switch( c )
 				{
 					case '(':
@@ -405,21 +406,22 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						*pPUB = c;
 						pPUB++;
 
-						com.wip = pMOM->wip;
-						if( com.wip == gpeALF_DEC )
+						//com.wip = pMOM->wip;
+						if( pMOM->wip == gpeALF_DEC )
 						{
 							// csak deklarálva van még a mama
 							nN = memcmp( pSTR, gpsSTRpub+pMOM->i_str, nSTR );
 
 							com.typ = nN ? gpeALF_FUNC : gpeALF_CONSTR;
+							com.wip = gpeALF_DEC;
 							nSTR++;
-							// DEC
-							// FUNC / CONSTR
+							// wip DEC
+							// typ FUNC / CONSTR
 						} else {
 							com.wip = gpeALF_INIT;
 							com.typ = gpeALF_CLASS;
-							// INIT
-							// CLASS
+							// wip INIT
+							// typ CLASS
 						}
 
 
@@ -483,7 +485,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									pNEW->n_str = nSTR;
 
 									/// pNEW->iDEF = 0;
-
+									pNEW->iDEC = com.iDEC;
 									com.mPC = iPC =
 									com.iDEC = pNEW->iPC;	// DEC pc
 									com.i_str = pNEW->i_str;
@@ -569,14 +571,15 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							case gpeALF_DEC:
 								// deklarál egy osztályt;
 								//mass.incLEV();
-								com.null();
 								if( !pFND->n_dat )
 								{
+									com.null();
+
 /// 0. STEP // DEC new CLASS ------------------------
 									pPRNT = &com;
 
-									com.iDEC = 0; 			// false?
-									com.wip = gpeALF_DEC; // pFND->wip;	// DEC new
+									com.iDEC = pFND->iPC; // 0; 			// false?
+									com.wip = gpeALF_DEC; 	// pFND->wip;	// DEC new
 									com.typ = pFND->typ;	// CLASS
 
 									com.mPC = mass.aPC[mass.iLEV];	//
@@ -586,6 +589,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 									break;
 								}
+
+								com.null();
+								com.iDEC = pFND->iPC;
+
 							case gpeALF_DEF:
 /// 2. STEP // DEFINE CLASS -------------------
 								pPRNT = &com;
@@ -646,8 +653,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					}
 				}
 				pS += nSKIP;
-				if( bCNTI )
-					continue;
+				if( bABC )
+					continue; // következő szó?
 
 				sVAN[0] = c;
 			}
@@ -694,22 +701,15 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 
 						case ')':
-							if( gpcCMPL* pDWN = mass.piLEVpc() )
+							if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST( gpsSTRpub, pPUB, &mass.CMPL, c ) )
 							{
-								pDWN->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
 								if( *pPUB )
 									cout << endl << pPUB;
 
-								if( pDWN->wip == gpeALF_DEF )
-								if( pDWN->iDEF )
-								if(	gpcCMPL* pDEF = pDEF->pPC( &mass.CMPL, pDWN->iDEF ) )
-								{
-									pDEF->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
-									if( *pPUB )
+								if( pDWN->wip == gpeALF_DEF && pDWN->iDEF )
+								if(	gpcCMPL* pDEF = pDEF->pPC( &mass.CMPL, pDWN->iDEF )->pLIST( gpsSTRpub, pPUB, &mass.CMPL ) )
+								if( *pPUB )
 										cout << endl << pPUB;
-
-								}
-
 							}
 							mass.asPRG[iLEV] = c;
 							iPC = mass.aPC[iLEV];
@@ -798,7 +798,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						case '<':
 							break;
 						case '=':
-
+							cout << endl << (gppTAB-iLEV) << iPC << "=";
 							break;
 						case '>':
 							break;
@@ -824,13 +824,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					nVAN = 0;
 					break;
 				case ']':
-					if( gpcCMPL* pDWN = mass.piLEVpc() )
-					{
-						pDWN->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
-						if( *pPUB )
+					if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
+					if( *pPUB )
 							cout << endl << pPUB;
 
-					}
 					mass.decLEV();
 					nVAN = 0;
 					break;
@@ -840,13 +837,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					nVAN = 0;
 					break;
 				case '}':
-					if( gpcCMPL* pDWN = mass.piLEVpc() )
-					{
-						pDWN->pLIST( &mass.CMPL, gpsSTRpub, pPUB );
-						if( *pPUB )
-							cout << endl  << pPUB;
+					if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
+					if( *pPUB )
+							cout << endl << pPUB;
 
-					}
 					mass.decLEV();
 					nVAN = 0;
 					break;

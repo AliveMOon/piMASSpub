@@ -148,6 +148,6 @@ public:
 	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
 	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
 
-	U1*  pLIST( gpcLAZY* pCMPL, U1* pSTR0, U1* pPUB );
+	gpcCMPL* pLIST( U1* pSTR0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
 
 };
