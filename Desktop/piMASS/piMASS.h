@@ -126,7 +126,7 @@ class gpcMASS;
 #define gpmSTR2U8( p, r )	strtol( (char*)(p), (char**)&(p), (r) )
 #define gpdVAN	strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
-#define gpmCLR	bzero( this, sizeof(*this) )
+#define gpmCLR	(this ? bzero( this, sizeof(*this) ) : (void)0)
 #define gpmN( p ) ( sizeof(p)/sizeof(*p) )
 #define gpmZ( p ) bzero( &p, sizeof(p) )
 #define gpmZn( p, n ) bzero( (p), (n)*sizeof(*(p)) )

@@ -108,6 +108,29 @@ U1* gpcMASS::reset( U1* pSTR )
 	rstLEV = iLEV;
 	return pPUB;
 }
+char gpsOP[] = "=<>-+*/";
+I1 gpcCMPL::sOP( char* pS )
+{
+	*pS = gpsOP[0];
+	pS[1] = 0;
+	if( this ? !op : true )
+		return 2;
+
+	U2 msk = 1, n = op ? (U2)log2( op ) : 0, l = 0, o = 0;
+
+	for( n = sizeof(gpsOP); l < n; l++, msk<<=1 )
+	{
+		if( op&msk )
+		{
+			pS[o] = gpsOP[l];
+			o++;
+		}
+	}
+
+	pS[o] = 0;
+	o++;
+	return o;
+}
 U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
 {
 	if( !this )
@@ -132,23 +155,31 @@ gpcCMPL* gpcCMPL::pLIST( U1* pSTR0, U1* pPUB, gpcLAZY* pCMPL, char c )
 
 	U4 n = nKID();
 	if( !n )
+	{
+		if( iINI )
+			pPC( pCMPL, iINI )->pLIST( pSTR0, pPUB, pCMPL, 'i' );
+		else if( iDEF )
+			pPC( pCMPL, iDEF )->pLIST( pSTR0, pPUB, pCMPL, 'd' );
 		return this;
+	}
 
 	gpcCMPL	*p_stuff, *p_def;
 	if( c )
 		pPUB += sprintf(
-							(char*)pPUB, "%s[%0.2d]%c ",
+							(char*)pPUB, "%0.2d %s[%0.2d]%c ",
+							iLEV,
 							pSTR0+i_str,
 							iPC,
 							c
 						);
+
 	for( U4 i = 0; i < n; i++ )
 	{
 		p_stuff = pPC( pCMPL, iKID( pCMPL, i ) );
 		if( !p_stuff  )
 			continue;
-		p_def = pPC( pCMPL, p_stuff->iDEF ? p_stuff->iDEF : p_stuff->iDEC );
 
+		p_def = pPC( pCMPL, p_stuff->iDEF ? p_stuff->iDEF : p_stuff->iDEC );
 
 		pPUB += sprintf(
 							(char*)pPUB, "%s[%0.2d]%s,",

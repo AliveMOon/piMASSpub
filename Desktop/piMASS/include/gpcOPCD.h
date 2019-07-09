@@ -2,7 +2,7 @@
 #define GPCOPCD_H_INCLUDED
 
 #include "gpcSRC.h"
-enum gpePRG : I2
+/*enum gpePRG : I2
 {
 	gpePRG_newclass = -1,	//r0
 	gpePRG_typ_name,	//r1
@@ -21,7 +21,7 @@ enum gpePRG : I2
 	gpePRG_r0xE,
 	gpePRG_r0xF,
 	gpePRG_end,		//r0x10
-};
+};*/
 
 class gpcOPCD
 {
@@ -35,9 +35,9 @@ public:
 
 	I8		i8;
 	U8		u8, nSTR, nLEN;
-	gpeALF	lab, typ, wip, aTYP[gpePRG_end];
+	gpeALF	lab, typ, wip; //, aTYP[gpePRG_end];
 	U1		*pSTR,
-			*apSTR[gpePRG_end],
+			//*apSTR[gpePRG_end],
 			iSTR;
 	double	d;
 	gpcOPCD(){};
@@ -74,7 +74,8 @@ public:
 	U4		iPC, mPC, iLEV,
 			i_dat, n_dat,
 			i_str, n_str,
-			iDEF, iDEC, iINI;
+			iDEF, iDEC, iINI,
+			op;
 
 
 	I2		nADD, nMUL, nASS;
@@ -98,7 +99,7 @@ public:
 		}
 		return gpeKIDstuff;
 	}
-
+	I1 sOP( char* pPUB );
 	gpcLAZY* reset( gpcLAZY* pCMPL, U1* pPUB )
 	{
 		pCMPL = cmpl_add( pCMPL, pPUB, strlen((char*)pPUB) );
