@@ -831,28 +831,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pPRNT->op = 0;
 						pPRNT = NULL;
 					}
-					/*{
-						pPRNT = pDST ? pDST : &com;
-						char	*pOP = (char*)pPUB, *pINFO = pOP,
-								o = pPRNT->sOP( pOP );
-						sprintf(
-									(pINFO = pOP+o), "%0.2d %0.2d[%0.2d:%0.2d]%0.2db %s %s %s ",
-									pPRNT->iLEV, iPC,
-									pPRNT->iPC, pPRNT->mPC,
-									pPRNT->n_dat,
-									(gppTAB-mass.relLEV()), gpsSTRpub+pPRNT->i_str, pOP
-								);
-						cout << endl << pINFO;
-						pPRNT = NULL;
-						//cout << endl << pDST->iLEV << "[" << pDST->iPC << ":" << pDST->mPC << "]" << (gppTAB - pDST->iLEV) << "=" ;
-					}*/
 
-					/*
-					if( pDST )
-						cout << endl << pDST->iLEV << "[" << pDST->iPC << ":" << pDST->mPC << "]" << (gppTAB - pDST->iLEV) << "=" ;
-					else
-						cout << endl << com.iLEV << "[" << com.iPC << ":" << com.mPC << "]" << (gppTAB - com.iLEV) << "com = ";
-					*/
 
 					u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
 					if( *pS == '.' )

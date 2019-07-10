@@ -1,0 +1,20 @@
+
+/etc/fstab :
+
+# creat RAMDISK and mount it to /mnt/ram
+# none /mnt/ram 
+tmpfs /mnt/ram tmpfs nodev,nosuid,size=8M 0 0
+
+-------------------------------------------------------------
+
+/etc/service:
+
+GPpiRULES	23/tcp		// ez szerintem nem müködik, még utánna kéne nézni
+
+-------------------------------------------------------------
+
+pi@GP-PI:~ $ cd Desktop/piMASS
+pi@GP-PI:~/Desktop/piMASS $ sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+
+
+
