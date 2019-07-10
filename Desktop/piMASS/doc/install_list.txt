@@ -7,14 +7,37 @@ tmpfs /mnt/ram tmpfs nodev,nosuid,size=8M 0 0
 
 -------------------------------------------------------------
 
-/etc/service:
-
-GPpiRULES	23/tcp		// ez szerintem nem müködik, még utánna kéne nézni
-
--------------------------------------------------------------
 
 pi@GP-PI:~ $ cd Desktop/piMASS
 pi@GP-PI:~/Desktop/piMASS $ sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+
+-------------------------------------------------------------
+
+/etc/service:
+
+pimass	23/tcp		// ez szerintem nem müködik, még utánna kéne nézni
+
+-------------------------------------------------------------
+
+pi@GP-PI:~/Desktop/piMASS $ git add .
+
+pi@GP-PI:~/Desktop/piMASS $ git commit -m "gpcOPCD [](){} sOP() 05-stupid :) to doc"
+[master a05f887] gpcOPCD [](){} sOP() 05-stupid :) to doc
+ 5 files changed, 44 insertions(+), 45 deletions(-)
+ create mode 100644 Desktop/piMASS/doc/install_list.txt
+
+pi@GP-PI:~/Desktop/piMASS $ git push origin master
+Username for 'https://github.com': AliveMOon
+Password for 'https://AliveMOon@github.com': 
+Counting objects: 14, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (9/9), done.
+Writing objects: 100% (14/14), 1.77 KiB | 0 bytes/s, done.
+Total 14 (delta 6), reused 0 (delta 0)
+remote: Resolving deltas: 100% (6/6), completed with 6 local objects.
+To https://github.com/AliveMOon/piMASSpub.git
+   4fe9836..a05f887  master -> master
+pi@GP-PI:~/Desktop/piMASS $ 
 
 
 
