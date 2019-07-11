@@ -336,7 +336,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		utf8,
 		&iLEV = mass.iLEV, alLEV = iLEV,
 		*piDAT = mass.aiDAT, &alDAT = mass.alDAT,
-		&iPC = mass.iPC, nPC;
+		&iPC = mass.iPC, nPC, iFND;
 	I4 nCHK;
 	bool bSIGN = false, bALF, bABC;
 
@@ -687,8 +687,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		}
 
 		nPC = com.nPC( &mass.CMPL );
-		iPC = com.cmpl_best( &mass.CMPL, pS, pE-pS );
-		pFND = pFND->pPC( &mass.CMPL, iPC );
+		iFND = com.cmpl_best( &mass.CMPL, pS, pE-pS );
+		pFND = pFND->pPC( &mass.CMPL, iFND );
 		if( pFND->wip == gpeALF_OPER )
 		{
 			nSKIP = pFND->n_str;
@@ -707,12 +707,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						nVAN = 0;
 						break;
 
-					case gpeALF_BRAKS:
+					case gpeALF_BRAKS:	// (
 						mass.incLEV();
 						nVAN = 0;
 						break;
 
-					case gpeALF_BRAKE:
+					case gpeALF_BRAKE:	// )
 						if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
 						{
 							cout << endl << pPUB+o;
@@ -734,6 +734,42 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						nVAN = 0;
 						break;
+					case gpeALF_MOV:	// =
+						if( !pDST )
+								pDST = pMOM->pPC( &mass.CMPL, iPC );
+
+						(pDST ? pDST->op : com.op ) |= 1;
+						break;
+					case gpeALF_COMS:
+						if( U1* pCOM = (U1*)strstr( (char*)pS+nSKIP, "*/" ) )
+						{
+							pS = pCOM+2;
+							nSKIP = 0;
+						} else {
+							nSKIP = 0;
+							pS = pE;
+						}
+						break;
+					case gpeALF_COM:
+						nSKIP += gpmVAN( pS+nSKIP, "\r\n", nLEN );
+						break;
+					default:
+						if( !pFND->i_str )
+						{
+							gpcCMPL* pM = pFND->pPC( &mass.CMPL, pFND->mPC );
+							for( U4 k = 0, n = pM->nKID(); k < n; k++ )
+							{
+								if( pM->iKID( &mass.CMPL, k ) != pFND->iPC )
+								{
+									continue;
+								}
+
+								cout << endl << pM->p_kid->sSTRix( k );
+								break;
+							}
+						}
+						break;
+
 			}
 			pS += nSKIP;
 			continue;

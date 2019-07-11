@@ -74,12 +74,14 @@ char* gpasOPER[] = {
 
 	"! inv",	"!! LG",	"!= neqLG",
 
+	"/* comS", 	"*/ comE",	"// com",
+
 
 	"& and", 	"&& andLG",	"&= andM",
 	"* mul", 	"** exp",	"*= mulM",
 							"**= expM",
-	"/ div", 	"/= divM",	"//= rtM",
-	"% rem", 	"/= remM",
+	"/ div", 	"/= divM",	"//= rootM",
+	"% rem", 	"%= remM",
 	"^ xor",	"^= xorM",
 
 
@@ -93,7 +95,6 @@ char* gpasOPER[] = {
 	">= beLG",	"> bgLG", 	">> sr", 	">>= srM",
 
 	". tag", 	"-> entry", ":: out"
-	"/* comS", 	"*/ comE",	"// com",
 	"( brakS",	") brakE",
 	"[ dimS", 	"] dimE",
 	"{ begin", 	"} end",
@@ -136,8 +137,8 @@ U1* gpcMASS::reset( U1* pSTR0 )
 			nS = strlen( (char*)pE ); //pE-(U1*)gpasOPER[i];
 			pS = (U1*)gpmMEMCPY( pPUB, pE, nS );
 
-			pPC->i_str = pS-pSTR0;
-			pPC->n_str = nS;
+			//pPC->i_str = pS-pSTR0;
+			//pPC->n_str = nS;
 			pPC->typ = gpfSTR2ALF( pPUB, pPUB+nS, NULL );
 			pPC->wip = gpeALF_OPER;
 			pPUB += nS+1;

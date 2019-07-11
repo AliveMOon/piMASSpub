@@ -385,6 +385,7 @@ typedef enum gpeALF: I8
 	gpeALF_RESET = gpdABCDE('R', 'E', 'S', 'E', 'T'),
 
 	gpeALF_RIGHT = gpdABCDE('R', 'I', 'G', 'H', 'T'),
+	gpeALF_ROOTM = gpdABCDE('R', 'O', 'O', 'T', 'M'),
 	gpeALF_RULES = gpdABCDE('R', 'U', 'L', 'E', 'S'),
 
 	gpeALF_SETUP = gpdABCDE('S', 'E', 'T', 'U', 'P'),
