@@ -1568,6 +1568,8 @@ public:
 	}
 	char* sSTRix( U8 iX )
 	{
+		if( !this )
+			return "false";
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 		return (char*)(str.p_alloc + p_ix0[iX].x);
 	}

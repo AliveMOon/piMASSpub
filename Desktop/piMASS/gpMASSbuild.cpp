@@ -354,7 +354,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
 	// és azon keresztül érhetik el
 	cout << endl << "lv fn[iP:mm]nD				// iD/alD";
-	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pDEF, *pPAR, *pDST = NULL;
+	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pDEF, *pPAR,
+
+			*pA = NULL,
+			*pB = NULL;
 	while( pS < pE )				/// 	COMPILER
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
@@ -617,22 +620,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									cout << endl << pPUB+o;
 									pPRNT = NULL;
 								}
-								/*if( pDST )
-								{
 
-									char	*pOP = (char*)pPUB, *pINFO = pOP,
-											o = pDST->sOP( pOP );
-									sprintf( pINFO = pOP+o, "%0.2d %0.2d[%0.2d:%0.2d]%0.2db %s %s %s %s",
-														pDST->iLEV, iPC,
-														pDST->iPC, pDST->mPC,
-														pDST->n_dat,
-														(gppTAB-mass.relLEV()), gpsSTRpub+pDST->i_str, pOP, pSTR
-
-													);
-									cout << endl << pINFO;
-									pPRNT = NULL;
-									//cout << endl << pDST->iLEV << "[" << pDST->iPC << ":" << pDST->mPC << "]" << (gppTAB - pDST->iLEV) << "=" ;
-								}*/
 								break;
 
 							case gpeALF_FUNC:
@@ -722,11 +710,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						{
 							if( *pPUB )
 								cout << endl << pPUB;
-
-							/*if( pDWN->wip == gpeALF_DEF && pDWN->iDEF )
-							if(	gpcCMPL* pDEF = pDEF->pPC( &mass.CMPL, pDWN->iDEF )->pLIST( gpsSTRpub, pPUB, &mass.CMPL ) )
-							if( *pPUB )
-									cout << endl << pPUB;*/
 						}
 
 						mass.asPRG[iLEV] = c;
@@ -755,18 +738,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						break;
 					default:
 						if( !pFND->i_str )
+						if(	gpcCMPL* pM = pFND->pPC( &mass.CMPL, pFND->mPC ) )
 						{
-							gpcCMPL* pM = pFND->pPC( &mass.CMPL, pFND->mPC );
-							for( U4 k = 0, n = pM->nKID(); k < n; k++ )
-							{
-								if( pM->iKID( &mass.CMPL, k ) != pFND->iPC )
-								{
-									continue;
-								}
-
-								cout << endl << pM->p_kid->sSTRix( k );
-								break;
-							}
+							cout << endl << pM->p_kid->sSTRix( pFND->iKD );
 						}
 						break;
 
@@ -826,10 +800,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								if( *pPUB )
 									cout << endl << pPUB;
 
-								/*if( pDWN->wip == gpeALF_DEF && pDWN->iDEF )
-								if(	gpcCMPL* pDEF = pDEF->pPC( &mass.CMPL, pDWN->iDEF )->pLIST( gpsSTRpub, pPUB, &mass.CMPL ) )
-								if( *pPUB )
-										cout << endl << pPUB;*/
 							}
 
 							mass.asPRG[iLEV] = c;

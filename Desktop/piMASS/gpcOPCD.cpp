@@ -400,6 +400,6 @@ gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	ppC[pC->iPC] = pC;
 
 	p_iPC = p_iPC->lazy_add( &pC->iPC, sizeof(pC->iPC), iPC8 = -1 );
-
+	pC->iKD = iPC8/sizeof(pC->iPC);
 	return pCMPL;
 }

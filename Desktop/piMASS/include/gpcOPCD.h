@@ -71,7 +71,7 @@ class gpcCMPL
 {
 public:
 	gpeALF	typ, wip;
-	U4		iPC, mPC, iLEV,
+	U4		iPC, mPC, iKD, iLEV,
 			i_dat, n_dat,
 			i_str, n_str,
 			iDEF, iDEC, iINI,
