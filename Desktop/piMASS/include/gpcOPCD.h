@@ -147,6 +147,7 @@ public:
 			return ppC[pc];
 		return NULL;
 	}
+	U4 cmpl_best( gpcLAZY* pCMPL, U1* pS, U4 nS );
 	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
 	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
 

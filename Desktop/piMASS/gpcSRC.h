@@ -472,7 +472,7 @@ class gpcMASS
 	gpcCLASS	*pTG;
 	gpcLAZY		*pSRCc,
 				*pLST;
-	U4			nLST, xFND, nALLOC, nSP,
+	U4			nLST, xFND, nALLOC, nSP, nOP,
 				aSPix[0x100];
 	gpcSRC		*pFND,
 				*apSP[0x100];
@@ -489,7 +489,7 @@ public:
 	U1			asPRG[0x1000],
 				*pPUB; //, nDICT;
 
-	// CPLD ----------------------------
+	// CMPL ----------------------------
 	gpcLAZY		CMPL;
 	gpcCMPL		PC;
 	U4			aPC[0x100], iPC,

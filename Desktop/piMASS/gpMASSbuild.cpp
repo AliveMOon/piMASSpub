@@ -686,6 +686,59 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			}
 		}
 
+		nPC = com.nPC( &mass.CMPL );
+		iPC = com.cmpl_best( &mass.CMPL, pS, pE-pS );
+		pFND = pFND->pPC( &mass.CMPL, iPC );
+		if( pFND->wip == gpeALF_OPER )
+		{
+			nSKIP = pFND->n_str;
+			switch( pFND->typ )
+			{
+					case gpeALF_BEGIN:	// {
+						mass.incLEV();
+						nVAN = 0;
+						break;
+					case gpeALF_END:	// }
+						if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
+						if( *pPUB )
+								cout << endl << pPUB;
+
+						mass.decLEV();
+						nVAN = 0;
+						break;
+
+					case gpeALF_BRAKS:
+						mass.incLEV();
+						nVAN = 0;
+						break;
+
+					case gpeALF_BRAKE:
+						if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
+						{
+							cout << endl << pPUB+o;
+							pPRNT = NULL;
+						}
+						if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST( gpsSTRpub, pPUB, &mass.CMPL, c ) )
+						{
+							if( *pPUB )
+								cout << endl << pPUB;
+
+							/*if( pDWN->wip == gpeALF_DEF && pDWN->iDEF )
+							if(	gpcCMPL* pDEF = pDEF->pPC( &mass.CMPL, pDWN->iDEF )->pLIST( gpsSTRpub, pPUB, &mass.CMPL ) )
+							if( *pPUB )
+									cout << endl << pPUB;*/
+						}
+
+						mass.asPRG[iLEV] = c;
+						iPC = mass.aPC[iLEV];
+
+						nVAN = 0;
+						break;
+			}
+			pS += nSKIP;
+			continue;
+		}
+
 		pS++;
 		nVAN = gpmNINCS( pS, sVAN );
 		if( pS + nVAN > pE )
