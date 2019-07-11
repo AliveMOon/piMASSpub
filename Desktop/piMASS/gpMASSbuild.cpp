@@ -415,7 +415,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						if( pMOM->wip == gpeALF_DEC )
 						{
 							// csak deklarálva van még a mama
-							nN = memcmp( pSTR, gpsSTRpub+pMOM->i_str, nSTR );
+							nN = memcmp( pSTR, gpsSTRpub+pMOM->iPUB, nSTR );
 
 							com.typ = nN ? gpeALF_FUNC : gpeALF_CONSTR;
 							com.wip = gpeALF_DEC;
@@ -461,9 +461,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				{
 					if( !pFND->wip )
 					{
-//--------------------------------------------------------
-//					NEM talált
-//--------------------------------------------------------
+///--------------------------------------------------------
+///						NEM talált
+///--------------------------------------------------------
 						//bFND = false;
 						// nem talált újat akar
 						if( pMOM )
@@ -482,18 +482,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 										pPRNT->pINFO = (char*)pPUB;
 										pPUB += sprintf( pPRNT->pINFO, "c{constr()}" );
 									}
-/// 1. STEP // DECLARED CLASS -------------------
+/// 1. STEP
+// DECLARED CLASS -------------------
 									pNEW->wip = com.wip; 	// DEC
 									pNEW->typ = com.typ; 	// CLASS
 									pNEW->iLEV = iLEV;
-									pNEW->i_str = pSTR-gpsSTRpub;	// name
+									pNEW->iPUB = pSTR-gpsSTRpub;	// name
 									pNEW->n_str = nSTR;
 
 									/// pNEW->iDEF = 0;
 									pNEW->iDEC = com.iDEC;
 									com.mPC = iPC =
 									com.iDEC = pNEW->iPC;	// DEC pc
-									com.i_str = pNEW->i_str;
+									com.iPUB = pNEW->iPUB;
 									com.n_str = pNEW->n_str;
 
 									pMOM = NULL;
@@ -511,17 +512,19 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									pDEF = com.pPC( &mass.CMPL, com.iDEF );
 
 
-/// 3. STEP // DEFINE STUFF x,y,z,etc.... -------------------
+/// 3. STEP
+// DEFINE STUFF x,y,z,etc.... -------------------
 									pNEW->wip = gpeALF_DEF; // ? pDEF->wip;
 									pNEW->typ = pDEF->typ;
 									pNEW->iLEV = iLEV;
-									pNEW->i_str = pSTR-gpsSTRpub;	// name
+									pNEW->iPUB = pSTR-gpsSTRpub;	// name
 									pNEW->n_str = nSTR;
 
 									pNEW->iDEF = pDEF->iPC;
 									if( com.wip == gpeALF_INIT )
 									{
-/// 4. STEP // DEFINE&INIT STUFF x,y,z,etc.... -------------------
+/// 4. STEP
+// DEFINE&INIT STUFF x,y,z,etc.... -------------------
 										pNEW->iINI = pNEW->iDEF;
 									}
 									/// com.iDEC -- ha 2.-nél ne bátottuk?
@@ -565,9 +568,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						}
 					} else {
-//--------------------------------------------------------
-//					IGEN talált
-//--------------------------------------------------------
+///--------------------------------------------------------
+///					IGEN talált
+///--------------------------------------------------------
 /// ismerte WIP megmondja mit akar csinálni
 						switch( pFND->wip )
 						{
@@ -580,7 +583,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								{
 									com.null();
 
-/// 0. STEP // DEC new CLASS ------------------------
+/// 0. STEP
+// DEC new CLASS ------------------------
 									pPRNT = &com;
 
 									com.iDEC = pFND->iPC; // 0; 			// false?
@@ -588,7 +592,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									com.typ = pFND->typ;	// CLASS
 
 									com.mPC = mass.aPC[mass.iLEV];	//
-									com.i_str = pSTR-gpsSTRpub;
+									com.iPUB = pSTR-gpsSTRpub;
 									com.n_str = nSTR;
 
 
@@ -599,9 +603,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								com.iDEC = pFND->iPC;
 
 							case gpeALF_DEF:
-/// 2. STEP // DEFINE CLASS -------------------
-
-
+/// 2. STEP
+// DEFINE CLASS -------------------
 								pPRNT = &com;
 
 								com.wip = gpeALF_DEF; 			//pFND->wip;	// DEF
@@ -611,15 +614,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 
 								com.mPC = mass.aPC[mass.iLEV];
-								com.i_str = pSTR-gpsSTRpub;
+								com.iPUB = pSTR-gpsSTRpub;
 								com.n_str = nSTR;
 								com.iLEV = mass.iLEV;
 
-								if( I1 o = pDST->sDST( pPUB, iPC, (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
-								{
-									cout << endl << pPUB+o;
-									pPRNT = NULL;
-								}
+								/// itt volt valami DSTs izé
 
 								break;
 
@@ -701,11 +700,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						break;
 
 					case gpeALF_BRAKE:	// )
-						if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
-						{
-							cout << endl << pPUB+o;
-							pPRNT = NULL;
-						}
+						/// itt volt valami DSTs izé
+
 						if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST( gpsSTRpub, pPUB, &mass.CMPL, c ) )
 						{
 							if( *pPUB )
@@ -718,10 +714,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						nVAN = 0;
 						break;
 					case gpeALF_MOV:	// =
-						if( !pDST )
-								pDST = pMOM->pPC( &mass.CMPL, iPC );
+						/// itt volt valami DSTs izé
 
-						(pDST ? pDST->op : com.op ) |= 1;
+
 						break;
 					case gpeALF_COMS:
 						if( U1* pCOM = (U1*)strstr( (char*)pS+nSKIP, "*/" ) )
@@ -737,7 +732,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						nSKIP += gpmVAN( pS+nSKIP, "\r\n", nLEN );
 						break;
 					default:
-						if( !pFND->i_str )
+						//if( !pFND->i_str )
 						if(	gpcCMPL* pM = pFND->pPC( &mass.CMPL, pFND->mPC ) )
 						{
 							cout << endl << pM->p_kid->sSTRix( pFND->iKD );
@@ -790,11 +785,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 
 						case ')':
-							if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
-							{
-								cout << endl << pPUB+o;
-								pPRNT = NULL;
-							}
+							/// itt volt valami DSTs izé
+
 							if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST( gpsSTRpub, pPUB, &mass.CMPL, c ) )
 							{
 								if( *pPUB )
@@ -812,33 +804,25 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 
 						case '+':
-							if( !pDST )
-								pDST = pMOM->pPC( &mass.CMPL, iPC );
-							if( pDST )
-								pDST->op |= 0x10;
+							/// itt volt valami DSTs izé
+
 							break;
 						case '-':
-							if( !pDST )
-								pDST = pMOM->pPC( &mass.CMPL, iPC );
-							if( pDST )
-								pDST->op |= 8;
+							/// itt volt valami DSTs izé
+
 							break;
 
 						case '*':
-							if( !pDST )
-								pDST = pMOM->pPC( &mass.CMPL, iPC );
-							if( pDST )
-								pDST->op |= 0x20;
+							/// itt volt valami DSTs izé
+
 							break;
 						case '/':
 							if( pS[nVAN] != '*'  )
 							{
 								if( !nVAN )
 								{
-									if( !pDST )
-										pDST = pMOM->pPC( &mass.CMPL, iPC );
-									if( pDST )
-										pDST->op |= 0x40;
+									/// itt volt valami DSTs izé
+
 									com.nMUL--;
 									break;
 								}
@@ -857,20 +841,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						case ',':	// vessző
 							// berakjuk ami létrejött a sorba
-							if( !pDST )
-							{
-								com.op = 0;
-								nVAN = 0;
-								break;
-							}
+							/// itt volt valami DSTs izé
 
-							if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
-							{
-								cout << endl << pPUB+o;
-								pPRNT = NULL;
-							}
-							pDST->op = 0;
-							pDST = NULL;
+
 							nVAN = 0;
 							break;
 						case '.':	// pont
@@ -880,16 +853,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				}
 				else if( c < 0x3A )
 				{
+					cout << endl << (gppTAB-mass.relLEV());
 					// 30-39 // számok 0-9
-					//if( pDST )
-					pPRNT = pDST ? pDST : &com;
-					pPRNT->op |= pPRNT->op ? 0 : 1;
-					if( I1 o = pPRNT->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()) ) )
-					{
-						cout << endl << pPUB+o;
-						pPRNT->op = 0;
-						pPRNT = NULL;
-					}
+					/// itt volt valami DSTs izé
 
 
 					u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
@@ -923,40 +889,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						case ';':
 							// mass.decLEV();
 							// comment
-							if( !pDST )
-							{
-								com.op = 0;
-								nVAN = 0;
-								break;
-							}
+							/// itt volt valami DSTs izé
 
-							if( I1 o = pDST->sDST( pPUB, iPC,  (char*)gpsSTRpub,  (char*)(gppTAB-mass.relLEV()),  (char*)pSTR ) )
-							{
-								cout << endl << pPUB+o;
-								pPRNT = NULL;
-							}
-							pDST->op = 0;
-							pDST = NULL;
 							nVAN = 0;
 							break;
 
 						case '<':
-							if( !pDST )
-								pDST = pMOM->pPC( &mass.CMPL, iPC );
-							if( pDST )
-								pDST->op |= 2;
+							/// itt volt valami DSTs izé
+
 							break;
 						case '=':
-							if( !pDST )
-								pDST = pMOM->pPC( &mass.CMPL, iPC );
-							(pDST ? pDST->op : com.op ) |= 1;
+							/// itt volt valami DSTs izé
+
 							//mass.incLEV();
 							break;
 						case '>':
-							if( !pDST )
-								pDST = pMOM->pPC( &mass.CMPL, iPC );
-							if( pDST )
-								pDST->op |= 4;
+							/// itt volt valami DSTs izé
+
 							break;
 						case '?':
 							nVAN = 0;

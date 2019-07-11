@@ -102,13 +102,13 @@ char* gpasOPER[] = {
 	"@ mail"
 };
 
-U1* gpcMASS::reset( U1* pSTR0 )
+U1* gpcMASS::reset( U1* pS0 )
 {
 	gpmZ( asPRG );
 	if( !pPUB )
 	{
 
-		pPUB = (U1*)strcpy( (char*)pSTR0, "false" );
+		pPUB = (U1*)strcpy( (char*)pS0, "false" );
 
 		U8 s8;
 		PC.reset( &CMPL, pPUB );
@@ -137,7 +137,7 @@ U1* gpcMASS::reset( U1* pSTR0 )
 			nS = strlen( (char*)pE ); //pE-(U1*)gpasOPER[i];
 			pS = (U1*)gpmMEMCPY( pPUB, pE, nS );
 
-			//pPC->i_str = pS-pSTR0;
+			//pPC->i_str = pS-pS0;
 			//pPC->n_str = nS;
 			pPC->typ = gpfSTR2ALF( pPUB, pPUB+nS, NULL );
 			pPC->wip = gpeALF_OPER;
@@ -150,7 +150,7 @@ U1* gpcMASS::reset( U1* pSTR0 )
 			gpcOPCD opcd = gpaOPCi[i];
 			nS = opcd.nSTR;
 			pS = opcd.pSTR;
-			gpmMEMCPY( pPUB, pS, nS );
+			pS = (U1*)gpmMEMCPY( pPUB, pS, nS );
 			pPUB[nS] = 0;
 			pPUB += nS+1;
 
@@ -158,10 +158,9 @@ U1* gpcMASS::reset( U1* pSTR0 )
 			pPC = PC.pPC( &CMPL, j );
 			if( !pPC )
 				continue;
-			pPC->i_str = pPUB-pSTR0;
+			pPC->iPUB = pS-pS0;
 			//pPC->n_str = gpaOPCi[i].nSTR;
 
-			//pPUB += pPC->n_str+1;
 			pPC->typ = opcd.typ;
 			pPC->wip = opcd.wip;
 			pPC->n_dat = opcd.nDAT;
@@ -197,7 +196,7 @@ I1 gpcCMPL::sOP( char* pS )
 	o++;
 	return o;
 }
-I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* p_str0, char* pTAB, char* pSTR )
+I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB, char* pSTR )
 {
 	if( !this )
 		return 0;
@@ -214,7 +213,7 @@ I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* p_str0, char* pTAB, char* pSTR )
 						iLEV, iFND,
 						iPC, mPC,
 						n_dat,
-						pTAB, p_str0 ? p_str0+i_str : "", pOP, pSTR
+						pTAB, pS0 ? pS0+iPUB : "", pOP, pSTR
 
 					);
 	return o;
@@ -230,12 +229,12 @@ U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
 
 	return ((U4*)p_iPC->p_alloc)[i];
 }
-gpcCMPL* gpcCMPL::pLIST( U1* pSTR0, U1* pPUB, gpcLAZY* pCMPL, char c )
+gpcCMPL* gpcCMPL::pLIST( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
 {
-	if( !pSTR0 )
+	if( !pS0 )
 		return NULL;
 	if( !pPUB )
-		pPUB = pSTR0;
+		pPUB = pS0;
 
 	*pPUB = 0;
 	if( this ? !pCMPL : true )
@@ -245,9 +244,9 @@ gpcCMPL* gpcCMPL::pLIST( U1* pSTR0, U1* pPUB, gpcLAZY* pCMPL, char c )
 	if( !n )
 	{
 		if( iINI )
-			pPC( pCMPL, iINI )->pLIST( pSTR0, pPUB, pCMPL, 'i' );
+			pPC( pCMPL, iINI )->pLIST( pS0, pPUB, pCMPL, 'i' );
 		else if( iDEF )
-			pPC( pCMPL, iDEF )->pLIST( pSTR0, pPUB, pCMPL, 'd' );
+			pPC( pCMPL, iDEF )->pLIST( pS0, pPUB, pCMPL, 'd' );
 		return this;
 	}
 
@@ -256,7 +255,7 @@ gpcCMPL* gpcCMPL::pLIST( U1* pSTR0, U1* pPUB, gpcLAZY* pCMPL, char c )
 		pPUB += sprintf(
 							(char*)pPUB, "%0.2d %s[%0.2d]%c ",
 							iLEV,
-							pSTR0+i_str,
+							pS0+iPUB,
 							iPC,
 							c
 						);
@@ -271,9 +270,9 @@ gpcCMPL* gpcCMPL::pLIST( U1* pSTR0, U1* pPUB, gpcLAZY* pCMPL, char c )
 
 		pPUB += sprintf(
 							(char*)pPUB, "%s[%0.2d]%s,",
-							pSTR0+p_def->i_str,
+							pS0+p_def->iPUB,
 							p_stuff->iPC,
-							pSTR0+p_stuff->i_str
+							pS0+p_stuff->iPUB
 						);
 
 	}

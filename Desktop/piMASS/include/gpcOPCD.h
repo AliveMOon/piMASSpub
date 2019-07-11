@@ -73,7 +73,8 @@ public:
 	gpeALF	typ, wip;
 	U4		iPC, mPC, iKD, iLEV,
 			i_dat, n_dat,
-			i_str, n_str,
+			iPUB,
+			n_str,
 			iDEF, iDEC, iINI,
 			op;
 
@@ -100,7 +101,7 @@ public:
 		return gpeKIDstuff;
 	}
 	I1 sOP( char* pPUB );
-	I1 sDST( U1* pPUB, U4 iFND, char* p_str0, char* pTAB  = "", char* pSTR = "" );
+	I1 sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB  = "", char* pSTR = "" );
 	gpcLAZY* reset( gpcLAZY* pCMPL, U1* pPUB )
 	{
 		pCMPL = cmpl_add( pCMPL, pPUB, strlen((char*)pPUB) );
@@ -151,6 +152,6 @@ public:
 	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
 	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
 
-	gpcCMPL* pLIST( U1* pSTR0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
+	gpcCMPL* pLIST( U1* pS0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
 
 };

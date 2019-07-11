@@ -1483,8 +1483,8 @@ public:
 		if( !str.p_alloc )
 			ver = 0;
 		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
-		U1* p_str0 = str.p_alloc;
-		pS = p_str0+aSTRT[0];
+		U1* pS0 = str.p_alloc;
+		pS = pS0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
 
@@ -1497,7 +1497,7 @@ public:
 		pIX->x = aSTRT[0];
 		pIX->y = nS;
 
-		U4 iIX = p_ix0->dict_find( p_str0, *pIX );
+		U4 iIX = p_ix0->dict_find( pS0, *pIX );
 
 		// UNDOza a bejegyzést
 		str.n_load = aSTRT[0];
@@ -1517,8 +1517,8 @@ public:
 		if( !str.p_alloc )
 			ver = 0;
 		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
-		U1* p_str0 = str.p_alloc;
-		pS = p_str0+aSTRT[0];
+		U1* pS0 = str.p_alloc;
+		pS = pS0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
 
@@ -1530,7 +1530,7 @@ public:
 		pIX->null();
 		pIX->x = aSTRT[0];
 		pIX->y = nS;
-		U4 iIX, nADD = p_ix0->dict_add( p_str0, iIX, *pIX );
+		U4 iIX, nADD = p_ix0->dict_add( pS0, iIX, *pIX );
 
 		if( nIX == nADD )
 		{
