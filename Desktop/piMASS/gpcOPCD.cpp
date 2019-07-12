@@ -34,16 +34,16 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_zero },
 	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TRUE },
 
-	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_DEF, gpeALF_CLASS },
-	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_DEF, gpeALF_CLASS },
+	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_DEC, gpeALF_CLASS },
 
 	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
 	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_IF },
@@ -74,6 +74,8 @@ char* gpasOPER[] = {
 
 	"! inv",	"!! LG",	"!= neqLG",
 
+	//"+ add", 	"++ inc",	"+= addM", ///--------------- DBG
+
 	"/* comS", 	"*/ comE",	"// com",
 
 
@@ -87,7 +89,7 @@ char* gpasOPER[] = {
 
 	"= mov", 	"== eqLG",
 	"| or", 	"|| orLG",	"|= orM",
-	"+ add", 	"++ inc",	"+= addM",
+	"+ add", 	"++ inc",	"+= addM",	/// -------------- GOOD
 	"- sub", 	"++ dec",	"-= subM",
 
 
@@ -101,6 +103,52 @@ char* gpasOPER[] = {
 	"? if",		": else",
 	"@ mail"
 };
+
+char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB )
+{
+	char	*pASMop = (char*)pPUB, *psOP = NULL, *psA = NULL, *psB = NULL,
+			*pRa	= pASMop+0x10,
+			*pRb	= pRa+0x10,
+			*pCOUT	= pRb+0x10;
+	*pCOUT = 0;
+	gpcCMPL* pM = NULL;
+	if( pA->wip == gpeALF_REG )
+	{
+		sprintf( pRa, "%d", pA->u8 );
+		psA = pRa;
+	}
+	else if( pM = pA->pPC( pCMPL, pA->mPC ) )
+	{
+		psA = pM->p_kid->sSTRix( pA->iKD );
+	}
+
+	if( !this )
+	{
+		psOP = NULL;
+	}
+	else if(	pM = pPC( pCMPL, mPC ) )
+	{
+		psOP = pM->p_kid->sSTRix( iKD );
+	}
+
+	if( pB->wip == gpeALF_REG )
+	{
+		sprintf( pRb, "%d", pB->u8 );
+		psB = pRb;
+	}
+	else if( pM = pB->pPC( pCMPL, pB->mPC ) )
+	{
+		psB = pM->p_kid->sSTRix( pB->iKD );
+	}
+
+	gpfALF2STR( pASMop, (I8)typ );
+	sprintf(
+				pCOUT, "\r\n%s.%c [%0.2d], [%0.2d]		; %s %s %s",
+						pASMop, sNDAT[pA->n_dat], pA->iPC, pB->iPC,
+																		(psA ? psA : "?"), (psOP ? psOP : "?"), (psB ? psB : "?")
+			);
+	return pCOUT;
+}
 
 U1* gpcMASS::reset( U1* pS0 )
 {
@@ -123,28 +171,33 @@ U1* gpcMASS::reset( U1* pS0 )
 			pE = (U1*)strchr( gpasOPER[i], ' ' );
 			if( !pE )
 				continue;
+// "op ALF" -------------------------------
 			nS = pE-(U1*)gpasOPER[i];
 			pS = (U1*)gpmMEMCPY( pPUB, gpasOPER[i], nS );
 			pS[nS] = 0;
 			pPUB += nS+1;
 
-			PC.pPC( &CMPL, 0 )->cmpl_add( &CMPL, pS, nS );
+			PC.pPC( &CMPL, 0 )
+				->cmpl_add( &CMPL, pS, nS );
 			pPC = PC.pPC( &CMPL, j );
 			if( !pPC )
 				continue;
 
+			pPC->iPUB = pS-pS0; // op
+
+// "ALF" ----------------------------
 			pE++;
 			nS = strlen( (char*)pE ); //pE-(U1*)gpasOPER[i];
 			pS = (U1*)gpmMEMCPY( pPUB, pE, nS );
-
-			//pPC->i_str = pS-pS0;
-			//pPC->n_str = nS;
-			pPC->typ = gpfSTR2ALF( pPUB, pPUB+nS, NULL );
-			pPC->wip = gpeALF_OPER;
+			pS[nS] = 0;
 			pPUB += nS+1;
+
+			pPC->typ = gpfSTR2ALF( pS, pS+nS, NULL );
+			pPC->wip = gpeALF_OPER;
+
 			j++;
 		}
-		nOP = j;
+		nOP0 = j;
 		for( U4 i = 1, iN = gpmN(gpaOPCi), nwLEV = iLEV; i < iN; i++ )
 		{
 			gpcOPCD opcd = gpaOPCi[i];
@@ -166,7 +219,7 @@ U1* gpcMASS::reset( U1* pS0 )
 			pPC->n_dat = opcd.nDAT;
 			j++;
 		}
-
+		nOP1 = j;
 
 		iLEV++;
 	}
@@ -229,7 +282,7 @@ U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
 
 	return ((U4*)p_iPC->p_alloc)[i];
 }
-gpcCMPL* gpcCMPL::pLIST( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
+gpcCMPL* gpcCMPL::sKIDlst( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
 {
 	if( !pS0 )
 		return NULL;
@@ -244,9 +297,9 @@ gpcCMPL* gpcCMPL::pLIST( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
 	if( !n )
 	{
 		if( iINI )
-			pPC( pCMPL, iINI )->pLIST( pS0, pPUB, pCMPL, 'i' );
+			pPC( pCMPL, iINI )->sKIDlst( pS0, pPUB, pCMPL, 'i' );
 		else if( iDEF )
-			pPC( pCMPL, iDEF )->pLIST( pS0, pPUB, pCMPL, 'd' );
+			pPC( pCMPL, iDEF )->sKIDlst( pS0, pPUB, pCMPL, 'd' );
 		return this;
 	}
 
@@ -288,7 +341,7 @@ U4 gpcCMPL::cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	if( !ppC )
 		return 0;
 
-	gpcCMPL* pC = this;
+	gpcCMPL* pC = ppC[iPC]; // this;
 	U4 ifPC, nPC, *pPC = NULL;
 
 	while( pC )
@@ -328,7 +381,7 @@ U4 gpcCMPL::cmpl_best( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	if( !ppC )
 		return 0;
 
-	gpcCMPL* pC = this; //*pCC = pPC( pCMPL, 0 );
+	gpcCMPL* pC = ppC[iPC]; //this; //*pCC = pPC( pCMPL, 0 );
 	U4 ifPC, nPC, iBST = 0, nBST = 0;
 
 	while( pC )

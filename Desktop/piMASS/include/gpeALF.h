@@ -182,6 +182,7 @@ typedef enum gpeALF: I8
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
 	gpeALF_PRG = gpdABC('P', 'R', 'G'),
 	gpeALF_REF = gpdABC('R', 'E', 'F'),
+	gpeALF_REG = gpdABC('R', 'E', 'G'),
 	gpeALF_REM = gpdABC('R', 'E', 'M'),
 	gpeALF_REN = gpdABC('R', 'E', 'N'),
 	gpeALF_RET = gpdABC('R', 'E', 'T'),

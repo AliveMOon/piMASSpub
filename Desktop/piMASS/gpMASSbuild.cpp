@@ -303,7 +303,8 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
 		gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
-		*gppTAB = gpsTAB+strlen(gpsTAB);
+		*gppTAB = gpsTAB+strlen(gpsTAB),
+		gpsNDAT[] = "0bwllqqqqxxxxxxxx";
 
 
 U1 gpsSTRpub[0x10000];
@@ -336,7 +337,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		utf8,
 		&iLEV = mass.iLEV, alLEV = iLEV,
 		*piDAT = mass.aiDAT, &alDAT = mass.alDAT,
-		&iPC = mass.iPC, nPC, iFND;
+		&iPC = mass.iPC, nPC, iFND, iOP, nR = 0;
 	I4 nCHK;
 	bool bSIGN = false, bALF, bABC;
 
@@ -354,10 +355,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	// be kell jegyezni a rublikának egy saját változót amibe dolgozhat
 	// és azon keresztül érhetik el
 	cout << endl << "lv fn[iP:mm]nD				// iD/alD";
-	gpcCMPL	com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pDEF, *pPAR,
+	gpcCMPL	aR[8],
+			com = 0, *pFND = NULL, *pMOM = NULL, *pPRNT = NULL, *pNEW = NULL, *pDEF, *pPAR,
 
-			*pA = NULL,
-			*pB = NULL;
+			*pA = NULL, *pOP = NULL,
+			*pB = NULL, *piLEVpc = NULL;
+	gpmZ(aR);
+
 	while( pS < pE )				/// 	COMPILER
 	{
 		pS += gpmNINCS( pS, " \t\r\n" );
@@ -410,7 +414,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						// vagy a konstruktoráról szól a kifejezés
 						*pPUB = c;
 						pPUB++;
-
+						pB = pA = pOP = NULL;
+						nR = 0;
 						//com.wip = pMOM->wip;
 						if( pMOM->wip == gpeALF_DEC )
 						{
@@ -436,6 +441,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						// forrás tömböt akar
 						*pPUB = c;
 						pPUB++;
+						pB = pA = pOP = NULL;
+						nR = 0;
 
 						nSTR++;
 
@@ -544,6 +551,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 												continue;
 											}
 
+											if( !pPRNT )
+												break;
+
 											pPRNT->pINFO = (char*)pPUB;
 											pPUB += sprintf(
 																pPRNT->pINFO,
@@ -619,6 +629,18 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								com.iLEV = mass.iLEV;
 
 								/// itt volt valami DSTs izé
+								if( !pB )
+								{
+									pB = pFND;
+									if( pFND->wip == gpeALF_DEF )
+										pPRNT = NULL;
+								}
+								else if( pOP ? pOP->wip == gpeALF_OPER : false )
+								{
+									pA = pB;
+									pB = pFND;
+									pPRNT = pA;
+								}
 
 								break;
 
@@ -632,11 +654,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					}
 
 					if( pPRNT )
+					if( pPRNT == pA )
 					{
-						/*if( iPC ? iPC == pPRNT->mPC : false )
-						{
-							bFND = true; /// construktor?
-						}*/
+						char* pCOUT = pOP->sASM( gpsSTRpub, pPUB, gpsNDAT, &mass.CMPL, pA, pB );
+						cout << pCOUT;
+						pPRNT = pOP = pA = NULL;
+					} else {
+
 						*pPUB = 0;
 						pPUB++;
 						U2 n = sprintf( (char*)pPUB, "%0.2d %0.2d[%0.2d:%0.2d]%0.2db %s%s",
@@ -674,35 +698,52 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		}
 
 		nPC = com.nPC( &mass.CMPL );
-		iFND = com.cmpl_best( &mass.CMPL, pS, pE-pS );
-		pFND = pFND->pPC( &mass.CMPL, iFND );
-		if( pFND->wip == gpeALF_OPER )
+		gpcCMPL& iLEVpc = *mass.piLEVpc();
+
+		if( pA && pOP && pB )
 		{
-			nSKIP = pFND->n_str;
-			switch( pFND->typ )
+			char* pCOUT = pOP->sASM( gpsSTRpub, pPUB, gpsNDAT, &mass.CMPL, pA, pB );
+			cout << pCOUT;
+			pA = pOP = NULL;
+		}
+		iOP = iLEVpc.cmpl_best( &mass.CMPL, pS, pE-pS );
+		pOP = pOP->pPC( &mass.CMPL, iOP );
+		if( pOP->wip == gpeALF_OPER )
+		{
+			nSKIP = pOP->n_str;
+			switch( pOP->typ )
 			{
 					case gpeALF_BEGIN:	// {
+						pB = pA = pOP = NULL;
+
 						mass.incLEV();
-						nVAN = 0;
+						nR = nVAN = 0;
 						break;
 					case gpeALF_END:	// }
-						if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
+						if( pB )
+							cout << "->STK";
+						pB = pA = pOP = NULL;
+
+						if( gpcCMPL* pDWN = iLEVpc.sKIDlst(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
 						if( *pPUB )
 								cout << endl << pPUB;
 
 						mass.decLEV();
-						nVAN = 0;
+						nR = nVAN = 0;
 						break;
 
 					case gpeALF_BRAKS:	// (
+						pB = pA = pOP = NULL;
+
 						mass.incLEV();
-						nVAN = 0;
+						nR = nVAN = 0;
 						break;
 
 					case gpeALF_BRAKE:	// )
-						/// itt volt valami DSTs izé
+						pB = pA = pOP = NULL;
 
-						if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST( gpsSTRpub, pPUB, &mass.CMPL, c ) )
+						/// itt volt valami DSTs izé
+						if( gpcCMPL* pDWN = iLEVpc.sKIDlst( gpsSTRpub, pPUB, &mass.CMPL, c ) )
 						{
 							if( *pPUB )
 								cout << endl << pPUB;
@@ -711,14 +752,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						mass.asPRG[iLEV] = c;
 						iPC = mass.aPC[iLEV];
 
-						nVAN = 0;
+						nR = nVAN = 0;
 						break;
-					case gpeALF_MOV:	// =
-						/// itt volt valami DSTs izé
 
 
-						break;
-					case gpeALF_COMS:
+
+					case gpeALF_COMS: // "/*"
 						if( U1* pCOM = (U1*)strstr( (char*)pS+nSKIP, "*/" ) )
 						{
 							pS = pCOM+2;
@@ -728,20 +767,32 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pS = pE;
 						}
 						break;
-					case gpeALF_COM:
+					case gpeALF_COM: // "//"
 						nSKIP += gpmVAN( pS+nSKIP, "\r\n", nLEN );
 						break;
+
+
+					//case gpeALF_MOV: // =
+						/// itt volt valami DSTs izé
 					default:
-						//if( !pFND->i_str )
-						if(	gpcCMPL* pM = pFND->pPC( &mass.CMPL, pFND->mPC ) )
+						/*if(	gpcCMPL* pM = pOP->pPC( &mass.CMPL, pOP->mPC ) )
 						{
-							cout << endl << pM->p_kid->sSTRix( pFND->iKD );
-						}
+							cout << endl << pM->p_kid->sSTRix( pOP->iKD );
+
+
+							//pA = NULL;
+						}*/
+						nSKIP += gpmNINCS( pS+nSKIP, " \t\r\n" );
 						break;
 
 			}
 			pS += nSKIP;
-			continue;
+
+			c = *pS;
+			if( (c < 0x30) || (c >= 0x3A)  )
+				continue;
+
+			sVAN[0] = c;
 		}
 
 		pS++;
@@ -787,7 +838,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						case ')':
 							/// itt volt valami DSTs izé
 
-							if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST( gpsSTRpub, pPUB, &mass.CMPL, c ) )
+							if( gpcCMPL* pDWN = iLEVpc.sKIDlst( gpsSTRpub, pPUB, &mass.CMPL, c ) )
 							{
 								if( *pPUB )
 									cout << endl << pPUB;
@@ -843,8 +894,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							// berakjuk ami létrejött a sorba
 							/// itt volt valami DSTs izé
 
-
-							nVAN = 0;
+							cout << //(pB ?
+									"->STK"  //: ",")
+									;
+							pA = pB = pOP = NULL;
+							nR = nVAN = 0;
 							break;
 						case '.':	// pont
 
@@ -853,30 +907,43 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				}
 				else if( c < 0x3A )
 				{
-					cout << endl << (gppTAB-mass.relLEV());
+					//cout << endl << (gppTAB-mass.relLEV());
 					// 30-39 // számok 0-9
 					/// itt volt valami DSTs izé
+					if( pOP ? pOP->wip != gpeALF_OPER : true )
+						pB = NULL;
 
+					pA = pB;
+					pB = aR+(nR%8);
+					nR++;
 
-					u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
+					pB->wip = gpeALF_REG;
+					pB->u8 = gpfSTR2U8( pS-(nVAN+1), &pS );
 					if( *pS == '.' )
                     {
-						typ = gpeALF_D;
-						d = gpmSTR2D( pS ) + (double)u8;		///
-						cout << d;
+						pB->typ = gpeALF_D;
+						pB->d = gpmSTR2D( pS ) + (double)u8;		///
+						//cout << d;
 					} else {
 						if( nADD < 0 )
 						{
-							typ = gpeALF_I;
-							i8 = -u8;							///
-							cout << i8;
+							pB->typ = gpeALF_I;
+							pB->i8 = -pB->u8;							///
+							//cout << i8;
 						} else {
-							cout << u8;
-							typ = gpeALF_U;
+							//cout << u8;
+							pB->typ = gpeALF_U;
 						}
 						d = 0;
                     }
                     nVAN = 0;
+
+					/*if( pA && pOP )
+					{
+						char* pCOUT = pOP->sASM( gpsSTRpub, pPUB, gpsNDAT, &mass.CMPL, pA, pB );
+						cout << pCOUT;
+						pA = NULL;
+					}*/
 
 
 				} else {
@@ -890,8 +957,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							// mass.decLEV();
 							// comment
 							/// itt volt valami DSTs izé
-
-							nVAN = 0;
+							pB = pA = pOP = NULL;
+							nR = nVAN = 0;
 							break;
 
 						case '<':
@@ -928,7 +995,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					nVAN = 0;
 					break;
 				case ']':
-					if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
+					if( gpcCMPL* pDWN = iLEVpc.sKIDlst(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
 					if( *pPUB )
 							cout << endl << pPUB;
 
@@ -941,7 +1008,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					nVAN = 0;
 					break;
 				case '}':
-					if( gpcCMPL* pDWN = mass.piLEVpc()->pLIST(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
+					if( gpcCMPL* pDWN = iLEVpc.sKIDlst(  gpsSTRpub, pPUB, &mass.CMPL, c ) )
 					if( *pPUB )
 							cout << endl << pPUB;
 

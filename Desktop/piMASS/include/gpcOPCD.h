@@ -78,6 +78,9 @@ public:
 			iDEF, iDEC, iINI,
 			op;
 
+	I8		i8;
+	U8		u8;
+	double	d;
 
 	I2		nADD, nMUL, nASS;
 	char*	pINFO;
@@ -152,6 +155,6 @@ public:
 	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
 	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
 
-	gpcCMPL* pLIST( U1* pS0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
-
+	gpcCMPL* sKIDlst( U1* pS0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
+	char* sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB );
 };
