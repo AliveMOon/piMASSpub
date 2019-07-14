@@ -133,7 +133,7 @@ public:
 
 	U4 iKID( gpcLAZY* pCMPL, U4 i );
 
-	U4 nPC( gpcLAZY* pCMPL )
+	/*U4 nPC( gpcLAZY* pCMPL )
 	{
 		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
 		if( !ppC )
@@ -141,7 +141,7 @@ public:
 
 		return pCMPL->n_load/sizeof(this);
 
-	}
+	}*/
 	gpcCMPL* pPC( gpcLAZY* pCMPL, U4 pc )
 	{
 		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
@@ -156,5 +156,6 @@ public:
 	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
 
 	gpcCMPL* sKIDlst( U1* pS0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
+	char* sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL );
 	char* sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB );
 };

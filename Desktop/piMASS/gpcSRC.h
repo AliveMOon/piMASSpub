@@ -413,7 +413,11 @@ public:
     }
     void hd( gpcMASS& mass, gpeALF* pTGpub = NULL );
     void cmpi( gpcMASS& mass, bool bDBG );
-    void cmpi_trash( gpcMASS& mass, bool bDBG );
+
+    void cmpi_SKELETON( gpcMASS& mass, bool bDBG );
+
+    void cmpi_trash2( gpcMASS& mass, bool bDBG );
+    //void cmpi_trash( gpcMASS& mass, bool bDBG );
 
     gpcSRC();
     virtual ~gpcSRC();
@@ -472,7 +476,7 @@ class gpcMASS
 	gpcCLASS	*pTG;
 	gpcLAZY		*pSRCc,
 				*pLST;
-	U4			nLST, xFND, nALLOC, nSP, nOP0, nOP1,
+	U4			nLST, xFND, nALLOC, nSP, nOP0, nOP1, iMAIN,
 				aSPix[0x100];
 	gpcSRC		*pFND,
 				*apSP[0x100];
@@ -502,20 +506,26 @@ public:
 	gpcLAZY		*apDICTopcd[0x1000];
 	gpcLZYdct	*apDICTix[0x1000];
 	U4			 anDICTix[0x1000],
-				aLEVsp[0x100],
+				//aLEVsp[0x100],
 				rstLEV, iLEV, nLEV, topLEV;
 
 	U4 relLEV( void )
 	{
 		return iLEV-rstLEV;
 	}
-	gpcCMPL* piLEVpc( void )
+
+	gpcCMPL* piLEVmom( void )
+	{
+		return PC.pPC( &CMPL, aPC[iLEV-1] );
+	}
+	gpcCMPL* piLEViPC( void )
 	{
 		return PC.pPC( &CMPL, aPC[iLEV] );
 	}
 	U4 incLEV( void )
 	{
-		//iPC = aPC[iLEV];
+
+		aPC[iLEV] = iPC;
 		U4 iDT = aiDAT[iLEV];
 
 		iLEV++;
@@ -527,14 +537,14 @@ public:
 		return iLEV;
 
 
-		aLEVsp[ nLEV ] = aLEVsp[ iLEV ];
+		/*aLEVsp[ nLEV ] = aLEVsp[ iLEV ];
 
 		iLEV++;
 		nLEV = iLEV+1;
 		if( topLEV < nLEV )
 			topLEV = nLEV;
 
-		return iLEV;
+		return iLEV;*/
 	};
 	U4 decLEV( void )
 	{

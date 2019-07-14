@@ -180,6 +180,7 @@ typedef enum gpeALF: I8
 	gpeALF_PMX = gpdABC('P', 'M', 'X'),
 	gpeALF_PMY = gpdABC('P', 'M', 'Y'),
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
+	gpeALF_PNT = gpdABC('P', 'N', 'T'),
 	gpeALF_PRG = gpdABC('P', 'R', 'G'),
 	gpeALF_REF = gpdABC('R', 'E', 'F'),
 	gpeALF_REG = gpdABC('R', 'E', 'G'),

@@ -63,9 +63,8 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_NEW },
 	{ gpaOPCi,	"del",		0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_DEL },
 
-	{ gpaOPCi,	"SYS",		0, 0, 0, 0,					0.0, gpeALF_CLASS },
-	{ gpaOPCi,	"GT",		0, 0, 0, 0,					0.0, gpeALF_CLASS },
-	{ gpaOPCi,	"PIC",		0, 0, 0, 0,					0.0, gpeALF_CLASS },
+	{ gpaOPCi,	"main",		0, 0, 0, 0,					0.0, gpeALF_PRG, gpeALF_MAIN },
+
 
 
 };
@@ -74,6 +73,7 @@ char* gpasOPER[] = {
 
 	"! inv",	"!! LG",	"!= neqLG",
 
+	". pnt",	", stk",
 	//"+ add", 	"++ inc",	"+= addM", ///--------------- DBG
 
 	"/* comS", 	"*/ comE",	"// com",
@@ -96,14 +96,65 @@ char* gpasOPER[] = {
 	"<= leLG",	"< ltLG", 	"<< sl", 	"<<= slM",
 	">= beLG",	"> bgLG", 	">> sr", 	">>= srM",
 
-	". tag", 	"-> entry", ":: out"
+	". tag", 	"-> entry", ":: out",
 	"( brakS",	") brakE",
 	"[ dimS", 	"] dimE",
 	"{ begin", 	"} end",
 	"? if",		": else",
 	"@ mail"
 };
+char* gpcCMPL::sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL )
+{
+	if( this ? !pPUB : true )
+	{
+		if( pPUB )
+			*pPUB = 0;
+		return (char*)pPUB;
+	}
 
+
+	char	*pALF = (char*)pPUB,
+			*pS = pALF+0x10;
+
+	gpfALF2STR( pALF, (I8)typ );
+	if( wip == gpeALF_REG )
+	{
+		switch( typ )
+		{
+			case gpeALF_D:
+				sprintf(
+							pS, "%0.2d:%0.2d R%d%s %f ",
+									pCMPL->nPC(), iLEV, iKD, pALF, d
+						);
+						break;
+			case gpeALF_I:
+				sprintf(
+							pS, "%0.2d:%0.2d R%d%s, %d ",
+									pCMPL->nPC(), iLEV, iKD, pALF, i8
+						);
+						break;
+			default:
+				sprintf(
+							pS, "%0.2d:%0.2d R%d%s, %d ",
+									pCMPL->nPC(), iLEV, iKD, pALF, u8
+						);
+			break;
+		}
+		return pS;
+	}
+
+	char *pDEC = pPC( pCMPL, mPC )->p_kid->sSTRix( iKD, "Oxo" );
+
+	if( !pDEC )
+		*pS = 0;
+	else
+		sprintf(
+					pS, "%0.2d:%0.2d %s %s.%c [%0.2d]",
+							pCMPL->nPC(), iLEV, pALF, pDEC, sNDAT[n_dat], iPC
+				);
+
+	return pS;
+}
 char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB )
 {
 	char	*pASMop = (char*)pPUB, *psOP = NULL, *psA = NULL, *psB = NULL,
@@ -119,7 +170,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	}
 	else if( pM = pA->pPC( pCMPL, pA->mPC ) )
 	{
-		psA = pM->p_kid->sSTRix( pA->iKD );
+		psA = pM->p_kid->sSTRix( pA->iKD, "-ASM:WARRNNING-" );
 	}
 
 	if( !this )
@@ -128,7 +179,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	}
 	else if(	pM = pPC( pCMPL, mPC ) )
 	{
-		psOP = pM->p_kid->sSTRix( iKD );
+		psOP = pM->p_kid->sSTRix( iKD, "-ASM:WARRNNING-" );
 	}
 
 	if( pB->wip == gpeALF_REG )
@@ -138,13 +189,13 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	}
 	else if( pM = pB->pPC( pCMPL, pB->mPC ) )
 	{
-		psB = pM->p_kid->sSTRix( pB->iKD );
+		psB = pM->p_kid->sSTRix( pB->iKD, "-ASM:WARRNNING-" );
 	}
 
 	gpfALF2STR( pASMop, (I8)typ );
 	sprintf(
-				pCOUT, "\r\n%s.%c [%0.2d], [%0.2d]		; %s %s %s",
-						pASMop, sNDAT[pA->n_dat], pA->iPC, pB->iPC,
+				pCOUT, "%0.2d:%0.2d %s.%c [%0.2d], [%0.2d]		; %s %s %s",
+						pCMPL->nPC(), pA->iLEV, pASMop, sNDAT[pA->n_dat], pA->iPC, pB->iPC,
 																		(psA ? psA : "?"), (psOP ? psOP : "?"), (psB ? psB : "?")
 			);
 	return pCOUT;
@@ -164,7 +215,11 @@ U1* gpcMASS::reset( U1* pS0 )
 		gpcCMPL* pPC = PC.pPC( &CMPL, 0 );
 		//pPC->i_str = 0;
 		pPUB += pPC->n_str+1;
-		U4 j = 1, nS;
+		iPC = 0;
+		incLEV();
+
+		iPC = CMPL.nPC();
+		U4 nS;
 		U1 *pS, *pE;
 		for( U4 i = 0, n = gpmN(gpasOPER), nSTR; i < n; i++ )
 		{
@@ -179,10 +234,11 @@ U1* gpcMASS::reset( U1* pS0 )
 
 			PC.pPC( &CMPL, 0 )
 				->cmpl_add( &CMPL, pS, nS );
-			pPC = PC.pPC( &CMPL, j );
+			pPC = PC.pPC( &CMPL, iPC );
 			if( !pPC )
 				continue;
 
+			pPC->iLEV = iLEV;
 			pPC->iPUB = pS-pS0; // op
 
 // "ALF" ----------------------------
@@ -192,12 +248,14 @@ U1* gpcMASS::reset( U1* pS0 )
 			pS[nS] = 0;
 			pPUB += nS+1;
 
-			pPC->typ = gpfSTR2ALF( pS, pS+nS, NULL );
 			pPC->wip = gpeALF_OPER;
+			pPC->typ = gpfSTR2ALF( pS, pS+nS, NULL );
+			if( pPC->typ == gpeALF_MAIN )
+				iMAIN = pPC->iPC;
 
-			j++;
+			iPC++;
 		}
-		nOP0 = j;
+		nOP0 = iPC;
 		for( U4 i = 1, iN = gpmN(gpaOPCi), nwLEV = iLEV; i < iN; i++ )
 		{
 			gpcOPCD opcd = gpaOPCi[i];
@@ -208,20 +266,24 @@ U1* gpcMASS::reset( U1* pS0 )
 			pPUB += nS+1;
 
 			PC.pPC( &CMPL, 0 )->cmpl_add( &CMPL, pS, nS );
-			pPC = PC.pPC( &CMPL, j );
+			pPC = PC.pPC( &CMPL, iPC );
 			if( !pPC )
 				continue;
 			pPC->iPUB = pS-pS0;
-			//pPC->n_str = gpaOPCi[i].nSTR;
-
+			pPC->iLEV = iLEV;
 			pPC->typ = opcd.typ;
 			pPC->wip = opcd.wip;
 			pPC->n_dat = opcd.nDAT;
-			j++;
-		}
-		nOP1 = j;
 
-		iLEV++;
+			if( pPC->typ == gpeALF_MAIN )
+				iMAIN = pPC->iPC;
+
+			iPC++;
+		}
+		nOP1 = iPC;
+
+		iPC = iMAIN;
+		incLEV();
 	}
 	rstLEV = iLEV;
 	return pPUB;
@@ -271,14 +333,21 @@ I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB, char* pSTR )
 					);
 	return o;
 }
+U4 gpcLAZY::nPC( void )
+{
+	if( !this )
+		return 0;
+
+	return n_load/sizeof(gpcCMPL*);
+}
 U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
 {
 	if( !this )
-		return nPC(pCMPL);
+		return pCMPL->nPC();
 
 	U4 n = p_iPC ? p_iPC->n_load/sizeof(U4) : 0;
 	if( i >= n )
-		return nPC( pCMPL );
+		return pCMPL->nPC();;
 
 	return ((U4*)p_iPC->p_alloc)[i];
 }
@@ -446,6 +515,7 @@ gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	gpcCMPL* pC = new gpcCMPL( iPC );
 	if( !pC )
 		return pCMPL;
+	bool b_rst = !iPC8;
 
 	pC->iPC = iPC8/sizeof(this);
 	pC->n_str = nS;
@@ -453,5 +523,9 @@ gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
 
 	p_iPC = p_iPC->lazy_add( &pC->iPC, sizeof(pC->iPC), iPC8 = -1 );
 	pC->iKD = iPC8/sizeof(pC->iPC);
+	if( b_rst)
+		pC->iLEV = 0;
+	else
+		pC->iLEV = iLEV+1;
 	return pCMPL;
 }

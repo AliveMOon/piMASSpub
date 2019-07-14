@@ -1050,7 +1050,7 @@ public:
 			U8		n_l8, n_a8;
 		};
 	};
-
+	U4 nPC( void );
 	void wait( void )
 	{
 		if( !this )
@@ -1566,10 +1566,10 @@ public:
 	{
 		return this ? (ix.n_load / sizeof(U4x4)) : 0;
 	}
-	char* sSTRix( U8 iX )
+	char* sSTRix( U8 iX, char* pER )
 	{
 		if( !this )
-			return "false";
+			return pER;
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 		return (char*)(str.p_alloc + p_ix0[iX].x);
 	}
