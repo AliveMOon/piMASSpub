@@ -191,9 +191,8 @@ public:
  	{
 		gpcCMPLlev* pLEV = this;
 		while( pLEV->iLEV < i)
-		{
-			pLEV = pLEV->inc();
-		}
+			pLEV = pLEV->inc( NULL );
+
 		return pLEV;
  	}
  	gpcCMPLlev* inc( gpcCMPL* pM )

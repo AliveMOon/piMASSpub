@@ -362,8 +362,16 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		gppLEV = gppLEV->newROOT();
 	gpcCMPLlev* pLEV = gppLEV->get( mass.iLEV );
 	gpcLAZY* pCMPL = &mass.CMPL;
+
+	//nSTR = 0;
+	pSTR = NULL;
+	gpeALF alf, mxALF;
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
+		if( !nSTR )
+			pSTR = NULL;
+		else if( !pSTR )
+			nSTR = 0;
 
 		if( pFND )
 		{
@@ -375,12 +383,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			{
 				switch( pFND->typ )
 				{
-					case gpeALF_CLASS:
-						// osztájt akar valaki dec/def-iniálni?
-						/// egy új CLASS élete azzal kezdödik hogy
-/// 0. CLASS -> pOP -------------------------------
-						pLEV->pOP = pFND;
-						break;
+
 					case gpeALF_BEGIN:
 /// 2. CLASS sNAME pDEF -> pMOM -----------------------------
 						if( pLEV->pDEF )
@@ -393,31 +396,46 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					case gpeALF_NEWROW:
 						pLEV->AoBclr();
 						break;
+					case gpeALF_STK:
+						pLEV->AoBclr();
+						break;
+
+					case gpeALF_CLASS:
+						// osztájt akar valaki dec/def-iniálni?
+						/// egy új CLASS élete azzal kezdödik hogy
+/// 0. CLASS -> pOP -------------------------------
 					default:
+						pLEV->pOP = pFND;
 						break;
 
 				}
 
 			} else {
-
+				switch( pFND->typ )
+				{
+                    case gpeALF_DEF:
+						pLEV->pDEF = pFND;
+						break;
+					default:
+						break;
+				}
 
 			}
 
-		} else {
+		}
+		else if( nSTR )
+		{
 			/// -----------------------------
 			/// 		NEM TALÁLAT
 			/// -----------------------------
-			if( pSTR ? nSTR : false )
-			{
+
 				// de van valami amit létrehozhatunk
 				iNEW = pCMPL->nPC();
 				if( !pLEV->pOP )
 				{
-					if( !pLEV->pDEF )
-						pLEV->pDEF = pDEF;
 					pMOM->cmpl_add(pCMPL, pSTR, nSTR );
 					pNEW = pMOM->pPC(pCMPL, iNEW );
-					if( !pNEW )
+					if( pNEW )
 					{
 						gpcCMPL& def = pLEV->pDEF ? *pLEV->pDEF : *pI4;
 						pNEW->wip = def.wip;
@@ -457,7 +475,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								break;
 					}
 				}
-			}
+
 			pCOUT = NULL;
 		}
 		if( pFND )
@@ -476,6 +494,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			nALF = gpfABCnincs( pSTR = pS, pE, nLEN, gpaALFadd );
 			if( nALF )
 			{
+				alf = gpfSTR2ALF( pSTR, pSTR+nSTR );
+				if( mxALF < alf )
+					mxALF = alf;
 				nSTR = nALF + gpmVAN( pSTR+nALF, gpsPRG, nVAN );
 				nLEN += nVAN;
 
@@ -524,9 +545,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pSTRpool = p_str;
 							nSTRpool = 0;
 						}
-						while( (pS < pE) ? (*pS != "\"") : false )
+					while( (pS < pE) ? (*pS != '\"' ) : false )
 						{
-							pSTR = pS+gpfVAN( pS, "\"", nLEN );
+							pSTR = pS+gpmVAN( pS, "\"", nLEN );
 							if( pSTR < pE )
 							{
 								nSTR = pSTR-pS;
