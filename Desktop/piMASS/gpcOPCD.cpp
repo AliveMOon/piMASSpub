@@ -103,7 +103,7 @@ char* gpasOPER[] = {
 	"? if",		": else",
 	"@ mail",	"\" str",
 };
-char* gpcCMPL::sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL )
+char* gpcCMPL::sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 {
 	if( this ? !pPUB : true )
 	{
@@ -123,20 +123,20 @@ char* gpcCMPL::sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL )
 		{
 			case gpeALF_D:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s\t%f ",
-									pCMPL->nPC(), iLEV, iKD, pTYP, d
+							pS, "%0.2d:%0.2d R%d%s%s%f ",
+									pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, d
 						);
 						break;
 			case gpeALF_I:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s\t%d ",
-									pCMPL->nPC(), iLEV, iKD, pTYP, i8
+							pS, "%0.2d:%0.2d R%d%s%s%d ",
+									pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, i8
 						);
 						break;
 			default:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s\t%d ",
-									pCMPL->nPC(), iLEV, iKD, pTYP, u8
+							pS, "%0.2d:%0.2d R%d%s%s%d ",
+									pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, u8
 						);
 			break;
 		}
@@ -149,8 +149,8 @@ char* gpcCMPL::sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL )
 		*pS = 0;
 	else
 		sprintf(
-					pS, "%0.2d:%0.2d[%0.2d]\t%s\t%s.%c ",
-							pCMPL->nPC(), iLEV, iPC, pSTR, pTYP, sNDAT[n_dat]
+					pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s.%c ",
+							pCMPL->nPC(), iLEV, iPC, pTAB, pSTR, pTYP, sNDAT[n_dat]
 				);
 
 	return pS;

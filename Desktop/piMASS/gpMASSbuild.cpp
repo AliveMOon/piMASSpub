@@ -353,19 +353,25 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		pTHIS = pMOM->pPC( &mass.CMPL, iTHIS );
 		pTHIS->typ = pTHIS->wip = gpeALF_PRG;
 	}
+	U4 &nDAT = pTHIS->n_dat;
+	nDAT = 0;
+
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
 	bool bABC;
 	cout << endl << "ASM:nP:lv[fd]\tstr\ttyp.sz\r\n-----------------------\r\n";
 
+	U4 floorLEV = mass.iLEV;
+
 	if( !gppLEV )
 		gppLEV = gppLEV->newROOT();
-	gpcCMPLlev* pLEV = gppLEV->get( mass.iLEV );
+	gpcCMPLlev* pLEV = gppLEV->get( floorLEV );
 	gpcLAZY* pCMPL = &mass.CMPL;
 
 	//nSTR = 0;
 	pSTR = NULL;
 	gpeALF alf, mxALF;
+
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 		if( !nSTR )
@@ -388,7 +394,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 /// 2. CLASS sNAME pDEF -> pMOM -----------------------------
 						if( pLEV->pDEF )
 							pMOM = pLEV->pDEF;
-						pLEV = pLEV->inc( pMOM );
+						pLEV = pLEV->inc( pMOM, '+' );
 						break;
 					case gpeALF_END:
 						pMOM = (pLEV = pLEV->dec())->pMOM;
@@ -443,11 +449,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pNEW->iDEF = def.iPC;
 						if( pNEW->n_dat = def.n_dat )
 						{
-							// ha új elem a mamában akkor növelni kell a DATA menyiségét
-							// while( pM )
-							//  += pNEW->n_dat;
-
-
+							pMOM->n_dat += pNEW->n_dat;
+							pLEV->iDAT += pNEW->n_dat;
 						}
 
 						pFND = pNEW;
@@ -480,12 +483,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		}
 		if( pFND )
 		{
-			pCOUT = pFND->sDECL( pPUB, gpsNDAT, &mass.CMPL );
+			pCOUT = pFND->sDECL( pPUB, gppTAB+floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
 			pFND = NULL;
 		}
+		if( nDAT < pLEV->iDAT )
+			nDAT = pLEV->iDAT;
 
 		if( pCOUT )
-			cout << "ASM:" << pCOUT << "\r\n";
+			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "\r\n";
 
 		c = *pS;
 		if( bABC = gpmbABC(c, gpaALFadd) )
