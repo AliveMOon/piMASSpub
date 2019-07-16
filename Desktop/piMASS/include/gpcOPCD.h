@@ -164,7 +164,7 @@ public:
 class gpcCMPLlev
 {
 public:
-	gpcCMPL	*pDEF, *pMOM, *pA, *pOP, *pB;
+	gpcCMPL	*pDEF, *pMOM, *pA, *pOP, *pB, *pFUNC;
 	U4 iLEV, nLEV, iDAT;
 	U1 c;
 	gpcCMPLlev(){};
@@ -207,9 +207,9 @@ public:
 		}
 		return this+1;
  	}
-	gpcCMPLlev* dec( void )
+	gpcCMPLlev* dec( U4 floor )
 	{
-		if( iLEV )
+		if( iLEV > floor )
 		{
 			return this-1;
 		}

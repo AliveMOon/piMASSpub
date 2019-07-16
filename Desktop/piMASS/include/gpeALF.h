@@ -359,6 +359,7 @@ typedef enum gpeALF: I8
 	gpeALF_COUNT = gpdABCDE('C', 'O', 'U', 'N', 'T'),
 	gpeALF_CREAT = gpdABCDE('C', 'R', 'E', 'A', 'T'),
 	gpeALF_CROSS = gpdABCDE('C', 'R', 'O', 'S', 'S'),
+	gpeALF_CYCLE = gpdABCDE('C', 'Y', 'C', 'L', 'E'),
 	gpeALF_DEBUG = gpdABCDE('D', 'E', 'B', 'U', 'G'),
 	gpeALF_DEBUS = gpdABCDE('D', 'E', 'B', 'U', 'S'),
 	gpeALF_ENTER = gpdABCDE('E', 'N', 'T', 'E', 'R'),

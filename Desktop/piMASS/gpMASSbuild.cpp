@@ -372,7 +372,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	pSTR = NULL;
 	gpeALF alf, mxALF;
 
-	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
+	if( pTHIS )
+	{
+		pCOUT = pTHIS->sDECL( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
+		/*if( pCOUT )
+			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "\r\n";*/
+	}
+
+	for( pS += gpmNINCS( pS, " \t\r\n" ); pS <= pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 		if( !nSTR )
 			pSTR = NULL;
@@ -395,10 +402,32 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						if( pLEV->pDEF )
 							pMOM = pLEV->pDEF;
 						pLEV = pLEV->inc( pMOM, '+' );
+						pLEV->AoBclr();
 						break;
 					case gpeALF_END:
-						pMOM = (pLEV = pLEV->dec())->pMOM;
+						pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
+						if( !pMOM )
+							pMOM = pTHIS;
+						pLEV->AoBclr();
 						break;
+
+
+					case gpeALF_BRAKS:
+						if( pLEV->pDEF )
+							pMOM = pLEV->pDEF;
+						pLEV = pLEV->inc( pMOM, '+' );
+						pLEV->AoBclr();
+						break;
+
+					case gpeALF_BRAKE:
+						//pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
+						//if( !pMOM )
+						//	pMOM = pTHIS;
+
+						pLEV->pDEF = NULL;
+						pLEV->AoBclr();
+						break;
+
 					case gpeALF_NEWROW:
 						pLEV->AoBclr();
 						break;
@@ -421,6 +450,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				{
                     case gpeALF_DEF:
 						pLEV->pDEF = pFND;
+
+						break;
+					case gpeALF_FUNC:
+						pLEV->pFUNC = pFND;
+
 						break;
 					default:
 						break;
@@ -437,22 +471,48 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 				// de van valami amit létrehozhatunk
 				iNEW = pCMPL->nPC();
+				bool bFUN = pSTR[nSTR-1] == '(';
 				if( !pLEV->pOP )
 				{
+
 					pMOM->cmpl_add(pCMPL, pSTR, nSTR );
 					pNEW = pMOM->pPC(pCMPL, iNEW );
 					if( pNEW )
 					{
 						gpcCMPL& def = pLEV->pDEF ? *pLEV->pDEF : *pI4;
-						pNEW->wip = def.wip;
-						pNEW->typ = def.typ;
-						pNEW->iDEF = def.iPC;
-						if( pNEW->n_dat = def.n_dat )
+						if( bFUN )
 						{
-							pMOM->n_dat += pNEW->n_dat;
-							pLEV->iDAT += pNEW->n_dat;
-						}
+							pNEW->wip = gpeALF_FUNC;
+							pNEW->iDEF = def.iPC;
 
+							char* p_str = pMOM->pPC( pCMPL, pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
+							U4 n_str = strlen( p_str );
+							if( n_str == nSTR-1 )
+							{
+								nSTR = ((char*)gp_memcmp( p_str, pSTR, n_str ))-p_str;
+                                if( nSTR == n_str )
+                                {
+									pNEW->wip = gpeALF_CONSTR;
+									pNEW->iDEF = pNEW->mPC;
+                                }
+							}
+							pNEW->typ = def.typ;
+							pLEV = pLEV->inc( pMOM, '+' );
+							pMOM = pNEW;
+							pLEV->AoBclr();
+							pLEV = pLEV->inc( pMOM );
+
+						} else {
+							pNEW->wip = def.wip;
+							pNEW->typ = def.typ;
+							pNEW->iDEF = def.iPC;
+							if( pNEW->n_dat = def.n_dat )
+							{
+								pMOM->n_dat += pNEW->n_dat;
+								pLEV->iDAT += pNEW->n_dat;
+							}
+
+						}
 						pFND = pNEW;
 					}
 				} else {
@@ -473,7 +533,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								pFND =
 								pLEV->pDEF = pNEW;
 								break;
+						case gpeALF_FUNC:
 
+								break;
 						default:
 								break;
 					}
@@ -483,7 +545,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		}
 		if( pFND )
 		{
-			pCOUT = pFND->sDECL( pPUB, gppTAB+floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
+			pCOUT = pFND->sDECL( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
 			pFND = NULL;
 		}
 		if( nDAT < pLEV->iDAT )
@@ -491,6 +553,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 		if( pCOUT )
 			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "\r\n";
+
+		/// --------------------------------
+		/// ITT a VÉGE
+		if( pS >= pE )
+			break;
+		/// --------------------------------
 
 		c = *pS;
 		if( bABC = gpmbABC(c, gpaALFadd) )
@@ -508,14 +576,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				pSTR = gpmSTRnCPY( pPUB, pSTR, nSTR );
 				pPUB += nSTR;
 				pS += nSTR;
+				pS += gpmNINCS( pS, " \t\r\n" );
+				if( *pS == '(' )
+				{
+					*pPUB = *pS;
+					nSTR++;
+					pS++;
+				}
 
 				iFND = pMOM->cmpl_find( &mass.CMPL, pSTR, nSTR );
 				if( !iFND )
 				{
+
 					/// NEMTALÁLT
 					pFND = NULL;
 					continue;
 				}
+
 				pFND = pMOM->pPC( &mass.CMPL, iFND );
 			}
 			continue;
@@ -608,6 +685,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			pFND->i8 = -pFND->u8;							///
 		} else
 			pFND->typ = gpeALF_U;
+
 
 
 	}

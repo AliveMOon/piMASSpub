@@ -20,7 +20,7 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 					gpdPRGsep, //gpsPRG,
 					nLEN );
 
-	return;
+	//return;
 
 	/// off
 	if( pSTR[nSTR] == '(' )
@@ -47,8 +47,8 @@ static const gpcOPCD gpaOPCi[] = {
 
 	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
 	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_IF },
-	{ gpaOPCi,	"for(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_FOR },
-	{ gpaOPCi,	"while(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_WHILE },
+	{ gpaOPCi,	"for(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_FOR },
+	{ gpaOPCi,	"while(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_WHILE },
 	{ gpaOPCi,	"switch(",	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SWITCH },
 
 	{ gpaOPCi,	"break",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
@@ -123,20 +123,24 @@ char* gpcCMPL::sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 		{
 			case gpeALF_D:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s%s%f ",
-									pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, d
+							pS,
+							"%0.2d:%0.2d R%d%s%s%f ",
+							pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, d
 						);
 						break;
 			case gpeALF_I:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s%s%d ",
-									pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, i8
+							pS,
+							"%0.2d:%0.2d R%d%s%s%lld ",
+							pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, i8
 						);
 						break;
 			default:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s%s%d ",
-									pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, u8
+							pS,
+							"%0.2d:%0.2d R%d%s%s%lld ",
+							pCMPL->nPC(), 	iLEV, 	iKD,	pTYP,	pTAB,	u8
+							// %0.2d		:%0.2d R%d		%s		%s		%d
 						);
 			break;
 		}
@@ -147,11 +151,39 @@ char* gpcCMPL::sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 
 	if( !pSTR )
 		*pS = 0;
-	else
-		sprintf(
-					pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s.%c ",
-							pCMPL->nPC(), iLEV, iPC, pTAB, pSTR, pTYP, sNDAT[n_dat]
-				);
+	else switch ( wip )
+	{
+		case gpeALF_CONSTR:
+		case gpeALF_FUNC:
+		case gpeALF_CYCLE:
+			{
+				if( *pTAB )
+					pTAB++;
+				if( *pTAB )
+					pTAB++;
+				gpfALF2STR( pTYP, (I8)wip );
+				gpcCMPL* pD = pPC( pCMPL, iDEF );
+				if( pD )
+				{
+					char *pDEF = pPC( pCMPL, pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
+					sprintf(
+								pS, "%0.2d:%0.2d[%0.2d]%s%s %s\t%s",
+										pCMPL->nPC(), iLEV, iPC,
+										pTAB,
+										pDEF, pSTR, pTYP //, sNDAT[n_dat]
+							);
+					break;
+				}
+			}
+		default:
+			sprintf(
+						pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s.%c ",
+								pCMPL->nPC(), iLEV, iPC,
+								pTAB,
+								pSTR, pTYP, sNDAT[n_dat]
+					);
+			break;
+	}
 
 	return pS;
 }

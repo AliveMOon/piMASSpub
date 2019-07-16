@@ -1,49 +1,133 @@
-HD: 1,0,0,0, V:1 H:0 C:0 
+-----------------
+HD:[b0] spc:1,0,0,0, V:1 H:0 C:0 
 bSW:0x00000000
 nTG:1 #main
 OFF:0xfffffdff
 bSW:0x00000084.[ENTER]
-
-ComPI: 0, 1, 0, 0,  V:1 H:1 B:0 
+ComPI:[a1] spc:0, 1, 0, 0,  V:1 H:1 B:0 
 bSW:0x00000084.
 
-lv fn[iP:mm]nD				// iD/alD
-00 70[00:00]00b class			//0/0 - 
-*AoB* DECL class.0 [70]
-02 51[00:78]00b 	U1			//0/0 - 
-*AoB* DECL U1.b [51]->STK->STK->STK
-03 51[00:83]00b 		U1		//0/0 - ->STK->STK->STK
-02 U1x4([83]) U1[84]X,U1[85]Y,U1[86]Z,U1[87]W,
-*AoB* pDF_A == pDF_B
-*AoB* pDF_A == pDF_B
-*AoB* pDF_A == pDF_B
-*AoB* pDF_A == pDF_B
-02 U1x4([83]} U1[84]X,U1[85]Y,U1[86]Z,U1[87]W,
-01 U1x4[78]} U1[79]x,U1[80]y,U1[81]z,U1[82]w,U1[83]U1x4(,
-01 78[00:00]00b U1x4			//0/0 - 
-*AoB* DECL U1x4.l [78]
-*AoB* add.0 [00], [00]		; 0 + 3->STK
-*AoB* add.0 [00], [00]		; 1 + 3->STK
-*AoB* add.0 [00], [00]		; 2 + 3->STK
-*AoB* add.0 [00], [00]		; 3 + 3
-01 U1x4[78]i U1[79]x,U1[80]y,U1[81]z,U1[82]w,U1[83]U1x4(,
-02 51[00:88]00b 	U1			//0/0 - 
-*AoB* DECL U1.b [51]
-*AoB* mov.b [89], [00]		; a = 10->STK
-*AoB* pDF_A == pDF_B
-*AoB* mov.b [90], [00]		; b = 0->STK
-*AoB* dims.b [91], [00]		; a1D[ [ 10
-*AoB* pDF_A == pDF_B
-03 53[00:63]00b 		U4		//0/0 - 
-*AoB* DECL U4.l [53]
-*AoB* mov.l [92], [00]		; i = 0
-*AoB* ltlg.l [92], [00]		; i < 10
-*AoB* pDF_A == pDF_B
-00 for[63]) U4[92]i,
-*AoB* pDF_A == pDF_B
-*AoB* pDF_A == pDF_B
-*AoB* mul.l [94], [00]		; b * 10
-*AoB* pDF_A == pDF_B
-*AoB* pDF_A == pDF_B
-*AoB* pDF_A == pDF_B
+ASM:nP:lv[fd]	str	typ.sz
+-----------------------
+ASM:79:01[78]	main	main.- 	0/0
+ASM:79:01[73]	class	class.- 	0/0
+ASM:80:02[79]	U1x4	def.- 	0/0
+ASM:80:01[47]		{	begin.- 	0/0
+ASM:80:01[54]		U1	def.b 	0/0
+ASM:81:03[80]		x	def.b 	1/1
+ASM:81:01[05]		,	stk.- 	1/1
+ASM:82:03[81]		y	def.b 	2/2
+ASM:82:01[05]		,	stk.- 	2/2
+ASM:83:03[82]		z	def.b 	3/3
+ASM:83:01[05]		,	stk.- 	3/3
+ASM:84:03[83]		w	def.b 	4/4
+ASM:84:01[06]		;	newrow.- 	4/4
+ASM:85:03[84]		U1x4 U1x4(	constr	4/4
+ASM:85:01[54]				U1	def.b 	4/4
+ASM:86:04[85]				X	def.b 	5/5
+ASM:86:01[05]				,	stk.- 	5/5
+ASM:87:04[86]				Y	def.b 	6/6
+ASM:87:01[05]				,	stk.- 	6/6
+ASM:88:04[87]				Z	def.b 	7/7
+ASM:88:01[05]				,	stk.- 	7/7
+ASM:89:04[88]				W	def.b 	8/8
+ASM:89:01[44]				)	brake.- 	8/8
+ASM:89:01[47]					{	begin.- 	8/8
+ASM:89:03[80]					x	def.b 	8/8
+ASM:89:01[23]					=	mov.- 	8/8
+ASM:89:04[85]					X	def.b 	8/8
+ASM:89:01[06]					;	newrow.- 	8/8
+ASM:89:03[81]					y	def.b 	8/8
+ASM:89:01[23]					=	mov.- 	8/8
+ASM:89:04[86]					Y	def.b 	8/8
+ASM:89:01[06]					;	newrow.- 	8/8
+ASM:89:03[82]					z	def.b 	8/8
+ASM:89:01[23]					=	mov.- 	8/8
+ASM:89:04[87]					Z	def.b 	8/8
+ASM:89:01[06]					;	newrow.- 	8/8
+ASM:89:03[83]					w	def.b 	8/8
+ASM:89:01[23]					=	mov.- 	8/8
+ASM:89:04[88]					W	def.b 	8/8
+ASM:89:01[06]					;	newrow.- 	8/8
+ASM:89:01[48]				}	end.- 	8/8
+ASM:89:01[48]			}	end.- 	4/8
+ASM:89:01[06]			;	newrow.- 	4/8
+ASM:89:02[79]			U1x4	def.l 	4/8
+ASM:90:03[89]			U1x4 xyzw(	func	4/8
+ASM:90:00 R4u					0 	4/8
+ASM:90:01[28]					+	add.- 	4/8
+ASM:90:00 R5u					3 	4/8
+ASM:90:01[05]					,	stk.- 	4/8
+ASM:90:00 R6u					1 	4/8
+ASM:90:01[28]					+	add.- 	4/8
+ASM:90:00 R7u					3 	4/8
+ASM:90:01[05]					,	stk.- 	4/8
+ASM:90:00 R0u					2 	4/8
+ASM:90:01[28]					+	add.- 	4/8
+ASM:90:00 R1u					3 	4/8
+ASM:90:01[05]					,	stk.- 	4/8
+ASM:90:00 R2u					3 	4/8
+ASM:90:01[28]					+	add.- 	4/8
+ASM:90:00 R3u					3 	4/8
+ASM:90:01[44]					)	brake.- 	4/8
+ASM:90:01[06]					;	newrow.- 	4/8
+ASM:90:01[54]					U1	def.b 	4/8
+ASM:91:04[90]					a	def.b 	5/8
+ASM:91:01[23]					=	mov.- 	5/8
+ASM:91:00 R4u					10 	5/8
+ASM:91:01[05]					,	stk.- 	5/8
+ASM:92:04[91]					b	def.b 	6/8
+ASM:92:01[23]					=	mov.- 	6/8
+ASM:92:00 R5u					0 	6/8
+ASM:92:01[05]					,	stk.- 	6/8
+ASM:93:04[92]					a1D	def.b 	7/8
+ASM:93:01[45]					[	dims.- 	7/8
+ASM:93:00 R6u					10 	7/8
+ASM:93:01[46]					]	dime.- 	7/8
+ASM:93:01[06]					;	newrow.- 	7/8
+ASM:93:01[16]					/	div.- 	7/8
+ASM:93:01[12]					*	mul.- 	7/8
+ASM:93:01[23]					=	mov.- 	7/8
+ASM:93:00 R7d					0.100000 	7/8
+ASM:93:01[05]					,	stk.- 	7/8
+ASM:94:04[93]					d	def.b 	8/8
+ASM:94:01[23]					=	mov.- 	8/8
+ASM:94:00 R0d					10.000000 	8/8
+ASM:94:01[06]					;	newrow.- 	8/8
+ASM:94:01[07]					*/	come.- 	8/8
+ASM:94:01[66]			! for(	cycle	8/8
+ASM:94:01[56]					U4	def.l 	8/8
+ASM:94:01[23]					=	mov.- 	8/8
+ASM:94:00 R1u					0 	8/8
+ASM:94:01[06]					;	newrow.- 	8/8
+ASM:95:04[94]					i	def.l 	12/12
+ASM:95:01[34]					<	ltlg.- 	12/12
+ASM:95:00 R2u					10 	12/12
+ASM:95:01[06]					;	newrow.- 	12/12
+ASM:95:04[94]					i	def.l 	12/12
+ASM:95:01[29]					++	inc.- 	12/12
+ASM:95:01[44]					)	brake.- 	12/12
+ASM:95:01[47]						{	begin.- 	12/12
+ASM:95:04[90]						a	def.b 	12/12
+ASM:95:01[30]						+=	addm.- 	12/12
+ASM:95:01[29]						++	inc.- 	12/12
+ASM:95:04[91]						b	def.b 	12/12
+ASM:95:01[12]						*	mul.- 	12/12
+ASM:95:00 R3u						10 	12/12
+ASM:95:01[28]						+	add.- 	12/12
+ASM:95:04[94]						i	def.l 	12/12
+ASM:95:01[06]						;	newrow.- 	12/12
+ASM:95:04[92]						a1D	def.b 	12/12
+ASM:95:01[45]						[	dims.- 	12/12
+ASM:95:04[94]						i	def.l 	12/12
+ASM:95:01[19]						%	rem.- 	12/12
+ASM:95:01[64]				! sizeof(	func	12/12
+ASM:95:04[92]						a1D	def.b 	12/12
+ASM:95:01[44]						)	brake.- 	12/12
+ASM:95:01[46]						]	dime.- 	12/12
+ASM:95:01[23]						=	mov.- 	12/12
+ASM:95:04[90]						a	def.b 	12/12
+ASM:95:01[06]						;	newrow.- 	12/12
+ASM:95:01[48]					}	end.- 	12/12
+
 alDAT:0BLD/VER:01
