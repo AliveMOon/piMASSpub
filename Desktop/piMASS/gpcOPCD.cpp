@@ -34,16 +34,16 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_zero },
 	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TRUE },
 
-	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_DEC, gpeALF_CLASS },
-	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_CLASS, gpeALF_DEF },
 
 	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
 	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_IF },
@@ -56,7 +56,7 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"return",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_RETURN },
 	{ gpaOPCi,	"discard",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
 
-	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_DEC, gpeALF_CLASS },
+	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_CLASS },
 	{ gpaOPCi,	"pub",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
 	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
 
@@ -73,7 +73,7 @@ char* gpasOPER[] = {
 
 	"! inv",	"!! LG",	"!= neqLG",
 
-	". pnt",	", stk",
+	". pnt",	", stk",	"; newrow"
 	//"+ add", 	"++ inc",	"+= addM", ///--------------- DBG
 
 	"/* comS", 	"*/ comE",	"// com",
@@ -101,7 +101,7 @@ char* gpasOPER[] = {
 	"[ dimS", 	"] dimE",
 	"{ begin", 	"} end",
 	"? if",		": else",
-	"@ mail"
+	"@ mail",	"\" str",
 };
 char* gpcCMPL::sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL )
 {
@@ -194,14 +194,15 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 
 	gpfALF2STR( pASMop, (I8)typ );
 	sprintf(
-				pCOUT, "%0.2d:%0.2d %s.%c [%0.2d], [%0.2d]		; %s %s %s",
-						pCMPL->nPC(), pA->iLEV, pASMop, sNDAT[pA->n_dat], pA->iPC, pB->iPC,
+				pCOUT,
+				"%0.2d:%0.2d %s.%c [%0.2d], [%0.2d]		; %s %s %s",
+				pCMPL->nPC(), pA->iLEV, pASMop, sNDAT[pA->n_dat], pA->iPC, pB->iPC,
 																		(psA ? psA : "?"), (psOP ? psOP : "?"), (psB ? psB : "?")
 			);
 	return pCOUT;
 }
 
-U1* gpcMASS::reset( U1* pS0 )
+U1* gpcMASS::msRST( U1* pS0 )
 {
 	gpmZ( asPRG );
 	if( !pPUB )

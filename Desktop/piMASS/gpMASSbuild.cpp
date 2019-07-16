@@ -330,16 +330,20 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	}
 	cout << "." << endl ;
 
-	U1	*pPUB = mass.reset( gpsSTRpub ),
+	U1	*pPUB = mass.msRST( gpsSTRpub ),
 		*pS = *pB == '\a' ? pB+1 : pB,
-		*pSe, *pE = pA+nL, *pSTR = pPUB, c, nADD = 0;
+		*pSe, *pE = pA+nL, *pSTR = pPUB, c, nADD = 0,
+		*pSTRpool = NULL;
 
 
 
-	U4	nSTR = gpfALF2STR( (char*)pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
-		iTHIS = mass.PC.cmpl_find( &mass.CMPL, pSTR, nSTR ), iFND, iR;
+	U4	nSTRpool = 0,
+		nSTR = gpfALF2STR( (char*)pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
+		iTHIS = mass.PC.cmpl_find( &mass.CMPL, pSTR, nSTR ), iFND, iR, iNEW;
 	U8 nLEN, nVAN, nALF;
-	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8];
+	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8],
+			*pI4 = pMOM->pPC( &mass.CMPL, pMOM->cmpl_find( &mass.CMPL, (U1*)"I4", 2 )),	// talán sima int legyen?
+			*pNEW = NULL;
 	gpmZ(aR);
 
 	if( pMOM->iPC != iTHIS )
@@ -357,25 +361,111 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	if( !gppLEV )
 		gppLEV = gppLEV->newROOT();
 	gpcCMPLlev* pLEV = gppLEV->get( mass.iLEV );
-
+	gpcLAZY* pCMPL = &mass.CMPL;
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 
 		if( pFND )
 		{
+		/// -----------------------------
+		/// 		IGEN TALÁLAT
+		/// -----------------------------
+
 			if( pFND->wip == gpeALF_OPER )
 			{
+				switch( pFND->typ )
+				{
+					case gpeALF_CLASS:
+						// osztájt akar valaki dec/def-iniálni?
+						/// egy új CLASS élete azzal kezdödik hogy
+/// 0. CLASS -> pOP -------------------------------
+						pLEV->pOP = pFND;
+						break;
+					case gpeALF_BEGIN:
+/// 2. CLASS sNAME pDEF -> pMOM -----------------------------
+						if( pLEV->pDEF )
+							pMOM = pLEV->pDEF;
+						pLEV = pLEV->inc( pMOM );
+						break;
+					case gpeALF_END:
+						pMOM = (pLEV = pLEV->dec())->pMOM;
+						break;
+					case gpeALF_NEWROW:
+						pLEV->AoBclr();
+						break;
+					default:
+						break;
+
+				}
 
 			} else {
 
 
 			}
-			pCOUT = pFND->sDECL( pPUB, gpsNDAT, &mass.CMPL );
-			pFND = NULL;
-		} else {
 
+		} else {
+			/// -----------------------------
+			/// 		NEM TALÁLAT
+			/// -----------------------------
+			if( pSTR ? nSTR : false )
+			{
+				// de van valami amit létrehozhatunk
+				iNEW = pCMPL->nPC();
+				if( !pLEV->pOP )
+				{
+					if( !pLEV->pDEF )
+						pLEV->pDEF = pDEF;
+					pMOM->cmpl_add(pCMPL, pSTR, nSTR );
+					pNEW = pMOM->pPC(pCMPL, iNEW );
+					if( !pNEW )
+					{
+						gpcCMPL& def = pLEV->pDEF ? *pLEV->pDEF : *pI4;
+						pNEW->wip = def.wip;
+						pNEW->typ = def.typ;
+						pNEW->iDEF = def.iPC;
+						if( pNEW->n_dat = def.n_dat )
+						{
+							// ha új elem a mamában akkor növelni kell a DATA menyiségét
+							// while( pM )
+							//  += pNEW->n_dat;
+
+
+						}
+
+						pFND = pNEW;
+					}
+				} else {
+					switch( pLEV->pOP->typ )
+					{
+						case gpeALF_CLASS:
+								pMOM->cmpl_add(pCMPL, pSTR, nSTR );
+								pNEW = pMOM->pPC(pCMPL, iNEW );
+								if( !pNEW )
+									break;
+/// 1. CLASS sNAME -> pDEF -----------------------------
+								pNEW->wip = gpeALF_CLASS;
+								pNEW->typ = gpeALF_DEF;
+								pNEW->iDEF = pNEW->iPC;
+
+								pLEV->pOP = NULL;
+
+								pFND =
+								pLEV->pDEF = pNEW;
+								break;
+
+						default:
+								break;
+					}
+				}
+			}
 			pCOUT = NULL;
 		}
+		if( pFND )
+		{
+			pCOUT = pFND->sDECL( pPUB, gpsNDAT, &mass.CMPL );
+			pFND = NULL;
+		}
+
 		if( pCOUT )
 			cout << "ASM:" << pCOUT << "\r\n";
 
@@ -396,8 +486,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				iFND = pMOM->cmpl_find( &mass.CMPL, pSTR, nSTR );
 				if( !iFND )
 				{
-
 					/// NEMTALÁLT
+					pFND = NULL;
 					continue;
 				}
 				pFND = pMOM->pPC( &mass.CMPL, iFND );
@@ -424,6 +514,42 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				case gpeALF_COM: // "//"
 					pS += gpmVAN( pS, "\r\n", nLEN );
 					pFND = NULL;
+					continue;
+				case gpeALF_STR:
+					{
+						U1* p_str = pPUB, *p_se = p_str, nSTR = 0;
+						if( pSTRpool+nSTRpool < p_str )
+						{
+							/// itt kéne elrakni ha még nem tette meg más
+							pSTRpool = p_str;
+							nSTRpool = 0;
+						}
+						while( (pS < pE) ? (*pS != "\"") : false )
+						{
+							pSTR = pS+gpfVAN( pS, "\"", nLEN );
+							if( pSTR < pE )
+							{
+								nSTR = pSTR-pS;
+								memcpy( p_se, pS, nSTR );
+								p_se += nSTR;
+								pS += nSTR;
+								if( pS[-1] == '\\' )
+								{
+									p_se[-1] = *pS;
+									pS++;
+                                }
+								continue;
+							}
+
+							nSTR = pE-pS;
+							memcpy( p_se, pS, nSTR );
+							p_se += nSTR;
+							pS = pE;
+						}
+						nSTRpool += p_se-p_str;
+						if( pS < pE )
+							pS++;
+					}
 					continue;
 				default:
 					break;

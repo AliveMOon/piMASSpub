@@ -570,7 +570,7 @@ public:
 	};
 
 	//void reset_o( void );
-	U1* reset( U1* pPUB );
+	U1* msRST( U1* pPUB );
 	void tag_add( gpeALF tg, U4 iKID )
 	{
 		I8 ix, n;

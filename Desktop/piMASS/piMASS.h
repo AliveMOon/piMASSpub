@@ -70,6 +70,9 @@
 #include "gpcOPCD.h"*/
 
 using namespace std;
+
+#define NULL nullptr
+
 typedef unsigned char	U1;
 typedef volatile U1		vU1;
 typedef unsigned short	U2;

@@ -164,10 +164,19 @@ public:
 class gpcCMPLlev
 {
 public:
-	gpcCMPL	*pDEC, *pMOM, *pA, *pOP, *pB;
+	gpcCMPL	*pDEF, *pMOM, *pA, *pOP, *pB;
 	U4 iLEV, nLEV;
 	gpcCMPLlev(){};
 
+	gpcCMPLlev* AoBclr( void )
+	{
+		if( !this )
+			return NULL;
+
+		pA = pOP = pB = NULL;
+
+		return this;
+	}
 	gpcCMPLlev* newROOT( U4 n = 0x100 )
 	{
 		if( this )
@@ -187,11 +196,12 @@ public:
 		}
 		return pLEV;
  	}
- 	gpcCMPLlev* inc( void )
+ 	gpcCMPLlev* inc( gpcCMPL* pM )
  	{
 		memcpy( this+1, this , sizeof(*this) );
 		this[1].iLEV = iLEV+1;
-
+		if( pM )
+			this[1].pMOM = pM;
 		return this+1;
  	}
 	gpcCMPLlev* dec( void )

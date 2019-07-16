@@ -29,7 +29,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 	}
 	cout << "." << endl ;
 
-	U1	*pPUB = mass.reset( gpsSTRpub ),
+	U1	*pPUB = mass.msRST( gpsSTRpub ),
 		*pS = *pB == '\a' ? pB+1 : pB,
 		*pSe, *pE = pA+nL, *pSTR = pPUB, c, nADD = 0;
 
@@ -168,7 +168,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 	}
 	cout << "." << endl ;
 
-	U1	*pPUB = mass.reset( gpsSTRpub ),
+	U1	*pPUB = mass.msRST( gpsSTRpub ),
 		*pS = *pB == '\a' ? pB+1 : pB,
 		*pSe, *pE = pA+nL, *pSTR = pPUB, c, nADD = 0;
 
