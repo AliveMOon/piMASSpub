@@ -159,3 +159,48 @@ public:
 	char* sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL );
 	char* sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB );
 };
+
+
+class gpcCMPLlev
+{
+public:
+	gpcCMPL	*pDEC, *pMOM, *pA, *pOP, *pB;
+	U4 iLEV, nLEV;
+	gpcCMPLlev(){};
+
+	gpcCMPLlev* newROOT( U4 n = 0x100 )
+	{
+		if( this )
+			return this;
+
+		gpcCMPLlev* pLEV = new gpcCMPLlev[n];
+		gpmZ( *pLEV );
+		pLEV->nLEV = n;
+		return pLEV;
+ 	}
+ 	gpcCMPLlev* get( U4 i )
+ 	{
+		gpcCMPLlev* pLEV = this;
+		while( pLEV->iLEV < i)
+		{
+			pLEV = pLEV->inc();
+		}
+		return pLEV;
+ 	}
+ 	gpcCMPLlev* inc( void )
+ 	{
+		memcpy( this+1, this , sizeof(*this) );
+		this[1].iLEV = iLEV+1;
+
+		return this+1;
+ 	}
+	gpcCMPLlev* dec( void )
+	{
+		if( iLEV )
+			return this-1;
+
+
+	}
+
+};
+

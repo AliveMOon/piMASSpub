@@ -1,80 +1,81 @@
-HD: 1,0,0,0, V:1 H:0 C:0 
+-----------------
+HD:[b0] spc:1,0,0,0, V:1 H:0 C:0 
 bSW:0x00000000
 nTG:1 #main
 OFF:0xfffffdff
 bSW:0x00000084.[ENTER]
-
-ComPI: 0, 1, 0, 0,  V:1 H:1 B:0 
+ComPI:[a1] spc:0, 1, 0, 0,  V:1 H:1 B:0 
 bSW:0x00000084.
 
-ASM:nP:lv tp dc.n iP
-ASM:78:01 class class.- [72]
-ASM:78:01 begin {.- [47]
-ASM:78:01 class U1.b [53]
-ASM:78:01 stk ,.- [05]
-ASM:78:01 stk ,.- [05]
-ASM:78:01 stk ,.- [05]
-ASM:78:01 braks (.- [43]
-ASM:78:01 class U1.b [53]
-ASM:78:01 stk ,.- [05]
-ASM:78:01 stk ,.- [05]
-ASM:78:01 stk ,.- [05]
-ASM:78:01 brake ).- [44]
-ASM:78:01 begin {.- [47]
-ASM:78:01 mov =.- [23]
-ASM:78:01 mov =.- [23]
-ASM:78:01 mov =.- [23]
-ASM:78:01 mov =.- [23]
-ASM:78:01 end }.- [48]
-ASM:78:01 end }.- [48]
-ASM:78:01 braks (.- [43]
-ASM:78:00 Ru4, 0 
-ASM:78:01 add +.- [28]
-ASM:78:00 Ru5, 3 
-ASM:78:01 stk ,.- [05]
-ASM:78:00 Ru6, 1 
-ASM:78:01 add +.- [28]
-ASM:78:00 Ru7, 3 
-ASM:78:01 stk ,.- [05]
-ASM:78:00 Ru0, 2 
-ASM:78:01 add +.- [28]
-ASM:78:00 Ru1, 3 
-ASM:78:01 stk ,.- [05]
-ASM:78:00 Ru2, 3 
-ASM:78:01 add +.- [28]
-ASM:78:00 Ru3, 3 
-ASM:78:01 brake ).- [44]
-ASM:78:01 class U1.b [53]
-ASM:78:01 mov =.- [23]
-ASM:78:00 Ru4, 10 
-ASM:78:01 stk ,.- [05]
-ASM:78:01 mov =.- [23]
-ASM:78:00 Ru5, 0 
-ASM:78:01 stk ,.- [05]
-ASM:78:01 dims [.- [45]
-ASM:78:00 Ru6, 10 
-ASM:78:01 dime ].- [46]
-ASM:78:01 for for.- [65]
-ASM:78:01 braks (.- [43]
-ASM:78:01 class U4.l [55]
-ASM:78:01 mov =.- [23]
-ASM:78:00 Ru7, 0 
-ASM:78:01 ltlg <.- [34]
-ASM:78:00 Ru0, 10 
-ASM:78:01 inc ++.- [29]
-ASM:78:01 brake ).- [44]
-ASM:78:01 begin {.- [47]
-ASM:78:01 addm +=.- [30]
-ASM:78:01 inc ++.- [29]
-ASM:78:01 mul *.- [12]
-ASM:78:00 Ru1, 10 
-ASM:78:01 add +.- [28]
-ASM:78:01 dims [.- [45]
-ASM:78:01 rem %.- [19]
-ASM:78:01 sizeof sizeof.- [63]
-ASM:78:01 braks (.- [43]
-ASM:78:01 brake ).- [44]
-ASM:78:01 dime ].- [46]
-ASM:78:01 mov =.- [23]
+ASM:nP:lv[fd]	str	typ.sz
+-----------------------
+ASM:78:01[72]	class	class.- 
+ASM:78:01[47]	{	begin.- 
+ASM:78:01[53]	U1	class.b 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[43]	(	braks.- 
+ASM:78:01[53]	U1	class.b 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[44]	)	brake.- 
+ASM:78:01[47]	{	begin.- 
+ASM:78:01[23]	=	mov.- 
+ASM:78:01[23]	=	mov.- 
+ASM:78:01[23]	=	mov.- 
+ASM:78:01[23]	=	mov.- 
+ASM:78:01[48]	}	end.- 
+ASM:78:01[48]	}	end.- 
+ASM:78:01[43]	(	braks.- 
+ASM:78:00 R4u	0 
+ASM:78:01[28]	+	add.- 
+ASM:78:00 R5u	3 
+ASM:78:01[05]	,	stk.- 
+ASM:78:00 R6u	1 
+ASM:78:01[28]	+	add.- 
+ASM:78:00 R7u	3 
+ASM:78:01[05]	,	stk.- 
+ASM:78:00 R0u	2 
+ASM:78:01[28]	+	add.- 
+ASM:78:00 R1u	3 
+ASM:78:01[05]	,	stk.- 
+ASM:78:00 R2u	3 
+ASM:78:01[28]	+	add.- 
+ASM:78:00 R3u	3 
+ASM:78:01[44]	)	brake.- 
+ASM:78:01[53]	U1	class.b 
+ASM:78:01[23]	=	mov.- 
+ASM:78:00 R4u	10 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[23]	=	mov.- 
+ASM:78:00 R5u	0 
+ASM:78:01[05]	,	stk.- 
+ASM:78:01[45]	[	dims.- 
+ASM:78:00 R6u	10 
+ASM:78:01[46]	]	dime.- 
+ASM:78:01[65]	for	for.- 
+ASM:78:01[43]	(	braks.- 
+ASM:78:01[55]	U4	class.l 
+ASM:78:01[23]	=	mov.- 
+ASM:78:00 R7u	0 
+ASM:78:01[34]	<	ltlg.- 
+ASM:78:00 R0u	10 
+ASM:78:01[29]	++	inc.- 
+ASM:78:01[44]	)	brake.- 
+ASM:78:01[47]	{	begin.- 
+ASM:78:01[30]	+=	addm.- 
+ASM:78:01[29]	++	inc.- 
+ASM:78:01[12]	*	mul.- 
+ASM:78:00 R1u	10 
+ASM:78:01[28]	+	add.- 
+ASM:78:01[45]	[	dims.- 
+ASM:78:01[19]	%	rem.- 
+ASM:78:01[63]	sizeof	sizeof.- 
+ASM:78:01[43]	(	braks.- 
+ASM:78:01[44]	)	brake.- 
+ASM:78:01[46]	]	dime.- 
+ASM:78:01[23]	=	mov.- 
 
 alDAT:0BLD/VER:01

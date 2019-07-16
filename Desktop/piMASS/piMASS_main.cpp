@@ -147,7 +147,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		}
 		else if( tmp.bENTR( *this, aSP44[nSP] ) )
 		{
-			cout << "[ENTER]" << endl;
+			cout << "[ENTER]"; // << endl;
 		}
 
 		if( aSP44[mom].z < aSP44[nSP].x )

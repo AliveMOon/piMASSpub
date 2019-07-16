@@ -113,44 +113,44 @@ char* gpcCMPL::sDECL( U1* pPUB, char* sNDAT, gpcLAZY* pCMPL )
 	}
 
 
-	char	*pALF = (char*)pPUB,
-			*pS = pALF+0x10;
+	char	*pTYP = (char*)pPUB,
+			*pS = pTYP+0x10;
 
-	gpfALF2STR( pALF, (I8)typ );
+	gpfALF2STR( pTYP, (I8)typ );
 	if( wip == gpeALF_REG )
 	{
 		switch( typ )
 		{
 			case gpeALF_D:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s %f ",
-									pCMPL->nPC(), iLEV, iKD, pALF, d
+							pS, "%0.2d:%0.2d R%d%s\t%f ",
+									pCMPL->nPC(), iLEV, iKD, pTYP, d
 						);
 						break;
 			case gpeALF_I:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s, %d ",
-									pCMPL->nPC(), iLEV, iKD, pALF, i8
+							pS, "%0.2d:%0.2d R%d%s\t%d ",
+									pCMPL->nPC(), iLEV, iKD, pTYP, i8
 						);
 						break;
 			default:
 				sprintf(
-							pS, "%0.2d:%0.2d R%d%s, %d ",
-									pCMPL->nPC(), iLEV, iKD, pALF, u8
+							pS, "%0.2d:%0.2d R%d%s\t%d ",
+									pCMPL->nPC(), iLEV, iKD, pTYP, u8
 						);
 			break;
 		}
 		return pS;
 	}
 
-	char *pDEC = pPC( pCMPL, mPC )->p_kid->sSTRix( iKD, "Oxo" );
+	char *pSTR = pPC( pCMPL, mPC )->p_kid->sSTRix( iKD, "Oxo" );
 
-	if( !pDEC )
+	if( !pSTR )
 		*pS = 0;
 	else
 		sprintf(
-					pS, "%0.2d:%0.2d %s %s.%c [%0.2d]",
-							pCMPL->nPC(), iLEV, pALF, pDEC, sNDAT[n_dat], iPC
+					pS, "%0.2d:%0.2d[%0.2d]\t%s\t%s.%c ",
+							pCMPL->nPC(), iLEV, iPC, pSTR, pTYP, sNDAT[n_dat]
 				);
 
 	return pS;

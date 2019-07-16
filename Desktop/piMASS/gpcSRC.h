@@ -7,6 +7,11 @@
 
 #define gpdPRGsep " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} "
 
+//extern U1 gpaALFadd[]; //0x100];
+//extern U1 gpsSTRpub[]; //[0x10000];
+
+
+
 enum gpeMASSsw:U8
 {
 	gpeMASSzero,
@@ -413,10 +418,10 @@ public:
     }
     void hd( gpcMASS& mass, gpeALF* pTGpub = NULL );
     void cmpi( gpcMASS& mass, bool bDBG );
-
+	void cmpi_undo00( gpcMASS& mass, bool bDBG );
     void cmpi_SKELETON( gpcMASS& mass, bool bDBG );
 
-    void cmpi_trash2( gpcMASS& mass, bool bDBG );
+    //void cmpi_trash2( gpcMASS& mass, bool bDBG );
     //void cmpi_trash( gpcMASS& mass, bool bDBG );
 
     gpcSRC();

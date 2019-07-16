@@ -59,6 +59,7 @@
 		<Unit filename="piMASS.h" />
 		<Unit filename="piMASS_main.cpp" />
 		<Unit filename="src/gpcND.cpp" />
+		<Unit filename="src/gpcPROTO.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

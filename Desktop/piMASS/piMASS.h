@@ -172,7 +172,31 @@ SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 	h = INVALID_SOCKET;
 	return h;
 }
+//#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
+U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nLEN, U1* gpaALFadd )
+{
+	nLEN = 0;
+	if( (p_str < pE) ? !*p_str : true )
+		return 0;
 
+	U1* pS = p_str;
+	while( pS < pE )
+	{
+		if( (*pS)&0x80 )
+		{
+			if( (*pS)&0x40 )
+				nLEN++;
+			pS++;
+			continue;
+		}
+		if( !gpaALFadd[*pS] )
+			break;
+
+		nLEN++;
+		pS++;
+	}
+	return pS-p_str;
+}
 #define gpdSTR_READ( x ) ( (x) ? (x) : "" )
 
 #define MAKE_ID( a,b,c,d )				\

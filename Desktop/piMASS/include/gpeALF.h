@@ -3,7 +3,8 @@
 
 #include "piMASS.h"
 
-#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
+
+#define gpmbABC( c, a ) (c < 0x80 ? a[c] : true)
 #define gpdUP ('a'-'A')
 #define gpdUP_CASE(a){ if( a >= 'a' && a <= 'z' ){ a -= gpdUP; }}
 #define gpdALF 								('Z'-'@')
@@ -586,5 +587,8 @@ typedef enum gpeALF: I8
 U1*		gpf_aALF_init(void);
 U8		gpfALF2STR(char* p_out, I8 d0);
 gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
+
+
+
 
 #endif // GPEALF_H_INCLUDED
