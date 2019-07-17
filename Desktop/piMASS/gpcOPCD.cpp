@@ -194,7 +194,7 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 						);
 			else
 				sprintf(
-							pS, "%0.2d:%0.2d[%0.2d] \t%s%s\t%s.%c",
+							pS, "%0.2d:%0.2d[%0.2d] %s%s\t%s.%c",
 									pCMPL->nPC(), iLEV, iPC, //i_dat,
 									pTAB,
 									pSTR, pTYP, sNDAT[n_dat]

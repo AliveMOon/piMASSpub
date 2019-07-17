@@ -75,7 +75,13 @@ public:
 			i_dat, n_dat,
 			iPUB,
 			n_str,
-			iDEF, iDEC, iCAL, iINI,
+			iDEF, iDEC, iCALL,
+			iSPARE, 	// tartalék
+						// pl:
+						// 1.) U1x4 xyzw(1,2,3,4);			// ez egy változó inicializálás
+						// 2.) U1x4 xyzw(1,2,3,4){ .... };	// ez egy fügvény definiálás
+						// Melyik is?
+			iREDIR, iINI,
 			op;
 
 	I8		i8;
