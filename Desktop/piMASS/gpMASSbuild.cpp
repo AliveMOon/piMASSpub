@@ -413,6 +413,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								case gpeALF_CONSTR:
 								case gpeALF_FUNC:
 								case gpeALF_CYCLE:
+								case gpeALF_CLASS:
 									pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
 									break;
 								default:
@@ -523,6 +524,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pNEW->iDEF = def.iPC;
 							if( pNEW->n_dat = def.n_dat )
 							{
+								pNEW->i_dat = pLEV->iDAT;
 								pMOM->n_dat += pNEW->n_dat;
 								pLEV->iDAT += pNEW->n_dat;
 							}
@@ -561,7 +563,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		if( pFND )
 		{
 			pCOUT = pFND->sDECL( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
-			pFND = NULL;
 		}
 		if( nDAT < pLEV->iDAT )
 			nDAT = pLEV->iDAT;
@@ -569,6 +570,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		if( pCOUT )
 			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "\r\n";
 
+		if( pFND )
+			pFND = NULL;
 		/// --------------------------------
 		/// ITT a VÉGE
 		if( pS >= pE )

@@ -167,7 +167,7 @@ char* gpcCMPL::sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 				{
 					char *pDEF = pPC( pCMPL, pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
 					sprintf(
-								pS, "%0.2d:%0.2d[%0.2d]%s%s %s\t%s",
+								pS, "%0.2d:%0.2d[%0.2d]%s%s.%s\t%s",
 										pCMPL->nPC(), iLEV, iPC,
 										pTAB,
 										pDEF, pSTR, pTYP //, sNDAT[n_dat]
@@ -175,12 +175,20 @@ char* gpcCMPL::sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 					break;
 				}
 			}
-		default:
+		case gpeALF_OPER:
 			sprintf(
-						pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s.%c ",
+						pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s",
 								pCMPL->nPC(), iLEV, iPC,
 								pTAB,
-								pSTR, pTYP, sNDAT[n_dat]
+								pSTR, pTYP//, sNDAT[n_dat]
+					);
+			break;
+		default:
+			sprintf(
+						pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s.%c %d",
+								pCMPL->nPC(), iLEV, iPC,
+								pTAB,
+								pSTR, pTYP, sNDAT[n_dat], i_dat
 					);
 			break;
 	}
