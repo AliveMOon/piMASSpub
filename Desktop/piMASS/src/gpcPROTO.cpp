@@ -58,7 +58,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 
 		if( pFND )
 		{
-			pCOUT = pFND->sDECL( pPUB, NULL, gpsNDAT, &mass.CMPL );
+			pCOUT = pFND->sLOG( pPUB, NULL, gpsNDAT, &mass.CMPL );
 			pFND = NULL;
 		} else
 			pCOUT = NULL;
@@ -197,7 +197,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 
 		if( pFND )
 		{
-			pCOUT = pFND->sDECL( pPUB, NULL, gpsNDAT, &mass.CMPL );
+			pCOUT = pFND->sLOG( pPUB, NULL, gpsNDAT, &mass.CMPL );
 			pFND = NULL;
 		} else
 			pCOUT = NULL;

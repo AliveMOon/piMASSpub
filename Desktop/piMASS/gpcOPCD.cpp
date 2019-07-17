@@ -103,7 +103,7 @@ char* gpasOPER[] = {
 	"? if",		": else",
 	"@ mail",	"\" str",
 };
-char* gpcCMPL::sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
+char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 {
 	if( this ? !pPUB : true )
 	{
@@ -157,10 +157,10 @@ char* gpcCMPL::sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 		case gpeALF_FUNC:
 		case gpeALF_CYCLE:
 			{
-				if( *pTAB )
+				/*if( *pTAB )
 					pTAB++;
 				if( *pTAB )
-					pTAB++;
+					pTAB++;*/
 				gpfALF2STR( pTYP, (I8)wip );
 				gpcCMPL* pD = pPC( pCMPL, iDEF );
 				if( pD )

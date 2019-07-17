@@ -374,7 +374,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	if( pTHIS )
 	{
-		pCOUT = pTHIS->sDECL( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
+		pCOUT = pTHIS->sLOG( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
 		/*if( pCOUT )
 			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "\r\n";*/
 	}
@@ -401,12 +401,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 /// 2. CLASS sNAME pDEF -> pMOM -----------------------------
 						if( pLEV->pDEF )
 							pMOM = pLEV->pDEF;
-						pLEV = pLEV->inc( pMOM, '+' );
+						pLEV = pLEV->inc( pMOM );
 						pLEV->AoBclr();
 						break;
 					case gpeALF_END:
 						pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
-						if( pMOM )
+						if( pLEV->pFND )
+							pFND = pLEV->pFND;
+						/*if( pMOM )
 						{
 							switch( pMOM->wip )
 							{
@@ -415,13 +417,15 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								case gpeALF_CYCLE:
 								case gpeALF_CLASS:
 									pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
+									if( pLEV->pFND )
+										pFND = pLEV->pFND;
 									break;
 								default:
 									break;
 
 							}
 
-						}
+						}*/
 						if( !pMOM )
 							pMOM = pTHIS;
 						pLEV->AoBclr();
@@ -431,7 +435,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					case gpeALF_BRAKS:
 						if( pLEV->pDEF )
 							pMOM = pLEV->pDEF;
-						pLEV = pLEV->inc( pMOM, '+' );
+						pLEV = pLEV->inc( pMOM );
 						pLEV->AoBclr();
 						break;
 
@@ -440,8 +444,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						//if( !pMOM )
 						//	pMOM = pTHIS;
 
-						pLEV->pDEF = NULL;
-						pLEV->AoBclr();
+						pLEV->DAoBclr();
+						if( pLEV->pFND )
+						{
+							pFND = pLEV->pFND;
+							pLEV->pFND = NULL;
+						}
 						break;
 
 					case gpeALF_NEWROW:
@@ -462,6 +470,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				}
 
 			} else {
+				// IGEN TALÁLAT nem OPERATOR
 				switch( pFND->typ )
 				{
                     case gpeALF_DEF:
@@ -469,10 +478,23 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 						break;
 					case gpeALF_FUNC:
-						pLEV->pFUNC = pFND;
-
+						pLEV->pCALL = pFND;
 						break;
 					default:
+						{
+							switch( pFND->wip )
+							{
+								case gpeALF_CYCLE:
+									pLEV = pLEV->inc( pMOM, pFND );
+									pMOM = pFND;
+									pLEV->DAoBclr();
+									//pLEV = pLEV->inc( pMOM );
+									pFND = NULL;
+									break;
+								default:
+									break;
+							}
+						}
 						break;
 				}
 
@@ -482,87 +504,96 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		else if( nSTR )
 		{
 			/// -----------------------------
-			/// 		NEM TALÁLAT
+			/// 		NEM TALÁLAT de VAN string
 			/// -----------------------------
 
-				// de van valami amit létrehozhatunk
-				iNEW = pCMPL->nPC();
-				bool bFUN = pSTR[nSTR-1] == '(';
-				if( !pLEV->pOP )
+			// de van valami amit létrehozhatunk
+			iNEW = pCMPL->nPC();
+			bool bFUN = pSTR[nSTR-1] == '(';
+			if( !pLEV->pOP )
+			{
+				/// NEM TALÁLAT operator SINCSEN
+
+				pMOM->cmpl_add(pCMPL, pSTR, nSTR );
+				pNEW = pMOM->pPC(pCMPL, iNEW );
+				if( pNEW )
 				{
-
-					pMOM->cmpl_add(pCMPL, pSTR, nSTR );
-					pNEW = pMOM->pPC(pCMPL, iNEW );
-					if( pNEW )
+					gpcCMPL& def = pLEV->pDEF ? *pLEV->pDEF : *pI4;
+					if( bFUN )
 					{
-						gpcCMPL& def = pLEV->pDEF ? *pLEV->pDEF : *pI4;
-						if( bFUN )
+						// van a végén zárójel
+						pNEW->wip = gpeALF_FUNC;
+						pNEW->iDEF = def.iPC;
+						pNEW->typ = def.typ;
+
+						char* p_str = pMOM->pPC( pCMPL, pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
+						U4 n_str = strlen( p_str );
+						if( n_str == nSTR-1 )
 						{
-							pNEW->wip = gpeALF_FUNC;
-							pNEW->iDEF = def.iPC;
-
-							char* p_str = pMOM->pPC( pCMPL, pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
-							U4 n_str = strlen( p_str );
-							if( n_str == nSTR-1 )
+							nSTR = ((char*)gp_memcmp( p_str, pSTR, n_str ))-p_str;
+							if( nSTR == n_str )
 							{
-								nSTR = ((char*)gp_memcmp( p_str, pSTR, n_str ))-p_str;
-                                if( nSTR == n_str )
-                                {
-									pNEW->wip = gpeALF_CONSTR;
-									pNEW->iDEF = pNEW->mPC;
-                                }
+								pNEW->wip = gpeALF_CONSTR;
+								pNEW->iDEF = pNEW->mPC;
 							}
-							pNEW->typ = def.typ;
-							pLEV = pLEV->inc( pMOM, '+' );
-							pMOM = pNEW;
-							pLEV->AoBclr();
-							pLEV = pLEV->inc( pMOM );
+						}
+						if( pNEW->wip != gpeALF_CONSTR )
+						{
+							// ha nem lett constructor
 
-						} else {
-							pNEW->wip = def.wip;
-							pNEW->typ = def.typ;
-							pNEW->iDEF = def.iPC;
-							if( pNEW->n_dat = def.n_dat )
-							{
-								pNEW->i_dat = pLEV->iDAT;
-								pMOM->n_dat += pNEW->n_dat;
-								pLEV->iDAT += pNEW->n_dat;
-							}
+						}
 
+						pLEV = pLEV->inc( pMOM, pNEW );
+						pMOM = pNEW;
+						pLEV->DAoBclr();
+						//pLEV = pLEV->inc( pMOM );
+						pFND = NULL;
+					} else {
+						pNEW->wip = def.wip;
+						pNEW->typ = def.typ;
+						pNEW->iDEF = def.iPC;
+						if( pNEW->n_dat = def.n_dat )
+						{
+							pNEW->i_dat = pLEV->iDAT;
+							pMOM->n_dat += pNEW->n_dat;
+							pLEV->iDAT += pNEW->n_dat;
 						}
 						pFND = pNEW;
 					}
-				} else {
-					switch( pLEV->pOP->typ )
-					{
-						case gpeALF_CLASS:
-								pMOM->cmpl_add(pCMPL, pSTR, nSTR );
-								pNEW = pMOM->pPC(pCMPL, iNEW );
-								if( !pNEW )
-									break;
-/// 1. CLASS sNAME -> pDEF -----------------------------
-								pNEW->wip = gpeALF_CLASS;
-								pNEW->typ = gpeALF_DEF;
-								pNEW->iDEF = pNEW->iPC;
 
-								pLEV->pOP = NULL;
-
-								pFND =
-								pLEV->pDEF = pNEW;
-								break;
-						case gpeALF_FUNC:
-
-								break;
-						default:
-								break;
-					}
 				}
+			} else {
+				// NEM TALÁLAT de VAN string NINCS operátor
+				switch( pLEV->pOP->typ )
+				{
+					case gpeALF_CLASS:
+							pMOM->cmpl_add(pCMPL, pSTR, nSTR );
+							pNEW = pMOM->pPC(pCMPL, iNEW );
+							if( !pNEW )
+								break;
+/// 1. CLASS sNAME -> pDEF -----------------------------
+							pNEW->wip = gpeALF_CLASS;
+							pNEW->typ = gpeALF_DEF;
+							pNEW->iDEF = pNEW->iPC;
+
+							pLEV->pOP = NULL;
+
+							pFND =
+							pLEV->pDEF = pNEW;
+							break;
+					case gpeALF_FUNC:
+
+							break;
+					default:
+							break;
+				}
+			}
 
 			pCOUT = NULL;
 		}
 		if( pFND )
 		{
-			pCOUT = pFND->sDECL( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
+			pCOUT = pFND->sLOG( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
 		}
 		if( nDAT < pLEV->iDAT )
 			nDAT = pLEV->iDAT;

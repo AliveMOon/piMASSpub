@@ -75,14 +75,14 @@ public:
 			i_dat, n_dat,
 			iPUB,
 			n_str,
-			iDEF, iDEC, iINI,
+			iDEF, iDEC, iCAL, iINI,
 			op;
 
 	I8		i8;
 	U8		u8;
 	double	d;
 
-	I2		nADD, nMUL, nASS;
+	I2		nADD, nMUL; //, nASS;
 	char*	pINFO;
 
 	gpcLZYdct	*p_kid;
@@ -156,7 +156,7 @@ public:
 	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
 
 	gpcCMPL* sKIDlst( U1* pS0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
-	char* sDECL( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL );
+	char* sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL );
 	char* sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB );
 };
 
@@ -164,11 +164,19 @@ public:
 class gpcCMPLlev
 {
 public:
-	gpcCMPL	*pDEF, *pMOM, *pA, *pOP, *pB, *pFUNC;
+	gpcCMPL	*pDEF, *pMOM, *pA, *pOP, *pB, *pFND, *pCALL;
 	U4 iLEV, nLEV, iDAT;
 	U1 c;
 	gpcCMPLlev(){};
+	gpcCMPLlev* DAoBclr( void )
+	{
+		if( !this )
+			return NULL;
 
+		pDEF = pA = pOP = pB = NULL;
+
+		return this;
+	}
 	gpcCMPLlev* AoBclr( void )
 	{
 		if( !this )
@@ -196,13 +204,14 @@ public:
 
 		return pLEV;
  	}
- 	gpcCMPLlev* inc( gpcCMPL* pM, U1 C = 0 )
+ 	gpcCMPLlev* inc( gpcCMPL* pM, gpcCMPL* pF = NULL )
  	{
 		memcpy( this+1, this , sizeof(*this) );
 		this[1].iLEV = iLEV+1;
+		//pFND = pF;
 		if( pM )
 		{
-			this[1].c = C;
+			this[1].pFND = pF;
 			this[1].pMOM = pM;
 		}
 		return this+1;
