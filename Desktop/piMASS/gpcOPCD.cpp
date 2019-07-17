@@ -73,7 +73,7 @@ char* gpasOPER[] = {
 
 	"! inv",	"!! LG",	"!= neqLG",
 
-	". pnt",	", stk",	"; newrow"
+	". pnt",	", stk",	"; newrow",
 	//"+ add", 	"++ inc",	"+= addM", ///--------------- DBG
 
 	"/* comS", 	"*/ comE",	"// com",

@@ -406,6 +406,21 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						break;
 					case gpeALF_END:
 						pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
+						if( pMOM )
+						{
+							switch( pMOM->wip )
+							{
+								case gpeALF_CONSTR:
+								case gpeALF_FUNC:
+								case gpeALF_CYCLE:
+									pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
+									break;
+								default:
+									break;
+
+							}
+
+						}
 						if( !pMOM )
 							pMOM = pTHIS;
 						pLEV->AoBclr();
