@@ -345,6 +345,7 @@ typedef enum gpeALF: I8
 	gpeALF_4 = gpdABCD('Z', 'Z', 'Z', 'Z'),
 	//- 5 -----------------
 	gpeALF_ANDLG = gpdABCDE('A', 'N', 'D', 'L', 'G'),
+	gpeALF_ARRAY = gpdABCDE('A', 'R', 'R', 'A', 'Y'),
 	gpeALF_BEGIN = gpdABCDE('B', 'E', 'G', 'I', 'N'),
 	gpeALF_BLOCK = gpdABCDE('B', 'L', 'O', 'C', 'K'),
 	gpeALF_BOBER = gpdABCDE('B', 'O', 'B', 'E', 'R'),

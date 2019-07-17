@@ -177,12 +177,30 @@ public:
 
 		return this;
 	}
+	gpcCMPLlev* DAoBCclr( void )
+	{
+		if( !this )
+			return NULL;
+
+		pDEF = pA = pOP = pB = pCALL = NULL;
+
+		return this;
+	}
 	gpcCMPLlev* AoBclr( void )
 	{
 		if( !this )
 			return NULL;
 
 		pA = pOP = pB = NULL;
+
+		return this;
+	}
+	gpcCMPLlev* AoBCclr( void )
+	{
+		if( !this )
+			return NULL;
+
+		pA = pOP = pB = pCALL = NULL;
 
 		return this;
 	}

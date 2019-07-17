@@ -156,6 +156,7 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 		case gpeALF_CONSTR:
 		case gpeALF_FUNC:
 		case gpeALF_CYCLE:
+		//case gpeALF_ARRAY:
 			{
 				/*if( *pTAB )
 					pTAB++;
@@ -184,12 +185,20 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 					);
 			break;
 		default:
-			sprintf(
-						pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s.%c %d",
-								pCMPL->nPC(), iLEV, iPC,
-								pTAB,
-								pSTR, pTYP, sNDAT[n_dat], i_dat
-					);
+			if( n_dat )
+				sprintf(
+							pS, "%0.2d:%0.2d[%0.2d]0x%x%s%s\t%s.%c",
+									pCMPL->nPC(), iLEV, iPC, i_dat,
+									pTAB,
+									pSTR, pTYP, sNDAT[n_dat]
+						);
+			else
+				sprintf(
+							pS, "%0.2d:%0.2d[%0.2d] \t%s%s\t%s.%c",
+									pCMPL->nPC(), iLEV, iPC, //i_dat,
+									pTAB,
+									pSTR, pTYP, sNDAT[n_dat]
+						);
 			break;
 	}
 

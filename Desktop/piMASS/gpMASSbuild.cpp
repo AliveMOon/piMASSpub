@@ -359,7 +359,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
 	bool bABC;
-	cout << endl << "ASM:nP:lv[fd]\tstr\ttyp.sz\r\n-----------------------\r\n";
+	cout << endl << "ASM:nP:lv[fd]me\tstr\ttyp.sz\r\n-----------------------\r\n";
 
 	U4 floorLEV = mass.iLEV;
 
@@ -401,6 +401,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 /// 2. CLASS sNAME pDEF -> pMOM -----------------------------
 						if( pLEV->pDEF )
 							pMOM = pLEV->pDEF;
+						if( pLEV->pCALL )
+							pLEV->pCALL = NULL;
 						pLEV = pLEV->inc( pMOM );
 						pLEV->AoBclr();
 						break;
@@ -408,24 +410,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
 						if( pLEV->pFND )
 							pFND = pLEV->pFND;
-						/*if( pMOM )
-						{
-							switch( pMOM->wip )
-							{
-								case gpeALF_CONSTR:
-								case gpeALF_FUNC:
-								case gpeALF_CYCLE:
-								case gpeALF_CLASS:
-									pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
-									if( pLEV->pFND )
-										pFND = pLEV->pFND;
-									break;
-								default:
-									break;
 
-							}
-
-						}*/
 						if( !pMOM )
 							pMOM = pTHIS;
 						pLEV->AoBclr();
@@ -447,13 +432,40 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pLEV->DAoBclr();
 						if( pLEV->pFND )
 						{
-							pFND = pLEV->pFND;
+							//pLEV->pOP = pFND;
+							pFND = pLEV->pCALL = pLEV->pFND;
 							pLEV->pFND = NULL;
 						}
 						break;
+					case gpeALF_DIME:
+						if( pLEV->pFND )
+						{
+							pFND = pLEV->pFND;
+							pLEV->pFND = NULL;
+							pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
+							if( pFND->wip == gpeALF_ARRAY )
+							{
+								pFND->i_dat = pLEV->iDAT;
+								U4 nD = pFND->n_dat;
+								if( nD )
+								{
+									pMOM->n_dat += nD;
+									pLEV->iDAT += nD;
+								}
+							}
 
-					case gpeALF_NEWROW:
+						}
 						pLEV->AoBclr();
+						break;
+					case gpeALF_NEWROW:
+						if( !pLEV->pCALL )
+						{
+							pLEV->AoBclr();
+							break;
+						}
+
+						pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
+						pLEV->AoBCclr();
 						break;
 					case gpeALF_STK:
 						pLEV->AoBclr();
@@ -486,7 +498,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							{
 								case gpeALF_CYCLE:
 									pLEV = pLEV->inc( pMOM, pFND );
-									pMOM = pFND;
+									//pMOM = pFND;
 									pLEV->DAoBclr();
 									//pLEV = pLEV->inc( pMOM );
 									pFND = NULL;
@@ -519,12 +531,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				if( pNEW )
 				{
 					gpcCMPL& def = pLEV->pDEF ? *pLEV->pDEF : *pI4;
+					pNEW->typ = def.typ;
+
 					if( bFUN )
 					{
 						// van a végén zárójel
 						pNEW->wip = gpeALF_FUNC;
 						pNEW->iDEF = def.iPC;
-						pNEW->typ = def.typ;
 
 						char* p_str = pMOM->pPC( pCMPL, pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
 						U4 n_str = strlen( p_str );
@@ -546,19 +559,30 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pLEV = pLEV->inc( pMOM, pNEW );
 						pMOM = pNEW;
 						pLEV->DAoBclr();
-						//pLEV = pLEV->inc( pMOM );
 						pFND = NULL;
 					} else {
-						pNEW->wip = def.wip;
-						pNEW->typ = def.typ;
+						bool bARY = pSTR[nSTR-1] == '[';
 						pNEW->iDEF = def.iPC;
-						if( pNEW->n_dat = def.n_dat )
+						pNEW->n_dat = def.n_dat;
+						if( bARY )
 						{
-							pNEW->i_dat = pLEV->iDAT;
-							pMOM->n_dat += pNEW->n_dat;
-							pLEV->iDAT += pNEW->n_dat;
+							pNEW->wip = gpeALF_ARRAY;
+							if( pLEV->pDEF )
+								pMOM = pLEV->pDEF;
+							pLEV = pLEV->inc( pMOM, pNEW );
+							pMOM = pNEW;
+							pLEV->DAoBclr();
+							pFND = NULL;
+						} else {
+							pNEW->wip = def.wip;
+							if( pNEW->n_dat )
+							{
+								pNEW->i_dat = pLEV->iDAT;
+								pMOM->n_dat += pNEW->n_dat;
+								pLEV->iDAT += pNEW->n_dat;
+							}
+							pFND = pNEW;
 						}
-						pFND = pNEW;
 					}
 
 				}
@@ -589,7 +613,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				}
 			}
 
-			pCOUT = NULL;
+			//pCOUT = NULL;
 		}
 		if( pFND )
 		{
@@ -599,8 +623,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			nDAT = pLEV->iDAT;
 
 		if( pCOUT )
+		{
 			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "\r\n";
-
+			pCOUT = NULL;
+		}
 		if( pFND )
 			pFND = NULL;
 		/// --------------------------------
@@ -626,11 +652,18 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				pPUB += nSTR;
 				pS += nSTR;
 				pS += gpmNINCS( pS, " \t\r\n" );
-				if( *pS == '(' )
+				switch( *pS )
 				{
-					*pPUB = *pS;
-					nSTR++;
-					pS++;
+					case '(':
+						*pPUB = *pS;
+						nSTR++;
+						pS++;
+						break;
+					case '[':
+						*pPUB = *pS;
+						nSTR++;
+						pS++;
+						break;
 				}
 
 				iFND = pMOM->cmpl_find( &mass.CMPL, pSTR, nSTR );
@@ -662,10 +695,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pS = pE;
 					}
 					pFND = NULL;
+					nSTR = 0;
 					continue;
 				case gpeALF_COM: // "//"
 					pS += gpmVAN( pS, "\r\n", nLEN );
 					pFND = NULL;
+					nSTR = 0;
 					continue;
 				case gpeALF_STR:
 					{
