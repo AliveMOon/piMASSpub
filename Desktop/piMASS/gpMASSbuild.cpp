@@ -430,10 +430,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						break;
 
 					case gpeALF_BRAKE:
-						//pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
-						//if( !pMOM )
-						//	pMOM = pTHIS;
-
 						pLEV->DAoBclr();
 						if( pLEV->pFND )
 						{
@@ -495,12 +491,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						}
 
 						pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
-						if( pLEV->pOP )
-						if( pLEV->pOP->typ == gpeALF_CLASS )
-						{
-							pLEV->pOP = NULL;
-							pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
-						}
 						pLEV->AoBCclr();
 						break;
 					case gpeALF_STK:
