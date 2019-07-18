@@ -590,7 +590,7 @@ typedef enum gpeALF: I8
 } GPT_ALFA;
 
 U1*		gpf_aALF_init(void);
-U8		gpfALF2STR(char* p_out, I8 d0);
+U8 		gpfALF2STR( char* p_out, I8 d0 );
 gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
 
 

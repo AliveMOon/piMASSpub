@@ -1,7 +1,6 @@
 # depslib dependency file v1.0
-1563213609 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
+1563461731 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
 	"piMASS.h"
-	"gpcSRC.h"
 
 1563461797 /home/pi/Desktop/piMASS/piMASS.h
 	<exception>
@@ -359,80 +358,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1560761767 source:/home/dezso/Asztal/piMASSpub/Desktop/piMASS/piMASS_main.cpp
-	"piMASS.h"
-
-1560806877 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/piMASS.h
-	<exception>
-	<mysys.h>
-	<errno.h>
-	<stdio.h>
-	<malloc.h>
-	<string.h>
-	<ctime>
-	<fstream>
-	<iostream>
-	<raspicam/raspicam.h>
-	<unistd.h>
-	<inttypes.h>
-	<sys/stat.h>
-	<sys/socket.h>
-	<netinet/in.h>
-	<netinet/tcp.h>
-	<arpa/inet.h>
-	<ifaddrs.h>
-	<stdarg.h>
-	<sys/ioctl.h>
-	<sys/select.h>
-	<netdb.h>
-	<SDL.h>
-	<SDL2/SDL_image.h>
-	<X11/X.h>
-	<X11/Xlib.h>
-	<X11/Xutil.h>
-	"X11/bitmaps/gray"
-	<X11/Xatom.h>
-	<X11/Xcursor/Xcursor.h>
-	<linux/limits.h>
-
-1551346706 /usr/include/SDL2/SDL_shape.h
-	"SDL_stdinc.h"
-	"SDL_pixels.h"
-	"SDL_rect.h"
-	"SDL_surface.h"
-	"SDL_video.h"
-	"begin_code.h"
-	"close_code.h"
-
-1560807231 source:/home/dezso/Asztal/piMASSpub/Desktop/piMASS/gpcSRC.cpp
-	"gpcSRC.h"
-
-1560813998 /home/dezso/Asztal/piMASSpub/Desktop/piMASS/gpcSRC.h
-
-1562069860 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
-	"gpcSRC.h"
-
-1563461854 /home/pi/Desktop/piMASS/gpcSRC.h
-	"piMASS.h"
-	"gpcSCHL.h"
-	"gpcOPCD.h"
-
-1563461731 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
-	"piMASS.h"
-
-1562069860 source:/home/pi/Desktop/piMASS/gpcU14.cpp
-	"gpcSRC.h"
-
-1562069860 source:/home/pi/Desktop/piMASS/gpcU44.cpp
-	"gpcSRC.h"
-
-1563464573 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
-	"gpcSRC.h"
-
-1562069614 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
-	"gpcND.h"
-
-1562069860 /home/pi/Desktop/piMASS/include/gpcND.h
+1563461731 /home/pi/Desktop/piMASS/include/gpcOPCD.h
 	"gpcSRC.h"
 
 1563461854 /home/pi/Desktop/piMASS//gpcSRC.h
@@ -477,17 +403,41 @@
 	"gpcOPCD.h"
 	"gpeALF.h"
 
-1562069860 /home/pi/Desktop/piMASS/include/gpcSCHL.h
+1563465300 /home/pi/Desktop/piMASS/include/gpeALF.h
 	"piMASS.h"
 
-1563461731 /home/pi/Desktop/piMASS/include/gpcOPCD.h
-	"gpcSRC.h"
+1562069860 /home/pi/Desktop/piMASS/include/gpcSCHL.h
+	"piMASS.h"
 
 1563464516 source:/home/pi/Desktop/piMASS/gpcOPCD.cpp
 	"gpcSRC.h"
 
-1563376021 /home/pi/Desktop/piMASS/include/gpeALF.h
+1563461854 /home/pi/Desktop/piMASS/gpcSRC.h
 	"piMASS.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+
+1562069860 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
+	"gpcSRC.h"
+
+1562069860 source:/home/pi/Desktop/piMASS/gpcU14.cpp
+	"gpcSRC.h"
+
+1562069860 source:/home/pi/Desktop/piMASS/gpcU44.cpp
+	"gpcSRC.h"
+
+1563471819 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1563213609 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+
+1562069614 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
+	"gpcND.h"
+
+1562069860 /home/pi/Desktop/piMASS/include/gpcND.h
+	"gpcSRC.h"
 
 1563463007 source:/home/pi/Desktop/piMASS/src/gpcPROTO.cpp
 	"gpcSRC.h"
