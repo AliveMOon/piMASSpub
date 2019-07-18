@@ -1061,6 +1061,7 @@ public:
         return D4( x-b.x, y-b.y, z-b.z, w-b.w );
 	}
 };
+class gpcCMPL;
 
 class gpcLAZY
 {
@@ -1483,6 +1484,8 @@ szasz:
 	gpcLAZY* tree_add( I8 id, I8& n );
 
 	//U8 gpcLAZY::tree_fnd( U8 id, U8& n )
+	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
+	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_zero , U1* pS = NULL );
 };
 
 

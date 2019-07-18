@@ -342,7 +342,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		iTHIS = mass.PC.cmpl_find( pCMPL, pSTR, nSTR ), iFND, iR, iNEW, iSPARE;
 	U8 nLEN, nVAN, nALF;
 	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8],
-			*pI4 = pMOM->pPC( pCMPL, pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 )),	// talán sima int legyen?
+			*pI4 = pCMPL->pPC( pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 ) ),
+					//pMOM->pPC( pCMPL, pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 )),	// talán sima int legyen?
 			*pNEW = NULL, *pSPARE, *pTMP;
 	gpmZ(aR);
 
@@ -350,7 +351,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	{
 		iTHIS = mass.CMPL.nPC();
 		pMOM->cmpl_add( pCMPL, pSTR, nSTR );
-		pTHIS = pMOM->pPC( pCMPL, iTHIS );
+		pTHIS = pCMPL->pPC( iTHIS );
 		pTHIS->typ = pTHIS->wip = gpeALF_PRG;
 	}
 	U4 &nDAT = pTHIS->n_dat;
@@ -467,7 +468,18 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							break;
 						}
 
-						if( pLEV->pCALL->iSPARE )
+
+						if( pSPARE = pCMPL->pSPARE( pLEV->pCALL->iSPARE, gpeALF_FUNC ) )
+						{
+							pFND = pSPARE;
+							if( pTMP = pCMPL->pPC( pFND->iDEF ) )
+							if( pFND->n_dat != pTMP->n_dat )
+								pFND->n_dat = pTMP->n_dat;
+
+						} else
+							pFND = pLEV->pCALL;
+
+						/*if( pLEV->pCALL->iSPARE )
 						{
 							if( pLEV->pCALL->wip == gpeALF_FUNC )
 							{
@@ -487,8 +499,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
                                 pLEV->pCALL = NULL;
 							} else
 								pFND = pLEV->pCALL;
-
-						}
+						}*/
 
 						pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
 						pLEV->AoBCclr();
@@ -555,7 +566,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				{
 					case gpeALF_CLASS:
 							pMOM->cmpl_add(pCMPL, pSTR, nSTR );
-							pNEW = pMOM->pPC(pCMPL, iNEW );
+							pNEW = pCMPL->pPC( iNEW );
 							if( !pNEW )
 								break;
 /// 1. CLASS sNAME -> pDEF ----------------------------- // pl. class U1x4
@@ -579,7 +590,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			} else {
 				/// NINCS találat VAN string NINCS operator
 				pMOM->cmpl_add(pCMPL, pSTR, nSTR );
-				pNEW = pMOM->pPC(pCMPL, iNEW );
+				pNEW = pCMPL->pPC( iNEW );
 				if( pNEW )
 				{
 					gpcCMPL& def = pLEV->pDEF ? *pLEV->pDEF : *pI4;
@@ -591,7 +602,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pNEW->wip = gpeALF_FUNC;
 						pNEW->iDEF = def.iPC;
 
-						char* pSTRmom = pMOM->pPC( pCMPL, pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
+						char* pSTRmom = pCMPL->pPC( pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
 						U4 nSTRmom = strlen( pSTRmom );
 						if( nSTRmom+1 == nSTR )
 						{
@@ -610,7 +621,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							// hátha változó inicializálás
 							iSPARE = pCMPL->nPC();
 							pMOM->cmpl_add(pCMPL, pSTR, nSTR-1 );
-							pSPARE = pMOM->pPC(pCMPL, iSPARE );
+							pSPARE = pCMPL->pPC( iSPARE );
 							if( pSPARE )
 							{
 								pNEW->iSPARE = iSPARE;
@@ -634,7 +645,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 							iSPARE = pCMPL->nPC();
 							pMOM->cmpl_add(pCMPL, pSTR, nSTR-1 );
-							pSPARE = pMOM->pPC(pCMPL, iSPARE );
+							pSPARE = pCMPL->pPC( iSPARE );
 							if( pSPARE )
 							{
 								//
@@ -730,19 +741,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				continue;
 			}
 
-			pFND = pMOM->pPC( pCMPL, iFND );
-			if( !pFND->iREDIR )
-				continue;
-
-			if( pFND->iREDIR == pFND->iPC )
-				continue;
-
-			pFND = pMOM->pPC( pCMPL, pFND->iREDIR );
+			pFND = pCMPL->pPC( iFND );
 			continue;
 		}
 
 		iFND = pMOM->cmpl_best( pCMPL, pS, pE-pS );
-		pFND = pMOM->pPC( pCMPL, iFND );
+		pFND = pCMPL->pPC( iFND );
 		if( pFND->wip == gpeALF_OPER )
 		{
 			pS += pFND->n_str;

@@ -147,7 +147,7 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 		return pS;
 	}
 
-	char *pSTR = pPC( pCMPL, mPC )->p_kid->sSTRix( iKD, "Oxo" );
+	char *pSTR = pCMPL->pPC( mPC )->p_kid->sSTRix( iKD, "Oxo" );
 
 	if( !pSTR )
 		*pS = 0;
@@ -163,10 +163,10 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 				if( *pTAB )
 					pTAB++;*/
 				gpfALF2STR( pTYP, (I8)wip );
-				gpcCMPL* pD = pPC( pCMPL, iDEF );
+				gpcCMPL* pD = pCMPL->pPC( iDEF );
 				if( pD )
 				{
-					char *pDEF = pPC( pCMPL, pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
+					char *pDEF = pCMPL->pPC( pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
 					sprintf(
 								pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s.%s\t%s",
 										pCMPL->nPC(),
@@ -222,7 +222,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 		sprintf( pRa, "%d", pA->u8 );
 		psA = pRa;
 	}
-	else if( pM = pA->pPC( pCMPL, pA->mPC ) )
+	else if( pM = pCMPL->pPC( pA->mPC ) )
 	{
 		psA = pM->p_kid->sSTRix( pA->iKD, "-ASM:WARRNNING-" );
 	}
@@ -231,7 +231,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	{
 		psOP = NULL;
 	}
-	else if(	pM = pPC( pCMPL, mPC ) )
+	else if( pM = pCMPL->pPC( mPC ) )
 	{
 		psOP = pM->p_kid->sSTRix( iKD, "-ASM:WARRNNING-" );
 	}
@@ -241,7 +241,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 		sprintf( pRb, "%d", pB->u8 );
 		psB = pRb;
 	}
-	else if( pM = pB->pPC( pCMPL, pB->mPC ) )
+	else if( pM = pCMPL->pPC( pB->mPC ) )
 	{
 		psB = pM->p_kid->sSTRix( pB->iKD, "-ASM:WARRNNING-" );
 	}
@@ -267,7 +267,7 @@ U1* gpcMASS::msRST( U1* pS0 )
 		U8 s8;
 		PC.reset( &CMPL, pPUB );
 		aPC[0] = 0;
-		gpcCMPL* pPC = PC.pPC( &CMPL, 0 );
+		gpcCMPL* pPC = CMPL.pPC( 0, pS0 );
 		//pPC->i_str = 0;
 		pPUB += pPC->n_str+1;
 		iPC = 0;
@@ -287,9 +287,8 @@ U1* gpcMASS::msRST( U1* pS0 )
 			pS[nS] = 0;
 			pPUB += nS+1;
 
-			PC.pPC( &CMPL, 0 )
-				->cmpl_add( &CMPL, pS, nS );
-			pPC = PC.pPC( &CMPL, iPC );
+			CMPL.pPC( 0 )->cmpl_add( &CMPL, pS, nS );
+			pPC = CMPL.pPC( iPC );
 			if( !pPC )
 				continue;
 
@@ -320,8 +319,8 @@ U1* gpcMASS::msRST( U1* pS0 )
 			pPUB[nS] = 0;
 			pPUB += nS+1;
 
-			PC.pPC( &CMPL, 0 )->cmpl_add( &CMPL, pS, nS );
-			pPC = PC.pPC( &CMPL, iPC );
+			CMPL.pPC( 0 )->cmpl_add( &CMPL, pS, nS );
+			pPC = CMPL.pPC( iPC );
 			if( !pPC )
 				continue;
 			pPC->iPUB = pS-pS0;
@@ -388,6 +387,59 @@ I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB, char* pSTR )
 					);
 	return o;
 }
+gpcCMPL* gpcLAZY::pPC( U4 pc, U1* pS )
+{
+	gpcCMPL	**ppC = this ? (gpcCMPL**)p_alloc : NULL;
+	if( !ppC )
+		return NULL;
+	U4 n = nPC();
+	while( pc < n )
+	{
+		if( !pc )
+			return *ppC;
+		if( !ppC[pc] )
+			return NULL;
+
+		//if( !ppC[pc]->iREDIR )
+		if( ppC[pc]->iREDIR ? ( pc == ppC[pc]->iREDIR ) : true )
+			return ppC[pc];
+
+
+		pc = ppC[pc]->iREDIR;
+	}
+
+	return NULL;
+}
+
+gpcCMPL* gpcLAZY::pSPARE( U4 pc, gpeALF sw, U1* pS )
+{
+	gpcCMPL	**ppC = this ? (gpcCMPL**)p_alloc : NULL;
+	if( !ppC )
+		return NULL;
+	U4 n = nPC();
+	while( pc < n )
+	{
+		if( !pc )
+			return *ppC;
+		if( !ppC[pc] )
+			return NULL;
+
+		if( ppC[pc]->iSPARE ? (pc != ppC[pc]->iSPARE) : false )
+		if( sw ? ppC[pc]->wip == sw : true )
+		{
+
+			pc = ppC[pc]->iSPARE;
+			continue;
+		}
+
+		if( ppC[pc]->iREDIR ? ( pc == ppC[pc]->iREDIR ) : true )
+			return ppC[pc];
+
+		pc = ppC[pc]->iREDIR;
+	}
+
+	return NULL;
+}
 U4 gpcLAZY::nPC( void )
 {
 	if( !this )
@@ -421,9 +473,9 @@ gpcCMPL* gpcCMPL::sKIDlst( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
 	if( !n )
 	{
 		if( iINI )
-			pPC( pCMPL, iINI )->sKIDlst( pS0, pPUB, pCMPL, 'i' );
+			pCMPL->pPC( iINI )->sKIDlst( pS0, pPUB, pCMPL, 'i' );
 		else if( iDEF )
-			pPC( pCMPL, iDEF )->sKIDlst( pS0, pPUB, pCMPL, 'd' );
+			pCMPL->pPC( iDEF )->sKIDlst( pS0, pPUB, pCMPL, 'd' );
 		return this;
 	}
 
@@ -439,11 +491,11 @@ gpcCMPL* gpcCMPL::sKIDlst( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
 
 	for( U4 i = 0; i < n; i++ )
 	{
-		p_stuff = pPC( pCMPL, iKID( pCMPL, i ) );
+		p_stuff = pCMPL->pPC( iKID( pCMPL, i ) );
 		if( !p_stuff  )
 			continue;
 
-		p_def = pPC( pCMPL, p_stuff->iDEF ? p_stuff->iDEF : p_stuff->iDEC );
+		p_def = pCMPL->pPC( p_stuff->iDEF ? p_stuff->iDEF : p_stuff->iDEC );
 
 		pPUB += sprintf(
 							(char*)pPUB, "%s[%0.2d]%s,",
@@ -505,7 +557,7 @@ U4 gpcCMPL::cmpl_best( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	if( !ppC )
 		return 0;
 
-	gpcCMPL* pC = ppC[iPC]; //this; //*pCC = pPC( pCMPL, 0 );
+	gpcCMPL* pC = ppC[iPC]; //this; //*pCC = pCMPL->pPC( 0 );
 	U4 ifPC, nPC, iBST = 0, nBST = 0;
 
 	while( pC )

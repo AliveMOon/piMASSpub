@@ -45,7 +45,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 	{
 		iTHIS = mass.CMPL.nPC();
 		pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
-		pTHIS = pMOM->pPC( &mass.CMPL, iTHIS );
+		pTHIS = mass.CMPL.pPC( iTHIS );
 		pTHIS->typ = pTHIS->wip = gpeALF_PRG;
 	}
 	mass.incLEV();
@@ -86,13 +86,13 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 					/// NEMTALÁLT
 					continue;
 				}
-				pFND = pMOM->pPC( &mass.CMPL, iFND );
+				pFND = mass.CMPL.pPC( iFND );
 			}
 			continue;
 		}
 
 		iFND = pMOM->cmpl_best( &mass.CMPL, pS, pE-pS );
-		pFND = pMOM->pPC( &mass.CMPL, iFND );
+		pFND = mass.CMPL.pPC( iFND );
 		if( pFND->wip == gpeALF_OPER )
 		{
 			pS += pFND->n_str;
@@ -184,7 +184,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 	{
 		iTHIS = mass.CMPL.nPC();
 		pMOM->cmpl_add( &mass.CMPL, pSTR, nSTR );
-		pTHIS = pMOM->pPC( &mass.CMPL, iTHIS );
+		pTHIS = mass.CMPL.pPC( iTHIS );
 		pTHIS->typ = pTHIS->wip = gpeALF_PRG;
 	}
 	mass.incLEV();
@@ -225,13 +225,13 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 					/// NEMTALÁLT
 					continue;
 				}
-				pFND = pMOM->pPC( &mass.CMPL, iFND );
+				pFND = mass.CMPL.pPC( iFND );
 			}
 			continue;
 		}
 
 		iFND = pMOM->cmpl_best( &mass.CMPL, pS, pE-pS );
-		pFND = pMOM->pPC( &mass.CMPL, iFND );
+		pFND = mass.CMPL.pPC( iFND );
 		if( pFND->wip == gpeALF_OPER )
 		{
 			pS += pFND->n_str;

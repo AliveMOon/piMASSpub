@@ -521,11 +521,11 @@ public:
 
 	gpcCMPL* piLEVmom( void )
 	{
-		return PC.pPC( &CMPL, aPC[iLEV-1] );
+		return CMPL.pPC( aPC[iLEV-1] );
 	}
 	gpcCMPL* piLEViPC( void )
 	{
-		return PC.pPC( &CMPL, aPC[iLEV] );
+		return CMPL.pPC( aPC[iLEV] );
 	}
 	U4 incLEV( void )
 	{

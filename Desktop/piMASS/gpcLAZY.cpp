@@ -113,3 +113,4 @@ gpcLAZY* gpcLAZY::tree_add( I8 id, I8& n )
 	n_load = s*sizeof(*p_i84);
 	return this;
 }
+
