@@ -359,7 +359,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
 	bool bABC;
-	cout << endl << "ASM:nP:lv[fd]me\tstr\ttyp.sz\r\n-----------------------\r\n";
+	cout << endl << "nP:MM.iK[fd]dt\tstr\ttyp.sz\r\n-----------------------\r\n";
 
 	U4 floorLEV = mass.iLEV;
 
@@ -374,9 +374,10 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	if( pTHIS )
 	{
+		pLEV->pMOM = pTHIS;
 		pCOUT = pTHIS->sLOG( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, &mass.CMPL );
-		/*if( pCOUT )
-			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "\r\n";*/
+		cout << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "L" << pLEV->iLEV <<"\r\n"<<endl;
+		pCOUT = NULL;
 	}
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS <= pE; pS += gpmNINCS( pS, " \t\r\n" ) )
@@ -397,17 +398,18 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				switch( pFND->typ )
 				{
 
-					case gpeALF_BEGIN:
-/// 2. CLASS sNAME pDEF -> pMOM ----------------------------- // pl. class U1x4 {
+					case gpeALF_BEGIN:							// '{'
+/// 2. CLASS sNAME pDEF -> pMOM -----------------------------	// pl. class U1x4 {
 						if( pLEV->pDEF )
-							pMOM = pLEV->pDEF;					/// pl. 81:02[80] U1x4 ez lesz az anya, ebbe akarok def.
+							pMOM = pLEV->pDEF;					// pl. 81:02[80] U1x4 ez lesz az anya, ebbe akarok def.
 						if( pLEV->pCALL )
 						{
 							pFND = pLEV->pCALL;
 							pLEV->pCALL = NULL;
 						}
-						pLEV = pLEV->inc( pMOM );
 						pLEV->AoBclr();
+						//pLEV = pLEV->inc( pMOM );
+						//pLEV->DAoBclr();
 						break;
 					case gpeALF_END:
 						pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
@@ -468,6 +470,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pLEV->AoBclr();
 							break;
 						}
+
 						if( pLEV->pCALL->iSPARE )
 						{
 							if( pLEV->pCALL->wip == gpeALF_FUNC )
@@ -490,7 +493,14 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								pFND = pLEV->pCALL;
 
 						}
+
 						pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
+						if( pLEV->pOP )
+						if( pLEV->pOP->typ == gpeALF_CLASS )
+						{
+							pLEV->pOP = NULL;
+							pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
+						}
 						pLEV->AoBCclr();
 						break;
 					case gpeALF_STK:
@@ -498,7 +508,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						break;
 
 					case gpeALF_CLASS:
-						// osztájt akar valaki dec/def-iniálni?
+						// osztájt akar valaki dec/def-incializálni?
 						/// egy új CLASS élete azzal kezdödik hogy
 /// 0. CLASS -> pOP ------------------------------- // pl. class
 					default:
@@ -512,6 +522,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				switch( pFND->typ )
 				{
                     case gpeALF_DEF:
+/// 3. CLASS pLEV->pDEF = "U1" -----------------------------	// pl. class U1x4 { U1
 						pLEV->pDEF = pFND;
 
 						break;
@@ -542,11 +553,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		else if( nSTR )
 		{
 			/// -----------------------------
-			/// 		NEM TALÁLAT de VAN string
+			/// 		NINCS találat VAN string
 			/// -----------------------------
 
 			iNEW = pCMPL->nPC();
-			bool bFUN = pSTR[nSTR-1] == '(';		// fügvényt szeretnénk?
+			bool bFUN = pSTR[nSTR-1] == '(';		// Fügvényt szeretnénk?
 			if( pLEV->pOP )
 			{
 				/// NINCS találat VAN string VAN operator
@@ -562,7 +573,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pNEW->typ = gpeALF_DEF;
 							pNEW->iDEF = pNEW->iPC;
 
-							pLEV->pOP = NULL; // ezt az operátort törlöm
+							/// ezt az operátort törlöm ???
+							//pLEV->pOP = NULL;
+							/// ezt az operátort törlöm ???
 
 							pFND =
 							pLEV->pDEF = pNEW;			// pl. U1x4
@@ -649,6 +662,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pLEV->DAoBclr();
 							pFND = NULL;
 						} else {
+/// 4. CLASS pNEW->wip = gpeALF_CLASS, typ = gpeALF_DEF-----------------------------	// pl. class U1x4 { U1 x
 							pNEW->wip = def.wip;
 							if( pNEW->n_dat )
 							{
@@ -674,7 +688,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 		if( pCOUT )
 		{
-			cout << "ASM:" << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "L" << pLEV->iLEV <<"\r\n";
+			cout << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "L" << pLEV->iLEV <<"\r\n";
 			pCOUT = NULL;
 		}
 		if( pFND )

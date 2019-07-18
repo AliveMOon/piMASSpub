@@ -168,34 +168,39 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 				{
 					char *pDEF = pPC( pCMPL, pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
 					sprintf(
-								pS, "%0.2d:%0.2d[%0.2d]%s%s.%s\t%s",
-										pCMPL->nPC(), iLEV, iPC,
+								pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s.%s\t%s",
+										pCMPL->nPC(),
+										mPC, iKD, iPC, //iLEV, mPC, iPC,
 										pTAB,
-										pDEF, pSTR, pTYP //, sNDAT[n_dat]
+										pDEF, pSTR, pTYP
 							);
 					break;
 				}
 			}
 		case gpeALF_OPER:
 			sprintf(
-						pS, "%0.2d:%0.2d[%0.2d]%s%s\t%s",
-								pCMPL->nPC(), iLEV, iPC,
+						pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s\t%s",
+								pCMPL->nPC(),
+								mPC, iKD, iPC, //iLEV, mPC, iPC,
 								pTAB,
-								pSTR, pTYP//, sNDAT[n_dat]
+								pSTR, pTYP
 					);
 			break;
 		default:
 			if( n_dat )
 				sprintf(
-							pS, "%0.2d:%0.2d[%0.2d]0x%x%s%s\t%s.%c",
-									pCMPL->nPC(), iLEV, iPC, i_dat,
+							pS, "%0.2d:%0.2d.%0.2d[%0.2d]0x%x%s%s\t%s.%c",
+									pCMPL->nPC(),
+									mPC, iKD, iPC, //iLEV, mPC, iPC,
+									 i_dat,
 									pTAB,
 									pSTR, pTYP, sNDAT[n_dat]
 						);
 			else
 				sprintf(
-							pS, "%0.2d:%0.2d[%0.2d] %s%s\t%s.%c",
-									pCMPL->nPC(), iLEV, iPC, //i_dat,
+							pS, "%0.2d:%0.2d.%0.2d[%0.2d] %s%s\t%s.%c",
+									pCMPL->nPC(),
+									mPC, iKD, iPC, //iLEV, mPC, iPC,
 									pTAB,
 									pSTR, pTYP, sNDAT[n_dat]
 						);
