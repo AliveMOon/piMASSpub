@@ -58,6 +58,7 @@ U4  U4x4::dict_add( U1* p_src, U4& m, U4x4& w )
 				return n_w+1;
 			}
 
+			m = cd;				/// ez nem volt
 			cd = p_w[cd].z;
 			continue;
 		}
