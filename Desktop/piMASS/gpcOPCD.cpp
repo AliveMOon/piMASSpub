@@ -187,7 +187,10 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 					);
 			break;
 		default:
-			if( n_dat )
+			if(
+					n_dat
+					//&& (iPC == pCMPL->nPC()-1)
+				)
 				sprintf(
 							pS, "%0.2d:%0.2d.%0.2d[%0.2d]0x%x%s%s\t%s.%c",
 									pCMPL->nPC(),
@@ -387,12 +390,13 @@ I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB, char* pSTR )
 					);
 	return o;
 }
-gpcCMPL* gpcLAZY::pPC( U4 pc, U1* pS )
+gpcCMPL* gpcLAZY::pPC( U4 pc, U1* pPUB )
 {
 	gpcCMPL	**ppC = this ? (gpcCMPL**)p_alloc : NULL;
 	if( !ppC )
 		return NULL;
 	U4 n = nPC();
+	U1* pS = pPUB;
 	while( pc < n )
 	{
 		if( !pc )
@@ -400,10 +404,12 @@ gpcCMPL* gpcLAZY::pPC( U4 pc, U1* pS )
 		if( !ppC[pc] )
 			return NULL;
 
+		if( pPUB )
+			pS = pPUB+ppC[pc]->iPUB;
+
 		//if( !ppC[pc]->iREDIR )
 		if( ppC[pc]->iREDIR ? ( pc == ppC[pc]->iREDIR ) : true )
 			return ppC[pc];
-
 
 		pc = ppC[pc]->iREDIR;
 	}

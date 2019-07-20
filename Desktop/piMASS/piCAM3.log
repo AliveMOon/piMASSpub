@@ -11,6 +11,7 @@ nP:MM.iK[fd]dt	str	typ.sz
 -----------------------
 80:00.78[79] 	main	main.-	0/0L3
 
+opF mom: class NULL<-main
 80:00.73[74]	class	class	0/0L3
 81:79.00[80] 	U1x4	def.-	0/0L3
 81:00.47[48]	{	begin	0/0L3
@@ -23,6 +24,7 @@ nP:MM.iK[fd]dt	str	typ.sz
 84:00.04[05]	,	stk	3/3L3
 85:80.03[84]0x3	w	def.b	4/4L3
 85:00.05[06]	;	newrow	4/4L3
+STR mom: U1x4( main<-U1x4
 86:00.54[55]0x0		U1	def.b	4/4L4
 87:85.00[86]0x4		X	def.b	5/5L4
 87:00.04[05]		,	stk	5/5L4
@@ -31,6 +33,8 @@ nP:MM.iK[fd]dt	str	typ.sz
 89:85.02[88]0x6		Z	def.b	7/7L4
 89:00.04[05]		,	stk	7/7L4
 90:85.03[89]0x7		W	def.b	8/8L4
+opF call:  NULL<-U1x4(U1
+opF call: U1x4(U1<- NULL
 90:80.04[85]		U1x4.U1x4(	constr	8/8L4
 90:80.00[81]0x0		x	def.b	8/8L4
 90:00.23[24]		=	mov	8/8L4
@@ -48,6 +52,7 @@ nP:MM.iK[fd]dt	str	typ.sz
 90:00.23[24]		=	mov	8/8L4
 90:85.03[89]0x7		W	def.b	8/8L4
 90:00.05[06]		;	newrow	8/8L4
+opF mom: }U1x4<-main
 90:00.48[49]	}	end	4/8L3
 90:00.48[49]	}	end	4/8L3
 90:00.05[06]	;	newrow	4/8L3
@@ -67,6 +72,8 @@ nP:MM.iK[fd]dt	str	typ.sz
 92:00 R2u		3 	4/8L4
 92:00.28[29]		+	add	4/8L4
 92:00 R3u		3 	4/8L4
+opF call:  NULL<-xyzw(u
+opF call: xyzw(u<- NULL
 92:79.02[91]0x0	xyzw	def.l	4/8L3
 92:00.54[55]0x0	U1	def.b	4/8L3
 93:79.03[92]0x4	a	def.b	5/9L3
@@ -77,7 +84,9 @@ nP:MM.iK[fd]dt	str	typ.sz
 94:00.23[24]	=	mov	6/10L3
 94:00 R5u	0 	6/10L3
 94:00.04[05]	,	stk	6/10L3
+STR mom: a1D[ main<-U1
 96:00 R6u		10 	6/10L4
+opF mom: a1D[uU1<-main
 96:79.05[94]0x6	a1D[	def.b	7/11L3
 96:00.05[06]	;	newrow	7/11L3
 96:00.56[57]0x0		U4	def.l	7/11L4
@@ -91,6 +100,8 @@ nP:MM.iK[fd]dt	str	typ.sz
 97:00.05[06]		;	newrow	11/15L4
 97:79.07[96]0x7		i	def.l	11/15L4
 97:00.29[30]		++	inc	11/15L4
+opF call:  NULL<-for(
+opF call: for(<- NULL
 97:00.66[67]		!.for(	cycle	11/15L4
 97:79.03[92]0x4		a	def.b	11/15L4
 97:00.30[31]		+=	addm	11/15L4
@@ -104,12 +115,13 @@ nP:MM.iK[fd]dt	str	typ.sz
 97:79.05[94]0x6		a1D[	def.b	11/15L4
 97:79.07[96]0x7		i	def.l	11/15L4
 97:00.19[20]		%	rem	11/15L4
-97:00.64[65]		!.sizeof(	func	11/15L4
-97:00.44[45]		)	brake	11/15L4
-97:00.46[47]		]	dime	11/15L4
-97:00.23[24]		=	mov	11/15L4
-97:79.03[92]0x4		a	def.b	11/15L4
-97:00.05[06]		;	newrow	11/15L4
-97:00.48[49]	}	end	7/15L3
+97:79.05[94]0x6			a1D[	def.b	11/15L5
+opF call:  NULL<-sizeof(
+opF call: sizeof(<- NULL
+97:00.64[65]			!.sizeof(	func	11/15L5
+97:00.23[24]			=	mov	11/15L5
+97:79.03[92]0x4			a	def.b	11/15L5
+97:00.05[06]			;	newrow	11/15L5
+97:00.48[49]		}	end	11/15L4
 
 alDAT:0BLD/VER:01

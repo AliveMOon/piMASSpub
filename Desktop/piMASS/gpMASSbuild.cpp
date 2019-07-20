@@ -339,12 +339,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	U4	nSTRpool = 0,
 		nSTR = gpfALF2STR( (char*)pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
-		iTHIS = mass.PC.cmpl_find( pCMPL, pSTR, nSTR ), iFND, iR, iNEW, iSPARE;
+		iTHIS = mass.PC.cmpl_find( pCMPL, pSTR, nSTR ), iFND, iR, iNEW, iSPARE, iREDIR;
 	U8 nLEN, nVAN, nALF;
 	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8],
 			*pI4 = pCMPL->pPC( pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 ) ),
 					//pMOM->pPC( pCMPL, pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 )),	// talán sima int legyen?
-			*pNEW = NULL, *pSPARE, *pTMP;
+			*pNEW = NULL, *pSPARE, *pTMP, *pREDIR, *pDm = NULL, *pDc = NULL;
 	gpmZ(aR);
 
 	if( pMOM->iPC != iTHIS )
@@ -405,12 +405,12 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pMOM = pLEV->pDEF;					// pl. 81:02[80] U1x4 ez lesz az anya, ebbe akarok def.
 						if( pLEV->pCALL )
 						{
+							// ez a zárójel pCALL-ja
 							pFND = pLEV->pCALL;
 							pLEV->pCALL = NULL;
 						}
+
 						pLEV->AoBclr();
-						//pLEV = pLEV->inc( pMOM );
-						//pLEV->DAoBclr();
 						break;
 					case gpeALF_END:
 						pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
@@ -434,7 +434,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						pLEV->DAoBclr();
 						if( pLEV->pFND )
 						{
-							//pLEV->pOP = pFND;
 							pLEV->pCALL = pLEV->pFND;
 
 							pFND =
@@ -442,6 +441,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						}
 						break;
 					case gpeALF_DIME:
+						if( pLEV->pCALL )
+						{
+							// ez a zárójel pCALL-ja
+							pFND = pLEV->pCALL;
+							pLEV->pCALL = NULL;
+						}
+
 						if( pLEV->pFND )
 						{
 							pFND = pLEV->pFND;
@@ -475,31 +481,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							if( pTMP = pCMPL->pPC( pFND->iDEF ) )
 							if( pFND->n_dat != pTMP->n_dat )
 								pFND->n_dat = pTMP->n_dat;
-
 						} else
 							pFND = pLEV->pCALL;
 
-						/*if( pLEV->pCALL->iSPARE )
-						{
-							if( pLEV->pCALL->wip == gpeALF_FUNC )
-							{
-                                // ki kell cserélni a sparéra
-                                pFND = pLEV->pCALL->pPC( pCMPL, pLEV->pCALL->iSPARE );
-                                if( pFND )
-                                {
-									if( pFND->iDEF )
-									{
-										pTMP = pLEV->pCALL->pPC( pCMPL, pFND->iDEF );
-										if( pFND->n_dat != pTMP->n_dat )
-										{
-											pFND->n_dat = pTMP->n_dat;
-										}
-									}
-                                }
-                                pLEV->pCALL = NULL;
-							} else
-								pFND = pLEV->pCALL;
-						}*/
 
 						pMOM = ( pLEV = pLEV->dec(floorLEV) )->pMOM;
 						pLEV->AoBCclr();
@@ -518,8 +502,29 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 				}
 
+				if( pDm != pLEV->pMOM )
+				{
+					cout 	<< "opF mom: "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : " NULL" )
+									<< ( pDm ? (char*)gpsSTRpub+pDm->iPUB : " NULL" )
+							<< "<-"
+									<< ( pLEV->pMOM ?  (char*) gpsSTRpub+pLEV->pMOM->iPUB : " NULL" )
+							<< endl;
+					pDm = pLEV->pMOM;
+				}
+				if( pDc != pLEV->pCALL )
+				{
+					cout 	<< "opF call: "
+							//<< (char*)pSTR
+									<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: " NULL" )
+							<< "<-"
+									<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: " NULL" )
+							<< endl;
+					pDc = pLEV->pCALL;
+				}
+
 			} else {
-				// IGEN TALÁLAT nem OPERATOR
+				// IGEN találat NEM operator
 				switch( pFND->typ )
 				{
                     case gpeALF_DEF:
@@ -556,7 +561,26 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						}
 						break;
 				}
-
+				if( pDm != pLEV->pMOM )
+				{
+					cout 	<< "FND mom: "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : " NULL" )
+									<< ( pDm ? (char*)gpsSTRpub+pDm->iPUB : " NULL" )
+							<< "<-"
+									<< ( pLEV->pMOM ?  (char*) gpsSTRpub+pLEV->pMOM->iPUB : " NULL" )
+							<< endl;
+					pDm = pLEV->pMOM;
+				}
+				if( pDc != pLEV->pCALL )
+				{
+					cout 	<< "FND call: "
+							//<< (char*)pSTR
+									<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: " NULL" )
+							<< "<-"
+									<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: " NULL" )
+							<< endl;
+					pDc = pLEV->pCALL;
+				}
 			}
 
 		}
@@ -567,7 +591,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			/// -----------------------------
 
 			iNEW = pCMPL->nPC();
-			//bool bFUN = pSTR[nSTR-1] == '(';		// Fügvényt szeretnénk?
 			if( pLEV->pOP )
 			{
 				/// NINCS találat VAN string VAN operator
@@ -613,6 +636,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						case '(':
 							// van a végén zárójel
 							pNEW->wip = gpeALF_FUNC;
+
 							{
 								char* pSTRmom = pCMPL->pPC( pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
 								U4 nSTRmom = strlen( pSTRmom );
@@ -632,7 +656,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							{
 								// ha nem lett constructor
 								// funkciónak látszó izé
-								// hátha változó inicializálás
+								// de attól még lehet VáLTOZó inicializálás is
+								// ezért csinálunk annak egy TARTALéKOT háha
 								iSPARE = pCMPL->nPC();
 								pMOM->cmpl_add(pCMPL, pSTR, nSTR-1 );
 								pSPARE = pCMPL->pPC( iSPARE );
@@ -654,19 +679,20 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pNEW->wip = gpeALF_ARRAY;
 							pNEW->n_dat = def.n_dat;
 
-							iSPARE = pCMPL->nPC();
+							iREDIR = pCMPL->nPC();
 							pMOM->cmpl_add(pCMPL, pSTR, nSTR-1 );
-							pSPARE = pCMPL->pPC( iSPARE );
-							if( pSPARE )
+							pREDIR = pCMPL->pPC( iREDIR );
+							if( pREDIR )
 							{
-								//
-								pSPARE->iPUB = pNEW->iPUB;
-								pSPARE->iDEF = def.iPC;
-								pSPARE->n_dat = def.n_dat;
-								pSPARE->wip = pNEW->wip;
-								pSPARE->typ = pNEW->typ;
-								pSPARE->iREDIR = pNEW->iPC;
-								//pNEW->iREDIR = iSPARE;
+								// REDIR meg arra lesz jó, hogy pl aIZE[]
+								// megtaláljuk a sizeof(aIZE) vel is
+								// vagy *aIZE, aIZE->, etc....
+								pREDIR->iPUB = pNEW->iPUB;
+								pREDIR->iDEF = def.iPC;
+								pREDIR->n_dat = def.n_dat;
+								pREDIR->wip = pNEW->wip;
+								pREDIR->typ = pNEW->typ;
+								pREDIR->iREDIR = pNEW->iPC;
 							}
 
 							if( pLEV->pDEF )
@@ -692,7 +718,26 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					}
 				}
 			}
-
+			if( pDm != pLEV->pMOM )
+			{
+				cout 	<< "STR mom: "
+						<< (char*)pSTR << " "
+								<< ( pDm ? (char*) gpsSTRpub+pDm->iPUB	: " NULL" )
+						<< "<-"
+								<< ( pLEV->pMOM ? (char*) gpsSTRpub+pLEV->pMOM->iPUB	: " NULL" )
+						<< endl;
+				pDm = pLEV->pMOM;
+			}
+			if( pDc != pLEV->pCALL )
+			{
+				cout 	<< "STR call: "
+						<< (char*)pSTR << " "
+								<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: " NULL" )
+						<< "<-"
+								<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: " NULL" )
+						<< endl;
+				pDc = pLEV->pCALL;
+			}
 			//pCOUT = NULL;
 		}
 		if( pFND )
@@ -747,7 +792,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					pS++;
 					break;
 			}
-
+			pSTR[nSTR] = 0;
+			pPUB++;
 			iFND = pMOM->cmpl_find( pCMPL, pSTR, nSTR );
 			if( !iFND )
 			{
@@ -756,7 +802,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				continue;
 			}
 
-			pFND = pCMPL->pPC( iFND );
+			pFND = pCMPL->pPC( iFND, gpsSTRpub );
 			continue;
 		}
 
@@ -791,7 +837,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pSTRpool = p_str;
 							nSTRpool = 0;
 						}
-					while( (pS < pE) ? (*pS != '\"' ) : false )
+						while( (pS < pE) ? (*pS != '\"' ) : false )
 						{
 							pSTR = pS+gpmVAN( pS, "\"", nLEN );
 							if( pSTR < pE )
