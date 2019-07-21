@@ -68,7 +68,7 @@ static const gpcOPCD gpaOPCi[] = {
 
 
 };
-char* gpasOPER[] = {
+const char* gpasOPER[] = {
 
 
 	"! inv",	"!! LG",	"!= neqLG",
@@ -147,7 +147,7 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 		return pS;
 	}
 
-	char *pSTR = pCMPL->pPC( mPC )->p_kid->sSTRix( iKD, "Oxo" );
+	char *pSTR = (char*)pCMPL->pPC( mPC )->p_kid->sSTRix( iKD, "Oxo" );
 
 	if( !pSTR )
 		*pS = 0;
@@ -166,7 +166,7 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 				gpcCMPL* pD = pCMPL->pPC( iDEF );
 				if( pD )
 				{
-					char *pDEF = pCMPL->pPC( pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
+					char *pDEF = (char*)pCMPL->pPC( pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
 					sprintf(
 								pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s.%s\t%s",
 										pCMPL->nPC(),
@@ -227,7 +227,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	}
 	else if( pM = pCMPL->pPC( pA->mPC ) )
 	{
-		psA = pM->p_kid->sSTRix( pA->iKD, "-ASM:WARRNNING-" );
+		psA = (char*)pM->p_kid->sSTRix( pA->iKD, "-ASM:WARRNNING-" );
 	}
 
 	if( !this )
@@ -236,7 +236,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	}
 	else if( pM = pCMPL->pPC( mPC ) )
 	{
-		psOP = pM->p_kid->sSTRix( iKD, "-ASM:WARRNNING-" );
+		psOP = (char*)pM->p_kid->sSTRix( iKD, "-ASM:WARRNNING-" );
 	}
 
 	if( pB->wip == gpeALF_REG )
@@ -246,7 +246,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	}
 	else if( pM = pCMPL->pPC( pB->mPC ) )
 	{
-		psB = pM->p_kid->sSTRix( pB->iKD, "-ASM:WARRNNING-" );
+		psB = (char*)pM->p_kid->sSTRix( pB->iKD, "-ASM:WARRNNING-" );
 	}
 
 	gpfALF2STR( pASMop, (I8)typ );

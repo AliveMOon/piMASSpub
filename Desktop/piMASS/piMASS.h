@@ -21,6 +21,76 @@
 //~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //~ SOFTWARE.
+#ifdef _WIN64
+
+	#pragma once
+	#define _CRT_SECURE_NO_WARNINGS
+	#pragma warning( push )
+	#pragma warning( disable : 4995 )
+
+	#include <stdlib.h>
+	#include <io.h>
+	#include <direct.h>
+	#include <malloc.h>
+	#include <memory.h>
+	#include <WinSock2.h>
+	#include <ws2tcpip.h>
+	#define bzero( a, n ) ( (void*)memset( a, 0, n ) )
+	#define PATH_MAX _MAX_PATH
+	//#define close( h ){ if( h != INVALID_SOCKET ){ closesocket( h ); h = INVALID_SOCKET; } }
+	#define ace _access
+	#define mkd( a, b ) ( _mkdir( a ) )
+	#define usleep Sleep
+	#define sleep Sleep
+	#define gpmALLOC( n ) ((U1*)_mm_malloc( n, 0x10 ))
+	#define gpmFREE( p ) _aligned_free( p )
+	#define gpmFD_CLOSE( h ){ if( h ){ CloseHandle( h ); h = 0; } }
+	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
+
+	#pragma comment (lib, "iphlpapi.lib")
+	#pragma comment (lib, "ws2_32.lib")
+
+
+#else
+
+	#ifdef gpdSYSpi
+	#include <raspicam/raspicam.h>
+	#endif // gpdSYSpi
+	#include <unistd.h> // for usleep()
+
+	#include <sys/socket.h>
+	#include <sys/ioctl.h>
+	#include <sys/select.h>
+	#include <sys/stat.h>
+
+	#include <netdb.h>
+	#include <ifaddrs.h>
+	#include <netinet/in.h>
+	#include <netinet/tcp.h>
+	#include <arpa/inet.h>
+	#include <X11/X.h>
+	#include <X11/Xlib.h>
+	#include <X11/Xutil.h>
+	#include "X11/bitmaps/gray"
+	#include <X11/Xatom.h>
+	//#include <X11/Xmu/CurUtil.h>
+	#include <X11/Xcursor/Xcursor.h>
+	#include <linux/limits.h>
+	//#include <bits/stdc++.h>
+	#include <GL/glew.h>
+
+	typedef int			SOCKET;
+	typedef sockaddr	SOCKADDR;
+	typedef sockaddr_in	SOCKADDR_IN; //struct	sockaddr_in	addrinfo;
+
+	#define ace access
+	#define mkd( a, b ) ( mkdir( a,b ) )
+	#define gpmALLOC( n ) ((U1*)memalign( 0x10, n ))
+	#define gpmFREE( p ) free( p )
+	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
+	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
+
+#endif
 
 #include <exception>
 #include <mysys.h>
@@ -32,36 +102,17 @@
 #include <fstream>
 #include <iostream>
 
-#ifdef gpdSYSpi
-    #include <raspicam/raspicam.h>
-#endif // gpdSYSpi
 
-#include <unistd.h> // for usleep()
 #include <inttypes.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <ifaddrs.h>
+
 #include <stdarg.h>
-#include <sys/ioctl.h>
-#include <sys/select.h>
-#include <netdb.h>
+
 #include <SDL.h>			//-lSDL2
-#include <SDL2/SDL_image.h>
+#include <SDL_image.h>
 
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include "X11/bitmaps/gray"
-#include <X11/Xatom.h>
-//#include <X11/Xmu/CurUtil.h>
-#include <X11/Xcursor/Xcursor.h>
-#include <linux/limits.h>
-//#include <bits/stdc++.h>
 
-#include <GL/glew.h>
+
+
 #include <math.h>
 
 
@@ -89,9 +140,7 @@ typedef int64_t		I8;
 typedef I8			LL;
 
 
-typedef int			SOCKET;
-typedef sockaddr	SOCKADDR;
-typedef sockaddr_in	SOCKADDR_IN; //struct	sockaddr_in	addrinfo;
+
 
 class float2;
 class float3;
@@ -129,7 +178,7 @@ class gpcMASS;
 #define gpmSTR2U8( p, r )	strtol( (char*)(p), (char**)&(p), (r) )
 #define gpdVAN	strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
-#define gpmCLR	(this ? bzero( this, sizeof(*this) ) : (void)0)
+#define gpmCLR	if( this ) bzero( this, sizeof(*this) )
 #define gpmN( p ) ( sizeof(p)/sizeof(*p) )
 #define gpmZ( p ) bzero( &p, sizeof(p) )
 #define gpmZn( p, n ) bzero( (p), (n)*sizeof(*(p)) )
@@ -149,8 +198,8 @@ class gpcMASS;
 #define gpmMEMCPY( d, s, n ) \
 			(														\
 				( (n)&&(d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\
-				? ( memcpy( (d), (s), ((n)*sizeof(*(d))) ) )		\
-				: ( (void*)d )  									\
+				? ( (char*)memcpy( (d), (s), ((n)*sizeof(*(d))) ) )		\
+				: ( (char*)d )  									\
 			)
 #define gpmSTRnCPY( d, s, n ) \
 			(														\
@@ -164,17 +213,8 @@ class gpcMASS;
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
 
-#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
-#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = NULL; } }
-SOCKET inline gpfSOC_CLOSE( SOCKET& h )
-{
-	if( h == INVALID_SOCKET )
-		return INVALID_SOCKET;
 
-	close( h );
-	h = INVALID_SOCKET;
-	return h;
-}
+
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nLEN, U1* gpaALFadd )
 {
@@ -294,7 +334,7 @@ int inline gpfACE( const I1* p_file, I4 mode )
 	if( !p_file )
 		return -1; // ha negatív nem elérhetõ
 
-	int io = access( p_file, mode );
+	int io = ace( p_file, mode );
 	return io;
 }
 bool inline gpfMKDR( char* p_buff, const char* p_new )
@@ -314,7 +354,8 @@ bool inline gpfMKDR( char* p_buff, const char* p_new )
 		if( gpfACE( p_buff, 0 ) > -1 )
 			break;
 
-		mi = mkdir( p_buff, S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH );
+		mi = //mkdir
+				mkd( p_buff, S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH );
 		if( mi > -1 )
 			break;
 
@@ -325,7 +366,8 @@ bool inline gpfMKDR( char* p_buff, const char* p_new )
 		p_last += gpmSTRLEN( p_last );
 		if( gpfACE( p_buff, 0 ) > -1 )
 			break;
-		mi = mkdir( p_buff, S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH );
+		mi = //mkdir
+				mkd( p_buff, S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH );
 
 	}
 	return p_last == p_first;
@@ -345,7 +387,7 @@ inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
 	*p2P = 0;
 	return p2P;
 }
-inline void* gp_memcmp( void* pA, void* pB, U8 n )
+inline void* gp_memcmp( U1* pA, U1* pB, U8 n )
 {
 	if( !pA || !pB )
 		return pA;
@@ -1108,7 +1150,7 @@ public:
 	}
 	~gpcLAZY()
 	{
-		free( p_alloc );
+		gpmFREE( p_alloc );
 	}
 
 	gpcLAZY* lazy_strict( void )
@@ -1127,9 +1169,9 @@ public:
 			else if( n_alloc > new_alloc )
 			{
 				U1* p_kill = p_alloc;
-				p_alloc = (U1*)memalign( 0x10, n_alloc+0x10 ); //, 0x10 );
+				p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
 				memcpy( p_alloc, p_kill, n_load );
-				free( p_kill );
+				gpmFREE( p_kill );
 				n_alloc = new_alloc;
 			}
 		}
@@ -1155,7 +1197,7 @@ public:
 			{
 				free( p_alloc );
 				n_alloc = new_alloc;
-				p_alloc = (U1*)memalign( 0x10, n_alloc+0x10 );
+				p_alloc = gpmALLOC( n_alloc+0x10 );
 			}
 		}
 		(*p_alloc) = n_load = 0;
@@ -1172,7 +1214,7 @@ public:
 			n_start = 0;
 			gpcLAZY* p_lazy = new gpcLAZY( n );
 			p_lazy->n_alloc = gpmPAD( n_byte*p_lazy->aSET[gpeLZYxN], 0x10 );
-			p_lazy->p_alloc = (U1*)memalign( 0x10, p_lazy->n_alloc+0x10 ); //, 0x10 );
+			p_lazy->p_alloc = gpmALLOC( p_lazy->n_alloc+0x10 ); //, 0x10 );
 			if( !p_void )
 			{
 				p_lazy->p_alloc[p_lazy->n_load = n_byte] = 0;
@@ -1205,7 +1247,7 @@ public:
 			U1* p_kill = p_alloc;
 			n_alloc = gpmPAD( (n_load+n_byte*n), 0x10 );
             p_alloc = NULL;
-			p_alloc = (U1*)memalign( 0x10, n_alloc+0x10 ); //, 0x10 );
+			p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
 			if( p_kill )
 			{
 				memcpy( p_alloc, p_kill, n_load );
@@ -1289,12 +1331,12 @@ public:
 		{
 			n_alloc += gpmPAD( (n_add*n), 0x10 );
 			p_kill = p_alloc;
-			p_alloc = (U1*)memalign( 0x10, n_alloc+0x10 ); //, 0x10 );
+			p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
 			memcpy( p_alloc, p_kill, n_start );
 			memcpy( p_alloc+dst_hi, p_kill+src_hi, n_hi );
 			n_load = new_load;
 			p_alloc[n_load] = 0;
-			free( p_kill );
+			gpmFREE( p_kill );
 			return this;
 		}
 
@@ -1379,14 +1421,19 @@ public:
 		if( !p_f )
 			return this;
 
-		//gpfPRI_LO();
-
+#ifdef _WIN64
+		fpos_t n_byte = 0;
+		fseek(p_f, 0, SEEK_END);
+		fgetpos(p_f, &n_byte);
+		fseek(p_f, 0, SEEK_SET);
+#else
 		fpos_t fp; // = (fpos_t)0;
 		U8 n_byte = 0;
 		fseek(p_f, 0, SEEK_END );
 		fgetpos(p_f, &fp);
 		n_byte = fp.__pos;
 		fseek(p_f, 0, SEEK_SET);
+#endif
 		gpcLAZY* p_lazy = this;
 
 		if( n_byte > 0 )
@@ -1596,7 +1643,7 @@ public:
 	{
 		return this ? (ix.n_load / sizeof(U4x4)) : 0;
 	}
-	char* sSTRix( U8 iX, char* pER )
+	const char* sSTRix( U8 iX, const char* pER )
 	{
 		if( !this )
 			return pER;

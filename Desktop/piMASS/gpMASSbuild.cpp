@@ -638,11 +638,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pNEW->wip = gpeALF_FUNC;
 
 							{
-								char* pSTRmom = pCMPL->pPC( pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
+								char* pSTRmom = (char*)pCMPL->pPC( pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
 								U4 nSTRmom = strlen( pSTRmom );
 								if( nSTRmom+1 == nSTR )
 								{
-									nSTRmom = ((char*)gp_memcmp( pSTRmom, pSTR, nSTRmom ))-pSTRmom;
+									nSTRmom = (gpmMEMCPY( pSTRmom, pSTR, nSTRmom ))-pSTRmom;
 									if( nSTR == nSTRmom+1 )
 									{
 										pNEW->wip = gpeALF_CONSTR;

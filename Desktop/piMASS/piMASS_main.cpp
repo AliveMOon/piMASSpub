@@ -171,8 +171,13 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 	}
 }
-
+#ifdef _WIN64
+//int WINAPI WinMain( int nA, char *apA[] )
+//int Main(int nA, char **apA )
+int main(int nA, char** apA )
+#else 
 int main( int nA, char *apA[] )
+#endif
 {
 	gpf_aALF_init();
 

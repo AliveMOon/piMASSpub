@@ -2,7 +2,33 @@
 1563461731 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
 	"piMASS.h"
 
-1563461797 /home/pi/Desktop/piMASS/piMASS.h
+1563723779 /home/pi/Desktop/piMASS/piMASS.h
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	<raspicam/raspicam.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<GL/glew.h>
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -12,29 +38,10 @@
 	<ctime>
 	<fstream>
 	<iostream>
-	<raspicam/raspicam.h>
-	<unistd.h>
 	<inttypes.h>
-	<sys/stat.h>
-	<sys/socket.h>
-	<netinet/in.h>
-	<netinet/tcp.h>
-	<arpa/inet.h>
-	<ifaddrs.h>
 	<stdarg.h>
-	<sys/ioctl.h>
-	<sys/select.h>
-	<netdb.h>
 	<SDL.h>
-	<SDL2/SDL_image.h>
-	<X11/X.h>
-	<X11/Xlib.h>
-	<X11/Xutil.h>
-	"X11/bitmaps/gray"
-	<X11/Xatom.h>
-	<X11/Xcursor/Xcursor.h>
-	<linux/limits.h>
-	<GL/glew.h>
+	<SDL_image.h>
 	<math.h>
 	"gpcOPCD.h"
 	"gpeALF.h"
@@ -366,7 +373,33 @@
 	"gpcSCHL.h"
 	"gpcOPCD.h"
 
-1563461797 /home/pi/Desktop/piMASS//piMASS.h
+1563723779 /home/pi/Desktop/piMASS//piMASS.h
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	<raspicam/raspicam.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<GL/glew.h>
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -376,29 +409,10 @@
 	<ctime>
 	<fstream>
 	<iostream>
-	<raspicam/raspicam.h>
-	<unistd.h>
 	<inttypes.h>
-	<sys/stat.h>
-	<sys/socket.h>
-	<netinet/in.h>
-	<netinet/tcp.h>
-	<arpa/inet.h>
-	<ifaddrs.h>
 	<stdarg.h>
-	<sys/ioctl.h>
-	<sys/select.h>
-	<netdb.h>
 	<SDL.h>
-	<SDL2/SDL_image.h>
-	<X11/X.h>
-	<X11/Xlib.h>
-	<X11/Xutil.h>
-	"X11/bitmaps/gray"
-	<X11/Xatom.h>
-	<X11/Xcursor/Xcursor.h>
-	<linux/limits.h>
-	<GL/glew.h>
+	<SDL_image.h>
 	<math.h>
 	"gpcOPCD.h"
 	"gpeALF.h"
@@ -409,7 +423,7 @@
 1562069860 /home/pi/Desktop/piMASS/include/gpcSCHL.h
 	"piMASS.h"
 
-1563544151 source:/home/pi/Desktop/piMASS/gpcOPCD.cpp
+1563673121 source:/home/pi/Desktop/piMASS/gpcOPCD.cpp
 	"gpcSRC.h"
 
 1563461854 /home/pi/Desktop/piMASS/gpcSRC.h
@@ -426,10 +440,10 @@
 1563480147 source:/home/pi/Desktop/piMASS/gpcU44.cpp
 	"gpcSRC.h"
 
-1563576449 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
+1563673300 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
 	"gpcSRC.h"
 
-1563213609 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
+1563675813 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
 	"piMASS.h"
 	"gpcSRC.h"
 
@@ -441,4 +455,10 @@
 
 1563463007 source:/home/pi/Desktop/piMASS/src/gpcPROTO.cpp
 	"gpcSRC.h"
+
+1523805994 /usr/include/SDL2/SDL_image.h
+	"SDL.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
 

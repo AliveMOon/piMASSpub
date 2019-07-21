@@ -7,9 +7,12 @@ tmpfs /mnt/ram tmpfs nodev,nosuid,size=8M 0 0
 
 -------------------------------------------------------------
 
-
 pi@GP-PI:~ $ cd Desktop/piMASS
 pi@GP-PI:~/Desktop/piMASS $ sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+
+------------------------------------
+
+sudo chmod -R 777 .
 
 -------------------------------------------------------------
 
@@ -38,6 +41,8 @@ remote: Resolving deltas: 100% (6/6), completed with 6 local objects.
 To https://github.com/AliveMOon/piMASSpub.git
    4fe9836..a05f887  master -> master
 pi@GP-PI:~/Desktop/piMASS $ 
+
+
 
 
 
