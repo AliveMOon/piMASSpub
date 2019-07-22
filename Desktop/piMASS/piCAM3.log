@@ -11,11 +11,19 @@ nP:MM.iK[fd]dt	str	typ.sz
 -----------------------
 80:00.78[79] 	main	main.-	0/0L3
 
-opF mom: class NULL<-main
 80:00.73[74]	class	class	0/0L3
+						| opF class mom: main -> NULL
+						| opF class Mom: main -> NULL
+						*---------- ----  ---   --    -
 81:79.00[80] 	U1x4	def.-	0/0L3
+						| FND U1x4 def: U1x4 -> NULL
+						*---------- ----  ---   --    -
 81:00.47[48]	{	begin	0/0L3
+						| opF U1x4 Mom: U1x4 -> main
+						*---------- ----  ---   --    -
 81:00.54[55]0x0	U1	def.b	0/0L3
+						| FND U1 def: U1 -> U1x4
+						*---------- ----  ---   --    -
 82:80.00[81]0x0	x	def.b	1/1L3
 82:00.04[05]	,	stk	1/1L3
 83:80.01[82]0x1	y	def.b	2/2L3
@@ -24,8 +32,13 @@ opF mom: class NULL<-main
 84:00.04[05]	,	stk	3/3L3
 85:80.03[84]0x3	w	def.b	4/4L3
 85:00.05[06]	;	newrow	4/4L3
-STR mom: U1x4( main<-U1x4
+						| STR U1x4( mom: U1x4 -> main
+						| STR U1x4( Mom: U1x4( -> U1x4
+						| STR U1x4( def: NULL -> U1
+						*---------- ----  ---   --    -
 86:00.54[55]0x0		U1	def.b	4/4L4
+						| FND U1 def: U1 -> NULL
+						*---------- ----  ---   --    -
 87:85.00[86]0x4		X	def.b	5/5L4
 87:00.04[05]		,	stk	5/5L4
 88:85.01[87]0x5		Y	def.b	6/6L4
@@ -33,30 +46,57 @@ STR mom: U1x4( main<-U1x4
 89:85.02[88]0x6		Z	def.b	7/7L4
 89:00.04[05]		,	stk	7/7L4
 90:85.03[89]0x7		W	def.b	8/8L4
-opF call:  NULL<-U1x4(U1
-opF call: U1x4(U1<- NULL
+						| STR W cal: U1x4( -> NULL
+						| STR W def: NULL -> U1
+						*---------- ----  ---   --    -
 90:80.04[85]		U1x4.U1x4(	constr	8/8L4
+						| FND W cal: NULL -> U1x4(
+						*---------- ----  ---   --    -
 90:80.00[81]0x0		x	def.b	8/8L4
+						| FND x def: x -> NULL
+						*---------- ----  ---   --    -
 90:00.23[24]		=	mov	8/8L4
 90:85.00[86]0x4		X	def.b	8/8L4
+						| FND X def: X -> x
+						*---------- ----  ---   --    -
 90:00.05[06]		;	newrow	8/8L4
 90:80.01[82]0x1		y	def.b	8/8L4
+						| FND y def: y -> X
+						*---------- ----  ---   --    -
 90:00.23[24]		=	mov	8/8L4
 90:85.01[87]0x5		Y	def.b	8/8L4
+						| FND Y def: Y -> y
+						*---------- ----  ---   --    -
 90:00.05[06]		;	newrow	8/8L4
 90:80.02[83]0x2		z	def.b	8/8L4
+						| FND z def: z -> Y
+						*---------- ----  ---   --    -
 90:00.23[24]		=	mov	8/8L4
 90:85.02[88]0x6		Z	def.b	8/8L4
+						| FND Z def: Z -> z
+						*---------- ----  ---   --    -
 90:00.05[06]		;	newrow	8/8L4
 90:80.03[84]0x3		w	def.b	8/8L4
+						| FND w def: w -> Z
+						*---------- ----  ---   --    -
 90:00.23[24]		=	mov	8/8L4
 90:85.03[89]0x7		W	def.b	8/8L4
+						| FND W def: W -> w
+						*---------- ----  ---   --    -
 90:00.05[06]		;	newrow	8/8L4
-opF mom: }U1x4<-main
 90:00.48[49]	}	end	4/8L3
+						| opF W mom: main -> U1x4
+						| opF W Mom: main -> U1x4(
+						| opF W def: U1 -> W
+						*---------- ----  ---   --    -
 90:00.48[49]	}	end	4/8L3
 90:00.05[06]	;	newrow	4/8L3
 90:79.00[80]0x0	U1x4	def.l	4/8L3
+						| FND U1x4 def: U1x4 -> U1
+						*---------- ----  ---   --    -
+						| STR xyzw( Mom: xyzw( -> main
+						| STR xyzw( def: NULL -> U1x4
+						*---------- ----  ---   --    -
 92:00 R4u		0 	4/8L4
 92:00.28[29]		+	add	4/8L4
 92:00 R5u		3 	4/8L4
@@ -72,10 +112,16 @@ opF mom: }U1x4<-main
 92:00 R2u		3 	4/8L4
 92:00.28[29]		+	add	4/8L4
 92:00 R3u		3 	4/8L4
-opF call:  NULL<-xyzw(u
-opF call: xyzw(u<- NULL
+						| STR xyzw( cal: xyzw( -> NULL
+						*---------- ----  ---   --    -
 92:79.02[91]0x0	xyzw	def.l	4/8L3
+						| FND xyzw( cal: NULL -> xyzw(
+						| FND xyzw( Mom: main -> xyzw(
+						| FND xyzw( def: U1x4 -> NULL
+						*---------- ----  ---   --    -
 92:00.54[55]0x0	U1	def.b	4/8L3
+						| FND U1 def: U1 -> U1x4
+						*---------- ----  ---   --    -
 93:79.03[92]0x4	a	def.b	5/9L3
 93:00.23[24]	=	mov	5/9L3
 93:00 R4u	10 	5/9L3
@@ -84,44 +130,80 @@ opF call: xyzw(u<- NULL
 94:00.23[24]	=	mov	6/10L3
 94:00 R5u	0 	6/10L3
 94:00.04[05]	,	stk	6/10L3
-STR mom: a1D[ main<-U1
+						| STR a1D[ mom: U1 -> main
+						| STR a1D[ Mom: a1D[ -> main
+						| STR a1D[ def: NULL -> U1
+						*---------- ----  ---   --    -
 96:00 R6u		10 	6/10L4
-opF mom: a1D[uU1<-main
 96:79.05[94]0x6	a1D[	def.b	7/11L3
+						| FND a1D[ mom: main -> U1
+						| FND a1D[ Mom: main -> a1D[
+						| FND a1D[ def: U1 -> NULL
+						*---------- ----  ---   --    -
 96:00.05[06]	;	newrow	7/11L3
+						| STR for( def: NULL -> U1
+						*---------- ----  ---   --    -
 96:00.56[57]0x0		U4	def.l	7/11L4
+						| FND U4 def: U4 -> NULL
+						*---------- ----  ---   --    -
 97:79.07[96]0x7		i	def.l	11/15L4
 97:00.23[24]		=	mov	11/15L4
 97:00 R7u		0 	11/15L4
 97:00.05[06]		;	newrow	11/15L4
 97:79.07[96]0x7		i	def.l	11/15L4
+						| FND i def: i -> U4
+						*---------- ----  ---   --    -
 97:00.34[35]		<	ltlg	11/15L4
 97:00 R0u		10 	11/15L4
 97:00.05[06]		;	newrow	11/15L4
 97:79.07[96]0x7		i	def.l	11/15L4
 97:00.29[30]		++	inc	11/15L4
-opF call:  NULL<-for(
-opF call: for(<- NULL
+						| STR i cal: for( -> NULL
+						| STR i def: NULL -> i
+						*---------- ----  ---   --    -
 97:00.66[67]		!.for(	cycle	11/15L4
+						| FND i cal: NULL -> for(
+						*---------- ----  ---   --    -
 97:79.03[92]0x4		a	def.b	11/15L4
+						| FND a def: a -> NULL
+						*---------- ----  ---   --    -
 97:00.30[31]		+=	addm	11/15L4
 97:00.29[30]		++	inc	11/15L4
 97:79.04[93]0x5		b	def.b	11/15L4
+						| FND b def: b -> a
+						*---------- ----  ---   --    -
 97:00.12[13]		*	mul	11/15L4
 97:00 R1u		10 	11/15L4
 97:00.28[29]		+	add	11/15L4
 97:79.07[96]0x7		i	def.l	11/15L4
+						| FND i def: i -> b
+						*---------- ----  ---   --    -
 97:00.05[06]		;	newrow	11/15L4
 97:79.05[94]0x6		a1D[	def.b	11/15L4
+						| FND a1D[ def: a1D[ -> i
+						*---------- ----  ---   --    -
 97:79.07[96]0x7		i	def.l	11/15L4
+						| FND i def: i -> a1D[
+						*---------- ----  ---   --    -
 97:00.19[20]		%	rem	11/15L4
+						| STR sizeof( def: NULL -> i
+						*---------- ----  ---   --    -
 97:79.05[94]0x6			a1D[	def.b	11/15L5
-opF call:  NULL<-sizeof(
-opF call: sizeof(<- NULL
+						| FND a1D def: a1D[ -> NULL
+						*---------- ----  ---   --    -
+						| STR a1D cal: sizeof( -> NULL
+						| STR a1D def: NULL -> a1D[
+						*---------- ----  ---   --    -
 97:00.64[65]			!.sizeof(	func	11/15L5
+						| FND a1D cal: NULL -> sizeof(
+						*---------- ----  ---   --    -
 97:00.23[24]			=	mov	11/15L5
 97:79.03[92]0x4			a	def.b	11/15L5
+						| FND a def: a -> NULL
+						*---------- ----  ---   --    -
 97:00.05[06]			;	newrow	11/15L5
 97:00.48[49]		}	end	11/15L4
+						| opF a def: i -> a
+						*---------- ----  ---   --    -
 
 alDAT:0BLD/VER:01

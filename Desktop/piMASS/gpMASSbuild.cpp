@@ -344,7 +344,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8],
 			*pI4 = pCMPL->pPC( pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 ) ),
 					//pMOM->pPC( pCMPL, pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 )),	// talán sima int legyen?
-			*pNEW = NULL, *pSPARE, *pTMP, *pREDIR, *pDm = NULL, *pDc = NULL;
+			*pNEW = NULL, *pSPARE, *pTMP, *pREDIR,
+			*pMm = NULL,
+			*pDm = NULL, *pDc = NULL, *pDd = NULL;
 	gpmZ(aR);
 
 	if( pMOM->iPC != iTHIS )
@@ -359,7 +361,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
-	bool bABC;
+	bool bABC, bENTER;
 	cout << endl << "nP:MM.iK[fd]dt\tstr\ttyp.sz\r\n-----------------------\r\n";
 
 	U4 floorLEV = mass.iLEV;
@@ -503,27 +505,68 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						break;
 
 				}
-
+				/*bENTER = false;
 				if( pDm != pLEV->pMOM )
 				{
-					cout 	<< "opF mom: "
-							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : " NULL" )
-									<< ( pDm ? (char*)gpsSTRpub+pDm->iPUB : " NULL" )
-							<< "<-"
-									<< ( pLEV->pMOM ?  (char*) gpsSTRpub+pLEV->pMOM->iPUB : " NULL" )
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\topF "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " mom: "
+									<< ( pDm ? (char*)gpsSTRpub+pDm->iPUB : "NULL" )
+							<< " <- "
+									<< ( pLEV->pMOM ?  (char*) gpsSTRpub+pLEV->pMOM->iPUB : "NULL" )
 							<< endl;
 					pDm = pLEV->pMOM;
 				}
 				if( pDc != pLEV->pCALL )
 				{
-					cout 	<< "opF call: "
-							//<< (char*)pSTR
-									<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: " NULL" )
-							<< "<-"
-									<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: " NULL" )
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\topF "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " cal: "
+									<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: "NULL" )
+							<< " <- "
+									<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: "NULL" )
 							<< endl;
 					pDc = pLEV->pCALL;
 				}
+				if( pDd != pLEV->pDEF )
+				{
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\topF "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " def: "
+									<< ( pDd ? (char*) gpsSTRpub+pDd->iPUB	: "NULL" )
+							<< " <- "
+									<< ( pLEV->pDEF ? (char*) gpsSTRpub+pLEV->pDEF->iPUB	: "NULL" )
+							<< endl;
+					pDd = pLEV->pDEF;
+				}
+
+				if( pMm != pMOM )
+				{
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\topF "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " Mom: "
+									<< ( pMm ? (char*)gpsSTRpub+pMm->iPUB : "NULL" )
+							<< " <- "
+									<< ( pMOM ?  (char*) gpsSTRpub+pMOM->iPUB : "NULL" )
+							<< endl;
+					pMm = pMOM;
+				}*/
 
 			} else {
 				// IGEN találat NEM operator
@@ -563,26 +606,69 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						}
 						break;
 				}
+				/*bENTER = false;
 				if( pDm != pLEV->pMOM )
 				{
-					cout 	<< "FND mom: "
-							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : " NULL" )
-									<< ( pDm ? (char*)gpsSTRpub+pDm->iPUB : " NULL" )
-							<< "<-"
-									<< ( pLEV->pMOM ?  (char*) gpsSTRpub+pLEV->pMOM->iPUB : " NULL" )
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\tFND "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " mom: "
+									<< ( pDm ? (char*)gpsSTRpub+pDm->iPUB : "NULL" )
+							<< " <- "
+									<< ( pLEV->pMOM ?  (char*) gpsSTRpub+pLEV->pMOM->iPUB : "NULL" )
 							<< endl;
 					pDm = pLEV->pMOM;
 				}
 				if( pDc != pLEV->pCALL )
 				{
-					cout 	<< "FND call: "
-							//<< (char*)pSTR
-									<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: " NULL" )
-							<< "<-"
-									<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: " NULL" )
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\tFND "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " cal: "
+									<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: "NULL" )
+							<< " <- "
+									<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: "NULL" )
 							<< endl;
 					pDc = pLEV->pCALL;
 				}
+				if( pDd != pLEV->pDEF )
+				{
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\tFND "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " def: "
+									<< ( pDd ? (char*) gpsSTRpub+pDd->iPUB	: "NULL" )
+							<< " <- "
+									<< ( pLEV->pDEF ? (char*) gpsSTRpub+pLEV->pDEF->iPUB	: "NULL" )
+							<< endl;
+					pDd = pLEV->pDEF;
+				}
+
+				if( pMm != pMOM )
+				{
+					if( !bENTER )
+					{
+						bENTER = true;
+						cout << endl;
+					}
+					cout 	<< "\t\t\t\t\tFND "
+							<< ( pFND ? (char*) gpsSTRpub+pFND->iPUB : "NULL" ) << " Mom: "
+									<< ( pMm ? (char*)gpsSTRpub+pMm->iPUB : "NULL" )
+							<< " <- "
+									<< ( pMOM ?  (char*) gpsSTRpub+pMOM->iPUB : "NULL" )
+							<< endl;
+					pMm = pMOM;
+				}*/
+
 			}
 
 		}
@@ -720,28 +806,72 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					}
 				}
 			}
+			/*bENTER = false;
 			if( pDm != pLEV->pMOM )
 			{
-				cout 	<< "STR mom: "
-						<< (char*)pSTR << " "
-								<< ( pDm ? (char*) gpsSTRpub+pDm->iPUB	: " NULL" )
-						<< "<-"
-								<< ( pLEV->pMOM ? (char*) gpsSTRpub+pLEV->pMOM->iPUB	: " NULL" )
+				if( !bENTER )
+				{
+					bENTER = true;
+					cout << endl;
+				}
+				cout	<< "\t\t\t\t\tSTR "
+						<< (char*)pSTR << " mom: "
+										<< ( pDm ? (char*) gpsSTRpub+pDm->iPUB	: "NULL" )
+						<< " <- "
+								<< ( pLEV->pMOM ? (char*) gpsSTRpub+pLEV->pMOM->iPUB	: "NULL" )
 						<< endl;
 				pDm = pLEV->pMOM;
 			}
 			if( pDc != pLEV->pCALL )
 			{
-				cout 	<< "STR call: "
-						<< (char*)pSTR << " "
-								<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: " NULL" )
-						<< "<-"
-								<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: " NULL" )
+				if( !bENTER )
+				{
+					bENTER = true;
+					cout << endl;
+				}
+				cout 	<< "\t\t\t\t\tSTR "
+						<< (char*)pSTR << " cal: "
+								<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: "NULL" )
+						<< " <- "
+								<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: "NULL" )
 						<< endl;
 				pDc = pLEV->pCALL;
 			}
-			//pCOUT = NULL;
+			if( pDd != pLEV->pDEF )
+			{
+				if( !bENTER )
+				{
+					bENTER = true;
+					cout << endl;
+				}
+				cout 	<< "\t\t\t\t\tSTR "
+						<< (char*)pSTR << " def: "
+								<< ( pDd ? (char*) gpsSTRpub+pDd->iPUB	: "NULL" )
+						<< " <- "
+								<< ( pLEV->pDEF ? (char*) gpsSTRpub+pLEV->pDEF->iPUB	: "NULL" )
+						<< endl;
+				pDd = pLEV->pDEF;
+			}
+			if( pMm != pMOM )
+			{
+				if( !bENTER )
+				{
+					bENTER = true;
+					cout << endl;
+				}
+				cout 	<< "\t\t\t\t\tSTR "
+						<< (char*)pSTR << " Mom: "
+								<< ( pMm ? (char*)gpsSTRpub+pMm->iPUB : "NULL" )
+						<< " <- "
+								<< ( pMOM ?  (char*) gpsSTRpub+pMOM->iPUB : "NULL" )
+						<< endl;
+				pMm = pMOM;
+			}*/
+
 		}
+
+
+
 		if( pFND )
 		{
 			pCOUT = pFND->sLOG( pPUB, gppTAB-1 + floorLEV-pLEV->iLEV, gpsNDAT, pCMPL );
@@ -754,8 +884,76 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			cout << pCOUT << "\t" << pLEV->iDAT << "/" << nDAT << "L" << pLEV->iLEV <<"\r\n";
 			pCOUT = NULL;
 		}
-		if( pFND )
-			pFND = NULL;
+
+		if(
+			const char* pLAB = pFND ? (pFND->wip == gpeALF_OPER ? "\t\t\t\t\t\t| opF" : "\t\t\t\t\t\t| FND" )  : ( pSTR ? "\t\t\t\t\t\t| STR" : NULL )
+		)
+		{
+			if( !pSTR )
+				pSTR = gpsSTRpub+pFND->iPUB;
+			bENTER = false;
+			if( pDm != pLEV->pMOM )
+			{
+				if( !bENTER )
+					bENTER = true;
+
+				cout	<<  pLAB << " "
+						<< (char*)pSTR << " mom: "
+								<< ( pLEV->pMOM ? (char*) gpsSTRpub+pLEV->pMOM->iPUB	: "NULL" )
+						<< " -> "
+										<< ( pDm ? (char*) gpsSTRpub+pDm->iPUB	: "NULL" )
+						<< endl;
+				pDm = pLEV->pMOM;
+			}
+			if( pDc != pLEV->pCALL )
+			{
+				if( !bENTER )
+					bENTER = true;
+
+				cout 	<<  pLAB << " "
+						<< (char*)pSTR << " cal: "
+								<< ( pLEV->pCALL ? (char*) gpsSTRpub+pLEV->pCALL->iPUB	: "NULL" )
+						<< " -> "
+								<< ( pDc ? (char*) gpsSTRpub+pDc->iPUB	: "NULL" )
+						<< endl;
+				pDc = pLEV->pCALL;
+			}
+			if( pMm != pMOM )
+			{
+				if( !bENTER )
+					bENTER = true;
+
+				cout 	<<  pLAB << " "
+						<<  pSTR << " Mom: "
+								<< ( pMOM ?  (char*) gpsSTRpub+pMOM->iPUB : "NULL" )
+						<< " -> "
+								<< ( pMm ? (char*)gpsSTRpub+pMm->iPUB : "NULL" )
+						<< endl;
+				pMm = pMOM;
+			}
+			if( pDd != pLEV->pDEF )
+			{
+				if( !bENTER )
+					bENTER = true;
+
+				cout 	<< pLAB << " "
+						<< (char*)pSTR << " def: "
+								<< ( pLEV->pDEF ? (char*) gpsSTRpub+pLEV->pDEF->iPUB	: "NULL" )
+						<< " -> "
+								<< ( pDd ? (char*) gpsSTRpub+pDd->iPUB	: "NULL" )
+						<< endl;
+				pDd = pLEV->pDEF;
+			}
+
+			if( bENTER )
+				cout << "\t\t\t\t\t\t*---------- ----  ---   --    -" << endl;
+
+		}
+
+
+
+		pFND = NULL;
+
 		/// --------------------------------
 		/// ITT a VÉGE
 		if( pS >= pE )
@@ -785,11 +983,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			{
 				case '(':
 					*pPUB = *pS;
+					pPUB++;
 					nSTR++;
 					pS++;
 					break;
 				case '[':
 					*pPUB = *pS;
+					pPUB++;
 					nSTR++;
 					pS++;
 					break;

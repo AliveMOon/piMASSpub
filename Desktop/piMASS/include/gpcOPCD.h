@@ -139,64 +139,6 @@ public:
 
 	U4 iKID( gpcLAZY* pCMPL, U4 i );
 
-	/*U4 nPC( gpcLAZY* pCMPL )
-	{
-		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
-		if( !ppC )
-			return 0;
-
-		return pCMPL->n_load/sizeof(this);
-
-	}*/
-	/*gpcCMPL* pPC( gpcLAZY* pCMPL, U4 pc, U1* pS = NULL )
-	{
-		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
-		if( !ppC )
-			return NULL;
-		while( pc < pCMPL->n_load/sizeof(this) )
-		{
-			if( !pc )
-				return *ppC;
-			if( !ppC[pc] )
-				return NULL;
-
-			if( !ppC[pc]->iREDIR )
-				return ppC[pc];
-
-			pc = ppC[pc]->iREDIR;
-		}
-
-		return NULL;
-	}
-
-	gpcCMPL* pSPARE( gpcLAZY* pCMPL, U4 pc, gpeALF sw = gpeALF_zero , U1* pS = NULL )
-	{
-		gpcCMPL	**ppC = pCMPL ? (gpcCMPL**)pCMPL->p_alloc : NULL;
-		if( !ppC )
-			return NULL;
-
-		while( pc < pCMPL->n_load/sizeof(this) )
-		{
-			if( !pc )
-				return *ppC;
-			if( !ppC[pc] )
-				return NULL;
-
-			if( ppC[pc]->iSPARE )
-			if( sw ? ppC[pc]->wip == sw : true )
-            {
-                pc = ppC[pc]->iSPARE;
-                continue;
-            }
-
-			if( !ppC[pc]->iREDIR )
-				return ppC[pc];
-
-			pc = ppC[pc]->iREDIR;
-		}
-
-		return NULL;
-	}*/
 
 	U4 cmpl_best( gpcLAZY* pCMPL, U1* pS, U4 nS );
 	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
