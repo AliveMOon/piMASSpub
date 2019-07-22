@@ -212,7 +212,7 @@ class gpcMASS;
 
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
-
+#define gpmMEMCMP (U1*)gp_memcmp
 
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)

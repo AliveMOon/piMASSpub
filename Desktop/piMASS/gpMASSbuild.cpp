@@ -403,14 +403,16 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 /// 2. CLASS sNAME pDEF -> pMOM -----------------------------	// pl. class U1x4 {
 						if( pLEV->pDEF )
 							pMOM = pLEV->pDEF;					// pl. 81:02[80] U1x4 ez lesz az anya, ebbe akarok def.
-						if( pLEV->pCALL )
+						/*if( pLEV->pCALL )
 						{
-							// ez a zárójel pCALL-ja
 							pFND = pLEV->pCALL;
 							pLEV->pCALL = NULL;
 						}
+						pLEV->AoBclr();*/
+						if( pLEV->pCALL )
+							pFND = pLEV->pCALL;
 
-						pLEV->AoBclr();
+						pLEV->AoBCclr();
 						break;
 					case gpeALF_END:
 						pMOM = (pLEV = pLEV->dec(floorLEV))->pMOM;
@@ -638,11 +640,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							pNEW->wip = gpeALF_FUNC;
 
 							{
-								char* pSTRmom = (char*)pCMPL->pPC( pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
-								U4 nSTRmom = strlen( pSTRmom );
+								U1* pSTRmom = (U1*)pCMPL->pPC( pMOM->mPC )->p_kid->sSTRix( pMOM->iKD, "Oxo" );
+								U4 nSTRmom = gpmSTRLEN( pSTRmom );
 								if( nSTRmom+1 == nSTR )
 								{
-									nSTRmom = (gpmMEMCPY( pSTRmom, pSTR, nSTRmom ))-pSTRmom;
+									nSTRmom = (gpmMEMCMP( pSTRmom, pSTR, nSTRmom ))-pSTRmom;
 									if( nSTR == nSTRmom+1 )
 									{
 										pNEW->wip = gpeALF_CONSTR;
