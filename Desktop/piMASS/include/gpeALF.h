@@ -126,6 +126,7 @@ typedef enum gpeALF: I8
 	gpeALF_DEL = gpdABC('D', 'E', 'L'),
 	gpeALF_DIR = gpdABC('D', 'I', 'R'),
 	gpeALF_DIV = gpdABC('D', 'I', 'V'),
+	gpeALF_DOT = gpdABC('D', 'O', 'T'),
 	gpeALF_DST = gpdABC('D', 'S', 'T'),
 	gpeALF_DZR = gpdABC('D', 'Z', 'R'),
 	gpeALF_END = gpdABC('E', 'N', 'D'),

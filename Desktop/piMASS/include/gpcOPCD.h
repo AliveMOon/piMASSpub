@@ -153,8 +153,8 @@ public:
 class gpcCMPLlev
 {
 public:
-	gpcCMPL	*pDEF, *pMOM, *pA, *pOP, *pB, *pFND, *pCALL;
-	U4 iLEV, nLEV, iDAT;
+	gpcCMPL	*pDEF, *pMOM, *pDotM, *pDot, *pA, *pOP, *pB, *pFND, *pCALL;
+	U4 iLEV, nLEV, iDAT, iOFF;
 	U1 c;
 	gpcCMPLlev(){};
 	gpcCMPLlev* DAoBclr( void )
@@ -215,6 +215,9 @@ public:
  	{
 		memcpy( this+1, this , sizeof(*this) );
 		this[1].iLEV = iLEV+1;
+		this[1].pDotM =
+		this[1].pDot = NULL;
+		this[1].iOFF = 0;
 		//pFND = pF;
 		if( pM )
 		{

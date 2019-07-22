@@ -346,7 +346,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					//pMOM->pPC( pCMPL, pMOM->cmpl_find( pCMPL, (U1*)"I4", 2 )),	// talán sima int legyen?
 			*pNEW = NULL, *pSPARE, *pTMP, *pREDIR,
 			*pMm = NULL,
-			*pDm = NULL, *pDc = NULL, *pDd = NULL;
+			*pDm = NULL, *pDc = NULL, *pDd = NULL, *pDot = NULL, *pDotM = NULL;
 	gpmZ(aR);
 
 	if( pMOM->iPC != iTHIS )
@@ -400,7 +400,27 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			{
 				switch( pFND->typ )
 				{
+					case gpeALF_DOT:
 
+						if( pLEV->pDEF )
+							pMOM = pLEV->pDEF;					// pl. 81:02[80] U1x4 ez lesz az anya, ebbe akarok def.
+
+						if( !pLEV->pDotM )
+						{
+							pLEV->pDotM = pMOM;
+							if( pMOM->iDEF != pMOM->iPC )
+								pLEV->pDot = pCMPL->pPC( pMOM->iDEF, gpsSTRpub );
+							pLEV->iOFF = 0;
+						} /*else {
+							if( pMOM->iDEF != pMOM->iPC )
+								pLEV->pDOT = pCMPL->pPC( pMOM->iDEF, gpsSTRpub );
+							pLEV->iOFF = 0;
+						}*/
+						if( pLEV->pCALL )
+							pFND = pLEV->pCALL;
+
+						pLEV->AoBclr();
+						break;
 					case gpeALF_BEGIN:							// '{'
 /// 2. CLASS sNAME pDEF -> pMOM -----------------------------	// pl. class U1x4 {
 						if( pLEV->pDEF )
@@ -628,6 +648,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									pSPARE->wip = gpeALF_CLASS;
 									pSPARE->typ = def.typ;
 									pSPARE->iDEF = def.iPC;
+									pSPARE->iPUB = pNEW->iPUB;
+
 								}
 							}
 
@@ -679,8 +701,6 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 					}
 				}
 			}
-
-
 		}
 
 
@@ -739,6 +759,21 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						<< endl;
 				pDc = pLEV->pCALL;
 			}
+
+			if( pDot != pLEV->pDot )
+			{
+				if( !bENTER )
+					bENTER = true;
+				//if( pDotM ? pDotM->iPC ==  )
+				cout 	<<  pLAB << " "
+						<< (char*)pSTR << " dot: "
+								<< ( pLEV->pDotM ? (char*) gpsSTRpub+pLEV->pDotM->iPUB : "NULL" )
+						<< "."
+								<< ( pDot ? (char*) gpsSTRpub+pDot->iPUB : "NULL" )
+						<< endl;
+				pDot = pLEV->pDot;
+			}
+
 			if( pMm != pMOM )
 			{
 				if( !bENTER )
@@ -829,6 +864,15 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			}
 			pSTR[nSTR] = 0;
 			pPUB++;
+			if( pLEV->pDot ? pLEV->pDot->iDEF == pLEV->pDot->iPC : false )
+			{
+				iFND = pLEV->pDot->cmpl_find( pCMPL, pSTR, nSTR );
+				pFND = pLEV->pDot = pCMPL->pPC( iFND, gpsSTRpub );
+				if( pFND )
+					pLEV->iOFF += pFND->i_dat;
+				continue;
+			}
+
 			iFND = pMOM->cmpl_find( pCMPL, pSTR, nSTR );
 			if( !iFND )
 			{
@@ -898,6 +942,8 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 						if( pS < pE )
 							pS++;
 					}
+					continue;
+				case gpeALF_DOT:
 					continue;
 				default:
 					break;

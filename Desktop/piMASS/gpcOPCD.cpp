@@ -73,7 +73,8 @@ const char* gpasOPER[] = {
 
 	"! inv",	"!! LG",	"!= neqLG",
 
-	". pnt",	", stk",	"; newrow",
+	//". pnt",
+				", stk",	"; newrow",
 	//"+ add", 	"++ inc",	"+= addM", ///--------------- DBG
 
 	"/* comS", 	"*/ comE",	"// com",
@@ -96,7 +97,7 @@ const char* gpasOPER[] = {
 	"<= leLG",	"< ltLG", 	"<< sl", 	"<<= slM",
 	">= beLG",	"> bgLG", 	">> sr", 	">>= srM",
 
-	". tag", 	"-> entry", ":: out",
+	". dot", 	"-> entry", ":: out",
 	"( brakS",	") brakE",
 	"[ dimS", 	"] dimE",
 	"{ begin", 	"} end",
