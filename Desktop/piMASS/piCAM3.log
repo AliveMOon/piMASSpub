@@ -16,10 +16,10 @@ nP:MM.iK[fd]dt	str	typ.sz
 						| opF class Mom: main -> NULL
 						*---------- ----  ---   --    -
 81:79.00[80] 	U1x4	def.-	0/0L3
-						| FND U1x4 def: U1x4 -> NULL
+						| NEW U1x4 def: U1x4 -> NULL
 						*---------- ----  ---   --    -
 81:00.47[48]	{	begin	0/0L3
-						| opF U1x4 Mom: U1x4 -> main
+						| opF { Mom: U1x4 -> main
 						*---------- ----  ---   --    -
 81:00.54[55]0x0	U1	def.b	0/0L3
 						| FND U1 def: U1 -> U1x4
@@ -50,7 +50,7 @@ nP:MM.iK[fd]dt	str	typ.sz
 						| STR W def: NULL -> U1
 						*---------- ----  ---   --    -
 90:80.04[85]		U1x4.U1x4(	constr	8/8L4
-						| FND W cal: NULL -> U1x4(
+						| FND U1x4( cal: NULL -> U1x4(
 						*---------- ----  ---   --    -
 90:80.00[81]0x0		x	def.b	8/8L4
 						| FND x def: x -> NULL
@@ -85,9 +85,9 @@ nP:MM.iK[fd]dt	str	typ.sz
 						*---------- ----  ---   --    -
 90:00.05[06]		;	newrow	8/8L4
 90:00.48[49]	}	end	4/8L3
-						| opF W mom: main -> U1x4
-						| opF W Mom: main -> U1x4(
-						| opF W def: U1 -> W
+						| opF } mom: main -> U1x4
+						| opF } Mom: main -> U1x4(
+						| opF } def: U1 -> W
 						*---------- ----  ---   --    -
 90:00.48[49]	}	end	4/8L3
 90:00.05[06]	;	newrow	4/8L3
@@ -112,12 +112,12 @@ nP:MM.iK[fd]dt	str	typ.sz
 92:00 R2u		3 	4/8L4
 92:00.28[29]		+	add	4/8L4
 92:00 R3u		3 	4/8L4
-						| STR xyzw( cal: xyzw( -> NULL
+						| STR false cal: xyzw( -> NULL
 						*---------- ----  ---   --    -
 92:79.02[91]0x0	xyzw	def.l	4/8L3
-						| FND xyzw( cal: NULL -> xyzw(
-						| FND xyzw( Mom: main -> xyzw(
-						| FND xyzw( def: U1x4 -> NULL
+						| FND false cal: NULL -> xyzw(
+						| FND false Mom: main -> xyzw(
+						| FND false def: U1x4 -> NULL
 						*---------- ----  ---   --    -
 92:00.54[55]0x0	U1	def.b	4/8L3
 						| FND U1 def: U1 -> U1x4
@@ -158,11 +158,11 @@ nP:MM.iK[fd]dt	str	typ.sz
 97:00.05[06]		;	newrow	11/15L4
 97:79.07[96]0x7		i	def.l	11/15L4
 97:00.29[30]		++	inc	11/15L4
-						| STR i cal: for( -> NULL
-						| STR i def: NULL -> i
+						| STR ++ cal: for( -> NULL
+						| STR ++ def: NULL -> i
 						*---------- ----  ---   --    -
 97:00.66[67]		!.for(	cycle	11/15L4
-						| FND i cal: NULL -> for(
+						| FND for( cal: NULL -> for(
 						*---------- ----  ---   --    -
 97:79.03[92]0x4		a	def.b	11/15L4
 						| FND a def: a -> NULL
@@ -189,13 +189,13 @@ nP:MM.iK[fd]dt	str	typ.sz
 						| STR sizeof( def: NULL -> i
 						*---------- ----  ---   --    -
 97:79.05[94]0x6			a1D[	def.b	11/15L5
-						| FND a1D def: a1D[ -> NULL
+						| FND a1D[ def: a1D[ -> NULL
 						*---------- ----  ---   --    -
-						| STR a1D cal: sizeof( -> NULL
-						| STR a1D def: NULL -> a1D[
+						| STR a1D[ cal: sizeof( -> NULL
+						| STR a1D[ def: NULL -> a1D[
 						*---------- ----  ---   --    -
 97:00.64[65]			!.sizeof(	func	11/15L5
-						| FND a1D cal: NULL -> sizeof(
+						| FND sizeof( cal: NULL -> sizeof(
 						*---------- ----  ---   --    -
 97:00.23[24]			=	mov	11/15L5
 97:79.03[92]0x4			a	def.b	11/15L5
@@ -203,7 +203,7 @@ nP:MM.iK[fd]dt	str	typ.sz
 						*---------- ----  ---   --    -
 97:00.05[06]			;	newrow	11/15L5
 97:00.48[49]		}	end	11/15L4
-						| opF a def: i -> a
+						| opF } def: i -> a
 						*---------- ----  ---   --    -
 
 alDAT:0BLD/VER:01
