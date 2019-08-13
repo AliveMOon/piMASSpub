@@ -28,11 +28,15 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
-FILE_NAME_0=1141;C++;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2FDesktop%2FpiMASS%2FpiMASS_main.cpp;0;4
-FILE_NAME_1=1718;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FpiMASS%2FpiMASS.h;0;4
-FILE_NAME_2=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FpiMASS%2Fsys%2Finclude%2Fmysys.h;0;4
-FILE_NAME_3=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FpiMASS%2FpiMASSpub%2FDesktop%2FpiMASS%2Fsys%2Finclude%2Fmysys.h;0;4
+current_page=0
+FILE_NAME_0=149;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Ftutorial11_2d_fonts%2Ftutorial11.cpp;0;4
+FILE_NAME_1=763;C;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2FDesktop%2FopenGl%2F2%2Fmain.c;0;2
+FILE_NAME_2=207;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-master%2Ftutorial06_keyboard_and_mouse%2Ftutorial06.cpp;0;4
+FILE_NAME_3=2640;C++;0;EISO-8859-1;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Ftutorial05_textured_cube%2Ftutorial05.cpp;0;4
+FILE_NAME_4=308;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Ftutorial06_keyboard_and_mouse%2Ftutorial06.cpp;0;4
+FILE_NAME_5=503;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Fcommon%2Ftexture.hpp;0;4
+FILE_NAME_6=229;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Fcommon%2Ftext2D.hpp;0;4
+FILE_NAME_7=1538;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Fcommon%2Ftext2D.cpp;0;4
 
 [VTE]
 last_dir=/home/pi

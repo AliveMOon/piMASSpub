@@ -56,31 +56,97 @@ const char * InitError::what() const throw()
 
 class SDL
 {
-    SDL_Window * pSDLwin;
-    SDL_Renderer * pSDLrndr;
+	SDL_Rect	txt, chr;
+	U1x4		*pTXT;
+	U4			nTXT;
+	SDL_Surface		*pSRFload,
+					*pSRFchar,
+					*pSRFwin;
+    SDL_Window		*pSDLwin;
+    SDL_Renderer	*pSDLrndr;
 public:
-    SDL( U4 flags = 0 );
+    SDL( U4 flags = 0, char* pPATH = NULL, char*pFILE = NULL );
     virtual ~SDL();
     void draw();
+    void TXT_draw();
 };
 
-SDL::SDL( U4 flags )
+SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 {
     if ( SDL_Init( flags ) != 0 )
         throw InitError();
 
-    if ( SDL_CreateWindowAndRenderer( 640, 480, SDL_WINDOW_SHOWN,
-                                      &pSDLwin, &pSDLrndr ) != 0 )
+    if ( SDL_CreateWindowAndRenderer( txt.w = 640, txt.h = 480, SDL_WINDOW_SHOWN, &pSDLwin, &pSDLrndr ) != 0 )
         throw InitError();
+
+
+
+	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
+		throw InitError();
+
+	if( !pPATH )
+		return;
+
+	pSRFload = SDL_LoadBMP( pPATH );
+	pSRFchar = SDL_ConvertSurface( pSRFload, pSRFwin->format, 0 );
+	gpmSDL_FreeSRF( pSRFload );
+	chr.x = 8;
+	chr.y = 32;
+	chr.w =	pSRFchar->w/chr.x;
+	chr.h = pSRFchar->h/chr.y;
+
+	txt.x = (txt.w/chr.w)*2;
+	txt.y = (txt.h/chr.h)*2;
+	pTXT = new U1x4[nTXT = txt.x*txt.y];
+	gpmZn( pTXT, nTXT );
+
+	pTXT[0] = U1x4(255,255,255,'!'-' ');
+	gpfMEMSET( pTXT+1, 10, pTXT, sizeof(*pTXT) );
 }
 
 SDL::~SDL()
 {
+	gpmSDL_FreeSRF( pSRFload );
+	gpmSDL_FreeSRF( pSRFchar );
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
     SDL_Quit();
 }
+void SDL::TXT_draw()
+{
+	SDL_Rect src, dst;
+	src = chr;
+	dst.w = txt.w/txt.x;
+	dst.h = txt.h/txt.y;
 
+	U1 c;
+	if( dst.w != src.w || dst.h != src.h )
+	{
+		for( U4 i = 0; i < nTXT; i++ )
+		{
+			c = pTXT[i].w;
+			if( !c )
+				continue;
+			src.x = (c%chr.x)*chr.w;
+			src.y = (c/chr.x)*chr.h;
+			dst.x = (i%txt.x)*dst.w;
+			dst.y = (i/txt.x)*dst.h;
+			SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
+		}
+		return;
+	}
+	for( U4 i = 0; i < nTXT; i++ )
+	{
+		c = pTXT[i].w;
+		if( !c )
+			continue;
+		src.x = (c%chr.x)*chr.w;
+		src.y = (c/chr.x)*chr.h;
+		dst.x = (i%txt.x)*chr.w;
+		dst.y = (i/txt.x)*chr.h;
+		SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
+	}
+}
 void SDL::draw()
 {
     // Clear the window with a black background
@@ -100,17 +166,31 @@ void SDL::draw()
                     0,   0,   0  // Black
                 };
 
-    SDL_Rect colorBar;
+    SDL_Rect colorBar, src, dst;
     colorBar.x = 0; colorBar.y = 0; colorBar.w = 90; colorBar.h = 480;
+
+	src = dst = chr;
+	U1 c;
 
     // Render a new color bar every 0.5 seconds
     for ( int i = 0; i != sizeof rgb / sizeof *rgb; i += 3, colorBar.x += 90 )
+    if(true)
     {
+		SDL_FillRect( pSRFwin, &colorBar, SDL_MapRGB(pSRFwin->format, rgb[i], rgb[i + 1], rgb[i + 2] ) );
+
+		TXT_draw();
+
+		SDL_UpdateWindowSurface( pSDLwin );
+		SDL_Delay( 500 );
+    } else {
         SDL_SetRenderDrawColor( pSDLrndr, rgb[i], rgb[i + 1], rgb[i + 2], 255 );
         SDL_RenderFillRect( pSDLrndr, &colorBar );
         SDL_RenderPresent( pSDLrndr );
         SDL_Delay( 500 );
     }
+
+
+
 }
 char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 	 gpsEXEname[0x100],
@@ -175,7 +255,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
 int main(int nA, char** apA )
-#else 
+#else
 int main( int nA, char *apA[] )
 #endif
 {
@@ -184,14 +264,6 @@ int main( int nA, char *apA[] )
 	if( nA > 0 )
 	{
 		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, apA[0] );
-
-		/*strrchr( strcpy( gpsEXEpath, apA[0] ), '/' );
-		if( !gppEXEfile)
-			gppEXEfile = gpsEXEpath;
-		else if( *gppEXEfile == '/' )
-			gppEXEfile++;
-		strcpy( gpsEXEname, gppEXEfile );
-		*gppEXEfile = 0;*/
 
 		cout << "Start in:" << gpsEXEpath << endl;
 		cout << "Exe is:" << gpsEXEname << endl;
@@ -208,13 +280,6 @@ int main( int nA, char *apA[] )
 			{
 				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, apA[i] );
 
-				/*strcpy( gpsMASSpath, apA[i] );
-				gppMASSfile = strrchr( gpsMASSpath, '/' );
-				if( !gppMASSfile )
-					gppMASSfile = gpsMASSpath;
-				else if( *gppMASSfile == '/' )
-					gppMASSfile++;
-				strcpy( gpsMASSname, gppMASSfile );*/
 				cout << "MASS is:" << gpsMASSname << endl;
 				continue;
 			}
@@ -230,7 +295,8 @@ int main( int nA, char *apA[] )
 
 		gpcMASS* pSRCc = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
-        SDL sdl( SDL_INIT_VIDEO | SDL_INIT_TIMER );
+		strcpy( gppMASSfile, "mini_char.bmp" );
+        SDL sdl( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         sdl.draw();
 
         return 0;

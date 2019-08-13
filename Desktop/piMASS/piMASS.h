@@ -89,6 +89,7 @@
 	#define gpmFREE( p ) free( p )
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
+	#define gpmSDL_FreeSRF( h ){ if( h ){ SDL_FreeSurface( h ); h = NULL; } }
 
 #endif
 
@@ -109,12 +110,9 @@
 
 #include <SDL.h>			//-lSDL2
 #include <SDL_image.h>
-
-
-
-
 #include <math.h>
-
+// Include GLFW
+//#include <glfw3.h>
 
 
 /*#include "gpcSCHL.h"

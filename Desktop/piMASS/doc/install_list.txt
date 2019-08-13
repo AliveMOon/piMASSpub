@@ -42,6 +42,91 @@ To https://github.com/AliveMOon/piMASSpub.git
    4fe9836..a05f887  master -> master
 pi@GP-PI:~/Desktop/piMASS $ 
 
+code:block asztal piMASS
+-------------------------------------------------------------
+Other compiler options:
+`sdl2-config --cflags`
+----------------------------------------
+Linker settings:
+Link Libraries
+GP
+GLEW
+SDL2
+
+Other linker options:
+`sdl2-config --libs`
+-----------------------------
+Search directories
+Compiler
+./
+include
+
+---------------------------------------- OpenGL Shader?
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo apt-get install raspi-gpio
+
+sudo apt-get install xcompmgr libgl1-mesa-dri
+
+sudo apt-get install mesa-utils
+
+glxinfo | grep -v "None"
+
+sudo raspi-config
+
+------------------------ SAMBA--------------------- /etc/samba/smb.conf
+
+
+[PIGL]
+   comment = pigl Directories
+   path = /home/pi/Desktop/openGl/2
+   browseable = yes
+   writeable = yes
+   only guest = no
+   create mask = 0777
+   directory mask = 0777
+   public = yes
+   guest ok = yes	
+
+------------------- GDB ----------------------------
+
+https://dontpressthat.wordpress.com/2017/11/15/using-eclipse-to-write-c-c-programs-for-the-raspberrypi/
+
+sudo apt-get install gdb-multiarch
+
+sudo apt-get install gdbserver
+
+WIN:
+https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download
+
+
+------------------ GL ------------------------------------
+sudo apt-get install libx11-dev
+sudo apt-get install libxi-dev
+sudo apt-get install libgl1-mesa-dev
+sudo apt-get install libglu1-mesa-dev 
+
+sudo apt-get install libxrandr-dev
+sudo apt-get install libxext-dev
+sudo apt-get install libxcursor-dev
+sudo apt-get install libxinerama-dev
+ sudo apt-get install libxi-dev
+
+sudo apt-get install libglew-dev 	// ilyenkor mar aszondja a legfrissebb -------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
