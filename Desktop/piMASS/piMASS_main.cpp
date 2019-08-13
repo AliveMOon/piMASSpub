@@ -23,6 +23,59 @@
 #include "piMASS.h"
 #include "gpcSRC.h"
 
+U1 gp_s_key_map[] =
+// simple
+"00123456789-=000"
+"qwertzuiopőú11as"
+"dfghjkléá022yxcv"
+"bnm,.-3*3 3fffff"
+"fffff44789-456+1"
+"230.555ff5555555"
+"6666fff666666666"
+"7777777777777777"
+"8888888888888888"
+"9999999999999999"
+"aaaaaaaaaaaaaaaa"
+"bbbbbbbbbbbbbbbb"
+"cccccccccccccccc"
+"dddddddddddddddd"
+"eeeeeeeeeeeeeeee"
+"ffffffffffffffff"
+// shift
+"00\'\"+!%/=()0-=00"
+"QWERTZUIOP1111AS"
+"DFGHJKL22222YXCV"
+"BNM?:_3*3 3fffff"
+"fffff44789-456+1"
+"230.555ff5555555"
+"6666fff666666666"
+"7777777777777777"
+"8888888888888888"
+"9999999999999999"
+"aaaaaaaaaaaaaaaa"
+"bbbbbbbbbbbbbbbb"
+"cccccccccccccccc"
+"dddddddddddddddd"
+"eeeeeeeeeeeeeeee"
+"ffffffffffffffff"
+// alt
+"001234567890-=00"
+"\\|ERTYUIOP[]11AS"
+"D[]HJKL$2'22>#&@"
+"{}M;.*3*3 3fffff"
+"fffff44789-456+1"
+"230.55<ff5555555"
+"6666fff666666666"
+"7777777777777777"
+"8888888888888888"
+"9999999999999999"
+"aaaaaaaaaaaaaaaa"
+"bbbbbbbbbbbbbbbb"
+"cccccccccccccccc"
+"dddddddddddddddd"
+"eeeeeeeeeeeeeeee"
+"ffffffffffffffff";
+
 class InitError : public std::exception
 {
     std::string msg;
@@ -65,10 +118,12 @@ class SDL
     SDL_Window		*pSDLwin;
     SDL_Renderer	*pSDLrndr;
 public:
+	U1x4		*pCRS;
     SDL( U4 flags = 0, char* pPATH = NULL, char*pFILE = NULL );
     virtual ~SDL();
     void draw();
     void TXT_draw();
+    void ins( U1* pU1 = NULL );
 };
 
 SDL::SDL( U4 flags, char* pPATH, char* pFILE )
@@ -97,7 +152,7 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 
 	txt.x = (txt.w/chr.w)*2;
 	txt.y = (txt.h/chr.h)*2;
-	pTXT = new U1x4[nTXT = txt.x*txt.y];
+	pCRS = pTXT = new U1x4[nTXT = txt.x*txt.y];
 	gpmZn( pTXT, nTXT );
 
 	pTXT[0] = U1x4(255,255,255,'!'-' ');
@@ -111,6 +166,17 @@ SDL::~SDL()
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
     SDL_Quit();
+}
+void SDL::ins( U1* pC )
+{
+	if( pC )
+	for( ; *pC; pC++ )
+	{
+		pCRS->w = *pC > ' ' ? *pC - ' ' :  0;
+		pCRS++;
+	}
+	TXT_draw();
+	SDL_UpdateWindowSurface( pSDLwin );
 }
 void SDL::TXT_draw()
 {
@@ -251,6 +317,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 	}
 }
+U1 gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff;
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -298,6 +365,92 @@ int main( int nA, char *apA[] )
 		strcpy( gppMASSfile, "mini_char.bmp" );
         SDL sdl( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         sdl.draw();
+        SDL_Event ev;
+        U1 c = 0;
+        U1* pKEY; // = (U1*)SDL_GetKeyboardState(NULL);
+        U4 aKT[0x200];
+        gpmZ(aKT);
+        while( gppKEYbuff )
+        {
+			gppKEYbuff = gpsKEYbuff;
+			while( SDL_PollEvent( &ev ) )
+			{
+				switch( ev.type )
+				{
+					case SDL_QUIT:
+						gppKEYbuff = NULL;
+						continue;
+					case SDL_KEYDOWN:
+						aKT[ev.key.keysym.scancode] = ev.key.timestamp|1;
+						break;
+					case SDL_KEYUP:
+						aKT[ev.key.keysym.scancode] = ev.key.timestamp&(~1);
+						if( ev.key.keysym.sym >= 0x80 )
+						{
+							switch( ev.key.keysym.sym )
+							{
+								case SDLK_UP:
+									c = 4;
+									break;
+								case SDLK_RIGHT:
+									c = 3;
+									break;
+								case SDLK_LEFT:
+									c = 2;
+									break;
+								case SDLK_DOWN:
+									c = 1;
+									break;
+
+								case SDLK_LSHIFT:
+								case SDLK_RSHIFT:
+								case SDLK_LALT:
+								case SDLK_RALT:
+								case SDLK_LCTRL:
+								case SDLK_RCTRL:
+									break;
+								default:
+									gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pKEY );
+							}
+							break;
+						}
+
+						pKEY = (U1*)SDL_GetKeyName( ev.key.keysym.sym );
+						if( pKEY[1] )
+						{
+							c = ev.key.keysym.sym;
+
+						} else {
+							// ez a bilencs kiosztások változása miatt kell
+							c = *pKEY;
+							if(
+								!(
+									(
+										 aKT[SDL_SCANCODE_LSHIFT]
+										|aKT[SDL_SCANCODE_RSHIFT]
+									)
+								&1)
+							)
+							if( c >= 'A' && c <= 'Z' )
+							{
+								c += 'a'-'A';
+							}
+						}
+						break;
+				}
+				if( c )
+				{
+					*gppKEYbuff = c;
+					gppKEYbuff++;
+					c = 0;
+				}
+			}
+			if( gppKEYbuff == gpsKEYbuff )
+				continue;
+
+			*gppKEYbuff = 0;
+			sdl.ins( gpsKEYbuff );
+        }
 
         return 0;
     }
