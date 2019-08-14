@@ -29,10 +29,10 @@ U1 gp_s_key_map_sdl[] =
 */
 "0000            "		"0123abcdefghijkl"
 "                "		"mnopqrstuvwxzy12"
-"       :/2/2 :'\""		"3456789on9bb uoo"
+"       :/2// :'\""		"3456789on9bt uoo"
 "'\"3''    3ffffff"		"uu2ea0,.-9123456"
-"ffffff444444/444"		"789abc6789abddef"
-"5555555555555555"		"0123456789abcdef"
+"ffffff444444/44_"		"789abc6789abdder"
+"___5555555555555"		"ldu3456789abcdef"
 "6666'66666666666"		"0123i56789abcdef"
 "7777777777777777"		"0123456789abcdef"
 "8888888888888888"		"0123456789abcdef"
@@ -46,10 +46,10 @@ U1 gp_s_key_map_sdl[] =
 // shift
 "0000            "		"0123ABCDEFGHIJKL"
 "                "		"MNOPQRSTUVWXZY'\""
-"       :/222 :'\""		"+!%/=()ON9AB UOO" // \n
+"       :/2// :'\""		"+!%/=()ON9BT UOO" // \n
 "'\"3''    3FFFFFF"		"UU2EA0?:_9123456"
-"FFFFFF4444444444"		"789ABC6789ABCDEF"
-"5555555555555555"		"0123456789ABCDEF"
+"FFFFFF444444/44_"		"789ABC6789ABDDER"
+"___5555555555555"		"LDU3456789ABCDEF"
 "6666'66666666666"		"0123I56789ABCDEF"
 "7777777777777777"		"0123456789ABCDEF"
 "8888888888888888"		"0123456789ABCDEF"
@@ -65,8 +65,8 @@ U1 gp_s_key_map_sdl[] =
 "        =       "	"M}OP\\RSTC@|# >~?"
 " 2222222/222 222"	"^1234567N9AB DEF"
 "333 33 3 3333333"	"012$45;7*9ABCDEF"
-"4444444444444444"	"0123456789ABCDEF"
-"5555555555555555"	"0123456789ABCDEF"
+"FFFFFF444444/44_"	"789ABC6789ABDDER"
+"___5555555555555"	"LDU3456789ABCDEF"
 "6666 66666666666"	"0123<56789ABCDEF"
 "7777777777777777"	"0123456789ABCDEF"
 "8888888888888888"	"0123456789ABCDEF"
@@ -82,8 +82,8 @@ U1 gp_s_key_map_sdl[] =
 "              11"	"MNOPQRSTUVWXZYEF"
 "22222222 222 222"	"01234567\n9AB DEF"
 "3333333333333333"	"0123456789ABCDEF"
-"4444444444444444"	"0123456789ABCDEF"
-"5555555555555555"	"0123456789ABCDEF"
+"FFFFFF444444/44_"	"789ABC6789ABDDER"
+"___5555555555555"	"LDU3456789ABCDEF"
 "6666666666666666"	"0123456789ABCDEF"
 "7777777777777777"	"0123456789ABCDEF"
 "8888888888888888"	"0123456789ABCDEF"
@@ -479,13 +479,156 @@ int main( int nA, char *apA[] )
 					continue;
 				if( c )
 				{
-					if( c == ' ' )
+					char *pUTF8 = NULL;
+					switch( c )
 					{
-						*gppKEYbuff = aXY[1];
-						gppKEYbuff++;
-					} else {
-						gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );
+						case ' ':
+							*gppKEYbuff = aXY[1];
+							gppKEYbuff++;
+							break;
+						// enter tab izé bizé
+						case '/':
+							break;
+						// cursor nyilak
+						case '_':
+
+							break;
+						// ékezetek ----------------
+						case '\'':
+							{
+								switch( aXY[1] )
+								{
+									case 'A':
+										pUTF8 = "\xc3\x81";
+										break;
+									case 'a':
+										pUTF8 = "\xc3\xa1";
+										break;
+									case 'E':
+										pUTF8 = "\xc3\x89";
+										break;
+									case 'e':
+										pUTF8 = "\xc3\xa9";
+										break;
+									case 'I':
+										pUTF8 = "\xc3\x8d";
+										break;
+									case 'i':
+										pUTF8 = "\xc3\xad";
+										break;
+									case 'O':
+										pUTF8 = "\xc3\x93";
+										break;
+									case 'o':
+										pUTF8 = "\xc3\xb3";
+										break;
+									case 'U':
+										pUTF8 = "\xc3\x9a";
+										break;
+									case 'u':
+										pUTF8 = "\xc3\xba";
+										break;
+									default:
+										pUTF8 = "?";
+								}
+								gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							}
+							break;
+						case '\"':
+							switch( aXY[1] )
+							{
+								/*case 'A':
+									pUTF8 = "\xc3\x81";
+									break;
+								case 'a':
+									pUTF8 = "\xc3\xa1";
+									break;
+								case 'E':
+									pUTF8 = "\xc3\x89";
+									break;
+								case 'e':
+									pUTF8 = "\xc3\xa9";
+									break;
+								case 'I':
+									pUTF8 = "\xc3\x8d";
+									break;
+								case 'i':
+									pUTF8 = "\xc3\xad";
+									break;*/
+
+								case 'O':
+									pUTF8 = "\xc5\x90";
+									break;
+								case 'o':
+									pUTF8 = "\xc5\x91";
+									break;
+								case 'U':
+									pUTF8 = "\xc5\xb0";
+									break;
+								case 'u':
+									pUTF8 = "\xc5\xb1";
+									break;
+								default:
+									pUTF8 = "?";
+							}
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							break;
+						case ':':
+							switch( aXY[1] )
+							{
+								/*case 'A':
+									pUTF8 = "\xc3\x81";
+									break;
+								case 'a':
+									pUTF8 = "\xc3\xa1";
+									break;
+								case 'E':
+									pUTF8 = "\xc3\x89";
+									break;
+								case 'e':
+									pUTF8 = "\xc3\xa9";
+									break;
+								case 'I':
+									pUTF8 = "\xc3\x8d";
+									break;
+								case 'i':
+									pUTF8 = "\xc3\xad";
+									break;*/
+
+								case 'O':
+									pUTF8 = "\xc3\x96";
+									break;
+								case 'o':
+									pUTF8 = "\xc3\xb6";
+									break;
+								case 'U':
+									pUTF8 = "\xc3\x90";
+									break;
+								case 'u':
+									pUTF8 = "\xc3\xbc";
+									break;
+								default:
+									pUTF8 = "?";
+							}
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							break;
+						case '=':
+							// € izé
+							switch( aXY[1] )
+							{
+								case 'C':
+								case 'c':
+										pUTF8 = "\u20AC";
+										break;
+								default:
+									pUTF8 = "?";
+							}
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							break;
+						default:
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );
 					}
+
 					c = 0;
 				}
 			}
