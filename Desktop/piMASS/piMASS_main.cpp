@@ -215,9 +215,11 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 	if( !pPATH )
 		return;
 
-	pSRFload = SDL_LoadBMP( pPATH );
-	pSRFchar = SDL_ConvertSurface( pSRFload, pSRFwin->format, 0 );
-	gpmSDL_FreeSRF( pSRFload );
+	pSRFload = IMG_Load( pPATH ); // SDL_LoadBMP( pPATH );
+	pSRFchar = pSRFload; //SDL_ConvertSurface( pSRFload, pSRFwin->format, 0 );
+
+	if( pSRFchar != pSRFload )
+		gpmSDL_FreeSRF( pSRFload );
 	chr.x = 8;
 	chr.y = 32;
 	chr.w =	pSRFchar->w/chr.x;
@@ -234,7 +236,8 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 
 SDL::~SDL()
 {
-	gpmSDL_FreeSRF( pSRFload );
+	//if( pSRFchar != pSRFload )
+		gpmSDL_FreeSRF( pSRFload );
 	gpmSDL_FreeSRF( pSRFchar );
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
@@ -435,7 +438,7 @@ int main( int nA, char *apA[] )
 
 		gpcMASS* pSRCc = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
-		strcpy( gppMASSfile, "mini_char.bmp" );
+		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
         SDL sdl( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         sdl.draw();
         SDL_Event ev;
@@ -488,6 +491,7 @@ int main( int nA, char *apA[] )
 							break;
 						// enter tab izé bizé
 						case '/':
+
 							break;
 						// cursor nyilak
 						case '_':
