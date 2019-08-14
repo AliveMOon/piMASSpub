@@ -23,6 +23,79 @@
 #include "piMASS.h"
 #include "gpcSRC.h"
 
+U1 gp_s_key_map_sdl[] =
+/*
+ 0123456789abcdef
+*/
+"0000            "		"0123abcdefghijkl"
+"                "		"mnopqrstuvwxzy12"
+"       :/2/2 :'\""		"3456789on9bb uoo"
+"'\"3''    3ffffff"		"uu2ea0,.-9123456"
+"ffffff444444/444"		"789abc6789abddef"
+"5555555555555555"		"0123456789abcdef"
+"6666'66666666666"		"0123i56789abcdef"
+"7777777777777777"		"0123456789abcdef"
+"8888888888888888"		"0123456789abcdef"
+"9999999999999999"		"0123456789abcdef"
+"aaaaaaaaaaaaaaaa"		"0123456789abcdef"
+"bbbbbbbbbbbbbbbb"		"0123456789abcdef"
+"cccccccccccccccc"		"0123456789abcdef"
+"dddddddddddddddd"		"0123456789abcdef"
+"xxxxxxxxeeeeeeee"		"0123456789abcdef"
+"ffffffffffffffff"		"0123456789abcdef"
+// shift
+"0000            "		"0123ABCDEFGHIJKL"
+"                "		"MNOPQRSTUVWXZY'\""
+"       :/222 :'\""		"+!%/=()ON9AB UOO" // \n
+"'\"3''    3FFFFFF"		"UU2EA0?:_9123456"
+"FFFFFF4444444444"		"789ABC6789ABCDEF"
+"5555555555555555"		"0123456789ABCDEF"
+"6666'66666666666"		"0123I56789ABCDEF"
+"7777777777777777"		"0123456789ABCDEF"
+"8888888888888888"		"0123456789ABCDEF"
+"9999999999999999"		"0123456789ABCDEF"
+"AAAAAAAAAAAAAAAA"		"0123456789ABCDEF"
+"BBBBBBBBBBBBBBBB"		"0123456789ABCDEF"
+"CCCCCCCCCCCCCCCC"		"0123456789ABCDEF"
+"DDDDDDDDDDDDDDDD"		"0123456789ABCDEF"
+"xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
+"FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
+// alt
+"0000            "	"0123A{&DE[]HIJKL"
+"        =       "	"M}OP\\RSTC@|# >~?"
+" 2222222/222 222"	"^1234567N9AB DEF"
+"333 33 3 3333333"	"012$45;7*9ABCDEF"
+"4444444444444444"	"0123456789ABCDEF"
+"5555555555555555"	"0123456789ABCDEF"
+"6666 66666666666"	"0123<56789ABCDEF"
+"7777777777777777"	"0123456789ABCDEF"
+"8888888888888888"	"0123456789ABCDEF"
+"9999999999999999"	"0123456789ABCDEF"
+"AAAAAAAAAAAAAAAA"	"0123456789ABCDEF"
+"BBBBBBBBBBBBBBBB"	"0123456789ABCDEF"
+"CCCCCCCCCCCCCCCC"	"0123456789ABCDEF"
+"DDDDDDDDDDDDDDDD"	"0123456789ABCDEF"
+"xxxxxxxxEEEEEEEE"	"0123456789ABCDEF"
+"FFFFFFFFFFFFFFFF"	"0123456789ABCDEF"
+// shift+alt
+"0000            "	"0123ABCDEFGHIJKL"
+"              11"	"MNOPQRSTUVWXZYEF"
+"22222222 222 222"	"01234567\n9AB DEF"
+"3333333333333333"	"0123456789ABCDEF"
+"4444444444444444"	"0123456789ABCDEF"
+"5555555555555555"	"0123456789ABCDEF"
+"6666666666666666"	"0123456789ABCDEF"
+"7777777777777777"	"0123456789ABCDEF"
+"8888888888888888"	"0123456789ABCDEF"
+"9999999999999999"	"0123456789ABCDEF"
+"AAAAAAAAAAAAAAAA"	"0123456789ABCDEF"
+"BBBBBBBBBBBBBBBB"	"0123456789ABCDEF"
+"CCCCCCCCCCCCCCCC"	"0123456789ABCDEF"
+"DDDDDDDDDDDDDDDD"	"0123456789ABCDEF"
+"xxxxxxxxEEEEEEEE"	"0123456789ABCDEF"
+"FFFFFFFFFFFFFFFF"	"0123456789ABCDEF"
+;
+
 U1 gp_s_key_map[] =
 // simple
 "00123456789-=000"
@@ -368,8 +441,9 @@ int main( int nA, char *apA[] )
         SDL_Event ev;
         U1 c = 0;
         U1* pKEY; // = (U1*)SDL_GetKeyboardState(NULL);
-        U4 aKT[0x200];
+        U4 aKT[0x200], scan;
         gpmZ(aKT);
+        U1 aXY[] = "00";
         while( gppKEYbuff )
         {
 			gppKEYbuff = gpsKEYbuff;
@@ -384,64 +458,34 @@ int main( int nA, char *apA[] )
 						aKT[ev.key.keysym.scancode] = ev.key.timestamp|1;
 						break;
 					case SDL_KEYUP:
-						aKT[ev.key.keysym.scancode] = ev.key.timestamp&(~1);
-						if( ev.key.keysym.sym >= 0x80 )
-						{
-							switch( ev.key.keysym.sym )
-							{
-								case SDLK_UP:
-									c = 4;
-									break;
-								case SDLK_RIGHT:
-									c = 3;
-									break;
-								case SDLK_LEFT:
-									c = 2;
-									break;
-								case SDLK_DOWN:
-									c = 1;
-									break;
 
-								case SDLK_LSHIFT:
-								case SDLK_RSHIFT:
-								case SDLK_LALT:
-								case SDLK_RALT:
-								case SDLK_LCTRL:
-								case SDLK_RCTRL:
-									break;
-								default:
-									gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pKEY );
-							}
-							break;
-						}
+						aKT[ev.key.keysym.scancode] = ev.key.timestamp;
+						aKT[ev.key.keysym.scancode] &= ~1;
 
-						pKEY = (U1*)SDL_GetKeyName( ev.key.keysym.sym );
-						if( pKEY[1] )
-						{
-							c = ev.key.keysym.sym;
+						scan = ev.key.keysym.scancode&0xff;
+						scan = scan%0x10+(scan/0x10)*0x20;
 
-						} else {
-							// ez a bilencs kiosztások változása miatt kell
-							c = *pKEY;
-							if(
-								!(
-									(
-										 aKT[SDL_SCANCODE_LSHIFT]
-										|aKT[SDL_SCANCODE_RSHIFT]
-									)
-								&1)
-							)
-							if( c >= 'A' && c <= 'Z' )
-							{
-								c += 'a'-'A';
-							}
-						}
+						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+							scan |= 0x200;
+						if( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) )
+							scan |= 0x400;
+
+						aXY[0] = c = gp_s_key_map_sdl[scan];
+						aXY[1] = gp_s_key_map_sdl[scan+0x10];
+
 						break;
 				}
+				if( c == 'x' )
+					continue;
 				if( c )
 				{
-					*gppKEYbuff = c;
-					gppKEYbuff++;
+					if( c == ' ' )
+					{
+						*gppKEYbuff = aXY[1];
+						gppKEYbuff++;
+					} else {
+						gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );
+					}
 					c = 0;
 				}
 			}
