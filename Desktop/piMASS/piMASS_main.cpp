@@ -61,39 +61,39 @@ U1 gp_s_key_map_sdl[] =
 "xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
 "FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
 // alt
-"0000            "	"0123A{&DE[]HIJKL"
-"        =       "	"M}OP\\RSTC@|# >~?"
-" 2222222/222 222"	"^1234567N9AB DEF"
-"333 33 3 3333333"	"012$45;7*9ABCDEF"
-"FFFFFF444444/44_"	"789ABC6789ABDDER"
-"___5555555555555"	"LDU3456789ABCDEF"
-"6666 66666666666"	"0123<56789ABCDEF"
-"7777777777777777"	"0123456789ABCDEF"
-"8888888888888888"	"0123456789ABCDEF"
-"9999999999999999"	"0123456789ABCDEF"
-"AAAAAAAAAAAAAAAA"	"0123456789ABCDEF"
-"BBBBBBBBBBBBBBBB"	"0123456789ABCDEF"
-"CCCCCCCCCCCCCCCC"	"0123456789ABCDEF"
-"DDDDDDDDDDDDDDDD"	"0123456789ABCDEF"
-"xxxxxxxxEEEEEEEE"	"0123456789ABCDEF"
-"FFFFFFFFFFFFFFFF"	"0123456789ABCDEF"
+"0000            "		"0123A{&DE[]HIJKL"
+"        =       "		"M}OP\\RSTC@|# >~?"
+" 2222222/222 222"		"^1234567N9AB DEF"
+"333 33 3 3333333"		"012$45;7*9ABCDEF"
+"FFFFFF444444/44_"		"789ABC6789ABDDER"
+"___5555555555555"		"LDU3456789ABCDEF"
+"6666 66666666666"		"0123<56789ABCDEF"
+"7777777777777777"		"0123456789ABCDEF"
+"8888888888888888"		"0123456789ABCDEF"
+"9999999999999999"		"0123456789ABCDEF"
+"AAAAAAAAAAAAAAAA"		"0123456789ABCDEF"
+"BBBBBBBBBBBBBBBB"		"0123456789ABCDEF"
+"CCCCCCCCCCCCCCCC"		"0123456789ABCDEF"
+"DDDDDDDDDDDDDDDD"		"0123456789ABCDEF"
+"xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
+"FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
 // shift+alt
-"0000            "	"0123ABCDEFGHIJKL"
-"              11"	"MNOPQRSTUVWXZYEF"
-"22222222 222 222"	"01234567\n9AB DEF"
-"3333333333333333"	"0123456789ABCDEF"
-"FFFFFF444444/44_"	"789ABC6789ABDDER"
-"___5555555555555"	"LDU3456789ABCDEF"
-"6666666666666666"	"0123456789ABCDEF"
-"7777777777777777"	"0123456789ABCDEF"
-"8888888888888888"	"0123456789ABCDEF"
-"9999999999999999"	"0123456789ABCDEF"
-"AAAAAAAAAAAAAAAA"	"0123456789ABCDEF"
-"BBBBBBBBBBBBBBBB"	"0123456789ABCDEF"
-"CCCCCCCCCCCCCCCC"	"0123456789ABCDEF"
-"DDDDDDDDDDDDDDDD"	"0123456789ABCDEF"
-"xxxxxxxxEEEEEEEE"	"0123456789ABCDEF"
-"FFFFFFFFFFFFFFFF"	"0123456789ABCDEF"
+"0000            "		"0123ABCDEFGHIJKL"
+"              11"		"MNOPQRSTUVWXZYEF"
+"22222222 222 222"		"01234567\n9AB DEF"
+"3333333333333333"		"0123456789ABCDEF"
+"FFFFFF444444/44_"		"789ABC6789ABDDER"
+"___5555555555555"		"LDU3456789ABCDEF"
+"6666666666666666"		"0123456789ABCDEF"
+"7777777777777777"		"0123456789ABCDEF"
+"8888888888888888"		"0123456789ABCDEF"
+"9999999999999999"		"0123456789ABCDEF"
+"AAAAAAAAAAAAAAAA"		"0123456789ABCDEF"
+"BBBBBBBBBBBBBBBB"		"0123456789ABCDEF"
+"CCCCCCCCCCCCCCCC"		"0123456789ABCDEF"
+"DDDDDDDDDDDDDDDD"		"0123456789ABCDEF"
+"xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
+"FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
 ;
 
 U1 gp_s_key_map[] =
@@ -246,14 +246,41 @@ SDL::~SDL()
 void SDL::ins( U1* pC )
 {
 	if( pC )
-	for( ; *pC; pC++ )
+	for( U1 nx; *pC; pC++ )
 	{
-		pCRS->w = *pC > ' ' ? *pC - ' ' :  0;
+		if( *pC < ' ' )
+		{
+			continue;
+		}
+		if( *pC < 0x80 )
+		{
+			pCRS->w = *pC - ' ';
+			pCRS++;
+			continue;
+		}
+		nx = *pC;
+		pC++;
+		if( !*pC )
+			break;
+
+		pCRS->w = *pC - ' ';
+		pCRS->w += (nx&4)>>2;
 		pCRS++;
 	}
 	TXT_draw();
 	SDL_UpdateWindowSurface( pSDLwin );
 }
+U1 gpsEKEZET[] =
+" A       E   I  "
+"UOoO  O   U U   "
+" a       e   i  "
+"uUuo  o   u u   "
+" '       '   '  "
+":\"\"'  :   ' :   "
+" '       '   '  "
+":\"\"'  :   ' :   "
+"0123456789abcdef";
+
 void SDL::TXT_draw()
 {
 	SDL_Rect src, dst;
@@ -261,7 +288,7 @@ void SDL::TXT_draw()
 	dst.w = txt.w/txt.x;
 	dst.h = txt.h/txt.y;
 
-	U1 c;
+	U1 c,d;
 	if( dst.w != src.w || dst.h != src.h )
 	{
 		for( U4 i = 0; i < nTXT; i++ )
@@ -269,6 +296,18 @@ void SDL::TXT_draw()
 			c = pTXT[i].w;
 			if( !c )
 				continue;
+			if( c > 0x60 )
+			{
+				d = gpsEKEZET[c-0x60]-' ';
+				src.x = (d%chr.x)*chr.w;
+				src.y = (d/chr.x)*chr.h;
+				dst.x = (i%txt.x)*dst.w;
+				dst.y = (i/txt.x)*dst.h;
+				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
+
+				c = gpsEKEZET[c-0x20]-' ';
+			}
+
 			src.x = (c%chr.x)*chr.w;
 			src.y = (c/chr.x)*chr.h;
 			dst.x = (i%txt.x)*dst.w;
@@ -282,6 +321,18 @@ void SDL::TXT_draw()
 		c = pTXT[i].w;
 		if( !c )
 			continue;
+		if( c > 0x60 )
+		{
+			d = gpsEKEZET[c-0x60]-' ';
+			src.x = (d%chr.x)*chr.w;
+			src.y = (d/chr.x)*chr.h;
+			dst.x = (i%txt.x)*chr.w;
+			dst.y = (i/txt.x)*chr.h;
+			SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
+
+			c = gpsEKEZET[c-0x20]-' ';
+		}
+
 		src.x = (c%chr.x)*chr.w;
 		src.y = (c/chr.x)*chr.h;
 		dst.x = (i%txt.x)*chr.w;
