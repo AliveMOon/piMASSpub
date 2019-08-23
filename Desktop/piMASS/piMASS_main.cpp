@@ -225,8 +225,8 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 	chr.w =	pSRFchar->w/chr.x;
 	chr.h = pSRFchar->h/chr.y;
 
-	txt.x = (txt.w/chr.w)*2;
-	txt.y = (txt.h/chr.h)*2;
+	txt.x = (txt.w/chr.w); //*2;
+	txt.y = (txt.h/chr.h); //*2;
 	pCRS = pTXT = new U1x4[nTXT = txt.x*txt.y];
 	gpmZn( pTXT, nTXT );
 
@@ -237,7 +237,7 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 SDL::~SDL()
 {
 	//if( pSRFchar != pSRFload )
-		gpmSDL_FreeSRF( pSRFload );
+	gpmSDL_FreeSRF( pSRFload );
 	gpmSDL_FreeSRF( pSRFchar );
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
@@ -305,7 +305,7 @@ void SDL::TXT_draw()
 				dst.y = (i/txt.x)*dst.h;
 				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
 
-				c = gpsEKEZET[c-0x20]-' ';
+				c = gpsEKEZET[c-0x20]+0x40;
 			}
 
 			src.x = (c%chr.x)*chr.w;

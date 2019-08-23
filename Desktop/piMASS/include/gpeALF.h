@@ -70,7 +70,7 @@ typedef enum gpeALF: I8
 	gpeALF_IN = gpdAB('I', 'N'),
 
 	// key ( A, B, ..., Z )
-	gpeALF_KA = gpdAB('K', 'A'),
+	gpeALF_KA = gpdAB('K', 'A'),			// KEYBOARD 'a'
 	gpeALF_KO = gpdAB('K', 'O'),
 	gpeALF_KZ = gpdAB('K', 'Z'),
 	gpeALF_LG = gpdAB('L', 'G'),
