@@ -184,7 +184,7 @@ class SDL
 {
 	SDL_Rect	txt, chr;
 	U1x4		*pTXT;
-	U4			nTXT;
+	U4			nTXT, nX;
 	SDL_Surface		*pSRFload,
 					*pSRFchar,
 					*pSRFwin;
@@ -224,9 +224,9 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 	chr.y = 32;
 	chr.w =	pSRFchar->w/chr.x;
 	chr.h = pSRFchar->h/chr.y;
-
-	txt.x = (txt.w/chr.w); //*2;
-	txt.y = (txt.h/chr.h); //*2;
+	nX = 2;
+	txt.x = (txt.w/chr.w)*nX;
+	txt.y = (txt.h/chr.h)*nX;
 	pCRS = pTXT = new U1x4[nTXT = txt.x*txt.y];
 	gpmZn( pTXT, nTXT );
 
@@ -287,7 +287,7 @@ void SDL::TXT_draw()
 	src = chr;
 	dst.w = txt.w/txt.x;
 	dst.h = txt.h/txt.y;
-
+	SDL_FillRect( pSRFwin, NULL, 0x00000000 );
 	U1 c,d;
 	if( dst.w != src.w || dst.h != src.h )
 	{
@@ -296,7 +296,21 @@ void SDL::TXT_draw()
 			c = pTXT[i].w;
 			if( !c )
 				continue;
+			dst.x = (i%txt.x)*dst.w;
+			dst.y = (i/txt.x)*dst.h;
+
 			if( c > 0x60 )
+			{
+				d = gpsEKEZET[c-0x60]-' ';
+				src.x = (d%chr.x)*chr.w;
+				src.y = (d/chr.x)*chr.h;
+				//dst.x = (i%txt.x)*chr.w;
+				//dst.y = (i/txt.x)*chr.h;
+				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
+
+				c = gpsEKEZET[c-0x20]-' ';
+			}
+			/*if( c > 0x60 )
 			{
 				d = gpsEKEZET[c-0x60]-' ';
 				src.x = (d%chr.x)*chr.w;
@@ -306,12 +320,11 @@ void SDL::TXT_draw()
 				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
 
 				c = gpsEKEZET[c-0x20]+0x40;
-			}
+			}*/
 
 			src.x = (c%chr.x)*chr.w;
 			src.y = (c/chr.x)*chr.h;
-			dst.x = (i%txt.x)*dst.w;
-			dst.y = (i/txt.x)*dst.h;
+
 			SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
 		}
 		return;
@@ -321,13 +334,14 @@ void SDL::TXT_draw()
 		c = pTXT[i].w;
 		if( !c )
 			continue;
+		dst.x = (i%txt.x)*chr.w;
+		dst.y = (i/txt.x)*chr.h;
+
 		if( c > 0x60 )
 		{
 			d = gpsEKEZET[c-0x60]-' ';
 			src.x = (d%chr.x)*chr.w;
 			src.y = (d/chr.x)*chr.h;
-			dst.x = (i%txt.x)*chr.w;
-			dst.y = (i/txt.x)*chr.h;
 			SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
 
 			c = gpsEKEZET[c-0x20]-' ';
@@ -335,8 +349,8 @@ void SDL::TXT_draw()
 
 		src.x = (c%chr.x)*chr.w;
 		src.y = (c/chr.x)*chr.h;
-		dst.x = (i%txt.x)*chr.w;
-		dst.y = (i/txt.x)*chr.h;
+		//dst.x = (i%txt.x)*chr.w;
+		//dst.y = (i/txt.x)*chr.h;
 		SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
 	}
 }
