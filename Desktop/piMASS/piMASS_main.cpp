@@ -184,7 +184,7 @@ class SDL
 {
 	SDL_Rect	txt, chr;
 	U1x4		*pTXT;
-	U4			nTXT, nX;
+	U4			nTXT, nX,dX;
 	SDL_Surface		*pSRFload,
 					*pSRFchar,
 					*pSRFwin;
@@ -224,9 +224,9 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 	chr.y = 32;
 	chr.w =	pSRFchar->w/chr.x;
 	chr.h = pSRFchar->h/chr.y;
-	nX = 2;
-	txt.x = (txt.w/chr.w)*nX;
-	txt.y = (txt.h/chr.h)*nX;
+	nX = 4, dX = 2;
+	txt.x = ((txt.w/chr.w)*nX)/dX;
+	txt.y = ((txt.h/chr.h)*nX)/dX;
 	pCRS = pTXT = new U1x4[nTXT = txt.x*txt.y];
 	gpmZn( pTXT, nTXT );
 
@@ -308,7 +308,7 @@ void SDL::TXT_draw()
 				//dst.y = (i/txt.x)*chr.h;
 				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
 
-				c = gpsEKEZET[c-0x20]-' ';
+				c = gpsEKEZET[c-0x20]-' '+0x60;
 			}
 			/*if( c > 0x60 )
 			{
@@ -344,7 +344,7 @@ void SDL::TXT_draw()
 			src.y = (d/chr.x)*chr.h;
 			SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
 
-			c = gpsEKEZET[c-0x20]-' ';
+			c = gpsEKEZET[c-0x20]-' '+0x60;
 		}
 
 		src.x = (c%chr.x)*chr.w;
