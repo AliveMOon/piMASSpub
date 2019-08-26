@@ -180,7 +180,7 @@ const char * InitError::what() const throw()
     return msg.c_str();
 }
 
-class SDL
+class GPS_CRS
 {
 	SDL_Rect	txt, chr;
 	U1x4		*pTXT;
@@ -192,14 +192,14 @@ class SDL
     SDL_Renderer	*pSDLrndr;
 public:
 	U1x4		*pCRS;
-    SDL( U4 flags = 0, char* pPATH = NULL, char*pFILE = NULL );
-    virtual ~SDL();
+    GPS_CRS( U4 flags = 0, char* pPATH = NULL, char*pFILE = NULL );
+    virtual ~GPS_CRS();
     void draw();
     void TXT_draw();
-    void ins( U1* pU1 = NULL );
+    void ins( U1* pC, U1* pM, U1* pB  );
 };
 
-SDL::SDL( U4 flags, char* pPATH, char* pFILE )
+GPS_CRS::GPS_CRS( U4 flags, char* pPATH, char* pFILE )
 {
     if ( SDL_Init( flags ) != 0 )
         throw InitError();
@@ -234,7 +234,7 @@ SDL::SDL( U4 flags, char* pPATH, char* pFILE )
 	gpfMEMSET( pTXT+1, 10, pTXT, sizeof(*pTXT) );
 }
 
-SDL::~SDL()
+GPS_CRS::~GPS_CRS()
 {
 	//if( pSRFchar != pSRFload )
 	gpmSDL_FreeSRF( pSRFload );
@@ -243,27 +243,31 @@ SDL::~SDL()
     SDL_DestroyRenderer( pSDLrndr );
     SDL_Quit();
 }
-void SDL::ins( U1* pC )
+void GPS_CRS::ins( U1* pC, U1* pM, U1* pB )
 {
-	if( pC )
-	for( U1 nx; *pC; pC++ )
+	for( U1 i = 0; pB+i < pM; i++ )
 	{
-		if( *pC < ' ' )
+		pTXT[i].w = pB[i]-' ';
+	}
+	if( pC > pM )
+	for( U1 nx; pM < pC; pM++ )
+	{
+		if( *pM < ' ' )
 		{
 			continue;
 		}
-		if( *pC < 0x80 )
+		if( *pM < 0x80 )
 		{
-			pCRS->w = *pC - ' ';
+			pCRS->w = *pM - ' ';
 			pCRS++;
 			continue;
 		}
-		nx = *pC;
-		pC++;
-		if( !*pC )
+		nx = *pM;
+		pM++;
+		if( !*pM )
 			break;
 
-		pCRS->w = *pC - ' ';
+		pCRS->w = *pM - ' ';
 		pCRS->w += (nx&4)>>2;
 		pCRS++;
 	}
@@ -281,7 +285,7 @@ U1 gpsEKEZET[] =
 ":\"\"'  :   ' :   "
 "0123456789abcdef";
 
-void SDL::TXT_draw()
+void GPS_CRS::TXT_draw()
 {
 	SDL_Rect src, dst;
 	src = chr;
@@ -302,13 +306,13 @@ void SDL::TXT_draw()
 			if( c > 0x60 )
 			{
 				d = gpsEKEZET[c-0x60]-' ';
+				c = gpsEKEZET[c-0x20]-' '+0x60;
+				if( d >= 'a'-' ' && d <= 'z'-' ' )
+					c += 8;
 				src.x = (d%chr.x)*chr.w;
 				src.y = (d/chr.x)*chr.h;
-				//dst.x = (i%txt.x)*chr.w;
-				//dst.y = (i/txt.x)*chr.h;
 				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
 
-				c = gpsEKEZET[c-0x20]-' '+0x60;
 			}
 			/*if( c > 0x60 )
 			{
@@ -354,7 +358,7 @@ void SDL::TXT_draw()
 		SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
 	}
 }
-void SDL::draw()
+void GPS_CRS::draw()
 {
     // Clear the window with a black background
     SDL_SetRenderDrawColor( pSDLrndr, 0, 0, 0, 255 );
@@ -458,7 +462,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 	}
 }
-U1 gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff;
+U1 gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff;
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -504,7 +508,7 @@ int main( int nA, char *apA[] )
 		gpcMASS* pSRCc = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
 		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
-        SDL sdl( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
+        GPS_CRS sdl( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         sdl.draw();
         SDL_Event ev;
         U1 c = 0;
@@ -512,9 +516,27 @@ int main( int nA, char *apA[] )
         U4 aKT[0x200], scan;
         gpmZ(aKT);
         U1 aXY[] = "00";
+        I4x4 mouse(0,0);
+        U4 nM;
         while( gppKEYbuff )
         {
-			gppKEYbuff = gpsKEYbuff;
+			if( gppKEYbuff != gpsKEYbuff )
+			{
+				*gppKEYbuff = 0;
+				sdl.ins( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
+			}
+
+
+			gppMOUSEbuff = gppKEYbuff = gpsKEYbuff;
+			SDL_GetMouseState( &mouse.x, &mouse.y );
+			if( (nM = abs( mouse.z-mouse.x)+abs( mouse.w-mouse.y)) > 0 )
+			{
+				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d ", mouse.x, mouse.y );
+				mouse.z=mouse.x;
+				mouse.w=mouse.y;
+				gppMOUSEbuff = gppKEYbuff;
+				*gppKEYbuff = 0;
+			}
 			while( SDL_PollEvent( &ev ) )
 			{
 				switch( ev.type )
@@ -701,11 +723,7 @@ int main( int nA, char *apA[] )
 					c = 0;
 				}
 			}
-			if( gppKEYbuff == gpsKEYbuff )
-				continue;
 
-			*gppKEYbuff = 0;
-			sdl.ins( gpsKEYbuff );
         }
 
         return 0;
