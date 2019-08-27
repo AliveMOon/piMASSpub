@@ -274,7 +274,7 @@ void GPS_CRS::ins( U1* pC, U1* pM, U1* pB )
 	TXT_draw();
 	SDL_UpdateWindowSurface( pSDLwin );
 }
-U1 gpsEKEZET[] =
+U1 gpsHUN[] =
 " A       E   I  "
 "UOoO  O   U U   "
 " a       e   i  "
@@ -305,8 +305,8 @@ void GPS_CRS::TXT_draw()
 
 			if( c > 0x60 )
 			{
-				d = gpsEKEZET[c-0x60]-' ';
-				c = gpsEKEZET[c-0x20]-' '+0x60;
+				d = gpsHUN[c-0x60]-' ';
+				c = gpsHUN[c-0x20]-' '+0x60;
 				if( d >= 'a'-' ' && d <= 'z'-' ' )
 					c += 8;
 				src.x = (d%chr.x)*chr.w;
@@ -316,14 +316,14 @@ void GPS_CRS::TXT_draw()
 			}
 			/*if( c > 0x60 )
 			{
-				d = gpsEKEZET[c-0x60]-' ';
+				d = gpsHUN[c-0x60]-' ';
 				src.x = (d%chr.x)*chr.w;
 				src.y = (d/chr.x)*chr.h;
 				dst.x = (i%txt.x)*dst.w;
 				dst.y = (i/txt.x)*dst.h;
 				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
 
-				c = gpsEKEZET[c-0x20]+0x40;
+				c = gpsHUN[c-0x20]+0x40;
 			}*/
 
 			src.x = (c%chr.x)*chr.w;
@@ -343,12 +343,12 @@ void GPS_CRS::TXT_draw()
 
 		if( c > 0x60 )
 		{
-			d = gpsEKEZET[c-0x60]-' ';
+			d = gpsHUN[c-0x60]-' ';
 			src.x = (d%chr.x)*chr.w;
 			src.y = (d/chr.x)*chr.h;
 			SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
 
-			c = gpsEKEZET[c-0x20]-' '+0x60;
+			c = gpsHUN[c-0x20]-' '+0x60;
 		}
 
 		src.x = (c%chr.x)*chr.w;
@@ -508,32 +508,39 @@ int main( int nA, char *apA[] )
 		gpcMASS* pSRCc = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
 		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
-        GPS_CRS sdl( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
-        sdl.draw();
+        GPS_CRS crs( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
+        //sdl.draw();
         SDL_Event ev;
         U1 c = 0;
         U1* pKEY; // = (U1*)SDL_GetKeyboardState(NULL);
         U4 aKT[0x200], scan;
         gpmZ(aKT);
         U1 aXY[] = "00";
-        I4x4 mouse(0,0);
-        U4 nM;
+        I4x4 mouseXY(0,0), mouseW(0);
+        I4 nM, nMB = 0, nMBB = 0;
         while( gppKEYbuff )
         {
 			if( gppKEYbuff != gpsKEYbuff )
 			{
 				*gppKEYbuff = 0;
-				sdl.ins( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
+				crs.ins( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 			}
 
 
 			gppMOUSEbuff = gppKEYbuff = gpsKEYbuff;
-			SDL_GetMouseState( &mouse.x, &mouse.y );
-			if( (nM = abs( mouse.z-mouse.x)+abs( mouse.w-mouse.y)) > 0 )
+			nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
+			if( (
+					nM =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos
+							+abs(nMBB-nMB)										// mBUTTON
+							+abs( mouseW.z-mouseW.x)+abs( mouseW.w-mouseW.y)	// mWheel
+				) > 0 )
 			{
-				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d ", mouse.x, mouse.y );
-				mouse.z=mouse.x;
-				mouse.w=mouse.y;
+				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d wx:%d wy:%d %d", mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB );
+				mouseXY.z=mouseXY.x;
+				mouseXY.w=mouseXY.y;
+				mouseW.z=mouseW.x;
+				mouseW.w=mouseW.y;
+				nMBB = nMB;
 				gppMOUSEbuff = gppKEYbuff;
 				*gppKEYbuff = 0;
 			}
@@ -541,6 +548,10 @@ int main( int nA, char *apA[] )
 			{
 				switch( ev.type )
 				{
+					case SDL_MOUSEWHEEL:
+						mouseW.x += ev.wheel.x;
+						mouseW.y += ev.wheel.y;
+						break;
 					case SDL_QUIT:
 						gppKEYbuff = NULL;
 						continue;
@@ -553,12 +564,22 @@ int main( int nA, char *apA[] )
 						aKT[ev.key.keysym.scancode] &= ~1;
 
 						scan = ev.key.keysym.scancode&0xff;
-						scan = scan%0x10+(scan/0x10)*0x20;
+						// az SDL scan codjábol csinál egy 0x20*y öszeget
+						// ami a táblázatban a kívánt karakterre fog mutatni
+						scan = (scan%0x10) + (scan/0x10)*0x20;
 
+						// SHIFT & ALT modosíthatja
+						// tehát 0x800-as táblázatban tud válogatni
 						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
 							scan |= 0x200;
 						if( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) )
 							scan |= 0x400;
+						// a táblázat első 0x10 / 16 a vezérlő kód
+						// ' ' sima ASCII
+						// - :"' - ékezetes betűk
+						// fF azok a felső funkció gombok f1f2f3f4 etc...
+						// _ kurzor nyilak
+						// / azok a szeparátor azaz enter tab cell etc...
 
 						aXY[0] = c = gp_s_key_map_sdl[scan];
 						aXY[1] = gp_s_key_map_sdl[scan+0x10];
@@ -628,25 +649,6 @@ int main( int nA, char *apA[] )
 						case '\"':
 							switch( aXY[1] )
 							{
-								/*case 'A':
-									pUTF8 = "\xc3\x81";
-									break;
-								case 'a':
-									pUTF8 = "\xc3\xa1";
-									break;
-								case 'E':
-									pUTF8 = "\xc3\x89";
-									break;
-								case 'e':
-									pUTF8 = "\xc3\xa9";
-									break;
-								case 'I':
-									pUTF8 = "\xc3\x8d";
-									break;
-								case 'i':
-									pUTF8 = "\xc3\xad";
-									break;*/
-
 								case 'O':
 									pUTF8 = "\xc5\x90";
 									break;
@@ -667,25 +669,6 @@ int main( int nA, char *apA[] )
 						case ':':
 							switch( aXY[1] )
 							{
-								/*case 'A':
-									pUTF8 = "\xc3\x81";
-									break;
-								case 'a':
-									pUTF8 = "\xc3\xa1";
-									break;
-								case 'E':
-									pUTF8 = "\xc3\x89";
-									break;
-								case 'e':
-									pUTF8 = "\xc3\xa9";
-									break;
-								case 'I':
-									pUTF8 = "\xc3\x8d";
-									break;
-								case 'i':
-									pUTF8 = "\xc3\xad";
-									break;*/
-
 								case 'O':
 									pUTF8 = "\xc3\x96";
 									break;
@@ -715,6 +698,10 @@ int main( int nA, char *apA[] )
 									pUTF8 = "?";
 							}
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							break;
+						case 'f':
+						case 'F':
+
 							break;
 						default:
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );
