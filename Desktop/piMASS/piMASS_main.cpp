@@ -48,7 +48,7 @@ U1 gp_s_key_map_sdl[] =
 "                "		"MNOPQRSTUVWXZY'\""
 "       :/2// :'\""		"+!%/=()ON9BT UOO" // \n
 "'\"3''    3FFFFFF"		"UU2EA0?:_9123456"
-"FFFFFF444444/44_"		"789ABC6789ABDDER"
+"FFFFFF444444/44_"		"789abc6789ABDDER"
 "___5555555555555"		"LDU3456789ABCDEF"
 "6666'66666666666"		"0123I56789ABCDEF"
 "7777777777777777"		"0123456789ABCDEF"
@@ -64,8 +64,8 @@ U1 gp_s_key_map_sdl[] =
 "0000            "		"0123A{&DE[]HIJKL"
 "        =       "		"M}OP\\RSTC@|# >~?"
 " 2222222/222 222"		"^1234567N9AB DEF"
-"333 33 3 3333333"		"012$45;7*9ABCDEF"
-"FFFFFF444444/44_"		"789ABC6789ABDDER"
+"333 33 3 3333333"		"012$45;7*9123456"
+"FFFFFF444444/44_"		"789abc6789ABDDER"
 "___5555555555555"		"LDU3456789ABCDEF"
 "6666 66666666666"		"0123<56789ABCDEF"
 "7777777777777777"		"0123456789ABCDEF"
@@ -81,8 +81,8 @@ U1 gp_s_key_map_sdl[] =
 "0000            "		"0123ABCDEFGHIJKL"
 "              11"		"MNOPQRSTUVWXZYEF"
 "22222222 222 222"		"01234567\n9AB DEF"
-"3333333333333333"		"0123456789ABCDEF"
-"FFFFFF444444/44_"		"789ABC6789ABDDER"
+"3333333333333333"		"0123456789123456"
+"FFFFFF444444/44_"		"789abc6789ABDDER"
 "___5555555555555"		"LDU3456789ABCDEF"
 "6666666666666666"		"0123456789ABCDEF"
 "7777777777777777"		"0123456789ABCDEF"
@@ -517,9 +517,10 @@ int main( int nA, char *apA[] )
         gpmZ(aKT);
         U1 aXY[] = "00";
         I4x4 mouseXY(0,0), mouseW(0);
-        I4 nM, nMB = 0, nMBB = 0;
+        I4 nM, nMB = 0, nMBB = 0, nF;
         while( gppKEYbuff )
         {
+
 			if( gppKEYbuff != gpsKEYbuff )
 			{
 				*gppKEYbuff = 0;
@@ -533,9 +534,10 @@ int main( int nA, char *apA[] )
 					nM =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos
 							+abs(nMBB-nMB)										// mBUTTON
 							+abs( mouseW.z-mouseW.x)+abs( mouseW.w-mouseW.y)	// mWheel
+							+nF
 				) > 0 )
 			{
-				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d wx:%d wy:%d %d", mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB );
+				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d wx:%d wy:%d %d F%d    .", mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB, nF );
 				mouseXY.z=mouseXY.x;
 				mouseXY.w=mouseXY.y;
 				mouseW.z=mouseW.x;
@@ -543,6 +545,11 @@ int main( int nA, char *apA[] )
 				nMBB = nMB;
 				gppMOUSEbuff = gppKEYbuff;
 				*gppKEYbuff = 0;
+				if( nF )
+				{
+
+					nF = 0;
+				}
 			}
 			while( SDL_PollEvent( &ev ) )
 			{
@@ -701,6 +708,10 @@ int main( int nA, char *apA[] )
 							break;
 						case 'f':
 						case 'F':
+							{
+								nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
+														aXY[1]-'0';
+							}
 
 							break;
 						default:
