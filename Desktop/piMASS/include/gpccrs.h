@@ -11,7 +11,7 @@ class gpcCRS
 
 		U4 nMINI;
 
-		gpcCRS( gpcWIN& win );
+		gpcCRS( gpcWIN& win, I4 mag0 = 1 );
 		virtual ~gpcCRS();
 
 		I4x4 	gtFRM() { return frm; }

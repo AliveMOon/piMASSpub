@@ -2,14 +2,18 @@
 
 
 
-gpcCRS::gpcCRS( gpcWIN& win )
+gpcCRS::gpcCRS( gpcWIN& win, I4 mag0 )
 {
 	//ctor
 	gpmCLR;
 	SDL_Rect div = win.wDIV(0);
 	frm.z = div.w/win.chr.w;
 	frm.w = div.h/win.chr.h;
+	if( mag0 < 2 )
+		return;
 
+	frm.z *= mag0;
+	frm.w *= mag0;
 }
 
 gpcCRS::~gpcCRS()
@@ -72,7 +76,7 @@ bool gpcCRS::MINI_draw( gpcWIN& win, U1 nDIV )
 	}
 
 
-	SDL_FillRect( win.pSRFwin, &div, 0x00000000 );
+	SDL_FillRect( win.pSRFwin, &div, 0x000000A8 );
 
 	dst.w = div.w/frm.z;
 	dst.h = div.h/frm.w;

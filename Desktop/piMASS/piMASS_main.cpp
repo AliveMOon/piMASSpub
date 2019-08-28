@@ -458,14 +458,14 @@ int main( int nA, char *apA[] )
 						{
 							if( ev.wheel.y )
 							{
-								I4 zm = min( crs.frm.z, crs.frm.w ), zd = zm;
+								I4 zm = min( crs.frm.z, crs.frm.w ), zd = zm, mag = -ev.wheel.y;
 								if( zm < 9 )
-								if( ev.wheel.y < 0 )
+								if( mag < 0 )
 									break;
 								if( zm > 512 )
-								if( ev.wheel.y > 0 )
+								if( mag > 0 )
 									break;
-								zm += ev.wheel.y;
+								zm += mag;
 								crs.frm.z *= zm;
 								crs.frm.w *= zm;
 								crs.frm.z /= zd;
