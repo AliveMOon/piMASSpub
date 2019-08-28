@@ -55,11 +55,15 @@
 		<Unit filename="include/gpcND.h" />
 		<Unit filename="include/gpcOPCD.h" />
 		<Unit filename="include/gpcSCHL.h" />
+		<Unit filename="include/gpccrs.h" />
+		<Unit filename="include/gpcwin.h" />
 		<Unit filename="include/gpeALF.h" />
 		<Unit filename="piMASS.h" />
 		<Unit filename="piMASS_main.cpp" />
 		<Unit filename="src/gpcND.cpp" />
 		<Unit filename="src/gpcPROTO.cpp" />
+		<Unit filename="src/gpccrs.cpp" />
+		<Unit filename="src/gpcwin.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

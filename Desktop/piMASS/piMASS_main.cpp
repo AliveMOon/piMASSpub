@@ -22,6 +22,7 @@
 
 #include "piMASS.h"
 #include "gpcSRC.h"
+#include "gpccrs.h"
 
 U1 gp_s_key_map_sdl[] =
 /*
@@ -149,17 +150,9 @@ U1 gp_s_key_map[] =
 "eeeeeeeeeeeeeeee"
 "ffffffffffffffff";
 
-class InitError : public std::exception
-{
-    std::string msg;
-public:
-    InitError();
-    InitError( const std::string & );
-    virtual ~InitError() throw();
-    virtual const char * what() const throw();
-};
 
-InitError::InitError() :
+
+/*InitError::InitError() :
     exception(),
     msg( SDL_GetError() )
 {
@@ -178,34 +171,35 @@ InitError::~InitError() throw()
 const char * InitError::what() const throw()
 {
     return msg.c_str();
-}
+}*/
 
-class GPS_CRS
+
+class gpcWINo
 {
 	SDL_Rect	txt, chr;
 	U1x4		*pTXT;
 	U4			nTXT, nX,dX;
+	I4			winID;
 	SDL_Surface		*pSRFload,
 					*pSRFchar,
 					*pSRFwin;
-    SDL_Window		*pSDLwin;
     SDL_Renderer	*pSDLrndr;
 public:
-	U1x4		*pCRS;
-    GPS_CRS( U4 flags = 0, char* pPATH = NULL, char*pFILE = NULL );
-    virtual ~GPS_CRS();
+    SDL_Window		*pSDLwin;
+	U1x4			*pCRS;
+    gpcWINo( U4 flags = 0, char* pPATH = NULL, char*pFILE = NULL );
+    virtual ~gpcWINo();
     void draw();
     void TXT_draw();
     void ins( U1* pC, U1* pM, U1* pB  );
 };
 
-GPS_CRS::GPS_CRS( U4 flags, char* pPATH, char* pFILE )
-{
-    if ( SDL_Init( flags ) != 0 )
-        throw InitError();
 
-    if ( SDL_CreateWindowAndRenderer( txt.w = 640, txt.h = 480, SDL_WINDOW_SHOWN, &pSDLwin, &pSDLrndr ) != 0 )
-        throw InitError();
+/*gpcWIN::gpcWIN( U4 flags, char* pPATH, char* pFILE )
+{
+
+
+
 
 
 
@@ -224,7 +218,7 @@ GPS_CRS::GPS_CRS( U4 flags, char* pPATH, char* pFILE )
 	chr.y = 32;
 	chr.w =	pSRFchar->w/chr.x;
 	chr.h = pSRFchar->h/chr.y;
-	nX = 4, dX = 2;
+	nX = 2, dX = 2;
 	txt.x = ((txt.w/chr.w)*nX)/dX;
 	txt.y = ((txt.h/chr.h)*nX)/dX;
 	pCRS = pTXT = new U1x4[nTXT = txt.x*txt.y];
@@ -234,7 +228,7 @@ GPS_CRS::GPS_CRS( U4 flags, char* pPATH, char* pFILE )
 	gpfMEMSET( pTXT+1, 10, pTXT, sizeof(*pTXT) );
 }
 
-GPS_CRS::~GPS_CRS()
+gpcWIN::~gpcWIN()
 {
 	//if( pSRFchar != pSRFload )
 	gpmSDL_FreeSRF( pSRFload );
@@ -242,123 +236,11 @@ GPS_CRS::~GPS_CRS()
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
     SDL_Quit();
-}
-void GPS_CRS::ins( U1* pC, U1* pM, U1* pB )
-{
-	for( U1 i = 0; pB+i < pM; i++ )
-	{
-		pTXT[i].w = pB[i]-' ';
-	}
-	if( pC > pM )
-	for( U1 nx; pM < pC; pM++ )
-	{
-		if( *pM < ' ' )
-		{
-			continue;
-		}
-		if( *pM < 0x80 )
-		{
-			pCRS->w = *pM - ' ';
-			pCRS++;
-			continue;
-		}
-		nx = *pM;
-		pM++;
-		if( !*pM )
-			break;
+}*/
 
-		pCRS->w = *pM - ' ';
-		pCRS->w += (nx&4)>>2;
-		pCRS++;
-	}
-	TXT_draw();
-	SDL_UpdateWindowSurface( pSDLwin );
-}
-U1 gpsHUN[] =
-" A       E   I  "
-"UOoO  O   U U   "
-" a       e   i  "
-"uUuo  o   u u   "
-" '       '   '  "
-":\"\"'  :   ' :   "
-" '       '   '  "
-":\"\"'  :   ' :   "
-"0123456789abcdef";
 
-void GPS_CRS::TXT_draw()
-{
-	SDL_Rect src, dst;
-	src = chr;
-	dst.w = txt.w/txt.x;
-	dst.h = txt.h/txt.y;
-	SDL_FillRect( pSRFwin, NULL, 0x00000000 );
-	U1 c,d;
-	if( dst.w != src.w || dst.h != src.h )
-	{
-		for( U4 i = 0; i < nTXT; i++ )
-		{
-			c = pTXT[i].w;
-			if( !c )
-				continue;
-			dst.x = (i%txt.x)*dst.w;
-			dst.y = (i/txt.x)*dst.h;
 
-			if( c > 0x60 )
-			{
-				d = gpsHUN[c-0x60]-' ';
-				c = gpsHUN[c-0x20]-' '+0x60;
-				if( d >= 'a'-' ' && d <= 'z'-' ' )
-					c += 8;
-				src.x = (d%chr.x)*chr.w;
-				src.y = (d/chr.x)*chr.h;
-				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
-
-			}
-			/*if( c > 0x60 )
-			{
-				d = gpsHUN[c-0x60]-' ';
-				src.x = (d%chr.x)*chr.w;
-				src.y = (d/chr.x)*chr.h;
-				dst.x = (i%txt.x)*dst.w;
-				dst.y = (i/txt.x)*dst.h;
-				SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
-
-				c = gpsHUN[c-0x20]+0x40;
-			}*/
-
-			src.x = (c%chr.x)*chr.w;
-			src.y = (c/chr.x)*chr.h;
-
-			SDL_BlitScaled( pSRFchar, &src, pSRFwin, &dst );
-		}
-		return;
-	}
-	for( U4 i = 0; i < nTXT; i++ )
-	{
-		c = pTXT[i].w;
-		if( !c )
-			continue;
-		dst.x = (i%txt.x)*chr.w;
-		dst.y = (i/txt.x)*chr.h;
-
-		if( c > 0x60 )
-		{
-			d = gpsHUN[c-0x60]-' ';
-			src.x = (d%chr.x)*chr.w;
-			src.y = (d/chr.x)*chr.h;
-			SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
-
-			c = gpsHUN[c-0x20]-' '+0x60;
-		}
-
-		src.x = (c%chr.x)*chr.w;
-		src.y = (c/chr.x)*chr.h;
-		//dst.x = (i%txt.x)*chr.w;
-		//dst.y = (i/txt.x)*chr.h;
-		SDL_BlitSurface( pSRFchar, &src, pSRFwin, &dst );
-	}
-}
-void GPS_CRS::draw()
+/*void gpcWIN::draw()
 {
     // Clear the window with a black background
     SDL_SetRenderDrawColor( pSDLrndr, 0, 0, 0, 255 );
@@ -402,7 +284,7 @@ void GPS_CRS::draw()
 
 
 
-}
+}*/
 char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 	 gpsEXEname[0x100],
 	 gpsMASSpath[gpeMXPATH], *gppMASSfile = gpsMASSpath,
@@ -485,6 +367,9 @@ int main( int nA, char *apA[] )
 
     try
     {
+		if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
+			throw InitError();
+
 		for( int i = 1; i < nA; i++ )
 		{
 			cout << apA[i] << endl;
@@ -508,7 +393,10 @@ int main( int nA, char *apA[] )
 		gpcMASS* pSRCc = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
 		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
-        GPS_CRS crs( SDL_INIT_EVERYTHING, gpsMASSpath, gppMASSfile ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
+
+		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480);
+		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
+        gpcCRS crs( win );
         //sdl.draw();
         SDL_Event ev;
         U1 c = 0;
@@ -516,7 +404,7 @@ int main( int nA, char *apA[] )
         U4 aKT[0x200], scan;
         gpmZ(aKT);
         U1 aXY[] = "00";
-        I4x4 mouseXY(0,0), mouseW(0);
+
         I4 nM, nMB = 0, nMBB = 0, nF;
         while( gppKEYbuff )
         {
@@ -524,7 +412,9 @@ int main( int nA, char *apA[] )
 			if( gppKEYbuff != gpsKEYbuff )
 			{
 				*gppKEYbuff = 0;
-				crs.ins( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
+				crs.MINI_ins( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
+				crs.MINI_draw( win );
+				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
 
 
@@ -551,6 +441,9 @@ int main( int nA, char *apA[] )
 					nF = 0;
 				}
 			}
+
+
+
 			while( SDL_PollEvent( &ev ) )
 			{
 				switch( ev.type )
@@ -592,6 +485,17 @@ int main( int nA, char *apA[] )
 						aXY[1] = gp_s_key_map_sdl[scan+0x10];
 
 						break;
+					case SDL_WINDOWEVENT:
+						if( ev.window.event != SDL_WINDOWEVENT_RESIZED )
+							break;
+						SDL_GetWindowSize( win.pSDLwin, &winSIZ.x, &winSIZ.y );
+						if( !(abs( winSIZ.z-winSIZ.x)+abs( winSIZ.w-winSIZ.y))	)
+							break;
+
+
+
+						winSIZ.z = winSIZ.x;
+						winSIZ.w = winSIZ.y;
 				}
 				if( c == 'x' )
 					continue;

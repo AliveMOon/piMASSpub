@@ -443,9 +443,10 @@
 1565793674 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
 	"gpcSRC.h"
 
-1566847313 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
+1566948198 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
 	"piMASS.h"
 	"gpcSRC.h"
+	"gpccrs.h"
 
 1562069614 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
 	"gpcND.h"
@@ -461,4 +462,17 @@
 	"SDL_version.h"
 	"begin_code.h"
 	"close_code.h"
+
+1566951102 source:/home/pi/Desktop/piMASS/src/gpccrs.cpp
+	"gpccrs.h"
+
+1566951102 /home/pi/Desktop/piMASS/include/gpccrs.h
+	"gpcwin.h"
+
+1566948828 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
+	"gpcwin.h"
+
+1566948828 /home/pi/Desktop/piMASS/include/gpcwin.h
+	"piMASS.h"
+	"gpcSRC.h"
 
