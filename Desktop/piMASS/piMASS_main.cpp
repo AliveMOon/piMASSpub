@@ -518,7 +518,7 @@ int main( int nA, char *apA[] )
 						if( !(abs( winSIZ.z-winSIZ.x)+abs( winSIZ.w-winSIZ.y))	)
 							break;
 
-
+						win.gpeWINresize();
 
 						winSIZ.z = winSIZ.x;
 						winSIZ.w = winSIZ.y;

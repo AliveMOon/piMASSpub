@@ -31,7 +31,7 @@ class gpcWIN
 		SDL_Rect		chr;
 
 		SDL_Rect	wDIV( U1 nDIV );
-
+		void		gpeWINresize( void );
 		gpcWIN( char* pPATH, char* pFILE, I4x4& siz );
 		virtual ~gpcWIN();
 

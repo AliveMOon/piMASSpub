@@ -79,7 +79,17 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 	chr.h = pSRFchar->h/chr.y;
 
 }
+void gpcWIN::gpeWINresize( void )
+{
+	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
+		throw InitError();
+	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
+	winDIV.z = winDIV.x = winSIZ.x*winDIV.x / winDIV.z;
+	winDIV.w = winDIV.y = winSIZ.y*winDIV.y / winDIV.w;
 
+
+
+}
 gpcWIN::~gpcWIN()
 {
 	gpmSDL_FreeSRF( pSRFload );
