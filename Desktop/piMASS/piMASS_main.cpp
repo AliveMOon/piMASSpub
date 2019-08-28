@@ -396,7 +396,10 @@ int main( int nA, char *apA[] )
 
 		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480);
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
-        gpcCRS crs( win );
+        gpcCRS main_crs( win ), *apCRS[4];
+        gpmZ(apCRS);
+        U4 nDIV = 0;
+        apCRS[nDIV] = &main_crs;
         //sdl.draw();
         SDL_Event ev;
         U1 c = 0;
@@ -405,15 +408,15 @@ int main( int nA, char *apA[] )
         gpmZ(aKT);
         U1 aXY[] = "00";
 
-        I4 nM, nMB = 0, nMBB = 0, nF;
+        I4 nMOV, nMAG = 0, nMB = 0, nMBB = 0, nF = 0;
         while( gppKEYbuff )
         {
-
+			gpcCRS& crs = apCRS[nDIV] ? *apCRS[nDIV] : main_crs;
 			if( gppKEYbuff != gpsKEYbuff )
 			{
 				*gppKEYbuff = 0;
 				crs.MINI_ins( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
-				crs.MINI_draw( win );
+				crs.MINI_draw( win, nDIV );
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
 
@@ -421,10 +424,11 @@ int main( int nA, char *apA[] )
 			gppMOUSEbuff = gppKEYbuff = gpsKEYbuff;
 			nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 			if( (
-					nM =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos
+					nMOV =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos
 							+abs(nMBB-nMB)										// mBUTTON
 							+abs( mouseW.z-mouseW.x)+abs( mouseW.w-mouseW.y)	// mWheel
 							+nF
+							+nMAG
 				) > 0 )
 			{
 				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d wx:%d wy:%d %d F%d    .", mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB, nF );
@@ -440,6 +444,7 @@ int main( int nA, char *apA[] )
 
 					nF = 0;
 				}
+				nMAG = 0;
 			}
 
 
@@ -449,6 +454,26 @@ int main( int nA, char *apA[] )
 				switch( ev.type )
 				{
 					case SDL_MOUSEWHEEL:
+						if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
+						{
+							if( ev.wheel.y )
+							{
+								I4 zm = min( crs.frm.z, crs.frm.w ), zd = zm;
+								if( zm < 9 )
+								if( ev.wheel.y < 0 )
+									break;
+								if( zm > 512 )
+								if( ev.wheel.y > 0 )
+									break;
+								zm += ev.wheel.y;
+								crs.frm.z *= zm;
+								crs.frm.w *= zm;
+								crs.frm.z /= zd;
+								crs.frm.w /= zd;
+								nMAG = 1;
+							}
+							break;
+						}
 						mouseW.x += ev.wheel.x;
 						mouseW.y += ev.wheel.y;
 						break;
@@ -474,6 +499,7 @@ int main( int nA, char *apA[] )
 							scan |= 0x200;
 						if( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) )
 							scan |= 0x400;
+
 						// a táblázat első 0x10 / 16 a vezérlő kód
 						// ' ' sima ASCII
 						// - :"' - ékezetes betűk

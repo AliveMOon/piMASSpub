@@ -77,7 +77,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 	chr.y = 32;
 	chr.w =	pSRFchar->w/chr.x;
 	chr.h = pSRFchar->h/chr.y;
-	winDIV.x /= 2;
+	//winDIV.x /= 2;
 }
 
 gpcWIN::~gpcWIN()

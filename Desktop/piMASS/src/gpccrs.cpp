@@ -49,7 +49,7 @@ bool gpcCRS::MINI_off( void )
 	if( !nMINI )
 		return true;	// nincsen mérete ki lett kapcsolva?
 
-	pMINI = new U1x4[nMINI];
+	pCRS = pMINI = new U1x4[nMINI];
 	gpmZn( pMINI, nMINI );
 	return false; // resized mini, print new
 }
@@ -66,7 +66,7 @@ bool gpcCRS::MINI_draw( gpcWIN& win, U1 nDIV )
 		if( !nMINI )
 			return false;	// nincsen mérete ki lett kapcsolva?
 
-		pMINI = new U1x4[nMINI];
+		pCRS = pMINI = new U1x4[nMINI];
 		gpmZn( pMINI, nMINI );
 		return true; // resized mini, print new
 	}
