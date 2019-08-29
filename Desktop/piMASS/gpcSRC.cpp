@@ -161,7 +161,7 @@ gpcMASS::~gpcMASS()
 }
 
 
-gpcSRC* gpcMASS::add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
+gpcSRC* gpcMASS::SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 {
 	n = is = nLST;
 

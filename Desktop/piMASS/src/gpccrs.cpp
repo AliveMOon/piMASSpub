@@ -43,7 +43,7 @@ U1 gpsHUN[] =
 ":\"\"'  :   ' :   "
 "0123456789abcdef";
 
-bool gpcCRS::MINI_off( void )
+bool gpcCRS::miniOFF( void )
 {
 	if( nMINI == frm.z*frm.w )
 		return !nMINI;
@@ -57,10 +57,19 @@ bool gpcCRS::MINI_off( void )
 	gpmZn( pMINI, nMINI );
 	return false; // resized mini, print new
 }
-
-bool gpcCRS::MINI_draw( gpcWIN& win, U1 nDIV )
+U4 gpaC64[] = {
+	0, 			0xffffffff,
+	0xff880000,	0xffaaffee,
+	0xffcc44cc, 0xff00cc55,
+	0xff0000aa, 0xffeeee77,
+	0xffdd8855, 0xff664400,
+	0xffff7777, 0x33333333,
+	0xff777777, 0xffaaff66,
+	0xff0088ff, 0xffbbbbbb,
+};
+bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 {
-	SDL_Rect src = win.chr, div = win.wDIV( nDIV ), dst;
+	SDL_Rect src = win.chr, div = win.wDIV( iDIV ), dst;
 	U4 cx = src.x;
 
 	if( nMINI != frm.z*frm.w )
@@ -76,7 +85,7 @@ bool gpcCRS::MINI_draw( gpcWIN& win, U1 nDIV )
 	}
 
 
-	SDL_FillRect( win.pSRFwin, &div, 0x000000A8 );
+	SDL_FillRect( win.pSRFwin, &div, gpaC64[6] ); // 0x000000AA );
 
 	dst.w = div.w/frm.z;
 	dst.h = div.h/frm.w;
@@ -140,9 +149,9 @@ bool gpcCRS::MINI_draw( gpcWIN& win, U1 nDIV )
 	}
 	return false;
 }
-void gpcCRS::MINI_ins( U1* pC, U1* pM, U1* pB )
+void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )
 {
-	if( MINI_off() )
+	if( miniOFF() )
 		return;
 
 	if( !pCRS )
@@ -173,5 +182,12 @@ void gpcCRS::MINI_ins( U1* pC, U1* pM, U1* pB )
 		pCRS->w += (nx&4)>>2;
 		pCRS++;
 	}
+
+}
+void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
+{
+	if( miniOFF() )
+		return;
+
 
 }

@@ -303,9 +303,9 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 	U1	*pS = (U1*)pU,
 		*pSe = pS+nU;
 	gpcSRC tmp;
-	U4 is, n, xadd = 1, id, mom = 0;
+	U4 is, n, xadd = 1, id, momLV = 0, mCR, *pMAP;
 	nSP = 1;
-
+	U4x4 mCR44;
 	while( pS < pSe ? *pS : false )
 	{
 		tmp.reset( pS, pSe, &pS, aSP44[nSP] );
@@ -314,7 +314,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		tmp.IX = nLST;
 		if( tmp.bSUB( *this ) )
 		{
-			mom = nSP;
+			momLV = nSP;
             nSP++;
             aSP44[nSP].null();
 		}
@@ -323,22 +323,40 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 			cout << "[ENTER]"; // << endl;
 		}
 
-		if( aSP44[mom].z < aSP44[nSP].x )
-				aSP44[mom].z = aSP44[nSP].x;
-		if( aSP44[mom].w < aSP44[nSP].y )
-				aSP44[mom].w = aSP44[nSP].y;
+		if( aSP44[momLV].z < aSP44[nSP].x )
+				aSP44[momLV].z = aSP44[nSP].x;
+		if( aSP44[momLV].w < aSP44[nSP].y )
+				aSP44[momLV].w = aSP44[nSP].y;
 
-        apSP[nSP] = add( &tmp, xadd, aSPix[nSP], n );
 
-		apSP[nSP]->bMAIN( *this, true );
+        apSP[nSP] = SRCadd( &tmp, xadd, aSPix[nSP], n );
+
+        gpcSRC &spREF = *apSP[nSP];
+        if( apSP[momLV] )
+        {
+			if( !apSP[momLV]->pMAP )
+				apSP[momLV]->pMAP = new gpcMAP;
+			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.space, mCR44 );
+        }
+        else
+			pMAP = mapCR.MAPalloc( spREF.space, mCR44 );
+
+		spREF.bMAIN( *this, true );
+
+		if( pMAP )
+		{
+			mCR = spREF.space.x + spREF.space.y*mCR44.z;
+			pMAP[mCR] = xadd; //aSPix[nSP];
+		}
 
 		while( apSP[nSP]->bRET( *this ) )
 		{
 			//apSP[mom]->space = aSP44[mom];
-			apSP[mom]->retIX = aSPix[nSP];
-			mom--;
+			apSP[momLV]->retIX = aSPix[nSP];
+			momLV--;
 			nSP--;
 		}
+
 
 		xadd++;
 
@@ -398,8 +416,8 @@ int main( int nA, char *apA[] )
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         gpcCRS main_crs( win ), *apCRS[4];
         gpmZ(apCRS);
-        U4 nDIV = 0;
-        apCRS[nDIV] = &main_crs;
+        U4 iDIV = 0, nDIV = 1;
+        apCRS[iDIV] = &main_crs;
         //sdl.draw();
         SDL_Event ev;
         U1 c = 0;
@@ -411,12 +429,22 @@ int main( int nA, char *apA[] )
         I4 nMOV, nMAG = 0, nMB = 0, nMBB = 0, nF = 0;
         while( gppKEYbuff )
         {
-			gpcCRS& crs = apCRS[nDIV] ? *apCRS[nDIV] : main_crs;
+			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
+
 			if( gppKEYbuff != gpsKEYbuff )
 			{
 				*gppKEYbuff = 0;
-				crs.MINI_ins( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
-				crs.MINI_draw( win, nDIV );
+				if(
+					false &&
+					pSRCc
+					)
+				{
+					crs.miniRDY(  win, iDIV, *pSRCc, gppKEYbuff, gppMOUSEbuff );
+				} else {
+					crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
+				}
+
+				crs.miniDRW( win, iDIV );
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
 

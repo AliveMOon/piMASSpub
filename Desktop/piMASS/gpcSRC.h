@@ -300,11 +300,69 @@ I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 		*pp_str = p_str;
 	return i8;
 }
+class gpcMAP
+{
+public:
+	U4x4	map44;
+	U4*		pMAP, *pCOL, *pROW;
+	gpcMAP(void)
+	{
+		gpmCLR;
+	};
+	~gpcMAP()
+	{
+		gpmDELary(pMAP);
+	}
+	U4* MAPalloc( U4x4& spc, U4x4& mCR )
+	{
+		if(!this)
+		{
+			mCR = 0;
+			return NULL;
+		}
+		if(	(map44.z > spc.x) && (map44.w > spc.y) )
+		{
+			if( map44.x < spc.x+1 )
+				map44.x = spc.x+1;
+			if( map44.y < spc.y+1 )
+				map44.y = spc.y+1;
+			mCR = map44;
+			return pMAP;
+		}
+
+		mCR = map44;
+		U4* pK = pMAP, *pKC = pK+mCR.AREAzw(), *pKR = pKC+mCR.z;
+
+		map44.z = gpmPAD( spc.x+1, 0x10 );
+		map44.w = gpmPAD( spc.y+1, 0x10 );
+		if( map44.x < spc.x+1 )
+			map44.x = spc.x+1;
+		if( map44.y < spc.y+1 )
+			map44.y = spc.y+1;
+		pMAP = new U4[map44.AREAzw()+map44.SUMzw()];
+		pCOL = (pCOL = pMAP+map44.AREAzw()) + map44.z;
+
+		gpmZn( pMAP, map44.AREAzw()+map44.SUMzw() );
+		if( pK )
+		{
+			gpmMEMCPY( pCOL, pKC, mCR.z );
+			gpmMEMCPY( pROW, pKR, mCR.w );
+
+			for( U4* pS = pK, *pD = pMAP; pS < pKC; pS += mCR.z, pD += map44.z  )
+			{
+				gpmMEMCPY( pD, pS, mCR.z );
+			}
+			gpmDELary(pK);
+		}
+		mCR =  map44;
+		return pMAP;
+	}
+};
 class gpcSRC
 {
 public:
-    U1  	*pA, *pB;
-    U8		nL, nA, bSW;
+    U1  	*pA, *pB;			// pA - alloc *pB - tartalom
+    U8		nL, nA, bSW;		// pB = pA+nL
     U4x4	space;
     U4		IX, retIX, nALFtg, strtD, endD;
     gpeALF	*pALFtg;
@@ -312,6 +370,9 @@ public:
 			*pRES,
 			*pMINI,
 			*pBIG;
+
+	gpcMAP*	pMAP;
+
 
     bool qBLD( void )
     {
@@ -486,6 +547,7 @@ class gpcMASS
 	gpcSRC		*pFND,
 				*apSP[0x100];
 	U4x4 		aSP44[0x100];
+	gpcMAP		mapCR;
 
 	gpcSRC** ppSRC( void )
 	{
@@ -624,7 +686,7 @@ public:
 		gpcSRC** ppS = ppSRC();
 		return ppS ? ppS[i] : NULL;
 	}
-	gpcSRC* fnd( U4 xfnd )
+	gpcSRC* SRCfnd( U4 xfnd )
 	{
 		if(!this)
 			return NULL;
@@ -647,7 +709,7 @@ public:
 		return pFND;
 	}
 
-	gpcSRC* add( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
+	gpcSRC* SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
 
 };
 

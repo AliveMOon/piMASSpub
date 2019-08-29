@@ -115,6 +115,28 @@ sudo apt-get install libxinerama-dev
 sudo apt-get install libglew-dev 	// ilyenkor mar aszondja a legfrissebb -------------
 
 
+--------------- TUTORIAL -----------------
+
+sudo apt-get install libsdl2-dev
+sudo apt-get install libglew-dev
+sudo apt-get install libglm-dev
+
+C::B
+ProjBldOpt:
+	LinkerSettings
+	LinkLib:
+		GL
+		GLEW
+		SDL2
+		
+		OK
+		
+#include <GL/glew.h>
+
+
+
+
+
 
 
 

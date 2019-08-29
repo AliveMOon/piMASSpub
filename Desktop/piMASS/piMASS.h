@@ -490,6 +490,22 @@ public:
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
     }
+    U8 AREAxy( void )
+    {
+		return x*y;
+    }
+    U8 AREAzw( void )
+    {
+		return z*w;
+    }
+     U8 SUMxy( void )
+    {
+		return x+y;
+    }
+    U8 SUMzw( void )
+    {
+		return z+w;
+    }
 
 	U4 tree_add( U4 u4, U4 n_t )
 	{

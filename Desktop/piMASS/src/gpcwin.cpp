@@ -21,10 +21,10 @@ const char * InitError::what() const throw()
     return msg.c_str();
 }
 
-SDL_Rect gpcWIN::wDIV( U1 nDIV )
+SDL_Rect gpcWIN::wDIV( U1 iDIV )
 {
 	SDL_Rect div;
-	switch( nDIV%4)
+	switch( iDIV%4)
 	{
 		case 0:
 			div.y = div.x = 0;

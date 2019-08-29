@@ -17,10 +17,10 @@ class gpcCRS
 		I4x4 	gtFRM() { return frm; }
 		void 	stFRM(I4x4 val) { frm = val; }
 
-		bool		MINI_off( void );
-		void 		MINI_ins( U1* pC, U1* pM, U1* pB );
-		bool		MINI_draw( gpcWIN& win, U1 nDIV = 0 );
-
+		bool	miniOFF( void );
+		void 	miniINS( U1* pC, U1* pM, U1* pB );
+		bool	miniDRW( gpcWIN& win, U1 iDIV = 0 );
+		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 	protected:
 
 	private:
