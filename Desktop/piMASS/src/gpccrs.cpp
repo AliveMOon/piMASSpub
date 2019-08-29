@@ -7,8 +7,8 @@ gpcCRS::gpcCRS( gpcWIN& win, I4 mag0 )
 	//ctor
 	gpmCLR;
 	SDL_Rect div = win.wDIV(0);
-	frm.z = div.w/win.chr.w;
-	frm.w = div.h/win.chr.h;
+	frm.z = div.w/win.chrPIC.w;
+	frm.w = div.h/win.chrPIC.h;
 	if( mag0 < 2 )
 		return;
 
@@ -69,7 +69,7 @@ U4 gpaC64[] = {
 };
 bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 {
-	SDL_Rect src = win.chr, div = win.wDIV( iDIV ), dst;
+	SDL_Rect src = win.chrPIC, div = win.wDIV( iDIV ), dst;
 	U4 cx = src.x;
 
 	if( nMINI != frm.z*frm.w )
@@ -184,10 +184,28 @@ void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )
 	}
 
 }
+/// MINIrdy
 void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 {
 	if( miniOFF() )
 		return;
+	U4 xFND;
+	U4x4 dim;
+	if( gpcMAP* pMAP = &mass.mapCR )
+	{
+		U4	*pM = pMAP->pMAP,
+			*pC = pMAP->pCOL;
+		gpcSRC* pEDIT = NULL, *pSRC;
+		for( U4 i = 0, ie = pC-pM; i < ie; i++ )
+		{
+			if( !pM[i] )
+				continue;
+
+			xFND = pM[i];
+			pSRC = mass.SRCfnd( xFND );
+			dim = pSRC->CRSdim( aCRS );
 
 
+		}
+	}
 }

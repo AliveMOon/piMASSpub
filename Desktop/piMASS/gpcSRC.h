@@ -103,6 +103,7 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS )
 	*ppS = (U1*)pS;
 	return utf8;
 }
+
 inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 {
 	nLEN = 0;
@@ -192,6 +193,52 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 	}
 
 	return pS-pU;
+}
+inline U4 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
+{
+	U8 nLEN = 0;
+	if( !pVAN )
+		pVAN = (U1*)"\t\r\n\a";
+	col = row = 0;
+	U1	*pS,
+		aCHR[] = " ";
+	U4 xx = 0, n;
+    while( *pU ? pU < pUe : false )
+    {
+		n = gpfVAN( pU, pVAN, nLEN );
+		xx += n;
+		if( col < xx )
+			col = xx;
+
+		pS = pU+n;
+		aCHR[0] = *pS;
+		n = gpmNINCS( pS, aCHR );
+		switch( *pS )
+		{
+			case '\r':
+				xx = 0;
+				break;
+			case '\n':
+				row += n;
+				break;
+			case '\a':
+				row += n;
+				xx = 0;
+				break;
+			case '\t':
+				xx = (xx/4 + n)*4;
+				if( col >= xx )
+					break;
+
+				col = xx;
+				break;
+		}
+		nLEN += n;
+		pU = pS+n;
+
+    }
+
+	return nLEN;
 }
 inline U8 gpfVANn( U1* pS, const U1* pVAN )
 {
@@ -362,8 +409,8 @@ class gpcSRC
 {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
-    U8		nL, nA, bSW;		// pB = pA+nL
-    U4x4	space;
+    U8		nL, nA, bSW;		// pB = pA+iB()
+    U4x4	space, dim;
     U4		IX, retIX, nALFtg, strtD, endD;
     gpeALF	*pALFtg;
 	gpcLAZY	*pEXE,
@@ -373,6 +420,26 @@ public:
 
 	gpcMAP*	pMAP;
 
+	U4x4& CRSdim( U4x4* pCRS2 )
+	{
+		// bHD akkor igaz, ha szerkesztés alatt van a rublika
+		// és ráadásul a \a elöt6t van a cursor
+		bool bHD = false, bMINI = bHD ? false : !!pMINI;
+
+		U1	*pC = bMINI ? (U1*)pMINI->p_alloc : pA;
+		dim.w = bMINI ? pMINI->n_load : nL;
+
+
+		if( !bHD )
+		{
+			pC += iB()+1;
+			dim.w -= (pC-pA);
+		}
+
+        dim.z = gpfUTFlen( pC, pC, dim.x, dim.y ); // x oszlop y sor
+
+		return dim;
+	}
 
     bool qBLD( void )
     {
@@ -547,13 +614,13 @@ class gpcMASS
 	gpcSRC		*pFND,
 				*apSP[0x100];
 	U4x4 		aSP44[0x100];
-	gpcMAP		mapCR;
 
 	gpcSRC** ppSRC( void )
 	{
 		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
+	gpcMAP		mapCR;
 
 	gpeALF		aTGwip[0x100];
 	gpcOPCD		aPRG[0x1000];

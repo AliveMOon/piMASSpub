@@ -73,10 +73,10 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 	if( pSRFchar != pSRFload )
 		gpmSDL_FreeSRF( pSRFload );
 
-	chr.x = 8;
-	chr.y = 32;
-	chr.w =	pSRFchar->w/chr.x;
-	chr.h = pSRFchar->h/chr.y;
+	chrPIC.x = 8;
+	chrPIC.y = 32;
+	chrPIC.w =	pSRFchar->w/chrPIC.x;
+	chrPIC.h = pSRFchar->h/chrPIC.y;
 
 }
 void gpcWIN::gpeWINresize( void )
@@ -84,8 +84,8 @@ void gpcWIN::gpeWINresize( void )
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
 		throw InitError();
 	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
-	winDIV.z = winDIV.x = winSIZ.x*winDIV.x / winDIV.z;
-	winDIV.w = winDIV.y = winSIZ.y*winDIV.y / winDIV.w;
+	winDIV.z = winDIV.x = (winSIZ.x*winDIV.x / winDIV.z);
+	winDIV.w = winDIV.y = (winSIZ.y*winDIV.y / winDIV.w);
 
 
 

@@ -10,6 +10,7 @@ class gpcCRS
 		U1x4	*pMINI, *pCRS;
 
 		U4 nMINI;
+		U4x4 aCRS[2];
 
 		gpcCRS( gpcWIN& win, I4 mag0 = 1 );
 		virtual ~gpcCRS();

@@ -28,7 +28,7 @@ class gpcWIN
 						*pSRFchar,
 						*pSRFwin;
 
-		SDL_Rect		chr;
+		SDL_Rect		chrPIC;
 
 		SDL_Rect	wDIV( U1 iDIV );
 		void		gpeWINresize( void );

@@ -362,7 +362,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 	}
 }
-U1 gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff;
+U1 gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -427,6 +427,17 @@ int main( int nA, char *apA[] )
         U1 aXY[] = "00";
 
         I4 nMOV, nMAG = 0, nMB = 0, nMBB = 0, nF = 0;
+        gppKEYbuff = (
+						gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,
+																	"                                        "
+																	"     **** GRANDPACE piMASS V0.1 ****    "
+																	"                                        "
+																	" 1GB RAM SYSTEM  38911 piMASS BYTE FREE "
+																	"                                        "
+																	"READY                                   "
+																	//"_"
+												)
+					);
         while( gppKEYbuff )
         {
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
