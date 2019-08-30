@@ -202,9 +202,9 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		frm.y = frm.w;
 		bESC = true;
 	}
+	gpmZn( pMINI, nMINI );
 	if( bESC )
 	{
-		gpmZn( pMINI, nMINI );
 		return;
 	}
 	I4x4 miniALL = 0;
@@ -258,8 +258,10 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			if( miniALL.y >= frm.w )
 				break;
 
-			if( (miniALL.y +  pR[r]) < 0 )
+			if( (miniALL.y + (int)pR[r]) < 0 )
+			{
 				continue;
+			}
 
 			miniALL.x = frm.x;
 			for( U4 c = 0; c < pMAP->map44.x; miniALL.x += pC[c], c++ )

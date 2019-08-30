@@ -456,7 +456,7 @@ public:
 
 		return pC;
 	}
-	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, U4 fx, U4 fy, U4 fz, U4* pC64 )
+	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64 )
 	{
 		if( !this )
 			return xy;
@@ -511,7 +511,7 @@ public:
 			} else
 				nx = 0;
 
-			if( cxy.x >= fx )
+			if( cxy.x >= fx || cxy.x < 0 || cxy.y < 0 )
 			{
 				cxy.x++;
 				continue;

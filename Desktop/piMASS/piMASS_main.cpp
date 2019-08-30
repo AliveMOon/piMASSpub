@@ -462,13 +462,15 @@ int main( int nA, char *apA[] )
 
 			gppMOUSEbuff = gppKEYbuff = gpsKEYbuff;
 			nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
-			if( (
+			if(
+				(
 					nMOV =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos
 							+abs(nMBB-nMB)										// mBUTTON
 							+abs( mouseW.z-mouseW.x)+abs( mouseW.w-mouseW.y)	// mWheel
 							+nF
 							+nMAG
-				) > 0 )
+				) > 0
+			)
 			{
 				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d wx:%d wy:%d %d F%d    .", mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB, nF );
 				mouseXY.z=mouseXY.x;
@@ -522,6 +524,12 @@ int main( int nA, char *apA[] )
 							}
 							break;
 						}
+						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+							crs.frm.x += ev.wheel.y;
+						else
+							crs.frm.y += ev.wheel.y;
+						nMAG = 1;
+
 						mouseW.x += ev.wheel.x;
 						mouseW.y += ev.wheel.y;
 						break;
