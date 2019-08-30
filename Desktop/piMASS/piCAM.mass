@@ -8,7 +8,7 @@ READY
  1GB RAM SYSTEM 3B+ 0x80000 piMASS BYTE FREE 
  
 READY
- 
+  
 #main enter enter 
 	class U1x4
 	{
@@ -38,4 +38,10 @@ READY
 	{
 		a += ++b * 10 + i;
 		a1D[i%sizeof(a1D)] = a;
-	}	
+	}
+ 
+	**** GRÁNDPÁCÉ píMASS V0.1 ****	
+ 1GB RAM SYSTEM 3B+ 0x80000 piMASS BYTE FREE 
+ 
+READY
+ 	

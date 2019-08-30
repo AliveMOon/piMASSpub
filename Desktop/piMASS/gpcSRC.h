@@ -456,7 +456,7 @@ public:
 
 		return pC;
 	}
-	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4x4 frm, U4* pC64 )
+	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, U4 fx, U4 fy, U4 fz, U4* pC64 )
 	{
 		if( !this )
 			return xy;
@@ -467,7 +467,7 @@ public:
 		U4 cr, n;
 		for( U1* pC = pSRCstart( pCx2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
 		{
-			if( cxy.y > frm.w )
+			if( cxy.y >= fy )
 				break;
 
 			switch( *pC )
@@ -511,13 +511,13 @@ public:
 			} else
 				nx = 0;
 
-			if( cxy.x > frm.z )
+			if( cxy.x >= fx )
 			{
 				cxy.x++;
 				continue;
 			}
 
-			cr = cxy.x + cxy.y*frm.z;
+			cr = cxy.x + cxy.y*fz;
 			cxy.x++;
 
 			pO[cr] = c;

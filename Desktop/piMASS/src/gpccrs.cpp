@@ -276,8 +276,11 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
-				pSRC->CRSmini( pMINI, aCRS, miniALL, frm, gpaC64 );
-				break;
+				pSRC->CRSmini( 	pMINI, aCRS, miniALL,
+								min(frm.z, miniALL.x+pC[c]), min(frm.w, miniALL.y+pR[r]),
+								frm.z,
+								gpaC64 );
+
 			}
 		}
 

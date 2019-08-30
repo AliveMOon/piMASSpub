@@ -442,7 +442,7 @@ int main( int nA, char *apA[] )
         {
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
 
-			if( gppKEYbuff != gpsKEYbuff )
+			if( gppKEYbuff != gpsKEYbuff || nMAG )
 			{
 				*gppKEYbuff = 0;
 				if(
@@ -497,13 +497,22 @@ int main( int nA, char *apA[] )
 						{
 							if( ev.wheel.y )
 							{
-								I4 zm = min( crs.frm.z, crs.frm.w ), zd = zm, mag = -ev.wheel.y;
-								if( zm < 9 )
+								I4	zm = min( crs.frm.z, crs.frm.w ),
+									zd = zm,
+									mag = -ev.wheel.y;
+
+								if( zm <= 9 )
 								if( mag < 0 )
-									break;
-								if( zm > 512 )
+								{
+									zm = 9;
+									mag = 0;
+								}
+								if( zm >= 256 )
 								if( mag > 0 )
-									break;
+								{
+									zm = 256;
+									mag = 0;
+								}
 								zm += mag;
 								crs.frm.z *= zm;
 								crs.frm.w *= zm;
