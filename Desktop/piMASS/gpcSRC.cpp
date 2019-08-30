@@ -7,11 +7,11 @@ gpcSRC::gpcSRC()
     //ctor
     gpmCLR;
 }
-gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& spc )
+gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spc )
 {
 	gpmCLR;
-	space = spc;
-	spc.x++;
+	spc = _spc;
+	_spc.x++;
 
 	if( pS ? !*pS : true )
 	{
@@ -45,6 +45,7 @@ gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& spc )
 	*ppS = pS;
 	return *this;
 }
+static const U4 gpnZ = ((gpcSRC*)NULL)->nCLR();
 
 gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 {
@@ -53,11 +54,13 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 	//assignment operator
 
 	/// elopunk mindent most
-	pALFtg = B.pALFtg;	B.pALFtg = NULL;
+	gpmMEMCPY( this, &B, 1 );
+	gpmZn( (U1*)&B.pALFtg, gpnZ );
+ 	/*pALFtg = B.pALFtg;	B.pALFtg = NULL;
 	nALFtg = B.nALFtg;	B.nALFtg = 0;
 	IX = B.IX;
 	retIX = B.retIX;
-	space = B.space;
+	spc = B.spc;
 	bSW = B.bSW;
 	pEXE = B.pEXE; B.pEXE = NULL;
 	pRES = B.pRES; B.pRES = NULL;
@@ -65,7 +68,7 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 	pBIG = B.pBIG; B.pBIG = NULL;
 	nVER = B.nVER;
 	nBLD = B.nBLD;
-	nHD = B.nHD;
+	nHD = B.nHD;*/
 
 
 	qBLD();

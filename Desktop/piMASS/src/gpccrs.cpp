@@ -222,10 +222,10 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			xFND = pM[i];
 			pSRC = mass.SRCfnd( xFND );
 			dim = pSRC->CRSdim( aCRS );
-            if( pC[pSRC->space.x] < dim.x )
-				pC[pSRC->space.x] = dim.x;
-			if( pR[pSRC->space.y] < dim.y )
-				pR[pSRC->space.y] = dim.y;
+            if( pC[pSRC->spc.x] < dim.x )
+				pC[pSRC->spc.x] = dim.x;
+			if( pR[pSRC->spc.y] < dim.y )
+				pR[pSRC->spc.y] = dim.y;
 
 		}
 		for( U4 c = 0; c < pMAP->map44.x; c++ )
@@ -250,6 +250,34 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		{
 			gpmZn( pMINI, nMINI );
 			return;
+		}
+
+		miniALL.y = frm.y;
+		for( U4 r = 0; r < pMAP->map44.y; miniALL.y += pR[r], r++ )
+		{
+			if( miniALL.y >= frm.w )
+				break;
+
+			if( miniALL.y +  pR[r] < 0 )
+				continue;
+
+			miniALL.x = frm.x;
+			for( U4 c = 0; c < pMAP->map44.x; miniALL.x += pC[c], c++ )
+			{
+				if( miniALL.x >= frm.z )
+					break;
+
+				if( miniALL.x +  pC[c] < 0 )
+					continue;
+
+				i = c + d*pMAP->map44.w;
+				if( !pM[i] )
+					continue;
+
+				xFND = pM[i];
+				pSRC = mass.SRCfnd( xFND );
+				pSRC->CRSmini( pMINI, miniALL, frm );
+			}
 		}
 
 	}

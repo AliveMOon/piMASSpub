@@ -181,6 +181,9 @@ class gpcMASS;
 #define gpmZ( p ) bzero( &p, sizeof(p) )
 #define gpmZn( p, n ) bzero( (p), (n)*sizeof(*(p)) )
 
+#define gpmOFF( st, m ) ( (size_t)(&((st*)NULL)->m) )
+#define gpmOFFOFF(st, m,n) (GPM_OFF(st, m)-GPM_OFF(st, n))
+
 #define gpmSTRCPY( d, s ) \
 			(												\
 				( (d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\

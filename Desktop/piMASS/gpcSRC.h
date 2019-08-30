@@ -118,7 +118,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 		{
 			if( (*pS&0xc0) != 0x80 )
 				nLEN++;	// csak a 0x80 asokat nem számoljuk bele mert azok tötike karakterek
-			pS++;
+			pS++;gpfUTFlen
 		}
 		return pS-pU;
 	}
@@ -423,17 +423,22 @@ class gpcSRC
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
     U8		nL, nA, bSW;		// pB = pA+iB()
-    U4x4	space, dim;
+    U4x4	spc, dim;
     U4		IX, retIX, nALFtg, strtD, endD;
+
     gpeALF	*pALFtg;
 	gpcLAZY	*pEXE,
 			*pRES,
 			*pMINI,
 			*pBIG;
+	gpcMAP	*pMAP;
 
-	gpcMAP*	pMAP;
+	U4 nCLR(void)
+	{
+		return gpmOFF( gpcSRC, nVER )-gpmOFF( gpcSRC, pALFtg );
+	}
 
-	U4x4& CRSdim( U4x4* pCRS2 )
+	U1* pSRCstart( U4x4* pCRS2 )
 	{
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
 		// és ráadásul a \a elöt6t van a cursor
@@ -449,6 +454,78 @@ public:
 			dim.w -= (pC-pA);
 		}
 
+		return pC;
+	}
+	I4x4 CRSmini( U1x4* pO, I4x4 xy, I4x4 frm, U4* pC64 )
+	{
+		if( !this )
+			return xy;
+		I4x4 cxy = xy;
+		U1x4 c;
+		c.u4 = pC64[15];
+		U1 nx, cr;
+		for( U1* pC = pSRCstart( pCRS2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
+		{
+			if( cxy.y > frm.w )
+				break;
+
+			switch( *pC )
+			{
+				case '\r':
+					if( pC[1] != '\n' )
+					{
+						cxy.x = xy.x;
+						continue;
+					}
+					pC++;
+					cxy.x = xy.x;
+					cxy.y++;
+					continue;
+				case '\n':
+					cxy.x = xy.x;
+					cxy.y++;
+					continue;
+				case '\a':
+					cxy.y++;
+					cxy.x = xy.x;
+					continue;
+				case '\t':
+					cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4;
+					continue;
+				case ' ':
+					cxy.x++;
+					continue;
+			}
+
+			if( *pC < ' ' )
+				continue;
+
+			nx = *pC;
+			if( nx & 0x80 )
+			{
+				pC++;
+			} else
+				nx = 0;
+
+			if( cxy.x > frm.z )
+			{
+				cxy.x++;
+				continue;
+			}
+
+			cr = cxy.x+cxy.*frm.z;
+
+			pO[cr] = c;
+			pO[cr].w = *pC - ' ';
+			if( !nx )
+				continue;
+			pO[cr].w += (nx&4)>>2;
+		}
+		return cxy;
+	}
+	U4x4& CRSdim( U4x4* pCRS2 )
+	{
+		U1* pC = pSRCstart( pCRS2 );
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 
 		return dim;
@@ -483,7 +560,7 @@ public:
 		// kijebb lép
 		return bSW&gpeMASSretMSK;
     }
-    bool bENTR( gpcMASS& mass, U4x4& spc, U4 x = 0 )
+    bool bENTR( gpcMASS& mass, U4x4& _spc, U4 x = 0 )
     {
 		if( !this )
 			return false;
@@ -495,10 +572,10 @@ public:
 		if( !(bSW&gpeMASSentrMSK) )
 			return false;
 
-		space.x = x;
-		space.y++;
-		spc = space;
-		spc.x++;
+		spc.x = x;
+		spc.y++;
+		_spc = spc;
+		_spc.x++;
 		return true;
 
     }

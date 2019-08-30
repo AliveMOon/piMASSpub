@@ -336,16 +336,16 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
         {
 			if( !apSP[momLV]->pMAP )
 				apSP[momLV]->pMAP = new gpcMAP;
-			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.space, mCR44 );
+			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spc, mCR44 );
         }
         else
-			pMAP = mapCR.MAPalloc( spREF.space, mCR44 );
+			pMAP = mapCR.MAPalloc( spREF.spc, mCR44 );
 
 		spREF.bMAIN( *this, true );
 
 		if( pMAP )
 		{
-			mCR = spREF.space.x + spREF.space.y*mCR44.z;
+			mCR = spREF.spc.x + spREF.spc.y*mCR44.z;
 			pMAP[mCR] = xadd; //aSPix[nSP];
 		}
 
