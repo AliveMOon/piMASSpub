@@ -446,7 +446,7 @@ int main( int nA, char *apA[] )
 			{
 				*gppKEYbuff = 0;
 				if(
-					false &&
+					//false &&
 					pSRCc
 					)
 				{

@@ -191,10 +191,28 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		return;
 	U4 xFND;
 	U4x4 dim;
+	bool bESC = false;
+	if( frm.x > frm.z )
+	{
+		frm.x = frm.z;
+		bESC = true;
+	}
+	if( frm.y > frm.w )
+	{
+		frm.y = frm.w;
+		bESC = true;
+	}
+	if( bESC )
+	{
+		gpmZn( pMINI, nMINI );
+		return;
+	}
+	I4x4 miniALL = 0;
 	if( gpcMAP* pMAP = &mass.mapCR )
 	{
 		U4	*pM = pMAP->pMAP,
-			*pC = pMAP->pCOL;
+			*pC = pMAP->pCOL,
+			*pR = pMAP->pROW;
 		gpcSRC* pEDIT = NULL, *pSRC;
 		for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 		{
@@ -204,8 +222,35 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			xFND = pM[i];
 			pSRC = mass.SRCfnd( xFND );
 			dim = pSRC->CRSdim( aCRS );
-
+            if( pC[pSRC->space.x] < dim.x )
+				pC[pSRC->space.x] = dim.x;
+			if( pR[pSRC->space.y] < dim.y )
+				pR[pSRC->space.y] = dim.y;
 
 		}
+		for( U4 c = 0; c < pMAP->map44.x; c++ )
+		{
+			miniALL.z += pC[c];
+		}
+		for( U4 r = 0; r < pMAP->map44.y; r++ )
+		{
+			miniALL.w += pR[r];
+		}
+		if( frm.x+miniALL.z < 1 )
+		{
+			frm.x = -miniALL.z;
+			bESC = true;
+		}
+		if( frm.y+miniALL.w < 1 )
+		{
+			frm.y = -miniALL.w;
+			bESC = true;
+		}
+		if( bESC )
+		{
+			gpmZn( pMINI, nMINI );
+			return;
+		}
+
 	}
 }

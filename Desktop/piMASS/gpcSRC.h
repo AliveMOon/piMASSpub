@@ -194,9 +194,9 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 
 	return pS-pU;
 }
-inline U4 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
+inline U8 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
 {
-	U8 nLEN = 0;
+	U8 nLEN = 0, nBYTE, nUTF8 = 0;
 	if( !pVAN )
 		pVAN = (U1*)"\t\r\n\a";
 	col = row = 0;
@@ -205,20 +205,29 @@ inline U4 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
 	U4 xx = 0, n;
     while( *pU ? pU < pUe : false )
     {
-		n = gpfVAN( pU, pVAN, nLEN );
-		xx += n;
+		nBYTE = gpfVAN( pU, pVAN, nLEN );
+		nUTF8 += nLEN;
+		xx += nLEN;
 		if( col < xx )
 			col = xx;
 
-		pS = pU+n;
+		pS = pU+nBYTE;
 		aCHR[0] = *pS;
 		n = gpmNINCS( pS, aCHR );
 		switch( *pS )
 		{
 			case '\r':
+				if( pS[1] != '\n' )
+				{
+					xx = 0;
+					break;
+				}
+				n++;
 				xx = 0;
+				row++;
 				break;
 			case '\n':
+				xx = 0;
 				row += n;
 				break;
 			case '\a':
@@ -232,13 +241,17 @@ inline U4 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
 
 				col = xx;
 				break;
+			case ' ':
+				xx++;
+				break;
 		}
-		nLEN += n;
+		nUTF8 += n;
 		pU = pS+n;
 
     }
-
-	return nLEN;
+	col++;
+	row++;
+	return nUTF8;
 }
 inline U8 gpfVANn( U1* pS, const U1* pVAN )
 {
@@ -387,7 +400,7 @@ public:
 		if( map44.y < spc.y+1 )
 			map44.y = spc.y+1;
 		pMAP = new U4[map44.AREAzw()+map44.SUMzw()];
-		pCOL = (pCOL = pMAP+map44.AREAzw()) + map44.z;
+		pROW = (pCOL = pMAP+map44.AREAzw()) + map44.z;
 
 		gpmZn( pMAP, map44.AREAzw()+map44.SUMzw() );
 		if( pK )
@@ -436,7 +449,7 @@ public:
 			dim.w -= (pC-pA);
 		}
 
-        dim.z = gpfUTFlen( pC, pC, dim.x, dim.y ); // x oszlop y sor
+        dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 
 		return dim;
 	}
