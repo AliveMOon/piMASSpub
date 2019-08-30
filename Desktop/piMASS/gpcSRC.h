@@ -118,7 +118,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 		{
 			if( (*pS&0xc0) != 0x80 )
 				nLEN++;	// csak a 0x80 asokat nem számoljuk bele mert azok tötike karakterek
-			pS++;gpfUTFlen
+			pS++;
 		}
 		return pS-pU;
 	}
@@ -438,7 +438,7 @@ public:
 		return gpmOFF( gpcSRC, nVER )-gpmOFF( gpcSRC, pALFtg );
 	}
 
-	U1* pSRCstart( U4x4* pCRS2 )
+	U1* pSRCstart( U4x4* pCx2 )
 	{
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
 		// és ráadásul a \a elöt6t van a cursor
@@ -456,15 +456,16 @@ public:
 
 		return pC;
 	}
-	I4x4 CRSmini( U1x4* pO, I4x4 xy, I4x4 frm, U4* pC64 )
+	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4x4 frm, U4* pC64 )
 	{
 		if( !this )
 			return xy;
 		I4x4 cxy = xy;
 		U1x4 c;
 		c.u4 = pC64[15];
-		U1 nx, cr;
-		for( U1* pC = pSRCstart( pCRS2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
+		U1 nx, aC[] = " ";
+		U4 cr, n;
+		for( U1* pC = pSRCstart( pCx2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
 		{
 			if( cxy.y > frm.w )
 				break;
@@ -490,7 +491,10 @@ public:
 					cxy.x = xy.x;
 					continue;
 				case '\t':
-					cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4;
+					aC[0] = *pC;
+					n = gpmNINCS( pC+1, aC );
+					cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4;
+					pC += n;
 					continue;
 				case ' ':
 					cxy.x++;
@@ -513,7 +517,8 @@ public:
 				continue;
 			}
 
-			cr = cxy.x+cxy.*frm.z;
+			cr = cxy.x + cxy.y*frm.z;
+			cxy.x++;
 
 			pO[cr] = c;
 			pO[cr].w = *pC - ' ';
