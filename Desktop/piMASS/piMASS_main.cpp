@@ -416,13 +416,13 @@ int main( int nA, char *apA[] )
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         gpcCRS main_crs( win ), *apCRS[4];
         gpmZ(apCRS);
-        U4 iDIV = 0, nDIV = 1;
+        U4 iDIV = 0, nDIV = 1, mDIV;
         apCRS[iDIV] = &main_crs;
         //sdl.draw();
         SDL_Event ev;
         U1 c = 0;
         U1* pKEY; // = (U1*)SDL_GetKeyboardState(NULL);
-        U4 aKT[0x200], scan, bug = 0;
+        U4 aKT[0x200], scan, bug = 0, nBUG;
         gpmZ(aKT);
         U1 aXY[] = "00";
 
@@ -454,8 +454,8 @@ int main( int nA, char *apA[] )
 				} else {
 					crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 				}
-
-				crs.miniDRW( win, iDIV );
+				for( U1 i = 0; i < 4; i++ )
+					apCRS[i]->miniDRW( win, i ); //DIV );
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
 
@@ -472,18 +472,20 @@ int main( int nA, char *apA[] )
 				) > 0
 			)
 			{
+				mDIV = win.mDIV( mouseXY.a4x2[0] );
+
 				gppKEYbuff += sprintf(
 										(char*)gppKEYbuff,
 										"-= piMASS::%s"
-										" x:%d y:%d"
+										" x:%d y:%d, mDIV: %d"
 										" wx:%d wy:%d"
 										" %d F%d =-"
-										" %d",
+										" %d, %d",
 										gpsMASSname,
-										mouseXY.x, mouseXY.y,
+										mouseXY.x, mouseXY.y, mDIV,
 										mouseW.x, mouseW.y,
 										nMB, nF,
-										bug
+										bug, nBUG
 										);
 				mouseXY.z=mouseXY.x;
 				mouseXY.w=mouseXY.y;
@@ -548,11 +550,12 @@ int main( int nA, char *apA[] )
 								{
 									crs.CRSfrm.a4x2[1].x = div.w/bug;
 								}
+								nBUG = 0;
 								while( (bug = div.w - crs.CRSfrm.a4x2[1].x*bug ) > 8 )
 								{
 									crs.CRSfrm.a4x2[1].x += mag;
 									bug = div.w/crs.CRSfrm.a4x2[1].x;
-
+									nBUG++;
 								}
 
 								crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3)) ;

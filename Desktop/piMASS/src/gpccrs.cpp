@@ -72,7 +72,11 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 {
 	SDL_Rect src = win.chrPIC, div = win.wDIV( iDIV ), dst;
 	U4 cx = src.x;
-
+	if( this ? bESC : true )
+	{
+		SDL_FillRect( win.pSRFwin, &div, gpaC64[14] ); // 0x000000AA );
+		return false;
+	}
 	if( nMINI != CRSfrm.a4x2[1].area() )
 	{
 		gpmDELary( pMINI );
@@ -192,13 +196,13 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		return;
 	U4 xFND;
 	U4x4 dim;
-	bool bESC = false;
-	if( CRSfrm.x > CRSfrm.z )
+	bESC = false;
+	if( CRSfrm.x >= CRSfrm.z )
 	{
 		CRSfrm.x = CRSfrm.z;
 		bESC = true;
 	}
-	if( CRSfrm.y > CRSfrm.w )
+	if( CRSfrm.y >= CRSfrm.w )
 	{
 		CRSfrm.y = CRSfrm.w;
 		bESC = true;

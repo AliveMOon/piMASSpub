@@ -40,6 +40,10 @@ class gpcWIN
 			SDL_Rect div = wDIV( iDIV );
 			return I4x2( div.w/chrPIC.w, div.h/chrPIC.h );
 		}
+		U1 mDIV( const I4x2& mXY )
+		{
+			return (mXY.x/winDIV.x) | ((mXY.y/winDIV.y)<<1);
+		}
 
 	protected:
 

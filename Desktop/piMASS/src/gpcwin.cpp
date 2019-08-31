@@ -58,6 +58,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 	//ctor
 	gpmCLR;
 	winDIV = winSIZ = siz;
+	winDIV.a4x2[0] *= 7;
+	winDIV.a4x2[0] /= 8;
 	if( winID.x = SDL_CreateWindowAndRenderer( winSIZ.z, winSIZ.w, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &pSDLwin, &pSDLrndr ) != 0 )
         throw InitError();
 

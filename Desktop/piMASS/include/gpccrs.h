@@ -11,6 +11,7 @@ class gpcCRS
 
 		U4 nMINI;
 		U4x4 aCRS[2];
+		bool bESC;
 
 		gpcCRS( gpcWIN& win, I4 mag0 = 1 );
 		virtual ~gpcCRS();
