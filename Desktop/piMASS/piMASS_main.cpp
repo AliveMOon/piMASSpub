@@ -472,7 +472,7 @@ int main( int nA, char *apA[] )
 				) > 0
 			)
 			{
-				gppKEYbuff += sprintf( (char*)gppKEYbuff, "x:%d y:%d wx:%d wy:%d %d F%d    .", mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB, nF );
+				gppKEYbuff += sprintf( (char*)gppKEYbuff, "-= piMASS::%s x:%d y:%d wx:%d wy:%d %d F%d =-", gpsMASSname, mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB, nF );
 				mouseXY.z=mouseXY.x;
 				mouseXY.w=mouseXY.y;
 				mouseW.z=mouseW.x;
@@ -486,6 +486,8 @@ int main( int nA, char *apA[] )
 					nF = 0;
 				}
 				nMAG = 0;
+
+				SDL_SetWindowTitle( win.pSDLwin, (char*)gpsKEYbuff );
 			}
 
 
