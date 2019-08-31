@@ -775,11 +775,39 @@ public:
 		return (I8)x + y + z + w;
 	}
 
-	I8 area_xy( void )
+	I8 volume( void ) const
 	{
 		return x*y*z*w;
 	}
 
+	I8 area_xy( void ) const
+	{
+		return x*y;
+	}
+	I8 area_zw( void ) const
+	{
+		return z*w;
+	}
+	I4 mn_xy( void ) const
+	{
+		return x<y ? x : y;
+	}
+	I4 mn_zw( void ) const
+	{
+		return z<w ? z : w;
+	}
+	I4 mx_xy( void ) const
+	{
+		return x>y ? x : y;
+	}
+	I4 mx_zw( void ) const
+	{
+		return z>w ? z : w;
+	}
+	I4x4 abs( void ) const
+	{
+		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
+	}
 	I4x4* index( U4 n_i )
 	{
 		if( !this )

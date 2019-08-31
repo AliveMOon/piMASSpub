@@ -6,7 +6,7 @@
 class gpcCRS
 {
 	public:
-		I4x4 	frm;
+		I4x4 	CRSfrm;
 		U1x4	*pMINI, *pCRS;
 
 		U4 nMINI;
@@ -15,8 +15,8 @@ class gpcCRS
 		gpcCRS( gpcWIN& win, I4 mag0 = 1 );
 		virtual ~gpcCRS();
 
-		I4x4 	gtFRM() { return frm; }
-		void 	stFRM(I4x4 val) { frm = val; }
+		I4x4 	gtFRM() { return CRSfrm; }
+		void 	stFRM(I4x4 val) { CRSfrm = val; }
 
 		bool	miniOFF( void );
 		void 	miniINS( U1* pC, U1* pM, U1* pB );

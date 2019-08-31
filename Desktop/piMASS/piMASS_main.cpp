@@ -501,7 +501,7 @@ int main( int nA, char *apA[] )
 						{
 							if( ev.wheel.y )
 							{
-								I4	zm = min( crs.frm.z, crs.frm.w ),
+								I4	zm = crs.CRSfrm.mn_zw(),
 									zd = zm,
 									mag = -ev.wheel.y;
 
@@ -518,18 +518,18 @@ int main( int nA, char *apA[] )
 									mag = 0;
 								}
 								zm += mag;
-								crs.frm.z *= zm;
-								crs.frm.w *= zm;
-								crs.frm.z /= zd;
-								crs.frm.w /= zd;
+								crs.CRSfrm.z *= zm;
+								crs.CRSfrm.w *= zm;
+								crs.CRSfrm.z /= zd;
+								crs.CRSfrm.w /= zd;
 								nMAG = 1;
 							}
 							break;
 						}
 						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
-							crs.frm.x += ev.wheel.y;
+							crs.CRSfrm.x += ev.wheel.y;
 						else
-							crs.frm.y += ev.wheel.y;
+							crs.CRSfrm.y += ev.wheel.y;
 						nMAG = 1;
 
 						mouseW.x += ev.wheel.x;

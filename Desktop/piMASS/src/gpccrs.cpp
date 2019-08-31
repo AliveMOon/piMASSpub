@@ -7,13 +7,13 @@ gpcCRS::gpcCRS( gpcWIN& win, I4 mag0 )
 	//ctor
 	gpmCLR;
 	SDL_Rect div = win.wDIV(0);
-	frm.z = div.w/win.chrPIC.w;
-	frm.w = div.h/win.chrPIC.h;
+	CRSfrm.z = div.w/win.chrPIC.w;
+	CRSfrm.w = div.h/win.chrPIC.h;
 	if( mag0 < 2 )
 		return;
 
-	frm.z *= mag0;
-	frm.w *= mag0;
+	CRSfrm.z *= mag0;
+	CRSfrm.w *= mag0;
 }
 
 gpcCRS::~gpcCRS()
@@ -45,11 +45,11 @@ U1 gpsHUN[] =
 
 bool gpcCRS::miniOFF( void )
 {
-	if( nMINI == frm.z*frm.w )
+	if( nMINI == CRSfrm.area_zw() )
 		return !nMINI;
 
 	gpmDELary( pMINI );
-	nMINI = frm.z*frm.w;
+	nMINI = CRSfrm.z*CRSfrm.w;
 	if( !nMINI )
 		return true;	// nincsen mérete ki lett kapcsolva?
 
@@ -72,10 +72,10 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 	SDL_Rect src = win.chrPIC, div = win.wDIV( iDIV ), dst;
 	U4 cx = src.x;
 
-	if( nMINI != frm.z*frm.w )
+	if( nMINI != CRSfrm.area_zw() )
 	{
 		gpmDELary( pMINI );
-		nMINI = frm.z*frm.w;
+		nMINI = CRSfrm.area_zw();
 		if( !nMINI )
 			return false;	// nincsen mérete ki lett kapcsolva?
 
@@ -87,8 +87,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 
 	SDL_FillRect( win.pSRFwin, &div, gpaC64[6] ); // 0x000000AA );
 
-	dst.w = div.w/frm.z;
-	dst.h = div.h/frm.w;
+	dst.w = div.w/CRSfrm.z;
+	dst.h = div.h/CRSfrm.w;
 
 
 	U1 c,d;
@@ -99,8 +99,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 			c = pMINI[i].w;
 			if( !c )
 				continue;
-			dst.x = (i%frm.z)*dst.w + div.x;
-			dst.y = (i/frm.z)*dst.h + div.y;
+			dst.x = (i%CRSfrm.z)*dst.w + div.x;
+			dst.y = (i/CRSfrm.z)*dst.h + div.y;
 
 			if( c > 0x60 )
 			{
@@ -127,8 +127,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 		c = pMINI[i].w;
 		if( !c )
 			continue;
-		dst.x = (i%frm.z)*dst.w + div.x;
-		dst.y = (i/frm.z)*dst.h + div.y;
+		dst.x = (i%CRSfrm.z)*dst.w + div.x;
+		dst.y = (i/CRSfrm.z)*dst.h + div.y;
 
 		if( c > 0x60 )
 		{
@@ -192,14 +192,14 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 	U4 xFND;
 	U4x4 dim;
 	bool bESC = false;
-	if( frm.x > frm.z )
+	if( CRSfrm.x > CRSfrm.z )
 	{
-		frm.x = frm.z;
+		CRSfrm.x = CRSfrm.z;
 		bESC = true;
 	}
-	if( frm.y > frm.w )
+	if( CRSfrm.y > CRSfrm.w )
 	{
-		frm.y = frm.w;
+		CRSfrm.y = CRSfrm.w;
 		bESC = true;
 	}
 	gpmZn( pMINI, nMINI );
@@ -236,14 +236,14 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		{
 			miniALL.w += pR[r];
 		}
-		if( frm.x+miniALL.z < 1 )
+		if( CRSfrm.x+miniALL.z < 1 )
 		{
-			frm.x = -miniALL.z;
+			CRSfrm.x = -miniALL.z;
 			bESC = true;
 		}
-		if( frm.y+miniALL.w < 1 )
+		if( CRSfrm.y+miniALL.w < 1 )
 		{
-			frm.y = -miniALL.w;
+			CRSfrm.y = -miniALL.w;
 			bESC = true;
 		}
 		if( bESC )
@@ -252,10 +252,10 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			return;
 		}
 
-		miniALL.y = frm.y;
+		miniALL.y = CRSfrm.y;
 		for( U4 r = 0; r < pMAP->map44.y; miniALL.y += pR[r], r++ )
 		{
-			if( miniALL.y >= frm.w )
+			if( miniALL.y >= CRSfrm.w )
 				break;
 
 			if( (miniALL.y + (int)pR[r]) < 0 )
@@ -263,10 +263,10 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				continue;
 			}
 
-			miniALL.x = frm.x;
+			miniALL.x = CRSfrm.x;
 			for( U4 c = 0; c < pMAP->map44.x; miniALL.x += pC[c], c++ )
 			{
-				if( miniALL.x >= frm.z )
+				if( miniALL.x >= CRSfrm.z )
 					break;
 
 				if( miniALL.x +  pC[c] < 0 )
@@ -279,8 +279,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
 				pSRC->CRSmini( 	pMINI, aCRS, miniALL,
-								min(frm.z, miniALL.x+pC[c]), min(frm.w, miniALL.y+pR[r]),
-								frm.z,
+								min(CRSfrm.z, miniALL.x+pC[c]), min(CRSfrm.w, miniALL.y+pR[r]),
+								CRSfrm.z,
 								gpaC64 );
 
 			}
