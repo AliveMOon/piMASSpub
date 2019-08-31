@@ -6,9 +6,10 @@ gpcCRS::gpcCRS( gpcWIN& win, I4 mag0 )
 {
 	//ctor
 	gpmCLR;
-	SDL_Rect div = win.wDIV(0);
+	/*SDL_Rect div = win.wDIV(0);
 	CRSfrm.z = div.w/win.chrPIC.w;
-	CRSfrm.w = div.h/win.chrPIC.h;
+	CRSfrm.w = div.h/win.chrPIC.h;*/
+	CRSfrm.a4x2[1] = win.winFRM( 0 );
 	if( mag0 < 2 )
 		return;
 
@@ -45,7 +46,7 @@ U1 gpsHUN[] =
 
 bool gpcCRS::miniOFF( void )
 {
-	if( nMINI == CRSfrm.area_zw() )
+	if( nMINI == CRSfrm.a4x2[1].area() )
 		return !nMINI;
 
 	gpmDELary( pMINI );
@@ -72,10 +73,10 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 	SDL_Rect src = win.chrPIC, div = win.wDIV( iDIV ), dst;
 	U4 cx = src.x;
 
-	if( nMINI != CRSfrm.area_zw() )
+	if( nMINI != CRSfrm.a4x2[1].area() )
 	{
 		gpmDELary( pMINI );
-		nMINI = CRSfrm.area_zw();
+		nMINI = CRSfrm.a4x2[1].area();
 		if( !nMINI )
 			return false;	// nincsen mérete ki lett kapcsolva?
 

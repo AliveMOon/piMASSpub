@@ -720,7 +720,48 @@ public:
 	{
 		return (I8)x*b.x + (I8)y * b.y;
 	}
+	I4x2& operator *= ( I4 i )
+	{
+		if( !i )
+			return null();
+		if( i == 1 )
+			return *this;
 
+		x*=i;
+		y*=i;
+
+		return *this;
+	}
+	I4x2& operator /= ( I4 i )
+	{
+		if( i == 1 )
+			return *this;
+
+		if( !i )
+		{
+			x = y = 0x7fffffff;
+			return *this;
+		}
+
+		x/=i;
+		y/=i;
+
+		return *this;
+	}
+	I4x2& operator %= ( I4 i )
+	{
+		if( i == 1 )
+			return null();
+
+		if( !i )
+			return *this;
+
+
+		x%=i;
+		y%=i;
+
+		return *this;
+	}
 	I4x2& null( void )
 	{
 		gpmCLR;
@@ -732,9 +773,29 @@ public:
 		return (I8)x+y;
 	}
 
-	I8 area_xy( void )
+	I8 area( void )
 	{
 		return x*y;
+	}
+
+	U8 qlen (void ) const
+	{
+		return x*x+y*y;
+	}
+
+	I4 mn( void )
+	{
+		return x < y ? x:y;
+	}
+
+	I4 mx( void )
+	{
+		return x > y ? x:y;
+	}
+
+	I4x2 abs( void )
+	{
+		return I4x2( x<0?-x:x, y<0?-y:y );
 	}
 
 };
@@ -759,6 +820,11 @@ public:
     {
         x = _x; y = _y; z = _z; w = _w;
     }
+	I4x4( I4x2 _xy, I4x2 _zw )
+    {
+        a4x2[0] = _xy;
+        a4x2[1] = _zw;
+    }
 
 	U8 operator * (const I4x2& b) const
 	{
@@ -780,15 +846,16 @@ public:
 		return x*y*z*w;
 	}
 
-	I8 area_xy( void ) const
+	/*I8 area_xy( void ) const
 	{
 		return x*y;
 	}
 	I8 area_zw( void ) const
 	{
 		return z*w;
-	}
-	I4 mn_xy( void ) const
+	}*/
+
+	/*I4 mn_xy( void ) const
 	{
 		return x<y ? x : y;
 	}
@@ -803,11 +870,17 @@ public:
 	I4 mx_zw( void ) const
 	{
 		return z>w ? z : w;
-	}
+	}*/
+
 	I4x4 abs( void ) const
 	{
 		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
 	}
+	I4x4 zw_xy( void ) const
+	{
+		return I4x4( z, w, x, y );
+	}
+
 	I4x4* index( U4 n_i )
 	{
 		if( !this )

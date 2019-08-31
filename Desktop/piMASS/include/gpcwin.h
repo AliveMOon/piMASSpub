@@ -35,6 +35,12 @@ class gpcWIN
 		gpcWIN( char* pPATH, char* pFILE, I4x4& siz );
 		virtual ~gpcWIN();
 
+		I4x2 winFRM( U1 iDIV )
+		{
+			SDL_Rect div = wDIV( iDIV );
+			return I4x2( div.w/chrPIC.w, div.h/chrPIC.h );
+		}
+
 	protected:
 
 	private:

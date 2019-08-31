@@ -422,7 +422,7 @@ int main( int nA, char *apA[] )
         SDL_Event ev;
         U1 c = 0;
         U1* pKEY; // = (U1*)SDL_GetKeyboardState(NULL);
-        U4 aKT[0x200], scan;
+        U4 aKT[0x200], scan, bug = 0;
         gpmZ(aKT);
         U1 aXY[] = "00";
 
@@ -472,7 +472,19 @@ int main( int nA, char *apA[] )
 				) > 0
 			)
 			{
-				gppKEYbuff += sprintf( (char*)gppKEYbuff, "-= piMASS::%s x:%d y:%d wx:%d wy:%d %d F%d =-", gpsMASSname, mouseXY.x, mouseXY.y, mouseW.x, mouseW.y, nMB, nF );
+				gppKEYbuff += sprintf(
+										(char*)gppKEYbuff,
+										"-= piMASS::%s"
+										" x:%d y:%d"
+										" wx:%d wy:%d"
+										" %d F%d =-"
+										" %d",
+										gpsMASSname,
+										mouseXY.x, mouseXY.y,
+										mouseW.x, mouseW.y,
+										nMB, nF,
+										bug
+										);
 				mouseXY.z=mouseXY.x;
 				mouseXY.w=mouseXY.y;
 				mouseW.z=mouseW.x;
@@ -500,28 +512,73 @@ int main( int nA, char *apA[] )
 						if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
 						{
 							if( ev.wheel.y )
+							if( true )
 							{
-								I4	zm = crs.CRSfrm.mn_zw(),
+								I4 mag = -ev.wheel.y;
+								SDL_Rect div = win.wDIV(iDIV);
+								if( mag < 0 )
+								{
+									if( crs.CRSfrm.a4x2[1].x == 4 )
+										break;
+
+									if( crs.CRSfrm.a4x2[1].x < 4 )
+									{
+										crs.CRSfrm.a4x2[1].x = 4;
+										crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3) );
+										nMAG = 1;
+										break;
+									}
+								} else {
+									if( crs.CRSfrm.a4x2[1].x == div.w/8 )
+										break;
+
+									if( crs.CRSfrm.a4x2[1].x > div.w/8 )
+									{
+										crs.CRSfrm.a4x2[1].x = div.w/8;
+										crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3) );
+										nMAG = 1;
+										break;
+									}
+								}
+
+
+								crs.CRSfrm.a4x2[1].x += mag;
+								bug = div.w/crs.CRSfrm.a4x2[1].x;
+								if( mag > 0 )
+								{
+									crs.CRSfrm.a4x2[1].x = div.w/bug;
+								}
+								while( (bug = div.w - crs.CRSfrm.a4x2[1].x*bug ) > 8 )
+								{
+									crs.CRSfrm.a4x2[1].x += mag;
+									bug = div.w/crs.CRSfrm.a4x2[1].x;
+
+								}
+
+								crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3)) ;
+								nMAG = 1;
+								break;
+							} else {
+								I4	mx = win.winDIV.a4x2[1].mn()/8,
+									zm = crs.CRSfrm.a4x2[1].abs().mn(),
 									zd = zm,
 									mag = -ev.wheel.y;
 
-								if( zm <= 9 )
+								if( zm <= 1 )
 								if( mag < 0 )
 								{
-									zm = 9;
+									zm = 1;
 									mag = 0;
 								}
-								if( zm >= 256 )
+								if( zm >= mx )
 								if( mag > 0 )
 								{
-									zm = 256;
+									zm = mx;
 									mag = 0;
 								}
 								zm += mag;
-								crs.CRSfrm.z *= zm;
-								crs.CRSfrm.w *= zm;
-								crs.CRSfrm.z /= zd;
-								crs.CRSfrm.w /= zd;
+
+								(crs.CRSfrm.a4x2[1] *= zm) /= zd;
 								nMAG = 1;
 							}
 							break;
