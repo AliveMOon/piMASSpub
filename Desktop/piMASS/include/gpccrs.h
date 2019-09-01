@@ -6,7 +6,7 @@
 class gpcCRS
 {
 	public:
-		I4x4 	CRSfrm;
+		I4x4 	CRSfrm, AN;
 		U1x4	*pMINI, *pCRS;
 
 		U4 nMINI;
@@ -32,8 +32,30 @@ class gpcCRS
 				return o;
 
 			I4x2 xy = _xy - o.a4x2[0];
+			o = I4x4( xy, xy/cr );
+			if( gpcMAP* pMAP = &mass.mapCR )
+			{
+				U4	*pC = pMAP->pCOL,
+					*pR = pMAP->pROW;
 
-			return I4x4( xy, xy/cr );
+				AN.null();
+				for( AN.x = 0; AN.x < pMAP->map44.x; AN.x++ )
+				{
+					AN.z += pC[AN.x];
+					if( o.a4x2[1].x > AN.z )
+						continue;
+					AN.x++;
+					break;
+				}
+				for( AN.y = 0; AN.y < pMAP->map44.y; AN.y++ )
+				{
+					AN.w += pR[AN.y];
+					if( o.a4x2[1].y < AN.w )
+						break;
+				}
+			}
+
+			return o;
 
 		}
 	protected:

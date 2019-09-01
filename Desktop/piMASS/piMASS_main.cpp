@@ -473,10 +473,16 @@ int main( int nA, char *apA[] )
 				) > 0
 			)
 			{
+				*gpsMAINpub = 0;
 				mDIV = win.mDIV( mouseXY.a4x2[0] );
+
 				if( apCRS[mDIV] )
 				{
 					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *pSRCc, mouseXY.a4x2[0] );
+
+
+					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->AN.x );
+					pE += sprintf( pE, "%d", apCRS[mDIV]->AN.y );
 
 				}
 
@@ -484,13 +490,14 @@ int main( int nA, char *apA[] )
 										(char*)gppKEYbuff,
 										"-= piMASS::%s"
 										" x:%d y:%d, mDIV: %d"
-										"xycr:%s"
+										"xycr:%s AN:%s"
 										" wx:%d wy:%d"
 										" %d F%d =-"
 										" %d, %d",
 										gpsMASSname,
 										mouseXY.x, mouseXY.y, mDIV,
-										SRCxycr.str(gpsMAINpub),
+										SRCxycr.str(gpsMAINpub+0x80),
+										gpsMAINpub,
 										mouseW.x, mouseW.y,
 										nMB, nF,
 										bug, nBUG
