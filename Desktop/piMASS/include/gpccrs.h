@@ -23,6 +23,19 @@ class gpcCRS
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
 		bool	miniDRW( gpcWIN& win, U1 iDIV = 0 );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
+		I4x4 srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
+		{
+			SDL_Rect div = win.wDIV( iDIV );
+			I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
+			I4x4 o = CRSfrm & cr;
+			if( !this )
+				return o;
+
+			I4x2 xy = _xy - o.a4x2[0];
+
+			return I4x4( xy, xy/cr );
+
+		}
 	protected:
 
 	private:

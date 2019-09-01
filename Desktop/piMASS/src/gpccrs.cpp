@@ -77,6 +77,23 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 		SDL_FillRect( win.pSRFwin, &div, gpaC64[14] ); // 0x000000AA );
 		return false;
 	}
+
+	dst.y = dst.x = 0;
+
+	if( CRSfrm.x > 0 )
+	{
+		dst.w = CRSfrm.x*div.w/CRSfrm.z;
+		dst.h = div.h;
+		SDL_FillRect( win.pSRFwin, &dst, gpaC64[14] );
+	}
+
+	if( CRSfrm.y > 0 )
+	{
+		dst.h = CRSfrm.y*div.h/CRSfrm.w;
+		dst.w = div.w;
+		SDL_FillRect( win.pSRFwin, &dst, gpaC64[14] );
+	}
+
 	if( nMINI != CRSfrm.a4x2[1].area() )
 	{
 		gpmDELary( pMINI );
@@ -89,8 +106,13 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 		return true; // resized mini, print new
 	}
 
+	dst = div;
+	dst.x = CRSfrm.x*div.w/CRSfrm.z;
+	dst.y = CRSfrm.y*div.h/CRSfrm.w;
+	dst.w -= dst.x;
+	dst.h -= dst.y;
 
-	SDL_FillRect( win.pSRFwin, &div, gpaC64[6] ); // 0x000000AA );
+	SDL_FillRect( win.pSRFwin, &dst, gpaC64[6] ); // 0x000000AA );
 
 	dst.w = div.w/CRSfrm.z;
 	dst.h = div.h/CRSfrm.w;

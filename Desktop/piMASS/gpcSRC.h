@@ -391,7 +391,8 @@ public:
 		}
 
 		mCR = map44;
-		U4* pK = pMAP, *pKC = pK+mCR.AREAzw(), *pKR = pKC+mCR.z;
+		U4	*pK = pMAP, *pKC = pK+mCR.a4x2[1].area(), //AREAzw(),
+			*pKR = pKC+mCR.z;
 
 		map44.z = gpmPAD( spc.x+1, 0x10 );
 		map44.w = gpmPAD( spc.y+1, 0x10 );
@@ -399,10 +400,10 @@ public:
 			map44.x = spc.x+1;
 		if( map44.y < spc.y+1 )
 			map44.y = spc.y+1;
-		pMAP = new U4[map44.AREAzw()+map44.SUMzw()];
-		pROW = (pCOL = pMAP+map44.AREAzw()) + map44.z;
+		pMAP = new U4[map44.a4x2[1].are_sum()];
+		pROW = (pCOL = pMAP+map44.a4x2[1].area()) + map44.z;
 
-		gpmZn( pMAP, map44.AREAzw()+map44.SUMzw() );
+		gpmZn( pMAP, map44.a4x2[1].are_sum() );
 		if( pK )
 		{
 			gpmMEMCPY( pCOL, pKC, mCR.z );

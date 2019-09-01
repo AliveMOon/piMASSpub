@@ -363,6 +363,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 	}
 }
 U1 gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
+char gpsMAINpub[0x100];
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -412,7 +413,7 @@ int main( int nA, char *apA[] )
 
 		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
 
-		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480);
+		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480), SRCxycr(0);
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         gpcCRS main_crs( win ), *apCRS[4];
         gpmZ(apCRS);
@@ -473,16 +474,23 @@ int main( int nA, char *apA[] )
 			)
 			{
 				mDIV = win.mDIV( mouseXY.a4x2[0] );
+				if( apCRS[mDIV] )
+				{
+					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *pSRCc, mouseXY.a4x2[0] );
+
+				}
 
 				gppKEYbuff += sprintf(
 										(char*)gppKEYbuff,
 										"-= piMASS::%s"
 										" x:%d y:%d, mDIV: %d"
+										"xycr:%s"
 										" wx:%d wy:%d"
 										" %d F%d =-"
 										" %d, %d",
 										gpsMASSname,
 										mouseXY.x, mouseXY.y, mDIV,
+										SRCxycr.str(gpsMAINpub),
 										mouseW.x, mouseW.y,
 										nMB, nF,
 										bug, nBUG

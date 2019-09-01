@@ -455,6 +455,139 @@ public:
     U1x4& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
 };
 
+class U4x2
+{
+public:
+    U4 x,y;
+
+    U4x2(){};
+    U4x2( U4 _x, U4 _y = 0 )
+    {
+        x = _x; y = _y;
+    }
+	// cnt = fract * U4x2(1, w);
+	U4x2& cnt2fract(U4 w, U8 cnt)
+	{
+		U1 lg = log2(w * w);
+		w = 1<<(lg/2);
+		U8 X = w * w;
+		cnt %= X;
+		null();
+
+		while( cnt )
+		{
+			w >>= 1;
+			switch(cnt&3)
+			{
+				case 1:
+					x += w;
+					y += w;
+					break;
+				case 2:
+					x += w;
+					break;
+				case 3:
+					y += w;
+					break;
+			}
+			cnt >>= 2;
+		}
+		return *this;
+	}
+	U4x2& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
+
+	U8 operator * (const U4x2& b) const
+	{
+		return (U8)x*b.x + (U8)y*b.y;
+	}
+	U4x2 operator & (const U4x2& b) const
+	{
+		return U4x2( x*b.x, y*b.y );
+	}
+	U4x2& operator *= ( U4 i )
+	{
+		if( !i )
+			return null();
+		if( i == 1 )
+			return *this;
+
+		x*=i;
+		y*=i;
+
+		return *this;
+	}
+	U4x2& operator /= ( U4 i )
+	{
+		if( i == 1 )
+			return *this;
+
+		if( !i )
+		{
+			x = y = 0xffffffff;
+			return *this;
+		}
+
+		x/=i;
+		y/=i;
+
+		return *this;
+	}
+	U4x2& operator %= ( U4 i )
+	{
+		if( i == 1 )
+			return null();
+
+		if( !i )
+			return *this;
+
+
+		x%=i;
+		y%=i;
+
+		return *this;
+	}
+
+
+	U8 sum( void ) const
+	{
+		return (U8)x+y;
+	}
+
+	U8 area( void )
+	{
+		return x*y;
+	}
+	U8 are_sum( void )
+	{
+		return area()+sum();
+	}
+
+	U8 qlen(void ) const
+	{
+		return x*x+y*y;
+	}
+
+	U4 mn( void ) const
+	{
+		return x < y ? x:y;
+	}
+
+	U4 mx( void ) const
+	{
+		return x > y ? x:y;
+	}
+
+	U4x2 abs( void ) const
+	{
+		return U4x2( x<0?-x:x, y<0?-y:y );
+	}
+
+};
+
 class U4x4
 {
 public:
@@ -464,6 +597,10 @@ public:
         {
             U4 x,y,z,w;
         };
+        struct
+        {
+			U4x2 a4x2[2];
+		};
         struct
         {
             U4 aXYZW[4];
@@ -493,7 +630,7 @@ public:
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
     }
-    U8 AREAxy( void )
+    /*U8 AREAxy( void )
     {
 		return x*y;
     }
@@ -508,6 +645,11 @@ public:
     U8 SUMzw( void )
     {
 		return z+w;
+    }*/
+
+    U4x4 zwxy( void )  const
+    {
+		return U4x4( z,w, x,y );
     }
 
 	U4 tree_add( U4 u4, U4 n_t )
@@ -687,6 +829,11 @@ public:
     {
         x = _x; y = _y;
     }
+	I4x2( U4x2 b )
+    {
+        x = b.x;
+        y = b.y;
+    }
 	// cnt = fract * U42(1, w);
 	I4x2& cnt2fract(U4 w, U8 cnt)
 	{
@@ -720,6 +867,42 @@ public:
 	{
 		return (I8)x*b.x + (I8)y * b.y;
 	}
+	I4x2 operator & (const I4x2& b) const
+	{
+		return I4x2( x*b.x,  y*b.y );
+	}
+	I4x2 operator & (const U4x2& b) const
+	{
+		return I4x2( x*b.x,  y*b.y );
+	}
+
+	I4x2 operator / (const I4x2& b) const
+	{
+		return I4x2( b.x ? x/b.x : 0x7fffffff ,  b.y ? y/b.y : 0x7fffffff );
+	}
+	I4x2 operator / (const U4x2& b) const
+	{
+		return I4x2( b.x ? x/b.x : 0x7fffffff,  b.y ? y/b.y : 0x7fffffff );
+	}
+
+	I4x2 operator + (const I4x2& b) const
+	{
+		return I4x2( x+b.x,  y+b.y );
+	}
+	I4x2 operator + (const U4x2& b) const
+	{
+		return I4x2( x+b.x,  y+b.y );
+	}
+
+	I4x2 operator - (const I4x2& b) const
+	{
+		return I4x2( x-b.x,  y-b.y );
+	}
+	I4x2 operator - (const U4x2& b) const
+	{
+		return I4x2( x-b.x,  y-b.y );
+	}
+
 	I4x2& operator *= ( I4 i )
 	{
 		if( !i )
@@ -773,14 +956,19 @@ public:
 		return (I8)x+y;
 	}
 
-	I8 area( void )
+	I8 area( void ) const
 	{
 		return x*y;
 	}
 
+	U8 are_sum( void )
+	{
+		return abs().area()+abs().sum();
+	}
+
 	U8 qlen (void ) const
 	{
-		return x*x+y*y;
+		return x*x + y*y;
 	}
 
 	I4 mn( void )
@@ -825,11 +1013,30 @@ public:
         a4x2[0] = _xy;
         a4x2[1] = _zw;
     }
-
+    I4x4( U4x2 _xy, U4x2 _zw )
+    {
+        a4x2[0] = _xy;
+        a4x2[1] = _zw;
+    }
+	char* str( char* pBUFF, const char* pSP = ", "  )
+    {
+		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
+		return pBUFF;
+    }
 	U8 operator * (const I4x2& b) const
 	{
-		return a4x2[0]*b + a4x2[2]*b;
+		return a4x2[0]*b + a4x2[1]*b;
 	}
+
+	I4x4 operator & (const I4x2& b) const
+	{
+		return I4x4( a4x2[0]&b, a4x2[1]&b );
+	}
+	I4x4 operator & (const U4x2& b) const
+	{
+		return I4x4( a4x2[0]&b, a4x2[1]&b );
+	}
+
 	I4x4& null( void )
 	{
 		gpmCLR;
@@ -845,32 +1052,6 @@ public:
 	{
 		return x*y*z*w;
 	}
-
-	/*I8 area_xy( void ) const
-	{
-		return x*y;
-	}
-	I8 area_zw( void ) const
-	{
-		return z*w;
-	}*/
-
-	/*I4 mn_xy( void ) const
-	{
-		return x<y ? x : y;
-	}
-	I4 mn_zw( void ) const
-	{
-		return z<w ? z : w;
-	}
-	I4 mx_xy( void ) const
-	{
-		return x>y ? x : y;
-	}
-	I4 mx_zw( void ) const
-	{
-		return z>w ? z : w;
-	}*/
 
 	I4x4 abs( void ) const
 	{

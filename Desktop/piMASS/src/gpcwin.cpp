@@ -77,7 +77,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 
 	chrPIC.x = 8;
 	chrPIC.y = 32;
-	chrPIC.w =	pSRFchar->w/chrPIC.x;
+	chrPIC.w =pSRFchar->w/chrPIC.x;
 	chrPIC.h = pSRFchar->h/chrPIC.y;
 
 }
