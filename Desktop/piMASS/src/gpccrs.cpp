@@ -305,23 +305,24 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			gpmZn( pMINI, nMINI );
 			return;
 		}
-
+		gpmZn( pMINI, nMINI );
 		miniALL.y = CRSfrm.y;
 		for( U4 r = 0; r < pMAP->map44.y; miniALL.y += pR[r], r++ )
 		{
 			if( miniALL.y >= CRSfrm.w )
 				break;
-
-			if( (miniALL.y + (int)pR[r]) < 0 )
-			{
+            if( !pR[r] )
 				continue;
-			}
+			if( (miniALL.y + (int)pR[r]) < 0 )
+				continue;
 
 			miniALL.x = CRSfrm.x;
 			for( U4 c = 0; c < pMAP->map44.x; miniALL.x += pC[c], c++ )
 			{
 				if( miniALL.x >= CRSfrm.z )
 					break;
+				if( !pC[c] )
+					continue;
 
 				if( miniALL.x +  pC[c] < 0 )
 					continue;
@@ -333,7 +334,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
 				pSRC->CRSmini( 	pMINI, aCRS, miniALL,
-								min(CRSfrm.z, miniALL.x+pC[c]), min(CRSfrm.w, miniALL.y+pR[r]),
+								min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
 								CRSfrm.z,
 								gpaC64 );
 
