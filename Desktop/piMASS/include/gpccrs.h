@@ -6,7 +6,11 @@
 class gpcCRS
 {
 	public:
-		I4x4 	CRSfrm, AN, IN;
+		I4x4 	CRSfrm,
+				scnAN,	scnIN;
+				selANCR[2];
+		gpcSRC	*aSRC[2];
+
 		U1x4	*pMINI, *pCRS;
 
 		U4 nMINI;
@@ -23,6 +27,36 @@ class gpcCRS
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
 		bool	miniDRW( gpcWIN& win, U1 iDIV = 0 );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
+
+		void CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
+		{
+			SDL_Rect div = win.wDIV( iDIV );
+			I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
+
+			U4	*pM = pMAP->pMAP,
+				an = scnAN.a4x2[0]*I4x2( 1, pMAP->map44.x );
+			if( !pM[an] )
+				return;
+			xFND = pM[i];
+			gpcSRC* pSRC = mass.SRCfnd( xFND );
+			if( !pSRC )
+				return;
+
+			selANCR[1].a4x2[0] = scnAN.a4x2[0];		//AN
+
+			selANCR[1].a4x2[1] = scnIN.a4x2[0]/cr;	//IN
+			pSRC->CRSminiCR( selANCR[1].a4x2[1] );
+
+
+			aSRC[1] = pSRC;
+
+			if( bSH )
+				return; // ha le van nyomva a shift akkor meg akarjuk örizni a sel[0]-t.
+
+			selANCR[0] = selANCR[1];
+			aSRC[0] = aSRC[1];
+
+		}
 		I4x4 srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 		{
 			SDL_Rect div = win.wDIV( iDIV );
@@ -38,45 +72,42 @@ class gpcCRS
 				U4	*pC = pMAP->pCOL,
 					*pR = pMAP->pROW;
 
-				AN.null();
-				for( AN.x = 0; AN.x < pMAP->map44.x; AN.x++ )
+				scnAN.null();
+				for( scnAN.x = 0; scnAN.x < pMAP->map44.x; scnAN.x++ )
 				{
-					AN.z += pC[AN.x];
-					if( o.z >= AN.z )
+					scnAN.z += pC[scnAN.x];
+					if( o.z >= scnAN.z )
 						continue;
-					IN.z = pC[AN.x]*cr.x;
-					IN.x = xy.x - (AN.z*cr.x - IN.z);
 
-
+					scnIN.z = pC[scnAN.x]*cr.x;
+					scnIN.x = xy.x - (scnAN.z*cr.x - scnIN.z);
 					break;
 				}
-                if( AN.x >= pMAP->map44.x )
+                if( scnAN.x >= pMAP->map44.x )
                 {
-					IN.z = cr.x*9;
-					IN.x = xy.x - (AN.z*cr.x);
-					AN.x = pMAP->map44.x + 1 + IN.x/IN.z;
-					IN.x %= IN.z;
+					scnIN.z = cr.x*9;
+					scnIN.x = xy.x - (scnAN.z*cr.x);
+					scnAN.x = pMAP->map44.x + 1 + scnIN.x/scnIN.z;
+					scnIN.x %= scnIN.z;
 				} else
-					AN.x++; // ALF 'A' == 1
+					scnAN.x++; // ALF 'A' == 1
 
-				for( AN.y = 0; AN.y < pMAP->map44.y; AN.y++ )
+				for( scnAN.y = 0; scnAN.y < pMAP->map44.y; scnAN.y++ )
 				{
-					AN.w += pR[AN.y];
-					if( o.w >= AN.w )
+					scnAN.w += pR[scnAN.y];
+					if( o.w >= scnAN.w )
 						continue;
 
-					IN.w = pR[AN.y]*cr.y;
-					IN.y = xy.y - (AN.w*cr.y - IN.w);
+					scnIN.w = pR[scnAN.y]*cr.y;
+					scnIN.y = xy.y - (scnAN.w*cr.y - scnIN.w);
 					break;
 				}
-				if( AN.y >= pMAP->map44.y )
+				if( scnAN.y >= pMAP->map44.y )
                 {
-
-					IN.w = cr.y;
-					IN.y = xy.y - (AN.w*cr.y);
-					AN.y = pMAP->map44.y + IN.y/IN.w;
-					IN.y %= IN.w;
-
+					scnIN.w = cr.y;
+					scnIN.y = xy.y - (scnAN.w*cr.y);
+					scnAN.y = pMAP->map44.y + scnIN.y/scnIN.w;
+					scnIN.y %= scnIN.w;
 				}
 			}
 

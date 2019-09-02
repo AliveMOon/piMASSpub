@@ -457,6 +457,25 @@ public:
 
 		return pC;
 	}
+	void CRSminiCR( I4x2& cr )
+	{
+		if( !this )
+		{
+			cr.null();
+			return;
+		}
+		cr.y = min( cr.y, dim.y-1 );
+		if( !cr.sum() )
+			return;
+		I4x4 cxy = 0;
+		U1 sC[] = " ";
+
+		for( U1* pC = pSRCstart( pCx2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
+		{
+
+		}
+
+	}
 	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64 )
 	{
 		if( this ?
