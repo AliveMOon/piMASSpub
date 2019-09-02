@@ -1,6 +1,100 @@
+
 #include "gpccrs.h"
+#include "gpcSRC.h"
 
+I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
+{
+	SDL_Rect div = win.wDIV( iDIV );
+	I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
+	I4x4 o = CRSfrm & cr;
+	if( !this )
+		return o;
 
+	I4x2 xy = _xy - o.a4x2[0];
+	o = I4x4( xy, xy/cr );
+	if( gpcMAP* pMAP = &mass.mapCR )
+	{
+		U4	*pC = pMAP->pCOL,
+			*pR = pMAP->pROW;
+
+		scnAN.null();
+		for( scnAN.x = 0; scnAN.x < pMAP->map44.x; scnAN.x++ )
+		{
+			scnAN.z += pC[scnAN.x];
+			if( o.z >= scnAN.z )
+				continue;
+
+			scnIN.z = pC[scnAN.x]*cr.x;
+			scnIN.x = xy.x - (scnAN.z*cr.x - scnIN.z);
+			break;
+		}
+		if( scnAN.x >= pMAP->map44.x )
+		{
+			scnIN.z = cr.x*9;
+			scnIN.x = xy.x - (scnAN.z*cr.x);
+			scnAN.x = pMAP->map44.x + 1 + scnIN.x/scnIN.z;
+			scnIN.x %= scnIN.z;
+		} else
+			scnAN.x++; // ALF 'A' == 1
+
+		for( scnAN.y = 0; scnAN.y < pMAP->map44.y; scnAN.y++ )
+		{
+			scnAN.w += pR[scnAN.y];
+			if( o.w >= scnAN.w )
+				continue;
+
+			scnIN.w = pR[scnAN.y]*cr.y;
+			scnIN.y = xy.y - (scnAN.w*cr.y - scnIN.w);
+			break;
+		}
+		if( scnAN.y >= pMAP->map44.y )
+		{
+			scnIN.w = cr.y;
+			scnIN.y = xy.y - (scnAN.w*cr.y);
+			scnAN.y = pMAP->map44.y + scnIN.y/scnIN.w;
+			scnIN.y %= scnIN.w;
+		}
+	}
+
+	return o;
+
+}
+void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
+{
+	SDL_Rect div = win.wDIV( iDIV );
+	I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
+
+	gpcMAP* pMAP = &mass.mapCR;
+	if( !pMAP )
+		return;
+
+	U4	*pM = pMAP->pMAP,
+		an = scnAN.a4x2[0]*I4x2( 1, pMAP->map44.z ) - 1;
+	if( !pM[an] )
+		return;
+
+	U4 xFND = pM[an];
+	gpcSRC* pSRC = mass.SRCfnd( xFND );
+	if( !pSRC )
+		return;
+
+	selANCR[1].a4x2[0] = scnAN.a4x2[0];		//AN
+	selANCR[1].a4x2[1] = scnIN.a4x2[0]/cr;	//IN
+	anSTR[1] = pSRC->CRSminiCR( selANCR[1].a4x2[1] );
+
+	apSRC[1] = pSRC;
+
+	if( bSH )
+	{
+
+		return; // ha le van nyomva a shift akkor meg akarjuk örizni a sel[0]-t.
+	}
+
+	selANCR[0] = selANCR[1];
+	apSRC[0] = apSRC[1];
+	anSTR[0] = anSTR[1];
+
+}
 
 gpcCRS::gpcCRS( gpcWIN& win, I4 mag0 )
 {
@@ -333,10 +427,13 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
-				pSRC->CRSmini( 	pMINI, aCRS, miniALL,
-								min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
-								CRSfrm.z,
-								gpaC64 );
+				pSRC->CRSmini(
+									pMINI, aCRS, miniALL,
+									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
+									CRSfrm.z,
+									gpaC64,
+									*this
+								);
 
 			}
 		}

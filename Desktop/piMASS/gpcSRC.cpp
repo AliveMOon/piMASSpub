@@ -1,4 +1,5 @@
 #include "gpcSRC.h"
+#include "gpccrs.h"
 
 
 
@@ -147,7 +148,140 @@ gpcSRC::~gpcSRC()
 	gpmDELary(pBIG);
 }
 
+I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs )
+{
+	if( this ?
+				   ( fx <= 0 	||	fy <= 0 )
+				|| ( xy.x >= fx ||	xy.y >= fy )
+				: true )
+		return xy;
 
+	I4x4 cxy = xy;
+	U1x4 c;
+	//c.u4 = pC64[15];
+	U1 nx, aC[] = " ";
+	U4 cr, n, rr;
+	for( I4 r = max(xy.y,0); r < fy; r++ )
+	{
+		rr = r*fz;
+		for( I4 c = max(xy.x,0); c < fx; c++ )
+		{
+			cr = rr+c;
+			pO[cr].y = 0;
+		}
+	}
+
+	if( !(bSW&gpeMASSoffMSK) )
+	if( xy.x < fx && xy.y < fy )
+	{
+
+		// UP
+		if( xy.y >= 0 )
+		{
+			rr = xy.y*fz;
+			for( I4 c = max(xy.x,0); c < fx; c++ )
+			{
+				cr = rr+c;
+				pO[cr].y |= 1;
+			}
+		}
+		//DWN
+		{
+			rr = (fy-1)*fz;
+			for( I4 c = max(xy.x,0); c < fx; c++ )
+			{
+				cr = rr+c;
+				pO[cr].y |= 4;
+			}
+		}
+
+		// LEFT
+		//if( xy.x >= 0 )
+		{
+			for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fz ; r < fy; r++, rr += fz )
+			{
+				pO[rr].y |= 8;
+			}
+		}
+		// RIGHT
+		{
+			for( I4 r = max(xy.y,0), rr = fx-1 + r*fz; r < fy; r++, rr += fz )
+			{
+				pO[rr].y |= 2;
+			}
+		}
+
+	}
+	for( U1* pC = pSRCstart(), *pAL = pSRCalloc() , *pCe = pC+dim.w; pC < pCe; pC++ )
+	{
+		if( cxy.y >= fy )
+			break;
+
+		switch( *pC )
+		{
+			case '\r':
+				if( pC[1] != '\n' )
+				{
+					cxy.x = xy.x;
+					continue;
+				}
+				pC++;
+				cxy.x = xy.x;
+				cxy.y++;
+				continue;
+			case '\n':
+				cxy.x = xy.x;
+				cxy.y++;
+				continue;
+			case '\a':
+				cxy.y++;
+				cxy.x = xy.x;
+				continue;
+			case '\t':
+				aC[0] = *pC;
+				n = gpmNINCS( pC+1, aC );
+				cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4;
+				pC += n;
+				continue;
+			case ' ':
+				cxy.x++;
+				continue;
+		}
+
+		if( *pC < ' ' )
+			continue;
+
+		nx = *pC;
+		if( nx & 0x80 )
+		{
+			pC++;
+		} else
+			nx = 0;
+
+		if( cxy.x >= fx || cxy.x < 0 || cxy.y < 0 )
+		{
+			cxy.x++;
+			continue;
+		}
+
+		cr = cxy.x + cxy.y*fz;
+		cxy.x++;
+		if( this == crs.apSRC[0] )
+		if( pC-pAL == crs.anSTR[0] )
+				pO[cr].y |= 4;
+
+		if( this == crs.apSRC[1] )
+		if( pC-pAL == crs.anSTR[1] )
+				pO[cr].y |= 2;
+		//pO[cr] = c;
+		pO[cr].z = 15;
+		pO[cr].w = *pC - ' ';
+		if( !nx )
+			continue;
+		pO[cr].w += (nx&4)>>2;
+	}
+	return cxy;
+}
 
 gpcMASS::~gpcMASS()
 {

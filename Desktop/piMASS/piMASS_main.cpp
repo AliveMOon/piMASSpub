@@ -488,10 +488,10 @@ int main( int nA, char *apA[] )
 					if( !(nMB&1) )
 					{
 						// SELECT
-						apCRS[mDIV].CRSsel(
-											win, mDIV, *pSRCc,
-											(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-										);
+						apCRS[mDIV]->CRSsel(
+												win, mDIV, *pSRCc,
+												(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+											);
 						/*if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
 						{
 							// SHIFT nagyobb egysség kijelölése

@@ -5,12 +5,17 @@
 #include "gpcSCHL.h"
 #include "gpcOPCD.h"
 
+//#include "gpccrs.h"
+
+
+
+
 #define gpdPRGsep " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} "
 
 //extern U1 gpaALFadd[]; //0x100];
 //extern U1 gpsSTRpub[]; //[0x10000];
 
-
+class gpcCRS;
 
 enum gpeMASSsw:U8
 {
@@ -438,14 +443,20 @@ public:
 	{
 		return gpmOFF( gpcSRC, nVER )-gpmOFF( gpcSRC, pALFtg );
 	}
+	U1* pSRCalloc( void )
+	{
+		bool bHD = false, bMINI = bHD ? false : !!pMINI;
 
-	U1* pSRCstart( U4x4* pCx2 )
+		return bMINI ? pMINI->p_alloc : pA;
+	}
+	U1* pSRCstart( void ) // U4x4* pCx2 )
 	{
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
 		// és ráadásul a \a elöt6t van a cursor
 		bool bHD = false, bMINI = bHD ? false : !!pMINI;
 
-		U1	*pC = bMINI ? (U1*)pMINI->p_alloc : pA;
+		U1	*pC = bMINI ? //(U1*)
+							pMINI->p_alloc : pA;
 		dim.w = bMINI ? pMINI->n_load : nL;
 
 
@@ -457,92 +468,22 @@ public:
 
 		return pC;
 	}
-	void CRSminiCR( I4x2& cr )
+	U8 CRSminiCR( I4x2& cr )
 	{
 		if( !this )
 		{
 			cr.null();
-			return;
+			return 0;
 		}
 		cr.y = min( cr.y, dim.y-1 );
 		if( !cr.sum() )
-			return;
+			return 0;
 		I4x4 cxy = 0;
-		U1 sC[] = " ";
-
-		for( U1* pC = pSRCstart( pCx2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
+		U1 sC[] = " ", *pROW = pSRCstart(), *pCe, *pC;
+		U4 n;
+		for( pC = pROW, pCe = pC+dim.w; pC < pCe; pC++ )
 		{
-
-		}
-
-	}
-	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64 )
-	{
-		if( this ?
-					   ( fx <= 0 	||	fy <= 0 )
-					|| ( xy.x >= fx ||	xy.y >= fy )
-					: true )
-			return xy;
-
-		I4x4 cxy = xy;
-		U1x4 c;
-		//c.u4 = pC64[15];
-		U1 nx, aC[] = " ";
-		U4 cr, n, rr;
-		for( I4 r = max(xy.y,0); r < fy; r++ )
-		{
-			rr = r*fz;
-			for( I4 c = max(xy.x,0); c < fx; c++ )
-			{
-				cr = rr+c;
-				pO[cr].y = 0;
-			}
-		}
-
-		if( !(bSW&gpeMASSoffMSK) )
-		if( xy.x < fx && xy.y < fy )
-		{
-
-			// UP
-			if( xy.y >= 0 )
-			{
-				rr = xy.y*fz;
-				for( I4 c = max(xy.x,0); c < fx; c++ )
-				{
-					cr = rr+c;
-					pO[cr].y |= 1;
-				}
-			}
-			//DWN
-			{
-				rr = (fy-1)*fz;
-				for( I4 c = max(xy.x,0); c < fx; c++ )
-				{
-					cr = rr+c;
-					pO[cr].y |= 4;
-				}
-			}
-
-			// LEFT
-			//if( xy.x >= 0 )
-			{
-				for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fz ; r < fy; r++, rr += fz )
-				{
-					pO[rr].y |= 8;
-				}
-			}
-			// RIGHT
-			{
-				for( I4 r = max(xy.y,0), rr = fx-1 + r*fz; r < fy; r++, rr += fz )
-				{
-					pO[rr].y |= 2;
-				}
-			}
-
-		}
-		for( U1* pC = pSRCstart( pCx2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
-		{
-			if( cxy.y >= fy )
+			if( cxy.y == cr.y )
 				break;
 
 			switch( *pC )
@@ -550,25 +491,28 @@ public:
 				case '\r':
 					if( pC[1] != '\n' )
 					{
-						cxy.x = xy.x;
+						cxy.x = 0;
 						continue;
 					}
 					pC++;
-					cxy.x = xy.x;
+					pROW = pC+1;
+					cxy.x = 0;
 					cxy.y++;
 					continue;
 				case '\n':
-					cxy.x = xy.x;
+					pROW = pC+1;
+					cxy.x = 0;
 					cxy.y++;
 					continue;
 				case '\a':
+					pROW = pC+1;
 					cxy.y++;
-					cxy.x = xy.x;
+					cxy.x = 0;
 					continue;
 				case '\t':
-					aC[0] = *pC;
-					n = gpmNINCS( pC+1, aC );
-					cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4;
+					sC[0] = *pC;
+					n = gpmNINCS( pC+1, sC );
+					cxy.x = 0 + (cxy.x/4 + n)*4 + 4;
 					pC += n;
 					continue;
 				case ' ':
@@ -578,35 +522,49 @@ public:
 
 			if( *pC < ' ' )
 				continue;
+			if( *pC & 0x80 )
+				pC++;
+			cxy.x++;
+		}
 
-			nx = *pC;
-			if( nx & 0x80 )
+		cxy.x = 0;
+		for( pC = pROW; pC < pCe; pC++ )
+		{
+			if( cxy.x >= cr.x )
+			{
+				break;
+			}
+			else if( *pC&0x80 )
 			{
 				pC++;
-			} else
-				nx = 0;
-
-			if( cxy.x >= fx || cxy.x < 0 || cxy.y < 0 )
-			{
-				cxy.x++;
-				continue;
 			}
 
-			cr = cxy.x + cxy.y*fz;
-			cxy.x++;
+			switch( *pC )
+			{
+				case '\n':
+				case '\r':
+				case '\a':
+					break;
+				case '\t':
+					sC[0] = *pC;
+					n = gpmNINCS( pC+1, sC );
+					cxy.x =(cxy.x/4 + n)*4 + 4;
+					pC += n;
+					continue;
+				case ' ':
+					cxy.x++;
+					continue;
+			}
 
-			//pO[cr] = c;
-			pO[cr].z = 15;
-			pO[cr].w = *pC - ' ';
-			if( !nx )
-				continue;
-			pO[cr].w += (nx&4)>>2;
+			cxy.x++;
 		}
-		return cxy;
+		return pC - pSRCalloc();
 	}
+	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs );
+
 	U4x4& CRSdim( U4x4* pCRS2 )
 	{
-		U1* pC = pSRCstart( pCRS2 );
+		U1* pC = pSRCstart( ); //pCRS2 );
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 
 		return dim;
