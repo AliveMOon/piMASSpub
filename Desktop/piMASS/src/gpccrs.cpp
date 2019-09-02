@@ -86,6 +86,29 @@ void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
 
 	if( bSH )
 	{
+		U4	t1 = selANCR[1].a4x2[0]*I4x2(1,pMAP->map44.z),
+			t0 = selANCR[0].a4x2[0]*I4x2(1,pMAP->map44.z);
+		if( t0 > t1  )
+		{
+			I4x4 tmp = selANCR[0];
+			selANCR[0] = selANCR[1];
+			selANCR[1] = tmp;
+
+			apSRC[1] = apSRC[0];
+			apSRC[0] = pSRC;
+
+			t0 = anSTR[1];
+			anSTR[1] = anSTR[0];
+			anSTR[0] = t0;
+			return;
+		}
+
+		if( anSTR[1] < anSTR[0] )
+		{
+			t0 = anSTR[1];
+			anSTR[1] = anSTR[0];
+			anSTR[0] = t0;
+		}
 
 		return; // ha le van nyomva a shift akkor meg akarjuk örizni a sel[0]-t.
 	}
@@ -217,6 +240,18 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 	{
 		for( U4 i = 0; i < nMINI; i++ )
 		{
+			if( pMINI[i].y )
+			{
+				dst.x = (i%CRSfrm.z)*dst.w + div.x;
+				dst.y = (i/CRSfrm.z)*dst.h + div.y;
+				c = pMINI[i].y+0xb0;
+
+				src.x = (c%cx)*src.w;
+				src.y = (c/cx)*src.h;
+
+				SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
+			}
+
 			c = pMINI[i].w;
 			if( c )
 			{
@@ -241,17 +276,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 				SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
 			}
 
-			if( !pMINI[i].y )
-				continue;
 
-			dst.x = (i%CRSfrm.z)*dst.w + div.x;
-			dst.y = (i/CRSfrm.z)*dst.h + div.y;
-			c = pMINI[i].y+0xb0;
-
-			src.x = (c%cx)*src.w;
-			src.y = (c/cx)*src.h;
-
-			SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
 
 
 		}
@@ -260,6 +285,19 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 
 	for( U4 i = 0; i < nMINI; i++ )
 	{
+		if( c = pMINI[i].y )
+		{
+			dst.x = (i%CRSfrm.z)*dst.w + div.x;
+			dst.y = (i/CRSfrm.z)*dst.h + div.y;
+			c = pMINI[i].y+0xb0;
+
+			src.x = (c%cx)*src.w;
+			src.y = (c/cx)*src.h;
+			SDL_BlitSurface( win.pSRFchar, &src, win.pSRFwin, &dst );
+
+		}
+
+
 		c = pMINI[i].w;
 		if( c )
 		{
@@ -284,16 +322,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 			SDL_BlitSurface( win.pSRFchar, &src, win.pSRFwin, &dst );
 		}
 
-		if( !(c = pMINI[i].y) )
-			continue;
 
-		dst.x = (i%CRSfrm.z)*dst.w + div.x;
-		dst.y = (i/CRSfrm.z)*dst.h + div.y;
-		c = pMINI[i].y+0xb0;
-
-		src.x = (c%cx)*src.w;
-		src.y = (c/cx)*src.h;
-		SDL_BlitSurface( win.pSRFchar, &src, win.pSRFwin, &dst );
 	}
 	return false;
 }

@@ -160,7 +160,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 	U1x4 c;
 	//c.u4 = pC64[15];
 	U1 nx, aC[] = " ";
-	U4 cr, n, rr;
+	I4 cr, n, rr;
 	for( I4 r = max(xy.y,0); r < fy; r++ )
 	{
 		rr = r*fz;
@@ -212,10 +212,29 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		}
 
 	}
+	cr = dim.w;
+
+	bool bON = false;
+
 	for( U1* pC = pSRCstart(), *pAL = pSRCalloc() , *pCe = pC+dim.w; pC < pCe; pC++ )
 	{
 		if( cxy.y >= fy )
 			break;
+
+		cr = cxy.x + cxy.y*fz;
+		if( this == crs.apSRC[0] )
+		if( pC-pAL == crs.anSTR[0] )
+				bON = true;
+
+		if( bON )
+		if( cr >= 0 && cr < fy*fz )
+		{
+			pO[cr].y |= 0x10;
+		}
+
+		if( this == crs.apSRC[1] )
+		if( pC-pAL == crs.anSTR[1] )
+				bON = false;
 
 		switch( *pC )
 		{
@@ -264,21 +283,18 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 			continue;
 		}
 
-		cr = cxy.x + cxy.y*fz;
-		cxy.x++;
-		if( this == crs.apSRC[0] )
-		if( pC-pAL == crs.anSTR[0] )
-				pO[cr].y |= 4;
 
-		if( this == crs.apSRC[1] )
-		if( pC-pAL == crs.anSTR[1] )
-				pO[cr].y |= 2;
+		cr = cxy.x + cxy.y*fz;
+
 		//pO[cr] = c;
 		pO[cr].z = 15;
 		pO[cr].w = *pC - ' ';
+		cxy.x++;
+
 		if( !nx )
 			continue;
 		pO[cr].w += (nx&4)>>2;
+
 	}
 	return cxy;
 }
