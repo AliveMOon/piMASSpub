@@ -413,7 +413,7 @@ int main( int nA, char *apA[] )
 
 		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
 
-		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480), SRCxycr(0);
+		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480), SRCxycr(0), SRCin(0);
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         gpcCRS main_crs( win ), *apCRS[4];
         gpmZ(apCRS);
@@ -439,6 +439,7 @@ int main( int nA, char *apA[] )
 																	//"_"
 												)
 					);
+
         while( gppKEYbuff )
         {
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
@@ -479,7 +480,8 @@ int main( int nA, char *apA[] )
 				if( apCRS[mDIV] )
 				{
 					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *pSRCc, mouseXY.a4x2[0] );
-
+					if( apCRS[mDIV] )
+					SRCin = apCRS[mDIV]->IN;
 
 					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->AN.x );
 					pE += sprintf( pE, "%d", apCRS[mDIV]->AN.y );
@@ -490,14 +492,16 @@ int main( int nA, char *apA[] )
 										(char*)gppKEYbuff,
 										"-= piMASS::%s"
 										" x:%d y:%d, mDIV: %d"
-										"xycr:%s AN:%s"
+										" xycr:%s AN:%s"
+										" IN %s"
 										" wx:%d wy:%d"
 										" %d F%d =-"
 										" %d, %d",
 										gpsMASSname,
 										mouseXY.x, mouseXY.y, mDIV,
-										SRCxycr.str(gpsMAINpub+0x80),
+										SRCxycr.str(gpsMAINpub+0x40),
 										gpsMAINpub,
+										SRCin.str(gpsMAINpub+0x80),
 										mouseW.x, mouseW.y,
 										nMB, nF,
 										bug, nBUG

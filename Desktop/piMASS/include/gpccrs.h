@@ -6,7 +6,7 @@
 class gpcCRS
 {
 	public:
-		I4x4 	CRSfrm, AN;
+		I4x4 	CRSfrm, AN, IN;
 		U1x4	*pMINI, *pCRS;
 
 		U4 nMINI;
@@ -42,16 +42,41 @@ class gpcCRS
 				for( AN.x = 0; AN.x < pMAP->map44.x; AN.x++ )
 				{
 					AN.z += pC[AN.x];
-					if( o.a4x2[1].x > AN.z )
+					if( o.z >= AN.z )
 						continue;
-					AN.x++;
+					IN.z = pC[AN.x]*cr.x;
+					IN.x = xy.x - (AN.z*cr.x - IN.z);
+
+
 					break;
 				}
+                if( AN.x >= pMAP->map44.x )
+                {
+					IN.z = cr.x*9;
+					IN.x = xy.x - (AN.z*cr.x);
+					AN.x = pMAP->map44.x + 1 + IN.x/IN.z;
+					IN.x %= IN.z;
+				} else
+					AN.x++; // ALF 'A' == 1
+
 				for( AN.y = 0; AN.y < pMAP->map44.y; AN.y++ )
 				{
 					AN.w += pR[AN.y];
-					if( o.a4x2[1].y < AN.w )
-						break;
+					if( o.w >= AN.w )
+						continue;
+
+					IN.w = pR[AN.y]*cr.y;
+					IN.y = xy.y - (AN.w*cr.y - IN.w);
+					break;
+				}
+				if( AN.y >= pMAP->map44.y )
+                {
+
+					IN.w = cr.y;
+					IN.y = xy.y - (AN.w*cr.y);
+					AN.y = pMAP->map44.y + IN.y/IN.w;
+					IN.y %= IN.w;
+
 				}
 			}
 
