@@ -124,8 +124,51 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 		for( U4 i = 0; i < nMINI; i++ )
 		{
 			c = pMINI[i].w;
-			if( !c )
+			if( c )
+			{
+				dst.x = (i%CRSfrm.z)*dst.w + div.x;
+				dst.y = (i/CRSfrm.z)*dst.h + div.y;
+
+				if( c > 0x60 )
+				{
+					d = gpsHUN[c-0x60]-' ';
+					c = gpsHUN[c-0x20]-' '+0x60;
+					if( d >= 'a'-' ' && d <= 'z'-' ' )
+						c += 8;
+					src.x = (d%cx)*src.w;
+					src.y = (d/cx)*src.h;
+					SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
+
+				}
+
+				src.x = (c%cx)*src.w;
+				src.y = (c/cx)*src.h;
+
+				SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
+			}
+
+			if( !pMINI[i].y )
 				continue;
+
+			dst.x = (i%CRSfrm.z)*dst.w + div.x;
+			dst.y = (i/CRSfrm.z)*dst.h + div.y;
+			c = pMINI[i].y+0xb0;
+
+			src.x = (c%cx)*src.w;
+			src.y = (c/cx)*src.h;
+
+			SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
+
+
+		}
+		return false;
+	}
+
+	for( U4 i = 0; i < nMINI; i++ )
+	{
+		c = pMINI[i].w;
+		if( c )
+		{
 			dst.x = (i%CRSfrm.z)*dst.w + div.x;
 			dst.y = (i/CRSfrm.z)*dst.h + div.y;
 
@@ -144,34 +187,18 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 			src.x = (c%cx)*src.w;
 			src.y = (c/cx)*src.h;
 
-			SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
+			SDL_BlitSurface( win.pSRFchar, &src, win.pSRFwin, &dst );
 		}
-		return false;
-	}
 
-	for( U4 i = 0; i < nMINI; i++ )
-	{
-		c = pMINI[i].w;
-		if( !c )
+		if( !(c = pMINI[i].y) )
 			continue;
+
 		dst.x = (i%CRSfrm.z)*dst.w + div.x;
 		dst.y = (i/CRSfrm.z)*dst.h + div.y;
-
-		if( c > 0x60 )
-		{
-			d = gpsHUN[c-0x60]-' ';
-			c = gpsHUN[c-0x20]-' '+0x60;
-			if( d >= 'a'-' ' && d <= 'z'-' ' )
-				c += 8;
-			src.x = (d%cx)*src.w;
-			src.y = (d/cx)*src.h;
-			SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dst );
-
-		}
+		c = pMINI[i].y+0xb0;
 
 		src.x = (c%cx)*src.w;
 		src.y = (c/cx)*src.h;
-
 		SDL_BlitSurface( win.pSRFchar, &src, win.pSRFwin, &dst );
 	}
 	return false;

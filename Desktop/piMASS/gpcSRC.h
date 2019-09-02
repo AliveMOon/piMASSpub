@@ -459,13 +459,68 @@ public:
 	}
 	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64 )
 	{
-		if( !this )
+		if( this ?
+					   ( fx <= 0 	||	fy <= 0 )
+					|| ( xy.x >= fx ||	xy.y >= fy )
+					: true )
 			return xy;
+
 		I4x4 cxy = xy;
 		U1x4 c;
-		c.u4 = pC64[15];
+		//c.u4 = pC64[15];
 		U1 nx, aC[] = " ";
-		U4 cr, n;
+		U4 cr, n, rr;
+		for( I4 r = max(xy.y,0); r < fy; r++ )
+		{
+			rr = r*fz;
+			for( I4 c = max(xy.x,0); c < fx; c++ )
+			{
+				cr = rr+c;
+				pO[cr].y = 0;
+			}
+		}
+
+		if( !(bSW&gpeMASSoffMSK) )
+		if( xy.x < fx && xy.y < fy )
+		{
+
+			// UP
+			if( xy.y >= 0 )
+			{
+				rr = xy.y*fz;
+				for( I4 c = max(xy.x,0); c < fx; c++ )
+				{
+					cr = rr+c;
+					pO[cr].y |= 1;
+				}
+			}
+			//DWN
+			{
+				rr = (fy-1)*fz;
+				for( I4 c = max(xy.x,0); c < fx; c++ )
+				{
+					cr = rr+c;
+					pO[cr].y |= 4;
+				}
+			}
+
+			// LEFT
+			//if( xy.x >= 0 )
+			{
+				for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fz ; r < fy; r++, rr += fz )
+				{
+					pO[rr].y |= 8;
+				}
+			}
+			// RIGHT
+			{
+				for( I4 r = max(xy.y,0), rr = fx-1 + r*fz; r < fy; r++, rr += fz )
+				{
+					pO[rr].y |= 2;
+				}
+			}
+
+		}
 		for( U1* pC = pSRCstart( pCx2 ), *pCe = pC+dim.w; pC < pCe; pC++ )
 		{
 			if( cxy.y >= fy )
@@ -521,7 +576,8 @@ public:
 			cr = cxy.x + cxy.y*fz;
 			cxy.x++;
 
-			pO[cr] = c;
+			//pO[cr] = c;
+			pO[cr].z = 15;
 			pO[cr].w = *pC - ' ';
 			if( !nx )
 				continue;
