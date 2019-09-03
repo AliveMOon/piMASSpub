@@ -480,14 +480,15 @@ public:
 			return 0;
 		}
 		cr.y = min( cr.y, dim.y-1 );
-		if( !cr.sum() )
-			return 0;
+
+		//if( !cr.sum() )
+		//	return pC - pSRCalloc();;
 		I4x4 cxy = 0;
 		U1 sC[] = " ", *pROW = pSRCstart(), *pCe, *pC;
 		U4 n;
 		for( pC = pROW, pCe = pC+dim.w; pC < pCe; pC++ )
 		{
-			if( cxy.y == cr.y )
+			if( cxy.y >= cr.y )
 				break;
 
 			switch( *pC )
@@ -548,7 +549,8 @@ public:
 				case '\n':
 				case '\r':
 				case '\a':
-					break;
+					return pC - pSRCalloc();
+
 				case '\t':
 					sC[0] = *pC;
 					n = gpmNINCS( pC+1, sC );
