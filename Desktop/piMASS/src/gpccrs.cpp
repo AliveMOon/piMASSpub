@@ -471,7 +471,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
 									CRSfrm.z,
 									gpaC64,
-									*this
+									*this,
+									gpeCLR_blue, gpeCLR_blue2, gpeCLR_blue2
 								);
 
 			}

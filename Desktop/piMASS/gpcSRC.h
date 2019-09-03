@@ -424,6 +424,8 @@ public:
 		return pMAP;
 	}
 };
+
+
 class gpcSRC
 {
 public:
@@ -562,7 +564,7 @@ public:
 		}
 		return pC - pSRCalloc();
 	}
-	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs );
+	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch );
 
 	U4x4& CRSdim( U4x4* pCRS2 )
 	{

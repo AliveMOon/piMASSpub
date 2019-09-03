@@ -149,7 +149,7 @@ gpcSRC::~gpcSRC()
 	gpmDELary(pMAP);
 }
 
-I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs )
+I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch  )
 {
 	if( this ?
 				   ( fx <= 0 	||	fy <= 0 )
@@ -183,6 +183,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 			for( I4 c = max(xy.x,0); c < fx; c++ )
 			{
 				cr = rr+c;
+				pO[cr].x = fr;
 				pO[cr].y |= 1;
 			}
 		}
@@ -192,6 +193,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 			for( I4 c = max(xy.x,0); c < fx; c++ )
 			{
 				cr = rr+c;
+				pO[cr].x = fr;
 				pO[cr].y |= 4;
 			}
 		}
@@ -201,6 +203,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		{
 			for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fz ; r < fy; r++, rr += fz )
 			{
+				pO[rr].x = fr;
 				pO[rr].y |= 8;
 			}
 		}
@@ -208,6 +211,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		{
 			for( I4 r = max(xy.y,0), rr = fx-1 + r*fz; r < fy; r++, rr += fz )
 			{
+				pO[rr].x = fr;
 				pO[rr].y |= 2;
 			}
 		}
@@ -216,7 +220,8 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 	cr = dim.w;
 
 	bool bON = false;
-
+	/*gpeCLR 	fr = gpeCLR_blue2,
+			bg = gpeCLR_blue;*/
 	for( U1* pC = pSRCstart(), *pAL = pSRCalloc() , *pCe = pC+dim.w; pC < pCe; pC++ )
 	{
 		if( cxy.y >= fy )
@@ -231,6 +236,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		if( cr >= 0 && cr < fy*fz )
 		{
 			pO[cr].y |= 0x10;
+			pO[cr].x = ch;
 		}
 
 		if( this == crs.apSRC[1] )
@@ -288,7 +294,11 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		cr = cxy.x + cxy.y*fz;
 
 		//pO[cr] = c;
-		pO[cr].z = 15;
+		if( pO[cr].y && pO[cr].x == ch )
+			pO[cr].z = bg;
+		else
+			pO[cr].z = ch;
+
 		pO[cr].w = *pC - ' ';
 		cxy.x++;
 
