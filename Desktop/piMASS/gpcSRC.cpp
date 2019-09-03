@@ -233,6 +233,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 				bON = true;
 
 		if( bON )
+		if( cxy.x < fx )
 		if( cr >= 0 && cr < fy*fz )
 		{
 			pO[cr].y |= 0x10;
@@ -266,7 +267,23 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 			case '\t':
 				aC[0] = *pC;
 				n = gpmNINCS( pC+1, aC );
-				cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4;
+				if( bON )
+				{
+					U4 nFILL = (xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4)-cxy.x;
+                    if( cxy.x < 0 )
+                    if( cxy.x+nFILL > 0 )
+                    {
+						nFILL += cxy.x;
+						cxy.x = 0;
+                    }
+                    for( U4 cr = cxy.x + cxy.y*fz, cre = min( cxy.x+nFILL, cxy.x+fx)+cxy.y*fz; cr < cre; cr++  )
+                    {
+						pO[cr].y |= 0x10;
+						pO[cr].x = ch;
+                    }
+                    cxy.x += nFILL;
+				} else
+					cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4;
 				pC += n;
 				continue;
 			case ' ':
@@ -294,7 +311,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		cr = cxy.x + cxy.y*fz;
 
 		//pO[cr] = c;
-		if( pO[cr].y && pO[cr].x == ch )
+		if( pO[cr].y&0x10 && pO[cr].x == ch )
 			pO[cr].z = bg;
 		else
 			pO[cr].z = ch;
