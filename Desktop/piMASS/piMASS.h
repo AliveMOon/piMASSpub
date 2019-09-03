@@ -250,6 +250,14 @@ U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nLEN, U1* gpaALFadd )
 		| (((U4)b)<< 8)					\
 		| ((U4)a)						\
 	)
+enum gpeCLR: U1
+{
+	gpeCLR_black,	gpeCLR_red, 	gpeCLR_green,	gpeCLR_blue,
+	gpeCLR_violet,	gpeCLR_red2, 	gpeCLR_green2,	gpeCLR_blue2,
+	gpeCLR_brown,	gpeCLR_orange,	gpeCLR_yellow,  gpeCLR_cyan,
+	gpeCLR_gray,	gpeCLR_gray2,	gpeCLR_grey3,	gpeCLR_white,
+
+};
 enum gpeLZYset : U1
 {
 	gpeLZYoff,

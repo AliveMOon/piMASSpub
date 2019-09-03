@@ -428,7 +428,9 @@ class gpcSRC
 {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
-    U8		nL, nA, bSW;		// pB = pA+iB()
+    U8		nL,
+			nA,			// ha nA == 0 nm mi foglaltuk
+			bSW;		// pB = pA+iB()
     U4x4	spc, dim;
     U4		IX, retIX, nALFtg, strtD, endD;
 

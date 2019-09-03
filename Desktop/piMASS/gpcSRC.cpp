@@ -139,13 +139,14 @@ gpcSRC::gpcSRC( gpcSRC& B )
 
 gpcSRC::~gpcSRC()
 {
-	if( nA )
+	if( nA )			// ha nA == 0 nm mi foglaltuk
 		gpmDELary(pA);
 	gpmDELary(pALFtg);
 	gpmDELary(pEXE);
 	gpmDELary(pRES);
 	gpmDELary(pMINI);
 	gpmDELary(pBIG);
+	gpmDELary(pMAP);
 }
 
 I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs )
