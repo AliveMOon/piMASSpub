@@ -10,7 +10,7 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 	if( !this )
 		return o;
 
-	I4x2 xy = _xy - o.a4x2[0];
+	I4x2 xy = _xy - o.a4x2[0] - I4x2(div.x,div.y);
 	o = I4x4( xy, xy/cr );
 	if( gpcMAP* pMAP = &mass.mapCR )
 	{
@@ -194,19 +194,19 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 		return false;
 	}
 
-	dst.y = div.y,
-	dst.x = div.x;
+	dst.x = div.x,
+	dst.y = div.y;
 
 	if( CRSfrm.x > 0 )
 	{
-		dst.w = CRSfrm.x*div.w/CRSfrm.z;
+		dst.w = (CRSfrm.x*div.w)/CRSfrm.z;
 		dst.h = div.h;
 		SDL_FillRect( win.pSRFwin, &dst, gpaC64[14] );
 	}
 
 	if( CRSfrm.y > 0 )
 	{
-		dst.h = CRSfrm.y*div.h/CRSfrm.w;
+		dst.h = (CRSfrm.y*div.h)/CRSfrm.w;
 		dst.w = div.w;
 		SDL_FillRect( win.pSRFwin, &dst, gpaC64[14] );
 	}
@@ -224,10 +224,13 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 	}
 
 	dst = div;
-	dst.x += CRSfrm.x*div.w/CRSfrm.z;
-	dst.y += CRSfrm.y*div.h/CRSfrm.w;
+
+	dst.x = CRSfrm.x > 0 ? (CRSfrm.x*div.w)/CRSfrm.z : 0;
+	dst.y = CRSfrm.y > 0 ? (CRSfrm.y*div.h)/CRSfrm.w : 0;
 	dst.w -= dst.x;
 	dst.h -= dst.y;
+	dst.x += div.x;
+	dst.y += div.y;
 
 	SDL_FillRect( win.pSRFwin, &dst, gpaC64[6] ); // 0x000000AA );
 
