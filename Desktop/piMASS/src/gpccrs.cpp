@@ -440,6 +440,11 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		}
 		gpmZn( pMINI, nMINI );
 		miniALL.y = CRSfrm.y;
+		gpeCLR	c16bg = gpeCLR_blue,
+				c16fr = gpeCLR_blue2,
+				c16ch = gpeCLR_blue2;
+		I4x4 sel01( selANCR[0].a4x2[0], selANCR[1].a4x2[0] );
+
 		for( U4 r = 0; r < pMAP->map44.y; miniALL.y += pR[r], r++ )
 		{
 			if( miniALL.y >= CRSfrm.w )
@@ -467,77 +472,82 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
 
-				if( pB < pE )
 				if( pSRC == apSRC[0] )
-				if( pSRC == apSRC[1] )
 				{
-					I4	nSUB = anSTR[1] - anSTR[0],
-						nSTR = pE-pB,
-						nOL = pSRC->nL,
-						nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
+					if( pB < pE )
+					if( pSRC == apSRC[1] )
+					{
+						I4	nSUB = anSTR[1] - anSTR[0],
+							nSTR = pE-pB,
+							nOL = pSRC->nL,
+							nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
 
 
-					// több karakter írunk át
-					U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
-						*pRIG	= pOA + anSTR[1],
-						*pRIGe	= pOA + nOL,
-						*pLFT	= (pSRC->pA = new U1[nNEW]) + anSTR[0];
+						// több karakter írunk át
+						U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
+							*pRIG	= pOA + anSTR[1],
+							*pRIGe	= pOA + nOL,
+							*pLFT	= (pSRC->pA = new U1[nNEW]) + anSTR[0];
 
-					gpmMEMCPY( pSRC->pA, pOA, anSTR[0] );
+						gpmMEMCPY( pSRC->pA, pOA, anSTR[0] );
 
-					for( ; pB < pE; pB++ )
-                    {
-                        switch( *pB )
-                        {
-							case '\b':
-								if( pLFT > pSRC->pA )
-								{
-									pLFT--;
-									if( pLFT[0] == '\n' )
-									if( pLFT >= pSRC->pA )
-									if( pLFT[-1] == '\r' )
+						for( ; pB < pE; pB++ )
+						{
+							switch( *pB )
+							{
+								case '\b':
+									if( pLFT > pSRC->pA )
 									{
 										pLFT--;
-										continue;
+										if( pLFT[0] == '\n' )
+										if( pLFT >= pSRC->pA )
+										if( pLFT[-1] == '\r' )
+										{
+											pLFT--;
+											continue;
+										}
 									}
-								}
-								continue;
-							case 0x7f:
-								pB++;
-								if( pB < pE )	// ha még van a bufferban abbol deletézünk
 									continue;
+								case 0x7f:
+									pB++;
+									if( pB < pE )	// ha még van a bufferban abbol deletézünk
+										continue;
 
-								if( pRIG < pRIGe )
-									pRIG++;	// ha nincsen akkor a jobb oldalbol
-								continue;
-                        }
+									if( pRIG < pRIGe )
+										pRIG++;	// ha nincsen akkor a jobb oldalbol
+									continue;
+							}
 
-                        *pLFT = *pB;
-                        pLFT++;
+							*pLFT = *pB;
+							pLFT++;
 
-                    }
-                    anSTR[1] = anSTR[0] = pLFT-pSRC->pA;
-					if( pRIG < pRIGe )
-					{
-						gpmMEMCPY( pLFT, pRIG, pRIGe-pRIG );
-						pLFT += pRIGe-pRIG;
+						}
+						anSTR[1] = anSTR[0] = pLFT-pSRC->pA;
+						if( pRIG < pRIGe )
+						{
+							gpmMEMCPY( pLFT, pRIG, pRIGe-pRIG );
+							pLFT += pRIGe-pRIG;
+						}
+						pSRC->nL = pLFT-pSRC->pA;
+						pSRC->nA = nNEW;
+						pSRC->updt();
+						*pLFT = 0;
+
+						gpmDELary(pOA);
+						pSRC->hd(mass);
 					}
-					pSRC->nL = pLFT-pSRC->pA;
-					pSRC->nA = nNEW;
-					pSRC->updt();
-					*pLFT = 0;
-
-					gpmDELary(pOA);
-					pSRC->hd(mass);
 				}
-
+				c16fr = gpeCLR_blue2;
+				if( c+1 >= sel01.x	&& r >= sel01.y )
+				if( c+1 <= sel01.z	&& r <= sel01.w )
+					c16fr = gpeCLR_cyan;
 				pSRC->CRSmini(
 									pMINI, aCRS, miniALL,
 									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
 									CRSfrm.z,
 									gpaC64,
 									*this,
-									gpeCLR_blue, gpeCLR_blue2, gpeCLR_blue2
+									c16bg, c16fr, c16ch
 								);
 
 			}

@@ -19,8 +19,7 @@ class gpcWIN
 	public:
 
 		I4x4			winID,
-						winSIZ,
-						winDIV;
+						winSIZ;
 
 		SDL_Window		*pSDLwin;
 		SDL_Renderer	*pSDLrndr;
@@ -29,6 +28,7 @@ class gpcWIN
 						*pSRFwin;
 
 		SDL_Rect		chrPIC;
+		U1				bSW;
 
 		SDL_Rect	wDIV( U1 iDIV );
 		void		gpeWINresize( void );
@@ -49,10 +49,14 @@ class gpcWIN
 		{
 			return (mXY.x/winDIV.x) | ((mXY.y/winDIV.y)<<1);
 		}
-
+		I4x2& winWH()
+		{
+			return winDIV.a4x2[1];
+		}
 	protected:
 
 	private:
+		I4x4 winDIV;
 };
 
 #endif // GPCWIN_H

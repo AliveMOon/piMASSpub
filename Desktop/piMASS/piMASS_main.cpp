@@ -589,7 +589,7 @@ int main( int nA, char *apA[] )
 								nMAG = 1;
 								break;
 							} else {
-								I4	mx = win.winDIV.a4x2[1].mn()/8,
+								I4	mx = win.winWH().mn()/8,
 									zm = crs.CRSfrm.a4x2[1].abs().mn(),
 									zd = zm,
 									mag = -ev.wheel.y;
@@ -804,6 +804,17 @@ int main( int nA, char *apA[] )
 							{
 								nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
 														aXY[1]-'0';
+								if( nF )
+								if( nF < 5 )
+								{
+
+									U1 msk = (0x1<<(nF-1));
+									if( win.bSW&msk )
+										win.bSW = (win.bSW&(~msk));
+									else
+										win.bSW |= msk;
+
+								}
 							}
 
 							break;

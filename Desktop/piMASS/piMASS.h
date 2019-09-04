@@ -624,6 +624,11 @@ public:
     {
         x = _x; y = _y; z = _z; w = _w;
     }
+    U4x4( U4x2& _xy, U4x2& _zw )
+    {
+        a4x2[0] = _xy;
+        a4x2[1] = _zw;
+    }
     U4x4& operator = ( U4 b )
     {
         x = y = z = w = b;
