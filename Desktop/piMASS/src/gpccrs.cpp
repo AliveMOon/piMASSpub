@@ -194,7 +194,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 		return false;
 	}
 
-	dst.y = dst.x = 0;
+	dst.y = div.y,
+	dst.x = div.x;
 
 	if( CRSfrm.x > 0 )
 	{
@@ -223,8 +224,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 iDIV )
 	}
 
 	dst = div;
-	dst.x = CRSfrm.x*div.w/CRSfrm.z;
-	dst.y = CRSfrm.y*div.h/CRSfrm.w;
+	dst.x += CRSfrm.x*div.w/CRSfrm.z;
+	dst.y += CRSfrm.y*div.h/CRSfrm.w;
 	dst.w -= dst.x;
 	dst.h -= dst.y;
 

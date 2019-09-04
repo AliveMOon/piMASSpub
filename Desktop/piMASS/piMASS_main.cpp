@@ -449,6 +449,12 @@ int main( int nA, char *apA[] )
         //----------------------------------------------------
         while( gppKEYbuff )
         {
+			if( iDIV != mDIV )
+			{
+				iDIV = mDIV;
+				if( !apCRS[iDIV] )
+					apCRS[iDIV] = new gpcCRS(win);
+			}
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
 
 			if( gppKEYbuff != gpsKEYbuff || nMAG )
@@ -457,11 +463,22 @@ int main( int nA, char *apA[] )
 				if( piMASS )
 				{
 					crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, gppMOUSEbuff );
+					gppKEYbuff = gppMOUSEbuff;
+					*gppKEYbuff = 0;
 				} else {
 					crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 				}
 				for( U1 i = 0; i < 4; i++ )
+				{
+					if( iDIV != i )
+					{
+						if( !apCRS[i] )
+							continue;
+
+						apCRS[i]->miniRDY( win, iDIV, *piMASS, gppKEYbuff, gppKEYbuff );
+					}
 					apCRS[i]->miniDRW( win, i ); //DIV );
+				}
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
 
@@ -482,18 +499,22 @@ int main( int nA, char *apA[] )
 				mDIV = win.mDIV( mouseXY.a4x2[0] );
 				if( apCRS[mDIV] )
 				{
-					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
+					if( iDIV != mDIV )
+						iDIV = mDIV;
 
-					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnAN.x );
-					pE += sprintf( pE, "%d", apCRS[mDIV]->scnAN.y );
-					SRCin = apCRS[mDIV]->scnIN;
+					SRCxycr = apCRS[iDIV]->srcXYCR( win, iDIV, *piMASS, mouseXY.a4x2[0] );
+
+					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[iDIV]->scnAN.x );
+					pE += sprintf( pE, "%d", apCRS[iDIV]->scnAN.y );
+					SRCin = apCRS[iDIV]->scnIN;
 
 					if( (nMBB&1) )
 					if( !(nMB&1) )
 					{
 						// SELECT
-						apCRS[mDIV]->CRSsel(
-												win, mDIV, *piMASS,
+
+						apCRS[iDIV]->CRSsel(
+												win, iDIV, *piMASS,
 												(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 											);
 					}
@@ -527,7 +548,6 @@ int main( int nA, char *apA[] )
 				*gppKEYbuff = 0;
 				if( nF )
 				{
-
 					nF = 0;
 				}
 				nMAG = 0;
@@ -811,12 +831,18 @@ int main( int nA, char *apA[] )
 								if( nF )
 								if( nF < 5 )
 								{
+									mDIV = nF-1;
 
-									U1 msk = (0x1<<(nF-1));
+									U1 msk = (0x1<<mDIV);
 									if( win.bSW&msk )
 										win.bSW = (win.bSW&(~msk));
-									else
+									else {
 										win.bSW |= msk;
+										if( !apCRS[mDIV] )
+											apCRS[mDIV] = new gpcCRS( win );
+									}
+
+									iDIV = win.bSW ? mDIV : 0;
 
 								}
 							}
