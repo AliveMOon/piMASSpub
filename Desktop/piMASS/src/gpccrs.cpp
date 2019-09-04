@@ -466,6 +466,62 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
+
+				if( pB < pE )
+				if( pSRC == apSRC[0] )
+				if( pSRC == apSRC[1] )
+				{
+					I4	nSUB = anSTR[1] - anSTR[0],
+						nSTR = pE-pB,
+						nOL = pSRC->nL,
+						nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
+
+
+					// több karakter írunk át
+					U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
+						*pRIG	= pOA + anSTR[1],
+						*pRIGe	= pOA + nOL,
+						*pLFT	= (pSRC->pA = new U1[nNEW]) + anSTR[0];
+
+					gpmMEMCPY( pSRC->pA, pOA, anSTR[0] );
+
+					for( ; pB < pE; pB++ )
+                    {
+                        switch( *pB )
+                        {
+							case '\b':
+								if( pLFT > pSRC->pA )
+									pLFT--;
+								continue;
+							case 0x7f:
+								pB++;
+								if( pB < pE )	// ha még van a bufferban abbol deletézünk
+									continue;
+
+								if( pRIG < pRIGe )
+									pRIG++;	// ha nincsen akkor a jobb oldalbol
+								continue;
+                        }
+
+                        *pLFT = *pB;
+                        pLFT++;
+
+                    }
+                    anSTR[1] = anSTR[0] = pLFT-pSRC->pA;
+					if( pRIG < pRIGe )
+					{
+						gpmMEMCPY( pLFT, pRIG, pRIGe-pRIG );
+						pLFT += pRIGe-pRIG;
+					}
+					pSRC->nL = pLFT-pSRC->pA;
+					pSRC->nA = nNEW;
+					pSRC->updt();
+					*pLFT = 0;
+
+					gpmDELary(pOA);
+					pSRC->hd(mass);
+				}
+
 				pSRC->CRSmini(
 									pMINI, aCRS, miniALL,
 									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),

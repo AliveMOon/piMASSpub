@@ -443,6 +443,17 @@ public:
 			*pBIG;
 	gpcMAP	*pMAP;
 
+	U4 updt( void )
+	{
+		U8 nLEN = 0;
+		pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
+		nVER = nHD+1;
+
+		//ifpB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
+
+		return nVER;
+	}
+
 	U4 nCLR(void)
 	{
 		return gpmOFF( gpcSRC, nVER )-gpmOFF( gpcSRC, pALFtg );

@@ -492,20 +492,6 @@ int main( int nA, char *apA[] )
 												win, mDIV, *pSRCc,
 												(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 											);
-						/*if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
-						{
-							// SHIFT nagyobb egysség kijelölése
-							apCRS[mDIV].selANCR[1].a4x2[0] = apCRS[mDIV]->scnAN.a4x2[0];	//AN
-							apCRS[mDIV].selANCR[1].a4x2[1] = apCRS[mDIV]->scnIN.a4x2[0];	//IN
-
-						} else {
-							// kijelölés
-							apCRS[mDIV].selANCR[1].a4x2[0] = apCRS[mDIV]->scnAN.a4x2[0];	//AN
-
-
-							apCRS[mDIV].selANCR[0] = apCRS[mDIV].selANCR[1];
-						}*/
-
 					}
 				}
 
@@ -695,7 +681,25 @@ int main( int nA, char *apA[] )
 							break;
 						// enter tab izé bizé
 						case '/':
-
+							{
+								switch( aXY[1] )
+								{
+									case 'b':
+									case 'B':
+										*gppKEYbuff = '\b';
+										gppKEYbuff++;
+										break;
+									case 'd':
+									case 'D':
+										*gppKEYbuff = 0x7f;
+										gppKEYbuff++;
+										break;
+									case 'n':
+									case 'N':
+										gppKEYbuff += sprintf( (char*)gppKEYbuff, "\r\n" );
+										break;
+								}
+							}
 							break;
 						// cursor nyilak
 						case '_':
