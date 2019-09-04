@@ -47,6 +47,16 @@ class gpcWIN
 		}
 		U1 mDIV( const I4x2& mXY )
 		{
+			SDL_Rect dim;
+			for( U4 i = 0; i < 4; i++ )
+			{
+				dim = wDIV(i);
+				if( dim.x > mXY.x || dim.y > mXY.y )
+					continue;
+				if( mXY.x-dim.x >= dim.w || mXY.y-dim.y >= dim.h  )
+					continue;
+				return i;
+			}
 			return (mXY.x/winDIV.x) | ((mXY.y/winDIV.y)<<1);
 		}
 		I4x2& winWH()

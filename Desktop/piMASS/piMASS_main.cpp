@@ -409,15 +409,16 @@ int main( int nA, char *apA[] )
 		U8 s;
 		gpMASS.lazy_read( gpsMASSpath, s = -1, -1 );
 
-		gpcMASS* pSRCc = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
+		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
 		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
 
 		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480), SRCxycr(0), SRCin(0);
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         gpcCRS main_crs( win ), *apCRS[4];
+        U4 iDIV = 0, nDIV = 1, mDIV = iDIV, selDIV = iDIV;
+
         gpmZ(apCRS);
-        U4 iDIV = 0, nDIV = 1, mDIV;
         apCRS[iDIV] = &main_crs;
         //sdl.draw();
         SDL_Event ev;
@@ -439,7 +440,13 @@ int main( int nA, char *apA[] )
 																	//"_"
 												)
 					);
-
+		//----------------------------------------------------
+        //
+        //						MAIN WHILE
+        //
+        //		ha gppKEYbuff == NULL akkor zártuk be a programot
+        //
+        //----------------------------------------------------
         while( gppKEYbuff )
         {
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
@@ -447,12 +454,9 @@ int main( int nA, char *apA[] )
 			if( gppKEYbuff != gpsKEYbuff || nMAG )
 			{
 				*gppKEYbuff = 0;
-				if(
-					//false &&
-					pSRCc
-					)
+				if( piMASS )
 				{
-					crs.miniRDY(  win, iDIV, *pSRCc, gppKEYbuff, gppMOUSEbuff );
+					crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, gppMOUSEbuff );
 				} else {
 					crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 				}
@@ -478,7 +482,7 @@ int main( int nA, char *apA[] )
 				mDIV = win.mDIV( mouseXY.a4x2[0] );
 				if( apCRS[mDIV] )
 				{
-					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *pSRCc, mouseXY.a4x2[0] );
+					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
 
 					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnAN.x );
 					pE += sprintf( pE, "%d", apCRS[mDIV]->scnAN.y );
@@ -489,7 +493,7 @@ int main( int nA, char *apA[] )
 					{
 						// SELECT
 						apCRS[mDIV]->CRSsel(
-												win, mDIV, *pSRCc,
+												win, mDIV, *piMASS,
 												(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 											);
 					}
