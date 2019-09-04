@@ -491,7 +491,16 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
                         {
 							case '\b':
 								if( pLFT > pSRC->pA )
+								{
 									pLFT--;
+									if( pLFT[0] == '\n' )
+									if( pLFT >= pSRC->pA )
+									if( pLFT[-1] == '\r' )
+									{
+										pLFT--;
+										continue;
+									}
+								}
 								continue;
 							case 0x7f:
 								pB++;
