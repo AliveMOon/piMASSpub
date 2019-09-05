@@ -5,6 +5,11 @@
 I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 {
 	SDL_Rect div = win.wDIV( iDIV );
+	if( div.w < 1 )
+	{
+		div = win.wDIV( iDIV );
+		return 0;
+	}
 	I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
 	I4x4 o = CRSfrm & cr;
 	if( !this )
@@ -405,6 +410,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			*pC = pMAP->pCOL,
 			*pR = pMAP->pROW, i, ie;
 		gpcSRC* pEDIT = NULL, *pSRC;
+		gpmZn( pC, pMAP->map44.a4x2[1].sum() );
 		for( i = 0, ie = pC-pM; i < ie; i++ )
 		{
 			if( !pM[i] )

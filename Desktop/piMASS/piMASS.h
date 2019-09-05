@@ -1031,6 +1031,16 @@ public:
         a4x2[0] = _xy;
         a4x2[1] = _zw;
     }
+    I4x4& operator = ( I4 i )
+    {
+		x = y = z = w = i;
+		return *this;
+    }
+    I4x4& operator = ( I4x2 b )
+    {
+		a4x2[1] = a4x2[0] = b;
+		return *this;
+    }
 	char* str( char* pBUFF, const char* pSP = ", "  )
     {
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
@@ -1086,7 +1096,7 @@ public:
 			return p_this->index( n_i );
 		}
 
-		for( U4 i = 0; i < n_i; i++ )
+		for( I4 i = 0; i < n_i; i++ )
 		{
 			this[i] = i;
 			//this[i].y = 0;

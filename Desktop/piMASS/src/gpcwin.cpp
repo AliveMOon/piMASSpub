@@ -23,40 +23,46 @@ const char * InitError::what() const throw()
 SDL_Rect gpcWIN::wDIV( U1 iDIV )
 {
 	SDL_Rect div;
+
 	switch( iDIV%4)
 	{
 		case 0:
-			div.w = bSW&0x2 ? winDIV.x : winDIV.z;
-			div.h = bSW&0xc ? winDIV.y : winDIV.w;
+			div.w = (bSW&0x2) ? winDIV.x : winDIV.z;
+			div.h = (bSW&0x4) ? winDIV.y : winDIV.w;
 
 			div.x =
 			div.y = 0;
 			break;
 		case 1:
-			div.w = bSW&0x2 ? winSIZ.z-winDIV.x : 0;
-			div.x = winSIZ.z - div.w;
+			div.w = (bSW&0x2) ? winSIZ.z-winDIV.x : 0;
+			div.h = (bSW&0x8) ? winDIV.y : winDIV.w;
 
+			div.x = winSIZ.z - div.w;
 			div.y = 0;
-			div.h = bSW&0xc ? winDIV.y : winDIV.w;
 			break;
 		case 2:
-			div.w = bSW&0xa ? winDIV.x : winDIV.z;
-			div.x = winSIZ.z - div.w;
+			if( bSW&0x4 )
+			{
+				div.w = (bSW&0xa) ? winDIV.x : winDIV.z;
+				div.h = winDIV.w-winDIV.y;
+			} else {
+				div.w = div.h = 0;
+			}
 
-			div.y = bSW&0x4 ? winDIV.y : winDIV.w;
-			div.h = winDIV.w-winDIV.y;
+			div.x = 0;
+			div.y = winDIV.w-div.h;
 			break;
 		case 3:
 			if( bSW&0x8 )
 			{
-				div.w = bSW&0x4 ? winDIV.x : winDIV.z;
-				div.h = bSW&0x3 ? winDIV.w : winDIV.w-winDIV.y;
+				div.w = (bSW&0x4) ? winDIV.x : winDIV.z;
+				div.h = winDIV.y;
 			} else {
 				div.w = div.h = 0;
 			}
 
 			div.x = winDIV.z-div.w;
-			div.x = winDIV.w-div.h;
+			div.y = winDIV.w-div.h;
 			break;
 	}
 	return div;
@@ -95,9 +101,14 @@ void gpcWIN::gpeWINresize( void )
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
 		throw InitError();
 	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
-	winDIV.z = winDIV.x = (winSIZ.x*winDIV.x / winDIV.z);
-	winDIV.w = winDIV.y = (winSIZ.y*winDIV.y / winDIV.w);
+	winDIV = winSIZ.a4x2[0];
+	winDIV.a4x2[0] *= 4;
+	winDIV.a4x2[0] /= 8;
 
+	/*winDIV.z = winDIV.x = (winSIZ.x*winDIV.x / winDIV.z);
+	winDIV.w = winDIV.y = (winSIZ.y*winDIV.y / winDIV.w);
+	winDIV.a4x2[0] *= 4;
+	winDIV.a4x2[0] /= 8;*/
 
 
 }

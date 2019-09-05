@@ -565,8 +565,12 @@ int main( int nA, char *apA[] )
 						if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
 						{
 							if( ev.wheel.y )
-							if( true )
 							{
+								//------------------------------
+								//
+								// 		WHEEL ZOOM
+								//
+								//---------------------
 								I4 mag = -ev.wheel.y;
 								SDL_Rect div = win.wDIV(iDIV);
 								if( mag < 0 )
@@ -612,31 +616,14 @@ int main( int nA, char *apA[] )
 								crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3)) ;
 								nMAG = 1;
 								break;
-							} else {
-								I4	mx = win.winWH().mn()/8,
-									zm = crs.CRSfrm.a4x2[1].abs().mn(),
-									zd = zm,
-									mag = -ev.wheel.y;
-
-								if( zm <= 1 )
-								if( mag < 0 )
-								{
-									zm = 1;
-									mag = 0;
-								}
-								if( zm >= mx )
-								if( mag > 0 )
-								{
-									zm = mx;
-									mag = 0;
-								}
-								zm += mag;
-
-								(crs.CRSfrm.a4x2[1] *= zm) /= zd;
-								nMAG = 1;
 							}
 							break;
 						}
+						//------------------------------
+						//
+						// 		WHEEL SCROLL
+						//
+						//---------------------
 						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
 							crs.CRSfrm.x += ev.wheel.y;
 						else
@@ -689,8 +676,8 @@ int main( int nA, char *apA[] )
 
 						win.gpeWINresize();
 
-						winSIZ.z = winSIZ.x;
-						winSIZ.w = winSIZ.y;
+						winSIZ.a4x2[1] = winSIZ.a4x2[0];
+
 				}
 				if( c == 'x' )
 					continue;
@@ -826,10 +813,19 @@ int main( int nA, char *apA[] )
 						case 'f':
 						case 'F':
 							{
+								//------------------------------
+								//
+								// 		PANEL SWITCH
+								//
+								//---------------------
 								nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
 														aXY[1]-'0';
-								if( nF )
-								if( nF < 5 )
+								if( nF < 2 )
+								{
+									win.bSW = 1;
+									iDIV = 0;
+ 								}
+								else if( nF < 5 )
 								{
 									mDIV = nF-1;
 
@@ -845,6 +841,7 @@ int main( int nA, char *apA[] )
 									iDIV = win.bSW ? mDIV : 0;
 
 								}
+								win.bSW |= 1;
 							}
 
 							break;
