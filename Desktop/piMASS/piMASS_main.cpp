@@ -411,9 +411,9 @@ int main( int nA, char *apA[] )
 
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
-		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );
+		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );0
 
-		I4x4 mouseXY(0,0), mouseW(0), winSIZ(640,480,640,480), SRCxycr(0), SRCin(0);
+		I4x4 mouseXY(0,0), mouseW(0), winSIZ(800,600,800,600), SRCxycr(0), SRCin(0);
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         gpcCRS main_crs( win ), *apCRS[4];
         U4 iDIV = 0, nDIV = 1, mDIV = iDIV, selDIV = iDIV;
@@ -449,12 +449,12 @@ int main( int nA, char *apA[] )
         //----------------------------------------------------
         while( gppKEYbuff )
         {
-			if( iDIV != mDIV )
+			/*if( iDIV != mDIV )
 			{
 				iDIV = mDIV;
 				if( !apCRS[iDIV] )
 					apCRS[iDIV] = new gpcCRS(win);
-			}
+			}*/
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
 
 			if( gppKEYbuff != gpsKEYbuff || nMAG )
@@ -575,32 +575,47 @@ int main( int nA, char *apA[] )
 								SDL_Rect div = win.wDIV(iDIV);
 								if( mag < 0 )
 								{
-									if( crs.CRSfrm.a4x2[1].x == 4 )
+									if( crs.gtFRMwh(win,iDIV).x == 4 )
 										break;
 
-									if( crs.CRSfrm.a4x2[1].x < 4 )
+									if( crs.gtFRMwh(win,iDIV).x < 4 )
 									{
-										crs.CRSfrm.a4x2[1].x = 4;
-										crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3) );
+										crs.stFRMwh(
+														win,iDIV,
+														4,
+														(4*div.h*2) / (div.w*3)
+													);
 										nMAG = 1;
 										break;
 									}
 								} else {
-									if( crs.CRSfrm.a4x2[1].x == div.w/8 )
+									if( crs.gtFRMwh(win,iDIV).x == div.w/8 )
 										break;
 
-									if( crs.CRSfrm.a4x2[1].x > div.w/8 )
+									if( crs.gtFRMwh(win,iDIV).x > div.w/8 )
 									{
-										crs.CRSfrm.a4x2[1].x = div.w/8;
-										crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3) );
+										crs.stFRMwh( 	win,iDIV,
+														div.w/8,
+														((div.w/8)*div.h*2) / (div.w*3)
+													);
+
+										/*crs.CRSfrm.a4x2[1].x = div.w/8;
+										crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3) );*/
 										nMAG = 1;
 										break;
 									}
 								}
 
 
-								crs.CRSfrm.a4x2[1].x += mag;
-								bug = div.w/crs.CRSfrm.a4x2[1].x;
+
+								crs.stFRMwh(
+												win,iDIV,
+												crs.gtFRMwh(win,iDIV).x+mag, 0,
+												mag
+											);
+
+								//crs.CRSfrm.a4x2[1].x += mag;
+								/*bug = div.w/crs.CRSfrm.a4x2[1].x;
 								if( mag > 0 )
 								{
 									crs.CRSfrm.a4x2[1].x = div.w/bug;
@@ -613,7 +628,7 @@ int main( int nA, char *apA[] )
 									nBUG++;
 								}
 
-								crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3)) ;
+								crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3)) ;*/
 								nMAG = 1;
 								break;
 							}
@@ -625,9 +640,9 @@ int main( int nA, char *apA[] )
 						//
 						//---------------------
 						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
-							crs.CRSfrm.x += ev.wheel.y;
+							crs.addFRMxy( ev.wheel.y );
 						else
-							crs.CRSfrm.y += ev.wheel.y;
+							crs.addFRMxy( 0, ev.wheel.y );
 						nMAG = 1;
 
 						mouseW.x += ev.wheel.x;
@@ -823,7 +838,7 @@ int main( int nA, char *apA[] )
 								if( nF < 2 )
 								{
 									win.bSW = 1;
-									iDIV = 0;
+									mDIV = 0;
  								}
 								else if( nF < 5 )
 								{
@@ -834,14 +849,27 @@ int main( int nA, char *apA[] )
 										win.bSW = (win.bSW&(~msk));
 									else {
 										win.bSW |= msk;
-										if( !apCRS[mDIV] )
-											apCRS[mDIV] = new gpcCRS( win );
 									}
-
-									iDIV = win.bSW ? mDIV : 0;
-
 								}
 								win.bSW |= 1;
+								//if( iDIV != mDIV )
+								{
+									iDIV = mDIV;
+									if( !apCRS[iDIV] )
+											apCRS[iDIV] = new gpcCRS( win );
+									for( U1 i = 0, sw = win.bSW; i < 4; i++, sw >>= 1 )
+									{
+										if( !(sw&1) )
+											continue;
+
+										if( !apCRS[i] )
+											continue;
+
+										apCRS[i]->stFRMwh( win, i, apCRS[i]->gtFRMwh(win, i).x, 0 );
+
+
+									}
+								}
 							}
 
 							break;

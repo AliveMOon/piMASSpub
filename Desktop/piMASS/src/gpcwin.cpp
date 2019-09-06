@@ -34,10 +34,10 @@ SDL_Rect gpcWIN::wDIV( U1 iDIV )
 			div.y = 0;
 			break;
 		case 1:
-			div.w = (bSW&0x2) ? winSIZ.z-winDIV.x : 0;
+			div.w = (bSW&0x2) ? winDIV.z-winDIV.x : 0;
 			div.h = (bSW&0x8) ? winDIV.y : winDIV.w;
 
-			div.x = winSIZ.z - div.w;
+			div.x = winDIV.z - div.w;
 			div.y = 0;
 			break;
 		case 2:
@@ -73,8 +73,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 	//ctor
 	gpmCLR;
 	winDIV = winSIZ = siz;
-	winDIV.a4x2[0] *= 4;
-	winDIV.a4x2[0] /= 8;
+	winDIV.a4x2[0] /= 2; //*= 4;
+	//winDIV.a4x2[0] /= 8;
 	if( winID.x = SDL_CreateWindowAndRenderer( winSIZ.z, winSIZ.w, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &pSDLwin, &pSDLrndr ) != 0 )
         throw InitError();
 
@@ -92,7 +92,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 
 	chrPIC.x = 8*4;
 	chrPIC.y = 32*4;
-	chrPIC.w =pSRFchar->w/chrPIC.x;
+	chrPIC.w = pSRFchar->w/chrPIC.x;
 	chrPIC.h = pSRFchar->h/chrPIC.y;
 
 }
@@ -102,8 +102,7 @@ void gpcWIN::gpeWINresize( void )
 		throw InitError();
 	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
 	winDIV = winSIZ.a4x2[0];
-	winDIV.a4x2[0] *= 4;
-	winDIV.a4x2[0] /= 8;
+	winDIV.a4x2[0] /= 2;
 
 	/*winDIV.z = winDIV.x = (winSIZ.x*winDIV.x / winDIV.z);
 	winDIV.w = winDIV.y = (winSIZ.y*winDIV.y / winDIV.w);

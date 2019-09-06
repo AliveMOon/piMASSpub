@@ -40,7 +40,7 @@ class gpcWIN
 			return U4x2( chrPIC.w, chrPIC.h );
 		}
 
-		I4x2 winFRM( U1 iDIV )
+		I4x2 wFRM( U1 iDIV )
 		{
 			SDL_Rect div = wDIV( iDIV );
 			return I4x2( div.w/chrPIC.w, div.h/chrPIC.h );

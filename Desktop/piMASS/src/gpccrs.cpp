@@ -124,19 +124,12 @@ void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
 
 }
 
-gpcCRS::gpcCRS( gpcWIN& win, I4 mag0 )
+gpcCRS::gpcCRS( gpcWIN& win )
 {
 	//ctor
 	gpmCLR;
-	/*SDL_Rect div = win.wDIV(0);
-	CRSfrm.z = div.w/win.chrPIC.w;
-	CRSfrm.w = div.h/win.chrPIC.h;*/
-	CRSfrm.a4x2[1] = win.winFRM( 0 );
-	if( mag0 < 2 )
-		return;
-
-	CRSfrm.z *= mag0;
-	CRSfrm.w *= mag0;
+	CRSfrm.a4x2[1] = win.wFRM( 0 );
+	wDIVfrm = win.wDIV(0);
 }
 
 gpcCRS::~gpcCRS()
