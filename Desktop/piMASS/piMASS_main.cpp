@@ -702,6 +702,37 @@ int main( int nA, char *apA[] )
 					switch( c )
 					{
 						case ' ':
+							if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
+							{
+								switch( aXY[1] )
+								{
+									case 'v':
+									case 'V':
+										// paste
+										gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", SDL_GetClipboardText());
+										aXY[1] = 0;
+										break;
+									case 'c':
+									case 'C':
+										if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
+											SDL_SetClipboardText( (char*)gppKEYbuff );
+
+										*gppKEYbuff =
+										aXY[1] = 0;
+										break;
+									case 'x':
+									case 'X':
+										if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
+											SDL_SetClipboardText( (char*)gppKEYbuff );
+
+										*gppKEYbuff = 0;
+										aXY[1] = 0x7f;
+										break;
+								}
+
+							}
+							if( !aXY[1] )
+								break;
 							*gppKEYbuff = aXY[1];
 							gppKEYbuff++;
 							break;

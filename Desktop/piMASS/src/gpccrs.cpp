@@ -374,6 +374,25 @@ void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )
 
 }
 /// MINIrdy
+U1* gpcCRS::gtUTF8( U1* pBUFF )
+{
+	char* pS = NULL;
+	I4 nCPY = 0;
+	if( apSRC[1] )
+	if( apSRC[1] == apSRC[0] )
+	if( nCPY = anSTR[1] - anSTR[0] )
+	if( pS = nCPY > 0 ? (char*)apSRC[0]->pA : NULL )
+	{
+		pS += anSTR[0];
+	}
+	if( pS ? !nCPY : true )
+		return pBUFF;
+
+	gpmMEMCPY( pBUFF, pS, nCPY );
+	pBUFF[nCPY] = 0;
+
+	return pBUFF+nCPY;
+}
 void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 {
 	if( miniOFF() )

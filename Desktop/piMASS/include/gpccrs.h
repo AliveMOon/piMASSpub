@@ -21,6 +21,7 @@ class gpcCRS
 
 		gpcCRS( gpcWIN& win );
 		virtual ~gpcCRS();
+		U1*		gtUTF8( U1* pBUFF );
 
 		I4x2 gtFRMxy( gpcWIN& win, U1 iDIV )
 		{
