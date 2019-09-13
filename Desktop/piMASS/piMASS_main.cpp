@@ -462,11 +462,12 @@ int main( int nA, char *apA[] )
 				*gppKEYbuff = 0;
 				if( piMASS )
 				{
-					char	*pS = gppMOUSEbuff,
-							*pE;
-					while( pS < gppKEYbuff )
+					U1	*pS = gppMOUSEbuff,
+						*pE = pS;
+					if( !nMAG )
 					{
-						pE = pS;
+						crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
+					} else {
 						while( pE < gppKEYbuff )
 						{
 							switch( *pE )
@@ -800,23 +801,23 @@ int main( int nA, char *apA[] )
 								{
 									case 'l':
 									case 'L':
-										*gppKEYbuff = '2';
+										*gppKEYbuff = 2;
 										gppKEYbuff++;
 										break;
 									case 'r':
 									case 'R':
-										*gppKEYbuff = '3';
+										*gppKEYbuff = 3;
 										gppKEYbuff++;
 										break;
 
 									case 'u':
 									case 'U':
-										*gppKEYbuff = '4';
+										*gppKEYbuff = 4;
 										gppKEYbuff++;
 										break;
 									case 'd':
 									case 'D':
-										*gppKEYbuff = '5';
+										*gppKEYbuff = 5;
 										gppKEYbuff++;
 										break;
 
