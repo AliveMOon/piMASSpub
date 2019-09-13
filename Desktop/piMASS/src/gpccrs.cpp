@@ -504,7 +504,6 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 							nOL = pSRC->nL,
 							nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
 
-
 						// több karakter írunk át
 						U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
 							*pRIG	= pOA + anSTR[1],

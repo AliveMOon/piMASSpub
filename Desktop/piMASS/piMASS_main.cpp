@@ -462,7 +462,37 @@ int main( int nA, char *apA[] )
 				*gppKEYbuff = 0;
 				if( piMASS )
 				{
-					crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, gppMOUSEbuff );
+					char	*pS = gppMOUSEbuff,
+							*pE;
+					while( pS < gppKEYbuff )
+					{
+						pE = pS;
+						while( pE < gppKEYbuff )
+						{
+							switch( *pE )
+							{
+								case 2:
+								case 3:
+								case 4:
+								case 5:
+									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+									pS = pE+1;
+									//------------------------------------
+									//
+									//			CRS MOVE
+									//
+									//------------------------------------
+									{
+
+									}
+									break;
+							}
+							pE++;
+						}
+						if( pS < gppKEYbuff )
+							crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
+					}
+
 					gppKEYbuff = gppMOUSEbuff;
 					*gppKEYbuff = 0;
 				} else {
@@ -741,6 +771,11 @@ int main( int nA, char *apA[] )
 							{
 								switch( aXY[1] )
 								{
+									case 't':
+									case 'T':
+										*gppKEYbuff = '\t';
+										gppKEYbuff++;
+										break;
 									case 'b':
 									case 'B':
 										*gppKEYbuff = '\b';
@@ -760,7 +795,33 @@ int main( int nA, char *apA[] )
 							break;
 						// cursor nyilak
 						case '_':
+							{
+								switch( aXY[1] )
+								{
+									case 'l':
+									case 'L':
+										*gppKEYbuff = '2';
+										gppKEYbuff++;
+										break;
+									case 'r':
+									case 'R':
+										*gppKEYbuff = '3';
+										gppKEYbuff++;
+										break;
 
+									case 'u':
+									case 'U':
+										*gppKEYbuff = '4';
+										gppKEYbuff++;
+										break;
+									case 'd':
+									case 'D':
+										*gppKEYbuff = '5';
+										gppKEYbuff++;
+										break;
+
+								}
+							}
 							break;
 						// ékezetek ----------------
 						case '\'':
