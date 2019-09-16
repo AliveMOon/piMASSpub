@@ -76,6 +76,7 @@ class gpcCRS
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH );
+		void CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
 		I4x4 srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy );
 	protected:

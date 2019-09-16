@@ -457,16 +457,17 @@ int main( int nA, char *apA[] )
 			}*/
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
 
-			if( gppKEYbuff != gpsKEYbuff || nMAG )
+			if( (gppKEYbuff != gpsKEYbuff) || nMAG )
 			{
 				*gppKEYbuff = 0;
 				if( piMASS )
 				{
 					U1	*pS = gppMOUSEbuff,
 						*pE = pS;
-					if( !nMAG )
+					if( (gppKEYbuff == pS) ) //nMAG )
 					{
 						crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
+						pS = gppKEYbuff;
 					} else {
 						while( pE < gppKEYbuff )
 						{
@@ -485,15 +486,20 @@ int main( int nA, char *apA[] )
 									//------------------------------------
 									{
 
+										crs.CRSstp(
+														win, iDIV, *piMASS, *pE,
+														(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+													);
+
 									}
 									break;
 							}
 							pE++;
 						}
-						if( pS < gppKEYbuff )
-							crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
-					}
 
+					}
+					if( pS < gppKEYbuff )
+						crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
 					gppKEYbuff = gppMOUSEbuff;
 					*gppKEYbuff = 0;
 				} else {
@@ -757,7 +763,7 @@ int main( int nA, char *apA[] )
 											SDL_SetClipboardText( (char*)gppKEYbuff );
 
 										*gppKEYbuff = 0;
-										aXY[1] = 0x7f;
+										aXY[1] = 0x7e;
 										break;
 								}
 

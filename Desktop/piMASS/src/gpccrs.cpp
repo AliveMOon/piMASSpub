@@ -4,6 +4,8 @@
 
 I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 {
+	// XY - pixel
+	// CR - Coll/Row
 	SDL_Rect div = win.wDIV( iDIV );
 	if( div.w < 1 )
 	{
@@ -63,6 +65,84 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 
 	return o;
 
+}
+void gpcCRS::CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
+{
+	// ha van shift akkor a 2. cursort mozgatja
+	if( this ? !apSRC[0] : true )
+		return;
+	gpcSRC *pSRC = apSRC[1];
+	if( pSRC == apSRC[1] )
+	{
+		// ugyan abban a rublikában van
+		U1	*pOA	= pSRC->pA,
+			*pLFT	= pOA + anSTR[0],
+			*pRIG	= pOA + anSTR[1];
+		switch( stp )
+		{
+			case 2:
+				// hátra megy
+				if( pRIG <= pSRC->pA )
+					break;
+				if( pRIG[-1] == '\a' )
+					break;
+
+				pRIG--;
+				if( pRIG <= pSRC->pA )
+					break;
+
+
+				if(  pRIG[-1]&0x80  )
+				{
+					pRIG--;
+					break;
+				}
+				if( pRIG[0] != '\n' )
+					break;
+
+				if( pRIG <= pSRC->pA )
+					break;
+
+				if( pRIG[-1] == '\r' )
+						pRIG--;
+				break;
+			case 3:
+				if( pRIG-pSRC->pA < pSRC->nL )
+				{
+					if( pRIG[0] != '\r' )
+					{
+						if( pRIG[0] & 0x80 )
+							pRIG += 2;
+						else
+							pRIG++;
+					}
+					else if( pRIG[1] == '\n' )
+						pRIG += 2;
+				}
+				// elölre megy
+				break;
+			case 4:
+				// felfele egy sorral
+				break;
+			case 5:
+				// lefele egy sorral
+				break;
+		}
+		if( pRIG < pSRC->pA )
+			pRIG = pSRC->pA;
+		if( pRIG >= pSRC->pA+pSRC->nL )
+			pRIG = pSRC->pA+pSRC->nL;
+
+		anSTR[1] = pRIG-pSRC->pA;
+		if( !bSH )
+			anSTR[0] = anSTR[1];
+		else if( anSTR[0] > anSTR[1] )
+		{
+			U4 tmp = anSTR[0];
+			anSTR[0] = anSTR[1];
+			anSTR[1] = tmp;
+		}
+	}
 }
 void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
 {
@@ -421,7 +501,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		U4	*pM = pMAP->pMAP,
 			*pC = pMAP->pCOL,
 			*pR = pMAP->pROW, i, ie;
-		gpcSRC* pEDIT = NULL, *pSRC;
+		gpcSRC	*pEDIT = NULL,
+				*pSRC;
 		gpmZn( pC, pMAP->map44.a4x2[1].sum() );
 		for( i = 0, ie = pC-pM; i < ie; i++ )
 		{
@@ -528,6 +609,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 											continue;
 										}
 									}
+									continue;
+								case 0x7e:
 									continue;
 								case 0x7f:
 									pB++;
