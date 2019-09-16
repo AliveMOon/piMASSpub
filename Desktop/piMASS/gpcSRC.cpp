@@ -244,7 +244,8 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		}
 
 		if( this == crs.apSRC[1] )
-		if( pC-pAL == crs.anSTR[1] )
+		if( bON )
+		if( pC-pAL >= crs.anSTR[1] )
 		{
 			pO[cr].y &= 0xf;
 			if( crs.anSTR[0] != crs.anSTR[1] )
