@@ -111,6 +111,8 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS )
 
 inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 {
+	// return nBYTE
+	// nLEN = nCODE
 	nLEN = 0;
 	if( pU ? !*pU : true )
 		return 0;
@@ -291,6 +293,80 @@ inline U8 gpfVANn( U1* pS, const U1* pVAN )
 	return n;
 }
 U8 inline gpfABC( U1* p_str, U1* pE, U8& nLEN );
+
+inline U1* gpfUTF8left( U1* pB, U1* pS, U1 n, U1 b )
+{
+	if( pB >= pS )
+		return pB;
+
+	if( b )
+	{
+		while( pS > pB )
+		{
+			if( pS[-1] == n || pS[-1] == b  )
+				return pS;
+			pS--;
+		}
+
+		return pB;
+	}
+
+	while( pS > pB )
+	{
+		if( pS[-1] == n )
+			return pS;
+		pS--;
+	}
+
+	return pB;
+}
+inline U1* gpfUTF8stpX( U1* pB, U1* pE, U4 x, U4 nT = 4 )
+{
+	if(!x)
+		return pB;
+
+	U4 xUP = 0;
+	while( pB < pE )
+	{
+		if( xUP >= x )
+			return pB;
+		if( (pB[0]&0x80) )
+		{
+			xUP++;
+			pB += 2;
+			continue;
+		}
+
+		if( pB[0] == '\t' )
+			xUP = ((xUP/nT)+1)*nT;
+		else
+			xUP++;
+
+		pB++;
+	}
+	return pB;
+}
+inline U4 gpfUTF8rig( U1* pB, U1* pE, U4 nT = 4 )
+{
+	U4 r = 0;
+	while( pB < pE )
+	{
+		if( (pB[0]&0x80) )
+		{
+			r++;
+			pB += 2;
+			continue;
+		}
+
+		if( pB[0] == '\t' )
+			r = ((r/nT)+1)*nT;
+		else
+			r++;
+
+		pB++;
+	}
+	return r;
+}
 
 U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
 {

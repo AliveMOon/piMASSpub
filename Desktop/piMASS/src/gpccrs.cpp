@@ -82,13 +82,13 @@ void gpcCRS::CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool
 		{
 			case 2:
 				// hátra megy
-				if( pRIG <= pSRC->pA )
+				if( pRIG <= pOA )
 					break;
 				if( pRIG[-1] == '\a' )
 					break;
 
 				pRIG--;
-				if( pRIG <= pSRC->pA )
+				if( pRIG <= pOA )
 					break;
 
 
@@ -100,14 +100,14 @@ void gpcCRS::CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool
 				if( pRIG[0] != '\n' )
 					break;
 
-				if( pRIG <= pSRC->pA )
+				if( pRIG <= pOA )
 					break;
 
 				if( pRIG[-1] == '\r' )
 						pRIG--;
 				break;
 			case 3:
-				if( pRIG-pSRC->pA < pSRC->nL )
+				if( pRIG-pOA < pSRC->nL )
 				{
 					if( pRIG[0] != '\r' )
 					{
@@ -123,9 +123,94 @@ void gpcCRS::CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool
 				break;
 			case 4:
 				// felfele egy sorral
+				{
+
+					U1 *pRe = pRIG, *pDWN = gpfUTF8left( pOA, pRe, '\n', '\a' );
+					U4 x = gpfUTF8rig( pDWN, pRe );
+
+					pRIG = pDWN;
+					if( pRIG > pOA )
+					if( pRIG[-1] == '\n' )
+					{
+						pRIG--;
+						if( pRIG > pOA )
+						if( pRIG[-1] == '\r' )
+							pRIG--;
+					}
+
+
+					/*while( pRIG > pOA )
+					{
+						if( pRIG[-1] != '\n' )
+						{
+							if( pRIG[-1] == '\a')
+								break;
+							pRIG--;
+							continue;
+						}
+						pDWN = pRIG;
+						pRIG--;
+						if( pRIG <= pOA )
+							break;
+
+						if( pRIG[-1] != '\r' )
+							break;
+
+						pRIG--;
+						break;
+					}*/
+
+
+
+					pRe = pRIG;
+					while( pRIG > pOA )
+					{
+						if( pRIG[-1] == '\n' )
+							break;
+						if( pRIG[-1] == '\a' )
+							break;
+						pRIG--;
+					}
+
+					pRIG = gpfUTF8left( pOA, pRIG, '\n', '\a' );
+					if( !x )
+						break;
+					pRIG = gpfUTF8stpX( pRIG, pRe, x );
+
+					/*U4 xUP = 0;
+					while( pRIG < pRe )
+					{
+						if( xUP >= x )
+							break;
+						if( (pRIG[0]&0x80) )
+						{
+							xUP++;
+							pRIG += 2;
+							continue;
+						}
+
+						if( pRIG[0] == '\t' )
+							xUP = ((xUP/4)+1)*4;
+						else
+							xUP++;
+
+						pRIG++;
+					}*/
+				}
 				break;
 			case 5:
 				// lefele egy sorral
+				{
+					U1* pLFT = gpfUTF8left( pOA, pRIG, '\n', '\a' );
+					U4 x = gpfUTF8rig( pLFT, pRIG );
+					U8 nLEN = 0;
+					pRIG += gpfVAN( pRIG, (U1*)"\n", nLEN );
+
+					if( *pRIG == '\n')
+						pRIG++;
+
+					pRIG = gpfUTF8stpX( pRIG, pOA+pSRC->nL, x );
+				}
 				break;
 		}
 		if( pRIG < pSRC->pA )

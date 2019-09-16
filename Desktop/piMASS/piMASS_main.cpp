@@ -498,8 +498,8 @@ int main( int nA, char *apA[] )
 						}
 
 					}
-					if( pS < gppKEYbuff )
-						crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
+					//if( pS < gppKEYbuff )
+					crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
 					gppKEYbuff = gppMOUSEbuff;
 					*gppKEYbuff = 0;
 				} else {
