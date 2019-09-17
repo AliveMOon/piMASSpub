@@ -243,8 +243,8 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 			pO[cr].x = ch;
 		}
 
-		if( this == crs.apSRC[1] )
 		if( bON )
+		if( this == crs.apSRC[1] )
 		if( pC-pAL >= crs.anSTR[1] )
 		{
 			pO[cr].y &= 0xf;
@@ -274,13 +274,26 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 				cxy.x = xy.x;
 				continue;
 			case '\t':
+				cxy.x = xy.x + ((cxy.x-xy.x)/4 + 1)*4; // + 4;
+				continue;
+
 				aC[0] = *pC;
 				n = gpmNINCS( pC+1, aC );
-				if( !bON || cxy.y < 0 )
+				if( !bON || (cxy.y < 0) )
 				{
 					cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4;
 					pC += n;
 					continue;
+				}
+
+				if( this == crs.apSRC[1] )
+				if( ((pC-pAL)+1+n) >= crs.anSTR[1] )
+				{
+					pO[cr].y &= 0xf;
+					if( crs.anSTR[0] != crs.anSTR[1] )
+						pO[cr].y |= 8;
+					bON = false;
+					n = crs.anSTR[1]-((pC-pAL)+1);
 				}
 
 				cxy.x++;
