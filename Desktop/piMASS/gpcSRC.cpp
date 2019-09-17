@@ -241,6 +241,16 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 		{
 			pO[cr].y |= 0x10;
 			pO[cr].x = ch;
+			if( *pC == '\t' )
+			{
+				if( pO[cr].y&0x10 && pO[cr].x == ch )
+					pO[cr].z = bg;
+				else
+					pO[cr].z = ch;
+
+				pO[cr].w = '.' - ' ';
+			}
+
 		}
 
 		if( bON )
@@ -274,7 +284,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 				cxy.x = xy.x;
 				continue;
 			case '\t':
-				cxy.x = xy.x + ((cxy.x-xy.x)/4 + 1)*4; // + 4;
+				cxy.x = xy.x + ((cxy.x-xy.x)/4 + 1)*4;
 				continue;
 
 				/*aC[0] = *pC;
