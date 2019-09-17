@@ -277,7 +277,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 				cxy.x = xy.x + ((cxy.x-xy.x)/4 + 1)*4; // + 4;
 				continue;
 
-				aC[0] = *pC;
+				/*aC[0] = *pC;
 				n = gpmNINCS( pC+1, aC );
 				if( !bON || (cxy.y < 0) )
 				{
@@ -326,7 +326,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 				}
 				cxy.x += nFILL;
 				pC += n;
-				continue;
+				continue;*/
 
 			case ' ':
 				cxy.x++;
