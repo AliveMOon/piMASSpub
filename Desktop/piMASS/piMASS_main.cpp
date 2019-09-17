@@ -484,14 +484,10 @@ int main( int nA, char *apA[] )
 									//			CRS MOVE
 									//
 									//------------------------------------
-									{
-
-										crs.CRSstp(
-														win, iDIV, *piMASS, *pE,
-														(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-													);
-
-									}
+									crs.CRSstp(
+													win, iDIV, *piMASS, *pE,
+													(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);
 									break;
 							}
 							pE++;

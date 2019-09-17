@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="piCAM.mass" />
+				<Option parameters="begin.mass" />
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="./" />
@@ -23,7 +23,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="first.mass" />
+				<Option parameters="piCAM.mass" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="./" />
