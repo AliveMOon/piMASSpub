@@ -433,6 +433,102 @@ inline void* gp_memcmp( U1* pA, U1* pB, U8 n )
 	return (void*)(pAu1+n);
 }
 
+class UTF8
+{
+	U1* pU;
+public:
+	UTF8( void* pVOID ){
+		pU = (U1*)pVOID;
+	};
+	U1 operator = ( U1 ascii )
+	{
+		if( this ? !pU : true )
+			return 0;
+
+		*pU = ascii;
+		return ascii;
+	}
+	U1* pBK( void )
+	{
+		if( this ? !pU : true )
+			return NULL;
+
+		while( *pU & 0x80 )
+        {
+			if( (*pU & 0xc0) == 0xc0 )
+				return pU;
+			pU--;
+        }
+		return pU;
+	}
+	U1* pNX( void )
+	{
+		if( !pBK() )
+			return NULL;
+
+		pU++;
+		while( *pU & 0x80 )
+        {
+			if( (*pU & 0xc0) == 0xc0 )
+				return pU;
+			pU++;
+        }
+
+		return pU;
+	}
+
+	U1* operator ++ ()		// ++pUTF8
+	{
+		return pNX();
+	}
+
+	U1* operator ++ ( int )
+	{
+		// post
+		U1* pO = pU;
+		pNX();
+		return pO;
+	}
+
+	UTF8& operator += ( U8 n )
+	{
+		if( pBK() )
+		{
+			for( U8 i = 0; i < n; i++ )
+			{
+				if( !*pU )
+					break;
+
+				pU++;
+				while( *pU & 0x80 )
+				{
+					if( (*pU & 0xc0) == 0xc0 )
+						break;
+					pU++;
+				}
+			}
+		}
+		return *this;
+	}
+
+	UTF8& operator -= ( U8 n )
+	{
+		if( pBK() )
+		{
+			for( U8 i = n; i; i++ )
+			{
+				if( !*pU )
+					break;
+
+				pU++;
+				pBK();
+			}
+		}
+		return *this;
+	}
+
+};
+
 class U1x4
 {
 public:

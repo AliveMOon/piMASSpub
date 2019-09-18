@@ -139,7 +139,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			return;
 	}
 
-	U1* pS = pA;
+	U1* pS = pA, *pSS;
 	U8	oSW = bSW;
 	bSW &= ~gpeMASSclrMSK;
 	gpeALF alf, *pTGdie = pALFtg;
@@ -154,6 +154,11 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 	while( pB-pS )
 	{
+		if( (*pS&0x80) )
+		{
+			pS++;
+			continue;
+		}
 		pS += gpmNINCS( pS, " \t\r\n" );
 		if( pB <= pS )
 			break;
@@ -208,6 +213,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		}
 
 		alf = gpfSTR2ALF( pS, pB, &pS );
+
 		switch( alf )
 		{
 			case gpeALF_SUB:

@@ -92,7 +92,7 @@ void gpcCRS::CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool
 					break;
 
 
-				if(  pRIG[-1]&0x80  )
+				if(  (pRIG[-1]&0xc0) == 0xc0  )
 				{
 					pRIG--;
 					break;
@@ -111,7 +111,7 @@ void gpcCRS::CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool
 				{
 					if( pRIG[0] != '\r' )
 					{
-						if( pRIG[0] & 0x80 )
+						if(  (pRIG[0]&0xc0) == 0xc0 )
 							pRIG += 2;
 						else
 							pRIG++;
@@ -726,6 +726,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 						pSRC->hd(mass);
 					}
 				}
+
+
 				c16fr = gpeCLR_blue2;
 				if( c+1 >= sel01.x	&& r >= sel01.y )
 				if( c+1 <= sel01.z	&& r <= sel01.w )
