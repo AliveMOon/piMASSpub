@@ -66,7 +66,8 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 	return o;
 
 }
-void gpcCRS::CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
+
+void gpcCRS::CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 {
 	// ha van shift akkor a 2. cursort mozgatja
 	if( this ? !apSRC[0] : true )

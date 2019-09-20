@@ -30,7 +30,7 @@ U1 gp_s_key_map_sdl[] =
 */
 "0000            "		"0123abcdefghijkl"
 "                "		"mnopqrstuvwxzy12"
-"       :/2// :'\""		"3456789on9bt uoo"
+"       ://// :'\""		"3456789onebt uoo"
 "'\"3''    3ffffff"		"uu2ea0,.-9123456"
 "ffffff444444/44_"		"789abc6789abdder"
 "___5555555555555"		"ldu3456789abcdef"
@@ -47,7 +47,7 @@ U1 gp_s_key_map_sdl[] =
 // shift
 "0000            "		"0123ABCDEFGHIJKL"
 "                "		"MNOPQRSTUVWXZY'\""
-"       :/2// :'\""		"+!%/=()ON9BT UOO" // \n
+"       ://// :'\""		"+!%/=()ONEBT UOO" // \n
 "'\"3''    3FFFFFF"		"UU2EA0?:_9123456"
 "FFFFFF444444/44_"		"789abc6789ABDDER"
 "___5555555555555"		"LDU3456789ABCDEF"
@@ -96,7 +96,7 @@ U1 gp_s_key_map_sdl[] =
 "xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
 "FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
 ;
-
+/*
 U1 gp_s_key_map[] =
 // simple
 "00123456789-=000"
@@ -152,26 +152,7 @@ U1 gp_s_key_map[] =
 
 
 
-/*InitError::InitError() :
-    exception(),
-    msg( SDL_GetError() )
-{
-}
 
-InitError::InitError( const std::string & m ) :
-    exception(),
-    msg( m )
-{
-}
-
-InitError::~InitError() throw()
-{
-}
-
-const char * InitError::what() const throw()
-{
-    return msg.c_str();
-}*/
 
 
 class gpcWINo
@@ -192,99 +173,10 @@ public:
     void draw();
     void TXT_draw();
     void ins( U1* pC, U1* pM, U1* pB  );
-};
-
-
-/*gpcWIN::gpcWIN( U4 flags, char* pPATH, char* pFILE )
-{
+};*/
 
 
 
-
-
-
-	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
-		throw InitError();
-
-	if( !pPATH )
-		return;
-
-	pSRFload = IMG_Load( pPATH ); // SDL_LoadBMP( pPATH );
-	pSRFchar = pSRFload; //SDL_ConvertSurface( pSRFload, pSRFwin->format, 0 );
-
-	if( pSRFchar != pSRFload )
-		gpmSDL_FreeSRF( pSRFload );
-	chr.x = 8;
-	chr.y = 32;
-	chr.w =	pSRFchar->w/chr.x;
-	chr.h = pSRFchar->h/chr.y;
-	nX = 2, dX = 2;
-	txt.x = ((txt.w/chr.w)*nX)/dX;
-	txt.y = ((txt.h/chr.h)*nX)/dX;
-	pCRS = pTXT = new U1x4[nTXT = txt.x*txt.y];
-	gpmZn( pTXT, nTXT );
-
-	pTXT[0] = U1x4(255,255,255,'!'-' ');
-	gpfMEMSET( pTXT+1, 10, pTXT, sizeof(*pTXT) );
-}
-
-gpcWIN::~gpcWIN()
-{
-	//if( pSRFchar != pSRFload )
-	gpmSDL_FreeSRF( pSRFload );
-	gpmSDL_FreeSRF( pSRFchar );
-    SDL_DestroyWindow( pSDLwin );
-    SDL_DestroyRenderer( pSDLrndr );
-    SDL_Quit();
-}*/
-
-
-
-/*void gpcWIN::draw()
-{
-    // Clear the window with a black background
-    SDL_SetRenderDrawColor( pSDLrndr, 0, 0, 0, 255 );
-    SDL_RenderClear( pSDLrndr );
-
-    // Show the window
-    SDL_RenderPresent( pSDLrndr );
-
-    int rgb[] = { 203, 203, 203, // Gray
-                  254, 254,  31, // Yellow
-                    0, 255, 255, // Cyan
-                    0, 254,  30, // Green
-                  255,  16, 253, // Magenta
-                  253,   3,   2, // Red
-                   18,  14, 252, // Blue
-                    0,   0,   0  // Black
-                };
-
-    SDL_Rect colorBar, src, dst;
-    colorBar.x = 0; colorBar.y = 0; colorBar.w = 90; colorBar.h = 480;
-
-	src = dst = chr;
-	U1 c;
-
-    // Render a new color bar every 0.5 seconds
-    for ( int i = 0; i != sizeof rgb / sizeof *rgb; i += 3, colorBar.x += 90 )
-    if(true)
-    {
-		SDL_FillRect( pSRFwin, &colorBar, SDL_MapRGB(pSRFwin->format, rgb[i], rgb[i + 1], rgb[i + 2] ) );
-
-		TXT_draw();
-
-		SDL_UpdateWindowSurface( pSDLwin );
-		SDL_Delay( 500 );
-    } else {
-        SDL_SetRenderDrawColor( pSDLrndr, rgb[i], rgb[i + 1], rgb[i + 2], 255 );
-        SDL_RenderFillRect( pSDLrndr, &colorBar );
-        SDL_RenderPresent( pSDLrndr );
-        SDL_Delay( 500 );
-    }
-
-
-
-}*/
 char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 	 gpsEXEname[0x100],
 	 gpsMASSpath[gpeMXPATH], *gppMASSfile = gpsMASSpath,
@@ -462,21 +354,49 @@ int main( int nA, char *apA[] )
 				*gppKEYbuff = 0;
 				if( piMASS )
 				{
+
 					U1	*pS = gppMOUSEbuff,
 						*pE = pS;
-					if( (gppKEYbuff == pS) ) //nMAG )
+
+					if( gppKEYbuff == pS ) //nMAG )
 					{
+						// nincsen begépelve semmi
+						// mondjuk ZOOM, stb..?
 						crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
 						pS = gppKEYbuff;
 					} else {
+
 						while( pE < gppKEYbuff )
 						{
 							switch( *pE )
 							{
+								case '\v':
+									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+									//pS = pE+1;
+									// tehát ha bent van ki kell lépni a szerkeszttett cellából
+									crs.CRSbEDset( false );
+									break;
+								case '\r':
+								case '\n':
+                                    if( crs.CRSbEDget() )
+										break;
+
+									crs.CRSbEDset( true );
+									break;
 								case 2:
 								case 3:
 								case 4:
 								case 5:
+									if( !crs.CRSbEDget() )
+									{
+										crs.CRSsel(
+														win, iDIV, *piMASS,
+
+
+													);
+
+										break;
+									}
 									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
 									pS = pE+1;
 									//------------------------------------
@@ -484,7 +404,7 @@ int main( int nA, char *apA[] )
 									//			CRS MOVE
 									//
 									//------------------------------------
-									crs.CRSstp(
+									crs.CRSstpED(
 													win, iDIV, *piMASS, *pE,
 													(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 												);
@@ -774,6 +694,11 @@ int main( int nA, char *apA[] )
 							{
 								switch( aXY[1] )
 								{
+									case 'e':
+									case 'E':
+										*gppKEYbuff = '\v';
+										gppKEYbuff++;
+										break;
 									case 't':
 									case 'T':
 										*gppKEYbuff = '\t';

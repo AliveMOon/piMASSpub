@@ -8,8 +8,7 @@ class gpcSRC;
 class gpcCRS
 {
 	public:
-		I4x4
-				scnAN,	scnIN,
+		I4x4	scnAN,	scnIN,
 				selANCR[2];
 		gpcSRC	*apSRC[2];
 
@@ -17,11 +16,22 @@ class gpcCRS
 
 		U4 nMINI, anSTR[2];
 		U4x4 aCRS[2];
-		bool bESC;
+		bool bESC, bED;
 
 		gpcCRS( gpcWIN& win );
 		virtual ~gpcCRS();
 		U1*		gtUTF8( U1* pBUFF );
+
+		bool CRSbEDget( void )
+		{
+			return bED;
+		}
+
+		bool CRSbEDset( bool b )
+		{
+			return bED = b;
+		}
+
 
 		I4x2 gtFRMxy( gpcWIN& win, U1 iDIV )
 		{
@@ -76,7 +86,7 @@ class gpcCRS
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH );
-		void CRSstp( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
+		void CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
 		I4x4 srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy );
 	protected:
