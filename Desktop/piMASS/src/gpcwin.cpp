@@ -28,7 +28,7 @@ SDL_Rect gpcWIN::wDIV( U1 iDIV )
 	{
 		case 0:
 			div.w = (bSW&0x2) ? winDIV.x : winDIV.z;
-			div.h = (bSW&0x4) ? winDIV.y : winDIV.w;
+			div.h = (bSW&0xc) ? winDIV.y : winDIV.w;
 
 			div.x =
 			div.y = 0;

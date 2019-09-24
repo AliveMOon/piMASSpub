@@ -200,17 +200,19 @@ void gpcCRS::CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bo
 		}
 	}
 }
-void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
+void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 {
-	SDL_Rect div = win.wDIV( iDIV );
-	I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
+	if( this ? !(&sCRS): true )
+		return;
+	SDL_Rect sDIV = win.wDIV( sCRS.id );
+	I4x2 cr( sDIV.w/sCRS.CRSfrm.z, sDIV.h/sCRS.CRSfrm.w );
 
 	gpcMAP* pMAP = &mass.mapCR;
 	if( !pMAP )
 		return;
 
 	U4	*pM = pMAP->pMAP,
-		an = scnAN.a4x2[0]*I4x2( 1, pMAP->map44.z ) - 1;
+		an = sCRS.scnAN.a4x2[0]*I4x2( 1, pMAP->map44.z ) - 1;
 	if( !pM[an] )
 		return;
 
@@ -219,8 +221,8 @@ void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
 	if( !pSRC )
 		return;
 
-	selANCR[1].a4x2[0] = scnAN.a4x2[0];		//AN
-	selANCR[1].a4x2[1] = scnIN.a4x2[0]/cr;	//IN
+	selANCR[1].a4x2[0] = sCRS.scnAN.a4x2[0];		//AN
+	selANCR[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;	//IN
 	anSTR[1] = pSRC->CRSminiCR( selANCR[1].a4x2[1] );
 
 	apSRC[1] = pSRC;
@@ -261,6 +263,20 @@ void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
 		{
 			anSTR[1] = anSTR[0] = 0;
 		}
+
+		if( sCRS.id != id )
+		{
+			// SHIFT klick szinkronizálja a két cursort
+			sCRS.bED = bED;
+			sCRS.selANCR[0] = selANCR[0];
+			sCRS.selANCR[1] = selANCR[1];
+			sCRS.anSTR[0] = anSTR[0];
+			sCRS.anSTR[1] = anSTR[1];
+			apSRC[0] = apSRC[0];
+			apSRC[1] = apSRC[1];
+
+		}
+
 		return; // ha le van nyomva a shift akkor meg akarjuk örizni a sel[0]-t.
 	}
 
@@ -270,10 +286,11 @@ void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
 
 }
 
-gpcCRS::gpcCRS( gpcWIN& win )
+gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
 {
 	//ctor
 	gpmCLR;
+	id = _id;
 	CRSfrm.a4x2[1] = win.wFRM( 0 );
 	wDIVfrm = win.wDIV(0);
 }

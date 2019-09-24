@@ -18,9 +18,9 @@ class gpcCRS
 		U4x4 aCRS[2];
 		bool bESC, bED;
 
-		gpcCRS( gpcWIN& win );
+		gpcCRS( gpcWIN& win, U1 _id );
 		virtual ~gpcCRS();
-		U1*		gtUTF8( U1* pBUFF );
+		U1*		gtUTF8( U1* pBUFF ), id;
 
 		bool CRSbEDget( void )
 		{
@@ -90,7 +90,7 @@ class gpcCRS
 		bool	miniDRW( gpcWIN& win, U1 iDIV = 0 );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
-		void CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH );
+		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH );
 		void CRSstpCL( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 		void CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
