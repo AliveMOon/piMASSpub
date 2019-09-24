@@ -254,8 +254,8 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 	}
 }
-U1 gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
-char gpsMAINpub[0x100];
+U1	gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
+char gpsMAINpub[0x100], gpsTITLEpub[0x100];
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -455,6 +455,9 @@ int main( int nA, char *apA[] )
 				) > 0
 			)
 			{
+				gppKEYbuff += sprintf( (char*)gppKEYbuff, "move" );
+				gppMOUSEbuff = gppKEYbuff;
+
 				*gpsMAINpub = 0;
 				mDIV = win.mDIV( mouseXY.a4x2[0] );
 				if( apCRS[mDIV] )
@@ -472,47 +475,58 @@ int main( int nA, char *apA[] )
 					if( !(nMB&1) )
 					{
 						// SELECT
-
-						apCRS[iDIV]->CRSsel(
-												win, iDIV, *piMASS,
-												(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-											);
+						if( 1&(aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
+						{
+							//------------------------------
+							//
+							// 		AN INSERT
+							//
+							//---------------------
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s%s",
+														(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])) ? "#":"",
+														gpsMAINpub );
+						} else
+							apCRS[iDIV]->CRSsel(
+													win, iDIV, *piMASS,
+													(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);
 					}
 				}
+				*gppKEYbuff = 0;
 
-				gppKEYbuff += sprintf(
-										(char*)gppKEYbuff,
-										"-= piMASS::%s"
-										" x:%d y:%d, mDIV: %d"
-										" xycr:%s AN:%s"
-										" IN %s %0.2f %0.2f"
-										" wx:%d wy:%d"
-										" %d F%d =-"
-										" %d, %d",
-										gpsMASSname,
-										mouseXY.x, mouseXY.y, mDIV,
-										SRCxycr.str(gpsMAINpub+0x40),
-										gpsMAINpub,
-										SRCin.str(gpsMAINpub+0x80),
-										(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
-										mouseW.x, mouseW.y,
-										nMB, nF,
-										bug, nBUG
+				//gppKEYbuff +=
+								sprintf(
+											gpsTITLEpub,
+											"-= piMASS::%s"
+											" x:%d y:%d, mDIV: %d"
+											" xycr:%s AN:%s"
+											" IN %s %0.2f %0.2f"
+											" wx:%d wy:%d"
+											" %d F%d =-"
+											" %d, %d",
+											gpsMASSname,
+											mouseXY.x, mouseXY.y, mDIV,
+											SRCxycr.str(gpsMAINpub+0x40),
+											gpsMAINpub,
+											SRCin.str(gpsMAINpub+0x80),
+											(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
+											mouseW.x, mouseW.y,
+											nMB, nF,
+											bug, nBUG
 										);
 				mouseXY.z=mouseXY.x;
 				mouseXY.w=mouseXY.y;
 				mouseW.z=mouseW.x;
 				mouseW.w=mouseW.y;
 				nMBB = nMB;
-				gppMOUSEbuff = gppKEYbuff;
-				*gppKEYbuff = 0;
+
 				if( nF )
 				{
 					nF = 0;
 				}
 				nMAG = 0;
 
-				SDL_SetWindowTitle( win.pSDLwin, (char*)gpsKEYbuff );
+				SDL_SetWindowTitle( win.pSDLwin, gpsTITLEpub );
 			}
 
 
