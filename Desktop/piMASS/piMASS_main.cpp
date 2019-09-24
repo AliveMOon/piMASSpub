@@ -374,39 +374,52 @@ int main( int nA, char *apA[] )
 									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
 									//pS = pE+1;
 									// tehát ha bent van ki kell lépni a szerkeszttett cellából
-									crs.CRSbEDset( false );
+									crs.CRSbEDswitch();
 									break;
 								case '\r':
 								case '\n':
-                                    if( crs.CRSbEDget() )
+                                    if( !crs.CRSbEDget() )
+                                    {
+										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+										pS = pE+1;
+										crs.CRSstpCL(
+														win, iDIV, *piMASS,
+														*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+													);
 										break;
+                                    }
 
-									crs.CRSbEDset( true );
+									/*crs.CRSstpED(
+													win, iDIV, *piMASS,
+													*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);*/
 									break;
-								case 2:
-								case 3:
-								case 4:
-								case 5:
+								case 2:	// left
+								case 3:	// right
+								case 4:	// up
+								case 5:	// down
+									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+									pS = pE+1;
 									if( !crs.CRSbEDget() )
 									{
-										crs.CRSsel(
+										crs.CRSstpCL(
 														win, iDIV, *piMASS,
-
-
+														*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 													);
 
 										break;
 									}
-									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-									pS = pE+1;
+									//crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+									//pS = pE+1;
+
 									//------------------------------------
 									//
 									//			CRS MOVE
 									//
 									//------------------------------------
 									crs.CRSstpED(
-													win, iDIV, *piMASS, *pE,
-													(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+													win, iDIV, *piMASS,
+													*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 												);
 									break;
 							}

@@ -32,6 +32,11 @@ class gpcCRS
 			return bED = b;
 		}
 
+		bool CRSbEDswitch( void )
+		{
+			return bED = !bED;
+		}
+
 
 		I4x2 gtFRMxy( gpcWIN& win, U1 iDIV )
 		{
@@ -86,6 +91,7 @@ class gpcCRS
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH );
+		void CRSstpCL( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 		void CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
 		I4x4 srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy );

@@ -66,12 +66,25 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 	return o;
 
 }
+void gpcCRS::CRSstpCL( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
+{
+	// ha van shift akkor a 2. cursort mozgatja
+	if( !this )
+		return;
 
+
+}
 void gpcCRS::CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 {
 	// ha van shift akkor a 2. cursort mozgatja
-	if( this ? !apSRC[0] : true )
+	if( !this )
 		return;
+	if( !apSRC[0] )
+	{
+		// ha nincsen csin
+		return;
+	}
+
 	gpcSRC *pSRC = apSRC[1];
 	if( pSRC == apSRC[1] )
 	{
@@ -139,30 +152,6 @@ void gpcCRS::CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bo
 							pRIG--;
 					}
 
-
-					/*while( pRIG > pOA )
-					{
-						if( pRIG[-1] != '\n' )
-						{
-							if( pRIG[-1] == '\a')
-								break;
-							pRIG--;
-							continue;
-						}
-						pDWN = pRIG;
-						pRIG--;
-						if( pRIG <= pOA )
-							break;
-
-						if( pRIG[-1] != '\r' )
-							break;
-
-						pRIG--;
-						break;
-					}*/
-
-
-
 					pRe = pRIG;
 					while( pRIG > pOA )
 					{
@@ -178,25 +167,6 @@ void gpcCRS::CRSstpED( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1 stp, bool bSH, bo
 						break;
 					pRIG = gpfUTF8stpX( pRIG, pRe, x );
 
-					/*U4 xUP = 0;
-					while( pRIG < pRe )
-					{
-						if( xUP >= x )
-							break;
-						if( (pRIG[0]&0x80) )
-						{
-							xUP++;
-							pRIG += 2;
-							continue;
-						}
-
-						if( pRIG[0] == '\t' )
-							xUP = ((xUP/4)+1)*4;
-						else
-							xUP++;
-
-						pRIG++;
-					}*/
 				}
 				break;
 			case 5:
@@ -730,9 +700,15 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 
 				c16fr = gpeCLR_blue2;
-				if( c+1 >= sel01.x	&& r >= sel01.y )
-				if( c+1 <= sel01.z	&& r <= sel01.w )
-					c16fr = gpeCLR_cyan;
+				c16ch = gpeCLR_blue2;
+				if(
+						( c+1 >= sel01.x	&& r >= sel01.y )
+						&& ( c+1 <= sel01.z	&& r <= sel01.w )
+				)
+				{
+					c16fr = bED ? gpeCLR_yellow : gpeCLR_cyan;
+					c16ch = bED ? gpeCLR_cyan : gpeCLR_blue2;
+				}
 				pSRC->CRSmini(
 									pMINI, aCRS, miniALL,
 									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
