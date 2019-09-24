@@ -250,7 +250,17 @@ void gpcCRS::CRSsel( gpcWIN& win, U1 iDIV, gpcMASS& mass, bool bSH )
 			anSTR[1] = anSTR[0];
 			anSTR[0] = t0;
 		}
-
+		if( selANCR[0].a4x2[0] == selANCR[1].a4x2[0] )
+		{
+			CRSbEDset(true);
+		}
+		else if( CRSbEDget() )
+			CRSbEDset(false);
+		if( !bED )
+		if( anSTR[1] != anSTR[0] )
+		{
+			anSTR[1] = anSTR[0] = 0;
+		}
 		return; // ha le van nyomva a shift akkor meg akarjuk örizni a sel[0]-t.
 	}
 
@@ -699,15 +709,16 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				}
 
 
-				c16fr = gpeCLR_blue2;
-				c16ch = gpeCLR_blue2;
 				if(
 						( c+1 >= sel01.x	&& r >= sel01.y )
 						&& ( c+1 <= sel01.z	&& r <= sel01.w )
 				)
 				{
-					c16fr = bED ? gpeCLR_yellow : gpeCLR_cyan;
+					c16fr = bED ? gpeCLR_green2 : gpeCLR_cyan;
 					c16ch = bED ? gpeCLR_cyan : gpeCLR_blue2;
+				} else {
+					c16fr = gpeCLR_blue2;
+					c16ch = gpeCLR_blue2;
 				}
 				pSRC->CRSmini(
 									pMINI, aCRS, miniALL,

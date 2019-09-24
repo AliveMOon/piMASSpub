@@ -1011,6 +1011,16 @@ public:
 	{
 		return I4x2( x-b.x,  y-b.y );
 	}
+	bool operator != ( const I4x2& b ) const
+	{
+		if( x != b.x )
+			return true;
+		return y != b.y;
+	}
+	bool operator == ( const I4x2& b ) const
+	{
+		return !(*this!=b);
+	}
 
 	I4x2& operator *= ( I4 i )
 	{
@@ -1142,6 +1152,18 @@ public:
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
     }
+
+    bool operator != ( const I4x4& b ) const
+	{
+		if( a4x2[0] != b.a4x2[0] )
+			return true;
+		return a4x2[1] != b.a4x2[1];
+	}
+	bool operator == ( const I4x4& b ) const
+	{
+		return !(*this!=b);
+	}
+
 	U8 operator * (const I4x2& b) const
 	{
 		return a4x2[0]*b + a4x2[1]*b;

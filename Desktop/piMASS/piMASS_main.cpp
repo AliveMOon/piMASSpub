@@ -341,12 +341,6 @@ int main( int nA, char *apA[] )
         //----------------------------------------------------
         while( gppKEYbuff )
         {
-			/*if( iDIV != mDIV )
-			{
-				iDIV = mDIV;
-				if( !apCRS[iDIV] )
-					apCRS[iDIV] = new gpcCRS(win);
-			}*/
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
 
 			if( (gppKEYbuff != gpsKEYbuff) || nMAG )
