@@ -375,10 +375,14 @@ int main( int nA, char *apA[] )
                                     if( !crs.CRSbEDget() )
                                     {
 										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+										if( *pE == '\r' )
+										if( pE[1] == '\n' )
+											pE++;
+
 										pS = pE+1;
 										crs.CRSstpCL(
-														win, iDIV, *piMASS,
-														*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+														win, *piMASS,
+														5, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 													);
 										break;
                                     }
@@ -397,7 +401,7 @@ int main( int nA, char *apA[] )
 									if( !crs.CRSbEDget() )
 									{
 										crs.CRSstpCL(
-														win, iDIV, *piMASS,
+														win, *piMASS,
 														*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 													);
 
@@ -412,7 +416,7 @@ int main( int nA, char *apA[] )
 									//
 									//------------------------------------
 									crs.CRSstpED(
-													win, iDIV, *piMASS,
+													win, *piMASS,
 													*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 												);
 									break;
@@ -422,7 +426,7 @@ int main( int nA, char *apA[] )
 
 					}
 					//if( pS < gppKEYbuff )
-					crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
+					crs.miniRDY(win, iDIV, *piMASS, gppKEYbuff, pS );
 					gppKEYbuff = gppMOUSEbuff;
 					*gppKEYbuff = 0;
 				} else {
