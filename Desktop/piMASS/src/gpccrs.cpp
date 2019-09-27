@@ -75,9 +75,9 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 	switch(stp&0x7)
 	{
 		case 2:	// left
-			if( selANCR[1].x < 1 )
+			if( selANCR[1].x < 2 )
 			{
-				selANCR[1].x = 0;
+				selANCR[1].x = 1;
 				break;
 			}
 			selANCR[1].x--;
@@ -86,7 +86,7 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 			selANCR[1].x++;
 			break;
 		case 4:	// up
-			if( selANCR[1].y < 1 )
+			if( selANCR[1].y < 2 )
 			{
 				selANCR[1].y = 0;
 				break;
@@ -615,6 +615,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		gpcSRC	*pEDIT = NULL,
 				*pSRC;
 		gpmZn( pC, pMAP->map44.a4x2[1].sum() );
+
 		for( i = 0, ie = pC-pM; i < ie; i++ )
 		{
 			if( !pM[i] )
@@ -652,12 +653,15 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			gpmZn( pMINI, nMINI );
 			return;
 		}
+
 		gpmZn( pMINI, nMINI );
 		miniALL.y = CRSfrm.y;
 		gpeCLR	c16bg = gpeCLR_blue,
 				c16fr = gpeCLR_blue2,
 				c16ch = gpeCLR_blue2;
 		I4x4 sel01( selANCR[0].a4x2[0], selANCR[1].a4x2[0] );
+
+
 
 		for( U4 r = 0; r < pMAP->map44.y; miniALL.y += pR[r], r++ )
 		{

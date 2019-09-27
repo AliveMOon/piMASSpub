@@ -370,28 +370,43 @@ int main( int nA, char *apA[] )
 									// tehát ha bent van ki kell lépni a szerkeszttett cellából
 									crs.CRSbEDswitch();
 									break;
+								case '\t':
+									if( crs.CRSbEDget() )
+										break;
+
+									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+									if( *pE == '\r' )
+									if( pE[1] == '\n' )
+										pE++;
+
+									pS = pE+1;
+									crs.CRSstpCL(
+													win, *piMASS,
+													3, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);
+
+
+
+									break;
 								case '\r':
 								case '\n':
-                                    if( !crs.CRSbEDget() )
-                                    {
-										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-										if( *pE == '\r' )
-										if( pE[1] == '\n' )
-											pE++;
-
-										pS = pE+1;
-										crs.CRSstpCL(
-														win, *piMASS,
-														5, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-													);
+                                    if( crs.CRSbEDget() )
 										break;
-                                    }
 
-									/*crs.CRSstpED(
-													win, iDIV, *piMASS,
-													*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-												);*/
+
+									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+									if( *pE == '\r' )
+									if( pE[1] == '\n' )
+										pE++;
+
+									pS = pE+1;
+									crs.CRSstpCL(
+													win, *piMASS,
+													5, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);
 									break;
+
+
 								case 2:	// left
 								case 3:	// right
 								case 4:	// up
