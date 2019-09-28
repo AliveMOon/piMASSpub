@@ -39,10 +39,12 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 		{
 			scnIN.z = cr.x*gpdSRC_COLw;
 			scnIN.x = xy.x - (scnCR.z*cr.x);
-			scnCR.x = pMAP->mapCR44.x + 1 + scnIN.x/scnIN.z;
+
+			scnCR.x = 	  pMAP->mapCR44.x //+ 1
+						+ scnIN.x/scnIN.z;
 			scnIN.x %= scnIN.z;
-		} else
-			scnCR.x++; // ALF 'A' == 1
+		} 	//else
+			//scnCR.x++; // ALF 'A' == 1
 
 		for( scnCR.y = 0; scnCR.y < pMAP->mapCR44.y; scnCR.y++ )
 		{
@@ -249,7 +251,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 	if( !pSRC )
 		return;
 
-	selANCR[1].a4x2[0] = sCRS.scnCR.a4x2[0];		//AN
+	selANCR[1].a4x2[0] = sCRS.scnCR.a4x2[0]+U4x2(1,0);		//AN
 	selANCR[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;	//IN
 	anSTR[1] = pSRC->CRSminiCR( selANCR[1].a4x2[1] );
 
@@ -690,6 +692,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 			if( pSRC )
 			{
+				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )
+					anSTR[1] = anSTR[0] = pSRC->nL;
 				I4	nSUB = anSTR[1] - anSTR[0],
 					nSTR = pE-pB,
 					nOL = pSRC->nL,
