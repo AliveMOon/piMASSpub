@@ -147,9 +147,9 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 	pALFtg = NULL;
 	nALFtg = 0;
-	gpfALF2STR( (char*)gpsSTRpub, spc.x+1 );
-	psHD += sprintf( psHD, "\r\n-----------------\r\nHD:[%s%d] spc:%s V:%d H:%d C:%d \r\nbSW:0x%0.8x",
-						gpsSTRpub, spc.y, spc.str( psHD+0x100, "," ), nVER, nHD, nBLD,
+	gpfALF2STR( (char*)gpsSTRpub, spcCR.x+1 );
+	psHD += sprintf( 	psHD, "\r\n-----------------\r\nHD:[%s%d] spc:%s V:%d H:%d C:%d \r\nbSW:0x%0.8x",
+						gpsSTRpub, spcCR.y, spcCR.str( psHD+0x100, "," ), nVER, nHD, nBLD,
 						bSW );
 
 	while( pB-pS )
@@ -320,13 +320,13 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 {
 	hd( mass );
 
-	gpfALF2STR( (char*)gpsSTRpub, spc.x+1 );
+	gpfALF2STR( (char*)gpsSTRpub, spcCR.x+1 );
 
 	psHD = gpsHD;
 	psHD[0] = 0;
 	psHD += sprintf( 	psHD, "\r\nComPI:[%s%d] spc:%s V:%d H:%d B:%d \r\nbSW:0x%0.8x",
-						gpsSTRpub, spc.y,
-						spc.str( psHD+0x100), nVER, nHD, nBLD,
+						gpsSTRpub, spcCR.y,
+						spcCR.str( psHD+0x100), nVER, nHD, nBLD,
 						bSW );
 	if( psHD > gpsHD )
 	{

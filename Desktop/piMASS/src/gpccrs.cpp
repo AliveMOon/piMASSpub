@@ -625,7 +625,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			*pC = pMAP->pCOL,
 			*pR = pMAP->pROW, i, ie = pC-pM;
 		gpcSRC	*pEDIT = NULL,
-				*pSRC, tmp;
+				*pSRC, tmp, *pS2;
 
 
 
@@ -680,16 +680,6 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		if( pB < pE )
 		if( pSRC = mass.SRCadd( tmp, NULL, lurdAN.a4x2[0] ) )
 		{
-
-			/*i = (lurdAN.a4x2[0] * I4x2( 1, pMAP->map44.w ))-1;
-			xFND = pM[i];
-			pSRC = mass.SRCfnd( xFND );
-			if( !pSRC )
-			{
-				pSRC = mass.SRCadd( tmp, NULL, lurdAN.a4x2[0] );
-				xFND = pM[i];
-			}*/
-
 			if( pSRC )
 			{
 				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )
@@ -753,6 +743,27 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 				gpmDELary(pOA);
 				pSRC->hd(mass);
+
+				for( I4x2 s = lurdAN.a4x2[0]; s.y <= lurdAN.w; s.y++ )
+				{
+					for( s.x = lurdAN.x; s.x <= lurdAN.z; s.x++ )
+					{
+						U4	i = (s * I4x2( 1, mass.mapCR.mapCR44.z ))-1,
+							x_fnd = mass.mapCR.pMAP[i];
+						pS2 = x_fnd ? mass.SRCfnd( x_fnd ) : NULL;
+						if( pS2 == pSRC )
+							continue;
+						if( !pS2 )
+						{
+							pS2 = mass.SRCadd( tmp, NULL, s );
+						}
+						U1* pSS;
+						U4x4 mCR44 = s;
+						pS2->reset( pSRC->pA, pSRC->pA+pSRC->nL, &pSS, mCR44, 0 );
+						pS2->updt();
+					}
+				}
+
 			}
 		}
 

@@ -8,11 +8,11 @@ gpcSRC::gpcSRC()
     //ctor
     gpmCLR;
 }
-gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spc )
+gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcCR, U4 nADD )
 {
 	gpmCLR;
-	spc = _spc;
-	_spc.x++;
+	spcCR = _spcCR;
+	_spcCR.x += nADD;
 
 	if( pS ? !*pS : true )
 	{

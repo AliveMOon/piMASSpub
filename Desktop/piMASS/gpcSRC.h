@@ -512,7 +512,7 @@ public:
     U8		nL,
 			nA,			// ha nA == 0 nm mi foglaltuk
 			bSW;		// pB = pA+iB()
-    U4x4	spc, dim;
+    U4x4	spcCR, dim;
     U4		IX, retIX, nALFtg, strtD, endD;
 
     gpeALF	*pALFtg;
@@ -709,9 +709,9 @@ public:
 		if( !(bSW&gpeMASSentrMSK) )
 			return false;
 
-		spc.x = x;
-		spc.y++;
-		_spc = spc;
+		spcCR.x = x;
+		spcCR.y++;
+		_spc = spcCR;
 		_spc.x++;
 		return true;
 
@@ -821,7 +821,7 @@ public:
 		pB = pA+i;
 		return i;
 	}
-	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spc );
+	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spc, U4 nADD = 1 );
     gpcSRC( gpcSRC& B );
     gpcSRC& operator = ( gpcSRC& B );
 protected:

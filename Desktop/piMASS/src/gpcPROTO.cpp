@@ -19,7 +19,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 	char *psHD = gpsHD;
 	psHD[0] = 0;
 	psHD += sprintf( 	psHD, "\r\nComPI: %s V:%d H:%d B:%d \r\nbSW:0x%0.8x",
-						spc.str( psHD+0x100), nVER, nHD, nBLD,
+						spcCR.str( psHD+0x100), nVER, nHD, nBLD,
 						bSW );
 	if( psHD > gpsHD )
 	{
@@ -158,7 +158,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 	char *psHD = gpsHD;
 	psHD[0] = 0;
 	psHD += sprintf( 	psHD, "\r\nComPI: %s V:%d H:%d B:%d \r\nbSW:0x%0.8x",
-						spc.str( psHD+0x100), nVER, nHD, nBLD,
+						spcCR.str( psHD+0x100), nVER, nHD, nBLD,
 						bSW );
 	if( psHD > gpsHD )
 	{
