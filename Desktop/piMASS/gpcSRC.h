@@ -456,31 +456,28 @@ public:
 	}
 	U4* MAPalloc( U4x4& spc, U4x4& mCR )
 	{
+		// mCR -
 		if(!this)
 		{
 			mCR = 0;
 			return NULL;
 		}
-		if(	(map44.z > spc.x) && (map44.w > spc.y) )
-		{
-			if( map44.x < spc.x+1 )
-				map44.x = spc.x+1;
-			if( map44.y < spc.y+1 )
-				map44.y = spc.y+1;
-			mCR = map44;
-			return pMAP;
-		}
 
-		mCR = map44;
-		U4	*pK = pMAP, *pKC = pK+mCR.a4x2[1].area(), //AREAzw(),
-			*pKR = pKC+mCR.z;
-
-		map44.z = gpmPAD( spc.x+1, 0x10 );
-		map44.w = gpmPAD( spc.y+1, 0x10 );
 		if( map44.x < spc.x+1 )
 			map44.x = spc.x+1;
 		if( map44.y < spc.y+1 )
 			map44.y = spc.y+1;
+
+		mCR = map44;
+		if(	(map44.z > map44.x) && (map44.w > map44.y) )
+			return pMAP;
+
+		U4	*pK = pMAP, *pKC = pK+mCR.a4x2[1].area(), //AREAzw(),
+			*pKR = pKC+mCR.z;
+
+		map44.z = max( map44.z, gpmPAD( map44.x+1, 0x10 ) );
+		map44.w = max( map44.w, gpmPAD( map44.y+1, 0x10 ) );
+
 		pMAP = new U4[map44.a4x2[1].are_sum()];
 		pROW = (pCOL = pMAP+map44.a4x2[1].area()) + map44.z;
 
@@ -655,8 +652,10 @@ public:
 	}
 	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch );
 
-	U4x4& CRSdim( U4x4* pCRS2 )
+	U4x4 CRSdim( U4x4* pCRS2 )
 	{
+		if( !this )
+			return U4x4( 4, 1 );
 		U1* pC = pSRCstart( ); //pCRS2 );
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 
@@ -966,6 +965,7 @@ public:
 		pLZY->n_load = nKID*sizeof(iKID);
 	}
 
+	gpcSRC* SRCadd( gpcSRC& tmp, U1* pS, I4x2 an );
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();
 	gpcSRC* get( U4 i )

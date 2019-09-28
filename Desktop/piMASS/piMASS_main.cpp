@@ -183,7 +183,20 @@ char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 	 gpsMASSname[0x100];
 
 gpcLAZY gpMASS;
+U1 gpdONEcell[] = " \a ";
+gpcSRC* gpcMASS::SRCadd( gpcSRC& tmp, U1* pS, I4x2 an )
+{
+	if( !pS )
+		pS = gpdONEcell;
+	U1	*pSe = pS+gpmSTRLEN( pS ), *pSS;
+	aSP44[nSP] = an;
 
+	tmp.reset( pS, pSe, &pSS, aSP44[nSP] );
+	aSPix[nSP] = tmp.IX = nLST;
+	U4 xadd = nLST, n;
+
+	return SRCadd( &tmp, xadd, aSPix[nSP], n );
+}
 gpcMASS::gpcMASS( const U1* pU, U8 nU )
 {
 	gpmCLR;

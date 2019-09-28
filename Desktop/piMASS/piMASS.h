@@ -149,6 +149,7 @@ class U2x4;
 class U4x4;
 class U8x2;
 class U8x4;
+class I4x2;
 class I4x4;
 class I8x4;
 class gpcMASS;
@@ -603,6 +604,7 @@ public:
 		gpmCLR;
 		return *this;
 	}
+	U4x2& operator = ( const I4x2& b );
 
 	U8 operator * (const U4x2& b) const
 	{
@@ -720,6 +722,12 @@ public:
     {
         x = _x; y = _y; z = _z; w = _w;
     }
+	U4x4( const I4x2 _xy, I4x2* p_zw = NULL );
+    U4x4( U4x2& _xy, U4x2* p_zw = NULL )
+    {
+        a4x2[0] = _xy;
+        a4x2[1] = p_zw ? *p_zw : _xy;
+    }
     U4x4( U4x2& _xy, U4x2& _zw )
     {
         a4x2[0] = _xy;
@@ -733,6 +741,14 @@ public:
     {
         x = y = z = w = abs(b);
     }
+    U4x4& operator = ( const U4x2& b )
+    {
+		a4x2[1] = a4x2[0] = b;
+		return *this;
+    }
+    U4x4& operator = ( const I4x2& b );
+
+
     U4x4& str2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
     char* str( char* pBUFF, const char* pSP = ", "  )
     {
@@ -1176,6 +1192,23 @@ public:
 	I4x4 operator & (const U4x2& b) const
 	{
 		return I4x4( a4x2[0]&b, a4x2[1]&b );
+	}
+
+	I4x4 lurd( void )
+	{
+		// left - up - right - down
+		I4x4  lurd = *this;
+		if( x > z )
+		{
+			lurd.x = z;
+			lurd.z = x;
+		}
+		if( y > w )
+		{
+			lurd.y = w;
+			lurd.w = y;
+		}
+		return lurd;
 	}
 
 	I4x4& null( void )

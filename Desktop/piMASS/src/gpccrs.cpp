@@ -584,6 +584,7 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 
 	return pBUFF+nCPY;
 }
+
 void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 {
 	if( miniOFF() )
@@ -609,11 +610,24 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 	I4x4 miniALL = 0;
 	if( gpcMAP* pMAP = &mass.mapCR )
 	{
+		// nem a 0 cella a vezér hanem az 1-es
+		//if( lurd.a4x2[1].x > ie )
+
+		I4x4	selAN0AN1( selANCR[0].a4x2[0], selANCR[1].a4x2[0] ),
+				lurdAN = selAN0AN1.lurd();
+		U4x4	spc = lurdAN.a4x2[1],
+				mCR;
+		mass.mapCR.MAPalloc( spc, mCR );
+
 		U4	*pM = pMAP->pMAP,
 			*pC = pMAP->pCOL,
-			*pR = pMAP->pROW, i, ie;
+			*pR = pMAP->pROW, i, ie = pC-pM;
 		gpcSRC	*pEDIT = NULL,
-				*pSRC;
+				*pSRC, tmp;
+
+
+
+
 		gpmZn( pC, pMAP->map44.a4x2[1].sum() );
 
 		for( i = 0, ie = pC-pM; i < ie; i++ )
@@ -659,9 +673,82 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		gpeCLR	c16bg = gpeCLR_blue,
 				c16fr = gpeCLR_blue2,
 				c16ch = gpeCLR_blue2;
-		I4x4 sel01( selANCR[0].a4x2[0], selANCR[1].a4x2[0] );
 
+		if( lurdAN.x )
+		if( pB < pE )
+		{
+			i = (lurdAN.a4x2[0] * I4x2( 1, pMAP->map44.w ))-1;
+			xFND = pM[i];
+			pSRC = mass.SRCfnd( xFND );
+			if( !pSRC )
+			{
+				pSRC = mass.SRCadd( tmp, NULL, lurdAN.a4x2[0] );
+				xFND = pM[i];
+			}
 
+			if( pSRC )
+			{
+				I4	nSUB = anSTR[1] - anSTR[0],
+					nSTR = pE-pB,
+					nOL = pSRC->nL,
+					nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
+
+				// több karakter írunk át
+				U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
+					*pRIG	= pOA + anSTR[1],
+					*pRIGe	= pOA + nOL,
+					*pLFT	= (pSRC->pA = new U1[nNEW]) + anSTR[0];
+
+				gpmMEMCPY( pSRC->pA, pOA, anSTR[0] );
+
+				for( ; pB < pE; pB++ )
+				{
+					switch( *pB )
+					{
+						case '\b':
+							if( pLFT > pSRC->pA )
+							{
+								pLFT--;
+								if( pLFT[0] == '\n' )
+								if( pLFT >= pSRC->pA )
+								if( pLFT[-1] == '\r' )
+								{
+									pLFT--;
+									continue;
+								}
+							}
+							continue;
+						case 0x7e:
+							continue;
+						case 0x7f:
+							pB++;
+							if( pB < pE )	// ha még van a bufferban abbol deletézünk
+								continue;
+
+							if( pRIG < pRIGe )
+								pRIG++;	// ha nincsen akkor a jobb oldalbol
+							continue;
+					}
+
+					*pLFT = *pB;
+					pLFT++;
+
+				}
+				anSTR[1] = anSTR[0] = pLFT-pSRC->pA;
+				if( pRIG < pRIGe )
+				{
+					gpmMEMCPY( pLFT, pRIG, pRIGe-pRIG );
+					pLFT += pRIGe-pRIG;
+				}
+				pSRC->nL = pLFT-pSRC->pA;
+				pSRC->nA = nNEW;
+				pSRC->updt();
+				*pLFT = 0;
+
+				gpmDELary(pOA);
+				pSRC->hd(mass);
+			}
+		}
 
 		for( U4 r = 0; r < pMAP->map44.y; miniALL.y += pR[r], r++ )
 		{
@@ -690,10 +777,18 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
 
-				if( pSRC == apSRC[0] )
+				if( false )
+				if( I4x2(c+1,r) == lurdAN.a4x2[0] )
+				if( pB < pE )
 				{
-					if( pB < pE )
-					if( pSRC == apSRC[1] )
+					if( !pSRC )
+					{
+						pSRC = mass.SRCadd( tmp, NULL, lurdAN.a4x2[0] );
+						xFND = pM[i];
+					}
+
+
+					if( pSRC ) // == apSRC[1] )
 					{
 						I4	nSUB = anSTR[1] - anSTR[0],
 							nSTR = pE-pB,
@@ -757,10 +852,14 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 					}
 				}
 
-
-				if(
-						( c+1 >= sel01.x	&& r >= sel01.y )
-						&& ( c+1 <= sel01.z	&& r <= sel01.w )
+				if( !lurdAN.x )
+				{
+					c16fr = gpeCLR_blue2;
+					c16ch = gpeCLR_blue2;
+				}
+				else if(
+						   ( c+1 >= lurdAN.x	&& r >= lurdAN.y )
+						&& ( c+1 <= lurdAN.z	&& r <= lurdAN.w )
 				)
 				{
 					c16fr = bED ? gpeCLR_green2 : gpeCLR_cyan;

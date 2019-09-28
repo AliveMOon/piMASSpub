@@ -1,4 +1,21 @@
 #include "gpcSRC.h"
+
+U4x4::U4x4( const I4x2 _xy, I4x2* p_zw )
+{
+	a4x2[0] = _xy;
+	a4x2[1] = p_zw ? *p_zw : _xy;
+}
+U4x2& U4x2::operator = ( const I4x2& b )
+{
+	x = b.x > 0 ? b.x : 0;
+	y = b.y > 0 ? b.y : 0;
+	return *this;
+}
+U4x4& U4x4::operator = ( const I4x2& b )
+{
+	a4x2[1] = a4x2[0] = b;
+	return *this;
+}
 U4x4& U4x4::str2date( U1* p_str, U1* p_end, U1** pp_str )
 {
 	gpmCLR;
