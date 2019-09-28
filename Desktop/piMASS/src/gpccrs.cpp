@@ -25,7 +25,7 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 			*pR = pMAP->pROW;
 
 		scnCR.null();
-		for( scnCR.x = 0; scnCR.x < pMAP->mapCR44.x; scnCR.x++ )
+		for( scnCR.x = 0; scnCR.x < pMAP->mapCR44.z; scnCR.x++ )
 		{
 			scnCR.z += pC[scnCR.x];
 			if( o.z >= scnCR.z )
@@ -37,7 +37,7 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 		}
 		if( scnCR.x >= pMAP->mapCR44.x )
 		{
-			scnIN.z = cr.x*9;
+			scnIN.z = cr.x*gpdSRC_COLw;
 			scnIN.x = xy.x - (scnCR.z*cr.x);
 			scnCR.x = pMAP->mapCR44.x + 1 + scnIN.x/scnIN.z;
 			scnIN.x %= scnIN.z;
@@ -638,10 +638,10 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			xFND = pM[i];
 			pSRC = mass.SRCfnd( xFND );
 			dim = pSRC->CRSdim( aCRS );
-            if( pC[pSRC->spc.x] < dim.x )
-				pC[pSRC->spc.x] = dim.x;
-			if( pR[pSRC->spc.y] < dim.y )
-				pR[pSRC->spc.y] = dim.y;
+            if( pC[i%pMAP->mapCR44.z] < dim.x )
+				pC[i%pMAP->mapCR44.z] = dim.x;
+			if( pR[i/pMAP->mapCR44.z] < dim.y )
+				pR[i/pMAP->mapCR44.z] = dim.y;
 
 		}
 		for( U4 c = 0; c < pMAP->mapCR44.x; c++ )

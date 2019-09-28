@@ -9,7 +9,7 @@
 
 
 
-
+#define gpdSRC_COLw 4
 #define gpdPRGsep " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} "
 
 //extern U1 gpaALFadd[]; //0x100];
@@ -479,9 +479,15 @@ public:
 		mapCR44.w = max( mapCR44.w, gpmPAD( mapCR44.y, 0x10 ) );
 
 		pMAP = new U4[mapCR44.a4x2[1].are_sum()];
-		pROW = (pCOL = pMAP+mapCR44.a4x2[1].area()) + mapCR44.z;
+		pROW = (
+					pCOL = pMAP+mapCR44.a4x2[1].area()
+				) + mapCR44.z;
+		*pCOL = gpdSRC_COLw;
+		*pROW = 1;
 
-		gpmZn( pMAP, mapCR44.a4x2[1].are_sum() );
+		gpfMEMSET( pCOL+1, mapCR44.z-1, pCOL, sizeof(*pCOL) );
+		gpfMEMSET( pROW+1, mapCR44.w-1, pROW, sizeof(*pROW) );
+
 		if( pK )
 		{
 			gpmMEMCPY( pCOL, pKC, mCR.z );
