@@ -1,5 +1,31 @@
 #include "gpcSRC.h"
+U4x2& U4x2::mx( I4x2 b )
+{
+	if( b.x < 0 )
+		b.x = 0;
+	if( b.y < 0 )
+		b.y = 0;
 
+	if( x < b.x )
+		x = b.x;
+	if( y < b.y )
+		y = b.y;
+	return *this;
+}
+
+U4x2& U4x2::mn( I4x2 b )
+{
+	if( b.x < 0 )
+		b.x = 0;
+	if( b.y < 0 )
+		b.y = 0;
+
+	if( x > b.x )
+		x = b.x;
+	if( y > b.y )
+		y = b.y;
+	return *this;
+}
 U4x4::U4x4( const I4x2 _xy, I4x2* p_zw )
 {
 	a4x2[0] = _xy;

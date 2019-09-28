@@ -186,20 +186,36 @@ gpcLAZY gpMASS;
 U1 gpdONEcell[] = " \a ";
 gpcSRC* gpcMASS::SRCadd( gpcSRC& tmp, U1* pS, I4x2 an )
 {
+	U4	i = (an * I4x2( 1, mapCR.map44.z ))-1,
+		x_fnd = mapCR.pMAP[i];
+
+	gpcSRC* p_fnd = x_fnd ? SRCfnd( x_fnd ) : NULL;
+	if( p_fnd )
+		return p_fnd;
+
 	if( !pS )
 		pS = gpdONEcell;
 	U1	*pSe = pS+gpmSTRLEN( pS ), *pSS;
-	aSP44[nSP] = an;
+	aSP44[nSP].a4x2[0] = an;
 
 	tmp.reset( pS, pSe, &pSS, aSP44[nSP] );
 	aSPix[nSP] = tmp.IX = nLST;
-	U4 xadd = nLST, n;
+	U4 n;
+	if( nSP )
+		aSP44[nSP-1].a4x2[1].mx(  aSP44[nSP].a4x2[0] );
 
-	return SRCadd( &tmp, xadd, aSPix[nSP], n );
+	p_fnd = SRCadd( &tmp, xADD, aSPix[nSP], n );
+	if( !p_fnd )
+		return NULL;
+
+	mapCR.pMAP[i] = xADD;
+	xADD++;
+	return p_fnd;
 }
 gpcMASS::gpcMASS( const U1* pU, U8 nU )
 {
 	gpmCLR;
+	xADD = 1;
 	if(!nU)
 		return;
 	if( pU ? !*pU : true )
@@ -208,7 +224,8 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 	U1	*pS = (U1*)pU,
 		*pSe = pS+nU;
 	gpcSRC tmp;
-	U4 is, n, xadd = 1, id, momLV = 0, mCR, *pMAP;
+
+	U4 is, n, id, momLV = 0, mCR, *pMAP;
 	nSP = 1;
 	U4x4 mCR44;
 	while( pS < pSe ? *pS : false )
@@ -228,13 +245,15 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 			cout << "[ENTER]"; // << endl;
 		}
 
-		if( aSP44[momLV].z < aSP44[nSP].x )
+		aSP44[momLV].a4x2[1].mx(  aSP44[nSP].a4x2[0] );
+
+		/*if( aSP44[momLV].z < aSP44[nSP].x )
 				aSP44[momLV].z = aSP44[nSP].x;
 		if( aSP44[momLV].w < aSP44[nSP].y )
-				aSP44[momLV].w = aSP44[nSP].y;
+				aSP44[momLV].w = aSP44[nSP].y;*/
 
 
-        apSP[nSP] = SRCadd( &tmp, xadd, aSPix[nSP], n );
+        apSP[nSP] = SRCadd( &tmp, xADD, aSPix[nSP], n );
 
         gpcSRC &spREF = *apSP[nSP];
         if( apSP[momLV] )
@@ -251,7 +270,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		if( pMAP )
 		{
 			mCR = spREF.spc.x + spREF.spc.y*mCR44.z;
-			pMAP[mCR] = xadd; //aSPix[nSP];
+			pMAP[mCR] = xADD; //aSPix[nSP];
 		}
 
 		while( apSP[nSP]->bRET( *this ) )
@@ -263,7 +282,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		}
 
 
-		xadd++;
+		xADD++;
 
 	}
 }

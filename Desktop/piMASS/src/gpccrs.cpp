@@ -676,15 +676,17 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 		if( lurdAN.x )
 		if( pB < pE )
+		if( pSRC = mass.SRCadd( tmp, NULL, lurdAN.a4x2[0] ) )
 		{
-			i = (lurdAN.a4x2[0] * I4x2( 1, pMAP->map44.w ))-1;
+
+			/*i = (lurdAN.a4x2[0] * I4x2( 1, pMAP->map44.w ))-1;
 			xFND = pM[i];
 			pSRC = mass.SRCfnd( xFND );
 			if( !pSRC )
 			{
 				pSRC = mass.SRCadd( tmp, NULL, lurdAN.a4x2[0] );
 				xFND = pM[i];
-			}
+			}*/
 
 			if( pSRC )
 			{
@@ -770,14 +772,14 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				if( miniALL.x +  pC[c] < 0 )
 					continue;
 
-				i = c + r*pMAP->map44.w;
+				i = c + r*pMAP->map44.z;
 				if( !pM[i] )
 					continue;
 
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
 
-				if( false )
+				/*if( false )
 				if( I4x2(c+1,r) == lurdAN.a4x2[0] )
 				if( pB < pE )
 				{
@@ -850,7 +852,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 						gpmDELary(pOA);
 						pSRC->hd(mass);
 					}
-				}
+				}*/
 
 				if( !lurdAN.x )
 				{

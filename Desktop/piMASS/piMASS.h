@@ -691,6 +691,25 @@ public:
 	{
 		return U4x2( x<0?-x:x, y<0?-y:y );
 	}
+	U4x2& mx( const U4x2& b )
+	{
+		if( x < b.x )
+			x = b.x;
+		if( y < b.y )
+			y = b.y;
+		return *this;
+	}
+
+	U4x2& mn( const U4x2& b )
+	{
+		if( x > b.x )
+			x = b.x;
+		if( y > b.y )
+			y = b.y;
+		return *this;
+	}
+	U4x2& mx( I4x2 b );
+	U4x2& mn( I4x2 b );
 
 };
 
