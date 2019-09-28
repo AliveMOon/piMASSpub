@@ -8,7 +8,7 @@ class gpcSRC;
 class gpcCRS
 {
 	public:
-		I4x4	scnAN,	scnIN,
+		I4x4	scnCR,	scnIN,
 				selANCR[2];
 		gpcSRC	*apSRC[2];
 

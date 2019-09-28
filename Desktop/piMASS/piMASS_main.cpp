@@ -186,7 +186,10 @@ gpcLAZY gpMASS;
 U1 gpdONEcell[] = " \a ";
 gpcSRC* gpcMASS::SRCadd( gpcSRC& tmp, U1* pS, I4x2 an )
 {
-	U4	i = (an * I4x2( 1, mapCR.map44.z ))-1,
+	if( !an.x )
+		return NULL;
+
+	U4	i = (an * I4x2( 1, mapCR.mapCR44.z ))-1,
 		x_fnd = mapCR.pMAP[i];
 
 	gpcSRC* p_fnd = x_fnd ? SRCfnd( x_fnd ) : NULL;
@@ -207,6 +210,8 @@ gpcSRC* gpcMASS::SRCadd( gpcSRC& tmp, U1* pS, I4x2 an )
 	p_fnd = SRCadd( &tmp, xADD, aSPix[nSP], n );
 	if( !p_fnd )
 		return NULL;
+	I4x2 xCR = an + I4x2(0,1);
+	mapCR.mapCR44.a4x2[0].mx( xCR );
 
 	mapCR.pMAP[i] = xADD;
 	xADD++;
@@ -516,8 +521,8 @@ int main( int nA, char *apA[] )
 
 					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
 
-					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnAN.x );
-					pE += sprintf( pE, "%d", apCRS[mDIV]->scnAN.y );
+					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnCR.x );
+					pE += sprintf( pE, "%d", apCRS[mDIV]->scnCR.y );
 					SRCin = apCRS[mDIV]->scnIN;
 
 					if( (nMBB&1) )
