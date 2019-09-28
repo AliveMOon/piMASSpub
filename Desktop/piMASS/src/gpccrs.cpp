@@ -25,6 +25,7 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 			*pR = pMAP->pROW;
 
 		scnCR.null();
+		scnIN.null();
 		for( scnCR.x = 0; scnCR.x < pMAP->mapCR44.z; scnCR.x++ )
 		{
 			scnCR.z += pC[scnCR.x];
@@ -35,7 +36,7 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 			scnIN.x = xy.x - (scnCR.z*cr.x - scnIN.z);
 			break;
 		}
-		if( scnCR.x >= pMAP->mapCR44.x )
+		/*if( scnCR.x >= pMAP->mapCR44.x )
 		{
 			scnIN.z = cr.x*gpdSRC_COLw;
 			scnIN.x = xy.x - (scnCR.z*cr.x);
@@ -43,10 +44,11 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 			scnCR.x = 	  pMAP->mapCR44.x //+ 1
 						+ scnIN.x/scnIN.z;
 			scnIN.x %= scnIN.z;
-		} 	//else
+		} 	*/
+			//else
 			//scnCR.x++; // ALF 'A' == 1
 
-		for( scnCR.y = 0; scnCR.y < pMAP->mapCR44.y; scnCR.y++ )
+		for( scnCR.y = 0; scnCR.y < pMAP->mapCR44.w; scnCR.y++ )
 		{
 			scnCR.w += pR[scnCR.y];
 			if( o.w >= scnCR.w )
@@ -56,13 +58,13 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 			scnIN.y = xy.y - (scnCR.w*cr.y - scnIN.w);
 			break;
 		}
-		if( scnCR.y >= pMAP->mapCR44.y )
+		/*if( scnCR.y >= pMAP->mapCR44.y )
 		{
 			scnIN.w = cr.y;
 			scnIN.y = xy.y - (scnCR.w*cr.y);
 			scnCR.y = pMAP->mapCR44.y + scnIN.y/scnIN.w;
 			scnIN.y %= scnIN.w;
-		}
+		}*/
 	}
 
 	return o;
@@ -566,7 +568,6 @@ void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )
 	}
 
 }
-/// MINIrdy
 U1* gpcCRS::gtUTF8( U1* pBUFF )
 {
 	char* pS = NULL;
@@ -587,6 +588,11 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 	return pBUFF+nCPY;
 }
 
+///------------------------------
+///
+/// 		miniRDY
+///
+///------------------------------
 void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 {
 	if( miniOFF() )
@@ -684,6 +690,12 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			{
 				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )
 					anSTR[1] = anSTR[0] = pSRC->nL;
+
+				I4	nSTRT = pSRC->pSRCstart()-pSRC->pSRCalloc();
+				if( anSTR[0] < nSTRT )
+					anSTR[0] = nSTRT;
+				if( anSTR[1] < anSTR[0] )
+					anSTR[1] = anSTR[0];
 				I4	nSUB = anSTR[1] - anSTR[0],
 					nSTR = pE-pB,
 					nOL = pSRC->nL,
@@ -756,10 +768,16 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 						if( !pS2 )
 						{
 							pS2 = mass.SRCadd( tmp, NULL, s );
+							if( !pS2 )
+								continue;
 						}
+
 						U1* pSS;
 						U4x4 mCR44 = s;
-						pS2->reset( pSRC->pA, pSRC->pA+pSRC->nL, &pSS, mCR44, 0 );
+
+
+						//pS2->reset( pSRC->pA, pSRC->pA+pSRC->nL, &pSS, mCR44, 0 );
+						pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->nL );
 						pS2->updt();
 					}
 				}

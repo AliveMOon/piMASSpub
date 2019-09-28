@@ -822,8 +822,13 @@ public:
 		return i;
 	}
 	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spc, U4 nADD = 1 );
+
+    gpcSRC& SRCcpy( U1* pC, U1* pE );
+
+
     gpcSRC( gpcSRC& B );
     gpcSRC& operator = ( gpcSRC& B );
+
 protected:
     U4	nVER, nBLD, nHD;
 private:

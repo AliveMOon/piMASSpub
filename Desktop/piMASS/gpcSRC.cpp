@@ -8,6 +8,28 @@ gpcSRC::gpcSRC()
     //ctor
     gpmCLR;
 }
+gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe )
+{
+	if( pSe <= pS )
+		return *this;
+	nL = pSe-pS;
+	U1* pKL = nA ? pA : NULL;
+	if( nA < nL )
+	{
+		gpmDELary(pA);
+		nA = gpmPAD( nL+1, 0x10 );
+		pA = new U1[nA];
+	}
+
+	gpmMEMCPY( pA, pS, nL );
+	pA[nL] = 0;
+	U8 nLEN;
+	pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
+	if( *pB == '\a' )
+		pB++;
+
+	return *this;
+}
 gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcCR, U4 nADD )
 {
 	gpmCLR;
