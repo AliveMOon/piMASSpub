@@ -229,8 +229,7 @@ bool gpcMASS::save( U1* pPATH, U1* pFILE )
 	gpcLAZY buff;
 	gpcSRC* pSRC;
 	U4 z = mapCR.mapZN44.z;
-	struct passwd *pw = getpwuid(getuid());
-	const char *pHOME = pw->pw_dir;
+
 	U1 *pA, *pALF = gpsSVadr, *pNUM, *pNX, *pANo, *pLFT, *pRIG;
 	U8 nS = -1, nINS, nSTRT, nADR;
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
@@ -357,6 +356,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 }
 U1	gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
 char gpsMAINpub[0x100], gpsTITLEpub[0x100];
+I8 gpnEVENT = 0;
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -385,7 +385,7 @@ int main( int nA, char *apA[] )
 		for( int i = 1; i < nA; i++ )
 		{
 			cout << apA[i] << endl;
-			if( strstr( apA[i], ".mass" ) )
+			if( strcasestr( apA[i], ".mass" ) )
 			{
 				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, apA[i] );
 
@@ -393,14 +393,23 @@ int main( int nA, char *apA[] )
 				continue;
 			}
 		}
-
-		if( !*gpsMASSname )
+		if( gppMASSfile == gpsMASSpath )
 		{
-			strcpy( gpsMASSname, "pi.mass" );
+			struct passwd *pw = getpwuid(getuid());
+			const char *pHOME = pw->pw_dir;
+			gppMASSfile = gpsMASSpath + sprintf( gpsMASSpath, "./" ); //, pHOME );
+
 		}
+		if( !*gpsMASSname )
+			strcpy( gpsMASSname, "pi.mass" );
+
+
+
 		strcpy( gppMASSfile, gpsMASSname );
 		U8 s;
-		gpMASS.lzy_read( gpsMASSpath, s = -1, -1 );
+		cout << "Load:"<< gpsMASSpath << endl;
+		if( gpfACE(gpsMASSpath, 4) > -1 )
+			gpMASS.lzy_read( gpsMASSpath, s = -1, -1 );
 
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
@@ -643,13 +652,19 @@ int main( int nA, char *apA[] )
 				}
 				nMAG = 0;
 
+				/*if( gppMASSfile == gpsMASSpath )
+				{
+					strcpy( gppMASSfile, gpsMASSname );
+				}*/
 				SDL_SetWindowTitle( win.pSDLwin, gpsTITLEpub );
+
 			}
 
 
 
 			while( SDL_PollEvent( &ev ) )
 			{
+				gpnEVENT++;
 				switch( ev.type )
 				{
 					case SDL_MOUSEWHEEL: {
