@@ -184,12 +184,12 @@ char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 
 gpcLAZY gpMASS;
 U1 gpdONEcell[] = " \a ";
-gpcSRC* gpcMASS::SRCadd( gpcSRC& tmp, U1* pS, I4x2 an )
+gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 {
 	if( !an.x )
 		return NULL;
 
-	U4	i = (an * I4x2( 1, mapCR.mapCR44.z ))-1,
+	U4	i = (an * I4x2( 1, mapCR.mapZN44.z ))-1,
 		x_fnd = mapCR.pMAP[i];
 
 	gpcSRC* p_fnd = x_fnd ? SRCfnd( x_fnd ) : NULL;
@@ -210,8 +210,8 @@ gpcSRC* gpcMASS::SRCadd( gpcSRC& tmp, U1* pS, I4x2 an )
 	p_fnd = SRCadd( &tmp, xADD, aSPix[nSP], n );
 	if( !p_fnd )
 		return NULL;
-	I4x2 xCR = an + I4x2(0,1);
-	mapCR.mapCR44.a4x2[0].mx( xCR );
+	I4x2 zn = an + I4x2(0,1);
+	mapCR.mapZN44.a4x2[0].mx( zn );
 
 	mapCR.pMAP[i] = xADD;
 	xADD++;
@@ -265,10 +265,10 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
         {
 			if( !apSP[momLV]->pMAP )
 				apSP[momLV]->pMAP = new gpcMAP;
-			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mCR44 );
+			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mCR44, false );
         }
         else
-			pMAP = mapCR.MAPalloc( spREF.spcZN, mCR44 );
+			pMAP = mapCR.MAPalloc( spREF.spcZN, mCR44, false );
 
 		spREF.bMAIN( *this, true );
 
@@ -401,77 +401,74 @@ int main( int nA, char *apA[] )
 						{
 							switch( *pE )
 							{
-								case '\v':
-									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-									//pS = pE+1;
-									// tehát ha bent van ki kell lépni a szerkeszttett cellából
-									crs.CRSbEDswitch();
-									break;
-								case '\t':
-									if( crs.CRSbEDget() )
-										break;
+								case '\v': {
+										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+										//pS = pE+1;
+										// tehát ha bent van ki kell lépni a szerkeszttett cellából
+										crs.CRSbEDswitch();
+									} break;
+								case '\t': {
+										if( crs.CRSbEDget() )
+											break;
 
-									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-									if( *pE == '\r' )
-									if( pE[1] == '\n' )
-										pE++;
+										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+										if( *pE == '\r' )
+										if( pE[1] == '\n' )
+											pE++;
 
-									pS = pE+1;
-									crs.CRSstpCL(
-													win, *piMASS,
-													3, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-												);
-
-
-
-									break;
-								case '\r':
-								case '\n':
-                                    if( crs.CRSbEDget() )
-										break;
-
-
-									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-									if( *pE == '\r' )
-									if( pE[1] == '\n' )
-										pE++;
-
-									pS = pE+1;
-									crs.CRSstpCL(
-													win, *piMASS,
-													5, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-												);
-									break;
-
-
-								case 2:	// left
-								case 3:	// right
-								case 4:	// up
-								case 5:	// down
-									crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-									pS = pE+1;
-									if( !crs.CRSbEDget() )
-									{
+										pS = pE+1;
 										crs.CRSstpCL(
+														win, *piMASS,
+														3, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+													);
+									} break;
+								case '\r':
+								case '\n': {
+										if( crs.CRSbEDget() )
+											break;
+
+
+										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+										if( *pE == '\r' )
+										if( pE[1] == '\n' )
+											pE++;
+
+										pS = pE+1;
+										crs.CRSstpCL(
+														win, *piMASS,
+														5, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+													);
+									} break;
+
+
+								case 2:			// left
+								case 3:			// right
+								case 4:			// up
+								case 5:	{ 		// down
+										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+										pS = pE+1;
+										if( !crs.CRSbEDget() )
+										{
+											crs.CRSstpCL(
+															win, *piMASS,
+															*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+														);
+
+											break;
+										}
+										//crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+										//pS = pE+1;
+
+										//------------------------------------
+										//
+										//			CRS MOVE
+										//
+										//------------------------------------
+										crs.CRSstpED(
 														win, *piMASS,
 														*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 													);
-
-										break;
-									}
-									//crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-									//pS = pE+1;
-
-									//------------------------------------
-									//
-									//			CRS MOVE
-									//
-									//------------------------------------
-									crs.CRSstpED(
-													win, *piMASS,
-													*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-												);
-									break;
+									} break;
 							}
 							pE++;
 						}
@@ -518,8 +515,7 @@ int main( int nA, char *apA[] )
 				mDIV = win.mDIV( mouseXY.a4x2[0] );
 				if( apCRS[mDIV] )
 				{
-
-					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
+					SRCxycr = apCRS[mDIV]->scnZNCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
 
 					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnZN.x );
 					pE += sprintf( pE, "%d", apCRS[mDIV]->scnZN.y );
@@ -593,77 +589,79 @@ int main( int nA, char *apA[] )
 				switch( ev.type )
 				{
 					case SDL_MOUSEWHEEL:
-						if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
 						{
-							if( ev.wheel.y )
+							if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
 							{
-								//------------------------------
-								//
-								// 		WHEEL ZOOM
-								//
-								//---------------------
-								I4 mag = -ev.wheel.y;
-								SDL_Rect div = win.wDIV(mDIV);
-								if( mag < 0 )
+								if( ev.wheel.y )
 								{
-									if( apCRS[mDIV]->gtFRMwh(win,mDIV).x == 4 )
-										break;
-
-									if( apCRS[mDIV]->gtFRMwh(win,mDIV).x < 4 )
+									//------------------------------
+									//
+									// 		WHEEL ZOOM
+									//
+									//---------------------
+									I4 mag = -ev.wheel.y;
+									SDL_Rect div = win.wDIV(mDIV);
+									if( mag < 0 )
 									{
-										apCRS[mDIV]->stFRMwh(
-																win,mDIV,
-																4,
-																(4*div.h*2) / (div.w*3)
-															);
-										nMAG = 1;
-										break;
-									}
-								} else {
-									if( apCRS[mDIV]->gtFRMwh(win,mDIV).x == div.w/8 )
-										break;
+										if( apCRS[mDIV]->gtFRMwh(win,mDIV).x == 4 )
+											break;
 
-									if( apCRS[mDIV]->gtFRMwh(win,mDIV).x > div.w/8 )
-									{
-										apCRS[mDIV]->stFRMwh( 	win,mDIV,
-																div.w/8,
-																((div.w/8)*div.h*2) / (div.w*3)
-															);
+										if( apCRS[mDIV]->gtFRMwh(win,mDIV).x < 4 )
+										{
+											apCRS[mDIV]->stFRMwh(
+																	win,mDIV,
+																	4,
+																	(4*div.h*2) / (div.w*3)
+																);
+											nMAG = 1;
+											break;
+										}
+									} else {
+										if( apCRS[mDIV]->gtFRMwh(win,mDIV).x == div.w/8 )
+											break;
 
-										/*crs.CRSfrm.a4x2[1].x = div.w/8;
-										crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3) );*/
-										nMAG = 1;
-										break;
+										if( apCRS[mDIV]->gtFRMwh(win,mDIV).x > div.w/8 )
+										{
+											apCRS[mDIV]->stFRMwh( 	win,mDIV,
+																	div.w/8,
+																	((div.w/8)*div.h*2) / (div.w*3)
+																);
+
+											/*crs.CRSfrm.a4x2[1].x = div.w/8;
+											crs.CRSfrm.a4x2[1].y = max( 1, (crs.CRSfrm.a4x2[1].x*div.h*2) / (div.w*3) );*/
+											nMAG = 1;
+											break;
+										}
 									}
+
+
+
+									apCRS[mDIV]->stFRMwh(
+															win,mDIV,
+															apCRS[mDIV]->gtFRMwh(win,mDIV).x+mag, 0,
+															mag
+														);
+
+
+									nMAG = 1;
+									break;
 								}
-
-
-
-								apCRS[mDIV]->stFRMwh(
-														win,mDIV,
-														apCRS[mDIV]->gtFRMwh(win,mDIV).x+mag, 0,
-														mag
-													);
-
-
-								nMAG = 1;
 								break;
 							}
-							break;
-						}
-						//------------------------------
-						//
-						// 		WHEEL SCROLL
-						//
-						//---------------------
-						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
-							apCRS[mDIV]->addFRMxy( ev.wheel.y );
-						else
-							apCRS[mDIV]->addFRMxy( 0, ev.wheel.y );
-						nMAG = 1;
+							//------------------------------
+							//
+							// 		WHEEL SCROLL
+							//
+							//---------------------
+							if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+								apCRS[mDIV]->addFRMxy( ev.wheel.y );
+							else
+								apCRS[mDIV]->addFRMxy( 0, ev.wheel.y );
+							nMAG = 1;
 
-						mouseW.x += ev.wheel.x;
-						mouseW.y += ev.wheel.y;
+							mouseW.x += ev.wheel.x;
+							mouseW.y += ev.wheel.y;
+						}
 						break;
 					case SDL_QUIT:
 						gppKEYbuff = NULL;
@@ -672,32 +670,32 @@ int main( int nA, char *apA[] )
 						aKT[ev.key.keysym.scancode] = ev.key.timestamp|1;
 						break;
 					case SDL_KEYUP:
+						{
+							aKT[ev.key.keysym.scancode] = ev.key.timestamp;
+							aKT[ev.key.keysym.scancode] &= ~1;
 
-						aKT[ev.key.keysym.scancode] = ev.key.timestamp;
-						aKT[ev.key.keysym.scancode] &= ~1;
+							scan = ev.key.keysym.scancode&0xff;
+							// az SDL scan codjábol csinál egy 0x20*y öszeget
+							// ami a táblázatban a kívánt karakterre fog mutatni
+							scan = (scan%0x10) + (scan/0x10)*0x20;
 
-						scan = ev.key.keysym.scancode&0xff;
-						// az SDL scan codjábol csinál egy 0x20*y öszeget
-						// ami a táblázatban a kívánt karakterre fog mutatni
-						scan = (scan%0x10) + (scan/0x10)*0x20;
+							// SHIFT & ALT modosíthatja
+							// tehát 0x800-as táblázatban tud válogatni
+							if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+								scan |= 0x200;
+							if( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) )
+								scan |= 0x400;
 
-						// SHIFT & ALT modosíthatja
-						// tehát 0x800-as táblázatban tud válogatni
-						if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
-							scan |= 0x200;
-						if( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) )
-							scan |= 0x400;
+							// a táblázat első 0x10 / 16 a vezérlő kód
+							// ' ' sima ASCII
+							// - :"' - ékezetes betűk
+							// fF azok a felső funkció gombok f1f2f3f4 etc...
+							// _ kurzor nyilak
+							// / azok a szeparátor azaz enter tab cell etc...
 
-						// a táblázat első 0x10 / 16 a vezérlő kód
-						// ' ' sima ASCII
-						// - :"' - ékezetes betűk
-						// fF azok a felső funkció gombok f1f2f3f4 etc...
-						// _ kurzor nyilak
-						// / azok a szeparátor azaz enter tab cell etc...
-
-						aXY[0] = c = gp_s_key_map_sdl[scan];
-						aXY[1] = gp_s_key_map_sdl[scan+0x10];
-
+							aXY[0] = c = gp_s_key_map_sdl[scan];
+							aXY[1] = gp_s_key_map_sdl[scan+0x10];
+						}
 						break;
 					case SDL_WINDOWEVENT:
 						if( ev.window.event != SDL_WINDOWEVENT_RESIZED )

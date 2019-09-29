@@ -444,7 +444,7 @@ I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 class gpcMAP
 {
 public:
-	U4x4	mapCR44;
+	U4x4	mapZN44;
 	U4*		pMAP, *pCOL, *pROW;
 	gpcMAP(void)
 	{
@@ -454,52 +454,72 @@ public:
 	{
 		gpmDELary(pMAP);
 	}
-	U4* MAPalloc( U4x4& spcZN, U4x4& mCR )
+	U4* MAPalloc( U4x4& spcZN, U4x4& outZN, bool bRST )
 	{
 		// mCR -
 		if(!this)
 		{
-			mCR = 0;
+			outZN = 0;
 			return NULL;
 		}
 
-		if( mapCR44.x < spcZN.x+1 )
-			mapCR44.x = spcZN.x+1;
-		if( mapCR44.y < spcZN.y+1 )
-			mapCR44.y = spcZN.y+1;
+		if( mapZN44.x < spcZN.x+1 )
+			mapZN44.x = spcZN.x+1;
+		if( mapZN44.y < spcZN.y+1 )
+			mapZN44.y = spcZN.y+1;
 
-		mCR = mapCR44;
-		if(	(mapCR44.z > mapCR44.x) && (mapCR44.w > mapCR44.y) )
+		outZN = mapZN44;
+		if(	(mapZN44.z > mapZN44.x) && (mapZN44.w > mapZN44.y) )
+		{
+			if( bRST )
+			{
+				*pCOL = gpdSRC_COLw;
+				*pROW = 1;
+				gpfMEMSET( (pCOL+1), mapZN44.z-1, pCOL, sizeof(*pCOL) );
+				gpfMEMSET( (pROW+1), mapZN44.w-1, pROW, sizeof(*pROW) );
+			}
 			return pMAP;
+		}
 
-		U4	*pK = pMAP, *pKC = pK+mCR.a4x2[1].area(), //AREAzw(),
-			*pKR = pKC+mCR.z;
+		U4	*pK = pMAP,
+			*pKC = pK ? pK+outZN.a4x2[1].area() : NULL, //AREAzw(),
+			*pKR = pK ? pKC+outZN.z : NULL;
 
-		mapCR44.z = max( mapCR44.z, gpmPAD( mapCR44.x, 0x10 ) );
-		mapCR44.w = max( mapCR44.w, gpmPAD( mapCR44.y, 0x10 ) );
+		mapZN44.z = max( mapZN44.z, gpmPAD( mapZN44.x, 0x10 ) );
+		mapZN44.w = max( mapZN44.w, gpmPAD( mapZN44.y, 0x10 ) );
 
-		pMAP = new U4[mapCR44.a4x2[1].are_sum()];
+		U4 	nARE = mapZN44.a4x2[1].area(),
+			nALL = nARE + mapZN44.a4x2[1].sum();
+
+		pMAP = new U4[nALL];
 		pROW = (
-					pCOL = pMAP+mapCR44.a4x2[1].area()
-				) + mapCR44.z;
+					pCOL = pMAP+nARE
+				) + mapZN44.z;
+
 		*pCOL = gpdSRC_COLw;
 		*pROW = 1;
+		*pMAP = 0;
 
-		gpfMEMSET( pCOL+1, mapCR44.z-1, pCOL, sizeof(*pCOL) );
-		gpfMEMSET( pROW+1, mapCR44.w-1, pROW, sizeof(*pROW) );
+		//gpmZn( pMAP, nARE );
+		gpfMEMSET( (pMAP+1), nARE-1, pMAP, sizeof(*pMAP) );
+		gpfMEMSET( (pCOL+1), mapZN44.z-1, pCOL, sizeof(*pCOL) );
+		gpfMEMSET( (pROW+1), mapZN44.w-1, pROW, sizeof(*pROW) );
 
 		if( pK )
 		{
-			gpmMEMCPY( pCOL, pKC, mCR.z );
-			gpmMEMCPY( pROW, pKR, mCR.w );
-
-			for( U4* pS = pK, *pD = pMAP; pS < pKC; pS += mCR.z, pD += mapCR44.z  )
+			if( !bRST )
 			{
-				gpmMEMCPY( pD, pS, mCR.z );
+				gpmMEMCPY( pCOL, pKC, outZN.z );
+				gpmMEMCPY( pROW, pKR, outZN.w );
+			}
+
+			for( U4* pS = pK, *pD = pMAP; pS < pKC; pS += outZN.z, pD += mapZN44.z  )
+			{
+				gpmMEMCPY( pD, pS, outZN.z );
 			}
 			gpmDELary(pK);
 		}
-		mCR =  mapCR44;
+		outZN =  mapZN44;
 		return pMAP;
 	}
 };
@@ -976,7 +996,7 @@ public:
 		pLZY->n_load = nKID*sizeof(iKID);
 	}
 
-	gpcSRC* SRCadd( gpcSRC& tmp, U1* pS, I4x2 an );
+	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();
 	gpcSRC* get( U4 i )

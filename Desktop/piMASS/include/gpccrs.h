@@ -9,7 +9,7 @@ class gpcCRS
 {
 	public:
 		I4x4	scnZN,	scnIN,
-				selANCR[2];
+				selANIN[2];
 		gpcSRC	*apSRC[2];
 
 		U1x4	*pMINI, *pCRS;
@@ -94,7 +94,7 @@ class gpcCRS
 		void CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 		void CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
-		I4x4 srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy );
+		I4x4 scnZNCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy );
 	protected:
 
 	private:

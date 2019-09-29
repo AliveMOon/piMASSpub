@@ -2,7 +2,7 @@
 #include "gpccrs.h"
 #include "gpcSRC.h"
 
-I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
+I4x4 gpcCRS::scnZNCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 {
 	// XY - pixel
 	// CR - Coll/Row
@@ -26,7 +26,7 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 
 		scnZN.null();
 		scnIN.null();
-		for( scnZN.x = 0; scnZN.x < pMAP->mapCR44.z; scnZN.x++ )
+		for( scnZN.x = 0; scnZN.x < pMAP->mapZN44.z; scnZN.x++ )
 		{
 			scnZN.z += pC[scnZN.x];
 			if( o.z >= scnZN.z )
@@ -36,19 +36,9 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 			scnIN.x = xy.x - (scnZN.z*cr.x - scnIN.z);
 			break;
 		}
-		/*if( scnZN.x >= pMAP->mapCR44.x )
-		{
-			scnIN.z = cr.x*gpdSRC_COLw;
-			scnIN.x = xy.x - (scnZN.z*cr.x);
 
-			scnZN.x = 	  pMAP->mapCR44.x //+ 1
-						+ scnIN.x/scnIN.z;
-			scnIN.x %= scnIN.z;
-		} 	*/
-			//else
-			//scnZN.x++; // ALF 'A' == 1
 
-		for( scnZN.y = 0; scnZN.y < pMAP->mapCR44.w; scnZN.y++ )
+		for( scnZN.y = 0; scnZN.y < pMAP->mapZN44.w; scnZN.y++ )
 		{
 			scnZN.w += pR[scnZN.y];
 			if( o.w >= scnZN.w )
@@ -58,13 +48,7 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 			scnIN.y = xy.y - (scnZN.w*cr.y - scnIN.w);
 			break;
 		}
-		/*if( scnZN.y >= pMAP->mapCR44.y )
-		{
-			scnIN.w = cr.y;
-			scnIN.y = xy.y - (scnZN.w*cr.y);
-			scnZN.y = pMAP->mapCR44.y + scnIN.y/scnIN.w;
-			scnIN.y %= scnIN.w;
-		}*/
+
 	}
 
 	return o;
@@ -79,31 +63,31 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 	switch(stp&0x7)
 	{
 		case 2:	// left
-			if( selANCR[1].x < 2 )
+			if( selANIN[1].x < 2 )
 			{
-				selANCR[1].x = 1;
+				selANIN[1].x = 1;
 				break;
 			}
-			selANCR[1].x--;
+			selANIN[1].x--;
 			break;
 		case 3:	// right
-			selANCR[1].x++;
+			selANIN[1].x++;
 			break;
 		case 4:	// up
-			if( selANCR[1].y < 2 )
+			if( selANIN[1].y < 2 )
 			{
-				selANCR[1].y = 0;
+				selANIN[1].y = 0;
 				break;
 			}
-			selANCR[1].y--;
+			selANIN[1].y--;
 			break;
 		case 5:	// down)
-			selANCR[1].y++;
+			selANIN[1].y++;
 	}
 	if( bSH )
 		return;
 
-	selANCR[0]= selANCR[1];
+	selANIN[0]= selANIN[1];
 
 }
 void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
@@ -244,7 +228,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 		return;
 
 	U4	*pM = pMAP->pMAP,
-		i = sCRS.scnZN.a4x2[0]*I4x2( 1, pMAP->mapCR44.z );
+		i = sCRS.scnZN.a4x2[0]*I4x2( 1, pMAP->mapZN44.z );
 	//if( !pM[i] )
 	//	return;
 
@@ -253,20 +237,20 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 	//if( !pSRC )
 	//	return;
 
-	selANCR[1].a4x2[0] = sCRS.scnZN.a4x2[0]+U4x2(1,0);		//AN
-	selANCR[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;	//IN
-	anSTR[1] = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANCR[1].a4x2[1] ) : 0;
+	selANIN[1].a4x2[0] = sCRS.scnZN.a4x2[0]+U4x2(1,0);		//AN
+	selANIN[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;				//IN
+	anSTR[1] = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANIN[1].a4x2[1] ) : 0;
 
 
 	if( bSH )
 	{
-		U4	t1 = selANCR[1].a4x2[0]*I4x2(1,pMAP->mapCR44.z),
-			t0 = selANCR[0].a4x2[0]*I4x2(1,pMAP->mapCR44.z);
+		U4	t1 = selANIN[1].a4x2[0]*I4x2(1,pMAP->mapZN44.z),
+			t0 = selANIN[0].a4x2[0]*I4x2(1,pMAP->mapZN44.z);
 		if( t0 > t1  )
 		{
-			I4x4 tmp = selANCR[0];
-			selANCR[0] = selANCR[1];
-			selANCR[1] = tmp;
+			I4x4 tmp = selANIN[0];
+			selANIN[0] = selANIN[1];
+			selANIN[1] = tmp;
 
 			apSRC[1] = apSRC[0];
 			apSRC[0] = pSRC;
@@ -283,7 +267,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 			anSTR[1] = anSTR[0];
 			anSTR[0] = t0;
 		}
-		if( selANCR[0].a4x2[0] == selANCR[1].a4x2[0] )
+		if( selANIN[0].a4x2[0] == selANIN[1].a4x2[0] )
 		{
 			CRSbEDset(true);
 		}
@@ -299,8 +283,8 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 		{
 			// SHIFT klick szinkronizálja a két cursort
 			sCRS.bED = bED;
-			sCRS.selANCR[0] = selANCR[0];
-			sCRS.selANCR[1] = selANCR[1];
+			sCRS.selANIN[0] = selANIN[0];
+			sCRS.selANIN[1] = selANIN[1];
 			sCRS.anSTR[0] = anSTR[0];
 			sCRS.anSTR[1] = anSTR[1];
 			apSRC[0] = apSRC[0];
@@ -311,7 +295,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 		return; // ha le van nyomva a shift akkor meg akarjuk örizni a sel[0]-t.
 	}
 
-	selANCR[0] = selANCR[1];
+	selANIN[0] = selANIN[1];
 	apSRC[0] = apSRC[1];
 	anSTR[0] = anSTR[1];
 
@@ -620,22 +604,24 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		// nem a 0 cella a vezér hanem az 1-es
 		//if( lurd.a4x2[1].x > ie )
 
-		I4x4	selAN0AN1( selANCR[0].a4x2[0], selANCR[1].a4x2[0] ),
+		I4x4	selAN0AN1( selANIN[0].a4x2[0], selANIN[1].a4x2[0] ),
 				lurdAN = selAN0AN1.lurd();
 		U4x4	spcZN = lurdAN.a4x2[1] - U4x2(1,0),
 				mCR;
-		mass.mapCR.MAPalloc( spcZN, mCR );
+		mass.mapCR.MAPalloc( spcZN, mCR, true );
 
 		U4	*pM = pMAP->pMAP,
 			*pC = pMAP->pCOL,
 			*pR = pMAP->pROW, i, ie = pC-pM;
-		gpcSRC	*pEDIT = NULL,
-				*pSRC, tmp, *pS2;
 
+		gpcSRC	tmp,
+				*pEDIT = NULL,
+				*pSRC = NULL,
+				*pS2 = NULL;
 
-
-
-		gpmZn( pC, pMAP->mapCR44.a4x2[1].sum() );
+		//gpfMEMSET( (pC+1), mapZN44.z-1, pC, sizeof(*pC) );
+		//gpfMEMSET( (pR+1), mapZN44.w-1, pR, sizeof(*pR) );
+		//gpmZn( pC, pMAP->mapZN44.a4x2[1].sum() );
 
 		for( i = 0, ie = pC-pM; i < ie; i++ )
 		{
@@ -645,17 +631,17 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			xFND = pM[i];
 			pSRC = mass.SRCfnd( xFND );
 			dim = pSRC->CRSdim( aCRS );
-            if( pC[i%pMAP->mapCR44.z] < dim.x )
-				pC[i%pMAP->mapCR44.z] = dim.x;
-			if( pR[i/pMAP->mapCR44.z] < dim.y )
-				pR[i/pMAP->mapCR44.z] = dim.y;
+            if( pC[i%pMAP->mapZN44.z] < dim.x )
+				pC[i%pMAP->mapZN44.z] = dim.x;
+			if( pR[i/pMAP->mapZN44.z] < dim.y )
+				pR[i/pMAP->mapZN44.z] = dim.y;
 
 		}
-		for( U4 c = 0; c < pMAP->mapCR44.x; c++ )
+		for( U4 c = 0; c < pMAP->mapZN44.x; c++ )
 		{
 			miniALL.z += pC[c];
 		}
-		for( U4 r = 0; r < pMAP->mapCR44.y; r++ )
+		for( U4 r = 0; r < pMAP->mapZN44.y; r++ )
 		{
 			miniALL.w += pR[r];
 		}
@@ -683,20 +669,10 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 		if( lurdAN.x )
 		if( pB < pE )
-		if( pSRC = mass.SRCadd( tmp, NULL, lurdAN.a4x2[0] ) )
+		if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0] ) )
 		{
 			if( pSRC )
 			{
-
-				/*if( anSTR[0] < nSTRT )
-					anSTR[0] = nSTRT;
-				else if( anSTR[0] > pSRC->nL )
-					anSTR[0] = pSRC->nL;
-
-				if( anSTR[1] < anSTR[0] )
-					anSTR[1] = anSTR[0];*/
-
-
 				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )
 					anSTR[1] = anSTR[0] = pSRC->nL;
 
@@ -775,14 +751,14 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				{
 					for( s.x = lurdAN.x; s.x <= lurdAN.z; s.x++ )
 					{
-						U4	i = (s * I4x2( 1, mass.mapCR.mapCR44.z ))-1,
+						U4	i = (s * I4x2( 1, mass.mapCR.mapZN44.z ))-1,
 							x_fnd = mass.mapCR.pMAP[i];
 						pS2 = x_fnd ? mass.SRCfnd( x_fnd ) : NULL;
 						if( pS2 == pSRC )
 							continue;
 						if( !pS2 )
 						{
-							pS2 = mass.SRCadd( tmp, NULL, s );
+							pS2 = mass.SRCnew( tmp, NULL, s );
 							if( !pS2 )
 								continue;
 						}
@@ -800,7 +776,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			}
 		}
 
-		for( U4 r = 0; r < pMAP->mapCR44.y; miniALL.y += pR[r], r++ )
+		for( U4 r = 0; r < pMAP->mapZN44.y; miniALL.y += pR[r], r++ )
 		{
 			if( miniALL.y >= CRSfrm.w )
 				break;
@@ -810,7 +786,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				continue;
 
 			miniALL.x = CRSfrm.x;
-			for( U4 c = 0; c < pMAP->mapCR44.x; miniALL.x += pC[c], c++ )
+			for( U4 c = 0; c < pMAP->mapZN44.x; miniALL.x += pC[c], c++ )
 			{
 				if( miniALL.x >= CRSfrm.z )
 					break;
@@ -820,7 +796,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				if( miniALL.x +  pC[c] < 0 )
 					continue;
 
-				i = c + r*pMAP->mapCR44.z;
+				i = c + r*pMAP->mapZN44.z;
 				if( !pM[i] )
 					continue;
 
