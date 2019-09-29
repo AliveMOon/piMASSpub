@@ -265,16 +265,16 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
         {
 			if( !apSP[momLV]->pMAP )
 				apSP[momLV]->pMAP = new gpcMAP;
-			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcCR, mCR44 );
+			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mCR44 );
         }
         else
-			pMAP = mapCR.MAPalloc( spREF.spcCR, mCR44 );
+			pMAP = mapCR.MAPalloc( spREF.spcZN, mCR44 );
 
 		spREF.bMAIN( *this, true );
 
 		if( pMAP )
 		{
-			mCR = spREF.spcCR.x + spREF.spcCR.y*mCR44.z;
+			mCR = spREF.spcZN.x + spREF.spcZN.y*mCR44.z;
 			pMAP[mCR] = xADD; //aSPix[nSP];
 		}
 
@@ -521,8 +521,8 @@ int main( int nA, char *apA[] )
 
 					SRCxycr = apCRS[mDIV]->srcXYCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
 
-					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnCR.x );
-					pE += sprintf( pE, "%d", apCRS[mDIV]->scnCR.y );
+					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnZN.x );
+					pE += sprintf( pE, "%d", apCRS[mDIV]->scnZN.y );
 					SRCin = apCRS[mDIV]->scnIN;
 
 					if( (nMBB&1) )

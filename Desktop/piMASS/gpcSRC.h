@@ -454,7 +454,7 @@ public:
 	{
 		gpmDELary(pMAP);
 	}
-	U4* MAPalloc( U4x4& spcCR, U4x4& mCR )
+	U4* MAPalloc( U4x4& spcZN, U4x4& mCR )
 	{
 		// mCR -
 		if(!this)
@@ -463,10 +463,10 @@ public:
 			return NULL;
 		}
 
-		if( mapCR44.x < spcCR.x+1 )
-			mapCR44.x = spcCR.x+1;
-		if( mapCR44.y < spcCR.y+1 )
-			mapCR44.y = spcCR.y+1;
+		if( mapCR44.x < spcZN.x+1 )
+			mapCR44.x = spcZN.x+1;
+		if( mapCR44.y < spcZN.y+1 )
+			mapCR44.y = spcZN.y+1;
 
 		mCR = mapCR44;
 		if(	(mapCR44.z > mapCR44.x) && (mapCR44.w > mapCR44.y) )
@@ -512,7 +512,7 @@ public:
     U8		nL,
 			nA,			// ha nA == 0 nm mi foglaltuk
 			bSW;		// pB = pA+iB()
-    U4x4	spcCR, dim;
+    U4x4	spcZN, dim;
     U4		IX, retIX, nALFtg, strtD, endD;
 
     gpeALF	*pALFtg;
@@ -709,9 +709,9 @@ public:
 		if( !(bSW&gpeMASSentrMSK) )
 			return false;
 
-		spcCR.x = x;
-		spcCR.y++;
-		_spc = spcCR;
+		spcZN.x = x;
+		spcZN.y++;
+		_spc = spcZN;
 		_spc.x++;
 		return true;
 
@@ -821,7 +821,7 @@ public:
 		pB = pA+i;
 		return i;
 	}
-	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spc, U4 nADD = 1 );
+	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spcZN, U4 nADD = 1 );
 
     gpcSRC& SRCcpy( U1* pC, U1* pE );
 

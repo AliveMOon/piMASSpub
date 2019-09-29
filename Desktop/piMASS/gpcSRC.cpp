@@ -30,11 +30,11 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe )
 
 	return *this;
 }
-gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcCR, U4 nADD )
+gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 nADD )
 {
 	gpmCLR;
-	spcCR = _spcCR;
-	_spcCR.x += nADD;
+	spcZN = _spcZN;
+	_spcZN.x += nADD;
 
 	if( pS ? !*pS : true )
 	{

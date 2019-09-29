@@ -24,45 +24,45 @@ I4x4 gpcCRS::srcXYCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 		U4	*pC = pMAP->pCOL,
 			*pR = pMAP->pROW;
 
-		scnCR.null();
+		scnZN.null();
 		scnIN.null();
-		for( scnCR.x = 0; scnCR.x < pMAP->mapCR44.z; scnCR.x++ )
+		for( scnZN.x = 0; scnZN.x < pMAP->mapCR44.z; scnZN.x++ )
 		{
-			scnCR.z += pC[scnCR.x];
-			if( o.z >= scnCR.z )
+			scnZN.z += pC[scnZN.x];
+			if( o.z >= scnZN.z )
 				continue;
 
-			scnIN.z = pC[scnCR.x]*cr.x;
-			scnIN.x = xy.x - (scnCR.z*cr.x - scnIN.z);
+			scnIN.z = pC[scnZN.x]*cr.x;
+			scnIN.x = xy.x - (scnZN.z*cr.x - scnIN.z);
 			break;
 		}
-		/*if( scnCR.x >= pMAP->mapCR44.x )
+		/*if( scnZN.x >= pMAP->mapCR44.x )
 		{
 			scnIN.z = cr.x*gpdSRC_COLw;
-			scnIN.x = xy.x - (scnCR.z*cr.x);
+			scnIN.x = xy.x - (scnZN.z*cr.x);
 
-			scnCR.x = 	  pMAP->mapCR44.x //+ 1
+			scnZN.x = 	  pMAP->mapCR44.x //+ 1
 						+ scnIN.x/scnIN.z;
 			scnIN.x %= scnIN.z;
 		} 	*/
 			//else
-			//scnCR.x++; // ALF 'A' == 1
+			//scnZN.x++; // ALF 'A' == 1
 
-		for( scnCR.y = 0; scnCR.y < pMAP->mapCR44.w; scnCR.y++ )
+		for( scnZN.y = 0; scnZN.y < pMAP->mapCR44.w; scnZN.y++ )
 		{
-			scnCR.w += pR[scnCR.y];
-			if( o.w >= scnCR.w )
+			scnZN.w += pR[scnZN.y];
+			if( o.w >= scnZN.w )
 				continue;
 
-			scnIN.w = pR[scnCR.y]*cr.y;
-			scnIN.y = xy.y - (scnCR.w*cr.y - scnIN.w);
+			scnIN.w = pR[scnZN.y]*cr.y;
+			scnIN.y = xy.y - (scnZN.w*cr.y - scnIN.w);
 			break;
 		}
-		/*if( scnCR.y >= pMAP->mapCR44.y )
+		/*if( scnZN.y >= pMAP->mapCR44.y )
 		{
 			scnIN.w = cr.y;
-			scnIN.y = xy.y - (scnCR.w*cr.y);
-			scnCR.y = pMAP->mapCR44.y + scnIN.y/scnIN.w;
+			scnIN.y = xy.y - (scnZN.w*cr.y);
+			scnZN.y = pMAP->mapCR44.y + scnIN.y/scnIN.w;
 			scnIN.y %= scnIN.w;
 		}*/
 	}
@@ -244,20 +244,19 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 		return;
 
 	U4	*pM = pMAP->pMAP,
-		i = sCRS.scnCR.a4x2[0]*I4x2( 1, pMAP->mapCR44.z );
-	if( !pM[i] )
-		return;
+		i = sCRS.scnZN.a4x2[0]*I4x2( 1, pMAP->mapCR44.z );
+	//if( !pM[i] )
+	//	return;
 
 	U4 xFND = pM[i];
 	gpcSRC* pSRC = mass.SRCfnd( xFND );
-	if( !pSRC )
-		return;
+	//if( !pSRC )
+	//	return;
 
-	selANCR[1].a4x2[0] = sCRS.scnCR.a4x2[0]+U4x2(1,0);		//AN
+	selANCR[1].a4x2[0] = sCRS.scnZN.a4x2[0]+U4x2(1,0);		//AN
 	selANCR[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;	//IN
-	anSTR[1] = pSRC->CRSminiCR( selANCR[1].a4x2[1] );
+	anSTR[1] = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANCR[1].a4x2[1] ) : 0;
 
-	apSRC[1] = pSRC;
 
 	if( bSH )
 	{
@@ -623,9 +622,9 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 		I4x4	selAN0AN1( selANCR[0].a4x2[0], selANCR[1].a4x2[0] ),
 				lurdAN = selAN0AN1.lurd();
-		U4x4	spcCR = lurdAN.a4x2[1] - U4x2(1,0),
+		U4x4	spcZN = lurdAN.a4x2[1] - U4x2(1,0),
 				mCR;
-		mass.mapCR.MAPalloc( spcCR, mCR );
+		mass.mapCR.MAPalloc( spcZN, mCR );
 
 		U4	*pM = pMAP->pMAP,
 			*pC = pMAP->pCOL,
@@ -688,14 +687,30 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		{
 			if( pSRC )
 			{
+
+				/*if( anSTR[0] < nSTRT )
+					anSTR[0] = nSTRT;
+				else if( anSTR[0] > pSRC->nL )
+					anSTR[0] = pSRC->nL;
+
+				if( anSTR[1] < anSTR[0] )
+					anSTR[1] = anSTR[0];*/
+
+
 				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )
 					anSTR[1] = anSTR[0] = pSRC->nL;
 
 				I4	nSTRT = pSRC->pSRCstart()-pSRC->pSRCalloc();
+
 				if( anSTR[0] < nSTRT )
 					anSTR[0] = nSTRT;
-				if( anSTR[1] < anSTR[0] )
+				if( !bED )
+				{
+					anSTR[1] = pSRC->nL;
+				}
+				else if( anSTR[1] < anSTR[0] )
 					anSTR[1] = anSTR[0];
+
 				I4	nSUB = anSTR[1] - anSTR[0],
 					nSTR = pE-pB,
 					nOL = pSRC->nL,
