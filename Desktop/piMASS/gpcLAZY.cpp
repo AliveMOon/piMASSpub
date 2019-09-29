@@ -1,4 +1,16 @@
 #include "piMASS.h"
+char	gps_lzy_pub1[1024*0x100];
+gpcLAZY* gpcLAZY::lzy_format( U8& n_start, const char* p_format, ... )
+{
+	va_list vl;
+	va_start(vl, p_format);
+	gps_lzy_pub1[0] = 0;
+	U8 n = vsprintf( gps_lzy_pub1, p_format, vl );
+	if( n < 1 )
+		return this;
+	U8 s = -1;
+	return lzy_add( (U1*)gps_lzy_pub1, n, n_start );
+}
 
 U4 gpcLAZY::tree_fnd( U4 id, U4& n )
 {
@@ -19,7 +31,7 @@ gpcLAZY* gpcLAZY::tree_add( U4 id, U4& n )
 	U8 s = -1;
 	if( !this )
 	{
-		gpcLAZY* p_this = lazy_add( NULL, sizeof(U4x4), s, 8 );
+		gpcLAZY* p_this = lzy_add( NULL, sizeof(U4x4), s, 8 );
 		if( !p_this )
 			return NULL;
 
@@ -27,7 +39,7 @@ gpcLAZY* gpcLAZY::tree_add( U4 id, U4& n )
 		((U4x4*)p_this->p_alloc)->null().x = id;
 		return p_this;
 	}
-	lazy_add( NULL, sizeof(U4x4), s );
+	lzy_add( NULL, sizeof(U4x4), s );
 	U4x4* p_u44 = (U4x4*)p_alloc;
 	n = s/sizeof(*p_u44);
 	s = p_u44->tree_add( id, n );
@@ -57,7 +69,7 @@ gpcLAZY* gpcLAZY::tree_add( U8 id, U8& n )
 	U8 s = -1;
 	if( !this )
 	{
-		gpcLAZY* p_this = lazy_add( NULL, sizeof(U8x4), s, 8 );
+		gpcLAZY* p_this = lzy_add( NULL, sizeof(U8x4), s, 8 );
 		if( !p_this )
 			return NULL;
 
@@ -65,7 +77,7 @@ gpcLAZY* gpcLAZY::tree_add( U8 id, U8& n )
 		((U8x4*)p_this->p_alloc)->null().x = id;
 		return p_this;
 	}
-	lazy_add( NULL, sizeof(U8x4), s );
+	lzy_add( NULL, sizeof(U8x4), s );
 	U8x4* p_u84 = (U8x4*)p_alloc;
 	n = s/sizeof(*p_u84);
 	s = p_u84->tree_add( id, n );
@@ -95,7 +107,7 @@ gpcLAZY* gpcLAZY::tree_add( I8 id, I8& n )
 	U8 s = -1;
 	if( !this )
 	{
-		gpcLAZY* p_this = lazy_add( NULL, sizeof(I8x4), s = -1, 8 );
+		gpcLAZY* p_this = lzy_add( NULL, sizeof(I8x4), s = -1, 8 );
 		if( !p_this )
 			return NULL;
 
@@ -103,7 +115,7 @@ gpcLAZY* gpcLAZY::tree_add( I8 id, I8& n )
 		((I8x4*)p_this->p_alloc)->null().x = id;
 		return p_this;
 	}
-	lazy_add( NULL, sizeof(I8x4), s );
+	lzy_add( NULL, sizeof(I8x4), s );
 	I8x4* p_i84 = (I8x4*)p_alloc;
 	n = s/sizeof(*p_i84);
 	s = p_i84->tree_add( id, n );

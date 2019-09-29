@@ -4,5 +4,5 @@ enter enter	  b2	   c2	 1 d2	 c2	 1 e2	 c2	 1 f2	  10 g2	  10 h2	 
 enter enter	  b3	   c3	 c2	 1 d3	 c2	 1 e3	 c2	 1 f3	  10 g3	  10 h3	   a4	 
 enter enter	  b4	   c4	 c2	 1 d4	 c2	 1 e4	 c2	 1 f4	  10 g4	  10 h4	   a5	 
 enter enter	  b5	   c5	 c2	 1 d5	 c2	 1 e5	 c2	 1 f5	  10 g5	  10 h5	   a6	 
-enter enter	  b6	   c6	   d6	  10 e6	  10 f6	  1 g6	f6	  1 h6	f6	  1 a7	 
-enter enter	  b7	   c7	   d7	   e7	   f7	f6	  1 g7	f6	  1 h7	f6	  1 f8	f6	  1 g8	f6	  1 h8	f6	  1 f9	f6	  1 g9	f6	  1 h9	f6	  1 f10	f6	  1 g10	f6	  1 h10	f6	  1 f11	f6	  1 g11	f6	  1 h11	f6	  1 j11	 a
+enter enter	  b6	   c6	   d6	  10 e6	  10 f6	  10 g6	  10 h6	   a7	 
+enter enter	  b7	   c7	   d7	   e7	   f7	   g7	   h7	   j11	a

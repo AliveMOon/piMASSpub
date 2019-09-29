@@ -28,6 +28,7 @@ enum gpeMASSsw:U8
 	gpeMASSpass,
 	gpeMASSoff,
 	gpeMASSmain,
+	gpeMASSzn,
 
 	gpeMASSalert,
 	gpeMASSprg,
@@ -44,6 +45,7 @@ enum gpeMASSsw:U8
 	gpeMASSpassMSK = 1<<gpeMASSpass,
 	gpeMASSoffMSK = 1<<gpeMASSoff,
 	gpeMASSmainMSK = 1<<gpeMASSmain,
+	gpeMASSznMSK = 1<<gpeMASSzn,
 
 	gpeMASSclrMSK = (1<<gpeMASSalert)-1,
 	gpeMASSalertMSK,
@@ -51,6 +53,7 @@ enum gpeMASSsw:U8
 	gpeMASSgpuMSK = 1<<gpeMASSgpu,
 	gpeMASScrslMSK = 1<<gpeMASScrsL,
 	gpeMASScrsrMSK = 1<<gpeMASScrsR,
+
 
 };
 inline U4 gpfUTF8( const U1* pS, U1** ppS )
@@ -582,6 +585,7 @@ public:
 
 		return pC;
 	}
+
 	U8 CRSminiCR( I4x2& cr )
 	{
 		if( !this )
@@ -726,6 +730,12 @@ public:
 		hd( mass );
 
 		// új sort kezd a táblázatban
+		if( bSW&gpeMASSznMSK )
+		{
+			_spc = spcZN;
+			_spc.x++;
+			return false;
+		}
 		if( !(bSW&gpeMASSentrMSK) )
 			return false;
 
@@ -921,16 +931,6 @@ public:
 
 		nLEV = iLEV+1;
 		return iLEV;
-
-
-		/*aLEVsp[ nLEV ] = aLEVsp[ iLEV ];
-
-		iLEV++;
-		nLEV = iLEV+1;
-		if( topLEV < nLEV )
-			topLEV = nLEV;
-
-		return iLEV;*/
 	};
 	U4 decLEV( void )
 	{
@@ -964,7 +964,7 @@ public:
 		{
 			*pTG->ppGET( ix ) = pLZY = new gpcLAZY;
 		}
-		pLZY->lazy_add( (U4*)&iKID, sizeof(U4), s, 8 );
+		pLZY->lzy_add( (U4*)&iKID, sizeof(U4), s, 8 );
 	}
 	void tag_sub( gpeALF tg, U4 iKID )
 	{
@@ -997,6 +997,7 @@ public:
 	}
 
 	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
+	bool save( U1* pPATH, U1* pFILE );
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();
 	gpcSRC* get( U4 i )

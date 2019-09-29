@@ -608,9 +608,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				lurdAN = selAN0AN1.lurd();
 		U4x4	spcZN = lurdAN.a4x2[1] - U4x2(1,0),
 				mCR;
-		mass.mapCR.MAPalloc( spcZN, mCR, true );
 
-		U4	*pM = pMAP->pMAP,
+		U4	*pM = pMAP->MAPalloc( spcZN, mCR, true ),//pMAP->pMAP,
 			*pC = pMAP->pCOL,
 			*pR = pMAP->pROW, i, ie = pC-pM;
 

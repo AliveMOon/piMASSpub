@@ -79,6 +79,8 @@
 	//#include <bits/stdc++.h>
 	#include <GL/glew.h>
 
+	#include <pwd.h>
+
 	typedef int			SOCKET;
 	typedef sockaddr	SOCKADDR;
 	typedef sockaddr_in	SOCKADDR_IN; //struct	sockaddr_in	addrinfo;
@@ -1645,7 +1647,7 @@ public:
 		gpmFREE( p_alloc );
 	}
 
-	gpcLAZY* lazy_strict( void )
+	gpcLAZY* lzy_strict( void )
 	{
 		if( this ? !n_load : true )
 			return this;
@@ -1672,7 +1674,7 @@ public:
 	}
 
 
-	gpcLAZY* lazy_reset( void )
+	gpcLAZY* lzy_reset( void )
 	{
 		if( this ? !n_load : true )
 			return this;
@@ -1696,7 +1698,7 @@ public:
 		return this;
 	}
 
-	gpcLAZY* lazy_add( const void* p_void, U8 n_byte, U8& n_start, U1 n = 0 )
+	gpcLAZY* lzy_add( const void* p_void, U8 n_byte, U8& n_start, U1 n = 0 )
 	{
 		if( !n_byte )
 			return this;
@@ -1759,11 +1761,11 @@ public:
 		p_alloc[n_load] = 0;
 		return this;
 	}
-	gpcLAZY* lazy_plus(  const gpcLAZY* p_b, U8& n_start )
+	gpcLAZY* lzy_plus(  const gpcLAZY* p_b, U8& n_start )
 	{
-		return lazy_add( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
+		return lzy_add( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
 	}
-	gpcLAZY* lazy_sub( U8& n_start, U8 n_sub )
+	gpcLAZY* lzy_sub( U8& n_start, U8 n_sub )
 	{
 		if( !this )
 		{
@@ -1787,11 +1789,11 @@ public:
 		p_alloc[n_load] = 0;
 		return this;
 	}
-	gpcLAZY* lazy_exp( U8& n_start, U8 n_sub, U8 n_add, U1 n = 0 )
+	gpcLAZY* lzy_exp( U8& n_start, U8 n_sub, U8 n_add, U1 n = 0 )
 	{
 		if( !this )
 		{
-			return lazy_add( NULL, n_add, n_start, n );
+			return lzy_add( NULL, n_add, n_start, n );
 		}
 
 		if( !n )
@@ -1872,22 +1874,22 @@ public:
 		return this;
 	}
 
-	gpcLAZY* lazy_ins( const U1* p_u1, U8 n_u1, U8& n_start, U8 n_sub, U1 n = 0 )
+	gpcLAZY* lzy_ins( const U1* p_u1, U8 n_u1, U8& n_start, U8 n_sub, U1 n = 0 )
 	{
 		if( !this )
 		{
 			//start = n_u1;
-			return lazy_add( p_u1, n_u1, n_start, n );
+			return lzy_add( p_u1, n_u1, n_start, n );
 		}
 
-		lazy_exp( n_start, n_sub,  n_u1, n );
+		lzy_exp( n_start, n_sub,  n_u1, n );
 		memcpy( p_alloc+n_start, p_u1, n_u1 );
 		return this;
 	}
 	gpcLAZY& operator = ( const gpcLAZY& plus )
 	{
 		U8 s = 0;
-		lazy_ins( plus.p_alloc, plus.n_load, s, -1 );
+		lzy_ins( plus.p_alloc, plus.n_load, s, -1 );
 
 		return *this;
 	}
@@ -1895,10 +1897,10 @@ public:
 	gpcLAZY* operator += ( const gpcLAZY& plus )
 	{
 		U8 s = -1;
-		return lazy_add( plus.p_alloc, plus.n_load, s );
+		return lzy_add( plus.p_alloc, plus.n_load, s );
 	}
 
-	gpcLAZY* lazy_read( char* p_file, U8& n_start, U1 n = 0 )
+	gpcLAZY* lzy_read( char* p_file, U8& n_start, U1 n = 0 )
 	{
 		if( !p_file )
 			return this;
@@ -1930,7 +1932,7 @@ public:
 
 		if( n_byte > 0 )
 		{
-			p_lazy = p_lazy->lazy_add( NULL, n_byte, n_start, n );
+			p_lazy = p_lazy->lzy_add( NULL, n_byte, n_start, n );
 			if( !p_lazy )
 				goto szasz;
 			U8 n;
@@ -1951,7 +1953,7 @@ public:
 
 		return p_lazy;
 	}
-	gpcLAZY* lazy_write( const char* p_file, bool b_over = true )
+	gpcLAZY* lzy_write( const char* p_file, bool b_over = true )
 	{
 		if( this ? !n_load : true )
 			return this;
@@ -2000,8 +2002,8 @@ close:
 szasz:
 		return this;
 	}
-	gpcLAZY* lazy_format( U8& n_start, const char* p_format, ... );
-	gpcLAZY* lazy_reqCLOSE( void )
+	gpcLAZY* lzy_format( U8& n_start, const char* p_format, ... );
+	gpcLAZY* lzy_reqCLOSE( void )
 	{
 		if( !this )
 			return this;
@@ -2051,13 +2053,13 @@ public:
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
-		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
+		str.lzy_add( pS, nS+1, aSTRT[0] = -1 );
 		U1* pS0 = str.p_alloc;
 		pS = pS0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
 
-		ix.lazy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		ix.lzy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 
@@ -2085,13 +2087,13 @@ public:
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
-		str.lazy_add( pS, nS+1, aSTRT[0] = -1 );
+		str.lzy_add( pS, nS+1, aSTRT[0] = -1 );
 		U1* pS0 = str.p_alloc;
 		pS = pS0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
 
-		ix.lazy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		ix.lzy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 

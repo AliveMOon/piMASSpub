@@ -184,6 +184,7 @@ char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 
 gpcLAZY gpMASS;
 U1 gpdONEcell[] = " \a ";
+
 gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 {
 	if( !an.x )
@@ -217,6 +218,76 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 	xADD++;
 	return p_fnd;
 }
+U1	gpsSAVEbf[0x1000],
+	gpsSVadr[0x100];
+bool gpcMASS::save( U1* pPATH, U1* pFILE )
+{
+	if( this ? !mapCR.pMAP : true )
+		return false;
+	U4	*pM = mapCR.pMAP,
+		*pC = mapCR.pCOL;
+	gpcLAZY buff;
+	gpcSRC* pSRC;
+	U4 z = mapCR.mapZN44.z;
+	struct passwd *pw = getpwuid(getuid());
+	const char *pHOME = pw->pw_dir;
+	U1 *pA, *pALF = gpsSVadr, *pNUM, *pNX, *pANo, *pLFT, *pRIG;
+	U8 nS = -1, nINS, nSTRT, nADR;
+	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
+	{
+		if( !pM[i] )
+			continue;
+
+		pSRC = SRCfnd( pM[i] );
+		if( !pSRC )
+			continue;
+		pNUM = pALF+gpfALF2STR( (char*)pALF, (i%z)+1 );
+		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
+		buff.lzy_format( nS = -1, "\a %s", gpsSVadr );
+
+		pA = pSRC->pA;
+		if( !pA )
+		{
+			// megszünt a string ideje létrehozni ha van pRES
+			buff.lzy_format( nS = -1, "\a " );
+			continue;
+		}
+		nSTRT = pSRC->iB();
+		pLFT = pA;
+		pRIG = pA+pSRC->nL;
+        pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+		if( !pANo )
+		{
+            pANo = pLFT+gpmNINCS( pLFT, " \t" );
+            buff.lzy_ins( pANo, pRIG-pANo, nS = -1, -1 );
+			continue;
+		}
+		nADR = pNX-gpsSVadr;
+		while( pANo-pA < nSTRT )
+        {
+			buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+
+			pLFT = pANo + nADR;
+			pLFT += gpmNINCS( pLFT, " \t" );
+
+			pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+			if( !pANo )
+				break;
+        }
+		buff.lzy_ins( pLFT, pRIG-pLFT, nS = -1, -1 );
+	}
+	sprintf( (char*)gpsSAVEbf, "%s", pPATH );
+	U8 nUNDO = 0;
+	while( gpfACE((char*)gpsSAVEbf, 4) > -1 )
+	{
+		nUNDO++;
+		sprintf( (char*)gpsSAVEbf, "%s.undo0x%0.4llx", pPATH, nUNDO );
+	}
+	if( nUNDO)
+		rename( (char*)pPATH, (char*)gpsSAVEbf );
+	buff.lzy_write( (char*)pPATH );
+	return false;
+}
 gpcMASS::gpcMASS( const U1* pU, U8 nU )
 {
 	gpmCLR;
@@ -232,7 +303,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 	U4 is, n, id, momLV = 0, mCR, *pMAP;
 	nSP = 1;
-	U4x4 mCR44;
+	U4x4 mpZN;
 	while( pS < pSe ? *pS : false )
 	{
 		tmp.reset( pS, pSe, &pS, aSP44[nSP] );
@@ -251,13 +322,6 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		}
 
 		aSP44[momLV].a4x2[1].mx(  aSP44[nSP].a4x2[0] );
-
-		/*if( aSP44[momLV].z < aSP44[nSP].x )
-				aSP44[momLV].z = aSP44[nSP].x;
-		if( aSP44[momLV].w < aSP44[nSP].y )
-				aSP44[momLV].w = aSP44[nSP].y;*/
-
-
         apSP[nSP] = SRCadd( &tmp, xADD, aSPix[nSP], n );
 
         gpcSRC &spREF = *apSP[nSP];
@@ -265,16 +329,16 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
         {
 			if( !apSP[momLV]->pMAP )
 				apSP[momLV]->pMAP = new gpcMAP;
-			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mCR44, false );
+			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mpZN, false );
         }
         else
-			pMAP = mapCR.MAPalloc( spREF.spcZN, mCR44, false );
+			pMAP = mapCR.MAPalloc( spREF.spcZN, mpZN, false );
 
 		spREF.bMAIN( *this, true );
 
 		if( pMAP )
 		{
-			mCR = spREF.spcZN.x + spREF.spcZN.y*mCR44.z;
+			mCR = spREF.spcZN.x + spREF.spcZN.y*mpZN.z;
 			pMAP[mCR] = xADD; //aSPix[nSP];
 		}
 
@@ -336,7 +400,7 @@ int main( int nA, char *apA[] )
 		}
 		strcpy( gppMASSfile, gpsMASSname );
 		U8 s;
-		gpMASS.lazy_read( gpsMASSpath, s = -1, -1 );
+		gpMASS.lzy_read( gpsMASSpath, s = -1, -1 );
 
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 
@@ -588,8 +652,7 @@ int main( int nA, char *apA[] )
 			{
 				switch( ev.type )
 				{
-					case SDL_MOUSEWHEEL:
-						{
+					case SDL_MOUSEWHEEL: {
 							if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
 							{
 								if( ev.wheel.y )
@@ -661,16 +724,14 @@ int main( int nA, char *apA[] )
 
 							mouseW.x += ev.wheel.x;
 							mouseW.y += ev.wheel.y;
-						}
-						break;
+						} break;
 					case SDL_QUIT:
 						gppKEYbuff = NULL;
 						continue;
 					case SDL_KEYDOWN:
 						aKT[ev.key.keysym.scancode] = ev.key.timestamp|1;
 						break;
-					case SDL_KEYUP:
-						{
+					case SDL_KEYUP: {
 							aKT[ev.key.keysym.scancode] = ev.key.timestamp;
 							aKT[ev.key.keysym.scancode] &= ~1;
 
@@ -695,8 +756,7 @@ int main( int nA, char *apA[] )
 
 							aXY[0] = c = gp_s_key_map_sdl[scan];
 							aXY[1] = gp_s_key_map_sdl[scan+0x10];
-						}
-						break;
+						} break;
 					case SDL_WINDOWEVENT:
 						if( ev.window.event != SDL_WINDOWEVENT_RESIZED )
 							break;
@@ -716,44 +776,49 @@ int main( int nA, char *apA[] )
 					char *pUTF8 = NULL;
 					switch( c )
 					{
-						case ' ':
-							if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
-							{
-								switch( aXY[1] )
+						case ' ': {
+								if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
 								{
-									case 'v':
-									case 'V':
-										// paste
-										gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", SDL_GetClipboardText());
-										aXY[1] = 0;
-										break;
-									case 'c':
-									case 'C':
-										if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
-											SDL_SetClipboardText( (char*)gppKEYbuff );
+									switch( aXY[1] )
+									{
+										case 'v':
+										case 'V':
+											// paste
+											gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", SDL_GetClipboardText());
+											aXY[1] = 0;
+											break;
+										case 'c':
+										case 'C':
+											if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
+												SDL_SetClipboardText( (char*)gppKEYbuff );
 
-										*gppKEYbuff =
-										aXY[1] = 0;
-										break;
-									case 'x':
-									case 'X':
-										if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
-											SDL_SetClipboardText( (char*)gppKEYbuff );
+											*gppKEYbuff = aXY[1] = 0;
+											break;
+										case 'x':
+										case 'X':
+											if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
+												SDL_SetClipboardText( (char*)gppKEYbuff );
 
-										*gppKEYbuff = 0;
-										aXY[1] = 0x7e;
-										break;
+											*gppKEYbuff = 0;
+											aXY[1] = 0x7e;
+											break;
+										case 's':
+										case 'S':
+											// na mencsük ki ami van
+											strcpy( gppMASSfile, gpsMASSname );
+											piMASS->save( (U1*)gpsMASSpath, (U1*)gppMASSfile );
+											*gppKEYbuff =  aXY[1] = 0;
+											break;
+									}
+
 								}
-
-							}
-							if( !aXY[1] )
-								break;
-							*gppKEYbuff = aXY[1];
-							gppKEYbuff++;
-							break;
+								if( !aXY[1] )
+									break;
+								*gppKEYbuff = aXY[1];
+								gppKEYbuff++;
+							} break;
 						// enter tab izé bizé
-						case '/':
-							{
+						case '/': {
 								switch( aXY[1] )
 								{
 									case 'e':
@@ -781,11 +846,9 @@ int main( int nA, char *apA[] )
 										gppKEYbuff += sprintf( (char*)gppKEYbuff, "\r\n" );
 										break;
 								}
-							}
-							break;
+							} break;
 						// cursor nyilak
-						case '_':
-							{
+						case '_': {
 								switch( aXY[1] )
 								{
 									case 'l':
@@ -811,11 +874,9 @@ int main( int nA, char *apA[] )
 										break;
 
 								}
-							}
-							break;
+							} break;
 						// ékezetek ----------------
-						case '\'':
-							{
+						case '\'': {
 								switch( aXY[1] )
 								{
 									case 'A':
@@ -852,64 +913,62 @@ int main( int nA, char *apA[] )
 										pUTF8 = "?";
 								}
 								gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
-							}
-							break;
-						case '\"':
-							switch( aXY[1] )
-							{
-								case 'O':
-									pUTF8 = "\xc5\x90";
-									break;
-								case 'o':
-									pUTF8 = "\xc5\x91";
-									break;
-								case 'U':
-									pUTF8 = "\xc5\xb0";
-									break;
-								case 'u':
-									pUTF8 = "\xc5\xb1";
-									break;
-								default:
-									pUTF8 = "?";
-							}
-							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
-							break;
-						case ':':
-							switch( aXY[1] )
-							{
-								case 'O':
-									pUTF8 = "\xc3\x96";
-									break;
-								case 'o':
-									pUTF8 = "\xc3\xb6";
-									break;
-								case 'U':
-									pUTF8 = "\xc3\x90";
-									break;
-								case 'u':
-									pUTF8 = "\xc3\xbc";
-									break;
-								default:
-									pUTF8 = "?";
-							}
-							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
-							break;
-						case '=':
-							// € izé
-							switch( aXY[1] )
-							{
-								case 'C':
-								case 'c':
-										pUTF8 = "\u20AC";
+							} break;
+						case '\"': {
+								switch( aXY[1] )
+								{
+									case 'O':
+										pUTF8 = "\xc5\x90";
 										break;
-								default:
-									pUTF8 = "?";
-							}
-							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
-							break;
+									case 'o':
+										pUTF8 = "\xc5\x91";
+										break;
+									case 'U':
+										pUTF8 = "\xc5\xb0";
+										break;
+									case 'u':
+										pUTF8 = "\xc5\xb1";
+										break;
+									default:
+										pUTF8 = "?";
+								}
+								gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							}break;
+						case ':': {
+								switch( aXY[1] )
+								{
+									case 'O':
+										pUTF8 = "\xc3\x96";
+										break;
+									case 'o':
+										pUTF8 = "\xc3\xb6";
+										break;
+									case 'U':
+										pUTF8 = "\xc3\x90";
+										break;
+									case 'u':
+										pUTF8 = "\xc3\xbc";
+										break;
+									default:
+										pUTF8 = "?";
+								}
+								gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							} break;
+						case '=': {
+								// € EURO izé
+								switch( aXY[1] )
+								{
+									case 'C':
+									case 'c':
+											pUTF8 = "\u20AC";
+											break;
+									default:
+										pUTF8 = "?";
+								}
+								gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+							} break;
 						case 'f':
-						case 'F':
-							{
+						case 'F': {
 								//------------------------------
 								//
 								// 		PANEL SWITCH
@@ -952,9 +1011,7 @@ int main( int nA, char *apA[] )
 
 									}
 								}
-							}
-
-							break;
+							} break;
 						default:
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );
 					}

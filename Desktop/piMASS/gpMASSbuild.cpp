@@ -213,7 +213,26 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		}
 
 		alf = gpfSTR2ALF( pS, pB, &pS );
+		if( *pS >= '0' && *pS <= '9' )
+		{
+			///! ennek majd ciklusnak kell lenie!
+			///! mélységet lehessen adni
+			if( bSW &= gpeMASSznMSK )
+			{
+				gpfSTR2U8( pS, &pS );
+				continue;
+			}
 
+			spcZN.x = (U4)alf-1;
+			spcZN.y = gpfSTR2U8( pS, &pS );
+			bSW |= gpeMASSznMSK;
+			/*if( spcZN.x )
+				continue;
+			if( !spcZN.y )
+				continue;
+			bSW |= gpeMASSentrMSK;*/
+			continue;
+		}
 		switch( alf )
 		{
 			case gpeALF_SUB:
@@ -243,7 +262,8 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				bSW |= gpeMASScrsrMSK;
 				continue;
 			default:
-					break;
+				pS++;
+				break;
 		}
 	}
 
@@ -297,11 +317,15 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			gpmDELary(pALFtg);
 		gpmDELary(pTGdie);
 	}
-	psHD += sprintf( psHD, "\r\nOFF:0x%0.8x",
+
+	psHD += sprintf(	psHD, "\r\nOFF:0x%0.8x",
 						bOFF );
 	bSW &= bOFF;
 	nHD = nVER;
-	psHD += sprintf( psHD, "\r\nbSW:0x%0.8x",
+	if( bSW&gpeMASSznMSK )
+	if( bSW&gpeMASSentrMSK )
+		bSW &= ~gpeMASSentrMSK;
+	psHD += sprintf( 	psHD, "\r\nbSW:0x%0.8x",
 						bSW );
 	if( psHD > gpsHD )
 		cout << gpsHD;

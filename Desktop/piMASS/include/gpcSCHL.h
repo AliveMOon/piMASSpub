@@ -34,7 +34,7 @@ class gpcCLASS
 
 				U8 s = -1;
 
-				paLZY = paLZY->lazy_add( NULL, nADD*sizeof(pFND), s );
+				paLZY = paLZY->lzy_add( NULL, nADD*sizeof(pFND), s );
 				ppC = NULL;
 				if( paLZY )
 					ppC = (gpcLAZY**)paLZY->p_alloc;
@@ -158,7 +158,7 @@ public:
 
 		U8 s = -1;
 		nALLOC = nLST;
-		pKIDS = pKIDS->lazy_add( NULL, sizeof(*pKIDS), s );*/
+		pKIDS = pKIDS->lzy_add( NULL, sizeof(*pKIDS), s );*/
 		return this;
 	}
 };

@@ -485,7 +485,7 @@ gpcSRC* gpcMASS::SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
 	xFND = xfnd;
 	pFND = new gpcSRC( *pSRC );
 
-	pSRCc = pSRCc->lazy_add( &pFND, sizeof(pFND), s = -1);
+	pSRCc = pSRCc->lzy_add( &pFND, sizeof(pFND), s = -1);
 	return pFND;
 }
 
