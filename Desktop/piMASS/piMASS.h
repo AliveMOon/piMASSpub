@@ -374,7 +374,7 @@ bool inline gpfMKDR( char* p_buff, const char* p_new )
 	}
 	while( p_last < p_first )
 	{
-		*p_last = '\\';
+		*p_last = '/'; // \\';
 		p_last += gpmSTRLEN( p_last );
 		if( gpfACE( p_buff, 0 ) > -1 )
 			break;

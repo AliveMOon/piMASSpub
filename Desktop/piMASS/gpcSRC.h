@@ -997,7 +997,8 @@ public:
 	}
 
 	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
-	bool save( U1* pPATH, U1* pFILE );
+	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME );
+	bool SRCsave( U1* pPATH, U1* pFILE );
 	gpcMASS( const U1* pU, U8 nU );
 	virtual ~gpcMASS();
 	gpcSRC* get( U4 i )

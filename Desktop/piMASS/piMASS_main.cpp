@@ -218,9 +218,126 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 	xADD++;
 	return p_fnd;
 }
-U1	gpsSAVEbf[0x1000],
+
+
+
+
+
+
+
+U1	gpsRENMbf[0x1000],
+	gpsSAVEbf[0x1000],
 	gpsSVadr[0x100];
-bool gpcMASS::save( U1* pPATH, U1* pFILE )
+bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME )
+{
+	if( this ? !mapCR.pMAP : true )
+		return false;
+	U4	*pM = mapCR.pMAP,
+		*pC = mapCR.pCOL;
+	gpcLAZY buff;
+
+
+	gpcSRC* pSRC;
+	U4 z = mapCR.mapZN44.z;
+
+	U1 *pA, *pALF = gpsSVadr, *pNUM, *pNX, *pANo, *pLFT, *pRIG;
+	U8 nS = -1, nINS, iB, nADR;
+	buff.lzy_format( nS = -1,	"<HTML>\r\n"
+								"<HEAD>\r\n"
+								"<TITLE>HTML %s</TITLE>\r\n"
+								"</HEAD><BODY>\r\n"
+								"<TABLE BGCOLOR=#e0e0e0 "
+								"BORDER=0 "
+								"CELLPADDING=0 cellspacing=1 valign=top >\r\n",
+								pNAME
+					);
+	bool bTR = false, bTD = false;
+	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
+	{
+		if( !(i%z) )
+		{
+			buff.lzy_format( nS = -1, "%s<TR>", bTR ? "</TD></TR>\r\n":"" );
+			bTR = true;
+			bTD = false;
+		}
+		bTD = true;
+		if( !pM[i] )
+		{
+			buff.lzy_format( nS = -1, "%s<TD BGCOLOR=%s BORDER=0> ", bTD ? "</TD>" : "", "#ffffff"  );
+			continue;
+		}
+		buff.lzy_format( nS = -1, "%s<TD BGCOLOR=%s BORDER=1> ", bTD ? "</TD>" : "", ((i%z)+(i/z))%2 ? "#bfbfbf":"#afafaf"  );
+
+		pSRC = SRCfnd( pM[i] );
+		if( !pSRC )
+			continue;
+
+		pNUM = pALF+gpfALF2STR( (char*)pALF, (i%z)+1 );
+		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
+		buff.lzy_format( nS = -1, " %s", gpsSVadr );
+
+		pA = pSRC->pA;
+		if( !pA )
+		{
+			// megszünt a string ideje létrehozni ha van pRES
+			buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
+			continue;
+		}
+		iB = pSRC->iB();
+		pLFT = pA;
+		pRIG = pA+pSRC->nL;
+        pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+		if( !pANo )
+		{
+			// nem talált további AN címzést azaz nem kell semmit kihagyni
+            pANo = pLFT+gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
+            buff.lzy_ins( pANo, iB-(pANo-pA), nS = -1, -1 );
+
+			continue;
+		}
+		nADR = pNX-gpsSVadr;
+		while( pANo-pA < iB )
+        {
+			buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+
+			pLFT = pANo + nADR;
+			pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
+
+			pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+			if( !pANo )
+				break;
+        }
+        pLFT = pA+iB+1;
+        buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
+		buff.lzy_ins( pLFT, pRIG-pLFT, nS = -1, -1 );
+	}
+	buff.lzy_format( nS = -1, "</TD></TR></TABLE></BODY>" );
+
+	sprintf( (char*)gpsSAVEbf, "%s%s/", pPATH, pNAME );
+	char* pPNT = strrchr( (char*)gpsSAVEbf, '.' );
+	if( pPNT )
+		strcpy( pPNT, "/" );
+	else
+		pPNT = (char*)(gpsSAVEbf + sprintf( (char*)gpsSAVEbf, "%s/", gpsSAVEbf ));
+
+	strcpy( (char*)gpsRENMbf, (char*)gpsSAVEbf );
+	pPNT = (pPNT-(char*)gpsSAVEbf) + (char*)gpsRENMbf;
+
+	U8 nUNDO = 0;
+	while( gpfACE((char*)gpsRENMbf, 0 ) > -1 )
+	{
+		nUNDO++;
+		sprintf( pPNT, "0x%0.4llx/", nUNDO );
+	}
+
+	if( nUNDO)
+		rename( (char*)gpsSAVEbf, (char*)gpsRENMbf );
+
+	sprintf( (char*)gpsSAVEbf, "%sindex.html", gpsSAVEbf );
+	buff.lzy_write( (char*)gpsSAVEbf );
+	return false;
+}
+bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE )
 {
 	if( this ? !mapCR.pMAP : true )
 		return false;
@@ -231,7 +348,7 @@ bool gpcMASS::save( U1* pPATH, U1* pFILE )
 	U4 z = mapCR.mapZN44.z;
 
 	U1 *pA, *pALF = gpsSVadr, *pNUM, *pNX, *pANo, *pLFT, *pRIG;
-	U8 nS = -1, nINS, nSTRT, nADR;
+	U8 nS = -1, nINS, iB, nADR;
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{
 		if( !pM[i] )
@@ -251,23 +368,25 @@ bool gpcMASS::save( U1* pPATH, U1* pFILE )
 			buff.lzy_format( nS = -1, "\a " );
 			continue;
 		}
-		nSTRT = pSRC->iB();
+		iB = pSRC->iB();
 		pLFT = pA;
 		pRIG = pA+pSRC->nL;
         pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+
 		if( !pANo )
 		{
-            pANo = pLFT+gpmNINCS( pLFT, " \t" );
+			// nem talált további AN címzést azaz nem kell semmit kihagyni
+            pANo = pLFT+gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
             buff.lzy_ins( pANo, pRIG-pANo, nS = -1, -1 );
 			continue;
 		}
 		nADR = pNX-gpsSVadr;
-		while( pANo-pA < nSTRT )
+		while( pANo-pA < iB )
         {
 			buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
 
 			pLFT = pANo + nADR;
-			pLFT += gpmNINCS( pLFT, " \t" );
+			pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
 
 			pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
 			if( !pANo )
@@ -284,7 +403,7 @@ bool gpcMASS::save( U1* pPATH, U1* pFILE )
 	}
 	if( nUNDO)
 		rename( (char*)pPATH, (char*)gpsSAVEbf );
-	buff.lzy_write( (char*)pPATH );
+	buff.lzy_write( (char*)gpsSAVEbf );
 	return false;
 }
 gpcMASS::gpcMASS( const U1* pU, U8 nU )
@@ -818,11 +937,18 @@ int main( int nA, char *apA[] )
 											aXY[1] = 0x7e;
 											break;
 										case 's':
+											strcpy( gppMASSfile, gpsMASSname );
+											piMASS->SRCsave( (U1*)gpsMASSpath, (U1*)gppMASSfile );
+											*gppKEYbuff = aXY[1] = 0;
+											break;
 										case 'S':
 											// na mencsük ki ami van
-											strcpy( gppMASSfile, gpsMASSname );
-											piMASS->save( (U1*)gpsMASSpath, (U1*)gppMASSfile );
-											*gppKEYbuff =  aXY[1] = 0;
+											{
+												char* pFILE = gppMASSfile+sprintf( gppMASSfile, "HTML/" );
+												//strcpy( gppMASSfile, gpsMASSname );
+												piMASS->HTMLsave( (U1*)gpsMASSpath, (U1*)pFILE, (U1*)gpsMASSname );
+											}
+											*gppKEYbuff = aXY[1] = 0;
 											break;
 									}
 
