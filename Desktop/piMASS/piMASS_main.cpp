@@ -293,19 +293,22 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME )
             pANo = pLFT+gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
             buff.lzy_ins( pANo, iB-(pANo-pA), nS = -1, -1 );
 
-			continue;
-		}
-		nADR = pNX-gpsSVadr;
-		while( pANo-pA < iB )
-        {
-			buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+			//continue;
+		} else {
+			nADR = pNX-gpsSVadr;
+			while( pANo-pA < iB )
+			{
+				buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
 
-			pLFT = pANo + nADR;
-			pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
+				pLFT = pANo + nADR;
+				pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
 
-			pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
-			if( !pANo )
-				break;
+				pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+				if( !pANo )
+					break;
+			}
+			if( pLFT-pA < iB )
+				buff.lzy_ins( pLFT, iB-(pLFT-pA), nS = -1, -1 );
         }
         pLFT = pA+iB+1;
         buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
@@ -594,8 +597,9 @@ int main( int nA, char *apA[] )
 							switch( *pE )
 							{
 								case '\v': {
+										//*pE = 0;
 										crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-										//pS = pE+1;
+										pS = pE+1;
 										// tehát ha bent van ki kell lépni a szerkeszttett cellából
 										crs.CRSbEDswitch();
 									} break;
