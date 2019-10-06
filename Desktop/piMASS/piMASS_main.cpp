@@ -228,7 +228,7 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 U1	gpsRENMbf[0x1000],
 	gpsSAVEbf[0x1000],
 	gpsSVadr[0x100];
-bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME )
+bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT )
 {
 	if( this ? !mapCR.pMAP : true )
 		return false;
@@ -274,12 +274,16 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME )
 
 		pNUM = pALF+gpfALF2STR( (char*)pALF, (i%z)+1 );
 		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
+		if( bALT )
 		buff.lzy_format( nS = -1, " %s", gpsSVadr );
 
 		pA = pSRC->pA;
 		if( !pA )
 		{
 			// megszünt a string ideje létrehozni ha van pRES
+			if( bALT )
+				continue;
+
 			buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
 			continue;
 		}
@@ -287,56 +291,89 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME )
 		pLFT = pA;
 		pRIG = pA+pSRC->nL;
         pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
-		if( !pANo )
-		{
-			// nem talált további AN címzést azaz nem kell semmit kihagyni
-            pANo = pLFT+gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
-            buff.lzy_ins( pANo, iB-(pANo-pA), nS = -1, -1 );
 
-			//continue;
-		} else {
-			nADR = pNX-gpsSVadr;
-			while( pANo-pA < iB )
+        if( bALT )
+        {
+			if( !pANo )
 			{
-				buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+				// nem talált további AN címzést azaz nem kell semmit kihagyni
+				pANo = pLFT+gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
+				buff.lzy_ins( pANo, iB-(pANo-pA), nS = -1, -1 );
 
-				pLFT = pANo + nADR;
-				pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
+				//continue;
+			} else {
+				nADR = pNX-gpsSVadr;
+				while( pANo-pA < iB )
+				{
+					buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
 
-				pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
-				if( !pANo )
-					break;
+					pLFT = pANo + nADR;
+					pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
+
+					pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+					if( !pANo )
+						break;
+				}
+				if( pLFT-pA < iB )
+					buff.lzy_ins( pLFT, iB-(pLFT-pA), nS = -1, -1 );
 			}
-			if( pLFT-pA < iB )
-				buff.lzy_ins( pLFT, iB-(pLFT-pA), nS = -1, -1 );
+			buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
         }
         pLFT = pA+iB+1;
-        buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
-		buff.lzy_ins( pLFT, pRIG-pLFT, nS = -1, -1 );
+        bool bBR = true;
+        while( pRIG > pLFT )
+        {
+			if( *pLFT == '\n' )
+			{
+				buff.lzy_format( nS = -1, bBR ? "<BR>" : "\n" );
+				pLFT++;
+				continue;
+			}
+            pANo = pLFT + gpdVAN( (char*)pLFT, "\n<>" );
+            if( *pANo == '<' )
+            {
+				pANo++;
+				bBR = false;
+				buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+				pLFT = pANo;
+				continue;
+            }
+
+			if( *pANo == '>' )
+            {
+				pANo++;
+				bBR = true;
+				buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+				pLFT = pANo;
+				continue;
+            }
+
+			buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+			pLFT = pANo;
+        }
 	}
 	buff.lzy_format( nS = -1, "</TD></TR></TABLE></BODY>" );
 
 	sprintf( (char*)gpsSAVEbf, "%s%s/", pPATH, pNAME );
-	char* pPNT = strrchr( (char*)gpsSAVEbf, '.' );
-	if( pPNT )
-		strcpy( pPNT, "/" );
-	else
-		pPNT = (char*)(gpsSAVEbf + sprintf( (char*)gpsSAVEbf, "%s/", gpsSAVEbf ));
+	char* pPR = strrchr( (char*)gpsSAVEbf, '.' );
+	if( !pPR )
+		pPR = (char*)(gpsSAVEbf + sprintf( (char*)gpsSAVEbf, "%s", gpsSAVEbf ));
+
+	strcpy( pPR, "/index.html");
 
 	strcpy( (char*)gpsRENMbf, (char*)gpsSAVEbf );
-	pPNT = (pPNT-(char*)gpsSAVEbf) + (char*)gpsRENMbf;
+	pPR = (pPR-(char*)gpsSAVEbf) + (char*)gpsRENMbf;
 
 	U8 nUNDO = 0;
 	while( gpfACE((char*)gpsRENMbf, 0 ) > -1 )
 	{
 		nUNDO++;
-		sprintf( pPNT, "0x%0.4llx/", nUNDO );
+		sprintf( pPR, "/index0x%0.4llx.html", nUNDO );
 	}
 
 	if( nUNDO)
 		rename( (char*)gpsSAVEbf, (char*)gpsRENMbf );
 
-	sprintf( (char*)gpsSAVEbf, "%sindex.html", gpsSAVEbf );
 	buff.lzy_write( (char*)gpsSAVEbf );
 	return false;
 }
@@ -406,7 +443,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE )
 	}
 	if( nUNDO)
 		rename( (char*)pPATH, (char*)gpsSAVEbf );
-	buff.lzy_write( (char*)gpsSAVEbf );
+	buff.lzy_write( (char*)pPATH );
 	return false;
 }
 gpcMASS::gpcMASS( const U1* pU, U8 nU )
@@ -534,7 +571,11 @@ int main( int nA, char *apA[] )
 			gpMASS.lzy_read( gpsMASSpath, s = -1, -1 );
 
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
-
+		if( piMASS )
+		if( char* pUND = strcasestr( gpsMASSname, ".undo0x" ) )
+		{
+			*pUND = 0;
+		}
 		strcpy( gppMASSfile, "mini_char.png" ); //bmp" );0
 
 		I4x4 mouseXY(0,0), mouseW(0), winSIZ(800,600,800,600), SRCxycr(0), SRCin(0);
@@ -949,8 +990,9 @@ int main( int nA, char *apA[] )
 											// na mencsük ki ami van
 											{
 												char* pFILE = gppMASSfile+sprintf( gppMASSfile, "HTML/" );
+												bool bALT = ( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) );
 												//strcpy( gppMASSfile, gpsMASSname );
-												piMASS->HTMLsave( (U1*)gpsMASSpath, (U1*)pFILE, (U1*)gpsMASSname );
+												piMASS->HTMLsave( (U1*)gpsMASSpath, (U1*)pFILE, (U1*)gpsMASSname, bALT );
 											}
 											*gppKEYbuff = aXY[1] = 0;
 											break;
