@@ -294,6 +294,81 @@ enum gpeFD
 };
 typedef enum gpeNET4:U4
 {
+	gpcNET4_NULL, // = 0,
+	gpeNET4_U11	= MAKE_ID( 1, 'U', '1', '1' ),
+	gpeNET4_I11	= MAKE_ID( 1, 'I', '1', '1' ),
+
+	gpeNET4_U21	= MAKE_ID( 2, 'U', '2', '1' ),
+	gpeNET4_I21	= MAKE_ID( 2, 'I', '2', '1' ),
+	gpeNET4_H21	= MAKE_ID( 2, 'H', '4', '1' ),
+
+	gpeNET4_U41	= MAKE_ID( 4, 'U', '4', '1' ),
+	gpeNET4_I41	= MAKE_ID( 4, 'I', '4', '1' ),
+	gpeNET4_F41	= MAKE_ID( 4, 'F', '4', '1' ),
+
+	gpeNET4_ALF	= MAKE_ID( 8, 'A', 'L', 'F' ),
+	gpeNET4_U81	= MAKE_ID( 8, 'U', '8', '1' ),
+	gpeNET4_I81	= MAKE_ID( 8, 'I', '8', '1' ),
+	gpeNET4_D81	= MAKE_ID( 8, 'D', '8', '1' ),
+
+	// x2
+	gpeNET4_U12	= MAKE_ID( 2, 'U', '1', '2' ),
+	gpeNET4_I12	= MAKE_ID( 2, 'I', '1', '2' ),
+
+	gpeNET4_U22	= MAKE_ID( 4, 'U', '2', '2' ),
+	gpeNET4_I22	= MAKE_ID( 4, 'I', '2', '2' ),
+	gpeNET4_H22	= MAKE_ID( 4, 'H', '4', '2' ),
+
+	gpeNET4_U42	= MAKE_ID( 8, 'U', '4', '2' ),
+	gpeNET4_I42	= MAKE_ID( 8, 'I', '4', '2' ),
+	gpeNET4_F42	= MAKE_ID( 8, 'F', '4', '2' ),
+
+	gpeNET4_AN	= MAKE_ID( 16, 'U', '8', '2' ),
+	gpeNET4_U82	= MAKE_ID( 16, 'U', '8', '2' ),
+	gpeNET4_I82	= MAKE_ID( 16, 'I', '8', '2' ),
+	gpeNET4_D82	= MAKE_ID( 16, 'D', '8', '2' ),
+
+
+	// x3
+	gpeNET4_RGB	= MAKE_ID( 3, 'R', 'G', 'B' ),
+	gpeNET4_U13	= MAKE_ID( 3, 'U', '1', '3' ),
+	gpeNET4_I13	= MAKE_ID( 3, 'I', '1', '3' ),
+
+	gpeNET4_U23	= MAKE_ID( 6, 'U', '2', '3' ),
+	gpeNET4_I23	= MAKE_ID( 6, 'I', '2', '3' ),
+	gpeNET4_H23	= MAKE_ID( 6, 'H', '4', '3' ),
+
+	gpeNET4_U43	= MAKE_ID( 12, 'U', '4', '3' ),
+	gpeNET4_I43	= MAKE_ID( 12, 'I', '4', '3' ),
+	gpeNET4_F43	= MAKE_ID( 12, 'F', '4', '3' ),
+
+	gpeNET4_U83	= MAKE_ID( 24, 'U', '8', '3' ),
+	gpeNET4_I83	= MAKE_ID( 24, 'I', '8', '3' ),
+	gpeNET4_D83	= MAKE_ID( 24, 'D', '8', '3' ),
+
+	// x4
+	gpeNET4_CLR	= MAKE_ID( 4, 'C', 'L', 'R' ),
+	gpeNET4_U14	= MAKE_ID( 4, 'U', '1', '4' ),
+	gpeNET4_I14	= MAKE_ID( 4, 'I', '1', '4' ),
+
+	gpeNET4_U24	= MAKE_ID( 8, 'U', '2', '4' ),
+	gpeNET4_I24	= MAKE_ID( 8, 'I', '2', '4' ),
+	gpeNET4_H24	= MAKE_ID( 8, 'H', '4', '4' ),
+
+	gpeNET4_U44	= MAKE_ID( 16, 'U', '4', '4' ),
+	gpeNET4_I44	= MAKE_ID( 16, 'I', '4', '4' ),
+	gpeNET4_F44	= MAKE_ID( 16, 'F', '4', '4' ),
+
+	gpeNET4_U84	= MAKE_ID( 32, 'U', '8', '4' ),
+	gpeNET4_I84	= MAKE_ID( 32, 'I', '8', '4' ),
+	gpeNET4_D84	= MAKE_ID( 32, 'D', '8', '4' ),
+
+	gpeNET4_RES = MAKE_ID( 32 //sizeof(gpcRES)
+							, 'R', 'E', 'S' ),
+
+	gpeNET4_MAS = MAKE_ID( sizeof(void*), 'M', 'A', 'S' ),
+
+
 	gpeNET4_0EYE	= MAKE_ID( 0, 'E', 'Y', 'E' ),
 	gpeNET4_0HUD	= MAKE_ID( 0, 'H', 'U', 'D' ),
 	gpeNET4_PREV	= MAKE_ID( 'P', 'R', 'E', 'V' ),
@@ -565,7 +640,17 @@ public:
 class U4x2
 {
 public:
-    U4 x,y;
+	union
+	{
+		struct
+		{
+			U4 x,y;
+		};
+		struct
+		{
+			U1x4 aCLR[2];
+		};
+	};
 
     U4x2(){};
     U4x2( U4 _x, U4 _y = 0 )
@@ -733,6 +818,7 @@ public:
             U4 aXYZW[4];
         };
     };
+
     U4x4(){};
     U4x4& null( void )
 	{

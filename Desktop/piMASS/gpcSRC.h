@@ -444,11 +444,131 @@ I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 		*pp_str = p_str;
 	return i8;
 }
+class gpcRES
+{
+public:
+	union
+	{
+		struct
+		{
+			gpeALF	id;		// 0	8
+			gpeNET4 typ;	// 8	4
+			U4		a,		// 12	4	// ha a == 0 akkor regiszter
+			// dif ---------------
+					n;		// 16	4
+			U8		an;		// 20	8	// chace
+			U1*		pDAT;	// 28	?
+							// 32
+		};
+
+		struct
+		{
+			gpeALF	_id;	// 0	8
+			U1	 	aT[4];	// 8	4
+			U4		_a,		// 12	4	// ha a == 0 akkor regiszter
+			// dif ---------------
+					aU[4]; 	// 16
+							// 32
+		};
+
+	};
+
+	~gpcRES()
+	{
+		null();
+	}
+	gpcRES()
+	{
+		gpmCLR;
+	}
+	gpcRES( U1 u1 )
+	{
+		a = 0;
+		null();
+		typ = gpeNET4_U11;
+		aU[0] = u1;
+	}
+
+	gpcRES& null();
+	gpcRES& operator = ( gpcRES& b );
+
+
+	gpcRES( gpcRES& b )
+	{
+		*this = b;
+
+		return;
+	}
+
+
+	gpcRES& operator = ( gpeALF alf )
+	{
+		null();
+		typ == gpeNET4_ALF;
+		*(I8*)aU = alf;
+		return *this;
+	}
+	gpcRES& operator = ( U8 b )
+	{
+		null();
+		typ == gpeNET4_U81;
+		*(U8*)aU = b;
+		return *this;
+	}
+	gpcRES& operator = ( I8 b )
+	{
+		null();
+		typ == gpeNET4_I81;
+		*(I8*)aU = b;
+		return *this;
+	}
+	gpcRES& operator = ( double b )
+	{
+		null();
+		typ == gpeNET4_D81;
+		*(double*)aU = b;
+		return *this;
+	}
+
+
+};
+class gpcLAY
+{
+public:
+	gpeALF	id;		// 0
+	gpeNET4	typ;	// 8
+	void	*pVOID;	// 12
+	gpcLAY() { gpmCLR; }
+
+	void* pRE( U4 nZ, U4 nN, U4 oz, U4 oy )
+	{
+		if( !this )
+			return NULL;
+
+		void* pKILL = pVOID;
+		nZ *= *(U1*)&typ;
+		oz *= *(U1*)&typ;
+
+		pVOID = (void*)(new U1[nZ*nN]);
+		gpmZn( (U1*)pVOID, nZ*nN );
+
+		for( U1* pS = (U1*)pKILL, *pD = (U1*)pVOID, *pSe = pS+oz*oy ; pS < pSe; pS += oz, pD += nZ  )
+		{
+			gpmMEMCPY( pD, pS, oz );
+		}
+
+		gpmDELary(pKILL);
+		return pVOID;
+	}
+
+};
 class gpcMAP
 {
 public:
-	U4x4	mapZN44;
-	U4*		pMAP, *pCOL, *pROW;
+	U4x4	mapZN44;	// xy load zw alloc
+	U4		*pMAP, *pCOL, *pROW, nLAY;
+	gpcLAY	*pLAY;
+
 	gpcMAP(void)
 	{
 		gpmCLR;
@@ -466,9 +586,9 @@ public:
 			return NULL;
 		}
 
-		if( mapZN44.x < spcZN.x+1 )
+		if( mapZN44.x <= spcZN.x )
 			mapZN44.x = spcZN.x+1;
-		if( mapZN44.y < spcZN.y+1 )
+		if( mapZN44.y <= spcZN.y )
 			mapZN44.y = spcZN.y+1;
 
 		outZN = mapZN44;
@@ -522,7 +642,11 @@ public:
 			}
 			gpmDELary(pK);
 		}
-		outZN =  mapZN44;
+		for( U4 i = 0; i < nLAY; i++ )
+		{
+			pLAY[i].pRE( mapZN44.z, mapZN44.w, outZN.z, outZN.y );
+		}
+		outZN = mapZN44;
 		return pMAP;
 	}
 };
@@ -543,6 +667,7 @@ public:
 			*pRES,
 			*pMINI,
 			*pBIG;
+
 	gpcMAP	*pMAP;
 
 	U4 updt( void )
@@ -999,7 +1124,18 @@ public:
 	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
+
+
+	gpcMASS&	null();
+	gpcMASS&	operator = ( const gpcMASS& b );
+	gpcMASS(){ gpmCLR; }
 	gpcMASS( const U1* pU, U8 nU );
+	gpcMASS( const gpcMASS& b )
+	{
+		*this = b;
+	}
+
+
 	virtual ~gpcMASS();
 	gpcSRC* get( U4 i )
 	{
@@ -1032,6 +1168,8 @@ public:
 	}
 
 	gpcSRC* SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
+
+
 
 };
 

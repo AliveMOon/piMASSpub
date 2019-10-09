@@ -221,15 +221,95 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 
 
 
+gpcRES& gpcRES::null()
+{
+	if( !a )
+	{
+		gpmCLR;
+		return *this;
+	}
 
+	switch( typ )
+	{
+		case gpeNET4_MAS:
+			if( an < 2 )
+				delete (gpcMASS*)pDAT;
+			else
+				delete[] (gpcMASS*)pDAT;
+			break;
+		case gpeNET4_RES:
+			if( an < 2 )
+				delete (gpcRES*)pDAT;
+			else
+				delete[] (gpcRES*)pDAT;
+			break;
+		default:
+			delete[] pDAT;
+	}
+
+	gpmCLR;
+	return *this;
+}
+
+gpcRES& gpcRES::operator = ( gpcRES& b )
+{
+	if( !b.typ )
+		return null();
+
+	memcpy( this, &b, sizeof(b) );
+	if( !a )
+		return *this;
+
+	switch( typ )
+	{
+		case gpeNET4_MAS:
+			return null();
+
+			/// ki van kapcsolva
+			/// MASS
+			if( an < 2 )
+			{
+				pDAT = (U1*)new gpcMASS( *((gpcMASS*)b.pDAT) );
+				return *this;
+			}
+
+			pDAT = (U1*)new gpcMASS[an];
+			for( gpcMASS* pR = (gpcMASS*)pDAT, *pRe = pR+an, *pS = (gpcMASS*)b.pDAT; pR < pRe; pR++, pS++ )
+				*pR = *pS;
+
+			return *this;
+
+		case gpeNET4_RES:
+			if( an < 2 )
+			{
+				pDAT = (U1*)new gpcRES( *((gpcRES*)b.pDAT) );
+				return *this;
+			}
+
+			pDAT = (U1*)new gpcRES[an];
+			for( gpcRES* pR = (gpcRES*)pDAT, *pRe = pR+an, *pS = (gpcRES*)b.pDAT; pR < pRe; pR++, pS++ )
+				*pR = *pS;
+
+			return *this;
+
+		default:
+			if(	!*aT )
+				return null();
+
+			pDAT = new U1[*aT * an];
+			memcpy( pDAT, b.pDAT, *aT * an );
+			return *this;
+	}
+
+	return *this;
+}
 
 
 
 U1	gpsRENMbf[0x1000],
 	gpsSAVEbf[0x1000],
 	gpsSVadr[0x100];
-bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT )
-{
+bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 	if( this ? !mapCR.pMAP : true )
 		return false;
 	U4	*pM = mapCR.pMAP,
@@ -377,8 +457,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT )
 	buff.lzy_write( (char*)gpsSAVEbf );
 	return false;
 }
-bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE )
-{
+bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 	if( this ? !mapCR.pMAP : true )
 		return false;
 	U4	*pM = mapCR.pMAP,
@@ -445,6 +524,28 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE )
 		rename( (char*)pPATH, (char*)gpsSAVEbf );
 	buff.lzy_write( (char*)pPATH );
 	return false;
+}
+
+gpcMASS& gpcMASS::null()
+{
+	if( gpcSRC** ppS = ppSRC() )
+	for( U4 n = pSRCc->n_load/sizeof(U1x4*), i = 0; i < n; i++ )
+	{
+		gpmDEL( ppS[i] );
+	}
+
+	gpmDEL(pSRCc);
+	gpmDEL(pLST);
+
+	gpmCLR;
+	return *this;
+}
+
+gpcMASS& gpcMASS::operator = ( const gpcMASS& b )
+{
+	null();
+
+
 }
 gpcMASS::gpcMASS( const U1* pU, U8 nU )
 {
@@ -513,6 +614,8 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 	}
 }
+
+
 U1	gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
 char gpsMAINpub[0x100], gpsTITLEpub[0x100];
 I8 gpnEVENT = 0;
@@ -614,6 +717,7 @@ int main( int nA, char *apA[] )
         //----------------------------------------------------
         while( gppKEYbuff )
         {
+
 			gpcCRS& crs = apCRS[iDIV] ? *apCRS[iDIV] : main_crs;
 
 			if( (gppKEYbuff != gpsKEYbuff) || nMAG )
