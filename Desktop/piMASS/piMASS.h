@@ -1624,6 +1624,66 @@ public:
 	}
 };
 
+class F4
+{
+public:
+    float x,y,z,w;
+    F4(){};
+    F4( I4 _x, I4 _y, I4 _z, I4 _w )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    F4( float _x, float _y = 0.0, float _z = 0.0, float _w = 0.0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    F4( float* pF )
+    {
+        gpmMEMCPY( this, pF, 1 );
+    }
+    double sum( void ) const
+    {
+        return x+y+z+w;
+    }
+    double sum_xyz( void ) const
+    {
+        return x+y+z;
+    }
+    double qlen( void ) const
+    {
+        return x*x+y*y+z*z+w*w;
+    }
+    double qlen_xyz( void ) const
+    {
+        return x*x+y*y+z*z;
+    }
+    F4 norm_xyz( void ) const
+	{
+        double l = sqrt(qlen_xyz());
+		return F4( x/l, y/l, z/l );
+	}
+	float dot_xyz( F4 b ) const
+	{
+        return x*b.x + y*b.y + z*b.z;
+	}
+    F4 cross_xyz( F4 b ) const
+	{
+		return F4(
+						y * b.z - z * b.y,
+						z * b.x - x * b.z,
+						x * b.y - y * b.x
+				);
+	}
+	F4 operator + ( const F4& b ) const
+	{
+        return F4( x+b.x, y+b.y, z+b.z, w+b.w );
+	}
+	F4 operator - ( const F4& b ) const
+	{
+        return F4( x-b.x, y-b.y, z-b.z, w-b.w );
+	}
+};
+
 class D4
 {
 public:
