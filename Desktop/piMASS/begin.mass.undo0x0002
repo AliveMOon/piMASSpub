@@ -17,14 +17,14 @@ majd elmenetettem a dokumentumot HTML-ben
 
 azt pedig kinyomtattam CHROME-ban pdf-be :)
  b0	   c0	   d0	   e0	   f0	   g0	   h0	   a1	 
-enter enter	  b1	   c1	   d1	 
+enter enter	c b1	   c1	   d1	 
  Trabi
 							. e1	 
  Toyota
 								. f1	 
  Mercedes
 								. g1	   h1	   a2	a1	 
-enter enter	 b2	   
+enter enter	c b2	   
  Kerék c2	  d2	 c2	 <A HREF=20191008_162739.gif><IMG
  SRC=20191008_162739.gif
  ALT=20191008_162739.gif
@@ -38,10 +38,10 @@ enter enter	 b2	 
  ALT=valami1.jpg
  width=140 height=240>
 </A> g2	 e2	 c2	   h2	 e2	 c2	   a3	a1	 
-enter enter	 b3	 b2	   
+enter enter	c b3	 b2	   
  Váz
- c3	 b3	   d3	 b3	   e3	 c3	 c2	   f3	 e2	 c2	   g3	 e2	 c2	   h3	 e2	 c2	   a4	a1	 
-enter enter	 b4	 b2	   
+ c3	 b3	   d3	 b3	   e3	 c3	 c2	   f3	 e2	 c2	   g3	 e2	 c2	   h3	 e2	 c2	   a4	 
+enter enter	  b4	 b2	   
  Hajtás 
  c4	 b3	   d4	 b3	   e4	 c3	 c2	   f4	 e2	 c2	   g4	 e2	 c2	   h4	 e2	 c2	   a5	 
 enter enter	  b5	 b2	   

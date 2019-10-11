@@ -2,6 +2,8 @@
 #define GPCOPCD_H_INCLUDED
 
 #include "gpcSRC.h"
+#include "gpcres.h"
+
 /*enum gpePRG : I2
 {
 	gpePRG_newclass = -1,	//r0
@@ -59,7 +61,7 @@ enum gpeKID:U1
 	gpeKIDn,
 };
 
-#endif // GPCOPCD_H_INCLUDED
+
 class gpcKID
 {
 public:
@@ -236,4 +238,8 @@ public:
 	}
 
 };
+
+
+
+#endif // GPCOPCD_H_INCLUDED
 

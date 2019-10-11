@@ -2,8 +2,9 @@
 #define GPCSRC_H
 
 #include "piMASS.h"
-#include "gpcSCHL.h"
+//#include "gpcSCHL.h"
 #include "gpcOPCD.h"
+#include "gpcres.h"
 
 //#include "gpccrs.h"
 
@@ -444,330 +445,7 @@ I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
 		*pp_str = p_str;
 	return i8;
 }
-class gpcRES
-{
-public:
-	union
-	{
-		struct
-		{
-			gpeALF	id;		// 0	8
-			gpeNET4 typ;	// 8	4
-			U4		a,		// 12	4	// ha a == 0 akkor regiszter
-			// dif ---------------
-					n;		// 16	4
-			U8		an;		// 20	8	// chace
-			U1*		pDAT;	// 28	?
-							// 32
-		};
 
-		struct
-		{
-			gpeALF	_id;	// 0	8
-			U1	 	aT[4];	// 8	4
-			U4		_a,		// 12	4	// ha a == 0 akkor regiszter
-			// dif ---------------
-					aU[4]; 	// 16
-							// 32
-		};
-
-	};
-
-	~gpcRES()
-	{
-		null();
-	}
-	gpcRES()
-	{
-		gpmCLR;
-	}
-	gpcRES( U1 u1 )
-	{
-		a = 0;
-		null();
-		typ = gpeNET4_U11;
-		aU[0] = u1;
-	}
-
-	U8 nDAT( void ) {
-		if( this ? !a : true )
-			return 0;
-		return an * (*aT);
-	}
-	gpcRES& load( U1* pB, U8 nCPY ) {
-		U8 nO = nDAT();
-		if( (nO < nCPY) || (nO > nCPY*2) )
-		{
-			nO = 0;
-			if( an < 2 )
-				delete pDAT;
-			else
-				delete[] pDAT;
-			pDAT = NULL;
-		}
-
-		if( !pDAT )
-			pDAT = new U1[nCPY];
-
-		gpmMEMCPY( pDAT, pB, nCPY );
-		return *this;
-	}
-
-	gpcRES& null();
-	gpcRES& operator = ( gpcRES& b );
-
-
-	gpcRES( gpcRES& b )
-	{
-		*this = b;
-	}
-
-
-	gpcRES& operator = ( gpeALF alf )
-	{
-		null();
-		typ = gpeNET4_ALF;
-		*(I8*)aU = alf;
-		return *this;
-	}
-	gpcRES& operator = ( U8 b )
-	{
-		null();
-		typ = gpeNET4_U81;
-		*(U8*)aU = b;
-		return *this;
-	}
-	gpcRES& operator = ( I8 b )
-	{
-		null();
-		typ = gpeNET4_I81;
-		*(I8*)aU = b;
-		return *this;
-	}
-	gpcRES& operator = ( U1x4 b )
-	{
-		null();
-		typ = gpeNET4_U14;
-		*(U1x4*)aU = b;
-		return *this;
-	}
-	gpcRES& operator = ( double d )
-	{
-		null();
-		typ == gpeNET4_D81;
-		*(double*)aU = d;
-		return *this;
-	}
-	gpcRES& operator = ( const U4x2& b )
-	{
-		null();
-		typ = gpeNET4_U42;
-		*(U4x2*)aU = b;
-		return *this;
-	}
-	gpcRES& operator = ( const U4x4& b )
-	{
-		null();
-		typ = gpeNET4_U44;
-		*(U4x4*)aU = b;
-		return *this;
-	}
-	gpcRES& operator = ( const I4x2& b )
-	{
-		null();
-		typ = gpeNET4_I42;
-		*(I4x2*)aU = b;
-		return *this;
-	}
-	gpcRES& operator = ( const I4x4& b )
-	{
-		null();
-		typ = gpeNET4_I44;
-		*(I4x4*)aU = b;
-		return *this;
-	}
-	gpcRES& operator = ( const F4& b )
-	{
-		null();
-		typ = gpeNET4_I44;
-		*(F4*)aU = b;
-		return *this;
-	}
-
-	gpcRES& equ( gpeALF* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = *pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_ALF;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-	gpcRES& equ( U1* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = (U8)*pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_U11;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-
-	gpcRES& equ( U2* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = (U8)*pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_U21;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-	gpcRES& equ( U4* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = (U8)*pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_U41;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-	gpcRES& equ( U8* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = *pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_U81;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-
-	gpcRES& equ( U1x4* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = *pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_U14;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-	gpcRES& equ( U4x2* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = *pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_U42;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-
-	gpcRES& equ( U4x4* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = *pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_U44;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-
-	gpcRES& equ( I4x2* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = *pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_I42;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-
-	gpcRES& equ( I4x4* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = *pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_I44;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-
-	gpcRES& equ( F4* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a*_n;
-		if( nAN < 2 )
-			return ( nAN ) ? (*this = (F4)*pB) : null();
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_F44;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-	gpcRES& equ( D4* pB, U4 _a, U4 _n ) {
-		U8	nAN = _a * _n;
-
-		load( (U1*)pB, nAN * sizeof(*pB) );
-
-		typ = gpeNET4_D84;
-        a = _a;
-        n = _n;
-        an = nAN;
-
-		return *this;
-	}
-
-};
 class gpcLAY
 {
 public:
@@ -1225,7 +903,165 @@ protected:
 private:
 };
 
+// #include "gpcSCHL.h"
+class gpcCLASS
+{
 
+	gpcLAZY	*paLZY,
+			*pLST, *pFND;
+	I8	nLST, nCLASS,
+		idFND, ixFND;
+
+	gpcLAZY** ppCLASS( I8 ix )
+	{
+		if( ix >= nLST )
+			return NULL;
+
+		gpcLAZY** ppC = NULL;
+		if( paLZY )
+			ppC = (gpcLAZY**)paLZY->p_alloc;
+
+		nCLASS = ppC ? paLZY->n_load/sizeof(pFND) : 0;
+
+		if( nCLASS <= ix )
+		{
+			I8	nALL = paLZY ? paLZY->n_alloc/sizeof(pFND) : 0,
+				nADD;
+			if( nALL <= ix )
+			{
+				nALL = ix+1;
+				nADD = nALL-nCLASS;
+
+				U8 s = -1;
+
+				paLZY = paLZY->lzy_add( NULL, nADD*sizeof(pFND), s );
+				ppC = NULL;
+				if( paLZY )
+					ppC = (gpcLAZY**)paLZY->p_alloc;
+				else
+					return NULL;
+
+				if( !ppC )
+					return NULL;
+
+				gpmZn( ppC+nCLASS, nADD );
+				nCLASS = paLZY->n_load/sizeof(pFND) ;
+			}
+		}
+		return ppC+ix;
+	}
+	gpcCLASS( I8 id )
+	{
+		gpmCLR;
+		I8 n = 0;
+		pLST = pLST->tree_add( id, n );
+		if( !pLST )
+			return;
+
+		nLST = n;
+	}
+public:
+	gpcCLASS( void )
+	{
+		gpmCLR;
+	}
+
+	gpcLAZY* pGET( I8 ix )
+	{
+		if( ix >= nLST )
+			return NULL;
+
+		gpcLAZY** ppC = ppCLASS( ix );
+		if( !ppC )
+			return NULL;
+
+		return *ppC;
+	}
+	gpcLAZY** ppGET( I8 ix )
+	{
+		if( ix >= nLST )
+			return NULL;
+
+		return ppCLASS( ix );
+	}
+
+	I8 fnd( I8 id )
+	{
+		if( id ? !this : true )
+			return nLST;
+
+		if( nLST )
+		if( idFND == id )
+			return ixFND;
+
+		return pLST->tree_fnd(id, nLST);
+	}
+	gpcLAZY* p_fnd( I8 id, I8& ix )
+	{
+		ix = 0;
+		if( id ? !this : true )
+			return NULL;
+		if( !nLST )
+			return 0;
+
+		if( idFND == id )
+		{
+			ix = ixFND;
+			return pFND;
+		}
+
+		ix = pLST->tree_fnd(id, nLST);
+		if(ix >= nLST)
+			return NULL;
+
+		gpcLAZY** ppC = ppCLASS( ix );
+		if( ppC ? !*ppC : true )
+		{
+			ix = nLST;
+			return NULL;
+		}
+
+		ixFND = ix;
+		idFND = id;
+		return pFND = *ppC;
+	}
+	gpcCLASS* add( I8 id, I8& ix, I8& n )
+	{
+		if( !id )
+		{
+			ix = n = (this ? nLST: 0);
+			return this;
+		}
+		if( !this )
+		{
+			gpcCLASS* pSCHL = new gpcCLASS(id); ///
+			ix = 0;
+			n = 1;
+			return pSCHL;
+		}
+
+		ix = pLST->tree_fnd( id, nLST );
+		if( ix < nLST )
+		{
+			n = nLST;
+			return this;
+		}
+
+		pLST = pLST->tree_add(id, nLST);
+		n = nLST;
+		/*if( ix >= nLST ) // is és nLST - ha továbbra is egyenlő akkor nem tudta hozzá adni
+			return this;
+
+		ppCLASS( ix );
+		if( nCLASS > ix )
+			return this;
+
+		U8 s = -1;
+		nALLOC = nLST;
+		pKIDS = pKIDS->lzy_add( NULL, sizeof(*pKIDS), s );*/
+		return this;
+	}
+};
 
 class gpcMASS
 {
