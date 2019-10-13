@@ -336,14 +336,17 @@ public:
 			return *this;
 
 		U1	a16[0x10],
-			* pKILL = a ? pDAT : NULL;
+			*pKILL = NULL;
 		if( !a )
 			memcpy( a16, aU, *aT );
-		else if( xy.x < a && xy.y < n )
-			return *this;
+		else {
+			if( xy.x < a && xy.y < n )
+				return *this;
+			pKILL = pDAT;
+		}
 
 
-		U8	nSRC = a*(*aT),
+		U8	nSRC = a*(*aT),	// ha reg volt akor 0*(*aT) azaz büdös agy ZERO
 			nDST = (xy.x+1)*(*aT),
 			nNEW = nDST*(xy.y+1);
 
@@ -361,10 +364,84 @@ public:
 		an = a*n;
 		return *this;
 	}
+	U8 u8( const U4x2& xy )
+	{
+		U8 o = 0;
+
+		return o;
+	}
+
+	gpcRES& res2u8( void )
+	{
+		/// nincs befejezve
+		if( typ == gpeNET4_RES )
+		{
+			U4	*pA = new U4[a+n],
+				*pN = pA+a;
+			*pA = 1;
+			gpfMEMSET( pA+1, a+n-1, pA, sizeof(*pA) );
+
+			gpcRES* pR = (gpcRES*)pDAT;
+			U8 i = 0;
+			for( U4 y = 0; y < n; y++ )
+			{
+				for( U4 x = 0; x < a; x++, i++ )
+				{
+					if( pR[i].a < 1 )
+						continue;
+
+					if( pA[x] < pR[i].a )
+						pA[x] = pR[i].a;
+
+					if( pN[y] >= pR[i].n )
+						continue;
+
+					pN[y] = pR[i].n;
+				}
+			}
+			U4x4 xyWH = 0;
+			for( i = 0; i < a; i++ )
+				xyWH.z += pA[i];
+			for( i = 0; i < n; i++ )
+				xyWH.w += pN[i];
+			U8	nNEW = xyWH.a4x2[1].area(),
+				*pU8 = new U8[nNEW], iDST = 0, u8;
+			i = 0;
+			for( U4 y = 0, z = xyWH.z; y < n; y++ )
+			{
+				for( U4 x = 0; x < a; x++, i++ )
+				{
+					U4x2& xy = xyWH.a4x2[0];
+					for( xy.y = 0; xy.y < pR[i].n; xy.y++ )
+					for( xy.x = 0; xy.x < pR[i].a; xy.x++ )
+					{
+						pU8[iDST + (xy*U4x2(1,z)) ] = pR[i].u8( xy );
+					}
+				}
+				iDST += z*pN[y];
+			}
+
+
+			delete[] pA;
+		}
+
+		switch( *(U2*)(aT+1) )
+		{
+			case gpeNET2_U8:
+				return *this;
+
+		}
+
+		return *this;
+
+ 	}
 
 	gpcRES& equAN( U4x2 xy, U8 u8 )
 	{
-        EXPAND( xy );
+		if( !typ )
+			*this = (U8)0;
+
+		EXPAND( xy );
 
 		if( !a )
 			return *this = u8;
@@ -375,9 +452,7 @@ public:
 			case gpeNET4_U81:
 				((U8*)pDAT)[yax] = u8;
 				return *this;
-			/*case gpeNET4_U82:
-				((U8x2*)pDAT)[yax] = u8;
-				return *this;*/
+
 			case gpeNET4_U84:
 				((U8x4*)pDAT)[yax] = u8;
 				return *this;
@@ -475,10 +550,20 @@ public:
 				}
 			}
 
+			switch( typ )
+			{
+				case gpeNET4_I81:
+					((I8*)pDAT)[yax] = u8;
+					return *this;
 
+				case gpeNET4_I84:
+					((I8x4*)pDAT)[yax] = u8;
+					return *this;
+			}
 		}
 
-
+		// nem talált neki helyet
+		/// most legyen az egész RES?
 
 
 
