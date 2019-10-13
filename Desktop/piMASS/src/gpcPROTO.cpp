@@ -189,7 +189,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 	}
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
-	bool bABC;
+	bool 	bABC;
 	cout << endl << "ASM:nP:lv tp dc.n iP\r\n";
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )

@@ -420,8 +420,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		else if( !pSTR )
 			nSTR = 0;
 
-		if( pFND )
-		{
+		if( pFND ) {
 		/// -----------------------------
 		/// 		IGEN TALÁLAT
 		/// -----------------------------
@@ -595,8 +594,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			}
 
 		}
-		else if( nSTR )
-		{
+		else if( nSTR ) {
 			/// -----------------------------
 			/// 		NINCS találat VAN string
 			/// -----------------------------
@@ -790,8 +788,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 				pDc = pLEV->pCALL;
 			}
 
-			if( pDot != pLEV->pDot )
-			{
+			if( pDot != pLEV->pDot ) {
 				if( !bENTER )
 					bENTER = true;
 				//if( pDotM ? pDotM->iPC ==  )
@@ -859,8 +856,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 		/// --------------------------------
 
 		c = *pS;
-		if( bABC = gpmbABC(c, gpaALFadd) )
-        {
+		if( bABC = gpmbABC(c, gpaALFadd) ) {
 			// UTF8!
 			nALF = gpfABCnincs( pSTR = pS, pE, nLEN, gpaALFadd );
 			if( !nALF )

@@ -144,8 +144,8 @@ typedef I8			LL;
 
 class float2;
 class float3;
-class float4;
-class float4x4;
+class float4;		// ez a F4 négyes singleP vektor
+class float4x4;		// ja ez itt a matrix lenne
 class D4;
 class U2x4;
 class U4x4;
@@ -691,6 +691,52 @@ public:
 		gpmCLR;
 		return *this;
 	}
+	U4x2& operator += ( U4 u )
+	{
+		x += u;
+		y += u;
+		return *this;
+	}
+	U4x2& operator += ( I4 i )
+	{
+		x += i;
+		y += i;
+		return *this;
+	}
+	U4x2& operator += ( float f )
+	{
+		x += f;
+		y += f;
+		return *this;
+	}
+
+	U4x2& operator -= ( U4 u )
+	{
+		x -= u;
+		y -= u;
+		return *this;
+	}
+	U4x2& operator -= ( I4 i )
+	{
+		x -= i;
+		y -= i;
+		return *this;
+	}
+	U4x2& operator -= ( float f )
+	{
+		x -= f;
+		y -= f;
+		return *this;
+	}
+	U4x2& operator = ( int i )
+	{
+		if( !i )
+			return null();
+
+		x = y = i;
+		return *this;
+	}
+
 	U4x2& operator = ( const I4x2& b );
 
 	U8 operator * (const U4x2& b) const

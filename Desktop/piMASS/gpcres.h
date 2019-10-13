@@ -14,7 +14,7 @@ public:
 		struct
 		{
 			gpeALF	id;		// 0	8
-			gpeNET4 typ;	// 8	4
+			gpeNET4 typ;	// 8	4	// [0] SIZ  [1] UIFD [2][3] SIZxN
 			U4		a,		// 12	4	// ha a == 0 akkor regiszter
 			// dif ---------------
 					n;		// 16	4
@@ -26,7 +26,7 @@ public:
 		struct
 		{
 			gpeALF	_id;	// 0	8
-			U1	 	aT[4];	// 8	4
+			U1	 	aT[4];	// 8	4	// *aT egy elem mérete [1] UIFD [2][3] SIZxN
 			U4		_a,		// 12	4	// ha a == 0 akkor regiszter
 			// dif ---------------
 					aU[4]; 	// 16
@@ -36,7 +36,8 @@ public:
 	};
 
 
-
+	gpcRES(  U1* pS, U1* pE );
+	gpcRES* REScompiAN( U1* pS, U1* pE, U4* pMAP = NULL, gpcLZYdct* pDICT = NULL );
 
 	gpcRES( U1 u1 )
 	{
@@ -65,8 +66,10 @@ public:
 
 		if( !pDAT )
 			pDAT = new U1[nCPY];
-
-		gpmMEMCPY( pDAT, pB, nCPY );
+		if( !pB )
+			gpmZn( pDAT, nCPY );
+		else
+			gpmMEMCPY( pDAT, pB, nCPY );
 		return *this;
 	}
 
@@ -321,6 +324,166 @@ public:
         a = _a;
         n = _n;
         an = nAN;
+
+		return *this;
+	}
+
+
+
+	gpcRES& EXPAND( const U4x2& xy )
+	{
+		if( !xy.sum() )
+			return *this;
+
+		U1	a16[0x10],
+			* pKILL = a ? pDAT : NULL;
+		if( !a )
+			memcpy( a16, aU, *aT );
+		else if( xy.x < a && xy.y < n )
+			return *this;
+
+
+		U8	nSRC = a*(*aT),
+			nDST = (xy.x+1)*(*aT),
+			nNEW = nDST*(xy.y+1);
+
+		pDAT = new U1[nNEW];
+		gpmZn(pDAT,nNEW);
+
+		if( !nSRC )
+			memcpy( pDAT, a16, *aT );
+		else for( U1* pS = pKILL, *pD = pDAT, *pSe = pS + nSRC*n; pS < pSe; pS += nSRC, pD += nDST )
+				gpmMEMCPY( pD, pS, nSRC );
+
+
+		a = xy.x+1;
+		n = xy.y+1;
+		an = a*n;
+		return *this;
+	}
+
+	gpcRES& equAN( U4x2 xy, U8 u8 )
+	{
+        EXPAND( xy );
+
+		if( !a )
+			return *this = u8;
+
+		U8 yax = ((U8)xy.y)*a + xy.x;
+        switch( typ )
+        {
+			case gpeNET4_U81:
+				((U8*)pDAT)[yax] = u8;
+				return *this;
+			/*case gpeNET4_U82:
+				((U8x2*)pDAT)[yax] = u8;
+				return *this;*/
+			case gpeNET4_U84:
+				((U8x4*)pDAT)[yax] = u8;
+				return *this;
+
+
+			case gpeNET4_D81:
+				((double*)pDAT)[yax] = u8;
+				return *this;
+			case gpeNET4_RES:
+				((gpcRES*)pDAT)[yax] = u8;
+				return *this;
+		}
+											//0011223344556677
+		if( u8 < 							0x8000000000000000 )
+		{
+			if( u8 < 						0x100000000 )
+			{
+				if( u8 < 					0x80000000 )
+				{
+					if( u8 < 				0x10000 )
+					{
+						if( u8 < 			0x8000 )
+						{
+							if( u8 < 		0x100 )
+							{
+								if( u8 < 	0x80 )
+								{
+									switch( typ )
+									{
+										case gpeNET4_I11:
+											((I1*)pDAT)[yax] = u8;
+											return *this;
+										/*case gpeNET4_I14:
+											((I14*)pDAT)[yax] = u8;
+											return *this;*/
+									}
+								}
+
+								switch( typ )
+								{
+									case gpeNET4_U11:
+										((U1*)pDAT)[yax] = u8;
+										return *this;
+									case gpeNET4_U14:
+										((U1x4*)pDAT)[yax] = u8; // ez jó mert 0x100 nál kissebb azaz kitörli a többit
+										return *this;
+								}
+							}
+							switch( typ )
+							{
+								case gpeNET4_I21:
+									((I2*)pDAT)[yax] = u8;
+									return *this;
+							}
+						}
+						switch( typ )
+						{
+							case gpeNET4_U21:
+								((U2*)pDAT)[yax] = u8;
+								return *this;
+						}
+					}
+
+					switch( typ )
+					{
+						case gpeNET4_I41:
+							((I4*)pDAT)[yax] = u8;
+							return *this;
+						case gpeNET4_I42:
+							((I4x2*)pDAT)[yax] = u8;
+							return *this;
+						case gpeNET4_I44:
+							((I4x4*)pDAT)[yax] = u8;
+							return *this;
+					}
+				}
+
+				switch( typ )
+				{
+					case gpeNET4_U41:
+						((U4*)pDAT)[yax] = u8;
+						return *this;
+					case gpeNET4_U42:
+						((U4x2*)pDAT)[yax] = u8;
+						return *this;
+					case gpeNET4_U44:
+						((U4x4*)pDAT)[yax] = (U4)u8;
+						return *this;
+					case gpeNET4_F41:
+						((float*)pDAT)[yax] = u8;
+						return *this;
+					case gpeNET4_F44:
+						((F4*)pDAT)[yax] = u8;
+						return *this;
+				}
+			}
+
+
+		}
+
+
+
+
+
+
+
 
 		return *this;
 	}
