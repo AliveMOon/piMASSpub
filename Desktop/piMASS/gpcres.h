@@ -364,73 +364,94 @@ public:
 		an = a*n;
 		return *this;
 	}
-	U8 u8( const U4x2& xy )
+	U8 u8( U4x2 xy )
 	{
 		U8 o = 0;
-
+		if( typ != gpeNET4_RES )
+		{
+			o = *(U8*)aU;
+		}
 		return o;
 	}
+	U4x2 WH( void )
+	{
+		if( typ != gpeNET4_RES )
+			return U4x2( a, n );
 
+		U4	*pA = new U4[a+n],
+			*pN = pA+a;
+		*pA = 1;
+		gpfMEMSET( pA+1, a+n-1, pA, sizeof(*pA) );
+		gpcRES* pR = (gpcRES*)pDAT;
+		U8 i = 0;
+		U4x2 wh;
+		for( U4 y = 0; y < n; y++ )
+		{
+			for( U4 x = 0; x < a; x++, i++ )
+			{
+				wh = pR[i].WH();
+				if( wh.x < 1 )
+					continue;
+
+				if( pA[x] < wh.x )
+					pA[x] = wh.x;
+
+				if( pN[y] >= wh.y )
+					continue;
+
+				pN[y] = wh.y;
+			}
+		}
+		wh = 0;
+		for( i = 0; i < a; i++ )
+			wh.x += pA[i];
+		for( i = 0; i < n; i++ )
+			wh.y += pN[i];
+
+		delete[] pA;
+
+		return wh;
+	}
 	gpcRES& res2u8( void )
 	{
 		/// nincs befejezve
 		if( typ == gpeNET4_RES )
 		{
-			U4	*pA = new U4[a+n],
-				*pN = pA+a;
-			*pA = 1;
-			gpfMEMSET( pA+1, a+n-1, pA, sizeof(*pA) );
-
 			gpcRES* pR = (gpcRES*)pDAT;
 			U8 i = 0;
-			for( U4 y = 0; y < n; y++ )
-			{
-				for( U4 x = 0; x < a; x++, i++ )
-				{
-					if( pR[i].a < 1 )
-						continue;
+			U4x2 	wh = WH(),
+					xy;
 
-					if( pA[x] < pR[i].a )
-						pA[x] = pR[i].a;
-
-					if( pN[y] >= pR[i].n )
-						continue;
-
-					pN[y] = pR[i].n;
-				}
-			}
-			U4x4 xyWH = 0;
-			for( i = 0; i < a; i++ )
-				xyWH.z += pA[i];
-			for( i = 0; i < n; i++ )
-				xyWH.w += pN[i];
-			U8	nNEW = xyWH.a4x2[1].area(),
-				*pU8 = new U8[nNEW], iDST = 0, u8;
+			U8	nNEW = wh.area(),
+				*pU8 = new U8[nNEW], iDST = 0;
 			i = 0;
-			for( U4 y = 0, z = xyWH.z; y < n; y++ )
+			for( U4 y = 0, whx = wh.x, hy = 1; y < n; y++ )
 			{
 				for( U4 x = 0; x < a; x++, i++ )
 				{
-					U4x2& xy = xyWH.a4x2[0];
-					for( xy.y = 0; xy.y < pR[i].n; xy.y++ )
-					for( xy.x = 0; xy.x < pR[i].a; xy.x++ )
+					wh = pR[i].WH();
+					if( hy < wh.y )
+						hy = wh.y;
+					for( xy.y = 0; xy.y < wh.y; xy.y++ )
+					for( xy.x = 0; xy.x < wh.x; xy.x++ )
 					{
-						pU8[iDST + (xy*U4x2(1,z)) ] = pR[i].u8( xy );
+						pU8[iDST+(xy*U4x2(1,whx))] = pR[i].u8( xy );
 					}
 				}
-				iDST += z*pN[y];
+				iDST += whx*hy;
+				hy = 1;
 			}
+			null();
 
+			typ = gpeNET4_U81;
+			a = wh.x;
+			n = wh.x;
+			an = a*n;
+			pDAT = (U1*)pU8;
 
-			delete[] pA;
+			delete[] pR;
 		}
 
-		switch( *(U2*)(aT+1) )
-		{
-			case gpeNET2_U8:
-				return *this;
-
-		}
 
 		return *this;
 
