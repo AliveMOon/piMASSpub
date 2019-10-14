@@ -577,8 +577,9 @@ public:
     U4		IX, retIX, nALFtg, strtD, endD;
 
     gpeALF	*pALFtg;
+    gpcRES	*aRES[4];
 	gpcLAZY	*pEXE,
-			*pRES,
+			//*pRES,
 			*pMINI,
 			*pBIG;
 
@@ -1193,13 +1194,19 @@ public:
 		pLZY->n_load = nKID*sizeof(iKID);
 	}
 
+	/// gpcMASS:: find in main.cpp
 	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
+	gpcMASS& justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, U4 iED );
 
 
 	gpcMASS&	null();
 	gpcMASS&	operator = ( const gpcMASS& b );
+	/// -------------------
+
+
+
 	gpcMASS(){ gpmCLR; }
 	gpcMASS( const U1* pU, U8 nU );
 	gpcMASS( const gpcMASS& b )

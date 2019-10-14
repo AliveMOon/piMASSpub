@@ -10,6 +10,8 @@ class gpcRES;
 enum gpeTYP:U4
 {
 	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+	gpeTYP_U1 = MAKE_ID( 0x00, 0, 0, 0 ),
+	gpeTYP_U4 = MAKE_ID( 0x02, 0, 0, 0 ),
 	gpeTYP_I4 = MAKE_ID( 0x82, 0, 0, 0 ),
 };
 
@@ -116,7 +118,8 @@ public:
 	{
 		null();
 	}
-	gpcRES* compiAN( U1* pS, U1* pE, gpcLZYdct* pDICT = NULL );
+	gpcRES* compiEASY( U1* pS, U1* pE, gpcRES* pMOM );
+	gpcRES* compiHARD( U1* pS, U1* pE, gpcRES* pMOM );
 
 	gpcIS* pGET( U4 _i )
 	{

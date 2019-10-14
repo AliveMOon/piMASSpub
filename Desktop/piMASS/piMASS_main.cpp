@@ -490,6 +490,63 @@ gpcMASS& gpcMASS::null()
 	return *this;
 }
 
+gpcMASS& gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, U4 iED )
+{
+	U1* pKEYbuff = sKEYbuff;
+	gpcSRC	tmp, *pSRC;
+	U4 xFND;
+	if( U4 *pM = mass.mapCR.pMAP )
+	if( U4 *pC = mass.mapCR.pCOL )
+	if( U4 *pR = mass.mapCR.pROW )
+	if( pM < pC )
+	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
+	{
+		if( !pM[i] )
+			continue;
+
+		xFND = pM[i];
+		pSRC = SRCfnd( xFND );
+		if( !pSRC )
+			continue;
+
+		if( !pSRC->qBLD() )
+		{
+			if( !pSRC->aRES[3] )
+			{
+				pSRC->aRES[3] = pSRC->aRES[3]->compiEASY( pSRC->pSRCstart(), NULL, NULL );
+				//gpmDEL( pSRC->aRES[2] ); // OFF? 2
+				if( pSRC->aRES[3] )
+				{
+					//gpmDEL( pSRC->aRES[2] ); // OFF? 1
+					if( pSRC->aRES[2] )
+					{
+						gpmDEL( pSRC->aRES[1] ); // OFF 0
+						if( pSRC->aRES[1] )
+						{
+							gpmDEL( pSRC->aRES[0] );
+							pSRC->aRES[0] = pSRC->aRES[1];
+						}
+
+
+						pSRC->aRES[1] = pSRC->aRES[2];
+					}
+					pSRC->aRES[2] = pSRC->aRES[3];
+				}
+				pSRC->aRES[3] = NULL;
+			}
+		}
+
+		if( !pSRC->aRES[2] )
+			continue;	// ha nincsen 2 nem sikerült az építés
+
+		// egyébként meg kell probálni futatni
+		//pSRC->aRES[2]->run();
+
+	}
+
+	return pKEYbuff;
+}
+
 gpcMASS& gpcMASS::operator = ( const gpcMASS& b )
 {
 	null();
@@ -786,8 +843,11 @@ int main( int nA, char *apA[] )
 			}
 
 
-			gppMOUSEbuff = gppKEYbuff = gpsKEYbuff;
 			nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
+
+			gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( gpsKEYbuff, mouseXY,  );
+
+
 			if(
 				(
 					nMOV =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos

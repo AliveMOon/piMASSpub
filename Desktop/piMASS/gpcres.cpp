@@ -13,16 +13,22 @@ gpcIS::~gpcIS()
 	null();
 }
 
-gpcRES* gpcRES::compiAN( U1* pS, U1* pE, gpcLZYdct* pDICT )
+gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pMOM )
 {
+	if( pE )
+	if( pS >= pE )
+		return this;
+
 	if( !this )
 	{
 		gpcRES* pTHIS = new gpcRES;
 		if( !this )
 			return NULL;
 
-		return pTHIS->compiAN( pS, pE, pDICT );
+		return pTHIS->compiEASY( pS, pE, pMOM );
 	}
+	if( !pE )
+		pE = pS+strlen(pS);
 	null();
 	U4x4 xyWH = 0;
 	U4 deep = 0;
