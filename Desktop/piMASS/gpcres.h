@@ -5,8 +5,213 @@
 #include "gpcSCHL.h"
 #include "gpcOPCD.h"
 #include "gpcSRC.h"
+class gpcRES;
+
+class gpcIS
+{
+	gpcRES* pMOM;
+public:
+	void*	pDAT;
+	gpeALF 	alf;
+	U1x4	typ;
+	U4x4	AN;
+
+	gpcIS( gpcRES* pM = NULL );
+	~gpcIS();
+
+	gpcIS( const gpcIS& b )
+	{
+		gpmCLR;
+		*this = b;
+	}
+	gpcIS& null( void )
+	{
+        if( pMOM ? pDAT : NULL )
+			delete[] pDAT;
+
+        gpmCLR;
+	}
+	U4 nALL()
+	{
+		AN.z = AN.a4x2[0].area();
+		if( !typ.w )
+			typ.w = typ.area_yz()*(typ.x&0xf);
+
+		AN.w = AN.z;
+		if( typ.w > 1 )
+			AN.w *= typ.w;
+
+		return AN.w;
+	}
+	gpcIS& operator = ( const gpcIS& b )
+	{
+		if( this == &b )
+			return *this;
+
+		null();
+
+		if( !&b )
+			return *this;
+
+        gpmMEMCPY( this, &b, sizeof(*this) );
+		pMOM = NULL;
+		if( !pDAT )
+		{
+			return *this;
+		}
+
+		pDAT = new U1[nALL()];
+        memcpy( pDAT, b.pDAT, AN.w );
+
+        return *this;
+	}
+
+};
 
 class gpcRES
+{
+	gpeALF	*pID;
+	U1x4	*pTYP;
+	U4x4	*pAN;
+	U8x4	*pTREE;
+	U4		*pTx;
+	void**	ppDAT;
+	U4		n, t, i, ig;
+	gpcIS*	pIS;
+
+public:
+	gpcRES()
+	{
+        gpmCLR;
+	}
+	gpcIS* pGET( U4 _i )
+	{
+		if( this ? (_i >= n) : true )
+			return NULL;
+
+		if( !pIS )
+		{
+			pIS = new gpcIS( this );
+			if( !pIS )
+				return NULL;
+		}
+
+		if( ppDAT ? ppDAT[_i] : NULL )
+		if( pIS->pDAT == ppDAT[_i] )
+		{
+			return pIS;
+		}
+
+		pIS->alf	= pID ? pID[_i] : gpeALF_null;
+		pIS->typ	= pTYP ? pTYP[_i] : 0;
+		pIS->AN 	= pAN ? pAN[_i] : 0;
+		pIS->pDAT	= ppDAT ? ppDAT[_i] : NULL;
+
+		return pIS;
+	}
+    U4 iGET( gpeALF alf )
+    {
+		if( !this )
+			return 0;
+
+		if( !n )
+			return n;
+
+		if( i < n )
+		if( pID[i] == alf )
+			return i;
+
+		ig = n;
+		if( pTREE )
+		{
+			ig = pTREE->tree_fnd( alf, t );
+			if( ig < t )
+				return i = pTx[ig];
+
+			for( U4 j = 0, x; j < n; j++ )
+			{
+				if( !pID[j] )
+					continue;
+
+				if( ig >= n )
+				if( pID[j] == alf )
+				{
+					// azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
+					pTx[t] = ig = j;
+					x = pTREE->tree_fnd( pID[j], t );
+					if( x >= t )
+						t = pTREE->tree_add( pID[j], t );		// nem volt benne a listában
+					break;
+				}
+
+				x = pTREE->tree_fnd( pID[j], t );
+				if( x < t )
+					continue;
+
+				pTx[t] = j;
+				t = pTREE->tree_add( pID[j], t );
+			}
+
+			if( ig < n )
+				i = ig;	// megtalálta a ciklusban
+
+			return ig;
+		}
+
+		pTREE	= new U8x4[n];
+		pTx		= new U4[n];
+		gpmZn( pTREE, n );
+		t = 0;
+		for( U4 j = 0; j < n; j++ )
+		{
+			if( !pID[j] )
+				continue;
+
+			if( ig >= n )
+			if( pID[j] == alf )
+			{
+				pTx[t] = ig = j;
+				t = pTREE->tree_add( pID[j], t );
+				break; // azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
+			}
+
+			pTx[t] = j;
+			t = pTREE->tree_add( pID[j], t );
+
+		}
+		if( ig < n )
+			i = ig;	// megtalálta a ciklusban
+
+		return ig;
+
+
+
+    }
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class gpcREStrs
 {
 public:
 	union
@@ -36,10 +241,10 @@ public:
 	};
 
 
-	gpcRES(  U1* pS, U1* pE );
-	gpcRES* REScompiAN( U1* pS, U1* pE, U4* pMAP = NULL, gpcLZYdct* pDICT = NULL );
+	gpcREStrs(  U1* pS, U1* pE );
+	gpcREStrs* REScompiAN( U1* pS, U1* pE, U4* pMAP = NULL, gpcLZYdct* pDICT = NULL );
 
-	gpcRES( U1 u1 )
+	gpcREStrs( U1 u1 )
 	{
 		a = 0;
 		null();
@@ -52,7 +257,7 @@ public:
 			return 0;
 		return an * (*aT);
 	}
-	gpcRES& load( U1* pB, U8 nCPY ) {
+	gpcREStrs& load( U1* pB, U8 nCPY ) {
 		U8 nO = nDAT();
 		if( (nO < nCPY) || (nO > nCPY*2) )
 		{
@@ -73,81 +278,81 @@ public:
 		return *this;
 	}
 
-	gpcRES& null();
-	gpcRES& operator = ( const gpcRES& b );
+	gpcREStrs& null();
+	gpcREStrs& operator = ( const gpcREStrs& b );
 
-	~gpcRES();
-	gpcRES();
-	gpcRES( const gpcRES& b )
+	~gpcREStrs();
+	gpcREStrs();
+	gpcREStrs( const gpcREStrs& b )
 	{
 		*this = b;
 	}
 
 
-	gpcRES& operator = ( gpeALF alf )
+	gpcREStrs& operator = ( gpeALF alf )
 	{
 		null();
 		typ = gpeNET4_ALF;
 		*(I8*)aU = alf;
 		return *this;
 	}
-	gpcRES& operator = ( U8 b )
+	gpcREStrs& operator = ( U8 b )
 	{
 		null();
 		typ = gpeNET4_U81;
 		*(U8*)aU = b;
 		return *this;
 	}
-	gpcRES& operator = ( I8 b )
+	gpcREStrs& operator = ( I8 b )
 	{
 		null();
 		typ = gpeNET4_I81;
 		*(I8*)aU = b;
 		return *this;
 	}
-	gpcRES& operator = ( U1x4 b )
+	gpcREStrs& operator = ( U1x4 b )
 	{
 		null();
 		typ = gpeNET4_U14;
 		*(U1x4*)aU = b;
 		return *this;
 	}
-	gpcRES& operator = ( double d )
+	gpcREStrs& operator = ( double d )
 	{
 		null();
 		typ == gpeNET4_D81;
 		*(double*)aU = d;
 		return *this;
 	}
-	gpcRES& operator = ( const U4x2& b )
+	gpcREStrs& operator = ( const U4x2& b )
 	{
 		null();
 		typ = gpeNET4_U42;
 		*(U4x2*)aU = b;
 		return *this;
 	}
-	gpcRES& operator = ( const U4x4& b )
+	gpcREStrs& operator = ( const U4x4& b )
 	{
 		null();
 		typ = gpeNET4_U44;
 		*(U4x4*)aU = b;
 		return *this;
 	}
-	gpcRES& operator = ( const I4x2& b )
+	gpcREStrs& operator = ( const I4x2& b )
 	{
 		null();
 		typ = gpeNET4_I42;
 		*(I4x2*)aU = b;
 		return *this;
 	}
-	gpcRES& operator = ( const I4x4& b )
+	gpcREStrs& operator = ( const I4x4& b )
 	{
 		null();
 		typ = gpeNET4_I44;
 		*(I4x4*)aU = b;
 		return *this;
 	}
-	gpcRES& operator = ( const F4& b )
+	gpcREStrs& operator = ( const F4& b )
 	{
 		null();
 		typ = gpeNET4_I44;
@@ -155,7 +360,7 @@ public:
 		return *this;
 	}
 
-	gpcRES& equ( gpeALF* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( gpeALF* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = *pB) : null();
@@ -169,7 +374,7 @@ public:
 
 		return *this;
 	}
-	gpcRES& equ( U1* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( U1* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = (U8)*pB) : null();
@@ -184,7 +389,7 @@ public:
 		return *this;
 	}
 
-	gpcRES& equ( U2* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( U2* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = (U8)*pB) : null();
@@ -198,7 +403,7 @@ public:
 
 		return *this;
 	}
-	gpcRES& equ( U4* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( U4* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = (U8)*pB) : null();
@@ -212,7 +417,7 @@ public:
 
 		return *this;
 	}
-	gpcRES& equ( U8* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( U8* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = *pB) : null();
@@ -227,7 +432,7 @@ public:
 		return *this;
 	}
 
-	gpcRES& equ( U1x4* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( U1x4* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = *pB) : null();
@@ -241,7 +446,7 @@ public:
 
 		return *this;
 	}
-	gpcRES& equ( U4x2* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( U4x2* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = *pB) : null();
@@ -256,7 +461,7 @@ public:
 		return *this;
 	}
 
-	gpcRES& equ( U4x4* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( U4x4* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = *pB) : null();
@@ -271,7 +476,7 @@ public:
 		return *this;
 	}
 
-	gpcRES& equ( I4x2* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( I4x2* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = *pB) : null();
@@ -286,7 +491,7 @@ public:
 		return *this;
 	}
 
-	gpcRES& equ( I4x4* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( I4x4* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = *pB) : null();
@@ -301,7 +506,7 @@ public:
 		return *this;
 	}
 
-	gpcRES& equ( F4* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( F4* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a*_n;
 		if( nAN < 2 )
 			return ( nAN ) ? (*this = (F4)*pB) : null();
@@ -315,7 +520,7 @@ public:
 
 		return *this;
 	}
-	gpcRES& equ( D4* pB, U4 _a, U4 _n ) {
+	gpcREStrs& equ( D4* pB, U4 _a, U4 _n ) {
 		U8	nAN = _a * _n;
 
 		load( (U1*)pB, nAN * sizeof(*pB) );
@@ -330,7 +535,7 @@ public:
 
 
 
-	gpcRES& EXPAND( const U4x2& xy )
+	gpcREStrs& EXPAND( const U4x2& xy )
 	{
 		if( !xy.sum() )
 			return *this;
@@ -364,15 +569,7 @@ public:
 		an = a*n;
 		return *this;
 	}
-	U8 u8( U4x2 xy )
-	{
-		U8 o = 0;
-		if( typ != gpeNET4_RES )
-		{
-			o = *(U8*)aU;
-		}
-		return o;
-	}
+
 	U4x2 WH( void )
 	{
 		if( typ != gpeNET4_RES )
@@ -382,7 +579,7 @@ public:
 			*pN = pA+a;
 		*pA = 1;
 		gpfMEMSET( pA+1, a+n-1, pA, sizeof(*pA) );
-		gpcRES* pR = (gpcRES*)pDAT;
+		gpcREStrs* pR = (gpcREStrs*)pDAT;
 		U8 i = 0;
 		U4x2 wh;
 		for( U4 y = 0; y < n; y++ )
@@ -412,12 +609,22 @@ public:
 
 		return wh;
 	}
-	gpcRES& res2u8( void )
+	U8 u8( U4x2 xy )
+	{
+		U8 o = 0;
+
+		if( typ != gpeNET4_RES )
+		{
+			o = *(U8*)aU;
+		}
+		return o;
+	}
+	gpcREStrs& res2u8( void )
 	{
 		/// nincs befejezve
 		if( typ == gpeNET4_RES )
 		{
-			gpcRES* pR = (gpcRES*)pDAT;
+			gpcREStrs* pR = (gpcREStrs*)pDAT;
 			U8 i = 0;
 			U4x2 	wh = WH(),
 					xy;
@@ -457,7 +664,7 @@ public:
 
  	}
 
-	gpcRES& equAN( U4x2 xy, U8 u8 )
+	gpcREStrs& equAN( U4x2 xy, U8 u8 )
 	{
 		if( !typ )
 			*this = (U8)0;
@@ -483,7 +690,7 @@ public:
 				((double*)pDAT)[yax] = u8;
 				return *this;
 			case gpeNET4_RES:
-				((gpcRES*)pDAT)[yax] = u8;
+				((gpcREStrs*)pDAT)[yax] = u8;
 				return *this;
 		}
 											//0011223344556677
@@ -595,12 +802,12 @@ public:
 	}
 
 };
-/*class gpcRES
+/*class gpcREStrs
 {
 	public:
-		gpcRES();
-		virtual ~gpcRES();
-		gpcRES& operator=(const gpcRES& other);
+		gpcREStrs();
+		virtual ~gpcREStrs();
+		gpcREStrs& operator=(const gpcREStrs& other);
 
 	protected:
 

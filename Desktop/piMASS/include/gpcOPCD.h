@@ -44,7 +44,7 @@ public:
 	double	d;
 	gpcOPCD(){};
 	//gpcOPCD( const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t );
-	gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t, gpeALF df = gpeALF_zero );
+	gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8 u, double _d, gpeALF t, gpeALF df = gpeALF_null );
 
 	gpcOPCD& null()
 	{

@@ -90,7 +90,7 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 	{
 		if( ppS )
 			*ppS = p_end;
-		return gpeALF_zero;
+		return gpeALF_null;
 	}
 
 	if( pS ? !*pS : true )
@@ -98,7 +98,7 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 		if( ppS )
 			*ppS = pS;
 
-		return gpeALF_zero;
+		return gpeALF_null;
 	}
 
 	U8 alf = 0;
@@ -185,7 +185,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				if( pTGpub[i] != alf )
 					continue;
 
-				alf = gpeALF_zero;
+				alf = gpeALF_null;
 				break;
   			}
   			if( alf < gpeALF_A )

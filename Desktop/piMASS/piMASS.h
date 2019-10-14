@@ -382,7 +382,7 @@ typedef enum gpeNET4:U4
 	gpeNET4_I84	= MAKE_ID( 32, 'I', '8', '4' ),
 	gpeNET4_D84	= MAKE_ID( 32, 'D', '8', '4' ),
 
-	gpeNET4_RES = MAKE_ID( 32 //sizeof(gpcRES)
+	gpeNET4_RES = MAKE_ID( 32 //sizeof(gpcREStrs)
 							, 'R', 'E', 'S' ),
 
 	gpeNET4_MAS = MAKE_ID( sizeof(void*), 'M', 'A', 'S' ),
@@ -654,6 +654,39 @@ public:
         x = _x; y = _y; z = _z; w = _w;
     }
     U1x4& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
+    U4 area_xy()
+    {
+		U4 a = x;
+		a *= y;
+		return a;
+    }
+    U4 area_yz()
+    {
+		U4 a = y;
+		a *= z;
+		return a;
+    }
+    U4 area_zw()
+    {
+		U4 a = z;
+		a *= w;
+		return a;
+    }
+    U4 area()
+    {
+		U4 a = x;
+		a *= y;
+		a *= z;
+		a *= w;
+		return a;
+    }
+    U4 area_xyz()
+    {
+		U4 a = x;
+		a *= y;
+		a *= z;
+		return a;
+    }
 };
 
 class U4x2
@@ -1076,8 +1109,7 @@ public:
 				{
 					this[i].z = n_t;
 					this[n_t].y = i;
-					n_t++;
-					return n_t;
+					return n_t+1;
 				}
 				i = this[i].z;
 				continue;
@@ -1086,8 +1118,7 @@ public:
 			{
 				this[i].w = n_t;
 				this[n_t].y = i;
-				n_t++;
-				return n_t;
+				return n_t+1;
 			}
 			i = this[i].w;
 		}
@@ -1908,7 +1939,7 @@ typedef enum gpeNET4:U4
 	gpeNET4_I84	= MAKE_ID( sizeof(I8x4)		, 'I', '8', '4' ),
 	gpeNET4_D84	= MAKE_ID( sizeof(D4)		, 'D', '8', '4' ),
 
-	gpeNET4_RES = MAKE_ID( 32 //sizeof(gpcRES)
+	gpeNET4_RES = MAKE_ID( 32 //sizeof(gpcREStrs)
 							, 'R', 'E', 'S' ),
 
 	gpeNET4_MAS = MAKE_ID( sizeof(void*), 'M', 'A', 'S' ),
@@ -2348,7 +2379,7 @@ szasz:
 
 	//U8 gpcLAZY::tree_fnd( U8 id, U8& n )
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
-	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_zero , U1* pS = NULL );
+	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
 };
 
 

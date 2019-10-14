@@ -221,7 +221,7 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 
 
 
-gpcRES& gpcRES::null()
+gpcREStrs& gpcREStrs::null()
 {
 	if( !a )
 	{
@@ -239,9 +239,9 @@ gpcRES& gpcRES::null()
 			break;
 		case gpeNET4_RES:
 			if( an < 2 )
-				delete (gpcRES*)pDAT;
+				delete (gpcREStrs*)pDAT;
 			else
-				delete[] (gpcRES*)pDAT;
+				delete[] (gpcREStrs*)pDAT;
 			break;
 		default:
 			delete[] pDAT;

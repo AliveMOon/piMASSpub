@@ -21,7 +21,7 @@
 
 typedef enum gpeALF: I8
 {
-	gpeALF_zero = 0,
+	gpeALF_null = 0,
 	gpeALF_A,
 	gpeALF_B,
 	gpeALF_C,
@@ -586,6 +586,9 @@ typedef enum gpeALF: I8
 	//- 9 -----------------
 
 	gpeALF_CONNECTION = gpdABCDEFGHIJ('C','O','N','N','E','C','T','I','O','N'),
+	gpeALF_10 = gpdABCDEFGHIJ('Z','Z','Z','Z','Z','Z','Z','Z','Z','Z'),
+	gpeALF_resEND = gpeALF_10,
+	//- 10 -----------------
 
 	gpeALF_CRPXNLSKVLJFHG = 0x7fffffffffffffff,
 } GPT_ALFA;

@@ -2,11 +2,25 @@
 #include "gpcres.h"
 extern U1 gpaALFadd[];
 
-gpcRES* gpcRES::REScompiAN( U1* pS, U1* pE, U4* pMAP, gpcLZYdct* pDICT )
+
+gpcIS::gpcIS( gpcRES* pM )
+{
+	gpmCLR;
+	pMOM = pM;
+}
+gpcIS::~gpcIS()
+{
+	null();
+}
+
+
+
+
+gpcREStrs* gpcREStrs::REScompiAN( U1* pS, U1* pE, U4* pMAP, gpcLZYdct* pDICT )
 {
 	if( !this )
 	{
-		return new gpcRES( pS, pE );
+		return new gpcREStrs( pS, pE );
 	}
 	null();
 
@@ -403,7 +417,7 @@ gpcRES* gpcRES::REScompiAN( U1* pS, U1* pE, U4* pMAP, gpcLZYdct* pDICT )
 	return this;
 }
 
-gpcRES::gpcRES(  U1* pS, U1* pE )
+gpcREStrs::gpcREStrs(  U1* pS, U1* pE )
 {
 	gpmCLR;
 	if( pE > pS ? !*pS : true )
@@ -416,17 +430,17 @@ gpcRES::gpcRES(  U1* pS, U1* pE )
 }
 
 
-gpcRES::gpcRES()
+gpcREStrs::gpcREStrs()
 {
 	gpmCLR;
 }
 
-gpcRES::~gpcRES()
+gpcREStrs::~gpcREStrs()
 {
 	null();
 }
 
-gpcRES& gpcRES::operator = ( const gpcRES& b )
+gpcREStrs& gpcREStrs::operator = ( const gpcREStrs& b )
 {
 	if (this == &b )
 		return *this; // handle self assignment
@@ -460,12 +474,12 @@ gpcRES& gpcRES::operator = ( const gpcRES& b )
 		case gpeNET4_RES:
 			if( an < 2 )
 			{
-				pDAT = (U1*)new gpcRES( *((gpcRES*)b.pDAT) );
+				pDAT = (U1*)new gpcREStrs( *((gpcREStrs*)b.pDAT) );
 				return *this;
 			}
 
-			pDAT = (U1*)new gpcRES[an];
-			for( gpcRES* pR = (gpcRES*)pDAT, *pRe = pR+an, *pS = (gpcRES*)b.pDAT; pR < pRe; pR++, pS++ )
+			pDAT = (U1*)new gpcREStrs[an];
+			for( gpcREStrs* pR = (gpcREStrs*)pDAT, *pRe = pR+an, *pS = (gpcREStrs*)b.pDAT; pR < pRe; pR++, pS++ )
 				*pR = *pS;
 
 			return *this;
@@ -482,7 +496,7 @@ gpcRES& gpcRES::operator = ( const gpcRES& b )
 	return *this;
 }
 
-/*gpcRES& gpcRES::operator = ( const gpcRES& b )
+/*gpcREStrs& gpcREStrs::operator = ( const gpcREStrs& b )
 {
 	if (this == &b ) return *this; // handle self assignment
 
