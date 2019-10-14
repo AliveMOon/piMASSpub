@@ -13,7 +13,169 @@ gpcIS::~gpcIS()
 	null();
 }
 
+gpcRES* gpcRES::compiAN( U1* pS, U1* pE, gpcLZYdct* pDICT )
+{
+	if( !this )
+	{
+		gpcRES* pTHIS = new gpcRES;
+		if( !this )
+			return NULL;
 
+		return pTHIS->compiAN( pS, pE, pDICT );
+	}
+	null();
+	U4x4 xyWH = 0;
+	U4 deep = 0;
+	U1 *pU = pS, d;
+	U8 nLEN;
+
+	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
+	{
+		pS++;
+		switch( pS[-1] ) {
+			case ',': {	// vessző OSZLOPOK
+					if( deep )
+						break;
+
+					xyWH.x++;
+					if( xyWH.z >= xyWH.x )
+						break;
+					// bővíteni kell
+					xyWH.z = xyWH.x;
+				} break;
+			case ';': {	// SOROK
+					if( deep )
+						break;
+
+					xyWH.x = 0;
+					xyWH.y++;
+				} break;
+
+
+
+			case ')': {
+						if( !d )
+						{
+							pE = pS;
+							break;
+						}
+						if( d != '(' )
+							break;
+
+						if( deep )
+						{
+							deep--;
+							if( deep )
+								break;
+
+							d = 0;
+						} else
+							pE = pS;
+						break;
+					}
+			case '}': {
+						if( !d ) {
+							pE = pS;
+							break;
+						}
+
+						if( d != '{' )
+							break;
+
+						if( deep ) {
+							deep--;
+							if( deep )
+								break;
+
+							d = 0;
+						} else
+							pE = pS;
+						break;
+					}
+			case ']': {
+						if( !d ) {
+							pE = pS;
+							break;
+						}
+
+						if( d != ']' )
+							break;
+
+						if( deep ) {
+							deep--;
+							if( deep )
+								break;
+
+							d = 0;
+						} else
+							pE = pS;
+						break;
+					}
+			case '(':
+			case '{':
+			case '[': {
+					if( !d )
+					{
+						d = pS[-1];
+						deep = 1;
+						break;
+					}
+
+					if( d == pS[-1] )
+							deep++;
+
+				} break;
+
+
+
+			case '/': {
+					switch( *pS ) {
+						case '*':
+							pS = (U1*)strstr( (char*)pS+1, "*/" );
+							if( pS ? (pS >= pE) : true )
+							{
+								pS = pE;
+								break;
+							}
+
+							pS += 2;
+							break;
+
+						case '/':
+							pS += gpmVAN( pS, "\n", nLEN );
+							break;
+					}
+				} break;
+			case '\"': {
+					pS += gpmVAN( pS, "\"", nLEN );
+					if( *pS == '\"' )
+					{
+						pS++;
+						break;
+					}
+					pS = pE;
+				} break;
+			case '\'': {
+					pS += gpmVAN( pS, "\'", nLEN );
+					if( *pS == '\'' )
+					{
+						pS++;
+						break;
+					}
+					pS = pE;
+				} break;
+		}
+	}
+
+	if( pE > pS )
+		pE = pS;
+
+	pS = pU;
+
+
+
+	return this;
+}
 
 
 gpcREStrs* gpcREStrs::REScompiAN( U1* pS, U1* pE, U4* pMAP, gpcLZYdct* pDICT )

@@ -24,12 +24,15 @@ public:
 		gpmCLR;
 		*this = b;
 	}
-	gpcIS& null( void )
+	gpcIS* null( gpcRES* pM = NULL )
 	{
-        if( pMOM ? pDAT : NULL )
+		if( !this )
+			return this;
+        if( pMOM == pM ? pDAT : NULL )
 			delete[] pDAT;
 
         gpmCLR;
+        return this;
 	}
 	U4 nALL()
 	{
@@ -80,10 +83,32 @@ class gpcRES
 	gpcIS*	pIS;
 
 public:
+	gpcRES& null()
+	{
+		if( ppDAT )
+		for( U4 j = 0; j < n; j++ )
+		{
+			if( !ppDAT[j] )
+				continue;
+			pGET( j )->null( this );
+		}
+        gpmDELary( pID );
+		gpmDELary( pTYP );
+		gpmDELary( pAN );
+		gpmDELary( pTREE );
+		gpmDELary( pTx );
+		gpmDELary( pIS );
+	}
 	gpcRES()
 	{
         gpmCLR;
 	}
+	~gpcRES()
+	{
+		null();
+	}
+	gpcRES* compiAN( U1* pS, U1* pE, gpcLZYdct* pDICT = NULL );
+
 	gpcIS* pGET( U4 _i )
 	{
 		if( this ? (_i >= n) : true )
