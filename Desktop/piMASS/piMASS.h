@@ -687,6 +687,7 @@ public:
 		a *= z;
 		return a;
     }
+
 };
 
 class U4x2

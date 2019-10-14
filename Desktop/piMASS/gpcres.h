@@ -7,6 +7,12 @@
 #include "gpcSRC.h"
 class gpcRES;
 
+enum gpeTYP:U4
+{
+	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+	gpeTYP_I4 = MAKE_ID( 0x82, 0, 0, 0 ),
+};
+
 class gpcIS
 {
 	gpcRES* pMOM;
@@ -38,7 +44,7 @@ public:
 	{
 		AN.z = AN.a4x2[0].area();
 		if( !typ.w )
-			typ.w = typ.area_yz()*(typ.x&0xf);
+			typ.w = typ.area_yz()<<(typ.x&0xf);
 
 		AN.w = AN.z;
 		if( typ.w > 1 )
@@ -68,13 +74,16 @@ public:
 
         return *this;
 	}
+	gpcIS* equ( U4 typ, U8 u )
+	{
 
+	}
 };
 
 class gpcRES
 {
-	gpeALF	*pID;
-	U1x4	*pTYP;
+	gpeALF	*pLAB;
+	U1x4	*pTYP;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf)  ]
 	U4x4	*pAN;
 	U8x4	*pTREE;
 	U4		*pTx;
@@ -92,7 +101,7 @@ public:
 				continue;
 			pGET( j )->null( this );
 		}
-        gpmDELary( pID );
+        gpmDELary( pLAB );
 		gpmDELary( pTYP );
 		gpmDELary( pAN );
 		gpmDELary( pTREE );
@@ -127,14 +136,99 @@ public:
 			return pIS;
 		}
 
-		pIS->alf	= pID ? pID[_i] : gpeALF_null;
+		pIS->alf	= pLAB ? pLAB[_i] : gpeALF_null;
 		pIS->typ	= pTYP ? pTYP[_i] : 0;
 		pIS->AN 	= pAN ? pAN[_i] : 0;
 		pIS->pDAT	= ppDAT ? ppDAT[_i] : NULL;
 
 		return pIS;
 	}
-    U4 iGET( gpeALF alf )
+	gpcIS* pADD( gpeALF lab, U4 typ )
+	{
+		U4 nCPY = n;
+		n++;
+
+		void* pKILL = ppDAT;
+		ppDAT = new void*[n];
+		if( pKILL )
+		{
+			memcpy( ppDAT, pKILL, nCPY*sizeof(*ppDAT) );
+			delete[] pKILL;
+		}
+		ppDAT[nCPY] = NULL;
+
+		pKILL = pLAB;
+		pLAB = new gpeALF[n];
+		if( pKILL )
+		{
+			memcpy( pLAB, pKILL, nCPY*sizeof(*pLAB) );
+			delete[] pKILL;
+		}
+		pLAB[nCPY] = lab;
+
+		pKILL = pTYP;
+		pTYP = new U1x4[n];
+		if( pKILL )
+		{
+			memcpy( pTYP, pKILL, nCPY*sizeof(*pTYP) );
+			delete[] pKILL;
+		}
+		pTYP[nCPY].u4 = typ;
+
+		pKILL = pAN;
+		pAN = new U4x4[n];
+		if( pKILL )
+		{
+			memcpy( pAN, pKILL, nCPY*sizeof(*pAN) );
+			delete[] pKILL;
+		}
+		pAN[nCPY] = 0;
+
+		pKILL = pTREE;
+		pTREE = new U8x4[n];
+		if( pKILL )
+		{
+			memcpy( pTREE, pKILL, nCPY*sizeof(*pTREE) );
+			delete[] pKILL;
+		}
+		pTREE[nCPY].null();
+
+		pKILL = pTx;
+		pTx = new U4[n];
+		if( pKILL )
+		{
+			memcpy( pTx, pKILL, nCPY*sizeof(*pTx) );
+			delete[] pKILL;
+		}
+		pTx[nCPY] = 0;
+
+
+		pIS = pGET( nCPY );
+		if( pIS )
+		{
+
+		}
+
+
+		return pIS;
+	}
+	gpcIS* equ( gpeALF lab, U4 typ, U8 u )
+	{
+		U4 iF = iFND( lab );
+		pIS = pGET(iF);
+		if( !pIS )
+		{
+            if( !pADD( lab, typ ) )
+				return NULL;
+		}
+
+		return pIS->equ( typ, u );
+	}
+	U4 nFND()
+	{
+		return n;
+	}
+    U4 iFND( gpeALF alf )
     {
 		if( !this )
 			return 0;
@@ -143,7 +237,7 @@ public:
 			return n;
 
 		if( i < n )
-		if( pID[i] == alf )
+		if( pLAB[i] == alf )
 			return i;
 
 		ig = n;
@@ -155,26 +249,26 @@ public:
 
 			for( U4 j = 0, x; j < n; j++ )
 			{
-				if( !pID[j] )
+				if( !pLAB[j] )
 					continue;
 
 				if( ig >= n )
-				if( pID[j] == alf )
+				if( pLAB[j] == alf )
 				{
 					// azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
 					pTx[t] = ig = j;
-					x = pTREE->tree_fnd( pID[j], t );
+					x = pTREE->tree_fnd( pLAB[j], t );
 					if( x >= t )
-						t = pTREE->tree_add( pID[j], t );		// nem volt benne a listában
+						t = pTREE->tree_add( pLAB[j], t );		// nem volt benne a listában
 					break;
 				}
 
-				x = pTREE->tree_fnd( pID[j], t );
+				x = pTREE->tree_fnd( pLAB[j], t );
 				if( x < t )
 					continue;
 
 				pTx[t] = j;
-				t = pTREE->tree_add( pID[j], t );
+				t = pTREE->tree_add( pLAB[j], t );
 			}
 
 			if( ig < n )
@@ -189,19 +283,19 @@ public:
 		t = 0;
 		for( U4 j = 0; j < n; j++ )
 		{
-			if( !pID[j] )
+			if( !pLAB[j] )
 				continue;
 
 			if( ig >= n )
-			if( pID[j] == alf )
+			if( pLAB[j] == alf )
 			{
 				pTx[t] = ig = j;
-				t = pTREE->tree_add( pID[j], t );
+				t = pTREE->tree_add( pLAB[j], t );
 				break; // azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
 			}
 
 			pTx[t] = j;
-			t = pTREE->tree_add( pID[j], t );
+			t = pTREE->tree_add( pLAB[j], t );
 
 		}
 		if( ig < n )

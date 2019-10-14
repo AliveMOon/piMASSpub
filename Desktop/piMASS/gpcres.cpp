@@ -26,8 +26,11 @@ gpcRES* gpcRES::compiAN( U1* pS, U1* pE, gpcLZYdct* pDICT )
 	null();
 	U4x4 xyWH = 0;
 	U4 deep = 0;
-	U1 *pU = pS, d;
-	U8 nLEN;
+	U1 *pU = pS, d, *pBEG = NULL;
+	U8 nLEN, nLAB = 0;
+	gpeALF lab = gpeALF_null;
+
+	U1x4 typ = 0;
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -49,6 +52,35 @@ gpcRES* gpcRES::compiAN( U1* pS, U1* pE, gpcLZYdct* pDICT )
 
 					xyWH.x = 0;
 					xyWH.y++;
+					lab = gpeALF_null;
+				} break;
+
+			case ' = ':{
+					U4 i_fnd = nFND();
+                    if( deep )
+						break;
+
+					if( *pS == '=' )
+					{
+						// ez logikai izé nem assign
+						break;
+					}
+
+					while( !lab )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
+                    {
+						lab = (gpeALF)( 1 + U4x2( (U4)gpeALF_AAAAAA, nLAB )*U4x2(1,(U4)gpeALF_AAAAAA) );
+                        i_fnd = iFND( lab );
+                        if( i_fnd < nFND() )
+							lab = gpeALF_null;
+                    }
+
+					if( !typ.u4 )
+					{
+						typ.u4 = gpeTYP_I4;
+					}
+
+					equ( lab, typ.u4, 0 );
+					// új változó
 				} break;
 
 
@@ -171,6 +203,7 @@ gpcRES* gpcRES::compiAN( U1* pS, U1* pE, gpcLZYdct* pDICT )
 		pE = pS;
 
 	pS = pU;
+
 
 
 
