@@ -4,7 +4,9 @@
 #include "piMASS.h"
 //#include "gpcSCHL.h"
 #include "gpcOPCD.h"
-#include "gpcres.h"
+
+class gpcRES;
+//#include "gpcres.h"
 
 //#include "gpccrs.h"
 
@@ -471,7 +473,7 @@ public:
 			gpmMEMCPY( pD, pS, oz );
 		}
 
-		gpmDELary(pKILL);
+		gpmDELary( pKILL );
 		return pVOID;
 	}
 
@@ -577,7 +579,7 @@ public:
     U4		IX, retIX, nALFtg, strtD, endD;
 
     gpeALF	*pALFtg;
-    gpcRES	*aRES[4];
+    gpcRES*	apRES[4];
 	gpcLAZY	*pEXE,
 			//*pRES,
 			*pMINI,
@@ -626,8 +628,7 @@ public:
 		return pC;
 	}
 
-	U8 CRSminiCR( I4x2& cr )
-	{
+	U8 CRSminiCR( I4x2& cr ) {
 		if( !this )
 		{
 			cr.null();
@@ -1198,7 +1199,7 @@ public:
 	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
-	gpcMASS& justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, U4 iED );
+	U1* justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
 
 
 	gpcMASS&	null();

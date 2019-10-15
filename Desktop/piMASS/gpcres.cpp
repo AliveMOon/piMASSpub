@@ -3,14 +3,44 @@
 extern U1 gpaALFadd[];
 
 
-gpcIS::gpcIS( gpcRES* pM )
+gpcALU::gpcALU( gpcRES* pM )
 {
 	gpmCLR;
 	pMOM = pM;
 }
-gpcIS::~gpcIS()
+gpcALU::~gpcALU()
 {
 	null();
+}
+
+gpcRES& gpcRES::null()
+{
+	gpcRES* pR;
+	if( ppDAT )
+	{
+		for( U4 a = 0; a < n; a++ )
+		{
+			if( !ppDAT[a] )
+				continue;
+			if( !(pTYP[a].x&0x2) )
+			{
+				gpmDELary(ppDAT[a]);
+				continue;
+			}
+			pR = (gpcRES*)(ppDAT[a]);
+			pR->null();
+			gpmDEL(pR);
+		}
+		delete[] ppDAT;
+		ppDAT = NULL;
+	}
+	gpmDELary( pLAB );
+	gpmDELary( pOP );
+	gpmDELary( pTYP );
+	gpmDELary( pAN );
+	gpmDELary( pTREE );
+	gpmDELary( pTx );
+	gpmDELary( pALU );
 }
 
 gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pMOM )
@@ -22,13 +52,13 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pMOM )
 	if( !this )
 	{
 		gpcRES* pTHIS = new gpcRES;
-		if( !this )
+		if( !pTHIS )
 			return NULL;
 
 		return pTHIS->compiEASY( pS, pE, pMOM );
 	}
 	if( !pE )
-		pE = pS+strlen(pS);
+		pE = pS+strlen((char*)pS);
 	null();
 	U4x4 xyWH = 0;
 	U4 deep = 0;

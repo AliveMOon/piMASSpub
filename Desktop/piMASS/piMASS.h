@@ -690,6 +690,75 @@ public:
 
 };
 
+class I1x4
+{
+public:
+    union
+    {
+        struct
+        {
+            I1 x,y,z,w;
+        };
+        struct
+        {
+            I1 aXYZW[4];
+        };
+        struct
+        {
+            U4 u4;
+        };
+    };
+    I1x4(){};
+    I1x4( U4 b )
+    {
+        u4 = b;
+    }
+    I1x4( I1 _x, I1 _y, I1 _z = 0, I1 _w = 0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    I1x4& operator = ( U4 b )
+    {
+		u4 = b;
+		return *this;
+    }
+    //U1x4& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
+    I4 area_xy()
+    {
+		I8 a = x;
+		a *= y;
+		return a;
+    }
+    I4 area_yz()
+    {
+		I8 a = y;
+		a *= z;
+		return a;
+    }
+    I4 area_zw()
+    {
+		I8 a = z;
+		a *= w;
+		return a;
+    }
+    I4 area()
+    {
+		I8 a = x;
+		a *= y;
+		a *= z;
+		a *= w;
+		return a;
+    }
+    I4 area_xyz()
+    {
+		I8 a = x;
+		a *= y;
+		a *= z;
+		return a;
+    }
+
+};
+
 class U4x2
 {
 public:

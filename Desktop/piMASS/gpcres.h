@@ -10,29 +10,39 @@ class gpcRES;
 enum gpeTYP:U4
 {
 	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
-	gpeTYP_U1 = MAKE_ID( 0x00, 0, 0, 0 ),
-	gpeTYP_U4 = MAKE_ID( 0x02, 0, 0, 0 ),
-	gpeTYP_I4 = MAKE_ID( 0x82, 0, 0, 0 ),
+	// yz dimxy
+	// w size
+	gpeTYP_U1 = MAKE_ID( 0x00, 1, 1, 1 ),
+	gpeTYP_U4 = MAKE_ID( 0x02, 1, 1, 4 ),
+	gpeTYP_I4 = MAKE_ID( 0x82, 1, 1, 4 ),
+	gpeTYP_F  = MAKE_ID( 0xc2, 1, 1, 4 ),
+	gpeTYP_U8 = MAKE_ID( 0x03, 1, 1, 8 ),
+	gpeTYP_I8 = MAKE_ID( 0x83, 1, 1, 8 ),
+	gpeTYP_D  = MAKE_ID( 0xc3, 1, 1, 8 ),
+
+	gpeTYP_U14 = MAKE_ID( 0x00, 4, 1, 0 ),
+	gpeTYP_U44 = MAKE_ID( 0x02, 4, 1, 0 ),
+	gpeTYP_I44 = MAKE_ID( 0x82, 4, 1, 0 ),
 };
 
-class gpcIS
+class gpcALU
 {
 	gpcRES* pMOM;
 public:
 	void*	pDAT;
 	gpeALF 	alf;
+	I1x4	op;
 	U1x4	typ;
 	U4x4	AN;
+	gpcALU( gpcRES* pM = NULL );
+	~gpcALU();
 
-	gpcIS( gpcRES* pM = NULL );
-	~gpcIS();
-
-	gpcIS( const gpcIS& b )
+	gpcALU( const gpcALU& b )
 	{
 		gpmCLR;
 		*this = b;
 	}
-	gpcIS* null( gpcRES* pM = NULL )
+	gpcALU* null( gpcRES* pM = NULL )
 	{
 		if( !this )
 			return this;
@@ -54,7 +64,7 @@ public:
 
 		return AN.w;
 	}
-	gpcIS& operator = ( const gpcIS& b )
+	gpcALU& operator = ( const gpcALU& b )
 	{
 		if( this == &b )
 			return *this;
@@ -76,7 +86,7 @@ public:
 
         return *this;
 	}
-	gpcIS* equ( U4 typ, U8 u )
+	gpcALU* equ( U4 typ, U8 u )
 	{
 
 	}
@@ -85,31 +95,48 @@ public:
 class gpcRES
 {
 	gpeALF	*pLAB;
-	U1x4	*pTYP;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf)  ]
+	I1x4	*pOP;	// x add/sub // y mul/div // zw ?
+
+	U1x4	*pTYP;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+					// yz dimxy
+					// w size
 	U4x4	*pAN;
 	U8x4	*pTREE;
 	U4		*pTx;
 	void**	ppDAT;
 	U4		n, t, i, ig;
-	gpcIS*	pIS;
+	gpcALU*	pALU;
 
 public:
-	gpcRES& null()
-	{
+	gpcRES& null();
+	/*{
+		gpcRES* pR;
 		if( ppDAT )
-		for( U4 j = 0; j < n; j++ )
 		{
-			if( !ppDAT[j] )
-				continue;
-			pGET( j )->null( this );
+			for( U4 a = 0; a < n; a++ )
+			{
+				if( !ppDAT[a] )
+					continue;
+				if( !(pTYP[a].x&0x2) )
+				{
+					gpmDELary(ppDAT[a]);
+					continue;
+				}
+				pR = (gpcRES*)(ppDAT[a]);
+				pR->null( this );
+				gpmDEL(pR);
+			}
+			delete[] ppDAT;
+			ppDAT = NULL;
 		}
         gpmDELary( pLAB );
+        gpmDELary( pOP );
 		gpmDELary( pTYP );
 		gpmDELary( pAN );
 		gpmDELary( pTREE );
 		gpmDELary( pTx );
-		gpmDELary( pIS );
-	}
+		gpmDELary( pALU );
+	}*/
 	gpcRES()
 	{
         gpmCLR;
@@ -121,32 +148,33 @@ public:
 	gpcRES* compiEASY( U1* pS, U1* pE, gpcRES* pMOM );
 	gpcRES* compiHARD( U1* pS, U1* pE, gpcRES* pMOM );
 
-	gpcIS* pGET( U4 _i )
+	gpcALU* getALU( U4 a )
 	{
-		if( this ? (_i >= n) : true )
+		if( this ? (a >= n) : true )
 			return NULL;
 
-		if( !pIS )
+		if( !pALU )
 		{
-			pIS = new gpcIS( this );
-			if( !pIS )
+			pALU = new gpcALU( this );
+			if( !pALU )
 				return NULL;
 		}
 
-		if( ppDAT ? ppDAT[_i] : NULL )
-		if( pIS->pDAT == ppDAT[_i] )
+		if( ppDAT ? ppDAT[a] : NULL )
+		if( pALU->pDAT == ppDAT[a] )
 		{
-			return pIS;
+			return pALU;
 		}
 
-		pIS->alf	= pLAB ? pLAB[_i] : gpeALF_null;
-		pIS->typ	= pTYP ? pTYP[_i] : 0;
-		pIS->AN 	= pAN ? pAN[_i] : 0;
-		pIS->pDAT	= ppDAT ? ppDAT[_i] : NULL;
+		pALU->alf	= pLAB	? pLAB[a]	: gpeALF_null;
+		pALU->op	= pOP	? pOP[a]	: 0;
+		pALU->typ	= pTYP	? pTYP[a]	: 0;
+		pALU->AN 	= pAN	? pAN[a]	: 0;
+		pALU->pDAT	= ppDAT	? ppDAT[a]	: NULL;
 
-		return pIS;
+		return pALU;
 	}
-	gpcIS* pADD( gpeALF lab, U4 typ )
+	gpcALU* pADD( gpeALF lab, U4 typ, U4 op )
 	{
 		U4 nCPY = n;
 		n++;
@@ -168,6 +196,20 @@ public:
 			delete[] pKILL;
 		}
 		pLAB[nCPY] = lab;
+
+		pKILL = pOP;
+		if( op || pKILL )
+		{
+			pOP = new I1x4[n];
+			pOP->u4 = 0;
+			gpfMEMSET( pOP+1, n-1, pOP, sizeof(*pOP) );
+			if( pKILL )
+			{
+				memcpy( pOP, pKILL, nCPY*sizeof(*pOP) );
+				delete[] pKILL;
+			}
+			pOP[nCPY].u4 = op;
+		}
 
 		pKILL = pTYP;
 		pTYP = new U1x4[n];
@@ -206,26 +248,26 @@ public:
 		pTx[nCPY] = 0;
 
 
-		pIS = pGET( nCPY );
-		if( pIS )
+		pALU = getALU( nCPY );
+		if( pALU )
 		{
 
 		}
 
 
-		return pIS;
+		return pALU;
 	}
-	gpcIS* equ( gpeALF lab, U4 typ, U8 u )
+	gpcALU* equ( gpeALF lab, U4 typ, U8 u )
 	{
 		U4 iF = iFND( lab );
-		pIS = pGET(iF);
-		if( !pIS )
+		pALU = getALU(iF);
+		if( !pALU )
 		{
-            if( !pADD( lab, typ ) )
+            if( !pADD( lab, typ, 0 ) )
 				return NULL;
 		}
 
-		return pIS->equ( typ, u );
+		return pALU->equ( typ, u );
 	}
 	U4 nFND()
 	{

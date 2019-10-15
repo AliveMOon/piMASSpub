@@ -490,14 +490,14 @@ gpcMASS& gpcMASS::null()
 	return *this;
 }
 
-gpcMASS& gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, U4 iED )
+U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
 	U1* pKEYbuff = sKEYbuff;
 	gpcSRC	tmp, *pSRC;
 	U4 xFND;
-	if( U4 *pM = mass.mapCR.pMAP )
-	if( U4 *pC = mass.mapCR.pCOL )
-	if( U4 *pR = mass.mapCR.pROW )
+	if( U4 *pM = mapCR.pMAP )
+	if( U4 *pC = mapCR.pCOL )
+	if( U4 *pR = mapCR.pROW )
 	if( pM < pC )
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{
@@ -509,38 +509,38 @@ gpcMASS& gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, U4 iED )
 		if( !pSRC )
 			continue;
 
-		if( !pSRC->qBLD() )
+		if( pSRC->qBLD() )
 		{
-			if( !pSRC->aRES[3] )
+			if( !pSRC->apRES[3] )
 			{
-				pSRC->aRES[3] = pSRC->aRES[3]->compiEASY( pSRC->pSRCstart(), NULL, NULL );
-				//gpmDEL( pSRC->aRES[2] ); // OFF? 2
-				if( pSRC->aRES[3] )
+				pSRC->apRES[3] = pSRC->apRES[3]->compiEASY( pSRC->pSRCstart(), NULL, NULL );
+				//gpmDEL( pSRC->apRES[2] ); // OFF? 2
+				if( pSRC->apRES[3] )
 				{
-					//gpmDEL( pSRC->aRES[2] ); // OFF? 1
-					if( pSRC->aRES[2] )
+					//gpmDEL( pSRC->apRES[2] ); // OFF? 1
+					if( pSRC->apRES[2] )
 					{
-						gpmDEL( pSRC->aRES[1] ); // OFF 0
-						if( pSRC->aRES[1] )
+						gpmDEL( pSRC->apRES[1] ); // OFF 0
+						if( pSRC->apRES[1] )
 						{
-							gpmDEL( pSRC->aRES[0] );
-							pSRC->aRES[0] = pSRC->aRES[1];
+							gpmDEL( pSRC->apRES[0] );
+							pSRC->apRES[0] = pSRC->apRES[1];
 						}
 
 
-						pSRC->aRES[1] = pSRC->aRES[2];
+						pSRC->apRES[1] = pSRC->apRES[2];
 					}
-					pSRC->aRES[2] = pSRC->aRES[3];
+					pSRC->apRES[2] = pSRC->apRES[3];
 				}
-				pSRC->aRES[3] = NULL;
+				pSRC->apRES[3] = NULL;
 			}
 		}
 
-		if( !pSRC->aRES[2] )
+		if( !pSRC->apRES[2] )
 			continue;	// ha nincsen 2 nem sikerült az építés
 
 		// egyébként meg kell probálni futatni
-		//pSRC->aRES[2]->run();
+		//pSRC->apRES[2]->run();
 
 	}
 
@@ -845,7 +845,7 @@ int main( int nA, char *apA[] )
 
 			nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 
-			gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( gpsKEYbuff, mouseXY,  );
+			gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( gpsKEYbuff, mouseXY, aKT, SRCxycr, SRCin );
 
 
 			if(

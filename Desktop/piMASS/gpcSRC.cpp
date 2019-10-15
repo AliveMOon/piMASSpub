@@ -165,7 +165,9 @@ gpcSRC::~gpcSRC()
 		gpmDELary(pA);
 	gpmDELary(pALFtg);
 	gpmDELary(pEXE);
-	gpmDELary(pRES);
+	for( U1 i = 0; i < gpmN(apRES); i++ )
+		gpmDELary(apRES[i]);
+
 	gpmDELary(pMINI);
 	gpmDELary(pBIG);
 	gpmDELary(pMAP);
