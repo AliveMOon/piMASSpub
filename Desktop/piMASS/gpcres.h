@@ -12,17 +12,21 @@ enum gpeTYP:U4
 	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 	// yz dimxy
 	// w size
-	gpeTYP_U1 = MAKE_ID( 0x00, 1, 1, 1 ),
-	gpeTYP_U4 = MAKE_ID( 0x02, 1, 1, 4 ),
-	gpeTYP_I4 = MAKE_ID( 0x82, 1, 1, 4 ),
-	gpeTYP_F  = MAKE_ID( 0xc2, 1, 1, 4 ),
-	gpeTYP_U8 = MAKE_ID( 0x03, 1, 1, 8 ),
-	gpeTYP_I8 = MAKE_ID( 0x83, 1, 1, 8 ),
-	gpeTYP_D  = MAKE_ID( 0xc3, 1, 1, 8 ),
+	gpeTYP_U1 	= MAKE_ID( 0x00, 1, 1, 1 ),
+	gpeTYP_U4 	= MAKE_ID( 0x02, 1, 1, 4 ),
+	gpeTYP_I4 	= MAKE_ID( 0x82, 1, 1, 4 ),
+	gpeTYP_F  	= MAKE_ID( 0xc2, 1, 1, 4 ),
+	gpeTYP_U8 	= MAKE_ID( 0x03, 1, 1, 8 ),
+	gpeTYP_I8 	= MAKE_ID( 0x83, 1, 1, 8 ),
+	gpeTYP_D  	= MAKE_ID( 0xc3, 1, 1, 8 ),
 
-	gpeTYP_U14 = MAKE_ID( 0x00, 4, 1, 0 ),
-	gpeTYP_U44 = MAKE_ID( 0x02, 4, 1, 0 ),
-	gpeTYP_I44 = MAKE_ID( 0x82, 4, 1, 0 ),
+	gpeTYP_A	= MAKE_ID( 0x93, 1, 1, 8 ),
+	gpeTYP_AN 	= MAKE_ID( 0x93, 2, 1, 16 ),
+
+
+	gpeTYP_U14 	= MAKE_ID( 0x00, 4, 1, 0 ),
+	gpeTYP_U44 	= MAKE_ID( 0x02, 4, 1, 0 ),
+	gpeTYP_I44 	= MAKE_ID( 0x82, 4, 1, 0 ),
 };
 
 class gpcALU
@@ -106,40 +110,18 @@ class gpcRES
 	void**	ppDAT;
 	U4		n, t, i, ig;
 	gpcALU*	pALU;
+	gpcRES* pMOM;
 
 public:
 	gpcRES& null();
-	/*{
-		gpcRES* pR;
-		if( ppDAT )
-		{
-			for( U4 a = 0; a < n; a++ )
-			{
-				if( !ppDAT[a] )
-					continue;
-				if( !(pTYP[a].x&0x2) )
-				{
-					gpmDELary(ppDAT[a]);
-					continue;
-				}
-				pR = (gpcRES*)(ppDAT[a]);
-				pR->null( this );
-				gpmDEL(pR);
-			}
-			delete[] ppDAT;
-			ppDAT = NULL;
-		}
-        gpmDELary( pLAB );
-        gpmDELary( pOP );
-		gpmDELary( pTYP );
-		gpmDELary( pAN );
-		gpmDELary( pTREE );
-		gpmDELary( pTx );
-		gpmDELary( pALU );
-	}*/
-	gpcRES()
+
+	gpcRES( gpcRES* pM = NULL )
 	{
         gpmCLR;
+        if( !pM )
+			return;
+
+		pMOM = pM;
 	}
 	~gpcRES()
 	{
@@ -260,7 +242,14 @@ public:
 	gpcALU* equ( gpeALF lab, U4 typ, U8 u )
 	{
 		U4 iF = iFND( lab );
-		pALU = getALU(iF);
+		gpcRES* pM = this;
+		while( iF >= pM->nFND() )
+		{
+			pM = pM->pMOM;
+			iF = pM->iFND( lab );
+		}
+
+		pALU = pM->getALU(iF);
 		if( !pALU )
 		{
             if( !pADD( lab, typ, 0 ) )
@@ -271,7 +260,7 @@ public:
 	}
 	U4 nFND()
 	{
-		return n;
+		return this ? n : 0;
 	}
     U4 iFND( gpeALF alf )
     {

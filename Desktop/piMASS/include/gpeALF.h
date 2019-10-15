@@ -4,6 +4,7 @@
 #include "piMASS.h"
 
 
+#define gpmbNUM( c ) ( c >= '0' && c <= '9' )
 #define gpmbABC( c, a ) (c < 0x80 ? a[c] : true)
 #define gpdUP ('a'-'A')
 #define gpdUP_CASE(a){ if( a >= 'a' && a <= 'z' ){ a -= gpdUP; }}
