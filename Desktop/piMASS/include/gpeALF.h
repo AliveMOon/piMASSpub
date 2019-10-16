@@ -5,7 +5,10 @@
 
 
 #define gpmbNUM( c ) ( c >= '0' && c <= '9' )
-#define gpmbABC( c, a ) (c < 0x80 ? a[c] : true)
+#define gpmbASCII( c, a ) (c < 0x80 ? a[c] : false)
+#define gpmbABC( c, a ) (c < 0x80 ? a[c] : true)	// UTF8 kompatible azaz 0x80 felett betünek vesz mindent
+//#define gpmbUTF8( c, a ) (c < 0x80 ? a[c] : true)
+
 #define gpdUP ('a'-'A')
 #define gpdUP_CASE(a){ if( a >= 'a' && a <= 'z' ){ a -= gpdUP; }}
 #define gpdALF 								('Z'-'@')

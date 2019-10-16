@@ -220,6 +220,7 @@ class gpcMASS;
 
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
+
 U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nUTF8, U1* gpaALFadd )
 {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
@@ -1588,6 +1589,229 @@ public:
 	}
 };
 
+
+class I8x2
+{
+public:
+	union{
+		struct {
+			I8 x,y;
+		};
+		struct {
+			gpeALF	alf;
+			I8		num;
+		};
+
+	};
+
+    I8x2(){};
+    I8x2( I8 _x, I8 _y = 0 )
+    {
+        x = _x; y = _y;
+    }
+    I8x2( U4x2 b )
+    {
+        x = b.x;
+        y = b.y;
+    }
+	I8x2( U8* pB )
+    {
+		gpmMEMCPY( this, pB, 1 );
+    }
+	// cnt = fract * U42(1, w);
+	I8x2& cnt2fract( U4 w, U8 cnt )
+	{
+		U1 lg = log2(w * w);
+		w = 1<<(lg/2);
+		U8 X = w * w;
+		cnt %= X;
+		null();
+
+		while( cnt )
+		{
+			w >>= 1;
+			switch(cnt&3)
+			{
+				case 1:
+					x += w;
+					y += w;
+					break;
+				case 2:
+					x += w;
+					break;
+				case 3:
+					y += w;
+					break;
+			}
+			cnt >>= 2;
+		}
+		return *this;
+	}
+	I8 operator * (const I8x2& b) const
+	{
+		return (I8)x*b.x + (I8)y * b.y;
+	}
+	I8x2 operator & (const I8x2& b) const
+	{
+		return I8x2( x*b.x,  y*b.y );
+	}
+	I8x2 operator & (const U8* pB ) const
+	{
+		return I8x2( x* pB[0],  y* pB[1] );
+	}
+
+	I8x2 operator / (const U4x2& b) const
+	{
+		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
+	}
+	I8x2 operator / (const I8x2& b) const
+	{
+		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff ,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
+	}
+
+	I8x2 operator + (const I4x2& b) const
+	{
+		return I8x2( x+b.x,  y+b.y );
+	}
+	I8x2 operator + (const I8x2& b) const
+	{
+		return I8x2( x+b.x,  y+b.y );
+	}
+
+	I8x2 operator + (const U4x2& b) const
+	{
+		return I8x2( x+b.x,  y+b.y );
+	}
+	I8x2 operator + ( const U8* pB ) const
+	{
+		return I8x2( x+pB[0],  y+pB[1] );
+	}
+
+	I8x2 operator - (const I4x2& b) const
+	{
+		return I8x2( x-b.x,  y-b.y );
+	}
+	I8x2 operator - (const I8x2& b) const
+	{
+		return I8x2( x-b.x,  y-b.y );
+	}
+
+	I8x2 operator - (const U4x2& b) const
+	{
+		return I8x2( x-b.x,  y-b.y );
+	}
+	I8x2 operator - ( const U8* pB ) const
+	{
+		return I8x2( x-pB[0], y-pB[1] );
+	}
+
+	bool operator != ( const I4x2& b ) const
+	{
+		if( x != b.x )
+			return true;
+		return y != b.y;
+	}
+	bool operator != ( const I8x2& b ) const
+	{
+		if( x != b.x )
+			return true;
+		return y != b.y;
+	}
+	bool operator == ( const I4x2& b ) const
+	{
+		return !(*this!=b);
+	}
+	bool operator == ( const I8x2& b ) const
+	{
+		return !(*this!=b);
+	}
+
+	I8x2& operator *= ( I8 i )
+	{
+		if( !i )
+			return null();
+		if( i == 1 )
+			return *this;
+
+		x*=i;
+		y*=i;
+
+		return *this;
+	}
+	I8x2& operator /= ( I8 i )
+	{
+		if( i == 1 )
+			return *this;
+
+		if( !i )
+		{
+			x = y = 0x7FFFffffFFFFffff;
+			return *this;
+		}
+
+		x/=i;
+		y/=i;
+
+		return *this;
+	}
+	I8x2& operator %= ( I8 i )
+	{
+		if( i == 1 )
+			return null();
+
+		if( !i )
+			return *this;
+
+
+		x%=i;
+		y%=i;
+
+		return *this;
+	}
+	I8x2& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
+
+	I8 sum( void ) const
+	{
+		return x+y;
+	}
+
+	I8 area( void ) const
+	{
+		return x*y;
+	}
+
+	I8 are_sum( void ) const
+	{
+		return abs().area()+abs().sum();
+	}
+
+	I8 qlen (void ) const
+	{
+		return x*x + y*y;
+	}
+
+	I8 mn( void ) const
+	{
+		return x < y ? x:y;
+	}
+
+	I8 mx( void ) const
+	{
+		return x > y ? x:y;
+	}
+
+	I8x2 abs( void ) const
+	{
+		return I8x2( x<0?-x:x, y<0?-y:y );
+	}
+
+};
+
+
 class I8x4
 {
 public:
@@ -1603,6 +1827,10 @@ public:
         };
         struct
         {
+            I8x2 a8x2[2];
+        };
+        struct
+        {
             gpeALF labe;
             I8 mom, up, nx;
         };
@@ -1615,7 +1843,7 @@ public:
     I8x4& operator = ( U8 b )
     {
 		gpmCLR;
-        x = min( b, 0x7fffffffFFFFFFFF );
+        x = min( b, 0x7FFFffffFFFFffff );
 		return *this;
     }
     I8x4& operator = ( I8 b )
@@ -1629,6 +1857,8 @@ public:
 		gpmCLR;
 		return *this;
 	}
+	I8x4& RESaa( U1* pA, U1* pB );
+
     I8 tree_add( gpeALF alf, I8 n_t )
     {
 		return tree_add( (I8)alf, n_t );

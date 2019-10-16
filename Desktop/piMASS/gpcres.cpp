@@ -42,9 +42,16 @@ gpcRES& gpcRES::null()
 	gpmDELary( pTx );
 	gpmDELary( pALU );
 }
-
-gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
+I8x4& I8x4::RESaa( U1* pA, U1* pB )
 {
+	a8x2[0].alf = gpfSTR2ALF( pA, pA + min( 14, y ), NULL );
+	a8x2[1].alf = gpfSTR2ALF( pB, pB + min( 14, w ), NULL );
+	return *this;
+}
+gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
+{
+
+
 	if( pE )
 	if( pS >= pE )
 		return this;
@@ -55,14 +62,23 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
 		if( !pTHIS )
 			return NULL;
 
-		return pTHIS->compiEASY( pS, pE, pM );
+		return pTHIS->compiEASY( pS, pE, ppE, pM );
 	}
+	if( ppE )
+		*ppE = pS;
+
 	if( !pE )
 		pE = pS+strlen((char*)pS);
 	null();
 	U4x4 xyWH = 0;
 	U4 deep = 0, nALF;
-	U1 *pU = pS, d, *pBEG = NULL, *pPNT = NULL;
+	U1 	d, *pBEG = NULL, //*pPNT = NULL,
+		*apA[2], *apN[2], *apP[2], *pSTR ;
+
+	gpmZ(apA);
+	gpmZ(apN);
+	gpmZ(apP);
+
 	U8 nUTF8, nLAB = 0;
 	I8x4 lab = 0;
 	U8 u8 = 0;
@@ -75,14 +91,43 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
 	{
 		if( gpmbABC( *pS, gpaALFadd ) )
 		{
-			typ.u4 = gpeTYP_A;
-			nALF = gpfABCnincs( pBEG = pS, pE, nUTF8, gpaALFadd );
-			if( !lab.labe )
-				lab.labe = gpfSTR2ALF( pBEG, pBEG + min( 14, nALF ), NULL );
-			pS += nALF;
+			//typ.u4 = gpeTYP_A;
+			if( apA[0] )
+			{
+				apA[1] = apA[0];
+				lab.w = lab.y;
+			}
+			lab.a8x2[0].num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
+
+			apN[0] = apP[0] = NULL;
+			apA[0] = pS;
+			u8 = 0;
+			/*
+			if( lab.labe )
+			{
+				lab.a8x2[1] = lab.a8x2[0];
+				apLAB[1] = apLAB[0];
+			}
+			apLAB[0] = pBEG;
+			lab.labe = gpfSTR2ALF( pBEG, pBEG + min( 14, nALF ), NULL );*/
+			pS += lab.a8x2[0].num;
 		}
+
 		if( gpmbNUM( *pS ) )
 		{
+			if( apA[0] )
+			{
+				// az ötlet lényege, hogy nem lesz a apA[0] -ban szöveg ha AN
+				// viszont ha nem volt utánna szám  akkor a típus az apA[0] a label meg az apA[1] ben lesz
+				apA[1] = apA[0];
+			}
+			apN[0] = pS;
+
+			typ.u4 = gpeTYP_U8;
+			u8 = gpfSTR2U8( pS, &pS );
+
+			apP[0] = ( *pS == '.' ) ? pS : NULL;
+			/*
 			lab.y = gpfSTR2U8( pS, &pS );
 			if( typ.u4 == gpeTYP_A )
 			{
@@ -113,14 +158,105 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
 					typ.u4 = gpeTYP_U8;
 				}
 
-			}
+			}*/
 		}
+
 		pS++;
 		switch( pS[-1] ) {
-			case ',': {	// vessző OSZLOPOK
-					if( deep )
-						break;
+			case '+':{
+					lab.RESaa( apA[0], apA[1] );
 
+					op.x++;
+				} break;
+
+			case '-':{
+					lab.RESaa( apA[0], apA[1] );
+
+					op.x--;
+				} break;
+
+
+			case '*':{
+					lab.RESaa( apA[0], apA[1] );
+
+					op.y++;
+				} break;
+			case '/': {
+					switch( *pS ) {
+						case '*':
+							pS = (U1*)strstr( (char*)pS+1, "*/" );
+							if( pS ? (pS >= pE) : true )
+							{
+								pS = pE;
+								break;
+							}
+
+							pS += 2;
+							break;
+
+						case '/':
+							pS += gpmVAN( pS, "\n", nUTF8 );
+							break;
+						default:
+							lab.RESaa( apA[0], apA[1] );
+
+							op.y--;
+							break;
+					}
+				} break;
+			case '%':{
+					lab.RESaa( apA[0], apA[1] );
+
+					op.z++;
+				} break;
+			case '!':{
+					lab.RESaa( apA[0], apA[1] );
+
+					op.x *= -1;
+				} break;
+
+			case '.': {
+					lab.RESaa( apA[0], apA[1] );
+
+                    if( apA[0] )
+                    {
+						// már megvan lab.aa() //lab.a8x2[0].alf = gpfSTR2ALF( apA[0], apA[0] + min( 14, lab.y ), NULL );
+						if( apA[1] )
+						{
+							// ó kető van egymás után // ez valami típus?
+							// már megvan lab.aa() //lab.a8x2[1].alf = gpfSTR2ALF( apA[1], apA[1] + min( 14, lab.w ), NULL );
+
+						}
+						// ez csak egy kulcsszó megpontozva
+
+						break;
+                    }
+
+                    if( apA[1] && apN[0] )
+                    {
+						// ez egy AN megpontozva
+						// már megvan lab.aa() //lab.a8x2[1].alf = gpfSTR2ALF( apA[1], apA[1] + min( 14, lab.w ), NULL );
+
+						break;
+                    }
+
+                    //ez egy float szám ?
+                    pS--; // visszaléptetjük úgy is vissza mászik a gpmSTR2D-val;
+					d8 = gpmSTR2D( pS ) + u8;
+
+					typ.u4 = gpeTYP_D;
+					if( op.x < 0 )
+					{
+						// volt néhány minusz elötte
+						d8 *= -1.0;
+						op.x++;
+					}
+				} break;
+
+			case ',': {	// vessző OSZLOPOK
+					lab.RESaa( apA[0], apA[1] );
+
+					op.null();
 					xyWH.x++;
 					if( xyWH.z >= xyWH.x )
 						break;
@@ -128,17 +264,20 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
 					xyWH.z = xyWH.x;
 				} break;
 			case ';': {	// SOROK
-					if( deep )
-						break;
+					lab.RESaa( apA[0], apA[1] );
 
+					op.null();
 					xyWH.x = 0;
 					xyWH.y++;
-					lab.x = 0;
 				} break;
 
 			case ' = ':{
-                    if( deep )
-						break;
+					lab.RESaa( apA[0], apA[1] );
+
+					/// egyenlőségjel resetelei az xyWH-t
+					xyWH.null(); // Nesze! Most már null!
+				    //if( deep )
+					//	break;
 
 					if( *pS == '=' )
 					{
@@ -172,100 +311,30 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
 
 
 
-			case ')': {
-						if( !d )
-						{
-							pE = pS;
-							break;
-						}
-						if( d != '(' )
-							break;
-
-						if( deep )
-						{
-							deep--;
-							if( deep )
-								break;
-
-							d = 0;
-						} else
-							pE = pS;
-						break;
-					}
-			case '}': {
-						if( !d ) {
-							pE = pS;
-							break;
-						}
-
-						if( d != '{' )
-							break;
-
-						if( deep ) {
-							deep--;
-							if( deep )
-								break;
-
-							d = 0;
-						} else
-							pE = pS;
-						break;
-					}
+			case ')':
+			case '}':
 			case ']': {
-						if( !d ) {
-							pE = pS;
-							break;
-						}
-
-						if( d != ']' )
-							break;
-
-						if( deep ) {
-							deep--;
-							if( deep )
-								break;
-
-							d = 0;
-						} else
-							pE = pS;
+						pE = pS;
 						break;
 					}
 			case '(':
 			case '{':
 			case '[': {
-					if( !d )
-					{
-						d = pS[-1];
-						deep = 1;
-						break;
-					}
+					lab.RESaa( apA[0], apA[1] );
 
-					if( d == pS[-1] )
-							deep++;
+
+					gpcRES* pR = compiEASY( pS, pE, &pS, this );
+
 
 				} break;
 
 
 
-			case '/': {
-					switch( *pS ) {
-						case '*':
-							pS = (U1*)strstr( (char*)pS+1, "*/" );
-							if( pS ? (pS >= pE) : true )
-							{
-								pS = pE;
-								break;
-							}
 
-							pS += 2;
-							break;
-
-						case '/':
-							pS += gpmVAN( pS, "\n", nUTF8 );
-							break;
-					}
-				} break;
 			case '\"': {
+
+
+					pSTR = pS;
 					pS += gpmVAN( pS, "\"", nUTF8 );
 					if( *pS == '\"' )
 					{
@@ -276,6 +345,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
 				} break;
 			case '\'': {
 					pS += gpmVAN( pS, "\'", nUTF8 );
+					u8 = pS[-1]; // ucsot beolvassa
 					if( *pS == '\'' )
 					{
 						pS++;
@@ -286,13 +356,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, gpcRES* pM )
 		}
 	}
 
-	if( pE > pS )
-		pE = pS;
-
-	pS = pU;
 
 
 
+	if( ppE )
+		*ppE = pS;
 
 	return this;
 }

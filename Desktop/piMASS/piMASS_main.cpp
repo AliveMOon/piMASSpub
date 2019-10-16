@@ -513,7 +513,7 @@ U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4
 		{
 			if( !pSRC->apRES[3] )
 			{
-				pSRC->apRES[3] = pSRC->apRES[3]->compiEASY( pSRC->pSRCstart(), NULL, NULL );
+				pSRC->apRES[3] = pSRC->apRES[3]->compiEASY( pSRC->pSRCstart(), NULL, NULL, NULL );
 				//gpmDEL( pSRC->apRES[2] ); // OFF? 2
 				if( pSRC->apRES[3] )
 				{

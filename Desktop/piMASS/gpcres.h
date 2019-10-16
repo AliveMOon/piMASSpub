@@ -31,13 +31,16 @@ enum gpeTYP:U4
 
 class gpcALU
 {
-	gpcRES* pMOM;
 public:
-	void*	pDAT;
-	gpeALF 	alf;
+	U4		nALL;
+	gpcRES	*pMOM;
+	void	*pDAT;
 	I1x4	op;
 	U1x4	typ;
 	U4x4	AN;
+	gpeALF 	alf;
+
+
 	gpcALU( gpcRES* pM = NULL );
 	~gpcALU();
 
@@ -56,7 +59,7 @@ public:
         gpmCLR;
         return this;
 	}
-	U4 nALL()
+	U4 nLOAD()
 	{
 		AN.z = AN.a4x2[0].area();
 		if( !typ.w )
@@ -84,8 +87,8 @@ public:
 		{
 			return *this;
 		}
-
-		pDAT = new U1[nALL()];
+		nALL = nLOAD();
+		pDAT = new U1[nALL];
         memcpy( pDAT, b.pDAT, AN.w );
 
         return *this;
@@ -100,15 +103,17 @@ class gpcRES
 {
 	gpeALF	*pLAB;
 	I1x4	*pOP;	// x add/sub // y mul/div // zw ?
+					// w size
 
 	U1x4	*pTYP;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 					// yz dimxy
-					// w size
 	U4x4	*pAN;
 	U8x4	*pTREE;
 	U4		*pTx;
-	void**	ppDAT;
-	U4		n, t, i, ig;
+	void	**ppDAT;
+	U4		*pnALL,
+			n, t, i, ig;
+
 	gpcALU*	pALU;
 	gpcRES* pMOM;
 
@@ -127,8 +132,10 @@ public:
 	{
 		null();
 	}
-	gpcRES* compiEASY( U1* pS, U1* pE, gpcRES* pMOM );
-	gpcRES* compiHARD( U1* pS, U1* pE, gpcRES* pMOM );
+
+
+	gpcRES* compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
+	gpcRES* compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 
 	gpcALU* getALU( U4 a )
 	{
@@ -153,14 +160,16 @@ public:
 		pALU->typ	= pTYP	? pTYP[a]	: 0;
 		pALU->AN 	= pAN	? pAN[a]	: 0;
 		pALU->pDAT	= ppDAT	? ppDAT[a]	: NULL;
-
+		pALU->nALL	= pnALL ? pnALL[a]	: 0;
 		return pALU;
 	}
-	gpcALU* pADD( gpeALF lab, U4 typ, U4 op )
+	gpcALU* pADD( gpeALF alf, U4 typ, U4 op )
 	{
 		U4 nCPY = n;
 		n++;
 
+
+		/// ---------------------------------------------
 		void* pKILL = ppDAT;
 		ppDAT = new void*[n];
 		if( pKILL )
@@ -170,6 +179,17 @@ public:
 		}
 		ppDAT[nCPY] = NULL;
 
+		pKILL = pnALL;
+		pnALL = new U4[n];
+		if( pKILL )
+		{
+			memcpy( pnALL, pKILL, nCPY*sizeof(*pnALL) );
+			delete[] pKILL;
+		}
+		pnALL[nCPY] = 0;
+		/// ---------------------------------------------
+
+
 		pKILL = pLAB;
 		pLAB = new gpeALF[n];
 		if( pKILL )
@@ -177,7 +197,7 @@ public:
 			memcpy( pLAB, pKILL, nCPY*sizeof(*pLAB) );
 			delete[] pKILL;
 		}
-		pLAB[nCPY] = lab;
+		pLAB[nCPY] = alf;
 
 		pKILL = pOP;
 		if( op || pKILL )
@@ -229,12 +249,10 @@ public:
 		}
 		pTx[nCPY] = 0;
 
-
 		pALU = getALU( nCPY );
 		if( pALU )
-		{
+			return pALU;
 
-		}
 
 
 		return pALU;
