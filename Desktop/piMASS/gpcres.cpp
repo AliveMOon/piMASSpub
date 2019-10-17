@@ -239,7 +239,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					op.z |= 0x10;
 				} break;
 
-			case ' = ':{
+			case '=':{
 					lab.AB( apA[0], apA[1], apA, apA+1 );
 					if( *pS == '=' ) { // equal?
 						// ez logikai op nem assign
