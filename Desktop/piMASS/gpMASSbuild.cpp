@@ -102,11 +102,25 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 	}
 
 	U8 alf = 0;
-	U1 c;
+	U1 c, utf;
 
 	while( pS < p_end)
 	{
 		c = *(U1*)pS;
+		utf = 0x80;
+		if( c&utf )
+		{
+			utf >>= 1;
+			while( c&utf )
+            {
+				utf >>= 1;
+				pS++;
+            }
+			// most egyenlőre minden UTF-et kicserélünk e betüre;
+			c = 'e';
+
+
+		}
 		if( !gpaALFadd[c] )
 			break;
 		c -= gpaALFadd[c];
@@ -152,7 +166,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 						gpsSTRpub, spcZN.y, spcZN.str( psHD+0x100, "," ), nVER, nHD, nBLD,
 						bSW );
 
-	while( pB-pS )
+	while( pB > pS )
 	{
 		if( (*pS&0x80) )
 		{
@@ -235,6 +249,9 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 		}
 		switch( alf )
 		{
+			case gpeALF_null:
+				pS++;
+				continue;
 			case gpeALF_SUB:
 				bSW |= gpeMASSsubMSK;
 				continue;
@@ -262,6 +279,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				bSW |= gpeMASScrsrMSK;
 				continue;
 			default:
+				continue;
 				pS++;
 				break;
 		}

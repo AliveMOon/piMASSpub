@@ -1808,6 +1808,7 @@ public:
 	{
 		return I8x2( x<0?-x:x, y<0?-y:y );
 	}
+	I8x2& A( U1* pA, U1** ppA );
 
 };
 
@@ -1857,7 +1858,7 @@ public:
 		gpmCLR;
 		return *this;
 	}
-	I8x4& RESaa( U1* pA, U1* pB );
+	I8x4& AB( U1* pA, U1* pB, U1** ppA = NULL, U1** ppB = NULL );
 
     I8 tree_add( gpeALF alf, I8 n_t )
     {

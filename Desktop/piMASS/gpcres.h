@@ -102,7 +102,7 @@ public:
 class gpcRES
 {
 	gpeALF	*pLAB;
-	I1x4	*pOP;	// x add/sub // y mul/div // zw ?
+	I1x4	*pOP;	// x add/sub // y mul/div // z[7rem:mod 6not:! 5or:| 4and:& ]  //w ?
 					// w size
 
 	U1x4	*pTYP;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
