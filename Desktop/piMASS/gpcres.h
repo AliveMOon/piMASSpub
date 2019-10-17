@@ -41,7 +41,7 @@ public:
 	gpeALF 	alf;
 
 
-	gpcALU( gpcRES* pM = NULL );
+	gpcALU( gpcRES* pM ); //= NULL );
 	~gpcALU();
 
 	gpcALU( const gpcALU& b )
@@ -99,6 +99,35 @@ public:
 	}
 };
 
+class gpcADR
+{
+public:
+	gpcRES*	pRM;
+	U4		ix;
+	gpeALF	alf;
+	gpcADR(){ gpmCLR; };
+
+
+	gpcADR& operator = ( gpeALF a )
+	{
+		gpmCLR;
+		alf = a;
+		return *this;
+	}
+
+	gpcADR& operator = ( gpcRES* pM );
+
+
+	gpcADR( gpeALF a, gpcRES* pM )
+	{
+		*this = a;
+		*this = pM;
+	}
+
+	gpcALU* pTRG( gpcRES* pM );
+
+};
+
 class gpcRES
 {
 	gpeALF	*pLAB;
@@ -118,6 +147,10 @@ class gpcRES
 	gpcRES* pMOM;
 
 public:
+	gpcRES* pRM()
+	{
+		return pMOM;
+	}
 	gpcRES& null();
 
 	gpcRES( gpcRES* pM = NULL )
@@ -259,15 +292,15 @@ public:
 	}
 	gpcALU* equ( gpeALF lab, U4 typ, U8 u )
 	{
-		U4 iF = iFND( lab );
+		U4 iALU = iFND( lab );
 		gpcRES* pM = this;
-		while( iF >= pM->nFND() )
+		while( iALU >= pM->nFND() )
 		{
 			pM = pM->pMOM;
-			iF = pM->iFND( lab );
+			iALU = pM->iFND( lab );
 		}
 
-		pALU = pM->getALU(iF);
+		pALU = pM->getALU(iALU);
 		if( !pALU )
 		{
             if( !pADD( lab, typ, 0 ) )
@@ -276,6 +309,9 @@ public:
 
 		return pALU->equ( typ, u );
 	}
+
+
+
 	U4 nFND()
 	{
 		return this ? n : 0;

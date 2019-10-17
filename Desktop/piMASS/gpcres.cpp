@@ -58,6 +58,50 @@ I8x4& I8x4::AB( U1* pA, U1* pB, U1** ppA, U1** ppB )
 	a8x2[1].A( pB, ppB );
 	return *this;
 }
+
+gpcADR& gpcADR::operator = ( gpcRES* pM )
+{
+	pRM = pM;
+	if( alf ? !pM : true )
+	{
+		ix = 0;
+		pRM = NULL;
+		return *this;
+	}
+
+	U4 n = ix = pM->nFND();
+	while( ix >= n )
+	{
+		pRM = pRM->pRM();
+		if( !pRM )
+		{
+			ix = 0;
+			return *this;
+		}
+
+		n = pRM->nFND();
+		ix = pRM->iFND( alf );
+	}
+	return *this;
+}
+gpcALU* gpcADR::pTRG( gpcRES* pM )
+{
+	if( !pRM )
+	{
+		pRM = pM;
+		if( !pRM )
+			return NULL;
+
+		ix = pRM->nFND();
+	}
+
+	gpcALU* pT = pRM->getALU( ix );
+	if( pT )
+		return pT;
+
+	return pRM->pADD( alf, 0, 0 );
+}
+
 gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 {
 	if( pE )
@@ -95,6 +139,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	bool bMATH = false;
 	gpeALF XML = gpeALF_null;
 	I4 xmlD = 0;
+
+
+	gpcADR adr;
+	gpcALU* pTRG = NULL;
+
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 		if( gpmbABC( *pS, gpaALFadd ) )
@@ -174,7 +223,9 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					}
 				} break;
 			case '+':{
+
 					lab.AB( apA[0], apA[1], apA, apA+1 );
+
 
 
 					op.x++;
@@ -248,34 +299,31 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						break;
 					}
 
-					/// egyenlőségjel resetelei az xyWH-t
-					xyWH.null(); // Nesze! Most már null!
+					/// egyenlőségjel reseteli az xyWH-t
+					xyWH.null(); /// Nesze! Most már null!
 				    //if( deep )
 					//	break;
+					adr = lab.a8x2[0].alf;
+					adr = this;
 
-
-
-					U4 i_fnd = iFND( lab.labe );
-					gpcRES* pM = this;
-					while( i_fnd >= pM->nFND() )
-					{
-						pM = pM->pMOM;
-						i_fnd = pM->iFND( lab.labe );
-					}
-
-					while( !lab.labe )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
+					//U4 iFND = iFNDadr( lab.a8x2[0].alf, &apMOM[0] );
+					if( !adr.alf )
+					while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
                     {
-						lab.x = ( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nLAB ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
-                        i_fnd = iFND( lab.labe );
-                        if( i_fnd < nFND() )
-							lab.x = gpeALF_null;
+						// nem talált ilyen változót
+						adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nLAB ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
+                        adr = this; // ezzel indítjuk a keresést
+                        nLAB++;
                     }
+
+					pTRG = adr.pTRG( this );
+					break;
 
                     // x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 					if( typ.x&0x40) // lebeg
-						pM->equ( lab.labe, typ.u4, d8 );
+						pM->equ( lab.a8x2[0].alf, typ.u4, d8 );
 					else
-						pM->equ( lab.labe, typ.u4, lab.y );
+						pM->equ( lab.a8x2[0].alf, typ.u4, lab.y );
 					// új változó
 				} break;
 
