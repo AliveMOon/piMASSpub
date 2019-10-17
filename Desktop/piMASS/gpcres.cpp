@@ -167,7 +167,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			if( apA[0] )
 			{
 				// az ötlet lényege, hogy nem lesz a apA[0] -ban szöveg ha AN
-				// viszont ha nem volt utánna szám  akkor a típus az apA[0] a label meg az apA[1] ben lesz
+				// viszont ha nem volt utánna szám  akkor a típus az apA[0], a label meg az apA[1] ben lesz
 				apA[1] = apA[0];
 			}
 			apN[0] = pS;
@@ -299,6 +299,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						break;
 					}
 
+					/// = ASSIGN = -------------------------------------
 					/// egyenlőségjel reseteli az xyWH-t
 					xyWH.null(); /// Nesze! Most már null!
 				    //if( deep )
