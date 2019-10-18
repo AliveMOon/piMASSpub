@@ -1,4 +1,21 @@
- a0	 á 
+ a0	 á  
+ !!	 
+	Figyelem
+	A lényeg ebben a rublikában van 
+									!!
+
+
+ Ebben a dokumentumban az látható,
+ hogy már a
+<LI>Raspberry PI 
+<LI>LINUX 
+<LI>Code::Block 
+<LI>az új programom a piMASS-val
+
+elöbb elkészítettem a táblázatot
+majd elmenetettem a dokumentumot HTML-ben
+
+azt pedig kinyomtattam CHROME-ban pdf-be :)
  b0	  100,	-100;
  1,		1000, 100, 2;
 -100, 0xffFFffFF;
@@ -56,25 +73,7 @@ enter enter	  b7	 b2	 
  Ember
   alak c7	 b3	   d7	 b3	 
 
-  e7	 c3	 c2	     f7	 f6	   g7	 g6	 f6	   h7	 g6	 f6	   a8	   b8	   c8	   d8	   e8	   f8	   g8	 g6	 f6	   h8	 g6	 f6	   a9	   b9	   c9	   d9	   e9	   f9	   g9	 g6	 f6	   h9	 g6	 f6	   a10	   b10	   c10	   d10	   e10	   f10	   g10	 g6	 f6	   h10	 g6	 f6	   a11	   b11	   
- !!	 
-	Figyelem
-	A lényeg ebben a rublikában van 
-									!!
-
-
- Ebben a dokumentumban az látható,
- hogy már a
-<LI>Raspberry PI 
-<LI>LINUX 
-<LI>Code::Block 
-<LI>az új programom a piMASS-val
-
-elöbb elkészítettem a táblázatot
-majd elmenetettem a dokumentumot HTML-ben
-
-azt pedig kinyomtattam CHROME-ban pdf-be :)
- c11	   d11	  
+  e7	 c3	 c2	     f7	 f6	   g7	 g6	 f6	   h7	 g6	 f6	   a8	   b8	   c8	   d8	   e8	   f8	   g8	 g6	 f6	   h8	 g6	 f6	   a9	   b9	   c9	   d9	   e9	   f9	   g9	 g6	 f6	   h9	 g6	 f6	   a10	   b10	   c10	   d10	   e10	   f10	   g10	 g6	 f6	   h10	 g6	 f6	   a11	   b11	   c11	   d11	  
 
 
 
