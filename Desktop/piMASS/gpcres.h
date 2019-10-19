@@ -36,11 +36,13 @@ public:
 	gpcRES	*pMOM;
 	void	*pDAT;
 	I1x4	op;
-	U1x4	typ;
+	U1x4	typ;	// typ:
+					// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+					// yz[ dimXY ] 		, w[] = nBYTE*dimXY
 	U4x4	AN;
 	gpeALF 	alf;
 
-
+	gpcALU(){ gpmCLR; };
 	gpcALU( gpcRES* pM ); //= NULL );
 	~gpcALU();
 
@@ -49,25 +51,36 @@ public:
 		gpmCLR;
 		*this = b;
 	}
-	gpcALU* null( gpcRES* pM = NULL )
+	gpcALU& null()
 	{
-		if( !this )
-			return this;
-        if( pMOM == pM ? pDAT : NULL )
-			delete[] pDAT;
-
-        gpmCLR;
-        return this;
+		gpmCLR;
+        return *this;
+	}
+	U4 nDIM()
+	{
+		return typ.area_yz();
+	}
+	U4 nT1()
+	{
+		return 1<<(typ.x&0xf);
 	}
 	U4 nLOAD()
 	{
-		AN.z = AN.a4x2[0].area();
+		if( !AN.z )
+			AN.z = AN.a4x2[0].area();
+
+		// typ:
+		// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+		// yz[ dimXY ] 		, w[] = nBYTE*dimXY
 		if( !typ.w )
-			typ.w = typ.area_yz()<<(typ.x&0xf);
+			typ.w = nDIM()<<(typ.x&0xf);
 
 		AN.w = AN.z;
 		if( typ.w > 1 )
 			AN.w *= typ.w;
+		// AN
+		// x-A y-n
+		// z = a*n
 
 		return AN.w;
 	}
@@ -93,25 +106,29 @@ public:
 
         return *this;
 	}
-	gpcALU* equ( U4 typ, U8 u )
-	{
-
-	}
+	gpcALU& equ( gpcRES* pTHIS, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
+	gpcALU& equ( gpcRES* pTHIS, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm = 0 );
+	gpcALU& equ( gpcRES* pTHIS, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 };
 
 class gpcADR
 {
 public:
 	gpcRES*	pRM;
-	U4		ix;
-	gpeALF	alf;
+	I4		dp, ix, n;
+	I8x2	an;
+
 	gpcADR(){ gpmCLR; };
 
-
+	gpcADR( gpeALF a )
+	{
+		gpmCLR;
+		an.alf = a;
+	}
 	gpcADR& operator = ( gpeALF a )
 	{
 		gpmCLR;
-		alf = a;
+		an.alf = a;
 		return *this;
 	}
 
@@ -124,7 +141,8 @@ public:
 		*this = pM;
 	}
 
-	gpcALU* pTRG( gpcRES* pM );
+	gpcALU& ALU( gpcRES* pM );
+
 
 };
 
@@ -141,12 +159,16 @@ class gpcRES
 	U4		*pTx;
 	void	**ppDAT;
 	U4		*pnALL,
-			n, t, i, ig;
+			n, t, i, ig, iLEV;
 
-	gpcALU*	pALU;
+	gpcALU	alu;
 	gpcRES* pMOM;
 
 public:
+	U4 iL()
+	{
+		return iLEV;
+	}
 	gpcRES* pRM()
 	{
 		return pMOM;
@@ -159,45 +181,35 @@ public:
         if( !pM )
 			return;
 
-		pMOM = pM;
+		if( pMOM = pM )
+			iLEV = pMOM->iLEV+1;
 	}
+
 	~gpcRES()
 	{
 		null();
 	}
 
-
 	gpcRES* compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	gpcRES* compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 
-	gpcALU* getALU( U4 a )
+	gpcALU& ALU( U4 iA )
 	{
-		if( this ? (a >= n) : true )
-			return NULL;
+		alu = this;
 
-		if( !pALU )
-		{
-			pALU = new gpcALU( this );
-			if( !pALU )
-				return NULL;
-		}
+		if( iA >= n )
+			return alu;
 
-		if( ppDAT ? ppDAT[a] : NULL )
-		if( pALU->pDAT == ppDAT[a] )
-		{
-			return pALU;
-		}
-
-		pALU->alf	= pLAB	? pLAB[a]	: gpeALF_null;
-		pALU->op	= pOP	? pOP[a]	: 0;
-		pALU->typ	= pTYP	? pTYP[a]	: 0;
-		pALU->AN 	= pAN	? pAN[a]	: 0;
-		pALU->pDAT	= ppDAT	? ppDAT[a]	: NULL;
-		pALU->nALL	= pnALL ? pnALL[a]	: 0;
-		return pALU;
+		alu.alf		= pLAB	? pLAB[iA]	: gpeALF_null;
+		alu.op		= pOP	? pOP[iA]	: 0;
+		alu.typ		= pTYP	? pTYP[iA]	: 0;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+												// yz dimxy
+		alu.AN 		= pAN	? pAN[iA]	: 0;
+		alu.pDAT	= ppDAT	? ppDAT[iA]	: NULL;
+		alu.nALL	= pnALL ? pnALL[iA]	: 0;
+		return alu;
 	}
-	gpcALU* pADD( gpeALF alf, U4 typ, U4 op )
-	{
+	gpcALU& ADD( gpeALF alf, U4 typ, U4 op ) {
 		U4 nCPY = n;
 		n++;
 
@@ -282,35 +294,8 @@ public:
 		}
 		pTx[nCPY] = 0;
 
-		pALU = getALU( nCPY );
-		if( pALU )
-			return pALU;
-
-
-
-		return pALU;
+		return ALU( nCPY );
 	}
-	gpcALU* equ( gpeALF lab, U4 typ, U8 u )
-	{
-		U4 iALU = iFND( lab );
-		gpcRES* pM = this;
-		while( iALU >= pM->nFND() )
-		{
-			pM = pM->pMOM;
-			iALU = pM->iFND( lab );
-		}
-
-		pALU = pM->getALU(iALU);
-		if( !pALU )
-		{
-            if( !pADD( lab, typ, 0 ) )
-				return NULL;
-		}
-
-		return pALU->equ( typ, u );
-	}
-
-
 
 	U4 nFND()
 	{

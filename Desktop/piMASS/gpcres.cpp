@@ -40,8 +40,9 @@ gpcRES& gpcRES::null()
 	gpmDELary( pAN );
 	gpmDELary( pTREE );
 	gpmDELary( pTx );
-	gpmDELary( pALU );
+	//gpmDELary( pALU );
 }
+
 I8x2& I8x2::A( U1* pA, U1** ppA )
 {
 	alf = gpfSTR2ALF( pA, pA + min( 14, y ), NULL );
@@ -62,14 +63,14 @@ I8x4& I8x4::AB( U1* pA, U1* pB, U1** ppA, U1** ppB )
 gpcADR& gpcADR::operator = ( gpcRES* pM )
 {
 	pRM = pM;
-	if( alf ? !pM : true )
+	if( an.alf ? !pM : true )
 	{
-		ix = 0;
-		pRM = NULL;
-		return *this;
+		//ix = 0;
+		//pRM = NULL;
+		return *this = gpeALF_null;
 	}
 
-	U4 n = ix = pM->nFND();
+	n = ix = pM->nFND();
 	while( ix >= n )
 	{
 		pRM = pRM->pRM();
@@ -80,28 +81,211 @@ gpcADR& gpcADR::operator = ( gpcRES* pM )
 		}
 
 		n = pRM->nFND();
-		ix = pRM->iFND( alf );
+		ix = pRM->iFND( an.alf );
+		dp = pM->iL() - pRM->iL();
 	}
 	return *this;
 }
-gpcALU* gpcADR::pTRG( gpcRES* pM )
+gpcALU& gpcADR::ALU( gpcRES* pM )
 {
+	gpcALU alu( NULL );
 	if( !pRM )
 	{
 		pRM = pM;
 		if( !pRM )
-			return NULL;
+			return alu;
 
 		ix = pRM->nFND();
 	}
 
-	gpcALU* pT = pRM->getALU( ix );
-	if( pT )
-		return pT;
+	return pRM->ALU( ix );
+}
+gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
+{
+	if( !pM )
+		return null();
 
-	return pRM->pADD( alf, 0, 0 );
+	gpcADR adr = alf;
+	if( !alf )
+	{
+        U8 nCNT = 1;
+		adr.an.alf = gpeALF_A;
+		adr = pM;
+		while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
+		{
+			// nem talált ilyen változót
+			adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nCNT ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
+			adr = pM; // ezzel indítjuk a keresést
+			nCNT++;
+		}
+		*this = pM->ADD( adr.an.alf, ty4.u4, op4.u4 );
+ 	} else
+		adr = pM;
+
+
+	/// ha nem megfelelő typus át kell küldözgetni
+	/// a megfelelő typus dolgozza fel
+	// typ:
+	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+	// yz[ dimXY ] 		, w[] = nBYTE*dimXY
+	if( typ.x&0x40 && (u8&0x8000000000000000) )
+	{
+		// lebegőpontos volt vagy rohadt nagy, átküldjük double-ba
+		double d8 = u8;
+		if( op4.y < 0 )
+		{
+			d8 *= -1;
+			op4.y = 0;
+		}
+		return equ( pM, xy, ty4, op4, d8 );
+	}
+	if( typ.x&0x80 )
+	{
+		I8 i8 = u8;
+		if( op4.y < 0 )
+		{
+			i8 *= -1;
+			op4.y = 0;
+		}
+		return equ( pM, xy, ty4, op4, i8 );
+	}
+
+
+	gpcALU tmp;
+	tmp.typ = ty4;
+	tmp.AN.a4x2[0] = AN.a4x2[0];
+	tmp.pDAT = pDAT;
+
+	if( AN.a4x2[0].x <= xy.x )
+		tmp.AN.a4x2[0].x = xy.x+1;
+	if( AN.a4x2[0].y <= xy.y )
+		tmp.AN.a4x2[0].y = xy.y+1;
+
+    U4	nL0 = nLOAD(),
+		nL1 = tmp.nLOAD();
+
+	if( !pDAT )
+	{
+		pDAT = new U1[nL1];
+		gpmZn( (U1*)pDAT, nL1 );
+	}
+	if( (nL1 == nL0) && (ty4.u4 == typ.u4) )
+	{
+
+		// hát ez tök egyforma
+		(((U8*)pDAT)+(xy*U4x2(1,tmp.AN.x)))[dm%tmp.nDIM()] = u8 ;
+		return *this;
+	}
+
+
+
+	return *this;
 }
 
+gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm )
+{
+	if( !pM )
+		return null();
+
+	gpcADR adr = alf;
+	if( !alf )
+	{
+        U8 nCNT = 1;
+		adr.an.alf = gpeALF_A;
+		adr = pM;
+		while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
+		{
+			// nem talált ilyen változót
+			adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nCNT ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
+			adr = pM; // ezzel indítjuk a keresést
+			nCNT++;
+		}
+		*this = pM->ADD( adr.an.alf, ty4.u4, op4.u4 );
+ 	} else
+		adr = pM;
+
+
+	/// ha nem megfelelő typus át kell küldözgetni
+	/// a megfelelő typus dolgozza fel
+	// typ:
+	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+	// yz[ dimXY ] 		, w[] = nBYTE*dimXY
+	if( typ.x&0x40 )
+	{
+		// lebegőpontos volt vagy rohadt nagy, átküldjük double-ba
+		double d8 = i8;
+		if( op4.y < 0 )
+		{
+			d8 *= -1;
+			op4.y = 0;
+		}
+		return equ( pM, xy, ty4, op4, d8 );
+	}
+	if( !(typ.x&0x80) )
+	{
+		if( op4.y < 0 )
+		{
+			i8 *= -1;
+			op4.y = 0;
+		}
+		return equ( pM, xy, ty4, op4, i8 );
+	}
+
+
+	gpcALU tmp;
+	tmp.typ = ty4;
+	tmp.AN.a4x2[0] = AN.a4x2[0];
+	tmp.pDAT = pDAT;
+
+	if( AN.a4x2[0].x <= xy.x )
+		tmp.AN.a4x2[0].x = xy.x+1;
+	if( AN.a4x2[0].y <= xy.y )
+		tmp.AN.a4x2[0].y = xy.y+1;
+
+    U4	nL0 = nLOAD(),
+		nL1 = tmp.nLOAD();
+
+	if( !pDAT )
+	{
+		pDAT = new U1[nL1];
+		gpmZn( (U1*)pDAT, nL1 );
+	}
+	if( (nL1 == nL0) && (ty4.u4 == typ.u4) )
+	{
+
+		// hát ez tök egyforma
+		(((I8*)pDAT)+(xy*U4x2(1,tmp.AN.x)))[dm%tmp.nDIM()] = i8 ;
+		return *this;
+	}
+
+
+
+	return *this;
+}
+gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 dm )
+{
+	if( !pM )
+		return null();
+
+	if( !alf )
+	{
+        gpcADR adr;
+        U8 nCNT = 1;
+		adr.an.alf = gpeALF_A;
+		adr = pM;
+		while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
+		{
+			// nem talált ilyen változót
+			adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nCNT ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
+			adr = pM; // ezzel indítjuk a keresést
+			nCNT++;
+		}
+		*this = pM->ADD( adr.an.alf, ty4.u4, op4.u4 );
+ 	}
+
+
+	return *this;
+}
 gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 {
 	if( pE )
@@ -142,7 +326,8 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 
 	gpcADR adr;
-	gpcALU* pTRG = NULL;
+	gpcALU	aA[8];
+	gpmZ(aA);
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -183,7 +368,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
                     if( apA[0] )
                     {
-						// már megvan lab.aa() //lab.a8x2[0].alf = gpfSTR2ALF( apA[0], apA[0] + min( 14, lab.y ), NULL );
+						// már megvan lab.AB() //lab.a8x2[0].alf = gpfSTR2ALF( apA[0], apA[0] + min( 14, lab.y ), NULL );
 						if( apA[1] )
 						{
 							// ó kető van egymás után // ez valami típus?
@@ -291,7 +476,23 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				} break;
 
 			case '=':{
-					lab.AB( apA[0], apA[1], apA, apA+1 );
+					if( apA[0] )
+					{
+						// valami turpisság készül
+						lab.a8x2[0].A( apA[0], apA );
+						if( apA[1] )
+						{
+							lab.a8x2[1].A( apA[1], apA+1 );
+
+						}
+					} else {
+						if( apA[1] )
+						{
+							lab.a8x2[1].A( apA[1], apA+1 );
+							// AN A0:A1.A0 stb
+						}
+					}
+
 					if( *pS == '=' ) { // equal?
 						// ez logikai op nem assign
 
@@ -308,7 +509,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					adr = this;
 
 					//U4 iFND = iFNDadr( lab.a8x2[0].alf, &apMOM[0] );
-					if( !adr.alf )
+					if( !adr.an.alf )
 					while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
                     {
 						// nem talált ilyen változót
@@ -317,22 +518,70 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
                         nLAB++;
                     }
 
-					pTRG = adr.pTRG( this );
-					break;
+					aA[0] = adr.ALU( this );
+					/*break;
 
                     // x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 					if( typ.x&0x40) // lebeg
-						pM->equ( lab.a8x2[0].alf, typ.u4, d8 );
+						pM->equ( lab.a8x2[0].alf, op.u4, typ.u4, d8 );
 					else
-						pM->equ( lab.a8x2[0].alf, typ.u4, lab.y );
-					// új változó
+						pM->equ( lab.a8x2[0].alf, op.u4, typ.u4, lab.y );
+					// új változó*/
+				} break;
+
+			case ':': {
+					// ez valami név?
+					if( apA[0] )
+					{
+						// valami turpisság készül
+						lab.a8x2[0].A( apA[0], apA );
+						if( apA[1] )
+						{
+							lab.a8x2[1].A( apA[1], apA+1 );
+
+
+						}
+
+						op.z |= 0x8;	// nevet vagy típust is meghatároz
+
+
+					}
+
+
 				} break;
 
 
-
 			case ',': {	// vessző OSZLOPOK
-					lab.AB( apA[0], apA[1], apA, apA+1 );
 
+					if( apA[0] )
+					{
+						// valami turpisság készül
+						lab.a8x2[0].A( apA[0], apA );
+						if( apA[1] )
+						{
+							lab.a8x2[1].A( apA[1], apA+1 );
+
+						}
+						if( aA[0].alf != lab.a8x2[0].alf )
+						{
+							adr = lab.a8x2[0].alf;
+							adr = this;
+						}
+
+					} else {
+						if( apA[1] )
+						{
+							lab.a8x2[1].A( apA[1], apA+1 );
+							// AN A0:A1.A0 stb
+						}
+					}
+
+
+
+					if( typ.x&0x40 )
+						aA[0].equ( this, xyWH.a4x2[0], typ, op, d8 );
+					else
+						aA[0].equ( this, xyWH.a4x2[0], typ, op, u8 );
 
 					op.u4 = 0;
 					xyWH.x++;
