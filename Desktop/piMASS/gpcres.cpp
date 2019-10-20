@@ -124,11 +124,11 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 
 
 	/// ha nem megfelelő typus át kell küldözgetni
-	/// a megfelelő typus dolgozza fel
-	// typ:
+	/// a megfelelő típusban dolgozza fel
+	// U1x4 typ:
 	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
 	// yz[ dimXY ] 		, w[] = nBYTE*dimXY
-	if( typ.x&0x40 && (u8&0x8000000000000000) )
+	if( typ.x&0x40 || (u8&0x8000000000000000) )
 	{
 		// lebegőpontos volt vagy rohadt nagy, átküldjük double-ba
 		double d8 = u8;
@@ -141,6 +141,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 	}
 	if( typ.x&0x80 )
 	{
+		// signed azaz előjeles
 		I8 i8 = u8;
 		if( op4.y < 0 )
 		{
@@ -152,14 +153,11 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 
 
 	gpcALU tmp;
-	tmp.typ = ty4;
+	// AN
 	tmp.AN.a4x2[0] = AN.a4x2[0];
+	tmp.AN.a4x2[0].mx( xy );
+	tmp.typ = ty4;
 	tmp.pDAT = pDAT;
-
-	if( AN.a4x2[0].x <= xy.x )
-		tmp.AN.a4x2[0].x = xy.x+1;
-	if( AN.a4x2[0].y <= xy.y )
-		tmp.AN.a4x2[0].y = xy.y+1;
 
     U4	nL0 = nLOAD(),
 		nL1 = tmp.nLOAD();
@@ -176,6 +174,8 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 		(((U8*)pDAT)+(xy*U4x2(1,tmp.AN.x)))[dm%tmp.nDIM()] = u8 ;
 		return *this;
 	}
+
+
 
 
 
