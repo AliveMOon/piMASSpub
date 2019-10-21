@@ -151,32 +151,120 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 		return equ( pM, xy, ty4, op4, i8 );
 	}
 
-
 	gpcALU tmp;
-	// AN
-	tmp.AN.a4x2[0] = AN.a4x2[0];
-	tmp.AN.a4x2[0].mx( xy );
+
 	tmp.typ = ty4;
 	tmp.pDAT = pDAT;
 
-    U4	nL0 = nLOAD(),
-		nL1 = tmp.nLOAD();
+	tmp.AN.a4x2[0] = AN.a4x2[0];
+	tmp.AN.a4x2[0].mx( xy );
 
-	if( !pDAT )
+	U4x2 	X1( typ.y, typ.z ),
+			X2( ty4.y, ty4.z ).mx( X1 );
+
+	U4	nAN1	= AN.a4x2[0].area(),
+		nX1		= X1.area(),
+		nN1		= typ.x&0xf;
+		nB1		= 1<<nN1,
+
+		nAN2	= tmp.AN.a4x2[0].area(),
+		nX2		= X2.area(),
+		nN2		= ty4.x&0xf,
+		nB2		= 1<<nN2,
+
+		nXB1	= nX1*nB1,
+		nXB2	= nX2*nB2,
+
+		nLD1	= nAN1*nXB1,
+		nLD2	= nAN2*nXB2,
+
+		nBu8	= gpmNbyte(u8);
+
+
+    if( nB1 > nBu8  )
+    {
+		nB2 = nB1;
+		nN2 = nN1;
+		tmp.typ = (tmp.typ&0xf0) | nN2;//(typ.x&0xf);
+		nXB2 = nX2*nB2;
+		nLD2 = nAN2*nXB2;
+    }
+	if( nLD2 != nLD1 )
 	{
-		pDAT = new U1[nL1];
-		gpmZn( (U1*)pDAT, nL1 );
+		pDAT = new U1[nLD2];
+		gpmZn(pDAT, nLD2);
 	}
-	if( (nL1 == nL0) && (ty4.u4 == typ.u4) )
-	{
 
-		// hát ez tök egyforma
+	if( nLD2 == nLD1 )
+	{
 		(((U8*)pDAT)+(xy*U4x2(1,tmp.AN.x)))[dm%tmp.nDIM()] = u8 ;
 		return *this;
 	}
 
+	U8 src;
+	U4x2 	xyS,
+			T1( nXB1, nXB1*AN.a4x2[0].x ),
+			T2( nXB2, nXB2*tmp.AN.a4x2[0].x );
+
+    U1	*pS = (U1*)tmp.pDAT,
+		*pD = (U1*)pDAT;
+	for( xyS.y = 0; xyS.y < AN.a4x2[0].y; xyS.y++ )
+	if( nXB1 == nXB2 )
+	{
+		memcpy( pD+xyD*T2, pS+xyS*T1, T1.y );
+	}
+	else for( xyS.x = 0; xyS.x < AN.a4x2[0].x; xyS.x++ )
+    {
+		s = xyS*T1;
+		d = xyD*T2;
+
+        for( U2 x = 0; x < nX1; x++ )
+		{
+			if( nN1 == nN2 )
+			{
+				f( nN1 < 2 )
+				{
+					if( nN1 )
+						((U2*)(pD+d))[x] = ((U2*)(pS+s))[x];
+					else
+						((U1*)(pD+d))[x] = ((U1*)(pS+s))[x];
+				}
+				else if( nN1 > 3 )
+					((U8*)(pD+d))[x] = ((U8*)(pS+s))[x];
+				else
+					((U4*)(pD+d))[x] = ((U4*)(pS+s))[x];
+
+				continue;
+			}
+
+			if( nN1 < 2 )
+			{
+				if( nN1 )
+					src = ((U2*)(pS+s))[x];
+				else
+					src = ((U1*)(pS+s))[x];
+			}
+			else if( nN1 > 3 )
+				src = ((U8*)(pS+s))[x];
+			else
+				src = ((U4*)(pS+s))[x];
 
 
+			if( nN2 < 2 )
+			{
+				if( nN2 )
+					((U2*)(pD+d))[x] = src;
+				else
+					((U1*)(pD+d))[x] = src;
+			}
+			else if( nN2 > 3 )
+				((U8*)(pD+d))[x] = src;
+			else
+				((U4*)(pD+d))[x] = src;
+
+
+ 		}
+    }
 
 
 	return *this;

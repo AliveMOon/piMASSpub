@@ -386,7 +386,7 @@ U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
 			case 'x':
 			case 'X':
 				p_str++;
-				u8 = strtol( (char*)p_str, (char**)&p_str, 16 );
+				u8 = strtoll( (char*)p_str, (char**)&p_str, 16 );
 				break;
 			case 'b':
 			case 'B':

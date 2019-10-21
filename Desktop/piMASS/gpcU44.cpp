@@ -26,6 +26,8 @@ U4x2& U4x2::mn( I4x2 b )
 		y = b.y;
 	return *this;
 }
+
+
 U4x4::U4x4( const I4x2 _xy, I4x2* p_zw )
 {
 	a4x2[0] = _xy;

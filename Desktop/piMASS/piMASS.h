@@ -217,8 +217,8 @@ class gpcMASS;
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
 #define gpmMEMCMP (U1*)gp_memcmp
-
-
+#define gpmNbyte( u ) 	( u>0xffFF ? (u>0xffffFFFF ? 8 : 4) : (u>0xff ? 2 : 1)  )
+#define gpmNsh( b ) 	( b>2 ? (b>4 ? 4 : 3) : (b>1 ? 1 : 0)  )
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 
 U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nUTF8, U1* gpaALFadd )
