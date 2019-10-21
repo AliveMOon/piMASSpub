@@ -220,20 +220,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 		else
 			((U4*)(pD+d))[x] = u8;
 
-		if( pMOM )
-		{
-			if( pMOM->ppDAT[iA] == tmp.pDAT )
-			if( pMOM->ppDAT[iA] != pDAT )
-				gpmDELary( pMOM->ppDAT[iA] );
-			pMOM->ppDAT[iA] = pDAT;
-		}
-		/*if( adr.pRM )
-		{
-			if( adr.pRM->ppDAT[adr.ix] == tmp.pDAT )
-			if( adr.pRM->ppDAT[adr.ix] != pDAT )
-				gpmDELary( adr.pRM->ppDAT[adr.ix] );
-			adr.pRM->ppDAT[adr.ix] = pDAT;
-		}*/
+		pMOM->chg( *this );
 
 		return *this;
 	}
@@ -321,16 +308,14 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 	else
 		((U4*)(pD+d))[x] = u8;
 
-	if( tmp.pDAT != pDAT )
-		gpmDELary( tmp.pDAT );
-
-	if( pMOM )
+	pMOM->chg( *this );
+	/*if( adr.pRM )
 	{
-		if( pMOM->ppDAT[iA] == tmp.pDAT )
-		if( pMOM->ppDAT[iA] != pDAT )
-			gpmDELary( pMOM->ppDAT[iA] );
-		pMOM->ppDAT[iA] = pDAT;
-	}
+		if( adr.pRM->ppDAT[adr.ix] == tmp.pDAT )
+		if( adr.pRM->ppDAT[adr.ix] != pDAT )
+			gpmDELary( adr.pRM->ppDAT[adr.ix] );
+		adr.pRM->ppDAT[adr.ix] = pDAT;
+	}*/
 	return *this;
 }
 
@@ -492,8 +477,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			}
 			lab.a8x2[0].num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
 
-			apN[0] =
-			NULL;
+			apN[0] = NULL;
 			apA[0] = pS;
 			u8 = 0;
 			pS += lab.a8x2[0].num;
@@ -506,6 +490,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				// az ötlet lényege, hogy nem lesz a apA[0] -ban szöveg ha AN
 				// viszont ha nem volt utánna szám  akkor a típus az apA[0], a label meg az apA[1] ben lesz
 				apA[1] = apA[0];
+				apA[0] = NULL;
 			}
 			apN[0] = pS;
 			typ.u4 = gpeTYP_U8;

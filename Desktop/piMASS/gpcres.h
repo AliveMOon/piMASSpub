@@ -94,12 +94,12 @@ public:
 		if( !&b )
 			return *this;
 
-        gpmMEMCPY( this, &b, sizeof(*this) );
-		pMOM = NULL;
+        gpmMEMCPY( this, &b, 1 );
 		if( !pDAT )
 		{
 			return *this;
 		}
+		pMOM = NULL;
 		nALL = nLOAD();
 		pDAT = new U1[nALL];
         memcpy( pDAT, b.pDAT, AN.w );
@@ -161,11 +161,12 @@ class gpcRES
 	U4		*pnALL,
 			n, t, i, ig, iLEV;
 
+	void	**ppDAT;
 	gpcALU	alu;
 	gpcRES* pMOM;
 
 public:
-	void	**ppDAT;
+
 	U4 iL()
 	{
 		return iLEV;
@@ -210,6 +211,35 @@ public:
 		alu.pDAT	= ppDAT	? ppDAT[iA]	: NULL;
 		alu.nALL	= pnALL ? pnALL[iA]	: 0;
 		return alu;
+	}
+	gpcRES* chg( gpcALU& ali )
+	{
+		if( !this )
+			return NULL;
+
+		if( ali.iA >= n )
+			return this;
+
+		if( pLAB[ali.iA] == ali.alf )
+		{
+			if( !ppDAT )
+			{
+				ppDAT = new void*[n];
+			}
+			else if( ppDAT[ali.iA] != ali.pDAT )
+				gpmDELary( ppDAT[ali.iA] );
+			ppDAT[ali.iA] = ali.pDAT;
+			if( pOP )
+				pOP[ali.iA] = ali.op;
+			if( pTYP )
+				pTYP[ali.iA] = ali.typ;
+			if( pAN )
+				pAN[ali.iA] = ali.AN;
+
+		} else
+			gpmDELary( ali.pDAT );
+
+		return this;
 	}
 	gpcALU& ADD( gpeALF alf, U4 typ, U4 op ) {
 		U4 nCPY = n;
