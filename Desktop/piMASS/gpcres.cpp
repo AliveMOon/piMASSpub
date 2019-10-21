@@ -295,7 +295,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
     }
 
 	d = xy*T2;
-	x += dm;
+	x = dm;
 	if( nN2 < 2 )
 	{
 		if( nN2 )
@@ -309,13 +309,6 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 		((U4*)(pD+d))[x] = u8;
 
 	pMOM->chg( *this );
-	/*if( adr.pRM )
-	{
-		if( adr.pRM->ppDAT[adr.ix] == tmp.pDAT )
-		if( adr.pRM->ppDAT[adr.ix] != pDAT )
-			gpmDELary( adr.pRM->ppDAT[adr.ix] );
-		adr.pRM->ppDAT[adr.ix] = pDAT;
-	}*/
 	return *this;
 }
 
