@@ -764,6 +764,27 @@ public:
 
 	U4x2& operator = ( const I4x2& b );
 
+
+	U4x2 operator + (const U4 b) const
+	{
+		return U4x2( x+b, y+b );
+	}
+	U4x2 operator + (const U4x2 b) const
+	{
+		return U4x2( x+b.x, y+b.y );
+	}
+
+	U4x2 operator - (const U4 b) const
+	{
+		return U4x2( x-b, y-b );
+	}
+	U4x2 operator - (const U4x2 b) const
+	{
+		return U4x2( x-b.x, y-b.y );
+	}
+
+
+
 	U8 operator * (const U4x2& b) const
 	{
 		return (U8)x*b.x + (U8)y*b.y;
@@ -849,7 +870,7 @@ public:
 	{
 		return U4x2( x<0?-x:x, y<0?-y:y );
 	}
-	U4x2& mx( const U4x2& b )
+	U4x2& mx( U4x2 b )
 	{
 		if( x < b.x )
 			x = b.x;

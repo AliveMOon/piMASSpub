@@ -153,76 +153,82 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 
 	gpcALU tmp;
 
-	tmp.typ = ty4;
+	tmp.typ = typ;
 	tmp.pDAT = pDAT;
-
 	tmp.AN.a4x2[0] = AN.a4x2[0];
-	tmp.AN.a4x2[0].mx( xy );
 
-	U4x2 	X1( typ.y, typ.z ),
-			X2( ty4.y, ty4.z ).mx( X1 );
+	typ = ty4;
+	AN.a4x2[0].mx( xy+1 );
 
-	U4	nAN1	= AN.a4x2[0].area(),
+	U4x2 	X1( tmp.typ.y, tmp.typ.z ),
+			X2( typ.y, typ.z );
+	X2.mx( X1 );
+
+	U4	nAN1	= tmp.AN.a4x2[0].area(),
 		nX1		= X1.area(),
-		nN1		= typ.x&0xf;
+		nN1		= tmp.typ.x&0xf,
 		nB1		= 1<<nN1,
 
-		nAN2	= tmp.AN.a4x2[0].area(),
+		nAN2	= AN.a4x2[0].area(),
 		nX2		= X2.area(),
-		nN2		= ty4.x&0xf,
+		nN2		= typ.x&0xf,
 		nB2		= 1<<nN2,
 
 		nXB1	= nX1*nB1,
 		nXB2	= nX2*nB2,
 
 		nLD1	= nAN1*nXB1,
-		nLD2	= nAN2*nXB2,
+		nLD2	= nAN2*nXB2; //,
 
-		nBu8	= gpmNbyte(u8);
+//		nBu8	= gpmNbyte(u8);
 
 
-    if( nB1 > nBu8  )
+    if( nB1 > nB2  )
     {
 		nB2 = nB1;
 		nN2 = nN1;
-		tmp.typ = (tmp.typ&0xf0) | nN2;//(typ.x&0xf);
+		typ.x = (typ.x&0xf0) | nN2;//(typ.x&0xf);
 		nXB2 = nX2*nB2;
 		nLD2 = nAN2*nXB2;
     }
-	if( nLD2 != nLD1 )
-	{
-		pDAT = new U1[nLD2];
-		gpmZn(pDAT, nLD2);
-	}
-
+    dm %= nX2;
 	if( nLD2 == nLD1 )
 	{
-		(((U8*)pDAT)+(xy*U4x2(1,tmp.AN.x)))[dm%tmp.nDIM()] = u8 ;
+		(((U8*)pDAT)+(xy*U4x2(1,AN.x)))[dm] = u8 ;
 		return *this;
 	}
 
+	pDAT = new U1[nLD2];
+	gpmZn( (U1*)pDAT, nLD2);
+
 	U8 src;
 	U4x2 	xyS,
-			T1( nXB1, nXB1*AN.a4x2[0].x ),
-			T2( nXB2, nXB2*tmp.AN.a4x2[0].x );
+			T1( nXB1, nXB1*tmp.AN.a4x2[0].x ),
+			T2( nXB2, nXB2*AN.a4x2[0].x );
 
     U1	*pS = (U1*)tmp.pDAT,
 		*pD = (U1*)pDAT;
-	for( xyS.y = 0; xyS.y < AN.a4x2[0].y; xyS.y++ )
+	U4 s, d, x, se = tmp.AN.a4x2[0].y;
+	for( xyS = 0; xyS.y < se; xyS.y++ )
 	if( nXB1 == nXB2 )
 	{
-		memcpy( pD+xyD*T2, pS+xyS*T1, T1.y );
+		memcpy( pD+xyS*T2, pS+xyS*T1, T1.y );
 	}
-	else for( xyS.x = 0; xyS.x < AN.a4x2[0].x; xyS.x++ )
+	else for( xyS.x = 0; xyS.x < se; xyS.x++ )
     {
 		s = xyS*T1;
-		d = xyD*T2;
+		d = xyS*T2;
+		if( nB1 == nB2 )
+		{
+			memcpy( pD+d, pS+s, nXB1 );
+			continue;
+		}
 
-        for( U2 x = 0; x < nX1; x++ )
+        for( x = 0; x < nX1; x++ )
 		{
 			if( nN1 == nN2 )
 			{
-				f( nN1 < 2 )
+				if( nN1 < 2 )
 				{
 					if( nN1 )
 						((U2*)(pD+d))[x] = ((U2*)(pS+s))[x];
@@ -266,6 +272,19 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
  		}
     }
 
+	d = xy*T2;
+	x += dm;
+	if( nN2 < 2 )
+	{
+		if( nN2 )
+			((U2*)(pD+d))[x] = u8;
+		else
+			((U1*)(pD+d))[x] = u8;
+	}
+	else if( nN2 > 3 )
+		((U8*)(pD+d))[x] = u8;
+	else
+		((U4*)(pD+d))[x] = u8;
 
 	return *this;
 }
@@ -444,7 +463,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				apA[1] = apA[0];
 			}
 			apN[0] = pS;
-
 			typ.u4 = gpeTYP_U8;
 			u8 = gpfSTR2U8( pS, &pS );
 		}
@@ -668,8 +686,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 					if( typ.x&0x40 )
 						aA[0].equ( this, xyWH.a4x2[0], typ, op, d8 );
-					else
+					else {
+						typ.x = (typ.x&0xf0) | (gpmNbyte(u8)&0xf);
+
 						aA[0].equ( this, xyWH.a4x2[0], typ, op, u8 );
+					}
 
 					op.u4 = 0;
 					xyWH.x++;

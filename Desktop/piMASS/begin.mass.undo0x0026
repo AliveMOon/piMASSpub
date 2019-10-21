@@ -1,5 +1,5 @@
  a0	 á 
- b0	  0x10, 0xffFF,	-100;
+ b0	  0x100000000, 0xffFFffFF,	-100;
  1000,	.0, 100.0, 2;
 -100, 0xffFFffFF;
 a = nbuld + 3*sec
