@@ -32,7 +32,7 @@ enum gpeTYP:U4
 class gpcALU
 {
 public:
-	U4		nALL;
+	U4		nALL, iA;
 	gpcRES	*pMOM;
 	void	*pDAT;
 	I1x4	op;
@@ -157,7 +157,7 @@ class gpcRES
 	U4x4	*pAN;
 	U8x4	*pTREE;
 	U4		*pTx;
-	void	**ppDAT;
+
 	U4		*pnALL,
 			n, t, i, ig, iLEV;
 
@@ -165,6 +165,7 @@ class gpcRES
 	gpcRES* pMOM;
 
 public:
+	void	**ppDAT;
 	U4 iL()
 	{
 		return iLEV;
@@ -200,6 +201,7 @@ public:
 		if( iA >= n )
 			return alu;
 
+		alu.iA 		= iA;
 		alu.alf		= pLAB	? pLAB[iA]	: gpeALF_null;
 		alu.op		= pOP	? pOP[iA]	: 0;
 		alu.typ		= pTYP	? pTYP[iA]	: 0;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]

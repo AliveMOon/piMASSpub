@@ -187,11 +187,13 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
     {
 		nB2 = nB1;
 		nN2 = nN1;
-		typ.x = (typ.x&0xf0) | nN2;//(typ.x&0xf);
+		typ.x = (tmp.typ.x&0xf0) | nN2;//(typ.x&0xf);
 		nXB2 = nX2*nB2;
 		nLD2 = nAN2*nXB2;
     }
     dm %= nX2;
+	U4 d, x = 0;
+    if( pDAT )
 	if( nLD2 == nLD1 )
 	{
 		(((U8*)pDAT)+(xy*U4x2(1,AN.x)))[dm] = u8 ;
@@ -199,16 +201,49 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 	}
 
 	pDAT = new U1[nLD2];
-	gpmZn( (U1*)pDAT, nLD2);
+	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
+	U1		*pD = (U1*)pDAT;
+	gpmZn( pD, nLD2 );
+	if( !tmp.pDAT )
+	{
+		d = xy*T2;
+		x += dm;
+		if( nN2 < 2 )
+		{
+			if( nN2 )
+				((U2*)(pD+d))[x] = u8;
+			else
+				((U1*)(pD+d))[x] = u8;
+		}
+		else if( nN2 > 3 )
+			((U8*)(pD+d))[x] = u8;
+		else
+			((U4*)(pD+d))[x] = u8;
 
+		if( pMOM )
+		{
+			if( pMOM->ppDAT[iA] == tmp.pDAT )
+			if( pMOM->ppDAT[iA] != pDAT )
+				gpmDELary( pMOM->ppDAT[iA] );
+			pMOM->ppDAT[iA] = pDAT;
+		}
+		/*if( adr.pRM )
+		{
+			if( adr.pRM->ppDAT[adr.ix] == tmp.pDAT )
+			if( adr.pRM->ppDAT[adr.ix] != pDAT )
+				gpmDELary( adr.pRM->ppDAT[adr.ix] );
+			adr.pRM->ppDAT[adr.ix] = pDAT;
+		}*/
+
+		return *this;
+	}
+
+	U1* pS = (U1*)tmp.pDAT;
 	U8 src;
 	U4x2 	xyS,
-			T1( nXB1, nXB1*tmp.AN.a4x2[0].x ),
-			T2( nXB2, nXB2*AN.a4x2[0].x );
+			T1( nXB1, nXB1*tmp.AN.a4x2[0].x );
+	U4 s, se = tmp.AN.a4x2[0].y;
 
-    U1	*pS = (U1*)tmp.pDAT,
-		*pD = (U1*)pDAT;
-	U4 s, d, x, se = tmp.AN.a4x2[0].y;
 	for( xyS = 0; xyS.y < se; xyS.y++ )
 	if( nXB1 == nXB2 )
 	{
@@ -286,6 +321,16 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 	else
 		((U4*)(pD+d))[x] = u8;
 
+	if( tmp.pDAT != pDAT )
+		gpmDELary( tmp.pDAT );
+
+	if( pMOM )
+	{
+		if( pMOM->ppDAT[iA] == tmp.pDAT )
+		if( pMOM->ppDAT[iA] != pDAT )
+			gpmDELary( pMOM->ppDAT[iA] );
+		pMOM->ppDAT[iA] = pDAT;
+	}
 	return *this;
 }
 
@@ -687,7 +732,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					if( typ.x&0x40 )
 						aA[0].equ( this, xyWH.a4x2[0], typ, op, d8 );
 					else {
-						typ.x = (typ.x&0xf0) | (gpmNbyte(u8)&0xf);
+						typ.x = (typ.x&0xf0) | gpmSHnB(gpmUnB(u8));
 
 						aA[0].equ( this, xyWH.a4x2[0], typ, op, u8 );
 					}
