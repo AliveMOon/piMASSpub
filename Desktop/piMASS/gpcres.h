@@ -33,7 +33,7 @@ class gpcALU
 {
 public:
 	U4		nALL, iA;
-	gpcRES	*pMOM;
+	gpcRES	*pRM;
 	void	*pDAT;
 	I1x4	op;
 	U1x4	typ;	// typ:
@@ -99,7 +99,7 @@ public:
 		{
 			return *this;
 		}
-		pMOM = NULL;
+		pRM = NULL;				// pResMom
 		nALL = nLOAD();
 		pDAT = new U1[nALL];
         memcpy( pDAT, b.pDAT, AN.w );
@@ -115,7 +115,7 @@ class gpcADR
 {
 public:
 	gpcRES*	pRM;
-	I4		dp, ix, n;
+	I4		dp, iA, nA;
 	I8x2	an;
 
 	gpcADR(){ gpmCLR; };
@@ -148,7 +148,7 @@ public:
 
 class gpcRES
 {
-	gpeALF	*pLAB;
+	gpeALF	*pALF;
 	I1x4	*pOP;	// x add/sub // y mul/div // z[7rem:mod 6not:! 5or:| 4and:& ]  //w ?
 					// w size
 
@@ -156,10 +156,10 @@ class gpcRES
 					// yz dimxy
 	U4x4	*pAN;
 	U8x4	*pTREE;
-	U4		*pTx;
+	U4		*pTx,
 
-	U4		*pnALL,
-			n, t, i, ig, iLEV;
+			*pnALL,
+			nA, t, i, ig, iLEV;
 
 	void	**ppDAT;
 	gpcALU	alu;
@@ -199,11 +199,11 @@ public:
 	{
 		alu = this;
 
-		if( iA >= n )
+		if( iA >= nA )
 			return alu;
 
 		alu.iA 		= iA;
-		alu.alf		= pLAB	? pLAB[iA]	: gpeALF_null;
+		alu.alf		= pALF	? pALF[iA]	: gpeALF_null;
 		alu.op		= pOP	? pOP[iA]	: 0;
 		alu.typ		= pTYP	? pTYP[iA]	: 0;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 												// yz dimxy
@@ -217,14 +217,14 @@ public:
 		if( !this )
 			return NULL;
 
-		if( ali.iA >= n )
+		if( ali.iA >= nA )
 			return this;
 
-		if( pLAB[ali.iA] == ali.alf )
+		if( pALF[ali.iA] == ali.alf )
 		{
 			if( !ppDAT )
 			{
-				ppDAT = new void*[n];
+				ppDAT = new void*[nA];
 			}
 			else if( ppDAT[ali.iA] != ali.pDAT )
 				gpmDELary( ppDAT[ali.iA] );
@@ -242,13 +242,13 @@ public:
 		return this;
 	}
 	gpcALU& ADD( gpeALF alf, U4 typ, U4 op ) {
-		U4 nCPY = n;
-		n++;
+		U4 nCPY = nA;
+		nA++;
 
 
 		/// ---------------------------------------------
 		void* pKILL = ppDAT;
-		ppDAT = new void*[n];
+		ppDAT = new void*[nA];
 		if( pKILL )
 		{
 			memcpy( ppDAT, pKILL, nCPY*sizeof(*ppDAT) );
@@ -257,7 +257,7 @@ public:
 		ppDAT[nCPY] = NULL;
 
 		pKILL = pnALL;
-		pnALL = new U4[n];
+		pnALL = new U4[nA];
 		if( pKILL )
 		{
 			memcpy( pnALL, pKILL, nCPY*sizeof(*pnALL) );
@@ -267,21 +267,21 @@ public:
 		/// ---------------------------------------------
 
 
-		pKILL = pLAB;
-		pLAB = new gpeALF[n];
+		pKILL = pALF;
+		pALF = new gpeALF[nA];
 		if( pKILL )
 		{
-			memcpy( pLAB, pKILL, nCPY*sizeof(*pLAB) );
+			memcpy( pALF, pKILL, nCPY*sizeof(*pALF) );
 			delete[] pKILL;
 		}
-		pLAB[nCPY] = alf;
+		pALF[nCPY] = alf;
 
 		pKILL = pOP;
 		if( op || pKILL )
 		{
-			pOP = new I1x4[n];
+			pOP = new I1x4[nA];
 			pOP->u4 = 0;
-			gpfMEMSET( pOP+1, n-1, pOP, sizeof(*pOP) );
+			gpfMEMSET( pOP+1, nCPY, pOP, sizeof(*pOP) );
 			if( pKILL )
 			{
 				memcpy( pOP, pKILL, nCPY*sizeof(*pOP) );
@@ -291,7 +291,7 @@ public:
 		}
 
 		pKILL = pTYP;
-		pTYP = new U1x4[n];
+		pTYP = new U1x4[nA];
 		if( pKILL )
 		{
 			memcpy( pTYP, pKILL, nCPY*sizeof(*pTYP) );
@@ -300,7 +300,7 @@ public:
 		pTYP[nCPY].u4 = typ;
 
 		pKILL = pAN;
-		pAN = new U4x4[n];
+		pAN = new U4x4[nA];
 		if( pKILL )
 		{
 			memcpy( pAN, pKILL, nCPY*sizeof(*pAN) );
@@ -309,7 +309,7 @@ public:
 		pAN[nCPY] = 0;
 
 		pKILL = pTREE;
-		pTREE = new U8x4[n];
+		pTREE = new U8x4[nA];
 		if( pKILL )
 		{
 			memcpy( pTREE, pKILL, nCPY*sizeof(*pTREE) );
@@ -318,7 +318,7 @@ public:
 		pTREE[nCPY].null();
 
 		pKILL = pTx;
-		pTx = new U4[n];
+		pTx = new U4[nA];
 		if( pKILL )
 		{
 			memcpy( pTx, pKILL, nCPY*sizeof(*pTx) );
@@ -331,79 +331,79 @@ public:
 
 	U4 nFND()
 	{
-		return this ? n : 0;
+		return this ? nA : 0;
 	}
     U4 iFND( gpeALF alf )
     {
 		if( !this )
 			return 0;
 
-		if( !n )
-			return n;
+		if( !nA )
+			return nA;
 
-		if( i < n )
-		if( pLAB[i] == alf )
+		if( i < nA )
+		if( pALF[i] == alf )
 			return i;
 
-		ig = n;
+		ig = nA;
 		if( pTREE )
 		{
 			ig = pTREE->tree_fnd( alf, t );
 			if( ig < t )
 				return i = pTx[ig];
 
-			for( U4 j = 0, x; j < n; j++ )
+			for( U4 j = 0, x; j < nA; j++ )
 			{
-				if( !pLAB[j] )
+				if( !pALF[j] )
 					continue;
 
-				if( ig >= n )
-				if( pLAB[j] == alf )
+				if( ig >= nA )
+				if( pALF[j] == alf )
 				{
 					// azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
 					pTx[t] = ig = j;
-					x = pTREE->tree_fnd( pLAB[j], t );
+					x = pTREE->tree_fnd( pALF[j], t );
 					if( x >= t )
-						t = pTREE->tree_add( pLAB[j], t );		// nem volt benne a listában
+						t = pTREE->tree_add( pALF[j], t );		// nem volt benne a listában
 					break;
 				}
 
-				x = pTREE->tree_fnd( pLAB[j], t );
+				x = pTREE->tree_fnd( pALF[j], t );
 				if( x < t )
 					continue;
 
 				pTx[t] = j;
-				t = pTREE->tree_add( pLAB[j], t );
+				t = pTREE->tree_add( pALF[j], t );
 			}
 
-			if( ig < n )
+			if( ig < nA )
 				i = ig;	// megtalálta a ciklusban
 
 			return ig;
 		}
 
-		pTREE	= new U8x4[n];
-		pTx		= new U4[n];
-		gpmZn( pTREE, n );
+		pTREE	= new U8x4[nA];
+		pTx		= new U4[nA];
+		gpmZn( pTREE, nA );
 		t = 0;
-		for( U4 j = 0; j < n; j++ )
+		for( U4 j = 0; j < nA; j++ )
 		{
-			if( !pLAB[j] )
+			if( !pALF[j] )
 				continue;
 
-			if( ig >= n )
-			if( pLAB[j] == alf )
+			if( ig >= nA )
+			if( pALF[j] == alf )
 			{
 				pTx[t] = ig = j;
-				t = pTREE->tree_add( pLAB[j], t );
+				t = pTREE->tree_add( pALF[j], t );
 				break; // azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
 			}
 
 			pTx[t] = j;
-			t = pTREE->tree_add( pLAB[j], t );
+			t = pTREE->tree_add( pALF[j], t );
 
 		}
-		if( ig < n )
+		if( ig < nA )
 			i = ig;	// megtalálta a ciklusban
 
 		return ig;

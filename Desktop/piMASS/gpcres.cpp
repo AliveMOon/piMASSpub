@@ -6,7 +6,7 @@ extern U1 gpaALFadd[];
 gpcALU::gpcALU( gpcRES* pM )
 {
 	gpmCLR;
-	pMOM = pM;
+	pRM = pM;
 }
 gpcALU::~gpcALU()
 {
@@ -18,7 +18,7 @@ gpcRES& gpcRES::null()
 	gpcRES* pR;
 	if( ppDAT )
 	{
-		for( U4 a = 0; a < n; a++ )
+		for( U4 a = 0; a < nA; a++ )
 		{
 			if( !ppDAT[a] )
 				continue;
@@ -34,7 +34,7 @@ gpcRES& gpcRES::null()
 		delete[] ppDAT;
 		ppDAT = NULL;
 	}
-	gpmDELary( pLAB );
+	gpmDELary( pALF );
 	gpmDELary( pOP );
 	gpmDELary( pTYP );
 	gpmDELary( pAN );
@@ -70,18 +70,18 @@ gpcADR& gpcADR::operator = ( gpcRES* pM )
 		return *this = gpeALF_null;
 	}
 
-	n = ix = pM->nFND();
-	while( ix >= n )
+	nA = iA = pM->nFND();
+	while( iA >= nA )
 	{
 		pRM = pRM->pRM();
 		if( !pRM )
 		{
-			ix = 0;
+			iA = 0;
 			return *this;
 		}
 
-		n = pRM->nFND();
-		ix = pRM->iFND( an.alf );
+		nA = pRM->nFND();
+		iA = pRM->iFND( an.alf );
 		dp = pM->iL() - pRM->iL();
 	}
 	return *this;
@@ -95,10 +95,10 @@ gpcALU& gpcADR::ALU( gpcRES* pM )
 		if( !pRM )
 			return alu;
 
-		ix = pRM->nFND();
+		iA = pRM->nFND();
 	}
 
-	return pRM->ALU( ix );
+	return pRM->ALU( iA );
 }
 gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 {
@@ -214,14 +214,12 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 				((U2*)(pD+d))[x] = u8;
 			else
 				((U1*)(pD+d))[x] = u8;
-		}
-		else if( nN2 > 3 )
+		} else if( nN2 > 3 )
 			((U8*)(pD+d))[x] = u8;
 		else
 			((U4*)(pD+d))[x] = u8;
 
-		pMOM->chg( *this );
-
+		pRM->chg( *this );
 		return *this;
 	}
 
@@ -256,8 +254,10 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 						((U2*)(pD+d))[x] = ((U2*)(pS+s))[x];
 					else
 						((U1*)(pD+d))[x] = ((U1*)(pS+s))[x];
+					continue;
 				}
-				else if( nN1 > 3 )
+
+				if( nN1 > 3 )
 					((U8*)(pD+d))[x] = ((U8*)(pS+s))[x];
 				else
 					((U4*)(pD+d))[x] = ((U4*)(pS+s))[x];
@@ -308,7 +308,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 	else
 		((U4*)(pD+d))[x] = u8;
 
-	pMOM->chg( *this );
+	pRM->chg( *this );
 	return *this;
 }
 
