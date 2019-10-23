@@ -147,10 +147,9 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	tmp.pDAT = pDAT;
 	tmp.AN.a4x2[0] = AN.a4x2[0];
 
-	typ.typMX( ty4 );
+	typ.typMX( ty4 );		// typ.x[0b 1w 2l 3q]  // 1half? 2float 3double
 
 	AN.a4x2[0].mx( xy+1 );
-	typ = ty4.typMX( ty4.x );	// typ.x[0b 1w 2l 3q]  // 1half? 2float 3double
 	U4x2 	X1( tmp.typ.y, tmp.typ.z ),
 			X2( typ.y, typ.z );
 	X2.mx( X1 );
@@ -1290,7 +1289,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 	if( !pM )
 		return null();
 
-	ins( pM, xy+1, ty4 );
+	ins( pM, xy, ty4 );
 	U1* pD = (U1*)pDAT;
 	if( !pD )
 		return *this;
@@ -1324,8 +1323,8 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm )
 {
 	if( !pM )
 		return null();
-
-	ins( pM, xy+1, ty4 );
+	ty4.x |= 0x80;
+	ins( pM, xy, ty4 );
 	U1* pD = (U1*)pDAT;
 	if( !pD )
 		return *this;
@@ -1360,7 +1359,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 dm )
 	if( !pM )
 		return null();
 
-	int2flt( pM, xy+1, ty4 );
+	int2flt( pM, xy, ty4 );
 	U1* pD = (U1*)pDAT;
 	if( !pD )
 		return *this;

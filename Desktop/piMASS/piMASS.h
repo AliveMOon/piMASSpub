@@ -217,9 +217,9 @@ class gpcMASS;
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
 #define gpmMEMCMP (U1*)gp_memcmp
-#define gpmUnB( u )		( abs(u)>0xffFF ? (abs(u)>0xffffFFFF ? 8 : 4) : (abs(u)>0xff ? 2 : 1)  )
+#define gpmUnB( u )		( abs(u)>0x7fFF ? (abs(u)>0x7fffFFFF ? 8 : 4) : (abs(u)>0x7f ? 2 : 1)  )
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
-#define gpmSHnB( b )	( b>2 ? (b>4 ? 4 : 3) : (b>1 ? 1 : 0)  )
+#define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 
 U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nUTF8, U1* gpaALFadd )
