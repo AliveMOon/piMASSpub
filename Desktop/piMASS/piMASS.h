@@ -217,7 +217,8 @@ class gpcMASS;
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
 #define gpmMEMCMP (U1*)gp_memcmp
-#define gpmUnB( u )		( u>0xffFF ? (u>0xffffFFFF ? 8 : 4) : (u>0xff ? 2 : 1)  )
+#define gpmUnB( u )		( abs(u)>0xffFF ? (abs(u)>0xffffFFFF ? 8 : 4) : (abs(u)>0xff ? 2 : 1)  )
+#define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 4 : 3) : (b>1 ? 1 : 0)  )
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 
@@ -591,6 +592,56 @@ public:
 		return a;
     }
 
+    U1x4& mx( U1x4 xyzw )
+    {
+		if( x < xyzw.x )
+			x = xyzw.x;
+		if( y < xyzw.y )
+			y = xyzw.y;
+		if( z < xyzw.z )
+			z = xyzw.z;
+		if( w < xyzw.w )
+			w = xyzw.w;
+
+		return *this;
+    }
+    U1x4& mn( U1x4 xyzw )
+    {
+		if( x > xyzw.x )
+			x = xyzw.x;
+		if( y > xyzw.y )
+			y = xyzw.y;
+		if( z > xyzw.z )
+			z = xyzw.z;
+		if( w > xyzw.w )
+			w = xyzw.w;
+
+		return *this;
+    }
+
+	U1x4& typMX( U1x4 tp )
+	{
+		U1 sh = max( tp.x&0x3, x&0x3 );	// sh: 0B?1 1WH2 2LF4 3QD8
+		tp.x = (tp.x|x)&0xf0;
+
+		if( tp.x&0x40 )
+		{
+			tp.x |= 0x80;	// float akor signed
+			if( sh < 2 )
+				sh = 2;	// ha float most 4b kisebb nem lehet
+		}
+
+		x = tp.x|sh;
+		w = 1<<(x&0xf);
+
+		// legalább 1x1 es valamikből áll
+		if( y < tp.y )
+			y = tp.y;
+		if( z < tp.z )
+			z = tp.z;
+
+		return *this;
+	}
 };
 
 class I1x4

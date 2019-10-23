@@ -5,7 +5,9 @@
 #include "gpcSCHL.h"
 #include "gpcOPCD.h"
 #include "gpcSRC.h"
+class gpcALU;
 class gpcRES;
+
 
 enum gpeTYP:U4
 {
@@ -27,6 +29,41 @@ enum gpeTYP:U4
 	gpeTYP_U14 	= MAKE_ID( 0x00, 4, 1, 0 ),
 	gpeTYP_U44 	= MAKE_ID( 0x02, 4, 1, 0 ),
 	gpeTYP_I44 	= MAKE_ID( 0x82, 4, 1, 0 ),
+};
+
+class gpcADR
+{
+public:
+	gpcRES*	pRM;
+	I4		dp, iA, nA;
+	I8x2	an;
+
+	gpcADR(){ gpmCLR; };
+
+	gpcADR( gpeALF a )
+	{
+		gpmCLR;
+		an.alf = a;
+	}
+	gpcADR& operator = ( gpeALF a )
+	{
+		gpmCLR;
+		an.alf = a;
+		return *this;
+	}
+
+	gpcADR& operator = ( gpcRES* pM );
+
+
+	gpcADR( gpeALF a, gpcRES* pM )
+	{
+		*this = a;
+		*this = pM;
+	}
+
+	gpcALU& ALU( gpcRES* pM );
+
+
 };
 
 class gpcALU
@@ -106,45 +143,16 @@ public:
 
         return *this;
 	}
-	gpcALU& equ( gpcRES* pTHIS, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
-	gpcALU& equ( gpcRES* pTHIS, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm = 0 );
-	gpcALU& equ( gpcRES* pTHIS, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
+
+	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
+	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
+
+	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
+	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm = 0 );
+	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 };
 
-class gpcADR
-{
-public:
-	gpcRES*	pRM;
-	I4		dp, iA, nA;
-	I8x2	an;
 
-	gpcADR(){ gpmCLR; };
-
-	gpcADR( gpeALF a )
-	{
-		gpmCLR;
-		an.alf = a;
-	}
-	gpcADR& operator = ( gpeALF a )
-	{
-		gpmCLR;
-		an.alf = a;
-		return *this;
-	}
-
-	gpcADR& operator = ( gpcRES* pM );
-
-
-	gpcADR( gpeALF a, gpcRES* pM )
-	{
-		*this = a;
-		*this = pM;
-	}
-
-	gpcALU& ALU( gpcRES* pM );
-
-
-};
 
 class gpcRES
 {
