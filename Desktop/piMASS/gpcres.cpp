@@ -22,17 +22,26 @@ gpcRES& gpcRES::null()
 		{
 			if( !ppDAT[a] )
 				continue;
-			if( !(pTYP[a].x&0x2) )
-			{
-				gpmDELary(ppDAT[a]);
-				continue;
-			}
-			pR = (gpcRES*)(ppDAT[a]);
-			pR->null();
-			gpmDEL(pR);
+			// typ:
+			// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+			// yz[ dimXY ] 		, w[] = nBYTE*dimXY
+			gpmDELary(ppDAT[a]);
 		}
 		delete[] ppDAT;
 		ppDAT = NULL;
+	}
+	if( ppR )
+	{
+		for( U4 a = 0; a < nA; a++ )
+		{
+			if( !ppR[a] )
+				continue;
+
+			//ppR->null();
+			gpmDEL(ppR[a]);
+			//gpmDEL(pR);
+		}
+		gpmDELary(ppR);
 	}
 	gpmDELary( pALF );
 	gpmDELary( pOP );
@@ -393,14 +402,14 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 					((I1*)(pD+d))[x] = ((U1*)(pS+s))[x];
 
 				continue;
-			}
+			}	/// if( bS2 )  END --------------------------------------------------
 
 
 
 
-			/// UN SIGNED DST --------------------------------------------------------------------
+ /// UN SIGNED DST U8 U4 U2 U1 --------------------------------------------------------------------
 			if( bS1 ) {	/// signed src i8 i4 i2 i1 ---------------------------------------------------------
- /// UN SIGNED DST I8 I4 -------------------------------------------------------
+ /// UN SIGNED DST U8 U4 -------------------------------------------------------
 				if( nB2 > 2 ) {
  /// UN SIGNED DST U8 ------------------------------------------------------
 					if( nB2 > 4 ) {
@@ -472,6 +481,7 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 
 					continue;
 				}
+
  /// UN SIGNED DST U1 --------------------------------------------------------
 				if( nB1 > 2 ) { /// signed src i8 i4 ---------------------------------------
 					if( nB1 > 4 ) { /// signed src i8
@@ -498,98 +508,98 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 
 			/// UNsigned src u8 u4 u2 u1 ---------------------------------------------------------
 
- /// SIGNED DST I8 I4 -------------------------------------------------------
+ /// UN SIGNED DST U8 U4 -------------------------------------------------------
 			if( nB2 > 2 ) {
- /// SIGNED DST I8 ------------------------------------------------------
+ /// UN SIGNED DST U8 ------------------------------------------------------
 				if( nB2 > 4 ) {
 					if( nB1 > 2 ) { /// UNsigned src u8 u4 -----------------------------------------------
 						if( nB1 > 4 ) { /// UNsigned src u8 ----------------------------------------------
 							for( x = 0; x < nX1; x++ )
-								((I8*)(pD+d))[x] = ((U8*)(pS+s))[x];
+								((U8*)(pD+d))[x] = ((U8*)(pS+s))[x];
 							continue;
 						}
 						/// UNsigned src u4 ----------------------------------------------
 						for( x = 0; x < nX1; x++ )
-							((I8*)(pD+d))[x] = ((U4*)(pS+s))[x];
+							((U8*)(pD+d))[x] = ((U4*)(pS+s))[x];
 						continue;
 					}
 					if( nB1 > 1 ) {	/// signed src u2 ----------------------------------------------
 						for( x = 0; x < nX1; x++ )
-							((I8*)(pD+d))[x] = ((U2*)(pS+s))[x];
+							((U8*)(pD+d))[x] = ((U2*)(pS+s))[x];
 						continue;
 					}
 					/// signed src u1 ----------------------------------------------
 					for( x = 0; x < nX1; x++ )
-						((I8*)(pD+d))[x] = ((U1*)(pS+s))[x];
+						((U8*)(pD+d))[x] = ((U1*)(pS+s))[x];
 
 					continue;
 				}
- /// SIGNED DST I4 -----------------------------------------------------
+ /// UN SIGNED DST U4 -----------------------------------------------------
 				if( nB1 > 2 ) { /// UNsigned src u8 u4 ------------------------------------------------------
 					if( nB1 > 4 ) { /// UNsigned src u8 ------------------------------------------------------
 						for( x = 0; x < nX1; x++ )
-							((I4*)(pD+d))[x] = ((U8*)(pS+s))[x];
+							((U4*)(pD+d))[x] = ((U8*)(pS+s))[x];
 						continue;
 					}
 					/// signed src u4 ------------------------------------------------------
 					for( x = 0; x < nX1; x++ )
-						((I4*)(pD+d))[x] = ((U4*)(pS+s))[x];
+						((U4*)(pD+d))[x] = ((U4*)(pS+s))[x];
 					continue;
 				}
 				if( nB1 > 1 ) { /// UNsigned src u2 ------------------------------------------------------
 					for( x = 0; x < nX1; x++ )
-						((I4*)(pD+d))[x] = ((U2*)(pS+s))[x];
+						((U4*)(pD+d))[x] = ((U2*)(pS+s))[x];
 					continue;
 				}
 				/// UNsigned src u1 ------------------------------------------------------
 				for( x = 0; x < nX1; x++ )
-					((I4*)(pD+d))[x] = ((U1*)(pS+s))[x];
+					((U4*)(pD+d))[x] = ((U1*)(pS+s))[x];
 				continue;
 			}
- /// SIGNED DST I2 --------------------------------------
+ /// UN SIGNED DST I2 --------------------------------------
 			if( nB2 > 1 ) {
 				if( nB1 > 2 ) { /// UNsigned src u8 u4 ---------------------------------------
 					if( nB1 > 4 ) { /// UNsigned src u8 ---------------------------------------
 						for( x = 0; x < nX1; x++ )
-							((I2*)(pD+d))[x] = ((U8*)(pS+s))[x];
+							((U2*)(pD+d))[x] = ((U8*)(pS+s))[x];
 						continue;
 					}
 					/// UNsigned src u4 ---------------------------------------
 					for( x = 0; x < nX1; x++ )
-						((I2*)(pD+d))[x] = ((U4*)(pS+s))[x];
+						((U2*)(pD+d))[x] = ((U4*)(pS+s))[x];
 					continue;
 				}
 				if( nB1 > 1 ) { /// UNsigned src u2 ---------------------------------------
 					for( x = 0; x < nX1; x++ )
-						((I2*)(pD+d))[x] = ((U2*)(pS+s))[x];
+						((U2*)(pD+d))[x] = ((U2*)(pS+s))[x];
 					continue;
 				}
 				/// UNsigned src u1 ---------------------------------------
 				for( x = 0; x < nX1; x++ )
-					((I2*)(pD+d))[x] = ((U1*)(pS+s))[x];
+					((U2*)(pD+d))[x] = ((U1*)(pS+s))[x];
 
 				continue;
 			}
-/// SIGNED DST I1 --------------------------------------------------------
+/// UN SIGNED DST U1 --------------------------------------------------------
 			if( nB1 > 2 ) { /// UNsigned src u8 u4 ---------------------------------------
 				if( nB1 > 4 ) { /// UNsigned src u8
 					for( x = 0; x < nX1; x++ )
-						((I1*)(pD+d))[x] = ((U8*)(pS+s))[x];
+						((U1*)(pD+d))[x] = ((U8*)(pS+s))[x];
 					continue;
 				}
 				/// UNsigned src u4 --------------------------------
 				for( x = 0; x < nX1; x++ )
-					((I1*)(pD+d))[x] = ((U4*)(pS+s))[x];
+					((U1*)(pD+d))[x] = ((U4*)(pS+s))[x];
 				continue;
 			}
 			if( nB1 > 1 ) { /// UNsigned src u2 --------------------------------------
 				for( x = 0; x < nX1; x++ )
-					((I1*)(pD+d))[x] = ((U2*)(pS+s))[x];
+					((U1*)(pD+d))[x] = ((U2*)(pS+s))[x];
 				continue;
 			}
 			/// UNsigned src u1 --------------------------------------
 			for( x = 0; x < nX1; x++ )
-				((I1*)(pD+d))[x] = ((U1*)(pS+s))[x];
+				((U1*)(pD+d))[x] = ((U1*)(pS+s))[x];
 		}
 	}
 
@@ -861,8 +871,7 @@ gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	return *this;
 }
 
-gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
-{
+gpcALU& gpcALU::equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm ){
 	if( !pM )
 		return null();
 
@@ -1073,8 +1082,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
 	return *this;
 }
 
-gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm )
-{
+gpcALU& gpcALU::equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm ){
 	if( !pM )
 		return null();
 
@@ -1277,6 +1285,76 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm )
 	return *this;
 }
 
+gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
+{
+	if( !pM )
+		return null();
+
+	ins( pM, xy+1, ty4 );
+	U1* pD = (U1*)pDAT;
+	if( !pD )
+		return *this;
+
+
+	U4x2 	X2( typ.y, typ.z );
+
+	U4 		nB2		= typ.w,
+			nX2		= X2.area(),
+			nXB2	= nX2*nB2;
+	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
+	U4		d = xy*T2;
+
+
+	if( nB2 > 2 )
+	{
+		if( nB2 > 4 )
+			((U8*)(pD+d))[dm] = u8;
+		else
+			((U4*)(pD+d))[dm] = u8;
+	}
+	else if( nB2 > 1 )
+		((U2*)(pD+d))[dm] = u8;
+	else
+		((U1*)(pD+d))[dm] = u8;
+
+	return *this;
+}
+
+gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm )
+{
+	if( !pM )
+		return null();
+
+	ins( pM, xy+1, ty4 );
+	U1* pD = (U1*)pDAT;
+	if( !pD )
+		return *this;
+
+
+	U4x2 	X2( typ.y, typ.z );
+
+	U4 		nB2		= typ.w,
+			nX2		= X2.area(),
+			nXB2	= nX2*nB2;
+	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
+	U4		d = xy*T2;
+
+
+	if( nB2 > 2 )
+	{
+		if( nB2 > 4 )
+			((I8*)(pD+d))[dm] = i8;
+		else
+			((I4*)(pD+d))[dm] = i8;
+	}
+	else if( nB2 > 1 )
+		((I2*)(pD+d))[dm] = i8;
+	else
+		((I1*)(pD+d))[dm] = i8;
+
+	return *this;
+}
+
 gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 dm )
 {
 	if( !pM )
@@ -1338,6 +1416,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	I8x4 lab = 0;
 	U1x4 typ = 0;
 	I1x4 op = (U4)0;
+
 	bool bMATH = false;
 	gpeALF XML = gpeALF_null;
 	I4 xmlD = 0;
@@ -1567,7 +1646,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 				} break;
 
-
+			case ';': //{	// SOROK
 			case ',': {	// vessző OSZLOPOK
 
 					if( apA[0] )
@@ -1599,25 +1678,32 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						aA[0].equ( this, xyWH.a4x2[0], typ, op, d8 );
 					else {
 						typ.x = (typ.x&0xf0) | gpmSHnB(gpmUnB(u8));
-
-						aA[0].equ( this, xyWH.a4x2[0], typ, op, u8 );
+						if( op.x < 0 )
+							aA[0].equ( this, xyWH.a4x2[0], typ, op, -(I8)u8 );
+						else
+							aA[0].equ( this, xyWH.a4x2[0], typ, op, u8 );
 					}
 
 					op.u4 = 0;
-					xyWH.x++;
+					if( pS[-1] == ',' )
+						xyWH.x++;
+					else {
+						xyWH.x = 0;
+						xyWH.y++;
+					}
 					if( xyWH.z >= xyWH.x )
 						break;
 					// bővíteni kell
 					xyWH.z = xyWH.x;
 				} break;
-			case ';': {	// SOROK
+			/*case ';': {	// SOROK
 					lab.AB( apA[0], apA[1], apA, apA+1 );
 					bMATH = false;
 
 					op.u4 = 0;
 					xyWH.x = 0;
 					xyWH.y++;
-				} break;
+				} break;*/
 
 
 
@@ -1682,7 +1768,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			case '{':
 			case '[': {
 					lab.AB( apA[0], apA[1], apA, apA+1 );
-					pTMP = compiEASY( pS, pE, &pS, this );
+					pTMP = ((gpcRES*)NULL)->compiEASY( pS, pE, &pS, this );
 
 
 				} break;

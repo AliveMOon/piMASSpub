@@ -133,11 +133,11 @@ typedef uint64_t		U8;
 //typedef float		float;
 typedef double		F8;
 
-typedef char		I1;
-typedef short		I2;
-typedef int			I4;
-typedef int64_t		I8;
-typedef I8			LL;
+typedef signed char		I1;
+typedef signed short	I2;
+typedef int				I4;
+typedef int64_t			I8;
+typedef I8				LL;
 
 
 
@@ -335,7 +335,7 @@ inline void* gpfMEMSET( void* pD, U8 n, void* pS, U8 nS )
 	}
 	return pD;
 }
-int inline gpfACE( const I1* p_file, I4 mode )
+int inline gpfACE( const char* p_file, I4 mode )
 {
 	//	00	Existence only
 	//	02	Write-only
@@ -384,7 +384,7 @@ bool inline gpfMKDR( char* p_buff, const char* p_new )
 }
 inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
 {
-	I1* pC = strrchr( (I1*)pS, c );
+	char* pC = strrchr( (char*)pS, c );
 
 	if( !pC )
 		strcpy( (p2P+=sprintf(p2P,".%c",c)), pS ); // nincsen path
@@ -651,7 +651,7 @@ public:
     {
         struct
         {
-            I1 x,y,z,w;
+           I1 x,y,z,w;
         };
         struct
         {
