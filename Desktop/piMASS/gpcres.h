@@ -31,6 +31,38 @@ enum gpeTYP:U4
 	gpeTYP_I44 	= MAKE_ID( 0x82, 4, 1, 0 ),
 };
 
+class gpcISA
+{
+public:
+	I1x4	isa;
+	I8x2	an;
+	gpcISA(){};
+	gpcISA* null()
+	{
+		if( this )
+			gpmCLR;
+
+		return this;
+	}
+
+	gpcISA* AN( const I8x2& _an )
+	{
+		if( !this )
+			return NULL;
+		an = _an;
+		isa.aISA[0] = gpeISA_an;
+		return this;
+	}
+	gpcISA* var( gpeALF v )
+	{
+		if( !this )
+			return NULL;
+		an.alf = v;
+		isa.aISA[0] = gpeISA_var;
+		return this;
+	}
+};
+
 class gpcADR
 {
 public:
@@ -70,7 +102,8 @@ class gpcALU
 {
 public:
 	U4		nALL, iA;
-	gpcRES	*pRM;
+	gpcRES	*pRM,
+			*pRES;
 	void	*pDAT;
 	I1x4	op;
 	U1x4	typ;	// typ:
@@ -121,7 +154,7 @@ public:
 
 		return AN.w;
 	}
-	gpcALU& operator = ( const gpcALU& b )
+	/*gpcALU& operator = ( const gpcALU& b )
 	{
 		if( this == &b )
 			return *this;
@@ -142,8 +175,8 @@ public:
         memcpy( pDAT, b.pDAT, AN.w );
 
         return *this;
-	}
-	gpcALU& zero(void);
+	}*/
+	gpcALU& zero( void );
 	gpcRES* ins( gpcRES* pM, gpcRES* pKID );
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
@@ -152,9 +185,9 @@ public:
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 
-	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
+	/*gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm = 0 );
-	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
+	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );*/
 };
 
 
@@ -179,7 +212,63 @@ class gpcRES
 	gpcALU	alu;
 	gpcRES* pMOM;
 
+	gpcISA* pISA;
+	U4x2	nISA;
+
 public:
+	gpcISA*	pI( void )
+	{
+		if( !pISA )
+			nISA = 0;
+
+		if( nISA.x >= nISA.y )
+		{
+			gpcISA* pK = pISA;
+			nISA.y = nISA.x+0x10;
+            pISA = new gpcISA[nISA.y];
+            if( nISA.x )
+				gpmMEMCPY( pISA, pK, nISA.x );
+			gpmZn( pISA+nISA.x, nISA.y-nISA.x );
+		}
+		return pISA ? pISA+nISA.x : NULL;
+	}
+	gpcISA*	pISA_stp( U1 stp )
+	{
+		if( this ? !pISA : true )
+			return NULL;
+		gpcISA* pIS = pI();
+		if( !pIS )
+			return NULL;
+
+		pIS->isa.y = stp;
+
+		nISA.x++;
+		return pI()->null();
+	}
+
+	gpcISA*	pISAan( I8x2& an )
+	{
+		return pI()->AN( an );
+	}
+	gpcISA*	pISAvar( gpeALF a )
+	{
+		return pI()->var( a );
+
+		/*if( !pISA )
+			nISA = 0;
+
+		if( nISA.x >= nISA.y )
+		{
+			gpcISA* pK = pISA;
+			nISA.y = nISA.x+0x10;
+            pISA = new gpcISA[nISA.y];
+            if( nISA.x )
+				gpmMEMCPY( pISA, pK, nISA.x );
+			gpmZn( pISA+nISA.x, nISA.y-nISA.x );
+		}
+
+		return pISA[nISA.x].AN( an );*/
+	}
 
 	U4 iL()
 	{
@@ -189,7 +278,7 @@ public:
 	{
 		return pMOM;
 	}
-	gpcRES& null();
+	gpcRES* null();
 
 	gpcRES( gpcRES* pM = NULL )
 	{
@@ -223,6 +312,7 @@ public:
 												// yz dimxy
 		alu.AN 		= pAN	? pAN[iA]	: 0;
 		alu.pDAT	= ppDAT	? ppDAT[iA]	: NULL;
+		alu.pRES	= ppR	? ppR[iA]	: NULL;
 		alu.nALL	= pnALL ? pnALL[iA]	: 0;
 		return alu;
 	}
@@ -236,14 +326,35 @@ public:
 
 		if( pALF[ali.iA] == ali.alf )
 		{
+
 			if( !ppDAT )
 			{
-				ppDAT = new void*[nA];
-				gpmZn( ppDAT, nA );
+				if( ali.pDAT )
+				{
+					ppDAT = new void*[nA];
+					gpmZn( ppDAT, nA );
+				}
 			}
 			else if( ppDAT[ali.iA] != ali.pDAT )
 				gpmDELary( ppDAT[ali.iA] );
-			ppDAT[ali.iA] = ali.pDAT;
+			if( ppDAT )
+				ppDAT[ali.iA] = ali.pDAT;
+
+
+
+			if( !ppR )
+			{
+				if( ali.pRES )
+				{
+					ppR = new gpcRES*[nA];
+					gpmZn( ppR, nA );
+				}
+			}
+			else if( ppR[ali.iA] != ali.pRES )
+				gpmDEL( ppR[ali.iA] );
+			if( ppR )
+				ppR[ali.iA] = ali.pRES;
+
 			if( pOP )
 				pOP[ali.iA] = ali.op;
 			if( pTYP )
@@ -251,8 +362,11 @@ public:
 			if( pAN )
 				pAN[ali.iA] = ali.AN;
 
-		} else
-			gpmDELary( ali.pDAT );
+			return this;
+
+		}
+		gpmDELary( ali.pDAT );
+		gpmDELary( ali.pRES );
 
 		return this;
 	}

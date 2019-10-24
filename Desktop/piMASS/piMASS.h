@@ -529,6 +529,34 @@ public:
 	}
 
 };
+enum gpeISA : I1
+{
+	gpeISA_nop,
+	gpeISA_an,
+	gpeISA_anFUN,
+	gpeISA_var,
+	gpeISA_FUN,
+	gpeISA_dim,
+	gpeISA_not 		= '!',
+	gpeISA_rem 		= '%',
+	gpeISA_and 		= '&',
+	gpeISA_brkB 	= '(',
+	gpeISA_brkE 	= ')',
+	gpeISA_mul 		= '*',
+	gpeISA_plus 	= '+',
+	gpeISA_sub 		= '-',
+	gpeISA_dot 		= '.',
+	gpeISA_div 		= '/',
+	gpeISA_litl 	= '<',
+	gpeISA_equ	 	= '=',
+	gpeISA_gret 	= '>',
+	gpeISA_brkDB 	= '[',
+	gpeISA_brkDE 	= ']',
+	gpeISA_blkB 	= '{',
+	gpeISA_or 		= '|',
+	gpeISA_blkE		= '}',
+
+};
 
 class U1x4
 {
@@ -542,6 +570,10 @@ public:
         struct
         {
             U1 aXYZW[4];
+        };
+        struct
+        {
+            gpeISA aISA[4];
         };
         struct
         {
@@ -658,6 +690,10 @@ public:
         struct
         {
             I1 aXYZW[4];
+        };
+        struct
+        {
+            gpeISA aISA[4];
         };
         struct
         {

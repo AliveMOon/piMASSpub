@@ -13,9 +13,10 @@ gpcALU::~gpcALU()
 	null();
 }
 
-gpcRES& gpcRES::null()
+gpcRES* gpcRES::null()
 {
-	gpcRES* pR;
+	if( !this )
+		return NULL;
 	if( ppDAT )
 	{
 		for( U4 a = 0; a < nA; a++ )
@@ -49,7 +50,9 @@ gpcRES& gpcRES::null()
 	gpmDELary( pAN );
 	gpmDELary( pTREE );
 	gpmDELary( pTx );
+	gpmDELary( pISA );
 	//gpmDELary( pALU );
+	return this;
 }
 
 I8x2& I8x2::A( U1* pA, U1** ppA )
@@ -124,9 +127,15 @@ gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID )
 	gpmDEL(pKID);
 	return pKID;
 }
-gpcALU& gpcALU::zero(void)
+gpcALU& gpcALU::zero( void )
 {
-	pRM->null();
+	pDAT = NULL;
+	pRES = NULL;
+	op = 0;
+	typ = 0;
+	AN = 0;
+	pRM->chg( *this );
+
 	return *this;
 }
 gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
@@ -942,8 +951,8 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, 
 			nXB	= nX*nB;
 	U4x2	T( nXB, nXB*AN.a4x2[0].x );
 	U4		d = xy*T;
-	if( d > nAN )
-		d %= nAN;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
 	if( x > nX )
 		x %= nX;
 
@@ -1007,8 +1016,8 @@ gpcALU& gpcALU::equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 x )
 			nXB	= nX*nB;
 	U4x2	T( nXB, nXB*AN.a4x2[0].x );
 	U4		d = xy*T;
-	if( d > nAN )
-		d %= nAN;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
 	if( x > nX )
 		x %= nX;
 
@@ -1056,8 +1065,8 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 x )
 			nXB	= nX*nB;
 	U4x2	T( nXB, nXB*AN.a4x2[0].x );
 	U4		d = xy*T;
-	if( d > nAN )
-		d %= nAN;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
 	if( x > nX )
 		x %= nX;
 
