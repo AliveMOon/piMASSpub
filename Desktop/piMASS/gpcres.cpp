@@ -79,7 +79,8 @@ gpcADR& gpcADR::operator = ( gpcRES* pM )
 		return *this = gpeALF_null;
 	}
 
-	nA = iA = pM->nFND();
+	nA = pRM->nFND();
+	iA = pRM->iFND( an.alf );
 	while( iA >= nA )
 	{
 		pRM = pRM->pRM();
@@ -167,6 +168,7 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 		nXB2	= nX2*nB2,
 		nLD2	= nAN2*nXB2;
 
+	if( pDAT )
 	if( nLD2 != nLD1 )
 		pDAT = NULL;
 
@@ -870,494 +872,158 @@ gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	return *this;
 }
 
-gpcALU& gpcALU::equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm ){
+
+gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, U2 x )
+{
 	if( !pM )
 		return null();
 
-	gpcADR adr = alf;
-	if( !alf )
-	{
-        U8 nCNT = 1;
-		adr.an.alf = gpeALF_A;
-		adr = pM;
-		while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
-		{
-			// nem talált ilyen változót
-			adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nCNT ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
-			adr = pM; // ezzel indítjuk a keresést
-			nCNT++;
-		}
-		*this = pM->ADD( adr.an.alf, ty4.u4, op4.u4 );
- 	} else
-		adr = pM;
+	if( ty4.y < 1 )
+		ty4.y = 1;
+	if( ty4.z < 1 )
+		ty4.z = 1;
 
-
-	/// ha nem megfelelő typus át kell küldözgetni
-	/// a megfelelő típusban dolgozza fel
-	// U1x4 typ:
-	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
-	// yz[ dimXY ] 		, w[] = nBYTE*dimXY
-	if( typ.x&0x40 || (u8&0x8000000000000000) )
+	U1 OR = typ.x|ty4.x;
+	if( op4.x < 0 )
 	{
-		// lebegőpontos volt vagy rohadt nagy, átküldjük double-ba
-		double d8 = u8;
-		if( op4.y < 0 )
-		{
-			d8 *= -1;
-			op4.y = 0;
-		}
-		return equ( pM, xy, ty4, op4, d8 );
-	}
-	if( typ.x&0x80 )
-	{
-		// signed azaz előjeles
-		I8 i8 = u8;
-		if( op4.y < 0 )
-		{
-			i8 *= -1;
-			op4.y = 0;
-		}
-		return equ( pM, xy, ty4, op4, i8 );
+		U1 sub = -op4.x;
+		if( sub&1 )
+			OR |= 0x80;
+		else
+			op.x = 0;
 	}
 
-	gpcALU tmp;
-
-	tmp.typ = typ;
-	tmp.pDAT = pDAT;
-	tmp.AN.a4x2[0] = AN.a4x2[0];
-
-	typ = ty4;
-	AN.a4x2[0].mx( xy+1 );
-
-	U4x2 	X1( tmp.typ.y, tmp.typ.z ),
-			X2( typ.y, typ.z );
-	X2.mx( X1 );
-
-	U4	nAN1	= tmp.AN.a4x2[0].area(),
-		nX1		= X1.area(),
-		nN1		= tmp.typ.x&0xf,
-		nB1		= 1<<nN1,
-
-		nAN2	= AN.a4x2[0].area(),
-		nX2		= X2.area(),
-		nN2		= typ.x&0xf,
-		nB2		= 1<<nN2,
-
-		nXB1	= nX1*nB1,
-		nXB2	= nX2*nB2,
-
-		nLD1	= nAN1*nXB1,
-		nLD2	= nAN2*nXB2; //,
-
-//		nBu8	= gpmNbyte(u8);
-
-
-    if( nB1 > nB2  )
-    {
-		nB2 = nB1;
-		nN2 = nN1;
-		typ.x = (tmp.typ.x&0xf0) | nN2;//(typ.x&0xf);
-		nXB2 = nX2*nB2;
-		nLD2 = nAN2*nXB2;
-    }
-    dm %= nX2;
-	U4 d, x = 0;
-    if( pDAT )
-	if( nLD2 == nLD1 )
+	if( d8 != 0.0 ? true : (u8&0x8000000000000000) )
 	{
-		(((U8*)pDAT)+(xy*U4x2(1,AN.x)))[dm] = u8 ;
+		OR |= 0x40;
+	}
+
+	if( OR&0x40 )
+	{
+		d8 += u8;
+		return equ( pM, xy, ty4, op4, d8, x );
+	}
+	if( OR&0x80 )
+		return equSIG( pM, xy, ty4, op4, u8, x );
+
+	if( u8 < 0x10000 )
+		ty4.x = u8 > 0xff;
+	else
+		ty4.x = 2 + (u8>0xffffFFFF);
+
+	ins( pM, xy, ty4 );
+	U1* pD = (U1*)pDAT;
+	if( !pD )
 		return *this;
-	}
 
-	pDAT = new U1[nLD2];
-	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
-	U1		*pD = (U1*)pDAT;
-	gpmZn( pD, nLD2 );
-	if( !tmp.pDAT )
+
+	U4x2 	X( typ.y, typ.z );
+
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d = xy*T;
+	if( d > nAN )
+		d %= nAN;
+	if( x > nX )
+		x %= nX;
+
+
+	if( nB > 2 )
 	{
-		d = xy*T2;
-		x += dm;
-		if( nN2 < 2 )
-		{
-			if( nN2 )
-				((U2*)(pD+d))[x] = u8;
-			else
-				((U1*)(pD+d))[x] = u8;
-		} else if( nN2 > 3 )
+		if( nB > 4 )
 			((U8*)(pD+d))[x] = u8;
 		else
 			((U4*)(pD+d))[x] = u8;
-
-		pRM->chg( *this );
-		return *this;
 	}
-
-	U1* pS = (U1*)tmp.pDAT;
-	U8 src;
-	U4x2 	xyS,
-			T1( nXB1, nXB1*tmp.AN.a4x2[0].x );
-	U4 s, se = tmp.AN.a4x2[0].y;
-
-	for( xyS = 0; xyS.y < se; xyS.y++ )
-	if( nXB1 == nXB2 )
-	{
-		memcpy( pD+xyS*T2, pS+xyS*T1, T1.y );
-	}
-	else for( xyS.x = 0; xyS.x < se; xyS.x++ )
-    {
-		s = xyS*T1;
-		d = xyS*T2;
-		if( nB1 == nB2 )
-		{
-			memcpy( pD+d, pS+s, nXB1 );
-			continue;
-		}
-
-        for( x = 0; x < nX1; x++ )
-		{
-			if( nN1 == nN2 )
-			{
-				if( nN1 < 2 )
-				{
-					if( nN1 )
-						((U2*)(pD+d))[x] = ((U2*)(pS+s))[x];
-					else
-						((U1*)(pD+d))[x] = ((U1*)(pS+s))[x];
-					continue;
-				}
-
-				if( nN1 > 3 )
-					((U8*)(pD+d))[x] = ((U8*)(pS+s))[x];
-				else
-					((U4*)(pD+d))[x] = ((U4*)(pS+s))[x];
-
-				continue;
-			}
-
-			if( nN1 < 2 )
-			{
-				if( nN1 )
-					src = ((U2*)(pS+s))[x];
-				else
-					src = ((U1*)(pS+s))[x];
-			}
-			else if( nN1 > 3 )
-				src = ((U8*)(pS+s))[x];
-			else
-				src = ((U4*)(pS+s))[x];
-
-
-			if( nN2 < 2 )
-			{
-				if( nN2 )
-					((U2*)(pD+d))[x] = src;
-				else
-					((U1*)(pD+d))[x] = src;
-			}
-			else if( nN2 > 3 )
-				((U8*)(pD+d))[x] = src;
-			else
-				((U4*)(pD+d))[x] = src;
-
-
- 		}
-    }
-
-	d = xy*T2;
-	x = dm;
-	if( nN2 < 2 )
-	{
-		if( nN2 )
-			((U2*)(pD+d))[x] = u8;
-		else
-			((U1*)(pD+d))[x] = u8;
-	}
-	else if( nN2 > 3 )
-		((U8*)(pD+d))[x] = u8;
+	else if( nB > 1 )
+		((U2*)(pD+d))[x] = u8;
 	else
-		((U4*)(pD+d))[x] = u8;
+		((U1*)(pD+d))[x] = u8;
 
-	pRM->chg( *this );
 	return *this;
 }
 
-gpcALU& gpcALU::equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm ){
+gpcALU& gpcALU::equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 x )
+{
 	if( !pM )
 		return null();
 
-	gpcADR adr = alf;
-	if( !alf )
-	{
-        U8 nCNT = 1;
-		adr.an.alf = gpeALF_A;
-		adr = pM;
-		while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
-		{
-			// nem talált ilyen változót
-			adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nCNT ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
-			adr = pM; // ezzel indítjuk a keresést
-			nCNT++;
-		}
-		*this = pM->ADD( adr.an.alf, ty4.u4, op4.u4 );
- 	} else
-		adr = pM;
+	bool bSIG = pDAT ? typ.x&0x80 : true;
 
-
-	/// ha nem megfelelő typus át kell küldözgetni
-	/// a megfelelő típusban dolgozza fel
-	// U1x4 typ:
-	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
-	// yz[ dimXY ] 		, w[] = nBYTE*dimXY
-	if( typ.x&0x40 )
+	if( u8 <= 0x7fFF )
 	{
-		// lebegőpontos volt vagy rohadt nagy, átküldjük double-ba
-		double d8 = i8;
-		if( op4.y < 0 )
-		{
-			d8 *= -1;
-			op4.y = 0;
-		}
-		return equ( pM, xy, ty4, op4, d8 );
+		if( u8 < 0x7f )
+			ty4.x = 0x80;
+		else
+			ty4.x = 0x81;
 	}
-	bool bSIG = (typ.x&0x80);
-
-	gpcALU tmp;
-
-	tmp.typ = typ;
-	tmp.pDAT = pDAT;
-	tmp.AN.a4x2[0] = AN.a4x2[0];
-
-
-
-	typ.u4 = ty4.u4 | 0x80;
-	AN.a4x2[0].mx( xy+1 );
-
-	U4x2 	X1( tmp.typ.y, tmp.typ.z ),
-			X2( typ.y, typ.z );
-	X2.mx( X1 );
-
-	U4	nAN1	= tmp.AN.a4x2[0].area(),
-		nX1		= X1.area(),
-		nN1		= tmp.typ.x&0xf,
-		nB1		= 1<<nN1,
-
-		nAN2	= AN.a4x2[0].area(),
-		nX2		= X2.area(),
-		nN2		= typ.x&0xf,
-		nB2		= 1<<nN2,
-
-		nXB1	= nX1*nB1,
-		nXB2	= nX2*nB2,
-
-		nLD1	= nAN1*nXB1,
-		nLD2	= nAN2*nXB2; //,
-
-//		nBu8	= gpmNbyte(u8);
-
-
-    if( nB1 > nB2  )
-    {
-		nB2 = nB1;
-		nN2 = nN1;
-		typ.x = (tmp.typ.x&0xf0) | nN2;//(typ.x&0xf);
-		nXB2 = nX2*nB2;
-		nLD2 = nAN2*nXB2;
-    }
-    dm %= nX2;
-	U4 d, x = 0;
-    if( pDAT )
-	if( nLD2 == nLD1 )
+	else if( u8 <= 0x7fFFffFF )
 	{
-		(((I8*)pDAT)+(xy*U4x2(1,AN.x)))[dm] = i8 ;
+		ty4.x = 0x82;
+	} else
+		ty4.x = 0x83;
+
+	if( !bSIG ) // nem volt signed?
+	if( (ty4.x&0xf) <= (typ.x&0xf)  )
+	{
+		// akkor nem jó ha ugyan akkorát akarunk
+		ty4.x = 0x80 + min( 3, (typ.x&0xf)+1 );
+	}
+
+
+	I8 i8 = ( op4.x < 0 ) ? -u8 : u8;
+
+	ins( pM, xy, ty4 );
+	U1* pD = (U1*)pDAT;
+	if( !pD )
 		return *this;
-	}
 
-	pDAT = new U1[nLD2];
-	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
-	U1		*pD = (U1*)pDAT;
-	gpmZn( pD, nLD2 );
-	if( !tmp.pDAT )
+
+	U4x2 	X( typ.y, typ.z );
+
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d = xy*T;
+	if( d > nAN )
+		d %= nAN;
+	if( x > nX )
+		x %= nX;
+
+
+	if( nB > 2 )
 	{
-		d = xy*T2;
-		x += dm;
-		if( nN2 < 2 )
-		{
-			if( nN2 )
-				((I2*)(pD+d))[x] = i8;
-			else
-				((I1*)(pD+d))[x] = i8;
-		} else if( nN2 > 3 )
+		if( nB > 4 )
 			((I8*)(pD+d))[x] = i8;
 		else
 			((I4*)(pD+d))[x] = i8;
-
-		pRM->chg( *this );
-		return *this;
 	}
-
-	U1* pS = (U1*)tmp.pDAT;
-	I8 src;
-	U4x2 	xyS,
-			T1( nXB1, nXB1*tmp.AN.a4x2[0].x );
-	U4 s, se = tmp.AN.a4x2[0].y;
-
-	for( xyS = 0; xyS.y < se; xyS.y++ )
-	if( nXB1 == nXB2 ) // && bSIG )
-	{
-		memcpy( pD+xyS*T2, pS+xyS*T1, T1.y );
-	}
-	else for( xyS.x = 0; xyS.x < se; xyS.x++ )
-    {
-		s = xyS*T1;
-		d = xyS*T2;
-		if( nB1 == nB2 )
-		{
-			memcpy( pD+d, pS+s, nXB1 );
-			continue;
-		}
-
-        for( x = 0; x < nX1; x++ )
-		{
-			if( nN1 == nN2 )
-			{
-				if( nN1 < 2 )
-				{
-					if( nN1 )
-						((I2*)(pD+d))[x] = ((I2*)(pS+s))[x];
-					else
-						((I1*)(pD+d))[x] = ((I1*)(pS+s))[x];
-					continue;
-				}
-
-				if( nN1 > 3 )
-					((I8*)(pD+d))[x] = ((I8*)(pS+s))[x];
-				else
-					((I4*)(pD+d))[x] = ((I4*)(pS+s))[x];
-
-				continue;
-			}
-
-			if( nN1 < 2 )
-			{
-				if( nN1 )
-					src = ((I2*)(pS+s))[x];
-				else
-					src = ((I1*)(pS+s))[x];
-			}
-			else if( nN1 > 3 )
-				src = ((I8*)(pS+s))[x];
-			else
-				src = ((I4*)(pS+s))[x];
-
-
-			if( nN2 < 2 )
-			{
-				if( nN2 )
-					((I2*)(pD+d))[x] = src;
-				else
-					((I1*)(pD+d))[x] = src;
-			}
-			else if( nN2 > 3 )
-				((I8*)(pD+d))[x] = src;
-			else
-				((I4*)(pD+d))[x] = src;
-
-
- 		}
-    }
-
-	d = xy*T2;
-	x = dm;
-	if( nN2 < 2 )
-	{
-		if( nN2 )
-			((I2*)(pD+d))[x] = i8;
-		else
-			((I1*)(pD+d))[x] = i8;
-	}
-	else if( nN2 > 3 )
-		((I8*)(pD+d))[x] = i8;
+	else if( nB > 1 )
+		((I2*)(pD+d))[x] = i8;
 	else
-		((I4*)(pD+d))[x] = i8;
-
-	pRM->chg( *this );
-	return *this;
-}
-
-gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm )
-{
-	if( !pM )
-		return null();
-
-	ins( pM, xy, ty4 );
-	U1* pD = (U1*)pDAT;
-	if( !pD )
-		return *this;
-
-
-	U4x2 	X2( typ.y, typ.z );
-
-	U4 		nB2		= typ.w,
-			nX2		= X2.area(),
-			nXB2	= nX2*nB2;
-	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
-	U4		d = xy*T2;
-
-
-	if( nB2 > 2 )
-	{
-		if( nB2 > 4 )
-			((U8*)(pD+d))[dm] = u8;
-		else
-			((U4*)(pD+d))[dm] = u8;
-	}
-	else if( nB2 > 1 )
-		((U2*)(pD+d))[dm] = u8;
-	else
-		((U1*)(pD+d))[dm] = u8;
+		((I1*)(pD+d))[x] = i8;
 
 	return *this;
 }
 
-gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm )
+gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 x )
 {
 	if( !pM )
 		return null();
-	ty4.x |= 0x80;
-	ins( pM, xy, ty4 );
-	U1* pD = (U1*)pDAT;
-	if( !pD )
-		return *this;
 
-
-	U4x2 	X2( typ.y, typ.z );
-
-	U4 		nB2		= typ.w,
-			nX2		= X2.area(),
-			nXB2	= nX2*nB2;
-	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
-	U4		d = xy*T2;
-
-
-	if( nB2 > 2 )
-	{
-		if( nB2 > 4 )
-			((I8*)(pD+d))[dm] = i8;
-		else
-			((I4*)(pD+d))[dm] = i8;
-	}
-	else if( nB2 > 1 )
-		((I2*)(pD+d))[dm] = i8;
+	if( ty4.x&0xf != 3 )
+	if( abs(d8) > (double)0xffFFFF )
+		ty4.x = 0xc3;
 	else
-		((I1*)(pD+d))[dm] = i8;
+		ty4.x = 0xc2;
 
-	return *this;
-}
-
-gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 dm )
-{
-	if( !pM )
-		return null();
+	if( op.y < 0 )
+		d8 = -d8;
 
 	int2flt( pM, xy, ty4 );
 	U1* pD = (U1*)pDAT;
@@ -1365,451 +1031,27 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 dm )
 		return *this;
 
 
-	U4x2 	X2( typ.y, typ.z );
+	U4x2 	X( typ.y, typ.z );
 
-	U4 		nB2		= typ.w,
-			nX2		= X2.area(),
-			nXB2	= nX2*nB2;
-	U4x2	T2( nXB2, nXB2*AN.a4x2[0].x );
-	U4		d = xy*T2;
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d = xy*T;
+	if( d > nAN )
+		d %= nAN;
+	if( x > nX )
+		x %= nX;
 
-
-	if( nB2 > 4 )
-		((double*)(pD+d))[dm] = d8;
+	if( nB > 4 )
+		((double*)(pD+d))[x] = d8;
 	else
-		((float*)(pD+d))[dm] = d8;
+		((float*)(pD+d))[x] = d8;
 
 	return *this;
 }
-gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
-{
-	if( pE )
-	if( pS >= pE )
-		return this;
 
-	gpcRES* pTMP = this ? NULL : new gpcRES( pM );
-	if( pTMP )
-		return pTMP->compiEASY( pS, pE, ppE, pM );
-	else if( !this )
-		return NULL;
-
-	if( ppE )
-		*ppE = pS;
-
-	if( !pE )
-		pE = pS+strlen((char*)pS);
-	null();
-	U4x4 xyWH = 0;
-	U4 deep = 0, nALF;
-	U1 	d, *pBEG = NULL,
-		*apA[2], *apN[2],
-		*pSTR = pS, *pXe;
-
-	gpmZ(apA);
-	gpmZ(apN);
-	//gpmZ(apP);
-
-	U8 nUTF8, nLAB = 0, u8 = 0;
-	double d8 = 0;
-
-	I8x4 lab = 0;
-	U1x4 typ = 0;
-	I1x4 op = (U4)0;
-
-	bool bMATH = false;
-	gpeALF XML = gpeALF_null;
-	I4 xmlD = 0;
-
-
-	gpcADR adr;
-	gpcALU	aA[8];
-	gpmZ(aA);
-
-	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
-	{
-		if( gpmbABC( *pS, gpaALFadd ) )
-		{
-			if( apA[0] )
-			{
-				apA[1] = apA[0];
-				lab.w = lab.y;
-			}
-			lab.a8x2[0].num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
-
-			apN[0] = NULL;
-			apA[0] = pS;
-			u8 = 0;
-			pS += lab.a8x2[0].num;
-		}
-
-		if( gpmbNUM( *pS ) )
-		{
-			if( apA[0] )
-			{
-				// az ötlet lényege, hogy nem lesz a apA[0] -ban szöveg ha AN
-				// viszont ha nem volt utánna szám  akkor a típus az apA[0], a label meg az apA[1] ben lesz
-				apA[1] = apA[0];
-				apA[0] = NULL;
-			}
-			apN[0] = pS;
-			typ.u4 = gpeTYP_U8;
-			u8 = gpfSTR2U8( pS, &pS );
-		}
-
-		pS++;
-		switch( pS[-1] ) {
-			case '.': {
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-                    if( apA[0] )
-                    {
-						// már megvan lab.AB() //lab.a8x2[0].alf = gpfSTR2ALF( apA[0], apA[0] + min( 14, lab.y ), NULL );
-						if( apA[1] )
-						{
-							// ó kető van egymás után // ez valami típus?
-							// már megvan lab.aa() //lab.a8x2[1].alf = gpfSTR2ALF( apA[1], apA[1] + min( 14, lab.w ), NULL );
-
-						}
-						// ez csak egy kulcsszó megpontozva
-
-						break;
-                    }
-
-                    if( apA[1] && apN[0] )
-                    {
-						// ez egy AN megpontozva
-						// már megvan lab.aa() //lab.a8x2[1].alf = gpfSTR2ALF( apA[1], apA[1] + min( 14, lab.w ), NULL );
-
-						break;
-                    }
-
-                    //ez egy float szám ?
-                    pS--; // visszaléptetjük úgy is vissza mászik a gpmSTR2D-val;
-                    pXe = pS;
-					d8 = gpmSTR2D( pS ) + u8;
-					if( pS == pXe)
-					{
-						// hát ez nem nyert
-						// ez csak egy pont
-						pS++;
-						break;
-					}
-					typ.u4 = gpeTYP_D;
-					if( op.x < 0 )
-					{
-						// volt néhány minusz elötte
-						d8 *= -1.0;
-						op.x++;
-					}
-				} break;
-			case '+':{
-
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-
-
-					op.x++;
-				} break;
-
-			case '-':{
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-					op.x--;
-				} break;
-
-
-			case '*':{
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-					op.y++;
-				} break;
-			case '/': {
-					switch( *pS ) {
-						case '*':
-							pS = (U1*)strstr( (char*)pS+1, "*/" );
-							if( pS ? (pS >= pE) : true )
-							{
-								pS = pE;
-								break;
-							}
-
-							pS += 2;
-							break;
-
-						case '/':
-							pS += gpmVAN( pS, "\n", nUTF8 );
-							break;
-						default:
-							lab.AB( apA[0], apA[1], apA, apA+1 );
-
-							op.y--;
-							break;
-					}
-				} break;
-
-			case '%':{ // OSZTÁS maradék
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-					op.z |= 0x80;
-				} break;
-
-			/// LOGIC switch -------------------------------------
-			case '!':{ // NOT
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-					op.z = (op.z & ~0x40) | (op.z&0x40 ? 0 : 0x40);
-				} break;
-			case '|':{	// OR
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-					op.z |= 0x20;
-				} break;
-			case '&':{	// AND
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-
-					op.z |= 0x10;
-				} break;
-
-			case '=':{
-					if( apA[0] )
-					{
-						// valami turpisság készül
-						lab.a8x2[0].A( apA[0], apA );
-						if( apA[1] )
-						{
-							lab.a8x2[1].A( apA[1], apA+1 );
-
-						}
-					} else {
-						if( apA[1] )
-						{
-							lab.a8x2[1].A( apA[1], apA+1 );
-							// AN A0:A1.A0 stb
-						}
-					}
-
-					if( *pS == '=' ) { // equal?
-						// ez logikai op nem assign
-
-						op.z |= 0x8;
-						break;
-					}
-
-					/// = ASSIGN = -------------------------------------
-					/// egyenlőségjel reseteli az xyWH-t
-					xyWH.null(); /// Nesze! Most már null!
-				    //if( deep )
-					//	break;
-					adr = lab.a8x2[0].alf;
-					adr = this;
-
-					//U4 iFND = iFNDadr( lab.a8x2[0].alf, &apMOM[0] );
-					if( !adr.an.alf )
-					while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
-                    {
-						// nem talált ilyen változót
-						adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nLAB ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
-                        adr = this; // ezzel indítjuk a keresést
-                        nLAB++;
-                    }
-
-					aA[0] = adr.ALU( this );
-					/*break;
-
-                    // x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
-					if( typ.x&0x40) // lebeg
-						pM->equ( lab.a8x2[0].alf, op.u4, typ.u4, d8 );
-					else
-						pM->equ( lab.a8x2[0].alf, op.u4, typ.u4, lab.y );
-					// új változó*/
-				} break;
-
-			case ':': {
-					// ez valami név?
-					if( apA[0] )
-					{
-						// valami turpisság készül
-						lab.a8x2[0].A( apA[0], apA );
-						if( apA[1] )
-						{
-							lab.a8x2[1].A( apA[1], apA+1 );
-
-
-						}
-
-						op.z |= 0x8;	// nevet vagy típust is meghatároz
-
-
-					}
-
-
-				} break;
-
-			case ';': //{	// SOROK
-			case ',': {	// vessző OSZLOPOK
-
-					if( apA[0] )
-					{
-						// valami turpisság készül
-						lab.a8x2[0].A( apA[0], apA );
-						if( apA[1] )
-						{
-							lab.a8x2[1].A( apA[1], apA+1 );
-
-						}
-						if( aA[0].alf != lab.a8x2[0].alf )
-						{
-							adr = lab.a8x2[0].alf;
-							adr = this;
-						}
-
-					} else {
-						if( apA[1] )
-						{
-							lab.a8x2[1].A( apA[1], apA+1 );
-							// AN A0:A1.A0 stb
-						}
-					}
-
-
-
-					if( typ.x&0x40 )
-						aA[0].equ( this, xyWH.a4x2[0], typ, op, d8 );
-					else {
-						typ.x = (typ.x&0xf0) | gpmSHnB(gpmUnB(u8));
-						if( op.x < 0 )
-							aA[0].equ( this, xyWH.a4x2[0], typ, op, -(I8)u8 );
-						else
-							aA[0].equ( this, xyWH.a4x2[0], typ, op, u8 );
-					}
-
-					op.u4 = 0;
-					if( pS[-1] == ',' )
-						xyWH.x++;
-					else {
-						xyWH.x = 0;
-						xyWH.y++;
-					}
-					if( xyWH.z >= xyWH.x )
-						break;
-					// bővíteni kell
-					xyWH.z = xyWH.x;
-				} break;
-			/*case ';': {	// SOROK
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-					bMATH = false;
-
-					op.u4 = 0;
-					xyWH.x = 0;
-					xyWH.y++;
-				} break;*/
-
-
-
-			case '>':
-				lab.AB( apA[0], apA[1], apA, apA+1 );
-
-				if( bMATH )
-				{
-
-
-					break;
-				}
-
-			case '}':
-			case ')':
-			case ']': {
-						pE = pS;
-						break;
-					}
-			case '<':
-				lab.AB( apA[0], apA[1], apA, apA+1 );
-
-				if( bMATH )
-				{
-
-
-					break;
-				}
-				/// ezt be kell majd zavarni egy XML parserba
-				pS += gpmNINCS( pS, " \t\r\n" );
-				if( pS >= pE )
-					continue;
-
-				XML = gpfSTR2ALF( pS, pE, &pS );
-				pXe = pS;
-                while( pXe = (U1*)strstr( (char*)pXe, "</" ) )
-                {
-					pXe += 2;
-					if( pXe >= pE )
-					{
-						pXe = NULL;
-						break;
-					}
-					pXe += gpmNINCS( pXe, " \t\r\n" );
-					if( XML != gpfSTR2ALF( pXe, pE, &pXe ) )
-						continue;
-                    pS = pXe+gpmVAN( pXe, ">", nUTF8 );
-					break;
-                }
-                if( !pXe )
-                {
-					pE = pS;
-					break;
-                }
-                if( *pS == '>' )
-					pS++;
-
-
-				break;
-
-			case '(':
-			case '{':
-			case '[': {
-					lab.AB( apA[0], apA[1], apA, apA+1 );
-					pTMP = ((gpcRES*)NULL)->compiEASY( pS, pE, &pS, this );
-
-
-				} break;
-
-
-
-
-			case '\"': {
-
-
-					pSTR = pS;
-					pS += gpmVAN( pS, "\"", nUTF8 );
-					if( *pS == '\"' )
-					{
-						pS++;
-						break;
-					}
-					pS = pE;
-				} break;
-			case '\'': {
-					pS += gpmVAN( pS, "\'", nUTF8 );
-					u8 = pS[-1]; // ucsot beolvassa
-					if( *pS == '\'' )
-					{
-						pS++;
-						break;
-					}
-					pS = pE;
-				} break;
-		}
-	}
-
-
-
-
-	if( ppE )
-		*ppE = pS;
-
-	gpmDEL( pTMP ) // nem lett sehove elrakva? Arroe KONYEC!
-
-	return this;
-}
 
 
 gpcREStrs* gpcREStrs::REScompiAN( U1* pS, U1* pE, U4* pMAP, gpcLZYdct* pDICT )

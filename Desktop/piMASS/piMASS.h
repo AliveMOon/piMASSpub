@@ -621,17 +621,19 @@ public:
 
 	U1x4& typMX( U1x4 tp )
 	{
-		U1 sh = max( tp.x&0x3, x&0x3 );	// sh: 0B?1 1WH2 2LF4 3QD8
+		U1	sh1 = x&0xf;
+		if( sh1 < tp.x&0xf ) 	// sh: 0B?1 1WH2 2LF4 3QD8
+			sh1 = tp.x&0xf;
 		tp.x = (tp.x|x)&0xf0;
 
 		if( tp.x&0x40 )
 		{
 			tp.x |= 0x80;	// float akor signed
-			if( sh < 2 )
-				sh = 2;	// ha float most 4b kisebb nem lehet
+			if( sh1 < 2 )
+				sh1 = 2;	// ha float most 4b kisebb nem lehet
 		}
 
-		x = tp.x|sh;
+		x = tp.x|min(3,sh1);
 		w = 1<<(x&0xf);
 
 		// legalább 1x1 es valamikből áll

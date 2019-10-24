@@ -54,6 +54,7 @@
 		<Unit filename="gpcU44.cpp" />
 		<Unit filename="gpcres.cpp" />
 		<Unit filename="gpcres.h" />
+		<Unit filename="gpcres_compi.cpp" />
 		<Unit filename="include/gpcND.h" />
 		<Unit filename="include/gpcOPCD.h" />
 		<Unit filename="include/gpcSCHL.h" />

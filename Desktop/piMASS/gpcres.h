@@ -147,8 +147,8 @@ public:
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 
-	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
-	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm = 0 );
+	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, U2 dm = 0 );
+	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 
 	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
@@ -238,6 +238,7 @@ public:
 			if( !ppDAT )
 			{
 				ppDAT = new void*[nA];
+				gpmZn( ppDAT, nA );
 			}
 			else if( ppDAT[ali.iA] != ali.pDAT )
 				gpmDELary( ppDAT[ali.iA] );
