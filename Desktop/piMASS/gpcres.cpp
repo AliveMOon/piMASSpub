@@ -110,8 +110,25 @@ gpcALU& gpcADR::ALU( gpcRES* pM )
 
 	return pRM->ALU( iA );
 }
+gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID )
+{
+	if( !pKID )
+		return NULL;
+
+	if( !pM )
+		return pKID;
+
+	gpcADR adr = gpeALF_A;
 
 
+	gpmDEL(pKID);
+	return pKID;
+}
+gpcALU& gpcALU::zero(void)
+{
+	pRM->null();
+	return *this;
+}
 gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	if( !pM )
 		return null();

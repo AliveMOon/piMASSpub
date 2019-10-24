@@ -211,13 +211,10 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					/// = ASSIGN = -------------------------------------
 					/// egyenlőségjel reseteli az xyWH-t
 					xyWH.null(); /// Nesze! Most már null!
-				    //if( deep )
-					//	break;
-					adr = lab.a8x2[0].alf;
+				    adr = lab.a8x2[0].alf;
 					adr = this;
 
-					//U4 iFND = iFNDadr( lab.a8x2[0].alf, &apMOM[0] );
-					if( !adr.an.alf )
+					if( !adr.an.alf ) // nem lett megadva cél
 					while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
                     {
 						// nem talált ilyen változót
@@ -227,6 +224,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
                     }
 
 					aA[0] = adr.ALU( this );
+					aA[0].zero();
 					/*break;
 
                     // x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
@@ -260,31 +258,35 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 			case ';': //{	// SOROK
 			case ',': {	// vessző OSZLOPOK
-
-					if( apA[0] )
+					if( pTMP )
 					{
-						// valami turpisság készül
-						lab.a8x2[0].A( apA[0], apA );
-						if( apA[1] )
-						{
-							lab.a8x2[1].A( apA[1], apA+1 );
-
-						}
-						if( aA[0].alf != lab.a8x2[0].alf )
-						{
-							adr = lab.a8x2[0].alf;
-							adr = this;
-						}
-
+						pTMP = aA[0].ins( this, pTMP );
 					} else {
-						if( apA[1] )
+						if( apA[0] )
 						{
-							lab.a8x2[1].A( apA[1], apA+1 );
-							// AN A0:A1.A0 stb
-						}
-					}
+							// valami turpisság készül
+							lab.a8x2[0].A( apA[0], apA );
+							if( apA[1] )
+							{
+								lab.a8x2[1].A( apA[1], apA+1 );
 
-					aA[0].equ( this, xyWH.a4x2[0], typ, op, u8, d8 );
+							}
+							if( aA[0].alf != lab.a8x2[0].alf )
+							{
+								adr = lab.a8x2[0].alf;
+								adr = this;
+							}
+
+						} else {
+							if( apA[1] )
+							{
+								lab.a8x2[1].A( apA[1], apA+1 );
+								// AN A0:A1.A0 stb
+							}
+						}
+
+						aA[0].equ( this, xyWH.a4x2[0], typ, op, u8, d8 );
+					}
 
 					d8 = op.u4 = 0;
 					if( pS[-1] == ',' )

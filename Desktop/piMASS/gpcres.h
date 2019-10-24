@@ -143,7 +143,8 @@ public:
 
         return *this;
 	}
-
+	gpcALU& zero(void);
+	gpcRES* ins( gpcRES* pM, gpcRES* pKID );
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 
