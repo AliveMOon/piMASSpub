@@ -194,6 +194,7 @@ typedef enum gpeALF: I8
 	gpeALF_REN = gpdABC('R', 'E', 'N'),
 	gpeALF_RET = gpdABC('R', 'E', 'T'),
 	gpeALF_RUN = gpdABC('R', 'U', 'N'),
+	gpeALF_SEC = gpdABC('S', 'E', 'C'),
 	gpeALF_SIN = gpdABC('S', 'I', 'N'),
 	gpeALF_SIT = gpdABC('S', 'I', 'T'),
 	gpeALF_SLM = gpdABC('S', 'L', 'M'),
