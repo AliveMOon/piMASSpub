@@ -163,13 +163,18 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			case ':':
 			case '=':{
 
-
 					if( *pS == '=' ) { // equal?
 						// ez logikai op nem assign
 
 						op.z |= 0x8;
 						break;
 					}
+
+					/// = ASSIGN = -------------------------------------
+					/// egyenlőségjel reseteli az xyWH-t
+
+				    adr = pI ? pI->an.alf : gpeALF_null;
+					adr = this;
 
 					if( pI )
 					switch( pI->isa.aISA[0] )
@@ -181,11 +186,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 							break;
 					}
 
-					/// = ASSIGN = -------------------------------------
-					/// egyenlőségjel reseteli az xyWH-t
 					xyWH.null(); /// Nesze! Most már null!
-				    adr = pI[-1].an.alf;
-					adr = this;
 					if( adr.pRM )
 					{
 						aALU[0] = adr.ALU( this );

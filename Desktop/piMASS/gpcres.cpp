@@ -663,6 +663,7 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	return *this;
 }
 gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
+
 	if( !pM )
 		return null();
 
@@ -918,8 +919,6 @@ gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 			}
 		}
 	}
-
-
 
 	pM->chg( *this );
 	return *this;
