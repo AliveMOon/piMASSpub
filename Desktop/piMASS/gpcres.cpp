@@ -113,6 +113,31 @@ gpcALU& gpcADR::ALU( gpcRES* pM )
 
 	return pRM->ALU( iA );
 }
+gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID, gpcLAZY& str )
+{
+	gpcADR adr = alf;
+	adr = pM;
+	U8 nLAB = 0;
+	while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
+	{
+		// nem talált ilyen változót
+		adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nLAB ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
+		adr = pM; // ezzel indítjuk a keresést
+		nLAB++;
+	}
+
+
+	if( !pKID )
+		return NULL;
+
+	if( !pM )
+		return pKID;
+
+
+	gpmDEL(pKID);
+	return pKID;
+}
+
 gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID )
 {
 	if( !pKID )
@@ -121,7 +146,9 @@ gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID )
 	if( !pM )
 		return pKID;
 
-	gpcADR adr = gpeALF_A;
+	gpcADR adr = alf;
+	adr = pM;
+
 
 
 	gpmDEL(pKID);

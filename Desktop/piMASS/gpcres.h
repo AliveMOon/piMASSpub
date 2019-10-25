@@ -177,6 +177,7 @@ public:
         return *this;
 	}*/
 	gpcALU& zero( void );
+	gpcRES* ins( gpcRES* pM, gpcRES* pKID, gpcLAZY& str );
 	gpcRES* ins( gpcRES* pM, gpcRES* pKID );
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
@@ -477,7 +478,10 @@ public:
 		ig = nA;
 		if( pTREE )
 		{
-			ig = pTREE->tree_fnd( alf, t );
+			ig = pTREE->tree_fndHARD( alf, t );
+			/*if( pTREE->x != (U8)alf )
+				ig = t;*/
+
 			if( ig < t )
 				return i = pTx[ig];
 
@@ -491,13 +495,16 @@ public:
 				{
 					// azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
 					pTx[t] = ig = j;
-					x = pTREE->tree_fnd( pALF[j], t );
+					x = pTREE->tree_fndHARD( pALF[j], t );
 					if( x >= t )
 						t = pTREE->tree_add( pALF[j], t );		// nem volt benne a listában
 					break;
 				}
 
-				x = pTREE->tree_fnd( pALF[j], t );
+				x = pTREE->tree_fndHARD( pALF[j], t );
+				/*if( pTREE->x != (U8)alf )
+					x = t;*/
+
 				if( x < t )
 					continue;
 

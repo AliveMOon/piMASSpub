@@ -1233,6 +1233,34 @@ public:
 		}
 		return n_t;
 	}
+	U8 tree_fndHARD( U8 u8, U8 n_t )
+	{
+		// figyelem/WARNING
+		// visza térési érték, az, ameddig eljutott a fában
+		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
+
+		// szigorú
+		U8 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == u8 )
+				return i;
+
+			if( this[i].x < u8 )
+			{
+				if( !this[i].z )
+					break;
+
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+				break;
+
+			i = this[i].w;
+		}
+		return n_t;
+	}
 };
 
 class I4x2

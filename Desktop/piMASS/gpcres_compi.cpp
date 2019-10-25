@@ -36,7 +36,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	U1x4 typ = 0;
 	I1x4 op = (U4)0;
 
-	bool bMATH = false;
+	//bool bMATH = false;
 	gpeALF XML = gpeALF_null;
 	I4 xmlD = 0;
 
@@ -99,6 +99,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						break;
 					}
 				} break;
+			/// ALU ------------------------------------------------------------------------------
 			case '+': // öSSZEADáS
 			case '-': // KIVONáS
 				{
@@ -211,13 +212,20 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 					if( str.n_load)
 					{
+						//gpmDEL(pTMP);
+						pTMP = aALU[0].ins( this, pTMP, str );
 
+
+						// csak akkor kapunk valamit visza ha azt elrakta vagy lecserélte
+						pTMP = NULL;
 						str.lzy_reset();
-						gpmDEL(pTMP);
 					}
 					else if( pTMP )
 					{
 						pTMP = aALU[0].ins( this, pTMP );
+
+
+						pTMP = NULL;
 					} else {
 						aALU[0].equ( this, xyWH.a4x2[0], typ, op, u8, d8 );
 					}
@@ -241,28 +249,49 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 			case '>':
 
-				if( bMATH )
+				/*if( bMATH )
 				{
 
 
 					break;
-				}
+				}*/
 
 			case '}':
 			case ')':
 			case ']': {
+
+						if( str.n_load)
+						{
+							//gpmDEL(pTMP);
+							pTMP = aALU[0].ins( this, pTMP, str );
+
+
+							// csak akkor kapunk valamit visza ha azt elrakta vagy lecserélte
+							pTMP =  NULL;
+							str.lzy_reset();
+						}
+						else if( pTMP )
+						{
+							pTMP = aALU[0].ins( this, pTMP );
+
+
+							pTMP = NULL;
+						} else {
+							aALU[0].equ( this, xyWH.a4x2[0], typ, op, u8, d8 );
+						}
+
 
 						pE = pS;
 
 					} break;
 			case '<':
 
-				if( bMATH )
+				/*if( bMATH )
 				{
 
 
 					break;
-				}
+				}*/
 				/// ezt be kell majd zavarni egy XML parserba
 				pS += gpmNINCS( pS, " \t\r\n" );
 				if( pS >= pE )
@@ -342,9 +371,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				} break;
 		}
 	}
-
-
-
 
 	if( ppE )
 		*ppE = pS;
