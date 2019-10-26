@@ -34,13 +34,21 @@ enum gpeTYP:U4
 class gpcISA
 {
 public:
-	I1x4	isa;
+	I1x4	isa;			// x:gpeISA y:step
+	U2		i, n;
+
 	I8x2	an;
+	U4x2	trg;
+	gpcRES	*pRES;
+
 	gpcISA(){};
 	gpcISA* null()
 	{
 		if( this )
+		{
+			gpmDEL( pRES );
 			gpmCLR;
+		}
 
 		return this;
 	}
@@ -49,6 +57,8 @@ public:
 	{
 		if( !this )
 			return NULL;
+		isa.null();
+
 		an = _an;
 		isa.aISA[0] = gpeISA_an;
 		return this;
@@ -57,9 +67,37 @@ public:
 	{
 		if( !this )
 			return NULL;
+		isa.null();
+
 		an.alf = v;
+		an.num = 0;
 		isa.aISA[0] = gpeISA_var;
 		return this;
+	}
+	U1 stp( I1x4 op )
+	{
+		if( !op.u4 )
+			return 0;
+
+		if( op.x )
+		{
+			return  op.x > 0 ? '+' : '-';
+		}
+
+		if( op.z&0x80 )
+		{
+			// tudom, hogy hülyeség, de egyenlőre legyen így
+			return op.z;
+		}
+
+		if( op.y )
+		{
+			return  	abs(op.y) > 1 ?
+						 (op.y > 0 ? gpeISA_exp : gpeISA_root )
+						:(op.y > 0 ? gpeISA_mul : gpeISA_div ) ;
+		}
+
+		return 0;
 	}
 };
 
@@ -93,7 +131,7 @@ public:
 		*this = pM;
 	}
 
-	gpcALU& ALU( gpcRES* pM );
+	gpcALU& adr2ALU( gpcRES* pM );
 
 
 };
@@ -177,7 +215,7 @@ public:
         return *this;
 	}*/
 	gpcALU& zero( void );
-	gpcRES* ins( gpcRES* pM, gpcRES* pKID, gpcLAZY& str );
+	U8 ins( gpcRES* pM, gpcLAZY& str );
 	gpcRES* ins( gpcRES* pM, gpcRES* pKID );
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
@@ -233,42 +271,45 @@ public:
 		}
 		return pISA ? pISA+nISA.x : NULL;
 	}
-	gpcISA*	pISA_stp( U1 stp )
+	gpcISA*	resISA_stp( U1 stp, const U4x2& t )
 	{
 		if( this ? !pISA : true )
 			return NULL;
 		gpcISA* pIS = pI();
-		if( !pIS )
+		if( pIS ? !pIS->isa.x : true )
 			return NULL;
 
+		pIS->trg = t;
 		pIS->isa.y = stp;
+		if( !nISA.x )
+		{
+			nISA.x++;
+			return pI()->null();
+		}
+
 
 		nISA.x++;
-		return pI()->null();
+		pI()->null();
+		switch( stp )
+		{
+			case '.':
+				pIS->i = pIS[-1].i+1;
+				pIS[-pIS->isa.z].n = pIS->i;
+				if( !pIS[-pIS->isa.z].i )
+					break;
+				pIS[-pIS->isa.z].n -= pIS[-pIS->isa.z].i;
+		}
+
+		return pI();
 	}
 
-	gpcISA*	pISAan( I8x2& an )
+	gpcISA*	resISA_an( I8x2& an )
 	{
 		return pI()->AN( an );
 	}
-	gpcISA*	pISAvar( gpeALF a )
+	gpcISA*	resISA_var( gpeALF a )
 	{
 		return pI()->var( a );
-
-		/*if( !pISA )
-			nISA = 0;
-
-		if( nISA.x >= nISA.y )
-		{
-			gpcISA* pK = pISA;
-			nISA.y = nISA.x+0x10;
-            pISA = new gpcISA[nISA.y];
-            if( nISA.x )
-				gpmMEMCPY( pISA, pK, nISA.x );
-			gpmZn( pISA+nISA.x, nISA.y-nISA.x );
-		}
-
-		return pISA[nISA.x].AN( an );*/
 	}
 
 	U4 iL()

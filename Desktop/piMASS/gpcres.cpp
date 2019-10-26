@@ -99,7 +99,7 @@ gpcADR& gpcADR::operator = ( gpcRES* pM )
 	}
 	return *this;
 }
-gpcALU& gpcADR::ALU( gpcRES* pM )
+gpcALU& gpcADR::adr2ALU( gpcRES* pM )
 {
 	gpcALU alu( NULL );
 	if( !pRM )
@@ -113,11 +113,14 @@ gpcALU& gpcADR::ALU( gpcRES* pM )
 
 	return pRM->ALU( iA );
 }
-gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID, gpcLAZY& str )
+U8 gpcALU::ins( gpcRES* pM, gpcLAZY& str )
 {
+	if( !str.n_load )
+		return 0;
+
+	U8 nLAB = 0;
 	gpcADR adr = alf;
 	adr = pM;
-	U8 nLAB = 0;
 	while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
 	{
 		// nem talált ilyen változót
@@ -127,15 +130,8 @@ gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID, gpcLAZY& str )
 	}
 
 
-	if( !pKID )
-		return NULL;
 
-	if( !pM )
-		return pKID;
-
-
-	gpmDEL(pKID);
-	return pKID;
+	return str.n_load;
 }
 
 gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID )

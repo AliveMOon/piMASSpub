@@ -548,10 +548,13 @@ enum gpeISA : I1
 	gpeISA_dot 		= '.',
 	gpeISA_div 		= '/',
 	gpeISA_litl 	= '<',
-	gpeISA_equ	 	= '=',
+	gpeISA_assign 	= '=',
 	gpeISA_gret 	= '>',
+	gpeISA_exp 		= 'E',
+	gpeISA_root		= 'R',
 	gpeISA_brkDB 	= '[',
 	gpeISA_brkDE 	= ']',
+	gpeISA_equ		= 'e',
 	gpeISA_blkB 	= '{',
 	gpeISA_or 		= '|',
 	gpeISA_blkE		= '}',
@@ -580,6 +583,11 @@ public:
             U4 u4;
         };
     };
+    U1x4& null()
+    {
+		u4 = 0;
+		return *this;
+    }
     U1x4(){};
     U1x4( U4 b )
     {
@@ -700,6 +708,11 @@ public:
             U4 u4;
         };
     };
+    I1x4& null()
+    {
+		u4 = 0;
+		return *this;
+    }
     I1x4(){};
     I1x4( U4 b )
     {
@@ -749,6 +762,375 @@ public:
 		return a;
     }
 
+};
+
+
+class U2x2
+{
+public:
+	union
+	{
+		struct
+		{
+			U4 x,y;
+		};
+		struct
+		{
+			U1x4 aCLR[2];
+		};
+		struct
+		{
+			U4 u4;
+		};
+	};
+
+    U2x2(){};
+    U2x2( U2 _x, U2 _y = 0 )
+    {
+        x = _x; y = _y;
+    }
+	// cnt = fract * U4x2(1, w);
+	/*U4x2& cnt2fract(U4 w, U8 cnt)
+	{
+		U1 lg = log2(w * w);
+		w = 1<<(lg/2);
+		U8 X = w * w;
+		cnt %= X;
+		null();
+
+		while( cnt )
+		{
+			w >>= 1;
+			switch(cnt&3)
+			{
+				case 1:
+					x += w;
+					y += w;
+					break;
+				case 2:
+					x += w;
+					break;
+				case 3:
+					y += w;
+					break;
+			}
+			cnt >>= 2;
+		}
+		return *this;
+	}*/
+
+	U2x2& null( void )
+	{
+		u4 = 0;
+		return *this;
+	}
+	U2x2& operator += ( U2 u )
+	{
+		x += u;
+		y += u;
+		return *this;
+	}
+	U2x2& operator += ( I2 i )
+	{
+		x += i;
+		y += i;
+		return *this;
+	}
+	U2x2& operator += ( float f )
+	{
+		x += f;
+		y += f;
+		return *this;
+	}
+
+	U2x2& operator -= ( U2 u )
+	{
+		x -= u;
+		y -= u;
+		return *this;
+	}
+	U2x2& operator -= ( I2 i )
+	{
+		x -= i;
+		y -= i;
+		return *this;
+	}
+	U2x2& operator -= ( float f )
+	{
+		x -= f;
+		y -= f;
+		return *this;
+	}
+	U2x2& operator = ( int i )
+	{
+		if( !i )
+			return null();
+		if( i < 0 )
+			i *= -1;
+		x = y = i;
+		return *this;
+	}
+
+	//U2x2& operator = ( const I4x2& b );
+
+
+	U2x2 operator + (const U4 b) const
+	{
+		return U2x2( x+b, y+b );
+	}
+	U2x2 operator + (const U2x2 b) const
+	{
+		return U2x2( x+b.x, y+b.y );
+	}
+
+	U2x2 operator - (const U4 b) const
+	{
+		return U2x2( x-b, y-b );
+	}
+	U2x2 operator - (const U2x2 b) const
+	{
+		return U2x2( x-b.x, y-b.y );
+	}
+
+
+
+	U4 operator * (const U2x2& b) const
+	{
+		return (U4)x*b.x + (U4)y*b.y;
+	}
+	U2x2 operator & (const U2x2& b) const
+	{
+		return U2x2( x*b.x, y*b.y );
+	}
+	U2x2& operator *= ( U2 i )
+	{
+		if( !i )
+			return null();
+		if( i == 1 )
+			return *this;
+
+		x*=i;
+		y*=i;
+
+		return *this;
+	}
+	U2x2& operator /= ( U2 i )
+	{
+		if( i == 1 )
+			return *this;
+
+		if( !i )
+		{
+			x = y = 0xffffffff;
+			return *this;
+		}
+
+		x/=i;
+		y/=i;
+
+		return *this;
+	}
+	U2x2& operator %= ( U2 i )
+	{
+		if( i == 1 )
+			return null();
+
+		if( !i )
+			return *this;
+		x%=i;
+		y%=i;
+		return *this;
+	}
+
+
+	U4 sum( void ) const
+	{
+		return (U4)x+y;
+	}
+
+	U4 area( void )
+	{
+		return x*y;
+	}
+	U4 are_sum( void )
+	{
+		return area()+sum();
+	}
+
+	U4 qlen(void ) const
+	{
+		return x*x+y*y;
+	}
+
+	U2 mn( void ) const
+	{
+		return x < y ? x:y;
+	}
+
+	U2 mx( void ) const
+	{
+		return x > y ? x:y;
+	}
+
+	U2x2 abs( void ) const
+	{
+		return U2x2( x<0?-x:x, y<0?-y:y );
+	}
+	U2x2& mx( U2x2 b )
+	{
+		if( x < b.x )
+			x = b.x;
+		if( y < b.y )
+			y = b.y;
+		return *this;
+	}
+
+	U2x2& mn( const U2x2& b )
+	{
+		if( x > b.x )
+			x = b.x;
+		if( y > b.y )
+			y = b.y;
+		return *this;
+	}
+
+
+};
+
+class U2x4
+{
+public:
+    union
+    {
+        struct
+        {
+            U2 x,y,z,w;
+        };
+        struct
+        {
+			U2x2 a2x2[2];
+		};
+        struct
+        {
+            U2 aXYZW[4];
+        };
+    };
+
+    U2x4(){};
+    U2x4& null( void )
+	{
+		gpmCLR;
+		return *this;
+	}
+    U2x4( U2 _x, U2 _y = 0, U2 _z = 0, U2 _w = 0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+	//U2x4( const I4x2 _xy, I4x2* p_zw = NULL );
+    U2x4( U2x2& _xy, U2x2* p_zw = NULL )
+    {
+        a2x2[0] = _xy;
+        a2x2[1] = p_zw ? *p_zw : _xy;
+    }
+    U2x4( U2x2& _xy, U2x2& _zw )
+    {
+        a2x2[0] = _xy;
+        a2x2[1] = _zw;
+    }
+    U2x4& operator = ( U2 b )
+    {
+        x = y = z = w = b;
+    }
+    U2x4& operator = ( I2 b )
+    {
+        x = y = z = w = abs(b);
+    }
+    U2x4& operator = ( const U2x2& b )
+    {
+		a2x2[1] = a2x2[0] = b;
+		return *this;
+    }
+    U2x4& operator = ( const I4x2& b );
+
+
+    U2x4& str2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
+    char* str( char* pBUFF, const char* pSP = ", "  )
+    {
+		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
+		return pBUFF;
+    }
+
+
+    U2x4 zwxy( void )  const
+    {
+		return U2x4( z,w, x,y );
+    }
+
+	U2 tree_add( U2 u2, U2 n_t )
+	{
+		// x érték, y mama, z kicsiegyenlõ, w nagyobb
+		this[n_t].null().x = u2;
+		if( !n_t )
+			return 1;
+
+		U2 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == u2 )
+				return n_t;
+
+			if( this[i].x < u2 )
+			{
+				if( !this[i].z )
+				{
+					this[i].z = n_t;
+					this[n_t].y = i;
+					n_t++;
+					return n_t;
+				}
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+			{
+				this[i].w = n_t;
+				this[n_t].y = i;
+				n_t++;
+				return n_t;
+			}
+			i = this[i].w;
+		}
+		return n_t;
+	}
+	U2 tree_fnd( U2 u2, U4 n_t )
+	{
+		// figyelem/WARNING
+		// visza térési érték, az, ameddig eljutott a fában
+		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
+		U2 i = 0;
+		while( i < n_t )
+		{
+			if( this[i].x == u2 )
+				return i;
+
+			if( this[i].x < u2 )
+			{
+				if( !this[i].z )
+					return i;
+
+				i = this[i].z;
+				continue;
+			}
+			if( !this[i].w )
+				return i;
+
+			i = this[i].w;
+		}
+		return n_t;
+	}
+
+	/*U4	dict_add( U1* p_src, U4& m, U4x4& w );
+	U4  dict_find( U1* p_src, U4x4& w );*/
 };
 
 class U4x2
@@ -981,6 +1363,8 @@ public:
 
 };
 
+
+
 class U4x4
 {
 public:
@@ -1043,22 +1427,7 @@ public:
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
     }
-    /*U8 AREAxy( void )
-    {
-		return x*y;
-    }
-    U8 AREAzw( void )
-    {
-		return z*w;
-    }
-     U8 SUMxy( void )
-    {
-		return x+y;
-    }
-    U8 SUMzw( void )
-    {
-		return z+w;
-    }*/
+
 
     U4x4 zwxy( void )  const
     {
@@ -1739,7 +2108,10 @@ public:
 			gpeALF	alf;
 			I8		num;
 		};
-
+		struct
+        {
+			I4x2 a4x2[2];
+		};
 	};
 
     I8x2(){};
