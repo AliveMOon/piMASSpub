@@ -1,4 +1,19 @@
 #include "gpcSRC.h"
+U4x2& U4x2::operator = ( const I8x2& an )
+{
+	if( an.alf )
+	{
+		a4 = (gpeALFu4)an.alf;
+		n4 = an.num;
+	} else
+		gpmCLR;
+
+	return *this;
+}
+U4x2::U4x2( const I8x2& an )
+{
+	*this = an.alf;
+}
 U4x2& U4x2::mx( I4x2 b )
 {
 	if( b.x < 0 )

@@ -926,6 +926,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, 
 	if( !pM )
 		return null();
 
+
 	if( ty4.y < 1 )
 		ty4.y = 1;
 	if( ty4.z < 1 )

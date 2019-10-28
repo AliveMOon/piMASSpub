@@ -34,13 +34,13 @@ enum gpeTYP:U4
 class gpcISA
 {
 public:
-	I1x4	isa;			// x:gpeISA y:step
-	U2		i, n;
+	I1x4	isa;			// 0	4	// x:gpeISA y:step
+	U2		i, n, ix, iy;	// 4	8	//
+	gpcRES	*pRES;			// 12	4?	// zárójeles cuccok
 
-	I8x2	an;			// vagy AlfNum vagy VarIx
-	U4x2	trg;		// egy target koordináta
-	gpcRES	*pRES;		// zárójeles cuccok
-
+	U4x2	an,				// 16	8	// vagy AlfNum vagy VarIx
+			trg;			// 24	8	// egy target koordináta
+							// 32
 	gpcISA(){};
 	gpcISA* null()
 	{
@@ -69,8 +69,8 @@ public:
 			return NULL;
 		isa.null();
 
-		an.alf = v;
-		an.num = 0;
+		an.var = v;
+		ix = 0;
 		isa.aISA[0] = gpeISA_var;
 		return this;
 	}
@@ -255,7 +255,7 @@ class gpcRES
 	U4x2	nISA;
 
 public:
-	gpcISA*	pI( void )
+	gpcISA*	resISA( void )
 	{
 		if( !pISA )
 			nISA = 0;
@@ -275,7 +275,7 @@ public:
 	{
 		if( this ? !pISA : true )
 			return NULL;
-		gpcISA* pIS = pI();
+		gpcISA* pIS = resISA();
 		if( pIS ? !pIS->isa.x : true )
 			return NULL;
 
@@ -284,12 +284,12 @@ public:
 		if( !nISA.x )
 		{
 			nISA.x++;
-			return pI()->null();
+			return resISA()->null();
 		}
 
 
 		nISA.x++;
-		pI()->null();
+		resISA()->null();
 		switch( stp )
 		{
 			case '.':
@@ -300,16 +300,16 @@ public:
 				pIS[-pIS->isa.z].n -= pIS[-pIS->isa.z].i;
 		}
 
-		return pI();
+		return resISA();
 	}
 
 	gpcISA*	resISA_an( I8x2& an )
 	{
-		return pI()->AN( an );
+		return resISA()->AN( an );
 	}
 	gpcISA*	resISA_var( gpeALF a )
 	{
-		return pI()->var( a );
+		return resISA()->var( a );
 	}
 
 	U4 iL()
@@ -339,6 +339,7 @@ public:
 
 	gpcRES* compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	gpcRES* compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
+	gpcRES* run( gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM );
 
 	gpcALU& ALU( U4 iA )
 	{

@@ -153,6 +153,7 @@ class U8x2;
 class U8x4;
 class I4x2;
 class I4x4;
+class I8x2;
 class I8x4;
 class gpcMASS;
 
@@ -532,6 +533,8 @@ public:
 enum gpeISA : I1
 {
 	gpeISA_nop,
+	gpeISA_u8,
+	gpeISA_d8,
 	gpeISA_an,
 	gpeISA_anFUN,
 	gpeISA_var,
@@ -1155,6 +1158,14 @@ public:
 		{
 			gpeALF var;
 		};
+		struct
+		{
+			U8 u8;
+		};
+		struct
+		{
+			double d8;
+		};
 	};
 
     U4x2(){};
@@ -1162,6 +1173,8 @@ public:
     {
         x = _x; y = _y;
     }
+    U4x2( const I8x2& an );
+    U4x2& operator = ( const I8x2& an );
 	// cnt = fract * U4x2(1, w);
 	U4x2& cnt2fract(U4 w, U8 cnt)
 	{

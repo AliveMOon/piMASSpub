@@ -540,7 +540,7 @@ U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4
 			continue;	// ha nincsen 2 nem sikerült az építés
 
 		// egyébként meg kell probálni futatni
-		//pSRC->apRES[2]->run();
+		pSRC->apRES[2]->run( this, pSRC );
 
 	}
 

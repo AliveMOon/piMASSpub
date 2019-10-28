@@ -29,8 +29,8 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	//gpmZ(apN);
 	//gpmZ(apP);
 
-	U8 nUTF8, nLAB = 0, u8 = 0;
-	double d8 = 0;
+	U8 nUTF8, nLAB = 0, nSTR; //, u8 = 0;
+	//double d8 = 0;
 
 	I8x4 lab = 0;
 	U1x4 typ = 0;
@@ -43,12 +43,15 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 	gpcADR adr;
 	gpcALU	aALU[8];
+
+	//U4x2 aAN[8];
+
 	I8x2 aAN[8];
 
 	gpmZ(aALU);
 	gpcLAZY str;
 	U4  nAN = 0, nALU = 0, iI;
-	gpcISA* pI = NULL;
+	gpcISA* pI = NULL, *pUD8;
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -59,13 +62,13 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 			op.null();
 
-			u8 = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
+			nSTR = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
 			aAN[nAN].A( pS, NULL );
 
 			//apA[0] = pS;
-			pS += u8;
-			u8 = 0;
-			d8 = 0.0;
+			pS += nSTR;
+			//u8 = 0;
+			//d8 = 0.0;
 			if( gpmbNUM( *pS ) ) {	/// NUM -------------------------------------------------
 				aAN[nAN].num = gpfSTR2U8( pS, &pS );
 				pI = resISA_an( aAN[nAN] );
@@ -81,23 +84,23 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				resISA_stp( pI->stp(op), xyWH.a4x2[0] );
 
 			op.null();
+			pUD8 = pI ? pI : resISA();
 			pI = NULL;
 
-			d8 = 0.0;
-			if( *pS == '.' )
-			{
-				u8 = 0;
-			} else {
-				typ.u4 = gpeTYP_U8;
-				u8 = gpfSTR2U8( pS, &pS );
+			*pUD8->isa.aISA = gpeISA_u8;
+			//pUD8->trg = xyWH.a4x2[0];
+			pUD8->an.u8 = gpfSTR2U8( pS, &pS );
+
+			if( *pS != '.' )
 				pS += gpmNINCS( pS, " \t\r\n" );
-			}
 
 			if( *pS == '.' )
 			{
-				typ.u4 = gpeTYP_D;
+				*pUD8->isa.aISA = gpeISA_d8;
+				pUD8->an.d8 = pUD8->an.u8;
+				//typ.u4 = gpeTYP_D;
 				pXe = pS;	// ha DOUBLE, ha nem észre vesszük, mert marad a pS == pXe
-				d8 = gpmSTR2D( pS );
+				pUD8->an.d8 += gpmSTR2D( pS );
 				if( pS == pXe )
 					pS++;
 
@@ -113,14 +116,28 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 			case ';': //{	// SOROK
 			case ',': {	// vessző OSZLOPOK
+					if( pUD8 )
+					{
+						switch( *pUD8->isa.aISA )
+						{
+							case gpeISA_d8:
+								typ.u4 = gpeTYP_D;
+								aALU[0].equ( this, pUD8->trg, typ, op, 0, pUD8->an.d8 );
+								break;
+							case gpeISA_u8:
+								typ.u4 = gpeTYP_U8;
+								aALU[0].equ( this, pUD8->trg, typ, op, pUD8->an.u8, 0.0 );
+								break;
 
-					aALU[0].equ( this, xyWH.a4x2[0], typ, op, u8, d8 );
+						}
+					}
 					aALU[0].ins( this, str );
+					if( pI )
+						pI = resISA_stp( pS[-1], xyWH.a4x2[0] );
 
-					pI = resISA_stp( pS[-1], xyWH.a4x2[0] );
 
-
-					d8 = op.u4 = 0;
+					//d8 =
+					op.u4 = 0;
 					if( pS[-1] == ',' )
 						xyWH.x++;
 					else {
@@ -160,43 +177,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 					xyWH.null();
 					pI = resISA_stp( pS[-1], xyWH.a4x2[0] );
-					/*
 
-					/// = ASSIGN = -------------------------------------
-					/// egyenlőségjel reseteli az xyWH-t
-
-				    adr = pI ? pI->an.alf : gpeALF_null;
-					adr = this;
-
-					if( pI )
-					switch( pI->isa.aISA[0] )
-					{
-						case gpeISA_nop:
-							break;
-						default:
-							pI = pISA_stp( pS[-1] );
-							break;
-					}
-
-					xyWH.null(); /// Nesze! Most már null!
-					if( adr.pRM )
-					{
-						aALU[0] = adr.adr2ALU( this );
-						aALU[0].zero();
-						break;
-					}
-
-					if( !adr.an.alf ) // nem lett megadva cél
-					while( adr.pRM )	// ez azért, hogy hatékonyabb legyen a keresés, a binFA ne egyetlen jobb ág legyen
-                    {
-						// nem talált ilyen változót
-						adr = (gpeALF)( 1 + U4x2(0).cnt2fract( (U4)gpeALF_AAAAAA, nLAB ) * U4x2( 1, (U4)gpeALF_AAAAAA) );
-                        adr = this; // ezzel indítjuk a keresést
-                        nLAB++;
-                    }
-
-					aALU[0] = adr.ALU( this );
-					aALU[0].zero();*/
 
 				} break;
 			/// ALU ------------------------------------------------------------------------------
@@ -348,7 +329,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				} break;
 			case '\'': {
 					pS += gpmVAN( pS, "\'", nUTF8 );
-					u8 = pS[-1]; // ucsot beolvassa
+
+					pUD8 = pI ? pI : resISA();
+					pI = NULL;
+					*pUD8->isa.aISA = gpeISA_u8;
+					pUD8->an.u8 = pS[-1]; // ucsot beolvassa
 					if( *pS == '\'' )
 					{
 						pS++;
