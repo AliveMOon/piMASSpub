@@ -2707,6 +2707,7 @@ public:
 			U8		n_l8, n_a8;
 		};
 	};
+
 	U4 nPC( void );
 	void wait( void )
 	{

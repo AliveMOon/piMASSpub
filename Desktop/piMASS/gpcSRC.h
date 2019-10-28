@@ -608,16 +608,16 @@ public:
 
 		return bMINI ? pMINI->p_alloc : pA;
 	}
-	U1* pSRCstart( void ) // U4x4* pCx2 )
+	U1* pSRCstart( bool bNoMini = false ) // U4x4* pCx2 )
 	{
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
 		// és ráadásul a \a elöt6t van a cursor
-		bool bHD = false, bMINI = bHD ? false : !!pMINI;
+		bool bHD = false, bMINI = bHD ? false : ( bNoMini ? false : !!pMINI );
 
-		U1	*pC = bMINI ? //(U1*)
-							pMINI->p_alloc : pA;
+		U1	*pC = bMINI ? pMINI->p_alloc : pA;
 		dim.w = bMINI ? pMINI->n_load : nL;
-
+		if( bMINI )
+			return pC;
 
 		if( !bHD )
 		{
