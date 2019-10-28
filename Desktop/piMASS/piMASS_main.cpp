@@ -301,7 +301,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		if( !pSRC )
 			continue;
 
-		pNUM = pALF+gpfALF2STR( (char*)pALF, (i%z)+1 );
+		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
 		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
 		if( bALT )
 		buff.lzy_format( nS = -1, " %s", gpsSVadr );
@@ -425,7 +425,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		pSRC = SRCfnd( pM[i] );
 		if( !pSRC )
 			continue;
-		pNUM = pALF+gpfALF2STR( (char*)pALF, (i%z)+1 );
+		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
 		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
 		buff.lzy_format( nS = -1, "\a %s", gpsSVadr );
 
@@ -644,7 +644,9 @@ int main( int nA, char *apA[] )
 		*gppMASSfile = 0;
 	}
 
-
+	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
+	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );
+	*gpsKEYbuff = 0;
     try
     {
 		if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
@@ -867,7 +869,7 @@ int main( int nA, char *apA[] )
 				{
 					SRCxycr = apCRS[mDIV]->scnZNCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
 
-					char *pE = gpsMAINpub + gpfALF2STR( gpsMAINpub, apCRS[mDIV]->scnZN.x );
+					char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[mDIV]->scnZN.x );
 					pE += sprintf( pE, "%d", apCRS[mDIV]->scnZN.y );
 					SRCin = apCRS[mDIV]->scnIN;
 

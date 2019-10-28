@@ -487,6 +487,10 @@ typedef enum gpeALF: I8
 	gpeALF_GRIPPER = gpdABCDEFG('G', 'R', 'I', 'P', 'P', 'E', 'R'),
 	gpeALF_NOBUILD = gpdABCDEFG('N', 'O', 'B', 'U', 'I', 'L', 'D'),
 	gpeALF_NRENDER = gpdABCDEFG('N', 'R', 'E', 'N', 'D', 'E', 'R'),
+	// 0xffffFFFF                A    B    C    D    E    F    G
+	gpeALF_MWLQKWU = gpdABCDEFG('M', 'W', 'L', 'Q', 'K', 'W', 'U'),
+	gpeALF_U4      = gpeALF_MWLQKWU,
+
 	gpeALF_PICCPYE = gpdABCDEFG('P', 'I', 'C', 'C', 'P', 'Y', 'E'),
 	gpeALF_PICLIST = gpdABCDEFG('P', 'I', 'C', 'L', 'I', 'S', 'T'),
 	gpeALF_REFERER = gpdABCDEFG('R', 'E', 'F', 'E', 'R', 'E', 'R'),
@@ -590,7 +594,9 @@ typedef enum gpeALF: I8
 
 	//- 9 -----------------
 
-	gpeALF_CONNECTION = gpdABCDEFGHIJ('C','O','N','N','E','C','T','I','O','N'),
+	gpeALF_CONNECTION 	= gpdABCDEFGHIJ('C','O','N','N','E','C','T','I','O','N'),
+
+
 	gpeALF_10 = gpdABCDEFGHIJ('Z','Z','Z','Z','Z','Z','Z','Z','Z','Z'),
 	gpeALF_resEND = gpeALF_10,
 	//- 10 -----------------
@@ -599,7 +605,7 @@ typedef enum gpeALF: I8
 } GPT_ALFA;
 
 U1*		gpf_aALF_init(void);
-U8 		gpfALF2STR( char* p_out, I8 d0 );
+U8 		gpfALF2STR( U1* p_out, I8 d0 );
 gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
 
 

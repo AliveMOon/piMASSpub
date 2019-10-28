@@ -35,7 +35,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 
 
 
-	U4	nSTR = gpfALF2STR( (char*)pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
+	U4	nSTR = gpfALF2STR( pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
 		iTHIS = mass.PC.cmpl_find( &mass.CMPL, pSTR, nSTR ), iFND, iR;
 	U8 nLEN, nVAN, nALF;
 	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8];
@@ -174,7 +174,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 
 
 
-	U4	nSTR = gpfALF2STR( (char*)pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
+	U4	nSTR = gpfALF2STR( pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
 		iTHIS = mass.PC.cmpl_find( &mass.CMPL, pSTR, nSTR ), iFND, iR;
 	U8 nLEN, nVAN, nALF;
 	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8];

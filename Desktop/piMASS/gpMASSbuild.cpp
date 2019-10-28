@@ -44,7 +44,7 @@ U1* gpf_aALF_init( void )
 	}
 	return pS-p_str;
 }*/
-U8 gpfALF2STR( char* p_out, I8 d0 )
+U8 gpfALF2STR( U1* p_out, I8 d0 )
 {
 
 	if( !p_out )
@@ -161,7 +161,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 	pALFtg = NULL;
 	nALFtg = 0;
-	gpfALF2STR( (char*)gpsSTRpub, spcZN.x+1 );
+	gpfALF2STR( gpsSTRpub, spcZN.x+1 );
 	psHD += sprintf( 	psHD, "\r\n-----------------\r\nHD:[%s%d] spc:%s V:%d H:%d C:%d \r\nbSW:0x%0.8x",
 						gpsSTRpub, spcZN.y, spcZN.str( psHD+0x100, "," ), nVER, nHD, nBLD,
 						bSW );
@@ -311,7 +311,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				continue;
 			pALFtg[nALFtg] = pTGpub[i];
 			psHD += sprintf( psHD, " #" );
-			psHD += gpfALF2STR( psHD, (I8)pTGpub[i] );
+			psHD += gpfALF2STR( (U1*)psHD, (I8)pTGpub[i] );
 			switch( pALFtg[nALFtg] )
 			{
 				case gpeALF_MAIN:
@@ -362,7 +362,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 {
 	hd( mass );
 
-	gpfALF2STR( (char*)gpsSTRpub, spcZN.x+1 );
+	gpfALF2STR( gpsSTRpub, spcZN.x+1 );
 
 	psHD = gpsHD;
 	psHD[0] = 0;
@@ -386,7 +386,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 
 	U4	nSTRpool = 0,
-		nSTR = gpfALF2STR( (char*)pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
+		nSTR = gpfALF2STR( pSTR, (I8) (nALFtg ? pALFtg[0] : gpeALF_PRG) ),
 		iTHIS = mass.PC.cmpl_find( pCMPL, pSTR, nSTR ), iFND, iR, iNEW, iSPARE, iREDIR;
 	U8 nLEN, nVAN, nALF;
 	gpcCMPL *pMOM = mass.piLEVmom(), *pTHIS = pMOM, *pFND = NULL, aR[8],

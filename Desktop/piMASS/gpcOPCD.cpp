@@ -114,8 +114,8 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 	}
 
 
-	char	*pTYP = (char*)pPUB,
-			*pS = pTYP+0x10;
+	U1	*pTYP = pPUB,
+		*pS = pTYP+0x10;
 
 	gpfALF2STR( pTYP, (I8)typ );
 	if( wip == gpeALF_REG )
@@ -124,28 +124,28 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 		{
 			case gpeALF_D:
 				sprintf(
-							pS,
+							(char*)pS,
 							"%0.2d:%0.2d R%d%s%s%f ",
-							pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, d
+							pCMPL->nPC(), iLEV, iKD, (char*)pTYP, pTAB, d
 						);
 						break;
 			case gpeALF_I:
 				sprintf(
-							pS,
+							(char*)pS,
 							"%0.2d:%0.2d R%d%s%s%lld ",
-							pCMPL->nPC(), iLEV, iKD, pTYP, pTAB, i8
+							pCMPL->nPC(), iLEV, iKD, (char*)pTYP, pTAB, i8
 						);
 						break;
 			default:
 				sprintf(
-							pS,
+							(char*)pS,
 							"%0.2d:%0.2d R%d%s%s%lld ",
-							pCMPL->nPC(), 	iLEV, 	iKD,	pTYP,	pTAB,	u8
+							pCMPL->nPC(), 	iLEV, 	iKD,	(char*)pTYP,	pTAB,	u8
 							// %0.2d		:%0.2d R%d		%s		%s		%d
 						);
 			break;
 		}
-		return pS;
+		return (char*)pS;
 	}
 
 	char *pSTR = (char*)pCMPL->pPC( mPC )->p_kid->sSTRix( iKD, "Oxo" );
@@ -169,22 +169,22 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 				{
 					char *pDEF = (char*)pCMPL->pPC( pD->mPC )->p_kid->sSTRix( pD->iKD, "Oxo" );
 					sprintf(
-								pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s.%s\t%s",
+								(char*)pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s.%s\t%s",
 										pCMPL->nPC(),
 										mPC, iKD, iPC, //iLEV, mPC, iPC,
 										pTAB,
-										pDEF, pSTR, pTYP
+										pDEF, pSTR, (char*)pTYP
 							);
 					break;
 				}
 			}
 		case gpeALF_OPER:
 			sprintf(
-						pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s\t%s",
+						(char*)pS, "%0.2d:%0.2d.%0.2d[%0.2d]%s%s\t%s",
 								pCMPL->nPC(),
 								mPC, iKD, iPC, //iLEV, mPC, iPC,
 								pTAB,
-								pSTR, pTYP
+								pSTR, (char*)pTYP
 					);
 			break;
 		default:
@@ -193,30 +193,31 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 					//&& (iPC == pCMPL->nPC()-1)
 				)
 				sprintf(
-							pS, "%0.2d:%0.2d.%0.2d[%0.2d]0x%x%s%s\t%s.%c",
+							(char*)pS, "%0.2d:%0.2d.%0.2d[%0.2d]0x%x%s%s\t%s.%c",
 									pCMPL->nPC(),
 									mPC, iKD, iPC, //iLEV, mPC, iPC,
 									 i_dat,
 									pTAB,
-									pSTR, pTYP, sNDAT[n_dat]
+									pSTR, (char*)pTYP, sNDAT[n_dat]
 						);
 			else
 				sprintf(
-							pS, "%0.2d:%0.2d.%0.2d[%0.2d] %s%s\t%s.%c",
+							(char*)pS, "%0.2d:%0.2d.%0.2d[%0.2d] %s%s\t%s.%c",
 									pCMPL->nPC(),
 									mPC, iKD, iPC, //iLEV, mPC, iPC,
 									pTAB,
-									pSTR, pTYP, sNDAT[n_dat]
+									pSTR, (char*)pTYP, sNDAT[n_dat]
 						);
 			break;
 	}
 
-	return pS;
+	return (char*)pS;
 }
 char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB )
 {
-	char	*pASMop = (char*)pPUB, *psOP = NULL, *psA = NULL, *psB = NULL,
-			*pRa	= pASMop+0x10,
+	U1	*pASMop = pPUB;
+	char	*psOP = NULL, *psA = NULL, *psB = NULL,
+			*pRa	= (char*)pASMop+0x10,
 			*pRb	= pRa+0x10,
 			*pCOUT	= pRb+0x10;
 	*pCOUT = 0;

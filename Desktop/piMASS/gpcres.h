@@ -37,9 +37,9 @@ public:
 	I1x4	isa;			// x:gpeISA y:step
 	U2		i, n;
 
-	I8x2	an;
-	U4x2	trg;
-	gpcRES	*pRES;
+	I8x2	an;			// vagy AlfNum vagy VarIx
+	U4x2	trg;		// egy target koordináta
+	gpcRES	*pRES;		// zárójeles cuccok
 
 	gpcISA(){};
 	gpcISA* null()
