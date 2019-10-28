@@ -13,16 +13,472 @@
 #define gpdUP_CASE(a){ if( a >= 'a' && a <= 'z' ){ a -= gpdUP; }}
 #define gpdALF 								('Z'-'@')
 #define gpdA(a)								( a -'@' )
-#define gpdAB(a,b)							(I8)( gpdA(a)*gpdALF + gpdA(b) )
-#define gpdABC(a,b,c)						(I8)( gpdAB(a,b)*gpdALF + gpdA(c) )
-#define gpdABCD(a,b,c,d)					(I8)( gpdABC(a,b,c)*gpdALF + gpdA(d) )
-#define gpdABCDE(a,b,c,d,e)					(I8)( gpdABCD(a,b,c,d)*gpdALF + gpdA(e) )
-#define gpdABCDEF(a,b,c,d,e,f)				(I8)( gpdABCDE(a,b,c,d,e)*gpdALF + gpdA(f) )
-#define gpdABCDEFG(a,b,c,d,e,f,g)			(I8)( gpdABCDEF(a,b,c,d,e,f)*gpdALF + gpdA(g) )
+#define gpdAB(a,b)							(U4)( gpdA(a)*gpdALF + gpdA(b) )
+#define gpdABC(a,b,c)						(U4)( gpdAB(a,b)*gpdALF + gpdA(c) )
+#define gpdABCD(a,b,c,d)					(U4)( gpdABC(a,b,c)*gpdALF + gpdA(d) )
+#define gpdABCDE(a,b,c,d,e)					(U4)( gpdABCD(a,b,c,d)*gpdALF + gpdA(e) )
+#define gpdABCDEF(a,b,c,d,e,f)				(U4)( gpdABCDE(a,b,c,d,e)*gpdALF + gpdA(f) )
+#define gpdABCDEFG(a,b,c,d,e,f,g)			(U8)( gpdABCDEF(a,b,c,d,e,f)*gpdALF + gpdA(g) )
 #define gpdABCDEFGH(a,b,c,d,e,f,g,h)		(I8)( gpdABCDEFG(a,b,c,d,e,f,g)*gpdALF + gpdA(h) )
 #define gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)		(I8)( gpdABCDEFGH(a,b,c,d,e,f,g,h)*gpdALF + gpdA(i) )
 #define gpdABCDEFGHIJ(a,b,c,d,e,f,g,h,i,j)	(I8)( gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)*gpdALF + gpdA(j) )
 
+typedef enum gpeALFu4: U4
+{
+	gpeALFu4_null = 0,
+	gpeALFu4_A,
+	gpeALFu4_B,
+	gpeALFu4_C,
+
+	gpeALFu4_D,
+	gpeALFu4_E,
+	gpeALFu4_F,
+	gpeALFu4_G,
+
+	gpeALFu4_H,
+	gpeALFu4_I,
+	gpeALFu4_J,
+	gpeALFu4_K,
+
+	gpeALFu4_L,
+	gpeALFu4_M,
+	gpeALFu4_N,
+	gpeALFu4_O,
+
+	gpeALFu4_P,
+	gpeALFu4_Q,
+	gpeALFu4_R,
+	gpeALFu4_S,
+
+	gpeALFu4_T,
+	gpeALFu4_U,
+	gpeALFu4_V,
+	gpeALFu4_W,
+
+	gpeALFu4_X,
+	gpeALFu4_Y,
+	gpeALFu4_Z,
+	//- 2 -----------------
+	gpeALFu4_AA = gpdAB('A', 'A'),
+	gpeALFu4_AN = gpdAB('A', 'N'),
+	gpeALFu4_AT = gpdAB('A', 'T'),
+	gpeALFu4_CH = gpdAB('C', 'H'),
+	gpeALFu4_CL = gpdAB('C', 'L'),
+	gpeALFu4_CU = gpdAB('C', 'U'),
+	gpeALFu4_CW = gpdAB('C', 'W'),
+	gpeALFu4_DS = gpdAB('D', 'S'),
+	gpeALFu4_FI = gpdAB('F', 'I'),
+	gpeALFu4_GX = gpdAB('G', 'X'),
+	gpeALFu4_ID = gpdAB('I', 'D'),
+	gpeALFu4_IF = gpdAB('I', 'F'),
+	gpeALFu4_IN = gpdAB('I', 'N'),
+
+	// key ( A, B, ..., Z )
+	gpeALFu4_KA = gpdAB('K', 'A'),			// KEYBOARD 'a'
+	gpeALFu4_KO = gpdAB('K', 'O'),
+	gpeALFu4_KZ = gpdAB('K', 'Z'),
+	gpeALFu4_LG = gpdAB('L', 'G'),
+
+	gpeALFu4_MA = gpdAB('M', 'A'),
+	gpeALFu4_MN = gpdAB('M', 'N'),
+	gpeALFu4_MS = gpdAB('M', 'S'),
+	gpeALFu4_MX = gpdAB('M', 'X'),
+	gpeALFu4_MY = gpdAB('M', 'Y'),
+	gpeALFu4_NO = gpdAB('N', 'O'),
+	gpeALFu4_ON = gpdAB('O', 'N'),
+	gpeALFu4_OR = gpdAB('O', 'R'),
+	gpeALFu4_PI = gpdAB('P', 'I'),
+	gpeALFu4_RE = gpdAB('R', 'E'),
+	gpeALFu4_SL = gpdAB('S', 'L'),
+	gpeALFu4_SR = gpdAB('S', 'R'),
+	gpeALFu4_UP = gpdAB('U', 'P'),
+	gpeALFu4_WB = gpdAB('W', 'B'),
+	gpeALFu4_WH = gpdAB('W', 'H'),
+	gpeALFu4_WX = gpdAB('W', 'X'),
+	gpeALFu4_WY = gpdAB('W', 'Y'),
+	gpeALFu4_WW = gpdAB('W', 'W'),
+	gpeALFu4_ZM = gpdAB('Z', 'M'),
+	gpeALFu4_2 = gpdAB('Z', 'Z'),
+	//- 3 -----------------
+	gpeALFu4_ABS = gpdABC('A', 'B', 'S'),
+	gpeALFu4_ACE = gpdABC('A', 'C', 'E'), // access
+	gpeALFu4_ACT = gpdABC('A', 'C', 'T'),
+	gpeALFu4_ADD = gpdABC('A', 'D', 'D'),
+	gpeALFu4_ADR = gpdABC('A', 'D', 'R'),
+	gpeALFu4_AIN = gpdABC('A', 'I', 'N'),
+	gpeALFu4_AND = gpdABC('A', 'N', 'D'),
+	gpeALFu4_ARJ = gpdABC('A', 'R', 'J'),
+	gpeALFu4_ARR = gpdABC('A', 'R', 'R'),
+	gpeALFu4_ASM = gpdABC('A', 'S', 'M'),
+	gpeALFu4_BIN = gpdABC('B', 'I', 'N'),
+	gpeALFu4_BLK = gpdABC('B', 'L', 'K'),
+	gpeALFu4_BOB = gpdABC('B', 'O', 'B'),
+	gpeALFu4_BOX = gpdABC('B', 'O', 'X'),
+	gpeALFu4_CAM = gpdABC('C', 'A', 'M'),
+	gpeALFu4_CLR = gpdABC('C', 'L', 'R'),
+	gpeALFu4_CMX = gpdABC('C', 'M', 'X'),
+	gpeALFu4_CMY = gpdABC('C', 'M', 'Y'),
+	gpeALFu4_CNL = gpdABC('C', 'N', 'L'),
+	gpeALFu4_COM = gpdABC('C', 'O', 'M'),
+	gpeALFu4_COS = gpdABC('C', 'O', 'S'),
+	gpeALFu4_CPP = gpdABC('C', 'P', 'P'),
+	gpeALFu4_CPU = gpdABC('C', 'P', 'U'),
+	gpeALFu4_CPY = gpdABC('C', 'P', 'Y'),
+	gpeALFu4_CUT = gpdABC('C', 'U', 'T'),
+	gpeALFu4_DEC = gpdABC('D', 'E', 'C'),
+	gpeALFu4_DEF = gpdABC('D', 'E', 'F'),
+	gpeALFu4_DEL = gpdABC('D', 'E', 'L'),
+	gpeALFu4_DIR = gpdABC('D', 'I', 'R'),
+	gpeALFu4_DIV = gpdABC('D', 'I', 'V'),
+	gpeALFu4_DOT = gpdABC('D', 'O', 'T'),
+	gpeALFu4_DST = gpdABC('D', 'S', 'T'),
+	gpeALFu4_DZR = gpdABC('D', 'Z', 'R'),
+	gpeALFu4_END = gpdABC('E', 'N', 'D'),
+	gpeALFu4_ERU = gpdABC('E', 'R', 'U'),
+	gpeALFu4_EYE = gpdABC('E', 'Y', 'E'),
+	gpeALFu4_EXP = gpdABC('E', 'X', 'P'),
+
+	// function key ( f1, f2, ..., f12)
+	gpeALFu4_FKA = gpdABC('F', 'K', 'A'),
+	gpeALFu4_FKL = gpdABC('F', 'K', 'L'),
+
+	gpeALFu4_FMX = gpdABC('F', 'M', 'X'),
+	gpeALFu4_FMY = gpdABC('F', 'M', 'Y'),
+	gpeALFu4_FOR = gpdABC('F', 'O', 'R'),
+	gpeALFu4_FPS = gpdABC('F', 'P', 'S'),
+	gpeALFu4_GET = gpdABC('G', 'E', 'T'),
+	gpeALFu4_GIM = gpdABC('G', 'I', 'M'),
+	gpeALFu4_GIO = gpdABC('G', 'I', 'O'),
+	gpeALFu4_GIS = gpdABC('G', 'I', 'S'),
+	gpeALFu4_GIT = gpdABC('G', 'I', 'T'),
+	gpeALFu4_GIV = gpdABC('G', 'I', 'V'),
+	gpeALFu4_GPU = gpdABC('G', 'P', 'U'),
+	gpeALFu4_GXT = gpdABC('G', 'X', 'T'),
+	gpeALFu4_HUD = gpdABC('H', 'U', 'D'),
+	gpeALFu4_INC = gpdABC('I', 'N', 'C'),
+	gpeALFu4_INP = gpdABC('I', 'N', 'P'),
+	gpeALFu4_INT = gpdABC('I', 'N', 'T'),
+	gpeALFu4_INV = gpdABC('I', 'N', 'V'),
+	gpeALFu4_JPG = gpdABC('J', 'P', 'G'),
+	gpeALFu4_JOY = gpdABC('J', 'O', 'Y'),
+	gpeALFu4_KEY = gpdABC('K', 'E', 'Y'),
+	gpeALFu4_LOG = gpdABC('L', 'O', 'G'),
+	gpeALFu4_LWO = gpdABC('L', 'W', 'O'),
+	gpeALFu4_LWS = gpdABC('L', 'W', 'S'),
+	gpeALFu4_MAN = gpdABC('M', 'A', 'N'),
+	gpeALFu4_MAX = gpdABC('M', 'A', 'X'),
+	gpeALFu4_MEM = gpdABC('M', 'E', 'M'),
+	gpeALFu4_MIN = gpdABC('M', 'I', 'N'),
+	gpeALFu4_MLB = gpdABC('M', 'L', 'B'),
+	gpeALFu4_MMX = gpdABC('M', 'M', 'X'),
+	gpeALFu4_MMY = gpdABC('M', 'M', 'Y'),
+	gpeALFu4_MOM = gpdABC('M', 'O', 'M'),
+	gpeALFu4_MOV = gpdABC('M', 'O', 'V'),
+	gpeALFu4_MPG = gpdABC('M', 'R', 'B'),
+	gpeALFu4_MRB = gpdABC('M', 'R', 'B'),
+	gpeALFu4_MUL = gpdABC('M', 'U', 'L'),
+	gpeALFu4_NEW = gpdABC('N', 'E', 'W'),
+	gpeALFu4_OFF = gpdABC('O', 'F', 'F'),
+	gpeALFu4_ORM = gpdABC('O', 'R', 'M'),
+	gpeALFu4_OUT = gpdABC('O', 'U', 'T'),
+	gpeALFu4_PIC = gpdABC('P', 'I', 'C'),
+	gpeALFu4_PIX = gpdABC('P', 'I', 'X'),
+	gpeALFu4_PMX = gpdABC('P', 'M', 'X'),
+	gpeALFu4_PMY = gpdABC('P', 'M', 'Y'),
+	gpeALFu4_PNG = gpdABC('P', 'N', 'G'),
+	gpeALFu4_PNT = gpdABC('P', 'N', 'T'),
+	gpeALFu4_PRG = gpdABC('P', 'R', 'G'),
+	gpeALFu4_REF = gpdABC('R', 'E', 'F'),
+	gpeALFu4_REG = gpdABC('R', 'E', 'G'),
+	gpeALFu4_REM = gpdABC('R', 'E', 'M'),
+	gpeALFu4_REN = gpdABC('R', 'E', 'N'),
+	gpeALFu4_RET = gpdABC('R', 'E', 'T'),
+	gpeALFu4_RUN = gpdABC('R', 'U', 'N'),
+	gpeALFu4_SEC = gpdABC('S', 'E', 'C'),
+	gpeALFu4_SIN = gpdABC('S', 'I', 'N'),
+	gpeALFu4_SIT = gpdABC('S', 'I', 'T'),
+	gpeALFu4_SLM = gpdABC('S', 'L', 'M'),
+	gpeALFu4_SRC = gpdABC('S', 'R', 'C'),
+	gpeALFu4_SRM = gpdABC('S', 'R', 'M'),
+	gpeALFu4_STR = gpdABC('S', 'T', 'R'),
+	gpeALFu4_STK = gpdABC('S', 'T', 'K'),
+	gpeALFu4_SUB = gpdABC('S', 'U', 'B'),
+	gpeALFu4_SUM = gpdABC('S', 'U', 'M'),
+	gpeALFu4_SYS = gpdABC('S', 'Y', 'S'),
+
+	gpeALFu4_TAG = gpdABC('T', 'A', 'G'),
+	gpeALFu4_TYF = gpdABC('T', 'Y', 'F'),
+	gpeALFu4_TYI = gpdABC('T', 'Y', 'I'),
+	gpeALFu4_TYU = gpdABC('T', 'Y', 'U'),
+
+	gpeALFu4_VAL = gpdABC('V', 'A', 'L'),
+	gpeALFu4_VAR = gpdABC('V', 'A', 'R'),
+	gpeALFu4_VEC = gpdABC('V', 'E', 'C'),
+	gpeALFu4_VOX = gpdABC('V', 'O', 'X'),
+	gpeALFu4_WIN = gpdABC('W', 'I', 'N'),
+	gpeALFu4_WMX = gpdABC('W', 'M', 'X'),
+	gpeALFu4_WMY = gpdABC('W', 'M', 'Y'),
+	gpeALFu4_YPR = gpdABC('Y', 'P', 'R'),
+	gpeALFu4_XOR = gpdABC('X', 'O', 'R'),
+	gpeALFu4_ZIP = gpdABC('Z', 'I', 'P'),
+	gpeALFu4_3 = gpdABC('Z', 'Z', 'Z'),
+	//- 4 -----------------
+	gpeALFu4_ABMS = gpdABCD('A', 'B', 'M', 'S'),
+	gpeALFu4_ACOS = gpdABCD('A', 'C', 'O', 'S'),
+	gpeALFu4_ADDM = gpdABCD('A', 'D', 'D', 'M'),
+	gpeALFu4_ANDM = gpdABCD('A', 'N', 'D', 'M'),
+	gpeALFu4_ASIN = gpdABCD('A', 'S', 'I', 'N'),
+	gpeALFu4_BELG = gpdABCD('B', 'E', 'L', 'G'),
+	gpeALFu4_BGLG = gpdABCD('B', 'G', 'L', 'G'),
+	gpeALFu4_BONE = gpdABCD('B', 'O', 'N', 'E'),
+	gpeALFu4_BUMM = gpdABCD('B', 'U', 'M', 'M'),
+	gpeALFu4_BUMP = gpdABCD('B', 'U', 'M', 'P'),
+	gpeALFu4_CNLC = gpdABCD('C', 'N', 'L', 'C'),
+
+	gpeALFu4_COME = gpdABCD('C', 'O', 'M', 'E'),
+	gpeALFu4_COMS = gpdABCD('C', 'O', 'M', 'S'),
+
+	gpeALFu4_COPY = gpdABCD('C', 'O', 'P', 'Y'),
+	gpeALFu4_CRSA = gpdABCD('C', 'R', 'S', 'A'),
+	gpeALFu4_CRSL = gpdABCD('C', 'R', 'S', 'L'),
+	gpeALFu4_CRSN = gpdABCD('C', 'R', 'S', 'N'),
+	gpeALFu4_CRSR = gpdABCD('C', 'R', 'S', 'R'),
+	gpeALFu4_CRSX = gpdABCD('C', 'R', 'S', 'X'),
+	gpeALFu4_CRSY = gpdABCD('C', 'R', 'S', 'Y'),
+	gpeALFu4_CTRL = gpdABCD('C', 'T', 'R', 'L'),
+	gpeALFu4_DEEP = gpdABCD('D', 'E', 'E', 'P'),
+	gpeALFu4_DIME = gpdABCD('D', 'I', 'M', 'E'),
+	gpeALFu4_DIMS = gpdABCD('D', 'I', 'M', 'S'),
+	gpeALFu4_DIVM = gpdABCD('D', 'I', 'V', 'M'),
+	gpeALFu4_EDGE = gpdABCD('E', 'D', 'G', 'E'),
+	gpeALFu4_ELSE = gpdABCD('E', 'L', 'S', 'E'),
+	gpeALFu4_ENDD = gpdABCD('E', 'N', 'D', 'D'),
+	gpeALFu4_EQLG = gpdABCD('E', 'Q', 'L', 'G'),
+	gpeALFu4_EXIT = gpdABCD('E', 'X', 'I', 'T'),
+	gpeALFu4_EXPL = gpdABCD('E', 'X', 'P', 'L'),
+	gpeALFu4_EXPM = gpdABCD('E', 'X', 'P', 'M'),
+	gpeALFu4_FERI = gpdABCD('F', 'E', 'R', 'I'),
+	gpeALFu4_FILE = gpdABCD('F', 'I', 'L', 'E'),
+	gpeALFu4_FIND = gpdABCD('F', 'I', 'N', 'D'),
+	gpeALFu4_FSEC = gpdABCD('F', 'S', 'E', 'C'),
+	gpeALFu4_FUNC = gpdABCD('F', 'U', 'N', 'C'),
+	gpeALFu4_GOLD = gpdABCD('G', 'O', 'L', 'D'),
+
+
+	gpeALFu4_GPUC = gpdABCD('G', 'P', 'U', 'C'),	// gpeALFu4_GPU + VOXEL VERTEX
+
+	gpeALFu4_HAIR = gpdABCD('H', 'A', 'I', 'R'),
+	gpeALFu4_HAND = gpdABCD('H', 'A', 'N', 'D'),
+	gpeALFu4_HEAD = gpdABCD('H', 'E', 'A', 'D'),
+	gpeALFu4_HELP = gpdABCD('H', 'E', 'L', 'P'),
+	gpeALFu4_HOST = gpdABCD('H', 'O', 'S', 'T'),
+	gpeALFu4_HTML = gpdABCD('H', 'T', 'M', 'L'),
+	gpeALFu4_HTTP = gpdABCD('H', 'T', 'T', 'P'),
+
+	gpeALFu4_IDLE = gpdABCD('I', 'D', 'L', 'E'),
+	gpeALFu4_INIT = gpdABCD('I', 'N', 'I', 'T'),
+
+	gpeALFu4_ITEM = gpdABCD('I', 'T', 'E', 'M'),
+	gpeALFu4_JUMP = gpdABCD('J', 'U', 'M', 'P'),
+
+	gpeALFu4_KALT = gpdABCD('K', 'A', 'L', 'T'),
+	gpeALFu4_KICK = gpdABCD('K', 'I', 'C', 'K'),
+
+	gpeALFu4_LINE = gpdABCD('L', 'I', 'N', 'E'),
+	gpeALFu4_LEFT = gpdABCD('L', 'E', 'F', 'T'),
+	gpeALFu4_LELG = gpdABCD('L', 'E', 'L', 'G'),
+	gpeALFu4_LOOP = gpdABCD('L', 'O', 'O', 'P'),
+	gpeALFu4_LTLG = gpdABCD('L', 'T', 'L', 'G'),
+	gpeALFu4_MAIL = gpdABCD('M', 'A', 'I', 'L'),
+	gpeALFu4_MAIN = gpdABCD('M','A',  'I', 'N'),
+	gpeALFu4_MINI = gpdABCD('M', 'I', 'N', 'I'),
+
+	gpeALFu4_MONO = gpdABCD('M', 'O', 'N', 'O'),
+	gpeALFu4_MOON = gpdABCD('M', 'O', 'O', 'N'),
+
+	gpeALFu4_MLBX = gpdABCD('M', 'L', 'B', 'X'),		// egér X poziciója mielött le lett nyomva a BAL gomb
+	gpeALFu4_MLBY = gpdABCD('M', 'L', 'B', 'Y'),		// egér Y poziciója mielött le lett nyomva a BAL gomb
+
+	gpeALFu4_MRBX = gpdABCD('M', 'R', 'B', 'X'),		// egér X poziciója mielött le lett nyomva a JOBB gomb
+	gpeALFu4_MRBY = gpdABCD('M', 'R', 'B', 'Y'),		// egér Y poziciója mielött le lett nyomva a JOBB gomb
+
+	gpeALFu4_MULM = gpdABCD('M', 'U', 'L', 'M'),
+
+	gpeALFu4_NAME = gpdABCD('N', 'A', 'M', 'E'),
+	gpeALFu4_MSEC = gpdABCD('M', 'S', 'E', 'C'),
+	gpeALFu4_NEAR = gpdABCD('N', 'E', 'A', 'R'),
+	gpeALFu4_NUSE = gpdABCD('N', 'U', 'S', 'E'),
+	gpeALFu4_OPER = gpdABCD('O', 'P', 'E', 'R'),
+	gpeALFu4_ORLG = gpdABCD('O', 'R', 'L', 'G'),
+	gpeALFu4_OTOS = gpdABCD('O', 'T', 'O', 'S'),
+	gpeALFu4_OVER = gpdABCD('O', 'V', 'E', 'R'),
+
+	gpeALFu4_PACK = gpdABCD('P', 'A', 'C', 'K'),
+	gpeALFu4_PARA = gpdABCD('P', 'A', 'R', 'A'),
+	gpeALFu4_PASS = gpdABCD('P', 'A', 'S', 'S'),
+
+	gpeALFu4_PIXN = gpdABCD('P', 'I', 'X', 'N'),
+	gpeALFu4_POLY = gpdABCD('P', 'O', 'L', 'Y'),
+	gpeALFu4_PORT = gpdABCD('P', 'O', 'R', 'T'),
+	gpeALFu4_PREV = gpdABCD('P', 'R', 'E', 'V'),
+
+	gpeALFu4_QUAD = gpdABCD('Q', 'U', 'A', 'D'),
+
+	//gpeALFu4_RESA =	gpdABCD( 'R','E','S','A' ),
+	gpeALFu4_REMM = gpdABCD('R', 'E', 'M', 'M'),
+	gpeALFu4_ROBI = gpdABCD('R', 'O', 'B', 'I'),
+	gpeALFu4_ROCK = gpdABCD('R', 'O', 'C', 'K'),
+	gpeALFu4_SAVE = gpdABCD('S', 'A', 'V', 'E'),
+	gpeALFu4_STAR = gpdABCD('S', 'T', 'A', 'R'),
+	gpeALFu4_STEP = gpdABCD('S', 'T', 'E', 'P'),
+	gpeALFu4_STON = gpdABCD('S', 'T', 'O', 'N'),
+	gpeALFu4_STOW = gpdABCD('S', 'T', 'O', 'W'),
+	gpeALFu4_SUBM = gpdABCD('S', 'U', 'B', 'M'),
+	gpeALFu4_SQRT = gpdABCD('S', 'Q', 'R', 'T'),
+
+	gpeALFu4_TRUE = gpdABCD('T', 'R', 'U', 'E'),
+	gpeALFu4_TURN = gpdABCD('T', 'U', 'R', 'N'),
+
+	gpeALFu4_TYPE = gpdABCD('T', 'Y', 'P', 'E'),
+
+	gpeALFu4_USER = gpdABCD('U', 'S', 'E', 'R'),
+
+	gpeALFu4_WALK = gpdABCD('W', 'A', 'L', 'K'),
+	gpeALFu4_WHAM = gpdABCD('W', 'H', 'A', 'M'),
+
+	gpeALFu4_XORM = gpdABCD('X', 'O', 'R', 'M'),
+
+	gpeALFu4_4 = gpdABCD('Z', 'Z', 'Z', 'Z'),
+	//- 5 -----------------
+	gpeALFu4_ANDLG = gpdABCDE('A', 'N', 'D', 'L', 'G'),
+	gpeALFu4_ARRAY = gpdABCDE('A', 'R', 'R', 'A', 'Y'),
+	gpeALFu4_BEGIN = gpdABCDE('B', 'E', 'G', 'I', 'N'),
+	gpeALFu4_BLOCK = gpdABCDE('B', 'L', 'O', 'C', 'K'),
+	gpeALFu4_BOBER = gpdABCDE('B', 'O', 'B', 'E', 'R'),
+	gpeALFu4_BRAKE = gpdABCDE('B', 'R', 'A', 'K', 'E'),
+	gpeALFu4_BRAKS = gpdABCDE('B', 'R', 'A', 'K', 'S'),
+	gpeALFu4_BREAK = gpdABCDE('B', 'R', 'E', 'A', 'K'),
+	gpeALFu4_BUBLE = gpdABCDE('B', 'U', 'B', 'L', 'E'),
+	gpeALFu4_CACHE = gpdABCDE('C', 'A', 'C', 'H', 'E'),
+	gpeALFu4_CLASS = gpdABCDE('C', 'L', 'A', 'S', 'S'),
+	gpeALFu4_COLOR = gpdABCDE('C', 'O', 'L', 'O', 'R'),
+	gpeALFu4_CONST = gpdABCDE('C', 'O', 'N', 'S', 'T'),
+	gpeALFu4_COUNT = gpdABCDE('C', 'O', 'U', 'N', 'T'),
+	gpeALFu4_CREAT = gpdABCDE('C', 'R', 'E', 'A', 'T'),
+	gpeALFu4_CROSS = gpdABCDE('C', 'R', 'O', 'S', 'S'),
+	gpeALFu4_CYCLE = gpdABCDE('C', 'Y', 'C', 'L', 'E'),
+	gpeALFu4_DEBUG = gpdABCDE('D', 'E', 'B', 'U', 'G'),
+	gpeALFu4_DEBUS = gpdABCDE('D', 'E', 'B', 'U', 'S'),
+	gpeALFu4_ENTER = gpdABCDE('E', 'N', 'T', 'E', 'R'),
+	gpeALFu4_ENTRY = gpdABCDE('E', 'N', 'T', 'R', 'Y'),
+	gpeALFu4_ERECT = gpdABCDE('E', 'R', 'E', 'C', 'T'),
+	gpeALFu4_GETMX = gpdABCDE('G', 'E', 'T', 'M', 'X'),
+	gpeALFu4_GLOBA = gpdABCDE('G', 'L', 'O', 'B', 'A'),
+	gpeALFu4_HISTI = gpdABCDE('H', 'I', 'S', 'T', 'I'),
+	gpeALFu4_HUMAN = gpdABCDE('H', 'U', 'M', 'A', 'N'),
+	gpeALFu4_INDEX = gpdABCDE('I', 'N', 'D', 'E', 'X'),
+	gpeALFu4_KCTRL = gpdABCDE('K', 'C', 'T', 'R', 'L'),
+	gpeALFu4_LABEL = gpdABCDE('L', 'A', 'B', 'E', 'L'),
+	gpeALFu4_LATHE = gpdABCDE('L', 'A', 'T', 'H', 'E'),
+	gpeALFu4_LOCAL = gpdABCDE('L', 'O', 'C', 'A', 'L'),
+	gpeALFu4_NEGLG = gpdABCDE('N', 'E', 'G', 'L', 'G'),
+	gpeALFu4_NEQLG = gpdABCDE('N', 'E', 'Q', 'L', 'G'),
+	gpeALFu4_NGATE = gpdABCDE('N', 'G', 'A', 'T', 'E'),
+	gpeALFu4_NGCON = gpdABCDE('N', 'G', 'C', 'O', 'N'),
+	gpeALFu4_NGDIE = gpdABCDE('N', 'G', 'D', 'I', 'E'),
+
+	gpeALFu4_ORBIT = gpdABCDE('O', 'R', 'B', 'I', 'T'),
+	gpeALFu4_PASTE = gpdABCDE('P', 'A', 'S', 'T', 'E'),
+	gpeALFu4_PICQC = gpdABCDE('P', 'I', 'C', 'Q', 'C'),
+	gpeALFu4_PRINT = gpdABCDE('P', 'R', 'I', 'N', 'T'),
+	gpeALFu4_REPIC = gpdABCDE('R', 'E', 'P', 'I', 'C'),
+
+	gpeALFu4_RESET = gpdABCDE('R', 'E', 'S', 'E', 'T'),
+
+	gpeALFu4_RIGHT = gpdABCDE('R', 'I', 'G', 'H', 'T'),
+	gpeALFu4_ROOTM = gpdABCDE('R', 'O', 'O', 'T', 'M'),
+	gpeALFu4_RULES = gpdABCDE('R', 'U', 'L', 'E', 'S'),
+
+	gpeALFu4_SETUP = gpdABCDE('S', 'E', 'T', 'U', 'P'),
+	gpeALFu4_SHARE = gpdABCDE('S', 'H', 'A', 'R', 'E'),
+	gpeALFu4_SHOES = gpdABCDE('S', 'H', 'O', 'E', 'S'),
+	gpeALFu4_SLEFT = gpdABCDE('S', 'L', 'E', 'F', 'T'),
+	gpeALFu4_STORE = gpdABCDE('S', 'T', 'O', 'R', 'E'),
+
+	gpeALFu4_STACK = gpdABCDE('S', 'T', 'A', 'C', 'K'),
+	gpeALFu4_STONE = gpdABCDE('S', 'T', 'O', 'N', 'E'),
+	gpeALFu4_TABWH = gpdABCDE('T', 'A', 'B', 'W', 'H'),
+	gpeALFu4_TABXY = gpdABCDE('T', 'A', 'B', 'X', 'Y'),
+	gpeALFu4_THISA = gpdABCDE('T', 'H', 'I', 'S', 'A'),
+	gpeALFu4_THISN = gpdABCDE('T', 'H', 'I', 'S', 'N'),
+	gpeALFu4_TOKEN = gpdABCDE('T', 'O', 'K', 'E', 'N'),
+	gpeALFu4_TOUCH = gpdABCDE('T', 'O', 'U', 'C', 'H'),
+	gpeALFu4_TRACK = gpdABCDE('T', 'R', 'A', 'C', 'K'),
+	gpeALFu4_VARIA = gpdABCDE('V', 'A', 'R', 'I', 'A'),
+
+	gpeALFu4_UNDEF = gpdABCDE('U', 'N', 'D', 'E', 'F'),
+
+	gpeALFu4_UNSEL = gpdABCDE('U', 'N', 'S', 'E', 'L'),
+
+	gpeALFu4_WHILE = gpdABCDE('W', 'H', 'I', 'L', 'E'),
+
+	gpeALFu4_WMLBX = gpdABCDE('W', 'M', 'L', 'B', 'X'),		// egér X poziciója mielött le lett nyomva a BAL gomb
+	gpeALFu4_WMLBY = gpdABCDE('W', 'M', 'L', 'B', 'Y'),		// egér Y poziciója mielött le lett nyomva a BAL gomb
+
+	gpeALFu4_WMRBX = gpdABCDE('W', 'M', 'R', 'B', 'X'),		// egér X poziciója mielött le lett nyomva a JOBB gomb
+	gpeALFu4_WMRBY = gpdABCDE('W', 'M', 'R', 'B', 'Y'),		// egér Y poziciója mielött le lett nyomva a JOBB gomb
+	gpeALFu4_WRITE = gpdABCDE('W', 'R', 'I', 'T', 'E'),
+
+	gpeALFu4_5 = gpdABCDE('Z', 'Z', 'Z', 'Z', 'Z'),
+
+	//- 6 -----------------
+	gpeALFu4_AAAAAA = gpdABCDEF('A', 'A', 'A', 'A', 'A', 'A'),
+	gpeALFu4_ACCEPT = gpdABCDEF('A', 'C', 'C', 'E', 'P', 'T'),
+	gpeALFu4_ABOARD = gpdABCDEF('A', 'B', 'O', 'A', 'R', 'D'),
+	gpeALFu4_BUBLER = gpdABCDEF('B', 'U', 'B', 'L', 'E', 'R'),
+	gpeALFu4_CONSTR = gpdABCDEF('C', 'O', 'N', 'S', 'T', 'R'),
+	gpeALFu4_ELAPSE = gpdABCDEF('E', 'L', 'A', 'P', 'S', 'E'),
+	gpeALFu4_FERIKE = gpdABCDEF('F', 'E', 'R', 'I', 'K', 'E'),
+	gpeALFu4_FLINCH = gpdABCDEF('F', 'L', 'I', 'N', 'C', 'H'),
+	gpeALFu4_FORBID = gpdABCDEF('F', 'O', 'R', 'B', 'I', 'D'),
+	gpeALFu4_GALAXY = gpdABCDEF('G', 'A', 'L', 'A', 'X', 'Y'),
+	gpeALFu4_JACKET = gpdABCDEF('J', 'A', 'C', 'K', 'E', 'T'),
+	gpeALFu4_KSHIFT = gpdABCDEF('K', 'S', 'H', 'I', 'F', 'T'),
+	gpeALFu4_LISTEN = gpdABCDEF('L', 'I', 'S', 'T', 'E', 'N'),
+
+	gpeALFu4_NEWROW = gpdABCDEF('N', 'E', 'W', 'R', 'O', 'W'),
+
+	gpeALFu4_MODBUS = gpdABCDEF('M', 'O', 'D', 'B', 'U', 'S'),
+	gpeALFu4_NBUILD = gpdABCDEF('N', 'B', 'U', 'I', 'L', 'D'),
+	gpeALFu4_PICCPY = gpdABCDEF('P', 'I', 'C', 'C', 'P', 'Y'),
+	gpeALFu4_PLANET = gpdABCDEF('P', 'L', 'A', 'N', 'E', 'T'),
+	gpeALFu4_POLYER = gpdABCDEF('P', 'O', 'L', 'Y', 'E', 'R'),
+	gpeALFu4_PRAGMA = gpdABCDEF('P', 'R', 'A', 'G', 'M', 'A'),
+	gpeALFu4_REGGIO = gpdABCDEF('R', 'E', 'G', 'G', 'I', 'O'),
+	gpeALFu4_RENAME = gpdABCDEF('R', 'E', 'N', 'A', 'M', 'E'),
+	gpeALFu4_RETURN = gpdABCDEF('R', 'E', 'T', 'U', 'R', 'N'),
+	//gpeALFu4_SHADER =	gpdABCDEF( 'S','H','A','D','E','R' ),
+
+	gpeALFu4_SIZEOF = gpdABCDEF('S', 'I', 'Z', 'E', 'O', 'F'),
+	gpeALFu4_SHADOW = gpdABCDEF('S', 'H', 'A', 'D', 'O', 'W'),
+	gpeALFu4_SPRITE = gpdABCDEF('S', 'P', 'R', 'I', 'T', 'E'),
+	gpeALFu4_SRIGHT = gpdABCDEF('S', 'R', 'I', 'G', 'H', 'T'),
+	gpeALFu4_STEREO = gpdABCDEF('S', 'T', 'E', 'R', 'E', 'O'),
+	gpeALFu4_STOREE = gpdABCDEF('S', 'T', 'O', 'R', 'E', 'E'),
+	gpeALFu4_STOWUP = gpdABCDEF('S', 'T', 'O', 'W', 'U', 'P'),
+	gpeALFu4_STRROW = gpdABCDEF('S', 'T', 'R', 'R', 'O', 'W'),
+	gpeALFu4_SWITCH = gpdABCDEF('S', 'W', 'I', 'T', 'C', 'H'),
+	gpeALFu4_TARGET = gpdABCDEF('T', 'A', 'R', 'G', 'E', 'T'),
+	gpeALFu4_TELNET = gpdABCDEF('T', 'E', 'L', 'N', 'E', 'T'),
+
+	gpeALFu4_6 		= gpdABCDEF('Z', 'Z', 'Z', 'Z', 'Z', 'Z'),
+
+	//- 7 -----------------
+
+
+	gpeALFu4_MWLQKWU = (U4)gpdABCDEFG('M', 'W', 'L', 'Q', 'K', 'W', 'U'),
+	gpeALFu4_U4      = gpeALFu4_MWLQKWU,
+};
 typedef enum gpeALF: I8
 {
 	gpeALF_null = 0,

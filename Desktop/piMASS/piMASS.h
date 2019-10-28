@@ -1144,7 +1144,16 @@ public:
 		};
 		struct
 		{
+			gpeALFu4	a4;
+			U4			n4;
+		};
+		struct
+		{
 			U1x4 aCLR[2];
+		};
+		struct
+		{
+			gpeALF var;
 		};
 	};
 
@@ -1382,6 +1391,7 @@ public:
         {
             U4 aXYZW[4];
         };
+
     };
 
     U4x4(){};
@@ -2110,7 +2120,11 @@ public:
 		};
 		struct
         {
-			I4x2 a4x2[2];
+			I4x2 i4x2[2];
+		};
+		struct
+        {
+			U4x2 u4x2[2];
 		};
 	};
 
