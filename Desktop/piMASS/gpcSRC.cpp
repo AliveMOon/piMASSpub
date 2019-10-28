@@ -173,7 +173,7 @@ gpcSRC::~gpcSRC()
 	gpmDELary(pMAP);
 }
 
-I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch  )
+I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch, bool bNoMini  )
 {
 	if( this ?
 				   ( fx <= 0 	||	fy <= 0 )
@@ -246,7 +246,7 @@ I4x4 gpcSRC::CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC
 	bool bON = false;
 	I4 nFILL;
 
-	for( U1* pC = pSRCstart(), *pAL = pSRCalloc() , *pCe = pC+dim.w; pC < pCe; pC++ )
+	for( U1* pC = pSRCstart( bNoMini ), *pAL = pSRCalloc( bNoMini ) , *pCe = pC+dim.w; pC < pCe; pC++ )
 	{
 		if( cxy.y >= fy )
 			break;

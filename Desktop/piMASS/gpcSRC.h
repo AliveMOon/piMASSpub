@@ -602,9 +602,9 @@ public:
 	{
 		return gpmOFF( gpcSRC, nVER )-gpmOFF( gpcSRC, pALFtg );
 	}
-	U1* pSRCalloc( void )
+	U1* pSRCalloc( bool bNoMini )
 	{
-		bool bHD = false, bMINI = bHD ? false : !!pMINI;
+		bool bHD = false, bMINI = bHD ? false : ( bNoMini ? false : !!pMINI );
 
 		return bMINI ? pMINI->p_alloc : pA;
 	}
@@ -628,7 +628,7 @@ public:
 		return pC;
 	}
 
-	U8 CRSminiCR( I4x2& cr ) {
+	U8 CRSminiCR( I4x2& cr, bool bNoMini ) {
 		if( !this )
 		{
 			cr.null();
@@ -639,7 +639,7 @@ public:
 		//if( !cr.sum() )
 		//	return pC - pSRCalloc();;
 		I4x4 cxy = 0;
-		U1 sC[] = " ", *pROW = pSRCstart(), *pCe, *pC;
+		U1 sC[] = " ", *pROW = pSRCstart(bNoMini), *pCe, *pC;
 		U4 n;
 		for( pC = pROW, pCe = pC+dim.w; pC < pCe; pC++ )
 		{
@@ -704,7 +704,7 @@ public:
 				case '\n':
 				case '\r':
 				case '\a':
-					return pC - pSRCalloc();
+					return pC - pSRCalloc(bNoMini);
 
 				case '\t':
 					sC[0] = *pC;
@@ -719,15 +719,15 @@ public:
 
 			cxy.x++;
 		}
-		return pC - pSRCalloc();
+		return pC - pSRCalloc(bNoMini);
 	}
-	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch );
+	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch, bool bNoMini );
 
-	U4x4 CRSdim( U4x4* pCRS2 )
+	U4x4 CRSdim( U4x4* pCRS2, bool bNoMini )
 	{
 		if( !this )
 			return U4x4( 4, 1 );
-		U1* pC = pSRCstart( ); //pCRS2 );
+		U1* pC = pSRCstart( bNoMini ); //pCRS2 );
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 
 		return dim;

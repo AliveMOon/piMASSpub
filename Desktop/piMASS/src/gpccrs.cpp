@@ -239,7 +239,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 
 	selANIN[1].a4x2[0] = sCRS.scnZN.a4x2[0]+U4x2(1,0);		//AN
 	selANIN[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;				//IN
-	anSTR[1] = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANIN[1].a4x2[1] ) : 0;
+	anSTR[1] = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANIN[1].a4x2[1], true ) : 0;
 
 
 	if( bSH )
@@ -611,12 +611,13 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 		U4	*pM = pMAP->MAPalloc( spcZN, mCR, true ),//pMAP->pMAP,
 			*pC = pMAP->pCOL,
-			*pR = pMAP->pROW, i, ie = pC-pM;
+			*pR = pMAP->pROW, i, ie = pC-pM, c, r;
 
 		gpcSRC	tmp,
 				*pEDIT = NULL,
 				*pSRC = NULL,
 				*pS2 = NULL;
+		bool bNoMini = false;
 
 		//gpfMEMSET( (pC+1), mapZN44.z-1, pC, sizeof(*pC) );
 		//gpfMEMSET( (pR+1), mapZN44.w-1, pR, sizeof(*pR) );
@@ -626,14 +627,23 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		{
 			if( !pM[i] )
 				continue;
+			c = i%pMAP->mapZN44.z;
+			r = i/pMAP->mapZN44.z;
+			if(
+						   ( c+1 >= lurdAN.x	&& r >= lurdAN.y )
+						&& ( c+1 <= lurdAN.z	&& r <= lurdAN.w )
+				)
+				bNoMini = true;
+			else
+				bNoMini = false;
 
 			xFND = pM[i];
 			pSRC = mass.SRCfnd( xFND );
-			dim = pSRC->CRSdim( aCRS );
-            if( pC[i%pMAP->mapZN44.z] < dim.x )
-				pC[i%pMAP->mapZN44.z] = dim.x;
-			if( pR[i/pMAP->mapZN44.z] < dim.y )
-				pR[i/pMAP->mapZN44.z] = dim.y;
+			dim = pSRC->CRSdim( aCRS, bNoMini );
+            if( pC[c] < dim.x )
+				pC[c] = dim.x;
+			if( pR[r] < dim.y )
+				pR[r] = dim.y;
 
 		}
 		for( U4 c = 0; c < pMAP->mapZN44.x; c++ )
@@ -675,7 +685,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )
 					anSTR[1] = anSTR[0] = pSRC->nL;
 
-				I4	nSTRT = pSRC->pSRCstart()-pSRC->pSRCalloc();
+				I4	nSTRT = pSRC->pSRCstart(true)-pSRC->pSRCalloc(true);
 
 				if( anSTR[0] < nSTRT )
 					anSTR[0] = nSTRT;
@@ -802,7 +812,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				xFND = pM[i];
 				pSRC = mass.SRCfnd( xFND );
 
-
+				bNoMini = false;
 				if( !lurdAN.x )
 				{
 					c16fr = gpeCLR_blue2;
@@ -813,6 +823,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 						&& ( c+1 <= lurdAN.z	&& r <= lurdAN.w )
 				)
 				{
+					bNoMini = true;
 					c16fr = bED ? gpeCLR_green2 : gpeCLR_cyan;
 					c16ch = bED ? gpeCLR_cyan : gpeCLR_blue2;
 				} else {
@@ -825,7 +836,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 									CRSfrm.z,
 									gpaC64,
 									*this,
-									c16bg, c16fr, c16ch
+									c16bg, c16fr, c16ch,
+									bNoMini
 								);
 
 			}
