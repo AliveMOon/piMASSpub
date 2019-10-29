@@ -2962,6 +2962,8 @@ public:
 		}
 
 		//memcpy( p_alloc+start, p_u1, n_u1 );
+		if( !p_alloc )
+			return this;
 
 		n_load = new_load;
 		p_alloc[n_load] = 0;
@@ -2975,7 +2977,6 @@ public:
 			//start = n_u1;
 			return lzy_add( p_u1, n_u1, n_start, n );
 		}
-
 		lzy_exp( n_start, n_sub,  n_u1, n );
 		memcpy( p_alloc+n_start, p_u1, n_u1 );
 		return this;

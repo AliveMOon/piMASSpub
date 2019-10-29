@@ -60,22 +60,18 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			{
 				if( pI ? op.u4 : false )
 					pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
-				else if( pI ) {
-					// ne volt már operátor
-					resISA_stp( 0, xyWH.a4x2[0] );
-					pI = NULL;
-				}
+				else if( pI ) // ne volt már operátor
+					pI = resISA_stp( 0, xyWH.a4x2[0] );
 				else if( pUD8 ? op.u4 : false )
 					resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
-				pUD8 = NULL;
-				op.null();
+				pI = pUD8 = NULL;
 			}
-
-			nSTR = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
-			aAN[nAN].A( pS, NULL );
+			op.null();
+			aAN[nAN].num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
+			aAN[nAN].A( pS, NULL ); // aAN[nAN].num-bol veszi a string hiszat
 
 			//apA[0] = pS;
-			pS += nSTR;
+			pS += aAN[nAN].num; //nSTR;
 			//u8 = 0;
 			//d8 = 0.0;
 			if( gpmbNUM( *pS ) ) {	/// NUM -------------------------------------------------
@@ -272,7 +268,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			case '}':
 			case ')':
 			case ']': {
-						pI = resISA_stp(pS[-1], xyWH.a4x2[0]);
+						//pI = resISA_stp(pS[-1], xyWH.a4x2[0]);
 
 						pE = pS;
 					} break;
@@ -364,14 +360,23 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	if( ppE )
 		*ppE = pS;
 
-	if( pI || pUD8 )
+	if( pI )
+		resISA_stp( pS[-1], xyWH.a4x2[0] );
+	else if( pUD8 )
 	{
-		if( pI ? op.u4 : false )
-			pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
-		else if( pUD8 ? op.u4 : false )
-			resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
+		switch( *pUD8->isa.aISA )
+		{
+			case gpeISA_d8:
+				typ.u4 = gpeTYP_D;
+				aALU[0].equ( this, pUD8->trg, typ, op, 0, pUD8->an.d8 );
+				break;
+			case gpeISA_u8:
+				typ.u4 = gpeTYP_U8;
+				aALU[0].equ( this, pUD8->trg, typ, op, pUD8->an.u8, 0.0 );
+				break;
 
-		op.null();
+		}
+		pUD8 = NULL;
 	}
 
 	gpmDEL( pTMP ) // nem lett sehove elrakva? Arroe KONYEC!

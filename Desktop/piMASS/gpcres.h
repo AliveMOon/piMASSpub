@@ -342,7 +342,7 @@ public:
 
 	gpcRES* compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	gpcRES* compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
-	gpcRES* run( gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0 );
+	gpcRES* run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0 );
 
 	gpcALU& ALU( U4 iA )
 	{

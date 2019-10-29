@@ -55,13 +55,13 @@ gpcRES* gpcRES::null()
 	return this;
 }
 
-I8x2& I8x2::A( U1* pA, U1** ppA )
+I8x2& I8x2::A( U1* pS, U1** ppS )
 {
-	alf = gpfSTR2ALF( pA, pA + min( 14, y ), NULL );
-	if( !ppA )
+	alf = gpfSTR2ALF( pS, pS + min( 14, y ), NULL );
+	if( !ppS )
 		return *this;
 
-	*ppA = NULL;
+	*ppS = NULL;
 	return *this;
 }
 

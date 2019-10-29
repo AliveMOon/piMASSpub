@@ -3,51 +3,66 @@ extern U1 gpaALFadd[];
 U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t", *gppTABrun = gpsTABrun + strlen( (char*)gpsTABrun );
 
 
-gpcRES* gpcRES::run( gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep )
+gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep )
 {
 	if( this ? !pISA : true )
 		return this;
-	gpcLAZY mini;
+
+	if( pSRC )
+	if( pLZY ? false : !deep )
+	{
+		if( pSRC->pMINI )
+			pSRC->pMINI->lzy_reset();
+		else
+			pSRC->pMINI = new gpcLAZY;
+
+		pLZY = pSRC->pMINI;
+	}
+
+	//gpcLAZY mini;
 	U8 s = -1;
 	U1 sBUFF[0x1000], nB;
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
+
+		if( !pLZY )
+			continue;
 		if( pISA[i].isa.aISA[1] == '=' )
-			mini.lzy_format( s = -1, "\r\n%s", gppTABrun-deep );
+			pLZY->lzy_format( s = -1, "\r\n%s", gppTABrun-deep );
         switch( pISA[i].isa.aISA[0] )
         {
 			case gpeISA_nop: {
 				} break;
 			case gpeISA_u8: {
-					mini.lzy_format( s = -1, "%lld", pISA[i].an.u8 );
+					pLZY->lzy_format( s = -1, "%lld", pISA[i].an.u8 );
 				} break;
 			case gpeISA_d8: {
-					mini.lzy_format( s = -1, "%f", pISA[i].an.d8 );
+					pLZY->lzy_format( s = -1, "%f", pISA[i].an.d8 );
 				} break;
 			case gpeISA_an: {
 					gpfALF2STR( sBUFF, pISA[i].an.a4 );
-					mini.lzy_format( s = -1, "%s%d", sBUFF, pISA[i].an.n4 );
+					pLZY->lzy_format( s = -1, "%s%d", sBUFF, pISA[i].an.n4 );
 				} break;
 			case gpeISA_anFUN: {
 					gpfALF2STR( sBUFF, pISA[i].an.a4 );
-					mini.lzy_format( s = -1, "%s%d(", sBUFF, pISA[i].an.n4 );
+					pLZY->lzy_format( s = -1, "%s%d", sBUFF, pISA[i].an.n4 );
 				} break;
 			case gpeISA_var: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
-					mini.lzy_format( s = -1, "%s", sBUFF );
+					pLZY->lzy_format( s = -1, "%s", sBUFF );
 				} break;
 			case gpeISA_FUN: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
-					mini.lzy_format( s = -1, "%s(", sBUFF );
+					pLZY->lzy_format( s = -1, "%s", sBUFF );
 				} break;
         }
-        mini.lzy_format( s = -1, "%c", pISA[i].isa.aISA[1] >= ' ' ? pISA[i].isa.aISA[1] : '_' );
+        pLZY->lzy_format( s = -1, "%c", pISA[i].isa.aISA[1] >= ' ' ? pISA[i].isa.aISA[1] : '_' );
 
 	}
-	if( mini.n_load )
-	{
-		pSRC->pMINI = pSRC->pMINI->lzy_plus( &mini, s );
-	}
+
+	if( !deep )
+	if( pSRC->pMINI ? !pSRC->pMINI->n_load : false  )
+		gpmDEL(pSRC->pMINI);
 
 	return this;
 }
@@ -104,7 +119,7 @@ U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4
 
 		// egyébként meg kell probálni futatni
 		pSRC->pMINI->lzy_reset();
-		pSRC->apRES[2]->run( this, pSRC, NULL );
+		pSRC->apRES[2]->run( NULL, this, pSRC, NULL );
 
 	}
 
