@@ -51,7 +51,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	gpmZ(aALU);
 	gpcLAZY str;
 	U4  nAN = 0, nALU = 0, iI;
-	gpcISA* pI = NULL, *pUD8;
+	gpcISA* pI = NULL, *pUD8 = NULL;
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -67,7 +67,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				}
 				else if( pUD8 ? op.u4 : false )
 					resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
-
+				pUD8 = NULL;
 				op.null();
 			}
 
@@ -191,8 +191,8 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 
 					xyWH.null();
-					pI = resISA_stp( pS[-1], xyWH.a4x2[0] );
-
+					resISA_stp( pS[-1], xyWH.a4x2[0] );
+					pI = pUD8 = NULL;
 
 				} break;
 			/// ALU ------------------------------------------------------------------------------
@@ -363,6 +363,16 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 	if( ppE )
 		*ppE = pS;
+
+	if( pI || pUD8 )
+	{
+		if( pI ? op.u4 : false )
+			pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
+		else if( pUD8 ? op.u4 : false )
+			resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
+
+		op.null();
+	}
 
 	gpmDEL( pTMP ) // nem lett sehove elrakva? Arroe KONYEC!
 
