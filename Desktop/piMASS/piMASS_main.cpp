@@ -489,7 +489,7 @@ gpcMASS& gpcMASS::null()
 	gpmCLR;
 	return *this;
 }
-
+/*
 U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
 	U1* pKEYbuff = sKEYbuff;
@@ -547,6 +547,7 @@ U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4
 
 	return pKEYbuff;
 }
+*/
 
 gpcMASS& gpcMASS::operator = ( const gpcMASS& b )
 {

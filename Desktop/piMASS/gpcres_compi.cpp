@@ -56,11 +56,20 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 		if( gpmbABC( *pS, gpaALFadd ) ) { /// ALF NUM -------------------------------------------------
+			if( pI || pUD8 )
+			{
+				if( pI ? op.u4 : false )
+					pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
+				else if( pI ) {
+					// ne volt már operátor
+					resISA_stp( 0, xyWH.a4x2[0] );
+					pI = NULL;
+				}
+				else if( pUD8 ? op.u4 : false )
+					resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
 
-			if( pI ? op.u4 : false )
-				pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
-
-			op.null();
+				op.null();
+			}
 
 			nSTR = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
 			aAN[nAN].A( pS, NULL );
@@ -80,11 +89,16 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 		}
 		else if( gpmbNUM( *pS ) || *pS == '.' ) { /// NUM -------------------------------------------------
 
-			if( pI ? op.u4 : false )
-				resISA_stp( pI->stp(op), xyWH.a4x2[0] );
+			if( pI || pUD8 )
+			{
+				if( pI ? op.u4 : false )
+					pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
+				else if( pUD8 ? op.u4 : false )
+					resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
 
-			op.null();
-			pUD8 = pI ? pI : resISA();
+				op.null();
+			}
+			pUD8 = resISA();
 			pI = NULL;
 
 			*pUD8->isa.aISA = gpeISA_u8;
@@ -116,7 +130,9 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 			case ';': //{	// SOROK
 			case ',': {	// vessző OSZLOPOK
-					if( pUD8 )
+					if( pI )
+						resISA_stp( pS[-1], xyWH.a4x2[0] );
+					else if( pUD8 )
 					{
 						switch( *pUD8->isa.aISA )
 						{
@@ -130,12 +146,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 								break;
 
 						}
+						pUD8 = NULL;
 					}
 					aALU[0].ins( this, str );
-					if( pI )
-						pI = resISA_stp( pS[-1], xyWH.a4x2[0] );
 
-
+					pI = pUD8 = NULL;
 					//d8 =
 					op.u4 = 0;
 					if( pS[-1] == ',' )
@@ -304,8 +319,10 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			case '(':
 			case '{':
 			case '[': {
-					pI = resISA_stp(pS[-1], xyWH.a4x2[0]);
+					pI = resISA();
+					U1 stp = pS[-1];
 					pI->pRES = ((gpcRES*)NULL)->compiEASY( pS, pE, &pS, this );
+					pI = resISA_stp(stp, xyWH.a4x2[0]);
 
 
 				} break;

@@ -289,7 +289,7 @@ public:
 
 
 		nISA.x++;
-		resISA()->null();
+		pIS = resISA()->null();
 		switch( stp )
 		{
 			case '.':
@@ -298,9 +298,12 @@ public:
 				if( !pIS[-pIS->isa.z].i )
 					break;
 				pIS[-pIS->isa.z].n -= pIS[-pIS->isa.z].i;
+			case '(':
+				if( pIS[-1].isa.aISA[0] == gpeISA_var )
+					pIS[-1].isa.aISA[0] = gpeISA_FUN;
 		}
 
-		return resISA();
+		return pIS; //resISA();
 	}
 
 	gpcISA*	resISA_an( I8x2& an )
