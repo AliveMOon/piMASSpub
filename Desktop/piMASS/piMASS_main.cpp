@@ -883,9 +883,9 @@ int main( int nA, char *apA[] )
 
 			}
 
-
-
-			while( SDL_PollEvent( &ev ) )
+			//while( SDL_PollEvent( &ev ) )
+			//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
+			while( SDL_WaitEventTimeout( &ev, 20 ) )
 			{
 				gpnEVENT++;
 				switch( ev.type )

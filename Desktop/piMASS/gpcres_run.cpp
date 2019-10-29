@@ -54,6 +54,7 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 			case gpeISA_FUN: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
 					pLZY->lzy_format( s = -1, "%s", sBUFF );
+					pISA[i].pRES->run( pLZY, pMASS, pSRC, this, deep+1 );
 				} break;
         }
         pLZY->lzy_format( s = -1, "%c", pISA[i].isa.aISA[1] >= ' ' ? pISA[i].isa.aISA[1] : '_' );
