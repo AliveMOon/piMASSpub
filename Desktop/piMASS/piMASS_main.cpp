@@ -489,65 +489,7 @@ gpcMASS& gpcMASS::null()
 	gpmCLR;
 	return *this;
 }
-/*
-U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
-{
-	U1* pKEYbuff = sKEYbuff;
-	gpcSRC	tmp, *pSRC;
-	U4 xFND;
-	if( U4 *pM = mapCR.pMAP )
-	if( U4 *pC = mapCR.pCOL )
-	if( U4 *pR = mapCR.pROW )
-	if( pM < pC )
-	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
-	{
-		if( !pM[i] )
-			continue;
 
-		xFND = pM[i];
-		pSRC = SRCfnd( xFND );
-		if( !pSRC )
-			continue;
-
-		if( pSRC->qBLD() )
-		{
-			if( !pSRC->apRES[3] )
-			{
-				pSRC->apRES[3] = pSRC->apRES[3]->compiEASY( pSRC->pSRCstart( true ), NULL, NULL, NULL );
-				//gpmDEL( pSRC->apRES[2] ); // OFF? 2
-				if( pSRC->apRES[3] )
-				{
-					//gpmDEL( pSRC->apRES[2] ); // OFF? 1
-					if( pSRC->apRES[2] )
-					{
-						gpmDEL( pSRC->apRES[1] ); // OFF 0
-						if( pSRC->apRES[1] )
-						{
-							gpmDEL( pSRC->apRES[0] );
-							pSRC->apRES[0] = pSRC->apRES[1];
-						}
-
-
-						pSRC->apRES[1] = pSRC->apRES[2];
-					}
-					pSRC->apRES[2] = pSRC->apRES[3];
-				}
-				pSRC->apRES[3] = NULL;
-			}
-		}
-
-		if( !pSRC->apRES[2] )
-			continue;	// ha nincsen 2 nem sikerült az építés
-
-		// egyébként meg kell probálni futatni
-		pSRC->pMINI->lzy_reset();
-		pSRC->apRES[2]->run( this, pSRC, NULL );
-
-	}
-
-	return pKEYbuff;
-}
-*/
 
 gpcMASS& gpcMASS::operator = ( const gpcMASS& b )
 {

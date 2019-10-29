@@ -96,6 +96,7 @@ U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4
 				}
 				pSRC->apRES[3] = NULL;
 			}
+			pSRC->rdyBLD();
 		}
 
 		if( !pSRC->apRES[2] )

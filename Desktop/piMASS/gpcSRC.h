@@ -587,20 +587,33 @@ public:
 
 	gpcMAP	*pMAP;
 
-	U4 updt( void )
+	U4 srcUPDT( void )
 	{
 		U8 nLEN = 0;
 		pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
-		nVER = nHD+1;
+		nVERr = nHD+1;
 
 		//ifpB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 
-		return nVER;
+		return nVERr;
 	}
+	bool qBLD( void )
+    {
+		if( nVERr > nBLD )
+			return true;	// már kérte valaki
+
+		//nVERr = max( nHD, nBLD ); //+1;
+		return false; // mi kérjük elösször
+    }
+    U4 rdyBLD( void )
+    {
+		nBLD = nVERr;
+		return nVERr;
+    }
 
 	U4 nCLR(void)
 	{
-		return gpmOFF( gpcSRC, nVER )-gpmOFF( gpcSRC, pALFtg );
+		return gpmOFF( gpcSRC, nVERr )-gpmOFF( gpcSRC, pALFtg );
 	}
 	U1* pSRCalloc( bool bNoMini )
 	{
@@ -733,14 +746,7 @@ public:
 		return dim;
 	}
 
-    bool qBLD( void )
-    {
-		if( nVER > nBLD )
-			return true;	// már kérte valaki
 
-		nVER = max( nHD, nBLD )+1;
-		return false; // mi kérjük elösször
-    }
 
     bool bSUB( gpcMASS& mass )
     {
@@ -838,7 +844,7 @@ public:
 		if( !bM )
 			return false;
 
-		cmpi( mass, bDBG );
+		//cmpi( mass, bDBG );
 
 		return true;
     }
@@ -901,7 +907,7 @@ public:
     gpcSRC& operator = ( gpcSRC& B );
 
 protected:
-    U4	nVER, nBLD, nHD;
+    U4	nVERr, nBLD, nHD;
 private:
 };
 

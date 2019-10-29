@@ -145,10 +145,10 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 
 	psHD = gpsHD;
 	psHD[0] = 0;
-	if( nHD == nVER )
+	if( nHD == nVERr )
 	{
-		if( !nVER )
-			nVER = 1;
+		if( !nVERr )
+			nVERr = 1;
 		else
 			return;
 	}
@@ -163,7 +163,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	nALFtg = 0;
 	gpfALF2STR( gpsSTRpub, spcZN.x+1 );
 	psHD += sprintf( 	psHD, "\r\n-----------------\r\nHD:[%s%d] spc:%s V:%d H:%d C:%d \r\nbSW:0x%0.8x",
-						gpsSTRpub, spcZN.y, spcZN.str( psHD+0x100, "," ), nVER, nHD, nBLD,
+						gpsSTRpub, spcZN.y, spcZN.str( psHD+0x100, "," ), nVERr, nHD, nBLD,
 						bSW );
 
 	while( pB > pS )
@@ -339,7 +339,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	psHD += sprintf(	psHD, "\r\nOFF:0x%0.8x",
 						bOFF );
 	bSW &= bOFF;
-	nHD = nVER;
+	nHD = nVERr;
 	if( bSW&gpeMASSznMSK )
 	if( bSW&gpeMASSentrMSK )
 		bSW &= ~gpeMASSentrMSK;
@@ -368,7 +368,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	psHD[0] = 0;
 	psHD += sprintf( 	psHD, "\r\nComPI:[%s%d] spc:%s V:%d H:%d B:%d \r\nbSW:0x%0.8x",
 						gpsSTRpub, spcZN.y,
-						spcZN.str( psHD+0x100), nVER, nHD, nBLD,
+						spcZN.str( psHD+0x100), nVERr, nHD, nBLD,
 						bSW );
 	if( psHD > gpsHD )
 	{
@@ -1025,9 +1025,9 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 
 	}
 
-	cout << endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVER;
+	cout << endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
 	cout << endl;
-	nBLD = nVER;
+	nBLD = nVERr;
 }
 
 

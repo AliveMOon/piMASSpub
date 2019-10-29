@@ -750,7 +750,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 				}
 				pSRC->nL = pLFT-pSRC->pA;
 				pSRC->nA = nNEW;
-				pSRC->updt();
+				pSRC->srcUPDT();
 				*pLFT = 0;
 
 				gpmDELary(pOA);
@@ -778,7 +778,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 						//pS2->reset( pSRC->pA, pSRC->pA+pSRC->nL, &pSS, mCR44, 0 );
 						pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->nL );
-						pS2->updt();
+						pS2->srcUPDT();
 					}
 				}
 
