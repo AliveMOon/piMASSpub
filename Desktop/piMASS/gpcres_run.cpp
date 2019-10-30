@@ -21,14 +21,14 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 
 	//gpcLAZY mini;
 	U8 s = -1;
-	U1 sBUFF[0x1000], nB;
+	U1 sBUFF[0x1000], *pB = sBUFF, nB;
 	if( pLZY )
 	{
 		for( U4 a = 0; a < nA; a++ )
 		{
 			ALU( a );
-			gpfALF2STR( sBUFF, alu.alf );
-			pLZY->lzy_format( s = -1, "\r\n%s%s: %dx%d %dx%d", gppTABrun-deep, sBUFF, alu.AN.x, alu.AN.y, alu.AN.z, alu.AN.w );
+			pB = sBUFF + gpfALF2STR( sBUFF, alu.alf ) + 1;
+			pLZY->lzy_format( s = -1, "\r\n%s%s %s[%d][%d] nBYTE%d", gppTABrun-deep, alu.typ.typ2str(pB), sBUFF, alu.AN.x, alu.AN.y, alu.nLOAD() );
 		}
 	}
 	bool b_asg = false;
