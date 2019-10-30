@@ -569,6 +569,32 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 U1	gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
 char gpsMAINpub[0x100], gpsTITLEpub[0x100];
 I8 gpnEVENT = 0;
+class U4STR
+{
+public:
+	U4		sz;
+	char	*pSTR;
+	U4STR( U4 u4, const char* pS )
+	{
+		sz = u4;
+		pSTR = (char*)pS;
+	};
+};
+U4STR aSIZEOF[] = {
+	{ sizeof(gpcMASS), "gpcMASS" },
+	{ sizeof(gpcWIN), "gpcWIN" },
+	{ sizeof(gpcCRS), "gpcCRS" },
+	{ sizeof(gpcSRC), "gpcSRC" },
+	{ sizeof(gpcRES), "gpcRES" },
+	{ sizeof(gpcALU), "gpcALU" },
+	{ sizeof(gpcADR), "gpcADR" },
+	{ sizeof(gpcISA), "gpcISA" },
+	{ sizeof(I8x4), "I8x4" },
+	{ sizeof(I8x2), "I8x2" },
+	{ sizeof(U4x4), "U4x4" },
+	{ sizeof(U4x2), "U4x2" },
+};
+
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -577,6 +603,12 @@ int main(int nA, char** apA )
 int main( int nA, char *apA[] )
 #endif
 {
+	cout << endl;
+	for( U4 i = 0, e = gpmN(aSIZEOF); i < e; i++  )
+	{
+		cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 << endl;
+	}
+
 	gpf_aALF_init();
 
 	if( nA > 0 )

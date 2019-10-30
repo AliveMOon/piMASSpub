@@ -185,6 +185,13 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	} else
 		adr = pM;
 
+	if( !adr.pRM )
+	{
+		*this = pM->ADD( adr.an.alf, ty4.u4, 0 );
+		adr = pM;
+		if( !adr.pRM )
+			return null();
+	}
 	bool	bS1 = typ.x&0x80,
 			bF1 = typ.x&0x40,
 			bS2 = (typ.x|ty4.x)&0x80;

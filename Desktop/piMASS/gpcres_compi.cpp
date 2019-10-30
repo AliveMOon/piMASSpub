@@ -36,26 +36,47 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	U1x4 typ = 0;
 	I1x4 op = (U4)0;
 
-	bool bMATH = false;
+	bool	bMATH = false,
+			bCROSS = false;
 	gpeALF XML = gpeALF_null;
 	I4 xmlD = 0;
 
 
 	gpcADR adr;
-	gpcALU	aALU[8];
+	//gpcALU	aALU[8];
 
 	//U4x2 aAN[8];
 
 	I8x2 an; //aAN[8];
 
-	gpmZ(aALU);
+	//gpmZ(aALU);
 	gpcLAZY str;
 	U4  nAN = 0, nALU = 0, iI;
-	gpcISA* pI = NULL, *pUD8 = NULL;
-	bool bCROSS;
+	gpcISA	*pI = NULL,
+			*pUD8 = NULL;
 	nASG = 0;
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
+		if( op.u4 )
+		{
+			if( str.n_load )
+			{
+				pI = resISA_str( str );
+				//pUD8 = NULL;
+			}
+			if( pI || pUD8 )
+			{
+				if( pI ? op.u4 : false )
+					pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
+				else if( pI ) // ne volt már operátor
+					pI = resISA_stp( 0, xyWH.a4x2[0] );
+				else if( pUD8 ? op.u4 : false )
+					resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
+			}
+			pI = pUD8 = NULL;
+			op.null();
+		}
+
 		if( gpmbABC( *pS, gpaALFadd ) ) { /// ALF NUM -------------------------------------------------
 			if( pI || pUD8 )
 			{
@@ -67,37 +88,48 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
 				pI = pUD8 = NULL;
 			}
-			op.null();
 
+			/// a stingől itt lesz ALF --------------
 			an = pS;
-			pS += an.num;
-			/*aAN[nAN].num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
-			aAN[nAN].A( pS, NULL ); // aAN[nAN].num-bol veszi a string hiszat
+			pS += an.num;	// majd átlépjük
 
-			//apA[0] = pS;
-			pS += aAN[nAN].num; //nSTR;
-			//u8 = 0;
-			//d8 = 0.0;*/
-			if( bCROSS )
-			{
+			if( bCROSS ) { /// "#"CROSS -------------------------------------------------
 				bCROSS = false;
+				if( !gpmbNUM( *pS ) )
+				{
+					// valami #teg
+					pI = resISA_tag( an.alf );
+					pUD8 = NULL;
+					//d8 =
+					op.u4 = 0;
+					continue;
+				}
+				// meg volt #-izélva,  mondjuk a #abcd1234-t (ABCD, 1234) számnak tárolja
+				// az ötlet az hogy #abcd1234-t megtalálja a reALLOCátor és
+				// ha abcd1234 el lett mozdítva frissíti ezt is
 
-				pUD8 = resISA();
-				pI = NULL;
+				typ.u4 = gpeTYP_U8;
+				alu.equ( this, xyWH.a4x2[0], typ, op, an.x, 0.0 );
+				xyWH.a4x2[0].x++;
 
-				*pUD8->isa.aISA = gpeISA_u8;
-				//pUD8->trg = xyWH.a4x2[0];
-				pUD8->an.u8 = an.num;
+				an.num = gpfSTR2U8( pS, &pS );
+				alu.equ( this, xyWH.a4x2[0], typ, op, an.num, 0.0 );
+				xyWH.a4x2[0].x++;
+				if( xyWH.z < xyWH.x )
+					xyWH.z = xyWH.x;
+
+				pI = pUD8 = NULL;
+				op.u4 = 0;
 
 				continue;
 			}
+
 			if( gpmbNUM( *pS ) ) {	/// NUM -------------------------------------------------
 				an.num = gpfSTR2U8( pS, &pS );
 				pI = resISA_an( an );
-
 			} else {					/// VAR -------------------------------------------------
+				alu.alf = an.alf;
 				pI = resISA_var( an.alf );
-
 			}
 		}
 		else if( gpmbNUM( *pS ) || *pS == '.' ) { /// NUM -------------------------------------------------
@@ -111,6 +143,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 				op.null();
 			}
+
 			pUD8 = resISA();
 			pI = NULL;
 
@@ -134,6 +167,8 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			}
 			continue;
 		}
+
+
 		bCROSS = false;
 		pS++;
 		switch( pS[-1] ) {
@@ -146,6 +181,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 			case ';': //{	// SOROK
 			case ',': {	// vessző OSZLOPOK
+					if( str.n_load )
+					{
+						pI = resISA_str( str );
+						//pUD8 = NULL;
+					}
 					if( pI )
 						resISA_stp( pS[-1], xyWH.a4x2[0] );
 					else if( pUD8 )
@@ -154,17 +194,18 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						{
 							case gpeISA_d8:
 								typ.u4 = gpeTYP_D;
-								aALU[0].equ( this, pUD8->trg, typ, op, 0, pUD8->an.d8 );
+								alu.equ( this, xyWH.a4x2[0], typ, op, 0, pUD8->an.d8 );
 								break;
 							case gpeISA_u8:
 								typ.u4 = gpeTYP_U8;
-								aALU[0].equ( this, pUD8->trg, typ, op, pUD8->an.u8, 0.0 );
+								alu.equ( this, xyWH.a4x2[0], typ, op, pUD8->an.u8, 0.0 );
 								break;
 
 						}
 						pUD8 = NULL;
 					}
-					aALU[0].ins( this, str );
+
+					//aALU[0].ins( this, str );
 
 					pI = pUD8 = NULL;
 					//d8 =
@@ -196,7 +237,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						}
 					}	// NINCS brake DIREKT!!!!
 			case '=':{
-
 
 					if( *pS == pS[-1] ) { // equal?
 						// ez logikai op nem assign
@@ -388,11 +428,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 		{
 			case gpeISA_d8:
 				typ.u4 = gpeTYP_D;
-				aALU[0].equ( this, pUD8->trg, typ, op, 0, pUD8->an.d8 );
+				alu.equ( this, pUD8->trg, typ, op, 0, pUD8->an.d8 );
 				break;
 			case gpeISA_u8:
 				typ.u4 = gpeTYP_U8;
-				aALU[0].equ( this, pUD8->trg, typ, op, pUD8->an.u8, 0.0 );
+				alu.equ( this, pUD8->trg, typ, op, pUD8->an.u8, 0.0 );
 				break;
 
 		}

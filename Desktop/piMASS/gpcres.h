@@ -34,22 +34,46 @@ enum gpeTYP:U4
 class gpcISA
 {
 public:
-	I1x4	isa;			// 0	4	// x:gpeISA y:step
-	U2		i, n, ix, iy;	// 4	8	//
-	gpcRES	*pRES;			// 12	4?	// zárójeles cuccok
+	I1x4	isa;			// 0	4		// x:gpeISA y:step
+	U2		i, n, ix, iy;	// 4	2x4 8	//
+	gpcRES	*pRES;			// 12	4?		// zárójeles cuccok
 
-	U4x2	an,				// 16	8	// vagy AlfNum vagy VarIx
-			trg;			// 24	8	// egy target koordináta
+	U4x2	an,				// 16	8		// vagy AlfNum vagy VarIx
+			trg;			// 24	8		// egy target koordináta
 							// 32
 	gpcISA(){};
 	gpcISA* null()
 	{
 		if( this )
 		{
+			if( *isa.aISA == gpeISA_str )
+				gpmDELary(an.aSTR[0]);
 			gpmDEL( pRES );
 			gpmCLR;
 		}
 
+		return this;
+	}
+
+	gpcISA* str( gpcLAZY& str )
+	{
+		if( !this )
+			return NULL;
+		isa.null();
+
+		an.y = min( str.n_load, gpmSTRLEN( str.p_alloc ) );
+		if( an.y )
+		{
+			an.aSTR[0] = new U1[an.y+1];
+			gpmMEMCPY( an.aSTR[0], str.p_alloc, an.y );
+			an.aSTR[0][an.y] = 0;
+		} else {
+			an = 0;
+		}
+
+		isa.aISA[0] = gpeISA_str;
+
+		str.lzy_reset();
 		return this;
 	}
 
@@ -63,7 +87,7 @@ public:
 		isa.aISA[0] = gpeISA_an;
 		return this;
 	}
-	gpcISA* var( gpeALF v )
+	gpcISA* var( gpeALF v, gpeISA is = gpeISA_var )
 	{
 		if( !this )
 			return NULL;
@@ -71,9 +95,10 @@ public:
 
 		an.var = v;
 		ix = 0;
-		isa.aISA[0] = gpeISA_var;
+		isa.aISA[0] = is;
 		return this;
 	}
+
 	U1 stp( I1x4 op )
 	{
 		if( !op.u4 )
@@ -269,7 +294,10 @@ public:
             pISA = new gpcISA[nISA.y];
             if( nISA.x )
 				gpmMEMCPY( pISA, pK, nISA.x );
+			gpmZn( pK, nISA.x ); // muszáj nehogy felszabaditsa az an.aSTR[0]-okat
 			gpmZn( pISA+nISA.x, nISA.y-nISA.x );
+
+			gpmDELary(pK);
 		}
 		return pISA ? pISA+nISA.x : NULL;
 	}
@@ -315,6 +343,15 @@ public:
 	gpcISA*	resISA_var( gpeALF a )
 	{
 		return resISA()->var( a );
+	}
+	gpcISA*	resISA_tag( gpeALF a )
+	{
+		return resISA()->var( a, gpeISA_tag );
+	}
+
+	gpcISA*	resISA_str( gpcLAZY& str )
+	{
+		return resISA()->str( str );
 	}
 
 	U4 iL()

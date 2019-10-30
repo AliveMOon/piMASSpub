@@ -541,8 +541,11 @@ enum gpeISA : I1
 	gpeISA_FUN,
 	gpeISA_dim,
 	gpeISA_not 		= '!',
-	gpeISA_rem 		= '%',
-	gpeISA_and 		= '&',
+	gpeISA_str,		// 		= '\"'
+	gpeISA_tag, 	// 		= '#',
+	gpeISA_dollar,	//		= '$'
+	gpeISA_rem,		// 		= '%',
+	gpeISA_and,		// 		= '&',
 	gpeISA_brkB 	= '(',
 	gpeISA_brkE 	= ')',
 	gpeISA_mul 		= '*',
@@ -1161,6 +1164,10 @@ public:
 		struct
 		{
 			U8 u8;
+		};
+		struct
+		{
+			U1* aSTR[2];
 		};
 		struct
 		{
