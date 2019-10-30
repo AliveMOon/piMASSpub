@@ -244,7 +244,9 @@ class gpcRES
 	U4		*pTx,
 
 			*pnALL,
-			nA, t, i, ig, iLEV;
+			nA, t,
+			i, ig,
+			iLEV, nASG;
 
 	void	**ppDAT;
 	gpcRES	**ppR;

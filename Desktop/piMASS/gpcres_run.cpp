@@ -8,7 +8,7 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 	if( this ? !pISA : true )
 		return this;
 
-	if( pSRC )
+	if( nASG && pSRC )
 	if( pLZY ? false : !deep )
 	{
 		if( pSRC->pMINI )

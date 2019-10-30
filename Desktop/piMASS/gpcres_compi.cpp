@@ -46,13 +46,14 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 	//U4x2 aAN[8];
 
-	I8x2 aAN[8];
+	I8x2 an; //aAN[8];
 
 	gpmZ(aALU);
 	gpcLAZY str;
 	U4  nAN = 0, nALU = 0, iI;
 	gpcISA* pI = NULL, *pUD8 = NULL;
-
+	bool bCROSS;
+	nASG = 0;
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 		if( gpmbABC( *pS, gpaALFadd ) ) { /// ALF NUM -------------------------------------------------
@@ -67,19 +68,35 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				pI = pUD8 = NULL;
 			}
 			op.null();
-			aAN[nAN].num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
+
+			an = pS;
+			pS += an.num;
+			/*aAN[nAN].num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
 			aAN[nAN].A( pS, NULL ); // aAN[nAN].num-bol veszi a string hiszat
 
 			//apA[0] = pS;
 			pS += aAN[nAN].num; //nSTR;
 			//u8 = 0;
-			//d8 = 0.0;
+			//d8 = 0.0;*/
+			if( bCROSS )
+			{
+				bCROSS = false;
+
+				pUD8 = resISA();
+				pI = NULL;
+
+				*pUD8->isa.aISA = gpeISA_u8;
+				//pUD8->trg = xyWH.a4x2[0];
+				pUD8->an.u8 = an.num;
+
+				continue;
+			}
 			if( gpmbNUM( *pS ) ) {	/// NUM -------------------------------------------------
-				aAN[nAN].num = gpfSTR2U8( pS, &pS );
-				pI = resISA_an( aAN[nAN] );
+				an.num = gpfSTR2U8( pS, &pS );
+				pI = resISA_an( an );
 
 			} else {					/// VAR -------------------------------------------------
-				pI = resISA_var( aAN[nAN].alf );
+				pI = resISA_var( an.alf );
 
 			}
 		}
@@ -117,9 +134,12 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			}
 			continue;
 		}
-
+		bCROSS = false;
 		pS++;
 		switch( pS[-1] ) {
+			case '#':
+				bCROSS = true;
+				continue;
 			case '.': {
 					pI = resISA_stp( pS[-1], xyWH.a4x2[0] );
 				} break;
@@ -185,7 +205,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						break;
 					}
 
-
+					nASG++;
 					xyWH.null();
 					resISA_stp( pS[-1], xyWH.a4x2[0] );
 					pI = pUD8 = NULL;

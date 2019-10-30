@@ -1,4 +1,5 @@
 #include "gpcSRC.h"
+extern U1 gpaALFadd[];
 U4x2& U4x2::operator = ( const I8x2& an )
 {
 	if( an.alf )
@@ -13,6 +14,15 @@ U4x2& U4x2::operator = ( const I8x2& an )
 U4x2::U4x2( const I8x2& an )
 {
 	*this = an.alf;
+}
+I8x2& I8x2::operator = ( const U1* pS )
+{
+	if( pS ? !*pS : true )
+		return null();
+	U8 nUTF8;
+	num = gpfABCnincs( pS, pS+14, nUTF8, gpaALFadd );
+	alf = gpfSTR2ALF( pS, pS+num, NULL );
+	return *this;
 }
 U4x2& U4x2::mx( I4x2 b )
 {

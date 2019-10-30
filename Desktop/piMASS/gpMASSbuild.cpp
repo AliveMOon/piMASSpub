@@ -84,19 +84,19 @@ U8 gpfALF2STR( U1* p_out, I8 d0 )
 	memcpy( p_out, p_buff, n+1 );
 	return n;
 }
-gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
+gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
 {
 	if( p_end < pS )
 	{
 		if( ppS )
-			*ppS = p_end;
+			*ppS = (U1*)p_end;
 		return gpeALF_null;
 	}
 
 	if( pS ? !*pS : true )
 	{
 		if( ppS )
-			*ppS = pS;
+			*ppS = (U1*)pS;
 
 		return gpeALF_null;
 	}
@@ -132,7 +132,7 @@ gpeALF gpfSTR2ALF( U1* pS, U1* p_end, U1** ppS )
 	}
 
 	if (ppS)
-		*ppS = pS;
+		*ppS = (U1*)pS;
 
 	return (gpeALF)alf;
 }

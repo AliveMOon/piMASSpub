@@ -1062,7 +1062,7 @@ typedef enum gpeALF: I8
 
 U1*		gpf_aALF_init(void);
 U8 		gpfALF2STR( U1* p_out, I8 d0 );
-gpeALF	gpfSTR2ALF( U1* p_str, U1* p_end, U1** pp_str = NULL );
+gpeALF	gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL );
 
 
 

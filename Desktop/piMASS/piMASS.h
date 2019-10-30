@@ -223,19 +223,19 @@ class gpcMASS;
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 
-U8 inline gpfABCnincs( U1* p_str, U1* pE, U8& nUTF8, U1* gpaALFadd )
+U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFadd )
 {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
 	if( (p_str < pE) ? !*p_str : true )
 		return 0;
 
-	U1* pS = p_str;
+	U1* pS = (U1*)p_str;
 	while( pS < pE )
 	{
 		if( (*pS)&0x80 )
 		{
-			if( (*pS)&0x40 )
+			if( (*pS)&0x40 )	// UTF8-nál az első kódnál van 0x110yYYYY a többi már 0x10xxXXXX
 				nUTF8++;
 			pS++;
 			continue;
@@ -2155,6 +2155,7 @@ public:
     {
 		gpmMEMCPY( this, pB, 1 );
     }
+    I8x2& operator = ( const U1* ppS );
 	// cnt = fract * U42(1, w);
 	I8x2& cnt2fract( U4 w, U8 cnt )
 	{
