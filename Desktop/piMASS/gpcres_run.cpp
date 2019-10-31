@@ -40,12 +40,15 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 		if( b_asg )
 			pLZY->lzy_format( s = -1, "\r\n%s", gppTABrun-deep );
 
-		pLZY->lzy_format( s = -1, "[%d:%d]", pISA[i].trg.x, pISA[i].trg.y );
+
         switch( pISA[i].isa.aISA[0] )
         {
 			case gpeISA_nop: {
 				} break;
-			case gpeISA_u8: {
+			case gpeISA_trg:{
+					pLZY->lzy_format( s = -1, "[%d:%d]", pISA[i].an.x, pISA[i].an.y );
+				} break;
+ 			case gpeISA_u8: {
 					pLZY->lzy_format( s = -1, "%lld", pISA[i].an.u8 );
 				} break;
 			case gpeISA_d8: {

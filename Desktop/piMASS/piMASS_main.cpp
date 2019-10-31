@@ -568,7 +568,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 U1	gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
 char gpsMAINpub[0x100], gpsTITLEpub[0x100];
-I8 gpnEVENT = 0;
+I8 gpnEVENT = 0, gpnTITLE = 0;
 class U4STR
 {
 public:
@@ -877,24 +877,27 @@ int main( int nA, char *apA[] )
 				*gppKEYbuff = 0;
 
 				//gppKEYbuff +=
-								sprintf(
-											gpsTITLEpub,
-											"-= piMASS::%s"
-											" x:%d y:%d, mDIV: %d"
-											" xycr:%s AN:%s"
-											" IN %s %0.2f %0.2f"
-											" wx:%d wy:%d"
-											" %d F%d =-"
-											" %d, %d",
-											gpsMASSname,
-											mouseXY.x, mouseXY.y, mDIV,
-											SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
-											SRCin.str(gpsMAINpub+0x80),
-											(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
-											mouseW.x, mouseW.y,
-											nMB, nF,
-											bug, nBUG
-										);
+				sprintf(
+							gpsTITLEpub,
+							"-= piMASS%lld::%s"
+							" x:%d y:%d, mDIV: %d"
+							" xycr:%s AN:%s"
+							" IN %s %0.2f %0.2f"
+							" wx:%d wy:%d"
+							" %d F%d =-"
+							" %d, %d",
+
+							gpnEVENT-gpnTITLE,
+							gpsMASSname,
+							mouseXY.x, mouseXY.y, mDIV,
+							SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
+							SRCin.str(gpsMAINpub+0x80),
+							(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
+							mouseW.x, mouseW.y,
+							nMB, nF,
+							bug, nBUG
+						);
+				gpnTITLE = gpnEVENT;
 				mouseXY.z=mouseXY.x;
 				mouseXY.w=mouseXY.y;
 				mouseW.z=mouseW.x;

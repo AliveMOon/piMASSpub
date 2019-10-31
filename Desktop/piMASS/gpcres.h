@@ -38,8 +38,8 @@ public:
 	U2		i, n, ix, iy;	// 4	2x4 8	//
 	gpcRES	*pRES;			// 12	4?		// zárójeles cuccok
 
-	U4x2	an,				// 16	8		// vagy AlfNum vagy VarIx
-			trg;			// 24	8		// egy target koordináta
+	U4x2	an;				// 16	8		// vagy AlfNum vagy VarIx
+			//trg;			// 24	8		// egy target koordináta
 							// 32
 	gpcISA(){};
 	gpcISA* null()
@@ -96,6 +96,18 @@ public:
 		an.var = v;
 		ix = 0;
 		isa.aISA[0] = is;
+		return this;
+	}
+
+	gpcISA* trg( const U4x2& t )
+	{
+		if( !this )
+			return NULL;
+		isa.null();
+
+		an = t;
+		ix = 0;
+		isa.aISA[0] = gpeISA_trg;
 		return this;
 	}
 
@@ -301,7 +313,17 @@ public:
 		}
 		return pISA ? pISA+nISA.x : NULL;
 	}
-	gpcISA*	resISA_stp( U1 stp, const U4x2& t )
+	gpcISA*	resISA_trg( gpcISA* pT, const U4x2& t )
+	{
+		if( pT ? pT->an == t : false )
+			return pT;
+
+		pT = resISA()->trg( t );
+		nISA.x++;
+		resISA()->null();
+		return pT;
+	}
+	gpcISA*	resISA_stp( U1 stp )
 	{
 		if( this ? !pISA : true )
 			return NULL;
@@ -309,7 +331,6 @@ public:
 		if( pIS ? !pIS->isa.x : true )
 			return NULL;
 
-		pIS->trg = t;
 		pIS->isa.y = stp;
 		if( !nISA.x )
 		{

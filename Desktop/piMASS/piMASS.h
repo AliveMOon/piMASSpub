@@ -561,6 +561,7 @@ enum gpeISA : I1
 	gpeISA_brkDB 	= '[',
 	gpeISA_brkDE 	= ']',
 	gpeISA_equ		= 'e',
+	gpeISA_trg		= 'x',
 	gpeISA_blkB 	= '{',
 	gpeISA_or 		= '|',
 	gpeISA_blkE		= '}',
@@ -1285,7 +1286,16 @@ public:
 		return U4x2( x-b.x, y-b.y );
 	}
 
-
+	bool operator != ( const U4x2& b ) const
+	{
+		if( x != b.x )
+			return true;
+		return y != b.y;
+	}
+	bool operator == ( const U4x2& b ) const
+	{
+		return !(*this!=b);
+	}
 
 	U8 operator * (const U4x2& b) const
 	{
@@ -1460,6 +1470,16 @@ public:
 		return pBUFF;
     }
 
+    bool operator != ( const U4x4& b ) const
+	{
+		if( a4x2[0] != b.a4x2[0] )
+			return true;
+		return a4x2[1] != b.a4x2[1];
+	}
+	bool operator == ( const U4x4& b ) const
+	{
+		return !(*this!=b);
+	}
 
     U4x4 zwxy( void )  const
     {
