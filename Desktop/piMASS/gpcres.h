@@ -313,15 +313,18 @@ public:
 		}
 		return pISA ? pISA+nISA.x : NULL;
 	}
-	gpcISA*	resISA_trg( gpcISA* pT, const U4x2& t )
+	U4 resISA_trg( U4 iT, const U4x2& t )
 	{
-		if( pT ? pT->an == t : false )
-			return pT;
+		if( pISA )
+		if( pISA[iT].isa.aISA[0] == gpeISA_trg )
+		if( pISA[iT].an == t )
+			return iT;
 
-		pT = resISA()->trg( t );
+		iT = nISA.x;
+		resISA()->trg( t );
 		nISA.x++;
 		resISA()->null();
-		return pT;
+		return iT;
 	}
 	gpcISA*	resISA_stp( U1 stp )
 	{

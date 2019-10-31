@@ -262,8 +262,7 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 		d = xyS*T2;
 		memcpy( pD+d, pS+s, T1.y );
 	} else {
-		for( xyS.x = 0; xyS.x < sx; xyS.x++ )
-		{
+		for( xyS.x = 0; xyS.x < sx; xyS.x++ ) {
 			s = xyS*T1;
 			d = xyS*T2;
  /// SIGNED DST I8 I4 I2 I1 -------------------------------------------------------------
@@ -684,9 +683,17 @@ gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 			adr = pM; // ezzel indítjuk a keresést
 			nCNT++;
 		}
-		*this = pM->ADD( adr.an.alf, ty4.u4, 0 );
+			//*this = pM->ADD( adr.an.alf, ty4.u4, 0 );
 	} else
 		adr = pM;
+
+	if( !adr.pRM )
+	{
+		*this = pM->ADD( adr.an.alf, ty4.u4, 0 );
+		adr = pM;
+		if( !adr.pRM )
+			return null();
+	}
 
 	bool	bS1 = typ.x&0x80,
 			bF1 = typ.x&0x40;

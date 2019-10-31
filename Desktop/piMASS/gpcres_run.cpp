@@ -40,13 +40,12 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 		if( b_asg )
 			pLZY->lzy_format( s = -1, "\r\n%s", gppTABrun-deep );
 
-
         switch( pISA[i].isa.aISA[0] )
         {
 			case gpeISA_nop: {
 				} break;
 			case gpeISA_trg:{
-					pLZY->lzy_format( s = -1, "[%d:%d]", pISA[i].an.x, pISA[i].an.y );
+					pLZY->lzy_format( s = -1, "\r\n%s[%d:%d]", gppTABrun-deep, pISA[i].an.x, pISA[i].an.y );
 				} break;
  			case gpeISA_u8: {
 					pLZY->lzy_format( s = -1, "%lld", pISA[i].an.u8 );
@@ -60,19 +59,21 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 				} break;
 			case gpeISA_anFUN: {
 					gpfALF2STR( sBUFF, pISA[i].an.a4 );
-					pLZY->lzy_format( s = -1, "%s%d", sBUFF, pISA[i].an.n4 );
+					pLZY->lzy_format( s = -1, "%s%d(", sBUFF, pISA[i].an.n4 );
 				} break;
-			case gpeISA_var: {
-					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "%s%s", b_asg ? "." : "", sBUFF );
-				} break;
+
 			case gpeISA_tag: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
 					pLZY->lzy_format( s = -1, "#%s", sBUFF );
 				} break;
+
+			case gpeISA_var: {
+					gpfALF2STR( sBUFF, pISA[i].an.var );
+					pLZY->lzy_format( s = -1, "%s%s", b_asg ? "." : "", sBUFF );
+				} break;
 			case gpeISA_FUN: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "%s", sBUFF );
+					pLZY->lzy_format( s = -1, "%s(", sBUFF );
 					pISA[i].pRES->run( pLZY, pMASS, pSRC, this, deep+1 );
 				} break;
 			case gpeISA_str: {
