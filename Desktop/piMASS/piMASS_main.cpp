@@ -538,10 +538,10 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
         {
 			if( !apSP[momLV]->pMAP )
 				apSP[momLV]->pMAP = new gpcMAP;
-			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mpZN, false );
+			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mpZN ); //, false );
         }
         else
-			pMAP = mapCR.MAPalloc( spREF.spcZN, mpZN, false );
+			pMAP = mapCR.MAPalloc( spREF.spcZN, mpZN ); //, false );
 
 		spREF.bMAIN( *this, true );
 
@@ -707,6 +707,7 @@ int main( int nA, char *apA[] )
 			if( (gppKEYbuff != gpsKEYbuff) || nMAG )
 			{
 				*gppKEYbuff = 0;
+				U1 iRDY = 0x10;
 				if( piMASS )
 				{
 
@@ -717,10 +718,11 @@ int main( int nA, char *apA[] )
 					{
 						// nincsen begépelve semmi
 						// mondjuk ZOOM, stb..?
+						iRDY = crs.id;
 						crs.miniRDY(  win, iDIV, *piMASS, gppKEYbuff, pS );
 						pS = gppKEYbuff;
 					} else {
-
+						iRDY = crs.id;
 						while( pE < gppKEYbuff )
 						{
 							switch( *pE )
@@ -808,14 +810,20 @@ int main( int nA, char *apA[] )
 				}
 				for( U1 i = 0; i < 4; i++ )
 				{
-					if( iDIV != i )
+					if(
+							iRDY
+							//iDIV
+							!= i
+						)
 					{
 						if( !apCRS[i] )
 							continue;
 
-						apCRS[i]->miniRDY( win, iDIV, *piMASS, gppKEYbuff, gppKEYbuff );
+
+						apCRS[i]->miniRDY( win, iDIV,
+											*piMASS, gppKEYbuff, gppKEYbuff );
 					}
-					apCRS[i]->miniDRW( win, i ); //DIV );
+					apCRS[i]->miniDRW( win, i ); // X DIV );
 				}
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
@@ -845,7 +853,7 @@ int main( int nA, char *apA[] )
 				{
 					SRCxycr = apCRS[mDIV]->scnZNCR( win, mDIV, *piMASS, mouseXY.a4x2[0] );
 
-					char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[mDIV]->scnZN.x );
+					char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[mDIV]->scnZN.x+1 );
 					pE += sprintf( pE, "%d", apCRS[mDIV]->scnZN.y );
 					SRCin = apCRS[mDIV]->scnIN;
 

@@ -493,7 +493,7 @@ public:
 	{
 		gpmDELary(pMAP);
 	}
-	U4* MAPalloc( U4x4& spcZN, U4x4& outZN, bool bRST )
+	U4* MAPalloc( U4x4& spcZN, U4x4& outZN, U4 iRST = 4 ) //bool bRST )
 	{
 		// mCR -
 		if(!this)
@@ -510,12 +510,16 @@ public:
 		outZN = mapZN44;
 		if(	(mapZN44.z > mapZN44.x) && (mapZN44.w > mapZN44.y) )
 		{
-			if( bRST )
+			if( iRST < 0x4 )
 			{
 				*pCOL = gpdSRC_COLw;
 				*pROW = 1;
-				gpfMEMSET( (pCOL+1), mapZN44.z-1, pCOL, sizeof(*pCOL) );
-				gpfMEMSET( (pROW+1), mapZN44.w-1, pROW, sizeof(*pROW) );
+				U4 i = mapZN44.a4x2[1].sum()*iRST + 1;
+
+				gpfMEMSET( (pCOL+i), mapZN44.z-1, pCOL, sizeof(*pCOL) );
+				gpfMEMSET( (pROW+i), mapZN44.w-1, pROW, sizeof(*pROW) );
+
+				//gpfMEMSET( pCOL+mapZN44.a4x2[1].sum(), 3, pCOL, mapZN44.a4x2[1].sum() );
 			}
 			return pMAP;
 		}
@@ -528,7 +532,7 @@ public:
 		mapZN44.w = max( mapZN44.w, gpmPAD( mapZN44.y, 0x10 ) );
 
 		U4 	nARE = mapZN44.a4x2[1].area(),
-			nALL = nARE + mapZN44.a4x2[1].sum();
+			nALL = nARE + mapZN44.a4x2[1].sum()*4;
 
 		pMAP = new U4[nALL];
 		pROW = (
@@ -544,12 +548,16 @@ public:
 		gpfMEMSET( (pCOL+1), mapZN44.z-1, pCOL, sizeof(*pCOL) );
 		gpfMEMSET( (pROW+1), mapZN44.w-1, pROW, sizeof(*pROW) );
 
+		gpfMEMSET( pCOL+mapZN44.a4x2[1].sum(), 3, pCOL, mapZN44.a4x2[1].sum() );
+
 		if( pK )
 		{
-			if( !bRST )
+			if( iRST > 3 )
+			for( U4 i = 0, d = mapZN44.a4x2[1].sum(),s = outZN.a4x2[1].sum(); i < 4; i++ )
 			{
-				gpmMEMCPY( pCOL, pKC, outZN.z );
-				gpmMEMCPY( pROW, pKR, outZN.w );
+				gpmMEMCPY( (pCOL + i*d), (pKC + i*s), outZN.z );
+				gpmMEMCPY( (pROW + i*d), (pKR + i*s), outZN.w );
+
 			}
 
 			for( U4* pS = pK, *pD = pMAP; pS < pKC; pS += outZN.z, pD += mapZN44.z  )

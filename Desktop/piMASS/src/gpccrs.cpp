@@ -6,10 +6,10 @@ I4x4 gpcCRS::scnZNCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 {
 	// XY - pixel
 	// CR - Coll/Row
-	SDL_Rect div = win.wDIV( iDIV );
+	SDL_Rect div = win.wDIV( iDIV ); //iDIV );
 	if( div.w < 1 )
 	{
-		div = win.wDIV( iDIV );
+		div = win.wDIV( iDIV );  //iDIV );
 		return 0;
 	}
 	I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
@@ -22,8 +22,10 @@ I4x4 gpcCRS::scnZNCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 	if( gpcMAP* pMAP = &mass.mapCR )
 	{
 		U4	*pC = pMAP->pCOL,
-			*pR = pMAP->pROW;
-
+			*pR = pMAP->pROW,
+			nD = pMAP->mapZN44.a4x2[1].sum()*iDIV;
+		pC += nD;
+		pR += nD;
 		scnZN.null();
 		scnIN.null();
 		for( scnZN.x = 0; scnZN.x < pMAP->mapZN44.z; scnZN.x++ )
@@ -609,9 +611,12 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		U4x4	spcZN = lurdAN.a4x2[1] - U4x2(1,0),
 				mCR;
 
-		U4	*pM = pMAP->MAPalloc( spcZN, mCR, true ),//pMAP->pMAP,
+		U4	*pM = pMAP->MAPalloc( spcZN, mCR, id ),//pMAP->pMAP,
 			*pC = pMAP->pCOL,
 			*pR = pMAP->pROW, i, ie = pC-pM, c, r;
+		i = pMAP->mapZN44.a4x2[1].sum()*(U4)id;
+		pC += i;
+		pR += i;
 
 		gpcSRC	tmp,
 				*pEDIT = NULL,
@@ -623,7 +628,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		//gpfMEMSET( (pR+1), mapZN44.w-1, pR, sizeof(*pR) );
 		//gpmZn( pC, pMAP->mapZN44.a4x2[1].sum() );
 
-		for( i = 0, ie = pC-pM; i < ie; i++ )
+		for( i = 0; i < ie; i++ )
 		{
 			if( !pM[i] )
 				continue;
