@@ -28,7 +28,7 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 		{
 			ALU( a );
 			pB = sBUFF + gpfALF2STR( sBUFF, alu.alf ) + 1;
-			pLZY->lzy_format( s = -1, "\r\n%s%s %s[%d][%d] nBYTE%d", gppTABrun-deep, alu.typ.typ2str(pB), sBUFF, alu.AN.x, alu.AN.y, alu.nLOAD() );
+			pLZY->lzy_format( s = -1, "\r\n%s%s.%s[%dx%d]sof(%d) ", gppTABrun-deep, alu.typ.typ2str(pB), sBUFF, alu.AN.x, alu.AN.y, alu.nLOAD() );
 		}
 	}
 	bool b_asg = false;
@@ -39,6 +39,8 @@ gpcRES* gpcRES::run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, 
 		b_asg = pISA[i].isa.aISA[1] == '=';
 		if( b_asg )
 			pLZY->lzy_format( s = -1, "\r\n%s", gppTABrun-deep );
+
+		pLZY->lzy_format( s = -1, "[%d:%d]", pISA[i].trg.x, pISA[i].trg.y );
         switch( pISA[i].isa.aISA[0] )
         {
 			case gpeISA_nop: {

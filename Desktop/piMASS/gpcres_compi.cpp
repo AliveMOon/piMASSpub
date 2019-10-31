@@ -52,32 +52,27 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	//gpmZ(aALU);
 	gpcLAZY str;
 	U4  nAN = 0, nALU = 0, iI;
-	gpcISA	*pI = NULL,
-			*pUD8 = NULL;
+	gpcISA	*pI = NULL, *pUD8 = NULL,
+			*pTRG = NULL;
 	nASG = 0;
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 		if( op.u4 )
 		{
 			if( str.n_load )
-			{
 				pI = resISA_str( str );
-				//pUD8 = NULL;
-			}
-			if( pI || pUD8 )
-			{
-				if( pI ? op.u4 : false )
-					pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
-				else if( pI ) // ne volt már operátor
-					pI = resISA_stp( 0, xyWH.a4x2[0] );
-				else if( pUD8 ? op.u4 : false )
-					resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
-			}
+
+			if( pI )
+				pI = resISA_stp( pI->stp(op), xyWH.a4x2[0] );
+			else if( pUD8 )
+				resISA_stp( pUD8->stp(op), xyWH.a4x2[0] );
+
 			pI = pUD8 = NULL;
 			op.null();
 		}
 
 		if( gpmbABC( *pS, gpaALFadd ) ) { /// ALF NUM -------------------------------------------------
+
 			if( pI || pUD8 )
 			{
 				if( pI ? op.u4 : false )
@@ -90,6 +85,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			}
 
 			/// a stingől itt lesz ALF --------------
+			an.num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
 			an = pS;
 			pS += an.num;	// majd átlépjük
 
@@ -182,10 +178,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			case ';': //{	// SOROK
 			case ',': {	// vessző OSZLOPOK
 					if( str.n_load )
-					{
 						pI = resISA_str( str );
-						//pUD8 = NULL;
-					}
 					if( pI )
 						resISA_stp( pS[-1], xyWH.a4x2[0] );
 					else if( pUD8 )
@@ -202,14 +195,10 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 								break;
 
 						}
-						pUD8 = NULL;
 					}
-
-					//aALU[0].ins( this, str );
-
 					pI = pUD8 = NULL;
-					//d8 =
 					op.u4 = 0;
+
 					if( pS[-1] == ',' )
 						xyWH.x++;
 					else {
@@ -383,11 +372,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 				} break;
 
-
-
-
 			case '\"': {
-
 					pSTR = pS;
 					pS += gpmVAN( pS, "\"", nUTF8 );
 					U8 s = -1;

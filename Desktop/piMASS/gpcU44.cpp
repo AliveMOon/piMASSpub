@@ -23,7 +23,11 @@ U1* U1x4::typ2str( U1* pBUFF )
 {
 	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 	// yz dimxy
-	sprintf( (char*)pBUFF, "%s%dx%dx%d", gppsTYP[x>>0x4], 1<<(x&0xf), y, z );
+	if(  y*z > 1 )
+		sprintf( (char*)pBUFF, "%s%dx%dx%d", gppsTYP[x>>0x4], 1<<(x&0xf), y, z );
+	else
+		sprintf( (char*)pBUFF, "%s%d", gppsTYP[x>>0x4], 1<<(x&0xf) );
+
 	return pBUFF;
 }
 U4x2& U4x2::operator = ( const I8x2& an )
@@ -43,11 +47,13 @@ U4x2::U4x2( const I8x2& an )
 }
 I8x2& I8x2::operator = ( const U1* pS )
 {
-	if( pS ? !*pS : true )
+	if( num ? ( pS ? !*pS : true ) : true )
 		return null();
-	U8 nUTF8;
-	num = gpfABCnincs( pS, pS+14, nUTF8, gpaALFadd );
-	alf = gpfSTR2ALF( pS, pS+num, NULL );
+	if( num > 14 )
+		num = 14;
+	U1* pE = (U1*)pS + num;
+	alf = gpfSTR2ALF( pS, pE, &pE );
+	num = pE-pS;
 	return *this;
 }
 U4x2& U4x2::mx( I4x2 b )
