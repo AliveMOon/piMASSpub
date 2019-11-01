@@ -512,12 +512,15 @@ public:
 		{
 			if( iRST < 0x4 )
 			{
-				*pCOL = gpdSRC_COLw;
-				*pROW = 1;
-				U4 i = mapZN44.a4x2[1].sum()*iRST + 1;
+				U4 i = mapZN44.a4x2[1].sum()*iRST,
+					*pC = pCOL+i,
+					*pR = pROW+i;
 
-				gpfMEMSET( (pCOL+i), mapZN44.z-1, pCOL, sizeof(*pCOL) );
-				gpfMEMSET( (pROW+i), mapZN44.w-1, pROW, sizeof(*pROW) );
+				*pC = gpdSRC_COLw;
+				*pR = 1;
+
+				gpfMEMSET( (pC+1), mapZN44.z-1, pC, sizeof(*pC) );
+				gpfMEMSET( (pR+1), mapZN44.w-1, pR, sizeof(*pR) );
 
 				//gpfMEMSET( pCOL+mapZN44.a4x2[1].sum(), 3, pCOL, mapZN44.a4x2[1].sum() );
 			}
