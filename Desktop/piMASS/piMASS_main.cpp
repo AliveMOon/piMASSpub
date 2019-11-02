@@ -1203,17 +1203,23 @@ int main( int nA, char *apA[] )
 														aXY[1]-'0';
 								if( nF < 2 )
 								{
-									win.bSW = 1;
 									onDIV.x = 0;
+
+									if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+										win.bSW = 1;
+
  								}
 								else if( nF < 5 )
 								{
 									onDIV.x = nF-1;
 
 									U1 msk = (0x1<<onDIV.x);
+
 									if( win.bSW&msk )
-										win.bSW = (win.bSW&(~msk));
-									else {
+									{
+										if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+											win.bSW = (win.bSW&(~msk));
+									} else {
 										win.bSW |= msk;
 									}
 								} else {
