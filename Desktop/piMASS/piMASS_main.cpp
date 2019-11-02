@@ -96,84 +96,7 @@ U1 gp_s_key_map_sdl[] =
 "xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
 "FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
 ;
-/*
-U1 gp_s_key_map[] =
-// simple
-"00123456789-=000"
-"qwertzuiopőú11as"
-"dfghjkléá022yxcv"
-"bnm,.-3*3 3fffff"
-"fffff44789-456+1"
-"230.555ff5555555"
-"6666fff666666666"
-"7777777777777777"
-"8888888888888888"
-"9999999999999999"
-"aaaaaaaaaaaaaaaa"
-"bbbbbbbbbbbbbbbb"
-"cccccccccccccccc"
-"dddddddddddddddd"
-"eeeeeeeeeeeeeeee"
-"ffffffffffffffff"
-// shift
-"00\'\"+!%/=()0-=00"
-"QWERTZUIOP1111AS"
-"DFGHJKL22222YXCV"
-"BNM?:_3*3 3fffff"
-"fffff44789-456+1"
-"230.555ff5555555"
-"6666fff666666666"
-"7777777777777777"
-"8888888888888888"
-"9999999999999999"
-"aaaaaaaaaaaaaaaa"
-"bbbbbbbbbbbbbbbb"
-"cccccccccccccccc"
-"dddddddddddddddd"
-"eeeeeeeeeeeeeeee"
-"ffffffffffffffff"
-// alt
-"001234567890-=00"
-"\\|ERTYUIOP[]11AS"
-"D[]HJKL$2'22>#&@"
-"{}M;.*3*3 3fffff"
-"fffff44789-456+1"
-"230.55<ff5555555"
-"6666fff666666666"
-"7777777777777777"
-"8888888888888888"
-"9999999999999999"
-"aaaaaaaaaaaaaaaa"
-"bbbbbbbbbbbbbbbb"
-"cccccccccccccccc"
-"dddddddddddddddd"
-"eeeeeeeeeeeeeeee"
-"ffffffffffffffff";
 
-
-
-
-
-
-class gpcWINo
-{
-	SDL_Rect	txt, chr;
-	U1x4		*pTXT;
-	U4			nTXT, nX,dX;
-	I4			winID;
-	SDL_Surface		*pSRFload,
-					*pSRFchar,
-					*pSRFwin;
-    SDL_Renderer	*pSDLrndr;
-public:
-    SDL_Window		*pSDLwin;
-	U1x4			*pCRS;
-    gpcWINo( U4 flags = 0, char* pPATH = NULL, char*pFILE = NULL );
-    virtual ~gpcWINo();
-    void draw();
-    void TXT_draw();
-    void ins( U1* pC, U1* pM, U1* pB  );
-};*/
 
 
 
@@ -669,7 +592,8 @@ int main( int nA, char *apA[] )
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
         gpcCRS main_crs( win, 0 ), *apCRS[4];
         U4	srcDIV = 0, // nDIV = 1,
-			onDIV = srcDIV; //, selDIV = iDIV;
+			onDIV = srcDIV,
+			dstDIV = 0; //, selDIV = iDIV;
 
         gpmZ(apCRS);
         apCRS[srcDIV] = &main_crs;
@@ -786,7 +710,6 @@ int main( int nA, char *apA[] )
 															win, *piMASS,
 															*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 														);
-
 											break;
 										}
 										//crs.miniRDY( win, iDIV, *piMASS, pE, pS );
@@ -807,7 +730,7 @@ int main( int nA, char *apA[] )
 						}
 
 					}
-					//if( pS < gppKEYbuff )
+
 					crs.miniRDY(win, srcDIV, *piMASS, gppKEYbuff, pS );
 					gppKEYbuff = gppMOUSEbuff;
 					*gppKEYbuff = 0;
@@ -819,7 +742,7 @@ int main( int nA, char *apA[] )
 					if( crs.id != i )
 						apCRS[i]->miniRDY( win, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
 
-					apCRS[i]->miniDRW( win, i ); // X DIV );
+					apCRS[i]->miniDRW( win, srcDIV, onDIV, dstDIV ); // X DIV );
 				}
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
@@ -872,7 +795,11 @@ int main( int nA, char *apA[] )
 						} else {
 							if( srcDIV != onDIV )
 							if(!(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])))
+							if( srcDIV != onDIV )
+							{
+								dstDIV = srcDIV;
 								srcDIV = onDIV;
+							}
 
 							apCRS[srcDIV]->CRSsel(
 													win, *apCRS[onDIV], *piMASS,
@@ -1279,26 +1206,46 @@ int main( int nA, char *apA[] )
 									else {
 										win.bSW |= msk;
 									}
-								}
-								win.bSW |= 1;
-								//if( iDIV != mDIV )
-								{
-									//iDIV = mDIV;
-									if( !apCRS[onDIV] )
-											apCRS[onDIV] = new gpcCRS( win, onDIV );
-									for( U1 i = 0, sw = win.bSW; i < 4; i++, sw >>= 1 )
+								} else {
+									switch( nF )
 									{
-										if( !(sw&1) )
-											continue;
+										case 5:{	/// F5 ----- COPY
+										} break;
+										case 6:{	/// F6 ----- MOVE
+										} break;
+										case 7:{	/// F7 ----- NEW
+										} break;
+										case 8:{	/// F8 ----- DELETE
+										} break;
 
-										if( !apCRS[i] )
-											continue;
-
-										apCRS[i]->stFRMwh( win, apCRS[i]->gtFRMwh().x, 0 );
-
+										case 9:{	/// F9 ----- ?
+										} break;
+										case 10:{	/// F10 ----- ?
+										} break;
+										case 11:{	/// F11 ----- ?
+										} break;
+										case 12:{	/// F12 ----- ?
+										} break;
 
 									}
 								}
+								win.bSW |= 1;
+
+								if( !apCRS[onDIV] )
+										apCRS[onDIV] = new gpcCRS( win, onDIV );
+								for( U1 i = 0, sw = win.bSW; i < 4; i++, sw >>= 1 )
+								{
+									if( !(sw&1) )
+										continue;
+
+									if( !apCRS[i] )
+										continue;
+
+									apCRS[i]->stFRMwh( win, apCRS[i]->gtFRMwh().x, 0 );
+
+
+								}
+
 							} break;
 						default:
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );

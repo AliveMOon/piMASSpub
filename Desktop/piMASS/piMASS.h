@@ -1976,7 +1976,10 @@ public:
         {
 			I4x2 a4x2[2];
 		};
-
+		struct
+        {
+			SDL_Rect xyWH;
+        };
 	};
     I4x4(){};
     I4x4( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )

@@ -88,7 +88,7 @@ class gpcCRS
 
 		bool	miniOFF( void );
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
-		bool	miniDRW( gpcWIN& win, U1 iDIV = 0 );
+		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV  );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH );
@@ -104,6 +104,101 @@ class gpcCRS
 		SDL_Rect 	wDIVfrm;
 		//gpcCRS(const gpcCRS& other);
 		//gpcCRS& operator=(const gpcCRS& other);
+		void frmDRW( SDL_Rect dst, SDL_Rect src, SDL_Surface* pTRG, SDL_Surface* pCHAR, U1 frmC  )
+		{
+			if( this ? !frmC : true )
+				return;
+			SDL_Rect dst2;
+			U4	cx = src.w*8,
+				cy = src.h*32,
+				scx = (frmC%gpeCLR_violet)*cx,
+				scy = (frmC/gpeCLR_violet)*cy,
+				c = 1+0xb0;
+
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x + src.w;	// (i%CRSfrm.z)*dst.w + div.x;
+			dst2.y = dst.y; 			// (i/CRSfrm.z)*dst.h + div.y;
+			dst2.w = dst.w-src.w*2;
+			dst2.h = src.h;
+
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+			c = 3+0xb0;
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x + dst.w-src.w;
+			dst2.y = dst.y;
+			dst2.w = src.w;
+			dst2.h = src.h;
+
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+			c = 2+0xb0;
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x + dst.w-src.w;
+			dst2.y = dst.y + src.h;
+			dst2.w = src.w;
+			dst2.h = dst.h-src.h*2;
+
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+			c = 6+0xb0;
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x + dst.w-src.w;
+			dst2.y = dst.y + dst.h-src.h;
+			dst2.w = src.w;
+			dst2.h = src.h;
+
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+			c = 4+0xb0;
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x + src.w;
+			dst2.y = dst.y + dst.h-src.h;
+			dst2.w = dst.w-src.w*2;
+			dst2.h = src.h;
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+			c = 0xc+0xb0;
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x;
+			dst2.y = dst.y + dst.h-src.h;
+			dst2.w = src.w;
+			dst2.h = src.h;
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+			c = 0x8+0xb0;
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x;
+			dst2.y = dst.y + src.h;
+			dst2.w = src.w;
+			dst2.h = dst.h-src.h*2;
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+			c = 0x9+0xb0;
+			src.x = (c%8)*src.w + scx;
+			src.y = (c/8)*src.h + scy;
+
+			dst2.x = dst.x;
+			dst2.y = dst.y;
+			dst2.w = src.w;
+			dst2.h = src.h;
+			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+		}
 };
 
 #endif // GPCCRS_H
