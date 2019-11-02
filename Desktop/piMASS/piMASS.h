@@ -1184,6 +1184,8 @@ public:
         x = _x; y = _y;
     }
     U4x2( const I8x2& an );
+    U4x2( const I4x2& i42 );
+
     U4x2& operator = ( const I8x2& an );
 	// cnt = fract * U4x2(1, w);
 	U4x2& cnt2fract(U4 w, U8 cnt)
@@ -1960,7 +1962,23 @@ public:
 	{
 		return I4x2( x<0?-x:x, y<0?-y:y );
 	}
+	I4x2& mx( I4x2 b )
+	{
+		if( x < b.x )
+			x = b.x;
+		if( y < b.y )
+			y = b.y;
+		return *this;
+	}
 
+	I4x2& mn( const I4x2& b )
+	{
+		if( x > b.x )
+			x = b.x;
+		if( y > b.y )
+			y = b.y;
+		return *this;
+	}
 };
 
 class I4x4

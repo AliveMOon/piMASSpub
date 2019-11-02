@@ -26,7 +26,7 @@ class gpcWIN
 		SDL_Surface		*pSRFload,
 						*pSRFchar,
 						*pSRFwin;
-
+		gpcMASS			*pMASS;
 		SDL_Rect		chrPIC;
 		U1				bSW;
 

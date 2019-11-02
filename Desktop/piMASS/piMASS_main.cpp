@@ -461,10 +461,10 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
         {
 			if( !apSP[momLV]->pMAP )
 				apSP[momLV]->pMAP = new gpcMAP;
-			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN, mpZN ); //, false );
+			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN.a4x2[0], mpZN ); //, false );
         }
         else
-			pMAP = mapCR.MAPalloc( spREF.spcZN, mpZN ); //, false );
+			pMAP = mapCR.MAPalloc( spREF.spcZN.a4x2[0], mpZN ); //, false );
 
 		spREF.bMAIN( *this, true );
 
@@ -590,6 +590,7 @@ int main( int nA, char *apA[] )
 
 		I4x4 mouseXY(0,0), mouseW(0), winSIZ(800,600,800,600), SRCxycr(0), SRCin(0);
 		gpcWIN win( gpsMASSpath, gppMASSfile, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
+		win.pMASS = piMASS;
         gpcCRS main_crs( win, 0 ), *apCRS[4];
         U4	srcDIV = 0, // nDIV = 1,
 			onDIV = srcDIV,
@@ -742,7 +743,7 @@ int main( int nA, char *apA[] )
 					if( crs.id != i )
 						apCRS[i]->miniRDY( win, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
 
-					apCRS[i]->miniDRW( win, srcDIV, onDIV, dstDIV ); // X DIV );
+					apCRS[i]->miniDRW( win, srcDIV, onDIV, dstDIV, SRCxycr ); // X DIV );
 				}
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}

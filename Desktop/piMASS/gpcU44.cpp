@@ -45,6 +45,12 @@ U4x2::U4x2( const I8x2& an )
 {
 	*this = an.alf;
 }
+U4x2::U4x2( const I4x2& i42 )
+{
+	x = i42.x < 0 ? -i42.x : i42.x;
+	y = i42.y < 0 ? -i42.y : i42.y;
+}
+
 I8x2& I8x2::operator = ( const U1* pS )
 {
 	if( num ? ( pS ? !*pS : true ) : true )

@@ -493,7 +493,7 @@ public:
 	{
 		gpmDELary(pMAP);
 	}
-	U4* MAPalloc( U4x4& spcZN, U4x4& outZN, U4 iRST = 4 ) //bool bRST )
+	U4* MAPalloc( U4x2& spcZN, U4x4& outZN, U4 iRST = 4 ) //bool bRST )
 	{
 		// mCR -
 		if(!this)

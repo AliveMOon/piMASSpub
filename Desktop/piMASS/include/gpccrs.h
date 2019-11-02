@@ -8,15 +8,19 @@ class gpcSRC;
 class gpcCRS
 {
 	public:
-		I4x4	scnZN,	scnIN,
+		I4x4	scnZN0, scnZN,
+				scnIN,
 				selANIN[2];
 		gpcSRC	*apSRC[2];
 
 		U1x4	*pMINI, *pCRS;
 
-		U4 nMINI, anSTR[2];
+		U4 	nMINI, anSTR[2], nCp, nRp;
+		I4	*pCp, *pRp;
+
 		U4x4 aCRS[2];
 		bool bESC, bED;
+
 
 		gpcCRS( gpcWIN& win, U1 _id );
 		virtual ~gpcCRS();
@@ -88,7 +92,8 @@ class gpcCRS
 
 		bool	miniOFF( void );
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
-		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV  );
+		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
+							I4x4 scnXYCR  );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH );
@@ -104,10 +109,14 @@ class gpcCRS
 		SDL_Rect 	wDIVfrm;
 		//gpcCRS(const gpcCRS& other);
 		//gpcCRS& operator=(const gpcCRS& other);
-		void frmDRW( SDL_Rect dst, SDL_Rect src, SDL_Surface* pTRG, SDL_Surface* pCHAR, U1 frmC  )
+		void frmDRW( SDL_Rect dst, SDL_Rect src, I4x2 wh, SDL_Surface* pTRG, SDL_Surface* pCHAR, U1 frmC, U4 x  )
 		{
 			if( this ? !frmC : true )
 				return;
+			dst.w *= x;
+			dst.h *= x;
+			wh /= x;
+
 			SDL_Rect dst2;
 			U4	cx = src.w*8,
 				cy = src.h*32,
@@ -115,87 +124,96 @@ class gpcCRS
 				scy = (frmC/gpeCLR_violet)*cy,
 				c = 1+0xb0;
 
+
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x + src.w;	// (i%CRSfrm.z)*dst.w + div.x;
-			dst2.y = dst.y; 			// (i/CRSfrm.z)*dst.h + div.y;
-			dst2.w = dst.w-src.w*2;
-			dst2.h = src.h;
+			dst2 = dst;
 
+			dst2.x += dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
+			dst2.w *= wh.x-2;
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+
 
 			c = 3+0xb0;
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x + dst.w-src.w;
-			dst2.y = dst.y;
-			dst2.w = src.w;
-			dst2.h = src.h;
+			dst2 = dst;
 
+			dst2.x += (wh.x-1)*dst2.w;
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+
 
 			c = 2+0xb0;
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x + dst.w-src.w;
-			dst2.y = dst.y + src.h;
-			dst2.w = src.w;
-			dst2.h = dst.h-src.h*2;
+			dst2 = dst;
 
+			dst2.x += (wh.x-1)*dst.w;
+			dst2.y += dst.h;
+			dst2.h *= wh.y-2;
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+
 
 			c = 6+0xb0;
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x + dst.w-src.w;
-			dst2.y = dst.y + dst.h-src.h;
-			dst2.w = src.w;
-			dst2.h = src.h;
+			dst2 = dst;
 
+			dst2.x += (wh.x-1)*dst.w;
+			dst2.y += (wh.y-1)*dst.h;
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+
 
 			c = 4+0xb0;
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x + src.w;
-			dst2.y = dst.y + dst.h-src.h;
-			dst2.w = dst.w-src.w*2;
-			dst2.h = src.h;
+			dst2 = dst;
+
+			dst2.x += dst.w;
+			dst2.y += (wh.y-1)*dst.h;
+			dst2.w *= wh.x-2;
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+
 
 			c = 0xc+0xb0;
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x;
-			dst2.y = dst.y + dst.h-src.h;
-			dst2.w = src.w;
-			dst2.h = src.h;
+			dst2 = dst;
+			dst2.y += (wh.y-1)*dst.h;
+
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+
 
 			c = 0x8+0xb0;
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x;
-			dst2.y = dst.y + src.h;
-			dst2.w = src.w;
-			dst2.h = dst.h-src.h*2;
+			dst2 = dst;
+
+			dst2.y += dst.h;
+			dst2.h *= wh.y-2;
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+
+
 
 			c = 0x9+0xb0;
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2.x = dst.x;
-			dst2.y = dst.y;
-			dst2.w = src.w;
-			dst2.h = src.h;
+			dst2 = dst;
+
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
 
 		}
