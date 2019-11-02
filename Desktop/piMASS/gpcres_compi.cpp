@@ -46,7 +46,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	gpcADR adr;
 	//gpcALU	aALU[8];
 
-	U4x2 sub = 0;
+	//U4x2 sub = 0;
 
 	I8x2 an; //aAN[8];
 
@@ -88,11 +88,13 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					{
 						case gpeISA_d8:
 							typ.u4 = gpeTYP_D;
-							alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], 0, pUD8->an.d8 );
+							alu.equ(	this, xyWH.a4x2[0], //-sub,
+										typ, aOP[1], 0, pUD8->an.d8 );
 							break;
 						case gpeISA_u8:
 							typ.u4 = gpeTYP_U8;
-							alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], pUD8->an.u8, 0.0 );
+							alu.equ( 	this, xyWH.a4x2[0], //-sub,
+										 typ, aOP[1], pUD8->an.u8, 0.0 );
 							break;
 					}
 					xyWH.x++;
@@ -126,11 +128,13 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				// ha abcd1234 el lett mozdítva frissíti ezt is
 
 				typ.u4 = gpeTYP_U8;
-				alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], an.x, 0.0 );
+				alu.equ( this, xyWH.a4x2[0], //-sub,
+						 typ, aOP[1], an.x, 0.0 );
 				xyWH.a4x2[0].x++;
 
 				an.num = gpfSTR2U8( pS, &pS );
-				alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], an.num, 0.0 );
+				alu.equ( this, xyWH.a4x2[0], //-sub,
+						 typ, aOP[1], an.num, 0.0 );
 				xyWH.a4x2[0].x++;
 				if( xyWH.z < xyWH.x )
 					xyWH.z = xyWH.x;
@@ -145,9 +149,8 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				an.num = gpfSTR2U8( pS, &pS );
 				pI = resISA_an( an );
 			} else {					/// VAR -------------------------------------------------
-				alu.alf = an.alf;
-				sub.y = xyWH.y;
-				pI = resISA_var( an.alf );
+				( alu = an.alf ) = xyWH.a4x2[0];
+				pI = resISA_var( alu.alf );
 			}
 		}
 		else if( gpmbNUM( *pS ) || *pS == '.' ) { /// NUM -------------------------------------------------
@@ -164,11 +167,13 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					{
 						case gpeISA_d8:
 							typ.u4 = gpeTYP_D;
-							alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], 0, pUD8->an.d8 );
+							alu.equ( this, xyWH.a4x2[0], //-sub,
+									 typ, aOP[1], 0, pUD8->an.d8 );
 							break;
 						case gpeISA_u8:
 							typ.u4 = gpeTYP_U8;
-							alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], pUD8->an.u8, 0.0 );
+							alu.equ( this, xyWH.a4x2[0], //-sub,
+									 typ, aOP[1], pUD8->an.u8, 0.0 );
 							break;
 					}
 					xyWH.x++;
@@ -227,11 +232,13 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						{
 							case gpeISA_d8:
 								typ.u4 = gpeTYP_D;
-								alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[0], 0, pUD8->an.d8 );
+								alu.equ( this, xyWH.a4x2[0], //-sub,
+										 typ, aOP[0], 0, pUD8->an.d8 );
 								break;
 							case gpeISA_u8:
 								typ.u4 = gpeTYP_U8;
-								alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[0], pUD8->an.u8, 0.0 );
+								alu.equ( this, xyWH.a4x2[0], //-sub,
+										 typ, aOP[0], pUD8->an.u8, 0.0 );
 								break;
 
 						}
@@ -459,11 +466,13 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 		{
 			case gpeISA_d8:
 				typ.u4 = gpeTYP_D;
-				alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], 0, pUD8->an.d8 );
+				alu.equ( this, xyWH.a4x2[0], //-sub,
+						 typ, aOP[1], 0, pUD8->an.d8 );
 				break;
 			case gpeISA_u8:
 				typ.u4 = gpeTYP_U8;
-				alu.equ( this, xyWH.a4x2[0]-sub, typ, aOP[1], pUD8->an.u8, 0.0 );
+				alu.equ( this, xyWH.a4x2[0], //-sub,
+						 typ, aOP[1], pUD8->an.u8, 0.0 );
 				break;
 
 		}

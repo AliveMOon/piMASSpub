@@ -43,7 +43,7 @@ class gpcCRS
 
 			return CRSfrm.a4x2[0];
 		}
-		I4x2 gtFRMwh( gpcWIN& win, U1 iDIV )
+		I4x2 gtFRMwh( void ) //gpcWIN& win ) //, U1 iDIV )
 		{
 
 			return CRSfrm.a4x2[1];
@@ -60,12 +60,13 @@ class gpcCRS
 			CRSfrm.y += y;
 			return CRSfrm.a4x2[0];
 		}
-		I4x2 stFRMwh( gpcWIN& win, U1 iDIV, I4 w, I4 h, I4 mag = 0 )
+		I4x2 stFRMwh(	gpcWIN& win, //U1 iDIV,
+						I4 w, I4 h, I4 mag = 0 )
 		{
 			if( w > 3 )
 				CRSfrm.z = w;
 
-			SDL_Rect div = win.wDIV(iDIV);
+			SDL_Rect div = win.wDIV(id);
 			I4 bug = div.w/CRSfrm.z, nBUG = 0;
 			if( mag > 0 )
 				CRSfrm.z = div.w/bug;
@@ -94,7 +95,8 @@ class gpcCRS
 		void CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 		void CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
-		I4x4 scnZNCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy );
+		I4x4 scnZNCR(	gpcWIN& win, //U1 iDIV,
+						gpcMASS& mass, const I4x2& _xy );
 	protected:
 
 	private:

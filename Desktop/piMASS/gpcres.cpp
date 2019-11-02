@@ -55,7 +55,7 @@ gpcRES* gpcRES::null()
 	return this;
 }
 
-I8x2& I8x2::A( U1* pS, U1** ppS )
+/*I8x2& I8x2::A( U1* pS, U1** ppS )
 {
 	alf = gpfSTR2ALF( pS, pS + min( 14, y ), NULL );
 	if( !ppS )
@@ -70,7 +70,7 @@ I8x4& I8x4::AB( U1* pA, U1* pB, U1** ppA, U1** ppB )
 	a8x2[0].A( pA, ppA );
 	a8x2[1].A( pB, ppB );
 	return *this;
-}
+}*/
 
 gpcADR& gpcADR::operator = ( gpcRES* pM )
 {
@@ -975,6 +975,8 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, 
 	else
 		ty4.x = 2 + (u8>0xffffFFFF);
 
+	xy -= sub;
+
 	ins( pM, xy, ty4 );
 	U1* pD = (U1*)pDAT;
 	if( !pD )
@@ -1040,6 +1042,7 @@ gpcALU& gpcALU::equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 x )
 
 	I8 i8 = ( op4.x < 0 ) ? -u8 : u8;
 
+	xy -= sub;
 	ins( pM, xy, ty4 );
 	U1* pD = (U1*)pDAT;
 	if( !pD )
@@ -1089,6 +1092,7 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 x )
 	if( op.y < 0 )
 		d8 = -d8;
 
+	xy -= sub;
 	int2flt( pM, xy, ty4 );
 	U1* pD = (U1*)pDAT;
 	if( !pD )

@@ -1219,6 +1219,18 @@ public:
 		gpmCLR;
 		return *this;
 	}
+	U4x2& operator += ( const U4x2& b )
+	{
+		x += b.x;
+		y += b.y;
+		return *this;
+	}
+	U4x2& operator -= ( const U4x2& b )
+	{
+		x -= b.x;
+		y -= b.y;
+		return *this;
+	}
 	U4x2& operator += ( U4 u )
 	{
 		x += u;
@@ -1823,6 +1835,94 @@ public:
 	I4x2& null( void )
 	{
 		gpmCLR;
+		return *this;
+	}
+
+	I4x2& operator += ( const U4x2& u )
+	{
+		I4x2 b = u;
+		x += b.x;
+		y += b.y;
+		return *this;
+	}
+	I4x2& operator -= ( const U4x2& u )
+	{
+		I4x2 b = u;
+		x -= b.x;
+		y -= b.y;
+		return *this;
+	}
+
+	I4x2& operator += ( const I4x2& b )
+	{
+		x += b.x;
+		y += b.y;
+		return *this;
+	}
+	I4x2& operator -= ( const I4x2& b )
+	{
+		x -= b.x;
+		y -= b.y;
+		return *this;
+	}
+	I4x2& operator += ( U4 u )
+	{
+		if( u > 0x7fffFFFF )
+			u = 0x7fffFFFF;
+		x += u;
+		y += u;
+		return *this;
+	}
+	I4x2& operator += ( I4 i )
+	{
+		if( i < 0 )
+			i *= -1;
+		x += i;
+		y += i;
+		return *this;
+	}
+	I4x2& operator += ( float f )
+	{
+		x += f;
+		y += f;
+		return *this;
+	}
+
+	I4x2& operator -= ( U4 u )
+	{
+		if( u > 0x7fffFFFF )
+			u = 0x7fffFFFF;
+		x -= u;
+		y -= u;
+		return *this;
+	}
+	I4x2& operator -= ( I4 i )
+	{
+		if( i < 0 )
+			i *= -1;
+		x -= i;
+		y -= i;
+		return *this;
+	}
+	I4x2& operator -= ( float f )
+	{
+		x -= f;
+		y -= f;
+		return *this;
+	}
+	I4x2& operator = ( int i )
+	{
+		if( !i )
+			return null();
+
+		x = y = i;
+		return *this;
+	}
+
+	I4x2& operator = ( const U4x2& b )
+	{
+		x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
+		y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
 		return *this;
 	}
 

@@ -2,14 +2,15 @@
 #include "gpccrs.h"
 #include "gpcSRC.h"
 
-I4x4 gpcCRS::scnZNCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
+I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
+						gpcMASS& mass, const I4x2& _xy )
 {
 	// XY - pixel
 	// CR - Coll/Row
-	SDL_Rect div = win.wDIV( iDIV ); //iDIV );
+	SDL_Rect div = win.wDIV( id ); //iDIV );
 	if( div.w < 1 )
 	{
-		div = win.wDIV( iDIV );  //iDIV );
+		div = win.wDIV( id );  //iDIV );
 		return 0;
 	}
 	I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
@@ -22,10 +23,13 @@ I4x4 gpcCRS::scnZNCR( gpcWIN& win, U1 iDIV, gpcMASS& mass, const I4x2& _xy )
 	if( gpcMAP* pMAP = &mass.mapCR )
 	{
 		U4	*pC = pMAP->pCOL,
-			*pR = pMAP->pROW,
-			nD = pMAP->mapZN44.a4x2[1].sum()*iDIV;
-		pC += nD;
-		pR += nD;
+			*pR = pMAP->pROW;
+		if( id )
+		{
+			U4 nD = pMAP->mapZN44.a4x2[1].sum()*id;
+			pC += nD;
+			pR += nD;
+		}
 		scnZN.null();
 		scnIN.null();
 		for( scnZN.x = 0; scnZN.x < pMAP->mapZN44.z; scnZN.x++ )
@@ -341,6 +345,9 @@ U1 gpsHUN[] =
 
 bool gpcCRS::miniOFF( void )
 {
+	if( !this )
+		return true;
+
 	if( nMINI == CRSfrm.a4x2[1].area() )
 		return !nMINI;
 

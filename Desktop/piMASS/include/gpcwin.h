@@ -45,7 +45,7 @@ class gpcWIN
 			SDL_Rect div = wDIV( iDIV );
 			return I4x2( div.w/chrPIC.w, div.h/chrPIC.h );
 		}
-		U1 mDIV( const I4x2& mXY )
+		U1 onDIV( const I4x2& mXY )
 		{
 			SDL_Rect dim;
 			for( U4 i = 0; i < 4; i++ )

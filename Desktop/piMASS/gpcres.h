@@ -176,15 +176,16 @@ public:
 class gpcALU
 {
 public:
-	U4		nALL, iA;
-	gpcRES	*pRM,
-			*pRES;
-	void	*pDAT;
 	I1x4	op;
 	U1x4	typ;	// typ:
 					// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
 					// yz[ dimXY ] 		, w[] = nBYTE*dimXY
 	U4x4	AN;
+	U4x2	sub;
+	U4		nALL, iA;
+	gpcRES	*pRM,
+			*pRES;
+	void	*pDAT;
 	gpeALF 	alf;
 
 	gpcALU(){ gpmCLR; };
@@ -229,28 +230,7 @@ public:
 
 		return AN.w;
 	}
-	/*gpcALU& operator = ( const gpcALU& b )
-	{
-		if( this == &b )
-			return *this;
 
-		null();
-
-		if( !&b )
-			return *this;
-
-        gpmMEMCPY( this, &b, 1 );
-		if( !pDAT )
-		{
-			return *this;
-		}
-		pRM = NULL;				// pResMom
-		nALL = nLOAD();
-		pDAT = new U1[nALL];
-        memcpy( pDAT, b.pDAT, AN.w );
-
-        return *this;
-	}*/
 	gpcALU& zero( void );
 	U8 ins( gpcRES* pM, gpcLAZY& str );
 	gpcRES* ins( gpcRES* pM, gpcRES* pKID );
@@ -261,6 +241,18 @@ public:
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 
+	gpcALU& operator = ( gpeALF a )
+	{
+		null();
+		alf = a;
+		return *this;
+	}
+
+	gpcALU& operator = ( U4x2& u42 )
+	{
+		sub = u42;
+		return *this;
+	}
 	/*gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm = 0 );
 	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );*/
