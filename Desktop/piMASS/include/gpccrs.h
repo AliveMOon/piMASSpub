@@ -75,6 +75,7 @@ class gpcCRS
 			if( mag > 0 )
 				CRSfrm.z = div.w/bug;
 
+			if(mag)
 			while( (bug = div.w - CRSfrm.z*bug ) > 8 )
 			{
 				CRSfrm.z += mag;

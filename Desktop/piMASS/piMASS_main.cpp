@@ -593,9 +593,9 @@ int main( int nA, char *apA[] )
 		win.pMASS = piMASS;
         gpcCRS main_crs( win, 0 ), *apCRS[4];
         U4	srcDIV = 0, // nDIV = 1,
-			onDIV = srcDIV,
+			//onDIV = srcDIV,
 			dstDIV = 0; //, selDIV = iDIV;
-
+		U4x2 onDIV = srcDIV;
         gpmZ(apCRS);
         apCRS[srcDIV] = &main_crs;
         //sdl.draw();
@@ -743,7 +743,7 @@ int main( int nA, char *apA[] )
 					if( crs.id != i )
 						apCRS[i]->miniRDY( win, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
 
-					apCRS[i]->miniDRW( win, srcDIV, onDIV, dstDIV, SRCxycr ); // X DIV );
+					apCRS[i]->miniDRW( win, srcDIV, onDIV.x, dstDIV, SRCxycr ); // X DIV );
 				}
 				SDL_UpdateWindowSurface( win.pSDLwin );
 			}
@@ -768,15 +768,25 @@ int main( int nA, char *apA[] )
 				gppMOUSEbuff = gppKEYbuff;
 
 				*gpsMAINpub = 0;
-				onDIV = win.onDIV( mouseXY.a4x2[0] );
-				if( apCRS[onDIV] )
+				onDIV.y = onDIV.x;
+				onDIV.x = win.onDIV( mouseXY.a4x2[0] );
+				if( apCRS[onDIV.x] )
 				{
-					SRCxycr = apCRS[onDIV]->scnZNCR(	win, //mDIV,
+					SRCxycr = apCRS[onDIV.x]->scnZNCR(	win, //mDIV,
 														*piMASS, mouseXY.a4x2[0] );
 
-					char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV]->scnZN.x+1 );
-					pE += sprintf( pE, "%d", apCRS[onDIV]->scnZN.y );
-					SRCin = apCRS[onDIV]->scnIN;
+					char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
+					pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
+					SRCin = apCRS[onDIV.x]->scnIN;
+
+					if(!(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])))
+					if( onDIV.y != onDIV.x )
+					{
+						// változott az onDIV
+						U1 tmp = dstDIV;
+						dstDIV = srcDIV;
+						srcDIV = tmp;
+					}
 
 					if( (nMBB&1) )
 					if( !(nMB&1) )
@@ -794,16 +804,15 @@ int main( int nA, char *apA[] )
 														(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])) ? "#":"",
 														gpsMAINpub );
 						} else {
-							if( srcDIV != onDIV )
 							if(!(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])))
-							if( srcDIV != onDIV )
+							if( srcDIV != onDIV.x )
 							{
 								dstDIV = srcDIV;
-								srcDIV = onDIV;
+								srcDIV = onDIV.x;
 							}
 
 							apCRS[srcDIV]->CRSsel(
-													win, *apCRS[onDIV], *piMASS,
+													win, *apCRS[onDIV.x], *piMASS,
 													(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 												);
 						}
@@ -824,7 +833,7 @@ int main( int nA, char *apA[] )
 
 							gpnEVENT-gpnTITLE,
 							gpsMASSname,
-							mouseXY.x, mouseXY.y, onDIV,
+							mouseXY.x, mouseXY.y, onDIV.x,
 							SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
 							SRCin.str(gpsMAINpub+0x80),
 							(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
@@ -871,15 +880,15 @@ int main( int nA, char *apA[] )
 									//
 									//---------------------
 									I4 mag = -ev.wheel.y;
-									SDL_Rect div = win.wDIV(onDIV);
+									SDL_Rect div = win.wDIV(onDIV.x);
 									if( mag < 0 )
 									{
-										if( apCRS[onDIV]->gtFRMwh().x == 4 )
+										if( apCRS[onDIV.x]->gtFRMwh().x == 4 )
 											break;
 
-										if( apCRS[onDIV]->gtFRMwh().x < 4 )
+										if( apCRS[onDIV.x]->gtFRMwh().x < 4 )
 										{
-											apCRS[onDIV]->stFRMwh(
+											apCRS[onDIV.x]->stFRMwh(
 																	win, //onDIV,
 																	4,
 																	(4*div.h*2) / (div.w*3)
@@ -888,12 +897,12 @@ int main( int nA, char *apA[] )
 											break;
 										}
 									} else {
-										if( apCRS[onDIV]->gtFRMwh().x == div.w/8 )
+										if( apCRS[onDIV.x]->gtFRMwh().x == div.w/8 )
 											break;
 
-										if( apCRS[onDIV]->gtFRMwh().x > div.w/8 )
+										if( apCRS[onDIV.x]->gtFRMwh().x > div.w/8 )
 										{
-											apCRS[onDIV]->stFRMwh( 	win, //onDIV,
+											apCRS[onDIV.x]->stFRMwh( 	win, //onDIV,
 																	div.w/8,
 																	((div.w/8)*div.h*2) / (div.w*3)
 																);
@@ -907,9 +916,9 @@ int main( int nA, char *apA[] )
 
 
 
-									apCRS[onDIV]->stFRMwh(
+									apCRS[onDIV.x]->stFRMwh(
 															win, //onDIV,
-															apCRS[onDIV]->gtFRMwh().x+mag, 0,
+															apCRS[onDIV.x]->gtFRMwh().x+mag, 0,
 															mag
 														);
 
@@ -925,9 +934,9 @@ int main( int nA, char *apA[] )
 							//
 							//---------------------
 							if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
-								apCRS[onDIV]->addFRMxy( ev.wheel.y );
+								apCRS[onDIV.x]->addFRMxy( ev.wheel.y );
 							else
-								apCRS[onDIV]->addFRMxy( 0, ev.wheel.y );
+								apCRS[onDIV.x]->addFRMxy( 0, ev.wheel.y );
 							nMAG = 1;
 
 							mouseW.x += ev.wheel.x;
@@ -1195,13 +1204,13 @@ int main( int nA, char *apA[] )
 								if( nF < 2 )
 								{
 									win.bSW = 1;
-									onDIV = 0;
+									onDIV.x = 0;
  								}
 								else if( nF < 5 )
 								{
-									onDIV = nF-1;
+									onDIV.x = nF-1;
 
-									U1 msk = (0x1<<onDIV);
+									U1 msk = (0x1<<onDIV.x);
 									if( win.bSW&msk )
 										win.bSW = (win.bSW&(~msk));
 									else {
@@ -1232,8 +1241,8 @@ int main( int nA, char *apA[] )
 								}
 								win.bSW |= 1;
 
-								if( !apCRS[onDIV] )
-										apCRS[onDIV] = new gpcCRS( win, onDIV );
+								if( !apCRS[onDIV.x] )
+										apCRS[onDIV.x] = new gpcCRS( win, onDIV.x );
 								for( U1 i = 0, sw = win.bSW; i < 4; i++, sw >>= 1 )
 								{
 									if( !(sw&1) )

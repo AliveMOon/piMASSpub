@@ -546,24 +546,29 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 
 	}
 
-	if( id == oDIV  )
+	//if( id == oDIV  )
+
 	{
 		dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
 		dstPX.y = max( 0, scnZN0.w+CRSfrm.y );
 		wh = scnZN.a4x2[1]+CRSfrm.a4x2[0];
 		wh.mn( CRSfrm.a4x2[1] );
-		wh.x -= dstPX.x;
-		wh.y -= dstPX.y;
 
-		dstPX.x *= dstPX.w;
-		//dstPX.x /= CRSfrm.z;
-		dstPX.x += divPX.x;
+		if( wh.mn() > 0 )
+		{
+			wh.x -= dstPX.x;
+			wh.y -= dstPX.y;
 
-		dstPX.y *= dstPX.h;
-		//dstPX.y /= CRSfrm.w;
-		dstPX.y += divPX.y;
+			dstPX.x *= dstPX.w;
+			//dstPX.x /= CRSfrm.z;
+			dstPX.x += divPX.x;
 
-		frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 1 );
+			dstPX.y *= dstPX.h;
+			//dstPX.y /= CRSfrm.w;
+			dstPX.y += divPX.y;
+
+			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 1 );
+		}
 	}
 
 
@@ -572,6 +577,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 		return false;
 	}
 
+	if( selANIN[0].a4x2[0].x )
 	if( selANIN[0].a4x2[0] == selANIN[1].a4x2[0] )
 	{
 
@@ -631,6 +637,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 				continue;
 			if( r > lurdAN.w )
 				continue;
+			if( I4x2(c,r) == scnZN.a4x2[0] )
+				continue;
 
 			if(
 				   ( (c+1 >= lurdAN.x)	&& (r >= lurdAN.y) )
@@ -641,6 +649,9 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 				dstPX.y = max( 0, pRp[r]+CRSfrm.y );
 
 				wh = I4x2( pC[c]+pCp[c], pR[r]+pRp[r] ) + CRSfrm.a4x2[0];
+				if( wh.mn() < 0 )
+					continue;
+
 				wh.mn( CRSfrm.a4x2[1] );
 				wh.x -= dstPX.x;
 				wh.y -= dstPX.y;
