@@ -625,15 +625,27 @@ int main( int nA, char *apA[] )
         //		ha gppKEYbuff == NULL akkor zártuk be a programot
         //
         //----------------------------------------------------
+        bool bSHIFT, bCTRL, bALT, abALT[2];
+        U4x4 mSEC = 0;
+        if( !apCRS[srcDIV] )
+		if( !apCRS[srcDIV = 0] )
+		{
+			apCRS[srcDIV] = &main_crs;
+		}
+
         while( gppKEYbuff )
         {
-			if( !apCRS[srcDIV] )
-			if( !apCRS[srcDIV = 0] )
-			{
-				apCRS[srcDIV] = &main_crs;
-			}
+			mSEC.y = mSEC.x;
+			mSEC.x = SDL_GetTicks();
+			mSEC.z = mSEC.x-mSEC.y;
+
 
 			gpcCRS& crs = *apCRS[srcDIV]; // ? *apCRS[srcDIV] : main_crs;
+			bSHIFT = 1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]);
+			bCTRL = 1&(aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]);
+			abALT[0] = 1&aKT[SDL_SCANCODE_LALT];
+			abALT[1] = 1&aKT[SDL_SCANCODE_RALT];
+			bALT = abALT[0]|abALT[1];
 
 			if( (gppKEYbuff != gpsKEYbuff) || nMAG )
 			{
@@ -677,7 +689,7 @@ int main( int nA, char *apA[] )
 										pS = pE+1;
 										crs.CRSstpCL(
 														win, *piMASS,
-														3, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+														3, bSHIFT // = (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 													);
 									} break;
 								case '\r':
@@ -694,7 +706,7 @@ int main( int nA, char *apA[] )
 										pS = pE+1;
 										crs.CRSstpCL(
 														win, *piMASS,
-														5, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+														5, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 													);
 									} break;
 
@@ -709,7 +721,7 @@ int main( int nA, char *apA[] )
 										{
 											crs.CRSstpCL(
 															win, *piMASS,
-															*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+															*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 														);
 											break;
 										}
@@ -723,7 +735,7 @@ int main( int nA, char *apA[] )
 										//------------------------------------
 										crs.CRSstpED(
 														win, *piMASS,
-														*pE, (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+														*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 													);
 									} break;
 							}
@@ -779,7 +791,7 @@ int main( int nA, char *apA[] )
 					pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
 					SRCin = apCRS[onDIV.x]->scnIN;
 
-					if(!(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])))
+					if( !bSHIFT )
 					if( onDIV.y != onDIV.x )
 					{
 						// változott az onDIV
@@ -793,7 +805,7 @@ int main( int nA, char *apA[] )
 					{
 						// RELEASE leftMOUSE button
 						// SELECT
-						if( 1&(aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
+						if( bCTRL )
 						{
 							//------------------------------
 							//
@@ -801,10 +813,10 @@ int main( int nA, char *apA[] )
 							//
 							//---------------------
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s%s",
-														(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])) ? "#":"",
+														bSHIFT ? "#":"",
 														gpsMAINpub );
 						} else {
-							if(!(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT])))
+							if(!bSHIFT)
 							if( srcDIV != onDIV.x )
 							{
 								dstDIV = srcDIV;
@@ -813,7 +825,7 @@ int main( int nA, char *apA[] )
 
 							apCRS[srcDIV]->CRSsel(
 													win, *apCRS[onDIV.x], *piMASS,
-													(1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+													bSHIFT
 												);
 						}
 					}
@@ -821,7 +833,8 @@ int main( int nA, char *apA[] )
 				*gppKEYbuff = 0;
 
 				//gppKEYbuff +=
-				sprintf(
+
+				/*sprintf(
 							gpsTITLEpub,
 							"-= piMASS%lld::%s"
 							" x:%d y:%d, onDIV: %d"
@@ -831,7 +844,7 @@ int main( int nA, char *apA[] )
 							" %d F%d =-"
 							" %d, %d",
 
-							gpnEVENT-gpnTITLE,
+							gpnTITLE-gpnEVENT,
 							gpsMASSname,
 							mouseXY.x, mouseXY.y, onDIV.x,
 							SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
@@ -840,8 +853,8 @@ int main( int nA, char *apA[] )
 							mouseW.x, mouseW.y,
 							nMB, nF,
 							bug, nBUG
-						);
-				gpnTITLE = gpnEVENT;
+						);*/
+
 				mouseXY.z=mouseXY.x;
 				mouseXY.w=mouseXY.y;
 				mouseW.z=mouseW.x;
@@ -860,17 +873,44 @@ int main( int nA, char *apA[] )
 				}*/
 				SDL_SetWindowTitle( win.pSDLwin, gpsTITLEpub );
 
-			}
+			} else {
+				char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
+						pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
+						SRCin = apCRS[onDIV.x]->scnIN;
+				sprintf(
+							gpsTITLEpub,
+							"-= piMASS%d::%s"
+							" x:%d y:%d, onDIV: %d"
+							" xycr:%s AN:%s"
+							" IN %s %0.2f %0.2f"
+							" wx:%d wy:%d"
+							" %d F%d =-"
+							" %d, %d",
 
+							mSEC.z,
+							gpsMASSname,
+							mouseXY.x, mouseXY.y, onDIV.x,
+							SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
+							SRCin.str(gpsMAINpub+0x80),
+							(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
+							mouseW.x, mouseW.y,
+							nMB, nF,
+							bug, nBUG
+						);
+				SDL_SetWindowTitle( win.pSDLwin, gpsTITLEpub );
+			}
+			gpnTITLE++;
 			//while( SDL_PollEvent( &ev ) )
 			//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
-			while( SDL_WaitEventTimeout( &ev, 20 ) )
+			if( SDL_WaitEventTimeout( &ev, 20 ) )
 			{
 				gpnEVENT++;
+				gpnTITLE = gpnEVENT;
+
 				switch( ev.type )
 				{
 					case SDL_MOUSEWHEEL: {
-							if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
+							if( bCTRL )
 							{
 								if( ev.wheel.y )
 								{
@@ -933,7 +973,7 @@ int main( int nA, char *apA[] )
 							// 		WHEEL SCROLL
 							//
 							//---------------------
-							if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+							if( bSHIFT )
 								apCRS[onDIV.x]->addFRMxy( ev.wheel.y );
 							else
 								apCRS[onDIV.x]->addFRMxy( 0, ev.wheel.y );
@@ -959,10 +999,11 @@ int main( int nA, char *apA[] )
 
 							// SHIFT & ALT modosíthatja
 							// tehát 0x800-as táblázatban tud válogatni
-							if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+							scan |= (bSHIFT<<9)|(bSHIFT<<10);
+							/*if( bSHIFT )
 								scan |= 0x200;
-							if( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) )
-								scan |= 0x400;
+							if( bALT )
+								scan |= 0x400;*/
 
 							// a táblázat első 0x10 / 16 a vezérlő kód
 							// ' ' sima ASCII
@@ -994,7 +1035,7 @@ int main( int nA, char *apA[] )
 					switch( c )
 					{
 						case ' ': {
-								if( 1 & (aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]) )
+								if( bCTRL )
 								{
 									switch( aXY[1] )
 									{
@@ -1028,7 +1069,11 @@ int main( int nA, char *apA[] )
 											// na mencsük ki ami van
 											{
 												char* pFILE = gppMASSfile+sprintf( gppMASSfile, "HTML/" );
-												bool bALT = ( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) );
+												abALT[0] = 1&aKT[SDL_SCANCODE_LALT];
+												abALT[1] = 1&aKT[SDL_SCANCODE_RALT];
+												bALT = abALT[0]|abALT[1];
+
+												//bool bALT = ( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) );
 												//strcpy( gppMASSfile, gpsMASSname );
 												piMASS->HTMLsave( (U1*)gpsMASSpath, (U1*)pFILE, (U1*)gpsMASSname, bALT );
 											}
@@ -1205,7 +1250,7 @@ int main( int nA, char *apA[] )
 								{
 									onDIV.x = 0;
 
-									if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+									if( bSHIFT )
 										win.bSW = 1;
 
  								}
@@ -1217,7 +1262,7 @@ int main( int nA, char *apA[] )
 
 									if( win.bSW&msk )
 									{
-										if( 1 & (aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]) )
+										if( bSHIFT )
 											win.bSW = (win.bSW&(~msk));
 									} else {
 										win.bSW |= msk;
