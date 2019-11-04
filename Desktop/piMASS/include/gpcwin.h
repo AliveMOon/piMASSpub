@@ -50,8 +50,9 @@ class gpcWIN
 		U4x4 mSEC = 0;
 		I4 nMOV, nMAG, nMB, nMBB, nF;
 
-		bool bSHIFT, bCTRL, bALT, abALT[2];
-		U1				bSW;
+		bool	bSHIFT, bCTRL,
+				bALT, abALT[2];
+		U1		bSW;
 
 
 

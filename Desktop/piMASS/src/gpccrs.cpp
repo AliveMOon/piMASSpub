@@ -319,9 +319,9 @@ gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
 	//ctor
 	gpmCLR;
 	id = _id;
+	win.apCRS[id] = this;
 	CRSfrm.a4x2[1] = win.wFRM( 0 );
 	wDIVfrm = win.wDIV(id);
-	win.apCRS[id] = this;
 
 }
 
