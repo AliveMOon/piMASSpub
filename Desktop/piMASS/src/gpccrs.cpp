@@ -320,7 +320,9 @@ gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
 	gpmCLR;
 	id = _id;
 	CRSfrm.a4x2[1] = win.wFRM( 0 );
-	wDIVfrm = win.wDIV(0);
+	wDIVfrm = win.wDIV(id);
+	win.apCRS[id] = this;
+
 }
 
 gpcCRS::~gpcCRS()
@@ -582,7 +584,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 	{
 
 	}
-	else if( gpcMAP* pMAP = win.pMASS ? &win.pMASS->mapCR : NULL )
+	else if( gpcMAP* pMAP = win.piMASS ? &win.piMASS->mapCR : NULL )
 	{
 		I4x4	selAN0AN1( selANIN[0].a4x2[0], selANIN[1].a4x2[0] ),
 				lurdAN = selAN0AN1.lurd();

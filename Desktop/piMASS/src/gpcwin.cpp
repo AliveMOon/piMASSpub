@@ -1,4 +1,6 @@
 #include "gpcwin.h"
+#include "gpccrs.h"
+extern U1 gp_s_key_map_sdl[];
 
 InitError::InitError() :
     exception(),
@@ -68,12 +70,19 @@ SDL_Rect gpcWIN::wDIV( U1 iDIV )
 	return div;
 }
 
-gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
+gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* pPATH, char* pFILE )
 {
 	//ctor
 	gpmCLR;
-	winDIV = winSIZ = siz;
-	winDIV.a4x2[0] /= 2; //*= 4;
+	piMASS = piM;
+	SDL_DisplayMode sdlDM;
+	SDL_GetCurrentDisplayMode(0, &sdlDM);
+	winSIZ.z = (sdlDM.w*7)/8;
+	winSIZ.w = sdlDM.h;
+	winSIZ.a4x2[0] = winSIZ.a4x2[1];
+
+	winDIV = winSIZ/I4x4(2,2,1,1); // = siz;
+	//winDIV.a4x2[0] /= 2; //*= 4;
 	//winDIV.a4x2[0] /= 8;
 	if( winID.x = SDL_CreateWindowAndRenderer( winSIZ.z, winSIZ.w, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &pSDLwin, &pSDLrndr ) != 0 )
         throw InitError();
@@ -84,7 +93,11 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 	if( !pPATH )
 		return;
 
-	pSRFload = IMG_Load( pPATH );
+	gpmSTRCPY( gpsMASSname, sNAME );
+	gpmSTRCPY( gpsMASSpath, pPATH );
+	gppMASSfile = gpsMASSpath+(pFILE-pPATH);
+
+	pSRFload = IMG_Load( gpsMASSpath );
 	pSRFchar = pSRFload;
 
 	if( pSRFchar != pSRFload )
@@ -94,6 +107,10 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, I4x4& siz )
 	chrPIC.y = 32*4;
 	chrPIC.w = pSRFchar->w/chrPIC.x;
 	chrPIC.h = pSRFchar->h/chrPIC.y;
+
+	gppKEYbuff = gpsKEYbuff;
+	gppMOUSEbuff = gpsKEYbuff;
+
 
 }
 void gpcWIN::gpeWINresize( void )
@@ -118,5 +135,679 @@ gpcWIN::~gpcWIN()
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
 }
+
+void gpcWIN::run( const char* pWELLCOME )
+{
+	U4 scan, bug = 0, nBUG;
+	U1 aXY[] = "00", c = 0;
+
+	gppKEYbuff = ( gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,pWELLCOME ) );
+
+	while( gppKEYbuff ) {
+		mSEC.y = mSEC.x;
+		mSEC.x = SDL_GetTicks();
+		mSEC.z = mSEC.x-mSEC.y;
+
+
+		gpcCRS& crs = *apCRS[srcDIV]; // ? *apCRS[srcDIV] : main_crs;
+
+		/*bSHIFT = 1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]);
+		bCTRL = 1&(aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]);
+		abALT[0] = 1&aKT[SDL_SCANCODE_LALT];
+		abALT[1] = 1&aKT[SDL_SCANCODE_RALT];
+		bALT = abALT[0]|abALT[1];*/
+		reSCAN();
+
+		if( (gppKEYbuff != gpsKEYbuff) || nMAG )
+		{
+			*gppKEYbuff = 0;
+			U1 iRDY = 0x10;
+			if( piMASS )
+			{
+
+				U1	*pS = gppMOUSEbuff,
+					*pE = pS;
+
+				if( gppKEYbuff == pS ) //nMAG )
+				{
+					// nincsen begépelve semmi
+					// mondjuk ZOOM, stb..?
+					iRDY = crs.id;
+					crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS );
+					pS = gppKEYbuff;
+				} else {
+					iRDY = crs.id;
+					while( pE < gppKEYbuff )
+					{
+						switch( *pE )
+						{
+							case '\v': {
+									//*pE = 0;
+									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+									pS = pE+1;
+									// tehát ha bent van ki kell lépni a szerkeszttett cellából
+									crs.CRSbEDswitch();
+								} break;
+							case '\t': {
+									if( crs.CRSbEDget() )
+										break;
+
+									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+									if( *pE == '\r' )
+									if( pE[1] == '\n' )
+										pE++;
+
+									pS = pE+1;
+									crs.CRSstpCL(
+													*this, *piMASS,
+													3, bSHIFT // = (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);
+								} break;
+							case '\r':
+							case '\n': {
+									if( crs.CRSbEDget() )
+										break;
+
+
+									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+									if( *pE == '\r' )
+									if( pE[1] == '\n' )
+										pE++;
+
+									pS = pE+1;
+									crs.CRSstpCL(
+													*this, *piMASS,
+													5, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);
+								} break;
+
+
+							case 2:			// left
+							case 3:			// right
+							case 4:			// up
+							case 5:	{ 		// down
+									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+									pS = pE+1;
+									if( !crs.CRSbEDget() )
+									{
+										crs.CRSstpCL(
+														*this, *piMASS,
+														*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+													);
+										break;
+									}
+									//crs.miniRDY( win, iDIV, *piMASS, pE, pS );
+									//pS = pE+1;
+
+									//------------------------------------
+									//
+									//			CRS MOVE
+									//
+									//------------------------------------
+									crs.CRSstpED(
+													*this, *piMASS,
+													*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+												);
+								} break;
+						}
+						pE++;
+					}
+
+				}
+
+				crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS );
+				gppKEYbuff = gppMOUSEbuff;
+				*gppKEYbuff = 0;
+			} else {
+				crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
+			}
+			for( U1 i = 0; i < 4; i++ )
+			{
+				if( crs.id != i )
+					apCRS[i]->miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
+
+				apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr ); // X DIV );
+			}
+			SDL_UpdateWindowSurface( pSDLwin );
+		}
+
+
+		nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
+
+		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( gpsKEYbuff, mouseXY, aKT, SRCxycr, SRCin );
+
+
+		if(
+			(
+				nMOV =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos
+						+abs(nMBB-nMB)										// mBUTTON
+						+abs( mouseW.z-mouseW.x)+abs( mouseW.w-mouseW.y)	// mWheel
+						+nF
+						+nMAG
+			) > 0
+		)
+		{
+			gppKEYbuff += sprintf( (char*)gppKEYbuff, "move" );
+			gppMOUSEbuff = gppKEYbuff;
+
+			*gpsMAINpub = 0;
+			onDIV.y = onDIV.x;
+			onDIV.x = onDIVf( mouseXY.a4x2[0] );
+			if( apCRS[onDIV.x] )
+			{
+				SRCxycr = apCRS[onDIV.x]->scnZNCR(	*this, //win, //mDIV,
+													*piMASS, mouseXY.a4x2[0] );
+
+				char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
+				pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
+				SRCin = apCRS[onDIV.x]->scnIN;
+
+				if( !bSHIFT )
+				if( onDIV.y != onDIV.x )
+				{
+					// változott az onDIV
+					U1 tmp = dstDIV;
+					dstDIV = srcDIV;
+					srcDIV = tmp;
+				}
+
+				if( (nMBB&1) )
+				if( !(nMB&1) )
+				{
+					// RELEASE leftMOUSE button
+					// SELECT
+					if( bCTRL )
+					{
+						//------------------------------
+						//
+						// 		AN INSERT
+						//
+						//---------------------
+						gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s%s",
+													bSHIFT ? "#":"",
+													gpsMAINpub );
+					} else {
+						if(!bSHIFT)
+						if( srcDIV != onDIV.x )
+						{
+							dstDIV = srcDIV;
+							srcDIV = onDIV.x;
+						}
+
+						apCRS[srcDIV]->CRSsel(
+												*this, *apCRS[onDIV.x], *piMASS,
+												bSHIFT
+											);
+					}
+				}
+			}
+			*gppKEYbuff = 0;
+
+			mouseXY.z=mouseXY.x;
+			mouseXY.w=mouseXY.y;
+			mouseW.z=mouseW.x;
+			mouseW.w=mouseW.y;
+			nMBB = nMB;
+
+			if( nF )
+			{
+				nF = 0;
+			}
+			nMAG = 0;
+
+			/*if( gppMASSfile == gpsMASSpath )
+			{
+				strcpy( gppMASSfile, gpsMASSname );
+			}*/
+			SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
+
+		} else {
+			char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
+					pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
+					SRCin = apCRS[onDIV.x]->scnIN;
+			sprintf(
+						gpsTITLEpub,
+						"-= piMASS%d::%s"
+						" x:%d y:%d, onDIV: %d"
+						" xycr:%s AN:%s"
+						" IN %s %0.2f %0.2f"
+						" wx:%d wy:%d"
+						" %d F%d =-"
+						" %d, %d",
+
+						mSEC.z,
+						gpsMASSname,
+						mouseXY.x, mouseXY.y, onDIV.x,
+						SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
+						SRCin.str(gpsMAINpub+0x80),
+						(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
+						mouseW.x, mouseW.y,
+						nMB, nF,
+						bug, nBUG
+					);
+			SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
+		}
+		gpnTITLE++;
+		//while( SDL_PollEvent( &ev ) )
+		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
+		if( SDL_WaitEventTimeout( &ev, 20 ) )
+		{
+			gpnEVENT++;
+			gpnTITLE = gpnEVENT;
+
+			switch( ev.type )
+			{
+				case SDL_MOUSEWHEEL: {
+						if( bCTRL )
+						{
+							if( ev.wheel.y )
+							{
+								//------------------------------
+								//
+								// 		WHEEL ZOOM
+								//
+								//---------------------
+								I4 mag = -ev.wheel.y;
+								SDL_Rect div = wDIV(onDIV.x);
+								if( mag < 0 )
+								{
+									if( apCRS[onDIV.x]->gtFRMwh().x == 4 )
+										break;
+
+									if( apCRS[onDIV.x]->gtFRMwh().x < 4 )
+									{
+										apCRS[onDIV.x]->stFRMwh(
+																	*this,
+																	4,
+																	(4*div.h*2) / (div.w*3)
+																);
+										nMAG = 1;
+										break;
+									}
+								} else {
+									if( apCRS[onDIV.x]->gtFRMwh().x == div.w/8 )
+										break;
+
+									if( apCRS[onDIV.x]->gtFRMwh().x > div.w/8 )
+									{
+										apCRS[onDIV.x]->stFRMwh(
+																	*this,
+																	div.w/8,
+																	((div.w/8)*div.h*2) / (div.w*3)
+																);
+
+										nMAG = 1;
+										break;
+									}
+								}
+
+
+
+								apCRS[onDIV.x]->stFRMwh(
+															*this,
+															apCRS[onDIV.x]->gtFRMwh().x+mag, 0,
+															mag
+														);
+
+
+								nMAG = 1;
+								break;
+							}
+							break;
+						}
+						//------------------------------
+						//
+						// 		WHEEL SCROLL
+						//
+						//---------------------
+						if( bSHIFT )
+							apCRS[onDIV.x]->addFRMxy( ev.wheel.y );
+						else
+							apCRS[onDIV.x]->addFRMxy( 0, ev.wheel.y );
+						nMAG = 1;
+
+						mouseW.x += ev.wheel.x;
+						mouseW.y += ev.wheel.y;
+					} break;
+				case SDL_QUIT:
+					gppKEYbuff = NULL;
+					continue;
+				case SDL_KEYDOWN:
+					aKT[ev.key.keysym.scancode] = ev.key.timestamp|1;
+					reSCAN();
+					break;
+				case SDL_KEYUP: {
+						aKT[ev.key.keysym.scancode] = ev.key.timestamp;
+						aKT[ev.key.keysym.scancode] &= ~1;
+
+						scan = ev.key.keysym.scancode&0xff;
+						// az SDL scan codjábol csinál egy 0x20*y öszeget
+						// ami a táblázatban a kívánt karakterre fog mutatni
+						scan = (scan%0x10) + (scan/0x10)*0x20;
+
+						// SHIFT & ALT modosíthatja
+						// tehát 0x800-as táblázatban tud válogatni
+						scan |= reSCAN();
+						/*if( bSHIFT )
+							scan |= 0x200;
+						if( bALT )
+							scan |= 0x400;*/
+
+						// a táblázat első 0x10 / 16 a vezérlő kód
+						// ' ' sima ASCII
+						// - :"' - ékezetes betűk
+						// fF azok a felső funkció gombok f1f2f3f4 etc...
+						// _ kurzor nyilak
+						// / azok a szeparátor azaz enter tab cell etc...
+
+						aXY[0] = c = gp_s_key_map_sdl[scan];
+						aXY[1] = gp_s_key_map_sdl[scan+0x10];
+					} break;
+				case SDL_WINDOWEVENT:
+					if( ev.window.event != SDL_WINDOWEVENT_RESIZED )
+						break;
+					SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
+					if( !(abs( winSIZ.z-winSIZ.x)+abs( winSIZ.w-winSIZ.y))	)
+						break;
+
+					gpeWINresize();
+
+					winSIZ.a4x2[1] = winSIZ.a4x2[0];
+
+			}
+			if( c == 'x' )
+				continue;
+			if( c )
+			{
+				char *pUTF8 = NULL;
+				switch( c )
+				{
+					case ' ': {
+							if( bCTRL )
+							{
+								switch( aXY[1] )
+								{
+									case 'v':
+									case 'V':
+										// paste
+										gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", SDL_GetClipboardText());
+										aXY[1] = 0;
+										break;
+									case 'c':
+									case 'C':
+										if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
+											SDL_SetClipboardText( (char*)gppKEYbuff );
+
+										*gppKEYbuff = aXY[1] = 0;
+										break;
+									case 'x':
+									case 'X':
+										if( crs.gtUTF8( gppKEYbuff ) > gppKEYbuff )
+											SDL_SetClipboardText( (char*)gppKEYbuff );
+
+										*gppKEYbuff = 0;
+										aXY[1] = 0x7e;
+										break;
+									case 's':
+										strcpy( gppMASSfile, gpsMASSname );
+										piMASS->SRCsave( (U1*)gpsMASSpath, (U1*)gppMASSfile );
+										*gppKEYbuff = aXY[1] = 0;
+										break;
+									case 'S':
+										// na mencsük ki ami van
+										{
+											char* pFILE = gppMASSfile+sprintf( gppMASSfile, "HTML/" );
+											abALT[0] = 1&aKT[SDL_SCANCODE_LALT];
+											abALT[1] = 1&aKT[SDL_SCANCODE_RALT];
+											bALT = abALT[0]|abALT[1];
+
+											//bool bALT = ( 1 & (aKT[SDL_SCANCODE_LALT]|aKT[SDL_SCANCODE_RALT]) );
+											//strcpy( gppMASSfile, gpsMASSname );
+											piMASS->HTMLsave( (U1*)gpsMASSpath, (U1*)pFILE, (U1*)gpsMASSname, bALT );
+										}
+										*gppKEYbuff = aXY[1] = 0;
+										break;
+								}
+
+							}
+							if( !aXY[1] )
+								break;
+							*gppKEYbuff = aXY[1];
+							gppKEYbuff++;
+						} break;
+					// enter tab izé bizé
+					case '/': {
+							switch( aXY[1] )
+							{
+								case 'e':
+								case 'E':
+									*gppKEYbuff = '\v';
+									gppKEYbuff++;
+									break;
+								case 't':
+								case 'T':
+									*gppKEYbuff = '\t';
+									gppKEYbuff++;
+									break;
+								case 'b':
+								case 'B':
+									*gppKEYbuff = '\b';
+									gppKEYbuff++;
+									break;
+								case 'd':
+								case 'D':
+									*gppKEYbuff = 0x7f;
+									gppKEYbuff++;
+									break;
+								case 'n':
+								case 'N':
+									gppKEYbuff += sprintf( (char*)gppKEYbuff, "\r\n" );
+									break;
+							}
+						} break;
+					// cursor nyilak
+					case '_': {
+							switch( aXY[1] )
+							{
+								case 'l':
+								case 'L':
+									*gppKEYbuff = 2;
+									gppKEYbuff++;
+									break;
+								case 'r':
+								case 'R':
+									*gppKEYbuff = 3;
+									gppKEYbuff++;
+									break;
+
+								case 'u':
+								case 'U':
+									*gppKEYbuff = 4;
+									gppKEYbuff++;
+									break;
+								case 'd':
+								case 'D':
+									*gppKEYbuff = 5;
+									gppKEYbuff++;
+									break;
+
+							}
+						} break;
+					// ékezetek ----------------
+					case '\'': {
+							switch( aXY[1] )
+							{
+								case 'A':
+									pUTF8 = "\xc3\x81";
+									break;
+								case 'a':
+									pUTF8 = "\xc3\xa1";
+									break;
+								case 'E':
+									pUTF8 = "\xc3\x89";
+									break;
+								case 'e':
+									pUTF8 = "\xc3\xa9";
+									break;
+								case 'I':
+									pUTF8 = "\xc3\x8d";
+									break;
+								case 'i':
+									pUTF8 = "\xc3\xad";
+									break;
+								case 'O':
+									pUTF8 = "\xc3\x93";
+									break;
+								case 'o':
+									pUTF8 = "\xc3\xb3";
+									break;
+								case 'U':
+									pUTF8 = "\xc3\x9a";
+									break;
+								case 'u':
+									pUTF8 = "\xc3\xba";
+									break;
+								default:
+									pUTF8 = "?";
+							}
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+						} break;
+					case '\"': {
+							switch( aXY[1] )
+							{
+								case 'O':
+									pUTF8 = "\xc5\x90";
+									break;
+								case 'o':
+									pUTF8 = "\xc5\x91";
+									break;
+								case 'U':
+									pUTF8 = "\xc5\xb0";
+									break;
+								case 'u':
+									pUTF8 = "\xc5\xb1";
+									break;
+								default:
+									pUTF8 = "?";
+							}
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+						}break;
+					case ':': {
+							switch( aXY[1] )
+							{
+								case 'O':
+									pUTF8 = "\xc3\x96";
+									break;
+								case 'o':
+									pUTF8 = "\xc3\xb6";
+									break;
+								case 'U':
+									pUTF8 = "\xc3\x90";
+									break;
+								case 'u':
+									pUTF8 = "\xc3\xbc";
+									break;
+								default:
+									pUTF8 = "?";
+							}
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+						} break;
+					case '=': {
+							// € EURO izé
+							switch( aXY[1] )
+							{
+								case 'C':
+								case 'c':
+										pUTF8 = "\u20AC";
+										break;
+								default:
+									pUTF8 = "?";
+							}
+							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
+						} break;
+					case 'f':
+					case 'F': {
+							//------------------------------
+							//
+							// 		PANEL SWITCH
+							//
+							//---------------------
+							nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
+													aXY[1]-'0';
+							if( nF < 2 )
+							{
+								onDIV.x = 0;
+
+								if( bSHIFT )
+									bSW = 1;
+
+							}
+							else if( nF < 5 )
+							{
+								onDIV.x = nF-1;
+
+								U1 msk = (0x1<<onDIV.x);
+
+								if( bSW&msk )
+								{
+									if( bSHIFT )
+										bSW = (bSW&(~msk));
+								} else {
+									bSW |= msk;
+								}
+							} else {
+								switch( nF )
+								{
+									case 5:{	/// F5 ----- COPY
+									} break;
+									case 6:{	/// F6 ----- MOVE
+									} break;
+									case 7:{	/// F7 ----- NEW
+									} break;
+									case 8:{	/// F8 ----- DELETE
+									} break;
+
+									case 9:{	/// F9 ----- ?
+									} break;
+									case 10:{	/// F10 ----- ?
+									} break;
+									case 11:{	/// F11 ----- ?
+									} break;
+									case 12:{	/// F12 ----- ?
+									} break;
+
+								}
+							}
+							bSW |= 1;
+
+							if( !apCRS[onDIV.x] )
+									apCRS[onDIV.x] = new gpcCRS( *this, onDIV.x );
+							for( U1 i = 0, sw = bSW; i < 4; i++, sw >>= 1 )
+							{
+								if( !(sw&1) )
+									continue;
+
+								if( !apCRS[i] )
+									continue;
+
+								apCRS[i]->stFRMwh( *this, apCRS[i]->gtFRMwh().x, 0 );
+
+
+							}
+
+						} break;
+					default:
+						gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );
+				}
+
+				c = 0;
+			}
+		}
+
+	}
+
+}
+
+
 
 

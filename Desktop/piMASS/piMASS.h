@@ -2054,6 +2054,14 @@ public:
 	{
 		return I4x4( a4x2[0]&b, a4x2[1]&b );
 	}
+	I4x4 operator / (const I4x4& b) const
+	{
+		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
+	}
+	I4x4 operator / (const U4x4& b) const
+	{
+		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
+	}
 
 	I4x4 lurd( void )
 	{

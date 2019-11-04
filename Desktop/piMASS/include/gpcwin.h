@@ -17,23 +17,61 @@ public:
 class gpcWIN
 {
 	public:
+		gpcMASS*		piMASS;
+		gpcCRS			*apCRS[4];
 
 		I4x4			winID,
-						winSIZ;
+						winSIZ,
+						mouseXY, mouseW,
+						SRCxycr, SRCin;
 
 		SDL_Window		*pSDLwin;
 		SDL_Renderer	*pSDLrndr;
 		SDL_Surface		*pSRFload,
 						*pSRFchar,
 						*pSRFwin;
-		gpcMASS			*pMASS;
+		SDL_Event 		ev;
+
 		SDL_Rect		chrPIC;
+
+		char 	gpsMAINpub[0x100],
+				gpsTITLEpub[0x100],
+				gpsMASSpath[gpeMXPATH], *gppMASSfile,
+				gpsMASSname[0x100];
+		U1		gpsKEYbuff[0x100],
+				*gppKEYbuff,
+				*gppMOUSEbuff;
+
+		I8 gpnEVENT = 0, gpnTITLE = 0;
+
+		U4	aKT[0x200],
+			srcDIV, dstDIV;
+		U4x2 onDIV = srcDIV;
+		U4x4 mSEC = 0;
+		I4 nMOV, nMAG, nMB, nMBB, nF;
+
+		bool bSHIFT, bCTRL, bALT, abALT[2];
 		U1				bSW;
+
+
+
+
 
 		SDL_Rect	wDIV( U1 iDIV );
 		void		gpeWINresize( void );
-		gpcWIN( char* pPATH, char* pFILE, I4x4& siz );
+		gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piMASS ); //, char* pPATH, char* pFILE ); //, I4x4& siz );
 		virtual ~gpcWIN();
+
+		U4 reSCAN( void )
+		{
+			bSHIFT = 1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]);
+			bCTRL = 1&(aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]);
+			abALT[0] = 1&aKT[SDL_SCANCODE_LALT];
+			abALT[1] = 1&aKT[SDL_SCANCODE_RALT];
+			bALT = abALT[0]|abALT[1];
+
+			return (((U4)bSHIFT)<<9)|((U4)bALT<<10);
+		}
 
 		U4x2 chrWH( void )
 		{
@@ -45,7 +83,7 @@ class gpcWIN
 			SDL_Rect div = wDIV( iDIV );
 			return I4x2( div.w/chrPIC.w, div.h/chrPIC.h );
 		}
-		U1 onDIV( const I4x2& mXY )
+		U1 onDIVf( const I4x2& mXY )
 		{
 			SDL_Rect dim;
 			for( U4 i = 0; i < 4; i++ )
@@ -63,6 +101,7 @@ class gpcWIN
 		{
 			return winDIV.a4x2[1];
 		}
+		void run( const char* pWELLCOME );
 	protected:
 
 	private:
