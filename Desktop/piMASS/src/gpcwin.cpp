@@ -295,8 +295,7 @@ void gpcWIN::run( const char* pWELLCOME )
 			onDIV.x = onDIVf( mouseXY.a4x2[0] );
 			if( apCRS[onDIV.x] )
 			{
-				SRCxycr = apCRS[onDIV.x]->scnZNCR(	*this, //win, //mDIV,
-													*piMASS, mouseXY.a4x2[0] );
+				SRCxycr = apCRS[onDIV.x]->scnZNCR(	*this, *piMASS, mouseXY.a4x2[0] );
 
 				char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
 				pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
@@ -304,6 +303,7 @@ void gpcWIN::run( const char* pWELLCOME )
 
 				if( !bSHIFT )
 				if( onDIV.y != onDIV.x )
+				if( onDIV.x == dstDIV  )
 				{
 					// változott az onDIV
 					U1 tmp = dstDIV;
@@ -350,21 +350,16 @@ void gpcWIN::run( const char* pWELLCOME )
 			nMBB = nMB;
 
 			if( nF )
-			{
 				nF = 0;
-			}
 			nMAG = 0;
-
-			/*if( gppMASSfile == gpsMASSpath )
-			{
-				strcpy( gppMASSfile, gpsMASSname );
-			}*/
 			SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
 
 		} else {
 			char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
-					pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
-					SRCin = apCRS[onDIV.x]->scnIN;
+
+			pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
+			SRCin = apCRS[onDIV.x]->scnIN;
+
 			sprintf(
 						gpsTITLEpub,
 						"-= piMASS%d::%s"
@@ -388,8 +383,10 @@ void gpcWIN::run( const char* pWELLCOME )
 			SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
 		}
 		gpnTITLE++;
+
 		//while( SDL_PollEvent( &ev ) )
 		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
+
 		if( SDL_WaitEventTimeout( &ev, 20 ) )
 		{
 			gpnEVENT++;

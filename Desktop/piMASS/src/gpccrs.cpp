@@ -321,7 +321,7 @@ gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
 	id = _id;
 	win.apCRS[id] = this;
 	CRSfrm.a4x2[1] = win.wFRM( 0 );
-	wDIVfrm = win.wDIV(id);
+	wDIVfrm = win.wDIV(0);
 
 }
 
@@ -381,8 +381,7 @@ U4 gpaC64[] = {
 	0xff0088ff, 0xffbbbbbb, // vil.kék, vil szürk
 };
 // FRM 1 up // 2 right // 4 down // 8 left
-bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
-						I4x4 scnXYCR )
+bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR )
 {
 	if( !this )
 		return false;
@@ -442,14 +441,19 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 		scx, scy,
 		frmC = 0;
 
+	const U1*	pSTR = NULL;
+
 	if( (oDIV != sDIV) || (oDIV != dDIV) || (sDIV != dDIV) )
-	/*if( id == oDIV ) 				// fehér keret
-		frmC = gpeCLR_white; 		//gpaC64[gpeCLR_white];
-	else */
 	if( id == sDIV ) 			// sárga
+	{
 		frmC = gpeCLR_orange; 		//gpaC64[gpeCLR_yellow];
+		pSTR = (U1*)" SRC ";
+	}
 	else if( id == dDIV )			// zöld
+	{
 		frmC = gpeCLR_green; 		//gpaC64[gpeCLR_green];
+		pSTR = (U1*)" DST ";
+	}
 
 	U1 c,d, cc;
 	I4x2 wh;
@@ -569,7 +573,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 			//dstPX.y /= CRSfrm.w;
 			dstPX.y += divPX.y;
 
-			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 1 );
+			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 1, NULL );
 		}
 	}
 
@@ -664,7 +668,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 				dstPX.y *= dstPX.h;
 				dstPX.y += divPX.y;
 
-				frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 1 );
+				frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 1, NULL );
 			}
 		}
 	}
@@ -674,7 +678,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
 	dstPX.x += divPX.x;
 	dstPX.y += divPX.y;
 
-	frmDRW( dstPX, src, CRSfrm.a4x2[1], win.pSRFwin, win.pSRFchar, frmC, 1 );
+	frmDRW( dstPX, src, CRSfrm.a4x2[1], win.pSRFwin, win.pSRFchar, frmC, 1, pSTR );
 	return false;
 }
 void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )

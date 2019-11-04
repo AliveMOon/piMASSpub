@@ -93,31 +93,28 @@ class gpcCRS
 
 		bool	miniOFF( void );
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
-		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, // gpcMASS* pMASS,
-							I4x4 scnXYCR  );
+		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH );
 		void CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 		void CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
-		I4x4 scnZNCR(	gpcWIN& win, //U1 iDIV,
-						gpcMASS& mass, const I4x2& _xy );
+		I4x4 scnZNCR(	gpcWIN& win, gpcMASS& mass, const I4x2& _xy );
 	protected:
 
 	private:
 		I4x4 		CRSfrm;
 		SDL_Rect 	wDIVfrm;
-		//gpcCRS(const gpcCRS& other);
-		//gpcCRS& operator=(const gpcCRS& other);
-		void frmDRW( SDL_Rect dst, SDL_Rect src, I4x2 wh, SDL_Surface* pTRG, SDL_Surface* pCHAR, U1 frmC, U4 x  )
+
+		void frmDRW( SDL_Rect dst, SDL_Rect src, I4x2 wh, SDL_Surface* pTRG, SDL_Surface* pCHAR, U1 frmC, U4 x, const U1* pSTR )
 		{
 			if( this ? !frmC : true )
 				return;
 			dst.w *= x;
 			dst.h *= x;
 			wh /= x;
-
+			U4 nSTR = pSTR ? strlen( (char*)pSTR ) : 0;
 			SDL_Rect dst2;
 			U4	cx = src.w*8,
 				cy = src.h*32,
@@ -131,10 +128,23 @@ class gpcCRS
 
 			dst2 = dst;
 
-			dst2.x += dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
-			dst2.w *= wh.x-2;
+			dst2.x += dst.w + nSTR*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
+			dst2.w *= wh.x-(2-nSTR);
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
 
+			if( nSTR )
+			{
+                for( U4 i = 0; i < nSTR; i++ )
+                {
+					c = pSTR[i] - ' ';
+					src.x = (c%8)*src.w + scx;
+					src.y = (c/8)*src.h + scy;
+					dst2 = dst;
+					dst2.x += (i+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
+
+					SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+                }
+			}
 
 
 			c = 3+0xb0;
