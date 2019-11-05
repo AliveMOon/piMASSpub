@@ -504,18 +504,19 @@ public:
 	};
 };
 U4STR aSIZEOF[] = {
-	{ sizeof(gpcMASS), "gpcMASS" },
-	{ sizeof(gpcWIN), "gpcWIN" },
-	{ sizeof(gpcCRS), "gpcCRS" },
-	{ sizeof(gpcSRC), "gpcSRC" },
-	{ sizeof(gpcRES), "gpcRES" },
-	{ sizeof(gpcALU), "gpcALU" },
-	{ sizeof(gpcADR), "gpcADR" },
-	{ sizeof(gpcISA), "gpcISA" },
-	{ sizeof(I8x4), "I8x4" },
-	{ sizeof(I8x2), "I8x2" },
-	{ sizeof(U4x4), "U4x4" },
-	{ sizeof(U4x2), "U4x2" },
+	{ sizeof(gpcMASS),	"gpcMASS" },
+	{ sizeof(gpcWIN),	"gpcWIN" },
+	{ sizeof(gpcCRS),	"gpcCRS" },
+	{ sizeof(gpcSRC),	"gpcSRC" },
+	{ sizeof(gpcRES), 	"gpcRES" },
+	{ sizeof(gpcGT),	"gpcGT" },
+	{ sizeof(gpcALU),	"gpcALU" },
+	{ sizeof(gpcADR),	"gpcADR" },
+	{ sizeof(gpcISA),	"gpcISA" },
+	{ sizeof(I8x4),		"I8x4" },
+	{ sizeof(I8x2),		"I8x2" },
+	{ sizeof(U4x4),		"U4x4" },
+	{ sizeof(U4x2),		"U4x2" },
 };
 
 #ifdef _WIN64

@@ -56,6 +56,7 @@
 	#ifdef gpdSYSpi
 	#include <raspicam/raspicam.h>
 	#endif // gpdSYSpi
+
 	#include <unistd.h> // for usleep()
 
 	#include <sys/socket.h>
@@ -68,6 +69,7 @@
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
 	#include <arpa/inet.h>
+	#include <ifaddrs.h>
 	#include <X11/X.h>
 	#include <X11/Xlib.h>
 	#include <X11/Xutil.h>
@@ -222,6 +224,15 @@ class gpcMASS;
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
+SOCKET inline gpfSOC_CLOSE( SOCKET& h )
+{
+	if( h == INVALID_SOCKET )
+		return INVALID_SOCKET;
+
+	close( h );
+	h = INVALID_SOCKET;
+	return h;
+}
 
 U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFadd )
 {
@@ -302,6 +313,7 @@ enum gpeLX:U8
 {
     gpeZERO,
     gpeMXPATH = gpmPAD( PATH_MAX, 0x10 ) , //0x10*0x11,
+    gpeRECVn = (0x30000/12),
 };
 
 #include "gpeALF.h"
@@ -2313,7 +2325,7 @@ public:
     {
 		gpmMEMCPY( this, pB, 1 );
     }
-    I8x2& operator = ( const U1* ppS );
+    I8x2& operator = ( const U1* pS );
 	// cnt = fract * U42(1, w);
 	I8x2& cnt2fract( U4 w, U8 cnt )
 	{
@@ -2505,6 +2517,24 @@ public:
 		return I8x2( x<0?-x:x, y<0?-y:y );
 	}
 	I8x2& A( U1* pA, U1** ppA );
+
+	U8 str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false )
+	{
+		if( !p_buff )
+			return 0;
+		if( !this )
+		{
+			*p_buff = 0;
+			return 0;
+		}
+		U1* p_begin = p_buff;
+		p_buff += gpfALF2STR( p_buff, alf ); //, b_hex );
+		//_strupr( p_begin );
+		p_buff += sprintf( (char*)p_buff, b_hex ? "%llx": "%lld", max(num,0) );
+		if( p_post )
+			p_buff += sprintf( (char*)p_buff, "%s", p_post );
+		return p_buff-p_begin;
+	}
 
 };
 

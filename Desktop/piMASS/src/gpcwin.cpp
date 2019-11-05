@@ -147,6 +147,7 @@ void gpcWIN::run( const char* pWELLCOME )
 		mSEC.y = mSEC.x;
 		mSEC.x = SDL_GetTicks();
 		mSEC.z = mSEC.x-mSEC.y;
+		mSEC.w = 1000/max( 1, mSEC.z);
 
 
 		gpcCRS& crs = *apCRS[srcDIV]; // ? *apCRS[srcDIV] : main_crs;
@@ -370,7 +371,7 @@ void gpcWIN::run( const char* pWELLCOME )
 						" %d F%d =-"
 						" %d, %d",
 
-						mSEC.z,
+						mSEC.w,
 						gpsMASSname,
 						mouseXY.x, mouseXY.y, onDIV.x,
 						SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
@@ -387,7 +388,7 @@ void gpcWIN::run( const char* pWELLCOME )
 		//while( SDL_PollEvent( &ev ) )
 		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
 
-		if( SDL_WaitEventTimeout( &ev, 20 ) )
+		if( SDL_WaitEventTimeout( &ev, 10 ) ) /// EVENTS --------------------------------------------------
 		{
 			gpnEVENT++;
 			gpnTITLE = gpnEVENT;
@@ -799,6 +800,10 @@ void gpcWIN::run( const char* pWELLCOME )
 
 				c = 0;
 			}
+		}
+		else if( piMASS )
+		{
+
 		}
 
 	}

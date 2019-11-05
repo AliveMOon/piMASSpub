@@ -1,7 +1,7 @@
 #ifndef GPCSRC_H
 #define GPCSRC_H
 
-#include "piMASS.h"
+#include "gpcgt.h" //#include "piMASS.h"
 //#include "gpcSCHL.h"
 #include "gpcOPCD.h"
 
@@ -1120,6 +1120,10 @@ public:
 	U4			 anDICTix[0x1000],
 				//aLEVsp[0x100],
 				rstLEV, iLEV, nLEV, topLEV;
+
+	// GATE --------
+	gpcGTall	GTacpt, GTcnct;
+
 
 	U4 relLEV( void )
 	{
