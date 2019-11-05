@@ -24,7 +24,7 @@ public:
 		an = anDWN;
 	}
 	gpcGT_DWNL( char* p_file );
-	gpcLAZY* join( gpcLAZY* pOUT, gpcGT& mom );
+	gpcLAZY* join( gpcLAZY* pOUT, gpcGT& mom, gpcLAZY* pEXE = NULL );
 };
 
 class gpcHUD

@@ -155,7 +155,7 @@ void gpcGT::GTos( gpcGT& mom )
 				p_str = p_row;
 			}
 		}
-		if( pINP ? (p_sub > pINP->p_alloc : false )
+		if( pINP ? (p_sub > pINP->p_alloc) : false )
 		{
 			U8 s = 0;
 			pINP->lzy_ins( NULL, 0, s, p_sub-pINP->p_alloc );
