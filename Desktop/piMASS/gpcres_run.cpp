@@ -2,7 +2,7 @@
 extern U1 gpaALFadd[];
 U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t", *gppTABrun = gpsTABrun + strlen( (char*)gpsTABrun );
 
-bool bITT = false;
+bool bITT = true; // false; //
 
 gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSM )
 {
@@ -18,7 +18,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, 
 	U1 sBUFF[0x1000];
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
-		gpmCOUT( bITT, cout << (char)pISA[i].isa.aISA[0] );
+		gpmCOUT( bITT, cout << (((char)pISA[i].isa.aISA[0] ? (char)pISA[i].isa.aISA[1] : '~')) );
 		switch( pISA[i].isa.aISA[0] )
         {
 			case gpeISA_trg:{
