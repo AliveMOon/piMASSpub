@@ -546,6 +546,7 @@ enum gpeISA : I1
 {
 	gpeISA_nop,
 	gpeISA_u8,
+	gpeISA_i8,
 	gpeISA_d8,
 	gpeISA_an,
 	gpeISA_anFUN,
@@ -1200,6 +1201,21 @@ public:
 
     U4x2& operator = ( const I8x2& an );
 	// cnt = fract * U4x2(1, w);
+	U1* strA4N( U1* pBUFF )
+    {
+		sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, a4 )), "%d", n4 );
+		return pBUFF;
+    }
+    U1* strVAR( U1* pBUFF )
+    {
+		gpfALF2STR( pBUFF, var );
+		return pBUFF;
+    }
+	U1* str( U1* pBUFF, const char* pSP = ", " )
+    {
+		sprintf( (char*)pBUFF, "%d%s%d%s", x,pSP,y,pSP );
+		return pBUFF;
+    }
 	U4x2& cnt2fract(U4 w, U8 cnt)
 	{
 		U1 lg = log2(w * w);

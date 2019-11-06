@@ -57,9 +57,10 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	gpcISA	*pI = NULL, *pUD8 = NULL;
 	nASG = 0;
 
-	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE ? *pS : false; pS += gpmNINCS( pS, " \t\r\n" ), aOP[1] = aOP[0] )
+	for( 	pS += gpmNINCS( pS, " \t\r\n" );
+			pS < pE ? *pS : false;
+			pS += gpmNINCS( pS, " \t\r\n" ), aOP[1] = aOP[0] ) // korábbi OP ot elrakjuk hátha minuszolni akarjuk a következő dolgot vagy valami
 	{
-		//aOP[1] = aOP[0];
 		if( aOP[0].u4 )
 		{
 			if( str.n_load )
@@ -71,8 +72,9 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				resISA_stp( pUD8->stp(aOP[0]) );
 
 			pI = pUD8 = NULL;
-			aOP[0] = 0; //.null();
-		} //else
+			aOP[0] = 0;
+
+		}
 
 		if( gpmbABC( *pS, gpaALFadd ) ) { /// ALF NUM -------------------------------------------------
 			if( str.n_load )
@@ -318,7 +320,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 			case '*': { // SZORZÁS
 					aOP[0].y++;
-
 				} break;
 			case '/': {
 					switch( *pS ) {
@@ -458,7 +459,18 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	if( ppE )
 		*ppE = pS;
 
+	if( str.n_load )
+		pI = resISA_str( str );
+
 	if( pI )
+		resISA_stp( pI->stp(';') );
+	else if( pUD8 )
+		resISA_stp( pUD8->stp(';') );
+
+	pI = pUD8 = NULL;
+	aOP[0] = 0;
+
+	/*if( pI )
 		resISA_stp( pS[-1] );
 	else if( pUD8 )
 	{
@@ -477,7 +489,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 		}
 		pUD8 = NULL;
-	}
+	}*/
 
 	gpmDEL( pTMP ) // nem lett sehove elrakva? Arroe KONYEC!
 

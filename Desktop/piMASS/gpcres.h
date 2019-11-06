@@ -258,7 +258,153 @@ public:
 	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );*/
 };
 
+class gpcREG
+{
+	U8		u;
+	I8		i;
+	double	d;
+	U4 bD, nLG;
 
+public:
+	gpcREG(){ bD = 0; };
+
+	gpcREG& operator = ( U4 u4 )
+	{
+		if( u4 )
+		{
+			u = u4;
+			bD = 1;
+			return *this;
+		}
+		gpmCLR;
+		return *this;
+	}
+	gpcREG& operator = ( I4 i4 )
+	{
+		if( i4 )
+		{
+			i = i4;
+			bD = 2;
+			return *this;
+		}
+		gpmCLR;
+		return *this;
+	}
+	gpcREG& operator = ( float f4 )
+	{
+		if( f4 != 0.0f )
+		{
+			d = f4;
+			bD = 4;
+			return *this;
+		}
+		gpmCLR;
+		return *this;
+	}
+
+	gpcREG& operator = ( U8 u8 )
+	{
+		if( u8 )
+		{
+			u = u8;
+			bD = 1;
+			return *this;
+		}
+		gpmCLR;
+		return *this;
+	}
+	gpcREG& operator = ( I8 i8 )
+	{
+		if( i8 )
+		{
+			i = i8;
+			bD = 2;
+			return *this;
+		}
+		gpmCLR;
+		return *this;
+	}
+	gpcREG& operator = ( double d8 )
+	{
+		if( d8 != 0.0 )
+		{
+			d = d8;
+			bD = 4;
+			return *this;
+		}
+		gpmCLR;
+		return *this;
+	}
+
+	U8 u8()
+	{
+		if( this ? !bD : true )
+			return 0;
+
+		if( bD&1 )
+			return u;
+
+		if( bD&2 )
+			u = i < 0 ? -i : i;
+		else if( bD&4 )
+			u = d < 0.0 ? -d : d;
+		bD |= 1;
+		return u;
+	}
+	I8 i8()
+	{
+		if( this ? !bD : true )
+			return 0;
+
+		if( bD&2 )
+			return i;
+
+		if( bD&4 )
+			i = d;
+		else if( bD&1 )
+			i = u;
+
+		bD |= 2;
+		return i;
+	}
+	double d8()
+	{
+		if( this ? !bD : true )
+			return 0.0;
+
+		if( bD&4 )
+			return d;
+
+		if( bD&2 )
+			d = i;
+		else if( bD&1 )
+			d = u;
+
+		bD |= 4;
+		return d;
+	}
+
+};
+class gpcSTK
+{
+public:
+	gpcSTK* pMOM;
+	U4	iT = 0, nT = 0,
+		iA = 0, nA = 0,
+		iV = 0, nV = 0,
+		iD = 0, nD = 0,
+		iG = 0, nG = 0,
+		iS = 0, nS = 0;
+
+	U4x2	aTRG[8];
+	gpcREG	D[8];
+	gpeALF	aVR[8],
+			aTG[8];
+	U1*		apSTR[8];
+
+	gpcSTK( gpcSTK* pM ){ gpmCLR; pMOM = pM; };
+
+};
 
 class gpcRES
 {
@@ -397,7 +543,7 @@ public:
 
 	gpcRES* compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	gpcRES* compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
-	gpcRES* run( gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0 );
+	gpcRES* run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
 
 	gpcALU& ALU( U4 iA )
 	{
@@ -471,6 +617,7 @@ public:
 
 		return this;
 	}
+
 	gpcALU& ADD( gpeALF alf, U4 typ, U4 op ) {
 		U4 nCPY = nA;
 		nA++;
@@ -1152,6 +1299,8 @@ public:
 			case gpeNET4_RES:
 				((gpcREStrs*)pDAT)[yax] = u8;
 				return *this;
+			default:
+				break;
 		}
 											//0011223344556677
 		if( u8 < 							0x8000000000000000 )
