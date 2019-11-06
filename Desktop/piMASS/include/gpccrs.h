@@ -111,8 +111,15 @@ class gpcCRS
 		{
 			if( this ? !frmC : true )
 				return;
-			dst.w *= x;
-			dst.h *= x;
+			bool bHALF = false;
+			if( x )
+			{
+				dst.w *= x;
+				dst.h *= x;
+			} else {
+				x = 1;
+				bHALF = true;
+			}
 			wh /= x;
 			U4 nSTR = pSTR ? strlen( (char*)pSTR ) : 0;
 			SDL_Rect dst2;
@@ -128,13 +135,29 @@ class gpcCRS
 
 			dst2 = dst;
 
-			dst2.x += dst.w + nSTR*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
-			dst2.w *= wh.x-(2-nSTR);
+			dst2.x += (nSTR+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
+			dst2.w *= (wh.x-2) - nSTR;
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
 
 			if( nSTR )
 			{
-                for( U4 i = 0; i < nSTR; i++ )
+				if( bHALF )
+				{
+					for( U4 i = 0; i < nSTR; i++ )
+					{
+						c = pSTR[i] - ' ';
+						src.x = (c%8)*src.w + scx;
+						src.y = (c/8)*src.h + scy;
+						dst2 = dst;
+
+						dst2.w /= 2;
+						dst2.h /= 2;
+
+						dst2.x += (i+3)*(dst.w/2);	// (i%CRSfrm.z)*dst.w + div.x;
+						SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+					}
+				}
+                else for( U4 i = 0; i < nSTR; i++ )
                 {
 					c = pSTR[i] - ' ';
 					src.x = (c%8)*src.w + scx;

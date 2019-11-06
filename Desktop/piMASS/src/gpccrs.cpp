@@ -447,12 +447,12 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR )
 	if( id == sDIV ) 			// sárga
 	{
 		frmC = gpeCLR_orange; 		//gpaC64[gpeCLR_yellow];
-		pSTR = (U1*)" SRC ";
+		pSTR = (U1*)"SRC";
 	}
 	else if( id == dDIV )			// zöld
 	{
 		frmC = gpeCLR_green; 		//gpaC64[gpeCLR_green];
-		pSTR = (U1*)" DST ";
+		pSTR = (U1*)"DST";
 	}
 
 	U1 c,d, cc;
@@ -572,8 +572,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR )
 			dstPX.y *= dstPX.h;
 			//dstPX.y /= CRSfrm.w;
 			dstPX.y += divPX.y;
-
-			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 1, NULL );
+			U1 sSTR[0x20];
+			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 0,  (scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
 		}
 	}
 
@@ -678,7 +678,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR )
 	dstPX.x += divPX.x;
 	dstPX.y += divPX.y;
 
-	frmDRW( dstPX, src, CRSfrm.a4x2[1], win.pSRFwin, win.pSRFchar, frmC, 1, pSTR );
+	frmDRW( dstPX, src, CRSfrm.a4x2[1], win.pSRFwin, win.pSRFchar, frmC, 0, pSTR );
 	return false;
 }
 void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )

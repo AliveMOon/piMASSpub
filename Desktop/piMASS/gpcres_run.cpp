@@ -2,6 +2,7 @@
 extern U1 gpaALFadd[];
 U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t", *gppTABrun = gpsTABrun + strlen( (char*)gpsTABrun );
 
+bool bITT = false;
 
 gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSM )
 {
@@ -17,7 +18,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, 
 	U1 sBUFF[0x1000];
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
-		cout << (char)pISA[i].isa.aISA[0];
+		gpmCOUT( bITT, cout << (char)pISA[i].isa.aISA[0] );
 		switch( pISA[i].isa.aISA[0] )
         {
 			case gpeISA_trg:{
@@ -25,50 +26,50 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, 
 					stk.nT++;
 				} break;
  			case gpeISA_u8: {
-					cout << pISA[i].an.u8;
+					gpmCOUT( bITT, cout << pISA[i].an.u8 );
 					stk.D[stk.nD] = pISA[i].an.u8;
 					stk.nD++;
 				} break;
 			case gpeISA_i8: {
-					cout << -((I8)pISA[i].an.u8);
+					gpmCOUT( bITT, cout << -((I8)pISA[i].an.u8) );
 					stk.D[stk.nD] = -((I8)pISA[i].an.u8);
 					stk.nD++;
 				} break;
 			case gpeISA_d8: {
-					cout << pISA[i].an.d8;
+					gpmCOUT( bITT, cout << pISA[i].an.d8 );
 					stk.D[stk.nD] = pISA[i].an.d8;
 					stk.nD++;
 				} break;
 
 			case gpeISA_an: {
-					cout << pISA[i].an.strA4N( sBUFF );
+					gpmCOUT( bITT, cout << pISA[i].an.strA4N( sBUFF ) );
 					stk.aTRG[stk.nA] = pISA[i].an;
 					stk.nA++;
 				} break;
 			case gpeISA_anFUN: {
-					cout << pISA[i].an.strA4N( sBUFF );
+					gpmCOUT( bITT, cout << pISA[i].an.strA4N( sBUFF ) );
 					stk.aTRG[stk.nA] = pISA[i].an;
 					stk.nA++;
 				} break;
 
 			case gpeISA_tag: {
-					cout << pISA[i].an.strVAR( sBUFF );
+					gpmCOUT( bITT, cout << pISA[i].an.strVAR( sBUFF ) );
 					stk.aTG[stk.nG] = pISA[i].an.var;
 					stk.nG++;
 				} break;
 
 			case gpeISA_var: {
-					cout << pISA[i].an.strVAR( sBUFF );
+					gpmCOUT( bITT, cout << pISA[i].an.strVAR( sBUFF ) );
 					stk.aVR[stk.nV] = pISA[i].an.var;
 					stk.nV++;
 				} break;
 			case gpeISA_FUN: {
-					cout << pISA[i].an.strVAR( sBUFF );
+					gpmCOUT( bITT, cout << pISA[i].an.strVAR( sBUFF ) )
 					stk.aVR[stk.nV] = pISA[i].an.var;
 					stk.nV++;
 				} break;
 			case gpeISA_str: {
-					cout << (char*)( stk.apSTR[stk.nS] = pISA[i].an.aSTR[0] );
+					gpmCOUT( bITT, cout << (char*)( stk.apSTR[stk.nS] = pISA[i].an.aSTR[0] ) );
 					stk.nS++;
 				} break;
 
@@ -119,7 +120,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, 
 				break;
 		}
 
-		cout << (char)pISA[i].isa.aISA[1] << endl;
+		gpmCOUT( bITT, cout << ((char)pISA[i].isa.aISA[1] ? (char)pISA[i].isa.aISA[1] : '~') << endl );
 	}
 
 

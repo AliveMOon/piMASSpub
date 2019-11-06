@@ -159,6 +159,8 @@ class I8x2;
 class I8x4;
 class gpcMASS;
 
+#define gpmCOUT( b, p ) if( b ){ p; }
+
 #define gpdGT_NoDALEY 1
 #define INVALID_SOCKET  (SOCKET)(~0)
 #define SOCKET_ERROR            (-1)
@@ -2022,9 +2024,15 @@ public:
         {
 			I4x2 a4x2[2];
 		};
+
 		struct
         {
 			SDL_Rect xyWH;
+        };
+
+        struct
+        {
+			U4x2 au4x2[2];
         };
 	};
     I4x4(){};
