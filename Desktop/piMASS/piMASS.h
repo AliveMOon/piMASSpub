@@ -159,7 +159,7 @@ class I8x2;
 class I8x4;
 class gpcMASS;
 
-#define gpmCOUT( b, p ) if( b ){ p; }
+//#define gpm_bool( b, p ) if( b ){ (p) }
 
 #define gpdGT_NoDALEY 1
 #define INVALID_SOCKET  (SOCKET)(~0)

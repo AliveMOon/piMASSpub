@@ -33,6 +33,7 @@ enum gpeMASSsw:U8
 	gpeMASSmain,
 	gpeMASSzn,
 	gpeMASSloop,
+	gpeMASSdebug,
 
 	gpeMASSalert,
 	gpeMASSprg,
@@ -51,6 +52,7 @@ enum gpeMASSsw:U8
 	gpeMASSmainMSK = 1<<gpeMASSmain,
 	gpeMASSznMSK = 1<<gpeMASSzn,
 	gpeMASSloopMSK = 1<<gpeMASSloop,
+	gpeMASSdebugMSK = 1<<gpeMASSdebug,
 
 	gpeMASSclrMSK = (1<<gpeMASSalert)-1,
 	gpeMASSalertMSK,
@@ -594,9 +596,7 @@ public:
     gpeALF	*pALFtg;
     gpcRES	*pEXE,
 			*apOUT[4];
-	gpcLAZY	// *pEXE,
-			// *pRES,
-			*pMINI,
+	gpcLAZY	*pMINI,
 			*pBIG;
 
 	gpcMAP	*pMAP;

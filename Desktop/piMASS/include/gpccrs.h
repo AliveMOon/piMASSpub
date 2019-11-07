@@ -133,11 +133,14 @@ class gpcCRS
 			src.x = (c%8)*src.w + scx;
 			src.y = (c/8)*src.h + scy;
 
-			dst2 = dst;
+			if( wh.x > (2+nSTR) )
+			{
+				dst2 = dst;
 
-			dst2.x += (nSTR+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
-			dst2.w *= (wh.x-2) - nSTR;
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+				dst2.x += (nSTR+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
+				dst2.w *= wh.x - (2+nSTR);
+				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+			}
 
 			if( nSTR )
 			{
@@ -154,6 +157,8 @@ class gpcCRS
 						dst2.h /= 2;
 
 						dst2.x += (i+3)*(dst.w/2);	// (i%CRSfrm.z)*dst.w + div.x;
+						if( dst2.y > (dst.h/4) )
+							dst2.y -= (dst.h/4);
 						SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
 					}
 				}
@@ -180,18 +185,29 @@ class gpcCRS
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
 
 
+			if( wh.y > 2 )
+			{
+				c = 2+0xb0;
+				src.x = (c%8)*src.w + scx;
+				src.y = (c/8)*src.h + scy;
 
-			c = 2+0xb0;
-			src.x = (c%8)*src.w + scx;
-			src.y = (c/8)*src.h + scy;
+				dst2 = dst;
 
-			dst2 = dst;
+				dst2.x += (wh.x-1)*dst.w;
+				dst2.y += dst.h;
+				dst2.h *= wh.y-2;
+				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
 
-			dst2.x += (wh.x-1)*dst.w;
-			dst2.y += dst.h;
-			dst2.h *= wh.y-2;
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+				c = 0x8+0xb0;
+				src.x = (c%8)*src.w + scx;
+				src.y = (c/8)*src.h + scy;
 
+				dst2 = dst;
+
+				dst2.y += dst.h;
+				dst2.h *= wh.y-2;
+				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+			}
 
 
 			c = 6+0xb0;
@@ -205,18 +221,19 @@ class gpcCRS
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
 
 
+			if( wh.x > 2 )
+			{
+				c = 4+0xb0;
+				src.x = (c%8)*src.w + scx;
+				src.y = (c/8)*src.h + scy;
 
-			c = 4+0xb0;
-			src.x = (c%8)*src.w + scx;
-			src.y = (c/8)*src.h + scy;
+				dst2 = dst;
 
-			dst2 = dst;
-
-			dst2.x += dst.w;
-			dst2.y += (wh.y-1)*dst.h;
-			dst2.w *= wh.x-2;
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
-
+				dst2.x += dst.w;
+				dst2.y += (wh.y-1)*dst.h;
+				dst2.w *= wh.x-2;
+				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+			}
 
 
 			c = 0xc+0xb0;
@@ -227,20 +244,6 @@ class gpcCRS
 			dst2.y += (wh.y-1)*dst.h;
 
 			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
-
-
-
-			c = 0x8+0xb0;
-			src.x = (c%8)*src.w + scx;
-			src.y = (c/8)*src.h + scy;
-
-			dst2 = dst;
-
-			dst2.y += dst.h;
-			dst2.h *= wh.y-2;
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
-
-
 
 			c = 0x9+0xb0;
 			src.x = (c%8)*src.w + scx;
