@@ -463,9 +463,9 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 		pI = resISA_str( str );
 
 	if( pI )
-		resISA_stp( pI->stp(';') );
+		resISA_stp( ';' ); //pI->stp(';') );
 	else if( pUD8 )
-		resISA_stp( pUD8->stp(';') );
+		resISA_stp( ';' ); //pUD8->stp(';') );
 
 	pI = pUD8 = NULL;
 	aOP[0] = 0;

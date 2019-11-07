@@ -104,14 +104,14 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 	{
 		if( (U1)pISA[i].isa.aISA[0] > ' ' )
 		{
-			*pB =  (U1)pISA[i].isa.aISA[0];
+			*pB = (U1)pISA[i].isa.aISA[0];
 			pB++;
 		}
 
 		switch( pISA[i].isa.aISA[0] )
         {
 			case gpeISA_trg:{
-					pB += sprintf( (char*)pB, "%s", pISA[i].an.str( sBUFF ) );
+					pB += sprintf( (char*)pB, "[%d:%d]", pISA[i].an.x, pISA[i].an.y );
 					stk.aTRG[stk.nT] = pISA[i].an;
 					stk.nT++;
 				} break;
@@ -212,7 +212,6 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 			gpeISA_blkE:{} break;
 			gpeISA_nop:
 			default:
-				pB--;
 				break;
 		}
 	}
@@ -220,7 +219,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 
 	if( bITT )
 	if( pCOUT < pB )
-		cout << pCOUT; // << endl;
+		cout << (char*)pCOUT << endl; // ; //
 
 	if( !pSRC )
 		return pOUT;
