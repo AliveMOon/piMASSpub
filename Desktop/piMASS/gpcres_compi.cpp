@@ -7,9 +7,9 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	if( pS >= pE )
 		return this;
 
-	gpcRES* pTMP = this ? NULL : new gpcRES( pM );
-	if( pTMP )
-		return pTMP->compiEASY( pS, pE, ppE, pM );
+	gpcRES* pTHIS = this ? NULL : new gpcRES( pM );
+	if( pTHIS )
+		return pTHIS->compiEASY( pS, pE, ppE, pM );
 	else if( !this )
 		return NULL;
 
@@ -37,24 +37,19 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	I1x4 aOP[2] = {0};
 
 	bool	bMATH = false,
-			bCROSS = false; //,
+			bCROSS = false,
+			bGD = false; //,
 			//bOP;
 	gpeALF XML = gpeALF_null;
 	I4 xmlD = 0;
 
 
 	gpcADR adr;
-	//gpcALU	aALU[8];
-
-	//U4x2 sub = 0;
-
-	I8x2 an; //aAN[8];
-
-	//gpmZ(aALU);
+	I8x2 an;
 	gpcLAZY str;
 	U4  nAN = 0, nALU = 0, //iI,
 		iTRG = 0;
-	gpcISA	*pI = NULL, *pUD8 = NULL;
+	gpcISA	*pA = NULL, *pI = NULL, *pUD8 = NULL;
 	nASG = 0;
 
 	for( 	pS += gpmNINCS( pS, " \t\r\n" );
@@ -221,10 +216,14 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					pI = resISA_stp( pS[-1] );
 				} break;
 
-			case ';': //{	// SOROK
-			case ',': {	// vessző OSZLOPOK
+			// valamit befejez
+			case ';': 		// ;	SOROK		xyWH.y++;
+			case ',': {		// , 	OSZLOPOK	xyWH.x++;
 					if( str.n_load )
 						pI = resISA_str( str );
+
+					if( !bGD )
+						bGD = pI || pUD8;
 
 					if( pI )
 						resISA_stp( pS[-1] );
@@ -286,7 +285,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						aOP[0].z |= 0x8;
 						break;
 					}
-
 					nASG++;
 					//xyWH.null();
 					// /// ITT a TRG ------------------------------------------------------
@@ -304,6 +302,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					}
 					resISA_stp( pS[-1] );
 					pI = pUD8 = NULL;
+					bGD = true;
 
 				} break;
 			/// ALU ------------------------------------------------------------------------------
@@ -383,7 +382,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			case ')':
 			case ']': {
 						//pI = resISA_stp(pS[-1], xyWH.a4x2[0]);
-
+						bGD = true;
 						pE = pS;
 					} break;
 			case '<':
@@ -470,6 +469,9 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	if( ppE )
 		*ppE = pS;
 
+	if( !bGD )
+		return this;
+
 	if( str.n_load )
 		pI = resISA_str( str );
 
@@ -502,7 +504,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 		pUD8 = NULL;
 	}*/
 
-	gpmDEL( pTMP ) // nem lett sehove elrakva? Arroe KONYEC!
+	// gpmDEL( pTMP ) // nem lett sehove elrakva? Arroe KONYEC!
 
 	return this;
 }

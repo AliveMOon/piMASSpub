@@ -385,24 +385,51 @@ public:
 	}
 
 };
+class gpfFLG
+{
+public:
+	U4	iT = 0,	// trg	TRG
+		iA = 0,	// an	AN
+		iV = 0,	// var	VR
+		iD = 0, // reg	D
+		iG = 0, // tag	TG
+		iS = 0;	// str	STR;
+	gpfFLG& null() { gpmCLR; };
+	gpfFLG(){};
+
+
+};
 class gpcSTK
 {
 public:
-	gpcSTK* pMOM;
-	U4	iT = 0, nT = 0,
-		iA = 0, nA = 0,
-		iV = 0, nV = 0,
-		iD = 0, nD = 0,
-		iG = 0, nG = 0,
-		iS = 0, nS = 0;
 
-	U4x2	aTRG[8];
+	gpcSTK* pMOM;
+	gpcRES* pCres;
+	gpcSRC* pCsrc;
+
+	U4x2	aTRG[8],
+			aAN[8];
 	gpcREG	D[8];
 	gpeALF	aVR[8],
 			aTG[8];
 	U1*		apSTR[8];
+	gpfFLG 	main,
+			aFLG[8];
+	U4	iF = 0, nF = 0;
 
-	gpcSTK( gpcSTK* pM ){ gpmCLR; pMOM = pM; };
+	gpcSTK( gpcSTK* pM, gpcRES* pR, gpcSRC* pS ){ gpmCLR; pMOM = pM; pCres = pR; pCsrc = pS; };
+	U4 stpFLG( void )
+	{
+		aFLG[nF] = main;
+		iF = nF;
+		nF++;
+		main.null();
+		return nF;
+	}
+	gpfFLG& iFLG()
+	{
+		return aFLG[iF];
+	}
 
 };
 

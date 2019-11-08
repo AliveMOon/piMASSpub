@@ -3,22 +3,23 @@ extern U1 gpaALFadd[];
 
 bool bITT = true; // false; //
 
-gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSM )
+gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
 	if( this ? !pISA : true )
 		return pOUT;
 
-	gpcSTK stk( pSM );
 	if( pOUT ? !deep : false )
 	{
 		pOUT = new gpcRES;
 	}
-	U8 u8; I8 i8; double d8;
+	gpcSTK stk( pSTK, pOUT, pSRC );
+	U8 u8; I8 i8; double d8, iASG, nOUT = 0;
 	U1 sBUFF[0x1000], *pB = sBUFF+0x20, *pS = pB, nB;
 	bool bROW = false;
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
 		gpcISA &IS = pISA[i];
+		gpfFLG &flg = stk.main;
 		if( (U1)IS.isa.aISA[0] > ' ' )
 		{
 			*pB = (U1)IS.isa.aISA[0];
@@ -29,55 +30,65 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
         {
 			case gpeISA_trg:{
 					pB += sprintf( (char*)pB, "[%d:%d]", IS.an.x, IS.an.y );
-					stk.aTRG[stk.nT] = IS.an;
-					stk.nT++;
+					stk.aTRG[flg.iT] = IS.an;
+					flg.iT++;
 				} break;
- 			case gpeISA_u8: {
-					pB += sprintf( (char*)pB, "%lld", IS.an.u8 );
-					stk.D[stk.nD] = IS.an.u8;
-					stk.nD++;
-				} break;
-			case gpeISA_i8: {
-					pB += sprintf( (char*)pB, "%lld", -((I8)IS.an.u8) );
-					stk.D[stk.nD] = -((I8)IS.an.u8);
-					stk.nD++;
-				} break;
-			case gpeISA_d8: {
-					pB += sprintf( (char*)pB, "%f",  IS.an.d8 );
-					stk.D[stk.nD] = IS.an.d8;
-					stk.nD++;
-				} break;
+
 
 			case gpeISA_an: {
 					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
-					stk.aTRG[stk.nA] = IS.an;
-					stk.nA++;
+					stk.aAN[flg.iA] = IS.an;
+					flg.iA++;
 				} break;
 			case gpeISA_anFUN: {
 					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
-					stk.aTRG[stk.nA] = IS.an;
-					stk.nA++;
+					stk.aAN[flg.iA] = IS.an;
+					flg.iA++;
 				} break;
 
-			case gpeISA_tag: {
-					 pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
-					stk.aTG[stk.nG] = IS.an.var;
-					stk.nG++;
+			/// gpcREG D[]
+ 			case gpeISA_u8: {
+					pB += sprintf( (char*)pB, "%lld", IS.an.u8 );
+					stk.D[flg.iD] = IS.an.u8;
+					flg.iD++;
 				} break;
+			case gpeISA_i8: {
+					pB += sprintf( (char*)pB, "%lld", -((I8)IS.an.u8) );
+					stk.D[flg.iD] = -((I8)IS.an.u8);
+					flg.iD++;
+				} break;
+			case gpeISA_d8: {
+					pB += sprintf( (char*)pB, "%f",  IS.an.d8 );
+					stk.D[flg.iD] = IS.an.d8;
+					flg.iD++;
+				} break;
+
+
 
 			case gpeISA_var: {
 					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
-					stk.aVR[stk.nV] = IS.an.var;
-					stk.nV++;
+					stk.aVR[flg.iV] = IS.an.var;
+
+					flg.iV++;
 				} break;
 			case gpeISA_FUN: {
 					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
-					stk.aVR[stk.nV] = IS.an.var;
-					stk.nV++;
+					stk.aVR[flg.iV] = IS.an.var;
+
+					flg.iV++;
 				} break;
+
+
+			case gpeISA_tag: {
+					 pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
+					stk.aTG[flg.iG] = IS.an.var;
+					flg.iG++;
+				} break;
+
+
 			case gpeISA_str: {
-					pB += sprintf( (char*)pB, "%s", (stk.apSTR[stk.nS] = IS.an.aSTR[0])) ;
-					stk.nS++;
+					pB += sprintf( (char*)pB, "%s", (stk.apSTR[flg.iS] = IS.an.aSTR[0])) ;
+					flg.iS++;
 				} break;
 			case gpeISA_row:
 				bROW = true;
@@ -86,14 +97,11 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 			default:
 				break;
 		}
+		// CALL
 		if( IS.pRES )
 			pOUT = IS.pRES->run( pOUT, pMN, pMASS, pSRC, this, deep+1, &stk );
 
-		if( (U1)IS.isa.aISA[1] > ' ' )
-		{
-			*pB = (U1)IS.isa.aISA[1];
-			pB++;
-		}
+
 		switch( IS.isa.aISA[1] )
 		{
 			case gpeISA_u8:{} break;
@@ -121,7 +129,49 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 				bROW = true;
 				break;
 			case gpeISA_litl:{} break;
-			case gpeISA_assign:{} break;
+			case gpeISA_assign:{
+					if( !flg.iV )
+					{
+						if( flg.iA )
+						{
+							// ez valami an
+
+							break;
+						}
+						if( flg.iG )
+						{
+							// talán TAG?
+							break;
+						}
+						// egyik sem;
+						break;
+					}
+
+					bROW = false;
+					if( pOUT )
+					{
+						pOUT->alu = stk.aVR[flg.iV-1];
+						pOUT->alu = this;
+						if( !pOUT->alu.pRM )
+						{
+							// lokális változó és már használta valaki
+
+						}
+						break;
+					}
+
+
+					alu = stk.aVR[flg.iV-1];
+					alu = this;
+					if( !alu.pRM )
+					{
+						/// be kell másolni a pOUT-ba;
+
+						// na még mindig nincsen
+						break;
+					}
+
+				} break;
 			case gpeISA_gret:{} break;
 			case gpeISA_exp:{} break;
 			case gpeISA_root:{} break;
@@ -132,13 +182,22 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 			case gpeISA_blkB:{} break;
 			case gpeISA_or:{} break;
 			case gpeISA_blkE:{} break;
+
 			case gpeISA_nop:
 			default:
 				break;
 		}
 
+		if( (U1)IS.isa.aISA[1] > ' ' )
+		{
+			stk.stpFLG();
+			*pB = (U1)IS.isa.aISA[1];
+			pB++;
+		}
+
 		if( !bITT )
 			continue;
+
 		if( !bROW )
 			continue;
 
