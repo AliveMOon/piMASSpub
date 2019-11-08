@@ -59,6 +59,7 @@
 		<Unit filename="gpcgtos.cpp" />
 		<Unit filename="gpcres.cpp" />
 		<Unit filename="gpcres.h" />
+		<Unit filename="gpcres2mini.cpp" />
 		<Unit filename="gpcres_compi.cpp" />
 		<Unit filename="gpcres_run.cpp" />
 		<Unit filename="include/gpcND.h" />

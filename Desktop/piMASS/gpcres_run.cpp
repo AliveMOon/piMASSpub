@@ -1,93 +1,8 @@
 #include "gpcres.h"
 extern U1 gpaALFadd[];
-U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t", *gppTABrun = gpsTABrun + strlen( (char*)gpsTABrun );
 
 bool bITT = true; // false; //
-gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
-{
-	if( !this )
-		return pLZY;
 
-    if( deep ? !pLZY : false )
-		return NULL;
-
-	if( pLZY )
-		pLZY->lzy_reset();
-	else
-		pLZY = new gpcLAZY;
-
-	if( !pLZY )
-		return NULL;
-
-	U8 s = -1;
-	U1* pB = pBUFF;
-	for( U4 a = 0; a < nA; a++ )
-	{
-		ALU( a );
-		pB = pB + gpfALF2STR( pBUFF, alu.alf ) + 1;
-		pLZY->lzy_format( s = -1, "\r\n%s%s.%s[%dx%d]sof(%d) ", gppTABrun-deep, alu.typ.typ2str(pB), pBUFF, alu.AN.x, alu.AN.y, alu.nLOAD() );
-	}
-	/// ha nem DEBUG legyen pMOM == NULL és akor nem írja ki a pISA-t
-	if( !pMOM )
-		return pLZY;
-
-	/*bool b_asg = false;
-	for( U4 i = 0; i < nISA.x; i++ )
-	{
-
-		if( !pLZY )
-			continue;
-		b_asg = pISA[i].isa.aISA[1] == '=';
-		if( b_asg )
-			pLZY->lzy_format( s = -1, "\r\n%s", gppTABrun-deep );
-
-        switch( pISA[i].isa.aISA[0] )
-        {
-
-			case gpeISA_trg:{
-					pLZY->lzy_format( s = -1, "\r\n%s[%d:%d]", gppTABrun-deep, pISA[i].an.x, pISA[i].an.y );
-				} break;
- 			case gpeISA_u8: {
-					pLZY->lzy_format( s = -1, "%lld", pISA[i].an.u8 );
-				} break;
-			case gpeISA_d8: {
-					pLZY->lzy_format( s = -1, "%f", pISA[i].an.d8 );
-				} break;
-			case gpeISA_an: {
-					gpfALF2STR( sBUFF, pISA[i].an.a4 );
-					pLZY->lzy_format( s = -1, "%s%d", sBUFF, pISA[i].an.n4 );
-				} break;
-			case gpeISA_anFUN: {
-					gpfALF2STR( sBUFF, pISA[i].an.a4 );
-					pLZY->lzy_format( s = -1, "%s%d(", sBUFF, pISA[i].an.n4 );
-				} break;
-
-			case gpeISA_tag: {
-					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "#%s", sBUFF );
-				} break;
-
-			case gpeISA_var: {
-					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "%s%s", b_asg ? "." : "", sBUFF );
-				} break;
-			case gpeISA_FUN: {
-					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "%s(", sBUFF );
-					//pOUT = pISA[i].pRES->run( pOUT, pLZY, pMASS, pSRC, this, deep+1 );
-				} break;
-			case gpeISA_str: {
-					pLZY->lzy_format( s = -1, "\"%s\"", pISA[i].an.y ? pISA[i].an.aSTR[0] : (U1*)"" );
-				} break;
-			case gpeISA_nop:
-			default: {
-				} break;
-        }
-        pLZY->lzy_format( s = -1, "%c", pISA[i].isa.aISA[1] >= ' ' ? pISA[i].isa.aISA[1] : '_' );
-
-	}*/
-    return  pLZY;
-}
 gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSM )
 {
 	if( this ? !pISA : true )
@@ -99,127 +14,151 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 		pOUT = new gpcRES;
 	}
 	U8 u8; I8 i8; double d8;
-	U1 sBUFF[0x1000], *pB = sBUFF+0x20, *pCOUT = pB, nB;
+	U1 sBUFF[0x1000], *pB = sBUFF+0x20, *pS = pB, nB;
+	bool bROW = false;
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
-		if( (U1)pISA[i].isa.aISA[0] > ' ' )
+		gpcISA &IS = pISA[i];
+		if( (U1)IS.isa.aISA[0] > ' ' )
 		{
-			*pB = (U1)pISA[i].isa.aISA[0];
+			*pB = (U1)IS.isa.aISA[0];
 			pB++;
 		}
 
-		switch( pISA[i].isa.aISA[0] )
+		switch( IS.isa.aISA[0] )
         {
 			case gpeISA_trg:{
-					pB += sprintf( (char*)pB, "[%d:%d]", pISA[i].an.x, pISA[i].an.y );
-					stk.aTRG[stk.nT] = pISA[i].an;
+					pB += sprintf( (char*)pB, "[%d:%d]", IS.an.x, IS.an.y );
+					stk.aTRG[stk.nT] = IS.an;
 					stk.nT++;
 				} break;
  			case gpeISA_u8: {
-					pB += sprintf( (char*)pB, "%lld", pISA[i].an.u8 );
-					stk.D[stk.nD] = pISA[i].an.u8;
+					pB += sprintf( (char*)pB, "%lld", IS.an.u8 );
+					stk.D[stk.nD] = IS.an.u8;
 					stk.nD++;
 				} break;
 			case gpeISA_i8: {
-					pB += sprintf( (char*)pB, "%lld", -((I8)pISA[i].an.u8) );
-					stk.D[stk.nD] = -((I8)pISA[i].an.u8);
+					pB += sprintf( (char*)pB, "%lld", -((I8)IS.an.u8) );
+					stk.D[stk.nD] = -((I8)IS.an.u8);
 					stk.nD++;
 				} break;
 			case gpeISA_d8: {
-					pB += sprintf( (char*)pB, "%f",  pISA[i].an.d8 );
-					stk.D[stk.nD] = pISA[i].an.d8;
+					pB += sprintf( (char*)pB, "%f",  IS.an.d8 );
+					stk.D[stk.nD] = IS.an.d8;
 					stk.nD++;
 				} break;
 
 			case gpeISA_an: {
-					pB += sprintf( (char*)pB, "%s", pISA[i].an.strA4N( sBUFF ));
-					stk.aTRG[stk.nA] = pISA[i].an;
+					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
+					stk.aTRG[stk.nA] = IS.an;
 					stk.nA++;
 				} break;
 			case gpeISA_anFUN: {
-					pB += sprintf( (char*)pB, "%s", pISA[i].an.strA4N( sBUFF ));
-					stk.aTRG[stk.nA] = pISA[i].an;
+					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
+					stk.aTRG[stk.nA] = IS.an;
 					stk.nA++;
 				} break;
 
 			case gpeISA_tag: {
-					 pB += sprintf( (char*)pB, "%s", pISA[i].an.strVAR( sBUFF ) );
-					stk.aTG[stk.nG] = pISA[i].an.var;
+					 pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
+					stk.aTG[stk.nG] = IS.an.var;
 					stk.nG++;
 				} break;
 
 			case gpeISA_var: {
-					pB += sprintf( (char*)pB, "%s", pISA[i].an.strVAR( sBUFF ) );
-					stk.aVR[stk.nV] = pISA[i].an.var;
+					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
+					stk.aVR[stk.nV] = IS.an.var;
 					stk.nV++;
 				} break;
 			case gpeISA_FUN: {
-					pB += sprintf( (char*)pB, "%s", pISA[i].an.strVAR( sBUFF ) ) ;
-					stk.aVR[stk.nV] = pISA[i].an.var;
+					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
+					stk.aVR[stk.nV] = IS.an.var;
 					stk.nV++;
 				} break;
 			case gpeISA_str: {
-					pB += sprintf( (char*)pB, "%s", (stk.apSTR[stk.nS] = pISA[i].an.aSTR[0])) ;
+					pB += sprintf( (char*)pB, "%s", (stk.apSTR[stk.nS] = IS.an.aSTR[0])) ;
 					stk.nS++;
 				} break;
-
+			case gpeISA_row:
+				bROW = true;
+				break;
 			case gpeISA_nop:
 			default:
 				break;
 		}
-		if( pISA[i].pRES )
-			pOUT = pISA[i].pRES->run( pOUT, pMN, pMASS, pSRC, this, deep+1, &stk );
+		if( IS.pRES )
+			pOUT = IS.pRES->run( pOUT, pMN, pMASS, pSRC, this, deep+1, &stk );
 
-		if( (U1)pISA[i].isa.aISA[1] > ' ' )
+		if( (U1)IS.isa.aISA[1] > ' ' )
 		{
-			*pB = (U1)pISA[i].isa.aISA[1];
+			*pB = (U1)IS.isa.aISA[1];
 			pB++;
 		}
-		switch( pISA[i].isa.aISA[1] )
+		switch( IS.isa.aISA[1] )
 		{
-			gpeISA_u8:{} break;
-			gpeISA_i8:{} break;
-			gpeISA_d8:{} break;
-			gpeISA_an:{} break;
-			gpeISA_anFUN:{} break;
-			gpeISA_var:{} break;
-			gpeISA_FUN:{} break;
-			gpeISA_dim:{} break;
-			gpeISA_not:{} break;
-			gpeISA_str:{} break;
-			gpeISA_tag:{} break;
-			gpeISA_dollar:{} break;
-			gpeISA_rem:{} break;
-			gpeISA_and:{} break;
-			gpeISA_brkB:{} break;
-			gpeISA_brkE:{} break;
-			gpeISA_mul:{} break;
-			gpeISA_plus:{} break;
-			gpeISA_sub:{} break;
-			gpeISA_dot:{} break;
-			gpeISA_div:{} break;
-			gpeISA_litl:{} break;
-			gpeISA_assign:{} break;
-			gpeISA_gret:{} break;
-			gpeISA_exp:{} break;
-			gpeISA_root:{} break;
-			gpeISA_brkDB:{} break;
-			gpeISA_brkDE:{} break;
-			gpeISA_equ:{} break;
-			gpeISA_trg:{} break;
-			gpeISA_blkB:{} break;
-			gpeISA_or:{} break;
-			gpeISA_blkE:{} break;
-			gpeISA_nop:
+			case gpeISA_u8:{} break;
+			case gpeISA_i8:{} break;
+			case gpeISA_d8:{} break;
+			case gpeISA_an:{} break;
+			case gpeISA_anFUN:{} break;
+			case gpeISA_var:{} break;
+			case gpeISA_FUN:{} break;
+			case gpeISA_dim:{} break;
+			case gpeISA_not:{} break;
+			case gpeISA_str:{} break;
+			case gpeISA_tag:{} break;
+			case gpeISA_dollar:{} break;
+			case gpeISA_rem:{} break;
+			case gpeISA_and:{} break;
+			case gpeISA_brkB:{} break;
+			case gpeISA_brkE:{} break;
+			case gpeISA_mul:{} break;
+			case gpeISA_plus:{} break;
+			case gpeISA_sub:{} break;
+			case gpeISA_dot:{} break;
+			case gpeISA_div:{} break;
+			case gpeISA_row:
+				bROW = true;
+				break;
+			case gpeISA_litl:{} break;
+			case gpeISA_assign:{} break;
+			case gpeISA_gret:{} break;
+			case gpeISA_exp:{} break;
+			case gpeISA_root:{} break;
+			case gpeISA_brkDB:{} break;
+			case gpeISA_brkDE:{} break;
+			case gpeISA_equ:{} break;
+			case gpeISA_trg:{} break;
+			case gpeISA_blkB:{} break;
+			case gpeISA_or:{} break;
+			case gpeISA_blkE:{} break;
+			case gpeISA_nop:
 			default:
 				break;
+		}
+
+		if( !bITT )
+			continue;
+		if( !bROW )
+			continue;
+
+		bROW = false;
+
+		if( pS < pB )
+		{
+			*pB = 0;
+			cout << (char*)pS << endl; // ; //
+			pB = pS;
 		}
 	}
 	*pB = 0;
 
 	if( bITT )
-	if( pCOUT < pB )
-		cout << (char*)pCOUT << endl; // ; //
+	if( pS < pB )
+	{
+		cout << (char*)pS << endl; // ; //
+		pB = pS;
+	}
 
 	if( !pSRC )
 		return pOUT;

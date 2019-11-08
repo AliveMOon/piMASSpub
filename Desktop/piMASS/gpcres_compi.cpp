@@ -29,7 +29,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	//gpmZ(apN);
 	//gpmZ(apP);
 
-	U8 nUTF8, nLAB = 0, nSTR; //, u8 = 0;
+	U8 nUTF8, nLAB = 0, nSTR,  u8ALF = gpeALF_A; //, u8 = 0;
 	//double d8 = 0;
 
 	I8x4 lab = 0;
@@ -147,11 +147,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				continue;
 			}
 
-			if( gpmbNUM( *pS ) ) {	/// NUM -------------------------------------------------
+			if( gpmbNUM( *pS ) ) {		/// AN.NUM -------------------------------------------------
 				an.num = gpfSTR2U8( pS, &pS );
 				pI = resISA_an( an );
 			} else {					/// VAR -------------------------------------------------
-				( alu = an.alf ) = xyWH.a4x2[0];
+				( alu = an.alf ) = xyWH.a4x2[0];	// alu.alf = alf & alu.sub = xyWH.a4x2[0];
 				pI = resISA_var( alu.alf );
 			}
 		}
@@ -291,6 +291,17 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					//xyWH.null();
 					// /// ITT a TRG ------------------------------------------------------
 					// pTRG = resISA_trg(pTRG,xyWH.a4x2[0]);
+					if( !pI )
+					{
+						// nincsen amibe betegye
+
+						while( iFND( (gpeALF)u8ALF ) < nFND() )
+							u8ALF++;
+
+						( alu = (gpeALF)u8ALF ) = xyWH.a4x2[0];	// alu.alf = alf & alu.sub = xyWH.a4x2[0];
+						pI = resISA_var( alu.alf );
+						u8ALF++;
+					}
 					resISA_stp( pS[-1] );
 					pI = pUD8 = NULL;
 
