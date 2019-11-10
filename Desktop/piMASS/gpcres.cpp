@@ -74,8 +74,7 @@ I8x4& I8x4::AB( U1* pA, U1* pB, U1** ppA, U1** ppB )
 
 gpcADR& gpcADR::operator = ( gpcRES* pM )
 {
-	pRM = pM;
-	if( an.alf ? !pM : true )
+	if( an.alf ? !(pRM = pM) : true )
 	{
 		//ix = 0;
 		//pRM = NULL;

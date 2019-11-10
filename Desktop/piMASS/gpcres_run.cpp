@@ -5,16 +5,25 @@ bool bITT = true; // false; //
 
 gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
-	if( this ? !pISA : true )
-		return pOUT;
-
-	if( pOUT ? !deep : false )
+	if( this ? !nISA.x : true )
 	{
-		pOUT = new gpcRES;
+		if( this )
+		{
+			// takarítunk;
+			gpmDELary( pISA );
+			nISA = 0;
+		}
+		return pOUT;
+	}
+
+	if( pOUT ? false : !deep )
+	{
+		pOUT = new gpcRES( pMOM );
 	}
 	gpcSTK stk( pSTK, pOUT, pSRC );
 	U8 u8; I8 i8; double d8, iASG, nOUT = 0;
 	U1 sBUFF[0x1000], *pB = sBUFF+0x20, *pS = pB, nB;
+	gpcADR A, B;
 	bool bROW = false;
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
@@ -148,28 +157,33 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 					}
 
 					bROW = false;
+					B = stk.aVR[flg.iV-1];
 					if( pOUT )
 					{
-						pOUT->alu = stk.aVR[flg.iV-1];
-						pOUT->alu = this;
-						if( !pOUT->alu.pRM )
+						B = pOUT;
+						//pOUT->alu =
+						//pOUT->alu = this;
+						if( B.pRM )
 						{
 							// lokális változó és már használta valaki
 
+							break;
 						}
-						break;
 					}
 
 
-					alu = stk.aVR[flg.iV-1];
-					alu = this;
-					if( !alu.pRM )
+					B = stk.aVR[flg.iV-1];
+					B = this;
+					if( !B.pRM )	// na még mindig nincsen
 					{
-						/// be kell másolni a pOUT-ba;
 
-						// na még mindig nincsen
 						break;
 					}
+
+					// talált egy forrást
+					/// be kell másolni a pOUT-ba;
+
+
 
 				} break;
 			case gpeISA_gret:{} break;
