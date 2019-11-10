@@ -1,5 +1,11 @@
-#include "gpcwin.h"
+//#include "gpcwin.h"
 #include "gpccrs.h"
+//#include "gpcSRC.h"
+
+
+
+
+
 extern U1 gp_s_key_map_sdl[];
 
 InitError::InitError() :
@@ -21,6 +27,15 @@ InitError::~InitError() throw()
 const char * InitError::what() const throw()
 {
     return msg.c_str();
+}
+gpcRES* gpcWIN::WINvar( gpcRES* pOUT, gpeALF alf )
+{
+	if( pOUT ?  !alf : true )
+		return pOUT;
+
+
+
+	return pOUT;
 }
 SDL_Rect gpcWIN::wDIV( U1 iDIV )
 {
@@ -275,7 +290,7 @@ void gpcWIN::run( const char* pWELLCOME )
 
 		nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 
-		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( gpsKEYbuff, mouseXY, aKT, SRCxycr, SRCin );
+		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( *this ); //gpsKEYbuff, mouseXY, aKT, SRCxycr, SRCin );
 
 
 		if(
@@ -809,6 +824,7 @@ void gpcWIN::run( const char* pWELLCOME )
 	}
 
 }
+
 
 
 

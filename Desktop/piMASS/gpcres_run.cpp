@@ -1,9 +1,11 @@
-#include "gpcres.h"
+#include "gpcwin.h"
+//#include "gpcres.h"
+
 extern U1 gpaALFadd[];
 
 bool bITT = true; // false; //
 
-gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
+gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
 	if( this ? !nISA.x : true )
 	{
@@ -108,7 +110,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 		}
 		// CALL
 		if( IS.pRES )
-			pOUT = IS.pRES->run( pOUT, pMN, pMASS, pSRC, this, deep+1, &stk );
+			pOUT = IS.pRES->run( pOUT, pMN, win, pSRC, this, deep+1, &stk );
 
 
 		switch( IS.isa.aISA[1] )
@@ -172,11 +174,12 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 					}
 
 
-					B = stk.aVR[flg.iV-1];
+					//B = stk.aVR[flg.iV-1];
 					B = this;
 					if( !B.pRM )	// na még mindig nincsen
 					{
-
+						// na most nézzük meg van e beépített változó rá
+						win.WINvar( pOUT, B.an.alf );
 						break;
 					}
 
@@ -253,9 +256,9 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcMASS* pMASS, gpcSRC* pSRC, g
 	return pOUT;
 }
 
-U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
+U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
-	U1* pKEYbuff = sKEYbuff;
+	U1* pKEYbuff = win.gpsKEYbuff;
 	gpcSRC	tmp, *pSRC;
 	U4 xFND;
 	if( U4 *pM = mapCR.pMAP )
@@ -300,7 +303,8 @@ U1* gpcMASS::justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4
 			}
 
 			pSRC->pMINI->lzy_reset();
-			pSRC->apOUT[3] = pSRC->pEXE->run( pSRC->apOUT[3], NULL, this, pSRC, NULL );
+			pSRC->apOUT[3] = pSRC->pEXE->run( pSRC->apOUT[3], NULL, win, //this,
+																			pSRC, NULL );
 		}
 	}
 

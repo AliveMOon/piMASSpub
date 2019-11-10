@@ -1,8 +1,13 @@
 #ifndef GPCWIN_H
 #define GPCWIN_H
 
-#include "piMASS.h"
-#include "gpcSRC.h"
+//#include "piMASS.h"
+//#include "gpcSRC.h"
+#include "gpcres.h"
+
+class gpcCRS;
+class gpdADR;
+//class gpcRES;
 
 class InitError : public std::exception
 {
@@ -103,6 +108,7 @@ class gpcWIN
 			return winDIV.a4x2[1];
 		}
 		void run( const char* pWELLCOME );
+		gpcRES* WINvar( gpcRES* pOUT, gpeALF alf );
 	protected:
 
 	private:

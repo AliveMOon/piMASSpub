@@ -1,11 +1,12 @@
 #ifndef GPCSRC_H
 #define GPCSRC_H
 
-#include "gpcgt.h" //#include "piMASS.h"
-//#include "gpcSCHL.h"
+#include "gpcgt.h"
 #include "gpcOPCD.h"
 
 class gpcRES;
+class gpcCRS;
+class gpcWIN;
 //#include "gpcres.h"
 
 //#include "gpccrs.h"
@@ -18,7 +19,7 @@ class gpcRES;
 //extern U1 gpaALFadd[]; //0x100];
 //extern U1 gpsSTRpub[]; //[0x10000];
 
-class gpcCRS;
+
 
 enum gpeMASSsw:U8
 {
@@ -926,8 +927,7 @@ private:
 };
 
 // #include "gpcSCHL.h"
-class gpcCLASS
-{
+class gpcCLASS {
 
 	gpcLAZY	*paLZY,
 			*pLST, *pFND;
@@ -1223,7 +1223,7 @@ public:
 	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
-	U1* justDOit( U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
+	U1* justDOit( gpcWIN& win ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
 
 
 	gpcMASS&	null();

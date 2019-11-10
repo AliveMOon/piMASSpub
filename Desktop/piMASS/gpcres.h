@@ -1,13 +1,23 @@
 #ifndef GPCRES_H
 #define GPCRES_H
 
-#include "piMASS.h"
-#include "gpcSCHL.h"
-#include "gpcOPCD.h"
-#include "gpcSRC.h"
+//#include "piMASS.h"
+
 class gpcALU;
 class gpcRES;
 class gpcSRC;
+class gpcWIN;
+#include "gpcSRC.h"
+
+//#include "gpcwin.h"
+//class gpcWIN;
+
+
+
+
+#include "gpcSCHL.h"
+#include "gpcOPCD.h"
+
 
 enum gpeTYP:U4
 {
@@ -571,7 +581,7 @@ public:
 	gpcRES* 	compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	//gpcRES* 	compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	gpcLAZY* 	res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep );
-	gpcRES* 	run( gpcRES* pOUT, gpcLAZY* pLZY, gpcMASS* pMASS, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
+	gpcRES* 	run( gpcRES* pOUT, gpcLAZY* pLZY, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
 
 	gpcALU& ALU( U4 iA )
 	{

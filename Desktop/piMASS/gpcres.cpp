@@ -1,6 +1,8 @@
-
-#include "gpcres.h"
+#include "gpcwin.h"
+//#include "gpcres.h"
 extern U1 gpaALFadd[];
+
+
 
 
 gpcALU::gpcALU( gpcRES* pM )
