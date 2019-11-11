@@ -26,7 +26,69 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 	{
 		ALU( a );
 		pB = pB + gpfALF2STR( pBUFF, alu.alf ) + 1;
-		pLZY->lzy_format( s = -1, "%s%s%s.%s // [%dx%d]sof(%d) ", a ? "\r\n":"", gpsTABrun-deep, alu.typ.typ2str(pBUFF+0x10), pBUFF, alu.AN.x, alu.AN.y, alu.nLOAD() );
+		pLZY->lzy_format( s = -1, "%s%s%s.%s // [%dx%d]sof(%d) ", a ? "\r\n":"", gppTABrun-deep, alu.typ.typ2str(pBUFF+0x10), pBUFF, alu.AN.x, alu.AN.y, alu.nLOAD() );
+
+		U4x2 	X( alu.typ.y, alu.typ.z ), xy;
+		U1* pD = (U1*)alu.pDAT;
+		if( !pD )
+			continue;
+
+		U4 		nAN = alu.AN.a4x2[0].area(), d,
+				nB	= alu.typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*alu.AN.a4x2[0].x );
+		//U4		d =  (a.xy-sub)*T;
+
+		for( xy.y = 0; xy.y < alu.AN.y; xy.y++ )
+		{
+			pLZY->lzy_format( s = -1, "%s", gppTABrun-deep );
+			for( xy.x = 0; xy.x < alu.AN.x; xy.x++ )
+			{
+				d = xy*T;
+				if( d > nAN*nXB )
+					d %= nAN*nXB;
+				if( alu.typ.x&0x40 )
+				{
+					if( nB > 4 )
+						pLZY->lzy_format( s = -1, "%f,", ((double*)(pD+d))[0]  );
+					else
+						pLZY->lzy_format( s = -1, "%f,", ((float*)(pD+d))[0] );
+					continue;
+				}
+				if( alu.typ.x&0x80 )
+				{
+					if( nB > 2 )
+					{
+						if( nB > 4 )
+							pLZY->lzy_format( s = -1, "%lld,", ((I8*)(pD+d))[0]  );
+						else
+							pLZY->lzy_format( s = -1, "%d,", ((I4*)(pD+d))[0] );
+						continue;
+					}
+					if( nB > 2 )
+						pLZY->lzy_format( s = -1, "%lld,", ((I2*)(pD+d))[0]  );
+					else
+						pLZY->lzy_format( s = -1, "%d,", ((I1*)(pD+d))[0] );
+
+					continue;
+				}
+				if( nB > 2 )
+				{
+					if( nB > 4 )
+						pLZY->lzy_format( s = -1, "%lld,", ((U8*)(pD+d))[0]  );
+					else
+						pLZY->lzy_format( s = -1, "%d,", ((U4*)(pD+d))[0] );
+					continue;
+				}
+				if( nB > 2 )
+					pLZY->lzy_format( s = -1, "%d,", ((U2*)(pD+d))[0] );
+				else
+					pLZY->lzy_format( s = -1, "%d,", ((I1*)(pD+d))[0] );
+
+			}
+			pLZY->lzy_format( s = -1, ";\r\n" );
+		}
 	}
 	/// ha nem DEBUG legyen pMOM == NULL és akor nem írja ki a pISA-t
 	if( !pMOM )

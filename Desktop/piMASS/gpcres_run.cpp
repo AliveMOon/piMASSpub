@@ -3,7 +3,7 @@
 
 extern U1 gpaALFadd[];
 
-bool bITT = true; // false; //
+bool bITT =  false; //true; // false; //
 
 gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
