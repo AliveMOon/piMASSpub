@@ -469,9 +469,10 @@ class gpcRES
 	U1x4	*pTYP;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 					// yz dimxy
 	U4x4	*pAN;
-	U8x4	*pTREE;
-	U4		*pTx,
+	//U8x4	*pTREE;
 
+
+	U4		// *pTx,
 			*pnALL,
 			nA, t,
 			i, ig,
@@ -740,6 +741,7 @@ public:
 		}
 		pAN[nCPY] = 0;
 
+	/*
 		pKILL = pTREE;
 		pTREE = new U8x4[nA];
 		if( pKILL )
@@ -757,6 +759,7 @@ public:
 			delete[] pKILL;
 		}
 		pTx[nCPY] = 0;
+	*/
 
 		return ALU( nCPY );
 	}
@@ -777,12 +780,26 @@ public:
 		if( pALF[i] == alf )
 			return i;
 
+		for( U4 j = 0, x; j < nA; j++ )
+		{
+			if( !pALF[j] )
+				continue;
+
+			if( pALF[j] != alf )
+				continue;
+
+			return i = j;
+		}
+
+		return nA;
+
+		/*
 		ig = nA;
 		if( pTREE )
 		{
 			ig = pTREE->tree_fndHARD( alf, t );
-			/*if( pTREE->x != (U8)alf )
-				ig = t;*/
+			//  if( pTREE->x != (U8)alf )
+			//	ig = t;
 
 			if( ig < t )
 				return i = pTx[ig];
@@ -804,8 +821,8 @@ public:
 				}
 
 				x = pTREE->tree_fndHARD( pALF[j], t );
-				/*if( pTREE->x != (U8)alf )
-					x = t;*/
+				// if( pTREE->x != (U8)alf )
+				//	x = t;
 
 				if( x < t )
 					continue;
@@ -846,7 +863,7 @@ public:
 
 		return ig;
 
-
+*/
 
     }
 

@@ -50,8 +50,8 @@ gpcRES* gpcRES::null()
 	gpmDELary( pOP );
 	gpmDELary( pTYP );
 	gpmDELary( pAN );
-	gpmDELary( pTREE );
-	gpmDELary( pTx );
+	//gpmDELary( pTREE );
+	//gpmDELary( pTx );
 	gpmDELary( pISA );
 	//gpmDELary( pALU );
 	return this;

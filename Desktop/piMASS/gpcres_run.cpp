@@ -109,6 +109,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 					{
 						// valamit kapott
 						(B = pOUT->ADD( fnd.an.alf, 0,0 ))
+						//B
 						= stk.D[flg.iD];
 						break;
 					}
