@@ -110,6 +110,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 					// na most nézzük meg van e beépített változó rá
 					if( win.WINvar( stk.D[flg.iD], adr.an.alf ) )
 					{
+						pSRC->bSW |= gpeMASSloopMSK;
 						// valamit kapott
 						//(B = pOUT->ADD( adr.an.alf, 0, 0 ))
 						//= stk.D[flg.iD];
