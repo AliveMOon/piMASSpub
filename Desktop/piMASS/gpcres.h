@@ -187,9 +187,9 @@ class gpcREG
 	U8		u;
 	I8		i;
 	double	d;
-	U1x4 bD;		// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
-
+	U1x4	bD;		// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
 public:
+	U4x2	xy;
 	gpcREG(){ bD = 0; };
 	gpcREG& bad()
 	{
@@ -314,7 +314,7 @@ public:
 class gpcALU
 {
 public:
-	I1x4	op;
+	I1x4	op, isa;
 	U1x4	typ;	// typ:
 					// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
 					// yz[ dimXY ] 		, w[] = nBYTE*dimXY
@@ -375,11 +375,16 @@ public:
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 
+	U1*		dat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, U2 dm = 0 );
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 
 	gpcALU& operator = ( gpcREG& a );
+	gpcALU& operator += ( gpcREG& a );
+	gpcALU& operator -= ( gpcREG& a );
+	gpcALU& operator *= ( gpcREG& a );
+	gpcALU& operator /= ( gpcREG& a );
 
 	gpcALU& operator = ( gpeALF a )
 	{

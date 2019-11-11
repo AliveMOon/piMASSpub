@@ -935,7 +935,96 @@ gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	pM->chg( *this );
 	return *this;
 }
+U1* gpcALU::dat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 )
+{
+	if( !pM )
+		return NULL;
 
+
+	if( ty4.y < 1 )
+		ty4.y = 1;
+	if( ty4.z < 1 )
+		ty4.z = 1;
+
+	U1 OR = typ.x|ty4.x;
+	if( op4.x < 0 )
+	{
+		U1 sub = -op4.x;
+		if( sub&1 )
+			OR |= 0x80;
+		else
+			op.x = 0;
+	}
+
+	if( d8 != 0.0 ? true : (u8&0x8000000000000000) )
+	{
+		OR |= 0x40;
+	}
+
+	if( OR&0x40 )
+	{
+		// return equ( pM, xy, ty4, op4, d8, x );
+		d8 += u8;
+		if( ty4.x&0xf != 3 )
+		if( abs(d8) > (double)0xffFFFF )
+			ty4.x = 0xc3;
+		else
+			ty4.x = 0xc2;
+
+		if( op.y < 0 )
+			d8 = -d8;
+
+		xy -= sub;
+		int2flt( pM, xy, ty4 );
+		return (U1*)pDAT;
+	}
+	if( OR&0x80 )
+	{
+		//return equSIG( pM, xy, ty4, op4, u8, x );
+
+		bool bSIG = pDAT ? typ.x&0x80 : true;
+
+		if( u8 <= 0x7fFF )
+		{
+			if( u8 < 0x7f )
+				ty4.x = 0x80;
+			else
+				ty4.x = 0x81;
+		}
+		else if( u8 <= 0x7fFFffFF )
+		{
+			ty4.x = 0x82;
+		} else
+			ty4.x = 0x83;
+
+		if( !bSIG ) // nem volt signed?
+		if( (ty4.x&0xf) <= (typ.x&0xf)  )
+		{
+			// akkor nem jó ha ugyan akkorát akarunk
+			ty4.x = 0x80 + min( 3, (typ.x&0xf)+1 );
+		}
+
+
+		I8 i8 = ( op4.x < 0 ) ? -u8 : u8;
+
+		xy -= sub;
+		ins( pM, xy, ty4 );
+		return (U1*)pDAT;
+
+
+	}
+
+
+	if( u8 < 0x10000 )
+		ty4.x = u8 > 0xff;
+	else
+		ty4.x = 2 + (u8>0xffffFFFF);
+
+	xy -= sub;
+
+	ins( pM, xy, ty4 );
+	return (U1*)pDAT;
+}
 
 gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, U2 x )
 {
@@ -1126,15 +1215,403 @@ gpcALU& gpcALU::operator = ( gpcREG& a )
 	U1x4 t = 0;
 	t.x = a.t();
 	if( t.x&0x40 )
-		equ( pRM, 0, t, I1x4(0), 0, a.d8() );
+		equ( pRM, a.xy, t, I1x4(0), 0, a.d8() );
 	else if( t.x&0x80 )
-		equ( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		equ( pRM, a.xy, t, I1x4(-1), a.u8(), 0.0 );
 	else
-		equ( pRM, 0, t, 0, a.u8(), 0.0  );
+		equ( pRM, a.xy, t, 0, a.u8(), 0.0  );
 
 	return *this;
 }
 
+gpcALU& gpcALU::operator += ( gpcREG& a )
+{
+	//U4x2 xy = 0;
+	U4 x = 0;
+
+	U1x4 t = 0;
+	t.x = a.t();
+	U1* pD = NULL;
+	if( t.x&0x40 ) {	/// float ----------------------------------
+		pD = dat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d = (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+		if( nB > 4 )
+			((double*)(pD+d))[x] += a.d8();
+		else
+			((float*)(pD+d))[x] += a.d8();
+
+		return *this;
+	}
+	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
+		pD = dat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d =  (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+
+		if( nB > 2 )
+		{
+			if( nB > 4 )
+				((I8*)(pD+d))[x] += a.i8();
+			else
+				((I4*)(pD+d))[x] += a.i8();
+		}
+		else if( nB > 1 )
+			((I2*)(pD+d))[x] += a.i8();
+		else
+			((I1*)(pD+d))[x] += a.i8();
+
+		return *this;
+	}
+	/// unSIGNED ----------------------------------
+	pD = dat( pRM, 0, t, 0, a.u8(), 0.0  );
+	if( !pD )
+		return *this;
+
+	U4x2 	X( typ.y, typ.z );
+
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d =  (a.xy-sub)*T;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
+	if( x > nX )
+		x %= nX;
+
+
+	if( nB > 2 )
+	{
+		if( nB > 4 )
+			((U8*)(pD+d))[x] += a.u8();
+		else
+			((U4*)(pD+d))[x] += a.u8();
+	}
+	else if( nB > 1 )
+		((U2*)(pD+d))[x] += a.u8();
+	else
+		((U1*)(pD+d))[x] += a.u8();
+
+	return *this;
+}
+gpcALU& gpcALU::operator -= ( gpcREG& a )
+{
+	//U4x2 xy = 0;
+	U4 x = 0;
+
+	U1x4 t = 0;
+	t.x = a.t();
+	U1* pD = NULL;
+	if( t.x&0x40 ) {	/// float ----------------------------------
+		pD = dat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d = (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+		if( nB > 4 )
+			((double*)(pD+d))[x] -= a.d8();
+		else
+			((float*)(pD+d))[x] -= a.d8();
+
+		return *this;
+	}
+	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
+		pD = dat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d =  (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+
+		if( nB > 2 )
+		{
+			if( nB > 4 )
+				((I8*)(pD+d))[x] -= a.i8();
+			else
+				((I4*)(pD+d))[x] -= a.i8();
+		}
+		else if( nB > 1 )
+			((I2*)(pD+d))[x] -= a.i8();
+		else
+			((I1*)(pD+d))[x] -= a.i8();
+
+		return *this;
+	}
+	/// unSIGNED ----------------------------------
+	pD = dat( pRM, 0, t, 0, a.u8(), 0.0  );
+	if( !pD )
+		return *this;
+
+	U4x2 	X( typ.y, typ.z );
+
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d =  (a.xy-sub)*T;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
+	if( x > nX )
+		x %= nX;
+
+
+	if( nB > 2 )
+	{
+		if( nB > 4 )
+			((U8*)(pD+d))[x] -= a.u8();
+		else
+			((U4*)(pD+d))[x] -= a.u8();
+	}
+	else if( nB > 1 )
+		((U2*)(pD+d))[x] -= a.u8();
+	else
+		((U1*)(pD+d))[x] -= a.u8();
+
+	return *this;
+}
+gpcALU& gpcALU::operator *= ( gpcREG& a )
+{
+	//U4x2 xy = 0;
+	U4 x = 0;
+
+	U1x4 t = 0;
+	t.x = a.t();
+	U1* pD = NULL;
+	if( t.x&0x40 ) {	/// float ----------------------------------
+		pD = dat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d = (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+		if( nB > 4 )
+			((double*)(pD+d))[x] *= a.d8();
+		else
+			((float*)(pD+d))[x] *= a.d8();
+
+		return *this;
+	}
+	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
+		pD = dat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d =  (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+
+		if( nB > 2 )
+		{
+			if( nB > 4 )
+				((I8*)(pD+d))[x] *= a.i8();
+			else
+				((I4*)(pD+d))[x] *= a.i8();
+		}
+		else if( nB > 1 )
+			((I2*)(pD+d))[x] *= a.i8();
+		else
+			((I1*)(pD+d))[x] *= a.i8();
+
+		return *this;
+	}
+	/// unSIGNED ----------------------------------
+	pD = dat( pRM, 0, t, 0, a.u8(), 0.0  );
+	if( !pD )
+		return *this;
+
+	U4x2 	X( typ.y, typ.z );
+
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d =  (a.xy-sub)*T;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
+	if( x > nX )
+		x %= nX;
+
+
+	if( nB > 2 )
+	{
+		if( nB > 4 )
+			((U8*)(pD+d))[x] *= a.u8();
+		else
+			((U4*)(pD+d))[x] *= a.u8();
+	}
+	else if( nB > 1 )
+		((U2*)(pD+d))[x] *= a.u8();
+	else
+		((U1*)(pD+d))[x] *= a.u8();
+
+	return *this;
+}
+gpcALU& gpcALU::operator /= ( gpcREG& a )
+{
+	//U4x2 xy = 0;
+	U4 x = 0;
+
+	U1x4 t = 0;
+	t.x = a.t();
+	U1* pD = NULL;
+	if( t.x&0x40 ) {	/// float ----------------------------------
+		pD = dat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d = (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+		if( nB > 4 )
+			((double*)(pD+d))[x] /= a.d8();
+		else
+			((float*)(pD+d))[x] /= a.d8();
+
+		return *this;
+	}
+	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
+		pD = dat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d =  (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+
+		if( nB > 2 )
+		{
+			if( nB > 4 )
+				((I8*)(pD+d))[x] /= a.i8();
+			else
+				((I4*)(pD+d))[x] /= a.i8();
+		}
+		else if( nB > 1 )
+			((I2*)(pD+d))[x] /= a.i8();
+		else
+			((I1*)(pD+d))[x] /= a.i8();
+
+		return *this;
+	}
+	/// unSIGNED ----------------------------------
+	pD = dat( pRM, 0, t, 0, a.u8(), 0.0  );
+	if( !pD )
+		return *this;
+
+	U4x2 	X( typ.y, typ.z );
+
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d =  (a.xy-sub)*T;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
+	if( x > nX )
+		x %= nX;
+
+
+	if( nB > 2 )
+	{
+		if( nB > 4 )
+			((U8*)(pD+d))[x] /= a.u8();
+		else
+			((U4*)(pD+d))[x] /= a.u8();
+	}
+	else if( nB > 1 )
+		((U2*)(pD+d))[x] /= a.u8();
+	else
+		((U1*)(pD+d))[x] /= a.u8();
+
+	return *this;
+}
 gpcREStrs* gpcREStrs::REScompiAN( U1* pS, U1* pE, U4* pMAP, gpcLZYdct* pDICT )
 {
 	if( !this )
