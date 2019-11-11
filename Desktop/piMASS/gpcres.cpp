@@ -1121,7 +1121,19 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 x )
 	return *this;
 }
 
+gpcALU& gpcALU::operator = ( gpcREG& a )
+{
+	U1x4 t = 0;
+	t.x = a.t();
+	if( t.x&0x40 )
+		equ( pRM, 0, t, I1x4(0), 0, a.d8() );
+	else if( t.x&0x80 )
+		equ( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+	else
+		equ( pRM, 0, t, 0, a.u8(), 0.0  );
 
+	return *this;
+}
 
 gpcREStrs* gpcREStrs::REScompiAN( U1* pS, U1* pE, U4* pMAP, gpcLZYdct* pDICT )
 {

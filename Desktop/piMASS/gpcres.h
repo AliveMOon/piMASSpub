@@ -182,6 +182,134 @@ public:
 
 
 };
+class gpcREG
+{
+	U8		u;
+	I8		i;
+	double	d;
+	U1x4 bD;		// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+
+public:
+	gpcREG(){ bD = 0; };
+	gpcREG& bad()
+	{
+		u = 1;
+		i = -1;
+		d = 0.1;
+		bD.u4 = 0;
+		return *this;
+	}
+	gpcREG& err()
+	{
+		gpmCLR;
+		return *this;
+	}
+	gpcREG& operator = ( U4 u4 )
+	{
+		u = u4;
+		bD.u4 = 2;
+		return *this;
+	}
+	gpcREG& operator = ( I4 i4 )
+	{
+		if( i4 < 0 )
+		{
+			i = i4;
+			u = -i;
+			bD.u4 = 0x82;
+			return *this;
+		}
+		u = i4;
+		bD.u4 = 2;
+		return *this;
+	}
+	gpcREG& operator = ( float f4 )
+	{
+		i = (d = f4);
+		bD.u4 = ( f4 < 0.0 ) ? 0x82 : 0;
+		if( bD.u4 || ((float)i != f4) ) // neg? || float?
+		{
+			u = bD.u4 ? -i : i;
+			bD.u4 = 0xc2;
+			return *this;
+		}
+
+		u = i;
+		bD.u4 = 0x42;
+		return *this;
+	}
+
+	gpcREG& operator = ( U8 u8 )
+	{
+		u = u8;
+		bD.u4 = 3;
+		return *this;
+	}
+	gpcREG& operator = ( I8 i8 )
+	{
+		if( i8 < 0 )
+		{
+			i = i8;
+			u = -i;
+			bD.u4 = 0x83;
+			return *this;
+		}
+		u = i8;
+		bD.u4 = 3;
+		return *this;
+	}
+	gpcREG& operator = ( double d8 )
+	{
+		i = (d = d8);
+		bD.u4 = ( d < 0.0 ) ? 0x83 : 0;
+		if( bD.u4 || ((double)i != d) ) // neg? || float?
+		{
+			u = bD.u4 ? -i : i;
+			bD.u4 = 0xc3;
+			return *this;
+		}
+
+		u = i;
+		bD.u4 = 0x43;
+		return *this;
+	}
+
+	U8 u8()
+	{
+		if( this ? !bD.x : true )
+			return 0;
+		return u;
+	}
+	I8 i8()
+	{
+		if( this ? !bD.x : true )
+			return 0;
+
+		if( bD.x&0x80 ) // csak ha 0x80 akkor volt negatív értéke a számnak
+			return i;
+
+		return u;
+
+	}
+	double d8()
+	{
+		if( this ? !bD.x : true )
+			return 0.0;
+		if( bD.u4&0xf0)
+			return d;
+
+		return u;
+	}
+	bool bGD()
+	{
+		return bD.u4&0xf;
+	}
+	I1 t()
+	{
+		return bD.x;
+	}
+
+};
 
 class gpcALU
 {
@@ -251,6 +379,8 @@ public:
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 
+	gpcALU& operator = ( gpcREG& a );
+
 	gpcALU& operator = ( gpeALF a )
 	{
 		null();
@@ -268,133 +398,7 @@ public:
 	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );*/
 };
 
-class gpcREG
-{
-	U8		u;
-	I8		i;
-	double	d;
-	U4 bD, nLG;
 
-public:
-	gpcREG(){ bD = 0; };
-
-	gpcREG& operator = ( U4 u4 )
-	{
-		if( u4 )
-		{
-			u = u4;
-			bD = 1;
-			return *this;
-		}
-		gpmCLR;
-		return *this;
-	}
-	gpcREG& operator = ( I4 i4 )
-	{
-		if( i4 )
-		{
-			i = i4;
-			bD = 2;
-			return *this;
-		}
-		gpmCLR;
-		return *this;
-	}
-	gpcREG& operator = ( float f4 )
-	{
-		if( f4 != 0.0f )
-		{
-			d = f4;
-			bD = 4;
-			return *this;
-		}
-		gpmCLR;
-		return *this;
-	}
-
-	gpcREG& operator = ( U8 u8 )
-	{
-		if( u8 )
-		{
-			u = u8;
-			bD = 1;
-			return *this;
-		}
-		gpmCLR;
-		return *this;
-	}
-	gpcREG& operator = ( I8 i8 )
-	{
-		if( i8 )
-		{
-			i = i8;
-			bD = 2;
-			return *this;
-		}
-		gpmCLR;
-		return *this;
-	}
-	gpcREG& operator = ( double d8 )
-	{
-		if( d8 != 0.0 )
-		{
-			d = d8;
-			bD = 4;
-			return *this;
-		}
-		gpmCLR;
-		return *this;
-	}
-
-	U8 u8()
-	{
-		if( this ? !bD : true )
-			return 0;
-
-		if( bD&1 )
-			return u;
-
-		if( bD&2 )
-			u = i < 0 ? -i : i;
-		else if( bD&4 )
-			u = d < 0.0 ? -d : d;
-		bD |= 1;
-		return u;
-	}
-	I8 i8()
-	{
-		if( this ? !bD : true )
-			return 0;
-
-		if( bD&2 )
-			return i;
-
-		if( bD&4 )
-			i = d;
-		else if( bD&1 )
-			i = u;
-
-		bD |= 2;
-		return i;
-	}
-	double d8()
-	{
-		if( this ? !bD : true )
-			return 0.0;
-
-		if( bD&4 )
-			return d;
-
-		if( bD&2 )
-			d = i;
-		else if( bD&1 )
-			d = u;
-
-		bD |= 4;
-		return d;
-	}
-
-};
 class gpfFLG
 {
 public:
@@ -440,7 +444,20 @@ public:
 	{
 		return aFLG[iF];
 	}
+	gpeALF iVR( void )
+	{
+		if( aFLG[iF].iV >= main.iV )
+			return gpeALF_null;
 
+		return aVR[aFLG[iF].iV];
+	}
+	gpcREG& iD( gpcREG& o )
+	{
+		if( aFLG[iF].iD >= main.iD )
+			return o.err();
+
+		return D[aFLG[iF].iD];
+	}
 };
 
 class gpcRES

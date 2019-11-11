@@ -52,7 +52,7 @@ class gpcWIN
 		U4	aKT[0x200],
 			srcDIV, dstDIV;
 		U4x2 onDIV = srcDIV;
-		U4x4 mSEC = 0;
+		U4x4 mSEC = 0;	// x: new // y: prev // z: elapse // w: fps
 		I4 nMOV, nMAG, nMB, nMBB, nF;
 
 		bool	bSHIFT, bCTRL,
@@ -107,8 +107,8 @@ class gpcWIN
 		{
 			return winDIV.a4x2[1];
 		}
-		void run( const char* pWELLCOME );
-		gpcRES* WINvar( gpcRES* pOUT, gpeALF alf );
+		void	WINrun( const char* pWELLCOME );
+		bool	WINvar( gpcREG& out, gpeALF alf );
 	protected:
 
 	private:

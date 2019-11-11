@@ -28,14 +28,49 @@ const char * InitError::what() const throw()
 {
     return msg.c_str();
 }
-gpcRES* gpcWIN::WINvar( gpcRES* pOUT, gpeALF alf )
+bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 {
-	if( pOUT ?  !alf : true )
-		return pOUT;
+	out.err();
+	if( !alf )
+		return out.bGD();
+
+	if( alf < gpeALF_AAAAAA ) {
+		if( alf < gpeALF_AAAAA ) {
+			if( alf < gpeALF_AAAA ) {
+				if( alf < gpeALF_AAA ) {
+					if( alf < gpeALF_AA ) {		// A - Z ------------------------------------------
+
+					} else {					// AA - ZZ ----------------------------------------
+
+					}
+				} else {						// AAA - ZZZ --------------------------------------
+						switch( alf )
+						{
+							case gpeALF_FPS:
+								out = mSEC.w;
+								break;
+							default:
+								break;
+						}
+				}
+			} else {							// AAAA - ZZZZ ------------------------------------
+						switch( alf )
+						{
+							case gpeALF_MSEC:
+								out = mSEC.x&(~1);
+								break;
+							default:
+								break;
+						}
+			}
+		} else {								// AAAAA - ZZZZZ ----------------------------------
+
+		}
+	} else {									// AAAAAA - ZZZZZZ --------------------------------
 
 
-
-	return pOUT;
+	}
+	return out.bGD();
 }
 SDL_Rect gpcWIN::wDIV( U1 iDIV )
 {
@@ -151,7 +186,7 @@ gpcWIN::~gpcWIN()
     SDL_DestroyRenderer( pSDLrndr );
 }
 
-void gpcWIN::run( const char* pWELLCOME )
+void gpcWIN::WINrun( const char* pWELLCOME )
 {
 	U4 scan, bug = 0, nBUG;
 	U1 aXY[] = "00", c = 0;

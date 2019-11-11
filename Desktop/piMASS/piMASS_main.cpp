@@ -608,12 +608,12 @@ int main( int nA, char *apA[] )
         //apCRS[srcDIV] = &main_crs;
         //sdl.draw();
 
-		win.run( 	"                                        "
-					"     **** GRANDPACE piMASS V0.1 ****    "
-					"                                        "
-					" 1GB RAM SYSTEM  38911 piMASS BYTE FREE "
-					"                                        "
-					"READY                                   " );
+		win.WINrun( 	"                                        "
+						"     **** GRANDPACE piMASS V0.1 ****    "
+						"                                        "
+						" 1GB RAM SYSTEM  38911 piMASS BYTE FREE "
+						"                                        "
+						"READY                                   " );
 
 /*
         //SDL_Event ev;

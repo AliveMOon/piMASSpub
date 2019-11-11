@@ -25,7 +25,9 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 	gpcSTK stk( pSTK, pOUT, pSRC );
 	U8 u8; I8 i8; double d8, iASG, nOUT = 0;
 	U1 sBUFF[0x1000], *pB = sBUFF+0x20, *pS = pB, nB;
-	gpcADR A, B;
+	gpcADR fnd;
+	gpcALU A, B;
+	gpcREG err;
 	bool bROW = false;
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
@@ -39,67 +41,99 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 
 		switch( IS.isa.aISA[0] )
         {
-			case gpeISA_trg:{
+			case gpeISA_trg:{	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "[%d:%d]", IS.an.x, IS.an.y );
 					stk.aTRG[flg.iT] = IS.an;
-					flg.iT++;
+					//flg.iT++;
 				} break;
 
 
-			case gpeISA_an: {
+			case gpeISA_an: {	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
 					stk.aAN[flg.iA] = IS.an;
-					flg.iA++;
+					//flg.iA++;
 				} break;
-			case gpeISA_anFUN: {
+			case gpeISA_anFUN: {	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
 					stk.aAN[flg.iA] = IS.an;
-					flg.iA++;
+					//flg.iA++;
 				} break;
 
-			/// gpcREG D[]
- 			case gpeISA_u8: {
+			/// gpcREG D[]	// --------------------------------------------------------------------------------------
+ 			case gpeISA_u8: {	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%lld", IS.an.u8 );
 					stk.D[flg.iD] = IS.an.u8;
-					flg.iD++;
+					//flg.iD++;
 				} break;
-			case gpeISA_i8: {
+			case gpeISA_i8: {	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%lld", -((I8)IS.an.u8) );
 					stk.D[flg.iD] = -((I8)IS.an.u8);
-					flg.iD++;
+					//flg.iD++;
 				} break;
-			case gpeISA_d8: {
+			case gpeISA_d8: {	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%f",  IS.an.d8 );
 					stk.D[flg.iD] = IS.an.d8;
-					flg.iD++;
+					//flg.iD++;
 				} break;
 
 
 
-			case gpeISA_var: {
+			/// gpeISA_var	// --------------------------------------------------------------------------------------
+ 			case gpeISA_var: {	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
-					stk.aVR[flg.iV] = IS.an.var;
 
-					flg.iV++;
+					fnd = stk.aVR[flg.iV] = IS.an.var;
+					if( !fnd.an.alf )
+						break;
+
+					if( pOUT )
+					{
+						fnd = pOUT;
+						if( fnd.pRM )
+						{
+							// lokális változó és már használta valaki
+							B = fnd.pRM->ALU( fnd.iA );
+							break;
+						}
+					}
+					// na még mindig nincsen
+					fnd = this;
+					if( fnd.pRM )
+					{
+						// forrásként használható
+						B = fnd.pRM->ALU( fnd.iA );
+						break;
+					}
+					// na most nézzük meg van e beépített változó rá
+					if( win.WINvar( stk.D[flg.iD], fnd.an.alf ) )
+					{
+						// valamit kapott
+						(B = pOUT->ADD( fnd.an.alf, 0,0 ))
+						= stk.D[flg.iD];
+						break;
+					}
+
+					B = pOUT->ADD( fnd.an.alf, 0,0 );
 				} break;
-			case gpeISA_FUN: {
+
+			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
 					stk.aVR[flg.iV] = IS.an.var;
 
-					flg.iV++;
+					//flg.iV++;
 				} break;
 
 
 			case gpeISA_tag: {
 					 pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
 					stk.aTG[flg.iG] = IS.an.var;
-					flg.iG++;
+					//flg.iG++;
 				} break;
 
 
 			case gpeISA_str: {
 					pB += sprintf( (char*)pB, "%s", (stk.apSTR[flg.iS] = IS.an.aSTR[0])) ;
-					flg.iS++;
+					//flg.iS++;
 				} break;
 			case gpeISA_row:
 				bROW = true;
@@ -115,12 +149,18 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 
 		switch( IS.isa.aISA[1] )
 		{
-			case gpeISA_u8:{} break;
-			case gpeISA_i8:{} break;
-			case gpeISA_d8:{} break;
+			case gpeISA_u8:
+			case gpeISA_i8:
+			case gpeISA_d8:
+					{
+						B = stk.iD(err);
+					} break;
+
 			case gpeISA_an:{} break;
 			case gpeISA_anFUN:{} break;
-			case gpeISA_var:{} break;
+			case gpeISA_var:{
+
+				} break;
 			case gpeISA_FUN:{} break;
 			case gpeISA_dim:{} break;
 			case gpeISA_not:{} break;
@@ -141,7 +181,14 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 				break;
 			case gpeISA_litl:{} break;
 			case gpeISA_assign:{
-					if( !flg.iV )
+
+					A = B;
+					B = 0;
+					break;
+
+
+					fnd = stk.iVR();
+					if( !fnd.an.alf )
 					{
 						if( flg.iA )
 						{
@@ -158,36 +205,35 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 						break;
 					}
 
+
 					bROW = false;
-					B = stk.aVR[flg.iV-1];
+					fnd = stk.iVR();
 					if( pOUT )
 					{
-						B = pOUT;
+						fnd = pOUT;
 						//pOUT->alu =
 						//pOUT->alu = this;
-						if( B.pRM )
+						if( fnd.pRM )
 						{
 							// lokális változó és már használta valaki
-
+							B = fnd.pRM->ALU( fnd.iA );
 							break;
 						}
 					}
 
 
 					//B = stk.aVR[flg.iV-1];
-					B = this;
-					if( !B.pRM )	// na még mindig nincsen
+					fnd = this;
+					if( !fnd.pRM )	// na még mindig nincsen
 					{
-						// na most nézzük meg van e beépített változó rá
-						win.WINvar( pOUT, B.an.alf );
+						/// nem talált csinálni kell
+						B = pOUT->ADD( fnd.an.alf, 0,0 );
 						break;
 					}
 
 					// talált egy forrást
 					/// be kell másolni a pOUT-ba;
-
-
-
+					B = fnd.pRM->ALU( fnd.iA );
 				} break;
 			case gpeISA_gret:{} break;
 			case gpeISA_exp:{} break;
@@ -207,7 +253,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 
 		if( (U1)IS.isa.aISA[1] > ' ' )
 		{
-			stk.stpFLG();
+			//stk.stpFLG();
 			*pB = (U1)IS.isa.aISA[1];
 			pB++;
 		}
