@@ -128,7 +128,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	SDL_DisplayMode sdlDM;
 	SDL_GetCurrentDisplayMode(0, &sdlDM);
 	winSIZ.z = (sdlDM.w*7)/8;
-	winSIZ.w = sdlDM.h;
+	winSIZ.w = sdlDM.h-64;
 	winSIZ.a4x2[0] = winSIZ.a4x2[1];
 
 	winDIV = winSIZ/I4x4(2,2,1,1); // = siz;
