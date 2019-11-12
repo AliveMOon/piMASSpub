@@ -353,6 +353,25 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			win.nJDOIT.x++;
 			pSRC->pMINI->lzy_reset();
 			pSRC->apOUT[3] = pSRC->pEXE->RESrun( pSRC->apOUT[3], NULL, win, pSRC, NULL );
+			if( !pSRC->apOUT[3] )
+				continue;
+		}
+
+		/// READY
+		gpcRES& res = *pSRC->apOUT[3];
+		for( U4 a = 0, ae = res.nFND(); a < ae; a++ )
+		{
+			gpcALU& alu = res.ALU(a);
+			switch( alu.alf )
+			{
+				case gpeALF_TELNET: {
+						I4 port = alu.u8();
+						win.GT( gpeALF_ACCEPT, port)->GTlst();
+					} break;
+				default:
+					break;
+			}
+
 		}
 	}
 

@@ -647,7 +647,7 @@ I8 gpcGT::GTlst()
 			if( pACC )
 			{
 				pACC->addr_in = clientaddr;
-				GTclr();
+				pACC->GTclr();
 				/*gpmDEL( pACC->pPUB );
 				gpmDEL( pACC->pOUT );
 				gpmDEL( pACC->pINP );

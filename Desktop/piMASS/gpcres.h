@@ -398,9 +398,128 @@ public:
 		sub = u42;
 		return *this;
 	}
-	/*gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
-	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, I8 i8, U2 dm = 0 );
-	gpcALU& equ_o( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );*/
+
+	U8 u8()
+	{
+		if( this ? !pDAT : true )
+			return 0;
+
+		if( typ.x&0x40 )
+		{
+			if( typ.w > 4 )
+				return ((double*)pDAT)[0];
+
+			return ((float*)pDAT)[0];
+		}
+		if( typ.x&0x80 )
+		{
+			if( typ.w > 2 )
+			{
+				if( typ.w > 4 )
+					return ((I8*)pDAT)[0];
+
+				return ((I4*)pDAT)[0];
+			}
+			if( typ.w > 1 )
+				return ((I2*)pDAT)[0];
+
+			return ((I1*)pDAT)[0];
+		}
+		if( typ.w > 2 )
+		{
+			if( typ.w > 4 )
+				return ((U8*)pDAT)[0];
+
+			return ((U4*)pDAT)[0];
+		}
+		if( typ.w > 1 )
+			return ((U2*)pDAT)[0];
+		else
+			return ((U1*)pDAT)[0];
+
+		return 0;
+	}
+	I8 i8()
+	{
+		if( this ? !pDAT : true )
+			return 0;
+
+		if( typ.x&0x40 )
+		{
+			if( typ.w > 4 )
+				return ((double*)pDAT)[0];
+
+			return ((float*)pDAT)[0];
+		}
+		if( typ.x&0x80 )
+		{
+			if( typ.w > 2 )
+			{
+				if( typ.w > 4 )
+					return ((I8*)pDAT)[0];
+
+				return ((I4*)pDAT)[0];
+			}
+			if( typ.w > 1 )
+				return ((I2*)pDAT)[0];
+
+			return ((I1*)pDAT)[0];
+		}
+		if( typ.w > 2 )
+		{
+			if( typ.w > 4 )
+				return ((U8*)pDAT)[0];
+
+			return ((U4*)pDAT)[0];
+		}
+		if( typ.w > 1 )
+			return ((U2*)pDAT)[0];
+		else
+			return ((U1*)pDAT)[0];
+
+		return 0;
+	}
+	double d8()
+	{
+		if( this ? !pDAT : true )
+			return 0.0;
+
+		if( typ.x&0x40 )
+		{
+			if( typ.w > 4 )
+				return ((double*)pDAT)[0];
+
+			return ((float*)pDAT)[0];
+		}
+		if( typ.x&0x80 )
+		{
+			if( typ.w > 2 )
+			{
+				if( typ.w > 4 )
+					return ((I8*)pDAT)[0];
+
+				return ((I4*)pDAT)[0];
+			}
+			if( typ.w > 1 )
+				return ((I2*)pDAT)[0];
+
+			return ((I1*)pDAT)[0];
+		}
+		if( typ.w > 2 )
+		{
+			if( typ.w > 4 )
+				return ((U8*)pDAT)[0];
+
+			return ((U4*)pDAT)[0];
+		}
+		if( typ.w > 1 )
+			return ((U2*)pDAT)[0];
+		else
+			return ((U1*)pDAT)[0];
+
+		return 0.0;
+	}
+
 };
 
 
@@ -778,80 +897,8 @@ public:
 		}
 
 		return nA;
+	}
 
-/*
-		ig = nA;
-		if( pTREE )
-		{
-			ig = pTREE->tree_fndHARD( alf, t );
-			//  if( pTREE->x != (U8)alf )
-			//	ig = t;
-
-			if( ig < t )
-				return i = pTx[ig];
-
-			for( U4 j = 0, x; j < nA; j++ )
-			{
-				if( !pALF[j] )
-					continue;
-
-				if( ig >= nA )
-				if( pALF[j] == alf )
-				{
-					// azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
-					pTx[t] = ig = j;
-					x = pTREE->tree_fndHARD( pALF[j], t );
-					if( x >= t )
-						t = pTREE->tree_add( pALF[j], t );		// nem volt benne a listában
-					break;
-				}
-
-				x = pTREE->tree_fndHARD( pALF[j], t );
-				// if( pTREE->x != (U8)alf )
-				//	x = t;
-
-				if( x < t )
-					continue;
-
-				pTx[t] = j;
-				t = pTREE->tree_add( pALF[j], t );
-			}
-
-			if( ig < nA )
-				i = ig;	// megtalálta a ciklusban
-
-			return ig;
-		}
-
-		pTREE	= new U8x4[nA];
-		pTx		= new U4[nA];
-		gpmZn( pTREE, nA );
-		t = 0;
-		for( U4 j = 0; j < nA; j++ )
-		{
-			if( !pALF[j] )
-				continue;
-
-			if( ig >= nA )
-			if( pALF[j] == alf )
-			{
-				pTx[t] = ig = j;
-				t = pTREE->tree_add( pALF[j], t );
-				break; // azt remélem ettől, hogy amit gyakrabban keresnek az elöbre kerüljön
-			}
-
-			pTx[t] = j;
-			t = pTREE->tree_add( pALF[j], t );
-
-		}
-		if( ig < nA )
-			i = ig;	// megtalálta a ciklusban
-
-		return ig;
-
-*/
-
-    }
 
 
 };

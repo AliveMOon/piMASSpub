@@ -61,9 +61,56 @@ class gpcWIN
 				bALT, abALT[2];
 		U1		bSW;
 
+		/// READY
+		/// GATE -------------------------------------------
+		gpcGT	**ppGT, *pGT;
+		U4		iGTfr, iGTld, nGTall, iGT;
 
+		gpcGT*	GT( gpeALF alf, I4 port )
+		{
+			if( pGT )
+			if( pGT->port == port )
+			if( pGT->TnID.alf == alf )
+			    return pGT;
 
+			pGT = NULL;
+			iGTfr = iGTld;
+			for( U4 g = 0; g < iGTld; g++ )
+			{
+				if( !ppGT[g] )
+				{
+					if( iGTfr > g )
+						iGTfr = g;
+					continue;
+				}
 
+				if( ppGT[g]->port != port )
+					continue;
+				if( ppGT[g]->TnID.alf != alf )
+					continue;
+
+				pGT = ppGT[iGT = g];
+				return pGT;
+			}
+			if( iGTfr < iGTld )
+			{
+				iGT = iGTfr;
+				return ppGT[iGT] = pGT = new gpcGT( I8x2( alf, 0 ), port );
+			}
+
+			iGTld++;
+			if( iGTld >= nGTall )
+			{
+				nGTall += 0x10;
+				gpcGT	**ppKILL = ppGT;
+				ppGT = new gpcGT*[nGTall];
+				gpmMEMCPY( ppGT, ppKILL, iGTfr );
+				gpmDELary(ppKILL);
+			}
+
+			iGT = iGTfr;
+			return ppGT[iGT] = pGT = new gpcGT( I8x2( alf, 0 ), port );
+		}
 
 		SDL_Rect	wDIV( U1 iDIV );
 		void		gpeWINresize( void );
