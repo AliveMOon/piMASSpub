@@ -11,8 +11,7 @@ a = nbuild + 3*sec  c = 100 200 30;
 trg = pic( "ize", 1280, 1024 )
 cam = cam( "l0", 1280, 1024, 0.1 )
  c0	   d0	   e0	   f0	   g0	   h0	   a1	 
-enter enter	  b1	  = 10 + 20 + msec
-  c1	   d1	 
+enter enter	  b1	  = 10 + 20  c1	   d1	 
  Trabi
 							. e1	 
  Toyota
