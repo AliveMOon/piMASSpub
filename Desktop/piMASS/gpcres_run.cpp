@@ -305,6 +305,8 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 
 U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
+	win.nJDOIT.y = win.nJDOIT.x;
+
 	U1* pKEYbuff = win.gpsKEYbuff;
 	gpcSRC	tmp, *pSRC;
 	U4 xFND;
@@ -348,12 +350,13 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				pSRC->pMINI->lzy_reset();
 				continue;
 			}
-
+			win.nJDOIT.x++;
 			pSRC->pMINI->lzy_reset();
 			pSRC->apOUT[3] = pSRC->pEXE->run( pSRC->apOUT[3], NULL, win, //this,
 																			pSRC, NULL );
 		}
 	}
+
 
 	return pKEYbuff;
 }

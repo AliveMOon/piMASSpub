@@ -47,13 +47,15 @@ class gpcWIN
 				*gppKEYbuff,
 				*gppMOUSEbuff;
 
-		I8 gpnEVENT = 0, gpnTITLE = 0;
+		I8	gpnEVENT = 0,
+			gpnTITLE = 0;
 
 		U4	aKT[0x200],
 			srcDIV, dstDIV;
 		U4x2 onDIV = srcDIV;
-		U4x4 mSEC = 0;	// x: new // y: prev // z: elapse // w: fps
-		I4 nMOV, nMAG, nMB, nMBB, nF;
+		U4x4	mSEC = 0, // x: new // y: prev // z: elapse // w: fps
+				nJDOIT;
+		I4 nMOV, nIRQ,  nMB, nMBB, nF;
 
 		bool	bSHIFT, bCTRL,
 				bALT, abALT[2];

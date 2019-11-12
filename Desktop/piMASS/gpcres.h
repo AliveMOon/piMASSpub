@@ -484,9 +484,8 @@ class gpcRES
 			iLEV, nASG;
 
 	void	**ppDAT;
-	gpcRES	**ppR;
+	gpcRES	**ppR, *pMOM;
 	gpcALU	alu;
-	gpcRES* pMOM;
 
 	gpcISA* pISA;
 	U4x2	nISA;
