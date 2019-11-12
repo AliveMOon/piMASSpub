@@ -45,8 +45,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
         {
 			case gpeISA_trg:{	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "[%d:%d]", IS.an.x, IS.an.y );
-					stk.D[flg.iD].xy //= stk.aTRG[flg.iT]
-										= IS.an;
+					stk.D[flg.iD].xy = IS.an;
 					//flg.iT++;
 				} continue;
 
@@ -61,6 +60,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 					stk.aAN[flg.iA] = IS.an;
 					//flg.iA++;
 				} break;
+
 
 			/// gpcREG D[]	// --------------------------------------------------------------------------------------
  			case gpeISA_u8: {	// --------------------------------------------------------------------------------------
@@ -220,6 +220,9 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 				bROW = true;
 				break;
 			case gpeISA_litl:{} break;
+
+
+
 			case gpeISA_assign:{
 					if( stk.D[flg.iD].bGD() )
 					{
@@ -229,6 +232,9 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 					B = 0;
 
 				} break;
+
+
+
 			case gpeISA_gret:{} break;
 			case gpeISA_exp:{} break;
 			case gpeISA_root:{} break;

@@ -19,36 +19,30 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 	if( !pE )
 		pE = pS+strlen((char*)pS);
 	null();
+
+
 	U4x4 xyWH = 0;
-	U4 deep = 0, nALF;
+	U4	nAN = 0,	nALU = 0,
+		iTRG = 0,	nALF;
 	U1 	d, *pBEG = NULL,
-		// *apA[2], *apN[2],
 		*pSTR = pS, *pXe;
 
-	//gpmZ(apA);
-	//gpmZ(apN);
-	//gpmZ(apP);
-
-	U8 nUTF8, nLAB = 0, nSTR,  u8ALF = gpeALF_A; //, u8 = 0;
-	//double d8 = 0;
+	U8 nUTF8, nLAB = 0, nSTR, u8ALF = gpeALF_A;
 
 	I8x4 lab = 0;
+	I8x2 an;
 	U1x4 typ = 0;
 	I1x4 aOP[2] = {0};
 
 	bool	bMATH = false,
 			bCROSS = false,
-			bGD = false; //,
-			//bOP;
-	gpeALF XML = gpeALF_null;
-	I4 xmlD = 0;
+			bGD = false;
+	//gpeALF XML = gpeALF_null;
+	//I4 xmlD = 0;
 
 
 	gpcADR adr;
-	I8x2 an;
 	gpcLAZY str;
-	U4  nAN = 0, nALU = 0, //iI,
-		iTRG = 0;
 	gpcISA	*pA = NULL, *pI = NULL, *pUD8 = NULL;
 	nASG = 0;
 
@@ -195,7 +189,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			{
 				*pUD8->isa.aISA = gpeISA_d8;
 				pUD8->an.d8 = pUD8->an.u8;
-				//typ.u4 = gpeTYP_D;
 				pXe = pS;	// ha DOUBLE, ha nem észre vesszük, mert marad a pS == pXe
 				pUD8->an.d8 += gpmSTR2D( pS );
 				if( pS == pXe )
@@ -257,7 +250,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						xyWH.w = xyWH.y;
 					}
 					/// ITT a TRG ------------------------------------------------------
-					//iTRG = resISA_trg( iTRG, xyWH.a4x2[0] );
 					if( xyWH.z >= xyWH.x )
 						break;
 					// bővíteni kell
@@ -286,9 +278,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						break;
 					}
 					nASG++;
-					//xyWH.null();
 					// /// ITT a TRG ------------------------------------------------------
-					// pTRG = resISA_trg(pTRG,xyWH.a4x2[0]);
 					if( !pI )
 					{
 						// nincsen amibe betegye
@@ -296,7 +286,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						while( iFND( (gpeALF)u8ALF ) < nFND() )
 							u8ALF++;
 
-						( alu = (gpeALF)u8ALF ) = xyWH.a4x2[0];	// alu.alf = alf & alu.sub = xyWH.a4x2[0];
+						( alu = (gpeALF)u8ALF ) = xyWH.a4x2[0];
 						pI = resISA_var( alu.alf );
 						u8ALF++;
 					}
@@ -373,8 +363,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 				if( bMATH )
 				{
-
-
 					break;
 				}
 
@@ -389,41 +377,39 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 				if( bMATH )
 				{
-
-
 					break;
 				}
 				/// ezt be kell majd zavarni egy XML parserba
 				pS += gpmNINCS( pS, " \t\r\n" );
-				if( pS >= pE )
-					continue;
-
-				XML = gpfSTR2ALF( pS, pE, &pS );
-				pXe = pS;
-                while( pXe = (U1*)strstr( (char*)pXe, "</" ) )
-                {
-					pXe += 2;
-					if( pXe >= pE )
+				if( pS < pE )
+				{
+					gpeALF XML = gpfSTR2ALF( pS, pE, &pS );
+					pXe = pS;
+					while( pXe = (U1*)strstr( (char*)pXe, "</" ) )
 					{
-						pXe = NULL;
+						pXe += 2;
+						if( pXe >= pE )
+						{
+							pXe = NULL;
+							break;
+						}
+						pXe += gpmNINCS( pXe, " \t\r\n" );
+						if( XML != gpfSTR2ALF( pXe, pE, &pXe ) )
+							continue;
+						pS = pXe+gpmVAN( pXe, ">", nUTF8 );
 						break;
 					}
-					pXe += gpmNINCS( pXe, " \t\r\n" );
-					if( XML != gpfSTR2ALF( pXe, pE, &pXe ) )
-						continue;
-                    pS = pXe+gpmVAN( pXe, ">", nUTF8 );
-					break;
-                }
-                if( !pXe )
-                {
-					pE = pS;
-					break;
-                }
-                if( *pS == '>' )
-					pS++;
+					if( !pXe )
+					{
+						pE = pS;
+						break;
+					}
+					if( *pS == '>' )
+						pS++;
 
-
-				break;
+					break;
+				}
+				continue;
 
 			case '(':
 			case '{':
@@ -482,29 +468,6 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 	pI = pUD8 = NULL;
 	aOP[0] = 0;
-
-	/*if( pI )
-		resISA_stp( pS[-1] );
-	else if( pUD8 )
-	{
-		switch( *pUD8->isa.aISA )
-		{
-			case gpeISA_d8:
-				typ.u4 = gpeTYP_D;
-				alu.equ( this, xyWH.a4x2[0], //-sub,
-						 typ, aOP[1], 0, pUD8->an.d8 );
-				break;
-			case gpeISA_u8:
-				typ.u4 = gpeTYP_U8;
-				alu.equ( this, xyWH.a4x2[0], //-sub,
-						 typ, aOP[1], pUD8->an.u8, 0.0 );
-				break;
-
-		}
-		pUD8 = NULL;
-	}*/
-
-	// gpmDEL( pTMP ) // nem lett sehove elrakva? Arroe KONYEC!
 
 	return this;
 }

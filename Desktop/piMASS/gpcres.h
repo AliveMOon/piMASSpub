@@ -746,25 +746,6 @@ public:
 		}
 		pAN[nCPY] = 0;
 
-	/*
-		pKILL = pTREE;
-		pTREE = new U8x4[nA];
-		if( pKILL )
-		{
-			memcpy( pTREE, pKILL, nCPY*sizeof(*pTREE) );
-			delete[] pKILL;
-		}
-		pTREE[nCPY].null();
-
-		pKILL = pTx;
-		pTx = new U4[nA];
-		if( pKILL )
-		{
-			memcpy( pTx, pKILL, nCPY*sizeof(*pTx) );
-			delete[] pKILL;
-		}
-		pTx[nCPY] = 0;
-	*/
 
 		return ALU( nCPY );
 	}
