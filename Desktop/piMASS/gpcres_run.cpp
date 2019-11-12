@@ -5,7 +5,7 @@ extern U1 gpaALFadd[];
 
 bool bITT =  false; //true; // false; //
 
-gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
+gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
 	if( this ? !nISA.x : true )
 	{
@@ -148,7 +148,7 @@ gpcRES* gpcRES::run( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcR
 		}
 		// CALL
 		if( IS.pRES )
-			pOUT = IS.pRES->run( pOUT, pMN, win, pSRC, this, deep+1, &stk );
+			pOUT = IS.pRES->RESrun( pOUT, pMN, win, pSRC, this, deep+1, &stk );
 
 
 		switch( isa.aISA[1] )
@@ -352,8 +352,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			}
 			win.nJDOIT.x++;
 			pSRC->pMINI->lzy_reset();
-			pSRC->apOUT[3] = pSRC->pEXE->run( pSRC->apOUT[3], NULL, win, //this,
-																			pSRC, NULL );
+			pSRC->apOUT[3] = pSRC->pEXE->RESrun( pSRC->apOUT[3], NULL, win, pSRC, NULL );
 		}
 	}
 

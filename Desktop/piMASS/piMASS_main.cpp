@@ -144,35 +144,7 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 
 
 
-gpcREStrs& gpcREStrs::null()
-{
-	if( !a )
-	{
-		gpmCLR;
-		return *this;
-	}
 
-	switch( typ )
-	{
-		case gpeNET4_MAS:
-			if( an < 2 )
-				delete (gpcMASS*)pDAT;
-			else
-				delete[] (gpcMASS*)pDAT;
-			break;
-		case gpeNET4_RES:
-			if( an < 2 )
-				delete (gpcREStrs*)pDAT;
-			else
-				delete[] (gpcREStrs*)pDAT;
-			break;
-		default:
-			delete[] pDAT;
-	}
-
-	gpmCLR;
-	return *this;
-}
 
 
 
