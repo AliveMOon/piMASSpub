@@ -66,7 +66,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 							pLZY->lzy_format( s = -1, "%d,", ((I4*)(pD+d))[0] );
 						continue;
 					}
-					if( nB > 2 )
+					if( nB > 1 )
 						pLZY->lzy_format( s = -1, "%lld,", ((I2*)(pD+d))[0]  );
 					else
 						pLZY->lzy_format( s = -1, "%d,", ((I1*)(pD+d))[0] );
@@ -81,7 +81,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 						pLZY->lzy_format( s = -1, "%d,", ((U4*)(pD+d))[0] );
 					continue;
 				}
-				if( nB > 2 )
+				if( nB > 1 )
 					pLZY->lzy_format( s = -1, "%d,", ((U2*)(pD+d))[0] );
 				else
 					pLZY->lzy_format( s = -1, "%d,", ((I1*)(pD+d))[0] );
