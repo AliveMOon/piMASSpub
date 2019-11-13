@@ -403,6 +403,7 @@ gpcMASS::~gpcMASS()
 
 	gpmDEL(pSRCc);
 	gpmDEL(pLST);
+	gpmDEL(pCAM);
 }
 
 

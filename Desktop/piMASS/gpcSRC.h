@@ -1124,9 +1124,12 @@ public:
 				//aLEVsp[0x100],
 				rstLEV, iLEV, nLEV, topLEV;
 
-	// GATE --------
+	/// GATE --------
 	gpcGTall	GTacpt, GTcnct;
-
+	/// PIC ---------
+	gpcPICall	PIC;
+	/// CAM ---------
+	gpcPICAM*	pCAM;
 
 	U4 relLEV( void )
 	{

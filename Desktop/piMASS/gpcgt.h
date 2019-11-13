@@ -1,7 +1,8 @@
 #ifndef GPCGT_H
 #define GPCGT_H
 
-#include "piMASS.h"
+
+#include "gpcpic.h"
 //#define gpdRECVn (0x30000/12)
 class gpcGT;
 

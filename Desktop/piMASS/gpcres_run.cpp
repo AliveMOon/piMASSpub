@@ -359,6 +359,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 		/// READY
 		gpcRES& res = *pSRC->apOUT[3];
+		gpcPIC	*pTRG = NULL, *pPIC = NULL;
 		for( U4 a = 0, ae = res.nFND(); a < ae; a++ )
 		{
 			gpcALU& alu = res.ALU(a);
@@ -370,9 +371,29 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				}
 				else switch( alu.alf )
 				{
-					case gpeALF_CAM:
-						I4 port = alu.u8();
+					case gpeALF_CLR: {
 
+						} break;
+					case gpeALF_CAM:{
+							I4 iCAM = alu.u8();
+							if( !iCAM )
+								break;
+							if( pPIC = PIC.PIC( I8x2(alu.alf,iCAM) ) )
+							{
+								if( !pCAM )
+									pCAM = new gpcPICAM;
+								U1* pRGB = pPIC->getPIX( pCAM, win.mSEC.y+500 );
+								if( pRGB )
+								{
+									if( !win.pPICbg )
+									{
+										win.pPICbg = pPIC;
+									}
+								}
+
+							}
+						} break;
+					default:
 						break;
 				}
 

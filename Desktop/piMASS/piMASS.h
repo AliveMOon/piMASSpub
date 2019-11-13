@@ -21,6 +21,7 @@
 //~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //~ SOFTWARE.
+#include "mysys.h"
 #ifdef _WIN64
 
 	#pragma once
@@ -36,7 +37,7 @@
 	#include <WinSock2.h>
 	#include <ws2tcpip.h>
 	#define bzero( a, n ) ( (void*)memset( a, 0, n ) )
-	#define PATH_MAX _MAX_PATH
+	#define gpdMAX_PATH _MAX_PATH
 	//#define close( h ){ if( h != INVALID_SOCKET ){ closesocket( h ); h = INVALID_SOCKET; } }
 	#define ace _access
 	#define mkd( a, b ) ( _mkdir( a ) )
@@ -54,7 +55,7 @@
 #else
 
 	#ifdef gpdSYSpi
-	#include <raspicam/raspicam.h>
+		#include <raspicam/raspicam.h>
 	#endif // gpdSYSpi
 
 	#include <unistd.h> // for usleep()
@@ -95,6 +96,10 @@
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
 	#define gpmSDL_FreeSRF( h ){ if( h ){ SDL_FreeSurface( h ); h = NULL; } }
 
+	#define gpdMAX_PATH PATH_MAX
+
+	#define gpdRPI_WIDTH	640		// Allowable widths: 320, 640, 1280
+	#define gpdRPI_HEIGHT	480		// Allowable heights: 240, 480, 960
 #endif
 
 #include <exception>

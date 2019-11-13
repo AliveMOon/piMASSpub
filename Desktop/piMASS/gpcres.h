@@ -12,12 +12,8 @@ class gpcWIN;
 //#include "gpcwin.h"
 //class gpcWIN;
 
-
-
-
 #include "gpcSCHL.h"
 #include "gpcOPCD.h"
-
 
 enum gpeTYP:U4
 {

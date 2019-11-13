@@ -57,6 +57,8 @@
 		<Unit filename="gpcgt.cpp" />
 		<Unit filename="gpcgt.h" />
 		<Unit filename="gpcgtos.cpp" />
+		<Unit filename="gpcpic.cpp" />
+		<Unit filename="gpcpic.h" />
 		<Unit filename="gpcres.cpp" />
 		<Unit filename="gpcres.h" />
 		<Unit filename="gpcres2mini.cpp" />

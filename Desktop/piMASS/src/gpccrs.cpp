@@ -430,8 +430,12 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR )
 	dstPX.h -= dstPX.y;
 	dstPX.x += divPX.x;
 	dstPX.y += divPX.y;
-
-	SDL_FillRect( win.pSRFwin, &dstPX, gpaC64[6] ); // 0x000000AA );
+	if( win.pPICbg ? win.pPICbg->pSRF : NULL )
+	{
+		//src = win.pPICbg->xyOUT.xyWH
+		SDL_BlitScaled( win.pPICbg->pSRF, &win.pPICbg->xyOUT.xyWH, win.pSRFwin, &dstPX );
+	} else
+		SDL_FillRect( win.pSRFwin, &dstPX, gpaC64[6] ); // 0x000000AA );
 
 	dstPX.w = divPX.w/CRSfrm.z;	// cél karakter szélessége pix-be
 	dstPX.h = divPX.h/CRSfrm.w;	// cél karakter magassága pix-be

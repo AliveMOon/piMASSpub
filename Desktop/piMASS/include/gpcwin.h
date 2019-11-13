@@ -36,9 +36,9 @@ class gpcWIN
 		SDL_Surface		*pSRFload,
 						*pSRFchar,
 						*pSRFwin;
+		gpcPIC			*pPICbg;
 
 		SDL_Event 		ev;
-
 		SDL_Rect		chrPIC;
 
 		char 	gpsMAINpub[0x100],
