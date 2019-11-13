@@ -98,8 +98,8 @@
 
 	#define gpdMAX_PATH PATH_MAX
 
-	#define gpdRPI_WIDTH	640		// Allowable widths: 320, 640, 1280
-	#define gpdRPI_HEIGHT	480		// Allowable heights: 240, 480, 960
+	#define gpdRPI_WIDTH	320 // 640		// 1280	// Allowable widths: 320, 640, 1280
+	#define gpdRPI_HEIGHT	240 // 480		// 960	//  Allowable heights: 240, 480, 960
 #endif
 
 #include <exception>

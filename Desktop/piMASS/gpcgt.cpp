@@ -865,12 +865,12 @@ I8 gpcGT::GTlst()
 	U8 n_soc = aGTfd[gpeFD_recv].nFD+aGTfd[gpeFD_send].nFD;
 	if( !n_soc )
 	{
-		usleep( 50 );
+		usleep( 10 );
 		return 0;
 	}
 	struct timeval tv;   // sleep for tenr minutes!
 	tv.tv_sec = 0;
-	tv.tv_usec = 25000;
+	tv.tv_usec = 25;
 
 	int nS = select(
 					aGTfd[gpeFD_recv].maxSCK+1,

@@ -435,7 +435,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		//while( SDL_PollEvent( &ev ) )
 		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
 
-		if( SDL_WaitEventTimeout( &ev, 10 ) ) { /// EVENTS --------------------------------------------------
+		while( SDL_WaitEventTimeout( &ev, 10 ) ) { /// EVENTS --------------------------------------------------
 			gpnEVENT++;
 			gpnTITLE = gpnEVENT;
 
@@ -848,10 +848,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				c = 0;
 			}
 		}
-		else if( piMASS )
-		{
 
-		}
 
 	}
 
