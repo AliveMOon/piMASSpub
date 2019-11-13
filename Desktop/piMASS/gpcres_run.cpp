@@ -362,11 +362,26 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		for( U4 a = 0, ae = res.nFND(); a < ae; a++ )
 		{
 			gpcALU& alu = res.ALU(a);
-			switch( alu.alf )
+			if( alu.alf < gpeALF_AAAAAA )
+			{
+				if( alu.alf < gpeALF_AAA )
+				{
+
+				}
+				else switch( alu.alf )
+				{
+					case gpeALF_CAM:
+						I4 port = alu.u8();
+
+						break;
+				}
+
+			}
+			else switch( alu.alf )
 			{
 				case gpeALF_TELNET: {
 						I4 port = alu.u8();
-						win.GT( gpeALF_ACCEPT, port)->GTlst();
+						GTacpt.GT( alu.alf, port)->GTlst();
 					} break;
 				default:
 					break;

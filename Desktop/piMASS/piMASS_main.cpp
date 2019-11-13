@@ -482,6 +482,7 @@ U4STR aSIZEOF[] = {
 	{ sizeof(gpcRES), 	"gpcRES" },
 	{ sizeof(gpcSTK), 	"gpcSTK" },
 	{ sizeof(gpcREG), 	"gpcREG" },
+	{ sizeof(gpcGTall),	"gpcGTall"	},
 	{ sizeof(gpcGT),	"gpcGT"	},
 	{ sizeof(gpcALU),	"gpcALU" },
 	{ sizeof(gpcADR),	"gpcADR" },

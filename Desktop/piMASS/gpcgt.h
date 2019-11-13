@@ -117,7 +117,7 @@ public:
 class gpcGTall
 {
 public:
-	gpcGT	**ppGTalloc;
+	gpcGT	**ppGTalloc, *pGT;
 	U4		nGTalloc, iGTfr, nGTld;
 	gpcGTall() { gpmCLR; };
 	void		clr( );
@@ -129,6 +129,7 @@ public:
 
 		return ppGTalloc ? ppGTalloc[i] : NULL;
 	}
+	gpcGT* GT( gpeALF alf, I4 port );
 };
 
 class gpcGT

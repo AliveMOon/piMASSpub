@@ -134,6 +134,53 @@ void gpcGTall::clr()
 {
 	GTclose();
 }*/
+gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
+{
+	if( pGT )
+	if( pGT->port == port )
+	if( pGT->TnID.alf == alf )
+		return pGT;
+
+	pGT = NULL;
+	if( iGTfr > nGTld)
+		iGTfr = nGTld;
+	else if( !ppGTalloc )
+		iGTfr = nGTld = nGTalloc = 0;
+	else if( ppGTalloc[iGTfr] )
+		iGTfr = nGTld;
+
+	for( U4 g = 0; g < nGTld; g++ )
+	{
+		if( !ppGTalloc[g] )
+		{
+			if( iGTfr > g )
+				iGTfr = g;
+			continue;
+		}
+
+		if( ppGTalloc[g]->port != port )
+			continue;
+		if( ppGTalloc[g]->TnID.alf != alf )
+			continue;
+
+		pGT = ppGTalloc[g];
+		return pGT;
+	}
+	if( iGTfr < nGTld )
+		return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2( alf, 0 ), port );
+
+	nGTld++;
+	if( nGTld >= nGTalloc )
+	{
+		nGTalloc += 0x10;
+		gpcGT	**ppKILL = ppGTalloc;
+		ppGTalloc = new gpcGT*[nGTalloc];
+		gpmMEMCPY( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
+		gpmDELary(ppKILL);
+	}
+
+	return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2( alf, 0 ), port );
+}
 gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 {
 	gpcGT *pACC = NULL, *p_a;
