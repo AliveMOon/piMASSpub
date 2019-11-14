@@ -1965,6 +1965,12 @@ public:
 		return *this;
 	}
 
+	U1* strA4N( U1* pBUFF )
+    {
+		sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, x )), "%d", y );
+		return pBUFF;
+    }
+
 	I4x2& operator = ( const U4x2& b )
 	{
 		x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;

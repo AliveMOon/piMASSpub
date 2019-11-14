@@ -21,19 +21,35 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		return NULL;
 
 	U8 s = -1;
-	U1* pB = pBUFF+0x100;
+	U1* pB = pBUFF+0x100, *p_sep;
 	for( U4 a = 0; a < nA; a++ )
 	{
 		ALU( a );
-		pB = pB + gpfALF2STR( pBUFF, alu.alf ) + 1;
-		pLZY->lzy_format( s = -1, "%s%s%s.%s // [%dx%d]sof(%d) ", a ? "\r\n":"", gppTABrun-deep, alu.typ.typ2str(pBUFF+0x10), pBUFF, alu.AN.x, alu.AN.y, alu.nLOAD() );
+		if( (gpeALF)(a+1) != alu.alf )
+		{
+			pB = pB + gpfALF2STR( pBUFF, alu.alf ) + 1;
+		} else {
+			*pBUFF = 0;
+			pB = pBUFF;
+		}
+		pLZY->lzy_format( s = -1,	"%s"
+									//"%s."
+									"%s=" ,//" // [%dx%d]sof(%d) ",
+									gppTABrun-deep,
+									//alu.typ.typ2str(pBUFF+0x10),
+									pBUFF //, alu.AN.x, alu.AN.y, alu.nLOAD()
+									);
+
 
 		U4x2 	X( alu.typ.y, alu.typ.z ), xy;
 		U1* pD = (U1*)alu.pDAT;
 		if( !pD )
+		{
+			pLZY->lzy_format( s = -1, "\r\n" );
 			continue;
+		}
 
-		U4 		nAN = alu.AN.a4x2[0].area(), d,
+		U4 		nAN = alu.AN.a4x2[0].area(), d, xp1, xe,
 				nB	= alu.typ.w,
 				nX	= X.area(),
 				nXB	= nX*nB;
@@ -43,17 +59,19 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		for( xy.y = 0; xy.y < alu.AN.y; xy.y++ )
 		{
 			pLZY->lzy_format( s = -1, "%s", gppTABrun-deep );
-			for( xy.x = 0; xy.x < alu.AN.x; xy.x++ )
+			for( xy.x = 0, xe = alu.AN.x; xy.x < xe; xy.x = xp1 )
 			{
+				xp1 = xy.x+1;
+				p_sep = (U1*)((xp1 < xe) ? "," : "");
 				d = xy*T;
 				if( d > nAN*nXB )
 					d %= nAN*nXB;
 				if( alu.typ.x&0x40 )
 				{
 					if( nB > 4 )
-						pLZY->lzy_format( s = -1, "%f,", ((double*)(pD+d))[0]  );
+						pLZY->lzy_format( s = -1, "%f%s", ((double*)(pD+d))[0], p_sep );
 					else
-						pLZY->lzy_format( s = -1, "%f,", ((float*)(pD+d))[0] );
+						pLZY->lzy_format( s = -1, "%f%s", ((float*)(pD+d))[0], p_sep );
 					continue;
 				}
 				if( alu.typ.x&0x80 )
@@ -61,33 +79,34 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 					if( nB > 2 )
 					{
 						if( nB > 4 )
-							pLZY->lzy_format( s = -1, "%lld,", ((I8*)(pD+d))[0]  );
+							pLZY->lzy_format( s = -1, "%lld%s", ((I8*)(pD+d))[0], p_sep  );
 						else
-							pLZY->lzy_format( s = -1, "%d,", ((I4*)(pD+d))[0] );
+							pLZY->lzy_format( s = -1, "%d%s", ((I4*)(pD+d))[0], p_sep );
 						continue;
 					}
 					if( nB > 1 )
-						pLZY->lzy_format( s = -1, "%lld,", ((I2*)(pD+d))[0]  );
+						pLZY->lzy_format( s = -1, "%lld%s", ((I2*)(pD+d))[0], p_sep  );
 					else
-						pLZY->lzy_format( s = -1, "%d,", ((I1*)(pD+d))[0] );
+						pLZY->lzy_format( s = -1, "%d%s", ((I1*)(pD+d))[0], p_sep );
 
 					continue;
 				}
 				if( nB > 2 )
 				{
 					if( nB > 4 )
-						pLZY->lzy_format( s = -1, "%lld,", ((U8*)(pD+d))[0]  );
+						pLZY->lzy_format( s = -1, "%lld%s", ((U8*)(pD+d))[0], p_sep  );
 					else
-						pLZY->lzy_format( s = -1, "%d,", ((U4*)(pD+d))[0] );
+						pLZY->lzy_format( s = -1, "%d%s", ((U4*)(pD+d))[0], p_sep );
 					continue;
 				}
 				if( nB > 1 )
-					pLZY->lzy_format( s = -1, "%d,", ((U2*)(pD+d))[0] );
+					pLZY->lzy_format( s = -1, "%d%s", ((U2*)(pD+d))[0], p_sep );
 				else
-					pLZY->lzy_format( s = -1, "%d,", ((I1*)(pD+d))[0] );
+					pLZY->lzy_format( s = -1, "%d%s", ((I1*)(pD+d))[0], p_sep );
 
 			}
-			pLZY->lzy_format( s = -1, ";\r\n" );
+			if( nA > 1 )
+				pLZY->lzy_format( s = -1, ";\r\n" );
 		}
 	}
 	/// ha nem DEBUG legyen pMOM == NULL és akor nem írja ki a pISA-t
