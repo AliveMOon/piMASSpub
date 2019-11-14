@@ -72,6 +72,41 @@ const char *dz_s_http_dwnl_sFN_sFNpEXP_nS =	"HTTP/1.0 200 OK\r\n" \
 											"Content-Length: %lld\r\n" \
 											"\r\n";
 
+gpcLAZY* gpcLAZY::qEVENT(void)
+{
+	if(!this)
+		return NULL;
+	if(aWIP[gpeLZYwip] >= gpeWIP_esc)
+		return NULL;
+
+	U4 nREP = 10, nLOCK = 0;
+	while( nREP )
+	{
+		nREP--;
+		if( aWIP[gpeLZYwip] != gpeWIP_done )
+		{
+			usleep(100);
+			continue;
+		}
+		nLOCK++;
+		aWIP[gpeLZYwipSTK] = aWIP[gpeLZYwip];
+		if( !n_load )
+		{
+			DO();
+			return NULL;
+		}
+
+		//gt_wip_stk = gt_wip;
+		aWIP[gpeLZYwip] = gpeWIP_idle;
+		return this;
+	}
+	if( !nLOCK )
+		return NULL;
+
+	DO();
+	return NULL;
+}
+
 gpcLAZY* gpcGT_DWNL::join( gpcLAZY* pOUT, gpcGT& mom, gpcLAZY* pEXE )
 {
 	if( pOUT ? pOUT->n_alloc : false )
@@ -516,9 +551,31 @@ char* gpcGT::GTsend( char* p_err )
 		sprintf( p_err, "\nERROR: send 0 byte" );
 		return p_err;
 	}
+	U4 sub = n, nREPETA = 0;
+	while( sub < pOUT->n_load )
+	{
+		n = pOUT->n_load-sub;
+		if( n > sizeof(s_buff) )
+			n = sizeof(s_buff);
+
+		n = send( socket, ((char*)pOUT->p_alloc)+sub, n, 0 );
+		if( n == SOCKET_ERROR )
+		{
+			pOUT->lzy_ins( NULL, 0, s = 0, sub );
+			char* p_error = s_buff;
+			p_err += GTerr( p_error, &p_error );
+			bGTdie = true;
+			sprintf( p_err, "\nERROR: send SOCKET_ERROR DIE" );
+			return p_err;
+		}
+
+		sub += n;
+		nREPETA++;
+	}
+
 
 	bool b_close = pOUT->qCLOSE();
-	pOUT->lzy_ins( NULL, 0, s = 0, n );
+	pOUT->lzy_ins( NULL, 0, s = 0, sub ); //n );
 	if( !pOUT->n_load )
 		gpmDEL( pOUT );
 
@@ -865,12 +922,12 @@ I8 gpcGT::GTlst()
 	U8 n_soc = aGTfd[gpeFD_recv].nFD+aGTfd[gpeFD_send].nFD;
 	if( !n_soc )
 	{
-		usleep( 10 );
+		usleep( gpdGT_LIST_tOUT );
 		return 0;
 	}
 	struct timeval tv;   // sleep for tenr minutes!
 	tv.tv_sec = 0;
-	tv.tv_usec = 25;
+	tv.tv_usec = gpdGT_LIST_tOUT;
 
 	int nS = select(
 					aGTfd[gpeFD_recv].maxSCK+1,

@@ -133,14 +133,14 @@ void gpcGT::GTos( gpcGT& mom )
 							isEVNT.null();
 							isEVNT.id = gpeNET4_0EYE;
 							isEVNT.n = TnID.num;
-							mom.pEVNT = mom.pEVNT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
+							mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
 							pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
 							break;
 						case gpeALF_PREV:
 							isEVNT.null();
 							isEVNT.id = gpeNET4_PREV;
 							isEVNT.n = TnID.num;
-							mom.pEVNT = mom.pEVNT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
+							mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
 							pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
 							break;
 						default:

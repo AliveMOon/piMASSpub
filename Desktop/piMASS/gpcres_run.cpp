@@ -303,6 +303,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 	return pOUT;
 }
 
+
 U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
 	win.nJDOIT.y = win.nJDOIT.x;
@@ -402,7 +403,104 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			{
 				case gpeALF_TELNET: {
 						I4 port = alu.u8();
-						GTacpt.GT( alu.alf, port)->GTlst();
+						if( gpcGT* pGT = GTacpt.GT( alu.alf, port ) )
+						{
+							gpcGT& gt = *pGT;
+
+							gt.GTlst();
+							if( gpcLAZY* pEVNT = gt.pEVENT->qEVENT() )
+							{
+								U1x4* pBGRA;
+								U4 nGD = 0; U8 s;
+								gpcHUD* pEV = (gpcHUD*)pEVNT->p_alloc;
+								for(U4 i = 0, n = pEVNT->n_load / sizeof(gpcHUD); i < n; i++)
+								{
+									switch(pEV[i].id)
+									{
+										case gpeNET4_0EYE:
+											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) ) {
+												 I4x4	src( 0,0, win.pSRFwin->w, win.pSRFwin->h ),
+														dst( 0,0, win.pSRFwin->w/2, win.pSRFwin->h/2 );
+
+												if( !win.pSRFsnd )
+												{
+													 U4 rmask, gmask, bmask, amask;
+													#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+													  int shift = (req_format == STBI_rgb) ? 8 : 0;
+													  rmask = 0xff000000 >> shift;
+													  gmask = 0x00ff0000 >> shift;
+													  bmask = 0x0000ff00 >> shift;
+													  amask = 0x000000ff >> shift;
+													#else // little endian, like x86
+													  rmask = 0x000000ff;
+													  gmask = 0x0000ff00;
+													  bmask = 0x00ff0000;
+													  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
+													#endif
+													win.pSRFsnd = SDL_CreateRGBSurface(	0, dst.z, dst.w, 32,
+																						rmask, gmask, bmask, amask  );
+												}
+
+												if( SDL_Surface* pSURF = win.pSRFsnd )
+												{
+
+
+													SDL_BlitScaled(
+																		win.pSRFwin,	&src.xyWH,
+																		pSURF,			&dst.xyWH
+																	);
+
+													//IMG_SaveJPG( pSURF, "/mnt/ram/tmp.tmp" );
+													IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
+													gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
+													if( pPNG )
+													{
+														nGD++;
+														pGT->pHUD = pGT->pHUD->put( pPNG->p_alloc, pPNG->n_load );
+														pGT->pHUD->id = gpeNET4_0EYE;
+													}
+													//SDL_FreeSurface(pSURF);
+													if( gpfACE( gpdPICbg, 4) > -1 )
+													{
+														rename( gpdPICbg, "/mnt/ram/bg.kill" );
+													}
+													rename( "/mnt/ram/tmp.tmp", gpdPICbg );
+													if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+													{
+														remove( "/mnt/ram/bg.kill" );
+													}
+												}
+											} break;
+										case gpeNET4_0HUD:
+											if( win.pPICbg )
+											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) )  {
+												nGD++;
+												pGT->pHUD = pGT->pHUD->put( win.pPICbg->pPIX, win.pPICbg->nPIX/6 );
+												pGT->pHUD->id = pEV[i].id;
+											} break;
+										case gpeNET4_PREV:
+											if( win.pPICbg )
+											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) )  {
+												nGD++;
+												pGT->pHUD = pGT->pHUD->put( "\u001B[2J\r", strlen("\u001B[2J\r") );
+												pGT->pHUD->id = gpeNET4_PREV;
+												pT = pTXT;
+												while( *pT )
+												{
+													pGT->pHUD = pGT->pHUD->put( pT, strlen(pT) );
+													pGT->pHUD = pGT->pHUD->put( "\r\n", 2 );
+													pT += strlen(pT)+1;
+												}
+												pGT->pHUD->id = gpeNET4_PREV;
+											} break;
+									}
+								}
+								if( nGD )
+									pEVNT->lzy_reset();
+								pEVNT->DO();
+							}
+						}
+
 					} break;
 				default:
 					break;

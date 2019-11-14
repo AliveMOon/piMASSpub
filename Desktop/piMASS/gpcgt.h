@@ -148,7 +148,7 @@ class gpcGT
 		gpcLAZY		*pPUB,
 					*pOUT,
 					*pINP,
-					*pEVNT,
+					*pEVENT,
 					*pOS;
 		gpcGT_DWNL	*pDWN;
 		gpcHUD		*pHUD, isEVNT;
@@ -185,7 +185,7 @@ class gpcGT
 				gpmDEL( pINP );
 				gpmDEL( pDWN );
 				gpmDEL( pHUD );
-				gpmDEL( pEVNT );
+				gpmDEL( pEVENT );
 				gpmDEL( pOS );
 			}
 			return this;

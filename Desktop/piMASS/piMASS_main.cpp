@@ -523,6 +523,7 @@ int main( int nA, char *apA[] )
 	*gpsKEYbuff = 0;
     try
     {
+		IMG_Init( IMG_INIT_JPG|IMG_INIT_PNG );
 		if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
 			throw InitError();
 

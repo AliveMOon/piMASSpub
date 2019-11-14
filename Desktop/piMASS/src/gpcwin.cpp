@@ -126,15 +126,17 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	gpmCLR;
 	piMASS = piM;
 	SDL_DisplayMode sdlDM;
-	SDL_GetCurrentDisplayMode(0, &sdlDM);
+	SDL_GetCurrentDisplayMode( 0, &sdlDM );
 	winSIZ.z = (sdlDM.w*7)/8;
 	winSIZ.w = sdlDM.h-64;
 	winSIZ.a4x2[0] = winSIZ.a4x2[1];
 
-	winDIV = winSIZ/I4x4(2,2,1,1); // = siz;
-	//winDIV.a4x2[0] /= 2; //*= 4;
-	//winDIV.a4x2[0] /= 8;
-	if( winID.x = SDL_CreateWindowAndRenderer( winSIZ.z, winSIZ.w, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &pSDLwin, &pSDLrndr ) != 0 )
+	winDIV = winSIZ/I4x4(2,2,1,1);
+	if(
+		winID.x = SDL_CreateWindowAndRenderer(	winSIZ.z, winSIZ.w,
+												SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL,
+												&pSDLwin, &pSDLrndr ) != 0
+	)
         throw InitError();
 
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
@@ -161,7 +163,6 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	gppKEYbuff = gpsKEYbuff;
 	gppMOUSEbuff = gpsKEYbuff;
 
-
 }
 void gpcWIN::gpeWINresize( void )
 {
@@ -171,17 +172,12 @@ void gpcWIN::gpeWINresize( void )
 	winDIV = winSIZ.a4x2[0];
 	winDIV.a4x2[0] /= 2;
 
-	/*winDIV.z = winDIV.x = (winSIZ.x*winDIV.x / winDIV.z);
-	winDIV.w = winDIV.y = (winSIZ.y*winDIV.y / winDIV.w);
-	winDIV.a4x2[0] *= 4;
-	winDIV.a4x2[0] /= 8;*/
-
-
 }
 gpcWIN::~gpcWIN()
 {
 	gpmSDL_FreeSRF( pSRFload );
 	gpmSDL_FreeSRF( pSRFchar );
+	gpmSDL_FreeSRF( pSRFsnd );
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
 }
@@ -435,7 +431,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		//while( SDL_PollEvent( &ev ) )
 		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
 
-		while( SDL_WaitEventTimeout( &ev, 10 ) ) { /// EVENTS --------------------------------------------------
+		while( SDL_WaitEventTimeout( &ev, gpdSDL_tOUT ) ) { /// EVENTS --------------------------------------------------
 			gpnEVENT++;
 			gpnTITLE = gpnEVENT;
 

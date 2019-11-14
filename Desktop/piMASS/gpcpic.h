@@ -36,12 +36,11 @@ class gpcPIC
 public:
 	I8x2			TnID;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
-	U4				id, iSRC, iQC;
+	U4				id, iSRC, iQC, nPIXall, nPIX, bppS;
 	SDL_Surface		*pSRF;
 	I4x4			xyOUT, xySRC;
 	gpcPIC			*pSRC;
 
-	U4		nPIXall, nPIX;
 	U1		*pPIX;
 
 	gpcPIC(){ gpmCLR; pFILE = sFILE; };
@@ -49,6 +48,92 @@ public:
 	{
 		gpmCLR;
 		TnID = an;
+	}
+	gpcPIC* BAYER( SDL_Surface *pSRF )
+	{
+		if( !pSRF )
+			return this;
+
+		if( !this )
+		{
+			gpcPIC* pTHIS = new gpcPIC;
+			return pTHIS->BAYER( pSRF );
+		}
+
+		xyOUT.z = pSRF->w;
+		xyOUT.w = pSRF->h;
+		nPIX = xyOUT.a4x2[1].area()*4;
+        if( nPIXall < nPIX )
+        {
+			nPIXall = nPIX;
+			pPIX = new U1[nPIXall];
+        }
+
+		U1		*pS = (U1*)pSRF->pixels;
+		U1x4	*pD = (U1x4*)pPIX;
+		bppS = (U4)pSRF->format->BytesPerPixel;
+		U4	piS = pSRF->pitch,
+			piD = pSRF->w/2;
+
+		switch(bppS) {
+			case 1:
+				pD[0] = U1x4( pS[0], ((U2)pS[1]+pS[piS])/2,  pS[piS+1], 0xff );
+
+				break;
+
+			case 2:
+				//return *(Uint16 *)p;
+				break;
+
+			case 3:
+				/*if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+					return p[0] << 16 | p[1] << 8 | p[2];
+				else
+					return p[0] | p[1] << 8 | p[2] << 16;*/
+				break;
+
+			case 4:
+				//return *(Uint32 *)p;
+				break;
+
+			default:
+				break;       /* shouldn't happen, but avoids warnings */
+		}
+
+		return this;
+
+
+		/*Uint32 getpixel(SDL_Surface *surface, int x, int y) {
+			int bpp = surface->format->BytesPerPixel;
+			//  Here p is the address to the pixel we want to retrieve
+			Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+			switch(bpp) {
+			case 1:
+				return *p;
+				break;
+
+			case 2:
+				return *(Uint16 *)p;
+				break;
+
+			case 3:
+				if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+					return p[0] << 16 | p[1] << 8 | p[2];
+				else
+					return p[0] | p[1] << 8 | p[2] << 16;
+				break;
+
+			case 4:
+				return *(Uint32 *)p;
+				break;
+
+			default:
+				return 0;       // shouldn't happen, but avoids warnings
+			}
+		}*/
+
+
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc )
 	{
@@ -76,9 +161,9 @@ public:
 		// Extract the image
 		pC->cam.retrieve(
 							pPIX,
-							raspicam::	//RASPICAM_FORMAT_YUV420 );
+							raspicam::RASPICAM_FORMAT_IGNORE
+										//RASPICAM_FORMAT_YUV420 );
 										//RASPICAM_FORMAT_RGB );
-										RASPICAM_FORMAT_IGNORE
 						);
 
         I4x2& wh = xyOUT.a4x2[1];
@@ -96,14 +181,16 @@ public:
 		  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
 		#endif
 
-		SDL_Surface* pNEW = SDL_CreateRGBSurfaceFrom(
+		SDL_Surface	*pNEW = SDL_CreateRGBSurfaceFrom(
 														pPIX, wh.x, wh.y, 24, wh.x*3,
 														rmask, gmask, bmask, amask
-													);
+													),
+					*pGD = SDL_ConvertSurfaceFormat( pNEW, SDL_PIXELFORMAT_RGBA8888, 0);
 		if( pNEW )
 		{
+			SDL_FreeSurface(pNEW);
 			SDL_FreeSurface(pSRF);
-			pSRF = pNEW;
+			pSRF = pGD; //pNEW;
 		}
 		iQC = qc;
 		return pPIX;

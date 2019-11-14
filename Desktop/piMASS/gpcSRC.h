@@ -1130,6 +1130,10 @@ public:
 	gpcPICall	PIC;
 	/// CAM ---------
 	gpcPICAM*	pCAM;
+	/// TXT ---------
+	int nTXT = 0;
+	char* pTXT = NULL, *pT;
+
 
 	U4 relLEV( void )
 	{

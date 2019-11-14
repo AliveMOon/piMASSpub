@@ -35,7 +35,8 @@ class gpcWIN
 
 		SDL_Surface		*pSRFload,
 						*pSRFchar,
-						*pSRFwin;
+						*pSRFwin,
+						*pSRFsnd;
 		gpcPIC			*pPICbg;
 
 		SDL_Event 		ev;
