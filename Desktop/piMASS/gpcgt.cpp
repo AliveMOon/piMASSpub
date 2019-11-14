@@ -126,6 +126,8 @@ gpcLAZY* gpcGT_DWNL::join( gpcLAZY* pOUT, gpcGT& mom, gpcLAZY* pEXE )
 			pOUT = pOUT->lzy_format( n_size, dz_s_http_dwnl_sFN_sFNpEXP_nS, "setup", "setup.exe", n_send );
 			pOUT = pOUT->lzy_plus( pEXE, n_size );
 			return pOUT;
+		default:
+			break;
 	}
 }
 

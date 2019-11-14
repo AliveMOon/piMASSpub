@@ -14,6 +14,7 @@ class gpcWIN;
 
 
 #define gpdSRC_COLw 4
+#define gpdSRC_ROWw 1
 #define gpdPRGsep " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} "
 
 //extern U1 gpaALFadd[]; //0x100];

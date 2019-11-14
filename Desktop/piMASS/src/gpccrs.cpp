@@ -33,7 +33,36 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 		scnZN0.null();
 		scnZN.null();
 		scnIN.null();
-		for( scnZN.x = 0; scnZN.x < pMAP->mapZN44.z; scnZN.x++ )
+
+		for( scnZN.x = 0; o.z >= scnZN.z; scnZN.x++ )
+		{
+			scnZN.z += (scnZN.x < pMAP->mapZN44.z) ? pC[scnZN.x] : gpdSRC_COLw;
+			if( o.z >= scnZN.z )
+			{
+				scnZN0.z = scnZN.z;
+				continue;
+			}
+
+			scnIN.z = ((scnZN.x < pMAP->mapZN44.z) ? pC[scnZN.x] : gpdSRC_COLw)*cr.x;
+			scnIN.x = xy.x - (scnZN.z*cr.x - scnIN.z);
+			break;
+		}
+
+		for( scnZN.y = 0; o.w >= scnZN.w; scnZN.y++ )
+		{
+			scnZN.w += (scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw;
+			if( o.w >= scnZN.w )
+			{
+				scnZN0.w = scnZN.w;
+				continue;
+			}
+
+			scnIN.w = ((scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw)*cr.y;
+			scnIN.y = xy.y - (scnZN.w*cr.y - scnIN.w);
+			break;
+		}
+
+		/*for( scnZN.x = 0; scnZN.x < pMAP->mapZN44.z; scnZN.x++ )
 		{
 			scnZN.z += pC[scnZN.x];
 			if( o.z >= scnZN.z )
@@ -47,7 +76,6 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 			break;
 		}
 
-
 		for( scnZN.y = 0; scnZN.y < pMAP->mapZN44.w; scnZN.y++ )
 		{
 			scnZN.w += pR[scnZN.y];
@@ -60,7 +88,7 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 			scnIN.w = pR[scnZN.y]*cr.y;
 			scnIN.y = xy.y - (scnZN.w*cr.y - scnIN.w);
 			break;
-		}
+		}*/
 
 	}
 
@@ -562,7 +590,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR )
 	{
 		dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
 		dstPX.y = max( 0, scnZN0.w+CRSfrm.y );
-		wh = scnZN.a4x2[1]+CRSfrm.a4x2[0];
+		wh = scnZN.a4x2[1]; //+CRSfrm.a4x2[0];
 
 		/*wh.x =	( c < mZN.a4x2[1].x )
 				? pC[c]+pCp[c]
