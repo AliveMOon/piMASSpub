@@ -1,6 +1,6 @@
 #include "gpcgt.h"
 extern U1 gpaALFadd[];
-extern char gpsTAB[];
+extern char gpsTAB[], *gppTAB;
 gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB )
 {
 	if( !this )
@@ -26,6 +26,7 @@ void gpcGT::GTos( gpcGT& mom )
 {
 	if( !this )
 		return;
+
 	U1  s_com[0x200], s_answ[0x200];
 	char s_atrib[0x200], s_prompt[0x100], s_cell[0x100];
 	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
@@ -123,8 +124,11 @@ void gpcGT::GTos( gpcGT& mom )
 					cAN = (U1*)p_row; //cAN.an( p_row );
 					switch( cAN.alf )
 					{
+						case gpeALF_SRC:
+
+							break;
 						case gpeALF_GATELIST:
-							pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gpsTAB );
+							pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gppTAB ); //gpsTAB );
 							break;
 						case gpeALF_HELP:
 							pOUT = pOUT->lzy_format( s = -1, "%sHELP?", !*s_prompt ? "\r\n":"" );

@@ -2,7 +2,7 @@
 1569782949 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
 	"piMASS.h"
 
-1573666578 /home/pi/Desktop/piMASS/piMASS.h
+1573705330 /home/pi/Desktop/piMASS/piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -12,6 +12,7 @@
 	<WinSock2.h>
 	<ws2tcpip.h>
 	<raspicam/raspicam.h>
+	<wiringPi.h>
 	<unistd.h>
 	<sys/socket.h>
 	<sys/ioctl.h>
@@ -372,11 +373,11 @@
 	"gpcSRC.h"
 	"gpcres.h"
 
-1573666362 /home/pi/Desktop/piMASS//gpcSRC.h
+1573697727 /home/pi/Desktop/piMASS//gpcSRC.h
 	"gpcgt.h"
 	"gpcOPCD.h"
 
-1573666578 /home/pi/Desktop/piMASS//piMASS.h
+1573705330 /home/pi/Desktop/piMASS//piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -386,6 +387,7 @@
 	<WinSock2.h>
 	<ws2tcpip.h>
 	<raspicam/raspicam.h>
+	<wiringPi.h>
 	<unistd.h>
 	<sys/socket.h>
 	<sys/ioctl.h>
@@ -423,7 +425,7 @@
 	"gpcOPCD.h"
 	"gpeALF.h"
 
-1573408555 /home/pi/Desktop/piMASS/include/gpeALF.h
+1573703842 /home/pi/Desktop/piMASS/include/gpeALF.h
 	"piMASS.h"
 
 1570796037 /home/pi/Desktop/piMASS/include/gpcSCHL.h
@@ -433,7 +435,7 @@
 1572243713 source:/home/pi/Desktop/piMASS/gpcOPCD.cpp
 	"gpcSRC.h"
 
-1573666362 /home/pi/Desktop/piMASS/gpcSRC.h
+1573697727 /home/pi/Desktop/piMASS/gpcSRC.h
 	"gpcgt.h"
 	"gpcOPCD.h"
 
@@ -499,7 +501,7 @@
 1573521163 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
 	"gpcres.h"
 
-1573689124 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+1573705329 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
 	"gpcwin.h"
 
 1573670533 source:/home/pi/Desktop/piMASS/gpcgt.cpp
@@ -511,7 +513,7 @@
 1573665264 /home/pi/Desktop/piMASS//gpcgt.h
 	"gpcpic.h"
 
-1573665407 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
+1573705071 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
 	"gpcgt.h"
 
 1573568500 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp

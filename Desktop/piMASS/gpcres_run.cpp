@@ -370,32 +370,44 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				{
 
 				}
-				else switch( alu.alf )
+				else if( alu.alf < gpeALF_AAAA )
 				{
-					case gpeALF_CLR: {
+					switch( alu.alf )
+					{
+						case gpeALF_CLR: {
 
-						} break;
-					case gpeALF_CAM:{
-							I4 iCAM = alu.u8();
-							if( !iCAM )
-								break;
-							if( pPIC = PIC.PIC( I8x2(alu.alf,iCAM) ) )
-							{
-								if( !pCAM )
-									pCAM = new gpcPICAM;
-								U1* pRGB = pPIC->getPIX( pCAM, win.mSEC.y+50 );
-								if( pRGB )
+							} break;
+						case gpeALF_CAM:{
+								I4 iCAM = alu.u8();
+								if( !iCAM )
+									break;
+								if( pPIC = PIC.PIC( I8x2(alu.alf,iCAM) ) )
 								{
-									if( !win.pPICbg )
+									if( !pCAM )
+										pCAM = new gpcPICAM;
+									U1* pRGB = pPIC->getPIX( pCAM, win.mSEC.y+gpdRPI_tOUT ); //50 );
+									if( pRGB )
 									{
-										win.pPICbg = pPIC;
+										if( !win.pPICbg )
+										{
+											win.pPICbg = pPIC;
+										}
 									}
-								}
 
-							}
-						} break;
-					default:
-						break;
+								}
+							} break;
+						default:
+							break;
+					}
+				} else {
+					switch( alu.alf )
+					{
+						case gpeALF_GPIO:
+
+							break;
+						default:
+							break;
+					}
 				}
 
 			}
@@ -473,14 +485,14 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 											} break;
 										case gpeNET4_0HUD:
 											if( win.pPICbg )
-											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) )  {
+											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) ) {
 												nGD++;
 												pGT->pHUD = pGT->pHUD->put( win.pPICbg->pPIX, win.pPICbg->nPIX/6 );
 												pGT->pHUD->id = pEV[i].id;
 											} break;
 										case gpeNET4_PREV:
 											if( win.pPICbg )
-											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) )  {
+											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) ) {
 												nGD++;
 												pGT->pHUD = pGT->pHUD->put( "\u001B[2J\r", strlen("\u001B[2J\r") );
 												pGT->pHUD->id = gpeNET4_PREV;
@@ -493,6 +505,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 												}
 												pGT->pHUD->id = gpeNET4_PREV;
 											} break;
+										default:
+											break;
 									}
 								}
 								if( nGD )

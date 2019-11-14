@@ -723,6 +723,7 @@ typedef enum gpeALF: I8
 	gpeALF_FUNC = gpdABCD('F', 'U', 'N', 'C'),
 	gpeALF_GOLD = gpdABCD('G', 'O', 'L', 'D'),
 
+	gpeALF_GPIO = gpdABCD('G', 'P', 'I', 'O'),
 
 	gpeALF_GPUC = gpdABCD('G', 'P', 'U', 'C'),	// gpeALF_GPU + VOXEL VERTEX
 

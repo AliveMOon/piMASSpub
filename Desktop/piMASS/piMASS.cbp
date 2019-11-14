@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Option parameters="cam.mass" />
 				<Compiler>
+					<Add option="-O1" />
 					<Add option="-g" />
 					<Add directory="./" />
 					<Add directory="include" />

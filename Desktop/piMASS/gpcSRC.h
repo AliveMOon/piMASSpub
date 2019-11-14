@@ -1131,8 +1131,8 @@ public:
 	/// CAM ---------
 	gpcPICAM*	pCAM;
 	/// TXT ---------
-	int nTXT = 0;
-	char* pTXT = NULL, *pT;
+	U4 nTXT = 0;
+	char* pTXT, *pT;
 
 
 	U4 relLEV( void )
