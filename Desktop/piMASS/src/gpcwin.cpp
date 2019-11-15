@@ -360,21 +360,29 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s%s",
 													bSHIFT ? "#":"",
 													gpsMAINpub );
-					} else {
-						if( !bSHIFT )
-						{
-							apCRS[onDIV.x]->CRSsel(
-													*this, *apCRS[onDIV.x], *piMASS,
-													bSHIFT
-												);
-						} else {
-							apCRS[srcDIV]->CRSsel(
-													*this, *apCRS[onDIV.x], *piMASS,
-													bSHIFT
-												);
-						}
-
 					}
+					else if( bSHIFT && ( srcDIV != onDIV.x ) )
+					{
+						if( dstDIV != onDIV.x )
+                        {
+							dstDIV = onDIV.x;
+                        }
+						apCRS[srcDIV]->CRSsel(
+												*this, *apCRS[onDIV.x], *piMASS,
+												true
+											);
+					} else {
+                        if(( srcDIV != onDIV.x ) && ( dstDIV != onDIV.x ) )
+                        {
+							dstDIV = onDIV.x;
+                        }
+						apCRS[onDIV.x]->CRSsel(
+												*this, *apCRS[onDIV.x], *piMASS,
+												bSHIFT, bSHIFT ? 4 : srcDIV
+											);
+					}
+
+
 				}
 			}
 			*gppKEYbuff = 0;

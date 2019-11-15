@@ -257,7 +257,7 @@ void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 		}
 	}
 }
-void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
+void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src )
 {
 	if( this ? !(&sCRS): true )
 		return;
@@ -334,6 +334,19 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH )
 		}
 
 		return; // ha le van nyomva a shift akkor meg akarjuk örizni a sel[0]-t.
+	}
+	else if( src < 4 )
+	if( src != id )
+	if( win.apCRS[src] )
+	{
+		gpcCRS& cSRC = *win.apCRS[src];
+		selANIN[0] = selANIN[1];
+		apSRC[0] = apSRC[1];
+		anSTR[0] = anSTR[1];
+
+		selANIN[1].a4x2[0] += cSRC.selANIN[1].a4x2[0] - cSRC.selANIN[0].a4x2[0];
+
+		return;
 	}
 
 	selANIN[0] = selANIN[1];
