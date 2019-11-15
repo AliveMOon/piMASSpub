@@ -585,8 +585,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR )
 
 	}
 
-	//if( id == oDIV  )
-
+	if( id == oDIV  )
 	{
 		dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
 		dstPX.y = max( 0, scnZN0.w+CRSfrm.y );

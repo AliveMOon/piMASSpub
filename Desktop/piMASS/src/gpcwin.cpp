@@ -345,16 +345,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
 				SRCin = apCRS[onDIV.x]->scnIN;
 
-				if( !bSHIFT )
-				if( onDIV.y != onDIV.x )
-				if( onDIV.x == dstDIV  )
-				{
-					// változott az onDIV
-					U1 tmp = dstDIV;
-					dstDIV = srcDIV;
-					srcDIV = tmp;
-				}
-
 				if( (nMBB&1) )
 				if( !(nMB&1) )
 				{
@@ -371,17 +361,19 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 													bSHIFT ? "#":"",
 													gpsMAINpub );
 					} else {
-						if(!bSHIFT)
-						if( srcDIV != onDIV.x )
+						if( !bSHIFT )
 						{
-							dstDIV = srcDIV;
-							srcDIV = onDIV.x;
+							apCRS[onDIV.x]->CRSsel(
+													*this, *apCRS[onDIV.x], *piMASS,
+													bSHIFT
+												);
+						} else {
+							apCRS[srcDIV]->CRSsel(
+													*this, *apCRS[onDIV.x], *piMASS,
+													bSHIFT
+												);
 						}
 
-						apCRS[srcDIV]->CRSsel(
-												*this, *apCRS[onDIV.x], *piMASS,
-												bSHIFT
-											);
 					}
 				}
 			}
@@ -775,19 +767,38 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							//---------------------
 							nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
 													aXY[1]-'0';
-							if( nF < 2 )
+							U1 div = nF-1;
+							if( !div )
 							{
-								onDIV.x = 0;
+								//onDIV.x = 0;
 
 								if( bSHIFT )
+								{
+									dstDIV = srcDIV = 0;
 									bSW = 1;
-
+								} else {
+									if( !srcDIV )
+									{
+										srcDIV = dstDIV;
+										dstDIV = 0;
+									} else {
+										dstDIV = srcDIV;
+										srcDIV = 0;
+									}
+								}
 							}
-							else if( nF < 5 )
+							else if( div < 4 )
 							{
-								onDIV.x = nF-1;
+								if( srcDIV == div )
+								{
+									srcDIV = dstDIV;
+									dstDIV = div;
+								} else {
+									dstDIV = srcDIV;
+									srcDIV = div;
+								}
 
-								U1 msk = (0x1<<onDIV.x);
+								U1 msk = (0x1<<(div));
 
 								if( bSW&msk )
 								{
@@ -821,8 +832,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							}
 							bSW |= 1;
 
-							if( !apCRS[onDIV.x] )
-									apCRS[onDIV.x] = new gpcCRS( *this, onDIV.x );
+							if( !apCRS[div] )
+									apCRS[div] = new gpcCRS( *this, div );
 							for( U1 i = 0, sw = bSW; i < 4; i++, sw >>= 1 )
 							{
 								if( !(sw&1) )
@@ -832,8 +843,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 									continue;
 
 								apCRS[i]->stFRMwh( *this, apCRS[i]->gtFRMwh().x, 0 );
-
-
 							}
 
 						} break;
