@@ -775,7 +775,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							//---------------------
 							nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
 													aXY[1]-'0';
-							U1 div = nF-1;
+							U1 div = nF-1, msk = (0x1<<(div));
 							if( !div )
 							{
 								//onDIV.x = 0;
@@ -784,6 +784,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								{
 									dstDIV = srcDIV = 0;
 									bSW = 1;
+									div = 4;
 								} else {
 									if( !srcDIV )
 									{
@@ -797,21 +798,41 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							}
 							else if( div < 4 )
 							{
-								if( srcDIV == div )
+								if( bSHIFT )
+								{
+									if( srcDIV == div )
+									{
+										srcDIV = dstDIV;
+										dstDIV = 0;
+									}
+									else if( dstDIV == div )
+									{
+										dstDIV = 0;
+									}
+								}
+								else if( srcDIV == div )
 								{
 									srcDIV = dstDIV;
 									dstDIV = div;
 								} else {
-									dstDIV = srcDIV;
-									srcDIV = div;
+									if( bSW&msk)
+									{
+										dstDIV = srcDIV;
+										srcDIV = div;
+									} else
+										dstDIV = div;
+
 								}
 
-								U1 msk = (0x1<<(div));
+								//U1 msk = (0x1<<(div));
 
 								if( bSW&msk )
 								{
 									if( bSHIFT )
+									{
+										div = 4;
 										bSW = (bSW&(~msk));
+									}
 								} else {
 									bSW |= msk;
 								}
@@ -839,18 +860,21 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								}
 							}
 							bSW |= 1;
-
-							if( !apCRS[div] )
-									apCRS[div] = new gpcCRS( *this, div );
-							for( U1 i = 0, sw = bSW; i < 4; i++, sw >>= 1 )
+							if( div < 4 )
 							{
-								if( !(sw&1) )
-									continue;
+								if( !apCRS[div] )
+										apCRS[div] = new gpcCRS( *this, div );
 
-								if( !apCRS[i] )
-									continue;
+								for( U1 i = 0, sw = bSW; i < 4; i++, sw >>= 1 )
+								{
+									if( !(sw&1) )
+										continue;
 
-								apCRS[i]->stFRMwh( *this, apCRS[i]->gtFRMwh().x, 0 );
+									if( !apCRS[i] )
+										continue;
+
+									apCRS[i]->stFRMwh( *this, apCRS[i]->gtFRMwh().x, 0 );
+								}
 							}
 
 						} break;
