@@ -34,7 +34,7 @@ public:
 class gpcPIC
 {
 public:
-	I8x2			TnID;
+	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
 	U4				id, iSRC, iQC, nPIXall, nPIX, bppS;
 	SDL_Surface		*pSRF;
@@ -49,6 +49,7 @@ public:
 		gpmCLR;
 		TnID = an;
 	}
+
 	gpcPIC* BAYER( SDL_Surface *pSRF )
 	{
 		if( !pSRF )
@@ -203,6 +204,8 @@ class gpcPICall
 	gpcPIC	**ppPIC, *pPIC;
 	U4		nPICall, iPICfr, nPICld;
 public:
+	U4 iFND( U1* pS );
+
 	gpcPIC*	PIC( U4 i )
 	{
 		if( pPIC ? pPIC->id == i : false )

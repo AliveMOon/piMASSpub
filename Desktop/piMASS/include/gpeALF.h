@@ -709,6 +709,7 @@ typedef enum gpeALF: I8
 	gpeALF_DIME = gpdABCD('D', 'I', 'M', 'E'),
 	gpeALF_DIMS = gpdABCD('D', 'I', 'M', 'S'),
 	gpeALF_DIVM = gpdABCD('D', 'I', 'V', 'M'),
+	gpeALF_DRAW = gpdABCD('D', 'R', 'A', 'W'),
 	gpeALF_EDGE = gpdABCD('E', 'D', 'G', 'E'),
 	gpeALF_ELSE = gpdABCD('E', 'L', 'S', 'E'),
 	gpeALF_ENDD = gpdABCD('E', 'N', 'D', 'D'),
@@ -849,6 +850,7 @@ typedef enum gpeALF: I8
 	gpeALF_NGDIE = gpdABCDE('N', 'G', 'D', 'I', 'E'),
 
 	gpeALF_ORBIT = gpdABCDE('O', 'R', 'B', 'I', 'T'),
+	gpeALF_PAINT = gpdABCDE('P', 'A', 'I', 'N', 'T'),
 	gpeALF_PASTE = gpdABCDE('P', 'A', 'S', 'T', 'E'),
 	gpeALF_PICQC = gpdABCDE('P', 'I', 'C', 'Q', 'C'),
 	gpeALF_PRINT = gpdABCDE('P', 'R', 'I', 'N', 'T'),
