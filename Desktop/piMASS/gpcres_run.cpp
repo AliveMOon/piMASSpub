@@ -228,6 +228,10 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					{
 						B = stk.D[flg.iD];
 					}
+					else if( stk.apSTR[flg.iS] )
+					{
+                        B = stk.apSTR[flg.iS];
+					}
 					A = B;
 					B = 0;
 
@@ -395,6 +399,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									}
 
 								}
+							} break;
+						case gpeALF_PIC:{
+
 							} break;
 						default:
 							break;

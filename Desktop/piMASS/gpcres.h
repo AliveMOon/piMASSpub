@@ -17,9 +17,10 @@ class gpcWIN;
 
 enum gpeTYP:U4
 {
-	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	// yz dimxy
 	// w size
+	gpeTYP_STR 	= MAKE_ID( 0x10, 1, 1, 1 ),
 	gpeTYP_U1 	= MAKE_ID( 0x00, 1, 1, 1 ),
 	gpeTYP_U4 	= MAKE_ID( 0x02, 1, 1, 4 ),
 	gpeTYP_I4 	= MAKE_ID( 0x82, 1, 1, 4 ),
@@ -35,6 +36,8 @@ enum gpeTYP:U4
 	gpeTYP_U14 	= MAKE_ID( 0x00, 4, 1, 0 ),
 	gpeTYP_U44 	= MAKE_ID( 0x02, 4, 1, 0 ),
 	gpeTYP_I44 	= MAKE_ID( 0x82, 4, 1, 0 ),
+
+	gpeTYP_STRmsk = ~gpeTYP_STR, //MAKE_ID( 0xef, 0xff, 0xff, 0xff ),
 };
 
 class gpcISA
@@ -183,7 +186,7 @@ class gpcREG
 	U8		u;
 	I8		i;
 	double	d;
-	U1x4	bD;		// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+	U1x4	bD;		// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 public:
 	U4x2	xy;
 	gpcREG(){ bD = 0; };
@@ -371,7 +374,7 @@ public:
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 
-	U1*		ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 );
+	U1*		ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8 = 0, double d8 = 0.0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, U2 dm = 0 );
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
@@ -381,6 +384,8 @@ public:
 	gpcALU& operator -= ( gpcREG& a );
 	gpcALU& operator *= ( gpcREG& a );
 	gpcALU& operator /= ( gpcREG& a );
+
+	gpcALU& operator = ( U1* pSTR );
 
 	gpcALU& operator = ( gpeALF a )
 	{
@@ -586,7 +591,7 @@ class gpcRES
 	I1x4	*pOP;	// x add/sub // y mul/div // z[7rem:mod 6not:! 5or:| 4and:& ]  //w ?
 					// w size
 
-	U1x4	*pTYP;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+	U1x4	*pTYP;	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 					// yz dimxy
 	U4x4	*pAN;
 	//U8x4	*pTREE;
@@ -730,7 +735,7 @@ public:
 		alu.iA 		= iA;
 		alu.alf		= pALF	? pALF[iA]	: gpeALF_null;
 		alu.op		= pOP	? pOP[iA]	: 0;
-		alu.typ		= pTYP	? pTYP[iA]	: 0;	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ]
+		alu.typ		= pTYP	? pTYP[iA]	: 0;	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 												// yz dimxy
 		alu.AN 		= pAN	? pAN[iA]	: 0;
 		alu.pDAT	= ppDAT	? ppDAT[iA]	: NULL;

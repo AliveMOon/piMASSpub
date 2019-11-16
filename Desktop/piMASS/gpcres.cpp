@@ -925,11 +925,36 @@ U1* gpcALU::ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 )
 	if( !pM )
 		return NULL;
 
+	// typ:
+	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+	// yz[ dimXY ] 		, w[] = nBYTE*dimXY
+	if( !(ty4.u4&gpeTYP_STRmsk) )
+	{
+		if( pRM == pM )
+		if( !pDAT )				// nincs forrás
+		if( (d8+u8) == 0.0 )
+		{
+			xy -= sub;
+			AN.a4x2[0].mx( xy+1 );
+			typ = gpeTYP_U1;
+			if(ty4.x)
+				typ.x |= ty4.x;
 
-	if( ty4.y < 1 )
-		ty4.y = 1;
-	if( ty4.z < 1 )
-		ty4.z = 1;
+			U4 nAN2 = AN.a4x2[0].area();
+			pDAT = new U1[nAN2];
+			gpmZn( (U1*)pDAT, nAN2 );
+			pM->chg( *this );
+
+			return (U1*)pDAT;
+		}
+
+		ty4.u4 = gpeTYP_U1;
+	} else {
+		if( ty4.y < 1 )
+			ty4.y = 1;
+		if( ty4.z < 1 )
+			ty4.z = 1;
+	}
 
 	U1 OR = typ.x|ty4.x;
 	if( op4.x < 0 )
@@ -1595,5 +1620,21 @@ gpcALU& gpcALU::operator /= ( gpcREG& a )
 	else
 		((U1*)(pD+d))[x] /= a.u8();
 
+	return *this;
+}
+
+gpcALU& gpcALU::operator = ( U1* pSTR )
+{
+	if( pSTR ? !*pSTR : true )
+	{
+		// törölni kell nem volt benne semmi
+		return *this;
+	}
+
+	U4 n = gpmSTRLEN( pSTR );
+
+	U1* pD = ALUdat( pRM, U4x2(n,0), gpeTYP_STR, I1x4(0) );
+	gpmMEMCPY( pD, pSTR, n );
+	pD[n] = 0;
 	return *this;
 }

@@ -720,7 +720,7 @@ public:
 
 		return *this;
 	}
-	U1* typ2str( U1* pBUFF );	// x[7s,6f,5r,4p? : 3-0 nBYTE = 1<<(x&0xf) ] // yz dimxy
+	U1* typ2str( U1* pBUFF );	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ] // yz dimxy
 
 };
 
