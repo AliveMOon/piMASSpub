@@ -93,7 +93,7 @@ class gpcCRS
 
 		bool	miniOFF( void );
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
-		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR );
+		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH, U1 src = 4 );

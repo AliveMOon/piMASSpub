@@ -312,7 +312,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				if( crs.id != i )
 					apCRS[i]->miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
 
-				apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr );
+				apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 			}
 			SDL_UpdateWindowSurface( pSDLwin );
 		}
@@ -378,7 +378,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
                         }
 						apCRS[onDIV.x]->CRSsel(
 												*this, *apCRS[onDIV.x], *piMASS,
-												bSHIFT, bSHIFT ? 4 : srcDIV
+												bSHIFT //, bSHIFT ? 4 : srcDIV
 											);
 					}
 
