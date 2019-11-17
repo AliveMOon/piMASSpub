@@ -1127,6 +1127,7 @@ public:
 
 	/// GATE --------
 	gpcGTall	GTacpt, GTcnct;
+	gpcLAZY		*pJPGsnd;
 	/// PIC ---------
 	gpcPICall	PIC;
 	/// CAM ---------

@@ -55,7 +55,7 @@ class gpcWIN
 
 		U4	aKT[0x200],
 			srcDIV, dstDIV;
-		U4x2 onDIV = srcDIV;
+		U4x2 onDIV; // = srcDIV;
 		U4x4	mSEC = 0, // x: new // y: prev // z: elapse // w: fps
 				nJDOIT;
 		I4 nMOV, nIRQ,  nMB, nMBB, nF;

@@ -529,6 +529,8 @@ typedef enum gpeALF: I8
 	gpeALF_ID = gpdAB('I', 'D'),
 	gpeALF_IF = gpdAB('I', 'F'),
 	gpeALF_IN = gpdAB('I', 'N'),
+	gpeALF_IX = gpdAB('I', 'X'),
+	gpeALF_IY = gpdAB('I', 'Y'),
 
 	// key ( A, B, ..., Z )
 	gpeALF_KA = gpdAB('K', 'A'),			// KEYBOARD 'a'

@@ -486,32 +486,43 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 												if( SDL_Surface* pSURF = win.pSRFsnd )
 												{
-
-
 													SDL_BlitScaled(
 																		win.pSRFwin,	&src.xyWH,
 																		pSURF,			&dst.xyWH
 																	);
-													if( !gpfSAVEjpg( (U1*)"/mnt/ram/tmp.tmp", pSURF, 40 ) )
-														IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
 
-													gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
-													if( pPNG )
+
+													pJPGsnd = NULL; //gpfSRF2JPG( pJPGsnd, pSURF, 57 );
+													if( pJPGsnd )
 													{
-														nGD++;
-														pGT->pHUD = pGT->pHUD->put( pPNG->p_alloc, pPNG->n_load );
+														pGT->pHUD = pGT->pHUD->put( pJPGsnd->p_alloc, pJPGsnd->n_load );
 														pGT->pHUD->id = gpeNET4_0EYE;
-													}
-													//SDL_FreeSurface(pSURF);
-													if( gpfACE( gpdPICbg, 4) > -1 )
-													{
-														rename( gpdPICbg, "/mnt/ram/bg.kill" );
-													}
-													rename( "/mnt/ram/tmp.tmp", gpdPICbg );
+														pJPGsnd->lzy_reset();
+														//gpmDEL(pLZY);
+													} else {
+														gpmDEL(pJPGsnd);
+														if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSURF, 57 ) )
+															IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
 
-													if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
-													{
-														remove( "/mnt/ram/bg.kill" );
+														gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
+														if( pPNG )
+														{
+															nGD++;
+															pGT->pHUD = pGT->pHUD->put( pPNG->p_alloc, pPNG->n_load );
+															pGT->pHUD->id = gpeNET4_0EYE;
+															gpmDEL(pPNG);
+														}
+														//SDL_FreeSurface(pSURF);
+														if( gpfACE( gpdPICbg, 4) > -1 )
+														{
+															rename( gpdPICbg, "/mnt/ram/bg.kill" );
+														}
+														rename( "/mnt/ram/tmp.tmp", gpdPICbg );
+
+														if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+														{
+															remove( "/mnt/ram/bg.kill" );
+														}
 													}
 												}
 											} break;

@@ -3,41 +3,8 @@
 
 #include "piMASS.h"
 //GLOVAL(void)
-bool gpfSAVEjpg( U1* pFILE, SDL_Surface* pSRF, I4 q );
-/*{
-	struct jpeg_compress_struct cinfo;
-	struct jpeg_error_mrg jerr;
-
-	FILE* pOUT;
-	JSAMPROW aROW[1];
-
-	cinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_compress(&cinfo);
-	if(!(pOUT = fopen(pFILE, "wb")))
-		return false;
-
-	jpeg_stdio_dest(&cinfo, pOUT);
-    cinfo.image_width = pSRF->w;
-    cinfo.image_height = pSRF->h;
-    cinfo.input_components = 3;
-    cinfo.in_color_space = JCS_RGB;
-
-    jpeg_set_defaults(&cinfo);
-    jpeg_set_quality( &cinfo, q, true );
-    jpeg_start_compress(&cinfo,true);
-
-	int rowSTRD = pSRF->w*3;
-	while(cinfo.next_scanline < cinfo.image_height ) {
-		aROW[0] = ((U1*)pSRF->pixels)+(cinfo.next_scanline*rowSTRD);
-        jpeg_write_scanlines(&cinfo, aROW, 1 );
-	}
-
-    jpeg_finish_compress(&cinfo);
-    fcolose(pFILE);
-    jpeg_destroy_compress(&cinfo);
-
-	return true;
-}*/
+bool gpfSRFjpgSAVE( U1* pFILE, SDL_Surface* pSRF, I4 q );
+gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q );
 
 class gpcPICAM
 {

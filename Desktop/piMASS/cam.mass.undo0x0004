@@ -1,5 +1,5 @@
  a0	 cam = 1   a1	  telnet = 6023
- d1	 = ix e1	  = iy a2	 = 10+20 c5	 pic = "draw1"
+ d1	= inx e1	 = iny a2	 = 10+20 c5	 pic = "draw1"
 
  d5	 
 

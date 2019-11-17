@@ -33,7 +33,7 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 	out.err();
 	if( !alf )
 		return out.bGD();
-
+	gpcCRS& crs = *apCRS[onDIV.x];
 	if( alf < gpeALF_AAAAAA ) {
 		if( alf < gpeALF_AAAAA ) {
 			if( alf < gpeALF_AAAA ) {
@@ -41,7 +41,17 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 					if( alf < gpeALF_AA ) {		// A - Z ------------------------------------------
 
 					} else {					// AA - ZZ ----------------------------------------
-
+						switch( alf )
+						{
+							case gpeALF_IX:
+								out = crs.scnIN.x;
+								break;
+							case gpeALF_IY:
+								out = crs.scnIN.y;
+								break;
+							default:
+								break;
+						}
 					}
 				} else {						// AAA - ZZZ --------------------------------------
 						switch( alf )
