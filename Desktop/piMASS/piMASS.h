@@ -53,7 +53,7 @@
 
 
 #else
-	#include "CImg.h"
+
 	//#include <opencv2/core/core.hpp>
 	//#include <opencv2/highgui/highgui.hpp>
 
@@ -109,6 +109,8 @@
 	#define gpdRPI_tOUT		5
 #endif
 
+
+
 #define gpdGT_LIST_tOUT 5
 #define gpdPICbg "/mnt/ram/bg.png"
 
@@ -126,6 +128,9 @@
 #include <inttypes.h>
 
 #include <stdarg.h>
+
+#include "jpeglib.h"
+#include <setjmp.h>
 
 #include <SDL.h>			//-lSDL2
 #include <SDL_image.h>

@@ -2,7 +2,7 @@
 1569782949 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
 	"piMASS.h"
 
-1574004140 /home/pi/Desktop/piMASS/piMASS.h
+1574012856 /home/pi/Desktop/piMASS/piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -11,7 +11,6 @@
 	<memory.h>
 	<WinSock2.h>
 	<ws2tcpip.h>
-	"CImg.h"
 	<raspicam/raspicam.h>
 	<wiringPi.h>
 	<unistd.h>
@@ -45,6 +44,8 @@
 	<iostream>
 	<inttypes.h>
 	<stdarg.h>
+	"jpeglib.h"
+	<setjmp.h>
 	<SDL.h>
 	<SDL_image.h>
 	<math.h>
@@ -378,7 +379,7 @@
 	"gpcgt.h"
 	"gpcOPCD.h"
 
-1574004140 /home/pi/Desktop/piMASS//piMASS.h
+1574012856 /home/pi/Desktop/piMASS//piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -387,7 +388,6 @@
 	<memory.h>
 	<WinSock2.h>
 	<ws2tcpip.h>
-	"CImg.h"
 	<raspicam/raspicam.h>
 	<wiringPi.h>
 	<unistd.h>
@@ -421,6 +421,8 @@
 	<iostream>
 	<inttypes.h>
 	<stdarg.h>
+	"jpeglib.h"
+	<setjmp.h>
 	<SDL.h>
 	<SDL_image.h>
 	<math.h>
@@ -503,7 +505,7 @@
 1573521163 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
 	"gpcres.h"
 
-1574004006 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+1574013137 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
 	"gpcwin.h"
 
 1573774272 source:/home/pi/Desktop/piMASS/gpcgt.cpp
@@ -521,13 +523,13 @@
 1573874515 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp
 	"gpcres.h"
 
-1574011157 /home/pi/Desktop/piMASS/gpcpic.h
+1574012950 /home/pi/Desktop/piMASS/gpcpic.h
 	"piMASS.h"
 
-1574011157 /home/pi/Desktop/piMASS//gpcpic.h
+1574012950 /home/pi/Desktop/piMASS//gpcpic.h
 	"piMASS.h"
 
-1573876741 source:/home/pi/Desktop/piMASS/gpcpic.cpp
+1574013183 source:/home/pi/Desktop/piMASS/gpcpic.cpp
 	"gpcpic.h"
 	"gpcSRC.h"
 

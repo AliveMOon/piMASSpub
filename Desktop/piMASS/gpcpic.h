@@ -2,9 +2,9 @@
 #define GPCPIC_H
 
 #include "piMASS.h"
-
-bool inline gpfSAVEjpg( U1* pFILE, SDL_Surface* pSRF, I4 q )
-{
+//GLOVAL(void)
+bool gpfSAVEjpg( U1* pFILE, SDL_Surface* pSRF, I4 q );
+/*{
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mrg jerr;
 
@@ -37,7 +37,7 @@ bool inline gpfSAVEjpg( U1* pFILE, SDL_Surface* pSRF, I4 q )
     jpeg_destroy_compress(&cinfo);
 
 	return true;
-}
+}*/
 
 class gpcPICAM
 {

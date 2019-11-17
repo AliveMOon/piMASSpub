@@ -496,7 +496,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 													//gpmMEMCPY( (U1*)image.data, win.pSRFwin->pixels, win.pSRFwin->w*win.pSRFwin->h*3 );
 													//cv::imwrite(  "/mnt/ram/tmp.jpg", image );
 													//IMG_SaveJPG( pSURF, "/mnt/ram/tmp.tmp" );
-													if( gpfSAVEjpg( "/mnt/ram/tmp.tmp", win.pSRFsnd, 1 ) )
+													if( gpfSAVEjpg( (U1*)"/mnt/ram/tmp.tmp", win.pSRFsnd, 1 ) )
 													{
 
 													} else {
