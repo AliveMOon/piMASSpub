@@ -480,7 +480,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 													  bmask = 0x00ff0000;
 													  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
 													#endif
-													win.pSRFsnd = SDL_CreateRGBSurface(	0, dst.z, dst.w, 32,
+													win.pSRFsnd = SDL_CreateRGBSurface(	0, dst.z, dst.w, 24,
 																						rmask, gmask, bmask, amask  );
 												}
 
@@ -496,12 +496,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 													//gpmMEMCPY( (U1*)image.data, win.pSRFwin->pixels, win.pSRFwin->w*win.pSRFwin->h*3 );
 													//cv::imwrite(  "/mnt/ram/tmp.jpg", image );
 													//IMG_SaveJPG( pSURF, "/mnt/ram/tmp.tmp" );
-													if( gpfSAVEjpg( (U1*)"/mnt/ram/tmp.tmp", win.pSRFsnd, 1 ) )
-													{
-
-													} else {
+													if( !gpfSAVEjpg( (U1*)"/mnt/ram/tmp.tmp", pSURF, 1 ) )
 														IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
-													}
+
 													gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
 													if( pPNG )
 													{

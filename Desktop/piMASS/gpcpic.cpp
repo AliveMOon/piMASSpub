@@ -16,14 +16,14 @@ bool gpfSAVEjpg( U1* pFILE, SDL_Surface* pSRF, I4 q )
 	jpeg_stdio_dest(&cinfo, pOUT);
     cinfo.image_width = pSRF->w;
     cinfo.image_height = pSRF->h;
-    cinfo.input_components = 3;
+    cinfo.input_components = pSRF->format->BytesPerPixel; // 3;
     cinfo.in_color_space = JCS_RGB;
 
     jpeg_set_defaults(&cinfo);
     jpeg_set_quality( &cinfo, q, true );
     jpeg_start_compress(&cinfo,true);
 
-	int rowSTRD = pSRF->w*3;
+	int rowSTRD = pSRF->pitch;
 	while(cinfo.next_scanline < cinfo.image_height ) {
 		aROW[0] = ((U1*)pSRF->pixels)+(cinfo.next_scanline*rowSTRD);
         jpeg_write_scanlines(&cinfo, aROW, 1 );
