@@ -47,7 +47,18 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 								out = crs.scnIN.x;
 								break;
 							case gpeALF_IY:
+								if( crs.scnIN.y > 128 && crs.scnIN.y < 255 )
+								{
+									out = crs.scnIN.y;
+									break;
+								}
 								out = crs.scnIN.y;
+								break;
+							case gpeALF_IW:
+								out = crs.scnIN.z;
+								break;
+							case gpeALF_IH:
+								out = crs.scnIN.w;
 								break;
 							default:
 								break;

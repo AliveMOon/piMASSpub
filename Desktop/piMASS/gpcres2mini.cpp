@@ -28,17 +28,19 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		if( (gpeALF)(a+1) != alu.alf )
 		{
 			pB = pB + gpfALF2STR( pBUFF, alu.alf ) + 1;
-		} else {
-			*pBUFF = 0;
-			pB = pBUFF;
-		}
-		pLZY->lzy_format( s = -1,	"%s"
+			pLZY->lzy_format( s = -1,	"%s"
 									//"%s."
 									"%s=" ,//" // [%dx%d]sof(%d) ",
 									gppTABrun-deep,
 									//alu.typ.typ2str(pBUFF+0x10),
 									pBUFF //, alu.AN.x, alu.AN.y, alu.nLOAD()
 									);
+		} else {
+			*pBUFF = 0;
+			pB = pBUFF;
+			pLZY->lzy_format( s = -1, nA > 1 ? "%s" : "%s=", gppTABrun-deep );
+		}
+
 
 
 		U4x2 	X( alu.typ.y, alu.typ.z ), xy;
@@ -106,7 +108,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 				if( nB > 1 )
 					pLZY->lzy_format( s = -1, "%d%s", ((U2*)(pD+d))[0], p_sep );
 				else
-					pLZY->lzy_format( s = -1, "%d%s", ((I1*)(pD+d))[0], p_sep );
+					pLZY->lzy_format( s = -1, "%d%s", ((U1*)(pD+d))[0], p_sep );
 
 			}
 			if( nA > 1 )
