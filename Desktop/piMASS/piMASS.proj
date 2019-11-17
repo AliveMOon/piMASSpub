@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=7
+current_page=8
 FILE_NAME_0=149;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Ftutorial11_2d_fonts%2Ftutorial11.cpp;0;4
 FILE_NAME_1=763;C;0;EUTF-8;0;1;0;%2Fhome%2Fpi%2FDesktop%2FopenGl%2F2%2Fmain.c;0;2
 FILE_NAME_2=207;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-master%2Ftutorial06_keyboard_and_mouse%2Ftutorial06.cpp;0;4
@@ -37,6 +37,7 @@ FILE_NAME_4=308;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branc
 FILE_NAME_5=503;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Fcommon%2Ftexture.hpp;0;4
 FILE_NAME_6=229;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Fcommon%2Ftext2D.hpp;0;4
 FILE_NAME_7=1538;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2FDesktop%2FOGLT%2Fogl-2.1_branch%2Fcommon%2Ftext2D.cpp;0;4
+FILE_NAME_8=0;C++;0;EUTF-8;0;1;0;%2Ftmp%2Fxa-EOjejd%2FCImg.h;0;2
 
 [VTE]
 last_dir=/home/pi

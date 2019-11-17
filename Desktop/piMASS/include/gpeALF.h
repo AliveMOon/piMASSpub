@@ -665,6 +665,7 @@ typedef enum gpeALF: I8
 	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
 
 	gpeALF_TAG = gpdABC('T', 'A', 'G'),
+	gpeALF_TRG = gpdABC('T', 'R', 'G'),
 	gpeALF_TYF = gpdABC('T', 'Y', 'F'),
 	gpeALF_TYI = gpdABC('T', 'Y', 'I'),
 	gpeALF_TYU = gpdABC('T', 'Y', 'U'),

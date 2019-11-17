@@ -3,6 +3,42 @@
 
 #include "piMASS.h"
 
+bool inline gpfSAVEjpg( U1* pFILE, SDL_Surface* pSRF, I4 q )
+{
+	struct jpeg_compress_struct cinfo;
+	struct jpeg_error_mrg jerr;
+
+	FILE* pOUT;
+	JSAMPROW aROW[1];
+
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
+	if(!(pOUT = fopen(pFILE, "wb")))
+		return false;
+
+	jpeg_stdio_dest(&cinfo, pOUT);
+    cinfo.image_width = pSRF->w;
+    cinfo.image_height = pSRF->h;
+    cinfo.input_components = 3;
+    cinfo.in_color_space = JCS_RGB;
+
+    jpeg_set_defaults(&cinfo);
+    jpeg_set_quality( &cinfo, q, true );
+    jpeg_start_compress(&cinfo,true);
+
+	int rowSTRD = pSRF->w*3;
+	while(cinfo.next_scanline < cinfo.image_height ) {
+		aROW[0] = ((U1*)pSRF->pixels)+(cinfo.next_scanline*rowSTRD);
+        jpeg_write_scanlines(&cinfo, aROW, 1 );
+	}
+
+    jpeg_finish_compress(&cinfo);
+    fcolose(pFILE);
+    jpeg_destroy_compress(&cinfo);
+
+	return true;
+}
+
 class gpcPICAM
 {
 public:
@@ -102,39 +138,6 @@ public:
 		}
 
 		return this;
-
-
-		/*Uint32 getpixel(SDL_Surface *surface, int x, int y) {
-			int bpp = surface->format->BytesPerPixel;
-			//  Here p is the address to the pixel we want to retrieve
-			Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-
-			switch(bpp) {
-			case 1:
-				return *p;
-				break;
-
-			case 2:
-				return *(Uint16 *)p;
-				break;
-
-			case 3:
-				if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-					return p[0] << 16 | p[1] << 8 | p[2];
-				else
-					return p[0] | p[1] << 8 | p[2] << 16;
-				break;
-
-			case 4:
-				return *(Uint32 *)p;
-				break;
-
-			default:
-				return 0;       // shouldn't happen, but avoids warnings
-			}
-		}*/
-
-
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc )
 	{

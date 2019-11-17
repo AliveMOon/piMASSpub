@@ -53,9 +53,13 @@
 
 
 #else
+	#include "CImg.h"
+	//#include <opencv2/core/core.hpp>
+	//#include <opencv2/highgui/highgui.hpp>
 
 	#ifdef gpdSYSpi
 		#include <raspicam/raspicam.h>
+		//#include <raspicam/raspicam_cv.h>
 		#include <wiringPi.h>
 	#endif // gpdSYSpi
 

@@ -492,9 +492,16 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 																		win.pSRFwin,	&src.xyWH,
 																		pSURF,			&dst.xyWH
 																	);
-
+													//cv::Mat image( win.pSRFwin->w, win.pSRFwin->h, CV_8UC3 );
+													//gpmMEMCPY( (U1*)image.data, win.pSRFwin->pixels, win.pSRFwin->w*win.pSRFwin->h*3 );
+													//cv::imwrite(  "/mnt/ram/tmp.jpg", image );
 													//IMG_SaveJPG( pSURF, "/mnt/ram/tmp.tmp" );
-													IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
+													if( gpfSAVEjpg( "/mnt/ram/tmp.tmp", win.pSRFsnd, 1 ) )
+													{
+
+													} else {
+														IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
+													}
 													gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
 													if( pPNG )
 													{
@@ -508,6 +515,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 														rename( gpdPICbg, "/mnt/ram/bg.kill" );
 													}
 													rename( "/mnt/ram/tmp.tmp", gpdPICbg );
+
 													if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
 													{
 														remove( "/mnt/ram/bg.kill" );
