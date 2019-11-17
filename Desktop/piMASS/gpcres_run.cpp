@@ -492,11 +492,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 																		win.pSRFwin,	&src.xyWH,
 																		pSURF,			&dst.xyWH
 																	);
-													//cv::Mat image( win.pSRFwin->w, win.pSRFwin->h, CV_8UC3 );
-													//gpmMEMCPY( (U1*)image.data, win.pSRFwin->pixels, win.pSRFwin->w*win.pSRFwin->h*3 );
-													//cv::imwrite(  "/mnt/ram/tmp.jpg", image );
-													//IMG_SaveJPG( pSURF, "/mnt/ram/tmp.tmp" );
-													if( !gpfSAVEjpg( (U1*)"/mnt/ram/tmp.tmp", pSURF, 1 ) )
+													if( !gpfSAVEjpg( (U1*)"/mnt/ram/tmp.tmp", pSURF, 40 ) )
 														IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
 
 													gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
