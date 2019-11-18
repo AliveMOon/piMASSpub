@@ -387,6 +387,13 @@ public:
 	gpcALU& operator /= ( gpcREG& a );
 	gpcALU& operator %= ( gpcREG& a );
 
+	gpcALU& operator += ( gpcALU& b );
+	gpcALU& operator -= ( gpcALU& b );
+	gpcALU& operator *= ( gpcALU& b );
+	gpcALU& operator /= ( gpcALU& b );
+	gpcALU& operator %= ( gpcALU& b );
+
+
 	gpcALU& operator = ( U1* pSTR );
 
 	gpcALU& operator = ( gpeALF a )
@@ -405,7 +412,9 @@ public:
 	U8 u8() {
 		if( this ? !pDAT : true )
 			return 0;
-
+		// typ:
+		// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+		// yz[ dimXY ] 		, w[] = nBYTE*dimXY
 		if( typ.x&0x40 )
 		{
 			if( typ.w > 4 )

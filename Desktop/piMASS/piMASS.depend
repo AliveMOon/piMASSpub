@@ -491,23 +491,23 @@
 1574029327 /home/pi/Desktop/piMASS/include/gpcwin.h
 	"gpcres.h"
 
-1574047583 /home/pi/Desktop/piMASS//gpcres.h
+1574054017 /home/pi/Desktop/piMASS//gpcres.h
 	"gpcSRC.h"
 	"gpcSCHL.h"
 	"gpcOPCD.h"
 
-1574047583 /home/pi/Desktop/piMASS/gpcres.h
+1574054017 /home/pi/Desktop/piMASS/gpcres.h
 	"gpcSRC.h"
 	"gpcSCHL.h"
 	"gpcOPCD.h"
 
-1574046500 source:/home/pi/Desktop/piMASS/gpcres.cpp
+1574051301 source:/home/pi/Desktop/piMASS/gpcres.cpp
 	"gpcwin.h"
 
 1573521163 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
 	"gpcres.h"
 
-1574046625 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+1574053306 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
 	"gpcwin.h"
 
 1573774272 source:/home/pi/Desktop/piMASS/gpcgt.cpp
@@ -589,4 +589,7 @@
 	"ImfArray.h"
 	"tinyexr.h"
 	"CImg.h"
+
+1574053067 source:/home/pi/Desktop/piMASS/gpcalu.cpp
+	"gpcwin.h"
 

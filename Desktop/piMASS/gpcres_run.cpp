@@ -196,6 +196,12 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					}
 				} break;
 			case gpeISA_plus:{
+					if( A.alf && B.alf )
+					{
+						A += B;
+						B = 0;
+						break;
+					}
 					if( stk.D[flg.iD].bGD() )
 					{
 						if( A.pRM )
@@ -204,6 +210,8 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 							break;
 						}
 					}
+
+
 				} break;
 			case gpeISA_sub:{
 					if( stk.D[flg.iD].bGD() )

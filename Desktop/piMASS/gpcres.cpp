@@ -160,8 +160,11 @@ gpcALU& gpcALU::equ( gpcALU& b )
 		nB2		= typ.w,
 		nXB2	= nX2*nB2,
 		nLD2	= nAN2*nXB2;
-	U1* pD = new U1[nLD2];
+
+	//U4	nNEW = ;
+	U1	*pD = new U1[gpmPAD( nLD2+1, 0x10 )];
 	gpmMEMCPY( pD, b.pDAT, nLD2 );
+	pD[nLD2] = 0;
 	pDAT = pD;
 
 	pRM->chg( *this );
@@ -238,9 +241,10 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	if( pDAT )
 		return *this;
 
+	U4 nNEW = gpmPAD( nLD2+1, 0x10 );
 	U1		*pS = (U1*)tmp.pDAT,
-			*pD = new U1[nLD2];
-	gpmZn( pD, nLD2 );
+			*pD = new U1[nNEW];
+	gpmZn( pD, nNEW );
 	pDAT = pD;
 
 	if( !pS )
@@ -770,10 +774,10 @@ gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 		pM->chg( *this );
 		return *this;
 	}
-
+	U4 nNEW = gpmPAD( nLD2+1, 0x10 );
 	U1		*pS = (U1*)tmp.pDAT,
-			*pD = new U1[nLD2];
-	gpmZn( pD, nLD2 );
+			*pD = new U1[nNEW];
+	gpmZn( pD, nNEW );
 	pDAT = pD;
 
 	if( !pS )
@@ -960,7 +964,7 @@ U1* gpcALU::ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 )
 			if(ty4.x)
 				typ.x |= ty4.x;
 
-			U4 nAN2 = AN.a4x2[0].area();
+			U4 nAN2 = gpmPAD( AN.a4x2[0].area()+1, 0x10 );
 			pDAT = new U1[nAN2];
 			gpmZn( (U1*)pDAT, nAN2 );
 			pM->chg( *this );
