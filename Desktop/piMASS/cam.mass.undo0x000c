@@ -1,7 +1,6 @@
  a0	 cam = 1   d0	 =ia e0	  =in a1	  telnet = 6023
- d1	 = ix;
-na = a + 1 * 10 + a
- e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 c5	 pic = "draw1"
+ d1	 = ix
+na = a + 1 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 c5	 pic = "draw1"
 
  d5	 
 

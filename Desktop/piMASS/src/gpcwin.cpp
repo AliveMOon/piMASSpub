@@ -43,15 +43,16 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 					} else {					// AA - ZZ ----------------------------------------
 						switch( alf )
 						{
+							case gpeALF_IA:
+								out = crs.scnZN.x+1;
+								break;
+							case gpeALF_IN:
+								out = crs.scnZN.y;
+								break;
 							case gpeALF_IX:
 								out = crs.scnIN.x;
 								break;
 							case gpeALF_IY:
-								if( crs.scnIN.y > 128 && crs.scnIN.y < 255 )
-								{
-									out = crs.scnIN.y;
-									break;
-								}
 								out = crs.scnIN.y;
 								break;
 							case gpeALF_IW:

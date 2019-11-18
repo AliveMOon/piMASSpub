@@ -1634,6 +1634,8 @@ gpcALU& gpcALU::operator = ( U1* pSTR )
 	U4 n = gpmSTRLEN( pSTR );
 
 	U1* pD = ALUdat( pRM, U4x2(n,0), gpeTYP_STR, I1x4(0) );
+	if( !pD )
+		return *this;
 	gpmMEMCPY( pD, pSTR, n );
 	pD[n] = 0;
 	return *this;

@@ -530,6 +530,7 @@ typedef enum gpeALF: I8
 	gpeALF_IF = gpdAB('I', 'F'),
 	gpeALF_IH = gpdAB('I', 'H'),
 
+	gpeALF_IA = gpdAB('I', 'A'),
 	gpeALF_IN = gpdAB('I', 'N'),
 
 	gpeALF_IW = gpdAB('I', 'W'),
@@ -547,6 +548,8 @@ typedef enum gpeALF: I8
 	gpeALF_MS = gpdAB('M', 'S'),
 	gpeALF_MX = gpdAB('M', 'X'),
 	gpeALF_MY = gpdAB('M', 'Y'),
+
+	gpeALF_NA = gpdAB('N', 'A'),
 	gpeALF_NO = gpdAB('N', 'O'),
 	gpeALF_ON = gpdAB('O', 'N'),
 	gpeALF_OR = gpdAB('O', 'R'),

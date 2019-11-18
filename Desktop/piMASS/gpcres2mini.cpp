@@ -38,7 +38,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		} else {
 			*pBUFF = 0;
 			pB = pBUFF;
-			pLZY->lzy_format( s = -1, nA > 1 ? "%s" : "%s=", gppTABrun-deep );
+			pLZY->lzy_format( s = -1, nA > 1 ? "%s=" : "%s", gppTABrun-deep );
 		}
 
 

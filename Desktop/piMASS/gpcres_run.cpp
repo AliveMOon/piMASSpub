@@ -95,7 +95,8 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 						if( adr.pRM )
 						{
 							// lokális változó és már használta valaki
-							B = adr.pRM->ALU( adr.iA );
+							// B =
+							(IS.isa.aISA[1] == gpeISA_assign ? A : B) = adr.pRM->ALU( adr.iA );
 							break;
 						}
 					}
@@ -104,20 +105,20 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					if( adr.pRM )
 					{
 						// forrásként használható
-						B = adr.pRM->ALU( adr.iA );
+						//B =
+						(IS.isa.aISA[1] == gpeISA_assign ? A : B) = adr.pRM->ALU( adr.iA );
 						break;
 					}
 					// na most nézzük meg van e beépített változó rá
 					if( win.WINvar( stk.D[flg.iD], adr.an.alf ) )
 					{
-						pSRC->bSW |= gpeMASSloopMSK;
 						// valamit kapott
-						//(B = pOUT->ADD( adr.an.alf, 0, 0 ))
-						//= stk.D[flg.iD];
+						pSRC->bSW |= gpeMASSloopMSK;
 						break;
 					}
 
-					B = pOUT->ADD( adr.an.alf, 0,0 );
+					//B =
+					(IS.isa.aISA[1] == gpeISA_assign ? A : B) = pOUT->ADD( adr.an.alf, 0,0 );
 				} break;
 
 			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
@@ -226,13 +227,13 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			case gpeISA_assign:{
 					if( stk.D[flg.iD].bGD() )
 					{
-						B = stk.D[flg.iD];
+						A = stk.D[flg.iD];
 					}
 					else if( stk.apSTR[flg.iS] )
 					{
-                        B = stk.apSTR[flg.iS];
+                        A = stk.apSTR[flg.iS];
 					}
-					A = B;
+					//A = B;
 					B = 0;
 
 				} break;
