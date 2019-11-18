@@ -147,6 +147,26 @@ gpcALU& gpcALU::zero( void )
 
 	return *this;
 }
+gpcALU& gpcALU::equ( gpcALU& b )
+{
+	if( this == &b )
+		return b;
+
+	AN = b.AN;
+	typ = b.typ;
+	U4x2 X2( typ.y, typ.z );
+	U4	nAN2	= AN.a4x2[0].area(),
+		nX2		= X2.area(),
+		nB2		= typ.w,
+		nXB2	= nX2*nB2,
+		nLD2	= nAN2*nXB2;
+	U1* pD = new U1[nLD2];
+	gpmMEMCPY( pD, b.pDAT, nLD2 );
+	pDAT = pD;
+
+	pRM->chg( *this );
+	return *this;
+}
 gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	if( !pM )
 		return null();
@@ -1619,6 +1639,113 @@ gpcALU& gpcALU::operator /= ( gpcREG& a )
 		((U2*)(pD+d))[x] /= a.u8();
 	else
 		((U1*)(pD+d))[x] /= a.u8();
+
+	return *this;
+}
+
+gpcALU& gpcALU::operator %= ( gpcREG& a )
+{
+	//U4x2 xy = 0;
+	U4 x = 0;
+
+	U1x4 t = 0;
+	t.x = a.t();
+	U1* pD = NULL;
+	if( t.x&0x40 ) {	/// float ----------------------------------
+		pD = ALUdat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d = (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+		double dd, ad = abs(a.d8());
+		if( nB > 4 )
+			dd = abs(((double*)(pD+d))[x]);
+		else
+			dd = abs(((float*)(pD+d))[x]);
+
+        U8 u = dd/ad;
+		dd -= u;
+
+		if( nB > 4 )
+			((double*)(pD+d))[x] = dd;
+		else
+			((float*)(pD+d))[x] = dd;
+
+		return *this;
+	}
+	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
+		pD = ALUdat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		if( !pD )
+			return *this;
+
+		U4x2 	X( typ.y, typ.z );
+		U4 		nAN = AN.a4x2[0].area(),
+				nB	= typ.w,
+				nX	= X.area(),
+				nXB	= nX*nB;
+		U4x2	T( nXB, nXB*AN.a4x2[0].x );
+		U4		d =  (a.xy-sub)*T;
+		if( d > nAN*nXB )
+			d %= nAN*nXB;
+		if( x > nX )
+			x %= nX;
+
+
+		if( nB > 2 )
+		{
+			if( nB > 4 )
+				((I8*)(pD+d))[x] %= a.i8();
+			else
+				((I4*)(pD+d))[x] %= a.i8();
+		}
+		else if( nB > 1 )
+			((I2*)(pD+d))[x] %= a.i8();
+		else
+			((I1*)(pD+d))[x] %= a.i8();
+
+		return *this;
+	}
+	/// unSIGNED ----------------------------------
+	pD = ALUdat( pRM, 0, t, 0, a.u8(), 0.0  );
+	if( !pD )
+		return *this;
+
+	U4x2 	X( typ.y, typ.z );
+
+	U4 		nAN = AN.a4x2[0].area(),
+			nB	= typ.w,
+			nX	= X.area(),
+			nXB	= nX*nB;
+	U4x2	T( nXB, nXB*AN.a4x2[0].x );
+	U4		d =  (a.xy-sub)*T;
+	if( d > nAN*nXB )
+		d %= nAN*nXB;
+	if( x > nX )
+		x %= nX;
+
+
+	if( nB > 2 )
+	{
+		if( nB > 4 )
+			((U8*)(pD+d))[x] %= a.u8();
+		else
+			((U4*)(pD+d))[x] %= a.u8();
+	}
+	else if( nB > 1 )
+		((U2*)(pD+d))[x] %= a.u8();
+	else
+		((U1*)(pD+d))[x] %= a.u8();
 
 	return *this;
 }

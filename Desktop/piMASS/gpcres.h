@@ -133,7 +133,7 @@ public:
 		if( op.z&0x80 )
 		{
 			// tudom, hogy hülyeség, de egyenlőre legyen így
-			return op.z;
+			return op.z < 0 ? gpeISA_rem : op.z;
 		}
 
 		if( op.y )
@@ -367,6 +367,7 @@ public:
 
 		return AN.w;
 	}
+	gpcALU& equ( gpcALU& b );
 
 	gpcALU& zero( void );
 	U8 ins( gpcRES* pM, gpcLAZY& str );
@@ -384,6 +385,7 @@ public:
 	gpcALU& operator -= ( gpcREG& a );
 	gpcALU& operator *= ( gpcREG& a );
 	gpcALU& operator /= ( gpcREG& a );
+	gpcALU& operator %= ( gpcREG& a );
 
 	gpcALU& operator = ( U1* pSTR );
 
@@ -400,8 +402,7 @@ public:
 		return *this;
 	}
 
-	U8 u8()
-	{
+	U8 u8() {
 		if( this ? !pDAT : true )
 			return 0;
 
@@ -440,8 +441,7 @@ public:
 
 		return 0;
 	}
-	I8 i8()
-	{
+	I8 i8() {
 		if( this ? !pDAT : true )
 			return 0;
 
@@ -480,8 +480,7 @@ public:
 
 		return 0;
 	}
-	double d8()
-	{
+	double d8() {
 		if( this ? !pDAT : true )
 			return 0.0;
 

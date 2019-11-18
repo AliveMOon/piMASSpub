@@ -172,7 +172,16 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			case gpeISA_str:{} break;
 			case gpeISA_tag:{} break;
 			case gpeISA_dollar:{} break;
-			case gpeISA_rem:{} break;
+			case gpeISA_rem:{
+					if( stk.D[flg.iD].bGD() )
+					{
+						if( A.pRM )
+						{
+							A %= stk.D[flg.iD];
+							break;
+						}
+					}
+				} break;
 			case gpeISA_and:{} break;
 			case gpeISA_brkB:{} break;
 			case gpeISA_brkE:{} break;
@@ -233,9 +242,11 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					{
                         A = stk.apSTR[flg.iS];
 					}
-					//A = B;
+					if( A.alf && B.alf )
+					{
+						A.equ( B );
+					}
 					B = 0;
-
 				} break;
 
 
