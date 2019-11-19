@@ -422,7 +422,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							} break;
 						case gpeALF_PIC:{
 								U8 pic_id = 0;
-								if( alu.typ.x & 0x10 )
+								if( alu.typ().x & 0x10 )
 								{
 									// ez a kép neve
 									pic_id = PIC.iFND( (U1*)alu.pDAT );
@@ -437,7 +437,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							} break;
 						case gpeALF_TRG:{
 								U8 trg_id = 0;
-								if( alu.typ.x & 0x10 )
+								if( alu.typ().x & 0x10 )
 								{
 									// ez a kép neve
 									trg_id = PIC.iFND( (U1*)alu.pDAT );

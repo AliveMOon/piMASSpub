@@ -2,7 +2,7 @@
 1569782949 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
 	"piMASS.h"
 
-1574024287 /home/pi/Desktop/piMASS/piMASS.h
+1574190587 /home/pi/Desktop/piMASS/piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -380,7 +380,7 @@
 	"gpcgt.h"
 	"gpcOPCD.h"
 
-1574024287 /home/pi/Desktop/piMASS//piMASS.h
+1574190587 /home/pi/Desktop/piMASS//piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -491,23 +491,23 @@
 1574029327 /home/pi/Desktop/piMASS/include/gpcwin.h
 	"gpcres.h"
 
-1574054017 /home/pi/Desktop/piMASS//gpcres.h
+1574203357 /home/pi/Desktop/piMASS//gpcres.h
 	"gpcSRC.h"
 	"gpcSCHL.h"
 	"gpcOPCD.h"
 
-1574054017 /home/pi/Desktop/piMASS/gpcres.h
+1574203357 /home/pi/Desktop/piMASS/gpcres.h
 	"gpcSRC.h"
 	"gpcSCHL.h"
 	"gpcOPCD.h"
 
-1574051301 source:/home/pi/Desktop/piMASS/gpcres.cpp
+1574203357 source:/home/pi/Desktop/piMASS/gpcres.cpp
 	"gpcwin.h"
 
 1573521163 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
 	"gpcres.h"
 
-1574053306 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+1574195303 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
 	"gpcwin.h"
 
 1573774272 source:/home/pi/Desktop/piMASS/gpcgt.cpp
@@ -522,7 +522,7 @@
 1573705071 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
 	"gpcgt.h"
 
-1574034727 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp
+1574197959 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp
 	"gpcres.h"
 
 1574021327 /home/pi/Desktop/piMASS/gpcpic.h
@@ -590,6 +590,9 @@
 	"tinyexr.h"
 	"CImg.h"
 
-1574053067 source:/home/pi/Desktop/piMASS/gpcalu.cpp
+1574194771 source:/home/pi/Desktop/piMASS/gpcalu.cpp
+	"gpcwin.h"
+
+1574203434 source:/home/pi/Desktop/piMASS/gpcresflt.cpp
 	"gpcwin.h"
 

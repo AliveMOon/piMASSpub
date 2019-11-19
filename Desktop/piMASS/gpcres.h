@@ -312,12 +312,12 @@ public:
 
 class gpcALU
 {
+	U1x4	type;	// typ:
+					// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+					// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
+	U4x4	an;
 public:
 	I1x4	op, isa;
-	U1x4	typ;	// typ:
-					// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
-					// yz[ dimXY ] 		, w[] = nBYTE*dimXY
-	U4x4	AN;
 	U4x2	sub;
 	U4		nALL, iA;
 	gpcRES	*pRM,
@@ -329,6 +329,109 @@ public:
 	gpcALU( gpcRES* pM ); //= NULL );
 	~gpcALU();
 
+	gpcALU& TanDT( gpcALU& b )
+	{
+		// bizalmatlanok legyünk a b-vel?
+		//gpmMEMCPY( this, &b, 1 );
+		type = b.type;
+		type.w = 0;
+		an = b.an;
+		an.w = 0;
+		pDAT = b.pDAT;
+		return *this;
+	}
+
+	U1x4& typ()
+	{
+		if( type.w )
+			return type;
+		/*if( !pDAT )
+		{
+			return type.null();
+		}*/
+		if( !type.y )
+			type.y = 1;
+		if( !type.z )
+			type.z = 1;
+
+		if( type.x&0x40 )
+		{
+			// ez float vagy double
+			// azaz legalább 2
+			if( (type.x&0xf) < 2 )
+				type.x = (type.x&0xf0) | 2;
+		}
+
+		type.w = 1<<(type.x&0xf);
+		return type;
+	}
+	U1x4& typ( U4 b )
+	{
+		type.u4 = b;
+		type.w = 0;
+		return typ();
+	}
+	U1x4& TYPmx( U4 b )
+	{
+		type.typMX( b );
+		//type.u4 = b;
+		//type.w = 0;
+		return typ();
+	}
+
+	U4x2 tDIM()
+	{
+		typ();
+		return U4x2(type.y,type.z);
+	}
+
+
+	U4 txySOF()
+	{
+		typ();
+		return tDIM().area()*type.w;
+	}
+	U4 rowSOF()
+	{
+		return txySOF()*an.x;
+	}
+
+
+	U4x4& AN()
+	{
+		if( an.w )
+			return an;
+		/*if( !pDAT )
+		{
+			return an.null();
+		}*/
+		if( !an.x )
+			an.x = 1;
+		if( !an.y )
+			an.y = 1;
+
+		an.z = an.a4x2[0].area();
+		an.w = an.z*typ().w;
+		return an;
+	}
+
+	U4x2 trafo()
+	{
+		return U4x2( 1, AN().x )*txySOF();
+	}
+
+	U4x4& AN( U4x2 b )
+	{
+		an.w = 0;
+		an.a4x2[0] = b;
+		return AN();
+	}
+	U4x4& ANmx( U4x2 b )
+	{
+		an.w = 0;
+		an.a4x2[0].mx(b);
+		return AN();
+	}
 	gpcALU( const gpcALU& b )
 	{
 		gpmCLR;
@@ -341,32 +444,21 @@ public:
 	}
 	U4 nDIM()
 	{
-		return typ.area_yz();
+		return typ().area_yz();
 	}
-	U4 nT1()
+	/*U4 nT1()
 	{
 		return 1<<(typ.x&0xf);
-	}
+	}*/
 	U4 nLOAD()
 	{
-		if( !AN.z )
-			AN.z = AN.a4x2[0].area();
-
-		// typ:
-		// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
-		// yz[ dimXY ] 		, w[] = nBYTE*dimXY
-		if( !typ.w )
-			typ.w = nDIM()<<(typ.x&0xf);
-
-		AN.w = AN.z;
-		if( typ.w > 1 )
-			AN.w *= typ.w;
-		// AN
-		// x-A y-n
-		// z = a*n
-
-		return AN.w;
+		return AN().w;
 	}
+	U4 nALLOC()
+	{
+		return gpmPAD( AN().w+1, 0x10 );
+	}
+
 	gpcALU& equ( gpcALU& b );
 
 	gpcALU& zero( void );
@@ -414,36 +506,36 @@ public:
 			return 0;
 		// typ:
 		// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
-		// yz[ dimXY ] 		, w[] = nBYTE*dimXY
-		if( typ.x&0x40 )
+		// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
+		if( typ().x&0x40 )
 		{
-			if( typ.w > 4 )
+			if( typ().w > 4 )
 				return ((double*)pDAT)[0];
 
 			return ((float*)pDAT)[0];
 		}
-		if( typ.x&0x80 )
+		if( typ().x&0x80 )
 		{
-			if( typ.w > 2 )
+			if( typ().w > 2 )
 			{
-				if( typ.w > 4 )
+				if( typ().w > 4 )
 					return ((I8*)pDAT)[0];
 
 				return ((I4*)pDAT)[0];
 			}
-			if( typ.w > 1 )
+			if( typ().w > 1 )
 				return ((I2*)pDAT)[0];
 
 			return ((I1*)pDAT)[0];
 		}
-		if( typ.w > 2 )
+		if( typ().w > 2 )
 		{
-			if( typ.w > 4 )
+			if( typ().w > 4 )
 				return ((U8*)pDAT)[0];
 
 			return ((U4*)pDAT)[0];
 		}
-		if( typ.w > 1 )
+		if( typ().w > 1 )
 			return ((U2*)pDAT)[0];
 		else
 			return ((U1*)pDAT)[0];
@@ -454,35 +546,35 @@ public:
 		if( this ? !pDAT : true )
 			return 0;
 
-		if( typ.x&0x40 )
+		if( typ().x&0x40 )
 		{
-			if( typ.w > 4 )
+			if( typ().w > 4 )
 				return ((double*)pDAT)[0];
 
 			return ((float*)pDAT)[0];
 		}
-		if( typ.x&0x80 )
+		if( typ().x&0x80 )
 		{
-			if( typ.w > 2 )
+			if( typ().w > 2 )
 			{
-				if( typ.w > 4 )
+				if( typ().w > 4 )
 					return ((I8*)pDAT)[0];
 
 				return ((I4*)pDAT)[0];
 			}
-			if( typ.w > 1 )
+			if( typ().w > 1 )
 				return ((I2*)pDAT)[0];
 
 			return ((I1*)pDAT)[0];
 		}
-		if( typ.w > 2 )
+		if( typ().w > 2 )
 		{
-			if( typ.w > 4 )
+			if( typ().w > 4 )
 				return ((U8*)pDAT)[0];
 
 			return ((U4*)pDAT)[0];
 		}
-		if( typ.w > 1 )
+		if( typ().w > 1 )
 			return ((U2*)pDAT)[0];
 		else
 			return ((U1*)pDAT)[0];
@@ -493,35 +585,35 @@ public:
 		if( this ? !pDAT : true )
 			return 0.0;
 
-		if( typ.x&0x40 )
+		if( typ().x&0x40 )
 		{
-			if( typ.w > 4 )
+			if( typ().w > 4 )
 				return ((double*)pDAT)[0];
 
 			return ((float*)pDAT)[0];
 		}
-		if( typ.x&0x80 )
+		if( typ().x&0x80 )
 		{
-			if( typ.w > 2 )
+			if( typ().w > 2 )
 			{
-				if( typ.w > 4 )
+				if( typ().w > 4 )
 					return ((I8*)pDAT)[0];
 
 				return ((I4*)pDAT)[0];
 			}
-			if( typ.w > 1 )
+			if( typ().w > 1 )
 				return ((I2*)pDAT)[0];
 
 			return ((I1*)pDAT)[0];
 		}
-		if( typ.w > 2 )
+		if( typ().w > 2 )
 		{
-			if( typ.w > 4 )
+			if( typ().w > 4 )
 				return ((U8*)pDAT)[0];
 
 			return ((U4*)pDAT)[0];
 		}
-		if( typ.w > 1 )
+		if( typ().w > 1 )
 			return ((U2*)pDAT)[0];
 		else
 			return ((U1*)pDAT)[0];
@@ -743,9 +835,9 @@ public:
 		alu.iA 		= iA;
 		alu.alf		= pALF	? pALF[iA]	: gpeALF_null;
 		alu.op		= pOP	? pOP[iA]	: 0;
-		alu.typ		= pTYP	? pTYP[iA]	: 0;	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+		alu.typ( pTYP ? pTYP[iA].u4	: 0 );	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 												// yz dimxy
-		alu.AN 		= pAN	? pAN[iA]	: 0;
+		alu.AN( pAN	? pAN[iA].a4x2[0]	: 0 );
 		alu.pDAT	= ppDAT	? ppDAT[iA]	: NULL;
 		alu.pRES	= ppR	? ppR[iA]	: NULL;
 		alu.nALL	= pnALL ? pnALL[iA]	: 0;
@@ -795,9 +887,9 @@ public:
 			if( pOP )
 				pOP[ali.iA] = ali.op;
 			if( pTYP )
-				pTYP[ali.iA] = ali.typ;
+				pTYP[ali.iA] = ali.typ();
 			if( pAN )
-				pAN[ali.iA] = ali.AN;
+				pAN[ali.iA] = ali.AN();
 
 			return this;
 		}

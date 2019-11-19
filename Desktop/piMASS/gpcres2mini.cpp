@@ -43,36 +43,39 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 
 
 
-		U4x2 	X( alu.typ.y, alu.typ.z ), xy;
+		U4x2 	//X = alu.xDIM(),
+				xy;
 		U1* pD = (U1*)alu.pDAT;
 		if( !pD )
 		{
 			pLZY->lzy_format( s = -1, "\r\n" );
 			continue;
 		}
-		if( alu.typ.x & 0x10 )
+		if( alu.typ().x & 0x10 )
 		{
 			pLZY->lzy_format( s = -1, "%s\"%s\"", gppTABrun-deep, pD );
 			continue;
 		}
-		U4 		nAN = alu.AN.a4x2[0].area(), d, xp1, xe,
-				nB	= alu.typ.w,
-				nX	= X.area(),
-				nXB	= nX*nB;
-		U4x2	T( nXB, nXB*alu.AN.a4x2[0].x );
+		U4 		nAN = alu.AN().z, d, xp1, xe,
+				nB	= alu.typ().w,
+				//nX	= X.area(),
+				nXB	= alu.txySOF(); //txySOF(); // nX*nB;
+
+		U4x2	T = alu.trafo(); //  alu.txySOF(), nXB*alu.AN.a4x2[0].x );
 		//U4		d =  (a.xy-sub)*T;
 
-		for( xy.y = 0; xy.y < alu.AN.y; xy.y++ )
+		for( xy.y = 0; xy.y < alu.AN().y; xy.y++ )
 		{
 			pLZY->lzy_format( s = -1, "%s", gppTABrun-deep );
-			for( xy.x = 0, xe = alu.AN.x; xy.x < xe; xy.x = xp1 )
+			for( xy.x = 0, xe = alu.AN().x; xy.x < xe; xy.x = xp1 )
 			{
 				xp1 = xy.x+1;
 				p_sep = (U1*)((xp1 < xe) ? "," : "");
 				d = xy*T;
-				if( d > nAN*nXB )
-					d %= nAN*nXB;
-				if( alu.typ.x&0x40 )
+				/*if( d > nAN*nXB )
+					d %= nAN*nXB;*/
+
+				if( alu.typ().x&0x40 )
 				{
 					if( nB > 4 )
 						pLZY->lzy_format( s = -1, "%f%s", ((double*)(pD+d))[0], p_sep );
@@ -80,7 +83,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 						pLZY->lzy_format( s = -1, "%f%s", ((float*)(pD+d))[0], p_sep );
 					continue;
 				}
-				if( alu.typ.x&0x80 )
+				if( alu.typ().x&0x80 )
 				{
 					if( nB > 2 )
 					{
