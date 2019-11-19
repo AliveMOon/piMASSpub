@@ -30,15 +30,15 @@ ba = a + a // % 2
 
 
 
-  f5	 trg ="draw1";
-trgw = 640;
-trgh = 512*3;
-sprite = "sprite";
-ssx = 128;
-ssy = 16;
-ssw = 16;
-ssh = ssw;
-sdx = ix;
-sdy = iy;
-sdw = ssw;
-sdh = sdw;  c6	 						 
+  f5	trg ="draw1"
+trgw = 640
+trgh = 512*3
+sprite = "sprite"
+ssx = 128
+ssy = 16
+ssw = 16
+ssh = ssw
+sdx = ix
+sdy = iy
+sdw = ssw
+sdh = sdw  c6	 						 
