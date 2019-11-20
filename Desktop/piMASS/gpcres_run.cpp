@@ -45,7 +45,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
         {
 			case gpeISA_trg:{	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "[%d:%d]", IS.an.x, IS.an.y );
-					stk.D[flg.iD].xy = IS.an;
+					stk.aTRG[flg.iT] = IS.an;
 					//flg.iT++;
 				} continue;
 
@@ -131,7 +131,6 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
 					stk.aVR[flg.iV] = IS.an.var;
-
 					//flg.iV++;
 				} break;
 
@@ -163,8 +162,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 		{
 			case gpeISA_u8:
 			case gpeISA_i8:
-			case gpeISA_d8:
-					{
+			case gpeISA_d8: {
 						B = stk.iD(err);
 					} break;
 

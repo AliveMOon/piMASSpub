@@ -176,11 +176,8 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 			}
 
 			pI = NULL;
-			pUD8 = resISA();
-
-			*pUD8->isa.aISA = gpeISA_u8;
-			//pUD8->trg = xyWH.a4x2[0];
-			pUD8->an.u8 = gpfSTR2U8( pS, &pS );
+			(pUD8 = resISA())->an.u8 = gpfSTR2U8( pS, &pS );
+			pUD8->isa.aISA[0] = gpeISA_u8;
 
 			if( *pS != '.' )
 				pS += gpmNINCS( pS, " \t\r\n" );
@@ -195,6 +192,9 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					pS++;
 
 			}
+
+
+
 			continue;
 		}
 
@@ -222,7 +222,11 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 						resISA_stp( pS[-1] );
 					else if( pUD8 )
 					{
-						switch( *pUD8->isa.aISA )
+						if( nISA.x ? pUD8[-1].isa.aISA[1] : false )
+						{
+							resISA_stp( pS[-1] );
+						}
+						else switch( *pUD8->isa.aISA )
 						{
 							case gpeISA_d8:
 								typ.u4 = gpeTYP_D;
