@@ -39,5 +39,5 @@ ssw = 16;
 ssh = ssw; // + 100;
 sdx = trgw*ix/iw - 8;
 sdy = trgh*iy/ih - 8;
-sdw = ssw;
+sdw = ssw*10;
 sdh = sdw; c6	 						 

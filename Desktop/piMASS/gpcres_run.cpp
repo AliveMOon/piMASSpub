@@ -475,6 +475,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							// ez indítja a rajzolást MOST
 							/// nem így lesz csak próba
 								sprt[1].w = alu.i8();
+								if( !(sprt[0].a4x2[1].area()*sprt[1].a4x2[1].area()) )
+									break;
 								if( !pTRG || !pSPR )
 									break;
 
