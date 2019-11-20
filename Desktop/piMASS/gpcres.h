@@ -343,27 +343,7 @@ public:
 
 	U1x4& typ()
 	{
-		if( type.w )
-			return type;
-		/*if( !pDAT )
-		{
-			return type.null();
-		}*/
-		if( !type.y )
-			type.y = 1;
-		if( !type.z )
-			type.z = 1;
-
-		if( type.x&0x40 )
-		{
-			// ez float vagy double
-			// azaz legalább 2
-			if( (type.x&0xf) < 2 )
-				type.x = (type.x&0xf0) | 2;
-		}
-
-		type.w = 1<<(type.x&0xf);
-		return type;
+		return type.typ();
 	}
 	U1x4& typ( U4 b )
 	{
@@ -467,7 +447,8 @@ public:
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 
-	U1*		ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8 = 0, double d8 = 0.0 );
+	U1*	ALUdatHARD( gpcRES* pM, U4x2 xy, U1x4 ty4, I1 mul );
+	U1*	ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8 = 0, double d8 = 0.0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8, U2 dm = 0 );
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );

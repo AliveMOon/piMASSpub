@@ -766,7 +766,7 @@ U1* gpcALU::ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 )
 		}
 
 
-		I8 i8 = ( op4.x < 0 ) ? -u8 : u8;
+		//I8 i8 = ( op4.x < 0 ) ? -u8 : u8;
 
 		xy -= sub;
 		ins( pM, xy, ty4 );
@@ -1231,7 +1231,7 @@ gpcALU& gpcALU::operator *= ( gpcREG& a )
 	t.x = a.t();
 	U1* pD = NULL;
 	if( t.x&0x40 ) {	/// float ----------------------------------
-		pD = ALUdat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		pD = ALUdatHARD( pRM, a.xy, t, +1 );
 		if( !pD )
 			return *this;
 
@@ -1260,7 +1260,7 @@ gpcALU& gpcALU::operator *= ( gpcREG& a )
 		return *this;
 	}
 	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
-		pD = ALUdat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		pD = ALUdatHARD( pRM, a.xy, t, +1 );
 		if( !pD )
 			return *this;
 
@@ -1297,7 +1297,7 @@ gpcALU& gpcALU::operator *= ( gpcREG& a )
 		return *this;
 	}
 	/// unSIGNED ----------------------------------
-	pD = ALUdat( pRM, 0, t, 0, a.u8(), 0.0  );
+	pD = ALUdatHARD( pRM, a.xy, t, +1 );
 	if( !pD )
 		return *this;
 
@@ -1343,7 +1343,7 @@ gpcALU& gpcALU::operator /= ( gpcREG& a )
 	t.x = a.t();
 	U1* pD = NULL;
 	if( t.x&0x40 ) {	/// float ----------------------------------
-		pD = ALUdat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		pD = ALUdatHARD( pRM, a.xy, t, -1 );
 		if( !pD )
 			return *this;
 
@@ -1372,7 +1372,7 @@ gpcALU& gpcALU::operator /= ( gpcREG& a )
 		return *this;
 	}
 	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
-		pD = ALUdat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		pD = ALUdatHARD( pRM, a.xy, t, -1 );
 		if( !pD )
 			return *this;
 
@@ -1425,7 +1425,7 @@ gpcALU& gpcALU::operator /= ( gpcREG& a )
 		return *this;
 	}
 	/// unSIGNED ----------------------------------
-	pD = ALUdat( pRM, 0, t, 0, a.u8(), 0.0  );
+	pD = ALUdatHARD( pRM, a.xy, t, -1 );
 	if( !pD )
 		return *this;
 
@@ -1477,7 +1477,7 @@ gpcALU& gpcALU::operator %= ( gpcREG& a )
 	t.x = a.t();
 	U1* pD = NULL;
 	if( t.x&0x40 ) {	/// float ----------------------------------
-		pD = ALUdat( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+		pD = ALUdatHARD( pRM, a.xy, t, 0 );
 		if( !pD )
 			return *this;
 
@@ -1515,7 +1515,7 @@ gpcALU& gpcALU::operator %= ( gpcREG& a )
 		return *this;
 	}
 	if( t.x&0x80 ) {	/// SIGNED ----------------------------------
-		pD = ALUdat( pRM, 0, t, I1x4(-1), a.u8(), 0.0 );
+		pD = ALUdatHARD( pRM, a.xy, t, 0 );
 		if( !pD )
 			return *this;
 
@@ -1552,7 +1552,7 @@ gpcALU& gpcALU::operator %= ( gpcREG& a )
 		return *this;
 	}
 	/// unSIGNED ----------------------------------
-	pD = ALUdat( pRM, 0, t, 0, a.u8(), 0.0  );
+	pD = ALUdatHARD( pRM, a.xy, t, 0 );
 	if( !pD )
 		return *this;
 

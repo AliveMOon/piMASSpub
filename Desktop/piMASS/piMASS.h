@@ -703,7 +703,22 @@ public:
 
 		return *this;
     }
+	U1x4& typ()
+	{
+		if( w )
+			return *this;
 
+		if( !y )
+			y = 1;
+		if( !z )
+			z = 1;
+
+		if( x&0x40 )
+			x = ((x&0xf) < 2 ) ? 0xc2 : 0xc3;
+
+		w = 1<<(x&0xf);
+		return *this;
+	}
 	U1x4& typMX( U1x4 tp )
 	{
 		U1	sh1 = x&0xf;
