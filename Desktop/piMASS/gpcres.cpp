@@ -1392,19 +1392,35 @@ gpcALU& gpcALU::operator /= ( gpcREG& a )
 			d %= nAN*nXB;
 		if( x > nX )
 			x %= nX;*/
+		I8 i8 = a.i8();
+		if( !i8 )
+		{
+			if( typ().w > 2 )
+			{
+				if( typ().w > 4 )
+					((I8*)(pD+d))[x] = ~((I8*)(pD+d))[x];
+				else
+					((I4*)(pD+d))[x] = ~((I4*)(pD+d))[x];
+			}
+			else if( typ().w > 1 )
+				((I2*)(pD+d))[x] = ~((I2*)(pD+d))[x];
+			else
+				((I1*)(pD+d))[x] = ~((I1*)(pD+d))[x];
 
+			return *this;
+		}
 
 		if( typ().w > 2 )
 		{
 			if( typ().w > 4 )
-				((I8*)(pD+d))[x] /= a.i8();
+				((I8*)(pD+d))[x] /= i8;
 			else
-				((I4*)(pD+d))[x] /= a.i8();
+				((I4*)(pD+d))[x] /= i8;
 		}
 		else if( typ().w > 1 )
-			((I2*)(pD+d))[x] /= a.i8();
+			((I2*)(pD+d))[x] /= i8;
 		else
-			((I1*)(pD+d))[x] /= a.i8();
+			((I1*)(pD+d))[x] /= i8;
 
 		return *this;
 	}
@@ -1418,18 +1434,23 @@ gpcALU& gpcALU::operator /= ( gpcREG& a )
 			d %= AN().w;
 		x %= tDIM().area();
 
-		/*U4x2 	X( typ.y, typ.z );
+	U8 u8 = a.i8();
+	if( !u8 )
+	{
+		if( typ().w > 2 )
+		{
+			if( typ().w > 4 )
+				((U8*)(pD+d))[x] = ~((U8*)(pD+d))[x];
+			else
+				((U4*)(pD+d))[x] = ~((U4*)(pD+d))[x];
+		}
+		else if( typ().w > 1 )
+			((U2*)(pD+d))[x] = ~((U2*)(pD+d))[x];
+		else
+			((U1*)(pD+d))[x] = ~((U1*)(pD+d))[x];
 
-	U4 		nAN = AN.a4x2[0].area(),
-			nB	= typ.w,
-			nX	= X.area(),
-			nXB	= nX*nB;
-	U4x2	T( nXB, nXB*AN.a4x2[0].x );
-	U4		d =  (a.xy-sub)*T;
-	if( d > nAN*nXB )
-		d %= nAN*nXB;
-	if( x > nX )
-		x %= nX;*/
+		return *this;
+	}
 
 
 	if( typ().w > 2 )
