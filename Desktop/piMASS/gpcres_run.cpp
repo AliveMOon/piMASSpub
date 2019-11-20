@@ -66,16 +66,19 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
  			case gpeISA_u8: {	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%lld", IS.an.u8 );
 					stk.D[flg.iD] = IS.an.u8;
+					B = gpeALF_null;
 					//flg.iD++;
 				} break;
 			case gpeISA_i8: {	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%lld", -((I8)IS.an.u8) );
 					stk.D[flg.iD] = -((I8)IS.an.u8);
+					B = gpeALF_null;
 					//flg.iD++;
 				} break;
 			case gpeISA_d8: {	// --------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%f",  IS.an.d8 );
 					stk.D[flg.iD] = IS.an.d8;
+					B = gpeALF_null;
 					//flg.iD++;
 				} break;
 
@@ -96,7 +99,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 						{
 							// lokális változó és már használta valaki
 							// B =
-							(IS.isa.aISA[1] == gpeISA_assign ? A : B) = adr.pRM->ALU( adr.iA );
+							(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = adr.pRM->ALU( adr.iA );
 							break;
 						}
 					}
@@ -105,8 +108,12 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					if( adr.pRM )
 					{
 						// forrásként használható
-						//B =
-						(IS.isa.aISA[1] == gpeISA_assign ? A : B) = adr.pRM->ALU( adr.iA );
+						if( IS.isa.aISA[1] == gpeISA_assign )
+						{
+							FND = pOUT->ADD( adr.an.alf, 0,0 );
+							FND.equ( adr.pRM->ALU( adr.iA ) );
+						} else
+							B = adr.pRM->ALU( adr.iA );
 						break;
 					}
 					// na most nézzük meg van e beépített változó rá
@@ -118,7 +125,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					}
 
 					//B =
-					(IS.isa.aISA[1] == gpeISA_assign ? A : B) = pOUT->ADD( adr.an.alf, 0,0 );
+					(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = pOUT->ADD( adr.an.alf, 0,0 );
 				} break;
 
 			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
@@ -199,7 +206,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					if( A.alf && B.alf )
 					{
 						A += B;
-						B = 0;
+						B = gpeALF_null;
 						break;
 					}
 					if( stk.D[flg.iD].bGD() )
@@ -249,12 +256,13 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					else if( stk.apSTR[flg.iS] )
 					{
                         A = stk.apSTR[flg.iS];
+                        stk.apSTR[flg.iS] = NULL;
 					}
 					if( A.alf && B.alf )
 					{
 						A.equ( B );
 					}
-					B = 0;
+					B = gpeALF_null;
 				} break;
 
 
@@ -281,6 +289,12 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			//stk.stpFLG();
 			*pB = (U1)IS.isa.aISA[1];
 			pB++;
+		}
+
+		if( isa.aISA[1] == gpeISA_assign )
+		{
+			A = FND;
+			B = gpeALF_null;
 		}
 
 		if( !bITT )

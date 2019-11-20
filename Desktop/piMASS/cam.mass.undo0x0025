@@ -30,7 +30,7 @@ ba = a + a // % 2
 
 
 
-  e5	  f5	 trg ="draw1";
+  e5	 f5	 trg ="draw1";
 trgw = 640;
 trgh = 512 * 3;
 sprite = "sprite";

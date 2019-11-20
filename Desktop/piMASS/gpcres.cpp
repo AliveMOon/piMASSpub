@@ -1574,6 +1574,7 @@ gpcALU& gpcALU::operator = ( U1* pSTR )
 	if( pSTR ? !*pSTR : true )
 	{
 		// törölni kell nem volt benne semmi
+
 		return *this;
 	}
 

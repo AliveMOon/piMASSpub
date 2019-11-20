@@ -54,6 +54,8 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		if( alu.typ().x & 0x10 )
 		{
 			pLZY->lzy_format( s = -1, "%s\"%s\"", gppTABrun-deep, pD );
+			if( nA > 1 )
+				pLZY->lzy_format( s = -1, ";\r\n" );
 			continue;
 		}
 		U4 		nAN = alu.AN().z, d, xp1, xe,

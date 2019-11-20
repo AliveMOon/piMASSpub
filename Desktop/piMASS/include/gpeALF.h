@@ -661,12 +661,25 @@ typedef enum gpeALF: I8
 	gpeALF_REN = gpdABC('R', 'E', 'N'),
 	gpeALF_RET = gpdABC('R', 'E', 'T'),
 	gpeALF_RUN = gpdABC('R', 'U', 'N'),
+
+	gpeALF_SDH = gpdABC('S', 'D', 'H'),
+	gpeALF_SDW = gpdABC('S', 'D', 'W'),
+	gpeALF_SDX = gpdABC('S', 'D', 'X'),
+	gpeALF_SDY = gpdABC('S', 'D', 'Y'),
+
 	gpeALF_SEC = gpdABC('S', 'E', 'C'),
 	gpeALF_SIN = gpdABC('S', 'I', 'N'),
 	gpeALF_SIT = gpdABC('S', 'I', 'T'),
 	gpeALF_SLM = gpdABC('S', 'L', 'M'),
 	gpeALF_SRC = gpdABC('S', 'R', 'C'),
 	gpeALF_SRM = gpdABC('S', 'R', 'M'),
+
+	gpeALF_SSH = gpdABC('S', 'S', 'H'),
+	gpeALF_SSW = gpdABC('S', 'S', 'W'),
+	gpeALF_SSX = gpdABC('S', 'S', 'X'),
+	gpeALF_SSY = gpdABC('S', 'S', 'Y'),
+
+
 	gpeALF_STR = gpdABC('S', 'T', 'R'),
 	gpeALF_STK = gpdABC('S', 'T', 'K'),
 	gpeALF_SUB = gpdABC('S', 'U', 'B'),
@@ -806,6 +819,9 @@ typedef enum gpeALF: I8
 	gpeALF_STOW = gpdABCD('S', 'T', 'O', 'W'),
 	gpeALF_SUBM = gpdABCD('S', 'U', 'B', 'M'),
 	gpeALF_SQRT = gpdABCD('S', 'Q', 'R', 'T'),
+
+	gpeALF_TRGH = gpdABCD('T', 'R', 'G', 'H'),
+	gpeALF_TRGW = gpdABCD('T', 'R', 'G', 'W'),
 
 	gpeALF_TRUE = gpdABCD('T', 'R', 'U', 'E'),
 	gpeALF_TURN = gpdABCD('T', 'U', 'R', 'N'),
