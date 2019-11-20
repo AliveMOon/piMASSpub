@@ -507,8 +507,268 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 	else if( id == dDIV )			// zöld
 		frmC = gpeCLR_green;
 
+
 	U1 c,d, cc;
 	I4x2 wh;
+
+	if( frmC )
+	{
+	//	return false;
+	//	}
+	/// SEL -----------------------------------------------------
+
+		if( win.apCRS[eDIV]->selANIN[0].a4x2[0].x )
+		if( gpcMAP* pMAP = win.piMASS ? &win.piMASS->mapCR : NULL )
+		{
+			I4x4	selAN0AN1( win.apCRS[eDIV]->selANIN[0].a4x2[0], win.apCRS[eDIV]->selANIN[1].a4x2[0] ),
+					lurdAN = selAN0AN1.lurd();
+			U4x2 	spcZN = lurdAN.a4x2[1] - U4x2(1,0);
+			U4x4	mZN;
+
+			U4	*pM = pMAP->MAPalloc( spcZN, mZN ),
+				c = lurdAN.a4x2[0].x-1,
+				r = lurdAN.a4x2[0].y,
+				nCR = mZN.a4x2[1].sum();
+
+			I4	*pC = (I4*)pMAP->pCOL,
+				*pR = (I4*)pMAP->pROW,
+				i, ie = pC-(I4*)pM;
+
+			U4x2 iSKIP = c+r*mZN.z;
+
+			if( id )
+			{
+				i = nCR*(U4)id;
+				pC += i;
+				pR += i;
+			}
+
+			if( (nCp <= mZN.a4x2[1].x) || (nRp <= mZN.a4x2[1].y) )
+			{
+				nCp = mZN.a4x2[1].x+1;
+				nRp = mZN.a4x2[1].y+1;
+				gpmDELary(pCp);
+			}
+			if( !pCp )
+			{
+				pCp = new I4[nCp+nRp];
+				pRp = pCp + nCp;
+			}
+
+
+			*pCp = 0;
+			for( i = 0; i < mZN.a4x2[1].x; i++ )
+			{
+				pCp[i+1] = pCp[i] + pC[i];
+			}
+
+			*pRp = 0;
+			for( i = 0; i < mZN.a4x2[1].y; i++ )
+			{
+				pRp[i+1] = pRp[i] + pR[i];
+			}
+
+
+			dstPX.x = max( 0, pCp[c]+CRSfrm.x );
+			dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+			wh.x =	( c < mZN.a4x2[1].x )
+					? pC[c]+pCp[c]
+					: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
+			wh.y =	( r < mZN.a4x2[1].y )
+					? (pR[r]+pRp[r])
+					: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
+			wh += CRSfrm.a4x2[0];
+
+			if( wh.mn() ) {
+				wh.mn( CRSfrm.a4x2[1] );
+				wh.x -= dstPX.x;
+				wh.y -= dstPX.y;
+
+				dstPX.x *= dstPX.w;
+				dstPX.x += divPX.x;
+
+				dstPX.y *= dstPX.h;
+				dstPX.y += divPX.y;
+
+				frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[0].strA4N(sSTR) );
+			}
+
+			c = lurdAN.a4x2[1].x-1, r = lurdAN.a4x2[1].y;
+			wh.x =	( c < mZN.a4x2[1].x )
+					? pC[c]+pCp[c]
+					: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
+			wh.y =	( r < mZN.a4x2[1].y )
+					? (pR[r]+pRp[r])
+					: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
+			wh += CRSfrm.a4x2[0];
+
+			iSKIP.y = c+r*mZN.z;
+
+			dstPX.x = max( 0, pCp[c]+CRSfrm.x );
+			dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+
+
+			if( wh.mn() ) {
+				wh.mn( CRSfrm.a4x2[1] );
+				wh.x -= dstPX.x;
+				wh.y -= dstPX.y;
+
+				dstPX.x *= dstPX.w;
+				dstPX.x += divPX.x;
+
+				dstPX.y *= dstPX.h;
+				dstPX.y += divPX.y;
+
+				frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[1].strA4N(sSTR) );
+			}
+
+			if( win.apCRS[eDIV]->selANIN[0].a4x2[0] == win.apCRS[eDIV]->selANIN[1].a4x2[0] )
+			{
+				for( i = 0; i < ie; i++ )
+				{
+					if( iSKIP.x == i || iSKIP.y == i )
+						continue;
+					c = i%mZN.z;
+					r = i/mZN.z;
+
+					if( pM[i] )
+					if( U4 xFND = pM[i] )
+					if(	gpcSRC* pSRC = win.piMASS->SRCfnd( xFND ) )
+					if( pSRC->picID )
+					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
+					if( SDL_Surface* pSRF = pPIC->pSRF )
+					{
+						I4x4 s, d;
+						s.x = s.y = 0;
+						s.z = pSRF->w;
+						s.w = pSRF->h;
+
+						d.x = max( 0, pCp[c]+CRSfrm.x );
+						d.y = max( 0, pRp[r]+CRSfrm.y );
+
+						d.z =	( c < mZN.a4x2[1].x )
+								? pC[c]+pCp[c]
+								: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
+						d.w =	( r < mZN.a4x2[1].y )
+								? (pR[r]+pRp[r])
+								: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
+						d.a4x2[1] += CRSfrm.a4x2[0];
+						if( d.a4x2[1].mn() > 0 )
+						{
+							d.a4x2[1].mn( CRSfrm.a4x2[1] );
+							d.a4x2[1] -= d.a4x2[0];
+
+							d.x *= dstPX.w;
+							d.x += divPX.x;
+
+							d.y *= dstPX.h;
+							d.y += divPX.y;
+
+							d.z *= dstPX.w;
+							d.w *= dstPX.h;
+
+							SDL_BlitScaled( pSRF, &s.xyWH, win.pSRFwin, &d.xyWH );
+						}
+					}
+				}
+			} else {
+
+				for( i = 0; i < ie; i++ )
+				{
+					if( iSKIP.x == i || iSKIP.y == i )
+						continue;
+					c = i%mZN.z;
+					r = i/mZN.z;
+
+					if( pM[i] )
+					if( U4 xFND = pM[i] )
+					if(	gpcSRC* pSRC = win.piMASS->SRCfnd( xFND ) )
+					if( pSRC->picID )
+					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID) )
+					if( SDL_Surface* pSRF = pPIC->pSRF )
+					{
+						I4x4 s, d;
+						s.x = s.y = 0;
+						s.z = pSRF->w;
+						s.w = pSRF->h;
+
+						d.x = max( 0, pCp[c]+CRSfrm.x );
+						d.y = max( 0, pRp[r]+CRSfrm.y );
+
+						d.z =	( c < mZN.a4x2[1].x )
+								? pC[c]+pCp[c]
+								: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
+						d.w =	( r < mZN.a4x2[1].y )
+								? (pR[r]+pRp[r])
+								: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
+						d.a4x2[1] += CRSfrm.a4x2[0];
+						if( d.a4x2[1].mn() > 0 )
+						{
+							d.a4x2[1].mn( CRSfrm.a4x2[1] );
+							d.a4x2[1] -= d.a4x2[0];
+
+							d.x *= dstPX.w;
+							d.x += divPX.x;
+
+							d.y *= dstPX.h;
+							d.y += divPX.y;
+
+							d.z *= dstPX.w;
+							d.w *= dstPX.h;
+
+							SDL_BlitScaled( pSRF, &s.xyWH, win.pSRFwin, &d.xyWH );
+						}
+					}
+
+					if( c+1 < lurdAN.x )
+						continue;
+					if( c+1 > lurdAN.z )
+						continue;
+
+					if( r < lurdAN.y )
+						continue;
+					if( r > lurdAN.w )
+						continue;
+					/*if( I4x2(c,r) == scnZN.a4x2[0] )
+						continue;*/
+
+					if(
+						   ( (c+1 >= lurdAN.x)	&& (r >= lurdAN.y) )
+						&& ( (c+1 <= lurdAN.z)	&& (r <= lurdAN.w) )
+					) {
+						dstPX.x = max( 0, pCp[c]+CRSfrm.x );
+						dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+
+						wh.x =	( c < mZN.a4x2[1].x )
+								? pC[c]+pCp[c]
+								: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
+						wh.y =	( r < mZN.a4x2[1].y )
+								? (pR[r]+pRp[r])
+								: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
+						wh += CRSfrm.a4x2[0];
+						if( wh.mn() < 0 )
+							continue;
+
+						wh.mn( CRSfrm.a4x2[1] );
+						wh.x -= dstPX.x;
+						wh.y -= dstPX.y;
+
+						dstPX.x *= dstPX.w;
+						dstPX.x += divPX.x;
+
+						dstPX.y *= dstPX.h;
+						dstPX.y += divPX.y;
+
+						frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 1, NULL );
+					}
+				}
+			}
+		}
+
+	}
+
+
+
 	if( dstPX.w != src.w || dstPX.h != src.h ) { /// SCALE Blit -------------------------
 		for( U4 i = 0; i < nMINI; i++ ) {
 			if( pMINI[i].y )
@@ -627,171 +887,11 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 	}
 
 
-	if( !frmC )
-	{
+
+
+	if( frmC )
 		return false;
-	}
-	/// SEL -----------------------------------------------------
 
-	if( win.apCRS[eDIV]->selANIN[0].a4x2[0].x )
-	if( gpcMAP* pMAP = win.piMASS ? &win.piMASS->mapCR : NULL )
-	{
-
-		I4x4	selAN0AN1( win.apCRS[eDIV]->selANIN[0].a4x2[0], win.apCRS[eDIV]->selANIN[1].a4x2[0] ),
-				lurdAN = selAN0AN1.lurd();
-		U4x2 	spcZN = lurdAN.a4x2[1] - U4x2(1,0);
-		U4x4	mZN;
-
-		U4	*pM = pMAP->MAPalloc( spcZN, mZN ),
-			c = lurdAN.a4x2[0].x-1,
-			r = lurdAN.a4x2[0].y,
-			nCR = mZN.a4x2[1].sum();
-
-		I4	*pC = (I4*)pMAP->pCOL,
-			*pR = (I4*)pMAP->pROW,
-			i, ie = pC-(I4*)pM;
-
-		U4x2 iSKIP = c+r*mZN.z;
-
-		if( id )
-		{
-			i = nCR*(U4)id;
-			pC += i;
-			pR += i;
-		}
-
-		if( (nCp <= mZN.a4x2[1].x) || (nRp <= mZN.a4x2[1].y) )
-		{
-			nCp = mZN.a4x2[1].x+1;
-			nRp = mZN.a4x2[1].y+1;
-			gpmDELary(pCp);
-		}
-		if( !pCp )
-		{
-			pCp = new I4[nCp+nRp];
-			pRp = pCp + nCp;
-		}
-
-
-		*pCp = 0;
-		for( i = 0; i < mZN.a4x2[1].x; i++ )
-		{
-			pCp[i+1] = pCp[i] + pC[i];
-		}
-
-		*pRp = 0;
-		for( i = 0; i < mZN.a4x2[1].y; i++ )
-		{
-			pRp[i+1] = pRp[i] + pR[i];
-		}
-
-
-		dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-		dstPX.y = max( 0, pRp[r]+CRSfrm.y );
-		wh.x =	( c < mZN.a4x2[1].x )
-				? pC[c]+pCp[c]
-				: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
-		wh.y =	( r < mZN.a4x2[1].y )
-				? (pR[r]+pRp[r])
-				: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
-		wh += CRSfrm.a4x2[0];
-
-		if( wh.mn() ) {
-			wh.mn( CRSfrm.a4x2[1] );
-			wh.x -= dstPX.x;
-			wh.y -= dstPX.y;
-
-			dstPX.x *= dstPX.w;
-			dstPX.x += divPX.x;
-
-			dstPX.y *= dstPX.h;
-			dstPX.y += divPX.y;
-
-			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[0].strA4N(sSTR) );
-		}
-
-		c = lurdAN.a4x2[1].x-1, r = lurdAN.a4x2[1].y;
-		wh.x =	( c < mZN.a4x2[1].x )
-				? pC[c]+pCp[c]
-				: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
-		wh.y =	( r < mZN.a4x2[1].y )
-				? (pR[r]+pRp[r])
-				: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
-		wh += CRSfrm.a4x2[0];
-
-		iSKIP.y = c+r*mZN.z;
-
-		dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-		dstPX.y = max( 0, pRp[r]+CRSfrm.y );
-
-
-		if( wh.mn() ) {
-			wh.mn( CRSfrm.a4x2[1] );
-			wh.x -= dstPX.x;
-			wh.y -= dstPX.y;
-
-			dstPX.x *= dstPX.w;
-			dstPX.x += divPX.x;
-
-			dstPX.y *= dstPX.h;
-			dstPX.y += divPX.y;
-
-			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[1].strA4N(sSTR) );
-		}
-
-		if( win.apCRS[eDIV]->selANIN[0].a4x2[0] != win.apCRS[eDIV]->selANIN[1].a4x2[0] ) {
-
-			for( i = 0; i < ie; i++ )
-			{
-				if( iSKIP.x == i || iSKIP.y == i )
-					continue;
-
-				c = i%mZN.z;
-				if( c+1 < lurdAN.x )
-					continue;
-				if( c+1 > lurdAN.z )
-					continue;
-
-				r = i/mZN.z;
-				if( r < lurdAN.y )
-					continue;
-				if( r > lurdAN.w )
-					continue;
-				/*if( I4x2(c,r) == scnZN.a4x2[0] )
-					continue;*/
-
-				if(
-					   ( (c+1 >= lurdAN.x)	&& (r >= lurdAN.y) )
-					&& ( (c+1 <= lurdAN.z)	&& (r <= lurdAN.w) )
-				) {
-					dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-					dstPX.y = max( 0, pRp[r]+CRSfrm.y );
-
-					wh.x =	( c < mZN.a4x2[1].x )
-							? pC[c]+pCp[c]
-							: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
-					wh.y =	( r < mZN.a4x2[1].y )
-							? (pR[r]+pRp[r])
-							: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
-					wh += CRSfrm.a4x2[0];
-					if( wh.mn() < 0 )
-						continue;
-
-					wh.mn( CRSfrm.a4x2[1] );
-					wh.x -= dstPX.x;
-					wh.y -= dstPX.y;
-
-					dstPX.x *= dstPX.w;
-					dstPX.x += divPX.x;
-
-					dstPX.y *= dstPX.h;
-					dstPX.y += divPX.y;
-
-					frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 1, NULL );
-				}
-			}
-		}
-	}
 	if( win.bSW < 2 )
 		return false;
 

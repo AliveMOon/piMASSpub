@@ -174,7 +174,7 @@ class gpcPICall
 	gpcPIC	**ppPIC, *pPIC;
 	U4		nPICall, iPICfr, nPICld;
 public:
-	U4 iFND( U1* pS );
+	U4 alfFND( U1* pS );
 
 	gpcPIC*	PIC( U4 i )
 	{

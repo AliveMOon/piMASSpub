@@ -347,12 +347,17 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	U1* pKEYbuff = win.gpsKEYbuff;
 	gpcSRC	tmp, *pSRC;
 	U4 xFND;
+	int pic_id = 0;
+	I4x4 sprt[2] = {0}, trgWH = 0;
 	if( U4 *pM = mapCR.pMAP )
 	if( U4 *pC = mapCR.pCOL )
 	if( U4 *pR = mapCR.pROW )
 	if( pM < pC )
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{
+		if( pSRC && pic_id )
+			pSRC->picID = pic_id;
+
 		if( !pM[i] )
 			continue;
 
@@ -361,6 +366,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		if( !pSRC )
 			continue;
 
+		pic_id = pSRC->picID = 0;
 		gpmDEL( pSRC->apOUT[0] );
 		if( pSRC->qBLD() )
 		{
@@ -396,7 +402,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 		/// READY
 		gpcRES& res = *pSRC->apOUT[3];
-		gpcPIC	*pTRG = NULL, *pPIC = NULL;
+		gpcPIC	*pTRG = NULL, *pPIC = NULL, *pSPR = NULL;
+
 		for( U4 a = 0, ae = res.nFND(); a < ae; a++ )
 		{
 			gpcALU& alu = res.ALU(a);
@@ -433,38 +440,125 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								}
 							} break;
 						case gpeALF_PIC:{
-								U8 pic_id = 0;
 								if( alu.typ().x & 0x10 )
 								{
 									// ez a kép neve
-									pic_id = PIC.iFND( (U1*)alu.pDAT );
+									pic_id = PIC.alfFND( (U1*)alu.pDAT );
 								} else
 									pic_id = alu.u8();
 
                                 // be kell mapolni a rublika háterének
 								if( pPIC = PIC.PIC( pic_id ) )
 								{
-
+									pic_id++;
+                                    break;
 								}
+
+								I8x2 alfN(0,14);
+								U1* pS = (U1*)alu.pDAT;
+								alfN = pS;
+								alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+								if( !(pPIC = PIC.PIC( alfN )) )
+									break;
+
 							} break;
+						case gpeALF_SDX:
+							sprt[1].x = alu.i8();
+							break;
+						case gpeALF_SDY:
+							sprt[1].y = alu.i8();
+							break;
+						case gpeALF_SDW:
+							sprt[1].z = alu.i8();
+							break;
+						case gpeALF_SDH:{
+							// ez indítja a rajzolást MOST
+							/// nem így lesz csak próba
+								sprt[1].w = alu.i8();
+								if( !pTRG || !pSPR )
+									break;
+
+								if( !pTRG->pSRF )
+                                {
+									U4 rmask, gmask, bmask, amask;
+									#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+									  int shift = (req_format == STBI_rgb) ? 8 : 0;
+									  rmask = 0xff000000 >> shift;
+									  gmask = 0x00ff0000 >> shift;
+									  bmask = 0x0000ff00 >> shift;
+									  amask = 0x000000ff >> shift;
+									#else // little endian, like x86
+									  rmask = 0x000000ff;
+									  gmask = 0x0000ff00;
+									  bmask = 0x00ff0000;
+									  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
+									#endif
+									if( !trgWH.z )
+										trgWH.z = 640;
+									if( !trgWH.w )
+										trgWH.w = 480;
+									trgWH.a4x2[0] = trgWH.a4x2[1];
+									pTRG->pSRF = SDL_CreateRGBSurface( 0, trgWH.x, trgWH.y, 32, rmask, gmask,bmask, amask );
+									if( !pTRG->pSRF )
+										break;
+                                }
+                                if( !pSPR->pSRF )
+                                {
+									pSPR->TnID.str( (U1*)win.gppMASSfile, (U1*)".png" );
+									pSPR->pSRF = IMG_Load( win.gpsMASSpath );
+									if( !pSPR->pSRF )
+										break;
+                                }
+
+								SDL_BlitScaled( pSPR->pSRF, &sprt[0].xyWH, pTRG->pSRF, &sprt[1].xyWH );
+
+							} break;
+						case gpeALF_SSX:
+							sprt[0].x = alu.i8();
+							break;
+						case gpeALF_SSY:
+							sprt[0].y = alu.i8();
+							break;
+						case gpeALF_SSW:
+							sprt[0].z = alu.i8();
+							break;
+						case gpeALF_SSH:
+							sprt[0].w = alu.i8();
+							break;
+
 						case gpeALF_TRG:{
 								U8 trg_id = 0;
+
 								if( alu.typ().x & 0x10 )
 								{
 									// ez a kép neve
-									trg_id = PIC.iFND( (U1*)alu.pDAT );
+									trg_id = PIC.alfFND( (U1*)alu.pDAT );
 								} else
 									trg_id = alu.u8();
+
 								if( pTRG = PIC.PIC( trg_id ) )
                                     break;
+
+								I8x2 alfN(0,14);
+								U1* pS = (U1*)alu.pDAT;
+								alfN = pS;
+								alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+								if( !(pTRG = PIC.PIC( alfN )) )
+									break;
 
 							} break;
 						default:
 							break;
 					}
-				} else {
+				} else { //	gpeALF_ZZZZZ // 5 char
 					switch( alu.alf )
 					{
+						case gpeALF_TRGH:
+							trgWH.w = alu.u8();
+							break;
+						case gpeALF_TRGW:
+							trgWH.z = alu.u8();
+							break;
 						case gpeALF_GPIO:
 
 							break;
@@ -476,6 +570,27 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			}
 			else switch( alu.alf )
 			{
+				case gpeALF_SPRITE: {
+						U8 spr_id = 0;
+						if( alu.typ().x & 0x10 )
+						{
+							// ez a kép neve
+							spr_id = PIC.alfFND( (U1*)alu.pDAT );
+						} else
+							spr_id = alu.u8();
+
+						if( pSPR = PIC.PIC( spr_id ) )
+							break;
+
+						I8x2 alfN(0,14);
+						U1* pS = (U1*)alu.pDAT;
+						alfN = pS;
+						alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+						if( !(pSPR = PIC.PIC( alfN )) )
+							break;
+
+
+					} break;
 				case gpeALF_TELNET: {
 						I4 port = alu.u8();
 						if( gpcGT* pGT = GTacpt.GT( alu.alf, port ) )

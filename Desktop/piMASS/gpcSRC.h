@@ -593,7 +593,7 @@ public:
 			nA,			// ha nA == 0 nm mi foglaltuk
 			bSW;		// pB = pA+iB()
     U4x4	spcZN, dim;
-    U4		IX, retIX, nALFtg, strtD, endD;
+    U4		IX, retIX, nALFtg, strtD, endD, picID;
 
     gpeALF	*pALFtg;
     gpcRES	*pEXE,

@@ -118,11 +118,11 @@ gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q )
 
 
 
-U4 gpcPICall::iFND( U1* pS )
+U4 gpcPICall::alfFND( U1* pS )
 {
-	I8x2 alfN(0,14);
-	alfN = pS;
-	alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+	I8x2 TnID(0,14);
+	TnID = pS;
+	TnID.num = gpfSTR2U8( pS+TnID.num, &pS );
 
 	for( U4 p = 0; p < nPICld; p++ )
 	{
@@ -133,7 +133,7 @@ U4 gpcPICall::iFND( U1* pS )
 			continue;
 		}
 
-		if( ppPIC[p]->alfN != alfN )
+		if( ppPIC[p]->TnID != TnID )
 			continue;
 
 		return p;
