@@ -482,9 +482,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 								if( !pTRG->pSRF )
                                 {
-									U4 rmask, gmask, bmask, amask;
+									/*U4 rmask, gmask, bmask, amask;
 									#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-									  int shift = (req_format == STBI_rgb) ? 8 : 0;
+									  int shift = 0; //(req_format == STBI_rgb) ? 8 : 0;
 									  rmask = 0xff000000 >> shift;
 									  gmask = 0x00ff0000 >> shift;
 									  bmask = 0x0000ff00 >> shift;
@@ -494,15 +494,22 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									  gmask = 0x0000ff00;
 									  bmask = 0x00ff0000;
 									  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
-									#endif
+									#endif*/
 									if( !trgWH.z )
 										trgWH.z = 640;
 									if( !trgWH.w )
 										trgWH.w = 480;
-									trgWH.a4x2[0] = trgWH.a4x2[1];
-									pTRG->pSRF = SDL_CreateRGBSurface( 0, trgWH.x, trgWH.y, 32, rmask, gmask,bmask, amask );
+
+									pTRG->pSRF = SDL_CreateRGBSurface( 0, trgWH.z, trgWH.w, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
 									if( !pTRG->pSRF )
 										break;
+									if( trgWH.a4x2[0] != trgWH.a4x2[1] )
+									{
+										SDL_SetSurfaceBlendMode( pTRG->pSRF, SDL_BLENDMODE_BLEND );
+										trgWH.a4x2[0] = 0;
+										SDL_FillRect( pTRG->pSRF, &trgWH.xyWH, 0 ); //amask );
+										trgWH.a4x2[0] = trgWH.a4x2[1];
+									}
                                 }
                                 if( !pSPR->pSRF )
                                 {
@@ -513,7 +520,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
                                 }
 
 								SDL_BlitScaled( pSPR->pSRF, &sprt[0].xyWH, pTRG->pSRF, &sprt[1].xyWH );
-
+								//SDL_UpdateWindowSurface( win.pSDLwin );
 							} break;
 						case gpeALF_SSX:
 							sprt[0].x = alu.i8();
@@ -560,6 +567,12 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							break;
 						case gpeALF_TRGW:
 							trgWH.z = alu.u8();
+							break;
+						case gpeALF_UNSEL:
+							if( alu.u8()&1 )
+								pSRC->bSW |= gpeMASSunselMSK;
+							else
+								pSRC->bSW &= ~gpeMASSunselMSK;
 							break;
 						case gpeALF_GPIO:
 

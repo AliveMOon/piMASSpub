@@ -270,15 +270,13 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 	if( !pM )
 		return;
 
-	U4	//*pM = pMAP->pMAP,
-		i = sCRS.scnZN.a4x2[0]*I4x2( 1, mpZN.z );
-	//if( !pM[i] )
-	//	return;
+	U4	i = sCRS.scnZN.a4x2[0]*I4x2( 1, mpZN.z );
 
 	U4 xFND = pM[i];
 	gpcSRC* pSRC = mass.SRCfnd( xFND );
-	//if( !pSRC )
-	//	return;
+	if( pSRC )
+	if( pSRC->bSW&gpeMASSunselMSK )
+		return; //pSRC = NULL;
 
 	selANIN[1].a4x2[0] = sCRS.scnZN.a4x2[0]+U4x2(1,0);		//AN
 	selANIN[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;				//IN
