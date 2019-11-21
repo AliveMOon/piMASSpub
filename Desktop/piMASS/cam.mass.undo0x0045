@@ -19,6 +19,23 @@ unsel = 1
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   e5	  f5	 trg ="draw1";
 trgw = 640;
 trgh = 512 * 3;
@@ -30,4 +47,4 @@ ssh = ssw; // + 100;
 sdx = trgw*ix/iw - 8;
 sdy = trgh*iy/ih - 8;
 sdw = ssw;
-sdh = sdw; a6	 						  c6	 
+sdh = sdw; a6							  c6	 						 

@@ -47,9 +47,10 @@ public:
 	U1		*pPIX;
 
 	gpcPIC(){ gpmCLR; pFILE = sFILE; };
-	gpcPIC( I8x2 an )
+	gpcPIC( I8x2 an, U4 i )
 	{
 		gpmCLR;
+		id = i;
 		TnID = an;
 	}
 
@@ -229,7 +230,7 @@ public:
 				gpmDELary(ppKILL);
 			}
 		}
-		return ppPIC[iPICfr] = pPIC = new gpcPIC( an );
+		return ppPIC[iPICfr] = pPIC = new gpcPIC( an, iPICfr );
 	}
 };
 

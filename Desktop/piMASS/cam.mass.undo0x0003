@@ -1,10 +1,27 @@
  a0	 cam = 1   d0	 =ia e0	  =in a1	  telnet = 6023
  d1	 = ix;
 na = a + 1 * 10 + a;
-ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 a5	 pic ="cam1" c5	 pic = "draw1"
+ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 c5	 pic = "draw1"
 unsel = 1
 
  d5	 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -30,4 +47,4 @@ ssh = ssw; // + 100;
 sdx = trgw*ix/iw - 8;
 sdy = trgh*iy/ih - 8;
 sdw = ssw;
-sdh = sdw; a6	 						  c6	 
+sdh = sdw; c6	 						 
