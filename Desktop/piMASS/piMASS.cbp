@@ -48,6 +48,7 @@
 			<Add library="SDL2" />
 			<Add library="libjpeg" />
 		</Linker>
+		<Unit filename="camU.h" />
 		<Unit filename="gpMASSbuild.cpp" />
 		<Unit filename="gpcLAZY.cpp" />
 		<Unit filename="gpcOPCD.cpp" />
