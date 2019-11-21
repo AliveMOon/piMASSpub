@@ -7,7 +7,7 @@ unsel = 1
  d5	 pic = "sprite0" e5	  f5	 trg ="draw1";
 trgw = 640;
 trgh = 512 * 3;
-sprite = "sprite";
+sprite = "cam1";
 ssx = 16;
 ssy = 16;
 ssw = 32;

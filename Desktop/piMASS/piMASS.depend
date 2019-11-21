@@ -431,7 +431,7 @@
 	"gpcOPCD.h"
 	"gpeALF.h"
 
-1574210227 /home/pi/Desktop/piMASS/include/gpeALF.h
+1574311202 /home/pi/Desktop/piMASS/include/gpeALF.h
 	"piMASS.h"
 
 1570796037 /home/pi/Desktop/piMASS/include/gpcSCHL.h
@@ -485,7 +485,7 @@
 1573857525 /home/pi/Desktop/piMASS/include/gpccrs.h
 	"gpcwin.h"
 
-1574032515 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
+1574310716 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
 	"gpccrs.h"
 
 1574029327 /home/pi/Desktop/piMASS/include/gpcwin.h
@@ -507,7 +507,7 @@
 1574218374 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
 	"gpcres.h"
 
-1574293879 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+1574311110 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
 	"gpcwin.h"
 
 1573774272 source:/home/pi/Desktop/piMASS/gpcgt.cpp
@@ -595,4 +595,7 @@
 
 1574205784 source:/home/pi/Desktop/piMASS/gpcresflt.cpp
 	"gpcwin.h"
+
+1574311110 source:/home/pi/Desktop/piMASS/gpcwin_var.cpp
+	"gpccrs.h"
 

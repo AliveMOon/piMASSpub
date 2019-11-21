@@ -28,7 +28,7 @@ const char * InitError::what() const throw()
 {
     return msg.c_str();
 }
-bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
+/*bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 {
 	out.err();
 	if( !alf )
@@ -68,6 +68,12 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 				} else {						// AAA - ZZZ --------------------------------------
 						switch( alf )
 						{
+							case gpeALF_MLB:
+								out = nMB;
+								break;
+							case gpeALF_MRB:
+								out = nMB;
+								break;
 							case gpeALF_FPS:
 								out = mSEC.w;
 								break;
@@ -93,7 +99,7 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 
 	}
 	return out.bGD();
-}
+}*/
 SDL_Rect gpcWIN::wDIV( U1 iDIV )
 {
 	SDL_Rect div;

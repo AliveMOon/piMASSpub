@@ -637,6 +637,7 @@ typedef enum gpeALF: I8
 	gpeALF_MEM = gpdABC('M', 'E', 'M'),
 	gpeALF_MIN = gpdABC('M', 'I', 'N'),
 	gpeALF_MLB = gpdABC('M', 'L', 'B'),
+	gpeALF_MMB = gpdABC('M', 'M', 'B'),
 	gpeALF_MMX = gpdABC('M', 'M', 'X'),
 	gpeALF_MMY = gpdABC('M', 'M', 'Y'),
 	gpeALF_MOM = gpdABC('M', 'O', 'M'),

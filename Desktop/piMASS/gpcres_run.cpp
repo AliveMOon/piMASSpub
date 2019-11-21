@@ -439,6 +439,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 								}
 							} break;
+
 						case gpeALF_PIC:{
 								if( alu.typ().x & 0x10 )
 								{
