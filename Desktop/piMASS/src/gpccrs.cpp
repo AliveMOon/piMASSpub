@@ -582,25 +582,39 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
 					if( SDL_Surface* pSRF = pPIC->pSRF )
 					{
-						I4x4 s, d;
+						I4x4 s, d, w;
 						s.x = s.y = 0;
 						s.z = pSRF->w;
 						s.w = pSRF->h;
 
-						d.x = max( 0, pCp[c]+CRSfrm.x );
-						d.y = max( 0, pRp[r]+CRSfrm.y );
+						w.x = pCp[c];
+						w.y = pRp[r];
+						w.z	= pC[c]+w.x;
+						w.w	= pR[r]+w.y;
 
-						d.z =	( c < mZN.a4x2[1].x )
-								? pC[c]+pCp[c]
-								: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
-						d.w =	( r < mZN.a4x2[1].y )
-								? (pR[r]+pRp[r])
-								: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
-						d.a4x2[1] += CRSfrm.a4x2[0];
-						if( d.a4x2[1].mn() > 0 )
+						w += CRSfrm.a4x2[0];
+						if( w.a4x2[1].mn() > 0 )
 						{
+							d = w;
 							d.a4x2[1].mn( CRSfrm.a4x2[1] );
+							w.a4x2[1] -= w.a4x2[0];
 							d.a4x2[1] -= d.a4x2[0];
+							d.a4x2[0].mx(0);
+							//w = d-w;
+                            if( w.a4x2[0].x < 0 )
+							{
+								s.x -= (w.a4x2[0].x*s.z) / w.a4x2[1].x;
+							}
+							if( w.a4x2[0].y < 0 )
+							{
+								s.y -= (w.a4x2[0].y*s.w) / w.a4x2[1].y;
+							}
+
+							s.a4x2[1] &= d.a4x2[1];
+							s.a4x2[1] /= w.a4x2[1];
+
+							//d.a4x2[1] -= d.a4x2[0];
+
 
 							d.x *= dstPX.w;
 							d.x += divPX.x;
@@ -689,25 +703,39 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
 					if( SDL_Surface* pSRF = pPIC->pSRF )
 					{
-						I4x4 s, d;
+						I4x4 s, d, w;
 						s.x = s.y = 0;
 						s.z = pSRF->w;
 						s.w = pSRF->h;
 
-						d.x = max( 0, pCp[c]+CRSfrm.x );
-						d.y = max( 0, pRp[r]+CRSfrm.y );
+						w.x = pCp[c];
+						w.y = pRp[r];
+						w.z	= pC[c]+w.x;
+						w.w	= pR[r]+w.y;
 
-						d.z =	( c < mZN.a4x2[1].x )
-								? pC[c]+pCp[c]
-								: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
-						d.w =	( r < mZN.a4x2[1].y )
-								? (pR[r]+pRp[r])
-								: (pR[mZN.a4x2[1].y]+pRp[mZN.a4x2[1].y] + (r-mZN.a4x2[1].y)*gpdSRC_COLw);
-						d.a4x2[1] += CRSfrm.a4x2[0];
-						if( d.a4x2[1].mn() > 0 )
+						w += CRSfrm.a4x2[0];
+						if( w.a4x2[1].mn() > 0 )
 						{
+							d = w;
 							d.a4x2[1].mn( CRSfrm.a4x2[1] );
+							w.a4x2[1] -= w.a4x2[0];
 							d.a4x2[1] -= d.a4x2[0];
+							d.a4x2[0].mx(0);
+							//w = d-w;
+                            if( w.a4x2[0].x < 0 )
+							{
+								s.x -= (w.a4x2[0].x*s.z) / w.a4x2[1].x;
+							}
+							if( w.a4x2[0].y < 0 )
+							{
+								s.y -= (w.a4x2[0].y*s.w) / w.a4x2[1].y;
+							}
+
+							s.a4x2[1] &= d.a4x2[1];
+							s.a4x2[1] /= w.a4x2[1];
+
+							//d.a4x2[1] -= d.a4x2[0];
+
 
 							d.x *= dstPX.w;
 							d.x += divPX.x;

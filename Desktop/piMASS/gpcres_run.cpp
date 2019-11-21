@@ -482,19 +482,6 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 								if( !pTRG->pSRF )
                                 {
-									/*U4 rmask, gmask, bmask, amask;
-									#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-									  int shift = 0; //(req_format == STBI_rgb) ? 8 : 0;
-									  rmask = 0xff000000 >> shift;
-									  gmask = 0x00ff0000 >> shift;
-									  bmask = 0x0000ff00 >> shift;
-									  amask = 0x000000ff >> shift;
-									#else // little endian, like x86
-									  rmask = 0x000000ff;
-									  gmask = 0x0000ff00;
-									  bmask = 0x00ff0000;
-									  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
-									#endif*/
 									if( !trgWH.z )
 										trgWH.z = 640;
 									if( !trgWH.w )
@@ -506,6 +493,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									if( trgWH.a4x2[0] != trgWH.a4x2[1] )
 									{
 										SDL_SetSurfaceBlendMode( pTRG->pSRF, SDL_BLENDMODE_BLEND );
+										SDL_SetSurfaceAlphaMod( pTRG->pSRF, 128 );
+										SDL_SetRenderDrawBlendMode( win.pSDLrndr, SDL_BLENDMODE_BLEND);
 										trgWH.a4x2[0] = 0;
 										SDL_FillRect( pTRG->pSRF, &trgWH.xyWH, 0 ); //amask );
 										trgWH.a4x2[0] = trgWH.a4x2[1];

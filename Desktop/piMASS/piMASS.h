@@ -1301,6 +1301,38 @@ public:
 		y -= b.y;
 		return *this;
 	}
+	U4x2& operator &= ( const U4x2& u )
+	{
+		x *= u.x;
+		y *= u.y;
+		return *this;
+	}
+	U4x2& operator /= ( const U4x2& u )
+	{
+		if( u.x )
+			x /= u.x;
+		else
+			x = 0xffffFFFF;
+
+		if( u.y )
+			y /= u.y;
+		else
+			y = 0xffffFFFF;
+		return *this;
+	}
+	U4x2& operator %= ( const U4x2& u )
+	{
+		if( u.x )
+			x %= u.x;
+		else
+			x = 0;
+
+		if( u.y )
+			y %= u.y;
+		else
+			y = 0;
+		return *this;
+	}
 	U4x2& operator += ( U4 u )
 	{
 		x += u;
@@ -1563,6 +1595,71 @@ public:
 		return !(*this!=b);
 	}
 
+
+	U4x4& operator += ( const U4x4& b )
+	{
+		a4x2[0] += b.a4x2[0];
+		a4x2[1] += b.a4x2[1];
+		return *this;
+	}
+	U4x4& operator -= ( const U4x4& b )
+	{
+		a4x2[0] -= b.a4x2[0];
+		a4x2[1] -= b.a4x2[1];
+		return *this;
+	}
+
+	U4x4& operator += ( const U4x2& b )
+	{
+		a4x2[0] += b;
+		a4x2[1] += b;
+		return *this;
+	}
+	U4x4& operator -= ( const U4x2& b )
+	{
+		a4x2[0] -= b;
+		a4x2[1] -= b;
+		return *this;
+	}
+
+	U4x4& operator += ( U4 u )
+	{
+		a4x2[0] += u;
+		a4x2[1] += u;
+		return *this;
+	}
+	U4x4& operator += ( I4 i )
+	{
+		a4x2[0] += i;
+		a4x2[1] += i;
+		return *this;
+	}
+	U4x4& operator += ( float f )
+	{
+		a4x2[0] += f;
+		a4x2[1] += f;
+		return *this;
+	}
+
+	U4x4& operator -= ( U4 u )
+	{
+		a4x2[0] -= u;
+		a4x2[1] -= u;
+		return *this;
+	}
+	U4x4& operator -= ( I4 i )
+	{
+		a4x2[0] -= i;
+		a4x2[1] -= i;
+		return *this;
+	}
+	U4x4& operator -= ( float f )
+	{
+		a4x2[0] -= f;
+		a4x2[1] -= f;
+		return *this;
+	}
+
     U4x4 zwxy( void )  const
     {
 		return U4x4( z,w, x,y );
@@ -1823,6 +1920,10 @@ public:
 		return I4x2( x*b.x,  y*b.y );
 	}
 
+	I4x2 operator % (const I4x2& b) const
+	{
+		return I4x2( b.x ? x/b.x : 0,  b.y ? y/b.y : 0 );
+	}
 	I4x2 operator / (const I4x2& b) const
 	{
 		return I4x2( b.x ? x/b.x : 0x7fffffff ,  b.y ? y/b.y : 0x7fffffff );
@@ -1922,6 +2023,41 @@ public:
 		y -= b.y;
 		return *this;
 	}
+
+
+	I4x2& operator &= ( const I4x2& i )
+	{
+		x *= i.x;
+		y *= i.y;
+		return *this;
+	}
+	I4x2& operator /= ( const I4x2& i )
+	{
+		if( i.x )
+			x /= i.x;
+		else
+			x = 0x7fffFFFF;
+
+		if( i.y )
+			y /= i.y;
+		else
+			y = 0x7fffFFFF;
+		return *this;
+	}
+	I4x2& operator %= ( const I4x2& i )
+	{
+		if( i.x )
+			x %= i.x;
+		else
+			x = 0;
+
+		if( i.y )
+			y %= i.y;
+		else
+			y = 0;
+		return *this;
+	}
+
 
 	I4x2& operator += ( const I4x2& b )
 	{
@@ -2121,6 +2257,82 @@ public:
 		return !(*this!=b);
 	}
 
+	I4x4& operator += ( const I4x4& b )
+	{
+		a4x2[0] += b.a4x2[0];
+		a4x2[1] += b.a4x2[1];
+		return *this;
+	}
+	I4x4& operator -= ( const I4x4& b )
+	{
+		a4x2[0] -= b.a4x2[0];
+		a4x2[1] -= b.a4x2[1];
+		return *this;
+	}
+
+	I4x4& operator += ( const I4x2& b )
+	{
+		a4x2[0] += b;
+		a4x2[1] += b;
+		return *this;
+	}
+	I4x4& operator -= ( const I4x2& b )
+	{
+		a4x2[0] -= b;
+		a4x2[1] -= b;
+		return *this;
+	}
+
+	I4x4& operator += ( U4 u )
+	{
+		a4x2[0] += u;
+		a4x2[1] += u;
+		return *this;
+	}
+	I4x4& operator += ( I4 i )
+	{
+		a4x2[0] += i;
+		a4x2[1] += i;
+		return *this;
+	}
+	I4x4& operator += ( float f )
+	{
+		a4x2[0] += f;
+		a4x2[1] += f;
+		return *this;
+	}
+
+	I4x4& operator -= ( U4 u )
+	{
+		a4x2[0] -= u;
+		a4x2[1] -= u;
+		return *this;
+	}
+	I4x4& operator -= ( I4 i )
+	{
+		a4x2[0] -= i;
+		a4x2[1] -= i;
+		return *this;
+	}
+	I4x4& operator -= ( float f )
+	{
+		a4x2[0] -= f;
+		a4x2[1] -= f;
+		return *this;
+	}
+
+	I4x4 operator + (const I4x4& b) const
+	{
+		return I4x4( x+b.x, y+b.y, z+b.z, w+b.w );
+	}
+	I4x4 operator - (const I4x4& b) const
+	{
+		return I4x4( x-b.x, y-b.y, z-b.z, w-b.w );
+	}
+
+
+
+
 	U8 operator * (const I4x2& b) const
 	{
 		return a4x2[0]*b + a4x2[1]*b;
@@ -2137,6 +2349,10 @@ public:
 	I4x4 operator / (const I4x4& b) const
 	{
 		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
+	}
+	I4x4 operator % (const I4x4& b) const
+	{
+		return I4x4( a4x2[0]%b.a4x2[0], a4x2[1]%b.a4x2[1] );
 	}
 	I4x4 operator / (const U4x4& b) const
 	{
@@ -2180,13 +2396,12 @@ public:
 	{
 		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
 	}
-	I4x4 zw_xy( void ) const
+	I4x4 zwxy( void ) const
 	{
 		return I4x4( z, w, x, y );
 	}
 
-	I4x4* index( U4 n_i )
-	{
+	I4x4* index( U4 n_i ) {
 		if( !this )
 		{
 			I4x4* p_this = new I4x4[n_i+1];
@@ -2203,8 +2418,7 @@ public:
 		}
 		return this;
 	}
-	U4 histi( U1* p_src, U4 n_src )
-	{
+	U4 histi( U1* p_src, U4 n_src ) {
 		for( U4 i = 0; i < n_src; i++ )
 			this[p_src[i]].y++;
 
@@ -2219,8 +2433,7 @@ public:
 	}
 
 
-	I4 median( U4 n, bool b_inc = false )
-	{
+	I4 median( U4 n, bool b_inc = false ) {
 		// b_inc == true - incrementált növekvő sorban leszenk
 		// b_inc == false - dekrementáslt csökkenő sorban leszenk (nem definiálod akkor ez, azaz csökenő )
 		if( !this || n < 1 )
@@ -2334,8 +2547,7 @@ public:
 
 		return this[n/2].y;
 	}
-	I4 average( U4 n )
-	{
+	I4 average( U4 n ) {
 		// vigyázz ez sorrendezi az értékeket
 		if( !this || n < 1 )
 			return 0;
