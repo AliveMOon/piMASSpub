@@ -682,7 +682,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 											if( win.pPICbg )
 											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) ) {
 												nGD++;
-												pGT->pHUD = pGT->pHUD->put( win.pPICbg->pPIX, win.pPICbg->nPIX/6 );
+												pGT->pHUD = pGT->pHUD->put( win.pPICbg->getPIX(), win.pPICbg->nPIX/6 );
 												pGT->pHUD->id = pEV[i].id;
 											} break;
 										case gpeNET4_PREV:

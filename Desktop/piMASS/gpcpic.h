@@ -44,7 +44,7 @@ public:
 	I4x4			xyOUT, xySRC;
 	gpcPIC			*pSRC;
 
-	U1		*pPIX;
+	//U1		*pPIX;
 
 	gpcPIC(){ gpmCLR; pFILE = sFILE; };
 	gpcPIC( I8x2 an, U4 i )
@@ -54,60 +54,8 @@ public:
 		TnID = an;
 	}
 
-	gpcPIC* BAYER( SDL_Surface *pSRF )
-	{
-		if( !pSRF )
-			return this;
 
-		if( !this )
-		{
-			gpcPIC* pTHIS = new gpcPIC;
-			return pTHIS->BAYER( pSRF );
-		}
-
-		xyOUT.z = pSRF->w;
-		xyOUT.w = pSRF->h;
-		nPIX = xyOUT.a4x2[1].area()*4;
-        if( nPIXall < nPIX )
-        {
-			nPIXall = nPIX;
-			pPIX = new U1[nPIXall];
-        }
-
-		U1		*pS = (U1*)pSRF->pixels;
-		U1x4	*pD = (U1x4*)pPIX;
-		bppS = (U4)pSRF->format->BytesPerPixel;
-		U4	piS = pSRF->pitch,
-			piD = pSRF->w/2;
-
-		switch(bppS) {
-			case 1:
-				pD[0] = U1x4( pS[0], ((U2)pS[1]+pS[piS])/2,  pS[piS+1], 0xff );
-
-				break;
-
-			case 2:
-				//return *(Uint16 *)p;
-				break;
-
-			case 3:
-				/*if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-					return p[0] << 16 | p[1] << 8 | p[2];
-				else
-					return p[0] | p[1] << 8 | p[2] << 16;*/
-				break;
-
-			case 4:
-				//return *(Uint32 *)p;
-				break;
-
-			default:
-				break;       /* shouldn't happen, but avoids warnings */
-		}
-
-		return this;
-	}
-	U1* getPIX( gpcPICAM* pC, U4 qc )
+	/*U1* getPIXo( gpcPICAM* pC, U4 qc )
 	{
 		if( !this )
 			return NULL;
@@ -166,6 +114,95 @@ public:
 		}
 		iQC = qc;
 		return pPIX;
+	}*/
+	U1* getPIX()
+	{
+		if( !this )
+			return NULL;
+
+		return pSRF ? (U1*)pSRF->pixels : NULL;
+	}
+	U1* getPIX( gpcPICAM* pC, U4 qc )
+	{
+		if( !this )
+			return NULL;
+		if( !pC )
+			return pSRF ? (U1*)pSRF->pixels : NULL;
+		if( pC->cam.open() )
+		{
+			usleep(3*1000);
+		}
+		if( iQC >= qc )
+			return pSRF ? (U1*)pSRF->pixels : NULL;
+
+        nPIX = pC->cam.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB );
+		xyOUT.a4x2[1] = I4x2( pC->cam.getWidth(), pC->cam.getHeight() );
+
+		if( nPIXall < nPIX )
+		{
+			nPIXall = nPIX;
+			SDL_FreeSurface(pSRF);
+			U4 rmask, gmask, bmask, amask;
+			#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+			  int shift = (req_format == STBI_rgb) ? 8 : 0;
+			  rmask = 0xff000000 >> shift;
+			  gmask = 0x00ff0000 >> shift;
+			  bmask = 0x0000ff00 >> shift;
+			  amask = 0x000000ff >> shift;
+			#else // little endian, like x86
+			  rmask = 0x000000ff;
+			  gmask = 0x0000ff00;
+			  bmask = 0x00ff0000;
+			  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
+			#endif
+			pSRF = SDL_CreateRGBSurface( 0, xyOUT.z, xyOUT.w, 24, rmask, gmask, bmask, amask );
+
+				/*	SDL_CreateRGBSurfaceFrom(
+												pPIX, xyOUT.a4x2[1].x, xyOUT.a4x2[1].y, 24, xyOUT.a4x2[1].x*3,
+												0, 0, 0, 0
+											);*/
+
+		}
+
+		if( pSRF )
+		{
+			pC->cam.grab();
+			pC->cam.retrieve(
+								(U1*)pSRF->pixels,
+								raspicam::RASPICAM_FORMAT_IGNORE
+											//RASPICAM_FORMAT_YUV420 );
+											//RASPICAM_FORMAT_RGB );
+							);
+		}
+
+       /* I4x2& wh = xyOUT.a4x2[1];
+        U4 rmask, gmask, bmask, amask;
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		  int shift = (req_format == STBI_rgb) ? 8 : 0;
+		  rmask = 0xff000000 >> shift;
+		  gmask = 0x00ff0000 >> shift;
+		  bmask = 0x0000ff00 >> shift;
+		  amask = 0x000000ff >> shift;
+		#else // little endian, like x86
+		  rmask = 0x000000ff;
+		  gmask = 0x0000ff00;
+		  bmask = 0x00ff0000;
+		  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
+		#endif
+
+		SDL_Surface	*pNEW = SDL_CreateRGBSurfaceFrom(
+														pPIX, wh.x, wh.y, 24, wh.x*3,
+														rmask, gmask, bmask, amask
+													),
+					*pGD = SDL_ConvertSurfaceFormat( pNEW, SDL_PIXELFORMAT_RGBA8888, 0);
+		if( pNEW )
+		{
+			SDL_FreeSurface(pNEW);
+			SDL_FreeSurface(pSRF);
+			pSRF = pGD; //pNEW;
+		}*/
+		iQC = qc;
+		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 
 };
