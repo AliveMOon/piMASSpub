@@ -106,7 +106,7 @@
 	#define gpdRPI_WIDTH	1280	//320 // 640		//  Allowable widths: 320, 640, 1280
 	#define gpdRPI_HEIGHT	960	//240 // 480		//   Allowable heights: 240, 480, 960
 	#define gpdSDL_tOUT		5
-	#define gpdRPI_tOUT		5
+	#define gpdRPI_tOUT		100
 #endif
 
 
@@ -135,6 +135,8 @@
 #include <SDL.h>			//-lSDL2
 #include <SDL_image.h>
 #include <math.h>
+#include <thread>
+
 // Include GLFW
 //#include <glfw3.h>
 

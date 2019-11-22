@@ -115,8 +115,107 @@ gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q )
 
 	return pBUFF;
 }
+class gpcTHRD_CAM
+{
+public:
+	gpcPICAM* pC;
+	SDL_Surface* pSRF;
+	gpcTHRD_CAM(){gpmCLR;};
+};
+void call_cam( gpcTHRD_CAM* pTC )
+{
+
+	gpcTHRD_CAM cpy = *pTC;
+	while( cpy.pC )
+	{
+		usleep(1000);
+		cpy.pC->cam.grab();
+		cpy.pC->cam.retrieve(
+							(U1*)cpy.pSRF->pixels,
+							raspicam::RASPICAM_FORMAT_IGNORE
+										//RASPICAM_FORMAT_YUV420 );
+										//RASPICAM_FORMAT_RGB );
+						);
+	}
+}
+
+U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
+	{
+		if( !this )
+			return NULL;
+		if( !pC )
+			return pSRF ? (U1*)pSRF->pixels : NULL;
+		if( pC->cam.open() )
+		{
+			usleep(3*1000);
+		}
+		if( iQC >= qc )
+			return pSRF ? (U1*)pSRF->pixels : NULL;
+
+		if( bT )
+		{
+			iQC = qc;
+			return pSRF ? (U1*)pSRF->pixels : NULL;
+		}
+
+        nPIX = pC->cam.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB );
+		xyOUT.a4x2[1] = I4x2( pC->cam.getWidth(), pC->cam.getHeight() );
+
+		if( nPIXall < nPIX )
+		{
+			nPIXall = nPIX;
+			SDL_FreeSurface(pSRF);
+			U4 rmask, gmask, bmask, amask;
+			#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+			  int shift = (req_format == STBI_rgb) ? 8 : 0;
+			  rmask = 0xff000000 >> shift;
+			  gmask = 0x00ff0000 >> shift;
+			  bmask = 0x0000ff00 >> shift;
+			  amask = 0x000000ff >> shift;
+			#else // little endian, like x86
+			  rmask = 0x000000ff;
+			  gmask = 0x0000ff00;
+			  bmask = 0x00ff0000;
+			  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
+			#endif
+			pSRF = SDL_CreateRGBSurface( 0, xyOUT.z, xyOUT.w, 24, rmask, gmask, bmask, amask );
+
+			/*	SDL_CreateRGBSurfaceFrom(
+											pPIX, xyOUT.a4x2[1].x, xyOUT.a4x2[1].y, 24, xyOUT.a4x2[1].x*3,
+											0, 0, 0, 0
+										);*/
+
+		}
+
+		if( pSRF )
+		{
+			gpcTHRD_CAM trd;
+			trd.pC = pC;
+			trd.pSRF = pSRF;
+
+			if( !bT )
+			{
+				T = std::thread( call_cam, &trd );
+				usleep(3*1000);
+				bT = true;
+			}
+			if( !bT )
+			{
+				pC->cam.grab();
+				pC->cam.retrieve(
+									(U1*)pSRF->pixels,
+									raspicam::RASPICAM_FORMAT_IGNORE
+												//RASPICAM_FORMAT_YUV420 );
+												//RASPICAM_FORMAT_RGB );
+								);
+			}
+
+		}
 
 
+		iQC = qc;
+		return pSRF ? (U1*)pSRF->pixels : NULL;
+	}
 
 U4 gpcPICall::alfFND( U1* pS )
 {
