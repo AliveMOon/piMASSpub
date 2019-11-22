@@ -453,17 +453,22 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						bug, nBUG
 					);
 		}
-		SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
-		gpnTITLE++;
+
 
 		//while( SDL_PollEvent( &ev ) )
 		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
+		if( mSEC.x-msEVNT < gpdEV_tOUT )
+			continue;
+
+		SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
+		gpnTITLE++;
+		msEVNT = mSEC.x;
+
 		U4 tout = gpdSDL_tOUT;
 		while( SDL_WaitEventTimeout( &ev, tout ) ) { /// EVENTS --------------------------------------------------
 			tout = 0;
 			gpnEVENT++;
 			gpnTITLE = gpnEVENT;
-
 			switch( ev.type )
 			{
 				case SDL_MOUSEWHEEL: {

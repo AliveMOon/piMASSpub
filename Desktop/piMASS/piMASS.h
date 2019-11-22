@@ -105,13 +105,14 @@
 
 	#define gpdRPI_WIDTH	1280	//320 // 640		//  Allowable widths: 320, 640, 1280
 	#define gpdRPI_HEIGHT	960	//240 // 480		//   Allowable heights: 240, 480, 960
-	#define gpdSDL_tOUT		5
-	#define gpdRPI_tOUT		100
+	#define gpdEV_tOUT		33
+	#define gpdSDL_tOUT		3
+	#define gpdRPI_tOUT		44
 #endif
 
 
 
-#define gpdGT_LIST_tOUT 5
+#define gpdGT_LIST_tOUT 3
 #define gpdPICbg "/mnt/ram/bg.png"
 
 #include <exception>
