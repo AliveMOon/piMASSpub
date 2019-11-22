@@ -465,7 +465,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		msEVNT = mSEC.x;
 
 		U4 tout = gpdSDL_tOUT;
-		while( SDL_WaitEventTimeout( &ev, tout ) ) { /// EVENTS --------------------------------------------------
+		if( SDL_WaitEventTimeout( &ev, tout ) ) do
+		{ /// EVENTS --------------------------------------------------
 			tout = 0;
 			gpnEVENT++;
 			gpnTITLE = gpnEVENT;
@@ -919,6 +920,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				c = 0;
 			}
 		}
+		while( SDL_PollEvent( &ev ) );
 
 
 	}
