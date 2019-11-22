@@ -50,7 +50,7 @@
 
 	#pragma comment (lib, "iphlpapi.lib")
 	#pragma comment (lib, "ws2_32.lib")
-
+	#define gpdU4x2nSTR 1
 
 #else
 
@@ -61,6 +61,9 @@
 		#include <raspicam/raspicam.h>
 		//#include <raspicam/raspicam_cv.h>
 		#include <wiringPi.h>
+		#define gpdU4x2nSTR 2
+	#else
+		#define gpdU4x2nSTR 1
 	#endif // gpdSYSpi
 
 	#include <unistd.h> // for usleep()
@@ -105,14 +108,15 @@
 
 	#define gpdRPI_WIDTH	1280 //1280	//320 // 640		//  Allowable widths: 320, 640, 1280
 	#define gpdRPI_HEIGHT	960 //960	//240 // 480		//   Allowable heights: 240, 480, 960
-	#define gpdEV_tOUT		10
+	#define gpdEV_tOUT		7
 	#define gpdSDL_tOUT		3
-	#define gpdRPI_tOUT		5
+	#define gpdRPI_tOUT		7
+	#define gpdJDOIT_tOUT	21
 #endif
 
 
 
-#define gpdGT_LIST_tOUT 3
+#define gpdGT_LIST_tOUT 17
 #define gpdPICbg "/mnt/ram/bg.png"
 
 #include <exception>
@@ -337,6 +341,7 @@ enum gpeFD
 enum gpeLX:U8
 {
     gpeZERO,
+    gpeU4x2nSTR = sizeof(U8)/sizeof(void*),
     gpeMXPATH = gpmPAD( PATH_MAX, 0x10 ) , //0x10*0x11,
     gpeRECVn = (0x30000/12),
 };
@@ -1226,7 +1231,7 @@ public:
 		};
 		struct
 		{
-			U1* aSTR[2];
+			U1* aSTR[gpeU4x2nSTR];
 		};
 		struct
 		{

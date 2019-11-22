@@ -230,7 +230,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		if(
 			  (gppKEYbuff != gpsKEYbuff)
 			|| nIRQ
-			|| ((mSEC.x-nJDOIT.z)>333)
+			|| ((mSEC.x-nJDOIT.z) > gpdJDOIT_tOUT)
 		) {
 			*gppKEYbuff = 0;
 			U1 iRDY = 0x10;
@@ -346,7 +346,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		}
 
 
-		nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
+		//nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 
 		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( *this );
 
@@ -461,6 +461,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			continue;
 
 		SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
+		nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
+
 		gpnTITLE++;
 		msEVNT = mSEC.x;
 
