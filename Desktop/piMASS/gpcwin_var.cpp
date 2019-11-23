@@ -63,6 +63,9 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 							case gpeALF_MSEC:
 								out = mSEC.x&(~1);
 								break;
+							case gpeALF_USER:
+
+								break;
 							default:
 								break;
 						}

@@ -42,7 +42,7 @@
 			<Add option="`sdl2-config --cflags`" />
 		</Compiler>
 		<Linker>
-			<Add option="`sdl2-config --libs` -pthread -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf" />
+			<Add option="`sdl2-config --libs` -pthread" />
 			<Add library="GL" />
 			<Add library="GLEW" />
 			<Add library="SDL2" />

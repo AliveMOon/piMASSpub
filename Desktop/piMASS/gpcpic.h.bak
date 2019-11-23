@@ -5,68 +5,15 @@
 //GLOVAL(void)
 bool gpfSRFjpgSAVE( U1* pFILE, SDL_Surface* pSRF, I4 q );
 gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q );
-#ifndef gpdSYSpi
-class gpcCAMubi
-{
-    U1 frm;
-    U4x2 wh;
-    U4 nGRB;
-    bool bOPEN;
-public:
-    void setFormat( RASPICAM_FORMAT f )
-    {
-        frm = f;
-    }
-    void setCaptureSize( U4 w, U4 h )
-    {
-        wh.x = w;
-        wh.y = h;
-    }
-    bool open()
-    {
-        if( bOPEN )
-            return bOPEN;
-
-        return bOPEN = true;
-    }
-    U4 getImageTypeSize( RASPICAM_FORMAT f )
-    {
-        return 0;
-    }
-    U4 getWidth()
-    {
-        return wh.x;
-    }
-    U4 getHeight()
-    {
-        return wh.y;
-    }
-    U4 grab()
-    {
-       return nGRB++;
-    }
-		// Extract the image
-    void* retrieve( void *pPIX, RASPICAM_FORMAT f )
-    {
-        return pPIX;
-    }
-    gpcCAMubi(){ gpmCLR; };
-};
-#endif
 
 class gpcPICAM
 {
 public:
-	gpdCAMu	cam;
+	raspicam::RaspiCam	cam;
 	I4x2				wh;
 	gpcPICAM(){
 		// Allowable values: RASPICAM_FORMAT_GRAY,RASPICAM_FORMAT_RGB,RASPICAM_FORMAT_BGR,RASPICAM_FORMAT_YUV420
-
-		#ifdef gpdSYSpi
-			cam.setFormat(raspicam::RASPICAM_FORMAT_RGB);
-		#else
-			cam.setFormat( RASPICAM_FORMAT_RGB );
-		#endif
+		cam.setFormat(raspicam::RASPICAM_FORMAT_RGB);
 
 		// Allowable widths: 320, 640, 1280
 		// Allowable heights: 240, 480, 960

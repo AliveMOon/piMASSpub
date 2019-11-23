@@ -474,6 +474,26 @@ public:
 		pSTR = (char*)pS;
 	};
 };
+/*
+457064	gpcMASS	28566	8
+7528	gpcWIN	470	8
+208	gpcCRS	13	0
+144	gpcSRC	9	0
+144	gpcRES	9	0
+848	gpcSTK	53	0
+40	gpcREG	2	8
+20	gpcGTall	1	4
+85528	gpcGT	5345	8
+4208	gpcPIC	263	0
+72	gpcALU	4	8
+32	gpcADR	2	0
+24	gpcISA	1	8
+32	I8x4	2	0
+16	I8x2	1	0
+16	U4x4	1	0
+8	U4x2	0	8
+
+*/
 U4STR aSIZEOF[] = {
 	{ sizeof(gpcMASS),	"gpcMASS"	},
 	{ sizeof(gpcWIN),	"gpcWIN" 	},

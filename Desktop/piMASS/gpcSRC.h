@@ -1105,7 +1105,7 @@ public:
 	gpcMAP		mapCR;
 
 	gpeALF		aTGwip[0x100];
-	gpcOPCD		aPRG[0x1000];
+	//gpcOPCD		aPRG[0x1000];
 	U1			asPRG[0x1000],
 				*pPUB; //, nDICT;
 
@@ -1119,8 +1119,8 @@ public:
 
 
 
-	gpcLAZY		*apDICTopcd[0x1000];
-	gpcLZYdct	*apDICTix[0x1000];
+	//gpcLAZY		*apDICTopcd[0x1000];
+	//gpcLZYdct	*apDICTix[0x1000];
 	U4			 anDICTix[0x1000],
 				//aLEVsp[0x100],
 				rstLEV, iLEV, nLEV, topLEV;

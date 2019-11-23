@@ -51,7 +51,7 @@
 	#pragma comment (lib, "iphlpapi.lib")
 	#pragma comment (lib, "ws2_32.lib")
 	#define gpdU4x2nSTR 1
-	#define gpdCAMu gpcCAMx64
+
 #else
 
 	//#include <opencv2/core/core.hpp>
@@ -62,11 +62,8 @@
 		//#include <raspicam/raspicam_cv.h>
 		#include <wiringPi.h>
 		#define gpdU4x2nSTR 2
-		#define gpdCAMu raspicam::RaspiCam
 	#else
 		#define gpdU4x2nSTR 1
-	#define gpdCAMu gpcCAMubi
-        #include "camU.h"
 	#endif // gpdSYSpi
 
 	#include <unistd.h> // for usleep()

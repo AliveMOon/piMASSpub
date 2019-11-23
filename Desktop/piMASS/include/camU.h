@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _RASPICAM_TYPES_H
 #define _RASPICAM_TYPES_H
 
-namespace raspicam {
+//namespace raspicam {
 
     /**Image formats
      */
@@ -130,7 +130,7 @@ namespace raspicam {
         RASPICAM_ENCODING_RGB
     } RASPICAM_ENCODING;
 
-};
+//};
 #endif
 
 

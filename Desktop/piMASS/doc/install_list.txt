@@ -44,7 +44,14 @@ pi@GP-PI:~/Desktop/piMASS $
 
 code:block asztal piMASS
 -------------------------------------------------------------
+sudo apt install libsdl2-dev libsdl2-2.0-0 -y
+sudo apt install libjpeg9-dev libwebp-dev libtiff5-dev libsdl2-image-dev libsdl2-image-2.0-0 -y
+sudo apt install libmikmod-dev libfishsound1-dev libsmpeg-dev liboggz2-dev libflac-dev libfluidsynth-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 -y
+sudo apt install libfreetype6-dev libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y
+
+
 Other compiler options:
+`sdl2-config --libs` -pthread -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf
 `sdl2-config --cflags`
 ----------------------------------------
 Linker settings:
@@ -86,7 +93,19 @@ sudo raspi-config
    create mask = 0777
    directory mask = 0777
    public = yes
-   guest ok = yes	
+   guest ok = yes
+
+cli/shell> sudo smbpasswd -a [user]/n
+New SMB password: ****
+Retype new SMB password: ****
+Added user [user].
+cli/shell>_ 	
+
+sudo service smbd start
+
+sudo service smbd stop
+sudo service smbd restart
+
 
 ------------------- GDB ----------------------------
 
