@@ -205,7 +205,6 @@ void gpcWIN::gpeWINresize( void )
 }
 gpcWIN::~gpcWIN()
 {
-    if( pSRFload != pSRFchar )
 	gpmSDL_FreeSRF( pSRFload );
 	gpmSDL_FreeSRF( pSRFchar );
 	gpmSDL_FreeSRF( pSRFsnd );

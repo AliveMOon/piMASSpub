@@ -45,13 +45,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     /**Image formats
      */
-   typedef enum RASPICAM_FORMAT{
+    enum RASPICAM_FORMAT{
         RASPICAM_FORMAT_YUV420,
         RASPICAM_FORMAT_GRAY,
         RASPICAM_FORMAT_BGR,
         RASPICAM_FORMAT_RGB,
         RASPICAM_FORMAT_IGNORE //do not use
-    } RASPICAM_FORMAT;
+    };
 
     /**Exposure types
      */

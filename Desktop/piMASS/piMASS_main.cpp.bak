@@ -542,7 +542,7 @@ int main( int nA, char *apA[] )
 	{
 		cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 << endl;
 	}
-    cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR << endl;
+
 	gpf_aALF_init();
 
 	if( nA > 0 )

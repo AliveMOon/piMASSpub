@@ -70,12 +70,12 @@ public:
 			return NULL;
 		isa.null();
 
-		U4 nSTR = min( str.n_load, gpmSTRLEN( str.p_alloc ) );
-		if( nSTR )
+		an.y = min( str.n_load, gpmSTRLEN( str.p_alloc ) );
+		if( an.y )
 		{
-			an.aSTR[0] = new U1[nSTR+1];
-			gpmMEMCPY( an.aSTR[0], str.p_alloc, nSTR );
-			an.aSTR[0][nSTR] = 0;
+			an.aSTR[0] = new U1[an.y+1];
+			gpmMEMCPY( an.aSTR[0], str.p_alloc, an.y );
+			an.aSTR[0][an.y] = 0;
 		} else {
 			an = 0;
 		}

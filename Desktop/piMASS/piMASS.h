@@ -66,7 +66,7 @@
 	#else
 		#define gpdU4x2nSTR 1
 	#define gpdCAMu gpcCAMubi
-        #include "camU.h"
+        #include <camU.h>
 	#endif // gpdSYSpi
 
 	#include <unistd.h> // for usleep()
