@@ -402,12 +402,19 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 												true
 											);
 					} else {
-                        if(( srcDIV != onDIV.x ) && ( dstDIV != onDIV.x ) )
+						if( onDIV.x != srcDIV )
+						{
+							U4 tmp = srcDIV;
+							srcDIV = onDIV.x;
+							dstDIV = tmp;
+						}
+
+                        /*if(( srcDIV != onDIV.x ) && ( dstDIV != onDIV.x ) )
                         {
 							dstDIV = onDIV.x;
-                        }
-						apCRS[onDIV.x]->CRSsel(
-												*this, *apCRS[onDIV.x], *piMASS,
+                        }*/
+						apCRS[srcDIV]->CRSsel(
+												*this, *apCRS[srcDIV], *piMASS,
 												bSHIFT //, bSHIFT ? 4 : srcDIV
 											);
 					}

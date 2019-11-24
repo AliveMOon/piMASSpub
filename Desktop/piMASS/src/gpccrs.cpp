@@ -919,8 +919,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 
 
-	if( frmC )
-		return false;
+	//if( frmC )
+	//	return false;
 
 	if( win.bSW < 2 )
 		return false;
