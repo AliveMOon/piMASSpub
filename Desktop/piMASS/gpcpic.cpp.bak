@@ -132,11 +132,7 @@ void call_cam( gpcTHRD_CAM* pTC )
 		cpy.pC->cam.grab();
 		cpy.pC->cam.retrieve(
 							(U1*)cpy.pSRF->pixels,
-							#ifdef gpdSYSpi
-                                raspicam::RASPICAM_FORMAT_IGNORE
-							#else
-                                RASPICAM_FORMAT_IGNORE
-							#endif
+							raspicam::RASPICAM_FORMAT_IGNORE
 										//RASPICAM_FORMAT_YUV420 );
 										//RASPICAM_FORMAT_RGB );
 						);
@@ -162,13 +158,7 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 
-	nPIX = pC->cam.getImageTypeSize(
-                            #ifdef gpdSYSpi
-                                raspicam::RASPICAM_FORMAT_RGB
-							#else
-                                RASPICAM_FORMAT_RGB
-							#endif
-							 );
+	nPIX = pC->cam.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB );
 	xyOUT.a4x2[1] = I4x2( pC->cam.getWidth(), pC->cam.getHeight() );
 
 	if( nPIXall < nPIX )
@@ -214,11 +204,7 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 			pC->cam.grab();
 			pC->cam.retrieve(
 								(U1*)pSRF->pixels,
-								#ifdef gpdSYSpi
-                                    raspicam::RASPICAM_FORMAT_IGNORE
-                                #else
-                                    RASPICAM_FORMAT_IGNORE
-                                #endif
+								raspicam::RASPICAM_FORMAT_IGNORE
 											//RASPICAM_FORMAT_YUV420 );
 											//RASPICAM_FORMAT_RGB );
 							);

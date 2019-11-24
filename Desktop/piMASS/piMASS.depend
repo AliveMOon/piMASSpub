@@ -535,7 +535,7 @@
 1574395948 /home/pi/Desktop/piMASS//gpcpic.h
 	"piMASS.h"
 
-1574389715 source:/home/pi/Desktop/piMASS/gpcpic.cpp
+1574564550 source:/home/pi/Desktop/piMASS/gpcpic.cpp
 	"gpcpic.h"
 	"gpcSRC.h"
 
@@ -606,4 +606,6 @@
 1574373454 /home/pi/Desktop/piMASS//camU.h
 
 1574373454 /home/pi/Desktop/piMASS/camU.h
+
+1574563560 /home/pi/Desktop/piMASS/include/camU.h
 
