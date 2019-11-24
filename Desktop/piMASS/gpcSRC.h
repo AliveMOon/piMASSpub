@@ -1106,8 +1106,8 @@ public:
 
 	gpeALF		aTGwip[0x100];
 	//gpcOPCD		aPRG[0x1000];
-	U1			asPRG[0x1000],
-				*pPUB; //, nDICT;
+	//U1			asPRG[0x1000],
+	//			*pPUB; //, nDICT;
 
 	// CMPL ----------------------------
 	gpcLAZY		CMPL;
@@ -1164,7 +1164,7 @@ public:
 		nLEV = iLEV+1;
 		return iLEV;
 	};
-	U4 decLEV( void )
+	/*U4 decLEV( void )
 	{
 		iPC = aPC[iLEV];
 		if( iLEV > rstLEV )
@@ -1180,7 +1180,7 @@ public:
 		}
 		nLEV = iLEV+1;
 		return iLEV;
-	};
+	};*/
 
 	//void reset_o( void );
 	U1* msRST( U1* pPUB );

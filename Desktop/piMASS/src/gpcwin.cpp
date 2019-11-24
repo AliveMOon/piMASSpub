@@ -191,6 +191,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	gppKEYbuff = gpsKEYbuff;
 	gppMOUSEbuff = gpsKEYbuff;
 
+	pHOST = sHOST;
+	pUSER = sUSER;
 }
 void gpcWIN::gpeWINresize( void )
 {

@@ -475,7 +475,7 @@ public:
 	};
 };
 /*
-457064	gpcMASS	28566	8
+26976	gpcMASS	1686	0
 7528	gpcWIN	470	8
 208	gpcCRS	13	0
 144	gpcSRC	9	0

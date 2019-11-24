@@ -261,9 +261,10 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA,
 	return pCOUT;
 }
 
+/*
 U1* gpcMASS::msRST( U1* pS0 )
 {
-	gpmZ( asPRG );
+	//gpmZ( asPRG );
 	if( !pPUB )
 	{
 
@@ -347,6 +348,8 @@ U1* gpcMASS::msRST( U1* pS0 )
 	rstLEV = iLEV;
 	return pPUB;
 }
+*/
+
 char gpsOP[] = "=<>-+*/";
 I1 gpcCMPL::sOP( char* pS )
 {

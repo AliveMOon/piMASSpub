@@ -1,12 +1,12 @@
  a0	 cam = 1 // * 0 d0	 =ia e0	  =in a1	  telnet = 6001;
 = user;
-= host; c1	 c = 1;
+= host; c1	c = 1;
 ="blabla
 blabla
 blabla
 pi" d1	 = ix;
 na = a + 1 * 10 + a;
-ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 a3	  b3	 =fps  a5	 pic ="cam1" c5	 pic = "draw1"
+ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 b3	 =fps  a5	 pic ="cam1" c5	 pic = "draw1"
 unsel = 1
 
  d5	 pic = "sprite0" e5	  f5	 trg ="draw1";

@@ -182,14 +182,23 @@ public:
 
 };
 class gpcREG
-{
-	U8		u;
-	I8		i;
-	double	d;
-	U1x4	bD;		// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+{					// 	pi	x64
+	U8		u;		// 	8	8
+	I8		i;		// 	8	8
+	double	d;		// 	8	8
+
+	U1x4	bD;		// 	4	4	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+					//			// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
+	U1*		pSTR;	///	4	8
 public:
-	U4x2	xy;
+	U4x2	xy;		//	8	8
+
 	gpcREG(){ bD = 0; };
+	~gpcREG()
+	{
+		if( bD.u4 == gpeTYP_STR )
+			gpmDELary( pSTR );
+	}
 	gpcREG& bad()
 	{
 		u = 1;
@@ -198,11 +207,28 @@ public:
 		bD.u4 = 0;
 		return *this;
 	}
-	gpcREG& err()
+	gpcREG& off()
 	{
+		if( bD.u4 == gpeTYP_STR )
+				gpmDELary( pSTR );
 		gpmCLR;
 		return *this;
 	}
+	U1* getSTR()
+	{
+		if( this ? !pSTR : true )
+			return NULL;
+		U1* pS = pSTR;
+		gpmCLR;
+		return pS;
+	}
+
+	gpcREG& operator = ( U1* pU )
+	{
+		pSTR = gpfSTR( pSTR, pU );
+		bD.u4 = gpeTYP_STR;
+	}
+
 	gpcREG& operator = ( U4 u4 )
 	{
 		u = u4;
@@ -301,7 +327,7 @@ public:
 	}
 	bool bGD()
 	{
-		return bD.u4&0xf;
+		return bD.x; //.u4&0x1f;
 	}
 	I1 t()
 	{
@@ -313,7 +339,7 @@ public:
 class gpcALU
 {
 	U1x4	type;	// typ:
-					// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+					/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 					// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
 	U4x4	an;
 public:
@@ -660,7 +686,7 @@ public:
 	gpcREG& iD( gpcREG& o )
 	{
 		if( aFLG[iF].iD >= main.iD )
-			return o.err();
+			return o.off();
 
 		return D[aFLG[iF].iD];
 	}

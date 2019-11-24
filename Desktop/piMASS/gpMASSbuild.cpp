@@ -357,6 +357,7 @@ char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{}
 
 
 
+/*
 gpcCMPLlev*	gppLEV = NULL;
 void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 {
@@ -458,11 +459,11 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 							if( pMOM->iDEF != pMOM->iPC )
 								pLEV->pDot = pCMPL->pPC( pMOM->iDEF, gpsSTRpub );
 							pLEV->iOFF = 0;
-						} /*else {
-							if( pMOM->iDEF != pMOM->iPC )
-								pLEV->pDOT = pCMPL->pPC( pMOM->iDEF, gpsSTRpub );
-							pLEV->iOFF = 0;
-						}*/
+						} //else {
+						//	if( pMOM->iDEF != pMOM->iPC )
+						//		pLEV->pDOT = pCMPL->pPC( pMOM->iDEF, gpsSTRpub );
+						//	pLEV->iOFF = 0;
+						// }
 						if( pLEV->pCALL )
 							pFND = pLEV->pCALL;
 
@@ -696,7 +697,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 									pSPARE->iDEF = def.iPC;
 									pSPARE->iPUB = pNEW->iPUB;
 
-								}
+								pPUB}
 							}
 
 							pLEV = pLEV->inc( pMOM, pNEW );
@@ -937,7 +938,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 			switch( pFND->typ )
 			{
 				case gpeALF_COMS: // "/*"
-					if( U1* pCOM = (U1*)strstr( (char*)pS, "*/" ) )
+					if( U1* pCOM = (U1*)strstr( (char*)pS, "* /" ) )
 					{
 						pS = pCOM+2;
 					} else {
@@ -1028,7 +1029,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 	cout << endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
 	cout << endl;
 	nBLD = nVERr;
-}
+}*/
 
 
 

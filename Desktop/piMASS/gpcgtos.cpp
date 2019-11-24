@@ -140,13 +140,13 @@ void gpcGT::GTos( gpcGT& mom )
 							mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
 							pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
 							break;
-						case gpeALF_PREV:
+						/*case gpeALF_PREV:
 							isEVNT.null();
 							isEVNT.id = gpeNET4_PREV;
 							isEVNT.n = TnID.num;
 							mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
 							pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
-							break;
+							break;*/
 						default:
 							pOUT = pOUT->lzy_format( s = -1, "%snonsens", !*s_prompt ? "\r\n":"" );
 					}

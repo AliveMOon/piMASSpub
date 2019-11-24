@@ -11,7 +11,7 @@ extern char gpsNDAT[];
 extern char gpsPRG[];
 
 
-
+/*
 void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 {
 	hd( mass );
@@ -83,7 +83,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 				iFND = pMOM->cmpl_find( &mass.CMPL, pSTR, nSTR );
 				if( !iFND )
 				{
-					/// NEMTALÁLT
+					///"*_/" NEMTALÁLT
 					continue;
 				}
 				pFND = mass.CMPL.pPC( iFND );
@@ -99,7 +99,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 			switch( pFND->typ )
 			{
 				case gpeALF_COMS: // "/*"
-					if( U1* pCOM = (U1*)strstr( (char*)pS, "*/" ) )
+					if( U1* pCOM = (U1*)strstr( (char*)pS, "*_/" ) )
 					{
 						pS = pCOM+2;
 					} else {
@@ -143,13 +143,16 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 		} else
 			pFND->typ = gpeALF_U;
 
-
+"*_/"
 	}
 
 	cout << endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
 	cout << endl;
 	nBLD = nVERr;
 }
+*/
+
+/*
 void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 {
 
@@ -238,7 +241,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 			switch( pFND->typ )
 			{
 				case gpeALF_COMS: // "/*"
-					if( U1* pCOM = (U1*)strstr( (char*)pS, "*/" ) )
+					if( U1* pCOM = (U1*)strstr( (char*)pS, "*_/" ) )
 					{
 						pS = pCOM+2;
 					} else {
@@ -288,3 +291,4 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 	cout << endl;
 	nBLD = nVERr;
 }
+*/

@@ -114,12 +114,12 @@
 	#define gpdEV_tOUT		7
 	#define gpdSDL_tOUT		3
 	#define gpdRPI_tOUT		7
-	#define gpdJDOIT_tOUT	21
+	#define gpdJDOIT_tOUT	3
 #endif
 
 
 
-#define gpdGT_LIST_tOUT 17
+#define gpdGT_LIST_tOUT 3
 #define gpdPICbg "/mnt/ram/bg.png"
 
 #include <exception>
@@ -266,6 +266,28 @@ SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 	return h;
 }
 
+inline U1* gpfSTR( U1* pSTR, const U1* pU )
+{
+	if(pSTR == pU )
+		return pSTR;
+
+	U8 nSTR = gpmSTRLEN(pSTR), nU = gpmSTRLEN( pU );
+	if( !nU )
+	{
+		gpmDELary(pSTR);
+		return pSTR;
+	}
+	if( nU < nSTR )
+	{
+		gpmMEMCPY( pSTR, pU, nU );
+		pSTR[nU] = 0;
+		return pSTR;
+	}
+	pSTR = new U1[nU+1];
+	gpmMEMCPY( pSTR, pU, nU );
+	pSTR[nU] = 0;
+	return pSTR;
+}
 U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFadd )
 {
 	/// a viszatérési érték nBYTE, nLEN az UTF(

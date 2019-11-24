@@ -46,7 +46,9 @@ class gpcWIN
 				gpsTITLEpub[0x100],
 				gpsMASSpath[gpeMXPATH], *gppMASSfile,
 				gpsMASSname[0x100];
-		U1		gpsKEYbuff[0x100],
+		U1		sHOST[0x100], *pHOST,
+				sUSER[0x100], *pUSER,
+				gpsKEYbuff[0x100],
 				*gppKEYbuff,
 				*gppMOUSEbuff;
 
@@ -55,7 +57,7 @@ class gpcWIN
 
 		U4	aKT[0x200],
 			srcDIV, dstDIV, msEVNT;
-		U4x2 onDIV; // = srcDIV;
+		U4x2 	onDIV; // = srcDIV;
 		U4x4	mSEC = 0, // x: new // y: prev // z: elapse // w: fps
 				nJDOIT;
 		I4 nMOV, nIRQ,  nMB, nMBB, nF;
@@ -64,8 +66,34 @@ class gpcWIN
 				bALT, abALT[2];
 		U1		bSW;
 
+		gpcLAZY	winPUB;
+		U8		iPUB;
 
+		bool bINIThu()
+		{
+			if( pHOST <= sHOST )
+			{
+				//pCOMP +=
+				pHOST += gethostname( (char*)sHOST, sizeof(sHOST) );
+			}
+			if( pUSER <= sUSER )
+			{
+				char* pU = getlogin();
+				if( !pU )
+				{
+					struct passwd *pw = getpwuid(getuid());
+					pU = strrchr( pw->pw_dir, '/' );
+					if( pU ? *pU == '/' : false )
+						pU++;
+				}
 
+				//__uid_t id = getuid();
+				//pCOMP +=
+				pUSER += sprintf( (char*)sUSER, "%s", pU ); //id ? getlogin() : "root" );
+				//pUSER += getlogin_r( (char*)sUSER, sizeof(sUSER) );
+			}
+			return true;
+		}
 		SDL_Rect	wDIV( U1 iDIV );
 		void		gpeWINresize( void );
 		gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piMASS ); //, char* pPATH, char* pFILE ); //, I4x4& siz );

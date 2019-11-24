@@ -3,9 +3,10 @@ extern U1 gp_s_key_map_sdl[];
 
 bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 {
-	out.err();
+	out.off();
 	if( !alf )
 		return out.bGD();
+	U8 iS = winPUB.n_load;
 	gpcCRS& crs = *apCRS[onDIV.x];
 	if( alf < gpeALF_AAAAAA ) {
 		if( alf < gpeALF_AAAAA ) {
@@ -63,9 +64,12 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 							case gpeALF_MSEC:
 								out = mSEC.x&(~1);
 								break;
-							case gpeALF_USER:
-
-								break;
+							case gpeALF_HOST: if( bINIThu() ) {
+									out = sHOST;
+								} break;
+							case gpeALF_USER: if( bINIThu() ) {
+									out = sUSER;
+								} break;
 							default:
 								break;
 						}
@@ -77,5 +81,6 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 
 
 	}
+	winPUB.n_load = iS;
 	return out.bGD();
 }

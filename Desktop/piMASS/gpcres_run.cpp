@@ -121,6 +121,10 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					{
 						// valamit kapott
 						pSRC->bSW |= gpeMASSloopMSK;
+						if( stk.apSTR[flg.iS] = stk.D[flg.iD].getSTR() )
+						{
+							pB += sprintf( (char*)pB, "%s", stk.apSTR[flg.iS] ) ;
+						}
 						break;
 					}
 
