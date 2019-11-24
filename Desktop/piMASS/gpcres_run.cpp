@@ -29,8 +29,15 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 	gpcADR adr;
 	gpcALU A, B, FND;
 	gpcREG err;
-	I1x4 isa = 0;
+	I1x4 isa = 0, back;
 	bool bROW = false;
+
+	U4	mZ = win.mZ,
+		mN = win.mN, mxZN = mZ*mN, znI = mxZN, ixFND = 0;
+	gpcSRC* pANS = NULL;
+	gpcRES	*pANcall = NULL, *pDOT = NULL;
+	gpcMASS& mass = *win.piMASS;
+
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
 		gpcISA &IS = pISA[i];
@@ -53,7 +60,29 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			case gpeISA_an: {	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
 					stk.aAN[flg.iA] = IS.an;
-					//flg.iA++;
+					znI = mxZN;
+					if( IS.an.x )
+					if( IS.an.y < mN )
+					{
+						znI = IS.an.y*mZ + IS.an.x-1;
+						if( ixFND = win.pM[znI] )
+						{
+							if( pANS ? pANS->IX != ixFND: true )
+							{
+								pANS = mass.SRCfnd( ixFND );
+							}
+							if( !pANS )
+								pANcall = NULL;
+							else {
+								pANcall = pANS->apOUT[3];
+								if( !pANcall )
+								{
+									pANcall = pANS->apOUT[3] = pANS->pEXE->RESrun( pANS->apOUT[3], NULL, win, pANS, NULL );
+								}
+							}
+						}
+					}
+					flg.iA++;
 				} break;
 			case gpeISA_anFUN: {	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
@@ -91,6 +120,26 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					adr = stk.aVR[flg.iV] = IS.an.var;
 					if( !adr.an.alf )
 						break;
+
+					if( pDOT )
+					{
+						adr = pDOT;
+						if( adr.pRM )
+						{
+							// lokális változó és már használta valaki
+							// B =
+							//pISA[-IS.i]
+
+							isa = pISA[i-1-IS.i].isa;
+							if( isa.aISA[0] == gpeISA_trg )
+								isa = pISA[i-2-IS.i].isa;
+
+							//(back.aISA[1] == gpeISA_assign ? A :
+							B = adr.pRM->ALU( adr.iA );
+						}
+						pDOT = NULL;
+						break;
+					}
 
 					if( pOUT )
 					{
@@ -232,7 +281,10 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 						}
 					}
 				} break;
-			case gpeISA_dot:{} break;
+			case gpeISA_dot:{
+					pDOT = pANcall ? pANcall : pDOT;
+					pANcall = NULL;
+				} break;
 			case gpeISA_div:{
 					if( stk.D[flg.iD].bGD() )
 					{
@@ -264,6 +316,10 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					{
 						A.equ( B );
 					}
+					else if( pANcall )
+					{
+						pANcall;
+					}
 					B = gpeALF_null;
 				} break;
 
@@ -293,10 +349,16 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			pB++;
 		}
 
-		if( isa.aISA[1] == gpeISA_assign )
+		switch( isa.aISA[1] )
 		{
-			A = FND;
-			B = gpeALF_null;
+			case gpeISA_assign:
+				A = FND;
+				B = gpeALF_null;
+				break;
+			case gpeISA_dot:{
+					pDOT = pANcall ? pANcall : pDOT;
+					pANcall = NULL;
+				} break;
 		}
 
 		if( !bITT )
@@ -353,9 +415,11 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	U4 xFND;
 	int pic_id = 0;
 	I4x4 sprt[2] = {0}, trgWH = 0;
-	if( U4 *pM = mapCR.pMAP )
-	if( U4 *pC = mapCR.pCOL )
-	if( U4 *pR = mapCR.pROW )
+	win.mZ = mapCR.mapZN44.z;
+	win.mN = mapCR.mapZN44.w;
+	if( U4 *pM = win.pM = mapCR.pMAP )
+	if( U4 *pC = win.pC = mapCR.pCOL )
+	if( U4 *pR = win.pR = mapCR.pROW )
 	if( pM < pC )
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{

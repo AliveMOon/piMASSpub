@@ -771,11 +771,16 @@ public:
 		switch( stp )
 		{
 			case '.':
-				pIS->i = pIS[-1].i+1;
+				/*pIS->i = pIS[-1].i+1;
 				pIS[-pIS->isa.z].n = pIS->i;
 				if( !pIS[-pIS->isa.z].i )
 					break;
-				pIS[-pIS->isa.z].n -= pIS[-pIS->isa.z].i;
+				pIS[-pIS->isa.z].n -= pIS[-pIS->isa.z].i;*/
+				pIS->i = pIS[-1].i+1;
+				pIS[-pIS->i].n = pIS->i;
+				if( !pIS[-pIS->i].i )
+					break;
+				pIS[-pIS->i].n -= pIS[-pIS->i].i;
 			case '(':
 				if( pIS[-1].isa.aISA[0] == gpeISA_var )
 					pIS[-1].isa.aISA[0] = gpeISA_FUN;

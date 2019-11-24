@@ -69,6 +69,9 @@ class gpcWIN
 		gpcLAZY	winPUB;
 		U8		iPUB;
 
+		/// RUN MAP --------------
+		U4	*pM, *pC, *pR, mZ, mN;
+
 		bool bINIThu()
 		{
 			if( pHOST <= sHOST )

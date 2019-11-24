@@ -1,12 +1,9 @@
  a0	 cam = 1 // * 0 d0	 =ia e0	  =in a1	  telnet = 6001;
 = user;
 = host;
-= c1.a;
-= d1.a; c1	 c = 1;
+= c1.a; c1	 c = 1;
 ="blabla
-blablaaaa
-na csak őssze szedte
-de szar lasú
+blabla
 blabla
 pi" d1	 = ix;
 na = a + 1 * 10 + a;
