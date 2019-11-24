@@ -357,14 +357,29 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		buff.lzy_ins( pLFT, pRIG-pLFT, nS = -1, -1 );
 	}
 	sprintf( (char*)gpsSAVEbf, "%s", pPATH );
-	U8 nUNDO = 0;
-	while( gpfACE((char*)gpsSAVEbf, 4) > -1 )
+	int iGD = 0;
+	if( gpfACE((char*)gpsSAVEbf, 4) > -1 )
 	{
-		nUNDO++;
-		sprintf( (char*)gpsSAVEbf, "%s.undo0x%0.4llx", pPATH, nUNDO );
+		strcpy( (char*)gpsRENMbf, (char*)gpsSAVEbf );
+		char* pPR = strrchr( (char*)gpsRENMbf, '.' );
+		if(pPR)
+		{
+			strcpy( pPR, "_undo/" );
+			pPR += gpmSTRLEN(pPR);
+		}
+		U8 nUNDO = 0;
+		char s_buff[gpeMXPATH];
+		if( gpfMKDR( s_buff, (char*)gpsRENMbf ) )
+		{
+			sprintf( pPR, "0x%0.4llx", nUNDO );
+			while( gpfACE((char*)gpsRENMbf, 4) > -1 )
+			{
+				nUNDO++;
+				sprintf( pPR, "0x%0.4llx", nUNDO );
+			}
+			iGD = rename( (char*)pPATH, (char*)gpsRENMbf );
+		}
 	}
-	if( nUNDO)
-		rename( (char*)pPATH, (char*)gpsSAVEbf );
 	buff.lzy_write( (char*)pPATH );
 	return false;
 }
