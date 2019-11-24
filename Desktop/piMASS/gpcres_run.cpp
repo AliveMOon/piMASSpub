@@ -137,6 +137,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 							//(back.aISA[1] == gpeISA_assign ? A :
 							B = adr.pRM->ALU( adr.iA );
 						}
+						flg.iA = 0;
 						pDOT = NULL;
 						break;
 					}
