@@ -1,4 +1,5 @@
 #include "gpcgt.h"
+#include "gpcSRC.h"
 
 U1 dz_a_favpng[]=
 {
@@ -171,6 +172,63 @@ void gpcGTall::clr()
 {
 	GTclose();
 }*/
+gpcGT* gpcGTall::GT( U4 xfnd, U1* pIPA, U4 nIPA )
+{
+	int port = 80, nCMP = nIPA, p;
+	U8 nLEN;
+	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n" ),
+		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;", nLEN );
+
+	nCMP = pE-pS;
+	gpmMEMCPY( sPUB, pS, nCMP );
+
+	p = gpfSTR2I8( pE, NULL );
+	if( p )
+		port = p;
+	I8x2 an( xfnd, port );
+	for( U4 g = 0; g < nGTld; g++ )
+	{
+		if( !ppGTalloc[g] )
+		{
+			if( iGTfr > g )
+				iGTfr = g;
+			continue;
+		}
+
+		if( ppGTalloc[g]->port != port )
+			continue;
+		if( ppGTalloc[g]->TnID.alf != an.alf )
+			continue;
+
+		pGT = ppGTalloc[g];
+		return pGT;
+	}
+
+	if( iGTfr < nGTld )
+	{
+		pGT = new gpcGT( an, port );
+		gpmMEMCPY( pGT->s_ip, sPUB, nCMP );
+		pGT->s_ip[nCMP] = 0;
+
+		return ppGTalloc[iGTfr] = pGT;
+	}
+
+	nGTld++;
+	if( nGTld >= nGTalloc )
+	{
+		nGTalloc += 0x10;
+		gpcGT	**ppKILL = ppGTalloc;
+		ppGTalloc = new gpcGT*[nGTalloc];
+		gpmMEMCPY( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
+		gpmDELary(ppKILL);
+	}
+
+	pGT = new gpcGT( an, port );
+	gpmMEMCPY( pGT->s_ip, sPUB, nCMP );
+	pGT->s_ip[nCMP] = 0;
+
+	return ppGTalloc[iGTfr] = pGT;
+}
 gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
 {
 	if( pGT )
@@ -596,6 +654,121 @@ char* gpcGT::GTsend( char* p_err )
 
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 static const char gp_sHELLO_acc[] = "account;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
+I8 gpcGT::GTcnct()
+{
+	if( socket == INVALID_SOCKET )
+	{
+		struct addrinfo ainfo;
+		gpmZ( ainfo );
+		ainfo.ai_family = AF_INET;
+		ainfo.ai_socktype = SOCK_STREAM;
+		ainfo.ai_protocol = IPPROTO_TCP;
+		ainfo.ai_flags = AI_PASSIVE;
+		ainfo.ai_addrlen = sizeof(ainfo);
+
+		char	*p_print = sGTpub,
+				s_port[32],
+				*p_err = p_print;
+		sprintf( s_port, "%d", port);
+		int error = getaddrinfo( NULL, s_port, &ainfo, &p_ainf );
+		if( error != 0 )
+			GTerr( p_err, &p_err );
+		socket = ::socket( p_ainf->ai_family, p_ainf->ai_socktype, p_ainf->ai_protocol );
+
+		p_err += sprintf( p_err, "OK" );
+		GTopti( p_err, &p_err, gpdGT_NoDALEY );
+		cout << p_print << endl;
+		p_print = p_err;
+
+		// BIND
+		p_err += sprintf( p_err, "\n\t\tBIND - " );
+		/* bind */
+
+		addr_in.sin_family = AF_INET;
+		addr_in.sin_port = htons(port);
+		// LISTEN: addr_in.sin_addr.s_addr = INADDR_ANY;
+		addr_in.sin_addr.s_addr = inet_addr( s_ip );
+		memset(&(addr_in.sin_zero), '\0', 8);
+
+		error = connect( socket, (struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,
+									 sizeof(addr_in) ); // sizeof(struct sockaddr) );
+		if ( error == SOCKET_ERROR )
+		{
+			gpfSOC_CLOSE( socket );
+			bGTdie = true;
+			return 0;
+		}
+	}
+
+	char *p_err = sGTpub;
+	*sGTpub = 0;
+	U8 s;
+	if( aGTfd[gpeFD_recv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFD_recv] ) )
+	{
+		p_err = GTrecv( p_err );
+		if( *p_err )
+			cerr << p_err << endl;
+
+
+		if( aGTcrs[1] != 'h' )
+			GTos( *this );
+
+
+		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
+		if( !bGTdie )
+			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
+	}
+
+	if( aGTfd[gpeFD_send].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFD_send] ) )
+	{
+		U8 s;
+		if(!pOUT)
+		{
+			if(pHUD ? pHUD->p_alloc : NULL )
+			{
+				pOUT = pOUT->lzy_format( s = -1, " hud" );
+
+				pOUT = pOUT->lzy_add(pHUD, 8, s = -1);
+				pOUT = pOUT->lzy_add(pHUD->p_alloc, pHUD->n, s = -1);
+				gpmDEL(pHUD);
+				GTprmpt();
+				//break;
+			}
+
+
+			if( pDWN )
+			{
+				pOUT = pDWN->join( pOUT, *this );
+				if( !pOUT )
+				if( pDWN->dw_i >=  pDWN->dw_il )
+				{
+					gpmDEL(pDWN);
+				}
+			}
+		}
+
+		p_err = GTsend( p_err );
+		if( *p_err )
+			cerr << p_err << endl;
+	}
+
+	aGTfd[gpeFD_recv].setFD( socket );
+	aGTfd[gpeFD_send].setFD( socket );
+
+	struct timeval tv;   // sleep for tenr minutes!
+	tv.tv_sec = 0;
+	tv.tv_usec = gpdGT_LIST_tOUT;
+
+	int nS = select(
+					aGTfd[gpeFD_recv].maxSCK+1,
+					&aGTfd[gpeFD_recv].fdS,
+					(aGTfd[gpeFD_send].nFD ? &aGTfd[gpeFD_send].fdS : NULL),
+					NULL, //(aGTfd[gpeFD_excp].fd_count ? &aGTfd[gpeFD_excp] : NULL),
+					&tv
+				);
+
+	return nS;
+}
 I8 gpcGT::GTlst()
 {
 	if( socket == INVALID_SOCKET )

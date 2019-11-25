@@ -2,6 +2,7 @@
 #define GPCPIC_H
 
 #include "piMASS.h"
+//#include "gpcSRC.h"
 //GLOVAL(void)
 bool gpfSRFjpgSAVE( U1* pFILE, SDL_Surface* pSRF, I4 q );
 gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q );

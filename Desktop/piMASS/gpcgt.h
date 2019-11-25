@@ -120,6 +120,7 @@ class gpcGTall
 public:
 	gpcGT	**ppGTalloc, *pGT;
 	U4		nGTalloc, iGTfr, nGTld;
+	U1		sPUB[gpdMAX_PATH];
 	gpcGTall() { gpmCLR; };
 	void		clr( );
 	gpcGT*		GTacc( SOCKET sock, I4 port );
@@ -131,6 +132,7 @@ public:
 		return ppGTalloc ? ppGTalloc[i] : NULL;
 	}
 	gpcGT* GT( gpeALF alf, I4 port );
+	gpcGT* GT( U4 xfnd, U1* pIPA, U4 nIPA );
 };
 
 class gpcGT
@@ -158,7 +160,7 @@ class gpcGT
 						*pIFa;
 
 		gpcFD	aGTfd[gpeFD_n];
-		U4		nFDs, nFDr, nFDe;
+		U4		nFDs, nFDr, nFDe, nCMP;
 
 		char	sGTpub[0x10000],
 				s_buff[0x30000/12],
@@ -196,6 +198,7 @@ class gpcGT
 			gpfSOC_CLOSE( socket );
 			return this;
 		}
+		I8		GTcnct();
 		I8		GTlst();
 		int		GTerr( char* p_err, char** pp_err );
 		U1		GTopti( char* p_error, char** pp_error, int no_daley );

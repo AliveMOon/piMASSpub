@@ -421,7 +421,8 @@ U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
 	return u8;
 }
 #define gpmVAN( d, v, l ) gpfVAN( (d), (U1*)v, l )
-I8 inline gpfSRC2I8( U1* p_str, U1** pp_str = NULL )
+
+I8 inline gpfSTR2I8( U1* p_str, U1** pp_str = NULL )
 {
 	if( !p_str )
 		return 0;

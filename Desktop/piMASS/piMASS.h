@@ -199,7 +199,6 @@ class gpcMASS;
 #define frac( a ) ( (a)-floor((a)) )
 
 
-//#define gpdMAX_PATH			0x110
 #define max( a, b ) ( a > b ? a : b )
 #define min( a, b ) ( a < b ? a : b )
 #define PI acos(-1.0)
@@ -465,10 +464,10 @@ inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
 	*p2P = 0;
 	return p2P;
 }
-inline void* gp_memcmp( U1* pA, U1* pB, U8 n )
+inline void* gp_memcmp( const U1* pA, const U1* pB, U8 n )
 {
 	if( !pA || !pB )
-		return pA;
+		return (void*)pA;
 
 	if( pA == pB )
 		return (void*)(pA+n);

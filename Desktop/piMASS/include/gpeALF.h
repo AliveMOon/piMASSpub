@@ -821,6 +821,7 @@ typedef enum gpeALF: I8
 	gpeALF_STOW = gpdABCD('S', 'T', 'O', 'W'),
 	gpeALF_SUBM = gpdABCD('S', 'U', 'B', 'M'),
 	gpeALF_SQRT = gpdABCD('S', 'Q', 'R', 'T'),
+	gpeALF_SYNC = gpdABCD('S', 'Y', 'N', 'C'),
 
 	gpeALF_TRGH = gpdABCD('T', 'R', 'G', 'H'),
 	gpeALF_TRGW = gpdABCD('T', 'R', 'G', 'W'),
