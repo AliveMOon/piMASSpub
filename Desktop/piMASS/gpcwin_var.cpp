@@ -70,6 +70,9 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 							case gpeALF_USER: if( bINIThu() ) {
 									out = sUSER;
 								} break;
+							case gpeALF_NBLD:{
+                                    out = nJDOIT.x;
+								} break;
 							default:
 								break;
 						}

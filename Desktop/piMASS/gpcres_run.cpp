@@ -7,14 +7,12 @@ bool bITT =  false; //true; // false; //
 
 gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
-	if( this ? !nISA.x : true )
+	if( win.pM ? !this : true )
+		return pOUT;
+
+	if( !nISA.x )
 	{
-		if( this )
-		{
-			// takarítunk;
-			gpmDELary( pISA );
-			nISA = 0;
-		}
+		gpmDELary( pISA );
 		return pOUT;
 	}
 
@@ -26,17 +24,24 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 	U8 u8; I8 i8; double d8, iASG, nOUT = 0;
 	U1 sBUFF[0x1000], *pB = sBUFF+0x20, *pS = pB, nB;
 
-	gpcADR adr;
-	gpcALU A, B, FND;
 	gpcREG err;
 	I1x4 isa = 0, back;
 	bool bROW = false;
 
-	U4	mZ = win.mZ,
-		mN = win.mN, mxZN = mZ*mN, znI = mxZN, ixFND = 0;
-	gpcSRC* pANS = NULL;
-	gpcRES	*pANcall = NULL, *pDOT = NULL;
 	gpcMASS& mass = *win.piMASS;
+
+
+
+	U4	mZ = win.mZ,
+		mN = win.mN, mxZN = mZ*mN + 1; //, znI = mxZN;
+	U4x2 trg = 0;
+	U4 anFND = 0;
+	gpcADR A0;
+	gpcREG D0;
+	gpcALU A, B, FND;
+	gpcSRC	*pANS = NULL;
+	gpcRES	*pANcall = NULL, *pDOT = NULL;
+	U1		*pSTR = NULL;
 
 	for( U4 i = 0; i < nISA.x; i++ )
 	{
@@ -50,40 +55,53 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 
 		switch( IS.isa.aISA[0] )
         {
-			case gpeISA_trg:{	// -------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "[%d:%d]", IS.an.x, IS.an.y );
-					stk.aTRG[flg.iT] = IS.an;
-					//flg.iT++;
+			case gpeISA_trg: {	// -------------------------------------------------------------------------------------
+					trg = IS.an;
 				} continue;
 
 
 			case gpeISA_an: {	// -------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
+						//pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
+						anFND = 0;
+						B = gpeALF_null;
+						if( IS.an.x ? IS.an.x > mZ : true )
+							break;
+						if( IS.an.y < mN )
+						if(	anFND = win.pM[IS.an.y*mZ + IS.an.x-1] )
+						if( pANS = mass.SRCfnd( anFND ) )
+							pSTR = pANS->pB+1;
+					} break;
+					/*
 					stk.aAN[flg.iA] = IS.an;
-					znI = mxZN;
-					if( IS.an.x )
-					if( IS.an.y < mN )
+					znI = mxZN; pANS = NULL;
+					if( IS.an.x ? (IS.an.y>=mN) : true )
+						break;
+
+					znI = IS.an.y*mZ + IS.an.x-1;
+
+
+					if( pANS ? pANS->IX != ixFND: true )
 					{
-						znI = IS.an.y*mZ + IS.an.x-1;
-						if( ixFND = win.pM[znI] )
+						pANS = mass.SRCfnd( ixFND );
+					}
+					if( !pANS )
+						pANcall = NULL;
+					else {
+						pANcall = pANS->apOUT[3];
+						if( !pANcall )
 						{
-							if( pANS ? pANS->IX != ixFND: true )
+							pANcall = pANS->apOUT[3] = pANS->pEXE->RESrun( pANS->apOUT[3], NULL, win, pANS, NULL );
+							if( !pANcall )
 							{
-								pANS = mass.SRCfnd( ixFND );
-							}
-							if( !pANS )
-								pANcall = NULL;
-							else {
-								pANcall = pANS->apOUT[3];
-								if( !pANcall )
-								{
-									pANcall = pANS->apOUT[3] = pANS->pEXE->RESrun( pANS->apOUT[3], NULL, win, pANS, NULL );
-								}
+
+								pSRC->bSW |= gpeMASSloopMSK;
 							}
 						}
 					}
+
+
 					flg.iA++;
-				} break;
+				} break;*/
 			case gpeISA_anFUN: {	// -------------------------------------------------------------------------------------
 					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
 					stk.aAN[flg.iA] = IS.an;
@@ -93,93 +111,74 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 
 			/// gpcREG D[]	// --------------------------------------------------------------------------------------
  			case gpeISA_u8: {	// --------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "%lld", IS.an.u8 );
-					stk.D[flg.iD] = IS.an.u8;
+					D0 = IS.an.u8;
 					B = gpeALF_null;
-					//flg.iD++;
 				} break;
 			case gpeISA_i8: {	// --------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "%lld", -((I8)IS.an.u8) );
-					stk.D[flg.iD] = -((I8)IS.an.u8);
+					D0 = -((I8)IS.an.u8);
 					B = gpeALF_null;
-					//flg.iD++;
 				} break;
 			case gpeISA_d8: {	// --------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "%f",  IS.an.d8 );
-					stk.D[flg.iD] = IS.an.d8;
+					D0 = IS.an.d8;
 					B = gpeALF_null;
-					//flg.iD++;
 				} break;
 
 
 
 			/// gpeISA_var	// --------------------------------------------------------------------------------------
  			case gpeISA_var: {	// --------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
-
-					adr = stk.aVR[flg.iV] = IS.an.var;
-					if( !adr.an.alf )
+					A0 = IS.an.var;
+					if( !A0.an.alf )
 						break;
 
 					if( pDOT )
 					{
-						adr = pDOT;
-						if( adr.pRM )
-						{
-							// lokális változó és már használta valaki
-							// B =
-							//pISA[-IS.i]
-
-							isa = pISA[i-1-IS.i].isa;
-							if( isa.aISA[0] == gpeISA_trg )
-								isa = pISA[i-2-IS.i].isa;
-
-							//(back.aISA[1] == gpeISA_assign ? A :
-							B = adr.pRM->ALU( adr.iA );
-						}
-						flg.iA = 0;
+						A0 = pDOT;
 						pDOT = NULL;
+						if( !A0.pRM )
+							break;
+						if( pANS ? pANS->bSW&gpeMASSloopMSK : false )
+							pSRC->bSW |= gpeMASSloopMSK;
+						// lokális változó és már használta valaki
+						isa = pISA[i-1-IS.i].isa;
+						if( isa.aISA[0] == gpeISA_trg )
+							isa = pISA[i-2-IS.i].isa;
+						B = A0.pRM->ALU( A0.iA );
 						break;
 					}
 
 					if( pOUT )
 					{
-						adr = pOUT;
-						if( adr.pRM )
+						A0 = pOUT;
+						if( A0.pRM )
 						{
-							// lokális változó és már használta valaki
-							// B =
-							(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = adr.pRM->ALU( adr.iA );
+							(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = A0.pRM->ALU( A0.iA );
 							break;
 						}
 					}
 					// na még mindig nincsen
-					adr = this;
-					if( adr.pRM )
+					A0 = this;
+					if( A0.pRM )
 					{
 						// forrásként használható
 						if( IS.isa.aISA[1] == gpeISA_assign )
 						{
-							FND = pOUT->ADD( adr.an.alf, 0,0 );
-							FND.equ( adr.pRM->ALU( adr.iA ) );
+							FND = pOUT->ADD( A0.an.alf, 0,0 );
+							FND.equ( A0.pRM->ALU( A0.iA ) );
 						} else
-							B = adr.pRM->ALU( adr.iA );
+							B = A0.pRM->ALU( A0.iA );
 						break;
 					}
 					// na most nézzük meg van e beépített változó rá
-					if( win.WINvar( stk.D[flg.iD], adr.an.alf ) )
+					if( win.WINvar( D0, A0.an.alf ) )
 					{
 						// valamit kapott
 						pSRC->bSW |= gpeMASSloopMSK;
-						if( stk.apSTR[flg.iS] = stk.D[flg.iD].getSTR() )
-						{
-							pB += sprintf( (char*)pB, "%s", stk.apSTR[flg.iS] ) ;
-						}
+						pSTR = D0.getSTR();
 						break;
 					}
 
-					//B =
-					(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = pOUT->ADD( adr.an.alf, 0,0 );
+					(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = pOUT->ADD( A0.an.alf, 0,0 );
 				} break;
 
 			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
@@ -197,7 +196,8 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 
 
 			case gpeISA_str: {
-					pB += sprintf( (char*)pB, "%s", (stk.apSTR[flg.iS] = IS.an.aSTR[0])) ;
+					pSTR = IS.an.aSTR[0];
+					//pB += sprintf( (char*)pB, "%s", (stk.apSTR[flg.iS] = IS.an.aSTR[0])) ;
 					//flg.iS++;
 				} break;
 			case gpeISA_row:
@@ -212,12 +212,11 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			pOUT = IS.pRES->RESrun( pOUT, pMN, win, pSRC, this, deep+1, &stk );
 
 
-		switch( isa.aISA[1] )
-		{
+		switch( isa.aISA[1] ) {
 			case gpeISA_u8:
 			case gpeISA_i8:
 			case gpeISA_d8: {
-						B = stk.iD(err);
+						B = D0;
 					} break;
 
 			case gpeISA_an:{} break;
@@ -232,27 +231,15 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 			case gpeISA_tag:{} break;
 			case gpeISA_dollar:{} break;
 			case gpeISA_rem:{
-					if( stk.D[flg.iD].bGD() )
-					{
-						if( A.pRM )
-						{
-							A %= stk.D[flg.iD];
-							break;
-						}
-					}
+					if( A.pRM ? D0.bGD() : false )
+						A %= D0;
 				} break;
 			case gpeISA_and:{} break;
 			case gpeISA_brkB:{} break;
 			case gpeISA_brkE:{} break;
 			case gpeISA_mul:{
-					if( stk.D[flg.iD].bGD() )
-					{
-						if( A.pRM )
-						{
-							A *= stk.D[flg.iD];
-							break;
-						}
-					}
+					if( A.pRM ? D0.bGD() : false )
+						A *= D0;
 				} break;
 			case gpeISA_plus:{
 					if( A.alf && B.alf )
@@ -261,41 +248,31 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 						B = gpeALF_null;
 						break;
 					}
-					if( stk.D[flg.iD].bGD() )
-					{
-						if( A.pRM )
-						{
-							A += stk.D[flg.iD];
-							break;
-						}
-					}
 
-
+					if( A.pRM ? D0.bGD() : false )
+						A += D0;
 				} break;
 			case gpeISA_sub:{
-					if( stk.D[flg.iD].bGD() )
-					{
-						if( A.pRM )
-						{
-							A -= stk.D[flg.iD];
-							break;
-						}
-					}
-				} break;
-			case gpeISA_dot:{
-					pDOT = pANcall ? pANcall : pDOT;
-					pANcall = NULL;
+					if( A.pRM ? D0.bGD() : false )
+						A -= D0;
 				} break;
 			case gpeISA_div:{
-					if( stk.D[flg.iD].bGD() )
-					{
-						if( A.pRM )
-						{
-							A /= stk.D[flg.iD];
-							break;
-						}
-					}
+					if( A.pRM ? D0.bGD() : false )
+						A /= D0;
 				} break;
+
+
+
+
+			case gpeISA_dot:{
+					pANcall = NULL;
+					if( anFND )
+						pDOT = ( pANS = mass.SRCfnd( anFND ) ) ? pANS->apOUT[3] : NULL;
+					else
+						pDOT = NULL;
+				} break;
+
+
 			case gpeISA_row:
 				bROW = true;
 				break;
@@ -304,14 +281,12 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 
 
 			case gpeISA_assign:{
-					if( stk.D[flg.iD].bGD() )
+					if( D0.bGD() )
+						A = D0;
+					else if( pSTR )
 					{
-						A = stk.D[flg.iD];
-					}
-					else if( stk.apSTR[flg.iS] )
-					{
-                        A = stk.apSTR[flg.iS];
-                        stk.apSTR[flg.iS] = NULL;
+                        A = pSTR;
+                        pSTR = NULL;
 					}
 					if( A.alf && B.alf )
 					{
@@ -357,8 +332,11 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 				B = gpeALF_null;
 				break;
 			case gpeISA_dot:{
-					pDOT = pANcall ? pANcall : pDOT;
 					pANcall = NULL;
+					if( anFND )
+						pDOT = ( pANS = mass.SRCfnd( anFND ) ) ? pANS->apOUT[3] : NULL;
+					else
+						pDOT = NULL;
 				} break;
 		}
 

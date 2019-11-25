@@ -791,6 +791,7 @@ typedef enum gpeALF: I8
 
 	gpeALF_NAME = gpdABCD('N', 'A', 'M', 'E'),
 	gpeALF_MSEC = gpdABCD('M', 'S', 'E', 'C'),
+	gpeALF_NBLD = gpdABCD('N', 'B', 'L', 'D'),
 	gpeALF_NEAR = gpdABCD('N', 'E', 'A', 'R'),
 	gpeALF_NUSE = gpdABCD('N', 'U', 'S', 'E'),
 	gpeALF_OPER = gpdABCD('O', 'P', 'E', 'R'),

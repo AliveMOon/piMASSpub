@@ -1,5 +1,5 @@
- a0	 cam = 1 // * 0 c0	 192.168.0.157 6001  d0	 =ia e0	  =in a1	  telnet = 6001;
- sync = c0 c1	 c = nbld;
+ a0	 cam = 1 // * 0 c0	192.168.0.157 6001  d0	 =ia e0	  =in a1	  telnet = 6001;
+ sync = "192.168.0.157" c1	 c = 1;
 ="blabla
 blablaaaa
 na csak őssze szedte
@@ -10,7 +10,7 @@ na = a + 1 * 10 + a;
 ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 a3	   b3	 =fps  a5	 pic ="cam1" c5	 pic = "draw1"
 unsel = 1
 
- d5	 pic = "sprite0" e5	 = c1.c ; f5	 trg ="draw1";
+ d5	 pic = "sprite0" e5	  f5	 trg ="draw1";
 trgw = 640;
 trgh = 512 * 3;
 sprite = "sprite";
