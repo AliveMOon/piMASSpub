@@ -74,6 +74,8 @@ class gpcWIN
 
 		bool bINIThu()
 		{
+			if( !this )
+				return false;
 			if( pHOST <= sHOST )
 			{
 				//pCOMP +=

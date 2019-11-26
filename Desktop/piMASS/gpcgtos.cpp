@@ -1,4 +1,5 @@
 #include "gpcgt.h"
+#include "gpcwin.h"
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
 gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB )
@@ -10,9 +11,10 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 	U8 s;
 	p_out = p_out->lzy_format(
 									s = -1,
-									"%s%0.8x %s %s %d %s %s",
+									"%s%0.8x %s %s %d %s %s %s %d %d %s",
 									pTAB, socket, s_type, s_ip,
 									port, ((socket < 0) ? "die" : "live"),
+                                    sHOST, sUSER, mSEC.x, mSEC.y,
 									p_enter
 								);
 	pTAB--;
@@ -22,7 +24,7 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 
 	return p_out;
 }
-void gpcGT::GTos( gpcGT& mom )
+void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 {
 	if( !this )
 		return;
@@ -124,6 +126,26 @@ void gpcGT::GTos( gpcGT& mom )
 					cAN = (U1*)p_row; //cAN.an( p_row );
 					switch( cAN.alf )
 					{
+						case gpeALF_ACCOUNT: if( pWIN->bINIThu() ) {
+								pOUT = pOUT->lzy_format( 	s = -1,	"%shost %s"
+																	"%suser %s"
+																	"%smsec 0x%x",
+															!*s_prompt ? "\r\n":";", pWIN->sHOST,
+															!*s_prompt ? "\r\n":";", pWIN->sUSER,
+															!*s_prompt ? "\r\n":";", pWIN->mSEC.x
+															 );
+							} break;
+						case gpeALF_USER: {
+								pUSER = sUSER+sprintf( (char*)sUSER, "%s", s_atrib );
+							} break;
+						case gpeALF_HOST: {
+								pHOST = sHOST+sprintf( (char*)sHOST, "%s", s_atrib );
+							} break;
+						case gpeALF_MSEC: if( pWIN ) {
+								mSEC.y = pWIN ? pWIN->mSEC.x : 0;
+								mSEC.x = gpfSTR2U8( (U1*)s_atrib, NULL );
+							} break;
+
 						case gpeALF_SRC:
 
 							break;

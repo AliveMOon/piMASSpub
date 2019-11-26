@@ -4,6 +4,7 @@
 
 #include "gpcpic.h"
 //#define gpdRECVn (0x30000/12)
+class gpcWIN;
 class gpcGT;
 
 class gpcGT_DWNL
@@ -169,6 +170,10 @@ class gpcGT
 		U1	bGTdie,
 			aGTcrs[2];
 
+		U1		sHOST[0x100], *pHOST,
+				sUSER[0x100], *pUSER;
+		U4x2 	mSEC;
+
 		~gpcGT() { GTclose(); };
 		gpcGT( I8x2 id, I4 prt, SOCKET sock = INVALID_SOCKET )
 		{
@@ -198,8 +203,8 @@ class gpcGT
 			gpfSOC_CLOSE( socket );
 			return this;
 		}
-		I8		GTcnct();
-		I8		GTlst();
+		I8		GTcnct( gpcWIN& win );
+		I8		GTlst( gpcWIN& win );
 		int		GTerr( char* p_err, char** pp_err );
 		U1		GTopti( char* p_error, char** pp_error, int no_daley );
 		char*	GTrecv( char* p_err );
@@ -215,7 +220,7 @@ class gpcGT
 
 			return iCNT;
 		}
-		void		GTos( gpcGT& mom );
+		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL );
 		gpcLAZY*	GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB );
 
 

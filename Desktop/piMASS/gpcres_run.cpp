@@ -604,7 +604,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							if( gpcGT* pGT = GTcnct.GT( xFND, (U1*)alu.pDAT, alu.nLOAD() ) )
 							{
 								gpcGT& gt = *pGT;
-								gt.GTcnct();
+								gt.GTcnct( win );
 
 							}
 							break;
@@ -658,7 +658,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						{
 							gpcGT& gt = *pGT;
 
-							gt.GTlst();
+							gt.GTlst( win );
 							if( gpcLAZY* pEVNT = gt.pEVENT->qEVENT() )
 							{
 								U1x4* pBGRA;

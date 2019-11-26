@@ -1023,25 +1023,6 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
 			}
 		}
-		else if( p_gt->pINP ? !p_gt->pOUT : false )
-		{
-            if( p_gt )
-			{
-				if( p_gt->aGTcrs[1] == 'h' )
-					p_gt += 0; //->gtOS_html( *this );
-				else
-					p_gt->GTos( *this, &win );
-			}
-
-			if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
-			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
-			{
-				p_gt = GTacc.iGT(p);
-				if( p_gt ? p_gt->bGTdie : true )
-					continue;
-				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
-			}
-		}
 
 		if( aGTfd[gpeFD_send].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFD_send] ) )
 		{

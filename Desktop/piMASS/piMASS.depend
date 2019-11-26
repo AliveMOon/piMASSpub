@@ -492,7 +492,7 @@
 1574563679 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
 	"gpccrs.h"
 
-1574673271 /home/pi/Desktop/piMASS/include/gpcwin.h
+1574728951 /home/pi/Desktop/piMASS/include/gpcwin.h
 	"gpcres.h"
 
 1574574570 /home/pi/Desktop/piMASS//gpcres.h
@@ -511,21 +511,22 @@
 1574218374 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
 	"gpcres.h"
 
-1574688143 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+1574732167 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
 	"gpcwin.h"
 
-1574690892 source:/home/pi/Desktop/piMASS/gpcgt.cpp
+1574732093 source:/home/pi/Desktop/piMASS/gpcgt.cpp
 	"gpcgt.h"
 	"gpcSRC.h"
 
-1574689467 /home/pi/Desktop/piMASS/gpcgt.h
+1574731988 /home/pi/Desktop/piMASS/gpcgt.h
 	"gpcpic.h"
 
-1574689467 /home/pi/Desktop/piMASS//gpcgt.h
+1574731988 /home/pi/Desktop/piMASS//gpcgt.h
 	"gpcpic.h"
 
-1574538586 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
+1574733498 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
 	"gpcgt.h"
+	"gpcwin.h"
 
 1574208293 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp
 	"gpcres.h"
