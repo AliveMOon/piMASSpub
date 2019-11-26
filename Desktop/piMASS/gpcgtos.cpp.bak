@@ -37,9 +37,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( nSYN ? pINP->n_load < nSYN : false )
 		return;
 	else {
-		while( nSYN )
+		if( nSYN )
 		{
-            U1* pDAT = p_str+sizeof(gpcSYNC);
+            U1* pDAT = pINP->p_alloc+sizeof(gpcSYNC);
             gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
 			switch( syn.typ )
 			{
@@ -65,22 +65,16 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					break;
 			}
 
-			pINP->lzy_ins( NULL, 0, s = 0, nSYN );
+			pINP->lzy_ins( NULL, 0, s, nSYN );
 			nSYN = 0;
-			p_str = pINP ? pINP->p_alloc : NULL;
-			if( *p_str )
-                break;
-
-            if( pINP->n_load < sizeof(gpcSYNC) )
-                return;
-
-            gpcSYNC* pSYN = (gpcSYNC*)p_str;
-            nSYN = pSYN->nB;
-
+			return;
 		}
-
-		U1	*p_sub = p_str + gpmSTRLEN( p_str ),
+		U1	*p_sub = p_str,
 			*p_end = p_str+pINP->n_load;
+
+		while( (p_str < p_end) && !*p_str )
+			p_str++;
+		p_sub = p_str;
 
 		U1 *p_back = p_str + gpdVAN( (char*)p_str, "\b" );
 		bool b_back = false;
@@ -124,7 +118,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		}
 		I8x2 cAN;
 		U8 nUTF8;
-		if( p_str < p_sub ) // p_end )
+		if( p_str < p_end )
 		{
 			U1	*p_row = (U1*)p_str+gpmNINCS( p_str, " \t;\r\n" ),
 				*p_row_end = p_row+gpdVAN( (char*)p_row, ";\r\n" ),

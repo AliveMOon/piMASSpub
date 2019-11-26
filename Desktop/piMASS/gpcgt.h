@@ -32,7 +32,7 @@ public:
 class gpcHUD
 {
 public:
-	gpeNET4	id;
+	gpeNET4		id;
 	U4			n;
 	U1			*p_alloc;
 	gpcHUD(void)
@@ -161,7 +161,7 @@ class gpcGT
 						*pIFa;
 
 		gpcFD	aGTfd[gpeFD_n];
-		U4		nFDs, nFDr, nFDe, nCMP;
+		U4		nFDs, nFDr, nFDe, msSYN, nSYN;
 
 		char	sGTpub[0x10000],
 				s_buff[0x30000/12],

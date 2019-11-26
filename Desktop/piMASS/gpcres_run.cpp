@@ -475,9 +475,10 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								{
 									if( !pCAM )
 										pCAM = new gpcPICAM;
-									U1* pRGB = pPIC->getPIX( pCAM, win.mSEC.y+gpdRPI_tOUT ); //50 );
+									U1* pRGB = pPIC->getPIX( pCAM, win.mSEC.y ); //50 );
 									if( pRGB )
 									{
+										win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, pPIC->id, win.mSEC.y ), win.msSYN );
 										if( !win.pPICbg )
 										{
 											win.pPICbg = pPIC;

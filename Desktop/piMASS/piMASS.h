@@ -113,7 +113,7 @@
 	#define gpdRPI_HEIGHT	960 //960	//240 // 480		//   Allowable heights: 240, 480, 960
 	#define gpdEV_tOUT		7
 	#define gpdSDL_tOUT		3
-	#define gpdRPI_tOUT		7
+	#define gpdRPI_tOUT		1000/20
 	#define gpdJDOIT_tOUT	3
 #endif
 
@@ -3111,7 +3111,7 @@ typedef enum gpeNET2:U4
 };
 typedef enum gpeNET4:U4
 {
-	gpcNET4_NULL, // = 0,
+	gpeNET4_null, // = 0,
 	gpeNET4_U11	= MAKE_ID( sizeof(U1)		, 'U', '1', '1' ),
 	gpeNET4_I11	= MAKE_ID( sizeof(I1)		, 'I', '1', '1' ),
 
@@ -3188,10 +3188,33 @@ typedef enum gpeNET4:U4
 
 	gpeNET4_0EYE	= MAKE_ID( 0, 'E', 'Y', 'E' ),
 	gpeNET4_0HUD	= MAKE_ID( 0, 'H', 'U', 'D' ),
+
+	gpeNET4_0PIC	= MAKE_ID( 0, 'P', 'I', 'C' ),
+	gpeNET4_0SRC	= MAKE_ID( 0, 'S', 'R', 'C' ),
+	gpeNET4_0SYN	= MAKE_ID( 0, 'S', 'Y', 'N' ),
+
+
 	gpeNET4_PREV	= MAKE_ID( 'P', 'R', 'E', 'V' ),
 };
 
 class gpcCMPL;
+
+
+class gpcSYNC
+{
+public:
+	gpeNET4	typ;
+	U4		id, ms, nB;
+	gpcSYNC( gpeNET4 t, U4 i, U4 s, U4 n = 0 )
+	{
+        typ = t;
+        id = i;
+        ms = s;
+        nB = n;
+	}
+};
+
+
 
 class gpcLAZY
 {
@@ -3223,6 +3246,71 @@ public:
 	{
 		aWIP[gpeLZYwip] = aWIP[gpeLZYwipSTK];
 	}
+
+
+	gpcLAZY* syncADD( gpcSYNC s, U4& ms )
+	{
+		if( !s.typ )
+			return this;
+
+		gpcSYNC* pSYNC = this ? (gpcSYNC*)p_alloc : NULL;
+		if( pSYNC )
+		for( U4 i = 0, e = n_load/sizeof(gpcSYNC); i < e; i++ )
+		{
+			if( pSYNC[i].typ == s.typ ? pSYNC[i].id != s.id : true )
+				continue;
+			if( pSYNC[i].ms >= s.ms )
+				continue;
+			pSYNC[i].ms = s.ms;
+			s.typ = gpeNET4_null;
+			if( ms < s.ms )
+				ms = s.ms;
+			return this;
+		}
+
+		U8 i = -1;
+		gpcLAZY* pOUT = lzy_add( &s, sizeof(s), i );
+
+		if( ms < s.ms )
+			ms = s.ms;
+		return pOUT;
+	}
+
+	gpcLAZY* syncJOIN( gpcLAZY* pOUT, U4 ms )
+	{
+		if( this ? ( p_alloc ? !n_load : true ) : true )
+			return pOUT;
+
+		U8 s = -1, b;
+		gpcSYNC syn( gpeNET4_0SYN, 0, ms ),
+				*pSYN = (gpcSYNC*)p_alloc;
+
+		pOUT = pOUT->lzy_add( &syn, sizeof(syn), s = -1 );
+		b = s;
+		for( U4 i = 0, e = n_load/sizeof(syn); i < e; i++ )
+		{
+			 if( pSYN[i].ms < ms )
+				continue;
+			pOUT = pOUT->lzy_add( pSYN+i, sizeof(syn), s = -1 );
+		}
+
+		pSYN = (gpcSYNC*)(pOUT->p_alloc+b);
+		pSYN->nB = pOUT->n_load-b;
+		if( pSYN->nB > sizeof(syn) )
+			return pOUT;
+
+		if( b )
+		{
+			pOUT->n_load = b;
+			return pOUT;
+		}
+
+		gpmDEL( pOUT );
+		return NULL;
+	}
+
+
+
 	gpcLAZY* qEVENT(void);
 	gpcLAZY( void )
 	{

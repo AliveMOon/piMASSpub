@@ -154,11 +154,11 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 		usleep(3*1000);
 	}
 	if( iQC >= qc )
-		return pSRF ? (U1*)pSRF->pixels : NULL;
+		return NULL; //pSRF ? (U1*)pSRF->pixels : NULL;
 
 	if( bT )
 	{
-		iQC = qc;
+		iQC = qc+gpdRPI_tOUT;
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 

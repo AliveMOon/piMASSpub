@@ -19,6 +19,8 @@ public:
     virtual const char * what() const throw();
 };
 
+
+
 class gpcWIN
 {
 	public:
@@ -69,8 +71,15 @@ class gpcWIN
 		gpcLAZY	winPUB;
 		U8		iPUB;
 
+		/// SYNC MAP --------------
+		gpcLAZY *pSYNwin, *pSYNgt;
+		U4		msSYN, msSYNrst;
+
+
 		/// RUN MAP --------------
 		U4	*pM, *pC, *pR, mZ, mN;
+
+
 
 		bool bINIThu()
 		{

@@ -1,5 +1,6 @@
 #include "gpcgt.h"
 #include "gpcSRC.h"
+#include "gpcwin.h"
 
 U1 dz_a_favpng[]=
 {
@@ -659,6 +660,13 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 {
 	if( socket == INVALID_SOCKET )
 	{
+		pUSER = sUSER;
+		pHOST = sHOST;
+		*sUSER = 0;
+		*sHOST = 0;
+		gpmDEL(pINP);
+		nSYN = 0;
+
 		struct addrinfo ainfo;
 		gpmZ( ainfo );
 		ainfo.ai_family = AF_INET;
@@ -746,6 +754,13 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 					gpmDEL(pDWN);
 				}
 			}
+
+			//if( sUSER < pUSER )
+            if( msSYN < win.msSYN )
+            {
+				pOUT = win.pSYNwin->syncJOIN( pOUT, msSYN );
+				msSYN = win.msSYN;
+            }
 		}
 
 		p_err = GTsend( p_err );
@@ -928,11 +943,6 @@ I8 gpcGT::GTlst( gpcWIN& win )
 			{
 				pACC->addr_in = clientaddr;
 				pACC->GTclr();
-				/*gpmDEL( pACC->pPUB );
-				gpmDEL( pACC->pOUT );
-				gpmDEL( pACC->pINP );
-				gpmDEL( pACC->pDWN );*/
-				//gpmMEMCPY( &pACC->addr, &clientaddr, n_clientaddr );
 				U8 n_start = -1;
 				if( pACC->port & 1 )// telnetek
 				{
@@ -1014,7 +1024,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 					p_gt->GTos( *this, &win );
 			}
 
-			if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
+			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
 			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
 			{
 				p_gt = GTacc.iGT(p);
@@ -1033,7 +1043,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 					p_gt->GTos( *this, &win );
 			}
 
-			if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
+			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
 			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
 			{
 				p_gt = GTacc.iGT(p);
@@ -1069,6 +1079,9 @@ I8 gpcGT::GTlst( gpcWIN& win )
 						gpmDEL(p_gt->pDWN);
 					}
 				}
+
+
+
 			}
 
 			p_err = p_gt->GTsend( p_err );
