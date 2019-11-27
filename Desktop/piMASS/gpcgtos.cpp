@@ -53,6 +53,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 							case gpeNET4_0SYN:
 								break;
 							case gpeNET4_0PIC:
+
 								break;
 							default:
 								break;
@@ -60,6 +61,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					}
 					break;
 				case gpeNET4_0PIC:
+
 					break;
 				default:
 					break;

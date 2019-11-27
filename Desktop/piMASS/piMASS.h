@@ -3204,7 +3204,7 @@ class gpcSYNC
 {
 public:
 	gpeNET4	typ;
-	U4		id, ms, nB;
+	U4		nB, id, ms;
 	gpcSYNC( gpeNET4 t, U4 i, U4 s, U4 n = 0 )
 	{
         typ = t;

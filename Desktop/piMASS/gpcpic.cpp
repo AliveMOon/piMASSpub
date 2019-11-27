@@ -126,12 +126,15 @@ void call_cam( gpcTHRD_CAM* pTC )
 {
 
 	gpcTHRD_CAM cpy = *pTC;
+	gpdCAMu& cam = cpy.pC->cam;
+	U1* pPIX = (U1*)cpy.pSRF->pixels;
 	while( cpy.pC )
 	{
 		usleep(10);
-		cpy.pC->cam.grab();
-		cpy.pC->cam.retrieve(
-							(U1*)cpy.pSRF->pixels,
+		cam.grab();
+		//memcpy ( cpy.pSRF->pixels, cpy.pC->cam.callback_data._buffData.data, getImageTypeSize( RASPICAM_FORMAT_IGNORE ) );
+		cam.retrieve(
+							pPIX,
 							#ifdef gpdSYSpi
                                 raspicam::RASPICAM_FORMAT_IGNORE
 							#else
