@@ -37,9 +37,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( nSYN ? pINP->n_load < nSYN : false )
 		return;
 	else {
-		if( nSYN )
+		while( nSYN )
 		{
-            U1* pDAT = pINP->p_alloc+sizeof(gpcSYNC);
+            U1* pDAT = p_str+sizeof(gpcSYNC);
             gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
 			switch( syn.typ )
 			{
@@ -48,11 +48,12 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					{
 						gpcSYNC& isyn = ((gpcSYNC*)pDAT)[i];
 
-						switch( syn.typ )
+						switch( isyn.typ )
 						{
 							case gpeNET4_0SYN:
 								break;
 							case gpeNET4_0PIC:
+								pOUT = pOUT->lzy_format( 	s = -1,	"%spic 0x%x", !*s_prompt ? "\r\n":"", isyn.id );
 								break;
 							default:
 								break;
@@ -60,21 +61,28 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					}
 					break;
 				case gpeNET4_0PIC:
+
 					break;
 				default:
 					break;
 			}
 
-			pINP->lzy_ins( NULL, 0, s, nSYN );
+			pINP->lzy_ins( NULL, 0, s = 0, nSYN );
 			nSYN = 0;
-			return;
-		}
-		U1	*p_sub = p_str,
-			*p_end = p_str+pINP->n_load;
+			p_str = pINP ? pINP->p_alloc : NULL;
+			if( *p_str )
+                break;
 
-		while( (p_str < p_end) && !*p_str )
-			p_str++;
-		p_sub = p_str;
+            if( pINP->n_load < sizeof(gpcSYNC) )
+                return;
+
+            gpcSYNC* pSYN = (gpcSYNC*)p_str;
+            nSYN = pSYN->nB;
+
+		}
+
+		U1	*p_sub = p_str + gpmSTRLEN( p_str ),
+			*p_end = p_str+pINP->n_load;
 
 		U1 *p_back = p_str + gpdVAN( (char*)p_str, "\b" );
 		bool b_back = false;
@@ -118,7 +126,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		}
 		I8x2 cAN;
 		U8 nUTF8;
-		if( p_str < p_end )
+		if( p_str < p_sub ) // p_end )
 		{
 			U1	*p_row = (U1*)p_str+gpmNINCS( p_str, " \t;\r\n" ),
 				*p_row_end = p_row+gpdVAN( (char*)p_row, ";\r\n" ),
@@ -186,13 +194,16 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 						case gpeALF_HELP:
 							pOUT = pOUT->lzy_format( s = -1, "%sHELP?", !*s_prompt ? "\r\n":"" );
 							break;
-						case gpeALF_EYE:
-							isEVNT.null();
-							isEVNT.id = gpeNET4_0EYE;
-							isEVNT.n = TnID.num;
-							mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
-							break;
+						case gpeALF_EYE: {
+								isEVNT.null();
+								isEVNT.id = gpeNET4_0EYE;
+								isEVNT.n = TnID.num;
+								mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
+								pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
+							} break;
+						case gpeALF_PIC: {
+
+							} break;
 						/*case gpeALF_PREV:
 							isEVNT.null();
 							isEVNT.id = gpeNET4_PREV;

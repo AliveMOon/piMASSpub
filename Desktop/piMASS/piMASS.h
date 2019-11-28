@@ -3276,7 +3276,37 @@ public:
 		return pOUT;
 	}
 
-	gpcLAZY* syncJOIN( gpcLAZY* pOUT, U4 ms )
+	gpcLAZY* putPIC( U1* pDAT, U4 nDAT, U1* pNAME, U4 ms )
+	{
+		if( pDAT ? !nDAT : true )
+			return this;
+
+		U8 s = -1, b;
+		gpcSYNC syn( gpeNET4_0PIC, 0, ms );
+
+		gpcLAZY* pOUT = this->lzy_add( &syn, sizeof(syn), s = -1 );
+		b = s;
+		if( !pNAME )
+			pNAME = (U1*)"ize.pic";
+		pOUT = pOUT->lzy_add( pNAME, gpmSTRLEN(pNAME)+1, s = -1 );
+		pOUT = pOUT->lzy_add( pDAT, nDAT, s = -1 );
+
+		gpcSYNC* pSYN = (gpcSYNC*)(pOUT->p_alloc+b);
+		pSYN->nB = pOUT->n_load-b;
+		if( pSYN->nB > sizeof(syn) )
+			return pOUT;
+
+		if( b )
+		{
+			pOUT->n_load = b;
+			return pOUT;
+		}
+
+		gpmDEL( pOUT );
+		return NULL;
+	}
+
+	gpcLAZY* putSYN( gpcLAZY* pOUT, U4 ms )
 	{
 		if( this ? ( p_alloc ? !n_load : true ) : true )
 			return pOUT;

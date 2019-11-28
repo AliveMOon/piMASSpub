@@ -152,7 +152,7 @@ class gpcGT
 					*pOUT,
 					*pINP,
 					*pEVENT,
-					*pOS;
+					*pSYN;
 		gpcGT_DWNL	*pDWN;
 		gpcHUD		*pHUD, isEVNT;
 
@@ -161,7 +161,10 @@ class gpcGT
 						*pIFa;
 
 		gpcFD	aGTfd[gpeFD_n];
-		U4		nFDs, nFDr, nFDe, msSYN, nSYN;
+		U4		nFDs, nFDr, nFDe,
+
+				nSYN,
+				msSYNgt, msSYNwin;
 
 		char	sGTpub[0x10000],
 				s_buff[0x30000/12],
@@ -193,7 +196,7 @@ class gpcGT
 				gpmDEL( pDWN );
 				gpmDEL( pHUD );
 				gpmDEL( pEVENT );
-				gpmDEL( pOS );
+				gpmDEL( pSYN );
 			}
 			return this;
 		}

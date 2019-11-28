@@ -756,10 +756,10 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			}
 
 			//if( sUSER < pUSER )
-            if( msSYN < win.msSYN )
+            if( msSYNwin < win.msSYN )
             {
-				pOUT = win.pSYNwin->syncJOIN( pOUT, msSYN );
-				msSYN = win.msSYN;
+				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin );
+				msSYNwin = win.msSYN;
             }
 		}
 
