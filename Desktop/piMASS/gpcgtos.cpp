@@ -74,7 +74,21 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 				}
 				break;
 			case gpeNET4_0PIC:{
-
+					U1	*pPNT = pDAT+gpdVAN( (char*)pDAT, "." ),
+						*pEND = pPNT+gpdVAN( (char*)pPNT, " \a\t;\"\'" );
+					I8x2 TnID( 0, pPNT-pDAT );
+					TnID = pDAT;
+					TnID.num = gpfSTR2I8( pDAT+TnID.num, NULL );
+					if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( TnID ) )
+					{
+						SDL_Surface* pKILL = pPIC->pSRF;
+						SDL_RWops *pRW = SDL_RWFromMem( pEND+1, syn.nB-((pEND+1)-pDAT) );
+						pPIC->pSRF = IMG_Load_RW( pRW, 1 );
+						if( !pPIC->pSRF )
+							pPIC->pSRF = pKILL;
+						else
+							SDL_FreeSurface(pKILL);
+					}
 				} break;
 			default:
 				break;
@@ -83,14 +97,21 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		pINP->lzy_ins( NULL, 0, s = 0, nSYN );
 		nSYN = 0;
 		p_str = pINP ? pINP->p_alloc : NULL;
-		if( *p_str )
-			break;
+		if( p_str )
+		{
+			if( *p_str )
+				break;
 
-		if( pINP->n_load < sizeof(gpcSYNC) )
-			return;
+			if( pINP->n_load < sizeof(gpcSYNC) )
+			if( pSYN ? pSYN->n_load : false )
+				break;
+			else
+				return;
 
-		nSYN = ((gpcSYNC*)p_str)->nB;
+			nSYN = ((gpcSYNC*)p_str)->nB;
+		}
 	}
+
 	if( pSYN ? pSYN->n_load : false )
 	{
 		for( U4 i = 0, ie = pSYN->n_load/sizeof(gpcSYNC); i < ie; i++ )
@@ -110,10 +131,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		gpmDEL(pSYN);
 	}
 
-
-
-
-
+	if( !p_str )
+		return;
 
 	U1	*p_sub = p_str + gpmSTRLEN( p_str ),
 		*pINPload = p_str + pINP->n_load;
@@ -252,6 +271,12 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 								if( pPNG )
 								{
 									//nGD++;
+									if( pPIC->pFILE <= pPIC->sFILE )
+										pPIC->pFILE = pPIC->sFILE;
+									if( !*pPIC->pFILE )
+									{
+										pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
+									}
 									pOUT = pOUT->putPIC( pPNG->p_alloc, pPNG->n_load, pPIC->pFILE, pWIN->mSEC.x );
 									gpmDEL(pPNG);
 								}

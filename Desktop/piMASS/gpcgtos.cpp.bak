@@ -33,212 +33,307 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	char	s_atrib[0x200], s_prompt[0x100], s_cell[0x100];
 	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
 
-	if( U1* p_str = pINP ? pINP->p_alloc : NULL )
+	U1* p_str = pINP ? pINP->p_alloc : NULL;
+	if( !p_str )
+		return;
+
+	if( !*p_str )
+	if( pINP->n_load < sizeof(gpcSYNC) )
+			return;
+	else
+		nSYN = ((gpcSYNC*)p_str)->nB;
+
 	if( nSYN ? pINP->n_load < nSYN : false )
 		return;
-	else {
-		while( nSYN )
+
+	while( nSYN )
+	{
+		U1* pDAT = p_str+sizeof(gpcSYNC);
+		gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
+		switch( syn.typ )
 		{
-            U1* pDAT = p_str+sizeof(gpcSYNC);
-            gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
-			switch( syn.typ )
+			case gpeNET4_0SYN:
+				for( U4 i = 0, ie = (syn.nB/sizeof(gpcSYNC))-1; i < ie; i++ )
+				{
+					gpcSYNC& isyn = ((gpcSYNC*)pDAT)[i];
+					if( isyn.nB > sizeof(gpcSYNC) )
+						isyn.nB = 0;
+					switch( isyn.typ )
+					{
+						case gpeNET4_0SYN:
+							break;
+						case gpeNET4_0PIC:
+							if( !isyn.id )
+								break;
+
+							pSYN = pSYN->syncADD( isyn, msSYNgt );
+							break;
+						default:
+							break;
+					}
+				}
+				break;
+			case gpeNET4_0PIC:{
+					U1	*pPNT = pDAT+gpdVAN( (char*)pDAT, "." ),
+						*pEND = pPNT+gpdVAN( (char*)pPNT, " \a\t;\"\'" );
+					I8x2 TnID( 0, pPNT-pDAT );
+					TnID = pDAT;
+					TnID.num = gpfSTR2I8( pDAT+TnID.num, NULL );
+					if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( TnID ) )
+					{
+						SDL_Surface* pKILL = pPIC->pSRF;
+						SDL_RWops *pRW = SDL_RWFromMem( pEND+1, syn.nB-((pEND+1)-pDAT) );
+						pPIC->pSRF = IMG_Load_RW( pRW, 1 );
+						if( !pPIC->pSRF )
+							pPIC->pSRF = pKILL;
+						else
+							SDL_FreeSurface(pKILL);
+                        /*if( pKILL == pWIN->pPICbg )
+							pWIN->pPICbg = pPIC->pSRF;*/
+					}
+				} break;
+			default:
+				break;
+		}
+
+		pINP->lzy_ins( NULL, 0, s = 0, nSYN );
+		nSYN = 0;
+		p_str = pINP ? pINP->p_alloc : NULL;
+		if( *p_str )
+			break;
+
+		if( pINP->n_load < sizeof(gpcSYNC) )
+			return;
+
+		nSYN = ((gpcSYNC*)p_str)->nB;
+	}
+	if( pSYN ? pSYN->n_load : false )
+	{
+		for( U4 i = 0, ie = pSYN->n_load/sizeof(gpcSYNC); i < ie; i++ )
+		{
+			gpcSYNC& isyn = ((gpcSYNC*)pSYN->p_alloc)[i];
+			switch( isyn.typ )
 			{
 				case gpeNET4_0SYN:
-					for( U4 i = 0, ie = (syn.nB/sizeof(gpcSYNC))-1; i < ie; i++ )
-					{
-						gpcSYNC& isyn = ((gpcSYNC*)pDAT)[i];
-
-						switch( isyn.typ )
-						{
-							case gpeNET4_0SYN:
-								break;
-							case gpeNET4_0PIC:
-								pOUT = pOUT->lzy_format( 	s = -1,	"%spic 0x%x", !*s_prompt ? "\r\n":"", isyn.id );
-								break;
-							default:
-								break;
-						}
-					}
 					break;
 				case gpeNET4_0PIC:
-
+					pOUT = pOUT->lzy_format( s = -1, "pic 0x%x", isyn.id );
 					break;
 				default:
 					break;
 			}
-
-			pINP->lzy_ins( NULL, 0, s = 0, nSYN );
-			nSYN = 0;
-			p_str = pINP ? pINP->p_alloc : NULL;
-			if( *p_str )
-                break;
-
-            if( pINP->n_load < sizeof(gpcSYNC) )
-                return;
-
-            gpcSYNC* pSYN = (gpcSYNC*)p_str;
-            nSYN = pSYN->nB;
-
 		}
+		gpmDEL(pSYN);
+	}
 
-		U1	*p_sub = p_str + gpmSTRLEN( p_str ),
-			*p_end = p_str+pINP->n_load;
 
-		U1 *p_back = p_str + gpdVAN( (char*)p_str, "\b" );
-		bool b_back = false;
-		while( *p_back == '\b' )
+
+
+
+
+	U1	*p_sub = p_str + gpmSTRLEN( p_str ),
+		*pINPload = p_str + pINP->n_load;
+
+	U1 *p_back = p_str + gpdVAN( (char*)p_str, "\b" );
+	bool b_back = false;
+	while( *p_back == '\b' )
+	{
+		b_back = !aGTcrs[0];
+		I8	n_sub = p_sub-pINP->p_alloc,
+			n_back = gpmNINCS( p_back, "\b" ), n_str = p_back-pINP->p_alloc;
+		if( n_str <= n_back )
 		{
-			b_back = !aGTcrs[0];
-			I8	n_sub = p_sub-pINP->p_alloc,
-				n_back = gpmNINCS( p_back, "\b" ), n_str = p_back-pINP->p_alloc;
-			if( n_str <= n_back )
+			n_str = 0;
+		} else {
+			n_str -= n_back;
+		}
+		n_back += p_back-pINP->p_alloc;
+		if( n_sub > n_str )
+		{
+			n_str = 0;
+		}
+		U8 s = n_str;
+		pINP->lzy_ins( NULL, 0, s, n_back );
+
+		p_str = pINP ? pINP->p_alloc : NULL;
+		if( !p_str )
+		{
+			// elfogyott;
+			gpmDEL( pINP );
+			p_sub = pINPload = p_str;
+			break;
+		}
+		p_sub = p_str,
+		pINPload = p_str+pINP->n_load;
+		p_back = p_str+gpdVAN( (char*)p_str, "\b" );
+	}
+	if( b_back )
+	if( !aGTcrs[0] )
+	{
+		pOUT = pOUT->lzy_format( s = -1, "  \r0x%x>", iCNT );
+		if( pINP )
+			pOUT = pOUT->lzy_format( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
+	}
+
+	I8x2 cAN;
+	if( p_str < p_sub )
+	{
+		U1	*p_row = p_str+gpmNINCS( p_str, " \t;>\r\n" ),
+			*p_row_end = p_row+gpdVAN( (char*)p_row, ";\r\n" ),
+			*p_next = p_row_end+gpmNINCS( p_row_end, ";\r\n" ),
+			*p_answ = s_answ,
+			*p_com = s_com;
+			//*p_cell;
+
+		p_sub = p_row;
+		I8 n_com, n_row, n_cpy, n_atrib;
+		//I84 io_cnt;
+		if( p_row_end < p_next )
+		{
+			iCNT++;
+			if( *p_row_end == ';' )
 			{
-				n_str = 0;
+				aGTcrs[0] = ';';
 			} else {
-				n_str -= n_back;
+				aGTcrs[0] = 0;
+				p_next += gpdVAN( (char*)p_next, ">" );
+				p_next += gpmNINCS( p_next, ">" );
 			}
-			n_back += p_back-pINP->p_alloc;
-			if( n_sub > n_str )
-			{
-				n_str = 0;
-			}
-			U8 s = n_str;
-			pINP->lzy_ins( NULL, 0, s, n_back );
 
-			p_str = pINP ? pINP->p_alloc : NULL;
-			if( !p_str )
+			p_str = p_next;
+			if( p_row < p_row_end )
 			{
-				// elfogyott;
-				gpmDEL( pINP );
-				p_sub = p_end = p_str;
-				break;
-			}
-			p_sub = p_str,
-			p_end = p_str+pINP->n_load;
-			p_back = p_str+gpdVAN( (char*)p_str, "\b" );
-		}
-		if( b_back )
-		if( !aGTcrs[0] )
-		{
-			pOUT = pOUT->lzy_format( s = -1, "  \r%x>", socket );
-			if( pINP )
-				pOUT = pOUT->lzy_format( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
-		}
-		I8x2 cAN;
-		U8 nUTF8;
-		if( p_str < p_sub ) // p_end )
-		{
-			U1	*p_row = (U1*)p_str+gpmNINCS( p_str, " \t;\r\n" ),
-				*p_row_end = p_row+gpdVAN( (char*)p_row, ";\r\n" ),
-				*p_next = p_row_end+gpmNINCS( p_row_end, ";\r\n" ),
-				*p_answ = s_answ,
-				*p_com = s_com,
-				*p_cell;
-			p_sub = p_row;
-			I8 n_com, n_row, n_cpy, n_atrib;
-			//I84 io_cnt;
-			if( p_row_end < p_next )
-			{
-				*s_prompt = 0;
-				iCNT++;
-				if( *p_row_end != ';' )
+				n_row = p_row_end-p_row; // gpdVAN( (char*)p_row, ";\r\n" );
+				n_com = gpdVAN( (char*)p_row, "+-0123456789 \t;\r\n" );
+
+				n_cpy = min( n_com, (sizeof(s_com)-1) );
+				((U1*)gpmMEMCPY( s_com, p_row, n_cpy ))[n_cpy] = 0;
+
+				n_com += gpmNINCS( p_row+n_com, " \t" );
+				n_atrib = min( (n_row-n_com), (sizeof(s_atrib)-1) );
+				if( n_atrib )
 				{
-					aGTcrs[0] = 0;
-					sprintf( s_prompt, "\r\n%x>", iCNT );
-				} else {
+					// jött valami atributum
+					((char*)gpmMEMCPY( s_atrib, p_row+n_com, n_atrib ))[n_atrib] = 0;
 
-					gpmSTRCPY( s_prompt, ";" );
-					aGTcrs[0] = ';';
 				}
-				p_str = p_next;
-				if( p_row < p_row_end )
+
+				cAN.num = n_cpy;
+				cAN = s_com;
+
+				switch( cAN.alf )
 				{
-					n_row = gpdVAN( (char*)p_row, ";\r\n" );
-					n_com = gpdVAN( (char*)p_row, "+-0123456789 \t;\r\n" );
-					n_cpy = min( n_com, (sizeof(s_com)-1) );
-					((U1*)gpmMEMCPY( p_com, p_row, n_cpy ))[n_cpy] = 0;
-					n_com += gpmNINCS( p_row+n_com, " \t" );
-					n_atrib = min( (n_row-n_com), (sizeof(s_atrib)-1) );
-					if( n_atrib )
-					{
-						// jött valami atributum
-						((char*)gpmMEMCPY( s_atrib, p_row+n_com, n_atrib ))[n_atrib] = 0;
-
-					}
-					cAN.num = gpfABCnincs( p_row, p_row_end, nUTF8, gpaALFadd );
-					cAN = (U1*)p_row; //cAN.an( p_row );
-					switch( cAN.alf )
-					{
-						case gpeALF_ACCOUNT: if( pWIN->bINIThu() ) {
-								pOUT = pOUT->lzy_format( 	s = -1,	"%shost %s"
-																	"%suser %s"
-																	"%smsec 0x%x",
-															!*s_prompt ? "\r\n":"", pWIN->sHOST,
-															!*s_prompt ? "\r\n":";", pWIN->sUSER,
-															!*s_prompt ? "\r\n":";", pWIN->mSEC.x
-															 );
-							} break;
-						case gpeALF_USER: {
-								pUSER = sUSER+sprintf( (char*)sUSER, "%s", s_atrib );
-							} break;
-						case gpeALF_HOST: {
-								pHOST = sHOST+sprintf( (char*)sHOST, "%s", s_atrib );
-							} break;
-						case gpeALF_MSEC: if( pWIN ) {
-								mSEC.y = pWIN ? pWIN->mSEC.x : 0;
-								mSEC.x = gpfSTR2U8( (U1*)s_atrib, NULL );
-							} break;
-						case gpeALF_GATELIST:
-							pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gppTAB ); //gpsTAB );
-							break;
-						case gpeALF_HELP:
-							pOUT = pOUT->lzy_format( s = -1, "%sHELP?", !*s_prompt ? "\r\n":"" );
-							break;
-						case gpeALF_EYE: {
-								isEVNT.null();
-								isEVNT.id = gpeNET4_0EYE;
-								isEVNT.n = TnID.num;
-								mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
-								pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
-							} break;
-						case gpeALF_PIC: {
-
-							} break;
-						/*case gpeALF_PREV:
+					case gpeALF_ACCOUNT: if( pWIN->bINIThu() ) {
+							pOUT = pOUT->lzy_format(
+														s = -1,	"%shost %s;"
+																"%suser %s;"
+																"%smsec 0x%x;",
+														aGTcrs[0] ? "" : "\r\n", pWIN->sHOST,
+														aGTcrs[0] ? "" : "\r\n", pWIN->sUSER,
+														aGTcrs[0] ? "" : "\r\n", pWIN->mSEC.x
+													);
+						} break;
+					case gpeALF_USER: {
+							pUSER = sUSER+sprintf( (char*)sUSER, "%s", s_atrib );
+						} break;
+					case gpeALF_HOST: {
+							pHOST = sHOST+sprintf( (char*)sHOST, "%s", s_atrib );
+						} break;
+					case gpeALF_MSEC: if( pWIN ) {
+							mSEC.y = pWIN ? pWIN->mSEC.x : 0;
+							mSEC.x = gpfSTR2U8( (U1*)s_atrib, NULL );
+						} break;
+					case gpeALF_GATELIST:
+						pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gppTAB ); //gpsTAB );
+						break;
+					case gpeALF_HELP:
+						pOUT = pOUT->lzy_format( s = -1, "%sHELP?", aGTcrs[0] ? "" : "\r\n" );
+						break;
+					case gpeALF_EYE: {
 							isEVNT.null();
-							isEVNT.id = gpeNET4_PREV;
+							isEVNT.id = gpeNET4_0EYE;
 							isEVNT.n = TnID.num;
 							mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
-							break;*/
-						default:
-							pOUT = pOUT->lzy_format( s = -1, "%snonsens", !*s_prompt ? "\r\n":"" );
-					}
-					p_sub = p_next; // p_row_end;
-				}
+							pOUT = pOUT->lzy_format(s = -1, "%s event", aGTcrs[0] ? "" : "\r\n" );
+						} break;
+					case gpeALF_PIC: {
+							U4 iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
+							if( iPIC )
+							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC-1 ) )
+							if( SDL_Surface *pSRF = pPIC->pSRF )
+							{
+								if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
+									IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
+								gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
+								if( pPNG )
+								{
+									//nGD++;
+									if( pPIC->pFILE <= pPIC->sFILE )
+										pPIC->pFILE = pPIC->sFILE;
+									if( !*pPIC->pFILE )
+									{
+										pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
+									}
+									pOUT = pOUT->putPIC( pPNG->p_alloc, pPNG->n_load, pPIC->pFILE, pWIN->mSEC.x );
+									gpmDEL(pPNG);
+								}
+								//SDL_FreeSurface(pSURF);
+								if( gpfACE( gpdPICbg, 4) > -1 )
+								{
+									rename( gpdPICbg, "/mnt/ram/bg.kill" );
+								}
+								rename( "/mnt/ram/tmp.tmp", gpdPICbg );
 
-			}
-			if( p_str < p_row )
-			{
-				p_str = p_row;
-			}
-		}
-		if( pINP ? (p_sub > pINP->p_alloc) : false )
-		{
-			U8 s = 0;
-			pINP->lzy_ins( NULL, 0, s, p_sub-pINP->p_alloc );
-			if( pOUT )
-			if( nOUT < pOUT->n_alloc )
-			{
-				if( aGTcrs[0] )
-				{
-					pOUT = pOUT->lzy_format( s = -1, ";" );
-				} else {
-					pOUT = pOUT->lzy_format( s = -1, "\b\r\n%x>", iCNT );
+								if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+								{
+									remove( "/mnt/ram/bg.kill" );
+
+								}
+							}
+						} break;
+					case gpeALF_OK:
+					case gpeALF_NONSENS:
+					case gpeALF_NONSENSE: {
+
+						} break;
+					/*case gpeALF_PREV:
+						isEVNT.null();
+						isEVNT.id = gpeNET4_PREV;
+						isEVNT.n = TnID.num;
+						mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
+						pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
+						break;*/
+					default:
+						pOUT = pOUT->lzy_format( s = -1, "%snonsens", aGTcrs[0] ? "" : "\r\n" );
 				}
+				p_sub = p_next; // p_row_end;
 			}
 		}
+
+		if( p_row_end < pINPload )
+		if( !*p_row_end )
+			p_sub = p_row_end;
+		/*if( p_str < p_row )
+		{
+			p_str = p_row;
+		}*/
 	}
+
+	if( pINP ? (p_sub > pINP->p_alloc) : false )
+	{
+		U8 s = 0;
+		pINP->lzy_ins( NULL, 0, s, p_sub-pINP->p_alloc );
+		if( pOUT )
+		if( nOUT < pOUT->n_load )
+		if( aGTcrs[0] )
+		{
+			pOUT = pOUT->lzy_format( s = -1, ";" );
+		} else {
+			pOUT = pOUT->lzy_format( s = -1, "\b\r\n0x%x>", iCNT );
+		}
+
+	}
+
 
 	if( pINP ? !pINP->n_load : true )
 	{

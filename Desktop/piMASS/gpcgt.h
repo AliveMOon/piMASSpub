@@ -22,7 +22,7 @@ public:
 	gpcGT_DWNL( I8x2& anDWN )
 	{
 		gpmCLR;
-		anDWN.str( s_file_name );
+		anDWN.an2str( s_file_name );
 		an = anDWN;
 	}
 	gpcGT_DWNL( char* p_file );

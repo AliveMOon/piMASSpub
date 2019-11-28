@@ -551,7 +551,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
                                 }
                                 if( !pSPR->pSRF )
                                 {
-									pSPR->TnID.str( (U1*)win.gppMASSfile, (U1*)".png" );
+									pSPR->TnID.an2str( (U1*)win.gppMASSfile, (U1*)".png" );
 									pSPR->pSRF = IMG_Load( win.gpsMASSpath );
 									if( !pSPR->pSRF )
 										break;

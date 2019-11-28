@@ -2830,7 +2830,7 @@ public:
 	}
 	I8x2& A( U1* pA, U1** ppA );
 
-	U8 str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false )
+	U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false )
 	{
 		if( !p_buff )
 			return 0;
