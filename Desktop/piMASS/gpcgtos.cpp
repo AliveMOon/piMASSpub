@@ -11,10 +11,10 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 	U8 s;
 	p_out = p_out->lzyFRMT(
 									s = -1,
-									"%s%0.8x %s %s %d %s %s %s %d %d %s",
+									"%s%0.8x %s %s %d %s %s %s %d %d %d/%d%s",
 									pTAB, socket, s_type, s_ip,
 									port, ((socket < 0) ? "die" : "live"),
-                                    sHOST, sUSER, mSEC.x, mSEC.y,
+                                    sHOST, sUSER, mSEC.x, mSEC.y, nSYNdo, nSYNsum,
 									p_enter
 								);
 	pTAB--;
@@ -53,6 +53,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		switch( syn.typ() )
 		{
 			case gpeNET4_0SYN:
+				nSYNsum += syn.nS();
 				for( U4 iS = 0, nS = syn.nS()-1; iS < nS; iS++ )
 				{
 					gpcSYNC& isyn = ((gpcSYNC*)pDAT)[iS];
@@ -112,6 +113,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 	if( pSYNgt ? pSYNgt->n_load : false )
 	{
+		nSYNdo += pSYNgt->n_load/sizeof(gpcSYNC);
 		for( U4 i = 0, ie = pSYNgt->n_load/sizeof(gpcSYNC); i < ie; i++ )
 		{
 			gpcSYNC& isyn = ((gpcSYNC*)pSYNgt->p_alloc)[i];

@@ -71,6 +71,8 @@ class gpcWIN
 		gpcLAZY	winPUB;
 		U8		iPUB;
 
+		U1	sGTpub[0x10000],
+			sGTbuff[0x30000/12];
 		/// SYNC MAP --------------
 		gpcLAZY *pSYNwin, *pSYNgt;
 		U4		msSYN, msSYNrst;

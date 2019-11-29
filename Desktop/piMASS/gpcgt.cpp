@@ -419,7 +419,7 @@ int gpcGT::GTerr( char* p_error, char** pp_error )
 	return out;
 }
 
-U1 gpcGT::GTopti( char* p_error, char** pp_error, int no_daley )
+U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 {
 	*p_error = 0;
 	p_error += sprintf( p_error, "\n\t\t-= SOCKET_OPT =-" );
@@ -429,8 +429,8 @@ U1 gpcGT::GTopti( char* p_error, char** pp_error, int no_daley )
 	int rcvlow;
 	int setsndlow = 0xd5;
 	int setrcvlow = 0xd5;
-	int sndbuf = sizeof(s_buff)/3;
-	int rcvbuf = sizeof(s_buff)/3;
+	int sndbuf = n_buff/2;
+	int rcvbuf = n_buff/2;
 	socklen_t lenp = sizeof(socklen_t);
 	int result = 0;
 	int sndtout = sndbuf;
@@ -528,16 +528,16 @@ U1 gpcGT::GTopti( char* p_error, char** pp_error, int no_daley )
 }
 
 
-char* gpcGT::GTrecv( char* p_err )
+char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 {
 	// ha nincsen hiba p_err[0] == 0
 	// egyébként bele ír valamit akkor nem
 	p_err[0] = 0;
-	I8 n = recv( socket, s_buff, sizeof(s_buff), 0 );
+	I8 n = recv( socket, s_buff, n_buff, 0 );
 	if( n == SOCKET_ERROR )
 	{
 		char* p_error = s_buff;
-		p_err += GTopti( p_err, &p_err, gpdGT_NoDALEY );
+		p_err += GTopt( p_err, &p_err, gpdGT_NoDALEY, n_buff );
 		bGTdie = true;
 		sprintf( p_err, "\nERROR: recv SOCKET_ERROR DIE" );
 		return p_err;
@@ -557,7 +557,7 @@ char* gpcGT::GTrecv( char* p_err )
 	sprintf( p_err, "\nERROR: recv n == 0 DIE" );
 	return p_err;
 }
-char* gpcGT::GTsend( char* p_err )
+char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 {
 	// ha nincsen hiba p_err[0] == 0
 	// egyébként bele ír valamit akkor nem
@@ -595,8 +595,8 @@ char* gpcGT::GTsend( char* p_err )
 		n += nSKIP;
 	}
 
-	if( n > sizeof(s_buff) )
-		n = sizeof(s_buff);
+	if( n > n_buff )
+		n = n_buff;
 
 	n = send( socket, (char*)pOUT->p_alloc, n, 0 );
 	if( n == SOCKET_ERROR )
@@ -616,8 +616,8 @@ char* gpcGT::GTsend( char* p_err )
 	while( sub < pOUT->n_load )
 	{
 		n = pOUT->n_load-sub;
-		if( n > sizeof(s_buff) )
-			n = sizeof(s_buff);
+		if( n > n_buff )
+			n = n_buff;
 
 		n = send( socket, ((char*)pOUT->p_alloc)+sub, n, 0 );
 		if( n == SOCKET_ERROR )
@@ -676,7 +676,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		ainfo.ai_flags = AI_PASSIVE;
 		ainfo.ai_addrlen = sizeof(ainfo);
 
-		char	*p_print = sGTpub,
+		char	*p_print = (char*)win.sGTpub,
 				s_port[32],
 				*p_err = p_print;
 		sprintf( s_port, "%d", port);
@@ -686,7 +686,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		socket = ::socket( p_ainf->ai_family, p_ainf->ai_socktype, p_ainf->ai_protocol );
 
 		p_err += sprintf( p_err, "OK" );
-		GTopti( p_err, &p_err, gpdGT_NoDALEY );
+		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
 		cout << p_print << endl;
 		p_print = p_err;
 
@@ -710,12 +710,12 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		}
 	}
 
-	char *p_err = sGTpub;
-	*sGTpub = 0;
+	char *p_err = (char*)win.sGTpub;
+	*win.sGTpub = 0;
 	U8 s;
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 	{
-		p_err = GTrecv( p_err );
+		p_err = GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 		if( *p_err )
 			cerr << p_err << endl;
 
@@ -764,7 +764,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
             }
 		}
 
-		p_err = GTsend( p_err );
+		p_err = GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 		if( *p_err )
 			cerr << p_err << endl;
 	}
@@ -797,7 +797,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 		ainfo.ai_protocol = IPPROTO_TCP;
 		ainfo.ai_flags = AI_PASSIVE;
 		ainfo.ai_addrlen = sizeof(ainfo);
-		char	*p_print = sGTpub,
+		char	*p_print = (char*)win.sGTpub,
 				s_port[32],
 				*p_err = p_print;
 		sprintf( s_port, "%d", port);
@@ -807,7 +807,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 		socket = ::socket( p_ainf->ai_family, p_ainf->ai_socktype, p_ainf->ai_protocol );
 
 		p_err += sprintf( p_err, "OK" );
-		GTopti( p_err, &p_err, gpdGT_NoDALEY );
+		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
 		cout << p_print << endl;
 		p_print = p_err;
 
@@ -843,8 +843,8 @@ I8 gpcGT::GTlst( gpcWIN& win )
 		error = listen( socket, SOMAXCONN );
 	}
 	//SOCKET acpt_soc;
-	char *p_err = sGTpub;
-	*sGTpub = 0;
+	char *p_err = (char*)win.sGTpub;
+	*win.sGTpub = 0;
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( socket, &a_fdset[gpeFDrcv]) )
 	{
 		// LISTENER
@@ -967,9 +967,10 @@ I8 gpcGT::GTlst( gpcWIN& win )
 
 				}
 
-				pACC->GTopti( p_err, &p_err, gpdGT_NoDALEY );
+				pACC->GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
 				getifaddrs(&pIFadr);
-				char	*pB = s_buff+gpeRECVn/2, *pBi = pB;
+				char	*s_buff = (char*)win.sGTpub,
+						*pB = s_buff+gpeRECVn/2, *pBi = pB;
 				void	*pIFtmp = NULL;
 				for( pIFa = pIFadr; pIFa != NULL; pIFa = pIFa->ifa_next )
 				{
@@ -1013,7 +1014,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 
 		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 		{
-			p_err = p_gt->GTrecv( p_err );
+			p_err = p_gt->GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 			if( *p_err )
 				cerr << p_err << endl;
 
@@ -1085,7 +1086,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 
 			}
 
-			p_err = p_gt->GTsend( p_err );
+			p_err = p_gt->GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 			if( *p_err )
 				cerr << p_err << endl;
 		}

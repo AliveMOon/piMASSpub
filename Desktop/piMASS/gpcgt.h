@@ -163,11 +163,11 @@ class gpcGT
 		gpcFD	aGTfd[gpeFDn];
 		U4		nFDs, nFDr, nFDe,
 
-				nSYN,
+				nSYN, nSYNsum, nSYNdo,
 				msSYNgt, msSYNwin;
 
-		char	sGTpub[0x10000],
-				s_buff[0x30000/12],
+		char	//sGTpub[0x10000],
+				//s_buff[0x30000/12],
 				s_ip[0x400],
 				s_telnet[80*25+4];
 		U1	bGTdie,
@@ -209,9 +209,9 @@ class gpcGT
 		I8		GTcnct( gpcWIN& win );
 		I8		GTlst( gpcWIN& win );
 		int		GTerr( char* p_err, char** pp_err );
-		U1		GTopti( char* p_error, char** pp_error, int no_daley );
-		char*	GTrecv( char* p_err );
-		char*	GTsend( char* p_err );
+		U1		GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff );
+		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );
+		char*	GTsnd( char* p_err, char* s_buff, U4 n_buff );
 
 		U4 GTprmpt( void )
 		{

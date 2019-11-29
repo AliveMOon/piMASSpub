@@ -125,10 +125,16 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 		case 5:	// down)
 			selANIN[1].y++;
 	}
-	if( bSH )
-		return;
+	if( !bSH )
+		selANIN[0]= selANIN[1];
 
-	selANIN[0]= selANIN[1];
+/*
+	if( !edANIN[0].a4x2[0].x )
+		return;
+	if( (edANIN[0].a4x2[0] == selANIN[0].a4x2[0]) && (edANIN[1].a4x2[0] == selANIN[1].a4x2[0]) )
+		return;*/
+
+
 
 }
 void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
@@ -1099,6 +1105,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 		if( pB < pE )
 		if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0] ) )
 		{
+			//gpmMEMCPY( edANIN, selANIN, 2 );
 			if( pSRC )
 			{
 				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )

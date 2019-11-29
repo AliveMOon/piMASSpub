@@ -10,7 +10,7 @@ class gpcCRS
 	public:
 		I4x4	scnZN0, scnZN,
 				scnIN,
-				selANIN[2];
+				selANIN[2]; //, edANIN[2];
 		gpcSRC	*apSRC[2];
 
 		U1x4	*pMINI, *pCRS;
