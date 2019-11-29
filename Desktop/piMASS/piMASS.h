@@ -354,10 +354,10 @@ enum gpeWIP : U1
 
 enum gpeFD
 {
-	gpeFD_recv,
-	gpeFD_send,
-	gpeFD_excp,
-	gpeFD_n,
+	gpeFDrcv,
+	gpeFDsnd,
+	gpeFDexcp,
+	gpeFDn,
 
 };
 
@@ -3202,15 +3202,53 @@ class gpcCMPL;
 
 class gpcSYNC
 {
+protected:
+	gpeNET4	typ4;
+	U4		nb;
 public:
-	gpeNET4	typ;
-	U4		nB, id, ms;
+	U4		id, ms;
 	gpcSYNC( gpeNET4 t, U4 i, U4 s, U4 n = 0 )
 	{
-        typ = t;
+        typ4 = t;
         id = i;
         ms = s;
-        nB = n;
+        nb = n ? n : sizeof(*this);
+        //gt = g;
+	}
+	gpeNET4 typ()
+	{
+		return typ4;
+	}
+	U4 nS()
+	{
+		return nb/sizeof(*this);
+	}
+	U4 nB()
+	{
+		return nb;
+	}
+	U4 nB( U4 n )
+	{
+		if( !this )
+			return 0;
+
+		if( n < sizeof(*this) )
+			n = sizeof(*this);
+
+		nb = n;
+		return nb;
+	}
+	bool operator != ( const gpcSYNC b ) const
+	{
+		if( typ4 != b.typ4 )
+			return true;
+
+		return id != b.id;
+	}
+
+	bool operator == ( const gpcSYNC b ) const
+	{
+		return !(*this != b);
 	}
 };
 
@@ -3250,30 +3288,53 @@ public:
 
 	gpcLAZY* syncADD( gpcSYNC s, U4& ms )
 	{
-		if( !s.typ )
+		if( !s.typ() )
 			return this;
 
 		gpcSYNC* pSYNC = this ? (gpcSYNC*)p_alloc : NULL;
+
 		if( pSYNC )
-		for( U4 i = 0, e = n_load/sizeof(gpcSYNC); i < e; i++ )
+		for( U4 i = 0, e = n_load/sizeof(*pSYNC); i < e; i++ )
 		{
-			if( pSYNC[i].typ == s.typ ? pSYNC[i].id != s.id : true )
+			if( pSYNC[i] != s )
 				continue;
+
 			if( pSYNC[i].ms >= s.ms )
-				continue;
+				return this;
+
 			pSYNC[i].ms = s.ms;
-			s.typ = gpeNET4_null;
+			//s.typ = gpeNET4_null;
 			if( ms < s.ms )
 				ms = s.ms;
 			return this;
 		}
 
 		U8 i = -1;
-		gpcLAZY* pOUT = lzy_add( &s, sizeof(s), i );
+		gpcLAZY* pOUT = lzyADD( &s, sizeof(s), i );
 
 		if( ms < s.ms )
 			ms = s.ms;
 		return pOUT;
+	}
+	gpcLAZY* SYNrdy( U4 strt )
+	{
+		if( this ? (strt > n_load) : true )
+			return this;
+
+		gpcSYNC* pSYN = (gpcSYNC*)(p_alloc+strt);
+		pSYN->nB( n_load-strt );
+		if( pSYN->nS() > 1 )
+			return this;
+
+		if( strt )
+		{
+			n_load = strt;
+			return this;
+		}
+
+		delete this;
+		return NULL;
+
 	}
 
 	gpcLAZY* putPIC( U1* pDAT, U4 nDAT, U1* pNAME, U4 ms )
@@ -3284,26 +3345,14 @@ public:
 		U8 s = -1, b;
 		gpcSYNC syn( gpeNET4_0PIC, 0, ms );
 
-		gpcLAZY* pOUT = this->lzy_add( &syn, sizeof(syn), s = -1 );
+		gpcLAZY* pOUT = this->lzyADD( &syn, sizeof(syn), s = -1 );
 		b = s;
 		if( !pNAME )
 			pNAME = (U1*)"ize.pic";
-		pOUT = pOUT->lzy_add( pNAME, gpmSTRLEN(pNAME)+1, s = -1 );
-		pOUT = pOUT->lzy_add( pDAT, nDAT, s = -1 );
+		pOUT = pOUT->lzyADD( pNAME, gpmSTRLEN(pNAME)+1, s = -1 );
+		pOUT = pOUT->lzyADD( pDAT, nDAT, s = -1 );
 
-		gpcSYNC* pSYN = (gpcSYNC*)(pOUT->p_alloc+b);
-		pSYN->nB = pOUT->n_load-b;
-		if( pSYN->nB > sizeof(syn) )
-			return pOUT;
-
-		if( b )
-		{
-			pOUT->n_load = b;
-			return pOUT;
-		}
-
-		gpmDEL( pOUT );
-		return NULL;
+		return pOUT->SYNrdy(b);
 	}
 
 	gpcLAZY* putSYN( gpcLAZY* pOUT, U4 ms )
@@ -3315,28 +3364,16 @@ public:
 		gpcSYNC syn( gpeNET4_0SYN, 0, ms ),
 				*pSYN = (gpcSYNC*)p_alloc;
 
-		pOUT = pOUT->lzy_add( &syn, sizeof(syn), s = -1 );
+		pOUT = pOUT->lzyADD( &syn, sizeof(syn), s = -1 );
 		b = s;
 		for( U4 i = 0, e = n_load/sizeof(syn); i < e; i++ )
 		{
 			 if( pSYN[i].ms < ms )
 				continue;
-			pOUT = pOUT->lzy_add( pSYN+i, sizeof(syn), s = -1 );
+			pOUT = pOUT->lzyADD( pSYN+i, sizeof(syn), s = -1 );
 		}
 
-		pSYN = (gpcSYNC*)(pOUT->p_alloc+b);
-		pSYN->nB = pOUT->n_load-b;
-		if( pSYN->nB > sizeof(syn) )
-			return pOUT;
-
-		if( b )
-		{
-			pOUT->n_load = b;
-			return pOUT;
-		}
-
-		gpmDEL( pOUT );
-		return NULL;
+		return pOUT->SYNrdy(b);
 	}
 
 
@@ -3411,7 +3448,7 @@ public:
 		return this;
 	}
 
-	gpcLAZY* lzy_add( const void* p_void, U8 n_byte, U8& n_start, U1 n = 0 )
+	gpcLAZY* lzyADD( const void* p_void, U8 n_byte, U8& n_start, U1 n = 0 )
 	{
 		if( !n_byte )
 			return this;
@@ -3476,7 +3513,7 @@ public:
 	}
 	gpcLAZY* lzy_plus(  const gpcLAZY* p_b, U8& n_start )
 	{
-		return lzy_add( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
+		return lzyADD( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
 	}
 	gpcLAZY* lzy_sub( U8& n_start, U8 n_sub )
 	{
@@ -3506,7 +3543,7 @@ public:
 	{
 		if( !this )
 		{
-			return lzy_add( NULL, n_add, n_start, n );
+			return lzyADD( NULL, n_add, n_start, n );
 		}
 
 		if( !n )
@@ -3594,7 +3631,7 @@ public:
 		if( !this )
 		{
 			//start = n_u1;
-			return lzy_add( p_u1, n_u1, n_start, n );
+			return lzyADD( p_u1, n_u1, n_start, n );
 		}
 		lzy_exp( n_start, n_sub,  n_u1, n );
 		memcpy( p_alloc+n_start, p_u1, n_u1 );
@@ -3611,10 +3648,10 @@ public:
 	gpcLAZY* operator += ( const gpcLAZY& plus )
 	{
 		U8 s = -1;
-		return lzy_add( plus.p_alloc, plus.n_load, s );
+		return lzyADD( plus.p_alloc, plus.n_load, s );
 	}
 
-	gpcLAZY* lzy_read( char* p_file, U8& n_start, U1 n = 0 )
+	gpcLAZY* lzyRD( char* p_file, U8& n_start, U1 n = 0 )
 	{
 		if( !p_file )
 			return this;
@@ -3646,7 +3683,7 @@ public:
 
 		if( n_byte > 0 )
 		{
-			p_lazy = p_lazy->lzy_add( NULL, n_byte, n_start, n );
+			p_lazy = p_lazy->lzyADD( NULL, n_byte, n_start, n );
 			if( !p_lazy )
 				goto szasz;
 			U8 n;
@@ -3716,7 +3753,7 @@ close:
 szasz:
 		return this;
 	}
-	gpcLAZY* lzy_format( U8& n_start, const char* p_format, ... );
+	gpcLAZY* lzyFRMT( U8& n_start, const char* p_format, ... );
 	gpcLAZY* lzy_reqCLOSE( void )
 	{
 		if( !this )
@@ -3767,13 +3804,13 @@ public:
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
-		str.lzy_add( pS, nS+1, aSTRT[0] = -1 );
+		str.lzyADD( pS, nS+1, aSTRT[0] = -1 );
 		U1* pS0 = str.p_alloc;
 		pS = pS0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
 
-		ix.lzy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 
@@ -3801,13 +3838,13 @@ public:
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
-		str.lzy_add( pS, nS+1, aSTRT[0] = -1 );
+		str.lzyADD( pS, nS+1, aSTRT[0] = -1 );
 		U1* pS0 = str.p_alloc;
 		pS = pS0+aSTRT[0];
 		if( pS[nS] )
 			pS[nS] = 0;
 
-		ix.lzy_add( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 

@@ -9,7 +9,7 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 
 	U1 s_type[0x20], *pE = s_type + gpfALF2STR( s_type, TnID.alf );
 	U8 s;
-	p_out = p_out->lzy_format(
+	p_out = p_out->lzyFRMT(
 									s = -1,
 									"%s%0.8x %s %s %d %s %s %s %d %d %s",
 									pTAB, socket, s_type, s_ip,
@@ -41,7 +41,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( pINP->n_load < sizeof(gpcSYNC) )
 			return;
 	else
-		nSYN = ((gpcSYNC*)p_str)->nB;
+		nSYN = ((gpcSYNC*)p_str)->nB();
 
 	if( nSYN ? pINP->n_load < nSYN : false )
 		return;
@@ -50,15 +50,13 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	{
 		U1* pDAT = p_str+sizeof(gpcSYNC);
 		gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
-		switch( syn.typ )
+		switch( syn.typ() )
 		{
 			case gpeNET4_0SYN:
-				for( U4 i = 0, ie = (syn.nB/sizeof(gpcSYNC))-1; i < ie; i++ )
+				for( U4 iS = 0, nS = syn.nS()-1; iS < nS; iS++ )
 				{
-					gpcSYNC& isyn = ((gpcSYNC*)pDAT)[i];
-					if( isyn.nB > sizeof(gpcSYNC) )
-						isyn.nB = 0;
-					switch( isyn.typ )
+					gpcSYNC& isyn = ((gpcSYNC*)pDAT)[iS];
+					switch( isyn.typ() )
 					{
 						case gpeNET4_0SYN:
 							break;
@@ -66,7 +64,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 							if( !isyn.id )
 								break;
 
-							pSYN = pSYN->syncADD( isyn, msSYNgt );
+							pSYNgt = pSYNgt->syncADD( isyn, msSYNgt );
 							break;
 						default:
 							break;
@@ -81,11 +79,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					TnID.num = gpfSTR2I8( pDAT+TnID.num, NULL );
 					if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( TnID ) )
 					{
-						SDL_Surface* pKILL = pPIC->pSRF;
-						SDL_RWops *pRW = SDL_RWFromMem( pEND+1, syn.nB-((pEND+1)-pDAT) );
-						pPIC->pSRF = IMG_Load_RW( pRW, 1 );
-						if( !pPIC->pSRF )
-							pPIC->pSRF = pKILL;
+						SDL_Surface* pKILL = pPIC->pSHR;
+						SDL_RWops *pRW = SDL_RWFromMem( pEND+1, syn.nB()-((pEND+1)-pDAT) );
+						pPIC->pSHR = IMG_Load_RW( pRW, 1 );
+						if( !pPIC->pSHR )
+							pPIC->pSHR = pKILL;
 						else
 							SDL_FreeSurface(pKILL);
 					}
@@ -103,36 +101,39 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 				break;
 
 			if( pINP->n_load < sizeof(gpcSYNC) )
-			if( pSYN ? pSYN->n_load : false )
+			if( pSYNgt ? pSYNgt->n_load : false )
 				break;
 			else
 				return;
 
-			nSYN = ((gpcSYNC*)p_str)->nB;
+			nSYN = ((gpcSYNC*)p_str)->nB();
 		}
 	}
 
-	if( pSYN ? pSYN->n_load : false )
+	if( pSYNgt ? pSYNgt->n_load : false )
 	{
-		for( U4 i = 0, ie = pSYN->n_load/sizeof(gpcSYNC); i < ie; i++ )
+		for( U4 i = 0, ie = pSYNgt->n_load/sizeof(gpcSYNC); i < ie; i++ )
 		{
-			gpcSYNC& isyn = ((gpcSYNC*)pSYN->p_alloc)[i];
-			switch( isyn.typ )
+			gpcSYNC& isyn = ((gpcSYNC*)pSYNgt->p_alloc)[i];
+			switch( isyn.typ() )
 			{
 				case gpeNET4_0SYN:
 					break;
 				case gpeNET4_0PIC:
-					pOUT = pOUT->lzy_format( s = -1, "pic 0x%x", isyn.id );
+					pOUT = pOUT->lzyFRMT( s = -1, "pic 0x%x;", isyn.id );
 					break;
 				default:
 					break;
 			}
 		}
-		gpmDEL(pSYN);
+		gpmDEL(pSYNgt);
 	}
 
 	if( !p_str )
+	{
+
 		return;
+	}
 
 	U1	*p_sub = p_str + gpmSTRLEN( p_str ),
 		*pINPload = p_str + pINP->n_load;
@@ -173,9 +174,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( b_back )
 	if( !aGTcrs[0] )
 	{
-		pOUT = pOUT->lzy_format( s = -1, "  \r0x%x>", iCNT );
+		pOUT = pOUT->lzyFRMT( s = -1, "  \r0x%x>", iCNT );
 		if( pINP )
-			pOUT = pOUT->lzy_format( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
+			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 	}
 
 	I8x2 cAN;
@@ -227,7 +228,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 				switch( cAN.alf )
 				{
 					case gpeALF_ACCOUNT: if( pWIN->bINIThu() ) {
-							pOUT = pOUT->lzy_format(
+							pOUT = pOUT->lzyFRMT(
 														s = -1,	"%shost %s;"
 																"%suser %s;"
 																"%smsec 0x%x;",
@@ -250,14 +251,14 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 						pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gppTAB ); //gpsTAB );
 						break;
 					case gpeALF_HELP:
-						pOUT = pOUT->lzy_format( s = -1, "%sHELP?", aGTcrs[0] ? "" : "\r\n" );
+						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", aGTcrs[0] ? "" : "\r\n" );
 						break;
 					case gpeALF_EYE: {
 							isEVNT.null();
 							isEVNT.id = gpeNET4_0EYE;
 							isEVNT.n = TnID.num;
-							mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzy_format(s = -1, "%s event", aGTcrs[0] ? "" : "\r\n" );
+							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
+							pOUT = pOUT->lzyFRMT(s = -1, "%s event", aGTcrs[0] ? "" : "\r\n" );
 						} break;
 					case gpeALF_PIC: {
 							U4 iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
@@ -267,11 +268,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 							{
 								if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
 									IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
-								gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzy_read( "/mnt/ram/tmp.tmp", s = -1 );
+								gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
 								if( pPNG )
 								{
 									//nGD++;
-									if( pPIC->pFILE <= pPIC->sFILE )
+									if( pPIC->pFILE < pPIC->sFILE )
 										pPIC->pFILE = pPIC->sFILE;
 									if( !*pPIC->pFILE )
 									{
@@ -303,11 +304,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 						isEVNT.null();
 						isEVNT.id = gpeNET4_PREV;
 						isEVNT.n = TnID.num;
-						mom.pEVENT = mom.pEVENT->lzy_add( &isEVNT, sizeof(isEVNT), s = -1 );
-						pOUT = pOUT->lzy_format(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
+						mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
+						pOUT = pOUT->lzyFRMT(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
 						break;*/
 					default:
-						pOUT = pOUT->lzy_format( s = -1, "%snonsens", aGTcrs[0] ? "" : "\r\n" );
+						pOUT = pOUT->lzyFRMT( s = -1, "%snonsens", aGTcrs[0] ? "" : "\r\n" );
 				}
 				p_sub = p_next; // p_row_end;
 			}
@@ -330,9 +331,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		if( nOUT < pOUT->n_load )
 		if( aGTcrs[0] )
 		{
-			pOUT = pOUT->lzy_format( s = -1, ";" );
+			pOUT = pOUT->lzyFRMT( s = -1, ";" );
 		} else {
-			pOUT = pOUT->lzy_format( s = -1, "\b\r\n0x%x>", iCNT );
+			pOUT = pOUT->lzyFRMT( s = -1, "\b\r\n0x%x>", iCNT );
 		}
 
 	}
@@ -348,6 +349,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
     if( pINP->n_load < sizeof(gpcSYNC) )
         return;
 	gpcSYNC* pSYN = (gpcSYNC*)pINP->p_alloc;
-	nSYN = pSYN->nB;
+	nSYN = pSYN->nB();
 
 }

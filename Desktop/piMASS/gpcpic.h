@@ -57,15 +57,18 @@ public:
 
 class gpcPICAM
 {
+	bool bCAMU;
 public:
 	gpdCAMu	cam;
-	I4x2				wh;
+	I4x2 wh;
 	gpcPICAM(){
 		// Allowable values: RASPICAM_FORMAT_GRAY,RASPICAM_FORMAT_RGB,RASPICAM_FORMAT_BGR,RASPICAM_FORMAT_YUV420
 
 		#ifdef gpdSYSpi
+			bCAMU = false;
 			cam.setFormat(raspicam::RASPICAM_FORMAT_RGB);
 		#else
+			bCAMU = true;
 			cam.setFormat( RASPICAM_FORMAT_RGB );
 		#endif
 
@@ -77,14 +80,17 @@ public:
 
 		// Open camera
 		//cout<<"Opening Camera..."<<endl;
-		if ( !cam.open())
+		if( !cam.open() )
 		{
 			//cerr<<"Error opening camera"<<endl;return -1;
 			return;
 		}
 		usleep(300*1000); // ? ez feltétlen kell
 	};
-
+	bool bGD()
+	{
+		return !bCAMU;
+	}
 
 };
 
@@ -94,7 +100,7 @@ public:
 	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
 	U4				id, iSRC, iQC, nPIXall, nPIX, bppS;
-	SDL_Surface		*pSRF;
+	SDL_Surface		*pSRF, *pSHR;
 	I4x4			xyOUT, xySRC;
 	gpcPIC			*pSRC;
 	bool			bT;
@@ -109,67 +115,6 @@ public:
 		TnID = an;
 	}
 
-
-	/*U1* getPIXo( gpcPICAM* pC, U4 qc )
-	{
-		if( !this )
-			return NULL;
-		if( !pC )
-			return pPIX;
-		if( pC->cam.open() )
-		{
-			usleep(300*1000);
-		}
-		if( iQC >= qc )
-			return pPIX;
-
-        nPIX = pC->cam.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB );
-		xyOUT.a4x2[1] = I4x2( pC->cam.getWidth(), pC->cam.getHeight() );
-
-		if( nPIXall < nPIX )
-		{
-			nPIXall = nPIX;
-			gpmDELary( pPIX );
-			pPIX = new U1[nPIXall];
-		}
-		pC->cam.grab();
-		// Extract the image
-		pC->cam.retrieve(
-							pPIX,
-							raspicam::RASPICAM_FORMAT_IGNORE
-										//RASPICAM_FORMAT_YUV420 );
-										//RASPICAM_FORMAT_RGB );
-						);
-
-        I4x2& wh = xyOUT.a4x2[1];
-        U4 rmask, gmask, bmask, amask;
-		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-		  int shift = (req_format == STBI_rgb) ? 8 : 0;
-		  rmask = 0xff000000 >> shift;
-		  gmask = 0x00ff0000 >> shift;
-		  bmask = 0x0000ff00 >> shift;
-		  amask = 0x000000ff >> shift;
-		#else // little endian, like x86
-		  rmask = 0x000000ff;
-		  gmask = 0x0000ff00;
-		  bmask = 0x00ff0000;
-		  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
-		#endif
-
-		SDL_Surface	*pNEW = SDL_CreateRGBSurfaceFrom(
-														pPIX, wh.x, wh.y, 24, wh.x*3,
-														rmask, gmask, bmask, amask
-													),
-					*pGD = SDL_ConvertSurfaceFormat( pNEW, SDL_PIXELFORMAT_RGBA8888, 0);
-		if( pNEW )
-		{
-			SDL_FreeSurface(pNEW);
-			SDL_FreeSurface(pSRF);
-			pSRF = pGD; //pNEW;
-		}
-		iQC = qc;
-		return pPIX;
-	}*/
 	U1* getPIX()
 	{
 		if( !this )
@@ -179,7 +124,14 @@ public:
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc );
 
-
+	SDL_Surface* surDRW()
+	{
+		if( pSHR )
+			return pSHR;
+		if( pSRF )
+			return pSRF;
+		return NULL;
+	}
 };
 
 class gpcPICall

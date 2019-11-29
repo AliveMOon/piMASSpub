@@ -958,7 +958,7 @@ class gpcCLASS {
 
 				U8 s = -1;
 
-				paLZY = paLZY->lzy_add( NULL, nADD*sizeof(pFND), s );
+				paLZY = paLZY->lzyADD( NULL, nADD*sizeof(pFND), s );
 				ppC = NULL;
 				if( paLZY )
 					ppC = (gpcLAZY**)paLZY->p_alloc;
@@ -1082,7 +1082,7 @@ public:
 
 		U8 s = -1;
 		nALLOC = nLST;
-		pKIDS = pKIDS->lzy_add( NULL, sizeof(*pKIDS), s );*/
+		pKIDS = pKIDS->lzyADD( NULL, sizeof(*pKIDS), s );*/
 		return this;
 	}
 };
@@ -1197,7 +1197,7 @@ public:
 		{
 			*pTG->ppGET( ix ) = pLZY = new gpcLAZY;
 		}
-		pLZY->lzy_add( (U4*)&iKID, sizeof(U4), s, 8 );
+		pLZY->lzyADD( (U4*)&iKID, sizeof(U4), s, 8 );
 	}
 	void tag_sub( gpeALF tg, U4 iKID )
 	{

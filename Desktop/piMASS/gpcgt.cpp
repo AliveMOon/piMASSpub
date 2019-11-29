@@ -118,14 +118,14 @@ gpcLAZY* gpcGT_DWNL::join( gpcLAZY* pOUT, gpcGT& mom, gpcLAZY* pEXE )
 	{
 		case gpeALF_FAVICON:
 			n_send = sizeof(dz_a_favpng);
-			pOUT = pOUT->lzy_format( n_size, dz_s_http_dwnl_sFN_sFNdzr_nS, "favicon", "favicon.png", n_send );
+			pOUT = pOUT->lzyFRMT( n_size, dz_s_http_dwnl_sFN_sFNdzr_nS, "favicon", "favicon.png", n_send );
 			pOUT = pOUT->lzy_ins( dz_a_favpng, n_send, n_size, 0 );
 			return pOUT->lzy_reqCLOSE();
 		case gpeALF_S:
 			n_send = pEXE ? pEXE->n_alloc : 0;
 			if( !n_send )
 				return pOUT;
-			pOUT = pOUT->lzy_format( n_size, dz_s_http_dwnl_sFN_sFNpEXP_nS, "setup", "setup.exe", n_send );
+			pOUT = pOUT->lzyFRMT( n_size, dz_s_http_dwnl_sFN_sFNpEXP_nS, "setup", "setup.exe", n_send );
 			pOUT = pOUT->lzy_plus( pEXE, n_size );
 			return pOUT;
 		default:
@@ -573,11 +573,11 @@ char* gpcGT::GTsend( char* p_err )
 		if( !aGTcrs[1] )
 		if( aGTcrs[0] )
 		{
-			pOUT = pOUT->lzy_format( s = -1, ";" );
+			pOUT = pOUT->lzyFRMT( s = -1, ";" );
 		} else {
-			pOUT = pOUT->lzy_format( s = -1, "\r\n%x>", socket );
+			pOUT = pOUT->lzyFRMT( s = -1, "\r\n%x>", socket );
 			if( pINP )
-				pOUT = pOUT->lzy_format( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
+				pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 		}
 	}
 
@@ -660,6 +660,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 {
 	if( socket == INVALID_SOCKET )
 	{
+
 		pUSER = sUSER;
 		pHOST = sHOST;
 		*sUSER = 0;
@@ -712,7 +713,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	char *p_err = sGTpub;
 	*sGTpub = 0;
 	U8 s;
-	if( aGTfd[gpeFD_recv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFD_recv] ) )
+	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 	{
 		p_err = GTrecv( p_err );
 		if( *p_err )
@@ -728,17 +729,17 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
 	}
 
-	if( aGTfd[gpeFD_send].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFD_send] ) )
+	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 	{
 		U8 s;
 		if(!pOUT)
 		{
 			if(pHUD ? pHUD->p_alloc : NULL )
 			{
-				pOUT = pOUT->lzy_format( s = -1, " hud" );
+				pOUT = pOUT->lzyFRMT( s = -1, " hud" );
 
-				pOUT = pOUT->lzy_add(pHUD, 8, s = -1);
-				pOUT = pOUT->lzy_add(pHUD->p_alloc, pHUD->n, s = -1);
+				pOUT = pOUT->lzyADD(pHUD, 8, s = -1);
+				pOUT = pOUT->lzyADD(pHUD->p_alloc, pHUD->n, s = -1);
 				gpmDEL(pHUD);
 				GTprmpt();
 				//break;
@@ -768,18 +769,18 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			cerr << p_err << endl;
 	}
 
-	aGTfd[gpeFD_recv].setFD( socket );
-	aGTfd[gpeFD_send].setFD( socket );
+	aGTfd[gpeFDrcv].setFD( socket );
+	aGTfd[gpeFDsnd].setFD( socket );
 
 	struct timeval tv;   // sleep for tenr minutes!
 	tv.tv_sec = 0;
 	tv.tv_usec = gpdGT_LIST_tOUT;
 
 	int nS = select(
-					aGTfd[gpeFD_recv].maxSCK+1,
-					&aGTfd[gpeFD_recv].fdS,
-					(aGTfd[gpeFD_send].nFD ? &aGTfd[gpeFD_send].fdS : NULL),
-					NULL, //(aGTfd[gpeFD_excp].fd_count ? &aGTfd[gpeFD_excp] : NULL),
+					aGTfd[gpeFDrcv].maxSCK+1,
+					&aGTfd[gpeFDrcv].fdS,
+					(aGTfd[gpeFDsnd].nFD ? &aGTfd[gpeFDsnd].fdS : NULL),
+					NULL, //(aGTfd[gpeFDexcp].fd_count ? &aGTfd[gpeFDexcp] : NULL),
 					&tv
 				);
 
@@ -844,7 +845,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 	//SOCKET acpt_soc;
 	char *p_err = sGTpub;
 	*sGTpub = 0;
-	if( aGTfd[gpeFD_recv].isFD( socket ) ) // FD_ISSET( socket, &a_fdset[gpeFD_recv]) )
+	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( socket, &a_fdset[gpeFDrcv]) )
 	{
 		// LISTENER
 		//struct sockaddr_in
@@ -946,7 +947,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				U8 n_start = -1;
 				if( pACC->port & 1 )// telnetek
 				{
-					pACC->pOUT = pACC->pOUT->lzy_format(n_start, gp_sHELLO_acc, pACC->iCNT );
+					pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->iCNT );
 					pACC->iCNT++;
 					pACC->aGTcrs[0] = 'a';
 					pACC->GTos(*this);
@@ -954,7 +955,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				else switch( pACC->port )
 				{
 					case 23: // telnet
-						pACC->pOUT = pACC->pOUT->lzy_format( n_start,  gp_sHELLO, pACC->iCNT );
+						pACC->pOUT = pACC->pOUT->lzyFRMT( n_start,  gp_sHELLO, pACC->iCNT );
 						pACC->aGTcrs[0] = 'a';
 						pACC->GTos( *this );
 						break;
@@ -962,7 +963,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 						pACC->aGTcrs[1] = 'h';
 						break;
 					default:
-						pACC->pOUT = pACC->pOUT->lzy_format( n_start,  gp_sHELLO, pACC->iCNT );
+						pACC->pOUT = pACC->pOUT->lzyFRMT( n_start,  gp_sHELLO, pACC->iCNT );
 
 				}
 
@@ -1010,7 +1011,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 		if( p_gt ? p_gt->bGTdie : true )
 			continue;
 
-		if( aGTfd[gpeFD_recv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFD_recv] ) )
+		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 		{
 			p_err = p_gt->GTrecv( p_err );
 			if( *p_err )
@@ -1053,17 +1054,17 @@ I8 gpcGT::GTlst( gpcWIN& win )
 			}
 		}
 
-		if( aGTfd[gpeFD_send].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFD_send] ) )
+		if( aGTfd[gpeFDsnd].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 		{
 			U8 s;
 			if(!p_gt->pOUT)
 			{
 				if(p_gt->pHUD ? p_gt->pHUD->p_alloc : NULL )
 				{
-					p_gt->pOUT = p_gt->pOUT->lzy_format( s = -1, " hud" );
+					p_gt->pOUT = p_gt->pOUT->lzyFRMT( s = -1, " hud" );
 
-					p_gt->pOUT = p_gt->pOUT->lzy_add(p_gt->pHUD, 8, s = -1);
-					p_gt->pOUT = p_gt->pOUT->lzy_add(p_gt->pHUD->p_alloc, p_gt->pHUD->n, s = -1);
+					p_gt->pOUT = p_gt->pOUT->lzyADD(p_gt->pHUD, 8, s = -1);
+					p_gt->pOUT = p_gt->pOUT->lzyADD(p_gt->pHUD->p_alloc, p_gt->pHUD->n, s = -1);
 					gpmDEL(p_gt->pHUD);
 					p_gt->GTprmpt();
 					//break;
@@ -1102,8 +1103,8 @@ I8 gpcGT::GTlst( gpcWIN& win )
 		if( p_gt ? (p_gt->bGTdie || p_gt->socket == INVALID_SOCKET ) : true ) {
 			if( p_gt )
 			if(
-					aGTfd[gpeFD_send].isFD( p_gt->socket ) //FD_ISSET( p_gt->socket, &a_fdset[gpeFD_send] )
-				|| 	aGTfd[gpeFD_recv].isFD( p_gt->socket )
+					aGTfd[gpeFDsnd].isFD( p_gt->socket ) //FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] )
+				|| 	aGTfd[gpeFDrcv].isFD( p_gt->socket )
 			)
 			{
 				cerr << "miért?" << endl;
@@ -1115,19 +1116,19 @@ I8 gpcGT::GTlst( gpcWIN& win )
 			continue;
 		}
 
-		aGTfd[gpeFD_recv].setFD(p_gt->socket);
-		//FD_SET( p_gt->socket, &aGTfd[gpeFD_recv] );
+		aGTfd[gpeFDrcv].setFD(p_gt->socket);
+		//FD_SET( p_gt->socket, &aGTfd[gpeFDrcv] );
 
 		// ennek az az értelme, ha nincsen buffer nem érdekklödik, hogy írható e.
 		if( p_gt->pOUT || p_gt->pDWN || p_gt->pHUD )
-			aGTfd[gpeFD_send].setFD(p_gt->socket);	//FD_SET( p_gt->socket, &a_fdset[gpeFD_send] );
+			aGTfd[gpeFDsnd].setFD(p_gt->socket);	//FD_SET( p_gt->socket, &a_fdset[gpeFDsnd] );
 
-		if( aGTfd[gpeFD_recv].nFD >= FD_SETSIZE )
+		if( aGTfd[gpeFDrcv].nFD >= FD_SETSIZE )
 			break;
 	}
 
-	aGTfd[gpeFD_recv].setFD( socket );
-	U8 n_soc = aGTfd[gpeFD_recv].nFD+aGTfd[gpeFD_send].nFD;
+	aGTfd[gpeFDrcv].setFD( socket );
+	U8 n_soc = aGTfd[gpeFDrcv].nFD+aGTfd[gpeFDsnd].nFD;
 	if( !n_soc )
 	{
 		usleep( gpdGT_LIST_tOUT );
@@ -1138,10 +1139,10 @@ I8 gpcGT::GTlst( gpcWIN& win )
 	tv.tv_usec = gpdGT_LIST_tOUT;
 
 	int nS = select(
-					aGTfd[gpeFD_recv].maxSCK+1,
-					&aGTfd[gpeFD_recv].fdS,
-					(aGTfd[gpeFD_send].nFD ? &aGTfd[gpeFD_send].fdS : NULL),
-					NULL, //(aGTfd[gpeFD_excp].fd_count ? &aGTfd[gpeFD_excp] : NULL),
+					aGTfd[gpeFDrcv].maxSCK+1,
+					&aGTfd[gpeFDrcv].fdS,
+					(aGTfd[gpeFDsnd].nFD ? &aGTfd[gpeFDsnd].fdS : NULL),
+					NULL, //(aGTfd[gpeFDexcp].fd_count ? &aGTfd[gpeFDexcp] : NULL),
 					&tv
 				);
 

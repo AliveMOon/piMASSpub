@@ -28,7 +28,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		if( (gpeALF)(a+1) != alu.alf )
 		{
 			pB = pB + gpfALF2STR( pBUFF, alu.alf ) + 1;
-			pLZY->lzy_format( s = -1,	"%s"
+			pLZY->lzyFRMT( s = -1,	"%s"
 									//"%s."
 									"%s=" ,//" // [%dx%d]sof(%d) ",
 									gppTABrun-deep,
@@ -38,7 +38,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		} else {
 			*pBUFF = 0;
 			pB = pBUFF;
-			pLZY->lzy_format( s = -1, nA > 1 ? "%s=" : "%s", gppTABrun-deep );
+			pLZY->lzyFRMT( s = -1, nA > 1 ? "%s=" : "%s", gppTABrun-deep );
 		}
 
 
@@ -48,14 +48,14 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		U1* pD = (U1*)alu.pDAT;
 		if( !pD )
 		{
-			pLZY->lzy_format( s = -1, "\r\n" );
+			pLZY->lzyFRMT( s = -1, "\r\n" );
 			continue;
 		}
 		if( alu.typ().x & 0x10 )
 		{
-			pLZY->lzy_format( s = -1, "%s\"%s\"", gppTABrun-deep, pD );
+			pLZY->lzyFRMT( s = -1, "%s\"%s\"", gppTABrun-deep, pD );
 			if( nA > 1 )
-				pLZY->lzy_format( s = -1, ";\r\n" );
+				pLZY->lzyFRMT( s = -1, ";\r\n" );
 			continue;
 		}
 		U4 		nAN = alu.AN().z, d, xp1, xe,
@@ -68,7 +68,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 
 		for( xy.y = 0; xy.y < alu.AN().y; xy.y++ )
 		{
-			pLZY->lzy_format( s = -1, "%s", gppTABrun-deep );
+			pLZY->lzyFRMT( s = -1, "%s", gppTABrun-deep );
 			for( xy.x = 0, xe = alu.AN().x; xy.x < xe; xy.x = xp1 )
 			{
 				xp1 = xy.x+1;
@@ -80,9 +80,9 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 				if( alu.typ().x&0x40 )
 				{
 					if( nB > 4 )
-						pLZY->lzy_format( s = -1, "%f%s", ((double*)(pD+d))[0], p_sep );
+						pLZY->lzyFRMT( s = -1, "%f%s", ((double*)(pD+d))[0], p_sep );
 					else
-						pLZY->lzy_format( s = -1, "%f%s", ((float*)(pD+d))[0], p_sep );
+						pLZY->lzyFRMT( s = -1, "%f%s", ((float*)(pD+d))[0], p_sep );
 					continue;
 				}
 				if( alu.typ().x&0x80 )
@@ -90,34 +90,34 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 					if( nB > 2 )
 					{
 						if( nB > 4 )
-							pLZY->lzy_format( s = -1, "%lld%s", ((I8*)(pD+d))[0], p_sep  );
+							pLZY->lzyFRMT( s = -1, "%lld%s", ((I8*)(pD+d))[0], p_sep  );
 						else
-							pLZY->lzy_format( s = -1, "%d%s", ((I4*)(pD+d))[0], p_sep );
+							pLZY->lzyFRMT( s = -1, "%d%s", ((I4*)(pD+d))[0], p_sep );
 						continue;
 					}
 					if( nB > 1 )
-						pLZY->lzy_format( s = -1, "%lld%s", ((I2*)(pD+d))[0], p_sep  );
+						pLZY->lzyFRMT( s = -1, "%lld%s", ((I2*)(pD+d))[0], p_sep  );
 					else
-						pLZY->lzy_format( s = -1, "%d%s", ((I1*)(pD+d))[0], p_sep );
+						pLZY->lzyFRMT( s = -1, "%d%s", ((I1*)(pD+d))[0], p_sep );
 
 					continue;
 				}
 				if( nB > 2 )
 				{
 					if( nB > 4 )
-						pLZY->lzy_format( s = -1, "%lld%s", ((U8*)(pD+d))[0], p_sep  );
+						pLZY->lzyFRMT( s = -1, "%lld%s", ((U8*)(pD+d))[0], p_sep  );
 					else
-						pLZY->lzy_format( s = -1, "%d%s", ((U4*)(pD+d))[0], p_sep );
+						pLZY->lzyFRMT( s = -1, "%d%s", ((U4*)(pD+d))[0], p_sep );
 					continue;
 				}
 				if( nB > 1 )
-					pLZY->lzy_format( s = -1, "%d%s", ((U2*)(pD+d))[0], p_sep );
+					pLZY->lzyFRMT( s = -1, "%d%s", ((U2*)(pD+d))[0], p_sep );
 				else
-					pLZY->lzy_format( s = -1, "%d%s", ((U1*)(pD+d))[0], p_sep );
+					pLZY->lzyFRMT( s = -1, "%d%s", ((U1*)(pD+d))[0], p_sep );
 
 			}
 			if( nA > 1 )
-				pLZY->lzy_format( s = -1, ";\r\n" );
+				pLZY->lzyFRMT( s = -1, ";\r\n" );
 		}
 	}
 	/// ha nem DEBUG legyen pMOM == NULL és akor nem írja ki a pISA-t
@@ -132,51 +132,51 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 			continue;
 		b_asg = pISA[i].isa.aISA[1] == '=';
 		if( b_asg )
-			pLZY->lzy_format( s = -1, "\r\n%s", gppTABrun-deep );
+			pLZY->lzyFRMT( s = -1, "\r\n%s", gppTABrun-deep );
 
         switch( pISA[i].isa.aISA[0] )
         {
 
 			case gpeISA_trg:{
-					pLZY->lzy_format( s = -1, "\r\n%s[%d:%d]", gppTABrun-deep, pISA[i].an.x, pISA[i].an.y );
+					pLZY->lzyFRMT( s = -1, "\r\n%s[%d:%d]", gppTABrun-deep, pISA[i].an.x, pISA[i].an.y );
 				} break;
  			case gpeISA_u8: {
-					pLZY->lzy_format( s = -1, "%lld", pISA[i].an.u8 );
+					pLZY->lzyFRMT( s = -1, "%lld", pISA[i].an.u8 );
 				} break;
 			case gpeISA_d8: {
-					pLZY->lzy_format( s = -1, "%f", pISA[i].an.d8 );
+					pLZY->lzyFRMT( s = -1, "%f", pISA[i].an.d8 );
 				} break;
 			case gpeISA_an: {
 					gpfALF2STR( sBUFF, pISA[i].an.a4 );
-					pLZY->lzy_format( s = -1, "%s%d", sBUFF, pISA[i].an.n4 );
+					pLZY->lzyFRMT( s = -1, "%s%d", sBUFF, pISA[i].an.n4 );
 				} break;
 			case gpeISA_anFUN: {
 					gpfALF2STR( sBUFF, pISA[i].an.a4 );
-					pLZY->lzy_format( s = -1, "%s%d(", sBUFF, pISA[i].an.n4 );
+					pLZY->lzyFRMT( s = -1, "%s%d(", sBUFF, pISA[i].an.n4 );
 				} break;
 
 			case gpeISA_tag: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "#%s", sBUFF );
+					pLZY->lzyFRMT( s = -1, "#%s", sBUFF );
 				} break;
 
 			case gpeISA_var: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "%s%s", b_asg ? "." : "", sBUFF );
+					pLZY->lzyFRMT( s = -1, "%s%s", b_asg ? "." : "", sBUFF );
 				} break;
 			case gpeISA_FUN: {
 					gpfALF2STR( sBUFF, pISA[i].an.var );
-					pLZY->lzy_format( s = -1, "%s(", sBUFF );
+					pLZY->lzyFRMT( s = -1, "%s(", sBUFF );
 					//pOUT = pISA[i].pRES->run( pOUT, pLZY, pMASS, pSRC, this, deep+1 );
 				} break;
 			case gpeISA_str: {
-					pLZY->lzy_format( s = -1, "\"%s\"", pISA[i].an.y ? pISA[i].an.aSTR[0] : (U1*)"" );
+					pLZY->lzyFRMT( s = -1, "\"%s\"", pISA[i].an.y ? pISA[i].an.aSTR[0] : (U1*)"" );
 				} break;
 			case gpeISA_nop:
 			default: {
 				} break;
         }
-        pLZY->lzy_format( s = -1, "%c", pISA[i].isa.aISA[1] >= ' ' ? pISA[i].isa.aISA[1] : '_' );
+        pLZY->lzyFRMT( s = -1, "%c", pISA[i].isa.aISA[1] >= ' ' ? pISA[i].isa.aISA[1] : '_' );
 
 	}*/
     return  pLZY;

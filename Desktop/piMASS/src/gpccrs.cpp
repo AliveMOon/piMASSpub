@@ -475,8 +475,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 	dstPX.h -= dstPX.y;
 	dstPX.x += divPX.x;
 	dstPX.y += divPX.y;
-	if( win.pPICbg ? win.pPICbg->pSRF : NULL )
-		SDL_BlitScaled( win.pPICbg->pSRF, &win.pPICbg->xyOUT.xyWH, win.pSRFwin, &dstPX );
+	if( win.pPICbg ? win.pPICbg->surDRW() : NULL )
+		SDL_BlitScaled( win.pPICbg->surDRW(), &win.pPICbg->xyOUT.xyWH, win.pSRFwin, &dstPX );
 	else
 		SDL_FillRect( win.pSRFwin, &dstPX, gpaC64[6] );
 
@@ -701,7 +701,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 					if(	gpcSRC* pSRC = win.piMASS->SRCfnd( xFND ) )
 					if( pSRC->picID )
 					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
-					if( SDL_Surface* pSRF = pPIC->pSRF )
+					if( SDL_Surface* pSRF = pPIC->surDRW() )
 					{
 						I4x4 s, d, w;
 						s.x = s.y = 0;

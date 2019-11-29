@@ -485,8 +485,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 											win.pPICbg = pPIC;
 										}
 									}
-									else if( pPIC->pSHR )
-                      								win.pPICbg = pPIC;
+
 								}
 							} break;
 
@@ -498,11 +497,11 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								} else
 									pic_id = alu.u8();
 
-								// be kell mapolni a rublika háterének
+                                // be kell mapolni a rublika háterének
 								if( pPIC = PIC.PIC( pic_id ) )
 								{
 									pic_id++;
-									break;
+                                    break;
 								}
 
 								I8x2 alfN(0,14);
@@ -551,7 +550,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 										trgWH.a4x2[0] = trgWH.a4x2[1];
 									}
                                 }
-                                if( !pSPR->surDRW() )
+                                if( !pSPR->pSRF )
                                 {
 									pSPR->TnID.an2str( (U1*)win.gppMASSfile, (U1*)".png" );
 									pSPR->pSRF = IMG_Load( win.gpsMASSpath );
@@ -559,7 +558,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 										break;
                                 }
 
-								SDL_BlitScaled( pSPR->surDRW(), &sprt[0].xyWH, pTRG->pSRF, &sprt[1].xyWH );
+								SDL_BlitScaled( pSPR->pSRF, &sprt[0].xyWH, pTRG->pSRF, &sprt[1].xyWH );
 								//SDL_UpdateWindowSurface( win.pSDLwin );
 							} break;
 						case gpeALF_SSX:

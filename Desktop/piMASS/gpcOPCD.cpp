@@ -624,7 +624,7 @@ gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
 
 	U8 iPC8 = -1;
 
-	pCMPL = pCMPL->lzy_add( NULL, sizeof(this), iPC8 );
+	pCMPL = pCMPL->lzyADD( NULL, sizeof(this), iPC8 );
 	gpcCMPL	**ppC = (gpcCMPL**)pCMPL->p_alloc;
 	if( !ppC )
 	{
@@ -639,7 +639,7 @@ gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	pC->n_str = nS;
 	ppC[pC->iPC] = pC;
 
-	p_iPC = p_iPC->lzy_add( &pC->iPC, sizeof(pC->iPC), iPC8 = -1 );
+	p_iPC = p_iPC->lzyADD( &pC->iPC, sizeof(pC->iPC), iPC8 = -1 );
 	pC->iKD = iPC8/sizeof(pC->iPC);
 	if( b_rst)
 		pC->iLEV = 0;

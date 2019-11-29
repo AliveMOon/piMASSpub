@@ -152,7 +152,7 @@ class gpcGT
 					*pOUT,
 					*pINP,
 					*pEVENT,
-					*pSYN;
+					*pSYNgt;
 		gpcGT_DWNL	*pDWN;
 		gpcHUD		*pHUD, isEVNT;
 
@@ -160,7 +160,7 @@ class gpcGT
 		struct ifaddrs 	*pIFadr,
 						*pIFa;
 
-		gpcFD	aGTfd[gpeFD_n];
+		gpcFD	aGTfd[gpeFDn];
 		U4		nFDs, nFDr, nFDe,
 
 				nSYN,
@@ -196,7 +196,7 @@ class gpcGT
 				gpmDEL( pDWN );
 				gpmDEL( pHUD );
 				gpmDEL( pEVENT );
-				gpmDEL( pSYN );
+				gpmDEL( pSYNgt );
 			}
 			return this;
 		}
@@ -219,7 +219,7 @@ class gpcGT
 				return 0;
 			U8 s;
 			if( !aGTcrs[0] )
-				pOUT = pOUT->lzy_format( s = -1, "\r\n%x>", iCNT );
+				pOUT = pOUT->lzyFRMT( s = -1, "\r\n%x>", iCNT );
 
 			return iCNT;
 		}

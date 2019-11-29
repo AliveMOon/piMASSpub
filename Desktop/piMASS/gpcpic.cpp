@@ -106,10 +106,10 @@ gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q )
 	}
 
     jpeg_finish_compress(&INF);
-	 pBUFF = pBUFF->lzy_add( &jpgBUFF[0], jpgBUFF.size(), s = -1 );
+	 pBUFF = pBUFF->lzyADD( &jpgBUFF[0], jpgBUFF.size(), s = -1 );
 	/*U1	*pMEM;
 	jpeg_mem_dest( &INF, pMEM, &nMEM );
-    pBUFF = pBUFF->lzy_add( pMEM, nMEM, s = -1 );
+    pBUFF = pBUFF->lzyADD( pMEM, nMEM, s = -1 );
     gpmDELary(pMEM);*/
 
 
@@ -150,8 +150,10 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 {
 	if( !this )
 		return NULL;
+
 	if( !pC )
 		return pSRF ? (U1*)pSRF->pixels : NULL;
+
 	if( pC->cam.open() )
 	{
 		usleep(3*1000);

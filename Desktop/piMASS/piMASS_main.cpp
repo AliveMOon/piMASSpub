@@ -165,7 +165,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 
 	U1 *pA, *pALF = gpsSVadr, *pNUM, *pNX, *pANo, *pLFT, *pRIG;
 	U8 nS = -1, nINS, iB, nADR;
-	buff.lzy_format( nS = -1,	"<HTML>\r\n"
+	buff.lzyFRMT( nS = -1,	"<HTML>\r\n"
 								"<HEAD>\r\n"
 								"<TITLE>HTML %s</TITLE>\r\n"
 								"</HEAD><BODY>\r\n"
@@ -179,17 +179,17 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 	{
 		if( !(i%z) )
 		{
-			buff.lzy_format( nS = -1, "%s<TR>", bTR ? "</TD></TR>\r\n":"" );
+			buff.lzyFRMT( nS = -1, "%s<TR>", bTR ? "</TD></TR>\r\n":"" );
 			bTR = true;
 			bTD = false;
 		}
 		bTD = true;
 		if( !pM[i] )
 		{
-			buff.lzy_format( nS = -1, "%s<TD BGCOLOR=%s BORDER=0> ", bTD ? "</TD>" : "", "#ffffff"  );
+			buff.lzyFRMT( nS = -1, "%s<TD BGCOLOR=%s BORDER=0> ", bTD ? "</TD>" : "", "#ffffff"  );
 			continue;
 		}
-		buff.lzy_format( nS = -1, "%s<TD BGCOLOR=%s BORDER=1> ", bTD ? "</TD>" : "", ((i%z)+(i/z))%2 ? "#bfbfbf":"#afafaf"  );
+		buff.lzyFRMT( nS = -1, "%s<TD BGCOLOR=%s BORDER=1> ", bTD ? "</TD>" : "", ((i%z)+(i/z))%2 ? "#bfbfbf":"#afafaf"  );
 
 		pSRC = SRCfnd( pM[i] );
 		if( !pSRC )
@@ -198,7 +198,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
 		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
 		if( bALT )
-		buff.lzy_format( nS = -1, " %s", gpsSVadr );
+		buff.lzyFRMT( nS = -1, " %s", gpsSVadr );
 
 		pA = pSRC->pA;
 		if( !pA )
@@ -207,7 +207,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 			if( bALT )
 				continue;
 
-			buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
+			buff.lzyFRMT( nS = -1, "<BR>+--- --  -   <BR>" );
 			continue;
 		}
 		iB = pSRC->iB();
@@ -240,7 +240,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 				if( pLFT-pA < iB )
 					buff.lzy_ins( pLFT, iB-(pLFT-pA), nS = -1, -1 );
 			}
-			buff.lzy_format( nS = -1, "<BR>+--- --  -   <BR>" );
+			buff.lzyFRMT( nS = -1, "<BR>+--- --  -   <BR>" );
         }
         pLFT = pA+iB+1;
         bool bBR = true;
@@ -248,7 +248,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
         {
 			if( *pLFT == '\n' )
 			{
-				buff.lzy_format( nS = -1, bBR ? "<BR>" : "\n" );
+				buff.lzyFRMT( nS = -1, bBR ? "<BR>" : "\n" );
 				pLFT++;
 				continue;
 			}
@@ -275,7 +275,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 			pLFT = pANo;
         }
 	}
-	buff.lzy_format( nS = -1, "</TD></TR></TABLE></BODY>" );
+	buff.lzyFRMT( nS = -1, "</TD></TR></TABLE></BODY>" );
 
 	sprintf( (char*)gpsSAVEbf, "%s%s/", pPATH, pNAME );
 	char* pPR = strrchr( (char*)gpsSAVEbf, '.' );
@@ -321,13 +321,13 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 			continue;
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
 		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
-		buff.lzy_format( nS = -1, "\a %s", gpsSVadr );
+		buff.lzyFRMT( nS = -1, "\a %s", gpsSVadr );
 
 		pA = pSRC->pA;
 		if( !pA )
 		{
 			// megszünt a string ideje létrehozni ha van pRES
-			buff.lzy_format( nS = -1, "\a " );
+			buff.lzyFRMT( nS = -1, "\a " );
 			continue;
 		}
 		iB = pSRC->iB();
@@ -590,7 +590,7 @@ int main( int nA, char *apA[] )
 		U8 s;
 		cout << "Load:"<< gpsMASSpath << endl;
 		if( gpfACE(gpsMASSpath, 4) > -1 )
-			gpMASS.lzy_read( gpsMASSpath, s = -1, -1 );
+			gpMASS.lzyRD( gpsMASSpath, s = -1, -1 );
 
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 		if( piMASS )
