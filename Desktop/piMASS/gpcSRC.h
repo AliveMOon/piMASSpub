@@ -595,6 +595,7 @@ public:
 			bSW;		// pB = pA+iB()
     U4x4	spcZN, dim;
     U4		IX, retIX, nALFtg, strtD, endD, picID;
+    SOCKET	iGT;
 
     gpeALF	*pALFtg;
     gpcRES	*pEXE,
@@ -604,11 +605,12 @@ public:
 
 	gpcMAP	*pMAP;
 
-	U4 srcUPDT( )
+	U4 srcUPDT( SOCKET ig = INVALID_SOCKET )
 	{
 		U8 nLEN = 0;
 		pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 		nVERr = nHD+1;
+		iGT = ig;
 
 		return nVERr;
 	}
@@ -1225,7 +1227,7 @@ public:
 	}
 
 	/// gpcMASS:: find in main.cpp
-	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, U4 nS = 0 );
+	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, I4 nGT, U4 nS = 0 );
 
 
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );

@@ -107,7 +107,7 @@ char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 gpcLAZY gpMASS;
 U1 gpdONEcell[] = " \a ";
 
-gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, U4 nS )
+gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, I4 ig, U4 nS )
 {
 	if( !an.x )
 		return NULL;
@@ -128,7 +128,7 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, U4 nS )
 		if( !p_fnd->SRCcmp(pS,nS) )
 		{
 			p_fnd->SRCcpy(pS,pS+nS);
-			p_fnd->srcUPDT();
+			p_fnd->srcUPDT( ig );
 		}
 		return p_fnd;
 	}
@@ -149,6 +149,7 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, U4 nS )
 	if( !p_fnd )
 		return NULL;
 
+	p_fnd->iGT = ig;
 	pM[iZN] = xADD;
 	xADD++;
 	return p_fnd;

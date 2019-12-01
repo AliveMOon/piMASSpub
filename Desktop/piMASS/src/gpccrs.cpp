@@ -1103,7 +1103,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 
 		if( lurdAN.x )
 		if( pB < pE )
-		if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0] ) )
+		if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
 		{
 			//gpmMEMCPY( edANIN, selANIN, 2 );
 			if( pSRC )
@@ -1193,7 +1193,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 							continue;
 						if( !pS2 )
 						{
-							pS2 = mass.SRCnew( tmp, NULL, s );
+							pS2 = mass.SRCnew( tmp, NULL, s, -1 );
 							if( !pS2 )
 								continue;
 						}

@@ -33,7 +33,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( pWIN )
 	if( msSYNwin < pWIN->msSYN )
 	{
-		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin );
+		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket );
 		msSYNwin = pWIN->msSYN;
 	}
 
@@ -67,6 +67,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 				for( U4 iS = 0, nS = syn.nS()-1; iS < nS; iS++ )
 				{
 					gpcSYNC& isyn = ((gpcSYNC*)pDAT)[iS];
+					//isyn.ms = pWIN->mSEC.x; // most érkeztek
 					switch( isyn.typ() )
 					{
 						case gpeNET4_0SYN:
@@ -115,7 +116,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					U4 nA = syn.nB()-(pA-(U1*)&syn);
                     I4x2 an( ((U2)*pZN+1), (*pZN)>>0x10 );
 					gpcSRC	tmp,
-							*pSRC = pWIN->piMASS->SRCnew( tmp, pA, an, nA );
+							*pSRC = pWIN->piMASS->SRCnew( tmp, pA, an, socket, nA );
 					if( !pSRC )
 						break;
 
@@ -151,6 +152,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		for( U4 i = 0, ie = pSYNgt->n_load/sizeof(gpcSYNC); i < ie; i++ )
 		{
 			gpcSYNC& isyn = ((gpcSYNC*)pSYNgt->p_alloc)[i];
+			/*if( isyn.ms < pWIN->mSEC.x )
+				continue;*/
 			switch( isyn.typ() )
 			{
 				case gpeNET4_0SYN:
@@ -165,16 +168,15 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					break;
 			}
 		}
+
+		//msSYNgt = pWIN->mSEC.x;
 		gpmDEL(pSYNgt);
 	}
 
 
 
 	if( !p_str )
-	{
-
 		return;
-	}
 
 	U1	*p_sub = p_str + gpmSTRLEN( p_str ),
 		*pINPload = p_str + pINP->n_load;
@@ -221,6 +223,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	}
 
 	I8x2 cAN;
+	U1* pSKIP = NULL; U4 nSKIP = 0;
 	if( p_str < p_sub )
 	{
 		U1	*p_row = p_str+gpmNINCS( p_str, " \t;>\r\n" ),
@@ -341,6 +344,14 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 							if( nO < (pOUT ? pOUT->n_load : 0) )
 								nOUT = pOUT->n_load;
+
+							nSKIP = p_next-p_row;
+							if( nSKIP )
+							{
+								((U1*)gpmMEMCPY( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+								pSKIP = (U1*)s_atrib;
+							}
+
 						} break;
 					case gpeALF_SRC: {
 							if( pWIN ? !pWIN->mZ : true )
@@ -369,11 +380,23 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 							if( nO < (pOUT ? pOUT->n_load : 0) )
 								nOUT = pOUT->n_load;
 
+							nSKIP = p_next-p_row;
+							if( nSKIP )
+							{
+								((U1*)gpmMEMCPY( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+								pSKIP = (U1*)s_atrib;
+							}
+
 						} break;
 					case gpeALF_OK:
 					case gpeALF_NONSENS:
 					case gpeALF_NONSENSE: {
-
+							nSKIP = p_next-p_row;
+							if( nSKIP )
+							{
+								((U1*)gpmMEMCPY( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+								pSKIP = (U1*)s_atrib;
+							}
 						} break;
 					/*case gpeALF_PREV:
 						isEVNT.null();
@@ -384,6 +407,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 						break;*/
 					default:
 						pOUT = pOUT->lzyFRMT( s = -1, "%snonsens", aGTcrs[0] ? "" : "\r\n" );
+						default:
 				}
 				p_sub = p_next; // p_row_end;
 			}
@@ -400,9 +424,24 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 	if( pINP ? (p_sub > pINP->p_alloc) : false )
 	{
-		U8 s = 0;
+		U8 s = 0, n_str;
 		pINP->lzy_ins( NULL, 0, s, p_sub-pINP->p_alloc );
+		if( nSKIP )
+		{
+			n_str = gpmSTRLEN( pINP->p_alloc );
+			while( nSKIP < n_str )
+			{
+				p_sub = (U1*)strstr( (char*)pINP->p_alloc, (char*)pSKIP );
+				if( !p_sub )
+					break;
 
+				s = p_sub-pINP->p_alloc;
+				pINP->lzy_ins( NULL, 0, s, nSKIP );
+				if( !pINP->n_load )
+					break;
+				n_str = gpmSTRLEN( pINP->p_alloc );
+			}
+		}
 		if( pOUT )
 		if( nOUT < pOUT->n_load )
 		if( aGTcrs[0] )

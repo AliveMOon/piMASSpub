@@ -22,9 +22,8 @@ sdx = trgw*ix/iw - 16;
 sdy = trgh*iy/ih - 16;
 sdw = ssw;
 sdh = sdw*mlb; a6	 						
-nonsens = msec;
-d = nonsens;
- c6	 abcdef
+nonsens = fps;
+d = nonsens;  c6	 abcdef
 nami van jo vagy nem
  a7	 Na mégegyszer na most átmrent!
 Ja hát még nem tökéletes!

@@ -421,7 +421,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			gpmDEL( pSRC->pEXE );
 			pSRC->pEXE = pSRC->pEXE->compiEASY( pSRC->pSRCstart( true ), NULL, NULL, NULL );
 			pSRC->rdyBLD();
-			win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%win.mZ)+((i/win.mZ)<<16) , win.mSEC.y ), win.msSYN );
+			win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%win.mZ)+((i/win.mZ)<<16) , win.mSEC.y, pSRC->iGT, 0 ), win.msSYN );
 			pSRC->apOUT[0] = pSRC->apOUT[1];
 			pSRC->apOUT[1] = pSRC->apOUT[2];
 			pSRC->apOUT[2] = pSRC->apOUT[3];
@@ -481,7 +481,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									if( pRGB )
 									{
 										if( pCAM->bGD() )
-											win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, pPIC->id+1, win.mSEC.y ), win.msSYN );
+											win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, pPIC->id+1, win.mSEC.y, INVALID_SOCKET, 0 ), win.msSYN );
 										if( !win.pPICbg )
 										{
 											win.pPICbg = pPIC;

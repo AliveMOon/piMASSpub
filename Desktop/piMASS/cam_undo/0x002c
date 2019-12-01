@@ -21,14 +21,11 @@ ssh = ssw; // + 100;
 sdx = trgw*ix/iw - 16;
 sdy = trgh*iy/ih - 16;
 sdw = ssw;
-sdh = sdw*mlb; a6	 						
-nonsens = msec;
-d = nonsens;
- c6	 abcdef
+sdh = sdw*mlb; a6	 						nonsens = fps;
+c = nonsens,  c6	 abcdef
 nami van jo vagy nem
  a7	 Na mégegyszer na most átmrent!
-Ja hát még nem tökéletes!
-Na mi lesz már! c7	 ashs c8	  asjaj a10	 pic ="cam1"  c10	 pic ="cam1" d10	 pic = "draw2"
+Ja hát még nem tökéletes! c7	ashs c8	 asjaj a10	 pic ="cam1"  c10	 pic ="cam1" d10	 pic = "draw2"
 unsel = 1  e10	 trg ="draw2";
 trgw = 640;
 trgh = 512 * 3;

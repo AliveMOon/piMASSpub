@@ -3204,19 +3204,20 @@ class gpcSYNC
 {
 protected:
 	gpeNET4	typ4;
-	U4	nb;
+	U4		nb;
 public:
-	U4	id;
-	U4	ms;
-	I4	nGT;
+	U4		id;
+	U4		ms;
+	SOCKET	iGT;
 
-	gpcSYNC( gpeNET4 t, U8 i, U4 s, U4 n = 0 )
+	gpcSYNC( gpeNET4 t, U8 i, U4 s,	SOCKET	sck, // = INVALID_SOCKET
+									U4 		n ) // = 0 )
 	{
         typ4 = t;
         id = i;
         ms = s;
         nb = n ? n : sizeof(*this);
-        //gt = g;
+        iGT = sck;
 	}
 	gpeNET4 typ()
 	{
@@ -3306,6 +3307,7 @@ public:
 				return this;
 
 			pSYNC[i].ms = s.ms;
+			pSYNC[i].iGT = s.iGT;
 			//s.typ = gpeNET4_null;
 			if( ms < s.ms )
 				ms = s.ms;
@@ -3342,7 +3344,7 @@ public:
 	gpcLAZY* putZN( U1* pDAT, U4 nDAT, gpeNET4 nt4, U4 zn, U4 ms )
 	{
 		U8 s = -1, b;
-		gpcSYNC syn( nt4, 0, ms );
+		gpcSYNC syn( nt4, 0, ms, INVALID_SOCKET, 0 );
 
 		gpcLAZY* pOUT = this->lzyADD( &syn, sizeof(syn), s = -1 );
 		b = s;
@@ -3360,7 +3362,7 @@ public:
 			return this;
 
 		U8 s = -1, b;
-		gpcSYNC syn( gpeNET4_0PIC, 0, ms );
+		gpcSYNC syn( gpeNET4_0PIC, 0, ms, INVALID_SOCKET, 0 );
 
 		gpcLAZY* pOUT = this->lzyADD( &syn, sizeof(syn), s = -1 );
 		b = s;
@@ -3372,21 +3374,34 @@ public:
 		return pOUT->SYNrdy(b);
 	}
 
-	gpcLAZY* putSYN( gpcLAZY* pOUT, U4 ms )
+	gpcLAZY* putSYN( gpcLAZY* pOUT, U4 ms, SOCKET iGT )
 	{
 		if( this ? ( p_alloc ? !n_load : true ) : true )
 			return pOUT;
 
 		U8 s = -1, b;
-		gpcSYNC syn( gpeNET4_0SYN, 0, ms ),
+		gpcSYNC syn( gpeNET4_0SYN, 0, ms, INVALID_SOCKET, 0 ),
 				*pSYN = (gpcSYNC*)p_alloc;
 
 		pOUT = pOUT->lzyADD( &syn, sizeof(syn), s = -1 );
 		b = s;
-		for( U4 i = 0, e = n_load/sizeof(syn); i < e; i++ )
+		if( iGT > -1 )
 		{
-			 if( pSYN[i].ms < ms )
+			for( U4 i = 0, e = n_load/sizeof(syn); i < e; i++ )
+			{
+				if( pSYN[i].ms < ms )
+					continue;
+				if( pSYN[i].iGT == iGT )
+					continue;
+
+				pOUT = pOUT->lzyADD( pSYN+i, sizeof(syn), s = -1 );
+			}
+		}
+		else for( U4 i = 0, e = n_load/sizeof(syn); i < e; i++ )
+		{
+			if( pSYN[i].ms < ms )
 				continue;
+
 			pOUT = pOUT->lzyADD( pSYN+i, sizeof(syn), s = -1 );
 		}
 
