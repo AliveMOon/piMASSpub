@@ -56,6 +56,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 	while( nSYN )
 	{
+		aGTcrs[0] = ';';
 
 		U1* pDAT = p_str+sizeof(gpcSYNC);
 		gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
@@ -302,6 +303,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 							pOUT = pOUT->lzyFRMT(s = -1, "%s event", aGTcrs[0] ? "" : "\r\n" );
 						} break;
 					case gpeALF_PIC: {
+							U4 nO = pOUT ? pOUT->n_load : 0;
+
 							U4 iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
 							if( iPIC )
 							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC-1 ) )
@@ -335,11 +338,17 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 								}
 							}
+
+							if( nO < (pOUT ? pOUT->n_load : 0) )
+								nOUT = pOUT->n_load;
 						} break;
 					case gpeALF_SRC: {
 							if( pWIN ? !pWIN->mZ : true )
 								break;
-							U4	iZN = gpfSTR2U8( (U1*)s_atrib, NULL ), nA = 0;		// (i%win.mZ)+((i/win.mZ)<<16)
+
+							U4	nO = pOUT ? pOUT->n_load : 0,
+								iZN = gpfSTR2U8( (U1*)s_atrib, NULL ), nA = 0;		// (i%win.mZ)+((i/win.mZ)<<16)
+
 							U4x2 zn( (U2)iZN, iZN>>0x10 );
 							U1* pA = NULL;
 
@@ -356,6 +365,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 							}
 
 							pOUT = pOUT->putZN( pA, nA, gpeNET4_0SRC, iZN, pWIN->mSEC.x );
+
+							if( nO < (pOUT ? pOUT->n_load : 0) )
+								nOUT = pOUT->n_load;
 
 						} break;
 					case gpeALF_OK:
@@ -390,6 +402,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	{
 		U8 s = 0;
 		pINP->lzy_ins( NULL, 0, s, p_sub-pINP->p_alloc );
+
 		if( pOUT )
 		if( nOUT < pOUT->n_load )
 		if( aGTcrs[0] )

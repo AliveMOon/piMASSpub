@@ -3208,6 +3208,8 @@ protected:
 public:
 	U4	id;
 	U4	ms;
+	I4	nGT;
+
 	gpcSYNC( gpeNET4 t, U8 i, U4 s, U4 n = 0 )
 	{
         typ4 = t;

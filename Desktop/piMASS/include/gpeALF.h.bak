@@ -551,6 +551,9 @@ typedef enum gpeALF: I8
 
 	gpeALF_NA = gpdAB('N', 'A'),
 	gpeALF_NO = gpdAB('N', 'O'),
+
+	gpeALF_OK = gpdAB('O', 'K'),
+
 	gpeALF_ON = gpdAB('O', 'N'),
 	gpeALF_OR = gpdAB('O', 'R'),
 	gpeALF_PI = gpdAB('P', 'I'),
@@ -979,6 +982,7 @@ typedef enum gpeALF: I8
 	gpeALF_GIOFILE = gpdABCDEFG('G', 'I', 'O', 'F', 'I', 'L', 'E'),
 	gpeALF_GRIPPER = gpdABCDEFG('G', 'R', 'I', 'P', 'P', 'E', 'R'),
 	gpeALF_NOBUILD = gpdABCDEFG('N', 'O', 'B', 'U', 'I', 'L', 'D'),
+	gpeALF_NONSENS = gpdABCDEFG('N', 'O', 'N', 'S', 'E', 'N', 'S'),
 	gpeALF_NRENDER = gpdABCDEFG('N', 'R', 'E', 'N', 'D', 'E', 'R'),
 	// 0xffffFFFF                A    B    C    D    E    F    G
 	gpeALF_MWLQKWU = gpdABCDEFG('M', 'W', 'L', 'Q', 'K', 'W', 'U'),
@@ -1064,6 +1068,7 @@ typedef enum gpeALF: I8
 	gpeALF_IDXSTART = gpdABCDEFGH('I', 'D', 'X', 'S', 'T', 'A', 'R', 'T'),
 	gpeALF_INTERNET = gpdABCDEFGH('I', 'N', 'T', 'E', 'R', 'N', 'E', 'T'),
 	gpeALF_NLAYALOC = gpdABCDEFGH('N', 'L', 'A', 'Y', 'A', 'L', 'O', 'C'),
+	gpeALF_NONSENSE = gpdABCDEFGH('N', 'O', 'N', 'S', 'E', 'N', 'S', 'E'),
 	gpeALF_NSURFPIC = gpdABCDEFGH('N', 'S', 'U', 'R', 'F', 'P', 'I', 'C'),
 	gpeALF_PARTSURF = gpdABCDEFGH('P', 'A', 'R', 'T', 'S', 'U', 'R', 'F'),
 	gpeALF_PICSFILE = gpdABCDEFGH('P', 'I', 'C', 'S', 'F', 'I', 'L', 'E'),
