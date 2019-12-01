@@ -407,7 +407,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 						break;*/
 					default:
 						pOUT = pOUT->lzyFRMT( s = -1, "%snonsens", aGTcrs[0] ? "" : "\r\n" );
-						default:
+						break;
 				}
 				p_sub = p_next; // p_row_end;
 			}
