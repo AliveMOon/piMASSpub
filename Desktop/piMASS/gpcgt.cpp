@@ -757,11 +757,11 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			}
 
 			//if( sUSER < pUSER )
-            if( msSYNwin < win.msSYN )
+           /* if( msSYNwin < win.msSYN )
             {
 				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin );
 				msSYNwin = win.msSYN;
-            }
+            }*/
 		}
 
 		p_err = GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
@@ -1082,7 +1082,11 @@ I8 gpcGT::GTlst( gpcWIN& win )
 					}
 				}
 
-
+				/*if( p_gt->msSYNwin < win.msSYN )
+				{
+					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin );
+					p_gt->msSYNwin = win.msSYN;
+				}*/
 
 			}
 

@@ -396,6 +396,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	I4x4 sprt[2] = {0}, trgWH = 0;
 	win.mZ = mapCR.mapZN44.z;
 	win.mN = mapCR.mapZN44.w;
+	win.mZN = mapCR.mapZN44.a4x2[1].area();
 	if( U4 *pM = win.pM = mapCR.pMAP )
 	if( U4 *pC = win.pC = mapCR.pCOL )
 	if( U4 *pR = win.pR = mapCR.pROW )
@@ -420,6 +421,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			gpmDEL( pSRC->pEXE );
 			pSRC->pEXE = pSRC->pEXE->compiEASY( pSRC->pSRCstart( true ), NULL, NULL, NULL );
 			pSRC->rdyBLD();
+			win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%win.mZ)+((i/win.mZ)<<16) , win.mSEC.y ), win.msSYN );
 			pSRC->apOUT[0] = pSRC->apOUT[1];
 			pSRC->apOUT[1] = pSRC->apOUT[2];
 			pSRC->apOUT[2] = pSRC->apOUT[3];

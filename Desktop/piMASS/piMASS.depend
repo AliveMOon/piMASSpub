@@ -1,8 +1,26 @@
 # depslib dependency file v1.0
-1574987020 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
+1574275863 source:/home/pi/Desktop/piMASS/gpcalu.cpp
+	"gpcwin.h"
+
+1575145495 /home/pi/Desktop/piMASS/include/gpcwin.h
+	"gpcres.h"
+
+1574574570 /home/pi/Desktop/piMASS//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+
+1575181283 /home/pi/Desktop/piMASS//gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1575004211 /home/pi/Desktop/piMASS//gpcgt.h
+	"gpcpic.h"
+
+1574994738 /home/pi/Desktop/piMASS//gpcpic.h
 	"piMASS.h"
 
-1574991914 /home/pi/Desktop/piMASS/piMASS.h
+1575183170 /home/pi/Desktop/piMASS//piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -54,6 +72,8 @@
 	<thread>
 	"gpcOPCD.h"
 	"gpeALF.h"
+
+1574563560 /home/pi/Desktop/piMASS/include/camU.h
 
 1551380987 /usr/include/SDL2/SDL.h
 	"SDL_main.h"
@@ -374,15 +394,35 @@
 	"begin_code.h"
 	"close_code.h"
 
+1564244387 /usr/include/SDL2/SDL_image.h
+	"SDL.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
 1570995394 /home/pi/Desktop/piMASS/include/gpcOPCD.h
 	"gpcSRC.h"
 	"gpcres.h"
 
-1574987020 /home/pi/Desktop/piMASS//gpcSRC.h
-	"gpcgt.h"
-	"gpcOPCD.h"
+1574912495 /home/pi/Desktop/piMASS/include/gpeALF.h
+	"piMASS.h"
 
-1574991914 /home/pi/Desktop/piMASS//piMASS.h
+1570796037 /home/pi/Desktop/piMASS/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1575188826 source:/home/pi/Desktop/piMASS/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1575004211 /home/pi/Desktop/piMASS/gpcgt.h
+	"gpcpic.h"
+
+1574994738 /home/pi/Desktop/piMASS/gpcpic.h
+	"piMASS.h"
+
+1575183170 /home/pi/Desktop/piMASS/piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -435,23 +475,50 @@
 	"gpcOPCD.h"
 	"gpeALF.h"
 
-1574912495 /home/pi/Desktop/piMASS/include/gpeALF.h
-	"piMASS.h"
+1575181283 /home/pi/Desktop/piMASS/gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
 
-1570796037 /home/pi/Desktop/piMASS/include/gpcSCHL.h
+1575193146 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1574987020 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
 	"piMASS.h"
-	"gpcSRC.h"
 
 1574987020 source:/home/pi/Desktop/piMASS/gpcOPCD.cpp
 	"gpcSRC.h"
 
-1574987020 /home/pi/Desktop/piMASS/gpcSRC.h
-	"gpcgt.h"
+1574987020 source:/home/pi/Desktop/piMASS/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1574552891 source:/home/pi/Desktop/piMASS/gpcres.cpp
+	"gpcwin.h"
+
+1574986908 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp
+	"gpcres.h"
+
+1574574570 /home/pi/Desktop/piMASS/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
 	"gpcOPCD.h"
 
-1574987020 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
+1575186095 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
+	"gpcres.h"
+
+1575179440 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+	"gpcwin.h"
+
+1574205784 source:/home/pi/Desktop/piMASS/gpcresflt.cpp
+	"gpcwin.h"
+
+1575181372 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
 	"gpcSRC.h"
 	"gpccrs.h"
+
+1575002346 /home/pi/Desktop/piMASS/include/gpccrs.h
+	"gpcwin.h"
 
 1574684780 source:/home/pi/Desktop/piMASS/gpcU14.cpp
 	"gpcSRC.h"
@@ -459,13 +526,20 @@
 1574684779 source:/home/pi/Desktop/piMASS/gpcU44.cpp
 	"gpcSRC.h"
 
-1574536757 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
+1574677195 source:/home/pi/Desktop/piMASS/gpcwin_var.cpp
+	"gpccrs.h"
+
+1575145675 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
 	"gpcSRC.h"
 
-1574987020 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
+1575182070 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
 	"piMASS.h"
 	"gpcSRC.h"
 	"gpccrs.h"
+
+1575179437 source:/home/pi/Desktop/piMASS/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
 
 1562069614 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
 	"gpcND.h"
@@ -476,139 +550,6 @@
 1574536898 source:/home/pi/Desktop/piMASS/src/gpcPROTO.cpp
 	"gpcSRC.h"
 
-1564244387 /usr/include/SDL2/SDL_image.h
-	"SDL.h"
-	"SDL_version.h"
-	"begin_code.h"
-	"close_code.h"
-
-1575002403 source:/home/pi/Desktop/piMASS/src/gpccrs.cpp
-	"gpccrs.h"
-	"gpcSRC.h"
-
-1575002346 /home/pi/Desktop/piMASS/include/gpccrs.h
-	"gpcwin.h"
-
 1574563679 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
 	"gpccrs.h"
-
-1575004062 /home/pi/Desktop/piMASS/include/gpcwin.h
-	"gpcres.h"
-
-1574574570 /home/pi/Desktop/piMASS//gpcres.h
-	"gpcSRC.h"
-	"gpcSCHL.h"
-	"gpcOPCD.h"
-
-1574574570 /home/pi/Desktop/piMASS/gpcres.h
-	"gpcSRC.h"
-	"gpcSCHL.h"
-	"gpcOPCD.h"
-
-1574552891 source:/home/pi/Desktop/piMASS/gpcres.cpp
-	"gpcwin.h"
-
-1574218374 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
-	"gpcres.h"
-
-1574994960 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
-	"gpcwin.h"
-
-1575004598 source:/home/pi/Desktop/piMASS/gpcgt.cpp
-	"gpcgt.h"
-	"gpcSRC.h"
-	"gpcwin.h"
-
-1575004211 /home/pi/Desktop/piMASS/gpcgt.h
-	"gpcpic.h"
-
-1575004211 /home/pi/Desktop/piMASS//gpcgt.h
-	"gpcpic.h"
-
-1574996640 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
-	"gpcgt.h"
-	"gpcwin.h"
-
-1574986908 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp
-	"gpcres.h"
-
-1574994738 /home/pi/Desktop/piMASS/gpcpic.h
-	"piMASS.h"
-
-1574994738 /home/pi/Desktop/piMASS//gpcpic.h
-	"piMASS.h"
-
-1574987020 source:/home/pi/Desktop/piMASS/gpcpic.cpp
-	"gpcpic.h"
-	"gpcSRC.h"
-
-1571994400 /home/pi/Desktop/piMASS/include/CImg.h
-	<cstdio>
-	<cstdlib>
-	<cstdarg>
-	<cstring>
-	<cmath>
-	<cfloat>
-	<climits>
-	<ctime>
-	<exception>
-	<algorithm>
-	<stdio.h>
-	<sys/types.h>
-	<sys/time.h>
-	<sys/stat.h>
-	<unistd.h>
-	<dirent.h>
-	<fnmatch.h>
-	<windows.h>
-	<shlobj.h>
-	<process.h>
-	<io.h>
-	<initializer_list>
-	<utility>
-	<omp.h>
-	<X11/Xlib.h>
-	<X11/Xutil.h>
-	<X11/keysym.h>
-	<pthread.h>
-	<sys/ipc.h>
-	<sys/shm.h>
-	<X11/extensions/XShm.h>
-	<X11/extensions/Xrandr.h>
-	<cstddef>
-	<opencv2/opencv.hpp>
-	"png.h"
-	"jpeglib.h"
-	"setjmp.h"
-	"tiffio.h"
-	"minc_io_simple_volume.h"
-	"minc_1_simple.h"
-	"minc_1_simple_rw.h"
-	"zlib.h"
-	"curl/curl.h"
-	"Magick++.h"
-	"fftw3.h"
-	"Board.h"
-	"ImfRgbaFile.h"
-	"ImfInputFile.h"
-	"ImfChannelList.h"
-	"ImfMatrixAttribute.h"
-	"ImfArray.h"
-	"tinyexr.h"
-	"CImg.h"
-
-1574275863 source:/home/pi/Desktop/piMASS/gpcalu.cpp
-	"gpcwin.h"
-
-1574205784 source:/home/pi/Desktop/piMASS/gpcresflt.cpp
-	"gpcwin.h"
-
-1574677195 source:/home/pi/Desktop/piMASS/gpcwin_var.cpp
-	"gpccrs.h"
-
-1574373454 /home/pi/Desktop/piMASS//camU.h
-
-1574373454 /home/pi/Desktop/piMASS/camU.h
-
-1574563560 /home/pi/Desktop/piMASS/include/camU.h
 

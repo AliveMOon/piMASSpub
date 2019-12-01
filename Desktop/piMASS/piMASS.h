@@ -3204,10 +3204,11 @@ class gpcSYNC
 {
 protected:
 	gpeNET4	typ4;
-	U4		nb;
+	U4	nb;
 public:
-	U4		id, ms;
-	gpcSYNC( gpeNET4 t, U4 i, U4 s, U4 n = 0 )
+	U4	id;
+	U4	ms;
+	gpcSYNC( gpeNET4 t, U8 i, U4 s, U4 n = 0 )
 	{
         typ4 = t;
         id = i;
@@ -3323,7 +3324,7 @@ public:
 
 		gpcSYNC* pSYN = (gpcSYNC*)(p_alloc+strt);
 		pSYN->nB( n_load-strt );
-		if( pSYN->nS() > 1 )
+		if( pSYN->nB() > sizeof(*pSYN) ) //pSYN->nS() >= 1 )
 			return this;
 
 		if( strt )
@@ -3335,6 +3336,20 @@ public:
 		delete this;
 		return NULL;
 
+	}
+	gpcLAZY* putZN( U1* pDAT, U4 nDAT, gpeNET4 nt4, U4 zn, U4 ms )
+	{
+		U8 s = -1, b;
+		gpcSYNC syn( nt4, 0, ms );
+
+		gpcLAZY* pOUT = this->lzyADD( &syn, sizeof(syn), s = -1 );
+		b = s;
+		pOUT = pOUT->lzyADD( &zn, sizeof(zn), s = -1 );
+
+		if( pDAT ? nDAT : false )
+			pOUT = pOUT->lzyADD( pDAT, nDAT, s = -1 );
+
+		return pOUT->SYNrdy(b);
 	}
 
 	gpcLAZY* putPIC( U1* pDAT, U4 nDAT, U1* pNAME, U4 ms )

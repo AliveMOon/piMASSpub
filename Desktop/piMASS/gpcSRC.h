@@ -604,13 +604,11 @@ public:
 
 	gpcMAP	*pMAP;
 
-	U4 srcUPDT( void )
+	U4 srcUPDT( )
 	{
 		U8 nLEN = 0;
 		pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 		nVERr = nHD+1;
-
-		//ifpB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 
 		return nVERr;
 	}
@@ -753,8 +751,7 @@ public:
 	}
 	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch, bool bNoMini );
 
-	U4x4 CRSdim( U4x4* pCRS2, bool bNoMini )
-	{
+	U4x4 CRSdim( U4x4* pCRS2, bool bNoMini ) {
 		if( !this )
 			return U4x4( 4, 1 );
 		U1* pC = pSRCstart( bNoMini ); //pCRS2 );
@@ -765,8 +762,7 @@ public:
 
 
 
-    bool bSUB( gpcMASS& mass )
-    {
+    bool bSUB( gpcMASS& mass ) {
 		if( !this )
 			return false;
 
@@ -775,8 +771,7 @@ public:
 		// beljebb lép
 		return bSW&gpeMASSsubMSK;
     }
-    bool bRET( gpcMASS& mass )
-    {
+    bool bRET( gpcMASS& mass ) {
 		if( !this )
 			return false;
 
@@ -785,8 +780,7 @@ public:
 		// kijebb lép
 		return bSW&gpeMASSretMSK;
     }
-    bool bENTR( gpcMASS& mass, U4x4& _spc, U4 x = 0 )
-    {
+    bool bENTR( gpcMASS& mass, U4x4& _spc, U4 x = 0 ) {
 		if( !this )
 			return false;
 
@@ -810,8 +804,7 @@ public:
 		return true;
 
     }
-    bool bUNsel( gpcMASS& mass )
-    {
+    bool bUNsel( gpcMASS& mass ) {
 		if( !this )
 			return false;
 
@@ -822,8 +815,7 @@ public:
 		return bSW&gpeMASSunselMSK;
     }
 
-	bool bIN( gpcMASS& mass )
-    {
+	bool bIN( gpcMASS& mass ) {
 		if( !this )
 			return false;
 
@@ -833,8 +825,7 @@ public:
 		return bSW&gpeMASSinpMSK;
     }
 
-    bool bPASS( gpcMASS& mass )
-    {
+    bool bPASS( gpcMASS& mass ) {
 		if( !this )
 			return false;
 
@@ -844,15 +835,13 @@ public:
 
 		return bSW&gpeMASSpassMSK;
     }
-    bool bALERT( void )
-    {
+    bool bALERT( void ) {
 		if( !this )
 			return false;
 
 		return bSW&gpeMASSalertMSK;
     }
-    bool bMAIN( gpcMASS& mass, bool bDBG = false )
-    {
+    bool bMAIN( gpcMASS& mass, bool bDBG = false ) {
 		if( !this )
 			return false;
 		hd( mass );
@@ -875,8 +864,7 @@ public:
 
     gpcSRC();
     virtual ~gpcSRC();
-	U8 iB( void )
-	{
+	U8 iB( void ) {
 		if( !pA || !nL )
 			return 0;
 
@@ -918,7 +906,14 @@ public:
 	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spcZN, U4 nADD = 1 );
 
     gpcSRC& SRCcpy( U1* pC, U1* pE );
+	bool SRCcmp( U1* pS, U4 nS )
+	{
+        if( nS != nL )
+			return false;
 
+		U4 nCMP = gpmMEMCMP( pA, pS, nL )-pA;
+		return nCMP == nL;
+	}
 
     gpcSRC( gpcSRC& B );
     gpcSRC& operator = ( gpcSRC& B );
@@ -1230,7 +1225,9 @@ public:
 	}
 
 	/// gpcMASS:: find in main.cpp
-	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an );
+	gpcSRC* SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, U4 nS = 0 );
+
+
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
 	U1* justDOit( gpcWIN& win ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );

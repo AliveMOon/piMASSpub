@@ -107,21 +107,36 @@ char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
 gpcLAZY gpMASS;
 U1 gpdONEcell[] = " \a ";
 
-gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
+gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, U4 nS )
 {
 	if( !an.x )
 		return NULL;
 
-	U4	i = (an * I4x2( 1, mapCR.mapZN44.z ))-1,
-		x_fnd = mapCR.pMAP[i];
+	U4x2 znP1 = an + I4x2(0,1);
+	U4x4 mCR;
 
-	gpcSRC* p_fnd = x_fnd ? SRCfnd( x_fnd ) : NULL;
+	U4	*pM = mapCR.MAPalloc( znP1, mCR );
+
+	U4	iZN = (an * U4x2( 1, mCR.z ))-1,
+		xFND = pM[iZN];
+
+	gpcSRC* p_fnd = xFND ? SRCfnd( xFND ) : NULL;
 	if( p_fnd )
+	{
+
+		if( pS ? nS : false )
+		if( !p_fnd->SRCcmp(pS,nS) )
+		{
+			p_fnd->SRCcpy(pS,pS+nS);
+			p_fnd->srcUPDT();
+		}
 		return p_fnd;
+	}
 
 	if( !pS )
 		pS = gpdONEcell;
-	U1	*pSe = pS+gpmSTRLEN( pS ), *pSS;
+
+	U1	*pSe = pS + (nS?nS:gpmSTRLEN(pS)), *pSS;
 	aSP44[nSP].a4x2[0] = an;
 
 	tmp.reset( pS, pSe, &pSS, aSP44[nSP] );
@@ -133,10 +148,8 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an )
 	p_fnd = SRCadd( &tmp, xADD, aSPix[nSP], n );
 	if( !p_fnd )
 		return NULL;
-	I4x2 zn = an + I4x2(0,1);
-	mapCR.mapZN44.a4x2[0].mx( zn );
 
-	mapCR.pMAP[i] = xADD;
+	pM[iZN] = xADD;
 	xADD++;
 	return p_fnd;
 }

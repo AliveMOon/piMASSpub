@@ -29,6 +29,14 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( !this )
 		return;
 
+	if( !pOUT )
+	if( pWIN )
+	if( msSYNwin < pWIN->msSYN )
+	{
+		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin );
+		msSYNwin = pWIN->msSYN;
+	}
+
 	U1		s_com[0x200], s_answ[0x200];
 	char	s_atrib[0x200], s_prompt[0x100], s_cell[0x100];
 	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
@@ -44,10 +52,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		nSYN = ((gpcSYNC*)p_str)->nB();
 
 	if( nSYN ? pINP->n_load < nSYN : false )
-		return;
+			return;
 
 	while( nSYN )
 	{
+
 		U1* pDAT = p_str+sizeof(gpcSYNC);
 		gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
 		switch( syn.typ() )
@@ -67,8 +76,12 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 							pSYNgt = pSYNgt->syncADD( isyn, msSYNgt );
 							break;
+						//case gpeNET4_0SRC:
+
 						default:
+							pSYNgt = pSYNgt->syncADD( isyn, msSYNgt );
 							break;
+
 					}
 				}
 				break;
@@ -78,16 +91,33 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					I8x2 TnID( 0, pPNT-pDAT );
 					TnID = pDAT;
 					TnID.num = gpfSTR2I8( pDAT+TnID.num, NULL );
+					if( !*pEND )
+						pEND++;
 					if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( TnID ) )
 					{
 						SDL_Surface* pKILL = pPIC->pSHR;
-						SDL_RWops *pRW = SDL_RWFromMem( pEND+1, syn.nB()-((pEND+1)-pDAT) );
+
+						U4	nD = pEND-pDAT,
+							nS = pEND-(U1*)&syn;
+
+						SDL_RWops *pRW = SDL_RWFromMem( pEND, syn.nB()-nS );
 						pPIC->pSHR = IMG_Load_RW( pRW, 1 );
 						if( !pPIC->pSHR )
 							pPIC->pSHR = pKILL;
 						else
 							SDL_FreeSurface(pKILL);
 					}
+				} break;
+			case gpeNET4_0SRC:{
+					U4* pZN = (U4*)pDAT;
+					U1* pA = (U1*)(pZN+1);
+					U4 nA = syn.nB()-(pA-(U1*)&syn);
+                    I4x2 an( ((U2)*pZN+1), (*pZN)>>0x10 );
+					gpcSRC	tmp,
+							*pSRC = pWIN->piMASS->SRCnew( tmp, pA, an, nA );
+					if( !pSRC )
+						break;
+
 				} break;
 			default:
 				break;
@@ -101,6 +131,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 			if( *p_str )
 				break;
 
+
 			if( pINP->n_load < sizeof(gpcSYNC) )
 			if( pSYNgt ? pSYNgt->n_load : false )
 				break;
@@ -108,6 +139,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 				return;
 
 			nSYN = ((gpcSYNC*)p_str)->nB();
+			if( pINP->n_load < nSYN )
+				return;
 		}
 	}
 
@@ -124,12 +157,17 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 				case gpeNET4_0PIC:
 					pOUT = pOUT->lzyFRMT( s = -1, "pic 0x%x;", isyn.id );
 					break;
+				case gpeNET4_0SRC:
+					pOUT = pOUT->lzyFRMT( s = -1, "src 0x%x;", isyn.id );
+					break;
 				default:
 					break;
 			}
 		}
 		gpmDEL(pSYNgt);
 	}
+
+
 
 	if( !p_str )
 	{
@@ -245,6 +283,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 					case gpeALF_HOST: {
 							pHOST = sHOST+sprintf( (char*)sHOST, "%s", s_atrib );
 						} break;
+
 					case gpeALF_MSEC: if( pWIN ) {
 							mSEC.y = pWIN ? pWIN->mSEC.x : 0;
 							mSEC.x = gpfSTR2U8( (U1*)s_atrib, NULL );
@@ -296,6 +335,28 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 								}
 							}
+						} break;
+					case gpeALF_SRC: {
+							if( pWIN ? !pWIN->mZ : true )
+								break;
+							U4	iZN = gpfSTR2U8( (U1*)s_atrib, NULL ), nA = 0;		// (i%win.mZ)+((i/win.mZ)<<16)
+							U4x2 zn( (U2)iZN, iZN>>0x10 );
+							U1* pA = NULL;
+
+							if( zn.x < pWIN->mZ )
+							if( zn.y < pWIN->mN )
+							{
+								U4 iM = zn*U4x2(1,pWIN->mZ);
+								if( U4 xFND = pWIN->pM[iM] )
+								if( gpcSRC* pSRC = pWIN->piMASS->SRCfnd( xFND ) )
+								{
+									pA = pSRC->pA;
+									nA = pSRC->nL;
+								}
+							}
+
+							pOUT = pOUT->putZN( pA, nA, gpeNET4_0SRC, iZN, pWIN->mSEC.x );
+
 						} break;
 					case gpeALF_OK:
 					case gpeALF_NONSENS:

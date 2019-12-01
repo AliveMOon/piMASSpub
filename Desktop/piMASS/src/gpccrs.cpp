@@ -1055,9 +1055,9 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			c = i%pMAP->mapZN44.z;
 			r = i/pMAP->mapZN44.z;
 			if(
-						   ( c+1 >= lurdAN.x	&& r >= lurdAN.y )
-						&& ( c+1 <= lurdAN.z	&& r <= lurdAN.w )
-				)
+				   ( c+1 >= lurdAN.x	&& r >= lurdAN.y )
+				&& ( c+1 <= lurdAN.z	&& r <= lurdAN.w )
+			)
 				bNoMini = true;
 			else
 				bNoMini = false;

@@ -460,7 +460,14 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 		*ppE = pS;
 
 	if( !bGD )
+	{
+		if( nISA.x )
+		{
+			nISA = 0;
+			gpmDELary(pISA);
+		}
 		return this;
+	}
 
 	if( str.n_load )
 		pI = resISA_str( str );

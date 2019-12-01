@@ -8,22 +8,39 @@ gpcSRC::gpcSRC()
     //ctor
     gpmCLR;
 }
+
 gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe )
 {
-	if( pSe <= pS )
-		return *this;
-	nL = pSe-pS;
 	U1* pKL = nA ? pA : NULL;
-	if( nA < nL )
+	if( pSe <= pS )
 	{
-		gpmDELary(pA);
-		nA = gpmPAD( nL+1, 0x10 );
+        // kill
+        gpmDELary(pKL);
+        pB = pA = NULL;
+        nA = nL = 0;
+		return *this;
+	}
+	nL = pSe-pS;
+	if( nA < nL+2 )
+	{
+		gpmDELary(pKL);
+		nA = gpmPAD( nL+2, 0x10 );
 		pA = new U1[nA];
 	}
-
-	gpmMEMCPY( pA, pS, nL );
-	pA[nL] = 0;
 	U8 nLEN;
+	U4 iA = gpfVAN( pS, (U1*)"\a", nLEN );
+	if( iA >= nL )
+	{
+		iA = sizeof(" \a");
+		gpmMEMCPY( pA, " \a", iA );
+		iA--;
+	} else
+		iA = 0;
+
+	gpmMEMCPY( pA+iA, pS, nL );
+	nL += iA;
+	pA[nL] = 0;
+
 	pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 	if( *pB == '\a' )
 		pB++;

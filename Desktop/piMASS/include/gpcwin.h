@@ -79,7 +79,7 @@ class gpcWIN
 
 
 		/// RUN MAP --------------
-		U4	*pM, *pC, *pR, mZ, mN;
+		U4	*pM, *pC, *pR, mZ, mN, mZN;
 
 
 
