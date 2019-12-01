@@ -1,6 +1,5 @@
- a0	 cam = 1; // * 0; c0	 192.168.0.157 6001  d0	 =ia e0	  =in a1	  telnet = 6001;
- sync = c0;
-f = fps; c1	 c = nbld;
+ a0	 cam = 1 // * 0 c0	 192.168.0.157 6001  d0	 =ia e0	  =in a1	  telnet = 6001;
+ sync = c0 c1	 c = nbld;
 ="blabla
 blablaaaa
 na csak őssze szedte

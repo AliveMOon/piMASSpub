@@ -30,7 +30,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		return;
 
 	if( !pOUT )
-	if( pWIN )
+	if( (sUSER < pUSER) && (sHOST < pHOST) )
 	if( msSYNwin < pWIN->msSYN )
 	{
 		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket );
@@ -178,7 +178,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( !p_str )
 		return;
 
-	U1	*p_sub = p_str + gpmSTRLEN( p_str ),
+	U1	*p_sub = p_str,
+		*p_null = p_str + gpmSTRLEN( p_str ),
 		*pINPload = p_str + pINP->n_load;
 
 	U1 *p_back = p_str + gpdVAN( (char*)p_str, "\b" );
@@ -187,7 +188,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	{
 		b_back = !aGTcrs[0];
 		I8	n_sub = p_sub-pINP->p_alloc,
-			n_back = gpmNINCS( p_back, "\b" ), n_str = p_back-pINP->p_alloc;
+			n_back = gpmNINCS( p_back, "\b" ),
+			n_str = p_back-pINP->p_alloc;
 		if( n_str <= n_back )
 		{
 			n_str = 0;
@@ -207,10 +209,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 		{
 			// elfogyott;
 			gpmDEL( pINP );
-			p_sub = pINPload = p_str;
+			p_sub = p_null = pINPload = p_str;
 			break;
 		}
-		p_sub = p_str,
+		p_sub = p_str;
+		p_null = p_str + gpmSTRLEN( p_str );
 		pINPload = p_str+pINP->n_load;
 		p_back = p_str+gpdVAN( (char*)p_str, "\b" );
 	}
@@ -222,9 +225,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 	}
 
-	I8x2 cAN;
+	I8x2 cAN( gpeALF_NONSENSE, 0 );
 	U1* pSKIP = NULL; U4 nSKIP = 0;
-	if( p_str < p_sub )
+	if( p_str < p_null )
 	{
 		U1	*p_row = p_str+gpmNINCS( p_str, " \t;>\r\n" ),
 			*p_row_end = p_row+gpdVAN( (char*)p_row, ";\r\n" ),
@@ -390,14 +393,14 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 						} break;
 					case gpeALF_OK:
 					case gpeALF_NONSENS:
-					case gpeALF_NONSENSE: {
+					case gpeALF_NONSENSE:
 							nSKIP = p_next-p_row;
 							if( nSKIP )
 							{
 								((U1*)gpmMEMCPY( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
 								pSKIP = (U1*)s_atrib;
 							}
-						} break;
+						break;
 					/*case gpeALF_PREV:
 						isEVNT.null();
 						isEVNT.id = gpeNET4_PREV;

@@ -649,6 +649,7 @@ typedef enum gpeALF: I8
 	gpeALF_MRB = gpdABC('M', 'R', 'B'),
 	gpeALF_MUL = gpdABC('M', 'U', 'L'),
 	gpeALF_NEW = gpdABC('N', 'E', 'W'),
+	gpeALF_NON = gpdABC('N', 'O', 'N'),
 	gpeALF_OFF = gpdABC('O', 'F', 'F'),
 	gpeALF_ORM = gpdABC('O', 'R', 'M'),
 	gpeALF_OUT = gpdABC('O', 'U', 'T'),
@@ -796,6 +797,7 @@ typedef enum gpeALF: I8
 	gpeALF_MSEC = gpdABCD('M', 'S', 'E', 'C'),
 	gpeALF_NBLD = gpdABCD('N', 'B', 'L', 'D'),
 	gpeALF_NEAR = gpdABCD('N', 'E', 'A', 'R'),
+	gpeALF_NONS = gpdABCD('N', 'O', 'N', 'S'),
 	gpeALF_NUSE = gpdABCD('N', 'U', 'S', 'E'),
 	gpeALF_OPER = gpdABCD('O', 'P', 'E', 'R'),
 	gpeALF_ORLG = gpdABCD('O', 'R', 'L', 'G'),
@@ -880,6 +882,7 @@ typedef enum gpeALF: I8
 	gpeALF_NGATE = gpdABCDE('N', 'G', 'A', 'T', 'E'),
 	gpeALF_NGCON = gpdABCDE('N', 'G', 'C', 'O', 'N'),
 	gpeALF_NGDIE = gpdABCDE('N', 'G', 'D', 'I', 'E'),
+    gpeALF_NONSE = gpdABCDE('N', 'O', 'N', 'S', 'E'),
 
 	gpeALF_ORBIT = gpdABCDE('O', 'R', 'B', 'I', 'T'),
 	gpeALF_PAINT = gpdABCDE('P', 'A', 'I', 'N', 'T'),
@@ -942,6 +945,7 @@ typedef enum gpeALF: I8
 	gpeALF_LISTEN = gpdABCDEF('L', 'I', 'S', 'T', 'E', 'N'),
 
 	gpeALF_NEWROW = gpdABCDEF('N', 'E', 'W', 'R', 'O', 'W'),
+    gpeALF_NONSEN = gpdABCDEF('N', 'O', 'N', 'S', 'E', 'N'),
 
 	gpeALF_MODBUS = gpdABCDEF('M', 'O', 'D', 'B', 'U', 'S'),
 	gpeALF_NBUILD = gpdABCDEF('N', 'B', 'U', 'I', 'L', 'D'),

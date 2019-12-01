@@ -658,6 +658,7 @@ static const char gp_sHELLO_acc[] = "account;\r -= Welcome in piMASS 2019 =-\r\n
 
 I8 gpcGT::GTcnct( gpcWIN& win )
 {
+	U8 s;
 	if( socket == INVALID_SOCKET )
 	{
 
@@ -708,11 +709,19 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			bGTdie = true;
 			return 0;
 		}
+
+		if( port & 1 )// telnetek
+		{
+			pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, iCNT );
+			iCNT++;
+			aGTcrs[0] = 'a';
+			//GTos(*this);
+		}
 	}
 
 	char *p_err = (char*)win.sGTpub;
 	*win.sGTpub = 0;
-	U8 s;
+
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 	{
 		p_err = GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
@@ -728,10 +737,21 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		if( !bGTdie )
 			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
 	}
+	else if( !pOUT )
+	if( pINP ? pINP->n_load : false )
+	{
+		if( aGTcrs[1] != 'h' )
+			GTos( *this, &win );
+
+
+		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
+		if( !bGTdie )
+			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
+	}
 
 	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 	{
-		U8 s;
+
 		if(!pOUT)
 		{
 			if(pHUD ? pHUD->p_alloc : NULL )
@@ -756,12 +776,12 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				}
 			}
 
-			//if( sUSER < pUSER )
-           /* if( msSYNwin < win.msSYN )
+			if( (sUSER < pUSER) && (sHOST < pHOST) )
+            if( msSYNwin < win.msSYN )
             {
-				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin );
+				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin, socket );
 				msSYNwin = win.msSYN;
-            }*/
+            }
 		}
 
 		p_err = GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
@@ -1080,6 +1100,13 @@ I8 gpcGT::GTlst( gpcWIN& win )
 					{
 						gpmDEL(p_gt->pDWN);
 					}
+				}
+
+				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) )
+				if( p_gt->msSYNwin < win.msSYN )
+				{
+					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin, p_gt->socket );
+					p_gt->msSYNwin = win.msSYN;
 				}
 
 				/*if( p_gt->msSYNwin < win.msSYN )

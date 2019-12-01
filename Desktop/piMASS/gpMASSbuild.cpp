@@ -78,7 +78,7 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
 		return gpeALF_null;
 	}
 
-	I8 alf = 0;
+	U8 alf = 0;
 	U1 c, utf;
 
 	while( pS < p_end)

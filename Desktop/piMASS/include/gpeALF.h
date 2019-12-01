@@ -13,15 +13,15 @@
 #define gpdUP_CASE(a){ if( a >= 'a' && a <= 'z' ){ a -= gpdUP; }}
 #define gpdALF 								('Z'-'@')
 #define gpdA(a)								( a -'@' )
-#define gpdAB(a,b)							(U4)( gpdA(a)*gpdALF + gpdA(b) )
-#define gpdABC(a,b,c)						(U4)( gpdAB(a,b)*gpdALF + gpdA(c) )
-#define gpdABCD(a,b,c,d)					(U4)( gpdABC(a,b,c)*gpdALF + gpdA(d) )
-#define gpdABCDE(a,b,c,d,e)					(U4)( gpdABCD(a,b,c,d)*gpdALF + gpdA(e) )
-#define gpdABCDEF(a,b,c,d,e,f)				(U4)( gpdABCDE(a,b,c,d,e)*gpdALF + gpdA(f) )
+#define gpdAB(a,b)							(U8)( gpdA(a)*gpdALF + gpdA(b) )
+#define gpdABC(a,b,c)						(U8)( gpdAB(a,b)*gpdALF + gpdA(c) )
+#define gpdABCD(a,b,c,d)					(U8)( gpdABC(a,b,c)*gpdALF + gpdA(d) )
+#define gpdABCDE(a,b,c,d,e)					(U8)( gpdABCD(a,b,c,d)*gpdALF + gpdA(e) )
+#define gpdABCDEF(a,b,c,d,e,f)				(U8)( gpdABCDE(a,b,c,d,e)*gpdALF + gpdA(f) )
 #define gpdABCDEFG(a,b,c,d,e,f,g)			(U8)( gpdABCDEF(a,b,c,d,e,f)*gpdALF + gpdA(g) )
-#define gpdABCDEFGH(a,b,c,d,e,f,g,h)		(I8)( gpdABCDEFG(a,b,c,d,e,f,g)*gpdALF + gpdA(h) )
-#define gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)		(I8)( gpdABCDEFGH(a,b,c,d,e,f,g,h)*gpdALF + gpdA(i) )
-#define gpdABCDEFGHIJ(a,b,c,d,e,f,g,h,i,j)	(I8)( gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)*gpdALF + gpdA(j) )
+#define gpdABCDEFGH(a,b,c,d,e,f,g,h)		(U8)( gpdABCDEFG(a,b,c,d,e,f,g)*gpdALF + gpdA(h) )
+#define gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)		(U8)( gpdABCDEFGH(a,b,c,d,e,f,g,h)*gpdALF + gpdA(i) )
+#define gpdABCDEFGHIJ(a,b,c,d,e,f,g,h,i,j)	(U8)( gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)*gpdALF + gpdA(j) )
 
 typedef enum gpeALFu4: U4
 {
