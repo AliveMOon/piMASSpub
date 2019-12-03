@@ -1,9 +1,9 @@
 #include "gpcwin.h"
 //#include "gpcres.h"
 
+bool bITT =  false; //true; // false; //
 extern U1 gpaALFadd[];
 
-bool bITT =  false; //true; // false; //
 
 gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
@@ -21,11 +21,17 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 		pOUT = new gpcRES( pMOM );
 	}
 	gpcSTK stk( pSTK, pOUT, pSRC );
-	U8 u8; I8 i8; double d8, iASG, nOUT = 0;
-	U1 sBUFF[0x1000], *pB = sBUFF+0x20, *pS = pB, nB;
+	U4 iASG, nOUT = 0;
+
+	U8 u8;
+	I8 i8;
+	double d8;
+
+	U1	sBUFF[0x1000],
+		*pB = sBUFF+0x20, *pS = pB, nB;
 
 	gpcREG err;
-	I1x4 isa = 0, back;
+	I1x4 isa = 0; //, back;
 	bool bROW = false;
 
 	gpcMASS& mass = *win.piMASS;
@@ -103,7 +109,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 					flg.iA++;
 				} break;*/
 			case gpeISA_anFUN: {	// -------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
+					//pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
 					stk.aAN[flg.iA] = IS.an;
 					//flg.iA++;
 				} break;
@@ -182,14 +188,14 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, g
 				} break;
 
 			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
-					pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
+					//pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
 					stk.aVR[flg.iV] = IS.an.var;
 					//flg.iV++;
 				} break;
 
 
 			case gpeISA_tag: {
-					 pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
+					 //pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
 					stk.aTG[flg.iG] = IS.an.var;
 					//flg.iG++;
 				} break;
@@ -418,10 +424,21 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		gpmDEL( pSRC->apOUT[0] );
 		if( pSRC->qBLD() )
 		{
+			pSRC->msBLD = win.mSEC.x + pSRC->msBLTdly;
+			pSRC->rdyBLD();
+		}
+
+		if( pSRC->msBLD ? pSRC->msBLD <= win.mSEC.x : false )
+		{
 			gpmDEL( pSRC->pEXE );
 			pSRC->pEXE = pSRC->pEXE->compiEASY( pSRC->pSRCstart( true ), NULL, NULL, NULL );
-			pSRC->rdyBLD();
-			win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%win.mZ)+((i/win.mZ)<<16) , win.mSEC.y, pSRC->iGT, 0 ), win.msSYN );
+
+			if( !pSRC->msBLTdly )
+				pSRC->msBLTdly = gpeSYNmsec;
+			else
+				win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%win.mZ)+((i/win.mZ)<<16) , win.mSEC.y, pSRC->iGT, 0 ), win.msSYN );
+			pSRC->msBLD = 0;
+
 			pSRC->apOUT[0] = pSRC->apOUT[1];
 			pSRC->apOUT[1] = pSRC->apOUT[2];
 			pSRC->apOUT[2] = pSRC->apOUT[3];

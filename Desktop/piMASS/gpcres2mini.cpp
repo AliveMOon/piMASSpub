@@ -1,7 +1,8 @@
 #include "gpcres.h"
 extern U1 gpaALFadd[];
 //extern U1 gpsTABrun[];
-U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t", *gppTABrun = gpsTABrun + strlen( (char*)gpsTABrun );
+U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
+	*gppTABrun = gpsTABrun + sizeof(gpsTABrun)-1; //pmSTRLEN( (char*)gpsTABrun );
 
 
 gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )

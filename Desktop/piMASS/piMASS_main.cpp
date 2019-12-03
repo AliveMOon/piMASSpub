@@ -99,9 +99,9 @@ U1 gp_s_key_map_sdl[] =
 
 
 
-char gpsEXEpath[gpeMXPATH], *gppEXEfile = gpsEXEpath,
+char gpsEXEpath[gpdMAX_PATH], *gppEXEfile = gpsEXEpath,
 	 gpsEXEname[0x100],
-	 gpsMASSpath[gpeMXPATH], *gppMASSfile = gpsMASSpath,
+	 gpsMASSpath[gpdMAX_PATH], *gppMASSfile = gpsMASSpath,
 	 gpsMASSname[0x100];
 
 gpcLAZY gpMASS;
@@ -382,7 +382,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 			pPR += gpmSTRLEN(pPR);
 		}
 		U8 nUNDO = 0;
-		char s_buff[gpeMXPATH];
+		char s_buff[gpdMAX_PATH];
 		if( gpfMKDR( s_buff, (char*)gpsRENMbf ) )
 		{
 			sprintf( pPR, "0x%0.4llx", nUNDO );

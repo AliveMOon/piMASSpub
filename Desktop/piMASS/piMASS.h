@@ -250,7 +250,7 @@ class gpcMASS;
 
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
-#define gpmMEMCMP (U1*)gp_memcmp
+#define gpmMEMCMP gp_memcmp
 #define gpmUnB( u )		( abs(u)>0x7fFF ? (abs(u)>0x7fffFFFF ? 8 : 4) : (abs(u)>0x7f ? 2 : 1)  )
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
@@ -352,13 +352,11 @@ enum gpeWIP : U1
 };
 
 
-enum gpeFD
-{
+enum gpeFD {
 	gpeFDrcv,
 	gpeFDsnd,
 	gpeFDexcp,
 	gpeFDn,
-
 };
 
 
@@ -366,7 +364,10 @@ enum gpeLX:U8
 {
     gpeZERO,
     gpeU4x2nSTR = sizeof(U8)/sizeof(void*),
-    gpeMXPATH = gpmPAD( PATH_MAX, 0x10 ) , //0x10*0x11,
+   // gpeMXPATH = gpmPAD( gpdMAX_PATH, 0x10 ) , //0x10*0x11,
+
+    gpeSYNmsec = 2500,
+
     gpeRECVn = (0x30000/12),
 };
 
@@ -464,17 +465,45 @@ inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
 	*p2P = 0;
 	return p2P;
 }
-inline void* gp_memcmp( const U1* pA, const U1* pB, U8 n )
+
+inline U8 gp_memcmp( const void* pA, const void* pB, U8 n )
 {
 	if( !pA || !pB )
-		return (void*)pA;
+		return 0;
 
 	if( pA == pB )
-		return (void*)(pA+n);
+		return n;
 
 	U1	*pAu1 = (U1*)pA,
 		*pBu1 = (U1*)pB;
-	for( U8 i = 0; i < n; i++ )
+	U8 i = 0;
+	while( n-i > 8 )
+	{
+		if( *(U8*)(pAu1+i) != *(U8*)(pBu1+i) )
+			break;
+		i += 8;
+	}
+	while( n-i > 4 )
+	{
+		if( *(U4*)(pAu1+i) != *(U4*)(pBu1+i) )
+			break;
+		i += 4;
+	}
+	while( n-i > 2 )
+	{
+		if( *(U2*)(pAu1+i) != *(U2*)(pBu1+i) )
+			break;
+		i += 2;
+	}
+	while( i < n )
+	{
+		if( pAu1[i] != pBu1[i] )
+			return i;
+		i++;
+	}
+	return n;
+
+	/*for( U8 i = 0; i < n; i++ )
 	{
 		if( n-i > 8 )
 		{
@@ -498,8 +527,10 @@ inline void* gp_memcmp( const U1* pA, const U1* pB, U8 n )
 
 		return (void*)(pAu1+i);
 	}
-	return (void*)(pAu1+n);
+	return (void*)(pAu1+n);*/
 }
+
+
 
 class UTF8
 {
@@ -3254,6 +3285,21 @@ public:
 	{
 		return !(*this != b);
 	}
+
+	bool bSW( U8 sw )
+	{
+		switch( typ4 )
+		{
+			case gpeNET4_0SRC:
+				if( sw&1 )
+					return false; // ha azonos file csak akkor engedi a src-t elküldeni, különben hagyja a continue-t
+
+				return true;
+			default:
+				break;
+		}
+		return false;
+	}
 };
 
 
@@ -3374,7 +3420,7 @@ public:
 		return pOUT->SYNrdy(b);
 	}
 
-	gpcLAZY* putSYN( gpcLAZY* pOUT, U4 ms, SOCKET iGT )
+	gpcLAZY* putSYN( gpcLAZY* pOUT, U4 ms, SOCKET iGT, U8 bSW )
 	{
 		if( this ? ( p_alloc ? !n_load : true ) : true )
 			return pOUT;
@@ -3393,6 +3439,8 @@ public:
 					continue;
 				if( pSYN[i].iGT == iGT )
 					continue;
+				if( pSYN[i].bSW( bSW ) )
+					continue;
 
 				pOUT = pOUT->lzyADD( pSYN+i, sizeof(syn), s = -1 );
 			}
@@ -3401,6 +3449,8 @@ public:
 		{
 			if( pSYN[i].ms < ms )
 				continue;
+			if( pSYN[i].bSW( bSW ) )
+					continue;
 
 			pOUT = pOUT->lzyADD( pSYN+i, sizeof(syn), s = -1 );
 		}
@@ -3745,7 +3795,7 @@ public:
 		if( gpfACE(p_file, 4) < 0 )
 			return this;
 
-		char s_buff[gpeMXPATH];
+		char s_buff[gpdMAX_PATH];
 		FILE* p_f = fopen( p_file, "wb" );
 		U8 n_w = 0, n_err = 0, W0 = 0;
 

@@ -29,11 +29,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 	if( !this )
 		return;
 
-	if( !pOUT )
-	if( (sUSER < pUSER) && (sHOST < pHOST) )
+	if( pOUT ? false : !bI() )
+	if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
 	if( msSYNwin < pWIN->msSYN )
 	{
-		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket );
+		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
 		msSYNwin = pWIN->msSYN;
 	}
 
@@ -275,26 +275,41 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 				switch( cAN.alf )
 				{
 					case gpeALF_ACCOUNT: if( pWIN->bINIThu() ) {
+							mSEC.y = pWIN ? pWIN->mSEC.x+1 : 0;
 							pOUT = pOUT->lzyFRMT(
 														s = -1,	"%shost %s;"
 																"%suser %s;"
+																"%sfile %s;"
 																"%smsec 0x%x;",
 														aGTcrs[0] ? "" : "\r\n", pWIN->sHOST,
 														aGTcrs[0] ? "" : "\r\n", pWIN->sUSER,
-														aGTcrs[0] ? "" : "\r\n", pWIN->mSEC.x
+														aGTcrs[0] ? "" : "\r\n", pWIN->gpsMASSname,
+														aGTcrs[0] ? "" : "\r\n", mSEC.y
+
 													);
-						} break;
-					case gpeALF_USER: {
-							pUSER = sUSER+sprintf( (char*)sUSER, "%s", s_atrib );
 						} break;
 					case gpeALF_HOST: {
 							pHOST = sHOST+sprintf( (char*)sHOST, "%s", s_atrib );
 						} break;
+					case gpeALF_USER: {
+							pUSER = sUSER+sprintf( (char*)sUSER, "%s", s_atrib );
+						} break;
+					case gpeALF_FILE: {
+							U4 nF = sprintf( (char*)sFILE, "%s", s_atrib );
+							pFILE = sFILE+nF;
+
+							if( nF == gpmMEMCMP( sFILE, pWIN->gpsMASSname, nF ) )
+								bSW |= 1;
+							else
+								bSW &= ~1;
+						} break;
 
 					case gpeALF_MSEC: if( pWIN ) {
-							mSEC.y = pWIN ? pWIN->mSEC.x : 0;
 							mSEC.x = gpfSTR2U8( (U1*)s_atrib, NULL );
 						} break;
+
+
+
 					case gpeALF_GATELIST:
 						pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gppTAB ); //gpsTAB );
 						break;

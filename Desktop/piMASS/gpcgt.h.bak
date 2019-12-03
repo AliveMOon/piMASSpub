@@ -13,7 +13,7 @@ public:
 	I8x2 an;
 	U8	nIDX,
 		*p_dix, n_dix, dw_il, dw_i, dw_j, dw_je;
-	U1 s_file_name[gpdMAX_PATH];
+	U1 s_file_name[gpeMXPATH];
 	gpcGT_DWNL( U8 _dt )
 	{
 		gpmCLR;
@@ -156,49 +156,26 @@ class gpcGT
 		gpcGT_DWNL	*pDWN;
 		gpcHUD		*pHUD, isEVNT;
 
-		hostent			*p_host_ips;
+		hostent	*p_host_ips;
 		struct ifaddrs 	*pIFadr,
 						*pIFa;
 
 		gpcFD	aGTfd[gpeFDn];
-
 		U4		nFDs, nFDr, nFDe,
 
 				nSYN, nSYNsum, nSYNdo,
-				msSYNgt, msSYNwin, msGTdie;
-		U4x2 	mSEC;
-		U8		bSW;	// 1 same file
+				msSYNgt, msSYNwin;
 
-		char	s_ip[0x400],
+		char	//sGTpub[0x10000],
+				//s_buff[0x30000/12],
+				s_ip[0x400],
 				s_telnet[80*25+4];
+		U1	bGTdie,
+			aGTcrs[2];
 
-		U1		aGTcrs[2],
-				sHOST[0x100],
-				sUSER[0x100],
-				sFILE[0x100],
-				*pHOST, *pUSER, *pFILE;
-
-		bool bI()
-		{
-			if( !mSEC.x )
-				return false;
-
-			return mSEC.x == mSEC.y;
-		}
-		bool bGTdie()
-        {
-            if( !this )
-                return true;
-            if( socket == INVALID_SOCKET )
-            {
-                if( msGTdie&1 )
-                    return true;
-
-                msGTdie = 1;
-                return true;
-            }
-            return msGTdie&1;
-        }
+		U1		sHOST[0x100], *pHOST,
+				sUSER[0x100], *pUSER;
+		U4x2 	mSEC;
 
 		~gpcGT() { GTclose(); };
 		gpcGT( I8x2 id, I4 prt, SOCKET sock = INVALID_SOCKET )

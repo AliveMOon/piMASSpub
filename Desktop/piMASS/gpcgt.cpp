@@ -282,7 +282,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 	gpcGT *pACC = NULL, *p_a;
 	if( iGTfr < nGTld )
 	if( pACC = ppGTalloc[iGTfr] )
-	if( pACC->bGTdie )
+	if( pACC->bGTdie() )
 	{
 		pACC->TnID.alf = gpeALF_ACCEPT;
 		pACC->TnID.num = iGTfr;
@@ -291,7 +291,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 			gpfSOC_CLOSE( pACC->socket );
 		pACC->socket = sock;
 		// +-- --  -
-		pACC->bGTdie = false;
+		pACC->msGTdie = false;
 		iGTfr = nGTld;
 	} else {
 		pACC = NULL;
@@ -303,7 +303,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 		p_a = ppGTalloc[a];
 		if( p_a )
 		{
-			if( !p_a->bGTdie )
+			if( !p_a->bGTdie() )
 				continue;
 
 			pACC = p_a;
@@ -314,7 +314,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 				gpfSOC_CLOSE( pACC->socket );
 			pACC->socket = sock;
 			// +-- --  -
-			pACC->bGTdie = false;
+			pACC->msGTdie = false;
 			break;
 		}
 
@@ -538,7 +538,7 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 	{
 		char* p_error = s_buff;
 		p_err += GTopt( p_err, &p_err, gpdGT_NoDALEY, n_buff );
-		bGTdie = true;
+		msGTdie = 1;
 		sprintf( p_err, "\nERROR: recv SOCKET_ERROR DIE" );
 		return p_err;
 	}
@@ -552,7 +552,7 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 
 
 	gpfSOC_CLOSE( socket );
-	bGTdie = true;
+	msGTdie = 1;
 
 	sprintf( p_err, "\nERROR: recv n == 0 DIE" );
 	return p_err;
@@ -603,7 +603,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	{
 		char* p_error = s_buff;
 		p_err += GTerr( p_error, &p_error );
-		bGTdie = true;
+		msGTdie = 1;
 		sprintf( p_err, "\nERROR: send SOCKET_ERROR DIE" );
 		return p_err;
 	}
@@ -613,6 +613,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 		return p_err;
 	}
 	U4 sub = n, nREPETA = 0;
+	if( false )
 	while( sub < pOUT->n_load )
 	{
 		n = pOUT->n_load-sub;
@@ -625,7 +626,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 			pOUT->lzy_ins( NULL, 0, s = 0, sub );
 			char* p_error = s_buff;
 			p_err += GTerr( p_error, &p_error );
-			bGTdie = true;
+			msGTdie = 1;
 			sprintf( p_err, "\nERROR: send SOCKET_ERROR DIE" );
 			return p_err;
 		}
@@ -643,7 +644,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	if( !b_close )
 		return p_err;
 
-	bGTdie = true;
+	msGTdie = 1;
 	//sprintf( p_err, "\nGOOD only END! %x", socket );
 	n = send( socket, NULL, 0, 0 );
 	//gpfSOC_CLOSE( socket );
@@ -658,9 +659,18 @@ static const char gp_sHELLO_acc[] = "account;\r -= Welcome in piMASS 2019 =-\r\n
 
 I8 gpcGT::GTcnct( gpcWIN& win )
 {
+	if( this ? msGTdie > win.mSEC.x : true )
+		return 0;
+
 	U8 s;
 	if( socket == INVALID_SOCKET )
 	{
+        if( msGTdie == 1 )
+        {
+            gpfSOC_CLOSE( socket );
+			msGTdie = (win.mSEC.x+1500)|1;
+			return 0;
+        }
 
 		pUSER = sUSER;
 		pHOST = sHOST;
@@ -688,11 +698,9 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 		p_err += sprintf( p_err, "OK" );
 		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
-		cout << p_print << endl;
-		p_print = p_err;
 
 		// BIND
-		p_err += sprintf( p_err, "\n\t\tBIND - " );
+		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
 		/* bind */
 
 		addr_in.sin_family = AF_INET;
@@ -701,12 +709,15 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		addr_in.sin_addr.s_addr = inet_addr( s_ip );
 		memset(&(addr_in.sin_zero), '\0', 8);
 
+		cout << p_print << endl;
+		p_print = p_err;
+
 		error = connect( socket, (struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,
 									 sizeof(addr_in) ); // sizeof(struct sockaddr) );
-		if ( error == SOCKET_ERROR )
+		if( error == SOCKET_ERROR )
 		{
 			gpfSOC_CLOSE( socket );
-			bGTdie = true;
+			msGTdie = (win.mSEC.x+1500)|1;
 			return 0;
 		}
 
@@ -734,7 +745,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 
 		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
-		if( !bGTdie )
+		if( !bGTdie() )
 			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
 	}
 	else if( !pOUT )
@@ -745,7 +756,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 
 		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
-		if( !bGTdie )
+		if( !bGTdie() )
 			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
 	}
 
@@ -776,10 +787,15 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				}
 			}
 
-			if( (sUSER < pUSER) && (sHOST < pHOST) )
+			if( bI() )
+			{
+				// hoho én vagyok nem kell
+				cout << "I:" << socket;
+			} else
+			if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
             if( msSYNwin < win.msSYN )
             {
-				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin, socket );
+				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
 				msSYNwin = win.msSYN;
             }
 		}
@@ -1029,7 +1045,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 	for( ; nFDs < nFDe; nFDs++ )
 	{
 		p_gt = GTacc.iGT(nFDs);
-		if( p_gt ? p_gt->bGTdie : true )
+		if( p_gt ? p_gt->bGTdie() : true )
 			continue;
 
 		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
@@ -1050,7 +1066,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
 			{
 				p_gt = GTacc.iGT(p);
-				if( p_gt ? p_gt->bGTdie : true )
+				if( p_gt ? p_gt->bGTdie() : true )
 					continue;
 				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
 			}
@@ -1069,7 +1085,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
 			{
 				p_gt = GTacc.iGT(p);
-				if( p_gt ? p_gt->bGTdie : true )
+				if( p_gt->bGTdie() )
 					continue;
 				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
 			}
@@ -1102,10 +1118,11 @@ I8 gpcGT::GTlst( gpcWIN& win )
 					}
 				}
 
+				if( !p_gt->bI() )
 				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) )
 				if( p_gt->msSYNwin < win.msSYN )
 				{
-					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin, p_gt->socket );
+					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin, p_gt->socket, p_gt->bSW );
 					p_gt->msSYNwin = win.msSYN;
 				}
 
@@ -1132,8 +1149,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 	for( nFDe = nFDs; nFDe < GTacc.nGTld; nFDe++ )
 	{
 		p_gt = GTacc.iGT(nFDe);
-		if( p_gt ? (p_gt->bGTdie || p_gt->socket == INVALID_SOCKET ) : true ) {
-			if( p_gt )
+		if( p_gt->bGTdie() ) {
 			if(
 					aGTfd[gpeFDsnd].isFD( p_gt->socket ) //FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] )
 				|| 	aGTfd[gpeFDrcv].isFD( p_gt->socket )

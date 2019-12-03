@@ -44,15 +44,18 @@ class gpcWIN
 		SDL_Event 		ev;
 		SDL_Rect		chrPIC;
 
-		char 	gpsMAINpub[0x100],
-				gpsTITLEpub[0x100],
-				gpsMASSpath[gpeMXPATH], *gppMASSfile,
-				gpsMASSname[0x100];
-		U1		sHOST[0x100], *pHOST,
-				sUSER[0x100], *pUSER,
+		U1		sHOST[0x100],
+				sUSER[0x100],
 				gpsKEYbuff[0x100],
+				*pHOST, *pUSER,
 				*gppKEYbuff,
 				*gppMOUSEbuff;
+
+		char 	gpsMAINpub[0x100],
+				gpsTITLEpub[0x100],
+				gpsMASSname[0x100],
+				gpsMASSpath[gpdMAX_PATH], *gppMASSfile;
+
 
 		I8	gpnEVENT = 0,
 			gpnTITLE = 0;
