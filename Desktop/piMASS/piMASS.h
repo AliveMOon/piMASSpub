@@ -191,7 +191,7 @@ class gpcMASS;
 
 //#define gpm_bool( b, p ) if( b ){ (p) }
 
-#define gpdGT_NoDALEY 1
+#define gpdGT_NoDALEY 0 // 1
 #define INVALID_SOCKET  (SOCKET)(~0)
 #define SOCKET_ERROR            (-1)
 
@@ -366,7 +366,7 @@ enum gpeLX:U8
     gpeU4x2nSTR = sizeof(U8)/sizeof(void*),
    // gpeMXPATH = gpmPAD( gpdMAX_PATH, 0x10 ) , //0x10*0x11,
 
-    gpeSYNmsec = 2500,
+    gpeSYNmsec = 1111,
 
     gpeRECVn = (0x30000/12),
 };

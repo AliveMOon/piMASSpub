@@ -123,8 +123,8 @@ public:
 	U4		nGTalloc, iGTfr, nGTld;
 	U1		sPUB[gpdMAX_PATH];
 	gpcGTall() { gpmCLR; };
-	void		clr( );
-	gpcGT*		GTacc( SOCKET sock, I4 port );
+	void	clr( );
+	gpcGT*	GTacc( SOCKET sock, I4 port );
 	gpcGT* iGT( U4 i )
 	{
 		if( this ? i >= nGTld : true )
@@ -134,6 +134,7 @@ public:
 	}
 	gpcGT* GT( gpeALF alf, I4 port );
 	gpcGT* GT( U4 xfnd, U1* pIPA, U4 nIPA );
+	gpcGT* GT( SOCKET sock );
 };
 
 class gpcGT
@@ -142,7 +143,7 @@ class gpcGT
 		I8x2		TnID, gt_ip;
 		I4			port, iCNT;
 
-		SOCKET		socket;
+		SOCKET		socket, socket2;
 		SOCKADDR	sockAddr;
 		addrinfo	*p_ainf;
 		SOCKADDR_IN	*p_ai, addr_in;
@@ -166,7 +167,7 @@ class gpcGT
 
 				nSYN, nSYNsum, nSYNdo,
 				msSYNgt, msSYNwin, msGTdie;
-		U4x2 	mSEC;
+		U4x4 	mSEC;
 		U8		bSW;	// 1 same file
 
 		char	s_ip[0x400],
@@ -229,7 +230,7 @@ class gpcGT
 			gpfSOC_CLOSE( socket );
 			return this;
 		}
-		I8		GTcnct( gpcWIN& win );
+		I8		GTcnct( gpcWIN& win, gpcPICall& acpt );
 		I8		GTlst( gpcWIN& win );
 		int		GTerr( char* p_err, char** pp_err );
 		U1		GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff );
@@ -246,7 +247,7 @@ class gpcGT
 
 			return iCNT;
 		}
-		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL );
+		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcPICall* pALL = NULL );
 		gpcLAZY*	GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB );
 
 

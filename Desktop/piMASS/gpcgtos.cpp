@@ -24,7 +24,7 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 
 	return p_out;
 }
-void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
+void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcPICall* pALL  )
 {
 	if( !this )
 		return;
@@ -238,7 +238,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 
 		p_sub = p_row;
 		I8 n_com, n_row, n_cpy, n_atrib;
-		//I84 io_cnt;
 		if( p_row_end < p_next )
 		{
 			iCNT++;
@@ -256,34 +255,41 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 			{
 				n_row = p_row_end-p_row; // gpdVAN( (char*)p_row, ";\r\n" );
 				n_com = gpdVAN( (char*)p_row, "+-0123456789 \t;\r\n" );
-
-				n_cpy = min( n_com, (sizeof(s_com)-1) );
-				((U1*)gpmMEMCPY( s_com, p_row, n_cpy ))[n_cpy] = 0;
+				if( n_com ){
+					n_cpy = min( n_com, (sizeof(s_com)-1) );
+					((U1*)gpmMEMCPY( s_com, p_row, n_cpy ))[n_cpy] = 0;
+				} else
+					*s_com = 0;
 
 				n_com += gpmNINCS( p_row+n_com, " \t" );
-				n_atrib = min( (n_row-n_com), (sizeof(s_atrib)-1) );
-				if( n_atrib )
-				{
-					// jött valami atributum
-					((char*)gpmMEMCPY( s_atrib, p_row+n_com, n_atrib ))[n_atrib] = 0;
-
-				}
-
 				cAN.num = n_cpy;
 				cAN = s_com;
 
+				if( n_atrib = n_row-n_com ) {
+					// jött valami atributum
+					if( n_atrib > (sizeof(s_atrib)-1) )
+						n_atrib = (sizeof(s_atrib)-1);
+
+					((char*)gpmMEMCPY( s_atrib, p_row+n_com, n_atrib ))[n_atrib] = 0;
+				}
+
+
 				switch( cAN.alf )
 				{
-					case gpeALF_ACCOUNT: if( pWIN->bINIThu() ) {
+					case gpeALF_ACCOUNT:
+						socket2 = gpfSTR2U8( (U1*)s_atrib, NULL );
+						if( pWIN->bINIThu() ) {
 							mSEC.y = pWIN ? pWIN->mSEC.x+1 : 0;
 							pOUT = pOUT->lzyFRMT(
 														s = -1,	"%shost %s;"
 																"%suser %s;"
 																"%sfile %s;"
+																"%ssock 0x%x;",
 																"%smsec 0x%x;",
 														aGTcrs[0] ? "" : "\r\n", pWIN->sHOST,
 														aGTcrs[0] ? "" : "\r\n", pWIN->sUSER,
 														aGTcrs[0] ? "" : "\r\n", pWIN->gpsMASSname,
+														aGTcrs[0] ? "" : "\r\n", socket2,
 														aGTcrs[0] ? "" : "\r\n", mSEC.y
 
 													);
@@ -303,8 +309,13 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN  )
 							else
 								bSW &= ~1;
 						} break;
+					case gpeALF_SOCK: {
+							mSEC.z = gpfSTR2U8( (U1*)s_atrib, NULL );
+							if( gpcGT* pGT = pALL->GT( mSEC.z ) )
+								mSEC.y = pGT->mSEC.y;
 
-					case gpeALF_MSEC: if( pWIN ) {
+						} break;
+					case gpeALF_MSEC: {
 							mSEC.x = gpfSTR2U8( (U1*)s_atrib, NULL );
 						} break;
 

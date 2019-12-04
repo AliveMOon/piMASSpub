@@ -173,6 +173,23 @@ void gpcGTall::clr()
 {
 	GTclose();
 }*/
+gpcGT* gpcGTall::GT( SOCKET sock );
+{
+	if( !this )
+		return NULL;
+	for( U4 g = 0; g < nGTld; g++ )
+	{
+		if( ppGTalloc[g] )
+			continue;
+		if( ppGTalloc[g]->socket == sock )
+			return ppGTalloc[g];
+
+		gpcGT* pGT = ppGTalloc[g]->GT( SOCKET sock );
+		if( pGT )
+			return pGT;
+	}
+	return NULL;
+}
 gpcGT* gpcGTall::GT( U4 xfnd, U1* pIPA, U4 nIPA )
 {
 	int port = 80, nCMP = nIPA, p;
@@ -445,10 +462,10 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 
 	//ioctlsocket(socket, FIONBIO, &iMode );
 	result = setsockopt(	socket,		/* socket affected */
-                                 IPPROTO_TCP,	/* set option at TCP level */
-                                 TCP_NODELAY,	/* name of option */
-                                 (char *) &no_daley,	/* the cast is historical cruft */
-                                 sizeof(int));	/* length of option value */
+							IPPROTO_TCP,	/* set option at TCP level */
+							TCP_NODELAY,	/* name of option */
+							(char *) &no_daley,	/* the cast is historical cruft */
+							sizeof(int));	/* length of option value */
 	if( result == SOCKET_ERROR )
 		GTerr( p_error, &p_error );
 	p_error += sprintf( p_error, "\n\t\tDEF IPPROTO_TCP: %d", no_daley );
@@ -524,6 +541,8 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 			(char *)&yes,
 			sizeof(yes) );
 
+	int nbio = 0;
+	::ioctl(socket,FIONBIO,&nbio);
 	return 1;
 }
 
@@ -655,9 +674,9 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 }
 
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
-static const char gp_sHELLO_acc[] = "account;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
+static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 
-I8 gpcGT::GTcnct( gpcWIN& win )
+I8 gpcGT::GTcnct( gpcWIN& win, gpcPICall& acpt )
 {
 	if( this ? msGTdie > win.mSEC.x : true )
 		return 0;
@@ -723,7 +742,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 		if( port & 1 )// telnetek
 		{
-			pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, iCNT );
+			pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, socket, iCNT );
 			iCNT++;
 			aGTcrs[0] = 'a';
 			//GTos(*this);
@@ -741,7 +760,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 
 		if( aGTcrs[1] != 'h' )
-			GTos( *this, &win );
+			GTos( *this, &win, &acpt );
 
 
 		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
@@ -787,11 +806,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				}
 			}
 
-			if( bI() )
-			{
-				// hoho én vagyok nem kell
-				cout << "I:" << socket;
-			} else
+			if( !bI() )
 			if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
             if( msSYNwin < win.msSYN )
             {
@@ -983,7 +998,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				U8 n_start = -1;
 				if( pACC->port & 1 )// telnetek
 				{
-					pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->iCNT );
+					pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->socket, pACC->iCNT );
 					pACC->iCNT++;
 					pACC->aGTcrs[0] = 'a';
 					pACC->GTos(*this);
@@ -1119,7 +1134,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				}
 
 				if( !p_gt->bI() )
-				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) )
+				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) && (p_gt->sFILE < p_gt->pFILE) )
 				if( p_gt->msSYNwin < win.msSYN )
 				{
 					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin, p_gt->socket, p_gt->bSW );

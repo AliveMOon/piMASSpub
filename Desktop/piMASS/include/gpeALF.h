@@ -820,6 +820,7 @@ typedef enum gpeALF: I8
 	gpeALF_ROBI = gpdABCD('R', 'O', 'B', 'I'),
 	gpeALF_ROCK = gpdABCD('R', 'O', 'C', 'K'),
 	gpeALF_SAVE = gpdABCD('S', 'A', 'V', 'E'),
+	gpeALF_SOCK = gpdABCD('S', 'O', 'C', 'K'),
 	gpeALF_STAR = gpdABCD('S', 'T', 'A', 'R'),
 	gpeALF_STEP = gpdABCD('S', 'T', 'E', 'P'),
 	gpeALF_STON = gpdABCD('S', 'T', 'O', 'N'),
