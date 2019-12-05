@@ -686,6 +686,10 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 	if( this ? msGTdie > win.mSEC.x : true )
 		return 0;
 
+	struct timeval tv;   // sleep for tenr minutes!
+	tv.tv_sec = 0;
+	tv.tv_usec = gpdGT_LIST_tOUT;
+
 	U8 s;
 	if( socket == INVALID_SOCKET )
 	{
@@ -739,14 +743,30 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 		p_print = p_err;
 
 		// set non blocking
-		/*U8 a = fcntl( socket, F_GETFL, NULL );
+		U8 a = fcntl( socket, F_GETFL, NULL );
 		a |= O_NONBLOCK;
-		fcntl(socket, F_SETFL, a );*/
+		fcntl(socket, F_SETFL, a );
 
 
 		error = connect( socket, (struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,
 									 sizeof(addr_in) ); // sizeof(struct sockaddr) );
-		if( error == SOCKET_ERROR )
+		if( true )
+		{
+			fd_set cnct_w;
+			FD_ZERO( &cnct_w );
+			FD_SET( socket, &cnct_w );
+            int rc = select( socket+1, NULL, &cnct_w, NULL, &tv );
+			if( rc > 0 && FD_ISSET( socket, &cnct_w ) )
+			{
+
+			} else {
+				gpfSOC_CLOSE( socket );
+				msGTdie = (win.mSEC.x+1500)|1;
+				return 0;
+			}
+
+		}
+		else if( error == SOCKET_ERROR )
 		{
 			gpfSOC_CLOSE( socket );
 			msGTdie = (win.mSEC.x+1500)|1;
@@ -762,8 +782,8 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 		}
 	}
 
-	char *p_err = (char*)win.sGTpub;
-	*win.sGTpub = 0;
+	char	*p_err = (char*)win.sGTpub;
+			*win.sGTpub = 0;
 
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 	{
@@ -836,9 +856,7 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 	aGTfd[gpeFDrcv].setFD( socket );
 	aGTfd[gpeFDsnd].setFD( socket );
 
-	struct timeval tv;   // sleep for tenr minutes!
-	tv.tv_sec = 0;
-	tv.tv_usec = gpdGT_LIST_tOUT;
+
 
 	int nS = select(
 					aGTfd[gpeFDrcv].maxSCK+1,
@@ -1107,7 +1125,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				if( p_gt->aGTcrs[1] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
-					p_gt->GTos( *this, &win );
+					p_gt->GTos( *this, &win, win.piMASS ? &win.piMASS->GTcnct : NULL );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
