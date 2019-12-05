@@ -173,6 +173,23 @@ void gpcGTall::clr()
 {
 	GTclose();
 }*/
+gpcGT* gpcGTall::GT( SOCKET sock )
+{
+	if( !this )
+		return NULL;
+	for( U4 g = 0; g < nGTld; g++ )
+	{
+		if( ppGTalloc[g] )
+			continue;
+		if( ppGTalloc[g]->socket == sock )
+			return ppGTalloc[g];
+
+		gpcGT* pGT = ppGTalloc[g]->GTacc.GT( sock );
+		if( pGT )
+			return pGT;
+	}
+	return NULL;
+}
 gpcGT* gpcGTall::GT( U4 xfnd, U1* pIPA, U4 nIPA )
 {
 	int port = 80, nCMP = nIPA, p;
@@ -202,6 +219,11 @@ gpcGT* gpcGTall::GT( U4 xfnd, U1* pIPA, U4 nIPA )
 			continue;
 
 		pGT = ppGTalloc[g];
+		if( !pGT->bGTdie() )
+			return pGT;
+
+		gpmMEMCPY( pGT->s_ip, sPUB, nCMP );
+		pGT->s_ip[nCMP] = 0;
 		return pGT;
 	}
 
@@ -282,7 +304,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 	gpcGT *pACC = NULL, *p_a;
 	if( iGTfr < nGTld )
 	if( pACC = ppGTalloc[iGTfr] )
-	if( pACC->bGTdie )
+	if( pACC->bGTdie() )
 	{
 		pACC->TnID.alf = gpeALF_ACCEPT;
 		pACC->TnID.num = iGTfr;
@@ -291,7 +313,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 			gpfSOC_CLOSE( pACC->socket );
 		pACC->socket = sock;
 		// +-- --  -
-		pACC->bGTdie = false;
+		pACC->msGTdie = 0;
 		iGTfr = nGTld;
 	} else {
 		pACC = NULL;
@@ -303,7 +325,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 		p_a = ppGTalloc[a];
 		if( p_a )
 		{
-			if( !p_a->bGTdie )
+			if( !p_a->bGTdie() )
 				continue;
 
 			pACC = p_a;
@@ -314,7 +336,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 				gpfSOC_CLOSE( pACC->socket );
 			pACC->socket = sock;
 			// +-- --  -
-			pACC->bGTdie = false;
+			pACC->msGTdie = 0;
 			break;
 		}
 
@@ -445,10 +467,10 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 
 	//ioctlsocket(socket, FIONBIO, &iMode );
 	result = setsockopt(	socket,		/* socket affected */
-                                 IPPROTO_TCP,	/* set option at TCP level */
-                                 TCP_NODELAY,	/* name of option */
-                                 (char *) &no_daley,	/* the cast is historical cruft */
-                                 sizeof(int));	/* length of option value */
+							IPPROTO_TCP,	/* set option at TCP level */
+							TCP_NODELAY,	/* name of option */
+							(char *) &no_daley,	/* the cast is historical cruft */
+							sizeof(int));	/* length of option value */
 	if( result == SOCKET_ERROR )
 		GTerr( p_error, &p_error );
 	p_error += sprintf( p_error, "\n\t\tDEF IPPROTO_TCP: %d", no_daley );
@@ -524,6 +546,8 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 			(char *)&yes,
 			sizeof(yes) );
 
+	/*int nbio = 0;
+	::ioctl(socket,FIONBIO,&nbio);*/
 	return 1;
 }
 
@@ -538,7 +562,7 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 	{
 		char* p_error = s_buff;
 		p_err += GTopt( p_err, &p_err, gpdGT_NoDALEY, n_buff );
-		bGTdie = true;
+		msGTdie = 1;
 		sprintf( p_err, "\nERROR: recv SOCKET_ERROR DIE" );
 		return p_err;
 	}
@@ -552,7 +576,7 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 
 
 	gpfSOC_CLOSE( socket );
-	bGTdie = true;
+	msGTdie = 1;
 
 	sprintf( p_err, "\nERROR: recv n == 0 DIE" );
 	return p_err;
@@ -603,7 +627,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	{
 		char* p_error = s_buff;
 		p_err += GTerr( p_error, &p_error );
-		bGTdie = true;
+		msGTdie = 1;
 		sprintf( p_err, "\nERROR: send SOCKET_ERROR DIE" );
 		return p_err;
 	}
@@ -613,6 +637,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 		return p_err;
 	}
 	U4 sub = n, nREPETA = 0;
+	if( false )
 	while( sub < pOUT->n_load )
 	{
 		n = pOUT->n_load-sub;
@@ -625,7 +650,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 			pOUT->lzy_ins( NULL, 0, s = 0, sub );
 			char* p_error = s_buff;
 			p_err += GTerr( p_error, &p_error );
-			bGTdie = true;
+			msGTdie = 1;
 			sprintf( p_err, "\nERROR: send SOCKET_ERROR DIE" );
 			return p_err;
 		}
@@ -643,7 +668,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	if( !b_close )
 		return p_err;
 
-	bGTdie = true;
+	msGTdie = 1;
 	//sprintf( p_err, "\nGOOD only END! %x", socket );
 	n = send( socket, NULL, 0, 0 );
 	//gpfSOC_CLOSE( socket );
@@ -654,18 +679,33 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 }
 
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
-static const char gp_sHELLO_acc[] = "account;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
+static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 
-I8 gpcGT::GTcnct( gpcWIN& win )
+I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 {
+	if( this ? msGTdie > win.mSEC.x : true )
+		return 0;
+
+	struct timeval tv;   // sleep for tenr minutes!
+	tv.tv_sec = 0;
+	tv.tv_usec = gpdGT_LIST_tOUT;
+
 	U8 s;
 	if( socket == INVALID_SOCKET )
 	{
+        if( msGTdie == 1 )
+        {
+            gpfSOC_CLOSE( socket );
+			msGTdie = (win.mSEC.x+1500)|1;
+			return 0;
+        }
 
 		pUSER = sUSER;
 		pHOST = sHOST;
+		pFILE = sFILE;
 		*sUSER = 0;
 		*sHOST = 0;
+		*sFILE = 0;
 		gpmDEL(pINP);
 		nSYN = 0;
 
@@ -688,11 +728,9 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 		p_err += sprintf( p_err, "OK" );
 		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
-		cout << p_print << endl;
-		p_print = p_err;
 
 		// BIND
-		p_err += sprintf( p_err, "\n\t\tBIND - " );
+		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
 		/* bind */
 
 		addr_in.sin_family = AF_INET;
@@ -701,40 +739,65 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		addr_in.sin_addr.s_addr = inet_addr( s_ip );
 		memset(&(addr_in.sin_zero), '\0', 8);
 
+		cout << p_print << endl;
+		p_print = p_err;
+
+		// set non blocking
+		U8 a = fcntl( socket, F_GETFL, NULL );
+		a |= O_NONBLOCK;
+		fcntl(socket, F_SETFL, a );
+
+
 		error = connect( socket, (struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,
 									 sizeof(addr_in) ); // sizeof(struct sockaddr) );
-		if ( error == SOCKET_ERROR )
+		if( true )
+		{
+			fd_set cnct_w;
+			FD_ZERO( &cnct_w );
+			FD_SET( socket, &cnct_w );
+            int rc = select( socket+1, NULL, &cnct_w, NULL, &tv );
+			if( rc > 0 && FD_ISSET( socket, &cnct_w ) )
+			{
+
+			} else {
+				gpfSOC_CLOSE( socket );
+				msGTdie = (win.mSEC.x+1500)|1;
+				return 0;
+			}
+
+		}
+		else if( error == SOCKET_ERROR )
 		{
 			gpfSOC_CLOSE( socket );
-			bGTdie = true;
+			msGTdie = (win.mSEC.x+1500)|1;
 			return 0;
 		}
 
 		if( port & 1 )// telnetek
 		{
-			pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, iCNT );
+			pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, socket, iCNT );
 			iCNT++;
 			aGTcrs[0] = 'a';
 			//GTos(*this);
 		}
 	}
 
-	char *p_err = (char*)win.sGTpub;
-	*win.sGTpub = 0;
+	char	*p_err = (char*)win.sGTpub;
+			*win.sGTpub = 0;
 
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 	{
-		p_err = GTrcv( p_err, (char*)win.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            sGTbuff, sizeof(win.sGTbuff) );
+		p_err = GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 		if( *p_err )
 			cerr << p_err << endl;
 
 
 		if( aGTcrs[1] != 'h' )
-			GTos( *this, &win );
+			GTos( *this, &win, &acpt );
 
 
 		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
-		if( !bGTdie )
+		if( !bGTdie() )
 			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
 	}
 	else if( !pOUT )
@@ -745,7 +808,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 
 		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
-		if( !bGTdie )
+		if( !bGTdie() )
 			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
 	}
 
@@ -776,10 +839,11 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				}
 			}
 
-			if( (sUSER < pUSER) && (sHOST < pHOST) )
+			if( !bI() )
+			if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
             if( msSYNwin < win.msSYN )
             {
-				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin, socket );
+				pOUT = win.pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
 				msSYNwin = win.msSYN;
             }
 		}
@@ -792,9 +856,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	aGTfd[gpeFDrcv].setFD( socket );
 	aGTfd[gpeFDsnd].setFD( socket );
 
-	struct timeval tv;   // sleep for tenr minutes!
-	tv.tv_sec = 0;
-	tv.tv_usec = gpdGT_LIST_tOUT;
+
 
 	int nS = select(
 					aGTfd[gpeFDrcv].maxSCK+1,
@@ -808,8 +870,28 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 }
 I8 gpcGT::GTlst( gpcWIN& win )
 {
+	if( this ? msGTdie > win.mSEC.x : true )
+		return 0;
+
 	if( socket == INVALID_SOCKET )
 	{
+
+		if( msGTdie == 1 )
+        {
+            gpfSOC_CLOSE( socket );
+			msGTdie = (win.mSEC.x+1500)|1;
+			return 0;
+        }
+
+		pUSER = sUSER;
+		pHOST = sHOST;
+		pFILE = sFILE;
+		*sUSER = 0;
+		*sHOST = 0;
+		*sFILE = 0;
+		gpmDEL(pINP);
+		nSYN = 0;
+
 		struct addrinfo ainfo;
 		gpmZ( ainfo );
 		ainfo.ai_family = AF_INET;
@@ -967,7 +1049,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				U8 n_start = -1;
 				if( pACC->port & 1 )// telnetek
 				{
-					pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->iCNT );
+					pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->socket, pACC->iCNT );
 					pACC->iCNT++;
 					pACC->aGTcrs[0] = 'a';
 					pACC->GTos(*this);
@@ -1029,7 +1111,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 	for( ; nFDs < nFDe; nFDs++ )
 	{
 		p_gt = GTacc.iGT(nFDs);
-		if( p_gt ? p_gt->bGTdie : true )
+		if( p_gt->bGTdie() )
 			continue;
 
 		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
@@ -1043,14 +1125,14 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				if( p_gt->aGTcrs[1] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
-					p_gt->GTos( *this, &win );
+					p_gt->GTos( *this, &win, win.piMASS ? &win.piMASS->GTcnct : NULL );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
 			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
 			{
 				p_gt = GTacc.iGT(p);
-				if( p_gt ? p_gt->bGTdie : true )
+				if( p_gt->bGTdie() )
 					continue;
 				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
 			}
@@ -1069,7 +1151,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
 			{
 				p_gt = GTacc.iGT(p);
-				if( p_gt ? p_gt->bGTdie : true )
+				if( p_gt->bGTdie() )
 					continue;
 				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
 			}
@@ -1102,10 +1184,11 @@ I8 gpcGT::GTlst( gpcWIN& win )
 					}
 				}
 
-				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) )
+				if( !p_gt->bI() )
+				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) && (p_gt->sFILE < p_gt->pFILE) )
 				if( p_gt->msSYNwin < win.msSYN )
 				{
-					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin, p_gt->socket );
+					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin, p_gt->socket, p_gt->bSW );
 					p_gt->msSYNwin = win.msSYN;
 				}
 
@@ -1132,8 +1215,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 	for( nFDe = nFDs; nFDe < GTacc.nGTld; nFDe++ )
 	{
 		p_gt = GTacc.iGT(nFDe);
-		if( p_gt ? (p_gt->bGTdie || p_gt->socket == INVALID_SOCKET ) : true ) {
-			if( p_gt )
+		if( p_gt->bGTdie() ) {
 			if(
 					aGTfd[gpeFDsnd].isFD( p_gt->socket ) //FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] )
 				|| 	aGTfd[gpeFDrcv].isFD( p_gt->socket )

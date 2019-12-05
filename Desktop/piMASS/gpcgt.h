@@ -231,8 +231,8 @@ class gpcGT
 			gpfSOC_CLOSE( socket );
 			return this;
 		}
-		I8		GTcnct( gpcWIN& win, gpcGTall& acpt );
-		I8		GTlst( gpcWIN& win );
+		I8		GTcnct( gpcWIN& win ); //, gpcGTall& acpt );
+		I8		GTlst( gpcWIN& win, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );
 		U1		GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff );
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );

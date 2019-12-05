@@ -37,8 +37,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		msSYNwin = pWIN->msSYN;
 	}
 
-	U1		s_com[0x200], s_answ[0x200];
-	char	s_atrib[0x200], s_prompt[0x100], s_cell[0x100];
+	U1		s_com[0x400], s_answ[0x400];
+	char	s_atrib[0x400], s_prompt[0x100], s_cell[0x100];
 	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
 
 	U1* p_str = pINP ? pINP->p_alloc : NULL;

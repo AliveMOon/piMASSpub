@@ -179,7 +179,7 @@ gpcGT* gpcGTall::GT( SOCKET sock )
 		return NULL;
 	for( U4 g = 0; g < nGTld; g++ )
 	{
-		if( ppGTalloc[g] )
+		if( !ppGTalloc[g] )
 			continue;
 		if( ppGTalloc[g]->socket == sock )
 			return ppGTalloc[g];
@@ -681,7 +681,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 
-I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
+I8 gpcGT::GTcnct( gpcWIN& win )
 {
 	if( this ? msGTdie > win.mSEC.x : true )
 		return 0;
@@ -793,12 +793,12 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 
 
 		if( aGTcrs[1] != 'h' )
-			GTos( *this, &win, &acpt );
+			GTos( *this, &win ); //, &acpt );
 
 
-		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
+		/*if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
 		if( !bGTdie() )
-			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
+			pPUB = pPUB->lzy_plus( pOUT, s = -1 );*/
 	}
 	else if( !pOUT )
 	if( pINP ? pINP->n_load : false )
@@ -807,9 +807,9 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 			GTos( *this, &win );
 
 
-		if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
+		/*if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
 		if( !bGTdie() )
-			pPUB = pPUB->lzy_plus( pOUT, s = -1 );
+			pPUB = pPUB->lzy_plus( pOUT, s = -1 );*/
 	}
 
 	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
@@ -868,7 +868,7 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 
 	return nS;
 }
-I8 gpcGT::GTlst( gpcWIN& win )
+I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 {
 	if( this ? msGTdie > win.mSEC.x : true )
 		return 0;
@@ -1125,7 +1125,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				if( p_gt->aGTcrs[1] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
-					p_gt->GTos( *this, &win, win.piMASS ? &win.piMASS->GTcnct : NULL );
+					p_gt->GTos( *this, &win, &cnct ); //, win.piMASS ? &win.piMASS->GTcnct : NULL );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
@@ -1144,7 +1144,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 				if( p_gt->aGTcrs[1] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
-					p_gt->GTos( *this, &win );
+					p_gt->GTos( *this, &win, &cnct );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
