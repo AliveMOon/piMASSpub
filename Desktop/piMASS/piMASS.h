@@ -77,6 +77,7 @@
 	#include <sys/stat.h>
 
 	#include <netdb.h>
+	#include <fcntl.h>
 	#include <ifaddrs.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>

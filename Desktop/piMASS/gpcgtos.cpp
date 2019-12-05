@@ -24,7 +24,7 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 
 	return p_out;
 }
-void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcPICall* pALL  )
+void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 {
 	if( !this )
 		return;
@@ -311,7 +311,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcPICall* pALL  )
 						} break;
 					case gpeALF_SOCK: {
 							mSEC.z = gpfSTR2U8( (U1*)s_atrib, NULL );
-							if( gpcGT* pGT = pALL->GT( mSEC.z ) )
+							if( gpcGT* pGT = pALL->GT( (SOCKET)mSEC.z ) ) //GTacc.GT( (SOCKET)mSEC.z ) )
 								mSEC.y = pGT->mSEC.y;
 
 						} break;

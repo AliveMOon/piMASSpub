@@ -198,6 +198,7 @@ class gpcGT
                 msGTdie = 1;
                 return true;
             }
+
             return msGTdie&1;
         }
 
@@ -230,7 +231,7 @@ class gpcGT
 			gpfSOC_CLOSE( socket );
 			return this;
 		}
-		I8		GTcnct( gpcWIN& win, gpcPICall& acpt );
+		I8		GTcnct( gpcWIN& win, gpcGTall& acpt );
 		I8		GTlst( gpcWIN& win );
 		int		GTerr( char* p_err, char** pp_err );
 		U1		GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff );
@@ -247,7 +248,7 @@ class gpcGT
 
 			return iCNT;
 		}
-		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcPICall* pALL = NULL );
+		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLAZY*	GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB );
 
 

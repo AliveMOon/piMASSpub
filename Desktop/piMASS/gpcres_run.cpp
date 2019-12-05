@@ -626,7 +626,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							if( gpcGT* pGT = GTcnct.GT( xFND, (U1*)alu.pDAT, alu.nLOAD() ) )
 							{
 								gpcGT& gt = *pGT;
-								gt.GTcnct( win, GTacpt );
+								gt.GTcnct( win, GTacpt ); //, *this  );
 
 							}
 							break;

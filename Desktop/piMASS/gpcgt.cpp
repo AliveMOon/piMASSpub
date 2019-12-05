@@ -173,7 +173,7 @@ void gpcGTall::clr()
 {
 	GTclose();
 }*/
-gpcGT* gpcGTall::GT( SOCKET sock );
+gpcGT* gpcGTall::GT( SOCKET sock )
 {
 	if( !this )
 		return NULL;
@@ -184,7 +184,7 @@ gpcGT* gpcGTall::GT( SOCKET sock );
 		if( ppGTalloc[g]->socket == sock )
 			return ppGTalloc[g];
 
-		gpcGT* pGT = ppGTalloc[g]->GT( SOCKET sock );
+		gpcGT* pGT = ppGTalloc[g]->GTacc.GT( sock );
 		if( pGT )
 			return pGT;
 	}
@@ -308,7 +308,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 			gpfSOC_CLOSE( pACC->socket );
 		pACC->socket = sock;
 		// +-- --  -
-		pACC->msGTdie = false;
+		pACC->msGTdie = 0;
 		iGTfr = nGTld;
 	} else {
 		pACC = NULL;
@@ -331,7 +331,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 				gpfSOC_CLOSE( pACC->socket );
 			pACC->socket = sock;
 			// +-- --  -
-			pACC->msGTdie = false;
+			pACC->msGTdie = 0;
 			break;
 		}
 
@@ -541,8 +541,8 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 			(char *)&yes,
 			sizeof(yes) );
 
-	int nbio = 0;
-	::ioctl(socket,FIONBIO,&nbio);
+	/*int nbio = 0;
+	::ioctl(socket,FIONBIO,&nbio);*/
 	return 1;
 }
 
@@ -676,7 +676,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 
-I8 gpcGT::GTcnct( gpcWIN& win, gpcPICall& acpt )
+I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 {
 	if( this ? msGTdie > win.mSEC.x : true )
 		return 0;
@@ -693,8 +693,10 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcPICall& acpt )
 
 		pUSER = sUSER;
 		pHOST = sHOST;
+		pFILE = sFILE;
 		*sUSER = 0;
 		*sHOST = 0;
+		*sFILE = 0;
 		gpmDEL(pINP);
 		nSYN = 0;
 
@@ -730,6 +732,12 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcPICall& acpt )
 
 		cout << p_print << endl;
 		p_print = p_err;
+
+		// set non blocking
+		U8 a = fcntl( socket, F_GETFL, NULL );
+		a |= O_NONBLOCK;
+		fcntl(socket, F_SETFL, a );
+
 
 		error = connect( socket, (struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,
 									 sizeof(addr_in) ); // sizeof(struct sockaddr) );
@@ -839,8 +847,28 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcPICall& acpt )
 }
 I8 gpcGT::GTlst( gpcWIN& win )
 {
+	if( this ? msGTdie > win.mSEC.x : true )
+		return 0;
+
 	if( socket == INVALID_SOCKET )
 	{
+
+		if( msGTdie == 1 )
+        {
+            gpfSOC_CLOSE( socket );
+			msGTdie = (win.mSEC.x+1500)|1;
+			return 0;
+        }
+
+		pUSER = sUSER;
+		pHOST = sHOST;
+		pFILE = sFILE;
+		*sUSER = 0;
+		*sHOST = 0;
+		*sFILE = 0;
+		gpmDEL(pINP);
+		nSYN = 0;
+
 		struct addrinfo ainfo;
 		gpmZ( ainfo );
 		ainfo.ai_family = AF_INET;
@@ -1060,7 +1088,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 	for( ; nFDs < nFDe; nFDs++ )
 	{
 		p_gt = GTacc.iGT(nFDs);
-		if( p_gt ? p_gt->bGTdie() : true )
+		if( p_gt->bGTdie() )
 			continue;
 
 		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
@@ -1081,7 +1109,7 @@ I8 gpcGT::GTlst( gpcWIN& win )
 			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
 			{
 				p_gt = GTacc.iGT(p);
-				if( p_gt ? p_gt->bGTdie() : true )
+				if( p_gt->bGTdie() )
 					continue;
 				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
 			}
