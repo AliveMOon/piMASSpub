@@ -219,6 +219,11 @@ gpcGT* gpcGTall::GT( U4 xfnd, U1* pIPA, U4 nIPA )
 			continue;
 
 		pGT = ppGTalloc[g];
+		if( !pGT->bGTdie() )
+			return pGT;
+
+		gpmMEMCPY( pGT->s_ip, sPUB, nCMP );
+		pGT->s_ip[nCMP] = 0;
 		return pGT;
 	}
 
@@ -734,9 +739,9 @@ I8 gpcGT::GTcnct( gpcWIN& win, gpcGTall& acpt )
 		p_print = p_err;
 
 		// set non blocking
-		U8 a = fcntl( socket, F_GETFL, NULL );
+		/*U8 a = fcntl( socket, F_GETFL, NULL );
 		a |= O_NONBLOCK;
-		fcntl(socket, F_SETFL, a );
+		fcntl(socket, F_SETFL, a );*/
 
 
 		error = connect( socket, (struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,

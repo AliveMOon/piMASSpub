@@ -284,7 +284,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 														s = -1,	"%shost %s;"
 																"%suser %s;"
 																"%sfile %s;"
-																"%ssock 0x%x;",
+																"%ssock 0x%x;"
 																"%smsec 0x%x;",
 														aGTcrs[0] ? "" : "\r\n", pWIN->sHOST,
 														aGTcrs[0] ? "" : "\r\n", pWIN->sUSER,
