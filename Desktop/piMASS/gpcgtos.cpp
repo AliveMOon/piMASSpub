@@ -11,10 +11,16 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 	U8 s;
 	p_out = p_out->lzyFRMT(
 									s = -1,
-									"%s%0.8x %s %s %d %s %s %s %d %d %d/%d%s",
+									"%s%0.8x %s %s"
+									" %d %s"
+									" %s %s"
+									" %d %d %s"
+									" %d/%d%s",
 									pTAB, socket, s_type, s_ip,
 									port, ((socket < 0) ? "die" : "live"),
-                                    sHOST, sUSER, mSEC.x, mSEC.y, nSYNdo, nSYNsum,
+                                    sHOST, sUSER,
+                                    mSEC.x, mSEC.y, mSEC.a4x2[0].sum() ? (mSEC.x == mSEC.y ? "LP" : "->") : "<-",
+                                    nSYNdo, nSYNsum,
 									p_enter
 								);
 	pTAB--;
@@ -277,7 +283,13 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 				switch( cAN.alf )
 				{
 					case gpeALF_ACCOUNT:
-						socket2 = gpfSTR2U8( (U1*)s_atrib, NULL );
+						// én vagyok a KLIENS,
+						// a SERVER megkér, hogy azonosítsam magam
+						// elküldöm a onMSEC-et és a socket számomat
+						// ha a SERVER rákeres a KLIENSei között erre a
+						// socket-re és az iső stimmel
+						// nagy valszeg, hogy ez egy LOOP
+						sockAT = gpfSTR2U8( (U1*)s_atrib, NULL );
 						if( pWIN->bINIThu() ) {
 							mSEC.y = pWIN ? pWIN->mSEC.x+1 : 0;
 							pOUT = pOUT->lzyFRMT(
@@ -289,7 +301,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 														aGTcrs[0] ? "" : "\r\n", pWIN->sHOST,
 														aGTcrs[0] ? "" : "\r\n", pWIN->sUSER,
 														aGTcrs[0] ? "" : "\r\n", pWIN->gpsMASSname,
-														aGTcrs[0] ? "" : "\r\n", socket2,
+														aGTcrs[0] ? "" : "\r\n", socket,
 														aGTcrs[0] ? "" : "\r\n", mSEC.y
 
 													);
@@ -312,6 +324,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					case gpeALF_SOCK: {
 							mSEC.z = gpfSTR2U8( (U1*)s_atrib, NULL );
 							if( gpcGT* pGT = pALL->GT( (SOCKET)mSEC.z ) ) //GTacc.GT( (SOCKET)mSEC.z ) )
+							if( pGT->sockAT == socket )
 								mSEC.y = pGT->mSEC.y;
 
 						} break;
@@ -323,6 +336,14 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 					case gpeALF_GATELIST:
 						pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gppTAB ); //gpsTAB );
+						if( !pALL )
+							break;
+						for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
+						{
+							if( !pALL->ppGTalloc[i] )
+								continue;
+							pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, "\r\n", gppTAB );
+						}
 						break;
 					case gpeALF_HELP:
 						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", aGTcrs[0] ? "" : "\r\n" );

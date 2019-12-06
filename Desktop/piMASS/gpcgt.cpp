@@ -190,7 +190,7 @@ gpcGT* gpcGTall::GT( SOCKET sock )
 	}
 	return NULL;
 }
-gpcGT* gpcGTall::GT( U4 xfnd, U1* pIPA, U4 nIPA )
+gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 {
 	int port = 80, nCMP = nIPA, p;
 	U8 nLEN;
@@ -203,7 +203,7 @@ gpcGT* gpcGTall::GT( U4 xfnd, U1* pIPA, U4 nIPA )
 	p = gpfSTR2I8( pE, NULL );
 	if( p )
 		port = p;
-	I8x2 an( xfnd, port );
+	I8x2 an( alf, port );
 	for( U4 g = 0; g < nGTld; g++ )
 	{
 		if( !ppGTalloc[g] )

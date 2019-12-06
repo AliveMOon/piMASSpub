@@ -133,7 +133,7 @@ public:
 		return ppGTalloc ? ppGTalloc[i] : NULL;
 	}
 	gpcGT* GT( gpeALF alf, I4 port );
-	gpcGT* GT( U4 xfnd, U1* pIPA, U4 nIPA );
+	gpcGT* GT( gpeALF alf, U1* pIPA, U4 nIPA );
 	gpcGT* GT( SOCKET sock );
 };
 
@@ -143,7 +143,7 @@ class gpcGT
 		I8x2		TnID, gt_ip;
 		I4			port, iCNT;
 
-		SOCKET		socket, socket2;
+		SOCKET		socket, sockAT;
 		SOCKADDR	sockAddr;
 		addrinfo	*p_ainf;
 		SOCKADDR_IN	*p_ai, addr_in;
