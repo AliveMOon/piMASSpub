@@ -168,7 +168,7 @@ class gpcGT
 				nSYN, nSYNsum, nSYNdo,
 				msSYNgt, msSYNwin, msGTdie;
 		U4x4 	mSEC;
-		U8		bSW;	// 1 same file
+		U8		bSW;	// 1 same file | 2 loop
 
 		char	s_ip[0x400],
 				s_telnet[80*25+4];

@@ -19,7 +19,7 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 									pTAB, socket, s_type, s_ip,
 									port, ((socket < 0) ? "die" : "live"),
                                     sHOST, sUSER,
-                                    mSEC.x, mSEC.y, mSEC.a4x2[0].sum() ? (mSEC.x == mSEC.y ? "LP" : "->") : "<-",
+                                    mSEC.x, mSEC.y, bSW&2 ? "LP" : "<>",
                                     nSYNdo, nSYNsum,
 									p_enter
 								);
@@ -325,7 +325,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							mSEC.z = gpfSTR2U8( (U1*)s_atrib, NULL );
 							if( gpcGT* pGT = pALL->GT( (SOCKET)mSEC.z ) ) //GTacc.GT( (SOCKET)mSEC.z ) )
 							if( pGT->sockAT == socket )
+							{
 								mSEC.y = pGT->mSEC.y;
+								bSW |= 2;
+								pGT->bSW |= 2;
+							}
 
 						} break;
 					case gpeALF_MSEC: {
