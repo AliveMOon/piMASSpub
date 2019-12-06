@@ -839,7 +839,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				}
 			}
 
-			if( !bI() )
+			if( !(bTEL()|bLOOP()) )
 			if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
             if( msSYNwin < win.msSYN )
             {
@@ -1184,7 +1184,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 					}
 				}
 
-				if( !p_gt->bI() )
+				if( !(bTEL()|bLOOP()) ) //if( !p_gt->bI() )
 				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) && (p_gt->sFILE < p_gt->pFILE) )
 				if( p_gt->msSYNwin < win.msSYN )
 				{

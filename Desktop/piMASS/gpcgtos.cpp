@@ -17,9 +17,9 @@ gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* 
 									" %d %d %s"
 									" %d/%d%s",
 									pTAB, socket, s_type, s_ip,
-									port, ((socket < 0) ? "die" : "live"),
+									port, bGTdie() ? "die" : "live", //(socket < 0) ? "die" : "live"),
                                     sHOST, sUSER,
-                                    mSEC.x, mSEC.y, bSW&2 ? "LP" : "<>",
+                                    mSEC.x, mSEC.y, bLOOP() ? "LP" : "<>",
                                     nSYNdo, nSYNsum,
 									p_enter
 								);
@@ -35,7 +35,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( !this )
 		return;
 
-	if( pOUT ? false : !bI() )
+	if( !pOUT ) // ? false : !bI() )
+	if( !(bTEL()|bLOOP()) )
 	if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
 	if( msSYNwin < pWIN->msSYN )
 	{
@@ -240,7 +241,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			*p_next = p_row_end+gpmNINCS( p_row_end, ";\r\n" ),
 			*p_answ = s_answ,
 			*p_com = s_com;
-			//*p_cell;
 
 		p_sub = p_row;
 		I8 n_com, n_row, n_cpy, n_atrib;

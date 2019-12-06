@@ -179,12 +179,17 @@ class gpcGT
 				sFILE[0x100],
 				*pHOST, *pUSER, *pFILE;
 
-		bool bI()
+		bool bTEL()
 		{
-			if( !mSEC.x )
+			return !(mSEC.x&mSEC.y);
+		}
+		bool bLOOP()
+		{
+			return bSW&2;
+			/*if( !mSEC.x )
 				return false;
 
-			return mSEC.x == mSEC.y;
+			return mSEC.x == mSEC.y;*/
 		}
 		bool bGTdie()
         {
