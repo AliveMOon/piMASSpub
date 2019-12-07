@@ -40,14 +40,16 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( !nOUT )
 	{
 		// üres a pOUT töltsünk bele valamit
-		U4 nMIS = 8;
+		U4 nMIS = 0x18;
 		if( !(bTEL()|bLOOP()) )
 		if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
 		if( msSYNwin < pWIN->msSYN )
 		{
 			pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
 			msSYNwin = pWIN->msSYN;
-			nMIS = 1;
+			nOUT = pOUT ? pOUT->n_load : 0;
+			if( nOUT )
+				nMIS /= 3;
 		}
 
 		if( pMISO ? pMISO->n_load : false )
@@ -403,12 +405,14 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						} break;
 					case gpeALF_PIC: {
 
+
 							U4 	nO = pOUT ? pOUT->n_load : 0,
 								iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
 
 							if( iPIC )
 							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC-1 ) )
-                            {
+                            if( pMISO ? (pMISO->n_load < pPIC->nPKavg) : true )
+							{
 								if( !pPIC->pPACK )
 								if( SDL_Surface *pSRF = pPIC->pSRF )
 								{
@@ -424,6 +428,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 									//gpmDEL( pPIC->pPACK );
 									pPIC->pPACK = ((gpcLAZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
+									pPIC->nPKavg += pPIC->pPACK->n_load;
+									pPIC->nPKavg /= 2;
 									//SDL_FreeSurface(pSURF);
 									if( gpfACE( gpdPICbg, 4) > -1 )
 									{
@@ -440,10 +446,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 								if( pPIC->pPACK )
 								if( pPIC->pPACK->n_load > 0x400 )
-								{
-									if( pMISO ? (pMISO->n_load < pPIC->pPACK->n_load) : true )
-										pMISO = pMISO->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
-								} else
+									pMISO = pMISO->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+								else
 									pOUT = pOUT->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
 
 							}
