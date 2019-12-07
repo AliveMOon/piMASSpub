@@ -623,16 +623,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					{
 						case gpeALF_SYNC:
 							if( alu.typ().x & 0x10 )
-							if(
-								gpcGT* pGT = GTcnct.GT( alu.alf, //xFND,
-														(U1*)alu.pDAT, alu.nLOAD() )
-							)
-							{
-								gpcGT& gt = *pGT;
+							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
+								pGT->GTcnct( win );
 
-								gt.GTcnct( win ); //, GTacpt ); //, *this  );
-
-							}
 							break;
 						case gpeALF_TRGH:
 							trgWH.w = alu.u8();

@@ -143,7 +143,7 @@ class gpcGT
 		I8x2		TnID, gt_ip;
 		I4			port, iCNT;
 
-		SOCKET		socket, sockAT;
+		SOCKET		socket, sockAT, sockCNCT;
 		SOCKADDR	sockAddr;
 		addrinfo	*p_ainf;
 		SOCKADDR_IN	*p_ai, addr_in;
@@ -214,6 +214,7 @@ class gpcGT
 			TnID = id;
 			port = prt;
 			socket = sock;
+			sockAT = sockCNCT = INVALID_SOCKET;
 		}
 		gpcGT* GTclr()
 		{
@@ -234,6 +235,7 @@ class gpcGT
 		{
 			GTclr();
 			gpfSOC_CLOSE( socket );
+			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
 		I8		GTcnct( gpcWIN& win ); //, gpcGTall& acpt );

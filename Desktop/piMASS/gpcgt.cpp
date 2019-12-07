@@ -194,16 +194,18 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 {
 	int port = 80, nCMP = nIPA, p;
 	U8 nLEN;
-	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n" ),
+	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n!" ),
 		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;", nLEN );
 
 	nCMP = pE-pS;
-	gpmMEMCPY( sPUB, pS, nCMP );
+	//gpmMEMCPY( sPUB, pS, nCMP );
+	//sPUB[nCMP] = 0;
 
 	p = gpfSTR2I8( pE, NULL );
 	if( p )
 		port = p;
 	I8x2 an( alf, port );
+
 	for( U4 g = 0; g < nGTld; g++ )
 	{
 		if( !ppGTalloc[g] )
@@ -222,15 +224,19 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		if( !pGT->bGTdie() )
 			return pGT;
 
-		gpmMEMCPY( pGT->s_ip, sPUB, nCMP );
-		pGT->s_ip[nCMP] = 0;
+		if( gpmMEMCMP( pS, pGT->s_ip + (*pGT->s_ip == '!'), nCMP ) == nCMP )
+			return pGT;
+
+		*pGT->s_ip = '!';
+		gpmMEMCPY( pGT->s_ip+1, pS, nCMP );
+		pGT->s_ip[nCMP+1] = 0;
 		return pGT;
 	}
 
 	if( iGTfr < nGTld )
 	{
 		pGT = new gpcGT( an, port );
-		gpmMEMCPY( pGT->s_ip, sPUB, nCMP );
+		gpmMEMCPY( pGT->s_ip, pS, nCMP );
 		pGT->s_ip[nCMP] = 0;
 
 		return ppGTalloc[iGTfr] = pGT;
@@ -247,7 +253,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	}
 
 	pGT = new gpcGT( an, port );
-	gpmMEMCPY( pGT->s_ip, sPUB, nCMP );
+	gpmMEMCPY( pGT->s_ip, pS, nCMP );
 	pGT->s_ip[nCMP] = 0;
 
 	return ppGTalloc[iGTfr] = pGT;
@@ -309,8 +315,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 		pACC->TnID.alf = gpeALF_ACCEPT;
 		pACC->TnID.num = iGTfr;
 		pACC->port = port;
-		if( pACC->socket != INVALID_SOCKET )
-			gpfSOC_CLOSE( pACC->socket );
+		gpfSOC_CLOSE( pACC->socket );
 		pACC->socket = sock;
 		// +-- --  -
 		pACC->msGTdie = 0;
@@ -332,8 +337,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 			pACC->TnID.alf = gpeALF_ACCEPT;
 			pACC->TnID.num = a;
 			pACC->port = port;
-			if( pACC->socket != INVALID_SOCKET )
-				gpfSOC_CLOSE( pACC->socket );
+			gpfSOC_CLOSE( pACC->socket );
 			pACC->socket = sock;
 			// +-- --  -
 			pACC->msGTdie = 0;
@@ -554,6 +558,8 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 
 char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 {
+	if( bGTdie() )
+		return p_err;
 	// ha nincsen hiba p_err[0] == 0
 	// egyébként bele ír valamit akkor nem
 	p_err[0] = 0;
@@ -583,6 +589,8 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 }
 char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 {
+	if( bGTdie() )
+		return p_err;
 	// ha nincsen hiba p_err[0] == 0
 	// egyébként bele ír valamit akkor nem
 	p_err[0] = 0;
@@ -690,8 +698,9 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	tv.tv_sec = 0;
 	tv.tv_usec = gpdGT_LIST_tOUT;
 
+	bool bNEWip = *s_ip == '!';
 	U8 s;
-	if( socket == INVALID_SOCKET )
+	if( bNEWip || bGTdie() ) //socket == INVALID_SOCKET )
 	{
         if( msGTdie == 1 )
         {
@@ -709,66 +718,72 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		gpmDEL(pINP);
 		nSYN = 0;
 
-		struct addrinfo ainfo;
-		gpmZ( ainfo );
-		ainfo.ai_family = AF_INET;
-		ainfo.ai_socktype = SOCK_STREAM;
-		ainfo.ai_protocol = IPPROTO_TCP;
-		ainfo.ai_flags = AI_PASSIVE;
-		ainfo.ai_addrlen = sizeof(ainfo);
+		if( bNEWip )
+		{
+			sprintf( s_ip, "%s", s_ip+1 );
+			gpfSOC_CLOSE( sockCNCT );
+		}
 
 		char	*p_print = (char*)win.sGTpub,
 				s_port[32],
 				*p_err = p_print;
-		sprintf( s_port, "%d", port);
-		int error = getaddrinfo( NULL, s_port, &ainfo, &p_ainf );
-		if( error != 0 )
-			GTerr( p_err, &p_err );
-		socket = ::socket( p_ainf->ai_family, p_ainf->ai_socktype, p_ainf->ai_protocol );
 
-		p_err += sprintf( p_err, "OK" );
-		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
+		if( sockCNCT != INVALID_SOCKET )
+			socket = sockCNCT;
+		else {
+			struct addrinfo ainfo;
+			gpmZ( ainfo );
+			ainfo.ai_family = AF_INET;
+			ainfo.ai_socktype = SOCK_STREAM;
+			ainfo.ai_protocol = IPPROTO_TCP;
+			ainfo.ai_flags = AI_PASSIVE;
+			ainfo.ai_addrlen = sizeof(ainfo);
+
+
+			sprintf( s_port, "%d", port);
+			int error = getaddrinfo( NULL, s_port, &ainfo, &p_ainf );
+			if( error != 0 )
+				GTerr( p_err, &p_err );
+
+			socket = ::socket( p_ainf->ai_family, p_ainf->ai_socktype, p_ainf->ai_protocol );
+
+			GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
+			p_err += sprintf( p_err, "OK NEW CNCT" );
+
+			addr_in.sin_family = AF_INET;
+			addr_in.sin_port = htons(port);
+			addr_in.sin_addr.s_addr = inet_addr( s_ip );
+			// LISTEN: addr_in.sin_addr.s_addr = INADDR_ANY;
+			memset(&(addr_in.sin_zero), '\0', 8);
+
+			// set non blocking
+			U8 a = fcntl( socket, F_GETFL, NULL );
+			a |= O_NONBLOCK;
+			fcntl(socket, F_SETFL, a );
+
+			error = connect(
+								socket,
+								(struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,
+								sizeof(addr_in)
+						);
+		}
 
 		// BIND
 		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
-		/* bind */
-
-		addr_in.sin_family = AF_INET;
-		addr_in.sin_port = htons(port);
-		// LISTEN: addr_in.sin_addr.s_addr = INADDR_ANY;
-		addr_in.sin_addr.s_addr = inet_addr( s_ip );
-		memset(&(addr_in.sin_zero), '\0', 8);
-
 		cout << p_print << endl;
 		p_print = p_err;
 
-		// set non blocking
-		U8 a = fcntl( socket, F_GETFL, NULL );
-		a |= O_NONBLOCK;
-		fcntl(socket, F_SETFL, a );
-
-
-		error = connect( socket, (struct sockaddr *)&addr_in, 			// (struct sockaddr *)&addr,
-									 sizeof(addr_in) ); // sizeof(struct sockaddr) );
-		if( true )
+		fd_set cnct_w;
+		FD_ZERO( &cnct_w );
+		FD_SET( socket, &cnct_w );
+		int rc = select( socket+1, NULL, &cnct_w, NULL, &tv );
+		if( rc > 0 && FD_ISSET( socket, &cnct_w ) )
 		{
-			fd_set cnct_w;
-			FD_ZERO( &cnct_w );
-			FD_SET( socket, &cnct_w );
-            int rc = select( socket+1, NULL, &cnct_w, NULL, &tv );
-			if( rc > 0 && FD_ISSET( socket, &cnct_w ) )
-			{
-
-			} else {
-				gpfSOC_CLOSE( socket );
-				msGTdie = (win.mSEC.x+1500)|1;
-				return 0;
-			}
-
-		}
-		else if( error == SOCKET_ERROR )
-		{
-			gpfSOC_CLOSE( socket );
+			sockCNCT = INVALID_SOCKET;
+		} else {
+			// még nem sikerült eldugjuk ne szabadítsák fel
+			sockCNCT = socket;
+			socket = INVALID_SOCKET;
 			msGTdie = (win.mSEC.x+1500)|1;
 			return 0;
 		}
@@ -780,6 +795,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			aGTcrs[0] = 'a';
 			//GTos(*this);
 		}
+		msGTdie = 0;
 	}
 
 	char	*p_err = (char*)win.sGTpub;
