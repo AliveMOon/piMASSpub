@@ -369,7 +369,7 @@ enum gpeLX:U8
 
     gpeSYNmsec = 1111,
 
-    gpeRECVn = (0x30000/12),
+    gpeRECVn = (0x30000/6),
 };
 
 #include "gpeALF.h"

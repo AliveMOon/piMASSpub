@@ -40,7 +40,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( !nOUT )
 	{
 		// üres a pOUT töltsünk bele valamit
-		U4 nMISo = 0x30;
+		U4 nMISo = gpeRECVn;
 		if( !(bTEL()|bLOOP()) )
 		if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
 		if( msSYNwin < pWIN->msSYN )
