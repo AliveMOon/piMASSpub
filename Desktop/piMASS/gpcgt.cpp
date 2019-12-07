@@ -716,6 +716,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		*sHOST = 0;
 		*sFILE = 0;
 		gpmDEL(pINP);
+		gpmDEL(pMISi);
 		nSYN = 0;
 
 		if( bNEWip )

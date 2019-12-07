@@ -150,12 +150,12 @@ class gpcGT
 		gpcGTall	GTacc;
 
 		gpcLAZY		*pPUB,
-					*pINP, *pMISI,
+					*pINP, *pMISi,
 					*pEVENT,
 					*pSYNgt;
 
 	private:
-		gpcLAZY		*pOUT, *pMISO;
+		gpcLAZY		*pOUT, *pMISo;
 
 	public:
 		gpcGT_DWNL	*pDWN;
@@ -226,12 +226,19 @@ class gpcGT
 			{
 				GTacc.clr();
 				gpmDEL( pPUB );
-				gpmDEL( pOUT ); gpmDEL( pMISO );
-				gpmDEL( pINP ); gpmDEL( pMISI );
+				gpmDEL( pOUT ); gpmDEL( pMISo );
+				gpmDEL( pINP ); gpmDEL( pMISi );
 				gpmDEL( pDWN );
 				gpmDEL( pHUD );
 				gpmDEL( pEVENT );
 				gpmDEL( pSYNgt );
+				pUSER = sUSER;
+				pHOST = sHOST;
+				pFILE = sFILE;
+				*sUSER = 0;
+				*sHOST = 0;
+				*sFILE = 0;
+				nSYN = 0;
 			}
 			return this;
 		}

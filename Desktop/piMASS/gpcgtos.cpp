@@ -40,7 +40,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( !nOUT )
 	{
 		// üres a pOUT töltsünk bele valamit
-		U4 nMIS = 0x18;
+		U4 nMISo = 0x30;
 		if( !(bTEL()|bLOOP()) )
 		if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
 		if( msSYNwin < pWIN->msSYN )
@@ -49,20 +49,20 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			msSYNwin = pWIN->msSYN;
 			nOUT = pOUT ? pOUT->n_load : 0;
 			if( nOUT )
-				nMIS /= 3;
+				nMISo /= 3;
 		}
 
-		if( pMISO ? pMISO->n_load : false )
+		if( pMISo ? pMISo->n_load : false )
 		{
-			nMIS *= 0x400;
-			if( nMIS > pMISO->n_load )
-				nMIS = pMISO->n_load;
+			nMISo *= 0x400;
+			if( nMISo > pMISo->n_load )
+				nMISo = pMISo->n_load;
 			pOUT = pOUT->putZN(
-								pMISO->p_alloc, nMIS, gpeNET4_0NYL,	/// pD, nD, NET4,
-								pMISO->n_load,						/// Z,
-								pWIN ? pWIN->mSEC.x : mSEC.x 		/// N
+								pMISo->p_alloc, nMISo, gpeNET4_0NYL,	/// pD, nD, NET4,
+								pMISo->n_load,							/// Z,
+								pWIN ? pWIN->mSEC.x : mSEC.x 			/// N
 							);
-			pMISO->lzyINS( NULL, 0, s = 0, nMIS );
+			pMISo->lzyINS( NULL, 0, s = 0, nMISo );
 		}
 
 		nOUT = pOUT ? pOUT->n_load : 0;
@@ -97,7 +97,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					U4* pU4 = (U4*)pDAT;
 					U1* pA = (U1*)(pU4+1);
 					U8 nA = syn.nB()-(pA-(U1*)&syn), s = -1;
-					pMISI = pMISI->lzyADD( pA, nA, s );
+					pMISi = pMISi->lzyADD( pA, nA, s );
 				} break;
 
 			case gpeNET4_0SYN:
@@ -164,13 +164,13 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 				break;
 		}
 
-		if( pMISI ? pMISI->n_load >= sizeof(gpcSYNC) : false )
+		if( pMISi ? pMISi->n_load >= sizeof(gpcSYNC) : false )
 		{
-			U4 nMIS = ((gpcSYNC*)pMISI->p_alloc)->nB();
-			if( pMISI->n_load >= nMIS )
+			U4 nMISi = ((gpcSYNC*)pMISi->p_alloc)->nB();
+			if( pMISi->n_load >= nMISi )
 			{
-				pINP = pINP->lzyINS( pMISI->p_alloc, nMIS, s = 0, nSYN );
-				pMISI = pMISI->lzySUB( s = 0, nMIS );
+				pINP = pINP->lzyINS( pMISi->p_alloc, nMISi, s = 0, nSYN );
+				pMISi = pMISi->lzySUB( s = 0, nMISi );
 				nSYN = 0;
 			}
 		}
@@ -411,7 +411,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 							if( iPIC )
 							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC-1 ) )
-                            if( pMISO ? (pMISO->n_load < pPIC->nPKavg) : true )
+                            if( pMISo ? (pMISo->n_load < pPIC->nPKavg) : true )
 							{
 								if( !pPIC->pPACK )
 								if( SDL_Surface *pSRF = pPIC->pSRF )
@@ -446,7 +446,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 								if( pPIC->pPACK )
 								if( pPIC->pPACK->n_load > 0x400 )
-									pMISO = pMISO->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+									pMISo = pMISo->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
 								else
 									pOUT = pOUT->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
 
