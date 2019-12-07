@@ -3221,9 +3221,11 @@ typedef enum gpeNET4:U4
 	gpeNET4_0EYE	= MAKE_ID( 0, 'E', 'Y', 'E' ),
 	gpeNET4_0HUD	= MAKE_ID( 0, 'H', 'U', 'D' ),
 
+	gpeNET4_0NYL	= MAKE_ID( 0, 'N', 'Y', 'L' ),
 	gpeNET4_0PIC	= MAKE_ID( 0, 'P', 'I', 'C' ),
 	gpeNET4_0SRC	= MAKE_ID( 0, 'S', 'R', 'C' ),
 	gpeNET4_0SYN	= MAKE_ID( 0, 'S', 'Y', 'N' ),
+
 
 
 	gpeNET4_PREV	= MAKE_ID( 'P', 'R', 'E', 'V' ),
@@ -3507,7 +3509,7 @@ public:
 	}
 
 
-	gpcLAZY* lzy_reset( void )
+	gpcLAZY* lzyRST( void )
 	{
 		if( this ? !n_load : true )
 			return this;
@@ -3594,11 +3596,11 @@ public:
 		p_alloc[n_load] = 0;
 		return this;
 	}
-	gpcLAZY* lzy_plus(  const gpcLAZY* p_b, U8& n_start )
+	gpcLAZY* lzyPLUS(  const gpcLAZY* p_b, U8& n_start )
 	{
 		return lzyADD( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
 	}
-	gpcLAZY* lzy_sub( U8& n_start, U8 n_sub )
+	gpcLAZY* lzySUB( U8& n_start, U8 n_sub )
 	{
 		if( !this )
 		{
@@ -3709,7 +3711,7 @@ public:
 		return this;
 	}
 
-	gpcLAZY* lzy_ins( const U1* p_u1, U8 n_u1, U8& n_start, U8 n_sub, U1 n = 0 )
+	gpcLAZY* lzyINS( const U1* p_u1, U8 n_u1, U8& n_start, U8 n_sub, U1 n = 0 )
 	{
 		if( !this )
 		{
@@ -3723,7 +3725,7 @@ public:
 	gpcLAZY& operator = ( const gpcLAZY& plus )
 	{
 		U8 s = 0;
-		lzy_ins( plus.p_alloc, plus.n_load, s, -1 );
+		lzyINS( plus.p_alloc, plus.n_load, s, -1 );
 
 		return *this;
 	}
@@ -3736,6 +3738,7 @@ public:
 
 	gpcLAZY* lzyRD( char* p_file, U8& n_start, U1 n = 0 )
 	{
+		/// READ FILE
 		if( !p_file )
 			return this;
 
@@ -3787,8 +3790,9 @@ public:
 
 		return p_lazy;
 	}
-	gpcLAZY* lzy_write( const char* p_file, bool b_over = true )
+	gpcLAZY* lzyWR( const char* p_file, bool b_over = true )
 	{
+		/// WRITE FILE
 		if( this ? !n_load : true )
 			return this;
 

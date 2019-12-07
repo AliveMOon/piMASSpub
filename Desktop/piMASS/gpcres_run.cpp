@@ -456,11 +456,11 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		{
 			if( !pSRC->pEXE )
 			{
-				pSRC->pMINI->lzy_reset();
+				pSRC->pMINI->lzyRST();
 				continue;
 			}
 			win.nJDOIT.x++;
-			pSRC->pMINI->lzy_reset();
+			pSRC->pMINI->lzyRST();
 			pSRC->apOUT[3] = pSRC->pEXE->RESrun( pSRC->apOUT[3], NULL, win, pSRC, NULL );
 			if( !pSRC->apOUT[3] )
 				continue;
@@ -498,14 +498,18 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									if( pRGB )
 									{
 										if( pCAM->bGD() )
+										{
+											gpmDEL( pPIC->pPACK );
 											win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, pPIC->id+1, win.mSEC.y, INVALID_SOCKET, 0 ), win.msSYN );
+										}
+
 										if( !win.pPICbg )
 										{
 											win.pPICbg = pPIC;
 										}
 									}
 									else if( pPIC->pSHR )
-                      								win.pPICbg = pPIC;
+											win.pPICbg = pPIC;
 								}
 							} break;
 
@@ -724,7 +728,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 													{
 														pGT->pHUD = pGT->pHUD->put( pJPGsnd->p_alloc, pJPGsnd->n_load );
 														pGT->pHUD->id = gpeNET4_0EYE;
-														pJPGsnd->lzy_reset();
+														pJPGsnd->lzyRST();
 														//gpmDEL(pLZY);
 													} else {
 														gpmDEL(pJPGsnd);
@@ -780,7 +784,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									}
 								}
 								if( nGD )
-									pEVNT->lzy_reset();
+									pEVNT->lzyRST();
 								pEVNT->DO();
 							}
 						}

@@ -99,6 +99,7 @@ class gpcPIC
 public:
 	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
+	gpcLAZY			*pPACK;
 	U4				id, iSRC, iQC, nPIXall, nPIX, bppS;
 	SDL_Surface		*pSRF, *pSHR;
 	I4x4			xyOUT, xySRC;

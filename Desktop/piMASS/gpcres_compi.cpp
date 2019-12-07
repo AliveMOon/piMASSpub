@@ -430,7 +430,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 					pSTR = pS;
 					pS += gpmVAN( pS, "\"", nUTF8 );
 					U8 s = -1;
-					str.lzy_ins( pSTR, pS-pSTR, s, -1 );
+					str.lzyINS( pSTR, pS-pSTR, s, -1 );
 
 					if( *pS == '\"' )
 					{

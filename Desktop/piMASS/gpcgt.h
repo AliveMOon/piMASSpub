@@ -150,10 +150,14 @@ class gpcGT
 		gpcGTall	GTacc;
 
 		gpcLAZY		*pPUB,
-					*pOUT,
-					*pINP,
+					*pINP, *pMISI,
 					*pEVENT,
 					*pSYNgt;
+
+	private:
+		gpcLAZY		*pOUT, *pMISO;
+
+	public:
 		gpcGT_DWNL	*pDWN;
 		gpcHUD		*pHUD, isEVNT;
 
@@ -222,8 +226,8 @@ class gpcGT
 			{
 				GTacc.clr();
 				gpmDEL( pPUB );
-				gpmDEL( pOUT );
-				gpmDEL( pINP );
+				gpmDEL( pOUT ); gpmDEL( pMISO );
+				gpmDEL( pINP ); gpmDEL( pMISI );
 				gpmDEL( pDWN );
 				gpmDEL( pHUD );
 				gpmDEL( pEVENT );

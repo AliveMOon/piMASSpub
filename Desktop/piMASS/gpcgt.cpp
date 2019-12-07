@@ -119,14 +119,14 @@ gpcLAZY* gpcGT_DWNL::join( gpcLAZY* pOUT, gpcGT& mom, gpcLAZY* pEXE )
 		case gpeALF_FAVICON:
 			n_send = sizeof(dz_a_favpng);
 			pOUT = pOUT->lzyFRMT( n_size, dz_s_http_dwnl_sFN_sFNdzr_nS, "favicon", "favicon.png", n_send );
-			pOUT = pOUT->lzy_ins( dz_a_favpng, n_send, n_size, 0 );
+			pOUT = pOUT->lzyINS( dz_a_favpng, n_send, n_size, 0 );
 			return pOUT->lzy_reqCLOSE();
 		case gpeALF_S:
 			n_send = pEXE ? pEXE->n_alloc : 0;
 			if( !n_send )
 				return pOUT;
 			pOUT = pOUT->lzyFRMT( n_size, dz_s_http_dwnl_sFN_sFNpEXP_nS, "setup", "setup.exe", n_send );
-			pOUT = pOUT->lzy_plus( pEXE, n_size );
+			pOUT = pOUT->lzyPLUS( pEXE, n_size );
 			return pOUT;
 		default:
 			break;
@@ -575,7 +575,7 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 
 	s_buff[n] = 0;
 	U8 s = -1;
-	pINP = pINP->lzy_ins( (U1*)s_buff, n, s, 0 );
+	pINP = pINP->lzyINS( (U1*)s_buff, n, s, 0 );
 
 	if( n )
 		return p_err;
@@ -600,7 +600,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 		if( !pPUB )
 			return p_err;
 
-		pOUT = pOUT->lzy_plus( pPUB, s = -1 );
+		pOUT = pOUT->lzyPLUS( pPUB, s = -1 );
 		gpmDEL( pPUB );
 		if( !aGTcrs[1] )
 		if( aGTcrs[0] )
@@ -655,7 +655,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 		n = send( socket, ((char*)pOUT->p_alloc)+sub, n, 0 );
 		if( n == SOCKET_ERROR )
 		{
-			pOUT->lzy_ins( NULL, 0, s = 0, sub );
+			pOUT->lzyINS( NULL, 0, s = 0, sub );
 			char* p_error = s_buff;
 			p_err += GTerr( p_error, &p_error );
 			msGTdie = 1;
@@ -669,7 +669,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 
 
 	bool b_close = pOUT->qCLOSE();
-	pOUT->lzy_ins( NULL, 0, s = 0, sub ); //n );
+	pOUT->lzyINS( NULL, 0, s = 0, sub ); //n );
 	if( !pOUT->n_load )
 		gpmDEL( pOUT );
 
@@ -811,21 +811,12 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		if( aGTcrs[1] != 'h' )
 			GTos( *this, &win ); //, &acpt );
 
-
-		/*if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
-		if( !bGTdie() )
-			pPUB = pPUB->lzy_plus( pOUT, s = -1 );*/
 	}
 	else if( !pOUT )
 	if( pINP ? pINP->n_load : false )
 	{
 		if( aGTcrs[1] != 'h' )
 			GTos( *this, &win );
-
-
-		/*if( pOUT ) /// a maimi kapott választ azaz mindenkinek leadjuk a drotot
-		if( !bGTdie() )
-			pPUB = pPUB->lzy_plus( pOUT, s = -1 );*/
 	}
 
 	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
@@ -1150,7 +1141,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
-				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
+				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
 			}
 		}
 		else if( p_gt->pINP ? !p_gt->pOUT : false )
@@ -1169,7 +1160,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
-				p_gt->pPUB = p_gt->pPUB->lzy_plus( pOUT, s );
+				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
 			}
 		}
 

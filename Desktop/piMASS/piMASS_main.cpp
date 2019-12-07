@@ -235,14 +235,14 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 			{
 				// nem talált további AN címzést azaz nem kell semmit kihagyni
 				pANo = pLFT+gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
-				buff.lzy_ins( pANo, iB-(pANo-pA), nS = -1, -1 );
+				buff.lzyINS( pANo, iB-(pANo-pA), nS = -1, -1 );
 
 				//continue;
 			} else {
 				nADR = pNX-gpsSVadr;
 				while( pANo-pA < iB )
 				{
-					buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+					buff.lzyINS( pLFT, pANo-pLFT, nS = -1, -1 );
 
 					pLFT = pANo + nADR;
 					pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
@@ -252,7 +252,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 						break;
 				}
 				if( pLFT-pA < iB )
-					buff.lzy_ins( pLFT, iB-(pLFT-pA), nS = -1, -1 );
+					buff.lzyINS( pLFT, iB-(pLFT-pA), nS = -1, -1 );
 			}
 			buff.lzyFRMT( nS = -1, "<BR>+--- --  -   <BR>" );
         }
@@ -271,7 +271,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
             {
 				pANo++;
 				bBR = false;
-				buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+				buff.lzyINS( pLFT, pANo-pLFT, nS = -1, -1 );
 				pLFT = pANo;
 				continue;
             }
@@ -280,12 +280,12 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
             {
 				pANo++;
 				bBR = true;
-				buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+				buff.lzyINS( pLFT, pANo-pLFT, nS = -1, -1 );
 				pLFT = pANo;
 				continue;
             }
 
-			buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+			buff.lzyINS( pLFT, pANo-pLFT, nS = -1, -1 );
 			pLFT = pANo;
         }
 	}
@@ -311,7 +311,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 	if( nUNDO)
 		rename( (char*)gpsSAVEbf, (char*)gpsRENMbf );
 
-	buff.lzy_write( (char*)gpsSAVEbf );
+	buff.lzyWR( (char*)gpsSAVEbf );
 	return false;
 }
 bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
@@ -353,13 +353,13 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		{
 			// nem talált további AN címzést azaz nem kell semmit kihagyni
             pANo = pLFT+gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
-            buff.lzy_ins( pANo, pRIG-pANo, nS = -1, -1 );
+            buff.lzyINS( pANo, pRIG-pANo, nS = -1, -1 );
 			continue;
 		}
 		nADR = pNX-gpsSVadr;
 		while( pANo-pA < iB )
         {
-			buff.lzy_ins( pLFT, pANo-pLFT, nS = -1, -1 );
+			buff.lzyINS( pLFT, pANo-pLFT, nS = -1, -1 );
 
 			pLFT = pANo + nADR;
 			pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
@@ -368,7 +368,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 			if( !pANo )
 				break;
         }
-		buff.lzy_ins( pLFT, pRIG-pLFT, nS = -1, -1 );
+		buff.lzyINS( pLFT, pRIG-pLFT, nS = -1, -1 );
 	}
 	sprintf( (char*)gpsSAVEbf, "%s", pPATH );
 	int iGD = 0;
@@ -394,7 +394,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 			iGD = rename( (char*)pPATH, (char*)gpsRENMbf );
 		}
 	}
-	buff.lzy_write( (char*)pPATH );
+	buff.lzyWR( (char*)pPATH );
 	return false;
 }
 

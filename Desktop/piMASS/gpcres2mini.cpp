@@ -14,7 +14,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		return NULL;
 
 	if( pLZY )
-		pLZY->lzy_reset();
+		pLZY->lzyRST();
 	else
 		pLZY = new gpcLAZY;
 

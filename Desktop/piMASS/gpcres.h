@@ -82,7 +82,7 @@ public:
 
 		isa.aISA[0] = gpeISA_str;
 
-		str.lzy_reset();
+		str.lzyRST();
 		return this;
 	}
 

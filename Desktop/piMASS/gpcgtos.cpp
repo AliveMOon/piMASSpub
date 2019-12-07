@@ -35,18 +35,40 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( !this )
 		return;
 
-	if( !pOUT ) // ? false : !bI() )
-	if( !(bTEL()|bLOOP()) )
-	if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
-	if( msSYNwin < pWIN->msSYN )
+	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
+
+	if( !nOUT )
 	{
-		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
-		msSYNwin = pWIN->msSYN;
+		// üres a pOUT töltsünk bele valamit
+		U4 nMIS = 8;
+		if( !(bTEL()|bLOOP()) )
+		if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
+		if( msSYNwin < pWIN->msSYN )
+		{
+			pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
+			msSYNwin = pWIN->msSYN;
+			nMIS = 1;
+		}
+
+		if( pMISO ? pMISO->n_load : false )
+		{
+			nMIS *= 0x400;
+			if( nMIS > pMISO->n_load )
+				nMIS = pMISO->n_load;
+			pOUT = pOUT->putZN(
+								pMISO->p_alloc, nMIS, gpeNET4_0NYL,	/// pD, nD, NET4,
+								pMISO->n_load,						/// Z,
+								pWIN ? pWIN->mSEC.x : mSEC.x 		/// N
+							);
+			pMISO->lzyINS( NULL, 0, s = 0, nMIS );
+		}
+
+		nOUT = pOUT ? pOUT->n_load : 0;
 	}
 
 	U1		s_com[0x400], s_answ[0x400];
 	char	s_atrib[0x400], s_prompt[0x100], s_cell[0x100];
-	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
+
 
 	U1* p_str = pINP ? pINP->p_alloc : NULL;
 	if( !p_str )
@@ -69,6 +91,13 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
 		switch( syn.typ() )
 		{
+			case gpeNET4_0NYL:{
+					U4* pU4 = (U4*)pDAT;
+					U1* pA = (U1*)(pU4+1);
+					U8 nA = syn.nB()-(pA-(U1*)&syn), s = -1;
+					pMISI = pMISI->lzyADD( pA, nA, s );
+				} break;
+
 			case gpeNET4_0SYN:
 				nSYNsum += syn.nS();
 				for( U4 iS = 0, nS = syn.nS()-1; iS < nS; iS++ )
@@ -117,6 +146,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							SDL_FreeSurface(pKILL);
 					}
 				} break;
+
 			case gpeNET4_0SRC:{
 					U4* pZN = (U4*)pDAT;
 					U1* pA = (U1*)(pZN+1);
@@ -132,8 +162,20 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 				break;
 		}
 
-		pINP->lzy_ins( NULL, 0, s = 0, nSYN );
+		if( pMISI ? pMISI->n_load >= sizeof(gpcSYNC) : false )
+		{
+			U4 nMIS = ((gpcSYNC*)pMISI->p_alloc)->nB();
+			if( pMISI->n_load >= nMIS )
+			{
+				pINP = pINP->lzyINS( pMISI->p_alloc, nMIS, s = 0, nSYN );
+				pMISI = pMISI->lzySUB( s = 0, nMIS );
+				nSYN = 0;
+			}
+		}
+		if( nSYN )
+			pINP->lzyINS( NULL, 0, s = 0, nSYN );
 		nSYN = 0;
+
 		p_str = pINP ? pINP->p_alloc : NULL;
 		if( p_str )
 		{
@@ -209,7 +251,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			n_str = 0;
 		}
 		U8 s = n_str;
-		pINP->lzy_ins( NULL, 0, s, n_back );
+		pINP->lzyINS( NULL, 0, s, n_back );
 
 		p_str = pINP ? pINP->p_alloc : NULL;
 		if( !p_str )
@@ -360,40 +402,50 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							pOUT = pOUT->lzyFRMT(s = -1, "%s event", aGTcrs[0] ? "" : "\r\n" );
 						} break;
 					case gpeALF_PIC: {
-							U4 nO = pOUT ? pOUT->n_load : 0;
 
-							U4 iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
+							U4 	nO = pOUT ? pOUT->n_load : 0,
+								iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
+
 							if( iPIC )
 							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC-1 ) )
-							if( SDL_Surface *pSRF = pPIC->pSRF )
-							{
-								if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
-									IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
-								gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
-								if( pPNG )
+                            {
+								if( !pPIC->pPACK )
+								if( SDL_Surface *pSRF = pPIC->pSRF )
 								{
-									//nGD++;
 									if( pPIC->pFILE < pPIC->sFILE )
-										pPIC->pFILE = pPIC->sFILE;
+											pPIC->pFILE = pPIC->sFILE;
 									if( !*pPIC->pFILE )
 									{
 										pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
 									}
-									pOUT = pOUT->putPIC( pPNG->p_alloc, pPNG->n_load, pPIC->pFILE, pWIN->mSEC.x );
-									gpmDEL(pPNG);
-								}
-								//SDL_FreeSurface(pSURF);
-								if( gpfACE( gpdPICbg, 4) > -1 )
-								{
-									rename( gpdPICbg, "/mnt/ram/bg.kill" );
-								}
-								rename( "/mnt/ram/tmp.tmp", gpdPICbg );
 
-								if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
-								{
-									remove( "/mnt/ram/bg.kill" );
+									if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
+										IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
 
+									//gpmDEL( pPIC->pPACK );
+									pPIC->pPACK = ((gpcLAZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
+									//SDL_FreeSurface(pSURF);
+									if( gpfACE( gpdPICbg, 4) > -1 )
+									{
+										rename( gpdPICbg, "/mnt/ram/bg.kill" );
+									}
+									rename( "/mnt/ram/tmp.tmp", gpdPICbg );
+
+									if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+									{
+										remove( "/mnt/ram/bg.kill" );
+
+									}
 								}
+
+								if( pPIC->pPACK )
+								if( pPIC->pPACK->n_load > 0x400 )
+								{
+									if( pMISO ? (pMISO->n_load < pPIC->pPACK->n_load) : true )
+										pMISO = pMISO->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+								} else
+									pOUT = pOUT->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+
 							}
 
 							if( nO < (pOUT ? pOUT->n_load : 0) )
@@ -479,7 +531,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( pINP ? (p_sub > pINP->p_alloc) : false )
 	{
 		U8 s = 0, n_str;
-		pINP->lzy_ins( NULL, 0, s, p_sub-pINP->p_alloc );
+		pINP->lzyINS( NULL, 0, s, p_sub-pINP->p_alloc );
 		if( nSKIP )
 		{
 			n_str = gpmSTRLEN( pINP->p_alloc );
@@ -490,7 +542,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					break;
 
 				s = p_sub-pINP->p_alloc;
-				pINP->lzy_ins( NULL, 0, s, nSKIP );
+				pINP->lzyINS( NULL, 0, s, nSKIP );
 				if( !pINP->n_load )
 					break;
 				n_str = gpmSTRLEN( pINP->p_alloc );
