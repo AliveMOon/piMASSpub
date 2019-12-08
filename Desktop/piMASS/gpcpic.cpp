@@ -120,17 +120,16 @@ class gpcTHRD_CAM
 public:
 	gpcPICAM* pC;
 	SDL_Surface* pSRF;
-	gpcTHRD_CAM(){gpmCLR;};
+	gpcTHRD_CAM(){ gpmCLR; };
 };
 void call_cam( gpcTHRD_CAM* pTC )
 {
-
 	gpcTHRD_CAM cpy = *pTC;
 	gpdCAMu& cam = cpy.pC->cam;
-	U1* pPIX = (U1*)cpy.pSRF->pixels;
+	U1* pPIX = cpy.pSRF ? (U1*)cpy.pSRF->pixels : NULL;
 	while( cpy.pC )
 	{
-		usleep(10);
+		usleep(1000/30);
 		cam.grab();
 		//memcpy ( cpy.pSRF->pixels, cpy.pC->cam.callback_data._buffData.data, getImageTypeSize( RASPICAM_FORMAT_IGNORE ) );
 		cam.retrieve(

@@ -330,7 +330,11 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					}
 
 				}
-
+				if( apT[crs.id] )
+				{
+					aT[crs.id].join();
+					apT[crs.id] = NULL;
+				}
 				crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS );
 				gppKEYbuff = gppMOUSEbuff;
 				*gppKEYbuff = 0;
@@ -341,7 +345,14 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			for( U1 i = 0; i < 4; i++ )
 			{
 				if( crs.id != i )
+				{
+					if( apT[i] )
+					{
+						aT[i].join();
+						apT[i] = NULL;
+					}
 					apCRS[i]->miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
+				}
 
 				apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 			}
@@ -520,7 +531,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 										apCRS[onDIV.x]->stFRMwh(
 																	*this,
 																	div.w/8,
-																	((div.w/8)*div.h*2) / (div.w*3)
+																	((div.w>>3)*div.h*2) / (div.w*3)
 																);
 
 										nIRQ++;

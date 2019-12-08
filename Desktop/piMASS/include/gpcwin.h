@@ -7,6 +7,7 @@
 
 class gpcCRS;
 class gpdADR;
+class gpcTHRD_DRW;
 //class gpcRES;
 
 class InitError : public std::exception
@@ -84,8 +85,8 @@ class gpcWIN
 		/// RUN MAP --------------
 		U4	*pM, *pC, *pR, mZ, mN, mZN;
 
-
-
+		std::thread		aT[4];
+		gpcTHRD_DRW		*apT[4], *apTall[4];
 		bool bINIThu()
 		{
 			if( !this )

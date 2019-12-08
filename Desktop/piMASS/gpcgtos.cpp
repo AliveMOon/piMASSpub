@@ -420,6 +420,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 											pPIC->pFILE = pPIC->sFILE;
 									if( !*pPIC->pFILE )
 									{
+										if( pPIC->pFILE <= pPIC->sFILE )
+											pPIC->pFILE = pPIC->sFILE+sprintf( (char*)pPIC->sFILE, "/mnt/ram/" );
 										pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
 									}
 
@@ -431,11 +433,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 									pPIC->nPKavg += pPIC->pPACK->n_load;
 									pPIC->nPKavg /= 2;
 									//SDL_FreeSurface(pSURF);
-									if( gpfACE( gpdPICbg, 4) > -1 )
+									if( gpfACE( (char*)pPIC->sFILE, 4) > -1 )
 									{
-										rename( gpdPICbg, "/mnt/ram/bg.kill" );
+										rename( (char*)pPIC->sFILE, "/mnt/ram/bg.kill" );
 									}
-									rename( "/mnt/ram/tmp.tmp", gpdPICbg );
+									rename( "/mnt/ram/tmp.tmp", (char*)pPIC->sFILE );
 
 									if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
 									{
