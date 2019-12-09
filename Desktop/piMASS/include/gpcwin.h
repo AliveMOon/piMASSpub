@@ -20,7 +20,7 @@ public:
     virtual const char * what() const throw();
 };
 
-
+#define gpdNdiv gpmN(apCRS)
 
 class gpcWIN
 {
@@ -85,8 +85,18 @@ class gpcWIN
 		/// RUN MAP --------------
 		U4	*pM, *pC, *pR, mZ, mN, mZN;
 
-		std::thread		aT[4];
-		gpcTHRD_DRW		*apT[4], *apTall[4];
+		std::thread		aT[gpdNdiv]; //4];
+		gpcTHRD_DRW		*apT[gpdNdiv], *apTall[gpdNdiv];
+protected:
+private:
+		I4x4 winDIV;
+
+
+public:
+		~gpcWIN();
+		gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piMASS ); //, char* pPATH, char* pFILE ); //, I4x4& siz );
+
+
 		bool bINIThu()
 		{
 			if( !this )
@@ -116,8 +126,7 @@ class gpcWIN
 		}
 		SDL_Rect	wDIV( U1 iDIV );
 		void		gpeWINresize( void );
-		gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piMASS ); //, char* pPATH, char* pFILE ); //, I4x4& siz );
-		virtual ~gpcWIN();
+
 
 		U4 reSCAN( void )
 		{
@@ -160,10 +169,7 @@ class gpcWIN
 		}
 		void	WINrun( const char* pWELLCOME );
 		bool	WINvar( gpcREG& out, gpeALF alf );
-	protected:
 
-	private:
-		I4x4 winDIV;
 };
 
 #endif // GPCWIN_H

@@ -1,12 +1,30 @@
 //#include "gpcwin.h"
 #include "gpccrs.h"
 //#include "gpcSRC.h"
-
-
-
-
-
 extern U1 gp_s_key_map_sdl[];
+
+
+gpcWIN::~gpcWIN()
+{
+	for( U1 i = 0, e = gpmN(apTall); i < e; i++ )
+	{
+		if( apT[i] )
+		{
+			aT[i].join();
+			apT[i] = NULL;
+		}
+		gpmDEL( apTall[i] );
+	}
+	gpmDEL( pSYNwin );
+    gpmDEL( pSYNgt );
+    if( pSRFload != pSRFchar )
+		gpmSDL_FreeSRF( pSRFload );
+	gpmSDL_FreeSRF( pSRFchar );
+	gpmSDL_FreeSRF( pSRFsnd );
+    SDL_DestroyWindow( pSDLwin );
+    SDL_DestroyRenderer( pSDLrndr );
+}
+
 
 InitError::InitError() :
     exception(),
@@ -203,15 +221,7 @@ void gpcWIN::gpeWINresize( void )
 	winDIV.a4x2[0] /= 2;
 
 }
-gpcWIN::~gpcWIN()
-{
-    if( pSRFload != pSRFchar )
-	gpmSDL_FreeSRF( pSRFload );
-	gpmSDL_FreeSRF( pSRFchar );
-	gpmSDL_FreeSRF( pSRFsnd );
-    SDL_DestroyWindow( pSDLwin );
-    SDL_DestroyRenderer( pSDLrndr );
-}
+
 
 void gpcWIN::WINrun( const char* pWELLCOME )
 {
@@ -235,6 +245,17 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			|| nIRQ
 			|| ((mSEC.x-nJDOIT.z) > gpdJDOIT_tOUT)
 		) {
+			for( U1 i = 0; i < 4; i++ )
+			{
+				if( apT[i] )
+				{
+					aT[i].join();
+					apT[i] = NULL;
+				}
+
+			}
+			SDL_UpdateWindowSurface( pSDLwin );
+
 			*gppKEYbuff = 0;
 			U1 iRDY = 0x10;
 
@@ -330,11 +351,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					}
 
 				}
-				if( apT[crs.id] )
-				{
-					aT[crs.id].join();
-					apT[crs.id] = NULL;
-				}
+
 				crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS );
 				gppKEYbuff = gppMOUSEbuff;
 				*gppKEYbuff = 0;
@@ -345,18 +362,13 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			for( U1 i = 0; i < 4; i++ )
 			{
 				if( crs.id != i )
-				{
-					if( apT[i] )
-					{
-						aT[i].join();
-						apT[i] = NULL;
-					}
 					apCRS[i]->miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
-				}
 
 				apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
+				//cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
 			}
-			SDL_UpdateWindowSurface( pSDLwin );
+			//SDL_UpdateWindowSurface( pSDLwin );
+			//cout << "s" << SDL_GetTicks() << endl;
 		}
 
 

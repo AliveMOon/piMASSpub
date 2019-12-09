@@ -2,77 +2,14 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="include/gpcwin.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="146" topLine="57" />
-		</Cursor>
-	</File>
-	<File name="gpcLAZY.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2088" topLine="37" />
-		</Cursor>
-	</File>
-	<File name="gpcres2mini.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="415" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="include/gpcOPCD.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="851" topLine="46" />
-		</Cursor>
-	</File>
-	<File name="gpcwin_var.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="199" topLine="3" />
-		</Cursor>
-	</File>
-	<File name="gpcres_compi.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="374" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9006" topLine="396" />
-		</Cursor>
-	</File>
-	<File name="gpcU14.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="20" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="include/gpcSCHL.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="113" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="gpcOPCD.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="12670" topLine="558" />
-		</Cursor>
-	</File>
-	<File name="piMASS.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="278" zoom_1="-1" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8817" topLine="301" />
-		</Cursor>
-	</File>
-	<File name="gpcgt.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="20800" topLine="708" />
-		</Cursor>
-		<Folding>
-			<Collapse line="388" />
-		</Folding>
-	</File>
-	<File name="src/gpcPROTO.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="212" topLine="0" />
-		</Cursor>
-	</File>
 	<File name="gpcgtos.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="457" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="10479" topLine="405" />
+			<Cursor1 position="10479" topLine="426" />
 		</Cursor>
 	</File>
-	<File name="gpcU44.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="piMASS.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="278" zoom_1="-1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="910" topLine="24" />
+			<Cursor1 position="3703" topLine="91" />
 		</Cursor>
 	</File>
 	<File name="include/gpcND.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -80,81 +17,62 @@
 			<Cursor1 position="303" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="gpMASSbuild.cpp" open="0" top="0" tabpos="19" split="0" active="1" splitpos="388" zoom_1="0" zoom_2="0">
+	<File name="gpcpic.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="14765" topLine="682" />
+			<Cursor1 position="3213" topLine="114" />
 		</Cursor>
 	</File>
-	<File name="gpcres.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="319" zoom_1="0" zoom_2="0">
+	<File name="gpcpic.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1643" topLine="451" />
+			<Cursor1 position="1952" topLine="78" />
 		</Cursor>
 	</File>
-	<File name="gpcSRC.h" open="0" top="0" tabpos="25" split="0" active="1" splitpos="306" zoom_1="0" zoom_2="0">
+	<File name="src/gpcwin.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="206" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="18362" topLine="1090" />
+			<Cursor1 position="246" topLine="0" />
 		</Cursor>
-	</File>
-	<File name="gpcgt.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3579" topLine="121" />
-		</Cursor>
-	</File>
-	<File name="include/gpeALF.h" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="29795" topLine="801" />
-		</Cursor>
+		<Folding>
+			<Collapse line="48" />
+		</Folding>
 	</File>
 	<File name="gpcalu.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2047" topLine="81" />
 		</Cursor>
 	</File>
-	<File name="gpcpic.cpp" open="1" top="1" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="gpcOPCD.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3068" topLine="114" />
+			<Cursor1 position="12670" topLine="558" />
 		</Cursor>
 	</File>
-	<File name="src/gpccrs.cpp" open="1" top="0" tabpos="1" split="1" active="1" splitpos="255" zoom_1="0" zoom_2="0">
+	<File name="gpcwin_var.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="21971" topLine="889" />
-			<Cursor2 position="16902" topLine="863" />
+			<Cursor1 position="199" topLine="3" />
 		</Cursor>
-		<Folding>
-			<Collapse line="449" />
-		</Folding>
 	</File>
-	<File name="gpcres_run.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="91" zoom_1="0" zoom_2="0">
+	<File name="gpcres2mini.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="415" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src/gpcPROTO.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="212" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="gpcres_run.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="91" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="10622" topLine="474" />
 		</Cursor>
 	</File>
-	<File name="piMASS_main.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="368" zoom_1="0" zoom_2="0">
+	<File name="gpcgt.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="9787" topLine="322" />
+			<Cursor1 position="2113" topLine="118" />
 		</Cursor>
 	</File>
-	<File name="gpcres.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="168" zoom_1="0" zoom_2="0">
+	<File name="include/gpcSCHL.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2255" topLine="136" />
-		</Cursor>
-	</File>
-	<File name="include/gpccrs.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4733" topLine="199" />
-		</Cursor>
-	</File>
-	<File name="src/gpcwin.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="206" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="11655" topLine="415" />
-		</Cursor>
-		<Folding>
-			<Collapse line="30" />
-		</Folding>
-	</File>
-	<File name="gpcresflt.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2160" topLine="193" />
+			<Cursor1 position="113" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="gpcSRC.cpp" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -162,9 +80,87 @@
 			<Cursor1 position="3456" topLine="163" />
 		</Cursor>
 	</File>
-	<File name="gpcpic.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="gpcgt.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1952" topLine="78" />
+			<Cursor1 position="31388" topLine="1128" />
+		</Cursor>
+		<Folding>
+			<Collapse line="388" />
+		</Folding>
+	</File>
+	<File name="gpcres_compi.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="374" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9006" topLine="396" />
+		</Cursor>
+	</File>
+	<File name="gpcLAZY.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2088" topLine="37" />
+		</Cursor>
+	</File>
+	<File name="gpcresflt.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2160" topLine="193" />
+		</Cursor>
+	</File>
+	<File name="include/gpccrs.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4733" topLine="199" />
+		</Cursor>
+	</File>
+	<File name="include/gpcOPCD.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="851" topLine="46" />
+		</Cursor>
+	</File>
+	<File name="gpcres.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="319" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1643" topLine="451" />
+		</Cursor>
+	</File>
+	<File name="include/gpcwin.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="650" topLine="20" />
+		</Cursor>
+	</File>
+	<File name="gpcU44.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="910" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="piMASS_main.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="368" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="14996" topLine="608" />
+		</Cursor>
+	</File>
+	<File name="gpMASSbuild.cpp" open="0" top="0" tabpos="19" split="0" active="1" splitpos="388" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="14765" topLine="682" />
+		</Cursor>
+	</File>
+	<File name="include/gpeALF.h" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="29795" topLine="801" />
+		</Cursor>
+	</File>
+	<File name="gpcres.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="168" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2255" topLine="136" />
+		</Cursor>
+	</File>
+	<File name="gpcSRC.h" open="0" top="0" tabpos="25" split="0" active="1" splitpos="306" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="18362" topLine="1090" />
+		</Cursor>
+	</File>
+	<File name="src/gpccrs.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="255" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11697" topLine="486" />
+		</Cursor>
+	</File>
+	<File name="gpcU14.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
