@@ -434,7 +434,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			pSRC->pEXE = pSRC->pEXE->compiEASY( pSRC->pSRCstart( true ), NULL, NULL, NULL );
 
 			if( !pSRC->msBLTdly )
-				pSRC->msBLTdly = gpeSYNmsec;
+				pSRC->msBLTdly = gpdSYNmSEC;
 			else
 				win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%win.mZ)+((i/win.mZ)<<16) , win.mSEC.y, pSRC->iGT, 0 ), win.msSYN );
 			pSRC->msBLD = 0;

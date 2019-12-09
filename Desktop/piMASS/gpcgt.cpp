@@ -563,7 +563,7 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 	// ha nincsen hiba p_err[0] == 0
 	// egyébként bele ír valamit akkor nem
 	p_err[0] = 0;
-	I8 n = recv( socket, s_buff, n_buff, 0 );
+	int n = recv( socket, s_buff, n_buff, 0 );
 	if( n == SOCKET_ERROR )
 	{
 		char* p_error = s_buff;
@@ -580,6 +580,8 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 	if( n )
 		return p_err;
 
+	sprintf( p_err, "\nrecv n == 0?" );
+	return p_err;
 
 	gpfSOC_CLOSE( socket );
 	msGTdie = 1;

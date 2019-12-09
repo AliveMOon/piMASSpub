@@ -113,10 +113,12 @@
 	#define gpdRPI_WIDTH	1280 	//640	//1280	//320	//	Allowable widths: 320, 640, 1280
 	#define gpdRPI_HEIGHT	960 	//480	//960	//240	//	Allowable heights: 240, 480, 960
 	#define gpdEV_tOUT		7
-	#define gpdSDL_tOUT		3
+	#define gpdSDL_tOUT		7
 	#define gpdRPI_tOUT		1000/20
 	#define gpdJDOIT_tOUT	3
+	#define gpdSYNmSEC		333
 #endif
+
 
 
 
@@ -172,7 +174,16 @@ typedef int				I4;
 typedef int64_t			I8;
 typedef I8				LL;
 
+enum gpeLX:U8
+{
+    gpeZERO,
+    gpeU4x2nSTR = sizeof(U8)/sizeof(void*),
+   // gpeMXPATH = gpmPAD( gpdMAX_PATH, 0x10 ) , //0x10*0x11,
 
+    //gpeSYNmsec = 333,
+
+    gpeRECVn = (0x30000/8),
+};
 
 
 class float2;
@@ -361,16 +372,7 @@ enum gpeFD {
 };
 
 
-enum gpeLX:U8
-{
-    gpeZERO,
-    gpeU4x2nSTR = sizeof(U8)/sizeof(void*),
-   // gpeMXPATH = gpmPAD( gpdMAX_PATH, 0x10 ) , //0x10*0x11,
 
-    gpeSYNmsec = 1111,
-
-    gpeRECVn = (0x30000/6),
-};
 
 #include "gpeALF.h"
 

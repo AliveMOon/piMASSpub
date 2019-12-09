@@ -105,7 +105,9 @@ class gpcCRS
 		{
 			return CRSfrm;
 		}
-		void frmDRW( SDL_Rect dst, SDL_Rect src, I4x2 wh, SDL_Surface* pTRG, SDL_Surface* pCHAR, U1 frmC, U4 x, const U1* pSTR )
+		void frmDRW( 	SDL_Rect dst, SDL_Rect src,
+						I4x2 wh, SDL_Surface* pTRG, SDL_Surface* pCHAR,
+						U1 frmC, U4 x, const U1* pSTR )
 		{
 			if( this ? !frmC : true )
 				return;

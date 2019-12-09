@@ -490,8 +490,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 		//while( SDL_PollEvent( &ev ) )
 		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
-		if( mSEC.x-msEVNT < gpdEV_tOUT )
-			continue;
+		/*if( mSEC.x-msEVNT < gpdEV_tOUT )
+			continue;*/
 
 		SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
 		nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
@@ -500,11 +500,13 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		msEVNT = mSEC.x;
 
 		U4 tout = gpdSDL_tOUT;
-		if( SDL_WaitEventTimeout( &ev, tout ) ) do
-		{ /// EVENTS --------------------------------------------------
+		if( !SDL_WaitEventTimeout( &ev, tout ) )
+			continue;
+		gpnTITLE = gpnEVENT;
+
+		do { /// EVENTS --------------------------------------------------
 			tout = 0;
 			gpnEVENT++;
-			gpnTITLE = gpnEVENT;
 			switch( ev.type )
 			{
 				case SDL_MOUSEWHEEL: {
@@ -545,7 +547,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 																	div.w/8,
 																	((div.w>>3)*div.h*2) / (div.w*3)
 																);
-
 										nIRQ++;
 										break;
 									}
@@ -558,8 +559,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 															apCRS[onDIV.x]->gtFRMwh().x+mag, 0,
 															mag
 														);
-
-
 								nIRQ++;
 								break;
 							}
@@ -628,6 +627,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			}
 			if( c == 'x' )
 				continue;
+
 			if( c )
 			{
 				char *pUTF8 = NULL;
@@ -712,7 +712,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 									break;
 								case 'n':
 								case 'N':
-									gppKEYbuff += sprintf( (char*)gppKEYbuff, "\r\n" );
+									gppKEYbuff += sprintf( (char*)gppKEYbuff, "\r\n " );
 									break;
 							}
 						} break;
@@ -955,7 +955,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				c = 0;
 			}
 		}
-		while( SDL_PollEvent( &ev ) );
+		while( SDL_WaitEventTimeout( &ev, tout ) );
+		//while( SDL_PollEvent( &ev ) );
 
 
 	}

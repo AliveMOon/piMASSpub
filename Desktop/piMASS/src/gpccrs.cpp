@@ -2,6 +2,26 @@
 #include "gpccrs.h"
 #include "gpcSRC.h"
 
+
+gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
+{
+	//ctor
+	gpmCLR;
+	id = _id;
+	win.apCRS[id] = this;
+	CRSfrm.a4x2[1] = win.wFRM( 0 );
+	wDIVfrm = win.wDIV(0);
+
+}
+
+gpcCRS::~gpcCRS()
+{
+	//dtor
+	gpmDELary(pCp);
+}
+
+
+
 I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 						gpcMASS& mass, const I4x2& _xy )
 {
@@ -61,40 +81,11 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 			scnIN.y = xy.y - (scnZN.w*cr.y - scnIN.w);
 			break;
 		}
-
-		/*for( scnZN.x = 0; scnZN.x < pMAP->mapZN44.z; scnZN.x++ )
-		{
-			scnZN.z += pC[scnZN.x];
-			if( o.z >= scnZN.z )
-			{
-				scnZN0.z = scnZN.z;
-				continue;
-			}
-
-			scnIN.z = pC[scnZN.x]*cr.x;
-			scnIN.x = xy.x - (scnZN.z*cr.x - scnIN.z);
-			break;
-		}
-
-		for( scnZN.y = 0; scnZN.y < pMAP->mapZN44.w; scnZN.y++ )
-		{
-			scnZN.w += pR[scnZN.y];
-			if( o.w >= scnZN.w )
-			{
-				scnZN0.w = scnZN.w;
-				continue;
-			}
-
-			scnIN.w = pR[scnZN.y]*cr.y;
-			scnIN.y = xy.y - (scnZN.w*cr.y - scnIN.w);
-			break;
-		}*/
-
 	}
-
 	return o;
-
 }
+
+
 void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 {
 	// ha van shift akkor a 2. cursort mozgatja
@@ -125,14 +116,10 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 		case 5:	// down)
 			selANIN[1].y++;
 	}
-	if( !bSH )
-		selANIN[0]= selANIN[1];
 
-/*
-	if( !edANIN[0].a4x2[0].x )
-		return;
-	if( (edANIN[0].a4x2[0] == selANIN[0].a4x2[0]) && (edANIN[1].a4x2[0] == selANIN[1].a4x2[0]) )
-		return;*/
+	if( !bSH )
+		selANIN[0] = selANIN[1];
+
 
 
 
@@ -330,8 +317,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 		}
 
 		if( bCPY )
-		if( sCRS.id != id )
-		{
+		if( sCRS.id != id ) {
 			// SHIFT klick szinkronizálja a két cursort
 			sCRS.bED = bED;
 			sCRS.selANIN[0] = selANIN[0];
@@ -365,34 +351,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 
 }
 
-gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
-{
-	//ctor
-	gpmCLR;
-	id = _id;
-	win.apCRS[id] = this;
-	CRSfrm.a4x2[1] = win.wFRM( 0 );
-	wDIVfrm = win.wDIV(0);
 
-}
-
-gpcCRS::~gpcCRS()
-{
-	//dtor
-	gpmDELary(pCp);
-}
-
-/*gpcCRS::gpcCRS(const gpcCRS& other)
-{
-	//copy ctor
-}
-
-gpcCRS& gpcCRS::operator=(const gpcCRS& rhs)
-{
-	if (this == &rhs) return *this; // handle self assignment
-	//assignment operator
-	return *this;
-}*/
 U1 gpsHUN[] =
 " A       E   I  "
 "UOoO  O   U U   "
@@ -445,6 +404,210 @@ public:
 		pCRS = pC;
 		pWIN = &w;
 	}
+	static void callDRW( gpcTHRD_DRW* pTD )
+	{
+		gpcWIN &win	= *pTD->pWIN;
+		gpcCRS &crs	= *pTD->pCRS;
+		U4			nMINI 	= crs.nMINI;
+		U1x4*		pMINI	= crs.pMINI;
+		SDL_Rect	src 	= pTD->src,
+					fsrc	= src,
+					fdsrc	= src,
+					dstPX	= pTD->dstPX,
+					divPX 	= win.wDIV( crs.id );
+		I4x4		scnZN0	= crs.scnZN0,
+					CRSfrm	= crs.gtFRM();
+		U4	z = CRSfrm.z,
+			cs = 0, 	cc = 255,
+			fcs = 0, 	fcc = 255,
+			fds = 0, 	fdc = 255,
+			cx = src.w*8,
+			cy = src.h*32, frmC = pTD->frmC,
+			scx, scy,
+			fscx, fscy;
+		I4x2 wh;
+		U1 	c,d,
+			//sDIV = pTD->sDIV,
+			//oDIV = pTD->oDIV,
+			sSTR[0x20];
+
+		dstPX.y = divPX.y-dstPX.h;
+
+		if( dstPX.w != src.w || dstPX.h != src.h ) { /// SCALE Blit -------------------------
+			for( U4 i = 0; i < nMINI; i++, dstPX.x += dstPX.w ) {
+				if( !(i%z) )
+				{
+					dstPX.x = divPX.x;
+					dstPX.y += dstPX.h;
+				}
+
+				if( c = pMINI[i].y )
+				{
+					c += 0xb0;
+					if( cc != pMINI[i].x )
+					{
+						cc = pMINI[i].x;
+						scx = (cc&3)*cx;
+						scy = (cc>>2)*cy;
+					}
+					if( cs != c )
+					{
+						cs = c;
+						src.x = (cs&7)*src.w + scx;
+						src.y = (cs>>3)*src.h + scy;
+					}
+
+					SDL_BlitScaled( win.pSRFchar, &src, win.pSRFwin, &dstPX );
+				}
+
+				if( !pMINI[i].w )
+					continue;
+
+				if( fcc != pMINI[i].z )
+				{
+					fcc = pMINI[i].z;
+					fscx = (fcc&3)*cx;
+					fscy = (fcc>>2)*cy;
+				}
+
+				c = pMINI[i].w;
+				if( c > 0x60 )
+				{
+					d = gpsHUN[c-0x60]-' ';
+					c = gpsHUN[c-0x20]-' '+0x60;
+					if( d >= 'a'-' ' && d <= 'z'-' ' )
+						c += 8;
+					if( fds != d )
+					{
+						fds = d;
+						fdsrc.x =  (fds&7)*src.w + fscx;
+						fdsrc.y = (fds>>3)*src.h + fscy;
+					}
+
+					SDL_BlitScaled( win.pSRFchar, &fdsrc, win.pSRFwin, &dstPX );
+
+				}
+
+				if( fcs != c )
+				{
+					fcs = c;
+					fsrc.x =  (fcs&7)*fsrc.w + fscx;
+					fsrc.y = (fcs>>3)*fsrc.h + fscy;
+				}
+
+				SDL_BlitScaled( win.pSRFchar, &fsrc, win.pSRFwin, &dstPX );
+
+			}
+		}
+		else for( U4 i = 0; i < nMINI; i++, dstPX.x += dstPX.w ) { /// Blit -------------------------
+			if( !(i%z) )
+			{
+				dstPX.x = divPX.x;
+				dstPX.y += dstPX.h;
+			}
+
+			if( c = pMINI[i].y )
+			{
+				c += 0xb0;
+				if( cc != pMINI[i].x )
+				{
+					cc = pMINI[i].x;
+					scx = (cc&3)*cx;
+					scy = (cc>>2)*cy;
+				}
+				if( cs != c )
+				{
+					cs = c;
+					src.x = (cs&7)*src.w + scx;
+					src.y = (cs>>3)*src.h + scy;
+				}
+
+				SDL_BlitSurface( win.pSRFchar, &src, win.pSRFwin, &dstPX );
+
+			}
+
+			if( !pMINI[i].w )
+				continue;
+
+			if( fcc != pMINI[i].z )
+			{
+				fcc = pMINI[i].z;
+				fscx = (fcc&3)*cx;
+				fscy = (fcc>>2)*cy;
+			}
+
+			c = pMINI[i].w;
+			if( c > 0x60 )
+			{
+				d = gpsHUN[c-0x60]-' ';
+				c = gpsHUN[c-0x20]-' '+0x60;
+				if( d >= 'a'-' ' && d <= 'z'-' ' )
+					c += 8;
+				if( fds != d )
+				{
+					fds = d;
+					fdsrc.x =  (fds&7)*src.w + fscx;
+					fdsrc.y = (fds>>3)*src.h + fscy;
+				}
+				//src.x = (d&7)*src.w + scx;
+				//src.y = (d>>3)*src.h + scy;
+				SDL_BlitScaled( win.pSRFchar, &fdsrc, win.pSRFwin, &dstPX );
+			}
+
+			if( fcs != c )
+			{
+				fcs = c;
+				fsrc.x = (fcs&7)*src.w + fscx;
+				fsrc.y = (fcs>>3)*src.h + fscy;
+			}
+			//src.x = (c&7)*src.w + scx;
+			//src.y = (c>>3)*src.h + scy;
+
+			SDL_BlitSurface( win.pSRFchar, &fsrc, win.pSRFwin, &dstPX );
+		}
+
+		/// ON -----------------------------------------------------
+		if( crs.id == win.onDIV.x )
+		{
+			dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
+			dstPX.y = max( 0, scnZN0.w+CRSfrm.y );
+
+			wh = crs.scnZN.a4x2[1]; //+CRSfrm.a4x2[0];
+			wh += CRSfrm.a4x2[0];
+			wh.mn( CRSfrm.a4x2[1] );
+
+
+			if( wh.mn() > 0 )
+			{
+				wh.x -= dstPX.x;
+				wh.y -= dstPX.y;
+
+				dstPX.x *= dstPX.w;
+				dstPX.x += divPX.x;
+
+				dstPX.y *= dstPX.h;
+				dstPX.y += divPX.y;
+				crs.frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+			}
+		}
+
+
+
+
+		//if( frmC )
+		//	return false;
+
+		if( win.bSW < 2 )
+			return;
+
+		dstPX.x = CRSfrm.x > 0 ? (CRSfrm.x*divPX.w)/CRSfrm.z : 0;
+		dstPX.y = CRSfrm.y > 0 ? (CRSfrm.y*divPX.h)/CRSfrm.w : 0;
+		dstPX.x += divPX.x;
+		dstPX.y += divPX.y;
+
+		crs.frmDRW( dstPX, src, CRSfrm.a4x2[1], win.pSRFwin, win.pSRFchar, frmC, 0, (U1*)(crs.id == pTD->sDIV ? "EDIT" : "TARGET") );
+
+	}
 };
 void callDRW( gpcTHRD_DRW* pTD )
 {
@@ -459,9 +622,9 @@ void callDRW( gpcTHRD_DRW* pTD )
 				divPX 	= win.wDIV( crs.id );
 	I4x4		scnZN0	= crs.scnZN0,
 				CRSfrm	= crs.gtFRM();
-	U4	cs = 0, cc = 255,
-		fcs = 0, fcc = 255,
-		fds = 0, fdc = 255,
+	U4	cs = 0, 	cc = 255,
+		fcs = 0, 	fcc = 255,
+		fds = 0, 	fdc = 255,
 		cx = src.w*8,
 		cy = src.h*32, frmC = pTD->frmC,
 		scx, scy,
@@ -1049,7 +1212,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 		win.apT[id]->src = src;
 		win.apT[id]->dstPX = dstPX;
 
-		win.aT[id] = std::thread( callDRW, win.apT[id] );
+		win.aT[id] = std::thread( win.apT[id]->callDRW, win.apT[id] );
 		return false;
 	}
 
