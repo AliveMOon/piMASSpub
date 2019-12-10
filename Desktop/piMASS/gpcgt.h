@@ -269,7 +269,42 @@ class gpcGT
 		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLAZY*	GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB );
 
+		U8 GTout( gpcWIN* pWIN );
+		/*{
+			if( !this )
+				return 0;
 
+			U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
+			if( nOUT )
+				return nOUT;
+			// üres a pOUT töltsünk bele valamit
+			U4 nMISo = gpdRECVn;
+			if( !(bTEL()|bLOOP()) )
+			if( (sUSER < pUSER) && (sHOST < pHOST) && (sFILE < pFILE) )
+			if( msSYNwin < pWIN->msSYN )
+			{
+				pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
+				msSYNwin = pWIN->msSYN;
+				nOUT = pOUT ? pOUT->n_load : 0;
+				if( nOUT )
+					nMISo /= 3;
+			}
+
+			if( pMISo ? pMISo->n_load : false )
+			{
+				nMISo *= 0x400;
+				if( nMISo > pMISo->n_load )
+					nMISo = pMISo->n_load;
+				pOUT = pOUT->putZN(
+									pMISo->p_alloc, nMISo, gpeNET4_0NYL,	/// pD, nD, NET4,
+									pMISo->n_load,							/// Z,
+									pWIN ? pWIN->mSEC.x : mSEC.x 			/// N
+								);
+				pMISo->lzyINS( NULL, 0, s = 0, nMISo );
+			}
+
+			return pOUT ? pOUT->n_load : 0;
+		}*/
 	protected:
 
 	private:

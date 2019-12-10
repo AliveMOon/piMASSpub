@@ -1176,8 +1176,8 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 		if( aGTfd[gpeFDsnd].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 		{
-			U8 s;
-			if(!p_gt->pOUT)
+			U8 s, nOUT = GTout( &win );
+			if(!nOUT)
 			{
 				if(p_gt->pHUD ? p_gt->pHUD->p_alloc : NULL )
 				{
@@ -1201,13 +1201,15 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 					}
 				}
 
-				if( !(bTEL()|bLOOP()) ) //if( !p_gt->bI() )
+				/*if( !(bTEL()|bLOOP()) ) //if( !p_gt->bI() )
 				if( (p_gt->sUSER < p_gt->pUSER) && (p_gt->sHOST < p_gt->pHOST) && (p_gt->sFILE < p_gt->pFILE) )
 				if( p_gt->msSYNwin < win.msSYN )
 				{
 					p_gt->pOUT = win.pSYNwin->putSYN( p_gt->pOUT, p_gt->msSYNwin, p_gt->socket, p_gt->bSW );
 					p_gt->msSYNwin = win.msSYN;
-				}
+				}*/
+
+
 
 				/*if( p_gt->msSYNwin < win.msSYN )
 				{
