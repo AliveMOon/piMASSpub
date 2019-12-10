@@ -279,73 +279,64 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						switch( *pE )
 						{
 							case '\v': {
-									//*pE = 0;
-									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
-									pS = pE+1;
-									// tehát ha bent van ki kell lépni a szerkeszttett cellából
-									crs.CRSbEDswitch();
-								} break;
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								pS = pE+1;
+								// tehát ha bent van ki kell lépni a szerkeszttett cellából
+								crs.CRSbEDswitch();
+							} break;
 							case '\t': {
-									if( crs.CRSbEDget() )
-										break;
+								if( crs.CRSbEDget() )
+									break;
 
-									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
-									if( *pE == '\r' )
-									if( pE[1] == '\n' )
-										pE++;
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								if( *pE == '\r' )
+								if( pE[1] == '\n' )
+									pE++;
 
-									pS = pE+1;
-									crs.CRSstpCL(
-													*this, *piMASS,
-													3, bSHIFT // = (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-												);
-								} break;
+								pS = pE+1;
+								crs.CRSstpCL( *this, *piMASS, 3, bSHIFT );
+							} break;
 							case '\r':
 							case '\n': {
-									if( crs.CRSbEDget() )
-										break;
+								if( crs.CRSbEDget() )
+									break;
 
 
-									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
-									if( *pE == '\r' )
-									if( pE[1] == '\n' )
-										pE++;
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								if( *pE == '\r' )
+								if( pE[1] == '\n' )
+									pE++;
 
-									pS = pE+1;
-									crs.CRSstpCL(
-													*this, *piMASS,
-													5, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-												);
-								} break;
+								pS = pE+1;
+								crs.CRSstpCL( *this, *piMASS, 5, bSHIFT );
+							} break;
 
 
 							case 2:			// left
 							case 3:			// right
 							case 4:			// up
 							case 5:	{ 		// down
-									crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
-									pS = pE+1;
-									if( !crs.CRSbEDget() )
-									{
-										crs.CRSstpCL(
-														*this, *piMASS,
-														*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-													);
-										break;
-									}
-									//crs.miniRDY( win, iDIV, *piMASS, pE, pS );
-									//pS = pE+1;
 
-									//------------------------------------
-									//
-									//			CRS MOVE
-									//
-									//------------------------------------
-									crs.CRSstpED(
-													*this, *piMASS,
-													*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
-												);
-								} break;
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								pS = pE+1;
+								if( !crs.CRSbEDget() )
+								{
+									crs.CRSstpCL( *this, *piMASS, *pE, bSHIFT );
+
+									break;
+								}
+
+								//------------------------------------
+								//
+								//			CRS MOVE
+								//
+								//------------------------------------
+								crs.CRSstpED(
+												*this, *piMASS,
+												*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
+											);
+
+							} break;
 						}
 						pE++;
 					}

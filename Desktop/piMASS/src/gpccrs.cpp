@@ -120,9 +120,17 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 	if( !bSH )
 		selANIN[0] = selANIN[1];
 
-
-
-
+	gpmZ(apSRC);
+	U4 xFND = mass.getXFNDan( selANIN[1].au4x2[0] );
+    if( !xFND )
+		return;
+	apSRC[1] = mass.SRCfnd(xFND);
+	if( selANIN[0].au4x2[0] == selANIN[1].au4x2[0] )
+		apSRC[0] = apSRC[1];
+	if( !apSRC[1] )
+		return;
+	iSTR.x = apSRC[1]->iSTRT();
+	iSTR.y = apSRC[1]->nL;
 }
 void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 {
@@ -140,8 +148,8 @@ void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 	{
 		// ugyan abban a rublikában van
 		U1	*pOA	= pSRC->pA,
-			*pLFT	= pOA + anSTR[0],
-			*pRIG	= pOA + anSTR[1];
+			*pLFT	= pOA + iSTR.x,
+			*pRIG	= pOA + iSTR.y;
 		switch( stp )
 		{
 			case 2:
@@ -239,14 +247,14 @@ void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 		if( pRIG >= pSRC->pA+pSRC->nL )
 			pRIG = pSRC->pA+pSRC->nL;
 
-		anSTR[1] = pRIG-pSRC->pA;
+		iSTR.y = pRIG-pSRC->pA;
 		if( !bSH )
-			anSTR[0] = anSTR[1];
-		else if( anSTR[0] > anSTR[1] )
+			iSTR.x = iSTR.y;
+		else if( iSTR.x > iSTR.y )
 		{
-			U4 tmp = anSTR[0];
-			anSTR[0] = anSTR[1];
-			anSTR[1] = tmp;
+			U4 tmp = iSTR.x;
+			iSTR.x = iSTR.y;
+			iSTR.y = tmp;
 		}
 	}
 }
@@ -273,7 +281,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 
 	selANIN[1].a4x2[0] = sCRS.scnZN.a4x2[0]+U4x2(1,0);		//AN
 	selANIN[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;				//IN
-	anSTR[1] = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANIN[1].a4x2[1], true ) : 0;
+	iSTR.y = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANIN[1].a4x2[1], true ) : 0;
 
 	/// ha ezt igazra álítom akkor belemásolja a másik cursorba
 	bool bCPY = false; // OFF?
@@ -291,17 +299,17 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 			apSRC[1] = apSRC[0];
 			apSRC[0] = pSRC;
 
-			t0 = anSTR[1];
-			anSTR[1] = anSTR[0];
-			anSTR[0] = t0;
+			t0 = iSTR.y;
+			iSTR.y = iSTR.x;
+			iSTR.x = t0;
 			return;
 		}
 
-		if( anSTR[1] < anSTR[0] )
+		if( iSTR.y < iSTR.x )
 		{
-			t0 = anSTR[1];
-			anSTR[1] = anSTR[0];
-			anSTR[0] = t0;
+			t0 = iSTR.y;
+			iSTR.y = iSTR.x;
+			iSTR.x = t0;
 		}
 		if( selANIN[0].a4x2[0] == selANIN[1].a4x2[0] )
 		{
@@ -311,9 +319,9 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 			CRSbEDset(false);
 
 		if( !bED )
-		if( anSTR[1] != anSTR[0] )
+		if( iSTR.y != iSTR.x )
 		{
-			anSTR[1] = anSTR[0] = 0;
+			iSTR.y = iSTR.x = 0;
 		}
 
 		if( bCPY )
@@ -322,8 +330,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 			sCRS.bED = bED;
 			sCRS.selANIN[0] = selANIN[0];
 			sCRS.selANIN[1] = selANIN[1];
-			sCRS.anSTR[0] = anSTR[0];
-			sCRS.anSTR[1] = anSTR[1];
+			sCRS.iSTR = iSTR;
 			apSRC[0] = apSRC[0];
 			apSRC[1] = apSRC[1];
 
@@ -338,7 +345,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 		gpcCRS& cSRC = *win.apCRS[src];
 		selANIN[0] = selANIN[1];
 		apSRC[0] = apSRC[1];
-		anSTR[0] = anSTR[1];
+		iSTR.x = iSTR.y;
 
 		selANIN[1].a4x2[0] += cSRC.selANIN[1].a4x2[0] - cSRC.selANIN[0].a4x2[0];
 
@@ -347,7 +354,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 
 	selANIN[0] = selANIN[1];
 	apSRC[0] = apSRC[1];
-	anSTR[0] = anSTR[1];
+	iSTR.x = iSTR.y;
 
 }
 
@@ -609,7 +616,7 @@ public:
 
 	}
 };
-void callDRW( gpcTHRD_DRW* pTD )
+/*void callDRW( gpcTHRD_DRW* pTD )
 {
 	gpcWIN &win	= *pTD->pWIN;
 	gpcCRS &crs	= *pTD->pCRS;
@@ -821,7 +828,7 @@ void callDRW( gpcTHRD_DRW* pTD )
 
 	crs.frmDRW( dstPX, src, CRSfrm.a4x2[1], win.pSRFwin, win.pSRFchar, frmC, 0, (U1*)(crs.id == sDIV ? "EDIT" : "TARGET") );
 
-}
+}*/
 
 // FRM 1 up // 2 right // 4 down // 8 left
 bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT )
@@ -1197,7 +1204,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 	}
 
-
+#ifdef gpdSYSpi
 	if( !win.apTall[id] )
 	{
 		win.apTall[id] = new gpcTHRD_DRW( this, win );
@@ -1215,7 +1222,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 		win.aT[id] = std::thread( win.apT[id]->callDRW, win.apT[id] );
 		return false;
 	}
-
+#endif
 
 	if( dstPX.w != src.w || dstPX.h != src.h ) { /// SCALE Blit -------------------------
 		for( U4 i = 0; i < nMINI; i++ ) {
@@ -1392,10 +1399,10 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 	I4 nCPY = 0;
 	if( apSRC[1] )
 	if( apSRC[1] == apSRC[0] )
-	if( nCPY = anSTR[1] - anSTR[0] )
+	if( nCPY = iSTR.y - iSTR.x )
 	if( pS = nCPY > 0 ? (char*)apSRC[0]->pA : NULL )
 	{
-		pS += anSTR[0];
+		pS += iSTR.x;
 	}
 	if( pS ? !nCPY : true )
 		return pBUFF;
@@ -1520,32 +1527,32 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 			//gpmMEMCPY( edANIN, selANIN, 2 );
 			if( pSRC )
 			{
-				if( max( anSTR[1], anSTR[0] ) > pSRC->nL )
-					anSTR[1] = anSTR[0] = pSRC->nL;
+				if( max( iSTR.y, iSTR.x ) > pSRC->nL )
+					iSTR.y = iSTR.x = pSRC->nL;
 
 				I4	nSTRT = pSRC->pSRCstart(true)-pSRC->pSRCalloc(true);
 
-				if( anSTR[0] < nSTRT )
-					anSTR[0] = nSTRT;
+				if( iSTR.x < nSTRT )
+					iSTR.x = nSTRT;
 				if( !bED )
 				{
-					anSTR[1] = pSRC->nL;
+					iSTR.y = pSRC->nL;
 				}
-				else if( anSTR[1] < anSTR[0] )
-					anSTR[1] = anSTR[0];
+				else if( iSTR.y < iSTR.x )
+					iSTR.y = iSTR.x;
 
-				I4	nSUB = anSTR[1] - anSTR[0],
+				I4	nSUB = iSTR.y - iSTR.x,
 					nSTR = pE-pB,
 					nOL = pSRC->nL,
 					nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
 
 				// több karakter írunk át
 				U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
-					*pRIG	= pOA + anSTR[1],
+					*pRIG	= pOA + iSTR.y,
 					*pRIGe	= pOA + nOL,
-					*pLFT	= (pSRC->pA = new U1[nNEW]) + anSTR[0];
+					*pLFT	= (pSRC->pA = new U1[nNEW]) + iSTR.x;
 
-				gpmMEMCPY( pSRC->pA, pOA, anSTR[0] );
+				gpmMEMCPY( pSRC->pA, pOA, iSTR.x );
 
 				for( ; pB < pE; pB++ )
 				{
@@ -1580,7 +1587,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
 					pLFT++;
 
 				}
-				anSTR[1] = anSTR[0] = pLFT-pSRC->pA;
+				iSTR.y = iSTR.x = pLFT-pSRC->pA;
 				if( pRIG < pRIGe )
 				{
 					gpmMEMCPY( pLFT, pRIG, pRIGe-pRIG );

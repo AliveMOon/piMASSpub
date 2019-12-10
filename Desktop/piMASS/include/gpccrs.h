@@ -15,7 +15,9 @@ class gpcCRS
 
 		U1x4	*pMINI, *pCRS;
 
-		U4 	nMINI, anSTR[2], nCp, nRp;
+		U4x2 iSTR;
+		U4 	nMINI, //aiSTR[2],
+			nCp, nRp;
 		I4	*pCp, *pRp;
 
 		U4x4 aCRS[2];
@@ -107,8 +109,7 @@ class gpcCRS
 		}
 		void frmDRW( 	SDL_Rect dst, SDL_Rect src,
 						I4x2 wh, SDL_Surface* pTRG, SDL_Surface* pCHAR,
-						U1 frmC, U4 x, const U1* pSTR )
-		{
+						U1 frmC, U4 x, const U1* pSTR ) {
 			if( this ? !frmC : true )
 				return;
 			bool bHALF = false;

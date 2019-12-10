@@ -500,7 +500,7 @@ public:
 	{
 		gpmDELary(pMAP);
 	}
-	U4* MAPalloc( U4x2& spcZN, U4x4& outZN, U4 iRST = 4 ) //bool bRST )
+	U4* MAPalloc( const U4x2& spcZN, U4x4& outZN, U4 iRST = 4 ) //bool bRST )
 	{
 		// mCR -
 		if(!this)
@@ -652,7 +652,7 @@ public:
 
 		if( !bHD )
 		{
-			pC += iB()+1;
+			pC += iSTRT(); //iB()+1;
 			dim.w -= (pC-pA);
 		}
 
@@ -906,6 +906,10 @@ public:
 		pB = pA+i;
 		return i;
 	}
+	U8 iSTRT()
+	{
+		return iB()+1;
+	}
 	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spcZN, U4 nADD = 1 );
 
     gpcSRC& SRCcpy( U1* pC, U1* pE );
@@ -1136,6 +1140,26 @@ public:
 	U4 nTXT = 0;
 	char* pTXT, *pT;
 
+	U4 getXFNDzn( const U4x2& zn )
+	{
+		if( !this )
+			return 0;
+
+		U4x4 mpZN;
+		U4 *pM = mapCR.MAPalloc( zn, mpZN );
+		if( !pM )
+			return 0;
+
+		U4	i = zn*U4x2( 1, mpZN.z );
+		return pM[i];
+	}
+	U4 getXFNDan( I4x2 an )
+	{
+		if( this ? !an.x : true )
+			return 0;
+		an.x--;
+		return getXFNDzn(an);
+	}
 
 	U4 relLEV( void )
 	{
