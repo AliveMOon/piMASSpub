@@ -580,6 +580,7 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 	if( n )
 		return p_err;
 
+	msGTdie = 3;
 	sprintf( p_err, "\nrecv n == 0?" );
 	return p_err;
 
@@ -704,11 +705,16 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	U8 s;
 	if( bNEWip || bGTdie() ) //socket == INVALID_SOCKET )
 	{
-        if( msGTdie == 1 )
+        switch( msGTdie )
         {
-            gpfSOC_CLOSE( socket );
-			msGTdie = (win.mSEC.x+1500)|1;
-			return 0;
+			case 1:
+				gpfSOC_CLOSE( socket );
+				msGTdie = (win.mSEC.x+1500)|1;
+				return 0;
+			case 3:
+				gpfSOC_CLOSE( sockCNCT );
+				msGTdie = (win.mSEC.x+1500)|1;
+				return 0;
         }
 
 		pUSER = sUSER;
@@ -886,11 +892,12 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 	if( socket == INVALID_SOCKET )
 	{
 
-		if( msGTdie == 1 )
+		switch( msGTdie )
         {
-            gpfSOC_CLOSE( socket );
-			msGTdie = (win.mSEC.x+1500)|1;
-			return 0;
+			case 1:
+				gpfSOC_CLOSE( socket );
+				msGTdie = (win.mSEC.x+1500)|1;
+				return 0;
         }
 
 		pUSER = sUSER;
@@ -1082,7 +1089,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				pACC->GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
 				getifaddrs(&pIFadr);
 				char	*s_buff = (char*)win.sGTpub,
-						*pB = s_buff+gpeRECVn/2, *pBi = pB;
+						*pB = s_buff+gpdRECVn/2, *pBi = pB;
 				void	*pIFtmp = NULL;
 				for( pIFa = pIFadr; pIFa != NULL; pIFa = pIFa->ifa_next )
 				{

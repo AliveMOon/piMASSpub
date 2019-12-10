@@ -76,7 +76,7 @@ class gpcWIN
 		U8		iPUB;
 
 		U1	sGTpub[0x10000],
-			sGTbuff[gpeRECVn];
+			sGTbuff[gpdRECVn];
 		/// SYNC MAP --------------
 		gpcLAZY *pSYNwin, *pSYNgt;
 		U4		msSYN, msSYNrst;

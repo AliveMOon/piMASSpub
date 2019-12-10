@@ -8,7 +8,7 @@ de szar lassú
 blabla
 pi" d1	 = ix;
 na = a + 1 * 10 + a;
-ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 a3	   b3	 =fps  a5	 pic ="cam1" c5	 pic = "draw1"
+ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 a3	  b3	 =fps  a5	 pic ="cam1" c5	 pic = "draw1"
 unsel = 1
 
  d5	 pic = "sprite0" e5	 = c1.c ; f5	 trg ="draw1";
@@ -27,9 +27,10 @@ nonsens = msec;
 d = nonsens;
  c6	 abcdef
 nami van jo vagy nem
- a7	 Na mégegyszer na most átmrent!
+ d6	93734 osram
+  a7	 Na mégegyszer na most átmrent!
 Ja hát még nem tökéletes!
-Na mi lesz már! c7	 ashs c8	  asjaj a10	 pic ="cam1"  c10	 pic ="cam1" d10	 pic = "draw2"
+Na mi lesz már! c7	 ashs d7	save = 0 c8	  asjaj a10	 pic ="cam1"  c10	 pic ="cam1" d10	 pic = "draw2"
 unsel = 1  e10	 trg ="draw2";
 trgw = 640;
 trgh = 512 * 3;

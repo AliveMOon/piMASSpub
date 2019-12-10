@@ -117,6 +117,7 @@
 	#define gpdRPI_tOUT		1000/20
 	#define gpdJDOIT_tOUT	3
 	#define gpdSYNmSEC		333
+	#define gpdRECVn 		0x4000	//	(0x30000/0x10)
 #endif
 
 
@@ -182,7 +183,7 @@ enum gpeLX:U8
 
     //gpeSYNmsec = 333,
 
-    gpeRECVn = (0x30000/8),
+
 };
 
 
