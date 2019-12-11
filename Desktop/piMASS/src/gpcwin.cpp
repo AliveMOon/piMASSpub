@@ -214,6 +214,16 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 }
 void gpcWIN::gpeWINresize( void )
 {
+	for( U1 i = 0; i < 4; i++ )
+	{
+		if( apT[i] )
+		{
+			aT[i].join();
+			apT[i] = NULL;
+		}
+
+	}
+
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
 		throw InitError();
 	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
@@ -254,7 +264,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				}
 
 			}
-			SDL_UpdateWindowSurface( pSDLwin );
+			if( pSDLwin )
+				SDL_UpdateWindowSurface( pSDLwin );
 
 			*gppKEYbuff = 0;
 			U1 iRDY = 0x10;
