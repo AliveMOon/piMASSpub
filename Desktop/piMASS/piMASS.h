@@ -117,7 +117,8 @@
 	#define gpdRPI_tOUT		1000/20
 	#define gpdJDOIT_tOUT	3
 	#define gpdSYNmSEC		333
-	#define gpdRECVn 		(0x30000/0x8) //0x4000*4	//	(0x30000/0x10)
+	#define gpdRECVn 		(0x30000/0x8) 	//0x4000*4	//	(0x30000/0x10)
+	#define gpdHUDn			(gpdRECVn/0x4)
 #endif
 
 
