@@ -125,12 +125,27 @@ public:
 void call_cam( gpcTHRD_CAM* pTC )
 {
 	gpcTHRD_CAM cpy = *pTC;
+	//SDL_Surface srf =
 	gpdCAMu& cam = cpy.pC->cam;
-	U1* pPIX = cpy.pSRF ? (U1*)cpy.pSRF->pixels : NULL;
+	U1	*pPIX, *pDAT;
+
+	U4 iCNT = 0, p = cpy.pSRF->pitch, p2 = p*2, h = cpy.pSRF->h, e = p*h;
 	while( cpy.pC )
 	{
+		pPIX = cpy.pSRF ? (U1*)cpy.pSRF->pixels : NULL;
 		usleep(1000/30);
 		cam.grab();
+		if( !pPIX )
+			continue;
+
+		pDAT = cam.getImageBufferData();
+		if( pDAT )
+		{
+			for( U4 i = p*(iCNT&1); i < e; i += p2 )
+				memcpy( pPIX+i, pDAT+i, p );
+			iCNT++;
+			continue;
+		}
 		//memcpy ( cpy.pSRF->pixels, cpy.pC->cam.callback_data._buffData.data, getImageTypeSize( RASPICAM_FORMAT_IGNORE ) );
 		cam.retrieve(
 							pPIX,
