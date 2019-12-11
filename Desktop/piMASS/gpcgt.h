@@ -26,7 +26,7 @@ public:
 		an = anDWN;
 	}
 	gpcGT_DWNL( char* p_file );
-	gpcLAZY* join( gpcLAZY* pOUT, gpcGT& mom, gpcLAZY* pEXE = NULL );
+	gpcLZY* join( gpcLZY* pOUT, gpcGT& mom, gpcLZY* pEXE = NULL );
 };
 
 class gpcHUD
@@ -149,13 +149,13 @@ class gpcGT
 		SOCKADDR_IN	*p_ai, addr_in;
 		gpcGTall	GTacc;
 
-		gpcLAZY		*pPUB,
+		gpcLZY		*pPUB,
 					*pINP, *pMISi,
 					*pEVENT,
 					*pSYNgt;
 
 	private:
-		gpcLAZY		*pOUT, *pMISo;
+		gpcLZY		*pOUT, *pMISo;
 
 	public:
 		gpcGT_DWNL	*pDWN;
@@ -267,7 +267,7 @@ class gpcGT
 			return iCNT;
 		}
 		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
-		gpcLAZY*	GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB );
+		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );
 
 		U8 GTout( gpcWIN* pWIN );
 		/*{

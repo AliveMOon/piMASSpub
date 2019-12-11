@@ -72,13 +72,13 @@ class gpcWIN
 				bALT, abALT[2];
 		U1		bSW;
 
-		gpcLAZY	winPUB;
+		gpcLZY	winPUB;
 		U8		iPUB;
 
 		U1	sGTpub[0x10000],
 			sGTbuff[gpdRECVn];
 		/// SYNC MAP --------------
-		gpcLAZY *pSYNwin, *pSYNgt;
+		gpcLZY *pSYNwin, *pSYNgt;
 		U4		msSYN, msSYNrst;
 
 
@@ -96,7 +96,103 @@ public:
 		~gpcWIN();
 		gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piMASS ); //, char* pPATH, char* pFILE ); //, I4x4& siz );
 
+		gpcLZY* putLIST( gpcLZY* pLZY, gpeNET4 nt4, U4 i, U4 j, char* pPRMPT = NULL )
+		{
+			if( !this )
+				return pLZY;
+			U4x2 zn;
+			U4* pM = piMASS->pM( zn );
+			if( !pM )
+				return pLZY;
 
+			if( i > j )
+			{
+				U4 t = i;
+				i = j;
+				j = t;
+			}
+
+            U8 s = zn.area(), b = -1;
+            if( !j )
+				j = s;
+            else if( j > s )
+				j = s;
+
+            gpcSYNC syn( nt4, 0, mSEC.x, INVALID_SOCKET, 0 );
+			pLZY = pLZY->lzyADD( &syn, sizeof(syn), b );
+
+            U4 xFND, n = 0, z = zn.x;
+            U1 sBUFF[0x20], *pNUM;
+            for( ; i < j; i++ )
+            {
+				if( !( xFND = pM[i] ) )
+					continue;
+				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				if( !pSRC )
+					continue;
+				pNUM = sBUFF+gpfALF2STR( sBUFF, (i%z)+1 );
+				sprintf( (char*)pNUM, "%d\t", i/z );
+                pLZY = pLZY->lzyFRMT( s=-1, "%s%s: "
+											gpdPUB
+											"\r\n%s\r\n", n ? "" : "\r\n", sBUFF, (char*)pSRC->pPUB() );
+                n++;
+
+            }
+			if( pPRMPT )
+				pLZY = pLZY->lzyFRMT( s=-1, "\r\n%s", pPRMPT );
+
+            return pLZY->SYNrdy(b);
+		}
+		gpcLZY* putLIST( gpcLZY* pLZY, gpeNET4 nt4, I8x4 an, char* pPRMPT = NULL )
+		{
+			if( !this )
+				return pLZY;
+			U4x2 zn;
+			U4* pM = piMASS->pM( zn );
+			if( !pM )
+				return pLZY;
+
+			I8x4 lurdZN = an.lurd();
+			if( lurdZN.x > 0 )
+				lurdZN.x--;
+			else
+				lurdZN = I8x4( 0, 0, zn.x, zn.y );
+
+			U8 i = 0, j = zn.area(), b = -1, s;
+
+            gpcSYNC syn( nt4, 0, mSEC.x, INVALID_SOCKET, 0 );
+			pLZY = pLZY->lzyADD( &syn, sizeof(syn), b );
+
+            U4 xFND, n = 0, z = zn.x;
+            U1 sBUFF[0x20], *pNUM;
+            for( ; i < j; i++ )
+            {
+				an.x = i%z;
+				an.y = i/z;
+				if( an.x < lurdZN.x || an.y < lurdZN.y )
+					continue;
+				if( an.x >= lurdZN.z || an.y > lurdZN.w )
+					continue;
+
+				if( !( xFND = pM[i] ) )
+					continue;
+
+				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				if( !pSRC )
+					continue;
+				pNUM = sBUFF+gpfALF2STR( sBUFF, an.x+1 );
+				sprintf( (char*)pNUM, "%d\t", an.y );
+                pLZY = pLZY->lzyFRMT( s=-1, "%s%s: "
+											gpdPUB
+											"\r\n%s\r\n", n ? "" : "\r\n", sBUFF, (char*)pSRC->pPUB() );
+                n++;
+
+            }
+			if( pPRMPT )
+				pLZY = pLZY->lzyFRMT( s=-1, "\r\n%s", pPRMPT );
+
+            return pLZY->SYNrdy(b);
+		}
 		bool bINIThu()
 		{
 			if( !this )

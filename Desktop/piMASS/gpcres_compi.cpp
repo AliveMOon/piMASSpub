@@ -42,7 +42,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 
 	gpcADR adr;
-	gpcLAZY str;
+	gpcLZY str;
 	gpcISA	*pA = NULL, *pI = NULL, *pUD8 = NULL;
 	nASG = 0;
 

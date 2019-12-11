@@ -74,7 +74,7 @@ const char *dz_s_http_dwnl_sFN_sFNpEXP_nS =	"HTTP/1.0 200 OK\r\n" \
 											"Content-Length: %lld\r\n" \
 											"\r\n";
 
-gpcLAZY* gpcLAZY::qEVENT(void)
+gpcLZY* gpcLZY::qEVENT(void)
 {
 	if(!this)
 		return NULL;
@@ -109,7 +109,7 @@ gpcLAZY* gpcLAZY::qEVENT(void)
 	return NULL;
 }
 
-gpcLAZY* gpcGT_DWNL::join( gpcLAZY* pOUT, gpcGT& mom, gpcLAZY* pEXE )
+gpcLZY* gpcGT_DWNL::join( gpcLZY* pOUT, gpcGT& mom, gpcLZY* pEXE )
 {
 	if( pOUT ? pOUT->n_alloc : false )
 		return pOUT;
@@ -831,7 +831,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 	{
 		U8 s, nOUT = GTout( &win );
-		if( nOUT < (gpdHUDn*2) )
+		if( nOUT <= (gpdHUDn*2) )
 		{
 			if(pHUD ? pHUD->p_alloc : NULL )
 			{
@@ -1166,10 +1166,11 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 			}
 		}
 
+
 		if( aGTfd[gpeFDsnd].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 		{
 			U8 s, nOUT = p_gt->GTout( &win );
-			if( nOUT < (gpdHUDn*2) ) //if( nOUT < 0x400 )
+			if( nOUT <= (gpdHUDn*2) ) //if( nOUT < 0x400 )
 			{
 				if(p_gt->pHUD ? p_gt->pHUD->p_alloc : NULL )
 				{
@@ -1230,7 +1231,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 		//FD_SET( p_gt->socket, &aGTfd[gpeFDrcv] );
 
 		// ennek az az értelme, ha nincsen buffer nem érdekklödik, hogy írható e.
-		if( p_gt->pOUT || p_gt->pDWN || p_gt->pHUD )
+		if( !!p_gt->GTout( &win ) || !!p_gt->pDWN ) // || p_gt->pHUD )
 			aGTfd[gpeFDsnd].setFD(p_gt->socket);	//FD_SET( p_gt->socket, &a_fdset[gpeFDsnd] );
 
 		if( aGTfd[gpeFDrcv].nFD >= FD_SETSIZE )

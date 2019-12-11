@@ -64,7 +64,7 @@ void my_term_destination(j_compress_ptr pINF )
 	jpgBUFF.resize(jpgBUFF.size()-pINF->dest->free_in_buffer);
 }
 
-gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q )
+gpcLZY* gpfSRF2JPG( gpcLZY* pBUFF, SDL_Surface* pSRF, I4 q )
 {
 	if( !pSRF )
 		return pBUFF;

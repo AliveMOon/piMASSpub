@@ -5,7 +5,7 @@ bool bITT =  false; //true; // false; //
 extern U1 gpaALFadd[];
 
 
-gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLAZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
+gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
 {
 	if( win.pM ? !this : true )
 		return pOUT;
@@ -682,7 +682,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							gpcGT& gt = *pGT;
 
 							gt.GTlst( win, GTcnct );
-							if( gpcLAZY* pEVNT = gt.pEVENT->qEVENT() )
+							if( gpcLZY* pEVNT = gt.pEVENT->qEVENT() )
 							{
 								U1x4* pBGRA;
 								U4 nGD = 0; U8 s;
@@ -735,7 +735,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 														if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSURF, 57 ) )
 															IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );
 
-														gpcLAZY* pPNG = ((gpcLAZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
+														gpcLZY* pPNG = ((gpcLZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
 														if( pPNG )
 														{
 															nGD++;

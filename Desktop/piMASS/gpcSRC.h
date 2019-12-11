@@ -145,7 +145,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 	bool abVAN[0x80];
 	gpmZ( abVAN );
 	*abVAN = true;
-	gpcLAZY* pTREE = NULL;
+	gpcLZY* pTREE = NULL;
 	U4 u4, nT = 0;
 
 	if( nVAN == nLEN )
@@ -380,78 +380,73 @@ inline U4 gpfUTF8rig( U1* pB, U1* pE, U4 nT = 4 )
 	return r;
 }
 
-U8 inline gpfSTR2U8( U1* p_str, U1** pp_str = NULL )
+U8 inline gpfSTR2U8( void* pV, void* ppV = NULL )
 {
-	if( !p_str )
+	if( !pV )
 		return 0;
-	U8 u8 = strtol( (char*)p_str, (char**)&p_str, 10 );
+
+	char *p_str = (char*)pV;
+	U8 u8 = strtol( p_str, &p_str, 10 );
 	if( !u8 )
 	{
-		switch( *p_str )
+		switch( *(U1*)p_str )
 		{
 			case 'x':
 			case 'X':
 				p_str++;
-				u8 = strtoll( (char*)p_str, (char**)&p_str, 16 );
+				u8 = strtoll( p_str, &p_str, 16 );
 				break;
 			case 'b':
 			case 'B':
 				p_str++;
-				u8 = strtol( (char*)p_str, (char**)&p_str, 2 );
+				u8 = strtol( p_str, &p_str, 2 );
 				break;
 			case 'd':
 			case 'D':
 				p_str++;
-				u8 = strtol( (char*)p_str, (char**)&p_str, 10 );
-				break;
-		}
-	} /*else {
-		u8 = (U8)log2(u8);
-		switch( *p_str ) /// 1 2 4 8 16
-		{
-			case 'x':
-			case 'X':
-				p_str++;
-				u8 = ((gpmSTR2U8( p_str, 16 )<<1)|1) << u8;
-				break;
-		}
-	}*/
-	if( pp_str )
-		*pp_str = p_str;
-	return u8;
-}
-#define gpmVAN( d, v, l ) gpfVAN( (d), (U1*)v, l )
-
-I8 inline gpfSTR2I8( U1* p_str, U1** pp_str = NULL )
-{
-	if( !p_str )
-		return 0;
-	U8 nLEN;
-    p_str += gpmVAN(p_str, "+-0123456789xXbBdD", nLEN );
-	I8 i8 = strtol( (char*)p_str, (char**)&p_str, 10 );
-	if( !i8 )
-	{
-		switch( *p_str )
-		{
-			case 'x':
-			case 'X':
-				p_str++;
-				i8 = strtol( (char*)p_str, (char**)&p_str, 16 );
-				break;
-			case 'b':
-			case 'B':
-				p_str++;
-				i8 = strtol( (char*)p_str, (char**)&p_str, 2 );
-				break;
-			case 'd':
-			case 'D':
-				p_str++;
-				i8 = strtol( (char*)p_str, (char**)&p_str, 10 );
+				u8 = strtol( p_str, &p_str, 10 );
 				break;
 		}
 	}
-	if( pp_str )
-		*pp_str = p_str;
+	if( ppV )
+		*(char**)ppV = p_str;
+	return u8;
+}
+
+
+
+I8 inline gpfSTR2I8( void* pV, void* ppV = NULL )
+{
+	if( !pV )
+		return 0;
+
+	char *p_str = (char*)pV;
+	U8 nLEN;
+    p_str += gpmVAN(p_str, "+-0123456789xXbBdD", nLEN );
+	I8 i8 = strtol( p_str, &p_str, 10 );
+	if( !i8 )
+	{
+		switch( *(U1*)p_str )
+		{
+			case 'x':
+			case 'X':
+				p_str++;
+				i8 = strtol( p_str, &p_str, 16 );
+				break;
+			case 'b':
+			case 'B':
+				p_str++;
+				i8 = strtol( p_str, &p_str, 2 );
+				break;
+			case 'd':
+			case 'D':
+				p_str++;
+				i8 = strtol( p_str, &p_str, 10 );
+				break;
+		}
+	}
+	if( ppV )
+		*(char**)ppV = p_str;
 	return i8;
 }
 
@@ -601,7 +596,7 @@ public:
     gpeALF	*pALFtg;
     gpcRES	*pEXE,
 			*apOUT[4];
-	gpcLAZY	*pMINI,
+	gpcLZY	*pMINI,
 			*pBIG;
 
 	gpcMAP	*pMAP;
@@ -652,7 +647,7 @@ public:
 
 		if( !bHD )
 		{
-			pC += iSTRT(); //iB()+1;
+			pC += iPUB(); //iB()+1;
 			dim.w -= (pC-pA);
 		}
 
@@ -906,9 +901,20 @@ public:
 		pB = pA+i;
 		return i;
 	}
-	U8 iSTRT()
+	U8 iPUB()
 	{
 		return iB()+1;
+	}
+	U1* pPUB()
+	{
+		if( this ? pA : NULL )
+		{
+			if( pA[nL] != 0 )
+				pA[nL] = 0;
+			return (U1*)pA+iPUB();
+		}
+
+		return NULL;
 	}
 	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spcZN, U4 nADD = 1 );
 
@@ -934,19 +940,19 @@ private:
 // #include "gpcSCHL.h"
 class gpcCLASS {
 
-	gpcLAZY	*paLZY,
+	gpcLZY	*paLZY,
 			*pLST, *pFND;
 	I8	nLST, nCLASS,
 		idFND, ixFND;
 
-	gpcLAZY** ppCLASS( I8 ix )
+	gpcLZY** ppCLASS( I8 ix )
 	{
 		if( ix >= nLST )
 			return NULL;
 
-		gpcLAZY** ppC = NULL;
+		gpcLZY** ppC = NULL;
 		if( paLZY )
-			ppC = (gpcLAZY**)paLZY->p_alloc;
+			ppC = (gpcLZY**)paLZY->p_alloc;
 
 		nCLASS = ppC ? paLZY->n_load/sizeof(pFND) : 0;
 
@@ -964,7 +970,7 @@ class gpcCLASS {
 				paLZY = paLZY->lzyADD( NULL, nADD*sizeof(pFND), s );
 				ppC = NULL;
 				if( paLZY )
-					ppC = (gpcLAZY**)paLZY->p_alloc;
+					ppC = (gpcLZY**)paLZY->p_alloc;
 				else
 					return NULL;
 
@@ -993,18 +999,18 @@ public:
 		gpmCLR;
 	}
 
-	gpcLAZY* pGET( I8 ix )
+	gpcLZY* pGET( I8 ix )
 	{
 		if( ix >= nLST )
 			return NULL;
 
-		gpcLAZY** ppC = ppCLASS( ix );
+		gpcLZY** ppC = ppCLASS( ix );
 		if( !ppC )
 			return NULL;
 
 		return *ppC;
 	}
-	gpcLAZY** ppGET( I8 ix )
+	gpcLZY** ppGET( I8 ix )
 	{
 		if( ix >= nLST )
 			return NULL;
@@ -1023,7 +1029,7 @@ public:
 
 		return pLST->tree_fnd(id, nLST);
 	}
-	gpcLAZY* p_fnd( I8 id, I8& ix )
+	gpcLZY* p_fnd( I8 id, I8& ix )
 	{
 		ix = 0;
 		if( id ? !this : true )
@@ -1041,7 +1047,7 @@ public:
 		if(ix >= nLST)
 			return NULL;
 
-		gpcLAZY** ppC = ppCLASS( ix );
+		gpcLZY** ppC = ppCLASS( ix );
 		if( ppC ? !*ppC : true )
 		{
 			ix = nLST;
@@ -1093,7 +1099,7 @@ public:
 class gpcMASS
 {
 	gpcCLASS	*pTG;
-	gpcLAZY		*pSRCc,
+	gpcLZY		*pSRCc,
 				*pLST;
 	U4			nLST, xADD, xFND, nALLOC, nSP, nOP0, nOP1, iMAIN,
 				aSPix[0x100];
@@ -1114,7 +1120,7 @@ public:
 	//			*pPUB; //, nDICT;
 
 	// CMPL ----------------------------
-	gpcLAZY		CMPL;
+	gpcLZY		CMPL;
 	gpcCMPL		PC;
 	U4			aPC[0x100], iPC,
 				aiDAT[0x100], alDAT;
@@ -1123,7 +1129,7 @@ public:
 
 
 
-	//gpcLAZY		*apDICTopcd[0x1000];
+	//gpcLZY		*apDICTopcd[0x1000];
 	//gpcLZYdct	*apDICTix[0x1000];
 	U4			 anDICTix[0x1000],
 				//aLEVsp[0x100],
@@ -1131,7 +1137,7 @@ public:
 
 	/// GATE --------
 	gpcGTall	GTacpt, GTcnct;
-	gpcLAZY		*pJPGsnd;
+	gpcLZY		*pJPGsnd;
 	/// PIC ---------
 	gpcPICall	PIC;
 	/// CAM ---------
@@ -1139,7 +1145,16 @@ public:
 	/// TXT ---------
 	U4 nTXT = 0;
 	char* pTXT, *pT;
-
+	U4* pM( U4x2& zn )
+	{
+		zn = 0;
+		if( !this )
+			return NULL;
+		U4x4 mpZN;
+		U4* p_map = mapCR.MAPalloc( zn, mpZN );
+		zn = mpZN.a4x2[1];
+		return p_map;
+	}
 	U4 getXFNDzn( const U4x2& zn )
 	{
 		if( !this )
@@ -1215,10 +1230,10 @@ public:
 
         pTG = pTG->add( (I8)tg, ix, n );
 
-        gpcLAZY* pLZY = pTG->pGET( ix ); 	///
+        gpcLZY* pLZY = pTG->pGET( ix ); 	///
 		if( !pLZY )
 		{
-			*pTG->ppGET( ix ) = pLZY = new gpcLAZY;
+			*pTG->ppGET( ix ) = pLZY = new gpcLZY;
 		}
 		pLZY->lzyADD( (U4*)&iKID, sizeof(U4), s, 8 );
 	}
@@ -1227,7 +1242,7 @@ public:
 		if( !pTG )
 			return;
 		I8 ix;
-		gpcLAZY* pLZY = pTG->p_fnd( tg, ix );
+		gpcLZY* pLZY = pTG->p_fnd( tg, ix );
 		if( !pLZY )
 			return;
 

@@ -104,7 +104,7 @@ char gpsEXEpath[gpdMAX_PATH], *gppEXEfile = gpsEXEpath,
 	 gpsMASSpath[gpdMAX_PATH], *gppMASSfile = gpsMASSpath,
 	 gpsMASSname[0x100];
 
-gpcLAZY gpMASS;
+gpcLZY gpMASS;
 U1 gpdONEcell[] = " \a ";
 
 gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, I4 ig, U4 nS )
@@ -171,7 +171,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		return false;
 	U4	*pM = mapCR.pMAP,
 		*pC = mapCR.pCOL;
-	gpcLAZY buff;
+	gpcLZY buff;
 
 
 	gpcSRC* pSRC;
@@ -254,7 +254,11 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 				if( pLFT-pA < iB )
 					buff.lzyINS( pLFT, iB-(pLFT-pA), nS = -1, -1 );
 			}
-			buff.lzyFRMT( nS = -1, "<BR>+--- --  -   <BR>" );
+			buff.lzyFRMT(
+							nS = -1,	"<BR>"
+										gpdPUB //"+--- --  -   "
+										"<BR>"
+						);
         }
         pLFT = pA+iB+1;
         bool bBR = true;
@@ -319,7 +323,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		return false;
 	U4	*pM = mapCR.pMAP,
 		*pC = mapCR.pCOL;
-	gpcLAZY buff;
+	gpcLZY buff;
 	gpcSRC* pSRC;
 	U4 z = mapCR.mapZN44.z;
 

@@ -129,7 +129,7 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 		apSRC[0] = apSRC[1];
 	if( !apSRC[1] )
 		return;
-	iSTR.x = apSRC[1]->iSTRT();
+	iSTR.x = apSRC[1]->iPUB();
 	iSTR.y = apSRC[1]->nL;
 }
 void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )

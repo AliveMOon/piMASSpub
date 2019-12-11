@@ -9,7 +9,7 @@ public:
 	gpeALF	alfIS;
 	U8		typeIS;
 protected:
-	gpcLAZY	*pND,
+	gpcLZY	*pND,
 			*pLST;
 	U4		nLST, nALLOC;
 

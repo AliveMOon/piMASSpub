@@ -64,7 +64,7 @@ public:
 		return this;
 	}
 
-	gpcISA* str( gpcLAZY& str )
+	gpcISA* str( gpcLZY& str )
 	{
 		if( !this )
 			return NULL;
@@ -468,7 +468,7 @@ public:
 	gpcALU& equ( gpcALU& b );
 
 	gpcALU& zero( void );
-	U8 ins( gpcRES* pM, gpcLAZY& str );
+	U8 ins( gpcRES* pM, gpcLZY& str );
 	gpcRES* ins( gpcRES* pM, gpcRES* pKID );
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
@@ -802,7 +802,7 @@ public:
 		return resISA()->var( a, gpeISA_tag );
 	}
 
-	gpcISA*	resISA_str( gpcLAZY& str )
+	gpcISA*	resISA_str( gpcLZY& str )
 	{
 		return resISA()->str( str );
 	}
@@ -834,8 +834,8 @@ public:
 
 	gpcRES* 	compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	//gpcRES* 	compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
-	gpcLAZY* 	res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep );
-	gpcRES* 	RESrun( gpcRES* pOUT, gpcLAZY* pLZY, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
+	gpcLZY* 	res2mini( gpcLZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep );
+	gpcRES* 	RESrun( gpcRES* pOUT, gpcLZY* pLZY, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
 
 	gpcALU& ALU( U4 iA )
 	{

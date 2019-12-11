@@ -66,7 +66,7 @@ class gpcKID
 {
 public:
 	gpcLZYdct	*p_kid;
-	gpcLAZY		*p_iPC;
+	gpcLZY		*p_iPC;
 
 };
 class gpcCMPL
@@ -94,7 +94,7 @@ public:
 	char*	pINFO;
 
 	gpcLZYdct	*p_kid;
-	gpcLAZY		*p_iPC;
+	gpcLZY		*p_iPC;
 
 	gpeKID kid( gpeALF t )
 	{
@@ -113,7 +113,7 @@ public:
 	}
 	I1 sOP( char* pPUB );
 	I1 sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB  = "", char* pSTR = "" );
-	gpcLAZY* reset( gpcLAZY* pCMPL, U1* pPUB )
+	gpcLZY* reset( gpcLZY* pCMPL, U1* pPUB )
 	{
 		pCMPL = cmpl_add( pCMPL, pPUB, strlen((char*)pPUB) );
 
@@ -139,16 +139,16 @@ public:
 		return n;
 	}
 
-	U4 iKID( gpcLAZY* pCMPL, U4 i );
+	U4 iKID( gpcLZY* pCMPL, U4 i );
 
 
-	U4 cmpl_best( gpcLAZY* pCMPL, U1* pS, U4 nS );
-	U4 cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS );
-	gpcLAZY* cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS );
+	U4 cmpl_best( gpcLZY* pCMPL, U1* pS, U4 nS );
+	U4 cmpl_find( gpcLZY* pCMPL, U1* pS, U4 nS );
+	gpcLZY* cmpl_add( gpcLZY* pCMPL, U1* pS, U4 nS );
 
-	gpcCMPL* sKIDlst( U1* pS0, U1* pPUB , gpcLAZY* pCMPL, char c = 0 );
-	char* sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL );
-	char* sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB );
+	gpcCMPL* sKIDlst( U1* pS0, U1* pPUB , gpcLZY* pCMPL, char c = 0 );
+	char* sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLZY* pCMPL );
+	char* sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB );
 };
 
 

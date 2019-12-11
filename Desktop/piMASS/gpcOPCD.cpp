@@ -104,7 +104,7 @@ const char* gpasOPER[] = {
 	"? if",		": else",
 	"@ mail",	"\" str",
 };
-char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
+char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLZY* pCMPL )
 {
 	if( this ? !pPUB : true )
 	{
@@ -213,7 +213,7 @@ char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLAZY* pCMPL )
 
 	return (char*)pS;
 }
-char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLAZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB )
+char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLZY* pCMPL, gpcCMPL*pA, gpcCMPL*pB )
 {
 	U1	*pASMop = pPUB;
 	char	*psOP = NULL, *psA = NULL, *psB = NULL,
@@ -395,7 +395,7 @@ I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB, char* pSTR )
 					);
 	return o;
 }
-gpcCMPL* gpcLAZY::pPC( U4 pc, U1* pPUB )
+gpcCMPL* gpcLZY::pPC( U4 pc, U1* pPUB )
 {
 	gpcCMPL	**ppC = this ? (gpcCMPL**)p_alloc : NULL;
 	if( !ppC )
@@ -422,7 +422,7 @@ gpcCMPL* gpcLAZY::pPC( U4 pc, U1* pPUB )
 	return NULL;
 }
 
-gpcCMPL* gpcLAZY::pSPARE( U4 pc, gpeALF sw, U1* pS )
+gpcCMPL* gpcLZY::pSPARE( U4 pc, gpeALF sw, U1* pS )
 {
 	gpcCMPL	**ppC = this ? (gpcCMPL**)p_alloc : NULL;
 	if( !ppC )
@@ -451,14 +451,14 @@ gpcCMPL* gpcLAZY::pSPARE( U4 pc, gpeALF sw, U1* pS )
 
 	return NULL;
 }
-U4 gpcLAZY::nPC( void )
+U4 gpcLZY::nPC( void )
 {
 	if( !this )
 		return 0;
 
 	return n_load/sizeof(gpcCMPL*);
 }
-U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
+U4 gpcCMPL::iKID( gpcLZY* pCMPL, U4 i )
 {
 	if( !this )
 		return pCMPL->nPC();
@@ -469,7 +469,7 @@ U4 gpcCMPL::iKID( gpcLAZY* pCMPL, U4 i )
 
 	return ((U4*)p_iPC->p_alloc)[i];
 }
-gpcCMPL* gpcCMPL::sKIDlst( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
+gpcCMPL* gpcCMPL::sKIDlst( U1* pS0, U1* pPUB, gpcLZY* pCMPL, char c )
 {
 	if( !pS0 )
 		return NULL;
@@ -519,7 +519,7 @@ gpcCMPL* gpcCMPL::sKIDlst( U1* pS0, U1* pPUB, gpcLAZY* pCMPL, char c )
 	*pPUB = 0;
 	return this;
 }
-U4 gpcCMPL::cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS )
+U4 gpcCMPL::cmpl_find( gpcLZY* pCMPL, U1* pS, U4 nS )
 {
 	if( this ? !pCMPL : true )
 		return 0;
@@ -559,7 +559,7 @@ U4 gpcCMPL::cmpl_find( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	return 0;
 }
 
-U4 gpcCMPL::cmpl_best( gpcLAZY* pCMPL, U1* pS, U4 nS )
+U4 gpcCMPL::cmpl_best( gpcLZY* pCMPL, U1* pS, U4 nS )
 {
 	if( this ? !pCMPL : true )
 		return 0;
@@ -607,7 +607,7 @@ U4 gpcCMPL::cmpl_best( gpcLAZY* pCMPL, U1* pS, U4 nS )
 	return iBST;
 }
 
-gpcLAZY* gpcCMPL::cmpl_add( gpcLAZY* pCMPL, U1* pS, U4 nS )
+gpcLZY* gpcCMPL::cmpl_add( gpcLZY* pCMPL, U1* pS, U4 nS )
 {
 
 	U4 fnd = cmpl_find( pCMPL, pS, nS );

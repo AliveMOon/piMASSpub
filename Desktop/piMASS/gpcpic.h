@@ -5,7 +5,7 @@
 //#include "gpcSRC.h"
 //GLOVAL(void)
 bool gpfSRFjpgSAVE( U1* pFILE, SDL_Surface* pSRF, I4 q );
-gpcLAZY* gpfSRF2JPG( gpcLAZY* pBUFF, SDL_Surface* pSRF, I4 q );
+gpcLZY* gpfSRF2JPG( gpcLZY* pBUFF, SDL_Surface* pSRF, I4 q );
 #ifndef gpdSYSpi
 class gpcCAMubi
 {
@@ -99,7 +99,7 @@ class gpcPIC
 public:
 	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
-	gpcLAZY			*pPACK;
+	gpcLZY			*pPACK;
 	U4				id, iSRC, iQC, nPIXall, nPIX, bppS, nPKavg;
 	SDL_Surface		*pSRF, *pSHR;
 	I4x4			xyOUT, xySRC;

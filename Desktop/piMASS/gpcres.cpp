@@ -99,7 +99,7 @@ gpcALU& gpcADR::adr2ALU( gpcRES* pM )
 
 	return pRM->ALU( iA );
 }
-U8 gpcALU::ins( gpcRES* pM, gpcLAZY& str )
+U8 gpcALU::ins( gpcRES* pM, gpcLZY& str )
 {
 	if( !str.n_load )
 		return 0;

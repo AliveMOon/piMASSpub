@@ -2,7 +2,7 @@
 #include "gpcwin.h"
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
-gpcLAZY* gpcGT::GTos_GATELIST( gpcLAZY *p_out, const char* p_enter, const char* pTAB )
+gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB )
 {
 	if( !this )
 		return p_out;
@@ -335,8 +335,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					if( n_atrib > (sizeof(s_atrib)-1) )
 						n_atrib = (sizeof(s_atrib)-1);
 
-					((char*)gpmMEMCPY( s_atrib, p_row+n_com, n_atrib ))[n_atrib] = 0;
-				}
+					gpmMEMCPY( s_atrib, p_row+n_com, n_atrib )[n_atrib] = 0;
+				} else
+					*s_atrib = 0;
 
 
 				switch( cAN.alf )
@@ -408,6 +409,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, "\r\n", gppTAB );
 						}
 						break;
+
 					case gpeALF_HELP:
 						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", aGTcrs[0] ? "" : "\r\n" );
 						break;
@@ -418,6 +420,31 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
 							pOUT = pOUT->lzyFRMT(s = -1, "%s event", aGTcrs[0] ? "" : "\r\n" );
 						} break;
+
+
+
+					case gpeALF_LIST: {
+							U1* pS = (U1*)s_atrib;
+							I8x4 an = 0;
+							U8 nLEN;
+							for( U1 i = 0; i < 2; i++ )
+							{
+
+								nLEN = gpmNINCS( pS, ": \t\r\n" );
+								pS += nLEN;
+								an.a8x2[i].num = n_atrib - (pS-(U1*)s_atrib);
+								an.a8x2[i] = pS;
+								pS += an.a8x2[i].num;
+								an.a8x2[i].num = gpfSTR2U8( pS, &pS );
+
+							}
+
+							//= gpfSTR2U8( pSTR, &pSTR ), j = gpfSTR2U8( pSTR, &pSTR );
+							sprintf( s_atrib, "0x%x>", iCNT );
+							pMISo = pWIN->putLIST( pMISo, gpeNET4_0LST, an, s_atrib );
+						} break;
+
+
 					case gpeALF_PIC: {
 
 
@@ -444,7 +471,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 										IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
 
 									//gpmDEL( pPIC->pPACK );
-									pPIC->pPACK = ((gpcLAZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
+									pPIC->pPACK = ((gpcLZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
 									pPIC->nPKavg += pPIC->pPACK->n_load;
 									pPIC->nPKavg /= 2;
 									//SDL_FreeSurface(pSURF);

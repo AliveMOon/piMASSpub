@@ -5,7 +5,7 @@ U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t
 	*gppTABrun = gpsTABrun + sizeof(gpsTABrun)-1; //pmSTRLEN( (char*)gpsTABrun );
 
 
-gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
+gpcLZY* gpcRES::res2mini( gpcLZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 {
 	if( !this )
 		return pLZY;
@@ -16,7 +16,7 @@ gpcLAZY* gpcRES::res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 	if( pLZY )
 		pLZY->lzyRST();
 	else
-		pLZY = new gpcLAZY;
+		pLZY = new gpcLZY;
 
 	if( !pLZY )
 		return NULL;
