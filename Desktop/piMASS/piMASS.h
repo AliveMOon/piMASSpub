@@ -3144,7 +3144,7 @@ typedef enum gpeNET2:U4
 	gpeNET2_U4	= MAKE_ID( 'U', '4', 0, 0 ),
 	gpeNET2_U8	= MAKE_ID( 'U', '8', 0, 0 ),
 
-};
+} gpeNET2;
 typedef enum gpeNET4:U4
 {
 	gpeNET4_null, // = 0,
@@ -3233,7 +3233,7 @@ typedef enum gpeNET4:U4
 
 
 	gpeNET4_PREV	= MAKE_ID( 'P', 'R', 'E', 'V' ),
-};
+} gpeNET4;
 
 class gpcCMPL;
 

@@ -54,16 +54,16 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 
 	if( pMISo ? pMISo->n_load : false )
 	{
-		if( nMISo > pMISo->n_load )
-			nMISo = pMISo->n_load;
-
 		if( pHUD )
-			nMISo = (gpdHUDn > pOUT->n_load) ? (gpdHUDn - pOUT->n_load) : 0;
+			nMISo = (gpdHUDn > nOUT) ? (gpdHUDn - nOUT) : 0;
 		else
 			nMISo *= 0x400;
 
 		if( nMISo )
 		{
+			if( nMISo > pMISo->n_load )
+				nMISo = pMISo->n_load;
+
 			pOUT = pOUT->putZN(
 									pMISo->p_alloc, nMISo,					/// pD, nD,
 									gpeNET4_0NYL,					/// NET4,

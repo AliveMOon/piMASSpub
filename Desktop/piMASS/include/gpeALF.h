@@ -479,7 +479,7 @@ typedef enum gpeALFu4: U4
 
 	gpeALFu4_MWLQKWU = (U4)gpdABCDEFG('M', 'W', 'L', 'Q', 'K', 'W', 'U'),
 	gpeALFu4_U4      = gpeALFu4_MWLQKWU,
-};
+} gpeALFu4;
 typedef enum gpeALF: I8
 {
 	gpeALF_null = 0,
