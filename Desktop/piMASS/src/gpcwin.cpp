@@ -268,9 +268,12 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 			}
 
-
-			if( pSDLrndr ? NULL : pSDLwin )
+			if( pSDLrndr)
+				SDL_RenderPresent( pSDLrndr );
+			else if( pSDLwin )
+				//if( pSDLrndr ? NULL : pSDLwin )
 				SDL_UpdateWindowSurface( pSDLwin );
+
 
 			*gppKEYbuff = 0;
 			U1 iRDY = 0x10;
@@ -377,8 +380,9 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 				//cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
 			}
-			if( pSDLrndr)
-				SDL_RenderPresent( pSDLrndr );
+			/*if( pSDLrndr)
+				SDL_RenderPresent( pSDLrndr );*/
+
 			//SDL_UpdateWindowSurface( pSDLwin );
 			//cout << "s" << SDL_GetTicks() << endl;
 		}

@@ -733,7 +733,7 @@ public:
 
 				dstPX.y *= dstPX.h;
 				dstPX.y += divPX.y;
-				crs.frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+				crs.frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXchar, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
 			}
 		}
 
@@ -751,7 +751,7 @@ public:
 		dstPX.x += divPX.x;
 		dstPX.y += divPX.y;
 
-		crs.frmDRW( dstPX, src, CRSfrm.a4x2[1], win.pSRFwin, win.pSRFchar, frmC, 0, (U1*)(crs.id == pTD->sDIV ? "EDIT" : "TARGET") );
+		crs.frmDRWtx( dstPX, src, CRSfrm.a4x2[1], win.pSDLrndr, win.pTXchar, frmC, 0, (U1*)(crs.id == pTD->sDIV ? "EDIT" : "TARGET") );
 
 	}
 };
@@ -1528,8 +1528,10 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	}
 
 	SDL_Rect src = win.chrPIC, divPX = win.wDIV( id );
+	U1x4 *pC64 = (U1x4*)&gpaC64;
+	SDL_SetRenderDrawColor( win.pSDLrndr, pC64[14].z, pC64[14].y, pC64[14].x, pC64[14].w );
 	if( bESC ) {
-		SDL_FillRect( win.pSRFwin, &divPX, gpaC64[14] ); // 0x000000AA );
+		SDL_RenderFillRect( win.pSDLrndr, &divPX); // 0x000000AA );
 		return false;
 	}
 	SDL_Rect dstPX = divPX, dst2, cWH;
@@ -1537,13 +1539,15 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	if( CRSfrm.x > 0 ) {
 		dstPX.w = (CRSfrm.x*divPX.w)/CRSfrm.z;
 		dstPX.h = divPX.h;
-		SDL_FillRect( win.pSRFwin, &dstPX, gpaC64[14] );
+		SDL_RenderFillRect( win.pSDLrndr, &dstPX );
+		//SDL_FillRect( win.pSRFwin, &dstPX, gpaC64[14] );
 	}
 
 	if( CRSfrm.y > 0 ) {
 		dstPX.h = (CRSfrm.y*divPX.h)/CRSfrm.w;
 		dstPX.w = divPX.w;
-		SDL_FillRect( win.pSRFwin, &dstPX, gpaC64[14] );
+		SDL_RenderFillRect( win.pSDLrndr, &dstPX );
+		//
 	}
 
 	if( nMINI != CRSfrm.a4x2[1].area() ) {
@@ -1570,7 +1574,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	if( win.pPICbg ? win.pPICbg->surDRWtx(win.pSDLrndr) : NULL )
 		gpdBLTstx( win.pPICbg->surDRWtx(win.pSDLrndr), &win.pPICbg->xyOUT.xyWH, win.pSDLrndr, &dstPX );
 	else
-		SDL_FillRect( win.pSRFwin, &dstPX, gpaC64[6] );
+		SDL_RenderFillRect( win.pSDLrndr, &dstPX );
+		//
 
 	dstPX.w = divPX.w/CRSfrm.z;	// cél karakter szélessége pix-be
 	dstPX.h = divPX.h/CRSfrm.w;	// cél karakter magassága pix-be
@@ -1602,9 +1607,6 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	I4x2 wh;
 
 	if( frmC ) {
-
-
-
 		/// SEL -----------------------------------------------------
 		if( gpcMAP* pMAP = win.piMASS ? &win.piMASS->mapCR : NULL )
 		{
@@ -1657,7 +1659,6 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 			}
 
 			//U4
-
 			if( !win.apCRS[eDIV]->selANIN[0].a4x2[0].x  ) //? win.apCRS[eDIV]->selANIN[0].a4x2[0] == win.apCRS[eDIV]->selANIN[1].a4x2[0] : true )
 			{
 				for( i = 0; i < ie; i++ )
