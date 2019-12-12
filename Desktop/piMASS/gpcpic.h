@@ -141,14 +141,36 @@ public:
 			pS = pSHR;
 		else if( pSRF )
 			pS = pSRF;
-		if( pS == pREF )
+
+		if( pREF == pS )
 			return pTX;
 
-		SDL_DestroyTexture(pTX);
+		int w = 0, h = 0, acc = 0;
+		U4 frm;
 		pREF = pS;
-		if( !pREF )
-			return NULL;
 
+		if( pREF ? pTX : NULL )
+		{
+			SDL_QueryTexture( pTX, &frm, &acc, &w, &h );
+			if( (pREF->format ? pREF->format->format : 0)  != frm || pREF->w != w || pREF->h != h || acc != SDL_TEXTUREACCESS_STREAMING )
+			{
+				SDL_DestroyTexture(pTX);
+
+				pTX = SDL_CreateTexture( pRNDR, pREF->format->format, SDL_TEXTUREACCESS_STREAMING, pREF->w, pREF->h );
+
+			}
+			if( pTX )
+			{
+				void* pLOCK;
+				int pitch;
+				if( SDL_LockTexture( pTX, NULL, &pLOCK, &pitch ) )
+					return pTX;
+
+				memcpy( pLOCK, pREF->pixels, pitch*pREF->h );
+				SDL_UnlockTexture(pTX);
+			}
+			return pTX;
+		}
 
 		return pTX = SDL_CreateTextureFromSurface( pRNDR, pREF );
 	}
