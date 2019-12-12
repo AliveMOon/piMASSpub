@@ -137,8 +137,12 @@ void call_cam( gpcTHRD_CAM* pTC )
 		cam.grab();
 		if( !pPIX )
 			continue;
-
+		#ifdef gpdSYSpi
 		pDAT = cam.getImageBufferData();
+		#else
+		pDAT = NULL;
+		#endif
+
 		if( pDAT )
 		{
 			memcpy( pPIX, pDAT, p*h );

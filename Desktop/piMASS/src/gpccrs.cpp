@@ -397,6 +397,9 @@ U4 gpaC64[] = {
 	0xff777777, 0xffaaff66,	// szürk, vil.zöld
 	0xff0088ff, 0xffbbbbbb, // vil.kék, vil szürk
 };
+U1 gpaCLR2C64[] = {
+	0, 2, 5, 6, 4, 10, 13, 14, 9, 8, 7, 3, 11, 12, 15, 1,
+};
 class gpcTHRD_DRW
 {
 public:
@@ -1529,7 +1532,9 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 	SDL_Rect src = win.chrPIC, divPX = win.wDIV( id );
 	U1x4 *pC64 = (U1x4*)&gpaC64;
-	SDL_SetRenderDrawColor( win.pSDLrndr, pC64[14].z, pC64[14].y, pC64[14].x, pC64[14].w );
+
+	U1 color = gpaCLR2C64[gpeCLR_blue2];
+	SDL_SetRenderDrawColor( win.pSDLrndr, pC64[color].z, pC64[color].y, pC64[color].x, pC64[color].w );
 	if( bESC ) {
 		SDL_RenderFillRect( win.pSDLrndr, &divPX); // 0x000000AA );
 		return false;
@@ -1571,6 +1576,9 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	dstPX.h -= dstPX.y;
 	dstPX.x += divPX.x;
 	dstPX.y += divPX.y;
+
+	color = gpaCLR2C64[gpeCLR_blue];
+	SDL_SetRenderDrawColor( win.pSDLrndr, pC64[color].z, pC64[color].y, pC64[color].x, pC64[color].w );
 	if( win.pPICbg ? win.pPICbg->surDRWtx(win.pSDLrndr) : NULL )
 		gpdBLTstx( win.pPICbg->surDRWtx(win.pSDLrndr), &win.pPICbg->xyOUT.xyWH, win.pSDLrndr, &dstPX );
 	else
