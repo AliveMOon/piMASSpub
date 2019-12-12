@@ -141,8 +141,9 @@ void call_cam( gpcTHRD_CAM* pTC )
 		pDAT = cam.getImageBufferData();
 		if( pDAT )
 		{
-			for( U4 i = p*(iCNT&1); i < e; i += p2 )
-				memcpy( pPIX+i, pDAT+i, p );
+			memcpy( pPIX, pDAT, p*h );
+			/*for( U4 i = p*(iCNT&1); i < e; i += p2 )
+				memcpy( pPIX+i, pDAT+i, p );*/
 			iCNT++;
 			continue;
 		}
@@ -177,16 +178,17 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 
 	if( bT )
 	{
+		pREF = NULL;
 		iQC = qc+gpdRPI_tOUT;
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 
 	nPIX = pC->cam.getImageTypeSize(
-                            #ifdef gpdSYSpi
-                                raspicam::RASPICAM_FORMAT_RGB
-							#else
-                                RASPICAM_FORMAT_RGB
-							#endif
+								#ifdef gpdSYSpi
+									raspicam::RASPICAM_FORMAT_RGB
+								#else
+									RASPICAM_FORMAT_RGB
+								#endif
 							 );
 	xyOUT.a4x2[1] = I4x2( pC->cam.getWidth(), pC->cam.getHeight() );
 

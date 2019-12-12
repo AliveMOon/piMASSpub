@@ -117,11 +117,15 @@
 	#define gpdRPI_tOUT		1000/20
 	#define gpdJDOIT_tOUT	3
 	#define gpdSYNmSEC		333
-	#define gpdRECVn 		(0x30000/0x8) 	//0x4000*4	//	(0x30000/0x10)
+	#define gpdRECVn 		(0x30000/0x4) 	//0x4000*4	//	(0x30000/0x10)
 	#define gpdHUDn			(gpdRECVn/0x4)
 #endif
 
+#define gpdBLT 	SDL_BlitSurface //SDL_BlitSurface	//SDL_LowerBlit
+#define gpdBLTs	SDL_BlitScaled 	//SDL_SoftStretch //SDL_BlitScaled	//SDL_LowerBlitScaled
 
+#define gpdBLTstx( st, sxy, dt, dxy ) 	SDL_RenderCopy( dt, st, sxy,  dxy ) 	//SDL_SoftStretch //SDL_BlitScaled	//SDL_LowerBlitScaled
+#define gpdBLTtx( st, sxy, dt, dxy )  	SDL_RenderCopy( dt, st, sxy,  dxy )  //SDL_BlitSurface	//SDL_LowerBlit
 
 
 #define gpdGT_LIST_tOUT 3
@@ -205,7 +209,7 @@ class gpcMASS;
 
 //#define gpm_bool( b, p ) if( b ){ (p) }
 
-#define gpdGT_NoDALEY 0 // 1
+#define gpdGT_NoDALEY 1 	//0 //
 #define INVALID_SOCKET  (SOCKET)(~0)
 #define SOCKET_ERROR            (-1)
 

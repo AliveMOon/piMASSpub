@@ -201,6 +201,9 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	if( pSRFchar != pSRFload )
 		gpmSDL_FreeSRF( pSRFload );
 
+	pTXchar = SDL_CreateTextureFromSurface( pSDLrndr, pSRFchar );
+	if( !pTXchar )
+		cout << SDL_GetError() << endl;
 	chrPIC.x = 8*4;
 	chrPIC.y = 32*4;
 	chrPIC.w = pSRFchar->w/chrPIC.x;
@@ -264,7 +267,9 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				}
 
 			}
-			if( pSDLwin )
+
+
+			if( pSDLrndr ? NULL : pSDLwin )
 				SDL_UpdateWindowSurface( pSDLwin );
 
 			*gppKEYbuff = 0;
@@ -306,7 +311,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 								pS = pE+1;
 								crs.CRSstpCL( *this, *piMASS, 3, bSHIFT );
-							} break;
+							} break;if( pSDLrndr)
 							case '\r':
 							case '\n': {
 								if( crs.CRSbEDget() )
@@ -366,9 +371,14 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				if( crs.id != i )
 					apCRS[i]->miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
 
-				apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
+				if( pSDLrndr)
+					apCRS[i]->miniDRWtx( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
+				else
+					apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 				//cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
 			}
+			if( pSDLrndr)
+				SDL_RenderPresent( pSDLrndr );
 			//SDL_UpdateWindowSurface( pSDLwin );
 			//cout << "s" << SDL_GetTicks() << endl;
 		}

@@ -101,7 +101,8 @@ public:
 	U1				sFILE[gpdMAX_PATH], *pFILE;
 	gpcLZY			*pPACK;
 	U4				id, iSRC, iQC, nPIXall, nPIX, bppS, nPKavg;
-	SDL_Surface		*pSRF, *pSHR;
+	SDL_Surface		*pSRF, *pSHR, *pREF;
+	SDL_Texture		*pTX;
 	I4x4			xyOUT, xySRC;
 	gpcPIC			*pSRC;
 	bool			bT;
@@ -132,6 +133,24 @@ public:
 		if( pSRF )
 			return pSRF;
 		return NULL;
+	}
+	SDL_Texture* surDRWtx( SDL_Renderer* pRNDR )
+	{
+		SDL_Surface* pS = pREF;
+		if( pSHR )
+			pS = pSHR;
+		else if( pSRF )
+			pS = pSRF;
+		if( pS == pREF )
+			return pTX;
+
+		SDL_DestroyTexture(pTX);
+		pREF = pS;
+		if( !pREF )
+			return NULL;
+
+
+		return pTX = SDL_CreateTextureFromSurface( pRNDR, pREF );
 	}
 };
 

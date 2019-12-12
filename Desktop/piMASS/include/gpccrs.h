@@ -96,6 +96,7 @@ class gpcCRS
 		bool	miniOFF( void );
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
 		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
+		bool	miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH, U1 src = 4 );
@@ -106,6 +107,154 @@ class gpcCRS
 		I4x4& gtFRM()
 		{
 			return CRSfrm;
+		}
+		void frmDRWtx( 	SDL_Rect dst, SDL_Rect src,
+						I4x2 wh, SDL_Renderer* pTRG, SDL_Texture* pCHAR,
+						U1 frmC, U4 x, const U1* pSTR ) {
+			if( this ? !frmC : true )
+				return;
+			bool bHALF = false;
+			if( x )
+			{
+				dst.w *= x;
+				dst.h *= x;
+			} else {
+				x = 1;
+				bHALF = true;
+			}
+			wh /= x;
+			U4 nSTR = pSTR ? strlen( (char*)pSTR ) : 0;
+			SDL_Rect dst2;
+			U4	cx = src.w*8,
+				cy = src.h*32,
+				scx = (frmC&3)*cx,
+				scy = (frmC>>2)*cy,
+				c = 1+0xb0;
+
+
+			src.x = (c&7)*src.w + scx;
+			src.y = (c>>3)*src.h + scy;
+
+			if( wh.x > (2+nSTR) )
+			{
+				dst2 = dst;
+
+				dst2.x += (nSTR+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
+				dst2.w *= wh.x - (2+nSTR);
+				gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+			}
+
+			if( nSTR )
+			{
+				if( bHALF )
+				{
+					for( U4 i = 0; i < nSTR; i++ )
+					{
+						c = pSTR[i] - ' ';
+						src.x = (c&7)*src.w + scx;
+						src.y = (c>>3)*src.h + scy;
+						dst2 = dst;
+
+						dst2.w /= 2;
+						dst2.h /= 2;
+
+						dst2.x += (i+3)*(dst.w/2);	// (i%CRSfrm.z)*dst.w + div.x;
+						if( dst2.y > (dst.h/4) )
+							dst2.y -= (dst.h/4);
+						gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+					}
+				}
+                else for( U4 i = 0; i < nSTR; i++ )
+                {
+					c = pSTR[i] - ' ';
+					src.x = (c&7)*src.w + scx;
+					src.y = (c>>3)*src.h + scy;
+					dst2 = dst;
+					dst2.x += (i+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
+
+					gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+                }
+			}
+
+
+			c = 3+0xb0;
+			src.x = (c&7)*src.w + scx;
+			src.y = (c>>3)*src.h + scy;
+
+			dst2 = dst;
+
+			dst2.x += (wh.x-1)*dst2.w;
+			gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+
+
+			if( wh.y > 2 )
+			{
+				c = 2+0xb0;
+				src.x = (c&7)*src.w + scx;
+				src.y = (c>>3)*src.h + scy;
+
+				dst2 = dst;
+
+				dst2.x += (wh.x-1)*dst.w;
+				dst2.y += dst.h;
+				dst2.h *= wh.y-2;
+				gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+
+				c = 0x8+0xb0;
+				src.x = (c&7)*src.w + scx;
+				src.y = (c>>3)*src.h + scy;
+
+				dst2 = dst;
+
+				dst2.y += dst.h;
+				dst2.h *= wh.y-2;
+				gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+			}
+
+
+			c = 6+0xb0;
+			src.x = (c&7)*src.w + scx;
+			src.y = (c>>3)*src.h + scy;
+
+			dst2 = dst;
+
+			dst2.x += (wh.x-1)*dst.w;
+			dst2.y += (wh.y-1)*dst.h;
+			gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+
+
+			if( wh.x > 2 )
+			{
+				c = 4+0xb0;
+				src.x = (c&7)*src.w + scx;
+				src.y = (c>>3)*src.h + scy;
+
+				dst2 = dst;
+
+				dst2.x += dst.w;
+				dst2.y += (wh.y-1)*dst.h;
+				dst2.w *= wh.x-2;
+				gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+			}
+
+
+			c = 0xc+0xb0;
+			src.x = (c&7)*src.w + scx;
+			src.y = (c>>3)*src.h + scy;
+
+			dst2 = dst;
+			dst2.y += (wh.y-1)*dst.h;
+
+			gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+
+			c = 0x9+0xb0;
+			src.x = (c&7)*src.w + scx;
+			src.y = (c>>3)*src.h + scy;
+
+			dst2 = dst;
+
+			gpdBLTstx( pCHAR, &src, pTRG, &dst2 );
+
 		}
 		void frmDRW( 	SDL_Rect dst, SDL_Rect src,
 						I4x2 wh, SDL_Surface* pTRG, SDL_Surface* pCHAR,
@@ -140,7 +289,7 @@ class gpcCRS
 
 				dst2.x += (nSTR+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
 				dst2.w *= wh.x - (2+nSTR);
-				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+				gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 			}
 
 			if( nSTR )
@@ -160,7 +309,7 @@ class gpcCRS
 						dst2.x += (i+3)*(dst.w/2);	// (i%CRSfrm.z)*dst.w + div.x;
 						if( dst2.y > (dst.h/4) )
 							dst2.y -= (dst.h/4);
-						SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+						gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 					}
 				}
                 else for( U4 i = 0; i < nSTR; i++ )
@@ -171,7 +320,7 @@ class gpcCRS
 					dst2 = dst;
 					dst2.x += (i+1)*dst.w;	// (i%CRSfrm.z)*dst.w + div.x;
 
-					SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+					gpdBLTs( pCHAR, &src, pTRG, &dst2 );
                 }
 			}
 
@@ -183,7 +332,7 @@ class gpcCRS
 			dst2 = dst;
 
 			dst2.x += (wh.x-1)*dst2.w;
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+			gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 
 
 			if( wh.y > 2 )
@@ -197,7 +346,7 @@ class gpcCRS
 				dst2.x += (wh.x-1)*dst.w;
 				dst2.y += dst.h;
 				dst2.h *= wh.y-2;
-				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+				gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 
 				c = 0x8+0xb0;
 				src.x = (c&7)*src.w + scx;
@@ -207,7 +356,7 @@ class gpcCRS
 
 				dst2.y += dst.h;
 				dst2.h *= wh.y-2;
-				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+				gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 			}
 
 
@@ -219,7 +368,7 @@ class gpcCRS
 
 			dst2.x += (wh.x-1)*dst.w;
 			dst2.y += (wh.y-1)*dst.h;
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+			gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 
 
 			if( wh.x > 2 )
@@ -233,7 +382,7 @@ class gpcCRS
 				dst2.x += dst.w;
 				dst2.y += (wh.y-1)*dst.h;
 				dst2.w *= wh.x-2;
-				SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+				gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 			}
 
 
@@ -244,7 +393,7 @@ class gpcCRS
 			dst2 = dst;
 			dst2.y += (wh.y-1)*dst.h;
 
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+			gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 
 			c = 0x9+0xb0;
 			src.x = (c&7)*src.w + scx;
@@ -252,7 +401,7 @@ class gpcCRS
 
 			dst2 = dst;
 
-			SDL_BlitScaled( pCHAR, &src, pTRG, &dst2 );
+			gpdBLTs( pCHAR, &src, pTRG, &dst2 );
 
 		}
 	protected:

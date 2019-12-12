@@ -582,7 +582,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 										break;
                                 }
 
-								SDL_BlitScaled( pSPR->surDRW(), &sprt[0].xyWH, pTRG->pSRF, &sprt[1].xyWH );
+								gpdBLTs( pSPR->surDRW(), &sprt[0].xyWH, pTRG->pSRF, &sprt[1].xyWH );
+								pTRG->pREF = NULL;
 								//SDL_UpdateWindowSurface( win.pSDLwin );
 							} break;
 						case gpeALF_SSX:
@@ -717,7 +718,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 												if( SDL_Surface* pSURF = win.pSRFsnd )
 												{
-													SDL_BlitScaled(
+													gpdBLTs(
 																		win.pSRFwin,	&src.xyWH,
 																		pSURF,			&dst.xyWH
 																	);
