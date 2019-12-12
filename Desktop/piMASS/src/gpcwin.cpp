@@ -173,6 +173,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	piMASS = piM;
 	SDL_DisplayMode sdlDM;
 	SDL_GetCurrentDisplayMode( 0, &sdlDM );
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1" );
 	winSIZ.z = (sdlDM.w*7)/8;
 	winSIZ.w = sdlDM.h-64;
 	winSIZ.a4x2[0] = winSIZ.a4x2[1];
@@ -204,6 +205,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	pTXchar = SDL_CreateTextureFromSurface( pSDLrndr, pSRFchar );
 	if( !pTXchar )
 		cout << SDL_GetError() << endl;
+
 	chrPIC.x = 8*4;
 	chrPIC.y = 32*4;
 	chrPIC.w = pSRFchar->w/chrPIC.x;

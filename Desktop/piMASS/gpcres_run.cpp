@@ -718,6 +718,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 												if( SDL_Surface* pSURF = win.pSRFsnd )
 												{
+
 													gpdBLTs(
 																		win.pSRFwin,	&src.xyWH,
 																		pSURF,			&dst.xyWH
