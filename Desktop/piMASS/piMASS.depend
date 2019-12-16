@@ -20,7 +20,7 @@
 1576180851 /home/pi/Desktop/piMASS//gpcpic.h
 	"piMASS.h"
 
-1576485249 /home/pi/Desktop/piMASS//piMASS.h
+1576493477 /home/pi/Desktop/piMASS//piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -69,6 +69,8 @@
 	<setjmp.h>
 	<SDL.h>
 	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
 	<math.h>
 	<thread>
 	"gpcOPCD.h"
@@ -423,7 +425,7 @@
 1576180851 /home/pi/Desktop/piMASS/gpcpic.h
 	"piMASS.h"
 
-1576485249 /home/pi/Desktop/piMASS/piMASS.h
+1576493477 /home/pi/Desktop/piMASS/piMASS.h
 	"mysys.h"
 	<stdlib.h>
 	<io.h>
@@ -472,6 +474,8 @@
 	<setjmp.h>
 	<SDL.h>
 	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
 	<math.h>
 	<thread>
 	"gpcOPCD.h"
@@ -509,7 +513,7 @@
 1576055927 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
 	"gpcres.h"
 
-1576489158 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+1576492404 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
 	"gpcwin.h"
 
 1574205784 source:/home/pi/Desktop/piMASS/gpcresflt.cpp
@@ -554,4 +558,43 @@
 
 1576194723 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
 	"gpccrs.h"
+
+1551380987 /usr/include/SDL2/SDL_opengl.h
+	"SDL_config.h"
+	"gl_mangle.h"
+	<windows.h>
+	"SDL_opengl_glext.h"
+
+1551380987 /usr/include/SDL2/SDL_opengl_glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1551380987 /usr/include/SDL2/SDL_opengles2.h
+	"SDL_config.h"
+	<OpenGLES/ES2/gl.h>
+	<OpenGLES/ES2/glext.h>
+	<GLES2/gl2platform.h>
+	<GLES2/gl2.h>
+	<GLES2/gl2ext.h>
+	"SDL_opengles2_khrplatform.h"
+	"SDL_opengles2_gl2platform.h"
+	"SDL_opengles2_gl2.h"
+	"SDL_opengles2_gl2ext.h"
+
+1551380987 /usr/include/SDL2/SDL_opengles2_khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
+
+1551380987 /usr/include/SDL2/SDL_opengles2_gl2platform.h
+
+1551380987 /usr/include/SDL2/SDL_opengles2_gl2.h
+
+1551380987 /usr/include/SDL2/SDL_opengles2_gl2ext.h
 

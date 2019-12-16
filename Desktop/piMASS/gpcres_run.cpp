@@ -715,72 +715,20 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 													if( win.pSRFwin->w != src.z || win.pSRFwin->h != src.w )
 													{
 														gpmSDL_FreeSRF(win.pSRFwin);
-														win.pSRFwin = SDL_CreateRGBSurface(
-																									0, src.z, src.w, 24,
-																									rmask, gmask, bmask, amask
-																							);
+														win.pSRFwin = SDL_CreateRGBSurface( 0, src.z, src.w, 24, rmask, gmask, bmask, amask );
 													}
 
 													SDL_RenderReadPixels( win.pSDLrndr,  &src.xyWH, win.pSRFwin->format->format, win.pSRFwin->pixels, win.pSRFwin->pitch );
 
 												}
-												/*else if( SDL_Texture* pTX = win.pSDLrndr ? SDL_GetRenderTarget( win.pSDLrndr ) : NULL )
-												{
-													int //w = 0, h = 0,
-														acc = 0;
-
-													U4 frm;
-													SDL_QueryTexture( pTX, &frm, &acc, &src.z, &src.w );
-
-													dst = src;
-
-													if( win.pSRFwin )
-													if( win.pSRFwin->w != src.z || win.pSRFwin->h != src.w )
-													{
-														gpmSDL_FreeSRF(win.pSRFwin);
-													}
-
-													if( !win.pSRFwin )
-													{
-														win.pSRFwin = SDL_CreateRGBSurface(
-																								0, src.z, src.w, 24,
-																								rmask, gmask, bmask, amask
-																						);
-													}
-
-													SDL_RenderReadPixels( win.pSDLrndr,  &dst.xyWH, frm, win.pSRFwin->pixels, win.pSRFwin->pitch );
-													src.a4x2[0] = 0;
-													dst = src/2;
-													SDL_SetRenderTarget( win.pSDLrndr, NULL );
-												} else {
-													if( !win.pTXrndr )
-													{
-														win.pTXrndr = SDL_CreateTexture( win.pSDLrndr, win.pSRFwin->format->format, SDL_TEXTUREACCESS_TARGET, src.z, src.w );
-														if( !win.pTXrndr )
-														{
-															cout << "\r\n" << SDL_GetError() << endl;
-														}
-													}
-													SDL_SetRenderTarget( win.pSDLrndr, win.pTXrndr );
-
-
-												}*/
 
 												if( !win.pSRFsnd )
-												{
-													win.pSRFsnd = SDL_CreateRGBSurface(	0, dst.z, dst.w, 24,
-																						rmask, gmask, bmask, amask  );
-												}
-
+													win.pSRFsnd = SDL_CreateRGBSurface(	0, dst.z, dst.w, 24, rmask, gmask, bmask, amask  );
 
 												if( SDL_Surface* pSURF = win.pSRFsnd )
 												{
 													src.a4x2[0] = 0;
-													gpdBLTs(
-																		win.pSRFwin,	&src.xyWH,
-																		pSURF,			&dst.xyWH
-																	);
-
+													gpdBLTs( win.pSRFwin, &src.xyWH, pSURF, &dst.xyWH );
 
 													pJPGsnd = NULL; //gpfSRF2JPG( pJPGsnd, pSURF, 57 );
 													if( pJPGsnd )

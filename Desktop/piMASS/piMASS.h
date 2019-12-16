@@ -151,6 +151,8 @@
 
 #include <SDL.h>			//-lSDL2
 #include <SDL_image.h>
+#include <SDL_opengl.h>
+#include <SDL_opengles2.h>
 #include <math.h>
 #include <thread>
 
