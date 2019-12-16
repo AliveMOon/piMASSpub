@@ -936,8 +936,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 							d = w;
 							d.a4x2[1].mn( CRSfrm.a4x2[1] );
 							w.a4x2[1] -= w.a4x2[0];
-							d.a4x2[1] -= d.a4x2[0];
 							d.a4x2[0].mx(0);
+							d.a4x2[1] -= d.a4x2[0];
 							//w = d-w;
                             if( w.a4x2[0].x < 0 )
 							{
@@ -1057,8 +1057,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 							d = w;
 							d.a4x2[1].mn( CRSfrm.a4x2[1] );
 							w.a4x2[1] -= w.a4x2[0];
-							d.a4x2[1] -= d.a4x2[0];
 							d.a4x2[0].mx(0);
+							d.a4x2[1] -= d.a4x2[0];
 							//w = d-w;
                             if( w.a4x2[0].x < 0 )
 							{
@@ -1487,8 +1487,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 							d = w;
 							d.a4x2[1].mn( CRSfrm.a4x2[1] );
 							w.a4x2[1] -= w.a4x2[0];
-							d.a4x2[1] -= d.a4x2[0];
 							d.a4x2[0].mx(0);
+							d.a4x2[1] -= d.a4x2[0];
 							//w = d-w;
                             if( w.a4x2[0].x < 0 )
 							{
@@ -1608,8 +1608,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 							d = w;
 							d.a4x2[1].mn( CRSfrm.a4x2[1] );
 							w.a4x2[1] -= w.a4x2[0];
-							d.a4x2[1] -= d.a4x2[0];
 							d.a4x2[0].mx(0);
+							d.a4x2[1] -= d.a4x2[0];
 							//w = d-w;
                             if( w.a4x2[0].x < 0 )
 								s.x -= (w.a4x2[0].x*s.z) / w.a4x2[1].x;
