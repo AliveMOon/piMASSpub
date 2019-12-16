@@ -1986,6 +1986,38 @@ public:
 		}
 		return *this;
 	}
+
+	I4x2 operator * ( int b ) const
+	{
+		if( !b )
+			return 0;
+		if( b == 1 )
+			return *this;
+		if( b == -1 )
+			return I4x2( -x, -y );
+
+		return I4x2( x*b, y*b );
+	}
+	I4x2 operator / ( int b ) const
+	{
+		if( !b )
+			return I4x2( 0x7fffffff, 0x7fffffff );
+		if( b == 1 )
+			return *this;
+		if( b == -1 )
+			return I4x2( -x, -y );
+
+		return I4x2( x/b, y/b );
+	}
+	I4x2 operator % ( int b ) const
+	{
+		if( ( b > 0 ? b : -b ) < 2 )
+			return 0;
+
+		return I4x2( x%b, y%b );
+	}
+
+
 	I8 operator * (const I4x2& b) const
 	{
 		return (I8)x*b.x + (I8)y * b.y;
@@ -1998,6 +2030,9 @@ public:
 	{
 		return I4x2( x*b.x,  y*b.y );
 	}
+
+
+
 
 	I4x2 operator % (const I4x2& b) const
 	{
@@ -2409,8 +2444,18 @@ public:
 		return I4x4( x-b.x, y-b.y, z-b.z, w-b.w );
 	}
 
-
-
+	I4x4 operator * ( int b ) const
+	{
+		return I4x4( a4x2[0]*b, a4x2[1]*b );
+	}
+	I4x4 operator / ( int b ) const
+	{
+		return I4x4( a4x2[0]/b, a4x2[1]/b );
+	}
+	I4x4 operator % ( int b ) const
+	{
+		return I4x4( a4x2[0]%b, a4x2[1]%b );
+	}
 
 	U8 operator * (const I4x2& b) const
 	{

@@ -35,7 +35,9 @@ class gpcWIN
 
 		SDL_Window		*pSDLwin;
 		SDL_Renderer	*pSDLrndr;
-		SDL_Texture		*pTXchar;
+		SDL_Texture		*pTXrndr,
+						*pTXsnd,
+						*pTXchar;
 
 		SDL_Surface		*pSRFload,
 						*pSRFchar,
