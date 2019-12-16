@@ -485,7 +485,7 @@
 	"gpcgt.h"
 	"gpcOPCD.h"
 
-1576067776 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
+1576501790 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
 	"gpcgt.h"
 	"gpcwin.h"
 
@@ -556,7 +556,7 @@
 1574536898 source:/home/pi/Desktop/piMASS/src/gpcPROTO.cpp
 	"gpcSRC.h"
 
-1576194723 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
+1576493477 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
 	"gpccrs.h"
 
 1551380987 /usr/include/SDL2/SDL_opengl.h

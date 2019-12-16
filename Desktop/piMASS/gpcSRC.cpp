@@ -70,7 +70,11 @@ gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 nADD )
 	if( *pB == '\a' )
 		pS++;											//...\aA..B\aS
 	nL = gpfVAN( pS, (U1*)"\a", anLEN[1] );
-	if( !pS[nL] )
+	if( pS+nL >= pSe )
+	{
+		nL = pSe-pS;
+		pS = pSe;
+	} else if( !pS[nL] )
 		pS+=nL;											//...\aA..B\a... . .   . . ...S0
 	else if( pS[nL] != '\a' )
 		pS += gpfVAN( pS, (U1*)"\a", anLEN[1], true );	//...\aA..B\a... . .   . . ...S?

@@ -166,11 +166,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 			case gpeNET4_0SRC:{
 					U4* pZN = (U4*)pDAT;
-					U1* pA = (U1*)(pZN+1);
-					U4 nA = syn.nB()-(pA-(U1*)&syn);
+					U1* pS = (U1*)(pZN+1);
+					U4 nS = syn.nB()-(pS-(U1*)&syn);
                     I4x2 an( ((U2)*pZN+1), (*pZN)>>0x10 );
 					gpcSRC	tmp,
-							*pSRC = pWIN->piMASS->SRCnew( tmp, pA, an, socket, nA );
+							*pSRC = pWIN->piMASS->SRCnew( tmp, pS, an, socket, nS );
 					if( !pSRC )
 						break;
 
