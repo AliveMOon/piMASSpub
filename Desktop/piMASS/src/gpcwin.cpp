@@ -171,27 +171,22 @@ SDL_Rect gpcWIN::wDIV( U1 iDIV )
 }
 char gpsSHDRvx[] =
 	"#version 120\n"
-	"#define in varying\n"
-	"#define out varying\n"
-	"in vec2 v_vx;\n"
-	"out vec2 v_uv;\n"
-	"void main() {\n"
-	//"\tgl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-	//"\tgl_Position = gl_Vertex;\n"
+	"attribute vec2 v_vx;\n"
+	"varying vec2 v_uv;\n"
+	"void main()\n"
+	"{\n"
 	"\tgl_Position = vec4( v_vx.xy, 0.125f, 1.0f );\n"
-	//"\tgl_Position = vec4( 0.0, 0.0, 0.0f, 1.0f );\n"
 	"\tv_uv = v_vx.xy;\n"
-	"}\n";
+	"}\n\0";
 char gpsSHDRfr[] =
 	"#version 120\n"
-	"#define in varying\n"
-	"in vec2 v_uv;\n"
+	"varying vec2 v_uv;\n"
 	//"uniform sampler2D renderedTexture;\n"
 	"void main()\n"
 	"{\n"
 	"\tgl_FragColor = vec4( v_uv, 1.0, 1.0 );\n"
 	//"\tgl_FragColor = texture2D( renderedTexture, UV );\n"
-	"}\n";
+	"}\n\0";
 //VBO data
 GLfloat aVxD[] =
 {
@@ -225,13 +220,14 @@ gpcGL::gpcGL( gpcWIN& win )
 		return;
 	}
 
-	gVxSucc = GL_FALSE;
-	gProgID = glCreateProgram();
-
 	pTXback = SDL_CreateTexture(
 									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 									win.winSIZ.z, win.winSIZ.w
 								);
+
+	gVxSucc = GL_FALSE;
+
+
 
 }
 
@@ -309,10 +305,12 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 		return;
 
 	pGL->FrScmp( gpsSHDRfr );
-	if( pGL->gVxSucc != GL_TRUE )
+	if( pGL->gFrSucc != GL_TRUE )
 		return;
 
 	pGL->VxFrLink();
+	if( pGL->gPrgSucc != GL_TRUE )
+		return;
 
 	pGL->VBOnew( aVxD, gpmN(aVxD)/2, 2 );
 	pGL->IBOnew( aIxD, gpmN(aIxD) );

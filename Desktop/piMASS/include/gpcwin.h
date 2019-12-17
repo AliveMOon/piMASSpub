@@ -28,11 +28,12 @@ public:
 			v_vxID,
 			gVxSucc,
 			gFrSucc,
+			gPrgSucc,
 			gSucc;
 	GLuint	tmpID,
 			gProgID,
-			gVxS,
-			gFrS,
+			gVxSID,
+			gFrSID,
 			gVBO,
 			gIBO;
 
@@ -55,11 +56,11 @@ public:
 	{
 		U8 s = -1, nS = gpmSTRLEN(pS);
 		if( !nS )
-			return gVxS;
+			return gVxSID;
 
 		if( VxSsrc.n_load ? VxSsrc.n_load == nS : false )
 		if( gpmMEMCMP( VxSsrc.p_alloc, pS, VxSsrc.n_load ) == VxSsrc.n_load )
-				return gVxS;
+				return gVxSID;
 
 		//VxSlog.lzyRST();
 		//VxSsrc.lzyRST();
@@ -94,27 +95,30 @@ public:
 
 			//Deallocate string
 			//delete[] infoLog;
-			return gVxS;
+			return gVxSID;
 		}
 
 		//VxSsrc.lzyRST();
 		VxSsrc.lzyINS( (U1*)pS, nS, s = 0, -1 );
-		glDetachShader( gProgID, gVxS );
-		glDeleteShader( gVxS );
+		if( gVxSID )
+		{
+			glDetachShader( gProgID, gVxSID );
+			glDeleteShader( gVxSID );
+		}
 		gVxSucc = gSucc;
-		gVxS = tmpID;
-		return gVxS;
+		gVxSID = tmpID;
+		return gVxSID;
 
 	}
 	GLuint FrScmp( const char* pS )
 	{
 		U8 s = -1, nS = gpmSTRLEN(pS);
 		if( !nS )
-			return gVxS;
+			return gFrSID;
 
 		if( frSsrc.n_load ? frSsrc.n_load == nS : false )
 		if( gpmMEMCMP( frSsrc.p_alloc, pS, frSsrc.n_load ) == frSsrc.n_load )
-				return gFrS;
+				return gFrSID;
 
 		//FrSlog.lzyRST();
 		//frSsrc.lzyRST();
@@ -149,29 +153,33 @@ public:
 
 			//Deallocate string
 			//delete[] infoLog;
-			return gFrS;
+			return gFrSID;
 		}
 
 		//frSsrc.lzyRST();
 		frSsrc.lzyINS( (U1*)pS, nS, s = 0, -1 );
-		glDetachShader( gProgID, gFrS );
-		glDeleteShader( gFrS );
+		if( gFrSID )
+		{
+			glDetachShader( gProgID, gFrSID );
+			glDeleteShader( gFrSID );
+		}
 		gFrSucc = gSucc;
-		gFrS = tmpID;
-		return gFrS;
+		gFrSID = tmpID;
+		return gFrSID;
 
 	}
 
 	GLuint VxFrLink( )
 	{
 		U8 s;
-		glAttachShader( gProgID, gVxS );
-		glAttachShader( gProgID, gFrS );
+		gProgID = glCreateProgram();
+		glAttachShader( gProgID, gVxSID );
+		glAttachShader( gProgID, gFrSID );
 		glLinkProgram( gProgID );
 
 
 		gSucc = GL_FALSE;
-		glGetProgramiv( gProgID, GL_COMPILE_STATUS, &gSucc );
+		glGetProgramiv( gProgID, GL_LINK_STATUS, &gSucc );
 		if( gSucc != GL_TRUE )
 		{
 			int infoLogLength = 0;
@@ -197,11 +205,13 @@ public:
 			}
 			return -1;
 		}
-		v_vxID = glGetAttribLocation(gProgID, "v_vx");
+
+		v_vxID = glGetAttribLocation( gProgID, "v_vx" );
 		if( v_vxID < 0 )
 		{
 			return gProgID;
 		}
+		gPrgSucc = GL_TRUE;
 		return gProgID;
 
 	}
