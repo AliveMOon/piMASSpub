@@ -21,7 +21,242 @@ public:
 };
 
 #define gpdNdiv gpmN(apCRS)
+class gpcWINgl
+{
+public:
+	GLint	gVxPos2Loc,
+			gVxSucc,
+			gFrSucc,
+			gSucc;
+	GLuint	tmpID,
+			gProgID,
+			gVxS,
+			gFrS,
+			gVBO,
+			gIBO;
 
+	SDL_GLContext	gCntxt;
+	GLenum			glewErr;
+
+	gpcLZY	VxSlog,
+			VxSsrc,
+			FrSlog,
+			frSsrc,
+			Lnklog;
+
+	gpcWINgl( gpcWIN& win );
+
+
+	GLuint VxScmp( const char* pS )
+	{
+		U8 s = -1, nS = gpmSTRLEN(pS);
+		if( !nS )
+			return gVxS;
+
+		if( VxSsrc.n_load ? VxSsrc.n_load == nS : false )
+		if( gpmMEMCMP( VxSsrc.p_alloc, pS, VxSsrc.n_load ) == VxSsrc.n_load )
+				return gVxS;
+
+		//VxSlog.lzyRST();
+		//VxSsrc.lzyRST();
+
+		tmpID = glCreateShader( GL_VERTEX_SHADER );
+		glShaderSource( tmpID, 1, &pS, NULL );
+		glCompileShader( tmpID );
+		gSucc = GL_FALSE;
+		glGetShaderiv( tmpID, GL_COMPILE_STATUS, &gSucc );
+		if( gSucc != GL_TRUE )
+		{
+			int infoLogLength = 0;
+			int maxLength = infoLogLength;
+
+			//Get info string length
+			glGetShaderiv( tmpID, GL_INFO_LOG_LENGTH, &maxLength );
+
+			//Allocate string
+			if( maxLength )
+			{
+				VxSlog.lzyADD( NULL, maxLength, s, -1 );
+				//char* infoLog = new char[ maxLength ];
+
+				//Get info log
+				glGetShaderInfoLog( tmpID, maxLength, &infoLogLength, (char*)(VxSlog.p_alloc+s) );
+				if( infoLogLength > 0 )
+				{
+					VxSlog.n_load = s+infoLogLength;
+				} else
+					VxSlog.n_load = s;
+			}
+
+			//Deallocate string
+			//delete[] infoLog;
+			return gVxS;
+		}
+
+		//VxSsrc.lzyRST();
+		VxSsrc.lzyINS( (U1*)pS, nS, s = 0, -1 );
+		glDetachShader( gProgID, gVxS );
+		glDeleteShader( gVxS );
+		gVxSucc = gSucc;
+		gVxS = tmpID;
+		return gVxS;
+
+	}
+	GLuint FrScmp( const char* pS )
+	{
+		U8 s = -1, nS = gpmSTRLEN(pS);
+		if( !nS )
+			return gVxS;
+
+		if( frSsrc.n_load ? frSsrc.n_load == nS : false )
+		if( gpmMEMCMP( frSsrc.p_alloc, pS, frSsrc.n_load ) == frSsrc.n_load )
+				return gFrS;
+
+		//FrSlog.lzyRST();
+		//frSsrc.lzyRST();
+
+		tmpID = glCreateShader( GL_FRAGMENT_SHADER );
+		glShaderSource( tmpID, 1, &pS, NULL );
+		glCompileShader( tmpID );
+		gSucc = GL_FALSE;
+		glGetShaderiv( tmpID, GL_COMPILE_STATUS, &gSucc );
+		if( gSucc != GL_TRUE )
+		{
+			int infoLogLength = 0;
+			int maxLength = infoLogLength;
+
+			//Get info string length
+			glGetShaderiv( tmpID, GL_INFO_LOG_LENGTH, &maxLength );
+
+			//Allocate string
+			if( maxLength )
+			{
+				FrSlog.lzyADD( NULL, maxLength, s, -1 );
+				//char* infoLog = new char[ maxLength ];
+
+				//Get info log
+				glGetShaderInfoLog( tmpID, maxLength, &infoLogLength, (char*)(FrSlog.p_alloc+s) );
+				if( infoLogLength > 0 )
+				{
+					FrSlog.n_load = s+infoLogLength;
+				} else
+					FrSlog.n_load = s;
+			}
+
+			//Deallocate string
+			//delete[] infoLog;
+			return gFrS;
+		}
+
+		//frSsrc.lzyRST();
+		frSsrc.lzyINS( (U1*)pS, nS, s = 0, -1 );
+		glDetachShader( gProgID, gFrS );
+		glDeleteShader( gFrS );
+		gFrSucc = gSucc;
+		gFrS = tmpID;
+		return gFrS;
+
+	}
+
+	GLuint VxFrLink( )
+	{
+		U8 s;
+		glAttachShader( gProgID, gVxS );
+		glAttachShader( gProgID, gFrS );
+		glLinkProgram( gProgID );
+		gSucc = GL_FALSE;
+		glGetProgramiv( gProgID, GL_COMPILE_STATUS, &gSucc );
+		if( gSucc != GL_TRUE )
+		{
+			int infoLogLength = 0;
+			int maxLength = infoLogLength;
+
+			//Get info string length
+			glGetProgramiv( gProgID, GL_INFO_LOG_LENGTH, &maxLength );
+
+			//Allocate string
+			if( maxLength )
+			{
+				Lnklog.lzyADD( NULL, maxLength, s = -1, -1 );
+				//char* infoLog = new char[ maxLength ];
+
+				//Get info log
+				glGetProgramInfoLog( gProgID, maxLength, &infoLogLength, (char*)(Lnklog.p_alloc+s) );
+				if( infoLogLength > 0 )
+				{
+					Lnklog.n_load = s+infoLogLength;
+				} else
+					Lnklog.n_load = s;
+
+			}
+			return -1;
+		}
+		return gProgID;
+
+	}
+
+	GLuint VBOnew( GLfloat* pD, U4 nD, U4 nX )
+	{
+		//Create VBO
+		glGenBuffers( 1, &gVBO );
+		glBindBuffer( GL_ARRAY_BUFFER, gVBO );
+		glBufferData( GL_ARRAY_BUFFER, nX * nD * sizeof(*pD), pD, GL_STATIC_DRAW );
+		return gVBO;
+	}
+
+	GLuint IBOnew( GLuint* pD, U4 nD )
+	{
+		//Create IBO
+		glGenBuffers( 1, &gIBO );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, nD * sizeof(*pD), pD, GL_STATIC_DRAW );
+		return gIBO;
+	}
+
+	void rndr()
+	{
+		if(!this)
+			return;
+		//glClearColor( 0.f, 0.f, 0.f, 1.f );
+		//glClear( GL_COLOR_BUFFER_BIT );
+		GLdouble model[16],
+				 proj[16];
+
+		glGetDoublev( GL_MODELVIEW_MATRIX, model );
+		glGetDoublev( GL_PROJECTION_MATRIX, proj );
+
+		//glGetDoublev(GL_PROJECTION_MATRIX,projectionMatri x);
+
+		glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
+
+		glMatrixMode( GL_MODELVIEW );
+		glLoadIdentity();
+
+		//Bind program
+		glBegin( GL_QUADS );
+			 glVertex2f( -0.5f, -0.5f );
+            glVertex2f( 0.5f, -0.5f );
+            glVertex2f( 0.5f, 0.5f );
+            glVertex2f( -0.5f, 0.5f );
+
+/*			glUseProgram( gProgID );
+			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
+			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
+			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
+			glUseProgram( 0 );*/
+
+		glEnd();
+
+
+
+	}
+	~gpcWINgl()
+	{
+		SDL_GL_DeleteContext( gCntxt );
+	}
+
+};
 class gpcWIN
 {
 	public:
@@ -32,6 +267,8 @@ class gpcWIN
 						winSIZ,
 						mouseXY, mouseW,
 						SRCxycr, SRCin;
+
+		gpcWINgl		*pGL;
 
 		SDL_Window		*pSDLwin;
 		SDL_Renderer	*pSDLrndr;

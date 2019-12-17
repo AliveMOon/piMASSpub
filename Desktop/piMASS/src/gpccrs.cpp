@@ -624,8 +624,11 @@ public:
 		gpcCRS &crs	= *pTD->pCRS;
 		U4			nMINI 	= crs.nMINI;
 		U1x4*		pMINI	= crs.pMINI;
-		SDL_Rect	src 	= pTD->src,
-					fsrc	= src,
+		SDL_Rect	src = pTD->src;
+					//src.w--;
+					//src.h--;
+					//src.h = pTD->src.h-1; // 	= pTD->src,
+		SDL_Rect	fsrc	= src,
 					fdsrc	= src,
 					dstPX	= pTD->dstPX,
 					divPX 	= win.wDIV( crs.id );
@@ -641,8 +644,6 @@ public:
 			fscx, fscy;
 		I4x2 wh;
 		U1 	c,d,
-			//sDIV = pTD->sDIV,
-			//oDIV = pTD->oDIV,
 			sSTR[0x20];
 
 		dstPX.y = divPX.y-dstPX.h;

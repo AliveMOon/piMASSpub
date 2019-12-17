@@ -165,6 +165,60 @@ SDL_Rect gpcWIN::wDIV( U1 iDIV )
 	}
 	return div;
 }
+gpcWINgl::gpcWINgl( gpcWIN& win )
+{
+	gpmCLR;
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
+	if( !gCntxt )
+	{
+		cout << endl << "gpcWINgl init error" << endl;
+		return;
+	}
+	glewExperimental = GL_TRUE;
+	glewErr = glewInit();
+	if( glewErr != GLEW_OK )
+	{
+		cout << endl << "gpcWINgl GLEW_NOK error" << endl;
+		return;
+	}
+
+	gVxSucc = GL_FALSE;
+	gProgID = glCreateProgram();
+
+
+}
+
+char gpsSHDRvx[] =
+	"#version 120\n"
+	"#define in varying\n"
+	"in vec2 LVP2D;\n"
+	"void main() {\n"
+	"\tgl_Position = vec4( 0, 0, 0, 1 );\n"
+	"}\n";
+char gpsSHDRfr[] =
+	"#version 120\n"
+	"#define in varying\n"
+	"in vec2 UV;\n"
+	"uniform sampler2D renderedTexture;\n"
+	"void main()\n"
+	"{\n"
+	"\tgl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );\n"
+	//"\tgl_FragColor = texture2D( renderedTexture, UV );\n"
+	"}\n";
+//VBO data
+GLfloat aVxD[] =
+{
+	-0.25f, -0.25f,
+	 0.25f, -0.25f,
+	 0.25f,  0.25f,
+	-0.25f,  0.25f
+};
+
+//IBO data
+GLuint aIxD[] = { 0, 1, 2, 3 };
 
 gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* pPATH, char* pFILE )
 {
@@ -173,18 +227,28 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	piMASS = piM;
 	SDL_DisplayMode sdlDM;
 	SDL_GetCurrentDisplayMode( 0, &sdlDM );
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1" );
 	winSIZ.z = (sdlDM.w*7)/8;
 	winSIZ.w = sdlDM.h-64;
 	winSIZ.a4x2[0] = winSIZ.a4x2[1];
 
 	winDIV = winSIZ/I4x4(2,2,1,1);
-	if(
+	pSDLwin = SDL_CreateWindow(	"Custom shader with SDL2 renderer!", SDL_WINDOWPOS_CENTERED,
+								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE );
+
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+
+	pSDLrndr = SDL_CreateRenderer(	pSDLwin, -1,
+									SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+
+	/*if(
 		winID.x = SDL_CreateWindowAndRenderer(	winSIZ.z, winSIZ.w,
 												SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL,
 												&pSDLwin, &pSDLrndr ) != 0
 	)
-        throw InitError();
+        throw InitError();*/
+
+	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1" );
+
 
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
 		throw InitError();
@@ -216,6 +280,27 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 
 	pHOST = sHOST;
 	pUSER = sUSER;
+
+	pGL = new gpcWINgl( *this );
+	if( !pGL )
+		return;
+
+	pGL->VxScmp( gpsSHDRvx );
+	if( pGL->gVxSucc != GL_TRUE )
+		return;
+
+	pGL->FrScmp( gpsSHDRfr );
+	if( pGL->gVxSucc != GL_TRUE )
+		return;
+
+	pGL->VxFrLink();
+
+
+
+	pGL->VBOnew( aVxD, gpmN(aVxD)/2, 2 );
+	pGL->IBOnew( aIxD, gpmN(aIxD) );
+
+
 }
 void gpcWIN::gpeWINresize( void )
 {
@@ -271,9 +356,18 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			}
 
 			if( pSDLrndr)
+			{
 				SDL_RenderPresent( pSDLrndr );
+				if( false  ) //pGL )
+				{
+					GLint oldProgramId;
+					glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
+					pGL->rndr();
+					glUseProgram(oldProgramId);
+				}
+
+			}
 			else if( pSDLwin )
-				//if( pSDLrndr ? NULL : pSDLwin )
 				SDL_UpdateWindowSurface( pSDLwin );
 
 
@@ -382,8 +476,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 				//cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
 			}
-			/*if( pSDLrndr)
-				SDL_RenderPresent( pSDLrndr );*/
+			//if( pSDLrndr)
+			//	SDL_RenderPresent( pSDLrndr );
 
 			//SDL_UpdateWindowSurface( pSDLwin );
 			//cout << "s" << SDL_GetTicks() << endl;

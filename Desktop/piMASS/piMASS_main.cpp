@@ -578,7 +578,7 @@ int main( int nA, char *apA[] )
     try
     {
 		IMG_Init( IMG_INIT_JPG|IMG_INIT_PNG );
-		if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
+		if( SDL_Init( SDL_INIT_EVERYTHING | SDL_VIDEO_OPENGL ) != 0 )
 			throw InitError();
 
 		for( int i = 1; i < nA; i++ )
