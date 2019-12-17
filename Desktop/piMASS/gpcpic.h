@@ -154,7 +154,7 @@ public:
 			SDL_QueryTexture( pTX, &frm, &acc, &w, &h );
 			if( (pREF->format ? pREF->format->format : 0)  != frm || pREF->w != w || pREF->h != h || acc != SDL_TEXTUREACCESS_STREAMING )
 			{
-				SDL_DestroyTexture(pTX);
+				gpmSDL_FreeTX(pTX);
 
 				pTX = SDL_CreateTexture( pRNDR, pREF->format->format, SDL_TEXTUREACCESS_STREAMING, pREF->w, pREF->h );
 

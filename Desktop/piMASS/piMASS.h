@@ -107,6 +107,7 @@
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
 	#define gpmSDL_FreeSRF( h ){ if( h ){ SDL_FreeSurface( h ); h = NULL; } }
+	#define gpmSDL_FreeTX( h ){ if( h ){ SDL_DestroyTexture( h ); h = NULL; } }
 
 	#define gpdMAX_PATH PATH_MAX
 

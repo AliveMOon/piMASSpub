@@ -21,10 +21,11 @@ public:
 };
 
 #define gpdNdiv gpmN(apCRS)
-class gpcWINgl
+class gpcGL
 {
 public:
-	GLint	gVxPos2Loc,
+	GLint	//gVxPos2Loc,
+			v_vxID,
 			gVxSucc,
 			gFrSucc,
 			gSucc;
@@ -38,13 +39,16 @@ public:
 	SDL_GLContext	gCntxt;
 	GLenum			glewErr;
 
+
 	gpcLZY	VxSlog,
 			VxSsrc,
 			FrSlog,
 			frSsrc,
 			Lnklog;
 
-	gpcWINgl( gpcWIN& win );
+	SDL_Texture	*pTXback, *apTXmini[4];
+
+	gpcGL( gpcWIN& win );
 
 
 	GLuint VxScmp( const char* pS )
@@ -164,6 +168,8 @@ public:
 		glAttachShader( gProgID, gVxS );
 		glAttachShader( gProgID, gFrS );
 		glLinkProgram( gProgID );
+
+
 		gSucc = GL_FALSE;
 		glGetProgramiv( gProgID, GL_COMPILE_STATUS, &gSucc );
 		if( gSucc != GL_TRUE )
@@ -191,6 +197,11 @@ public:
 			}
 			return -1;
 		}
+		v_vxID = glGetAttribLocation(gProgID, "v_vx");
+		if( v_vxID < 0 )
+		{
+			return gProgID;
+		}
 		return gProgID;
 
 	}
@@ -213,12 +224,18 @@ public:
 		return gIBO;
 	}
 
-	void rndr()
+	void rndr( SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms )
 	{
 		if(!this)
 			return;
-		//glClearColor( 0.f, 0.f, 0.f, 1.f );
-		//glClear( GL_COLOR_BUFFER_BIT );
+		GLint oldProgramId;
+		glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
+		SDL_SetRenderTarget( pSDLrndr, NULL );
+		SDL_RenderClear( pSDLrndr );
+
+		ms = sin( ms/1000.0 )+1.0;
+		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
+		glClear( GL_COLOR_BUFFER_BIT );
 		GLdouble model[16],
 				 proj[16];
 
@@ -235,24 +252,38 @@ public:
 
 		//Bind program
 		glBegin( GL_QUADS );
-			 glVertex2f( -0.5f, -0.5f );
+		if( v_vxID < 0 )
+		{
+			glUseProgram( gProgID );
+			glVertex2f( -0.5f, -0.5f );
             glVertex2f( 0.5f, -0.5f );
             glVertex2f( 0.5f, 0.5f );
             glVertex2f( -0.5f, 0.5f );
-
-/*			glUseProgram( gProgID );
+		} else {
+			glUseProgram( gProgID );
+			glEnableVertexAttribArray( v_vxID );
 			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
+			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
 			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
-			glUseProgram( 0 );*/
 
+		}
+		glUseProgram( 0 );
 		glEnd();
 
+		SDL_GL_SwapWindow( pWIN );
 
+		if( !oldProgramId )
+			return;
 
+		glUseProgram(oldProgramId);
+		SDL_RenderClear( pSDLrndr );
 	}
-	~gpcWINgl()
+	~gpcGL()
 	{
+		gpmSDL_FreeTX( pTXback );
+		for( U4 i = 0; i < gpmN(apTXmini); i++ )
+			gpmSDL_FreeTX(apTXmini[i]);
 		SDL_GL_DeleteContext( gCntxt );
 	}
 
@@ -268,7 +299,7 @@ class gpcWIN
 						mouseXY, mouseW,
 						SRCxycr, SRCin;
 
-		gpcWINgl		*pGL;
+		gpcGL		*pGL;
 
 		SDL_Window		*pSDLwin;
 		SDL_Renderer	*pSDLrndr;

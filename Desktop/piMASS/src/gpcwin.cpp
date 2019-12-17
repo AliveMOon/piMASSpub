@@ -15,12 +15,16 @@ gpcWIN::~gpcWIN()
 		}
 		gpmDEL( apTall[i] );
 	}
+
 	gpmDEL( pSYNwin );
     gpmDEL( pSYNgt );
     if( pSRFload != pSRFchar )
 		gpmSDL_FreeSRF( pSRFload );
 	gpmSDL_FreeSRF( pSRFchar );
 	gpmSDL_FreeSRF( pSRFsnd );
+
+
+	gpmDEL(pGL);
     SDL_DestroyWindow( pSDLwin );
     SDL_DestroyRenderer( pSDLrndr );
 }
@@ -165,7 +169,43 @@ SDL_Rect gpcWIN::wDIV( U1 iDIV )
 	}
 	return div;
 }
-gpcWINgl::gpcWINgl( gpcWIN& win )
+char gpsSHDRvx[] =
+	"#version 120\n"
+	"#define in varying\n"
+	"#define out varying\n"
+	"in vec2 v_vx;\n"
+	"out vec2 v_uv;\n"
+	"void main() {\n"
+	//"\tgl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+	//"\tgl_Position = gl_Vertex;\n"
+	"\tgl_Position = vec4( v_vx.xy, 0.125f, 1.0f );\n"
+	//"\tgl_Position = vec4( 0.0, 0.0, 0.0f, 1.0f );\n"
+	"\tv_uv = v_vx.xy;\n"
+	"}\n";
+char gpsSHDRfr[] =
+	"#version 120\n"
+	"#define in varying\n"
+	"in vec2 v_uv;\n"
+	//"uniform sampler2D renderedTexture;\n"
+	"void main()\n"
+	"{\n"
+	"\tgl_FragColor = vec4( v_uv, 1.0, 1.0 );\n"
+	//"\tgl_FragColor = texture2D( renderedTexture, UV );\n"
+	"}\n";
+//VBO data
+GLfloat aVxD[] =
+{
+	-0.5f, -0.5f,
+	 0.0f, -0.5f,
+	 0.0f,  0.5f,
+	-0.5f,  0.5f,
+};
+
+//IBO data
+GLuint aIxD[] = // { 3, 2, 1, 0, };
+				{ 0, 1, 2, 3 };
+
+gpcGL::gpcGL( gpcWIN& win )
 {
 	gpmCLR;
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
@@ -174,51 +214,28 @@ gpcWINgl::gpcWINgl( gpcWIN& win )
 	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
 	if( !gCntxt )
 	{
-		cout << endl << "gpcWINgl init error" << endl;
+		cout << endl << "gpcGL init error" << endl;
 		return;
 	}
 	glewExperimental = GL_TRUE;
 	glewErr = glewInit();
 	if( glewErr != GLEW_OK )
 	{
-		cout << endl << "gpcWINgl GLEW_NOK error" << endl;
+		cout << endl << "gpcGL GLEW_NOK error" << endl;
 		return;
 	}
 
 	gVxSucc = GL_FALSE;
 	gProgID = glCreateProgram();
 
+	pTXback = SDL_CreateTexture(
+									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+									win.winSIZ.z, win.winSIZ.w
+								);
 
 }
 
-char gpsSHDRvx[] =
-	"#version 120\n"
-	"#define in varying\n"
-	"in vec2 LVP2D;\n"
-	"void main() {\n"
-	"\tgl_Position = vec4( 0, 0, 0, 1 );\n"
-	"}\n";
-char gpsSHDRfr[] =
-	"#version 120\n"
-	"#define in varying\n"
-	"in vec2 UV;\n"
-	"uniform sampler2D renderedTexture;\n"
-	"void main()\n"
-	"{\n"
-	"\tgl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );\n"
-	//"\tgl_FragColor = texture2D( renderedTexture, UV );\n"
-	"}\n";
-//VBO data
-GLfloat aVxD[] =
-{
-	-0.25f, -0.25f,
-	 0.25f, -0.25f,
-	 0.25f,  0.25f,
-	-0.25f,  0.25f
-};
 
-//IBO data
-GLuint aIxD[] = { 0, 1, 2, 3 };
 
 gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* pPATH, char* pFILE )
 {
@@ -235,7 +252,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	pSDLwin = SDL_CreateWindow(	"Custom shader with SDL2 renderer!", SDL_WINDOWPOS_CENTERED,
 								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE );
 
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+	SDL_SetHint( SDL_HINT_RENDER_DRIVER, "ope gpmSDL_FreeTX( pGL->pTXback );ngl" );
 
 	pSDLrndr = SDL_CreateRenderer(	pSDLwin, -1,
 									SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
@@ -262,7 +279,6 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 
 	pSRFload = IMG_Load( gpsMASSpath );
 	pSRFchar = pSRFload;
-
 	if( pSRFchar != pSRFload )
 		gpmSDL_FreeSRF( pSRFload );
 
@@ -281,9 +297,12 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	pHOST = sHOST;
 	pUSER = sUSER;
 
-	pGL = new gpcWINgl( *this );
-	if( !pGL )
+	pGL = true ? new gpcGL( *this ) : NULL;
+	if( pGL ? !pGL->pTXback : true )
+	{
+		gpmDEL(pGL);
 		return;
+	}
 
 	pGL->VxScmp( gpsSHDRvx );
 	if( pGL->gVxSucc != GL_TRUE )
@@ -295,11 +314,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 
 	pGL->VxFrLink();
 
-
-
 	pGL->VBOnew( aVxD, gpmN(aVxD)/2, 2 );
 	pGL->IBOnew( aIxD, gpmN(aIxD) );
-
 
 }
 void gpcWIN::gpeWINresize( void )
@@ -319,6 +335,16 @@ void gpcWIN::gpeWINresize( void )
 	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
 	winDIV = winSIZ.a4x2[0];
 	winDIV.a4x2[0] /= 2;
+
+	if( !pGL )
+		return;
+
+    gpmSDL_FreeTX( pGL->pTXback );
+    pGL->pTXback = SDL_CreateTexture( pSDLrndr, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, winSIZ.z, winSIZ.w );
+	if( pGL->pTXback )
+		return;
+
+	gpmDEL(pGL);
 
 }
 
@@ -354,19 +380,16 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				}
 
 			}
-
-			if( pSDLrndr)
+			if( pGL )
 			{
-				SDL_RenderPresent( pSDLrndr );
-				if( false  ) //pGL )
-				{
-					GLint oldProgramId;
-					glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
-					pGL->rndr();
-					glUseProgram(oldProgramId);
-				}
+
+
+				pGL->rndr( pSDLrndr, pSDLwin, mSEC.x );
+
 
 			}
+			else if( pSDLrndr)
+				SDL_RenderPresent( pSDLrndr );
 			else if( pSDLwin )
 				SDL_UpdateWindowSurface( pSDLwin );
 
