@@ -271,14 +271,14 @@ public:
 		glLoadIdentity();
 
 		//Bind program
-		glBegin( GL_QUADS );
 		if( v_vxID < 0 )
 		{
-			glUseProgram( gProgID );
-			glVertex2f( -0.5f, -0.5f );
-            glVertex2f( 0.5f, -0.5f );
-            glVertex2f( 0.5f, 0.5f );
-            glVertex2f( -0.5f, 0.5f );
+			glBegin( GL_QUADS );
+				glVertex2f( -0.5f, -0.5f );
+				glVertex2f( 0.5f, -0.5f );
+				glVertex2f( 0.5f, 0.5f );
+				glVertex2f( -0.5f, 0.5f );
+			glEnd();
 		} else {
 			glUseProgram( gProgID );
 			glEnableVertexAttribArray( v_vxID );
@@ -287,10 +287,8 @@ public:
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
 			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
 			glDisableVertexAttribArray( v_vxID );
-
+			glUseProgram( 0 );
 		}
-		glUseProgram( 0 );
-		glEnd();
 
 		SDL_GL_SwapWindow( pWIN );
 

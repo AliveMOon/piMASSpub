@@ -176,22 +176,22 @@ char gpsSHDRvx[] =
 	"void main()\n"
 	"{\n"
 	"	gl_Position = vec4( v_vx, 0.0, 1.0f );\n"
-	"	v_uv = v_vx;\n"
+	"	v_uv = (v_vx+1.0)/2.0;\n"
 	"}\n\0";
 char gpsSHDRfr[] =
 	"#version 120\n"
 	"varying vec2 v_uv;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = vec4( 1.0, v_uv, 1.0 );\n"
+	"	gl_FragColor = vec4( v_uv, 0.0, 1.0 );\n"
 	"}\n\0";
 //VBO data
 static const GLfloat aVxD[] =
 {
-	-0.5f, -0.5f,
-	 0.0f, -0.5f,
-	 0.0f,  0.5f,
-	-0.5f,  0.5f,
+	-1.0f, -1.0f,
+	 1.0f, -1.0f,
+	 1.0f,  1.0f,
+	-1.0f,  1.0f,
 };
 
 //IBO data
