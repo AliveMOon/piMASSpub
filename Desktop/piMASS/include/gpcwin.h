@@ -206,6 +206,17 @@ public:
 			return -1;
 		}
 
+		if( gVxSID )
+		{
+			glDetachShader( gProgID, gVxSID );
+			glDeleteShader( gVxSID );
+		}
+		if( gFrSID )
+		{
+			glDetachShader( gProgID, gFrSID );
+			glDeleteShader( gFrSID );
+		}
+
 		v_vxID = glGetAttribLocation( gProgID, "v_vx" );
 		if( v_vxID < 0 )
 		{
@@ -216,7 +227,7 @@ public:
 
 	}
 
-	GLuint VBOnew( GLfloat* pD, U4 nD, U4 nX )
+	GLuint VBOnew( const GLfloat* pD, U4 nD, U4 nX )
 	{
 		//Create VBO
 		glGenBuffers( 1, &gVBO );
@@ -225,7 +236,7 @@ public:
 		return gVBO;
 	}
 
-	GLuint IBOnew( GLuint* pD, U4 nD )
+	GLuint IBOnew( const GLuint* pD, U4 nD )
 	{
 		//Create IBO
 		glGenBuffers( 1, &gIBO );
@@ -240,19 +251,18 @@ public:
 			return;
 		GLint oldProgramId;
 		glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
-		SDL_SetRenderTarget( pSDLrndr, NULL );
-		SDL_RenderClear( pSDLrndr );
-
-		ms = sin( ms/1000.0 )+1.0;
-		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
-		glClear( GL_COLOR_BUFFER_BIT );
 		GLdouble model[16],
 				 proj[16];
 
 		glGetDoublev( GL_MODELVIEW_MATRIX, model );
 		glGetDoublev( GL_PROJECTION_MATRIX, proj );
 
-		//glGetDoublev(GL_PROJECTION_MATRIX,projectionMatri x);
+
+		SDL_SetRenderTarget( pSDLrndr, NULL );
+		SDL_RenderClear( pSDLrndr );
+		ms = sin( ms/1000.0 )+1.0;
+		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
+		glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
 
 		glMatrixMode( GL_PROJECTION );
 		glLoadIdentity();
@@ -276,6 +286,7 @@ public:
 			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
 			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
+			glDisableVertexAttribArray( v_vxID );
 
 		}
 		glUseProgram( 0 );

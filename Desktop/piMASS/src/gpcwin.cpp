@@ -175,20 +175,18 @@ char gpsSHDRvx[] =
 	"varying vec2 v_uv;\n"
 	"void main()\n"
 	"{\n"
-	"\tgl_Position = vec4( v_vx.xy, 0.125f, 1.0f );\n"
-	"\tv_uv = v_vx.xy;\n"
+	"	gl_Position = vec4( v_vx, 0.0, 1.0f );\n"
+	"	v_uv = v_vx;\n"
 	"}\n\0";
 char gpsSHDRfr[] =
 	"#version 120\n"
 	"varying vec2 v_uv;\n"
-	//"uniform sampler2D renderedTexture;\n"
 	"void main()\n"
 	"{\n"
-	"\tgl_FragColor = vec4( v_uv, 1.0, 1.0 );\n"
-	//"\tgl_FragColor = texture2D( renderedTexture, UV );\n"
+	"	gl_FragColor = vec4( 1.0, v_uv, 1.0 );\n"
 	"}\n\0";
 //VBO data
-GLfloat aVxD[] =
+static const GLfloat aVxD[] =
 {
 	-0.5f, -0.5f,
 	 0.0f, -0.5f,
@@ -197,7 +195,7 @@ GLfloat aVxD[] =
 };
 
 //IBO data
-GLuint aIxD[] = // { 3, 2, 1, 0, };
+static const GLuint aIxD[] = //{ 3, 2, 1, 0, };
 				{ 0, 1, 2, 3 };
 
 gpcGL::gpcGL( gpcWIN& win )
