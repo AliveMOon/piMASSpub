@@ -49,7 +49,82 @@ public:
 
 	SDL_Texture	*pTXback, *apTXmini[4];
 
+	~gpcGL()
+	{
+		gpmSDL_FreeTX( pTXback );
+		for( U4 i = 0; i < gpmN(apTXmini); i++ )
+			gpmSDL_FreeTX(apTXmini[i]);
+		SDL_GL_DeleteContext( gCntxt );
+	}
 	gpcGL( gpcWIN& win );
+
+	void rndr( SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms, SDL_Texture* pTX, SDL_Texture* pTXchar, U4 iDIV = 0 )
+	{
+		if(!this)
+			return;
+		GLint oldProgramId;
+		glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
+		GLdouble model[16],
+				 proj[16];
+
+		glGetDoublev( GL_MODELVIEW_MATRIX, model );
+		glGetDoublev( GL_PROJECTION_MATRIX, proj );
+
+
+		SDL_SetRenderTarget( pSDLrndr, NULL );
+		SDL_RenderClear( pSDLrndr );
+		ms = sin( ms/1000.0 )+1.0;
+		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
+		glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
+
+		glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
+
+		glMatrixMode( GL_MODELVIEW );
+		glLoadIdentity();
+
+		glActiveTexture(GL_TEXTURE0);
+		SDL_GL_BindTexture( pTX, NULL, NULL );
+		glActiveTexture(GL_TEXTURE1);
+		SDL_GL_BindTexture( pTXchar, NULL, NULL );
+
+		GLuint aTexID[2];
+		aTexID[0] = glGetUniformLocation(gProgID, "tex0");
+		aTexID[1] = glGetUniformLocation(gProgID, "tex1");
+		if( aTexID[1] )
+		{
+
+		}
+		//pTXchar, , NULL);
+		//Bind program
+		if( v_vxID < 0 )
+		{
+			glBegin( GL_QUADS );
+				glVertex2f( -0.5f, -0.5f );
+				glVertex2f( 0.5f, -0.5f );
+				glVertex2f( 0.5f, 0.5f );
+				glVertex2f( -0.5f, 0.5f );
+			glEnd();
+		} else {
+			glUseProgram( gProgID );
+			glEnableVertexAttribArray( v_vxID );
+			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
+			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );
+			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
+			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
+			glDisableVertexAttribArray( v_vxID );
+			glUseProgram( 0 );
+		}
+
+		SDL_GL_SwapWindow( pWIN );
+
+		if( !oldProgramId )
+			return;
+
+		glUseProgram(oldProgramId);
+		SDL_RenderClear( pSDLrndr );
+	}
+
 
 
 	GLuint VxScmp( const char* pS )
@@ -245,67 +320,7 @@ public:
 		return gIBO;
 	}
 
-	void rndr( SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms, SDL_Texture* pTXchar )
-	{
-		if(!this)
-			return;
-		GLint oldProgramId;
-		glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
-		GLdouble model[16],
-				 proj[16];
 
-		glGetDoublev( GL_MODELVIEW_MATRIX, model );
-		glGetDoublev( GL_PROJECTION_MATRIX, proj );
-
-
-		SDL_SetRenderTarget( pSDLrndr, NULL );
-		SDL_RenderClear( pSDLrndr );
-		ms = sin( ms/1000.0 )+1.0;
-		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
-		glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
-
-		glMatrixMode( GL_PROJECTION );
-		glLoadIdentity();
-
-		glMatrixMode( GL_MODELVIEW );
-		glLoadIdentity();
-
-		SDL_GL_BindTexture( pTXchar, NULL, NULL);
-		//Bind program
-		if( v_vxID < 0 )
-		{
-			glBegin( GL_QUADS );
-				glVertex2f( -0.5f, -0.5f );
-				glVertex2f( 0.5f, -0.5f );
-				glVertex2f( 0.5f, 0.5f );
-				glVertex2f( -0.5f, 0.5f );
-			glEnd();
-		} else {
-			glUseProgram( gProgID );
-			glEnableVertexAttribArray( v_vxID );
-			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
-			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
-			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
-			glDisableVertexAttribArray( v_vxID );
-			glUseProgram( 0 );
-		}
-
-		SDL_GL_SwapWindow( pWIN );
-
-		if( !oldProgramId )
-			return;
-
-		glUseProgram(oldProgramId);
-		SDL_RenderClear( pSDLrndr );
-	}
-	~gpcGL()
-	{
-		gpmSDL_FreeTX( pTXback );
-		for( U4 i = 0; i < gpmN(apTXmini); i++ )
-			gpmSDL_FreeTX(apTXmini[i]);
-		SDL_GL_DeleteContext( gCntxt );
-	}
 
 };
 class gpcWIN

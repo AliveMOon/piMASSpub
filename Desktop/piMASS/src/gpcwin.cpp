@@ -176,16 +176,18 @@ char gpsSHDRvx[] =
 	"void main()\n"
 	"{\n"
 	"	gl_Position = vec4( v_vx, 0.0, 1.0f );\n"
-	"	v_uv = (v_vx+1.0)/2.0;\n"
+	//"	v_uv = (v_vx+1.0)/2.0;\n"
+	"	v_uv = v_vx*vec2(0.5,-0.5) + 0.5 ;\n"
 	"}\n\0";
 char gpsSHDRfr[] =
 	"#version 120\n"
 	"varying vec2 v_uv;\n"
 	"uniform sampler2D tex0;\n"
+	"uniform sampler2D tex1;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor =	texture2D(v_uv)\n"
-	"					+vec4( v_uv, 0.0, 1.0 );\n"
+	"	gl_FragColor =	max( texture2D(tex0, v_uv),\n"
+	"						texture2D(tex1, v_uv) );\n"
 	"}\n\0";
 //VBO data
 static const GLfloat aVxD[] =
@@ -378,13 +380,11 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				}
 
 			}
-			if( pGL )
+
+			gpcPIC* pPIC = pGL ? piMASS->PIC.PIC( I8x2( gpeALF_MINI, crs.id ) ) : NULL;
+			if( pPIC )
 			{
-
-
-				pGL->rndr( pSDLrndr, pSDLwin, mSEC.x, pTXchar );
-
-
+				pGL->rndr( pSDLrndr, pSDLwin, mSEC.x, pPIC->pTX ? pPIC->pTX : pTXchar, pTXchar );
 			}
 			else if( pSDLrndr)
 				SDL_RenderPresent( pSDLrndr );
@@ -394,6 +394,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 			*gppKEYbuff = 0;
 			U1 iRDY = 0x10;
+
 
 			nJDOIT.z = mSEC.x;
 			if( piMASS )
@@ -407,7 +408,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					// nincsen begépelve semmi
 					// mondjuk ZOOM, stb..?
 					iRDY = crs.id;
-					crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS );
+					crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS, pPIC, pSDLrndr );
 					pS = gppKEYbuff;
 				} else {
 					iRDY = crs.id;
@@ -415,7 +416,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						switch( *pE )
 						{
 							case '\v': {
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								pS = pE+1;
 								// tehát ha bent van ki kell lépni a szerkeszttett cellából
 								crs.CRSbEDswitch();
@@ -424,21 +425,21 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								if( crs.CRSbEDget() )
 									break;
 
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
 
 								pS = pE+1;
 								crs.CRSstpCL( *this, *piMASS, 3, bSHIFT );
-							} break;if( pSDLrndr)
+							} break;
 							case '\r':
 							case '\n': {
 								if( crs.CRSbEDget() )
 									break;
 
 
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
@@ -453,7 +454,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							case 4:			// up
 							case 5:	{ 		// down
 
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS );
+								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								pS = pE+1;
 								if( !crs.CRSbEDget() )
 								{
@@ -479,13 +480,15 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 				}
 
-				crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS );
+				crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS, pPIC, pSDLrndr );
 				gppKEYbuff = gppMOUSEbuff;
 				*gppKEYbuff = 0;
 			} else {
 				crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 			}
 
+
+			if( !pPIC->unLOCK() )
 			for( U1 i = 0; i < 4; i++ )
 			{
 				if( crs.id != i )

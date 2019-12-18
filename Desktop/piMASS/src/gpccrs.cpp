@@ -370,22 +370,44 @@ U1 gpsHUN[] =
 ":\"\"'  :   ' :   "
 "0123456789abcdef";
 
-bool gpcCRS::miniOFF( void )
+bool gpcCRS::miniOFF( gpcPIC* pPIC, SDL_Renderer* pRNDR )
 {
 	if( !this )
 		return true;
 
-	if( nMINI == CRSfrm.a4x2[1].area() )
-		return !nMINI;
+	if( !pPIC || !pRNDR )
+	{
+		if( nMINI == CRSfrm.a4x2[1].area() )
+			return !nMINI;
 
-	gpmDELary( pMINI );
-	nMINI = CRSfrm.z*CRSfrm.w;
-	if( !nMINI )
-		return true;	// nincsen mérete ki lett kapcsolva?
+		if( !pLOCK )
+			gpmDELary( pMINI );
 
-	pCRS = pMINI = new U1x4[nMINI];
-	gpmZn( pMINI, nMINI );
-	return false; // resized mini, print new
+		nMINI = CRSfrm.a4x2[1].area(); //.z*CRSfrm.w;
+		if( !nMINI )
+			return true;	// nincsen mérete ki lett kapcsolva?
+
+		//pCRS =
+		pMINI = new U1x4[nMINI];
+		gpmZn( pMINI, nMINI );
+		return false; // resized mini, print new
+	}
+
+	if( pLOCK != pMINI )
+		gpmDELary( pMINI );
+
+	pLOCK = pPIC->u1x4LOCK( pRNDR, CRSfrm.au4x2[1], &CRSfrm.a4x2[1].x );
+
+	pMINI = pLOCK;
+	if( !pLOCK )
+	{
+		nMINI = 0;
+		return true;
+	}
+
+
+	nMINI = CRSfrm.a4x2[1].area();
+	return false;
 }
 U4 gpaC64[] = {
 	0, 			0xffffffff,	// fekete, fehér
@@ -799,7 +821,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 		if( !nMINI )
 			return false;	// nincsen mérete ki lett kapcsolva?
 
-		pCRS = pMINI = new U1x4[nMINI];
+		//pCRS =
+		pMINI = new U1x4[nMINI];
 		gpmZn( pMINI, nMINI );
 		return true; // resized mini, print new
 	}
@@ -1350,7 +1373,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 		if( !nMINI )
 			return false;	// nincsen mérete ki lett kapcsolva?
 
-		pCRS = pMINI = new U1x4[nMINI];
+		//pCRS =
+		pMINI = new U1x4[nMINI];
 		gpmZn( pMINI, nMINI );
 		return true; // resized mini, print new
 	}
@@ -1793,8 +1817,7 @@ void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )
 	if( miniOFF() )
 		return;
 
-	if( !pCRS )
-		pCRS = pMINI;
+	U1x4 *pCRS = pMINI;
 
 	for( U1 i = 0; pB+i < pM; i++ )
 	{
@@ -1848,9 +1871,9 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 /// 		miniRDY
 ///
 ///------------------------------
-void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB )
+void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC, SDL_Renderer* pRNDR )
 {
-	if( miniOFF() )
+	if( miniOFF( pPIC, pRNDR ) )
 		return;
 	U4 xFND;
 	U4x4 dim;

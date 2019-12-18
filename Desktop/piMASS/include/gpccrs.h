@@ -13,7 +13,7 @@ class gpcCRS
 				selANIN[2]; //, edANIN[2];
 		gpcSRC	*apSRC[2];
 
-		U1x4	*pMINI, *pCRS;
+		U1x4	*pMINI, *pLOCK; //, *pCRS;
 
 		U4x2 iSTR;
 		U4 	nMINI, //aiSTR[2],
@@ -21,7 +21,7 @@ class gpcCRS
 		I4	*pCp, *pRp;
 
 		U4x4 aCRS[2];
-		bool bESC, bED;
+		bool bESC, bED ;
 
 
 		gpcCRS( gpcWIN& win, U1 _id );
@@ -93,11 +93,11 @@ class gpcCRS
 			return CRSfrm.a4x2[1];
 		}
 
-		bool	miniOFF( void );
+		bool	miniOFF( gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
 		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		bool	miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
-		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB );
+		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH, U1 src = 4 );
 		void CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
