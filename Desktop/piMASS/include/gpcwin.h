@@ -245,7 +245,7 @@ public:
 		return gIBO;
 	}
 
-	void rndr( SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms )
+	void rndr( SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms, SDL_Texture* pTXchar )
 	{
 		if(!this)
 			return;
@@ -270,6 +270,7 @@ public:
 		glMatrixMode( GL_MODELVIEW );
 		glLoadIdentity();
 
+		SDL_GL_BindTexture( pTXchar, NULL, NULL);
 		//Bind program
 		if( v_vxID < 0 )
 		{

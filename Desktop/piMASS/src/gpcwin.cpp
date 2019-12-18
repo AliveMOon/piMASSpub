@@ -181,9 +181,11 @@ char gpsSHDRvx[] =
 char gpsSHDRfr[] =
 	"#version 120\n"
 	"varying vec2 v_uv;\n"
+	"uniform sampler2D tex0;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = vec4( v_uv, 0.0, 1.0 );\n"
+	"	gl_FragColor =	texture2D(v_uv)\n"
+	"					+vec4( v_uv, 0.0, 1.0 );\n"
 	"}\n\0";
 //VBO data
 static const GLfloat aVxD[] =
@@ -380,7 +382,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			{
 
 
-				pGL->rndr( pSDLrndr, pSDLwin, mSEC.x );
+				pGL->rndr( pSDLrndr, pSDLwin, mSEC.x, pTXchar );
 
 
 			}
