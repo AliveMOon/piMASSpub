@@ -28,9 +28,9 @@ d = nonsens;
  c6	 abcdef
 nami van jo vagy nem
  d6	 93734 osram
-  e6	 Hello!a a7	 Na mégegyszer na most átmrent!
+  e6	Hello!a a7	 Na mégegyszer na most átmrent!
 Ja hát még nem tökéletes!
-Na mi lesz már! c7	 ashs d7	 save = 0 e7	 Hello!0123 c8	  asjaj e8	  Hello!0123  c9	 = e5.a / 3600 ; e9	  Hello!01 a10	 pic ="cam1"  c10	 pic ="cam1" d10	 pic = "draw2"
+Na mi lesz már! c7	 ashs d7	 save = 0 e7	Hello!0123 c8	  asjaj e8	 Hello!0123  c9	= e5.a / 3600 ; e9	 Hello!01 a10	 pic ="cam1"  c10	 pic ="cam1" d10	 pic = "draw2"
 unsel = 1  e10	 trg ="draw2";
 trgw = 640;
 trgh = 512 * 3;

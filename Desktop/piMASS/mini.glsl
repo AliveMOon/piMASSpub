@@ -15,31 +15,64 @@ char gpsSHDRfr[] =
 	uniform sampler2D tex1;
 	void main()
 	{
-		vec4 mini = floor(texture2D(tex0, v_uv)*255.0);
-		vec2 cuv =	vec2( 
-								floor(fract(mini.a/8.0)*8.0)/8.0,
-								floor(mini.a/8.0)/32.0
-							) 
-					+	vec2( fract(v_uv.x*93.0)/8.0, fract(v_uv.x*60.0)/32.0 );
-		
-		gl_FragColor =	max( texture2D(tex0, v_uv),
-							 texture2D(tex1, cuv) );
-	}
+		vec4 mini = texture2D(tex0, v_uv)*256.0;
+		float 	c = mini.r,		cc = mini.a, 
+				f = mini.b+176,	fc = mini.g; 
+		vec2 	uv = vec2( fract(v_uv.x*93.0)/8.0, fract(v_uv.y*60.0)/32.0 ),		
+				f_uv =	vec2( 														
+								floor(fract(f/8.0)*8.0)/8.0,						
+								floor(f/8.0)/32.0									
+							) 														
+						+ uv, 
+				fc_uv = vec2( 														
+								floor(fract(fc/4.0)*4.0)/96.0,						
+								floor(fc/4.0)/512.0									
+							),
+				c_uv =	vec2( 														
+								floor(fract(c/8.0)*8.0)/8.0,						
+								floor(c/8.0)/32.0									
+							) 														
+						+ uv, 
+				cc_uv = vec2( 														
+								floor(fract(cc/4.0)*4.0)/96.0,						
+								floor(cc/4.0)/512.0									
+							);														
+																					
+		gl_FragColor =	max( 														
+								min( f, 1 ) * texture2D(tex1, f_uv ) * texture2D(tex1, fc_uv ),				
+							 	min( c, 1 ) * texture2D(tex1, c_uv ) * texture2D(tex1, cc_uv )					
+							);														
+	}	
 	
 	
-	"#version 120\n"
-	"varying vec2 v_uv;\n"
-	"uniform sampler2D tex0;\n"
-	"uniform sampler2D tex1;\n"
-	"void main()\n"
-	"{\n"
-	"	vec4 mini = floor(texture2D(tex0, v_uv)*255.0);\n"
-	"	vec2 cuv =	vec2( \n"
-	"							floor(frac(mini.a/8.0)*8.0)/8.0,\n"
-	"							floor(mini.a/8.0)/32.0\n"
-	"						) \n"
-	"				+	vec2( frac(v_uv.x*93.0)/8.0, frac(v_uv.x*60.0)/32.0 );\n"
-	"	\n"
-	"	gl_FragColor =	max( texture2D(tex0, v_uv),\n"
-	"						 texture2D(tex1, cuv) );\n"
-	"}\n";
+	#version 120
+	varying vec2 v_uv;
+	uniform sampler2D tex0;
+	uniform sampler2D tex1;
+	void main()
+	{
+		vec4 mini = texture2D(tex0, v_uv)*256.0;
+		float 	c = mini.r, 
+	   		f = mini.b+176; 
+		vec2 	uv = vec2( fract(v_uv.x*93.0)/8.0, fract(v_uv.y*60.0)/32.0 ),		
+				fuv =	vec2( 														
+								floor(fract(f/8.0)*8.0)/8.0,						
+								floor(f/8.0)/32.0									
+							) 														
+						+ uv,														
+				cuv =	vec2( 														
+								floor(fract(c/8.0)*8.0)/8.0,						
+								floor(c/8.0)/32.0									
+							) 														
+						+ uv;														
+																					
+		gl_FragColor =	max( 														
+								min( f, 1 ) * texture2D(tex1, fuv ),				
+							 	min( c, 1 ) * texture2D(tex1, cuv )					
+							);														
+	}																				;
+	
+	
+	
+	
+	

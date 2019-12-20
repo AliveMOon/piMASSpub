@@ -58,7 +58,10 @@ public:
 	}
 	gpcGL( gpcWIN& win );
 
-	void rndr( SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms, SDL_Texture* pTX, SDL_Texture* pTXchar, U4 iDIV = 0 )
+	void rndr(	SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms,
+				SDL_Texture* pTX,
+				SDL_Texture* pTXchar,
+				SDL_Texture* pTXbg, 		U4 iDIV = 0 )
 	{
 		if(!this)
 			return;
@@ -83,7 +86,7 @@ public:
 		glMatrixMode( GL_MODELVIEW );
 		glLoadIdentity();
 
-		GLuint aTexID[2];
+		GLuint aTexID[3];
 
 		if( v_vxID < 0 )
 		{
@@ -107,6 +110,13 @@ public:
 			glEnable(GL_TEXTURE_2D);
 			SDL_GL_BindTexture( pTXchar, NULL, NULL );
 
+			if( pTXbg )
+			{
+				glUniform1i( aTexID[2] = glGetUniformLocation(gProgID, "tex2"), 2);
+				glActiveTexture(GL_TEXTURE2);
+				glEnable(GL_TEXTURE_2D);
+				SDL_GL_BindTexture( pTXbg, NULL, NULL );
+			}
 			glEnableVertexAttribArray( v_vxID );
 			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
 			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );
