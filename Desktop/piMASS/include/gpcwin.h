@@ -83,20 +83,13 @@ public:
 		glMatrixMode( GL_MODELVIEW );
 		glLoadIdentity();
 
-		glActiveTexture(GL_TEXTURE0);
-		SDL_GL_BindTexture( pTX, NULL, NULL );
-		glActiveTexture(GL_TEXTURE1);
-		SDL_GL_BindTexture( pTXchar, NULL, NULL );
-
 		GLuint aTexID[2];
-		aTexID[0] = glGetUniformLocation(gProgID, "tex0");
-		aTexID[1] = glGetUniformLocation(gProgID, "tex1");
-		if( aTexID[1] )
-		{
 
-		}
-		//pTXchar, , NULL);
-		//Bind program
+
+
+
+
+
 		if( v_vxID < 0 )
 		{
 			glBegin( GL_QUADS );
@@ -107,6 +100,18 @@ public:
 			glEnd();
 		} else {
 			glUseProgram( gProgID );
+
+			glUniform1i( aTexID[0] = glGetUniformLocation(gProgID, "tex0"), 0);
+			glActiveTexture(GL_TEXTURE0);
+			glEnable(GL_TEXTURE_2D);
+			SDL_GL_BindTexture( pTX, NULL, NULL );
+
+
+			glUniform1i( aTexID[1] = glGetUniformLocation(gProgID, "tex1"), 1);
+			glActiveTexture(GL_TEXTURE1);
+			glEnable(GL_TEXTURE_2D);
+			SDL_GL_BindTexture( pTXchar, NULL, NULL );
+
 			glEnableVertexAttribArray( v_vxID );
 			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
 			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );

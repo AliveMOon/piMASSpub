@@ -186,8 +186,9 @@ char gpsSHDRfr[] =
 	"uniform sampler2D tex1;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor =	max( texture2D(tex0, v_uv),\n"
-	"						texture2D(tex1, v_uv) );\n"
+	"	gl_FragColor.rgb =	max( texture2D(tex0, v_uv).rgb,\n"
+	"						texture2D(tex1, v_uv).rgb );\n"
+	"	gl_FragColor.a = 1.0;\n"
 	"}\n\0";
 //VBO data
 static const GLfloat aVxD[] =
@@ -284,8 +285,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	if( !pTXchar )
 		cout << SDL_GetError() << endl;
 
-	chrPIC.x = 8*4;
-	chrPIC.y = 32*4;
+	chrPIC.x = 8; //*4;
+	chrPIC.y = 32; //*4;
 	chrPIC.w = pSRFchar->w/chrPIC.x;
 	chrPIC.h = pSRFchar->h/chrPIC.y;
 
