@@ -85,11 +85,6 @@ public:
 
 		GLuint aTexID[2];
 
-
-
-
-
-
 		if( v_vxID < 0 )
 		{
 			glBegin( GL_QUADS );

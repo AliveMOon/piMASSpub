@@ -180,15 +180,38 @@ char gpsSHDRvx[] =
 	"	v_uv = v_vx*vec2(0.5,-0.5) + 0.5 ;\n"
 	"}\n\0";
 char gpsSHDRfr[] =
+
 	"#version 120\n"
 	"varying vec2 v_uv;\n"
 	"uniform sampler2D tex0;\n"
 	"uniform sampler2D tex1;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor.rgb =	max( texture2D(tex0, v_uv).rgb,\n"
-	"						texture2D(tex1, v_uv).rgb );\n"
-	"	gl_FragColor.a = 1.0;\n"
+	"	vec4 mini = texture2D(tex0, v_uv)*256.0;\n"
+	"	float c = mini.r; \n"
+	"	if( c < 1.0) discard; \n"
+	"	vec2 cuv =	vec2( \n"
+	"							floor(fract(c/8.0)*8.0)/8.0,\n"
+	"							floor(c/8.0)/32.0\n"
+	"						) \n"
+	"				+	vec2( fract(v_uv.x*93.0)/8.0, fract(v_uv.y*60.0)/32.0 );\n"
+	"	\n"
+	"	gl_FragColor =	max( \n"
+	"							texture2D(tex0, v_uv),\n"
+	"						 	min( c, 1 ) * texture2D(tex1, cuv )\n"
+	"						);\n"
+	"}\n";
+
+char gpsSHDRfrOLD[] =
+	"#version 120\n"
+	"varying vec2 v_uv;\n"
+	"uniform sampler2D tex0;\n"
+	"uniform sampler2D tex1;\n"
+	"void main()\n"
+	"{\n"
+	"	gl_FragColor =	max( texture2D(tex0, v_uv),\n"
+	"						 texture2D(tex1, v_uv) );\n"
+	//"	gl_FragColor.a = 1.0;\n"
 	"}\n\0";
 //VBO data
 static const GLfloat aVxD[] =
