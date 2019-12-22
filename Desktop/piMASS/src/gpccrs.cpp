@@ -1866,6 +1866,8 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 	return pBUFF+nCPY;
 }
 
+
+
 ///------------------------------
 ///
 /// 		miniRDY

@@ -1145,13 +1145,13 @@ public:
 	/// TXT ---------
 	U4 nTXT = 0;
 	char* pTXT, *pT;
-	U4* pM( U4x2& zn )
+	U4* pM( U4x2& zn, U1 id = 4 )
 	{
 		zn = 0;
 		if( !this )
 			return NULL;
 		U4x4 mpZN;
-		U4* p_map = mapCR.MAPalloc( zn, mpZN );
+		U4* p_map = mapCR.MAPalloc( zn, mpZN, id );
 		zn = mpZN.a4x2[1];
 		return p_map;
 	}

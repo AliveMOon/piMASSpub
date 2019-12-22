@@ -451,7 +451,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					// nincsen begépelve semmi
 					// mondjuk ZOOM, stb..?
 					iRDY = crs.id;
-					crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS, pPIC, pSDLrndr );
+					crs.CRSins( *piMASS, gppKEYbuff, pS );
+					//crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS, pPIC, pSDLrndr );
 					pS = gppKEYbuff;
 				} else {
 					iRDY = crs.id;
@@ -459,7 +460,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						switch( *pE )
 						{
 							case '\v': {
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
+								crs.CRSins( *piMASS, pE, pS );
+								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								pS = pE+1;
 								// tehát ha bent van ki kell lépni a szerkeszttett cellából
 								crs.CRSbEDswitch();
@@ -468,7 +470,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								if( crs.CRSbEDget() )
 									break;
 
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
+								crs.CRSins( *piMASS, pE, pS );
+								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
@@ -482,7 +485,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 									break;
 
 
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
+								crs.CRSins( *piMASS, pE, pS );
+								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
@@ -497,7 +501,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							case 4:			// up
 							case 5:	{ 		// down
 
-								crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
+								crs.CRSins( *piMASS, pE, pS );
+								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								pS = pE+1;
 								if( !crs.CRSbEDget() )
 								{

@@ -98,6 +98,128 @@ class gpcCRS
 		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		bool	miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		void	miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
+		///------------------------------
+		///
+		/// 		CRSins
+		///
+		///------------------------------
+		void CRSins( gpcMASS& mass, U1* pE, U1* pB )
+		{
+			if( pB >= pE )
+				return;
+
+			I4x4	selAN0AN1( selANIN[0].a4x2[0], selANIN[1].a4x2[0] ),
+					lurdAN = selAN0AN1.lurd();
+			if( !lurdAN.x )
+				return;
+
+			gpcSRC	tmp, *pSRC, *pS2;
+
+			if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
+			{
+				if( max( iSTR.y, iSTR.x ) > pSRC->nL )
+					iSTR.y = iSTR.x = pSRC->nL;
+
+				I4	nSTRT = pSRC->pSRCstart(true)-pSRC->pSRCalloc(true);
+
+				if( iSTR.x < nSTRT )
+					iSTR.x = nSTRT;
+				if( !bED )
+				{
+					iSTR.y = pSRC->nL;
+				}
+				else if( iSTR.y < iSTR.x )
+					iSTR.y = iSTR.x;
+
+				I4	nSUB = iSTR.y - iSTR.x,
+					nSTR = pE-pB,
+					nOL = pSRC->nL,
+					nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
+
+				// több karakter írunk át
+				U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
+					*pRIG	= pOA + iSTR.y,
+					*pRIGe	= pOA + nOL,
+					*pLFT	= (pSRC->pA = new U1[nNEW]) + iSTR.x;
+
+				gpmMEMCPY( pSRC->pA, pOA, iSTR.x );
+
+				for( ; pB < pE; pB++ )
+				{
+					switch( *pB )
+					{
+						case '\b':
+							if( pLFT > pSRC->pA )
+							{
+								pLFT--;
+								if( pLFT[0] == '\n' )
+								if( pLFT >= pSRC->pA )
+								if( pLFT[-1] == '\r' )
+								{
+									pLFT--;
+									continue;
+								}
+							}
+							continue;
+						case 0x7e:
+							continue;
+						case 0x7f:
+							pB++;
+							if( pB < pE )	// ha még van a bufferban abbol deletézünk
+								continue;
+
+							if( pRIG < pRIGe )
+								pRIG++;	// ha nincsen akkor a jobb oldalbol
+							continue;
+					}
+
+					*pLFT = *pB;
+					pLFT++;
+
+				}
+				iSTR.y = iSTR.x = pLFT-pSRC->pA;
+				if( pRIG < pRIGe )
+				{
+					gpmMEMCPY( pLFT, pRIG, pRIGe-pRIG );
+					pLFT += pRIGe-pRIG;
+				}
+				pSRC->nL = pLFT-pSRC->pA;
+				pSRC->nA = nNEW;
+				pSRC->srcUPDT();
+				*pLFT = 0;
+
+				gpmDELary(pOA);
+				pSRC->hd(mass);
+
+				for( I4x2 s = lurdAN.a4x2[0]; s.y <= lurdAN.w; s.y++ )
+				{
+					for( s.x = lurdAN.x; s.x <= lurdAN.z; s.x++ )
+					{
+						U4	i = (s * I4x2( 1, mass.mapCR.mapZN44.z ))-1,
+							x_fnd = mass.mapCR.pMAP[i];
+						pS2 = x_fnd ? mass.SRCfnd( x_fnd ) : NULL;
+						if( pS2 == pSRC )
+							continue;
+						if( !pS2 )
+						{
+							pS2 = mass.SRCnew( tmp, NULL, s, -1 );
+							if( !pS2 )
+								continue;
+						}
+
+						U1* pSS;
+						U4x4 mCR44 = s;
+
+
+						//pS2->reset( pSRC->pA, pSRC->pA+pSRC->nL, &pSS, mCR44, 0 );
+						pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->nL );
+						pS2->srcUPDT();
+					}
+				}
+			}
+
+
+		}
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH, U1 src = 4 );
 		void CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
