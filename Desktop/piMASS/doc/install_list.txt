@@ -9,7 +9,9 @@ tmpfs /mnt/ram tmpfs nodev,nosuid,size=8M 0 0
 
 pi@GP-PI:~ $ cd Desktop/piMASS
 pi@GP-PI:~/Desktop/piMASS $ sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
-
+pi@GP-PI:~/Desktop/piMASS $ git add .
+pi@GP-PI:~/Desktop/piMASS $ git commit -m "OpenGL 02.003 "
+pi@GP-PI:~/Desktop/piMASS $ git push origin master
 ------------------------------------
 
 sudo chmod -R 777 .
