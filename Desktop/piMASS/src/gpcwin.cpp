@@ -186,19 +186,57 @@ char gpsSHDRfr[] =
 	"uniform sampler2D tex0;\n"
 	"uniform sampler2D tex1;\n"
 	"uniform sampler2D tex2;\n"
+	"uniform vec2 crsFRxy;\n"
+
 	"void main()\n"
 	"{\n"
 	"	vec4 mini = texture2D(tex0, v_uv)*256.0;\n"
-	"	float 	c = mini.r,		cc = mini.g, \n"
-	"			f = mini.b+176,	fc = mini.a; \n"
-	"	vec2 	uv = vec2( fract(v_uv.x*93.0)/8.0, fract(v_uv.y*60.0)/32.0 ),		\n"
+	"	float 	c = mini.r,			cc = mini.g, \n"
+	"			f = mini.b+0xb0,	fc = mini.a; \n"
+	"	vec2 	uv = fract(v_uv*crsFRxy)/vec2(8.0,32.0),							\n"
 	"			f_uv =	vec2( 														\n"
 	"							floor(fract(f/8.0)*8.0)/8.0,						\n"
 	"							floor(f/8.0)/32.0									\n"
 	"						) 														\n"
 	"					+ uv, \n"
 	"			fc_uv = vec2( 														\n"
-	"							floor(fract(fc/4.0)*4.0)/96.0,						\n"
+	"							floor(fract(fc/4.0)*4.0)/128.0,						\n"
+	"							floor(fc/4.0)/1024.0									\n"
+	"						),\n"
+	"			c_uv =	vec2( 														\n"
+	"							floor(fract(c/8.0)*8.0)/8.0,						\n"
+	"							floor(c/8.0)/32.0									\n"
+	"						) 														\n"
+	"					+ uv, \n"
+	"			cc_uv = vec2( 														\n"
+	"							floor(fract(cc/4.0)*4.0)/128.0,						\n"
+	"							floor(cc/4.0)/1024.0									\n"
+	"						);														\n"
+	"																				\n"
+	"	gl_FragColor =	 															\n"
+	"					min( f, 1 ) * texture2D(tex1, f_uv ) * texture2D(tex1, fc_uv )		\n"
+	"					+min( c, 1 ) * texture2D(tex1, c_uv ) * texture2D(tex1, cc_uv )		\n"
+	"					+vec4( texture2D( tex2, v_uv ).rgb, 0.0 );											\n"
+	"}	\n";
+
+	/*"#version 120\n"
+	"varying vec2 v_uv;\n"
+	"uniform sampler2D tex0;\n"
+	"uniform sampler2D tex1;\n"
+	"uniform sampler2D tex2;\n"
+	"void main()\n"
+	"{\n"
+	"	vec4 mini = texture2D(tex0, v_uv)*256.0;\n"
+	"	float 	c = mini.r,			cc = mini.g, \n"
+	"			f = mini.b+0xb0,	fc = mini.a; \n"
+	"	vec2 	uv = vec2( fract(v_uv.x*140.0)/8.0, fract(v_uv.y*60.0)/32.0 ),		\n"
+	"			f_uv =	vec2( 														\n"
+	"							floor(fract(f/8.0)*8.0)/8.0,						\n"
+	"							floor(f/8.0)/32.0									\n"
+	"						) 														\n"
+	"					+ uv, \n"
+	"			fc_uv = vec2( 														\n"
+	"							floor(fract(fc/4.0)*4.0)/64.0,						\n"
 	"							floor(fc/4.0)/512.0									\n"
 	"						),\n"
 	"			c_uv =	vec2( 														\n"
@@ -207,7 +245,7 @@ char gpsSHDRfr[] =
 	"						) 														\n"
 	"					+ uv, \n"
 	"			cc_uv = vec2( 														\n"
-	"							floor(fract(cc/4.0)*4.0)/96.0,						\n"
+	"							floor(fract(cc/4.0)*4.0)/64.0,						\n"
 	"							floor(cc/4.0)/512.0									\n"
 	"						);														\n"
 	"																				\n"
@@ -215,7 +253,7 @@ char gpsSHDRfr[] =
 	"					min( f, 1 ) * texture2D(tex1, f_uv ) * texture2D(tex1, fc_uv )		\n"
 	"					+min( c, 1 ) * texture2D(tex1, c_uv ) * texture2D(tex1, cc_uv )		\n"
 	"					+vec4( texture2D( tex2, v_uv ).rgb, 0.0 );											\n"
-	"}	\n";
+	"}	\n";*/
 
 char gpsSHDRfrOLD[] =
 	"#version 120\n"
@@ -273,7 +311,18 @@ gpcGL::gpcGL( gpcWIN& win )
 }
 
 
-
+U1 gpsHUNtx[] =
+" A       E   I  "
+"UOoO  O   U U   "
+// 0x20 -------------------
+" a       e   i  "
+"uUuo  o   u u   "
+" '       '   '  "
+":\"\"'  :   ' :   "
+// 0x60 -------------------
+" '       '   '  "
+":\"\"'  :   ' :   "
+"0123456789abcdef";
 gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* pPATH, char* pFILE )
 {
 	//ctor
@@ -299,10 +348,9 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 												SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL,
 												&pSDLwin, &pSDLrndr ) != 0
 	)
-        throw InitError();*/
-
-	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1" );
-
+        throw InitError();
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1" );
+	*/
 
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
 		throw InitError();
@@ -319,14 +367,22 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	if( pSRFchar != pSRFload )
 		gpmSDL_FreeSRF( pSRFload );
 
-	pTXchar = SDL_CreateTextureFromSurface( pSDLrndr, pSRFchar );
-	if( !pTXchar )
-		cout << SDL_GetError() << endl;
+
+
 
 	chrPIC.x = 8; //*4;
 	chrPIC.y = 32; //*4;
 	chrPIC.w = pSRFchar->w/chrPIC.x;
 	chrPIC.h = pSRFchar->h/chrPIC.y;
+	U1x4* pC = (U1x4*)(pSRFchar->pixels + 4*pSRFchar->pitch);
+	/*for( U4 i = 0; i < sizeof(gpsHUN); i++ )
+	{
+		pC[i/8]
+	}*/
+
+	pTXchar = SDL_CreateTextureFromSurface( pSDLrndr, pSRFchar );
+	if( !pTXchar )
+		cout << SDL_GetError() << endl;
 
 	gppKEYbuff = gpsKEYbuff;
 	gppMOUSEbuff = gpsKEYbuff;
@@ -426,7 +482,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				pGL->rndr(
 							pSDLrndr, pSDLwin, mSEC.x,
 							pPIC->pTX ? pPIC->pTX : pTXchar, pTXchar,				// charSET  texture
-							( pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL ) 		// background texture
+							( pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL ), 		// background texture
+							crs.gtFRMwh()
 						);
 			}
 			else if( pSDLrndr)

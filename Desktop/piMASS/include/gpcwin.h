@@ -31,7 +31,7 @@ public:
 			gPrgSucc,
 			gSucc;
 	GLuint	tmpID,
-			gProgID,
+			gProgID, aTexID[4],
 			gVxSID,
 			gFrSID,
 			gVBO,
@@ -61,7 +61,8 @@ public:
 	void rndr(	SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms,
 				SDL_Texture* pTX,
 				SDL_Texture* pTXchar,
-				SDL_Texture* pTXbg, 		U4 iDIV = 0 )
+				SDL_Texture* pTXbg,
+				const I4x2& crsFRwh  )
 	{
 		if(!this)
 			return;
@@ -86,8 +87,6 @@ public:
 		glMatrixMode( GL_MODELVIEW );
 		glLoadIdentity();
 
-		GLuint aTexID[3];
-
 		if( v_vxID < 0 )
 		{
 			glBegin( GL_QUADS );
@@ -98,25 +97,28 @@ public:
 			glEnd();
 		} else {
 			glUseProgram( gProgID );
-
-			glUniform1i( aTexID[0] = glGetUniformLocation(gProgID, "tex0"), 0);
+			glUniform1i( aTexID[0], 0);
 			glActiveTexture(GL_TEXTURE0);
 			glEnable(GL_TEXTURE_2D);
 			SDL_GL_BindTexture( pTX, NULL, NULL );
 
 
-			glUniform1i( aTexID[1] = glGetUniformLocation(gProgID, "tex1"), 1);
+			glUniform1i( aTexID[1], 1);
 			glActiveTexture(GL_TEXTURE1);
 			glEnable(GL_TEXTURE_2D);
 			SDL_GL_BindTexture( pTXchar, NULL, NULL );
 
 			if( pTXbg )
 			{
-				glUniform1i( aTexID[2] = glGetUniformLocation(gProgID, "tex2"), 2);
+				glUniform1i( aTexID[2], 2);
 				glActiveTexture(GL_TEXTURE2);
 				glEnable(GL_TEXTURE_2D);
 				SDL_GL_BindTexture( pTXbg, NULL, NULL );
 			}
+
+			glUniform2f( aTexID[3], (float)crsFRwh.x, (float)crsFRwh.y );
+
+
 			glEnableVertexAttribArray( v_vxID );
 			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
 			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );
@@ -307,6 +309,12 @@ public:
 		{
 			return gProgID;
 		}
+
+		aTexID[0] = glGetUniformLocation( gProgID, "tex0");
+		aTexID[1] = glGetUniformLocation( gProgID, "tex1");
+		aTexID[2] = glGetUniformLocation( gProgID, "tex2");
+		aTexID[3] = glGetUniformLocation( gProgID, "crsFRxy" );
+
 		gPrgSucc = GL_TRUE;
 		return gProgID;
 

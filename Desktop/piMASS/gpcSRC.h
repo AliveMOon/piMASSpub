@@ -1203,23 +1203,6 @@ public:
 		nLEV = iLEV+1;
 		return iLEV;
 	};
-	/*U4 decLEV( void )
-	{
-		iPC = aPC[iLEV];
-		if( iLEV > rstLEV )
-			iLEV--;
-		else
-			iLEV = rstLEV;
-		while( asPRG[iLEV] == ')' )
-		{
-			//cout << ")";
-			asPRG[iLEV] = 0;
-			if( iLEV > rstLEV )
-				iLEV--;
-		}
-		nLEV = iLEV+1;
-		return iLEV;
-	};*/
 
 	//void reset_o( void );
 	U1* msRST( U1* pPUB );

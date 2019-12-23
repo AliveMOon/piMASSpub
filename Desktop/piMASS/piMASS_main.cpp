@@ -616,7 +616,7 @@ int main( int nA, char *apA[] )
 		{
 			*pUND = 0;
 		}
-		strcpy( gppMASSfile, "mini_char_12x16.png" ); //bmp" );0
+		strcpy( gppMASSfile, gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
 
 
 		//I4x4 mouseXY(0,0), mouseW(0), winSIZ(800,600,800,600), SRCxycr(0), SRCin(0);

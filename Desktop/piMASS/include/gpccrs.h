@@ -44,14 +44,13 @@ class gpcCRS
 		}
 
 
-		I4x2 gtFRMxy( gpcWIN& win, U1 iDIV )
+		I4x2 gtFRMxy( ) //gpcWIN& win, U1 iDIV )
 		{
 
 			return CRSfrm.a4x2[0];
 		}
-		I4x2 gtFRMwh( void ) //gpcWIN& win ) //, U1 iDIV )
+		I4x2& gtFRMwh(  )  //gpcWIN& win ) //, U1 iDIV )
 		{
-
 			return CRSfrm.a4x2[1];
 		}
 		I4x2 stFRMxy( gpcWIN& win, U1 iDIV, I4 x, I4 y )
@@ -191,34 +190,32 @@ class gpcCRS
 				gpmDELary(pOA);
 				pSRC->hd(mass);
 
-				for( I4x2 s = lurdAN.a4x2[0]; s.y <= lurdAN.w; s.y++ )
+
+				/*for( I4x2 s = lurdAN.a4x2[0]; s.y <= lurdAN.w; s.y++ )
 				{
 					for( s.x = lurdAN.x; s.x <= lurdAN.z; s.x++ )
+					{*/
+
+				for( I4x2 s = lurdAN.a4x2[1]; s.y >= lurdAN.y; s.y-- )
+				for( s.x = lurdAN.a4x2[1].x; s.x >= lurdAN.x; s.x-- )
+				{
+
+					U4 x_fnd = mass.getXFNDan( s );
+					pS2 = x_fnd ? mass.SRCfnd( x_fnd ) : NULL;
+					if( !pS2 )
 					{
-						U4	i = (s * I4x2( 1, mass.mapCR.mapZN44.z ))-1,
-							x_fnd = mass.mapCR.pMAP[i];
-						pS2 = x_fnd ? mass.SRCfnd( x_fnd ) : NULL;
-						if( pS2 == pSRC )
-							continue;
+						pS2 = mass.SRCnew( tmp, NULL, s, -1 );
 						if( !pS2 )
-						{
-							pS2 = mass.SRCnew( tmp, NULL, s, -1 );
-							if( !pS2 )
-								continue;
-						}
-
-						U1* pSS;
-						U4x4 mCR44 = s;
-
-
-						//pS2->reset( pSRC->pA, pSRC->pA+pSRC->nL, &pSS, mCR44, 0 );
-						pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->nL );
-						pS2->srcUPDT();
+							continue;
 					}
+					if( pS2 == pSRC )
+						continue;
+
+
+					pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->nL );
+					pS2->srcUPDT();
 				}
 			}
-
-
 		}
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH, U1 src = 4 );

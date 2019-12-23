@@ -362,10 +362,12 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 U1 gpsHUN[] =
 " A       E   I  "
 "UOoO  O   U U   "
+// 0x20 -------------------
 " a       e   i  "
 "uUuo  o   u u   "
 " '       '   '  "
 ":\"\"'  :   ' :   "
+// 0x60 -------------------
 " '       '   '  "
 ":\"\"'  :   ' :   "
 "0123456789abcdef";
@@ -1975,7 +1977,9 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPI
 				c16fr = gpeCLR_blue2,
 				c16ch = gpeCLR_blue2;
 
-		if( lurdAN.x )
+		CRSins( mass, pE, pB );
+
+		/*if( lurdAN.x )
 		if( pB < pE )
 		if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
 		{
@@ -2083,7 +2087,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPI
 				}
 
 			}
-		}
+		}*/
 
 		for( U4 r = 0; r < pMAP->mapZN44.y; miniALL.y += pR[r], r++ )
 		{
