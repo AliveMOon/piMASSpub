@@ -372,8 +372,7 @@ U1 gpsHUN[] =
 ":\"\"'  :   ' :   "
 "0123456789abcdef";
 
-bool gpcCRS::miniOFF( gpcPIC* pPIC, SDL_Renderer* pRNDR )
-{
+bool gpcCRS::miniOFF( gpcPIC* pPIC, SDL_Renderer* pRNDR ) {
 	if( !this )
 		return true;
 
