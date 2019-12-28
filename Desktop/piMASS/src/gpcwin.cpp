@@ -1,7 +1,7 @@
 //#include "gpcwin.h"
 #include "gpccrs.h"
 //#include "gpcSRC.h"
-extern U1 gp_s_key_map_sdl[];
+extern U1 gpsKEYMAP[];
 
 
 gpcWIN::~gpcWIN()
@@ -896,8 +896,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						// _ kurzor nyilak
 						// / azok a szeparátor azaz enter tab cell etc...
 
-						aXY[0] = c = gp_s_key_map_sdl[scan];
-						aXY[1] = gp_s_key_map_sdl[scan+0x10];
+						aXY[0] = c = gpsKEYMAP[scan];
+						aXY[1] = gpsKEYMAP[scan+0x10];
 					} break;
 				case SDL_WINDOWEVENT:
 					if( ev.window.event != SDL_WINDOWEVENT_RESIZED )

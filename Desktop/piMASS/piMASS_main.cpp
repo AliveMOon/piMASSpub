@@ -24,7 +24,7 @@
 #include "gpcSRC.h"
 #include "gpccrs.h"
 
-U1 gp_s_key_map_sdl[] =
+U1 gpsKEYMAP[] =
 /*
  0123456789abcdef*/
 "0000            "		"0123abcdefghijkl"
@@ -50,7 +50,7 @@ U1 gp_s_key_map_sdl[] =
 "'\"3''    3FFFFFF"		"UU2EA0?:_9123456"
 "FFFFFF444444/44_"		"789abc6789ABDDER"
 "___     /       "		"LDUN/*-+n1234567"
-"    '66666666666"		"890,i56789abcdef"
+"    '66666666666"		"890,I56789abcdef"
 "7777777777777777"		"0123456789ABCDEF"
 "8888888888888888"		"0123456789ABCDEF"
 "9999999999999999"		"0123456789ABCDEF"
