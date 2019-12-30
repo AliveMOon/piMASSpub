@@ -45,19 +45,15 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
 	while( pS < p_end)
 	{
 		c = *(U1*)pS;
-		utf = 0x80;
-		if( c&utf )
-		{
-			utf >>= 1;
-			while( c&utf )
-            {
-				utf >>= 1;
-				pS++;
-            }
-			// most egyenlőre minden UTF-et kicserélünk e betüre;
+		//utf = 0x80;
+		if( (c>>6) == 2 ) { // ha van UTF8 szemét
+			pS++;
+			continue;
+		}
+
+		if( (c>>6) == 3 ) {	// UTF8 HEAD
+			//pS++;
 			c = 'e';
-
-
 		}
 		if( !gpaALFadd[c] )
 			break;
