@@ -47,13 +47,13 @@ public:
 			frSsrc,
 			Lnklog;
 
-	SDL_Texture	*pTXback, *apTXmini[4];
+	SDL_Texture	*pTXback; //, *apTXmini[4];
 
 	~gpcGL()
 	{
 		gpmSDL_FreeTX( pTXback );
-		for( U4 i = 0; i < gpmN(apTXmini); i++ )
-			gpmSDL_FreeTX(apTXmini[i]);
+		/*for( U4 i = 0; i < gpmN(apTXmini); i++ )
+			gpmSDL_FreeTX(apTXmini[i]);*/
 		SDL_GL_DeleteContext( gCntxt );
 	}
 	gpcGL( gpcWIN& win );
@@ -139,8 +139,7 @@ public:
 
 
 
-	GLuint VxScmp( const char* pS )
-	{
+	GLuint VxScmp( const char* pS ) {
 		U8 s = -1, nS = gpmSTRLEN(pS);
 		if( !nS )
 			return gVxSID;
@@ -197,8 +196,7 @@ public:
 		return gVxSID;
 
 	}
-	GLuint FrScmp( const char* pS )
-	{
+	GLuint FrScmp( const char* pS ) {
 		U8 s = -1, nS = gpmSTRLEN(pS);
 		if( !nS )
 			return gFrSID;
@@ -255,9 +253,7 @@ public:
 		return gFrSID;
 
 	}
-
-	GLuint VxFrLink( )
-	{
+	GLuint VxFrLink( ) {
 		U8 s;
 		gProgID = glCreateProgram();
 		glAttachShader( gProgID, gVxSID );
@@ -320,17 +316,14 @@ public:
 
 	}
 
-	GLuint VBOnew( const GLfloat* pD, U4 nD, U4 nX )
-	{
+	GLuint VBOnew( const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
 		glGenBuffers( 1, &gVBO );
 		glBindBuffer( GL_ARRAY_BUFFER, gVBO );
 		glBufferData( GL_ARRAY_BUFFER, nX * nD * sizeof(*pD), pD, GL_STATIC_DRAW );
 		return gVBO;
 	}
-
-	GLuint IBOnew( const GLuint* pD, U4 nD )
-	{
+	GLuint IBOnew( const GLuint* pD, U4 nD ) {
 		//Create IBO
 		glGenBuffers( 1, &gIBO );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
@@ -420,8 +413,7 @@ public:
 		~gpcWIN();
 		gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piMASS ); //, char* pPATH, char* pFILE ); //, I4x4& siz );
 
-		gpcLZY* putLIST( gpcLZY* pLZY, gpeNET4 nt4, U4 i, U4 j, char* pPRMPT = NULL )
-		{
+		gpcLZY* putLIST( gpcLZY* pLZY, gpeNET4 nt4, U4 i, U4 j, char* pPRMPT = NULL ) {
 			if( !this )
 				return pLZY;
 			U4x2 zn;
@@ -467,8 +459,7 @@ public:
 
             return pLZY->SYNrdy(b);
 		}
-		gpcLZY* putLIST( gpcLZY* pLZY, gpeNET4 nt4, I8x4 an, char* pPRMPT = NULL )
-		{
+		gpcLZY* putLIST( gpcLZY* pLZY, gpeNET4 nt4, I8x4 an, char* pPRMPT = NULL ) {
 			if( !this )
 				return pLZY;
 			U4x2 zn;
@@ -517,8 +508,7 @@ public:
 
             return pLZY->SYNrdy(b);
 		}
-		bool bINIThu()
-		{
+		bool bINI_hst_usr() {
 			if( !this )
 				return false;
 			if( pHOST <= sHOST )

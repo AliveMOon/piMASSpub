@@ -350,7 +350,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						// socket-re és az iső stimmel
 						// nagy valszeg, hogy ez egy LOOP
 						sockAT = gpfSTR2U8( (U1*)s_atrib, NULL );
-						if( pWIN->bINIThu() ) {
+						if( pWIN->bINI_hst_usr() ) {
 							mSEC.y = pWIN ? pWIN->mSEC.x+1 : 0;
 							pOUT = pOUT->lzyFRMT(
 														s = -1,	"%shost %s;"

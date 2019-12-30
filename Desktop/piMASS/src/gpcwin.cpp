@@ -385,7 +385,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM ) //, char* 
 	pSDLwin = SDL_CreateWindow(	"Custom shader with SDL2 renderer!", SDL_WINDOWPOS_CENTERED,
 								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE );
 
-	SDL_SetHint( SDL_HINT_RENDER_DRIVER, "ope gpmSDL_FreeTX( pGL->pTXback );ngl" );
+	SDL_SetHint( SDL_HINT_RENDER_DRIVER, "1" );
 
 	pSDLrndr = SDL_CreateRenderer(	pSDLwin, -1,
 									SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
@@ -1032,8 +1032,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						} break;
 					// ékezetek ----------------
 					case '\'': {
-							switch( aXY[1] )
-							{
+							switch( aXY[1] ) {
 								case 'A':
 									pUTF8 = "\xc3\x81";
 									break;
@@ -1070,8 +1069,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
 						} break;
 					case '\"': {
-							switch( aXY[1] )
-							{
+							switch( aXY[1] ) {
 								case 'O':
 									pUTF8 = "\xc5\x90";
 									break;
@@ -1090,8 +1088,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
 						}break;
 					case ':': {
-							switch( aXY[1] )
-							{
+							switch( aXY[1] ) {
 								case 'O':
 									pUTF8 = "\xc3\x96";
 									break;

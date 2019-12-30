@@ -1,3 +1,12 @@
+	#version 120\n"
+	attribute vec2 v_vx;
+	varying vec2 v_uv;
+	void main()
+	{
+		gl_Position = vec4( v_vx, 0.0, 1.0f );
+		v_uv = v_vx*vec2(0.5,-0.5) + 0.5 ;
+	}
+	
 	#version 120
 	varying vec2 v_uv;
 	uniform sampler2D tex0;	// MINI 	ABGR?

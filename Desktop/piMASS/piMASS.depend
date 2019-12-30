@@ -2,7 +2,7 @@
 1576678042 source:/home/pi/Desktop/piMASS/gpcalu.cpp
 	"gpcwin.h"
 
-1577101367 /home/pi/Desktop/piMASS/include/gpcwin.h
+1577714873 /home/pi/Desktop/piMASS/include/gpcwin.h
 	"gpcres.h"
 
 1576678042 /home/pi/Desktop/piMASS//gpcres.h
@@ -485,7 +485,7 @@
 	"gpcgt.h"
 	"gpcOPCD.h"
 
-1576678042 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
+1577712898 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
 	"gpcgt.h"
 	"gpcwin.h"
 
@@ -532,10 +532,10 @@
 1576678042 source:/home/pi/Desktop/piMASS/gpcU44.cpp
 	"gpcSRC.h"
 
-1577534866 source:/home/pi/Desktop/piMASS/gpcwin_var.cpp
+1577712941 source:/home/pi/Desktop/piMASS/gpcwin_var.cpp
 	"gpccrs.h"
 
-1577698996 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
+1577700252 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
 	"gpcSRC.h"
 
 1577534976 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
@@ -556,7 +556,7 @@
 1576678042 source:/home/pi/Desktop/piMASS/src/gpcPROTO.cpp
 	"gpcSRC.h"
 
-1577534866 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
+1577712090 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
 	"gpccrs.h"
 
 1551380987 /usr/include/SDL2/SDL_opengl.h

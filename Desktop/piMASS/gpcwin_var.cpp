@@ -64,10 +64,10 @@ bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 							case gpeALF_MSEC:
 								out = mSEC.x&(~1);
 								break;
-							case gpeALF_HOST: if( bINIThu() ) {
+							case gpeALF_HOST: if( bINI_hst_usr() ) {
 									out = sHOST;
 								} break;
-							case gpeALF_USER: if( bINIThu() ) {
+							case gpeALF_USER: if( bINI_hst_usr() ) {
 									out = sUSER;
 								} break;
 							case gpeALF_NBLD:{
