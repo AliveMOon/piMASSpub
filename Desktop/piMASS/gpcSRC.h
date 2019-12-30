@@ -495,8 +495,7 @@ public:
 	{
 		gpmDELary(pMAP);
 	}
-	U4* MAPalloc( const U4x2& spcZN, U4x4& outZN, U4 iRST = 4 ) //bool bRST )
-	{
+	U4* MAPalloc( const U4x2& spcZN, U4x4& outZN, U4 iRST = 4 ) {
 		// mCR -
 		if(!this)
 		{
@@ -747,12 +746,14 @@ public:
 		}
 		return pC - pSRCalloc(bNoMini);
 	}
-	I4x4 CRSmini( U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, U4* pC64, gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch, bool bNoMini );
+	I4x4 CRSmini(	U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, //U4* pC64,
+					gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch, bool bNoMini );
 
-	U4x4 CRSdim( U4x4* pCRS2, bool bNoMini ) {
+	U4x4 CRSdim( bool bNoMini ) {
 		if( !this )
-			return U4x4( 4, 1 );
-		U1* pC = pSRCstart( bNoMini ); //pCRS2 );
+			return U4x4( gpdSRC_COLw, gpdSRC_ROWw );
+
+		U1* pC = pSRCstart( bNoMini );
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 
 		return dim;

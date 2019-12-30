@@ -630,7 +630,11 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 				}
 
-				crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS, pPIC, pSDLrndr );
+				if( pS < gppKEYbuff )
+					crs.CRSins( *piMASS, gppKEYbuff, pS );
+
+				crs.miniRDY( *this, srcDIV, *piMASS, pPIC, pSDLrndr );
+
 				gppKEYbuff = gppMOUSEbuff;
 				*gppKEYbuff = 0;
 			} else {
@@ -642,7 +646,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			for( U1 i = 0; i < 4; i++ )
 			{
 				if( crs.id != i )
-					apCRS[i]->miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
+					apCRS[i]->miniRDY2( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
 
 				if( pSDLrndr)
 					apCRS[i]->miniDRWtx( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );

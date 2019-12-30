@@ -786,8 +786,7 @@ public:
 
 // FRM 1 up // 2 right // 4 down // 8 left
 
-bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT )
-{
+bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT ) {
 	if( !this )
 		return false;
 
@@ -1871,11 +1870,10 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 
 ///------------------------------
 ///
-/// 		miniRDY
+/// 		miniRDY2
 ///
 ///------------------------------
-void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC, SDL_Renderer* pRNDR )
-{
+void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC, SDL_Renderer* pRNDR ) {
 	if( miniOFF( pPIC, pRNDR ) )
 		return;
 	U4 xFND;
@@ -1939,7 +1937,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPI
 
 			xFND = pM[i];
 			pSRC = mass.SRCfnd( xFND );
-			dim = pSRC->CRSdim( aCRS, bNoMini );
+			dim = pSRC->CRSdim( bNoMini );
             if( pC[c] < dim.x )
 				pC[c] = dim.x;
 			if( pR[r] < dim.y )
@@ -1976,7 +1974,8 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPI
 				c16fr = gpeCLR_blue2,
 				c16ch = gpeCLR_blue2;
 
-		CRSins( mass, pE, pB );
+		if( pB < pE )
+			CRSins( mass, pE, pB );
 
 		/*if( lurdAN.x )
 		if( pB < pE )
@@ -2137,7 +2136,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPI
 									pMINI, aCRS, miniALL,
 									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
 									CRSfrm.z,
-									gpaC64,
+									//gpaC64,
 									*this,
 									c16bg, c16fr, c16ch,
 									bNoMini
@@ -2148,3 +2147,5 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPI
 
 	}
 }
+
+

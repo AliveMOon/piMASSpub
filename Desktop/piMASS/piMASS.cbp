@@ -80,6 +80,7 @@
 		<Unit filename="src/gpcND.cpp" />
 		<Unit filename="src/gpcPROTO.cpp" />
 		<Unit filename="src/gpccrs.cpp" />
+		<Unit filename="src/gpccrs_rdy.cpp" />
 		<Unit filename="src/gpcwin.cpp" />
 		<Extensions>
 			<code_completion />
