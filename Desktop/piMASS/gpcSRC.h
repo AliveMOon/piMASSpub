@@ -746,7 +746,8 @@ public:
 		}
 		return pC - pSRCalloc(bNoMini);
 	}
-	I4x4 CRSmini(	U1x4* pO, U4x4* pCx2, I4x4 xy, I4 fx, I4 fy, I4 fz, //U4* pC64,
+	I4x4 CRSmini(	U1x4* pO, //U4x4* pCx2,
+					I4x4 xy, I4 fx, I4 fy, I4 fz, //U4* pC64,
 					gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch, bool bNoMini );
 
 	U4x4 CRSdim( bool bNoMini ) {

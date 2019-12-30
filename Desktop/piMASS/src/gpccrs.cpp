@@ -2133,7 +2133,8 @@ void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcP
 					c16ch = gpeCLR_blue2;
 				}
 				pSRC->CRSmini(
-									pMINI, aCRS, miniALL,
+									pMINI, //aCRS,
+									miniALL,
 									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
 									CRSfrm.z,
 									//gpaC64,
