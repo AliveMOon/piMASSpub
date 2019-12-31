@@ -1502,6 +1502,14 @@ public:
 	{
 		return U4x2( x*b.x, y*b.y );
 	}
+	U4x2 operator / (const U4x2& b) const
+	{
+		return U4x2( b.x ? x/b.x : 0xffffffff, b.y ? y/b.y : 0xffffffff );
+	}
+	U4x2 operator % (const U4x2& b) const
+	{
+		return U4x2( b.x ? x%b.x : 0, b.y ? y%b.y : 0 );
+	}
 	U4x2& operator *= ( U4 i )
 	{
 		if( !i )

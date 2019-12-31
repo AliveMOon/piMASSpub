@@ -31,7 +31,7 @@ public:
 			gPrgSucc,
 			gSucc;
 	GLuint	tmpID,
-			gProgID, aTexID[4],
+			gProgID, aTexID[0x10],
 			gVxSID,
 			gFrSID,
 			gVBO,
@@ -62,7 +62,7 @@ public:
 				SDL_Texture* pTX,
 				SDL_Texture* pTXchar,
 				SDL_Texture* pTXbg,
-				const I4x2& crsFRwh  )
+				I4x2* pFRM, SDL_Rect divXY, I4x2 winSZ , const I4x2& txWH )
 	{
 		if(!this)
 			return;
@@ -115,8 +115,10 @@ public:
 				glEnable(GL_TEXTURE_2D);
 				SDL_GL_BindTexture( pTXbg, NULL, NULL );
 			}
-
-			glUniform2f( aTexID[3], (float)crsFRwh.x, (float)crsFRwh.y );
+			for( U4 i = 0; i < 4; i++ )
+				glUniform2f( aTexID[3]+i, (float)pFRM[i].x, (float)pFRM[i].y );
+			glUniform4f( aTexID[4], (float)divXY.x, (float)divXY.y, (float)winSZ.x/((float)(divXY.w-divXY.x)), (float)winSZ.y/((float)(divXY.h-divXY.y)) );
+			glUniform2f( aTexID[5], (float)txWH.x, (float)txWH.y );
 
 
 			glEnableVertexAttribArray( v_vxID );
@@ -309,8 +311,9 @@ public:
 		aTexID[0] = glGetUniformLocation( gProgID, "tex0");
 		aTexID[1] = glGetUniformLocation( gProgID, "tex1");
 		aTexID[2] = glGetUniformLocation( gProgID, "tex2");
-		aTexID[3] = glGetUniformLocation( gProgID, "crsFRxy" );
-
+		aTexID[3] = glGetUniformLocation( gProgID, "aFRM" );
+		aTexID[4] = glGetUniformLocation( gProgID, "divXYwh" );
+		aTexID[5] = glGetUniformLocation( gProgID, "txWH" );
 		gPrgSucc = GL_TRUE;
 		return gProgID;
 

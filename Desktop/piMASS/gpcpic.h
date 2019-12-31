@@ -106,7 +106,7 @@ public:
 	SDL_Texture		*pTX;
 	U1x4			*pLOCK;
 
-	I4x4			xyOUT, xySRC;
+	I4x4			xyOUT, xySRC, txWH;
 	gpcPIC			*pSRC;
 	bool			bT;
 	std::thread		T;
@@ -165,7 +165,11 @@ public:
 				gpmSDL_FreeTX(pTX);
 		}
 		if( !pTX )
+		{
 			pTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, wh.x, wh.y );
+			txWH = wh;
+		}
+
 
 		if( pTX ? SDL_LockTexture( pTX, NULL, (void**)&pLOCK, pPTCH ) : true )
 		{

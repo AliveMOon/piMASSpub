@@ -410,6 +410,31 @@ bool gpcCRS::miniOFF( gpcPIC* pPIC, SDL_Renderer* pRNDR ) {
 	nMINI = CRSfrm.a4x2[1].area();
 	return false;
 }
+bool gpcCRS::miniOFFgl( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 winWH ) {
+	if( !this )
+		return true;
+
+	if( !pPIC || !pRNDR )
+		return true;
+
+	if( pLOCK != pMINI )
+		gpmDELary( pMINI );
+
+	winWH /= I4x2(8,16);
+	winWH &= I4x2(4,5);
+	pLOCK = pPIC->u1x4LOCK( pRNDR, winWH, &winWH.x );
+
+	pMINI = pLOCK;
+	if( !pLOCK )
+	{
+		nMINI = 0;
+		return true;
+	}
+
+
+	nMINI = pPIC->txWH.a4x2[0].area(); // CRSfrm.a4x2[1].area();
+	return false;
+}
 U4 gpaC64[] = {
 	0, 			0xffffffff,	// fekete, fehér
 	0xff880000,	0xffaaffee, // piros, cyán
@@ -423,8 +448,7 @@ U4 gpaC64[] = {
 U1 gpaCLR2C64[] = {
 	0, 2, 5, 6, 4, 10, 13, 14, 9, 8, 7, 3, 11, 12, 15, 1,
 };
-class gpcTHRD_DRW
-{
+class gpcTHRD_DRW {
 public:
 	gpcCRS		*pCRS;
 	gpcWIN		*pWIN;
@@ -2132,11 +2156,13 @@ void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcP
 					c16fr = gpeCLR_blue2;
 					c16ch = gpeCLR_blue2;
 				}
+
+
 				pSRC->CRSmini(
 									pMINI, //aCRS,
 									miniALL,
 									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
-									CRSfrm.z,
+									CRSfrm.z, CRSfrm.z,
 									//gpaC64,
 									*this,
 									c16bg, c16fr, c16ch,

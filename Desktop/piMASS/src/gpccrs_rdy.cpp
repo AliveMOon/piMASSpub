@@ -3,12 +3,12 @@
 
 ///------------------------------
 ///
-/// 		miniRDY
+/// 		miniRDYgl
 ///
 ///------------------------------
-void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR )
+void gpcCRS::miniRDYgl( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR )
 {
-	if( miniOFF( pPIC, pRNDR ) )
+	if( miniOFFgl( pPIC, pRNDR, win.winSIZ.a4x2[0] ) )
 		return;
 	//U4 xFND;
 	bool bESC = false, bNoMini;
@@ -22,7 +22,11 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Ren
 		CRSfrm.y = CRSfrm.w;
 		bESC = true;
 	}
-	gpmZn( pMINI, nMINI );
+	SDL_Rect div = win.wDIV( id );
+	U4 off = (div.x ? pPIC->txWH.x/8: 0) + (div.y ? pPIC->txWH.a4x2[0].area()/10: 0) ;
+
+	for( U4 h = 0; h < CRSfrm.w; h++ )
+		gpmZn( pMINI + off + h*pPIC->txWH.x, CRSfrm.z );
 	if( bESC )
 		return;
 
@@ -93,6 +97,7 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Ren
 			c16fr = gpeCLR_blue2,
 			c16ch = gpeCLR_blue2;
 
+
 	for( U4 r = 0; r < mCR.y; xyWH.y += pR[r], r++ )
 	{
 		if( xyWH.y >= CRSfrm.w )
@@ -122,12 +127,12 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Ren
 			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w )
 			{
 				mass.SRCfnd( pM[i+c] )->CRSmini(
-												pMINI, xyWH,
+												pMINI+off, xyWH,
 
-												min(CRSfrm.z, xyWH.x+(int)pC[c]),
-												ie,
+												min(CRSfrm.z, xyWH.x+(int)pC[c]),	// fx
+												ie,									// fy
 
-												CRSfrm.z,
+												CRSfrm.z, pPIC->txWH.x,				// fz zz
 												*this,
 												c16bg, gpeCLR_blue2, gpeCLR_blue2,
 												false
@@ -144,13 +149,14 @@ void gpcCRS::miniRDY( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Ren
 				c16fr = c16ch = gpeCLR_blue2;
 
 
+
 			mass.SRCfnd( pM[i+c] )->CRSmini(
-											pMINI, xyWH,
+											pMINI + off, xyWH,
 
 											min(CRSfrm.z, xyWH.x+(int)pC[c]),
 											ie,
 
-											CRSfrm.z,
+											CRSfrm.z, pPIC->txWH.x,				// fz zz
 											*this,
 											c16bg, c16fr, c16ch,
 											bNoMini

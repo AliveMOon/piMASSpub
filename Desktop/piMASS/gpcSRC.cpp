@@ -181,10 +181,18 @@ gpcSRC::~gpcSRC()
 
 }
 
-I4x4 gpcSRC::CRSmini(	U1x4* pO,
-						//U4x4* pCx2,
-						I4x4 xy, I4 fx, I4 fy, I4 fz, //U4* pC64,
-						gpcCRS& crs, gpeCLR bg, gpeCLR fr, gpeCLR ch, bool bNoMini  )
+I4x4 gpcSRC::CRSmini(
+						U1x4* pO, I4x4 xy,
+
+						I4 fx,
+						I4 fy,
+
+						I4 fz, I4 zz,
+
+						gpcCRS& crs,
+						gpeCLR bg, gpeCLR fr, gpeCLR ch,
+						bool bNoMini
+					)
 {
 	if( this ?
 				   ( fx <= 0 	||	fy <= 0 )
@@ -199,7 +207,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 	I4 cr, n, rr;
 	for( I4 r = max(xy.y,0); r < fy; r++ )
 	{
-		rr = r*fz;
+		rr = r*zz;
 		for( I4 c = max(xy.x,0); c < fx; c++ )
 		{
 			cr = rr+c;
@@ -214,7 +222,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 		// UP
 		if( xy.y >= 0 )
 		{
-			rr = xy.y*fz;
+			rr = xy.y*zz;
 			for( I4 c = max(xy.x,0); c < fx; c++ )
 			{
 				cr = rr+c;
@@ -224,7 +232,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 		}
 		//DWN
 		{
-			rr = (fy-1)*fz;
+			rr = (fy-1)*zz;
 			for( I4 c = max(xy.x,0); c < fx; c++ )
 			{
 				cr = rr+c;
@@ -236,7 +244,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 		// LEFT
 		//if( xy.x >= 0 )
 		{
-			for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fz ; r < fy; r++, rr += fz )
+			for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*zz ; r < fy; r++, rr += zz )
 			{
 				pO[rr].x = fr;
 				pO[rr].y |= 8;
@@ -244,7 +252,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 		}
 		// RIGHT
 		{
-			for( I4 r = max(xy.y,0), rr = fx-1 + r*fz; r < fy; r++, rr += fz )
+			for( I4 r = max(xy.y,0), rr = fx-1 + r*zz; r < fy; r++, rr += zz )
 			{
 				pO[rr].x = fr;
 				pO[rr].y |= 2;
@@ -262,7 +270,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 		if( cxy.y >= fy )
 			break;
 
-		cr = cxy.x + cxy.y*fz;
+		cr = cxy.x + cxy.y*zz;
 		if( this == crs.apSRC[0] )
 		if( crs.apSRC[0] == crs.apSRC[1] )
 		if( pC-pAL == crs.iSTR.x )
@@ -273,7 +281,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 
 		if( bON )
 		if( cxy.x >= 0 && cxy.x < fx )
-		if( cr >= 0 && cr < fy*fz )
+		if( cr >= 0 && cr < fy*zz )
 		{
 			pO[cr].y |= 0x10;
 			pO[cr].x = ch;
@@ -396,7 +404,7 @@ I4x4 gpcSRC::CRSmini(	U1x4* pO,
 		}
 
 
-		cr = cxy.x + cxy.y*fz;
+		cr = cxy.x + cxy.y*zz;
 
 		//pO[cr] = c;
 		if( pO[cr].y&0x10 && pO[cr].x == ch )

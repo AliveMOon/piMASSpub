@@ -7,6 +7,10 @@
 		v_uv = v_vx*vec2(0.5,-0.5) + 0.5 ;
 	}
 	
+	
+	
+	
+char gpsSHDR[] =	
 	#version 120
 	varying vec2 v_uv;
 	uniform sampler2D tex0;	// MINI 	ABGR?
@@ -15,26 +19,37 @@
 									
 	uniform sampler2D tex1;	// MINI_CHAR_xXy_zXw.png
 	uniform sampler2D tex2;	// BackGround
-	uniform vec2 crsFRxy;
+	uniform vec2 aFRM[4];
+	uniform vec4 divXYwh;
+	uniform vec2 txWH;
 	void main()
 	{
 		
-		vec4	mini	= texture2D(tex0, v_uv)*0x100;
-		// FRAME
+		gl_FragColor		= vec4( texture2D( tex2, v_uv ).rgb, 0.0 );		// BG	
+
+		// txMINI
+		
+		
+		vec2	divUV	= v_uv*divXYwh.zw;
+				q 		= floor( divUV );
+		int	i 		= dot( q, vec2(1,2) ); 
+		vec2 	qUV	= q*aFRM[i],
+				qUVf	= fract(qUV)/vec2(8.0,32.0);									
+		vec4	mini	= texture2D( tex0, (qUV/txWH) + q*0.25 )*0x100;					
+		
+		// FRAME																
 		vec2	fc 	= (mini.ba + vec2( 0xb0, 0 ))/vec2(8.0,4.0),			// 0xb0  176	11*16 22*8
-				uv 	= fract(v_uv*crsFRxy)/vec2(8.0,32.0),
 				f_uv =	vec2(
 								floor(fract(fc.x)*8.0)/8.0,
 								floor(fc.x)/32.0
 							)
-						+ uv,
+						+ qUVf,
 				c_uv = vec2(
 								floor(fract(fc.y)*4.0)/128.0,
 								floor(fc.y)/1024.0
 							);
 		
-		gl_FragColor =	vec4( texture2D( tex2, v_uv ).rgb, 0.0 )		// BG
-							+	min( mini.b, 1 )								// hátha b == 0 akor 
+		gl_FragColor +=	min( mini.b, 1 )										// hátha b == 0 akor 
 																					// a töbit már nem csinálja
 								* texture2D(tex1, c_uv )						// FRM color
 								* texture2D(tex1, f_uv );						// FRM
@@ -42,9 +57,9 @@
 		// CHAR
 		vec2	ac = mini.rg/vec2(8.0,4.0),
 				a_uv =	vec2( 														
-								floor(fract(ac.x/8.0)*8.0)/8.0,						
-								floor(ac.x/8.0)/32.0									
-							) + uv;
+								floor(fract(ac.x)*8.0)/8.0,						
+								floor(ac.x)/32.0									
+							) + qUVf;
 		c_uv = vec2(
 						floor(fract(ac.y)*4.0)/128.0,
 						floor(ac.y)/1024.0
@@ -55,34 +70,35 @@
 		{
 			gl_FragColor += min( mini.r, 1 ) * texture2D(tex1, a_uv ) * c;
 			return;
-		}	
+		}
 		
-		ac = ((mini.rr - vec2( 0xA0, 0x60 ))/0x10;
-		a_uv =	vec2( 														
-						floor(fract(ac.x)*0x10)/128.0,						
+		ac = (mini.rr - vec2( 0x20, -0x20 ))/0x10;					
+		a_uv =	vec2( 													
+						floor(fract(ac.x)*0x10)/128.0,					
 						floor(ac.x)/1024.0									
-					);
-		c_uv =	vec2( 														
+					);															
+		c_uv =	vec2( 													
 						floor(fract(ac.y)*0x10)/128.0,						
 						floor(ac.y)/1024.0									
 					);
 		ac.x = texture2D(tex1, a_uv ).a;
 		ac.y = texture2D(tex1, c_uv ).a;
 		ac *= 0x100;
-		if( ac.x >= 'a'-' ' &&  ac.x <= 'z'-' ' )
+		ac.y += 0x60;
+		if( ac.x >= 0x41 &&  ac.x <= 0x5a )
 			ac.y += 8;
 		ac /= 8.0;
-		
+	
 		a_uv =	vec2(
 								floor(fract(ac.x)*8.0)/8.0,
 								floor(ac.x)/32.0
 							)
-						+ uv;
+						+ qUVf;
 		c_uv =	vec2(
 								floor(fract(ac.y)*8.0)/8.0,
 								floor(ac.y)/32.0
 							)
-						+ uv;
+						+ qUVf;
 						
 		gl_FragColor += max( texture2D(tex1, a_uv ), texture2D(tex1, c_uv ) ) * c;
 	}
@@ -186,13 +202,19 @@ char gpsSHDR[] =
 	"uniform sampler2D tex1;	// MINI_CHAR_xXy_zXw.png\n"
 	"uniform sampler2D tex2;	// BackGround\n"
 	"uniform vec2 crsFRxy;\n"
+	"uniform vec4 divXYwh;\n"
+	"uniform vec2 txWH;\n"
 	"void main()\n"
 	"{\n"
 	"	\n"
-	"	vec4	mini	= texture2D(tex0, v_uv)*0x100;\n"
-	"	// FRAME\n"
+	"	gl_FragColor =	vec4( texture2D( tex2, v_uv ).rgb, 0.0 );		// BG	\n"
+	"	vec2	big 	= crsFRxy,												\n"
+	"			divUV 	= v_uv*big*divXYwh.zw;									\n"
+	"	if( max( divUV.x / big.x, divUV.y/ big.y ) > 1.0 ) return; 				\n"
+	"	vec4	mini	= texture2D( tex0, divUV/txWH )*0x100;					\n"
+	"	// FRAME																\n"
 	"	vec2	fc 	= (mini.ba + vec2( 0xb0, 0 ))/vec2(8.0,4.0),			// 0xb0  176	11*16 22*8\n"
-	"			uv 	= fract(v_uv*crsFRxy)/vec2(8.0,32.0),\n"
+	"			uv 	= fract(divUV)/vec2(8.0,32.0),\n"
 	"			f_uv =	vec2(\n"
 	"							floor(fract(fc.x)*8.0)/8.0,\n"
 	"							floor(fc.x)/32.0\n"
@@ -203,8 +225,7 @@ char gpsSHDR[] =
 	"							floor(fc.y)/1024.0\n"
 	"						);\n"
 	"	\n"
-	"	gl_FragColor =	vec4( texture2D( tex2, v_uv ).rgb, 0.0 )		// BG\n"
-	"						+	min( mini.b, 1 )								// hátha b == 0 akor \n"
+	"	gl_FragColor +=	min( mini.b, 1 )										// hátha b == 0 akor \n"
 	"																				// a töbit már nem csinálja\n"
 	"							* texture2D(tex1, c_uv )						// FRM color\n"
 	"							* texture2D(tex1, f_uv );						// FRM\n"
@@ -212,8 +233,8 @@ char gpsSHDR[] =
 	"	// CHAR\n"
 	"	vec2	ac = mini.rg/vec2(8.0,4.0),\n"
 	"			a_uv =	vec2( 														\n"
-	"							floor(fract(ac.x/8.0)*8.0)/8.0,						\n"
-	"							floor(ac.x/8.0)/32.0									\n"
+	"							floor(fract(ac.x)*8.0)/8.0,						\n"
+	"							floor(ac.x)/32.0									\n"
 	"						) + uv;\n"
 	"	c_uv = vec2(\n"
 	"					floor(fract(ac.y)*4.0)/128.0,\n"
@@ -227,7 +248,7 @@ char gpsSHDR[] =
 	"		return;\n"
 	"	}	\n"
 	"	\n"
-	"	ac = ((mini.rr - vec2( 0xA0, 0x60 ))/0x10;\n"
+	"	ac = (mini.rr - vec2( 0x20, -0x20 ))/0x10;\n"
 	"	a_uv =	vec2( 														\n"
 	"					floor(fract(ac.x)*0x10)/128.0,						\n"
 	"					floor(ac.x)/1024.0									\n"
@@ -239,7 +260,8 @@ char gpsSHDR[] =
 	"	ac.x = texture2D(tex1, a_uv ).a;\n"
 	"	ac.y = texture2D(tex1, c_uv ).a;\n"
 	"	ac *= 0x100;\n"
-	"	if( ac.x >= 'a'-' ' &&  ac.x <= 'z'-' ' )\n"
+	"	ac.y += 0x60;\n"
+	"	if( ac.x >= 0x41 &&  ac.x <= 0x5a )\n"
 	"		ac.y += 8;\n"
 	"	ac /= 8.0;\n"
 	"	\n"
