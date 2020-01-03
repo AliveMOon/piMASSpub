@@ -198,7 +198,7 @@ enum gpeLX:U8
 
 class float2;
 class float3;
-class float4;		// ez a F4 négyes singleP vektor
+class float4;		// ez a Fx4 négyes singleP vektor
 class float4x4;		// ja ez itt a matrix lenne
 class D4;
 class U2x4;
@@ -239,6 +239,8 @@ class gpcMASS;
 #define gpmN( p ) ( sizeof(p)/sizeof(*p) )
 #define gpmZ( p ) bzero( &p, sizeof(p) )
 #define gpmZn( p, n ) bzero( (p), (n)*sizeof(*(p)) )
+
+#define gpmGLBOFF(a) (void*)(a)
 
 #define gpmOFF( st, m ) ( (size_t)(&((st*)NULL)->m) )
 #define gpmOFFOFF(st, m,n) (GPM_OFF(st, m)-GPM_OFF(st, n))
@@ -3090,24 +3092,188 @@ public:
 	}
 };
 
-
-
-class F4
+class Fx2
 {
 public:
-    float x,y,z,w;
-    F4(){};
-    F4( I4 _x, I4 _y, I4 _z, I4 _w )
+    float x,y;
+    Fx2(){};
+
+    Fx2( I4 _x, I4 _y = 0 )
     {
-        x = _x; y = _y; z = _z; w = _w;
+        x = _x; y = _y;
     }
-    F4( float _x, float _y = 0.0, float _z = 0.0, float _w = 0.0 )
+    Fx2( float _x, float _y = 0.0 )
     {
-        x = _x; y = _y; z = _z; w = _w;
+        x = _x; y = _y;
     }
-    F4( float* pF )
+    Fx2( float* pF )
     {
         gpmMEMCPY( this, pF, 1 );
+    }
+    Fx2( I4x2 xy )
+    {
+        x = xy.x; y = xy.y;
+    }
+    bool operator != ( const Fx2& b )
+    {
+		if( x != b.x )
+			return true;
+		if( y != b.y )
+			return true;
+
+		return false;
+    }
+    bool operator == ( const Fx2& b )
+    {
+		return !(*this!=b);
+    }
+
+    Fx2& operator = ( I4 b )
+    {
+		x = b; y = 0;
+		return *this;
+    }
+
+    Fx2& operator = ( const I4x2& xy )
+    {
+		x = xy.x; y = xy.y;
+		return *this;
+    }
+    Fx2& operator += ( const Fx2& xy )
+    {
+		x += xy.x; y += xy.y;
+		return *this;
+    }
+    Fx2& operator -= ( const Fx2& xy )
+    {
+		x -= xy.x; y -= xy.y;
+		return *this;
+    }
+    Fx2& operator &= ( const Fx2& xy )
+    {
+		x *= xy.x; y *= xy.y;
+		return *this;
+    }
+    Fx2& operator /= ( const Fx2& xy )
+    {
+		x /= xy.x; y /= xy.y;
+		return *this;
+    }
+    double sum( void ) const
+    {
+        return x+y;
+    }
+    double qlen( void ) const
+    {
+        return x*x+y*y;
+    }
+    Fx2 norm( void ) const
+	{
+        float l = sqrt(qlen());
+		return Fx2( x/l, y/l );
+	}
+	float dot( const Fx2& b ) const
+	{
+        return x*b.x + y*b.y;
+	}
+
+	Fx2 operator + ( float b ) const
+	{
+        return Fx2( x+b, y+b );
+	}
+	Fx2 operator - ( float b ) const
+	{
+        return Fx2( x-b, y-b );
+	}
+	Fx2 operator * ( float b ) const
+	{
+        return Fx2( x*b, y*b );
+	}
+	Fx2 operator / ( float b ) const
+	{
+        return Fx2( x/b, y/b );
+	}
+
+	Fx2 operator + ( const Fx2& b ) const
+	{
+        return Fx2( x+b.x, y+b.y );
+	}
+	Fx2 operator - ( const Fx2& b ) const
+	{
+        return Fx2( x-b.x, y-b.y );
+	}
+	float operator * ( const Fx2& b ) const
+	{
+        return x*b.x+y*b.y;
+	}
+	Fx2 operator & ( const Fx2& b ) const
+	{
+        return Fx2( x*b.x, y*b.y );
+	}
+	Fx2 operator / ( const Fx2& b ) const
+	{
+        return Fx2( x/b.x, y/b.y );
+	}
+	Fx2& add( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] += b;
+
+		return *this;
+	}
+	Fx2& sub( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] -= b;
+
+		return *this;
+	}
+	Fx2& mul( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] &= b;
+
+		return *this;
+	}
+	Fx2& div( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] /= b;
+
+		return *this;
+	}
+};
+
+class Fx4
+{
+public:
+	union
+	{
+		struct
+		{
+			float x,y,z,w;
+		};
+		struct
+		{
+			Fx2	aF2[2];
+		};
+	};
+    Fx4(){};
+    Fx4( I4 _x, I4 _y, I4 _z, I4 _w )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    Fx4( float _x, float _y = 0.0, float _z = 0.0, float _w = 0.0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    Fx4( float* pF )
+    {
+        gpmMEMCPY( this, pF, 1 );
+    }
+    Fx4( I4x2 xy )
+    {
+        aF2[0] = aF2[1] = xy;
     }
     double sum( void ) const
     {
@@ -3125,30 +3291,176 @@ public:
     {
         return x*x+y*y+z*z;
     }
-    F4 norm_xyz( void ) const
+    Fx4 norm_xyz( void ) const
 	{
         double l = sqrt(qlen_xyz());
-		return F4( x/l, y/l, z/l );
+		return Fx4( x/l, y/l, z/l );
 	}
-	float dot_xyz( F4 b ) const
+	float dot_xyz( Fx4 b ) const
 	{
         return x*b.x + y*b.y + z*b.z;
 	}
-    F4 cross_xyz( F4 b ) const
+    Fx4 cross_xyz( Fx4 b ) const
 	{
-		return F4(
+		return Fx4(
 						y * b.z - z * b.y,
 						z * b.x - x * b.z,
 						x * b.y - y * b.x
 				);
 	}
-	F4 operator + ( const F4& b ) const
+	Fx4 operator + ( const Fx4& b ) const
 	{
-        return F4( x+b.x, y+b.y, z+b.z, w+b.w );
+        return Fx4( x+b.x, y+b.y, z+b.z, w+b.w );
 	}
-	F4 operator - ( const F4& b ) const
+	Fx4 operator - ( const Fx4& b ) const
 	{
-        return F4( x-b.x, y-b.y, z-b.z, w-b.w );
+        return Fx4( x-b.x, y-b.y, z-b.z, w-b.w );
+	}
+	float operator * ( const Fx4& b ) const
+	{
+        return x*b.x + y*b.y + z*b.z + w*b.w;
+	}
+	Fx4 operator & ( const Fx4& b ) const
+	{
+        return Fx4( x*b.x, y*b.y, z*b.z, w*b.w );
+	}
+	Fx4 operator / ( const Fx4& b ) const
+	{
+        return Fx4( x/b.x, y/b.y, z/b.z, w/b.w );
+	}
+
+	bool operator != ( const Fx4& b )
+    {
+		if( aF2[0] != b.aF2[0] )
+			return true;
+		if( aF2[1] != b.aF2[1] )
+			return true;
+
+		return false;
+    }
+    bool operator == ( const Fx4& b )
+    {
+		return !(*this!=b);
+    }
+
+    Fx4& operator = ( const I4x2& b )
+    {
+		aF2[0] =
+		aF2[1] = b;
+		return *this;
+    }
+    Fx4& operator += ( const Fx2& b )
+    {
+		aF2[0] += b;
+		aF2[1] += b;
+		return *this;
+    }
+    Fx4& operator -= ( const Fx2& b )
+    {
+		aF2[0] -= b;
+		aF2[1] -= b;
+		return *this;
+    }
+    Fx4& operator &= ( const Fx2& b )
+    {
+		aF2[0] &= b;
+		aF2[1] &= b;
+		return *this;
+    }
+    Fx4& operator /= ( const Fx2& b )
+    {
+		aF2[0] /= b;
+		aF2[1] /= b;
+		return *this;
+    }
+
+
+
+	Fx4& operator += ( const Fx4& b )
+    {
+		aF2[0] += b.aF2[0];
+		aF2[1] += b.aF2[1];
+		return *this;
+    }
+    Fx4& operator -= ( const Fx4& b )
+    {
+		aF2[0] -= b.aF2[0];
+		aF2[1] -= b.aF2[1];
+		return *this;
+    }
+    Fx4& operator &= ( const Fx4& b )
+    {
+		aF2[0] &= b.aF2[0];
+		aF2[1] &= b.aF2[1];
+		return *this;
+    }
+    Fx4& operator /= ( const Fx4& b )
+    {
+		aF2[0] /= b.aF2[0];
+		aF2[1] /= b.aF2[1];
+		return *this;
+    }
+
+
+
+    /*Fx4& add( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] += b;
+
+		return *this;
+	}
+	Fx4& sub( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] -= b;
+
+		return *this;
+	}
+	Fx4& mul( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] &= b;
+
+		return *this;
+	}
+	Fx4& div( Fx2 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] /= b;
+
+		return *this;
+	}*/
+
+
+
+	Fx4& add( Fx4 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] += b;
+
+		return *this;
+	}
+	Fx4& sub( Fx4 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] -= b;
+
+		return *this;
+	}
+	Fx4& mul( Fx4 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] &= b;
+
+		return *this;
+	}
+	Fx4& div( Fx4 b, U4 n )
+	{
+		for( U4 i = 0; i < n; i++ )
+			this[i] /= b;
+
+		return *this;
 	}
 };
 
@@ -3294,7 +3606,7 @@ typedef enum gpeNET4:U4
 
 	gpeNET4_U44	= MAKE_ID( sizeof(U4x4)		, 'U', '4', '4' ),
 	gpeNET4_I44	= MAKE_ID( sizeof(I4x2)		, 'I', '4', '4' ),
-	gpeNET4_F44	= MAKE_ID( sizeof(F4)		, 'F', '4', '4' ),
+	gpeNET4_F44	= MAKE_ID( sizeof(Fx4)		, 'F', '4', '4' ),
 
 	gpeNET4_U84	= MAKE_ID( sizeof(U8x4)		, 'U', '8', '4' ),
 	gpeNET4_I84	= MAKE_ID( sizeof(I8x4)		, 'I', '8', '4' ),

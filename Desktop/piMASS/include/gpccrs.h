@@ -71,7 +71,7 @@ class gpcCRS
 			if( w > 3 )
 				CRSfrm.z = w;
 
-			SDL_Rect div = win.wDIV(id);
+			SDL_Rect div = win.wDIV(id).xyWH;
 			I4 bug = div.w/CRSfrm.z, nBUG = 0;
 			if( mag > 0 )
 				CRSfrm.z = div.w/bug;

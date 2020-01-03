@@ -147,14 +147,14 @@ public:
 		pLOCK = NULL;
 		return true;
 	}
-	U1x4* u1x4LOCK( SDL_Renderer* pRNDR, U4x2 wh, int* pPTCH )
+	U1x4* u1x4LOCK( SDL_Renderer* pRNDR, U4x2 wh, int& ptch )
 	{
 		if( !this )
 			return NULL;
 		if( pLOCK )
 			return pLOCK;
 
-		*pPTCH = 0;
+		ptch = 0;
 
 		if( pTX )
 		{
@@ -171,16 +171,15 @@ public:
 		}
 
 
-		if( pTX ? SDL_LockTexture( pTX, NULL, (void**)&pLOCK, pPTCH ) : true )
+		if( pTX ? SDL_LockTexture( pTX, NULL, (void**)&pLOCK, &ptch ) : true )
 		{
 			pLOCK = NULL;
 			return NULL;
 		}
-		*pPTCH /= sizeof(*pLOCK);
+		ptch /= sizeof(*pLOCK);
 		return pLOCK;
 	}
-	SDL_Texture* surDRWtx( SDL_Renderer* pRNDR )
-	{
+	SDL_Texture* surDRWtx( SDL_Renderer* pRNDR ) {
 		SDL_Surface* pS = pREF;
 		if( pSHR )
 			pS = pSHR;

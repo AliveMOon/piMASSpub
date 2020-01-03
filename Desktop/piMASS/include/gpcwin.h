@@ -24,18 +24,19 @@ public:
 class gpcGL
 {
 public:
-	GLint	//gVxPos2Loc,
-			v_vxID,
+	GLint	oPrgID,
+			v_vxID, v_uvID,
 			gVxSucc,
-			gFrSucc,
-			gPrgSucc,
+			gFrSucc, aTexID[0x8],
+			gPrgSucc, aUniID[0x8],
 			gSucc;
 	GLuint	tmpID,
-			gProgID, aTexID[0x10],
+			gProgID,
 			gVxSID,
 			gFrSID,
-			gVBO,
-			gIBO;
+			VaID,
+			VXbID,
+			IXbID;
 
 	SDL_GLContext	gCntxt;
 	GLenum			glewErr;
@@ -47,45 +48,306 @@ public:
 			frSsrc,
 			Lnklog;
 
-	SDL_Texture	*pTXback; //, *apTXmini[4];
+	SDL_Renderer* pRNDR;
+	I4x2	luXY,	trgWH,
+			boxXY, 	boxWH,
+			aTXwh[0x10];
+
+	SDL_Texture	*pTRG;
+
 
 	~gpcGL()
 	{
-		gpmSDL_FreeTX( pTXback );
-		/*for( U4 i = 0; i < gpmN(apTXmini); i++ )
-			gpmSDL_FreeTX(apTXmini[i]);*/
 		SDL_GL_DeleteContext( gCntxt );
 	}
+
 	gpcGL( gpcWIN& win );
-
-	void rndr(	SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms,
-				SDL_Texture* pTX,
-				SDL_Texture* pTXchar,
-				SDL_Texture* pTXbg,
-				I4x2* pFRM, SDL_Rect divXY, I4x2 winSZ , const I4x2& txWH )
+	gpcGL* TRG( SDL_Renderer* pSDLrndr, I4x2 lXY, const I4x2& tWH, float ms, bool bCLR = true, bool bDEP = true )
 	{
-		if(!this)
-			return;
-		GLint oldProgramId;
-		glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
-		GLdouble model[16],
-				 proj[16];
+		if( !this )
+			return NULL;
 
-		glGetDoublev( GL_MODELVIEW_MATRIX, model );
-		glGetDoublev( GL_PROJECTION_MATRIX, proj );
+		if( pRNDR != pSDLrndr )
+			pRNDR = pSDLrndr;
+
+		if( !pRNDR )
+			return NULL;
+
+		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
+		SDL_SetRenderTarget( pRNDR, NULL );
+		SDL_RenderClear( pRNDR );
+		//glUseProgram( gProgID );
+
+		if( trgWH != tWH )
+		{
+			gpmSDL_FreeTX( pTRG );
+			pTRG = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, tWH.x, tWH.y );
+			if( !pTRG )
+				return NULL;
+			SDL_SetRenderTarget( pRNDR, pTRG );
+			aUniID[0] = glGetUniformLocation( gProgID, "tgPX" );
+			aUniID[1] = glGetUniformLocation( gProgID, "xyPX" );
+			aUniID[2] = glGetUniformLocation( gProgID, "whPX" );
+			aUniID[3] = glGetUniformLocation( gProgID, "aTX" );
+		}
 
 
-		SDL_SetRenderTarget( pSDLrndr, NULL );
-		SDL_RenderClear( pSDLrndr );
+
+		luXY = lXY;
+		trgWH = tWH;
+
+		GLbitfield b = 0;
+		if( bCLR )
+			b |= GL_COLOR_BUFFER_BIT;
+		if( bDEP )
+			b |= GL_DEPTH_BUFFER_BIT;
+
 		ms = sin( ms/1000.0 )+1.0;
-		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
-		glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
+		glClearColor( ms*0.13, 0.0f, ms*0.3, 0.0f );
+		glClearDepth(1.0);
+		glClear( b );
+		return this;
+	}
+	GLuint IBOnew( const GLuint* pD, U4 nD ) {
+		//Create IBO
+		glGenBuffers( 1, &IXbID );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IXbID );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, nD * sizeof(*pD), pD, GL_STATIC_DRAW );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+		return IXbID;
+	}
+	GLuint VBOnew( const GLfloat* pD, U4 nD, U4 nX ) {
+		//Create VBO
+		glGenBuffers( 1, &VXbID );
+		glBindBuffer( GL_ARRAY_BUFFER, VXbID );
+		glBufferData( GL_ARRAY_BUFFER, nX * nD * sizeof(*pD), pD, GL_STATIC_DRAW );
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+		return VXbID;
+	}
+
+	gpcGL* SET_box( I4x2 xy, const I4x2& wh, const GLfloat* pVX4 )
+	{
+		if( this ? !wh.area() : true )
+			return NULL;
+
+		Fx4 aV4[4];
+		glUseProgram( gProgID );
+
+		if( boxXY == xy && boxWH == wh )
+		{
+			/*glBindBuffer( GL_ARRAY_BUFFER, VXbID );
+			//glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableVertexAttribArray( v_vxID );
+			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(*aV4), 0 );*/
+			return this;
+		}
+
+		if( boxWH.area() )
+			glDeleteBuffers(1,&VXbID);
+
+		xy -= luXY;
+
+		aV4[0].aF2[1] = 0;
+		aV4[0].aF2[0] = xy;
+
+		aV4[1].aF2[1] = I4x2( trgWH.x, 0 );
+		aV4[1].aF2[0] = xy + I4x2( wh.x, 0 );
+
+		aV4[2].aF2[1] = trgWH;
+		aV4[2].aF2[0] = xy + wh;
+
+		aV4[3].aF2[1] = Fx2(0,trgWH.y);
+		aV4[3].aF2[0] = xy + I4x2( 0, wh.y );
+
+		aV4[0].div( trgWH, gpmN(aV4) );
+
+		if( VXbID > 0 )
+			glDeleteBuffers(1,  &VXbID );
+
+		VBOnew( (float*)aV4, 4, 4 );
+		boxXY = xy;
+		boxWH = wh;
+
+		return this;
+		/*// GEN VX ARAY ATRIB
+		//glGenVertexArrays( 1, &VaID );
+		//glBindVertexArray(VaID);
+		//glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
+		//glEnableVertexAttribArray( v_vxID );
+		//glVertexAttribPointer( v_uvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), (void*)(sizeof(Fx2)) );
+		//glEnableVertexAttribArray( v_uvID );
+		// GEN VX BUFFER
+		glGenBuffers( 1, &VXbID );
+
+		glBindBuffer( GL_ARRAY_BUFFER, VXbID );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(aV4), aV4, GL_STATIC_DRAW );
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+		boxXY = xy;
+		boxWH = wh;
+
+		return this;*/
+	}
+
+	gpcGL* SET_box2( I4x2 xy, const I4x2& wh, const GLfloat* pVX4 ) {
+		if( this ? !wh.area() : true )
+			return NULL;
+
+		Fx2 aV2[4];
+		glUseProgram( gProgID );
+
+		if( boxXY == xy && boxWH == wh )
+		{
+			/*glBindBuffer( GL_ARRAY_BUFFER, VXbID );
+			//glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableVertexAttribArray( v_vxID );
+			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(*aV4), 0 );*/
+			return this;
+		}
+
+		if( boxWH.area() )
+			glDeleteBuffers(1,&VXbID);
+
+		xy -= luXY;
+
+		aV2[0] = xy;
+		aV2[1] = xy + I4x2( wh.x, 0 );
+		aV2[2] = xy + wh;
+		aV2[3] = xy + I4x2( 0, wh.y );
+
+		aV2[0].div( trgWH, gpmN(aV2) );
+
+		if( VXbID > 1 )
+			glDeleteBuffers(1,  &VXbID );
+
+		// GEN VX ARAY ATRIB
+		//glGenVertexArrays( 1, &VaID );
+		//glBindVertexArray(VaID);
+		//glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
+		//glEnableVertexAttribArray( v_vxID );
+		//glVertexAttribPointer( v_uvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), (void*)(sizeof(Fx2)) );
+		//glEnableVertexAttribArray( v_uvID );
+		// GEN VX BUFFER
+		glGenBuffers( 1, &VXbID );
+
+		glBindBuffer( GL_ARRAY_BUFFER, VXbID );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(aV2), aV2, GL_STATIC_DRAW );
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+		boxXY = xy;
+		boxWH = wh;
+
+		return this;
+	}
+
+	gpcGL* SET_tx( U1 i, SDL_Texture* pTX, I4x2 wh )
+	{
+		if( !this )
+			return NULL;
+
+		if( aTexID[i] < 0 )
+			return this;
+		if( !pTX )
+		{
+			//glDisable(GL_TEXTURE_2D);
+			return this;
+		}
+
+		glEnable(GL_TEXTURE_2D);
+		glUniform1i( aTexID[i], i );
+		glActiveTexture(GL_TEXTURE0+i);
+		SDL_GL_BindTexture( pTX, NULL, NULL );
+
+		if( aUniID[3] > -1 )
+			glUniform2f( aUniID[3]+i, (float)wh.x, (float)wh.y );
+
+		aTXwh[i] = wh;
+		return this;
+	}
+	gpcGL* DRW( I4x2 xy, I4x2 wh )
+	{
+		if( !this )
+			return NULL;
 
 		glMatrixMode( GL_PROJECTION );
 		glLoadIdentity();
 
 		glMatrixMode( GL_MODELVIEW );
 		glLoadIdentity();
+
+		if( aUniID[0] > -1 )
+			glUniform2f( aUniID[0], (float)trgWH.x, (float)trgWH.y );
+		if( aUniID[1] > -1 )
+			glUniform2f( aUniID[1], (float)xy.x, (float)xy.y );
+		if( aUniID[2] > -1 )
+			glUniform2f( aUniID[2], (float)wh.x, (float)wh.y );
+
+		glBindBuffer( GL_ARRAY_BUFFER, VXbID );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IXbID );
+
+		//glBindVertexArray( VaID ); //VXbID);
+
+		glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
+		glEnableVertexAttribArray( v_vxID );
+		glVertexAttribPointer( v_uvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
+		glEnableVertexAttribArray( v_uvID );
+
+		//glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
+		glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
+
+		glDisableVertexAttribArray( v_vxID );
+		glDisableVertexAttribArray( v_uvID );
+
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+		glBindVertexArray( 0 );
+
+		return this;
+	}
+	gpcGL* SWP( SDL_Window* pWIN )
+	{
+		if( !this )
+			return NULL;
+
+		SDL_GL_SwapWindow( pWIN );
+
+		if( oPrgID < 0 )
+			return this;
+
+		glUseProgram(oPrgID);
+		SDL_RenderClear( pRNDR );
+
+		return this;
+	}
+
+	void rndr(	SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms,
+				SDL_Texture* pTX,
+				SDL_Texture* pTXchar,
+				SDL_Texture* pTXbg,
+				I4x2* pFRM, SDL_Rect divXY, I4x2 winSZ , const I4x2& txWH ) {
+		if( this ? !pTX : true)
+			return;
+		//GLint oldProgramId;
+		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
+		/*GLdouble model[16],
+				 proj[16];
+
+		glGetDoublev( GL_MODELVIEW_MATRIX, model );
+		glGetDoublev( GL_PROJECTION_MATRIX, proj );*/
+
+
+		SDL_SetRenderTarget( pSDLrndr, NULL );
+		SDL_RenderClear( pSDLrndr );
+		ms = sin( ms/1000.0 )+1.0;
+		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
+		glClear( 	//GL_COLOR_BUFFER_BIT|
+					GL_DEPTH_BUFFER_BIT );
+
+		/*glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
+
+		glMatrixMode( GL_MODELVIEW );
+		glLoadIdentity();*/
 
 		if( v_vxID < 0 )
 		{
@@ -122,20 +384,22 @@ public:
 
 
 			glEnableVertexAttribArray( v_vxID );
-			glBindBuffer( GL_ARRAY_BUFFER, gVBO );
-			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL );
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
+			glBindBuffer( GL_ARRAY_BUFFER, VXbID );
+			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0 );
+			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IXbID );
+
 			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
+
 			glDisableVertexAttribArray( v_vxID );
 			glUseProgram( 0 );
 		}
 
 		SDL_GL_SwapWindow( pWIN );
 
-		if( !oldProgramId )
+		if( oPrgID < 0 )
 			return;
 
-		glUseProgram(oldProgramId);
+		glUseProgram(oPrgID);
 		SDL_RenderClear( pSDLrndr );
 	}
 
@@ -307,32 +571,23 @@ public:
 		{
 			return gProgID;
 		}
+		v_uvID = glGetAttribLocation( gProgID, "v_uv" );
+		/*if( v_uvID < 0 )
+		{
+			return gProgID;
+		}*/
 
-		aTexID[0] = glGetUniformLocation( gProgID, "tex0");
-		aTexID[1] = glGetUniformLocation( gProgID, "tex1");
-		aTexID[2] = glGetUniformLocation( gProgID, "tex2");
-		aTexID[3] = glGetUniformLocation( gProgID, "aFRM" );
-		aTexID[4] = glGetUniformLocation( gProgID, "divXYwh" );
-		aTexID[5] = glGetUniformLocation( gProgID, "txWH" );
+		aTexID[0] = glGetUniformLocation( gProgID, "tex0" );
+		aTexID[1] = glGetUniformLocation( gProgID, "tex1" );
+		aTexID[2] = glGetUniformLocation( gProgID, "tex2" );
 		gPrgSucc = GL_TRUE;
 		return gProgID;
 
 	}
 
-	GLuint VBOnew( const GLfloat* pD, U4 nD, U4 nX ) {
-		//Create VBO
-		glGenBuffers( 1, &gVBO );
-		glBindBuffer( GL_ARRAY_BUFFER, gVBO );
-		glBufferData( GL_ARRAY_BUFFER, nX * nD * sizeof(*pD), pD, GL_STATIC_DRAW );
-		return gVBO;
-	}
-	GLuint IBOnew( const GLuint* pD, U4 nD ) {
-		//Create IBO
-		glGenBuffers( 1, &gIBO );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIBO );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, nD * sizeof(*pD), pD, GL_STATIC_DRAW );
-		return gIBO;
-	}
+
+
+
 
 
 
@@ -537,7 +792,7 @@ public:
 			}
 			return true;
 		}
-		SDL_Rect	wDIV( U1 iDIV );
+		I4x4	wDIV( U1 iDIV );
 		void		gpeWINresize( void );
 
 
@@ -552,22 +807,19 @@ public:
 			return (((U4)bSHIFT)<<9)|((U4)bALT<<10);
 		}
 
-		U4x2 chrWH( void )
-		{
+		U4x2 chrWH( void ) {
 			return U4x2( chrPIC.w, chrPIC.h );
 		}
 
-		I4x2 wFRM( U1 iDIV )
-		{
-			SDL_Rect div = wDIV( iDIV );
-			return I4x2( div.w/chrPIC.w, div.h/chrPIC.h );
+		I4x2 wFRM( U1 iDIV ) {
+			I4x4 div = wDIV( iDIV );
+			return I4x2( div.z/chrPIC.w, div.w/chrPIC.h );
 		}
-		U1 onDIVf( const I4x2& mXY )
-		{
+		U1 onDIVf( const I4x2& mXY ) {
 			SDL_Rect dim;
 			for( U4 i = 0; i < 4; i++ )
 			{
-				dim = wDIV(i);
+				dim = wDIV(i).xyWH;
 				if( dim.x > mXY.x || dim.y > mXY.y )
 					continue;
 				if( mXY.x-dim.x >= dim.w || mXY.y-dim.y >= dim.h  )

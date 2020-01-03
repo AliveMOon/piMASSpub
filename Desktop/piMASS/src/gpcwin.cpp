@@ -122,54 +122,86 @@ const char * InitError::what() const throw()
 	}
 	return out.bGD();
 }*/
-SDL_Rect gpcWIN::wDIV( U1 iDIV )
+I4x4 gpcWIN::wDIV( U1 iDIV )
 {
-	SDL_Rect div;
+	//SDL_Rect
+	I4x4 div;
 
 	switch( iDIV%4)
 	{
 		case 0:
-			div.w = (bSW&0x2) ? winDIV.x : winDIV.z;
-			div.h = (bSW&0xc) ? winDIV.y : winDIV.w;
+			div.z = (bSW&0x2) ? winDIV.x : winDIV.z;
+			div.w = (bSW&0xc) ? winDIV.y : winDIV.w;
 
 			div.x =
 			div.y = 0;
 			break;
 		case 1:
-			div.w = (bSW&0x2) ? winDIV.z-winDIV.x : 0;
-			div.h = (bSW&0x8) ? winDIV.y : winDIV.w;
+			div.z = (bSW&0x2) ? winDIV.z-winDIV.x : 0;
+			div.w = (bSW&0x8) ? winDIV.y : winDIV.w;
 
-			div.x = winDIV.z - div.w;
+			div.x = winDIV.z - div.z;
 			div.y = 0;
 			break;
 		case 2:
 			if( bSW&0x4 )
 			{
-				div.w = (bSW&0xa) ? winDIV.x : winDIV.z;
-				div.h = winDIV.w-winDIV.y;
+				div.z = (bSW&0xa) ? winDIV.x : winDIV.z;
+				div.w = winDIV.w-winDIV.y;
 			} else {
-				div.w = div.h = 0;
+				div.z = div.w = 0;
 			}
 
 			div.x = 0;
-			div.y = winDIV.w-div.h;
+			div.y = winDIV.w-div.w;
 			break;
 		case 3:
 			if( bSW&0x8 )
 			{
-				div.w = (bSW&0x4) ? winDIV.x : winDIV.z;
-				div.h = winDIV.y;
+				div.z = (bSW&0x4) ? winDIV.x : winDIV.z;
+				div.w = winDIV.y;
 			} else {
-				div.w = div.h = 0;
+				div.z = div.w = 0;
 			}
 
-			div.x = winDIV.z-div.w;
-			div.y = winDIV.w-div.h;
+			div.x = winDIV.z-div.z;
+			div.y = winDIV.w-div.w;
 			break;
 	}
 	return div;
 }
 char gpsSHDRvx[] =
+	"#version 120										\n"
+	"attribute	vec2	v_vx;							\n"
+	"attribute	vec2	v_uv;							\n"
+	"varying	vec2	fr_uv;							\n"
+	"void main()										\n"
+	"{													\n"
+	"	gl_Position			= vec4( v_vx, 0, 1);		\n"
+	"	fr_uv				= v_uv;						\n"
+	"}													\n\0";
+char gpsSHDR[] =
+	"#version 120																	\n"
+	"varying vec2 fr_uv;															\n"
+	"uniform sampler2D tex0;						// MINI 	ABGR?				\n"
+	"												// U4		XYZW				\n"
+	"												//			cFcA 				\n"
+	"uniform sampler2D tex1;						// MINI_CHAR_xXy_zXw.png		\n"
+	"uniform sampler2D tex2;						// BackGround					\n"
+	"uniform vec2 tgPX;																\n"
+	"uniform vec2 xyPX;																\n"
+	"uniform vec2 whPX;																\n"
+	"uniform vec2 aTX[8];															\n"
+	"void main()																	\n"
+	"{																				\n"
+	"	gl_FragColor	=	vec4( texture2D( tex2, fr_uv ).rgb, 0.0 );		// BG	\n"
+	"	gl_FragColor	+=	vec4( texture2D( tex1, fr_uv ).rgb, 0.0 );		// BG	\n"
+	"	gl_FragColor	+=	vec4( texture2D( tex0, fr_uv ).rgb, 0.0 );		// BG	\n"
+	"	gl_FragColor	+=	vec4( fr_uv, 1.0, 1.0 );						// BG	\n"
+	"																				\n"
+	"}																				\n\0";
+
+char gpsSHDRvx0[] =
 	"#version 120\n"
 	"attribute vec2 v_vx;\n"
 	"varying vec2 v_uv;\n"
@@ -178,115 +210,20 @@ char gpsSHDRvx[] =
 	"	gl_Position = vec4( v_vx, 0.0, 1.0f );\n"
 	"	v_uv = v_vx*vec2(0.5,-0.5) + 0.5 ;\n"
 	"}\n\0";
-char gpsSHDR[] =
 
-/*	"#version 120\n"
-	"varying vec2 v_uv;\n"
-	"uniform sampler2D tex0;	// MINI 	ABGR?\n"
-	"								// U4		XYZW\n"
-	"								//			cFcA \n"
-	"								\n"
-	"uniform sampler2D tex1;	// MINI_CHAR_xXy_zXw.png\n"
-	"uniform sampler2D tex2;	// BackGround\n"
-	"uniform vec2 aFRM[4];\n"
-	"uniform vec4 divXYwh;\n"
-	"uniform vec2 txWH;\n"
-	"void main()\n"
-	"{\n"
-	"	\n"
-	"	gl_FragColor		= vec4( texture2D( tex2, v_uv ).rgb, 0.0 );		// BG	\n"
-
-	"	// txMINI\n"
-	"	vec2	dUV		= v_uv*divXYwh.zw,\n"
-	"			q 		= floor( dUV );\n"
-	"	int		i 		= int(q.x + q.y*2); \n"
-	"	vec2 	qUV		= fract(dUV)*aFRM[i],\n"
-	"			qUVf	= fract(qUV)/vec2(8.0,32.0);									\n"
-	"	vec4	mini	= texture2D( tex0, qUV/txWH + q*0.25 )*0x100;					\n"
-	"	gl_FragColor.rba = vec3( qUVf + qUV/txWH + q*0.25, 0.5 ) \n"
-	"					+	vec3( mini.xy/0x100, 0.5 ); \n"
-	" 	return;\n"
-	"	\n"
-	"	// FRAME																\n"
-	"	vec2	fc 	= (mini.ba + vec2( 0xb0, 0 ))/vec2(8.0,4.0),			// 0xb0  176	11*16 22*8\n"
-	"			f_uv =	vec2(\n"
-	"							floor(fract(fc.x)*8.0)/8.0,\n"
-	"							floor(fc.x)/32.0\n"
-	"						)\n"
-	"					+ qUVf,\n"
-	"			c_uv = vec2(\n"
-	"							floor(fract(fc.y)*4.0)/128.0,\n"
-	"							floor(fc.y)/1024.0\n"
-	"						);\n"
-	"	\n"
-	"	gl_FragColor +=	min( mini.b, 1 )										// hátha b == 0 akor \n"
-	"																				// a töbit már nem csinálja\n"
-	"							* texture2D(tex1, c_uv )						// FRM color\n"
-	"							* texture2D(tex1, f_uv );						// FRM\n"
-
-	"	// CHAR\n"
-	"	vec2	ac = mini.rg/vec2(8.0,4.0),\n"
-	"			a_uv =	vec2( 														\n"
-	"							floor(fract(ac.x)*8.0)/8.0,						\n"
-	"							floor(ac.x)/32.0									\n"
-	"						) + qUVf;\n"
-	"	c_uv = vec2(\n"
-	"					floor(fract(ac.y)*4.0)/128.0,\n"
-	"					floor(ac.y)/1024.0\n"
-	"				);\n"
-	"	vec4 c = texture2D(tex1, c_uv );\n"
-	"	\n"
-	"	if( mini.r <= 0x60 )\n"
-	"	{\n"
-	"		gl_FragColor += min( mini.r, 1 ) * texture2D(tex1, a_uv ) * c;\n"
-	"		return;\n"
-	"	}\n"
-	"	\n"
-	"	ac = (mini.rr - vec2( 0x20, -0x20 ))/0x10;					\n"
-	"	a_uv =	vec2( 													\n"
-	"					floor(fract(ac.x)*0x10)/128.0,					\n"
-	"					floor(ac.x)/1024.0									\n"
-	"				);															\n"
-	"	c_uv =	vec2( 													\n"
-	"					floor(fract(ac.y)*0x10)/128.0,						\n"
-	"					floor(ac.y)/1024.0									\n"
-	"				);\n"
-	"	ac.x = texture2D(tex1, a_uv ).a;\n"
-	"	ac.y = texture2D(tex1, c_uv ).a;\n"
-	"	ac *= 0x100;\n"
-	"	ac.y += 0x60;\n"
-	"	if( ac.x >= 0x41 &&  ac.x <= 0x5a )\n"
-	"		ac.y += 8;\n"
-	"	ac /= 8.0;\n"
-	"\n"
-	"	a_uv =	vec2(\n"
-	"							floor(fract(ac.x)*8.0)/8.0,\n"
-	"							floor(ac.x)/32.0\n"
-	"						)\n"
-	"					+ qUVf;\n"
-	"	c_uv =	vec2(\n"
-	"							floor(fract(ac.y)*8.0)/8.0,\n"
-	"							floor(ac.y)/32.0\n"
-	"						)\n"
-	"					+ qUVf;\n"
-	"					\n"
-	"	gl_FragColor += max( texture2D(tex1, a_uv ), texture2D(tex1, c_uv ) ) * c;\n"
-	"}\n"
-	"\0\0\0\0"
-	*/
-
+char gpsSHDR0[] =
 	"#version 120\n"
 	"varying vec2 v_uv;\n"
-	"uniform sampler2D tex0;	// MINI 	ABGR?\n"
-	"								// U4		XYZW\n"
-	"								//			cFcA \n"
-	"								\n"
-	"uniform sampler2D tex1;	// MINI_CHAR_xXy_zXw.png\n"
-	"uniform sampler2D tex2;	// BackGround\n"
-	"uniform vec2 aFRM[4];\n"
-	"uniform vec4 divXYwh;\n"
-	"uniform vec2 txWH;\n"
-	"void main()\n"
+	"uniform sampler2D tex0;	// MINI 	ABGR?				\n"
+	"							// U4		XYZW				\n"
+	"							//			cFcA 				\n"
+	"															\n"
+	"uniform sampler2D tex1;	// MINI_CHAR_xXy_zXw.png		\n"
+	"uniform sampler2D tex2;	// BackGround					\n"
+	"uniform vec2 aFRM[4];										\n"
+	"uniform vec4 divXYwh;										\n"
+	"uniform vec2 txWH;											\n"
+	"void main()												\n"
 	"{\n"
 	"	\n"
 	"	gl_FragColor =	vec4( texture2D( tex2, v_uv ).rgb, 0.0 );		// BG	\n"
@@ -294,7 +231,6 @@ char gpsSHDR[] =
 	"			big 	= aFRM[0],										\n"
 	"			divUV 	= diWH*big,										\n"
 	"			Q 		= floor(diWH)*0.25;								\n"
-	//"	if( max( divUV.x / big.x, divUV.y/ big.y ) > 1.0 ) return; 				\n"
 	"	vec4	mini	= texture2D( tex0, divUV/txWH + Q )*0x100;					\n"
 	"	// FRAME																\n"
 	"	vec2	fc 	= (mini.ba + vec2( 0xb0, 0 ))/vec2(8.0,4.0),			// 0xb0  176	11*16 22*8\n"
@@ -422,14 +358,22 @@ static const GLfloat aVxD[] =
 	 1.0f,  1.0f,
 	-1.0f,  1.0f,
 };
+static const GLfloat aVX4[] =
+{
+	-1.0f, -1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f, -1.0f,  1.0f,
+};
 
 //IBO data
 static const GLuint aIxD[] = //{ 3, 2, 1, 0, };
-				{ 0, 1, 2, 3 };
+								{ 0, 1, 2, 3 };
 
 gpcGL::gpcGL( gpcWIN& win )
 {
 	gpmCLR;
+	oPrgID = -1;
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
@@ -447,15 +391,12 @@ gpcGL::gpcGL( gpcWIN& win )
 		return;
 	}
 
-	pTXback = SDL_CreateTexture(
+	pTRG = SDL_CreateTexture(
 									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 									win.winSIZ.z, win.winSIZ.w
 								);
 
 	gVxSucc = GL_FALSE;
-
-
-
 }
 
 
@@ -537,11 +478,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	pUSER = sUSER;
 
 	pGL = true ? new gpcGL( *this ) : NULL;
-	if( pGL ? !pGL->pTXback : true )
-	{
-		gpmDEL(pGL);
+	if( !pGL ) //? !pGL->pTXback : true )
 		return;
-	}
 
 	pGL->VxScmp( gpsSHDRvx );
 	if( pGL->gVxSucc != GL_TRUE )
@@ -555,7 +493,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	if( pGL->gPrgSucc != GL_TRUE )
 		return;
 
-	pGL->VBOnew( aVxD, gpmN(aVxD)/2, 2 );
+	//pGL->VBOnew( aVxD, gpmN(aVxD)/2, 2 );
 	pGL->IBOnew( aIxD, gpmN(aIxD) );
 
 }
@@ -580,12 +518,12 @@ void gpcWIN::gpeWINresize( void )
 	if( !pGL )
 		return;
 
-    gpmSDL_FreeTX( pGL->pTXback );
-    pGL->pTXback = SDL_CreateTexture( pSDLrndr, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, winSIZ.z, winSIZ.w );
-	if( pGL->pTXback )
+	/*gpmSDL_FreeTX( pGL->pTRG );
+    pGL->pTRG = SDL_CreateTexture( pSDLrndr, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, winSIZ.z, winSIZ.w );
+	if( pGL->pTRG )
 		return;
 
-	gpmDEL(pGL);
+	gpmDEL(pGL);*/
 
 }
 
@@ -622,9 +560,21 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 			}
 
-			gpcPIC* pPIC = pGL ? piMASS->PIC.PIC( I8x2( gpeALF_MINI, 0 ) ) : NULL;
+			gpcPIC* pPIC = pGL ? piMASS->PIC.PIC( I8x2(gpeALF_MINI,0) ) : NULL;
 			if( pPIC )
-			{
+			if( pGL->v_uvID > -1 ) {
+				SDL_Rect w = wDIV(0).xyWH;
+				pGL->TRG( pSDLrndr, 0, winSIZ.a4x2[0], mSEC.x )
+				->SET_box( I4x2(w.x,w.y), I4x2(w.w,w.h), NULL ) //aVX4 )
+				->SET_tx( 0, pPIC->pTX, pPIC->txWH.a4x2[0] )
+				->SET_tx( 1, pTXchar, I4x2(16*8,32*32) )
+				->SET_tx( 2,	(pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL),
+								(pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960))
+						)
+				->DRW( apCRS[0]->gtFRMxy(), apCRS[0]->gtFRMwh() );
+				pGL->SWP( pSDLwin );
+			} else {
+
 				I4x2 aFRM[4];
 				gpmZ(aFRM);
 				for( U4 i = 0; i < 4; i++ )
@@ -633,15 +583,15 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				}
 				pGL->rndr(
 							pSDLrndr, pSDLwin, mSEC.x,
-							pPIC->pTX ? pPIC->pTX : pTXchar, pTXchar,				// charSET  texture
+							pPIC->pTX, pTXchar,				// charSET  texture
 							( pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL ), 		// background texture
-							aFRM, wDIV(0), winSIZ.a4x2[0], pPIC->txWH.a4x2[0]
+							aFRM, wDIV(0).xyWH, winSIZ.a4x2[0], pPIC->txWH.a4x2[0]
 						);
 			}
-			else if( pSDLrndr)
+			/*else if( pSDLrndr)
 				SDL_RenderPresent( pSDLrndr );
 			else if( pSDLwin )
-				SDL_UpdateWindowSurface( pSDLwin );
+				SDL_UpdateWindowSurface( pSDLwin );*/
 
 
 			*gppKEYbuff = 0;
@@ -925,7 +875,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								//
 								//---------------------
 								I4 mag = -ev.wheel.y;
-								SDL_Rect div = wDIV(onDIV.x);
+								SDL_Rect div = wDIV(onDIV.x).xyWH;
 								if( mag < 0 )
 								{
 									if( apCRS[onDIV.x]->gtFRMwh().x == 4 )
