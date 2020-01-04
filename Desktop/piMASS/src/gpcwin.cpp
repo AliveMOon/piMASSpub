@@ -176,30 +176,54 @@ char gpsSHDRvx[] =
 	"attribute	vec2	v_uv;							\n"
 	"varying	vec2	fr_uv;							\n"
 	"void main()										\n"
-	"{													\n"
-	"	gl_Position			= vec4( v_vx, 0, 1);		\n"
-	"	fr_uv				= v_uv;						\n"
+	"{																	\n"
+	"	gl_Position			= vec4( v_vx*vec2(2.0,-2.0)+vec2(-1.0,1.0), 0, 1);		\n"
+	"	fr_uv				= v_uv;										\n"
 	"}													\n\0";
 char gpsSHDR[] =
 	"#version 120																	\n"
 	"varying vec2 fr_uv;															\n"
-	"uniform sampler2D tex0;						// MINI 	ABGR?				\n"
+	"uniform sampler2D tex0;						// MINI_CHAR_xXy_zXw.png		\n"
+	"uniform sampler2D tex1;						// MINI 	ABGR?				\n"
 	"												// U4		XYZW				\n"
 	"												//			cFcA 				\n"
-	"uniform sampler2D tex1;						// MINI_CHAR_xXy_zXw.png		\n"
 	"uniform sampler2D tex2;						// BackGround					\n"
 	"uniform vec2 tgPX;																\n"
 	"uniform vec2 xyPX;																\n"
 	"uniform vec2 whPX;																\n"
 	"uniform vec2 aTX[8];															\n"
+	"vec4 cr_lut( vec2 ac )															\n"
+	"{																				\n"
+	"	ac /= vec2(8.0,4.0);														\n"
+	"	return vec4( 																\n"
+	"						floor( vec2(fract(ac.x)*8.0, ac.x) ), 	// char			\n"
+	"						floor( vec2(fract(ac.y)*4.0, ac.y) )	// LUT		  	\n"
+	"					)															\n"
+	"			/ vec4(																\n"
+	"						8.0,32.0,												\n"
+	"						128.0,1024.0											\n"
+	"					);															\n"
+	"}																				\n"
 	"void main()																	\n"
 	"{																				\n"
-	"	gl_FragColor	=	vec4( texture2D( tex2, fr_uv ).rgb, 0.0 );		// BG	\n"
-	"	gl_FragColor	+=	vec4( texture2D( tex1, fr_uv ).rgb, 0.0 );		// BG	\n"
-	"	gl_FragColor	+=	vec4( texture2D( tex0, fr_uv ).rgb, 0.0 );		// BG	\n"
-	"	gl_FragColor	+=	vec4( fr_uv, 1.0, 1.0 );						// BG	\n"
+	"	vec2	frm1 = fr_uv*whPX,													\n"
+	"			big_in = fract(frm1)/aTX[0],										\n"
+	"			frm0 = frm1/aTX[2];													\n"
+	"	vec4	big = texture2D( tex2, frm0 )*0x100;								\n"
 	"																				\n"
-	"}																				\n\0";
+	"	gl_FragColor = vec4( texture2D( tex1, fr_uv ).rgb, 0.0 );			// BG	\n"
+	//"	gl_FragColor += vec4( texture2D( tex0, fr_uv ).rgb*0.125, 0.0 );	// CHAR	\n"
+
+	"	vec4	cl = cr_lut(big.rg),												\n"
+	"			l_rgb = texture2D( tex0, cl.zw );									\n"
+	//"	if( big.r > 0 )																\n"
+	"	{																			\n"
+	"		gl_FragColor += texture2D( tex0, cl.xy+big_in )*l_rgb;					\n"
+	"	}																			\n"
+
+	"	gl_FragColor	+=	vec4( 0, big_in*0.25, 1.0 ) + big/0x200;	// BG		\n"
+	"																				\n"
+	"}\n";
 
 char gpsSHDRvx0[] =
 	"#version 120\n"
@@ -252,52 +276,53 @@ char gpsSHDR0[] =
 
 	"	// CHAR\n"
 	"	vec2	ac = mini.rg/vec2(8.0,4.0),\n"
-	"			a_uv =	vec2( 														\n"
-	"							floor(fract(ac.x)*8.0)/8.0,						\n"
-	"							floor(ac.x)/32.0									\n"
-	"						) + uv;\n"
-	"	c_uv = vec2(\n"
-	"					floor(fract(ac.y)*4.0)/128.0,\n"
-	"					floor(ac.y)/1024.0\n"
-	"				);\n"
-	"	vec4 c = texture2D(tex1, c_uv );\n"
-	"	\n"
-	"	if( mini.r <= 0x60 )\n"
-	"	{\n"
-	"		gl_FragColor += min( mini.r, 1 ) * texture2D(tex1, a_uv ) * c;\n"
-	"		return;\n"
-	"	}	\n"
-	"	\n"
-	"	ac = (mini.rr - vec2( 0x20, -0x20 ))/0x10;\n"
-	"	a_uv =	vec2( 														\n"
-	"					floor(fract(ac.x)*0x10)/128.0,						\n"
-	"					floor(ac.x)/1024.0									\n"
-	"				);\n"
-	"	c_uv =	vec2( 														\n"
-	"					floor(fract(ac.y)*0x10)/128.0,						\n"
-	"					floor(ac.y)/1024.0									\n"
-	"				);\n"
-	"	ac.x = texture2D(tex1, a_uv ).a;\n"
-	"	ac.y = texture2D(tex1, c_uv ).a;\n"
-	"	ac *= 0x100;\n"
-	"	ac.y += 0x60;\n"
-	"	if( ac.x >= 0x41 &&  ac.x <= 0x5a )\n"
-	"		ac.y += 8;\n"
-	"	ac /= 8.0;\n"
-	"	\n"
-	"	a_uv =	vec2(\n"
-	"							floor(fract(ac.x)*8.0)/8.0,\n"
-	"							floor(ac.x)/32.0\n"
-	"						)\n"
-	"					+ uv;\n"
-	"	c_uv =	vec2(\n"
-	"							floor(fract(ac.y)*8.0)/8.0,\n"
-	"							floor(ac.y)/32.0\n"
-	"						)\n"
-	"					+ uv;\n"
-	"					\n"
-	"	gl_FragColor += max( texture2D(tex1, a_uv ), texture2D(tex1, c_uv ) ) * c;\n"
-	"}	\n";
+	"			a_uv =	vec2( 															\n"
+	"							floor(fract(ac.x)*8.0)/8.0,								\n"
+	"							floor(ac.x)/32.0										\n"
+	"						) + uv;														\n"
+	"	c_uv = vec2(																	\n"
+	"					floor(fract(ac.y)*4.0)/128.0,									\n"
+	"					floor(ac.y)/1024.0												\n"
+	"				);																	\n"
+	"	vec4 c = texture2D(tex1, c_uv );												\n"
+	"																					\n"
+	"	if( mini.r <= 0x60 )															\n"
+	"	{																				\n"
+	"		gl_FragColor += min( mini.r, 1 ) * texture2D(tex1, a_uv ) * c;				\n"
+	"		return;																		\n"
+	"	}																				\n"
+	"																					\n"
+	"	ac = (mini.rr - vec2( 0x20, -0x20 ))/0x10;										\n"
+	"	a_uv =	vec2( 																	\n"
+	"					floor(fract(ac.x)*0x10)/128.0,									\n"
+	"					floor(ac.x)/1024.0												\n"
+	"				);																	\n"
+	"	c_uv =	vec2( 																	\n"
+	"					floor(fract(ac.y)*0x10)/128.0,									\n"
+	"					floor(ac.y)/1024.0												\n"
+	"				);																	\n"
+	"	ac.x = texture2D(tex1, a_uv ).a;												\n"
+	"	ac.y = texture2D(tex1, c_uv ).a;												\n"
+	"	ac *= 0x100;																	\n"
+	"	ac.y += 0x60;																	\n"
+	"	if( ac.x >= 0x41 &&  ac.x <= 0x5a )												\n"
+	"		ac.y += 8;																	\n"
+	"	ac /= 8.0;																		\n"
+	"																					\n"
+	"	a_uv =	vec2(																	\n"
+	"							floor(fract(ac.x)*8.0)/8.0,								\n"
+	"							floor(ac.x)/32.0										\n"
+	"						)															\n"
+	"					+ uv;															\n"
+	"	c_uv =	vec2(																	\n"
+	"							floor(fract(ac.y)*8.0)/8.0,								\n"
+	"							floor(ac.y)/32.0										\n"
+	"						)															\n"
+	"					+ uv;															\n"
+	"																					\n"
+	"	gl_FragColor += max( texture2D(tex1, a_uv ), texture2D(tex1, c_uv ) ) * c;		\n"
+	"}																					\n";
+
 char gpsSHDRfr_ref[] =
 	"#version 120																		\n"
 	"varying vec2 v_uv;																	\n"
@@ -395,8 +420,14 @@ gpcGL::gpcGL( gpcWIN& win )
 									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 									win.winSIZ.z, win.winSIZ.w
 								);
-
+	trgWH = win.winSIZ.a4x2[1];
 	gVxSucc = GL_FALSE;
+
+	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
+	if( pTXchar )
+		cout << "char" << (int)win.pSRFchar << endl;
+	else
+		cout << SDL_GetError() << endl;
 }
 
 
@@ -425,7 +456,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 
 	winDIV = winSIZ/I4x4(2,2,1,1);
 	pSDLwin = SDL_CreateWindow(	"Custom shader with SDL2 renderer!", SDL_WINDOWPOS_CENTERED,
-								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE );
+								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL );
 
 	SDL_SetHint( SDL_HINT_RENDER_DRIVER, "1" );
 
@@ -467,9 +498,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 		pC[(i>>4)*pSRFchar->w + (i&0xf)] = 0x01010101*(gpsHUNtx[i]-' ');
 	}
 
-	pTXchar = SDL_CreateTextureFromSurface( pSDLrndr, pSRFchar );
-	if( !pTXchar )
-		cout << SDL_GetError() << endl;
+
 
 	gppKEYbuff = gpsKEYbuff;
 	gppMOUSEbuff = gpsKEYbuff;
@@ -560,39 +589,27 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 			}
 
-			gpcPIC* pPIC = pGL ? piMASS->PIC.PIC( I8x2(gpeALF_MINI,0) ) : NULL;
+			gpcPIC* pPIC = pGL ? piMASS->PIC.PIC( I8x2(gpeALF_TRG,0x10) ) : NULL;
 			if( pPIC )
 			if( pGL->v_uvID > -1 ) {
-				SDL_Rect w = wDIV(0).xyWH;
+				I4x4 w = wDIV(0);
+				//pPIC->unLOCK();
+				SDL_Texture* pBGtx = (pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL);
+
+				if( pBGtx == pGL->pTXchar )
+					pBGtx = NULL;
+
 				pGL->TRG( pSDLrndr, 0, winSIZ.a4x2[0], mSEC.x )
-				->SET_box( I4x2(w.x,w.y), I4x2(w.w,w.h), NULL ) //aVX4 )
-				->SET_tx( 0, pPIC->pTX, pPIC->txWH.a4x2[0] )
-				->SET_tx( 1, pTXchar, I4x2(16*8,32*32) )
-				->SET_tx( 2,	(pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL),
-								(pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960))
+				->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
+				->SET_tx( 0, pGL->pTXchar, I4x2(8,32) )
+				->SET_tx( 1,
+								pBGtx,
+								(pPICbg ? pPICbg->txWH.a4x2[0] 		: I4x2(1280,960))
 						)
+				->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )
 				->DRW( apCRS[0]->gtFRMxy(), apCRS[0]->gtFRMwh() );
 				pGL->SWP( pSDLwin );
-			} else {
-
-				I4x2 aFRM[4];
-				gpmZ(aFRM);
-				for( U4 i = 0; i < 4; i++ )
-				{
-					aFRM[i] = apCRS[i] ? apCRS[i]->gtFRMwh() : I4x2(0);
-				}
-				pGL->rndr(
-							pSDLrndr, pSDLwin, mSEC.x,
-							pPIC->pTX, pTXchar,				// charSET  texture
-							( pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL ), 		// background texture
-							aFRM, wDIV(0).xyWH, winSIZ.a4x2[0], pPIC->txWH.a4x2[0]
-						);
 			}
-			/*else if( pSDLrndr)
-				SDL_RenderPresent( pSDLrndr );
-			else if( pSDLwin )
-				SDL_UpdateWindowSurface( pSDLwin );*/
-
 
 			*gppKEYbuff = 0;
 			U1 iRDY = 0x10;

@@ -423,7 +423,7 @@ bool gpcCRS::miniOFFgl( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 winWH ) {
 		gpmDELary( pMINI );
 
 	winWH /= I4x2(8,16);
-	winWH &= I4x2(4,5);
+	winWH &= I4x2(2,5);
 	pLOCK = pPIC->u1x4LOCK( pRNDR, winWH, winWH.x );
 
 	pMINI = pLOCK;
@@ -722,7 +722,7 @@ public:
 						src.y = (cs>>3)*src.h + scy;
 					}
 
-					gpdBLTstx( win.pTXchar, &src, win.pSDLrndr, &dstPX );
+					gpdBLTstx( win.pTXize, &src, win.pSDLrndr, &dstPX );
 				}
 
 				if( !pMINI[i].w )
@@ -749,7 +749,7 @@ public:
 						fdsrc.y = (fds>>3)*src.h + fscy;
 					}
 
-					gpdBLTstx( win.pTXchar, &fdsrc, win.pSDLrndr, &dstPX );
+					gpdBLTstx( win.pTXize, &fdsrc, win.pSDLrndr, &dstPX );
 
 				}
 
@@ -760,7 +760,7 @@ public:
 					fsrc.y = (fcs>>3)*fsrc.h + fscy;
 				}
 
-				gpdBLTstx( win.pTXchar, &fsrc, win.pSDLrndr, &dstPX );
+				gpdBLTstx( win.pTXize, &fsrc, win.pSDLrndr, &dstPX );
 
 			}
 		}
@@ -786,7 +786,7 @@ public:
 
 				dstPX.y *= dstPX.h;
 				dstPX.y += divPX.y;
-				crs.frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXchar, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+				crs.frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
 			}
 		}
 
@@ -804,7 +804,7 @@ public:
 		dstPX.x += divPX.x;
 		dstPX.y += divPX.y;
 
-		crs.frmDRWtx( dstPX, src, CRSfrm.a4x2[1], win.pSDLrndr, win.pTXchar, frmC, 0, (U1*)(crs.id == pTD->sDIV ? "EDIT" : "TARGET") );
+		crs.frmDRWtx( dstPX, src, CRSfrm.a4x2[1], win.pSDLrndr, win.pTXize, frmC, 0, (U1*)(crs.id == pTD->sDIV ? "EDIT" : "TARGET") );
 
 	}
 };
@@ -1596,7 +1596,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 					dstPX.y *= dstPX.h;
 					dstPX.y += divPX.y;
 
-					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXchar, frmC, 0, lurdAN.a4x2[0].strA4N(sSTR) );
+					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, frmC, 0, lurdAN.a4x2[0].strA4N(sSTR) );
 				}
 
 
@@ -1626,7 +1626,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 					dstPX.y *= dstPX.h;
 					dstPX.y += divPX.y;
 
-					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXchar, frmC, 0, lurdAN.a4x2[1].strA4N(sSTR) );
+					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, frmC, 0, lurdAN.a4x2[1].strA4N(sSTR) );
 				}
 
 				for( i = 0; i < ie; i++ )
@@ -1720,7 +1720,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 						dstPX.y *= dstPX.h;
 						dstPX.y += divPX.y;
 
-						frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXchar, frmC, 1, NULL );
+						frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, frmC, 1, NULL );
 					}
 				}
 			}
@@ -1761,7 +1761,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 				dstPX.x = (i%CRSfrm.z)*dstPX.w + divPX.x;
 				dstPX.y = (i/CRSfrm.z)*dstPX.h + divPX.y;
 
-				gpdBLTstx( win.pTXchar, &src, win.pSDLrndr, &dstPX );
+				gpdBLTstx( win.pTXize, &src, win.pSDLrndr, &dstPX );
 			}
 
 			if( !pMINI[i].w )
@@ -1783,14 +1783,14 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 					c += 8;
 				src.x = (d&7)*src.w + scx;
 				src.y = (d>>3)*src.h + scy;
-				gpdBLTstx( win.pTXchar, &src, win.pSDLrndr, &dstPX );
+				gpdBLTstx( win.pTXize, &src, win.pSDLrndr, &dstPX );
 
 			}
 
 			src.x = (c&7)*src.w + scx;
 			src.y = (c>>3)*src.h + scy;
 
-			gpdBLTstx( win.pTXchar, &src, win.pSDLrndr, &dstPX );
+			gpdBLTstx( win.pTXize, &src, win.pSDLrndr, &dstPX );
 
 		}
 	}
@@ -1817,7 +1817,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 			dstPX.y *= dstPX.h;
 			dstPX.y += divPX.y;
-			frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXchar, gpeCLR_white, 0,  (scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+			frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, gpeCLR_white, 0,  (scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
 		}
 	}
 
@@ -1835,7 +1835,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	dstPX.x += divPX.x;
 	dstPX.y += divPX.y;
 
-	frmDRWtx( dstPX, src, CRSfrm.a4x2[1], win.pSDLrndr, win.pTXchar, frmC, 0, (U1*)(id == sDIV ? "EDIT" : "TARGET") );
+	frmDRWtx( dstPX, src, CRSfrm.a4x2[1], win.pSDLrndr, win.pTXize, frmC, 0, (U1*)(id == sDIV ? "EDIT" : "TARGET") );
 	return false;
 }
 void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )

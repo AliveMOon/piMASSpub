@@ -53,7 +53,8 @@ public:
 			boxXY, 	boxWH,
 			aTXwh[0x10];
 
-	SDL_Texture	*pTRG;
+	SDL_Texture	*pTRG,
+				*pTXchar;
 
 
 	~gpcGL()
@@ -74,24 +75,27 @@ public:
 			return NULL;
 
 		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
-		SDL_SetRenderTarget( pRNDR, NULL );
-		SDL_RenderClear( pRNDR );
+		//SDL_SetRenderTarget( pRNDR, NULL );
+		//SDL_RenderClear( pRNDR );
 		//glUseProgram( gProgID );
 
+		if( pTRG )
 		if( trgWH != tWH )
 		{
 			gpmSDL_FreeTX( pTRG );
 			pTRG = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, tWH.x, tWH.y );
 			if( !pTRG )
 				return NULL;
-			SDL_SetRenderTarget( pRNDR, pTRG );
+			//pTXchar = SDL_CreateTextureFromSurface( pRNDR, pSRFchar );
+		}
+
+		if( aUniID[2] < 1 )
+		{
 			aUniID[0] = glGetUniformLocation( gProgID, "tgPX" );
 			aUniID[1] = glGetUniformLocation( gProgID, "xyPX" );
 			aUniID[2] = glGetUniformLocation( gProgID, "whPX" );
 			aUniID[3] = glGetUniformLocation( gProgID, "aTX" );
 		}
-
-
 
 		luXY = lXY;
 		trgWH = tWH;
@@ -106,6 +110,11 @@ public:
 		glClearColor( ms*0.13, 0.0f, ms*0.3, 0.0f );
 		glClearDepth(1.0);
 		glClear( b );
+
+		//glEnable(GL_TEXTURE_2D);
+		//SDL_SetRenderTarget( pRNDR, pTRG );
+		//char* pERR = (char*)SDL_GetError();
+
 		return this;
 	}
 	GLuint IBOnew( const GLuint* pD, U4 nD ) {
@@ -125,7 +134,7 @@ public:
 		return VXbID;
 	}
 
-	gpcGL* SET_box( I4x2 xy, const I4x2& wh, const GLfloat* pVX4 )
+	gpcGL* SET_box( I4x2 xy, const I4x2& wh )
 	{
 		if( this ? !wh.area() : true )
 			return NULL;
@@ -148,18 +157,16 @@ public:
 		xy -= luXY;
 
 		aV4[0].aF2[1] = 0;
+		aV4[1].aF2[1] = Fx2( 1, 0 );
+		aV4[2].aF2[1] = Fx2( 1, 1 );
+		aV4[3].aF2[1] = Fx2( 0, 1 );
+
 		aV4[0].aF2[0] = xy;
-
-		aV4[1].aF2[1] = I4x2( trgWH.x, 0 );
 		aV4[1].aF2[0] = xy + I4x2( wh.x, 0 );
-
-		aV4[2].aF2[1] = trgWH;
 		aV4[2].aF2[0] = xy + wh;
-
-		aV4[3].aF2[1] = Fx2(0,trgWH.y);
 		aV4[3].aF2[0] = xy + I4x2( 0, wh.y );
 
-		aV4[0].div( trgWH, gpmN(aV4) );
+		aV4[0].div( Fx4( trgWH, I4x2(1,1) ), gpmN(aV4) );
 
 		if( VXbID > 0 )
 			glDeleteBuffers(1,  &VXbID );
@@ -240,7 +247,7 @@ public:
 		return this;
 	}
 
-	gpcGL* SET_tx( U1 i, SDL_Texture* pTX, I4x2 wh )
+	gpcGL* SET_tx( U4 i, SDL_Texture* pTX, I4x2 wh )
 	{
 		if( !this )
 			return NULL;
@@ -248,14 +255,11 @@ public:
 		if( aTexID[i] < 0 )
 			return this;
 		if( !pTX )
-		{
-			//glDisable(GL_TEXTURE_2D);
 			return this;
-		}
 
-		glEnable(GL_TEXTURE_2D);
 		glUniform1i( aTexID[i], i );
-		glActiveTexture(GL_TEXTURE0+i);
+		glActiveTexture( GL_TEXTURE0+i );
+		glEnable(GL_TEXTURE_2D);
 		SDL_GL_BindTexture( pTX, NULL, NULL );
 
 		if( aUniID[3] > -1 )
@@ -269,11 +273,11 @@ public:
 		if( !this )
 			return NULL;
 
-		glMatrixMode( GL_PROJECTION );
+		/*glMatrixMode( GL_PROJECTION );
 		glLoadIdentity();
 
 		glMatrixMode( GL_MODELVIEW );
-		glLoadIdentity();
+		glLoadIdentity();*/
 
 		if( aUniID[0] > -1 )
 			glUniform2f( aUniID[0], (float)trgWH.x, (float)trgWH.y );
@@ -603,13 +607,15 @@ class gpcWIN
 						mouseXY, mouseW,
 						SRCxycr, SRCin;
 
+
 		gpcGL		*pGL;
 
 		SDL_Window		*pSDLwin;
 		SDL_Renderer	*pSDLrndr;
+
 		SDL_Texture		*pTXrndr,
 						*pTXsnd,
-						*pTXchar;
+						*pTXize;
 
 		SDL_Surface		*pSRFload,
 						*pSRFchar,

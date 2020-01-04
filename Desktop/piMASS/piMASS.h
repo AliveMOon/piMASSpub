@@ -3271,9 +3271,10 @@ public:
     {
         gpmMEMCPY( this, pF, 1 );
     }
-    Fx4( I4x2 xy )
+    Fx4( I4x2 xy, I4x2 zw = 0 )
     {
-        aF2[0] = aF2[1] = xy;
+        aF2[0] = xy;
+        aF2[1] = zw;
     }
     double sum( void ) const
     {
