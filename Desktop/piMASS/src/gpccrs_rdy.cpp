@@ -23,7 +23,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_R
 		bESC = true;
 	}
 	SDL_Rect div = win.wDIV( id ).xyWH;
-	U4 off = (div.x ? pPIC->txWH.x/8: 0) + (div.y ? pPIC->txWH.a4x2[0].area()/10: 0) ;
+	U4 off = (div.x ? pPIC->txWH.x/4: 0) + (div.y ? pPIC->txWH.a4x2[0].area()/10: 0) ;
 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
 		gpmZn( pMINI + off + h*pPIC->txWH.x, CRSfrm.z );
