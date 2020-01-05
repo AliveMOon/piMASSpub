@@ -75,12 +75,19 @@ class gpcCRS
 				return CRSfrm.a4x2[1];
 			}
 
-			if( c < 3 )
-				c = 3;
+			if( c < gpdSRC_COLw )
+				c = gpdSRC_COLw;
 
 			r = c*CR.y;
-			r /= CR.x;
-			CRSfrm.a4x2[1] = CR;
+			if( r < CR.x )
+			{
+                r = 1;
+                c = r*CR.x;
+                c /= CR.y;
+			} else
+				r /= CR.x;
+
+			CRSfrm.a4x2[1] = I4x2(c,r);
 			return CRSfrm.a4x2[1];
 /*
 

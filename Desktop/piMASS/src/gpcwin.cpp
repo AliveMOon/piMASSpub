@@ -91,7 +91,7 @@ char gpsSHDR[] =
 	"	vec2	frm1 = fr_uv*whPX,													\n"
 	"			big_in = fract(frm1)/aTX[0],										\n"
 	"			frm0 = frm1/aTX[2],													\n"
-	"			off0 = vec2( 1.0/4.0, 1.0/10.0 );								\n"
+	"			off0 = vec2( 1.0/4.0, 1.0/6.0 );								\n"
 	"	if( xyPX.x < 1 )						\n"
 	" 		off0.x = 0.0;						\n"
 	"	if( xyPX.y < 1 )						\n"
@@ -801,7 +801,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								// 		WHEEL ZOOM
 								//
 								//---------------------
-								I4 mag = apCRS[onDIV.x]->gtFRMwh().x - ev.wheel.y;
+								I4 mag = apCRS[onDIV.x]->gtFRMwh().x - ev.wheel.y*2;
 
 								apCRS[onDIV.x]->stFRMwh(
 															*this,
