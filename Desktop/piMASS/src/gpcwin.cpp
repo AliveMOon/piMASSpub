@@ -810,49 +810,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 														);
 								nIRQ++;
 								break;
-								/*
-
-								SDL_Rect div = wDIV(onDIV.x).xyWH;
-								if( mag < 0 )
-								{
-									if( apCRS[onDIV.x]->gtFRMwh().x == 4 )
-										break;
-
-									if( apCRS[onDIV.x]->gtFRMwh().x < 4 )
-									{
-										apCRS[onDIV.x]->stFRMwh(
-																	*this,
-																	4,
-																	(4*div.h*2) / (div.w*3)
-																);
-										nIRQ++;
-										break;
-									}
-								} else {
-									if( apCRS[onDIV.x]->gtFRMwh().x == div.w/8 )
-										break;
-
-									if( apCRS[onDIV.x]->gtFRMwh().x > div.w/8 )
-									{
-										apCRS[onDIV.x]->stFRMwh(
-																	*this,
-																	div.w/8,
-																	((div.w>>3)*div.h*2) / (div.w*3)
-																);
-										nIRQ++;
-										break;
-									}
-								}
-
-
-
-								apCRS[onDIV.x]->stFRMwh(
-															*this,
-															apCRS[onDIV.x]->gtFRMwh().x+mag, 0,
-															mag
-														);
-								nIRQ++;
-								break;*/
 							}
 							break;
 						}
@@ -1135,95 +1092,76 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
 													aXY[1]-'0';
 							U1 div = nF-1, msk = (0x1<<(div));
-							if( !div )
+							if( div < 4 )
 							{
-								//onDIV.x = 0;
-
-								if( bSHIFT )
+								if( !div )
 								{
-									dstDIV = srcDIV = 0;
-									bSW = 1;
-									div = 4;
-								} else {
-									if( !srcDIV )
+									//onDIV.x = 0;
+
+									if( bSHIFT )
 									{
-										srcDIV = dstDIV;
-										dstDIV = 0;
+										dstDIV = srcDIV = 0;
+										bSW = 1;
+										div = 4;
 									} else {
-										dstDIV = srcDIV;
-										srcDIV = 0;
+										if( !srcDIV )
+										{
+											srcDIV = dstDIV;
+											dstDIV = 0;
+										} else {
+											dstDIV = srcDIV;
+											srcDIV = 0;
+										}
 									}
 								}
-							}
-							else if( div < 4 )
-							{
-								if( bSHIFT )
-								{
-									if( srcDIV == div )
-									{
-										srcDIV = dstDIV;
-										dstDIV = 0;
-									}
-									else if( dstDIV == div )
-									{
-										dstDIV = 0;
-									}
-								}
-								else if( srcDIV == div )
-								{
-									srcDIV = dstDIV;
-									dstDIV = div;
-								} else {
-									if( bSW&msk)
-									{
-										dstDIV = srcDIV;
-										srcDIV = div;
-									} else
-										dstDIV = div;
-
-								}
-
-								//U1 msk = (0x1<<(div));
-
-								if( bSW&msk )
+								else if( div < 4 )
 								{
 									if( bSHIFT )
 									{
-										div = 4;
-										bSW = (bSW&(~msk));
+										if( srcDIV == div )
+										{
+											srcDIV = dstDIV;
+											dstDIV = 0;
+										}
+										else if( dstDIV == div )
+										{
+											dstDIV = 0;
+										}
 									}
-								} else {
-									bSW |= msk;
+									else if( srcDIV == div )
+									{
+										srcDIV = dstDIV;
+										dstDIV = div;
+									} else {
+										if( bSW&msk)
+										{
+											dstDIV = srcDIV;
+											srcDIV = div;
+										} else
+											dstDIV = div;
+
+									}
+
+									//U1 msk = (0x1<<(div));
+
+									if( bSW&msk )
+									{
+										if( bSHIFT )
+										{
+											div = 4;
+											bSW = (bSW&(~msk));
+										}
+									} else {
+										bSW |= msk;
+									}
 								}
-							} else {
-								switch( nF )
+
+								bSW |= 1;
+								if( div < 4 )
 								{
-									case 5:{	/// F5 ----- COPY
-									} break;
-									case 6:{	/// F6 ----- MOVE
-									} break;
-									case 7:{	/// F7 ----- NEW
-									} break;
-									case 8:{	/// F8 ----- DELETE
-									} break;
-
-									case 9:{	/// F9 ----- ?
-									} break;
-									case 10:{	/// F10 ----- ?
-									} break;
-									case 11:{	/// F11 ----- ?
-									} break;
-									case 12:{	/// F12 ----- ?
-									} break;
-
+									if( !apCRS[div] )
+											apCRS[div] = new gpcCRS( *this, div );
 								}
-							}
-							bSW |= 1;
-							if( div < 4 )
-							{
-								if( !apCRS[div] )
-										apCRS[div] = new gpcCRS( *this, div );
-
 								for( U1 i = 0, sw = bSW; i < 4; i++, sw >>= 1 )
 								{
 									if( !(sw&1) )
@@ -1234,7 +1172,34 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 									apCRS[i]->stFRMwh( *this, apCRS[i]->gtFRMwh().x, 0 );
 								}
+								break;
 							}
+
+
+
+							switch( nF )
+							{
+								case 5:{	/// F5 ----- COPY
+								} break;
+								case 6:{	/// F6 ----- MOVE
+								} break;
+								case 7:{	/// F7 ----- NEW
+								} break;
+								case 8:{	/// F8 ----- DELETE
+								} break;
+
+								case 9:{	/// F9 ----- ?
+								} break;
+								case 10:{	/// F10 ----- ?
+								} break;
+								case 11:{	/// F11 ----- ?
+								} break;
+								case 12:{	/// F12 ----- ?
+								} break;
+
+							}
+
+
 
 						} break;
 					default:
