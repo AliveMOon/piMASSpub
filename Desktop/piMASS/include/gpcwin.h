@@ -670,7 +670,7 @@ class gpcWIN
 		gpcTHRD_DRW		*apT[gpdNdiv], *apTall[gpdNdiv];
 protected:
 private:
-		I4x4 winDIV;
+		I4x4 winDIVpx, winDIVcr;
 
 
 public:
@@ -798,7 +798,75 @@ public:
 			}
 			return true;
 		}
-		I4x4	wDIV( U1 iDIV );
+		I4x4 wDIVcr( U1 iDIV )
+		{
+			//SDL_Rect
+			I4x4 div;
+
+			switch( iDIV%4)
+			{
+				case 0:
+					div.z = (bSW&0x2) ? winDIVcr.x : winDIVcr.z;
+					div.w = (bSW&0xc) ? winDIVcr.y : winDIVcr.w;
+
+					div.x =
+					div.y = 0;
+					break;
+				case 1:
+					div.z = (bSW&0x2) ? winDIVcr.z-winDIVcr.x : 0;
+					div.w = (bSW&0x8) ? winDIVcr.y : winDIVcr.w;
+
+					div.x = winDIVcr.z - div.z;
+					div.y = 0;
+					break;
+				case 2:
+					if( bSW&0x4 )
+					{
+						div.z = (bSW&0xa) ? winDIVcr.x : winDIVcr.z;
+						div.w = winDIVcr.w-winDIVcr.y;
+					} else {
+						div.z = div.w = 0;
+					}
+
+					div.x = 0;
+					div.y = winDIVcr.w-div.w;
+					break;
+				case 3:
+					if( bSW&0x8 )
+					{
+						div.z = (bSW&0x4) ? winDIVcr.x : winDIVcr.z;
+						div.w = winDIVcr.y;
+					} else {
+						div.z = div.w = 0;
+					}
+
+					div.x = winDIVcr.z-div.z;
+					div.y = winDIVcr.w-div.w;
+					break;
+			}
+			return div;
+		}
+		I4x2 wFRM( U1 iDIV ) {
+			I4x2 whCR = winSIZ.a4x2[1]/I4x2( (int*)&chrPIC.w );
+			return whCR;
+			/*I4x2 whCR = wDIVcr(iDIV).a4x2[1];
+			I4 mag = (whCR.x*gpdSIZ2CR.x)/chrPIC.w;
+			return whCR&mag;*/
+			/*I4x4 div = wDIV( iDIV );
+			return I4x2( div.z/chrPIC.w, div.w/chrPIC.h );*/
+		}
+
+		I4x4 wDIVpx( U1 iDIV )
+		{
+			//SDL_Rect
+			I4x4 div = wDIVcr(iDIV);
+			div &= gpdSIZ2CR;
+			return div;
+		}
+		I4x2 wDIVcrALL()
+		{
+			return winDIVcr.a4x2[1]&gpdCRall;
+		}
 		void		gpeWINresize( void );
 
 
@@ -817,26 +885,23 @@ public:
 			return U4x2( chrPIC.w, chrPIC.h );
 		}
 
-		I4x2 wFRM( U1 iDIV ) {
-			I4x4 div = wDIV( iDIV );
-			return I4x2( div.z/chrPIC.w, div.w/chrPIC.h );
-		}
+
 		U1 onDIVf( const I4x2& mXY ) {
 			SDL_Rect dim;
 			for( U4 i = 0; i < 4; i++ )
 			{
-				dim = wDIV(i).xyWH;
+				dim = wDIVpx(i).xyWH;
 				if( dim.x > mXY.x || dim.y > mXY.y )
 					continue;
 				if( mXY.x-dim.x >= dim.w || mXY.y-dim.y >= dim.h  )
 					continue;
 				return i;
 			}
-			return (mXY.x/winDIV.x) | ((mXY.y/winDIV.y)<<1);
+			return (mXY.x/winDIVpx.x) | ((mXY.y/winDIVpx.y)<<1);
 		}
-		I4x2& winWH()
+		I4x2& winWHpx()
 		{
-			return winDIV.a4x2[1];
+			return winDIVpx.a4x2[1];
 		}
 		void	WINrun( const char* pWELLCOME );
 		bool	WINvar( gpcREG& out, gpeALF alf );

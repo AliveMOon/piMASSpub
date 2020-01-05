@@ -260,7 +260,6 @@ I4x4 gpcSRC::CRSmini(
 		}
 
 	}
-	cr = dim.w;
 
 	bool bON = false;
 	I4 nFILL;
@@ -330,58 +329,6 @@ I4x4 gpcSRC::CRSmini(
 			case '\t':
 				cxy.x = xy.x + ((cxy.x-xy.x)/4 + 1)*4;
 				continue;
-
-				/*aC[0] = *pC;
-				n = gpmNINCS( pC+1, aC );
-				if( !bON || (cxy.y < 0) )
-				{
-					cxy.x = xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4;
-					pC += n;
-					continue;
-				}
-
-				if( this == crs.apSRC[1] )
-				if( ((pC-pAL)+1+n) >= crs.iSTR.y )
-				{
-					pO[cr].y &= 0xf;
-					if( crs.iSTR.x != crs.iSTR.y )
-						pO[cr].y |= 8;
-					bON = false;
-					n = crs.iSTR.y-((pC-pAL)+1);
-				}
-
-				cxy.x++;
-				nFILL = (xy.x + ((cxy.x-xy.x)/4 + n)*4 + 4) - cxy.x;
-
-				//if( cxy.x < 0 )
-				if( cxy.x+nFILL < 1 )
-				{
-					cxy.x += nFILL;
-					pC += n;
-					continue;
-				}
-				else if( cxy.x < 0)
-				{
-					nFILL += cxy.x;
-					cxy.x = 0;
-				}
-
-				for(
-						U4	cr = cxy.x + cxy.y*fz,
-							cre = min( cxy.x+nFILL, fx) + cxy.y*fz;
-
-						cr < cre;
-
-						cr++
-					)
-				{
-					pO[cr].y |= 0x10;
-					pO[cr].x = ch;
-				}
-				cxy.x += nFILL;
-				pC += n;
-				continue;*/
-
 			case ' ':
 				cxy.x++;
 				continue;

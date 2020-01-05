@@ -66,8 +66,28 @@ class gpcCRS
 			return CRSfrm.a4x2[0];
 		}
 		I4x2 stFRMwh(	gpcWIN& win, //U1 iDIV,
-						I4 w, I4 h, I4 mag = 0 )
+						I4 c, I4 r, I4 mag = 0 )
 		{
+			I4x2 CR = win.wDIVcr(id).a4x2[1];
+			if( c > CR.x || r > CR.y )
+			{
+				CRSfrm.a4x2[1] = CR;
+				return CRSfrm.a4x2[1];
+			}
+
+			if( c < 3 )
+				c = 3;
+
+			r = c*CR.y;
+			r /= CR.x;
+			CRSfrm.a4x2[1] = CR;
+			return CRSfrm.a4x2[1];
+/*
+
+
+
+
+
 			if( w > 3 )
 				CRSfrm.z = w;
 
@@ -89,17 +109,19 @@ class gpcCRS
 			else
 				CRSfrm.w = (CRSfrm.z*div.h*2) / (div.w*3);
 
-			return CRSfrm.a4x2[1];
+			return CRSfrm.a4x2[1];*/
 		}
 
+		bool	miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 wh );
+		void	miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR );
+
+
 		bool	miniOFF( gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
-		bool	miniOFFgl( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 wh );
 
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
 		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		bool	miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		void	miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
-		void	miniRDYgl( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR );
 		///------------------------------
 		///
 		/// 		CRSins
@@ -530,7 +552,7 @@ class gpcCRS
 
 	private:
 		I4x4 		CRSfrm;
-		SDL_Rect 	wDIVfrm;
+		//SDL_Rect 	wDIVfrm;
 
 };
 

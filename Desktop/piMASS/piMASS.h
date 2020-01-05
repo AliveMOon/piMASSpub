@@ -285,6 +285,9 @@ class gpcMASS;
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 #define gpdPUB "+--- --  -   "
+#define gpdSIZ2CR I4x2(4,8)
+#define gpdCRall I4x2(2,3)
+
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 {
@@ -1971,6 +1974,16 @@ public:
         x = b.x;
         y = b.y;
     }
+    I4x2( int* pI )
+    {
+		if( !pI )
+		{
+			gpmCLR;
+			return;
+		}
+        x = pI[0];
+        y = pI[1];
+    }
 	// cnt = fract * U42(1, w);
 	I4x2& cnt2fract(U4 w, U8 cnt)
 	{
@@ -2032,21 +2045,16 @@ public:
 	}
 
 
+
 	I8 operator * (const I4x2& b) const
 	{
 		return (I8)x*b.x + (I8)y * b.y;
 	}
+
 	I4x2 operator & (const I4x2& b) const
 	{
 		return I4x2( x*b.x,  y*b.y );
 	}
-	I4x2 operator & (const U4x2& b) const
-	{
-		return I4x2( x*b.x,  y*b.y );
-	}
-
-
-
 
 	I4x2 operator % (const I4x2& b) const
 	{
@@ -2374,6 +2382,9 @@ public:
 		return pBUFF;
     }
 
+
+
+
     bool operator != ( const I4x4& b ) const
 	{
 		if( a4x2[0] != b.a4x2[0] )
@@ -2384,6 +2395,9 @@ public:
 	{
 		return !(*this!=b);
 	}
+
+
+
 
 	I4x4& operator += ( const I4x4& b )
 	{
@@ -2398,6 +2412,28 @@ public:
 		return *this;
 	}
 
+	I4x4& operator &= ( const I4x4& b )
+	{
+		a4x2[0] &= b.a4x2[0];
+		a4x2[1] &= b.a4x2[1];
+		return *this;
+	}
+	I4x4& operator %= ( const I4x4& b )
+	{
+		a4x2[0] %= b.a4x2[0];
+		a4x2[1] %= b.a4x2[1];
+		return *this;
+	}
+	I4x4& operator /= ( const I4x4& b )
+	{
+		a4x2[0] /= b.a4x2[0];
+		a4x2[1] /= b.a4x2[1];
+		return *this;
+	}
+
+
+
+
 	I4x4& operator += ( const I4x2& b )
 	{
 		a4x2[0] += b;
@@ -2410,6 +2446,28 @@ public:
 		a4x2[1] -= b;
 		return *this;
 	}
+
+	I4x4& operator &= ( const I4x2& b )
+	{
+		a4x2[0] &= b;
+		a4x2[1] &= b;
+		return *this;
+	}
+	I4x4& operator %= ( const I4x2& b )
+	{
+		a4x2[0] %= b;
+		a4x2[1] %= b;
+		return *this;
+	}
+	I4x4& operator /= ( const I4x2& b )
+	{
+		a4x2[0] /= b;
+		a4x2[1] /= b;
+		return *this;
+	}
+
+
+
 
 	I4x4& operator += ( U4 u )
 	{
@@ -2449,14 +2507,39 @@ public:
 		return *this;
 	}
 
+
+
 	I4x4 operator + (const I4x4& b) const
 	{
 		return I4x4( x+b.x, y+b.y, z+b.z, w+b.w );
 	}
+
 	I4x4 operator - (const I4x4& b) const
 	{
 		return I4x4( x-b.x, y-b.y, z-b.z, w-b.w );
 	}
+
+	I8 operator * (const I4x4& b) const
+	{
+		return a4x2[0]*b.a4x2[0] + a4x2[1]*b.a4x2[1];
+	}
+
+	I4x4 operator % (const I4x4& b) const
+	{
+		return I4x4( a4x2[0]%b.a4x2[0], a4x2[1]%b.a4x2[1] );
+	}
+
+	I4x4 operator / (const I4x4& b) const
+	{
+		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
+	}
+
+	I4x4 operator / (const U4x4& b) const
+	{
+		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
+	}
+
+
 
 	I4x4 operator * ( int b ) const
 	{
@@ -2484,18 +2567,7 @@ public:
 	{
 		return I4x4( a4x2[0]&b, a4x2[1]&b );
 	}
-	I4x4 operator / (const I4x4& b) const
-	{
-		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
-	}
-	I4x4 operator % (const I4x4& b) const
-	{
-		return I4x4( a4x2[0]%b.a4x2[0], a4x2[1]%b.a4x2[1] );
-	}
-	I4x4 operator / (const U4x4& b) const
-	{
-		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
-	}
+
 
 	I4x4 lurd( void )
 	{

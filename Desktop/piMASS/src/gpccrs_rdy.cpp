@@ -1,14 +1,40 @@
 #include "gpccrs.h"
 #include "gpcSRC.h"
+bool gpcCRS::miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 allWH ) {
+	if( !this )
+		return true;
 
+	if( !pPIC || !pRNDR )
+		return true;
+
+	if( pLOCK != pMINI )
+	{
+		gpmDELary( pMINI );
+	}
+
+
+	/*winWH /= I4x2(4,8);
+	winWH &= I4x2(2,3);*/
+	pLOCK = pPIC->u1x4LOCK( pRNDR, allWH, allWH.x );
+	pMINI = pLOCK;
+
+	if( !pLOCK )
+	{
+		nMINI = 0;
+		return true;
+	}
+
+	nMINI = pPIC->txWH.a4x2[0].area(); // CRSfrm.a4x2[1].area();
+	return false;
+}
 ///------------------------------
 ///
 /// 		miniRDYgl
 ///
 ///------------------------------
-void gpcCRS::miniRDYgl( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR )
+void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR )
 {
-	if( miniOFFgl( pPIC, pRNDR, win.winSIZ.a4x2[0] ) )
+	if( miniLOCK( pPIC, pRNDR, win.wDIVcrALL() ) )
 		return;
 	//U4 xFND;
 	bool bESC = false, bNoMini;
@@ -22,11 +48,14 @@ void gpcCRS::miniRDYgl( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_R
 		CRSfrm.y = CRSfrm.w;
 		bESC = true;
 	}
-	SDL_Rect div = win.wDIV( id ).xyWH;
-	U4 off = (div.x ? pPIC->txWH.x/4: 0) + (div.y ? pPIC->txWH.a4x2[0].area()/10: 0) ;
+	I4x2 div = win.wDIVcr( id ).a4x2[0];
+	U4	zz = pPIC->txWH.x,
+		off = 	  (div.x ? zz/4: 0)
+				+ (div.y ? pPIC->txWH.a4x2[0].area()/6: 0);
 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
-		gpmZn( pMINI + off + h*pPIC->txWH.x, CRSfrm.z );
+		gpmZn( pMINI + off + h*zz, CRSfrm.z );
+
 	if( bESC )
 		return;
 
@@ -132,7 +161,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, U1 iDIV, gpcMASS& mass, gpcPIC* pPIC, SDL_R
 												min(CRSfrm.z, xyWH.x+(int)pC[c]),	// fx
 												ie,									// fy
 
-												CRSfrm.z, pPIC->txWH.x,				// fz zz
+												CRSfrm.z, zz,				// fz zz
 												*this,
 												c16bg, gpeCLR_blue2, gpeCLR_blue2,
 												false
