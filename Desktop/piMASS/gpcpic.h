@@ -100,7 +100,7 @@ public:
 	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
 	gpcLZY			*pPACK;
-	U4				id, iSRC, iQC, nPIXall, nPIX, bppS, nPKavg;
+	U4				id, iSRC, aiQC[2], nPIXall, nPIX, bppS, nPKavg;
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
 	SDL_Texture		*pTX;
@@ -108,7 +108,7 @@ public:
 
 	I4x4			xyOUT, xySRC, txWH;
 	gpcPIC			*pSRC;
-	bool			bT;
+	bool			bTHRD;
 	std::thread		T;
 	//U1		*pPIX;
 
@@ -182,8 +182,16 @@ public:
 	SDL_Texture* surDRWtx( SDL_Renderer* pRNDR ) {
 		SDL_Surface* pS = pREF;
 		if( pSHR )
-			pS = pSHR;
-		else if( pSRF )
+		{
+			if( pSRF )
+			{
+				if( aiQC[0] > aiQC[1] )
+					pS = pSRF;
+				else
+					pS = pSHR;
+			} else
+				pS = pSHR;
+		} else if( pSRF )
 			pS = pSRF;
 
 		if( pREF == pS )

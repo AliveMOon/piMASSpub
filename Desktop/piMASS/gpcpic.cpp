@@ -177,13 +177,13 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 	{
 		usleep(3*1000);
 	}
-	if( iQC >= qc )
+	if( aiQC[0] >= qc )
 		return NULL; //pSRF ? (U1*)pSRF->pixels : NULL;
 
-	if( bT )
+	if( bTHRD )
 	{
 		pREF = NULL;
-		iQC = qc+gpdRPI_tOUT;
+		aiQC[0] = qc+gpdRPI_tOUT;
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 
@@ -228,13 +228,13 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 		trd.pC = pC;
 		trd.pSRF = pSRF;
 
-		if( !bT )
+		if( !bTHRD )
 		{
 			T = std::thread( call_cam, &trd );
 			usleep(3*1000);
-			bT = true;
+			bTHRD = true;
 		}
-		if( !bT )
+		if( !bTHRD )
 		{
 			pC->cam.grab();
 			pC->cam.retrieve(
@@ -252,7 +252,7 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 	}
 
 
-	iQC = qc;
+	aiQC[0] = qc;
 	return pSRF ? (U1*)pSRF->pixels : NULL;
 }
 
