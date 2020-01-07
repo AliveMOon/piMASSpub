@@ -4,8 +4,9 @@ extern U1 gpsKEYMAP[];
 bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 {
 	out.off();
-	if( !alf )
+	if( alf ?  !apCRS[onDIV.x] : true  )
 		return out.bGD();
+
 	U8 iS = winPUB.n_load;
 	gpcCRS& crs = *apCRS[onDIV.x];
 	if( alf < gpeALF_AAAAAA ) {
