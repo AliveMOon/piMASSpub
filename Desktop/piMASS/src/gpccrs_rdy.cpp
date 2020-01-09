@@ -51,7 +51,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	I4x2 div = win.wDIVcr( id ).a4x2[0];
 	U4	zz = pPIC->txWH.x,
 		off = 	  (div.x ? zz/4: 0)
-				+ (div.y ? pPIC->txWH.a4x2[0].area()/6: 0);
+				+ (div.y ? pPIC->txWH.a4x2[0].area()/8: 0);
 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
 		gpmZn( pMINI + off + h*zz, CRSfrm.z );

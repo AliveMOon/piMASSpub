@@ -54,7 +54,8 @@ public:
 			aTXwh[0x10];
 
 	SDL_Texture	*pTRG,
-				*pTXchar;
+				*pTXchar,
+				*pTXiso;
 
 
 	~gpcGL()
@@ -92,8 +93,8 @@ public:
 		if( aUniID[2] < 1 )
 		{
 			aUniID[0] = glGetUniformLocation( gProgID, "tgPX" );
-			aUniID[1] = glGetUniformLocation( gProgID, "xyPX" );
-			aUniID[2] = glGetUniformLocation( gProgID, "whPX" );
+			aUniID[1] = glGetUniformLocation( gProgID, "DIVxy" );
+			aUniID[2] = glGetUniformLocation( gProgID, "FRMwh" );
 			aUniID[3] = glGetUniformLocation( gProgID, "aTX" );
 		}
 
@@ -466,7 +467,7 @@ public:
 		return gVxSID;
 
 	}
-	GLuint FrScmp( const char* pS ) {
+	GLuint FrgSHDRcmpi( const char* pS ) {
 		U8 s = -1, nS = gpmSTRLEN(pS);
 		if( !nS )
 			return gFrSID;
@@ -584,6 +585,7 @@ public:
 		aTexID[0] = glGetUniformLocation( gProgID, "tex0" );
 		aTexID[1] = glGetUniformLocation( gProgID, "tex1" );
 		aTexID[2] = glGetUniformLocation( gProgID, "tex2" );
+		aTexID[3] = glGetUniformLocation( gProgID, "tex3" );
 		gPrgSucc = GL_TRUE;
 		return gProgID;
 
@@ -619,6 +621,9 @@ class gpcWIN
 
 		SDL_Surface		*pSRFload,
 						*pSRFchar,
+
+						*pSRFiso,
+
 						*pSRFwin,
 						*pSRFsnd;
 		gpcPIC			*pPICbg;

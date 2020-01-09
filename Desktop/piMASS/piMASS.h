@@ -132,6 +132,7 @@
 #define gpdGT_LIST_tOUT 3
 #define gpdPICbg "/mnt/ram/bg.png"
 #define gpsMINI_CHAR "mini_char_16x32_8x32.png" //"mini_char_64x512.png"	// "mini_char_16x32.png" //
+#define gpsMINI_ISO "mini_ISO_32x32_1024x1536.png"
 
 #include <exception>
 #include <mysys.h>
@@ -286,7 +287,7 @@ class gpcMASS;
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 #define gpdPUB "+--- --  -   "
 #define gpdSIZ2CR I4x2(8,16)
-#define gpdCRall I4x2(2,3)
+#define gpdCRall I4x2(2,4)
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
