@@ -287,7 +287,7 @@ class gpcMASS;
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 #define gpdPUB "+--- --  -   "
 #define gpdSIZ2CR I4x2(8,16)
-#define gpdCRall I4x2(2,4)
+#define gpdCRall I4x2(1,2)
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )

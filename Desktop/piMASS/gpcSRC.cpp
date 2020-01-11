@@ -215,6 +215,7 @@ I4x4 gpcSRC::CRSmini(
 		}
 	}
 
+	if( false )
 	if( !(bSW&gpeMASSoffMSK) )
 	if( xy.x < fx && xy.y < fy )
 	{
@@ -261,7 +262,7 @@ I4x4 gpcSRC::CRSmini(
 
 	}
 
-	bool bON = false;
+	bool bON = false, bSEL = false;
 	I4 nFILL;
 
 	for( U1* pC = pSRCstart( bNoMini ), *pAL = pSRCalloc( bNoMini ) , *pCe = pC+dim.w; pC < pCe; pC++ )
@@ -274,7 +275,8 @@ I4x4 gpcSRC::CRSmini(
 		if( crs.apSRC[0] == crs.apSRC[1] )
 		if( pC-pAL == crs.iSTR.x )
 		{
-			pO[cr].y |= crs.iSTR.x==crs.iSTR.y ? 0x4 : 0x8;
+			pO[cr].z |= 0x20;
+			//pO[cr].y |= crs.iSTR.x==crs.iSTR.y ? 0x4 : 0x8;
 			bON = true;
 		}
 
@@ -282,8 +284,8 @@ I4x4 gpcSRC::CRSmini(
 		if( cxy.x >= 0 && cxy.x < fx )
 		if( cr >= 0 && cr < fy*zz )
 		{
-			pO[cr].y |= 0x10;
-			pO[cr].x = ch;
+			//pO[cr].y |= 0x10;
+			//pO[cr].x = ch;
 			if( *pC == '\t' )
 			{
 				if( pO[cr].y&0x10 && pO[cr].x == ch )
@@ -293,16 +295,16 @@ I4x4 gpcSRC::CRSmini(
 
 				pO[cr].w = '.' - ' ';
 			}
-
+			pO[cr].z |= 0x20;
 		}
 
 		if( bON )
 		if( this == crs.apSRC[1] )
 		if( pC-pAL >= crs.iSTR.y )
 		{
-			pO[cr].y &= 0xf;
-			if( crs.iSTR.x != crs.iSTR.y )
-				pO[cr].y |= 8;
+			//pO[cr].y &= 0xf;
+			//if( crs.iSTR.x != crs.iSTR.y )
+			//	pO[cr].y |= 8;
 			bON = false;
 		}
 
@@ -332,13 +334,19 @@ I4x4 gpcSRC::CRSmini(
 			case ' ':
 				cxy.x++;
 				continue;
+			case '_':
+				pO[cr-1].y = 1;
+				if( (pO[cr-1].w/0x20)%2 )
+					cxy.x++;
+
+				continue;
 		}
 
 		if( *pC < ' ' )
 			continue;
 
 		nx = *pC;
-		if( nx & 0x80 )
+		if( nx&0x80 )
 		{
 			pC++;
 		} else
@@ -353,8 +361,7 @@ I4x4 gpcSRC::CRSmini(
 
 		cr = cxy.x + cxy.y*zz;
 
-		//pO[cr] = c;
-		if( pO[cr].y&0x10 && pO[cr].x == ch )
+		if( (pO[cr].y&0x10) && (pO[cr].x==ch) )
 			pO[cr].z = bg;
 		else
 			pO[cr].z = ch;
