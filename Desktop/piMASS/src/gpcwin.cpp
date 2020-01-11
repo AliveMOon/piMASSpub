@@ -792,7 +792,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					I4x4 w = wDIVpx(i);
 					I4x2 FRMwh = apCRS[i]->gtFRMwh();
 
-					pGL->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
+					/*pGL->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
 					->SET_tx( 0, pGL->pTXchar, I4x2(8,32) )
 					->SET_tx( 1,
 									pBGtx,
@@ -800,6 +800,15 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							)
 					->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )
 					->SET_tx( 3, pGL->pTXiso, I4x2(32,32) )
+					->DRW( w.a4x2[0], FRMwh );*/
+
+					pGL->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
+					->SET_tx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
+					->SET_tx( 1,
+									pBGtx,
+									(pPICbg ? pPICbg->txWH.a4x2[0] 		: I4x2(1280,960))
+							)																				// tex1 -- BG background
+					->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )											// tex2 -- MINIiso
 					->DRW( w.a4x2[0], FRMwh );
 				}
 
