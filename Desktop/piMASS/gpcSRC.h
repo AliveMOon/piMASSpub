@@ -747,7 +747,7 @@ public:
 		return pC - pSRCalloc(bNoMini);
 	}
 	I4x4 CRSmini(
-					U1x4* pO, I4x4 xy,
+					U1x4* pO, U1x4* p1, I4x4 xy,
 					I4 fx,
 					I4 fy,
 

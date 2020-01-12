@@ -182,7 +182,7 @@ gpcSRC::~gpcSRC()
 }
 
 I4x4 gpcSRC::CRSmini(
-						U1x4* pO, I4x4 xy,
+						U1x4* pO, U1x4* p1,  I4x4 xy,
 
 						I4 fx,
 						I4 fy,
@@ -275,7 +275,7 @@ I4x4 gpcSRC::CRSmini(
 		if( crs.apSRC[0] == crs.apSRC[1] )
 		if( pC-pAL == crs.iSTR.x )
 		{
-			pO[cr].z |= 0x20;
+			pO[cr].z |= 0x10;
 			//pO[cr].y |= crs.iSTR.x==crs.iSTR.y ? 0x4 : 0x8;
 			bON = true;
 		}
@@ -295,7 +295,7 @@ I4x4 gpcSRC::CRSmini(
 
 				pO[cr].w = '.' - ' ';
 			}
-			pO[cr].z |= 0x20;
+			pO[cr].z |= 0x10;
 		}
 
 		if( bON )
@@ -347,9 +347,8 @@ I4x4 gpcSRC::CRSmini(
 
 		nx = *pC;
 		if( nx&0x80 )
-		{
 			pC++;
-		} else
+		else
 			nx = 0;
 
 		if( cxy.x >= fx || cxy.x < 0 || cxy.y < 0 )
@@ -362,9 +361,9 @@ I4x4 gpcSRC::CRSmini(
 		cr = cxy.x + cxy.y*zz;
 
 		if( (pO[cr].y&0x10) && (pO[cr].x==ch) )
-			pO[cr].z = bg;
+			pO[cr].z |= bg;
 		else
-			pO[cr].z = ch;
+			pO[cr].z |= ch;
 
 		pO[cr].w = *pC - ' ';
 		cxy.x++;
