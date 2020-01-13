@@ -607,7 +607,7 @@ class gpcWIN
 		I4x4			winID,
 						winSIZ,
 						mouseXY, mouseW,
-						SRCxycr, SRCin;
+						SRCxycr, SRCin, chrTX;
 
 
 		gpcGL		*pGL;
@@ -852,7 +852,7 @@ public:
 			return div;
 		}
 		I4x2 wFRM( U1 iDIV ) {
-			I4x2 whCR = winSIZ.a4x2[1]/I4x2( (int*)&chrPIC.w );
+			I4x2 whCR = winSIZ.a4x2[1]/chrTX.a4x2[1]; // I4x2( (int*)&chrPIC.w );
 			return whCR;
 			/*I4x2 whCR = wDIVcr(iDIV).a4x2[1];
 			I4 mag = (whCR.x*gpdSIZ2CR.x)/chrPIC.w;

@@ -286,7 +286,7 @@ class gpcMASS;
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 #define gpdPUB "+--- --  -   "
-#define gpdSIZ2CR I4x2(8,16)
+#define gpdSIZ2CR I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)

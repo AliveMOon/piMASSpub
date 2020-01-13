@@ -276,7 +276,8 @@ I4x4 gpcSRC::CRSmini(
 		if( crs.apSRC[0] == crs.apSRC[1] )
 		if( pC-pAL == crs.iSTR.x )
 		{
-			pO[cr].z |= 0x10;
+			if( cr > 0 )
+				pO[cr].z |= 0x10;
 			//pO[cr].y |= crs.iSTR.x==crs.iSTR.y ? 0x4 : 0x8;
 			bON = true;
 		}
@@ -336,10 +337,17 @@ I4x4 gpcSRC::CRSmini(
 				cxy.x++;
 				continue;
 			case '_':
+				if( cr < 1 )
+					continue;
 				pO[cr-1].y = 1;
 				if( (pO[cr-1].w/0x20)%2 )
 					cxy.x++;
 
+				continue;
+			case '#':
+				if( cr < 1 )
+						continue;
+				pO[cr-1].y = 2;
 				continue;
 		}
 
