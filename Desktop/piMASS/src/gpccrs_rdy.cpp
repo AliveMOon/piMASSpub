@@ -49,15 +49,19 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 		bESC = true;
 	}
 	I4x2 div = win.wDIVcr( id ).a4x2[0];
-	U4	zz = pPIC->txWH.x,
-		off = 	  (div.x ? zz/2: 0)
+	I4x4 fxyz;
+	fxyz.z = pPIC->txWH.x;
+
+	U4	//zz = pPIC->txWH.x,
+		off = 	  (div.x ? fxyz.z/2: 0)
 				+ (div.y ? pPIC->txWH.a4x2[0].area()/4: 0),
 		offFRM = pPIC->txWH.a4x2[0].area()/2;
 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
 	{
-		gpmZn( pMINI + off + h*zz, CRSfrm.z );
-		gpmZn( pMINI + off + h*zz + offFRM, CRSfrm.z );
+		fxyz.w = h*fxyz.z;
+		gpmZn( pMINI + off + fxyz.w, CRSfrm.z );
+		gpmZn( pMINI + off + fxyz.w + offFRM, CRSfrm.z );
 	}
 
 	if( bESC )
@@ -129,7 +133,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			c16ch = gpeCLR_blue2;
 
 
-	for( U4 r = 0; r < mCR.y; xyWH.y += pR[r], r++ )
+	for( U4 r = 0,a; r < mCR.y; xyWH.y += pR[r], r++ )
 	{
 		if( xyWH.y >= CRSfrm.w )
 			break;
@@ -140,7 +144,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 
 		xyWH.x = CRSfrm.x;
 		i = r*z;
-		ie = min(CRSfrm.w, xyWH.y+(int)pR[r]);
+		fxyz.y = min(CRSfrm.w, xyWH.y+(int)pR[r]);
 		for( U4 c = 0; c < mCR.x; xyWH.x += pC[c], c++ )
 		{
 			if( xyWH.x >= CRSfrm.z )
@@ -153,24 +157,35 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 
 			if( !pM[i+c] )
 				continue;
-
+			fxyz.x = min(CRSfrm.z, xyWH.x+(int)pC[c]);
 			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w )
 			{
-				mass.SRCfnd( pM[i+c] )->CRSmini(
-												pMINI+off, pMINI + off + offFRM, xyWH,
+				mass.SRCfnd( pM[i+c] )	->SRCfrm(
+												pMINI + off + offFRM,
 
-												min(CRSfrm.z, xyWH.x+(int)pC[c]),	// fx
-												ie,									// fy
+												xyWH,
 
-												CRSfrm.z, zz,				// fz zz
-												*this,
-												c16bg, gpeCLR_blue2, gpeCLR_blue2,
-												false
+												c16fr,
+												fxyz //.x,fxyz.y,
+												//CRSfrm.z, fxyz.z				// fz zz
+											)
+										->SRCmini(
+													pMINI+off, //pMINI + off + offFRM,
+
+													xyWH,
+
+													fxyz.x,fxyz.y,
+
+													CRSfrm.z, fxyz.z,				// fz zz
+													*this,
+													c16bg, //gpeCLR_blue2,
+													gpeCLR_blue2,
+													false
 											);
 				continue;
 			}
-
-			bNoMini = (c+1 >= lurdAN.x) && (c+1 <= lurdAN.z );
+			a = c+1;
+			bNoMini = ((a >= lurdAN.x) && (a <= lurdAN.z ));
 			if( bNoMini )
 			{
 				c16fr = bED ? gpeCLR_green2 : gpeCLR_cyan;
@@ -179,18 +194,29 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				c16fr = c16ch = gpeCLR_blue2;
 
 
-			mass.SRCfnd( pM[i+c] )->CRSmini(
-												pMINI + off, pMINI + off + offFRM, xyWH,
+			mass.SRCfnd( pM[i+c] )	->SRCfrm(
+												pMINI + off + offFRM,
 
-												min(CRSfrm.z, xyWH.x+(int)pC[c]),
-												ie,
+												xyWH,
 
-												CRSfrm.z, pPIC->txWH.x,				// fz zz
+												c16fr,
+												fxyz
+
+											)
+									->SRCmini(
+												pMINI + off, xyWH, //pMINI + off + offFRM,
+
+												fxyz.x,fxyz.y,
+
+												CRSfrm.z, fxyz.z,				// fz zz
+
 												*this,
-												c16bg, c16fr, c16ch,
+												c16bg, //c16fr,
+												c16ch,
 												bNoMini
 											);
 
+			c16fr = c16ch = gpeCLR_blue2;
 		}
 	}
 }

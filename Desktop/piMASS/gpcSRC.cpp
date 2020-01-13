@@ -180,9 +180,58 @@ gpcSRC::~gpcSRC()
 	gpmDELary(pMAP);
 
 }
+gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) //, I4 fz )
+{
+	if( this ?
+				   ( fxyz.x <= 0 ||	fxyz.y <= 0 )
+				|| ( xy.x >= fxyz.x ||	xy.y >= fxyz.y )
+				: true )
+		return NULL;
 
-I4x4 gpcSRC::CRSmini(
-						U1x4* pO, U1x4* p1,  I4x4 xy,
+	if( !p1 ) // ki lehet vele kapcsolni a keret rajzolást ha nem kap pointert
+		return this;
+
+	for( I4 r = max(xy.y,0); r < fxyz.y; r++ )
+	for( I4 c = max(xy.x,0) + r*fxyz.z, ce = c+fxyz.x; c < ce; c++ )
+			p1[c] = 0;
+
+	if( bSW&gpeMASSoffMSK )
+		return this;
+
+	// UP
+	if( xy.y >= 0 )
+	for( I4 yz = xy.y*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
+	{
+		p1[c].z = fr;
+		p1[c].w |= 0xa1;
+	}
+
+	//DWN
+	for( I4 yz = (fxyz.y-1)*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
+	{
+		p1[c].z = fr;
+		p1[c].w |= 0xa4;
+	}
+
+	// LEFT
+	for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fxyz.z ; r < fxyz.y; r++, rr += fxyz.z )
+	{
+		p1[rr].z = fr;
+		p1[rr].w |= 0xa8;
+	}
+
+	// RIGHT
+	for( I4 r = max(xy.y,0), rr = fxyz.x-1 + r*fxyz.z; r < fxyz.y; r++, rr += fxyz.z )
+	{
+		p1[rr].z = fr;
+		p1[rr].w |= 0xa2;
+	}
+
+
+	return this;
+}
+I4x4 gpcSRC::SRCmini(
+						U1x4* pO,  I4x4 xy,
 
 						I4 fx,
 						I4 fy,
@@ -190,7 +239,8 @@ I4x4 gpcSRC::CRSmini(
 						I4 fz, I4 zz,
 
 						gpcCRS& crs,
-						gpeCLR bg, gpeCLR fr, gpeCLR ch,
+						gpeCLR bg, //gpeCLR fr,
+						gpeCLR ch,
 						bool bNoMini
 					)
 {
@@ -206,17 +256,10 @@ I4x4 gpcSRC::CRSmini(
 	U1 nx, aC[] = " ";
 	I4 cr, n, rr;
 	for( I4 r = max(xy.y,0); r < fy; r++ )
-	{
-		rr = r*zz;
-		for( I4 c = max(xy.x,0); c < fx; c++ )
-		{
-			cr = rr+c;
-			pO[cr] = 0;
-			p1[cr] = 0;
-		}
-	}
+	for( I4 c = max(xy.x,0) + r*zz, ce = c+fx; c < ce; c++ )
+			pO[c] = 0;
 
-	if( p1 )
+	/*if( p1 )
 	if( !(bSW&gpeMASSoffMSK) )
 	if( xy.x < fx && xy.y < fy )
 	{
@@ -261,7 +304,7 @@ I4x4 gpcSRC::CRSmini(
 			}
 		}
 
-	}
+	}*/
 
 	bool bON = false, bSEL = false;
 	I4 nFILL;

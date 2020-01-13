@@ -93,7 +93,6 @@ char gpsSHDRisoFRG1x2[] =
 "	vec2	frm1 = fr_uv*FRMwh,																			\n"
 "			frm0 = frm1/aTX[2],								// atx[2] == TXwh							\n"
 "			t2x3 = vec2( 1.0/2.0, 1.0/3.0 )/gpdTXcrl.xy,	// aTX[0] == mn_iso_CR_32x32				\n"
-//"			t1x1 = t2x3*vec2( 2.0, 3.0 ),																\n"
 "			Ain = fract(frm1)*t2x3,							// atx[0] == mnCR							\n"
 "			off0 = vec2( 1.0/2.0, 1.0/4.0 ),															\n"
 "			off2x3 = 1.0/aTX[2];							// aTX[3] == mn_iso_CR						\n"
@@ -304,7 +303,8 @@ char gpsSHDRisoFRG1x2[] =
 "	\n"
 "	if( B < 1.0 )																						\n"
 " 		return;\n"
-"	gl_FragColor += Bc/(6+B+gl_FragColor.a);\n"
+//"	gl_FragColor *= gl_FragColor*(2.0/3.0);											\n"
+"	gl_FragColor += Bc/(6+B+gl_FragColor.a);											\n"
 
 "}\n";
 
@@ -1053,16 +1053,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					I4x4 w = wDIVpx(i);
 					I4x2 FRMwh = apCRS[i]->gtFRMwh();
 
-					/*pGL->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
-					->SET_tx( 0, pGL->pTXchar, I4x2(8,32) )
-					->SET_tx( 1,
-									pBGtx,
-									(pPICbg ? pPICbg->txWH.a4x2[0] 		: I4x2(1280,960))
-							)
-					->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )
-					->SET_tx( 3, pGL->pTXiso, I4x2(32,32) )
-					->DRW( w.a4x2[0], FRMwh );*/
-
 					pGL->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
 					->SET_tx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
 					->SET_tx( 1,
@@ -1075,28 +1065,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 				pGL->SWP( pSDLwin );
 			}
-
-			/*if( pPIC )
-			if( pGL->v_uvID > -1 ) {
-				I4x4 w = wDIV(0);
-				//pPIC->unLOCK();
-				SDL_Texture* pBGtx = (pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL);
-
-				if( pBGtx == pGL->pTXchar )
-					pBGtx = NULL;
-
-				pGL->TRG( pSDLrndr, 0, winSIZ.a4x2[0], mSEC.x )
-				->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
-				->SET_tx( 0, pGL->pTXchar, I4x2(8,32) )
-				->SET_tx( 1,
-								pBGtx,
-								(pPICbg ? pPICbg->txWH.a4x2[0] 		: I4x2(1280,960))
-						)
-				->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )
-				->DRW( apCRS[0]->gtFRMxy(), apCRS[0]->gtFRMwh() );
-
-				pGL->SWP( pSDLwin );
-			}*/
 
 			*gppKEYbuff = 0;
 			U1 iRDY = 0x10;
