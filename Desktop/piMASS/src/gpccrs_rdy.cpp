@@ -51,10 +51,14 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	I4x2 div = win.wDIVcr( id ).a4x2[0];
 	U4	zz = pPIC->txWH.x,
 		off = 	  (div.x ? zz/2: 0)
-				+ (div.y ? pPIC->txWH.a4x2[0].area()/4: 0);
+				+ (div.y ? pPIC->txWH.a4x2[0].area()/4: 0),
+		offFRM = pPIC->txWH.a4x2[0].area()/2;
 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
+	{
 		gpmZn( pMINI + off + h*zz, CRSfrm.z );
+		gpmZn( pMINI + off + h*zz + offFRM, CRSfrm.z );
+	}
 
 	if( bESC )
 		return;
@@ -153,7 +157,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w )
 			{
 				mass.SRCfnd( pM[i+c] )->CRSmini(
-												pMINI+off, xyWH,
+												pMINI+off, pMINI + off + offFRM, xyWH,
 
 												min(CRSfrm.z, xyWH.x+(int)pC[c]),	// fx
 												ie,									// fy
@@ -176,7 +180,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 
 
 			mass.SRCfnd( pM[i+c] )->CRSmini(
-												pMINI + off, xyWH,
+												pMINI + off, pMINI + off + offFRM, xyWH,
 
 												min(CRSfrm.z, xyWH.x+(int)pC[c]),
 												ie,

@@ -211,11 +211,12 @@ I4x4 gpcSRC::CRSmini(
 		for( I4 c = max(xy.x,0); c < fx; c++ )
 		{
 			cr = rr+c;
-			pO[cr].y = 0;
+			pO[cr] = 0;
+			p1[cr] = 0;
 		}
 	}
 
-	if( false )
+	if( p1 )
 	if( !(bSW&gpeMASSoffMSK) )
 	if( xy.x < fx && xy.y < fy )
 	{
@@ -227,8 +228,8 @@ I4x4 gpcSRC::CRSmini(
 			for( I4 c = max(xy.x,0); c < fx; c++ )
 			{
 				cr = rr+c;
-				pO[cr].x = fr;
-				pO[cr].y |= 1;
+				p1[cr].z = fr;
+				p1[cr].w |= 0xa1;
 			}
 		}
 		//DWN
@@ -237,8 +238,8 @@ I4x4 gpcSRC::CRSmini(
 			for( I4 c = max(xy.x,0); c < fx; c++ )
 			{
 				cr = rr+c;
-				pO[cr].x = fr;
-				pO[cr].y |= 4;
+				p1[cr].z = fr;
+				p1[cr].w |= 0xa4;
 			}
 		}
 
@@ -247,16 +248,16 @@ I4x4 gpcSRC::CRSmini(
 		{
 			for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*zz ; r < fy; r++, rr += zz )
 			{
-				pO[rr].x = fr;
-				pO[rr].y |= 8;
+				p1[rr].z = fr;
+				p1[rr].w |= 0xa8;
 			}
 		}
 		// RIGHT
 		{
 			for( I4 r = max(xy.y,0), rr = fx-1 + r*zz; r < fy; r++, rr += zz )
 			{
-				pO[rr].x = fr;
-				pO[rr].y |= 2;
+				p1[rr].z = fr;
+				p1[rr].w |= 0xa2;
 			}
 		}
 
