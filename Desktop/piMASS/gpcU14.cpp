@@ -21,9 +21,9 @@ U1x4* U1x4::pos( I4x2 pxy, const I4x4& whp )
 }
 U1x4* U1x4::frm( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 {
-
+	cr.mn(whp.a4x2[0]) -= 1;
 	if( flg&5 )
-    for( I4 e = min( cr.x,whp.x), u = 0, d = min( cr.y-1, whp.y)*whp.z; u < e; u++, d++ )
+    for( I4 e = cr.x, u = 0, d = cr.y*whp.z; u <= e; u++, d++ )
 	{
 		if( flg&1 )
 		{
@@ -41,7 +41,7 @@ U1x4* U1x4::frm( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 		return this;
 
 	if( flg&0xa )
-    for( I4 l = 0, r = min( cr.x-1, whp.x), e = whp.z*min( cr.y,whp.y); l < e; l += whp.z, r += whp.z )
+    for( I4 l = 0, r = cr.x, e = whp.z*cr.y; l <= e; l += whp.z, r += whp.z )
 	{
 		if( flg&8 )
 		{

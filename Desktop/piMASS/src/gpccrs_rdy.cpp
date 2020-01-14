@@ -134,6 +134,9 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 
 	gpcSRC* pSRC;
 	U1 sSTR[0x20];
+	bool bON = id == win.onDIV.x;
+	U4 iON = scnZN.a4x2[0]*I4x2(1,z);
+	I4x2 onAN = scnZN.a4x2[0]+I4x2(1,0);
 	for( U4 r = 0,a; r < mCR.y; xyWH.y += pR[r], r++ )
 	{
 		if( xyWH.y >= CRSfrm.w )
@@ -158,13 +161,26 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 
 			fxyz.x = min(CRSfrm.z, xyWH.x+(int)pC[c]);
 			a = c+1;
+			c16fr = bON&(iON == i+c) ? gpeCLR_white : gpeCLR_blue2;
+			c16ch = gpeCLR_blue2;
 
 			if( !pM[i+c] )
 			{
 				if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w || !((a >= lurdAN.x) && (a <= lurdAN.z )) )
+				{
+					if( bON ? iON != i+c : true )
 					continue;
 
+					pMINI[off+offFRM].pos( xyWH.a4x2[0], fxyz )->frm( xyWH.a4x2[1], gpeCLR_white, 0xf, fxyz-I4x4( xyWH.a4x2[0], 0 )  );
+					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+					continue;
+				}
+
 				pMINI[off+offFRM].pos( xyWH.a4x2[0], fxyz )->frm( xyWH.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyWH.a4x2[0], 0 )  );
+				if( a == lurdAN.x && r == lurdAN.y )
+					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].strA4N(sSTR), c16fr );
+				else if( a == lurdAN.z && r == lurdAN.w )
+					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].strA4N(sSTR), c16fr );
 				continue;
 			}
 			pSRC = mass.SRCfnd( pM[i+c] );
@@ -192,6 +208,8 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 									gpeCLR_blue2,
 									false
 							);
+				if( bON ? iON == i+c : false )
+					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
 				continue;
 			}
 			bNoMini = ((a >= lurdAN.x) && (a <= lurdAN.z ));
@@ -202,6 +220,13 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			} else
 				c16fr = c16ch = gpeCLR_blue2;
 
+			if( bON )
+			if( iON == i+c )
+			{
+				c16fr = gpeCLR_white;
+			}
+
+			//pMINI[off+offFRM].pos( xyWH.a4x2[0], fxyz )->frm( xyWH.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyWH.a4x2[0], 0 )  );
 
 			pSRC->SRCfrm(
 							pMINI + off + offFRM,
@@ -216,6 +241,8 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].strA4N(sSTR), c16fr );
 			else if( a == lurdAN.z && r == lurdAN.w )
 				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].strA4N(sSTR), c16fr );
+			else if( bON ? iON == i+c : false )
+				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
 
 			pSRC->SRCmini(
 							pMINI + off, xyWH, //pMINI + off + offFRM,
@@ -230,7 +257,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 							bNoMini
 						);
 
-			c16fr = c16ch = gpeCLR_blue2;
+
 		}
 	}
 }
