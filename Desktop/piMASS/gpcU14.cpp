@@ -14,3 +14,7 @@ U1x4& U1x4::str2time( U1* p_str, U1* p_end, U1** pp_str )
 
 	return *this;
 }
+U1x4* U1x4::pos( I4x2 pxy, const I4x4& whp )
+{
+	return this + (pxy.x%whp.x) + (pxy.y%whp.y)*whp.z;
+}

@@ -132,7 +132,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			c16fr = gpeCLR_blue2,
 			c16ch = gpeCLR_blue2;
 
-
+	gpcSRC* pSRC;
 	for( U4 r = 0,a; r < mCR.y; xyWH.y += pR[r], r++ )
 	{
 		if( xyWH.y >= CRSfrm.w )
@@ -158,30 +158,34 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			if( !pM[i+c] )
 				continue;
 			fxyz.x = min(CRSfrm.z, xyWH.x+(int)pC[c]);
+			pSRC = mass.SRCfnd( pM[i+c] );
+			if( !pSRC )
+			{
+
+			}
 			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w )
 			{
-				mass.SRCfnd( pM[i+c] )	->SRCfrm(
-												pMINI + off + offFRM,
+				pSRC->SRCfrm(
+								pMINI + off + offFRM,
 
-												xyWH,
+								xyWH,
 
-												c16fr,
-												fxyz //.x,fxyz.y,
-												//CRSfrm.z, fxyz.z				// fz zz
-											)
-										->SRCmini(
-													pMINI+off, //pMINI + off + offFRM,
+								c16fr,
+								fxyz
+						);
+				pSRC->SRCmini(
+									pMINI+off, //pMINI + off + offFRM,
 
-													xyWH,
+									xyWH,
 
-													fxyz.x,fxyz.y,
+									fxyz.x,fxyz.y,
 
-													CRSfrm.z, fxyz.z,				// fz zz
-													*this,
-													c16bg, //gpeCLR_blue2,
-													gpeCLR_blue2,
-													false
-											);
+									CRSfrm.z, fxyz.z,				// fz zz
+									*this,
+									c16bg, //gpeCLR_blue2,
+									gpeCLR_blue2,
+									false
+							);
 				continue;
 			}
 			a = c+1;
@@ -194,27 +198,30 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				c16fr = c16ch = gpeCLR_blue2;
 
 
-			mass.SRCfnd( pM[i+c] )	->SRCfrm(
-												pMINI + off + offFRM,
+			pSRC->SRCfrm(
+							pMINI + off + offFRM,
 
-												xyWH,
+							xyWH,
 
-												c16fr,
-												fxyz
+							c16fr,
+							fxyz
 
-											)
-									->SRCmini(
-												pMINI + off, xyWH, //pMINI + off + offFRM,
+						);
 
-												fxyz.x,fxyz.y,
+			pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( (U1*)"ize", c16fr );
 
-												CRSfrm.z, fxyz.z,				// fz zz
+			pSRC->SRCmini(
+							pMINI + off, xyWH, //pMINI + off + offFRM,
 
-												*this,
-												c16bg, //c16fr,
-												c16ch,
-												bNoMini
-											);
+							fxyz.x,fxyz.y,
+
+							CRSfrm.z, fxyz.z,				// fz zz
+
+							*this,
+							c16bg, //c16fr,
+							c16ch,
+							bNoMini
+						);
 
 			c16fr = c16ch = gpeCLR_blue2;
 		}

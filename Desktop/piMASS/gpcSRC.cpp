@@ -203,28 +203,40 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 	for( I4 yz = xy.y*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
 	{
 		p1[c].z = fr;
-		p1[c].w |= 0xa1;
+		p1[c].w |= 0x1;
 	}
-
+	/*if( pS1 )
+	{
+		I4 yz = xy.y*fxyz.z, c = max(xy.x,0) + yz + 1, ce = yz + fxyz.x - 1, cs = c;
+		while( *pS1 )
+		{
+			p1[c].z = fr;
+			p1[c].w = *pS1;
+			c++;
+			if( c >= ce )
+				break;
+			pS1++;
+		}
+	}*/
 	//DWN
 	for( I4 yz = (fxyz.y-1)*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
 	{
 		p1[c].z = fr;
-		p1[c].w |= 0xa4;
+		p1[c].w |= 0x4;
 	}
 
 	// LEFT
 	for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fxyz.z ; r < fxyz.y; r++, rr += fxyz.z )
 	{
 		p1[rr].z = fr;
-		p1[rr].w |= 0xa8;
+		p1[rr].w |= 0x8;
 	}
 
 	// RIGHT
 	for( I4 r = max(xy.y,0), rr = fxyz.x-1 + r*fxyz.z; r < fxyz.y; r++, rr += fxyz.z )
 	{
 		p1[rr].z = fr;
-		p1[rr].w |= 0xa2;
+		p1[rr].w |= 0x2;
 	}
 
 
@@ -259,52 +271,6 @@ I4x4 gpcSRC::SRCmini(
 	for( I4 c = max(xy.x,0) + r*zz, ce = c+fx; c < ce; c++ )
 			pO[c] = 0;
 
-	/*if( p1 )
-	if( !(bSW&gpeMASSoffMSK) )
-	if( xy.x < fx && xy.y < fy )
-	{
-
-		// UP
-		if( xy.y >= 0 )
-		{
-			rr = xy.y*zz;
-			for( I4 c = max(xy.x,0); c < fx; c++ )
-			{
-				cr = rr+c;
-				p1[cr].z = fr;
-				p1[cr].w |= 0xa1;
-			}
-		}
-		//DWN
-		{
-			rr = (fy-1)*zz;
-			for( I4 c = max(xy.x,0); c < fx; c++ )
-			{
-				cr = rr+c;
-				p1[cr].z = fr;
-				p1[cr].w |= 0xa4;
-			}
-		}
-
-		// LEFT
-		//if( xy.x >= 0 )
-		{
-			for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*zz ; r < fy; r++, rr += zz )
-			{
-				p1[rr].z = fr;
-				p1[rr].w |= 0xa8;
-			}
-		}
-		// RIGHT
-		{
-			for( I4 r = max(xy.y,0), rr = fx-1 + r*zz; r < fy; r++, rr += zz )
-			{
-				p1[rr].z = fr;
-				p1[rr].w |= 0xa2;
-			}
-		}
-
-	}*/
 
 	bool bON = false, bSEL = false;
 	I4 nFILL;

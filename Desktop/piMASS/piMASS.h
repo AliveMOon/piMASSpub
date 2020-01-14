@@ -834,7 +834,28 @@ public:
 		return *this;
 	}
 	U1* typ2str( U1* pBUFF );	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ] // yz dimxy
+	U1x4* pos( I4x2 pxy, const I4x4& whp );
+	/*{
+		U1x4* p_pos
+		p_pos = this + (pos.x%whp.x) + (pos.y%whp.y)*whp.z;
+		return p_pos;
+	}*/
+	U1x4* print( U1* p_str, gpeCLR clr )
+	{
+		if( this ? !p_str : true )
+			return this;
 
+		U1x4* p4 = this;
+		while( *p_str )
+		{
+			p4->u4 = 0;
+			p4->z = clr;
+			p4->w = *p_str;
+			p4++;
+			p_str++;
+		}
+        return p4;
+	}
 };
 
 class I1x4
