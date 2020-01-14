@@ -133,6 +133,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			c16ch = gpeCLR_blue2;
 
 	gpcSRC* pSRC;
+	U1 sSTR[0x20];
 	for( U4 r = 0,a; r < mCR.y; xyWH.y += pR[r], r++ )
 	{
 		if( xyWH.y >= CRSfrm.w )
@@ -155,14 +156,19 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			if( xyWH.x + pC[c] < 0 )
 				continue;
 
-			if( !pM[i+c] )
-				continue;
 			fxyz.x = min(CRSfrm.z, xyWH.x+(int)pC[c]);
-			pSRC = mass.SRCfnd( pM[i+c] );
-			if( !pSRC )
-			{
+			a = c+1;
 
+			if( !pM[i+c] )
+			{
+				if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w || !((a >= lurdAN.x) && (a <= lurdAN.z )) )
+					continue;
+
+				pMINI[off+offFRM].pos( xyWH.a4x2[0], fxyz )->frm( xyWH.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyWH.a4x2[0], 0 )  );
+				continue;
 			}
+			pSRC = mass.SRCfnd( pM[i+c] );
+
 			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w )
 			{
 				pSRC->SRCfrm(
@@ -188,7 +194,6 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 							);
 				continue;
 			}
-			a = c+1;
 			bNoMini = ((a >= lurdAN.x) && (a <= lurdAN.z ));
 			if( bNoMini )
 			{
@@ -207,8 +212,10 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 							fxyz
 
 						);
-
-			pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( (U1*)"ize", c16fr );
+			if( a == lurdAN.x && r == lurdAN.y )
+				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].strA4N(sSTR), c16fr );
+			else if( a == lurdAN.z && r == lurdAN.w )
+				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].strA4N(sSTR), c16fr );
 
 			pSRC->SRCmini(
 							pMINI + off, xyWH, //pMINI + off + offFRM,
