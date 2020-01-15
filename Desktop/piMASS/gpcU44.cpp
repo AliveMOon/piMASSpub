@@ -62,6 +62,9 @@ I8x2& I8x2::operator = ( const U1* pS )
 	num = pE-pS;
 	return *this;
 }
+
+
+
 U4x2& U4x2::mx( I4x2 b )
 {
 	if( b.x < 0 )

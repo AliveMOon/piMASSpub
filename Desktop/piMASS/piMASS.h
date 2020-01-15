@@ -2327,7 +2327,16 @@ public:
 	{
 		return I4x2( x<0?-x:x, y<0?-y:y );
 	}
-	I4x2& mx( I4x2 b )
+
+	I4x2 MX( const I4x2 b )
+	{
+		return  I4x2( x>b.x?x:b.x, y>b.y?y:b.y );
+	}
+	I4x2 MN( const I4x2 b )
+	{
+		return  I4x2( x<b.x?x:b.x, y<b.y?y:b.y );
+	}
+	I4x2& mx( const I4x2 b )
 	{
 		if( x < b.x )
 			x = b.x;
@@ -2336,7 +2345,7 @@ public:
 		return *this;
 	}
 
-	I4x2& mn( const I4x2& b )
+	I4x2& mn( const I4x2 b )
 	{
 		if( x > b.x )
 			x = b.x;
