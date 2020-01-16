@@ -23,7 +23,7 @@ gpcCRS::~gpcCRS()
 
 
 I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
-						gpcMASS& mass, const I4x2& _xy )
+						gpcMASS& mass, const I4x2& _xy, U1 srcDIV )
 {
 	// XY - pixel
 	// CR - Coll/Row
@@ -40,11 +40,13 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 
 	I4x2 xy = _xy - o.a4x2[0] - I4x2(div.x,div.y);
 	o = I4x4( xy, xy/cr );
+	if( srcDIV > 3 ? true : !win.apCRS[srcDIV] )
+		srcDIV = id;
 	if( gpcMAP* pMAP = &mass.mapCR )
 	{
 		U4	*pC = pMAP->pCOL,
 			*pR = pMAP->pROW;
-		if( id )
+		if( srcDIV )
 		{
 			U4 nD = pMAP->mapZN44.a4x2[1].sum()*id;
 			pC += nD;
@@ -264,12 +266,9 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 		return;
 
 	I4x2 cr = win.wDIVpx( sCRS.id ).a4x2[1]/sCRS.CRSfrm.a4x2[1];
-	/*SDL_Rect sDIV = win.wDIV( sCRS.id ).xyWH;
-	I4x2 cr( sDIV.w/sCRS.CRSfrm.z, sDIV.h/sCRS.CRSfrm.w );*/
 	U4x4 mpZN;
 
-	//gpcMAP* pMAP =
-	U4 *pM = mass.mapCR.MAPalloc( sCRS.scnZN.au4x2[0], mpZN ); //&mass.mapCR;
+	U4 *pM = mass.mapCR.MAPalloc( sCRS.scnZN.au4x2[0], mpZN );
 	if( !pM )
 		return;
 

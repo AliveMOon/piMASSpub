@@ -103,7 +103,7 @@ char gpsSHDRisoFRG1x2[] =
 " 		off0.y = 0.0;																					\n"
 
 "	gl_FragColor = vec4( texture2D( gpdTXbg, fr_uv ).rgb, 0 );				// BG						\n"
-"	gl_FragColor *= gl_FragColor;																		\n"
+"	gl_FragColor *= gl_FragColor*0.25;																		\n"
 "	// FRM -------------------------------------------------------\n"
 "	float B = 0, Aga; 	\n"
 "	vec4 A = texture2D( gpdTXut, frm0 + off0+vec2(0.0,0.5) )*0x100, cl, Bc = vec4(0,0,0,0);						\n"
@@ -301,8 +301,13 @@ char gpsSHDRisoFRG1x2[] =
 "		}																				\n"
 "	}																									\n"
 "	\n"
-"	if( B < 1.0 )																						\n"
+"	if( B < 0.5 )																						\n"
+"	{																									\n"
+"		if( gl_FragColor.a < 0.33 )																						\n"
+" 			discard;\n"
 " 		return;\n"
+"	}																									\n"
+
 //"	gl_FragColor *= gl_FragColor*(2.0/3.0);											\n"
 "	gl_FragColor += Bc/(6+B+gl_FragColor.a);											\n"
 
@@ -1220,7 +1225,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			onDIV.x = onDIVf( mouseXY.a4x2[0] );
 			if( apCRS[onDIV.x] )
 			{
-				SRCxycr = apCRS[onDIV.x]->scnZNCR(	*this, *piMASS, mouseXY.a4x2[0] );
+				SRCxycr = apCRS[onDIV.x]->scnZNCR(	*this, *piMASS, mouseXY.a4x2[0], bSHIFT ? srcDIV : onDIV.x  );
 
 				char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
 				pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );

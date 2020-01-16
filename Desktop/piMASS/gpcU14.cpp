@@ -35,6 +35,10 @@ U1x4* U1x4::frmFILL( I4x2 cr, U1x4 u, I4x4 whp  )
 }
 U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 {
+	I4 r = whp.a4x2[0].mn();
+	if( r < 1)
+		return this;
+
 	cr.mn(whp.a4x2[0]) -= 1;
 	if( flg&5 )
     for( I4 e = cr.x, u = 0, d = cr.y*whp.z; u <= e; u++, d++ )

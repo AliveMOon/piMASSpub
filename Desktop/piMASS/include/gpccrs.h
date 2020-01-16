@@ -43,7 +43,7 @@ class gpcCRS
 			return bED = !bED;
 		}
 
-		I4* ZNpos( const I4x2& mZN, U4* pC, U4* pR )
+		I4* ZNpos( const I4x2& mZN, I4* pC, I4* pR )
 		{
 			if( (nCp <= mZN.x) || (nRp <= mZN.y) )
 			{
@@ -161,8 +161,7 @@ class gpcCRS
 		/// 		CRSins
 		///
 		///------------------------------
-		void CRSins( gpcMASS& mass, U1* pE, U1* pB )
-		{
+		void CRSins( gpcMASS& mass, U1* pE, U1* pB ) {
 			if( pB >= pE )
 				return;
 
@@ -281,7 +280,7 @@ class gpcCRS
 		void CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 		void CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
-		I4x4 scnZNCR(	gpcWIN& win, gpcMASS& mass, const I4x2& _xy );
+		I4x4 scnZNCR( gpcWIN& win, gpcMASS& mass, const I4x2& _xy, U1 srcDIV );
 		I4x4& gtFRM()
 		{
 			return CRSfrm;

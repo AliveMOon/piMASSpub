@@ -84,9 +84,9 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 
 	/// nagyon vigyázz itt nem BIZTOS, hogy a saját, PC és pR-rel dolgozik,
 	/// hanem ha le van nyomva a SHIFT akor e SRC_DIV-vel
-	U4	*pM = pMAP->MAPalloc( spcZN, mZN, selID ),
-		*pC = pMAP->pCOL,
-		*pR = pMAP->pROW,
+	I4	*pM = (I4*)pMAP->MAPalloc( spcZN, mZN, selID ),
+		*pC = (I4*)pMAP->pCOL,
+		*pR = (I4*)pMAP->pROW,
 		i, ie = pC-pM, c, r, z = mZN.z;
 
 	if( selID )
@@ -152,7 +152,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	U1 sSTR[0x20];
 	U4 iON = scnZN.a4x2[0]*I4x2(1,z);
 	I4x2 onAN = scnZN.a4x2[0]+I4x2(1,0);
-
+	U1x4* pPOS;
 	if( lurdAN.x )
 	for( U4 r = lurdAN.y, c, ce; r <= lurdAN.w; r++ )
 	for( c = lurdAN.x-1; c < lurdAN.z; c++ )
@@ -167,6 +167,12 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 		else
 			xyWH.y = psRp[mZN.y]+((r-mZN.w)*gpdSRC_ROWw);
 
+		c16fr = (iON == I4x2(c,r)*I4x2(1,z)) ? gpeCLR_white
+											: (
+													(selID == win.srcDIV) ? gpeCLR_orange
+																		: gpeCLR_green
+											);
+
 		xyWH.a4x2[0] += CRSfrm.a4x2[0];
 		//xyWH.a4x2[1] = I4x2( pC[c], pR[r] );
 
@@ -174,7 +180,11 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 		fxyz.y = min(CRSfrm.w, (xyWH.y + (r < mZN.y ? pR[r] : gpdSRC_ROWw )) );
 
 		pMINI[off+offFRM].pos( xyWH.a4x2[0], fxyz )
-		->frmBRDR( xyWH.a4x2[1], gpeCLR_orange, 0xf, fxyz-I4x4( xyWH.a4x2[0].MX(0), 0 )  );
+			->frmBRDR( xyWH.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyWH.a4x2[0].MX(0), 0 )  );
+		if( c16fr != gpeCLR_white )
+			continue;
+
+		pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
 
 	}
 
@@ -190,7 +200,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			break;
 		if( !pR[r] )
 			continue;
-		if( (xyWH.y + (int)pR[r]) < 0 )
+		if( (xyWH.y + pR[r]) < 0 )
 			continue;
 
 		i = r*z;
@@ -207,7 +217,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 			if( xyWH.x + pC[c] < 0 )
 				continue;
 
-			fxyz.x = min(CRSfrm.z, xyWH.x+(int)pC[c]);
+			fxyz.x = min(CRSfrm.z, xyWH.x+pC[c]);
 			a = c+1;
 			c16fr = bON&(iON == i+c) ? gpeCLR_white : gpeCLR_blue2;
 			c16ch = gpeCLR_blue2;
