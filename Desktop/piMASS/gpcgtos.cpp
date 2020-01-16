@@ -429,21 +429,36 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							U8 nLEN;
 							for( U1 i = 0; i < 2; i++ )
 							{
-
 								nLEN = gpmNINCS( pS, ": \t\r\n" );
 								pS += nLEN;
 								an.a8x2[i].num = n_atrib - (pS-(U1*)s_atrib);
 								an.a8x2[i] = pS;
 								pS += an.a8x2[i].num;
 								an.a8x2[i].num = gpfSTR2U8( pS, &pS );
-
 							}
 
 							//= gpfSTR2U8( pSTR, &pSTR ), j = gpfSTR2U8( pSTR, &pSTR );
 							sprintf( s_atrib, "0x%x>", iCNT );
 							pMISo = pWIN->putLIST( pMISo, gpeNET4_0LST, an, s_atrib );
 						} break;
+					case gpeALF_MINI: {
+							U1* pS = (U1*)s_atrib;
+							I8x4 an = 0;
+							U8 nLEN;
+							for( U1 i = 0; i < 2; i++ )
+							{
+								nLEN = gpmNINCS( pS, ": \t\r\n" );
+								pS += nLEN;
+								an.a8x2[i].num = n_atrib - (pS-(U1*)s_atrib);
+								an.a8x2[i] = pS;
+								pS += an.a8x2[i].num;
+								an.a8x2[i].num = gpfSTR2U8( pS, &pS );
+							}
 
+							//= gpfSTR2U8( pSTR, &pSTR ), j = gpfSTR2U8( pSTR, &pSTR );
+							sprintf( s_atrib, "0x%x>", iCNT );
+							pMISo = pWIN->putMINI( pMISo, gpeNET4_0LST, an, s_atrib );
+						} break;
 
 					case gpeALF_PIC: {
 
