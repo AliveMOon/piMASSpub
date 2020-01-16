@@ -43,7 +43,34 @@ class gpcCRS
 			return bED = !bED;
 		}
 
+		I4* ZNpos( const I4x2& mZN, U4* pC, U4* pR )
+		{
+			if( (nCp <= mZN.x) || (nRp <= mZN.y) )
+			{
+				nCp = mZN.x+1;
+				nRp = mZN.y+1;
+				gpmDELary(pCp);
+			}
+			if( !pCp )
+			{
+				pCp = new I4[nCp+nRp];
+				pRp = pCp + nCp;
+			}
 
+
+			*pCp = 0;
+			for( U4 i = 0; i < nCp; i++ )
+			{
+				pCp[i+1] = pCp[i] + ( i < mZN.x ? pC[i] : gpdSRC_COLw );
+			}
+
+			*pRp = 0;
+			for( U4 i = 0; i < nRp; i++ )
+			{
+				pRp[i+1] = pRp[i] + ( i < mZN.y ? pR[i] : gpdSRC_ROWw );
+			}
+			return pCp;
+		}
 		I4x2 gtFRMxy( ) //gpcWIN& win, U1 iDIV )
 		{
 
@@ -120,7 +147,7 @@ class gpcCRS
 		}
 
 		bool	miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 wh );
-		void	miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR );
+		void	miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT );
 
 
 		bool	miniOFF( gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );

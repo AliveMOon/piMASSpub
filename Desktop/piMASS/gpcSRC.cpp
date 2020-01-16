@@ -192,7 +192,7 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 		return this;
 
 	for( I4 r = max(xy.y,0); r < fxyz.y; r++ )
-	for( I4 c = max(xy.x,0) + r*fxyz.z, ce = c+fxyz.x; c < ce; c++ )
+	for( I4 c = max(xy.x,0) + r*fxyz.z, s = c-xy.x, ce = c+fxyz.x-s; c < ce; c++ )
 			p1[c] = 0;
 
 	if( bSW&gpeMASSoffMSK )
@@ -267,9 +267,9 @@ I4x4 gpcSRC::SRCmini(
 	//c.u4 = pC64[15];
 	U1 nx, aC[] = " ";
 	I4 cr, n, rr;
-	for( I4 r = max(xy.y,0); r < fy; r++ )
-	for( I4 c = max(xy.x,0) + r*zz, ce = c+fx; c < ce; c++ )
-			pO[c] = 0;
+	//for( I4 r = max(xy.y,0); r < fy; r++ )
+	//for( I4 c = max(xy.x,0) + r*zz, ce = c+fx; c < ce; c++ )
+	//		pO[c] = 0;
 
 
 	bool bON = false, bSEL = false;

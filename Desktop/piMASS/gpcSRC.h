@@ -544,7 +544,7 @@ public:
 				) + mapZN44.z;
 
 		*pCOL = gpdSRC_COLw;
-		*pROW = 1;
+		*pROW = gpdSRC_ROWw;
 		*pMAP = 0;
 
 		//gpmZn( pMAP, nARE );

@@ -19,7 +19,21 @@ U1x4* U1x4::pos( I4x2 pxy, const I4x4& whp )
 	pxy.mx( I4x2(0,0) ).mn(whp.a4x2[1]-I4x2(1,1));
 	return this + pxy.x + pxy.y*whp.z;
 }
-U1x4* U1x4::frm( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
+U1x4* U1x4::frmFILL( I4x2 cr, U1x4 u, I4x4 whp  )
+{
+	cr.mn(whp.a4x2[0]) -= 1;
+	gpfMEMSET( this, cr.x, &u, sizeof(u) );
+
+	if( cr.mn() < 1 )
+		return this;
+
+	for(	U1x4	*pS = this, *pD = this+(whp.z*cr.y); pD > pS; pD -= whp.z )
+		gpmMEMCPY( pD, pS, cr.x );
+
+
+	return this;
+}
+U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 {
 	cr.mn(whp.a4x2[0]) -= 1;
 	if( flg&5 )

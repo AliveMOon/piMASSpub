@@ -835,7 +835,8 @@ public:
 	}
 	U1* typ2str( U1* pBUFF );	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ] // yz dimxy
 	U1x4* pos( I4x2 pxy, const I4x4& whp );
-	U1x4* frm( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  );
+	U1x4* frmFILL( I4x2 cr, U1x4 u, I4x4 whp );
+	U1x4* frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  );
 
 	U1x4* print( U1* p_str, gpeCLR clr )
 	{
