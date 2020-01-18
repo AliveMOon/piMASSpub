@@ -26,43 +26,55 @@ class gpcGLSL
 public:
 	GLint	isSUCC, nLOG,
 			PrgID, nT, nU,
-			aTexID[0x10],
+
+			ATvxID, ATuvID,
+
+			aTexID[GL_ACTIVE_TEXTURE-GL_TEXTURE0],
 			aUniID[0x10];
-	GLuint	vtxID,
+
+	GLuint	vrtxID,
 			frgID;
-	gpcLZY	vtxLOG, vtxSRC,
+	gpcLZY	vrtxLOG, vrtxSRC,
 			frgLOG, frgSRC;
 	U4 nSUCC;
+	I8x2	an;
 private:
-	gpcGLSL( const char* pSfrg, const char* pSvrtx )
-	{
-		gpmCLR;
+	GLint GLSLvrtx( const char* pSvrtx );
+	/*{
 		U8 s;
-		vtxID = glCreateShader( GL_VERTEX_SHADER );
-		const GLchar* pS = pSvrtx;
-		glShaderSource( vtxID, 1, &pS, 0 );
-		glCompileShader( vtxID );
-		glGetShaderiv( vtxID, GL_COMPILE_STATUS, &isSUCC );
+		nSUCC &= ~1;
+		isSUCC = GL_FALSE;
+
+		vrtxID = glCreateShader( GL_VERTEX_SHADER );
+		glShaderSource( vrtxID, 1, &pSvrtx, 0 );
+		glCompileShader( vrtxID );
+		glGetShaderiv( vrtxID, GL_COMPILE_STATUS, &isSUCC );
 		if( isSUCC != GL_TRUE )
 		{
 			//Get info string length
-			glGetShaderiv( vtxID, GL_INFO_LOG_LENGTH, &nLOG );
+			glGetShaderiv( vrtxID, GL_INFO_LOG_LENGTH, &nLOG );
 			if( nLOG )
 			{
-				vtxLOG.lzyADD( NULL, nLOG, s = -1, -1 );
-				glGetShaderInfoLog( vtxID, nLOG, &nLOG, (char*)(vtxLOG.p_alloc+s) );
-				if( nLOG > 0 )
-				{
-					vtxLOG.n_load = s+nLOG;
-				} else
-					vtxLOG.n_load = s;
+				vrtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
+				glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vrtxLOG.p_alloc );
 			}
-			return;
+		} else {
+			frgLOG.lzyRST();
+			vrtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
+			nSUCC |= 1;
 		}
-		nSUCC++;
+
+		return isSUCC;
+	}*/
+	GLint GLSLfrg( const char* pSfrg );
+	/*{
+		U8 s;
+		nT = 0;
+		nSUCC &= ~2;
+		isSUCC = GL_FALSE;
+
 		frgID = glCreateShader( GL_FRAGMENT_SHADER );
-		pS = pSfrg;
-		glShaderSource( frgID, 1, &pS, 0 );
+		glShaderSource( frgID, 1, &pSfrg, 0 );
 		glCompileShader( frgID );
 		glGetShaderiv( frgID, GL_COMPILE_STATUS, &isSUCC );
 		if( isSUCC != GL_TRUE )
@@ -71,53 +83,120 @@ private:
 			glGetShaderiv( frgID, GL_INFO_LOG_LENGTH, &nLOG );
 			if( nLOG )
 			{
-				vtxLOG.lzyADD( NULL, nLOG, s = -1, -1 );
-				glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc+s) );
-				if( nLOG > 0 )
-				{
-					frgLOG.n_load = s+nLOG;
-				} else
-					frgLOG.n_load = s;
+				frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
+				glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
 			}
-			return;
+		} else {
+			frgLOG.lzyRST();
+			frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
+			nSUCC |= 2;
+
 		}
-		nSUCC++;
+		return isSUCC;
+	}*/
+	GLint GLSLlnk()
+	{
+        if( (nSUCC&0x7) == 0x7 )
+			return GL_TRUE;
+
+        if( (nSUCC&0x7) != 3 )
+			return GL_FALSE;
+
+		glUseProgram(0);
+		if( PrgID > 0 )
+			glDeleteProgram(PrgID);
 
 		PrgID = glCreateProgram();
-		glAttachShader( PrgID, vtxID );
+		if( PrgID < 1 )
+			return GL_FALSE;
+
+		glAttachShader( PrgID, vrtxID );
 		glAttachShader( PrgID, frgID );
 		glLinkProgram( PrgID );
 
-		glDetachShader( PrgID, vtxID );
-		glDeleteShader( vtxID );
+		glDetachShader( PrgID, vrtxID );
+		glDeleteShader( vrtxID );
 		glDetachShader( PrgID, frgID );
 		glDeleteShader( frgID );
 
-		vtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
-		frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
+		aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
+		aUniID[1] = glGetUniformLocation( PrgID, "DIVxy" 	);
+		aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
+		aUniID[3] = glGetUniformLocation( PrgID, "aTX" 	);
+		nU = 4;
+
+		nSUCC |= 0x4;
+		return GL_TRUE;
+	}
+	gpcGLSL( const I8x2& _an, const char* pSfrg, const char* pSvrtx )
+	{
+		gpmCLR;
+		an = _an;
+		if( GLSLvrtx( pSvrtx ) != GL_TRUE )
+			return;
+
+		if( GLSLfrg( pSfrg ) != GL_TRUE )
+			return;
+
+		GLSLlnk();
 	}
 public:
-	gpcGLSL* pNEW( const char* pSfrag, const char* pSvrtx )
+	GLint fndTX( const char* p_txt )
 	{
-		gpcGLSL* pTHIS = new gpcGLSL( pSfrag, pSvrtx );
-		if( !pTHIS )
-			return NULL;
+		if( nT )
+			return nT;
 
-		if( nSUCC < 3 )
+		if( PrgID < 1 )
+			return nT;
+
+		char sTX[0x100];
+		nT = 0;
+		for( U4 i = 0, e = gpmN(aTexID); i < e; i++ )
 		{
-			gpmDEL(pTHIS);
-			return NULL;
+			sprintf( sTX, "%s%d", p_txt, i );
+			aTexID[i] = glGetUniformLocation( PrgID, sTX );
+			if( aTexID[i] > -1 )
+				nT = i+1;
 		}
 
+		return nT;
+	}
+	gpcGLSL* pNEW( const I8x2& an, const char* pSfrag, const char* pSvrtx, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  )
+	{
+		if( !this )
+		{
+			gpcGLSL* pTHIS = new gpcGLSL( an, pSfrag, pSvrtx );
+			if( !pTHIS )
+				return NULL;
 
-		return pTHIS;
+			if( (pTHIS->nSUCC&0x7) != 0x7 )
+			{
+				gpmDEL(pTHIS);
+				return NULL;
+			}
+
+			return pTHIS->pNEW( an, pSfrag, pSvrtx );
+		}
+		fndTX( pATtx );
+		// ATTRIBUTES ----------------------
+		ATvxID = glGetAttribLocation( PrgID, pATvx );
+		if( ATvxID < 0 )
+			return this;
+		nSUCC |= 8;
+
+		ATuvID = glGetAttribLocation( PrgID, pATuv );
+		if( ATuvID < 0 )
+			return this;
+
+		nSUCC |= 0x10;
+		return this;
 	}
 };
 class gpcGL
 {
 public:
 	GLint	oPrgID,
-			v_vxID, v_uvID,
+			ATvxID, ATuvID,
 			gVxSucc,
 			gFrSucc, aTexID[0x8],
 			gPrgSucc, aUniID[0x8],
@@ -149,6 +228,12 @@ public:
 				*pTXchar,
 				*pTXiso;
 
+	gpcGLSL		**ppGLSL, *pGLSL;
+	U4			iGLSL, eGLSL, nGLSL;
+
+	gpcGL* GLSLset( const I8x2 an, const char* pF = NULL, const char* pV = NULL  );
+
+
 
 	~gpcGL()
 	{
@@ -156,6 +241,7 @@ public:
 	}
 
 	gpcGL( gpcWIN& win );
+
 	gpcGL* TRG( SDL_Renderer* pSDLrndr, I4x2 lXY, const I4x2& tWH, float ms, bool bCLR = true, bool bDEP = true )
 	{
 		if( !this )
@@ -182,13 +268,13 @@ public:
 			//pTXchar = SDL_CreateTextureFromSurface( pRNDR, pSRFchar );
 		}
 
-		if( aUniID[2] < 1 )
+		/*if( aUniID[2] < 1 )
 		{
-			aUniID[0] = glGetUniformLocation( gProgID, "tgPX" );
-			aUniID[1] = glGetUniformLocation( gProgID, "DIVxy" );
-			aUniID[2] = glGetUniformLocation( gProgID, "FRMwh" );
-			aUniID[3] = glGetUniformLocation( gProgID, "aTX" );
-		}
+			aUniID[0] = glGetUniformLocation( gProgID, "tgPX" 	);
+			aUniID[1] = glGetUniformLocation( gProgID, "DIVxy" 	);
+			aUniID[2] = glGetUniformLocation( gProgID, "FRMwh" 	);
+			aUniID[3] = glGetUniformLocation( gProgID, "aTX" 	);
+		}*/
 
 		luXY = lXY;
 		trgWH = tWH;
@@ -233,14 +319,15 @@ public:
 			return NULL;
 
 		Fx4 aV4[4];
+
 		glUseProgram( gProgID );
 
 		if( boxXY == xy && boxWH == wh )
 		{
 			/*glBindBuffer( GL_ARRAY_BUFFER, VXbID );
 			//glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableVertexAttribArray( v_vxID );
-			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(*aV4), 0 );*/
+			glEnableVertexAttribArray( ATvxID );
+			glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(*aV4), 0 );*/
 			return this;
 		}
 
@@ -315,16 +402,16 @@ public:
 
 		//glBindVertexArray( VaID ); //VXbID);
 
-		glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
-		glEnableVertexAttribArray( v_vxID );
-		glVertexAttribPointer( v_uvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
-		glEnableVertexAttribArray( v_uvID );
+		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
+		glEnableVertexAttribArray( ATvxID );
+		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
+		glEnableVertexAttribArray( ATuvID );
 
 		//glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
 		glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
 
-		glDisableVertexAttribArray( v_vxID );
-		glDisableVertexAttribArray( v_uvID );
+		glDisableVertexAttribArray( ATvxID );
+		glDisableVertexAttribArray( ATuvID );
 
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
@@ -348,7 +435,7 @@ public:
 		return this;
 	}
 
-	void rndr(	SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms,
+/*	void rndr(	SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms,
 				SDL_Texture* pTX,
 				SDL_Texture* pTXchar,
 				SDL_Texture* pTXbg,
@@ -357,11 +444,7 @@ public:
 			return;
 		//GLint oldProgramId;
 		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
-		/*GLdouble model[16],
-				 proj[16];
 
-		glGetDoublev( GL_MODELVIEW_MATRIX, model );
-		glGetDoublev( GL_PROJECTION_MATRIX, proj );*/
 
 
 		SDL_SetRenderTarget( pSDLrndr, NULL );
@@ -371,13 +454,9 @@ public:
 		glClear( 	//GL_COLOR_BUFFER_BIT|
 					GL_DEPTH_BUFFER_BIT );
 
-		/*glMatrixMode( GL_PROJECTION );
-		glLoadIdentity();
 
-		glMatrixMode( GL_MODELVIEW );
-		glLoadIdentity();*/
 
-		if( v_vxID < 0 )
+		if( ATvxID < 0 )
 		{
 			glBegin( GL_QUADS );
 				glVertex2f( -0.5f, -0.5f );
@@ -411,14 +490,14 @@ public:
 			glUniform2f( aTexID[5], (float)txWH.x, (float)txWH.y );
 
 
-			glEnableVertexAttribArray( v_vxID );
+			glEnableVertexAttribArray( ATvxID );
 			glBindBuffer( GL_ARRAY_BUFFER, VXbID );
-			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0 );
+			glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0 );
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IXbID );
 
 			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
 
-			glDisableVertexAttribArray( v_vxID );
+			glDisableVertexAttribArray( ATvxID );
 			glUseProgram( 0 );
 		}
 
@@ -430,11 +509,11 @@ public:
 		glUseProgram(oPrgID);
 		SDL_RenderClear( pSDLrndr );
 	}
+*/
 
 
-
-	GLuint GLSLvrtx( const char* pS );
-	GLuint GLSLfrg( const char* pS );
+	GLuint GLSLvrtx( const char* pS = NULL );
+	GLuint GLSLfrg( const char* pS = NULL );
 	GLuint GLSLlnk( ) {
 		U8 s;
 		gProgID = glCreateProgram();
@@ -482,16 +561,13 @@ public:
 			glDeleteShader( gFrSID );
 		}
 
-		v_vxID = glGetAttribLocation( gProgID, "v_vx" );
-		if( v_vxID < 0 )
+		ATvxID = glGetAttribLocation( gProgID, "v_vx" );
+		if( ATvxID < 0 )
 		{
 			return gProgID;
 		}
-		v_uvID = glGetAttribLocation( gProgID, "v_uv" );
-		/*if( v_uvID < 0 )
-		{
-			return gProgID;
-		}*/
+		ATuvID = glGetAttribLocation( gProgID, "v_uv" );
+
 
 		aTexID[0] = glGetUniformLocation( gProgID, "tex0" );
 		aTexID[1] = glGetUniformLocation( gProgID, "tex1" );

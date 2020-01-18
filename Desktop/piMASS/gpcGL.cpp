@@ -15,7 +15,7 @@ char gpsGLSLfrgREF[] =
 "uniform sampler2D tex0;					// MINI_CHAR_xXy_zXw.png		\n"
 "void main()																\n"
 "{																			\n"
-"	gl_FragColor = texture2D( gpdTXbg, fr_uv );								\n"
+"	gl_FragColor = texture2D( tex0, fr_uv );								\n"
 "}																			\n"
 
 "\n\0";
@@ -278,6 +278,115 @@ char gpsGLSLfrgISO[] =
 
 "}\n";
 
+GLint gpcGLSL::GLSLvrtx( const char* pSvrtx )
+{
+	if( !pSvrtx )
+		pSvrtx = gpsGLSLvx;
+	U8 s;
+	nSUCC &= ~1;
+	isSUCC = GL_FALSE;
+
+	vrtxID = glCreateShader( GL_VERTEX_SHADER );
+	glShaderSource( vrtxID, 1, &pSvrtx, 0 );
+	glCompileShader( vrtxID );
+	glGetShaderiv( vrtxID, GL_COMPILE_STATUS, &isSUCC );
+	if( isSUCC != GL_TRUE )
+	{
+		//Get info string length
+		glGetShaderiv( vrtxID, GL_INFO_LOG_LENGTH, &nLOG );
+		if( nLOG )
+		{
+			vrtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
+			glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vrtxLOG.p_alloc );
+		}
+	} else {
+		frgLOG.lzyRST();
+		vrtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
+		nSUCC |= 1;
+	}
+
+	return isSUCC;
+}
+GLint gpcGLSL::GLSLfrg( const char* pSfrg )
+{
+	if( !pSfrg )
+		pSfrg = gpsGLSLfrgISO;
+	U8 s;
+	nT = 0;
+	nSUCC &= ~2;
+	isSUCC = GL_FALSE;
+
+	frgID = glCreateShader( GL_FRAGMENT_SHADER );
+	glShaderSource( frgID, 1, &pSfrg, 0 );
+	glCompileShader( frgID );
+	glGetShaderiv( frgID, GL_COMPILE_STATUS, &isSUCC );
+	if( isSUCC != GL_TRUE )
+	{
+		//Get info string length
+		glGetShaderiv( frgID, GL_INFO_LOG_LENGTH, &nLOG );
+		if( nLOG )
+		{
+			frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
+			glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
+		}
+	} else {
+		frgLOG.lzyRST();
+		frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
+		nSUCC |= 2;
+	}
+	return isSUCC;
+}
+
+gpcGL* gpcGL::GLSLset( const I8x2 an, const char* pF, const char* pV )
+{
+	if( pGLSL  ? pGLSL->an == an : false )
+		return NULL;
+
+	pGLSL = NULL;
+	eGLSL = nGLSL;
+    for( iGLSL = 0; iGLSL < nGLSL; iGLSL++ )
+    {
+		if( !ppGLSL[iGLSL] )
+		{
+			if( eGLSL > iGLSL )
+				eGLSL = iGLSL;
+			continue;
+		}
+
+        if( ppGLSL[iGLSL]->an != an )
+			continue;
+
+		pGLSL = ppGLSL[iGLSL];
+		break;
+    }
+	if( iGLSL > eGLSL )
+		iGLSL = eGLSL;
+
+	if( !pGLSL )
+	{
+	    if( iGLSL >= nGLSL )
+        {
+			iGLSL = nGLSL;
+			gpcGLSL **ppKILL = ppGLSL;
+			nGLSL += iGLSL + 0x4;
+			ppGLSL = new gpcGLSL*[nGLSL];
+			gpmMEMCPY( ppGLSL, ppKILL, iGLSL );
+			gpmDELary(ppKILL);
+			gpmZn( ppGLSL+iGLSL, nGLSL-iGLSL );
+        }
+		ppGLSL[iGLSL] = ppGLSL[iGLSL]->pNEW( an, pF, pV );
+		if( !ppGLSL[iGLSL] )
+			return NULL;
+		pGLSL = ppGLSL[iGLSL];
+	}
+
+	gProgID = pGLSL->PrgID;
+	gpmMEMCPY( aTexID, pGLSL->aTexID, gpmN(aTexID) );
+	gpmMEMCPY( aUniID, pGLSL->aUniID, gpmN(aUniID) );
+	ATvxID = pGLSL->ATvxID;
+	ATuvID = pGLSL->ATuvID;
+	return this;
+}
 gpcGL::gpcGL( gpcWIN& win )
 {
 	gpmCLR;

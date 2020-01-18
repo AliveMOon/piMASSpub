@@ -148,9 +148,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	chrPIC.h = pSRFchar->h/chrPIC.y;
 	U1x4* pC = (U1x4*)(pSRFchar->pixels + 4*pSRFchar->pitch);
 	for( U4 i = 0; i < 0x80; i++ )
-	{
 		pC[(i>>4)*pSRFchar->w + (i&0xf)] = 0x01010101*(gpsHUNtx[i]-' ');
-	}
 
 	gpmSTRCPY( gppMASSfile, gpsMINI_ISO );
 	pSRFiso = IMG_Load( gpsMASSpath );
@@ -165,23 +163,23 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	pHOST = sHOST;
 	pUSER = sUSER;
 
-	pGL = true ? new gpcGL( *this ) : NULL;
+	pGL =  new gpcGL( *this ); //true ? new gpcGL( *this ) : NULL;
 	if( !pGL ) //? !pGL->pTXback : true )
 		return;
 
-	pGL->GLSLvrtx( NULL );
+	pGL->GLSLset( I8x2( 0, 0 ) );
+
+	/*pGL->GLSLvrtx();
 	if( pGL->gVxSucc != GL_TRUE )
 		return;
 
-	//pGL->FrgSHDRcmpi( gpsGLSL );
-	//pGL->FrgSHDRcmpi( gpsGLSLiso );
-	pGL->GLSLfrg( NULL );
+	pGL->GLSLfrg();
 	if( pGL->gFrSucc != GL_TRUE )
 		return;
 
 	pGL->GLSLlnk();
 	if( pGL->gPrgSucc != GL_TRUE )
-		return;
+		return;*/
 
 	//pGL->VBOnew( aVxD, gpmN(aVxD)/2, 2 );
 	pGL->IBOnew( aIxD, gpmN(aIxD) );
@@ -219,7 +217,7 @@ void gpcWIN::gpeWINresize( void )
 
 }
 
-
+extern char gpsGLSLfrgREF[];
 void gpcWIN::WINrun( const char* pWELLCOME )
 {
 	U4 scan, bug = 0, nBUG;
@@ -258,22 +256,21 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			{
 				SDL_Texture* pBGtx = (pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL);
 				pGL->TRG( pSDLrndr, 0, winSIZ.a4x2[0], mSEC.x );
+
+				//pGL->GLSLset( I8x2( 0, 0 ) );
 				for( U1 i = 0; i < 4; i++ )
 				{
 					if( i ? !(bSW&(1<<i)) : false )
 						continue;
 
 					I4x4 w = wDIVpx(i);
-					I4x2 FRMwh = apCRS[i]->gtFRMwh();
+					I4x2 FRMwh = apCRS[i]->gtFRMwh(), bgWH = pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960);
 
+					pGL->GLSLset( I8x2( 0, 1 ), gpsGLSLfrgREF )->SET_box( w.a4x2[0], w.a4x2[1] )->SET_tx( 0, pBGtx, bgWH )->DRW( w.a4x2[0], FRMwh );
 
-
-					pGL->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
+					pGL->GLSLset( I8x2( 0, 0 ) )->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
 					->SET_tx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
-					->SET_tx( 1,
-									pBGtx,
-									(pPICbg ? pPICbg->txWH.a4x2[0] 		: I4x2(1280,960))
-							)																				// tex1 -- BG background
+					->SET_tx( 1, pBGtx, bgWH )																// tex1 -- BG background
 					->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )											// tex2 -- MINIiso
 					->DRW( w.a4x2[0], FRMwh );
 				}
