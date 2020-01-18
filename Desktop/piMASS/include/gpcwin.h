@@ -21,6 +21,98 @@ public:
 };
 
 #define gpdNdiv gpmN(apCRS)
+class gpcGLSL
+{
+public:
+	GLint	isSUCC, nLOG,
+			PrgID, nT, nU,
+			aTexID[0x10],
+			aUniID[0x10];
+	GLuint	vtxID,
+			frgID;
+	gpcLZY	vtxLOG, vtxSRC,
+			frgLOG, frgSRC;
+	U4 nSUCC;
+private:
+	gpcGLSL( const char* pSfrg, const char* pSvrtx )
+	{
+		gpmCLR;
+		U8 s;
+		vtxID = glCreateShader( GL_VERTEX_SHADER );
+		const GLchar* pS = pSvrtx;
+		glShaderSource( vtxID, 1, &pS, 0 );
+		glCompileShader( vtxID );
+		glGetShaderiv( vtxID, GL_COMPILE_STATUS, &isSUCC );
+		if( isSUCC != GL_TRUE )
+		{
+			//Get info string length
+			glGetShaderiv( vtxID, GL_INFO_LOG_LENGTH, &nLOG );
+			if( nLOG )
+			{
+				vtxLOG.lzyADD( NULL, nLOG, s = -1, -1 );
+				glGetShaderInfoLog( vtxID, nLOG, &nLOG, (char*)(vtxLOG.p_alloc+s) );
+				if( nLOG > 0 )
+				{
+					vtxLOG.n_load = s+nLOG;
+				} else
+					vtxLOG.n_load = s;
+			}
+			return;
+		}
+		nSUCC++;
+		frgID = glCreateShader( GL_FRAGMENT_SHADER );
+		pS = pSfrg;
+		glShaderSource( frgID, 1, &pS, 0 );
+		glCompileShader( frgID );
+		glGetShaderiv( frgID, GL_COMPILE_STATUS, &isSUCC );
+		if( isSUCC != GL_TRUE )
+		{
+			//Get info string length
+			glGetShaderiv( frgID, GL_INFO_LOG_LENGTH, &nLOG );
+			if( nLOG )
+			{
+				vtxLOG.lzyADD( NULL, nLOG, s = -1, -1 );
+				glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc+s) );
+				if( nLOG > 0 )
+				{
+					frgLOG.n_load = s+nLOG;
+				} else
+					frgLOG.n_load = s;
+			}
+			return;
+		}
+		nSUCC++;
+
+		PrgID = glCreateProgram();
+		glAttachShader( PrgID, vtxID );
+		glAttachShader( PrgID, frgID );
+		glLinkProgram( PrgID );
+
+		glDetachShader( PrgID, vtxID );
+		glDeleteShader( vtxID );
+		glDetachShader( PrgID, frgID );
+		glDeleteShader( frgID );
+
+		vtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
+		frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
+	}
+public:
+	gpcGLSL* pNEW( const char* pSfrag, const char* pSvrtx )
+	{
+		gpcGLSL* pTHIS = new gpcGLSL( pSfrag, pSvrtx );
+		if( !pTHIS )
+			return NULL;
+
+		if( nSUCC < 3 )
+		{
+			gpmDEL(pTHIS);
+			return NULL;
+		}
+
+
+		return pTHIS;
+	}
+};
 class gpcGL
 {
 public:
@@ -341,122 +433,8 @@ public:
 
 
 
-	GLuint GLSLvrtx( const char* pS );/* {
-		U8 s = -1, nS = gpmSTRLEN(pS);
-		if( !nS )
-			return gVxSID;
-
-		if( VxSsrc.n_load ? VxSsrc.n_load == nS : false )
-		if( gpmMEMCMP( VxSsrc.p_alloc, pS, VxSsrc.n_load ) == VxSsrc.n_load )
-				return gVxSID;
-
-		//VxSlog.lzyRST();
-		//VxSsrc.lzyRST();
-
-		tmpID = glCreateShader( GL_VERTEX_SHADER );
-		glShaderSource( tmpID, 1, &pS, NULL );
-		glCompileShader( tmpID );
-		gSucc = GL_FALSE;
-		glGetShaderiv( tmpID, GL_COMPILE_STATUS, &gSucc );
-		if( gSucc != GL_TRUE )
-		{
-			int infoLogLength = 0;
-			int maxLength = infoLogLength;
-
-			//Get info string length
-			glGetShaderiv( tmpID, GL_INFO_LOG_LENGTH, &maxLength );
-
-			//Allocate string
-			if( maxLength )
-			{
-				VxSlog.lzyADD( NULL, maxLength, s, -1 );
-				//char* infoLog = new char[ maxLength ];
-
-				//Get info log
-				glGetShaderInfoLog( tmpID, maxLength, &infoLogLength, (char*)(VxSlog.p_alloc+s) );
-				if( infoLogLength > 0 )
-				{
-					VxSlog.n_load = s+infoLogLength;
-				} else
-					VxSlog.n_load = s;
-			}
-
-			//Deallocate string
-			//delete[] infoLog;
-			return gVxSID;
-		}
-
-		//VxSsrc.lzyRST();
-		VxSsrc.lzyINS( (U1*)pS, nS, s = 0, -1 );
-		if( gVxSID )
-		{
-			glDetachShader( gProgID, gVxSID );
-			glDeleteShader( gVxSID );
-		}
-		gVxSucc = gSucc;
-		gVxSID = tmpID;
-		return gVxSID;
-
-	}*/
-	GLuint GLSLfrg( const char* pS ); /*{
-		if(!pS)
-			pS = gpsGLSLfrgISO;
-		U8 s = -1, nS = gpmSTRLEN(pS);
-		if( !nS )
-			return gFrSID;
-
-		if( frSsrc.n_load ? frSsrc.n_load == nS : false )
-		if( gpmMEMCMP( frSsrc.p_alloc, pS, frSsrc.n_load ) == frSsrc.n_load )
-				return gFrSID;
-
-		//FrSlog.lzyRST();
-		//frSsrc.lzyRST();
-
-		tmpID = glCreateShader( GL_FRAGMENT_SHADER );
-		glShaderSource( tmpID, 1, &pS, NULL );
-		glCompileShader( tmpID );
-		gSucc = GL_FALSE;
-		glGetShaderiv( tmpID, GL_COMPILE_STATUS, &gSucc );
-		if( gSucc != GL_TRUE )
-		{
-			int infoLogLength = 0;
-			int maxLength = infoLogLength;
-
-			//Get info string length
-			glGetShaderiv( tmpID, GL_INFO_LOG_LENGTH, &maxLength );
-
-			//Allocate string
-			if( maxLength )
-			{
-				FrSlog.lzyADD( NULL, maxLength, s, -1 );
-				//char* infoLog = new char[ maxLength ];
-
-				//Get info log
-				glGetShaderInfoLog( tmpID, maxLength, &infoLogLength, (char*)(FrSlog.p_alloc+s) );
-				if( infoLogLength > 0 )
-				{
-					FrSlog.n_load = s+infoLogLength;
-				} else
-					FrSlog.n_load = s;
-			}
-
-			//Deallocate string
-			//delete[] infoLog;
-			return gFrSID;
-		}
-
-		//frSsrc.lzyRST();
-		frSsrc.lzyINS( (U1*)pS, nS, s = 0, -1 );
-		if( gFrSID )
-		{
-			glDetachShader( gProgID, gFrSID );
-			glDeleteShader( gFrSID );
-		}
-		gFrSucc = gSucc;
-		gFrSID = tmpID;
-		return gFrSID;
-
-	}*/
+	GLuint GLSLvrtx( const char* pS );
+	GLuint GLSLfrg( const char* pS );
 	GLuint GLSLlnk( ) {
 		U8 s;
 		gProgID = glCreateProgram();

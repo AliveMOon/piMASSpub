@@ -20,47 +20,6 @@ char gpsGLSLfrgREF[] =
 
 "\n\0";
 
-char gpsGLSLfr_ref[] =
-	"#version 120																		\n"
-	"varying vec2 v_uv;																	\n"
-	"uniform sampler2D tex0;															\n"
-	"uniform sampler2D tex1;															\n"
-	"uniform sampler2D tex2;															\n"
-	"uniform vec2 crsFRxy;																\n"
-	"																					\n"
-	"void main()																		\n"
-	"{																					\n"
-	"	vec4 mini = texture2D(tex0, v_uv)*256.0;										\n"
-	"	float 	c = mini.r,			cc = mini.g, 										\n"
-	"			f = mini.b+0xb0,	fc = mini.a; 										\n"
-	"	vec2 	uv = fract(v_uv*crsFRxy)/vec2(8.0,32.0),								\n"
-	"			f_uv =	vec2( 															\n"
-	"							floor(fract(f/8.0)*8.0)/8.0,							\n"
-	"							floor(f/8.0)/32.0										\n"
-	"						) 															\n"
-	"					+ uv, 															\n"
-	"			fc_uv = vec2( 															\n"
-	"							floor(fract(fc/4.0)*4.0)/128.0,							\n"
-	"							floor(fc/4.0)/1024.0									\n"
-	"						),															\n"
-	"			c_uv =	vec2( 															\n"
-	"							floor(fract(c/8.0)*8.0)/8.0,							\n"
-	"							floor(c/8.0)/32.0										\n"
-	"						) 															\n"
-	"					+ uv, 															\n"
-	"			cc_uv = vec2( 															\n"
-	"							floor(fract(cc/4.0)*4.0)/128.0,							\n"
-	"							floor(cc/4.0)/1024.0									\n"
-	"						);															\n"
-	"																					\n"
-	"	gl_FragColor =	 																\n"
-	"					min( f, 1 ) * texture2D(tex1, f_uv ) * texture2D(tex1, fc_uv )	\n"
-	"					+min( c, 1 ) * texture2D(tex1, c_uv ) * texture2D(tex1, cc_uv )	\n"
-	"					+vec4( texture2D( tex2, v_uv ).rgb, 0.0 );						\n"
-	"}	\n";
-
-
-
 char gpsGLSLfrgISO[] =
 "#version 120																									\n"
 "varying vec2 fr_uv;																							\n"

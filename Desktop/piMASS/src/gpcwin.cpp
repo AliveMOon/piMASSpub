@@ -52,98 +52,6 @@ const char * InitError::what() const throw()
     return msg.c_str();
 }
 
-
-
-
-char gpsGLSLtrash[] =
-	"#version 120																	\n"
-	"varying vec2 fr_uv;															\n"
-	"uniform sampler2D tex0;						// MINI_CHAR_xXy_zXw.png		\n"
-	"uniform sampler2D tex1;						// BackGround					\n"
-	"uniform sampler2D tex2;						// MINI 	ABGR?				\n"
-	"												// U4		XYZW				\n"
-	"												//			cFcA 				\n"
-	"uniform vec2 tgPX;																\n"
-	"uniform vec2 DIVxy;																\n"
-	"uniform vec2 FRMwh;																\n"
-	"uniform vec2 aTX[8];															\n"
-	"vec4 cr_lut( vec2 ac )															\n"
-	"{																				\n"
-	"	ac /= vec2(8.0,4.0);														\n"
-	"	return vec4( 																\n"
-	"						floor( vec2(fract(ac.x)*8.0, ac.x) ), 	// char			\n"
-	"						floor( vec2(fract(ac.y)*4.0, ac.y) )	// LUT		  	\n"
-	"					)															\n"
-	"			/ vec4(																\n"
-	"						8.0,32.0,												\n"
-	"						128.0,1024.0											\n"
-	"					);															\n"
-	"}																				\n"
-	"void main()																	\n"
-	"{																				\n"
-	"	vec2	frm1 = fr_uv*FRMwh,													\n"
-	"			big_in = fract(frm1)/aTX[0],										\n"
-	"			frm0 = frm1/aTX[2],													\n"
-	"			off0 = vec2( 1.0/4.0, 1.0/6.0 );								\n"
-	"	if( DIVxy.x < 1 )						\n"
-	" 		off0.x = 0.0;						\n"
-	"	if( DIVxy.y < 1 )						\n"
-	" 		off0.y = 0.0;						\n"
-	"	vec4	big = texture2D( tex2, frm0 + off0 )*0x100;							\n"
-	"																				\n"
-	"	gl_FragColor = vec4( texture2D( tex1, fr_uv ).rgb, 0.0 );			// BG	\n"
-	"	vec4	fr			= cr_lut( big.ba+vec2(0xb0,0) ),						\n"
-	"			fr_rgb	= texture2D( tex0, fr.zw ),									\n"
-	"			cl			= cr_lut(big.rg),										\n"
-	"			cl_rgb	= texture2D( tex0, cl.zw );									\n"
-	"	if( big.b != 0 )															\n"
-	"		gl_FragColor += texture2D( tex0, fr.xy+big_in )*fr_rgb;					\n"
-	"																				\n"
-	"	if( big.r != 0 )															\n"
-	"	{																			\n"
-	"		if( big.r <= 0x60 )															\n"
-	"			gl_FragColor += texture2D( tex0, cl.xy+big_in )*cl_rgb;					\n"
-	"		else {																		\n"
-	"			cl.zw = (big.rr - vec2( 0x20, -0x20 ))/0x10;							\n"
-	"																					\n"
-	"			cl.z = texture2D( tex0,													\n"
-	"											floor(vec2(fract(cl.z)*0x10, cl.z)) 	\n"
-	"											/ vec2( 128.0, 1024 )					\n"
-	"								).a;												\n"
-	"			cl.w = texture2D( tex0,													\n"
-	"											floor(vec2(fract(cl.w)*0x10, cl.w)) 	\n"
-	"											/ vec2( 128.0, 1024 )					\n"
-	"								).a;												\n"
-	"			cl.zw *= 0x100;															\n"
-	"			if( cl.z >= 0x41 &&  cl.z <= 0x5a )										\n"
-	"				cl.w += 0x68;														\n"
-	"			else																	\n"
-	"				cl.w += 0x60;														\n"
-	"																					\n"
-	"			cl.zw /= 8;																\n"
-	"			cl = vec4( 																			\n"
-	"							floor(vec2(fract(cl.z)*0x8, cl.z)),									\n"
-	"							floor(vec2(fract(cl.w)*0x8, cl.w))									\n"
-	"						) / vec2( 8.0, 32.0 ).xyxy + big_in.xyxy;								\n"
-	"			gl_FragColor += max( texture2D(tex0, cl.xy ), texture2D(tex0, cl.zw ) ) * cl_rgb;	\n"
-	"		}																						\n"
-	"	}																			\n"
-	"} \n\0";
-
-
-
-
-char gpsGLSLfrOLD[] =
-	"#version 120\n"
-	"varying vec2 v_uv;\n"
-	"uniform sampler2D tex0;\n"
-	"uniform sampler2D tex1;\n"
-	"void main()\n"
-	"{\n"
-	"	gl_FragColor =	max( texture2D(tex0, v_uv),\n"
-	"						 texture2D(tex1, v_uv) );\n"
-	//"	gl_FragColor.a = 1.0;\n"
-	"}\n\0";
 //VBO data
 static const GLfloat aVxD[] =
 {
@@ -357,6 +265,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 					I4x4 w = wDIVpx(i);
 					I4x2 FRMwh = apCRS[i]->gtFRMwh();
+
+
 
 					pGL->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
 					->SET_tx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
