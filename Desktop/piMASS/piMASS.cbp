@@ -49,6 +49,7 @@
 			<Add library="libjpeg" />
 		</Linker>
 		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpcGL.cpp" />
 		<Unit filename="gpcLAZY.cpp" />
 		<Unit filename="gpcOPCD.cpp" />
 		<Unit filename="gpcSRC.cpp" />

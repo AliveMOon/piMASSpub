@@ -177,75 +177,6 @@ public:
 		boxWH = wh;
 
 		return this;
-		/*// GEN VX ARAY ATRIB
-		//glGenVertexArrays( 1, &VaID );
-		//glBindVertexArray(VaID);
-		//glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
-		//glEnableVertexAttribArray( v_vxID );
-		//glVertexAttribPointer( v_uvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), (void*)(sizeof(Fx2)) );
-		//glEnableVertexAttribArray( v_uvID );
-		// GEN VX BUFFER
-		glGenBuffers( 1, &VXbID );
-
-		glBindBuffer( GL_ARRAY_BUFFER, VXbID );
-		glBufferData( GL_ARRAY_BUFFER, sizeof(aV4), aV4, GL_STATIC_DRAW );
-		glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-		boxXY = xy;
-		boxWH = wh;
-
-		return this;*/
-	}
-
-	gpcGL* SET_box2( I4x2 xy, const I4x2& wh, const GLfloat* pVX4 ) {
-		if( this ? !wh.area() : true )
-			return NULL;
-
-		Fx2 aV2[4];
-		glUseProgram( gProgID );
-
-		if( boxXY == xy && boxWH == wh )
-		{
-			/*glBindBuffer( GL_ARRAY_BUFFER, VXbID );
-			//glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableVertexAttribArray( v_vxID );
-			glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(*aV4), 0 );*/
-			return this;
-		}
-
-		if( boxWH.area() )
-			glDeleteBuffers(1,&VXbID);
-
-		xy -= luXY;
-
-		aV2[0] = xy;
-		aV2[1] = xy + I4x2( wh.x, 0 );
-		aV2[2] = xy + wh;
-		aV2[3] = xy + I4x2( 0, wh.y );
-
-		aV2[0].div( trgWH, gpmN(aV2) );
-
-		if( VXbID > 1 )
-			glDeleteBuffers(1,  &VXbID );
-
-		// GEN VX ARAY ATRIB
-		//glGenVertexArrays( 1, &VaID );
-		//glBindVertexArray(VaID);
-		//glVertexAttribPointer( v_vxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
-		//glEnableVertexAttribArray( v_vxID );
-		//glVertexAttribPointer( v_uvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), (void*)(sizeof(Fx2)) );
-		//glEnableVertexAttribArray( v_uvID );
-		// GEN VX BUFFER
-		glGenBuffers( 1, &VXbID );
-
-		glBindBuffer( GL_ARRAY_BUFFER, VXbID );
-		glBufferData( GL_ARRAY_BUFFER, sizeof(aV2), aV2, GL_STATIC_DRAW );
-		glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-		boxXY = xy;
-		boxWH = wh;
-
-		return this;
 	}
 
 	gpcGL* SET_tx( U4 i, SDL_Texture* pTX, I4x2 wh )
@@ -410,7 +341,7 @@ public:
 
 
 
-	GLuint VxScmp( const char* pS ) {
+	GLuint GLSLvrtx( const char* pS );/* {
 		U8 s = -1, nS = gpmSTRLEN(pS);
 		if( !nS )
 			return gVxSID;
@@ -466,8 +397,10 @@ public:
 		gVxSID = tmpID;
 		return gVxSID;
 
-	}
-	GLuint FrgSHDRcmpi( const char* pS ) {
+	}*/
+	GLuint GLSLfrg( const char* pS ); /*{
+		if(!pS)
+			pS = gpsGLSLfrgISO;
 		U8 s = -1, nS = gpmSTRLEN(pS);
 		if( !nS )
 			return gFrSID;
@@ -523,8 +456,8 @@ public:
 		gFrSID = tmpID;
 		return gFrSID;
 
-	}
-	GLuint VxFrLink( ) {
+	}*/
+	GLuint GLSLlnk( ) {
 		U8 s;
 		gProgID = glCreateProgram();
 		glAttachShader( gProgID, gVxSID );
