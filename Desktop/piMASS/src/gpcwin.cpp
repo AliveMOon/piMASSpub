@@ -224,7 +224,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 	U1 aXY[] = "00", c = 0;
 
 	gppKEYbuff = ( gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,pWELLCOME ) );
-
+	I8x2 GLSLpic(0,1), GLSLiso(0,0);
 	while( gppKEYbuff ) {
 		mSEC.y = mSEC.x;
 		mSEC.x = SDL_GetTicks();
@@ -266,9 +266,9 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					I4x4 w = wDIVpx(i);
 					I4x2 FRMwh = apCRS[i]->gtFRMwh(), bgWH = pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960);
 
-					pGL->GLSLset( I8x2( 0, 1 ), gpsGLSLfrgREF )->SET_box( w.a4x2[0], w.a4x2[1] )->SET_tx( 0, pBGtx, bgWH )->DRW( w.a4x2[0], FRMwh );
+					pGL->GLSLset( GLSLpic, gpsGLSLfrgREF )->SET_box( w.a4x2[0], w.a4x2[1] )->SET_tx( 0, pBGtx, bgWH )->DRW( w.a4x2[0], FRMwh );
 
-					pGL->GLSLset( I8x2( 0, 0 ) )->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
+					pGL->GLSLset( GLSLiso )->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
 					->SET_tx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
 					->SET_tx( 1, pBGtx, bgWH )																// tex1 -- BG background
 					->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )											// tex2 -- MINIiso

@@ -40,62 +40,9 @@ public:
 	I8x2	an;
 private:
 	GLint GLSLvrtx( const char* pSvrtx );
-	/*{
-		U8 s;
-		nSUCC &= ~1;
-		isSUCC = GL_FALSE;
-
-		vrtxID = glCreateShader( GL_VERTEX_SHADER );
-		glShaderSource( vrtxID, 1, &pSvrtx, 0 );
-		glCompileShader( vrtxID );
-		glGetShaderiv( vrtxID, GL_COMPILE_STATUS, &isSUCC );
-		if( isSUCC != GL_TRUE )
-		{
-			//Get info string length
-			glGetShaderiv( vrtxID, GL_INFO_LOG_LENGTH, &nLOG );
-			if( nLOG )
-			{
-				vrtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
-				glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vrtxLOG.p_alloc );
-			}
-		} else {
-			frgLOG.lzyRST();
-			vrtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
-			nSUCC |= 1;
-		}
-
-		return isSUCC;
-	}*/
 	GLint GLSLfrg( const char* pSfrg );
-	/*{
-		U8 s;
-		nT = 0;
-		nSUCC &= ~2;
-		isSUCC = GL_FALSE;
-
-		frgID = glCreateShader( GL_FRAGMENT_SHADER );
-		glShaderSource( frgID, 1, &pSfrg, 0 );
-		glCompileShader( frgID );
-		glGetShaderiv( frgID, GL_COMPILE_STATUS, &isSUCC );
-		if( isSUCC != GL_TRUE )
-		{
-			//Get info string length
-			glGetShaderiv( frgID, GL_INFO_LOG_LENGTH, &nLOG );
-			if( nLOG )
-			{
-				frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
-				glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
-			}
-		} else {
-			frgLOG.lzyRST();
-			frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
-			nSUCC |= 2;
-
-		}
-		return isSUCC;
-	}*/
-	GLint GLSLlnk()
-	{
+	GLint GLSLlnk( const char** ppUlst = NULL );
+/*	{
         if( (nSUCC&0x7) == 0x7 )
 			return GL_TRUE;
 
@@ -119,15 +66,28 @@ private:
 		glDetachShader( PrgID, frgID );
 		glDeleteShader( frgID );
 
+		if( n > gpmN(aUniID) )
+			n > gpmN(aUniID);
+
+		for( U4 i = 0; i < n; i++ )
+		{
+			if( ppUlst[i] ? !*ppUlst[i] : true )
+				break;
+
+			aUniID[i] = glGetUniformLocation( PrgID, ppUlst[i] );
+			if( nU < i )
+				nU = i;
+		}
+
 		aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
 		aUniID[1] = glGetUniformLocation( PrgID, "DIVxy" 	);
 		aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
-		aUniID[3] = glGetUniformLocation( PrgID, "aTX" 	);
+		aUniID[3] = glGetUniformLocation( PrgID, "aTX" 		);
 		nU = 4;
 
 		nSUCC |= 0x4;
 		return GL_TRUE;
-	}
+	}*/
 	gpcGLSL( const I8x2& _an, const char* pSfrg, const char* pSvrtx )
 	{
 		gpmCLR;
@@ -231,7 +191,7 @@ public:
 	gpcGLSL		**ppGLSL, *pGLSL;
 	U4			iGLSL, eGLSL, nGLSL;
 
-	gpcGL* GLSLset( const I8x2 an, const char* pF = NULL, const char* pV = NULL  );
+	gpcGL* GLSLset( const I8x2& an, const char* pF = NULL, const char* pV = NULL  );
 
 
 

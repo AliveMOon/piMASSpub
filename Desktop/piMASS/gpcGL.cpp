@@ -336,11 +336,70 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg )
 	}
 	return isSUCC;
 }
+const char* asLST[] = {
+	"tgPX",
+	"DIVxy",
+	"FRMwh",
+	"aTX" ,
+	"",
+	NULL,
+};
+GLint gpcGLSL::GLSLlnk( const char** ppUlst )
+{
 
-gpcGL* gpcGL::GLSLset( const I8x2 an, const char* pF, const char* pV )
+	if( (nSUCC&0x7) == 0x7 )
+		return GL_TRUE;
+
+	if( (nSUCC&0x7) != 3 )
+		return GL_FALSE;
+
+	glUseProgram(0);
+	if( PrgID > 0 )
+		glDeleteProgram(PrgID);
+
+	PrgID = glCreateProgram();
+	if( PrgID < 1 )
+		return GL_FALSE;
+
+	glAttachShader( PrgID, vrtxID );
+	glAttachShader( PrgID, frgID );
+	glLinkProgram( PrgID );
+
+	glDetachShader( PrgID, vrtxID );
+	glDeleteShader( vrtxID );
+	glDetachShader( PrgID, frgID );
+	glDeleteShader( frgID );
+
+	if( !ppUlst )
+		ppUlst = asLST;
+	/*if( n > gpmN(aUniID) )
+		n > gpmN(aUniID);*/
+
+	nU = 0;
+	U4 i = 0;
+	while( ppUlst[i] ? *ppUlst[i] : false )
+	{
+		aUniID[i] = glGetUniformLocation( PrgID, ppUlst[i] );
+		i++;
+		if( aUniID[i-1] < 0 )
+			continue;
+		nU = i;
+	}
+
+	/*aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
+	aUniID[1] = glGetUniformLocation( PrgID, "DIVxy" 	);
+	aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
+	aUniID[3] = glGetUniformLocation( PrgID, "aTX" 		);
+	nU = 4;*/
+
+	nSUCC |= 0x4;
+	return GL_TRUE;
+}
+
+gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 {
 	if( pGLSL  ? pGLSL->an == an : false )
-		return NULL;
+		return this;
 
 	pGLSL = NULL;
 	eGLSL = nGLSL;
