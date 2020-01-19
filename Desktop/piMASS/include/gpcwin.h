@@ -35,59 +35,15 @@ public:
 	GLuint	vrtxID,
 			frgID;
 	gpcLZY	vrtxLOG, vrtxSRC,
-			frgLOG, frgSRC;
+			frgLOG, frgSRC,
+			lnkLOG;
 	U4 nSUCC;
 	I8x2	an;
 private:
 	GLint GLSLvrtx( const char* pSvrtx );
 	GLint GLSLfrg( const char* pSfrg );
 	GLint GLSLlnk( const char** ppUlst = NULL );
-/*	{
-        if( (nSUCC&0x7) == 0x7 )
-			return GL_TRUE;
 
-        if( (nSUCC&0x7) != 3 )
-			return GL_FALSE;
-
-		glUseProgram(0);
-		if( PrgID > 0 )
-			glDeleteProgram(PrgID);
-
-		PrgID = glCreateProgram();
-		if( PrgID < 1 )
-			return GL_FALSE;
-
-		glAttachShader( PrgID, vrtxID );
-		glAttachShader( PrgID, frgID );
-		glLinkProgram( PrgID );
-
-		glDetachShader( PrgID, vrtxID );
-		glDeleteShader( vrtxID );
-		glDetachShader( PrgID, frgID );
-		glDeleteShader( frgID );
-
-		if( n > gpmN(aUniID) )
-			n > gpmN(aUniID);
-
-		for( U4 i = 0; i < n; i++ )
-		{
-			if( ppUlst[i] ? !*ppUlst[i] : true )
-				break;
-
-			aUniID[i] = glGetUniformLocation( PrgID, ppUlst[i] );
-			if( nU < i )
-				nU = i;
-		}
-
-		aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
-		aUniID[1] = glGetUniformLocation( PrgID, "DIVxy" 	);
-		aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
-		aUniID[3] = glGetUniformLocation( PrgID, "aTX" 		);
-		nU = 4;
-
-		nSUCC |= 0x4;
-		return GL_TRUE;
-	}*/
 	gpcGLSL( const I8x2& _an, const char* pSfrg, const char* pSvrtx )
 	{
 		gpmCLR;
@@ -273,6 +229,8 @@ public:
 		return VXbID;
 	}
 
+
+
 	gpcGL* SET_box( I4x2 xy, const I4x2& wh )
 	{
 		if( this ? !wh.area() : true )
@@ -317,6 +275,15 @@ public:
 
 		return this;
 	}
+	gpcGL* SET_box( I4x4 xyxy )
+	{
+		xyxy.lurd();
+		xyxy.a4x2[1] -= xyxy.a4x2[0];
+		if( !xyxy.a4x2[1].mn() )
+			return NULL;
+
+		return SET_box( xyxy.a4x2[0], xyxy.a4x2[1] );
+	}
 
 	gpcGL* SET_tx( U4 i, SDL_Texture* pTX, I4x2 wh )
 	{
@@ -339,16 +306,9 @@ public:
 		aTXwh[i] = wh;
 		return this;
 	}
-	gpcGL* DRW( I4x2 xy, I4x2 wh )
-	{
+	gpcGL* DRW( I4x2 xy, I4x2 wh ) {
 		if( !this )
 			return NULL;
-
-		/*glMatrixMode( GL_PROJECTION );
-		glLoadIdentity();
-
-		glMatrixMode( GL_MODELVIEW );
-		glLoadIdentity();*/
 
 		if( aUniID[0] > -1 )
 			glUniform2f( aUniID[0], (float)trgWH.x, (float)trgWH.y );
@@ -360,14 +320,11 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, VXbID );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IXbID );
 
-		//glBindVertexArray( VaID ); //VXbID);
-
 		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
 		glEnableVertexAttribArray( ATvxID );
 		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
 		glEnableVertexAttribArray( ATuvID );
 
-		//glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
 		glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
 
 		glDisableVertexAttribArray( ATvxID );
@@ -394,83 +351,6 @@ public:
 
 		return this;
 	}
-
-/*	void rndr(	SDL_Renderer* pSDLrndr, SDL_Window* pWIN, float ms,
-				SDL_Texture* pTX,
-				SDL_Texture* pTXchar,
-				SDL_Texture* pTXbg,
-				I4x2* pFRM, SDL_Rect divXY, I4x2 winSZ , const I4x2& txWH ) {
-		if( this ? !pTX : true)
-			return;
-		//GLint oldProgramId;
-		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
-
-
-
-		SDL_SetRenderTarget( pSDLrndr, NULL );
-		SDL_RenderClear( pSDLrndr );
-		ms = sin( ms/1000.0 )+1.0;
-		glClearColor( ms*0.13, 0.0f, ms*0.3, 1.0f );
-		glClear( 	//GL_COLOR_BUFFER_BIT|
-					GL_DEPTH_BUFFER_BIT );
-
-
-
-		if( ATvxID < 0 )
-		{
-			glBegin( GL_QUADS );
-				glVertex2f( -0.5f, -0.5f );
-				glVertex2f( 0.5f, -0.5f );
-				glVertex2f( 0.5f, 0.5f );
-				glVertex2f( -0.5f, 0.5f );
-			glEnd();
-		} else {
-			glUseProgram( gProgID );
-			glUniform1i( aTexID[0], 0);
-			glActiveTexture(GL_TEXTURE0);
-			glEnable(GL_TEXTURE_2D);
-			SDL_GL_BindTexture( pTX, NULL, NULL );
-
-
-			glUniform1i( aTexID[1], 1);
-			glActiveTexture(GL_TEXTURE1);
-			glEnable(GL_TEXTURE_2D);
-			SDL_GL_BindTexture( pTXchar, NULL, NULL );
-
-			if( pTXbg )
-			{
-				glUniform1i( aTexID[2], 2);
-				glActiveTexture(GL_TEXTURE2);
-				glEnable(GL_TEXTURE_2D);
-				SDL_GL_BindTexture( pTXbg, NULL, NULL );
-			}
-			for( U4 i = 0; i < 4; i++ )
-				glUniform2f( aTexID[3]+i, (float)pFRM[i].x, (float)pFRM[i].y );
-			glUniform4f( aTexID[4], (float)divXY.x, (float)divXY.y, (float)winSZ.x/((float)(divXY.w-divXY.x)), (float)winSZ.y/((float)(divXY.h-divXY.y)) );
-			glUniform2f( aTexID[5], (float)txWH.x, (float)txWH.y );
-
-
-			glEnableVertexAttribArray( ATvxID );
-			glBindBuffer( GL_ARRAY_BUFFER, VXbID );
-			glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0 );
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IXbID );
-
-			glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
-
-			glDisableVertexAttribArray( ATvxID );
-			glUseProgram( 0 );
-		}
-
-		SDL_GL_SwapWindow( pWIN );
-
-		if( oPrgID < 0 )
-			return;
-
-		glUseProgram(oPrgID);
-		SDL_RenderClear( pSDLrndr );
-	}
-*/
-
 
 	GLuint GLSLvrtx( const char* pS = NULL );
 	GLuint GLSLfrg( const char* pS = NULL );

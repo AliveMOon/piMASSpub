@@ -76,11 +76,19 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 		selID = win.srcDIV;
 
 	I4x4	*p_selAI = (selID == id ? selANIN : win.apCRS[selID]->selANIN),
-			xyWH = 0,
-			lurdAN = I4x4( p_selAI[0].a4x2[0], p_selAI[1].a4x2[0] ).lurd();
 
+			&xyWH = aXYuvPC[0],
+
+			lurdAN = I4x4( p_selAI[0].a4x2[0], p_selAI[1].a4x2[0] ).lurd();
 	U4x2	spcZN = lurdAN.a4x2[1] - U4x2(1,0);
 	U4x4	mZN, dim;
+
+
+	gpmZ( aXYuvPC );
+	aXYuvPC[1].a4x2[1] = I4x2(1,1);
+	aXYuvPC[2].a4x2[0] = I4x2(0,1);
+	picBG.lzyRST();
+
 
 	/// nagyon vigyázz itt nem BIZTOS, hogy a saját, PC és pR-rel dolgozik,
 	/// hanem ha le van nyomva a SHIFT akor e SRC_DIV-vel
@@ -152,7 +160,9 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	U1 sSTR[0x20];
 	U4 iON = scnZN.a4x2[0]*I4x2(1,z);
 	I4x2 onAN = scnZN.a4x2[0]+I4x2(1,0);
-	U1x4* pPOS;
+	//U1x4* pPOS;
+	U8 s;
+
 	if( lurdAN.x )
 	for( U4 r = lurdAN.y, c, ce; r <= lurdAN.w; r++ )
 	for( c = lurdAN.x-1; c < lurdAN.z; c++ )
@@ -238,7 +248,16 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				}
 				continue;
 			}
-			pSRC = mass.SRCfnd( pM[i+c] );
+			if( pSRC = mass.SRCfnd( pM[i+c] ) )
+			if( pSRC->picID )
+			{
+				/// CELL PICTURES BACK GROUND -------------------
+				//xyWH azonos a xyPIC[0]-val!
+				aXYuvPC[2].a4x2[1].x = pSRC->picID-1;
+				picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+			}
+
+
 
 			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w )
 			{

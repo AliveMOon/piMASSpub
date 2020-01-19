@@ -1,4 +1,45 @@
 #include "gpccrs.h"
+gpcGL::gpcGL( gpcWIN& win )
+{
+	gpmCLR;
+	oPrgID = -1;
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
+	if( !gCntxt )
+	{
+		cout << endl << "gpcGL init error" << endl;
+		return;
+	}
+	glewExperimental = GL_TRUE;
+	glewErr = glewInit();
+	if( glewErr != GLEW_OK )
+	{
+		cout << endl << "gpcGL GLEW_NOK error" << endl;
+		return;
+	}
+
+	pTRG = SDL_CreateTexture(
+									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+									win.winSIZ.z, win.winSIZ.w
+								);
+	trgWH = win.winSIZ.a4x2[1];
+	gVxSucc = GL_FALSE;
+
+	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
+	if( pTXchar )
+		cout << "char" << (int)win.pSRFchar << endl;
+	else
+		cout << SDL_GetError() << endl;
+
+	pTXiso = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFiso );
+	if( pTXiso )
+		cout << "char" << (int)win.pSRFiso << endl;
+	else
+		cout << SDL_GetError() << endl;
+}
+
 char gpsGLSLvx[] =
 "#version 120																\n"
 "attribute	vec2	v_vx;													\n"
@@ -336,14 +377,7 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg )
 	}
 	return isSUCC;
 }
-const char* asLST[] = {
-	"tgPX",
-	"DIVxy",
-	"FRMwh",
-	"aTX" ,
-	"",
-	NULL,
-};
+
 GLint gpcGLSL::GLSLlnk( const char** ppUlst )
 {
 
@@ -361,38 +395,50 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst )
 	if( PrgID < 1 )
 		return GL_FALSE;
 
+	U8 s;
 	glAttachShader( PrgID, vrtxID );
 	glAttachShader( PrgID, frgID );
 	glLinkProgram( PrgID );
+	glGetProgramiv( PrgID, GL_LINK_STATUS, &isSUCC );
+	if( isSUCC != GL_TRUE )
+	{
+		//Get info string length
+		glGetShaderiv( PrgID, GL_INFO_LOG_LENGTH, &nLOG );
+		if( nLOG )
+		{
+			lnkLOG.lzyADD( NULL, nLOG, s = 0, 0 );
+			glGetShaderInfoLog( PrgID, nLOG, &nLOG, (char*)(lnkLOG.p_alloc) );
+		}
+	} else {
+		lnkLOG.lzyRST();
+		nSUCC |= 0x4;
+	}
 
 	glDetachShader( PrgID, vrtxID );
 	glDeleteShader( vrtxID );
 	glDetachShader( PrgID, frgID );
 	glDeleteShader( frgID );
 
-	if( !ppUlst )
-		ppUlst = asLST;
-	/*if( n > gpmN(aUniID) )
-		n > gpmN(aUniID);*/
-
-	nU = 0;
-	U4 i = 0;
-	while( ppUlst[i] ? *ppUlst[i] : false )
-	{
-		aUniID[i] = glGetUniformLocation( PrgID, ppUlst[i] );
-		i++;
-		if( aUniID[i-1] < 0 )
-			continue;
-		nU = i;
-	}
-
-	/*aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
+	aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
 	aUniID[1] = glGetUniformLocation( PrgID, "DIVxy" 	);
 	aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
 	aUniID[3] = glGetUniformLocation( PrgID, "aTX" 		);
-	nU = 4;*/
+	nU = 4;
 
-	nSUCC |= 0x4;
+	if( !ppUlst )
+		return GL_TRUE;
+
+	for( U4 i = 0, e = gpmN(aUniID); nU < e; i++ )
+	{
+		if( ppUlst[i] ? !*ppUlst[i] : true )
+			break;
+
+		aUniID[nU] = glGetUniformLocation( PrgID, ppUlst[i] );
+		if( aUniID[nU] < 0 )
+			continue;
+		nU++;
+	}
+
 	return GL_TRUE;
 }
 
@@ -446,46 +492,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 	ATuvID = pGLSL->ATuvID;
 	return this;
 }
-gpcGL::gpcGL( gpcWIN& win )
-{
-	gpmCLR;
-	oPrgID = -1;
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
-	if( !gCntxt )
-	{
-		cout << endl << "gpcGL init error" << endl;
-		return;
-	}
-	glewExperimental = GL_TRUE;
-	glewErr = glewInit();
-	if( glewErr != GLEW_OK )
-	{
-		cout << endl << "gpcGL GLEW_NOK error" << endl;
-		return;
-	}
 
-	pTRG = SDL_CreateTexture(
-									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-									win.winSIZ.z, win.winSIZ.w
-								);
-	trgWH = win.winSIZ.a4x2[1];
-	gVxSucc = GL_FALSE;
-
-	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
-	if( pTXchar )
-		cout << "char" << (int)win.pSRFchar << endl;
-	else
-		cout << SDL_GetError() << endl;
-
-	pTXiso = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFiso );
-	if( pTXiso )
-		cout << "char" << (int)win.pSRFiso << endl;
-	else
-		cout << SDL_GetError() << endl;
-}
 GLuint gpcGL::GLSLvrtx( const char* pS ) {
 	if( !pS )
 		pS = gpsGLSLvx;
