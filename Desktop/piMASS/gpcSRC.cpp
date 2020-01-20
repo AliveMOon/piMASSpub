@@ -242,8 +242,8 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 
 	return this;
 }
-I4x4 gpcSRC::SRCmini(
-						U1x4* pO,  I4x4 xy,
+I4x2 gpcSRC::SRCmini(
+						U1x4* pO,  I4x2 xy,
 
 						I4 fx,
 						I4 fy,
@@ -262,7 +262,7 @@ I4x4 gpcSRC::SRCmini(
 				: true )
 		return xy;
 
-	I4x4 cxy = xy;
+	I4x2 cxy = xy;
 	U1x4 c;
 	//c.u4 = pC64[15];
 	U1 nx, aC[] = " ";

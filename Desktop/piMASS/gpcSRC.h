@@ -747,8 +747,8 @@ public:
 		return pC - pSRCalloc(bNoMini);
 	}
 	gpcSRC* SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ); //, I4 fz );
-	I4x4 SRCmini(
-					U1x4* pO, I4x4 xy,
+	I4x2 SRCmini(
+					U1x4* pO, I4x2 xy,
 					I4 fx,
 					I4 fy,
 

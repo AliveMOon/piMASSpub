@@ -20,11 +20,11 @@ gpcGL::gpcGL( gpcWIN& win )
 		return;
 	}
 
+	trgWHpx = win.winSIZ.a4x2[1];
 	pTRG = SDL_CreateTexture(
 									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-									win.winSIZ.z, win.winSIZ.w
+									trgWHpx.x, trgWHpx.y
 								);
-	trgWH = win.winSIZ.a4x2[1];
 	gVxSucc = GL_FALSE;
 
 	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
@@ -57,6 +57,8 @@ char gpsGLSLfrgREF[] =
 "void main()																\n"
 "{																			\n"
 "	gl_FragColor = texture2D( tex0, fr_uv );								\n"
+"	if( gl_FragColor.a < (1/0x100) )										\n"
+" 		discard;															\n"
 "}																			\n"
 
 "\n\0";

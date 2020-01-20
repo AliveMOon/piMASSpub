@@ -117,38 +117,11 @@ class gpcCRS
 
 			CRSfrm.a4x2[1] = I4x2(c,r);
 			return CRSfrm.a4x2[1];
-/*
-
-
-
-
-
-			if( w > 3 )
-				CRSfrm.z = w;
-
-			SDL_Rect div = win.wDIV(id).xyWH;
-			I4 bug = div.w/CRSfrm.z, nBUG = 0;
-			if( mag > 0 )
-				CRSfrm.z = div.w/bug;
-
-			if(mag)
-			while( (bug = div.w - CRSfrm.z*bug ) > 8 )
-			{
-				CRSfrm.z += mag;
-				bug = div.w/CRSfrm.z;
-				nBUG++;
-			}
-
-			if( h > 0 )
-				CRSfrm.w = h;
-			else
-				CRSfrm.w = (CRSfrm.z*div.h*2) / (div.w*3);
-
-			return CRSfrm.a4x2[1];*/
 		}
 
 		bool	miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 wh );
 		void	miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT );
+		void	miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT );
 
 
 		bool	miniOFF( gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );

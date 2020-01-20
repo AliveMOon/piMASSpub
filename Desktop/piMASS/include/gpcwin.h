@@ -136,7 +136,7 @@ public:
 			Lnklog;
 
 	SDL_Renderer* pRNDR;
-	I4x2	luXY,	trgWH,
+	I4x2	luXY,	trgWHpx,
 			boxXY, 	boxWH,
 			aTXwh[0x10];
 
@@ -175,7 +175,7 @@ public:
 		//glUseProgram( gProgID );
 
 		if( pTRG )
-		if( trgWH != tWH )
+		if( trgWHpx != tWH )
 		{
 			gpmSDL_FreeTX( pTRG );
 			pTRG = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, tWH.x, tWH.y );
@@ -193,7 +193,7 @@ public:
 		}*/
 
 		luXY = lXY;
-		trgWH = tWH;
+		trgWHpx = tWH;
 
 		GLbitfield b = 0;
 		if( bCLR )
@@ -264,7 +264,7 @@ public:
 		aV4[2].aF2[0] = xy + wh;
 		aV4[3].aF2[0] = xy + I4x2( 0, wh.y );
 
-		aV4[0].div( Fx4( trgWH, I4x2(1,1) ), gpmN(aV4) );
+		aV4[0].div( Fx4( trgWHpx, I4x2(1,1) ), gpmN(aV4) );
 
 		if( VXbID > 0 )
 			glDeleteBuffers(1,  &VXbID );
@@ -275,14 +275,12 @@ public:
 
 		return this;
 	}
-	gpcGL* SET_box( I4x4 xyxy )
+	gpcGL* SET_box( I4x4 xyWH, const I4x4& divPX, const I4x2& frm )
 	{
-		xyxy.lurd();
-		xyxy.a4x2[1] -= xyxy.a4x2[0];
-		if( !xyxy.a4x2[1].mn() )
-			return NULL;
-
-		return SET_box( xyxy.a4x2[0], xyxy.a4x2[1] );
+		xyWH &= divPX.a4x2[1];
+		xyWH /= frm;
+		xyWH.a4x2[0] += divPX.a4x2[0];
+		return SET_box( xyWH.a4x2[0], xyWH.a4x2[1] );
 	}
 
 	gpcGL* SET_tx( U4 i, SDL_Texture* pTX, I4x2 wh )
@@ -311,7 +309,7 @@ public:
 			return NULL;
 
 		if( aUniID[0] > -1 )
-			glUniform2f( aUniID[0], (float)trgWH.x, (float)trgWH.y );
+			glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y );
 		if( aUniID[1] > -1 )
 			glUniform2f( aUniID[1], (float)xy.x, (float)xy.y );
 		if( aUniID[2] > -1 )
@@ -687,6 +685,10 @@ public:
 			}
 			return true;
 		}
+		I4x2 wFRM( U1 iDIV ) {
+			I4x2 whCR = winSIZ.a4x2[1]/chrTX.a4x2[1]; // I4x2( (int*)&chrPIC.w );
+			return whCR;
+		}
 		I4x4 wDIVcr( U1 iDIV )
 		{
 			//SDL_Rect
@@ -735,15 +737,7 @@ public:
 			}
 			return div;
 		}
-		I4x2 wFRM( U1 iDIV ) {
-			I4x2 whCR = winSIZ.a4x2[1]/chrTX.a4x2[1]; // I4x2( (int*)&chrPIC.w );
-			return whCR;
-			/*I4x2 whCR = wDIVcr(iDIV).a4x2[1];
-			I4 mag = (whCR.x*gpdSIZ2CR.x)/chrPIC.w;
-			return whCR&mag;*/
-			/*I4x4 div = wDIV( iDIV );
-			return I4x2( div.z/chrPIC.w, div.w/chrPIC.h );*/
-		}
+
 
 		I4x4 wDIVpx( U1 iDIV )
 		{
@@ -752,7 +746,11 @@ public:
 			div &= gpdSIZ2CR;
 			return div;
 		}
-		I4x2 wDIVcrALL()
+		I4x2 wDIVcrLAY()
+		{
+			return winDIVcr.a4x2[1];
+		}
+		I4x2 wDIVcrALLOCK()
 		{
 			return winDIVcr.a4x2[1]&gpdCRall;
 		}

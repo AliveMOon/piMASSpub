@@ -88,6 +88,34 @@ U1 gpsHUNtx[] =
 ":\"\"'  :   ' :   "
 // 0x80 -------------------
 "0123456789abcdef";
+void gpcWIN::gpeWINresize( void )
+{
+	for( U1 i = 0; i < 4; i++ )
+	if( apT[i] )
+	{
+		aT[i].join();
+		apT[i] = NULL;
+	}
+
+	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
+		throw InitError();
+	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
+
+	winSIZ.a4x2[1] = winSIZ.a4x2[0] / (gpdSIZ2CR*2);
+
+	winDIVcr.a4x2[0] = winSIZ.a4x2[1];
+	winDIVcr.a4x2[1] = winDIVcr.a4x2[0]*2;
+
+	winSIZ.a4x2[1] = winDIVcr.a4x2[1] & gpdSIZ2CR;
+
+	if( winSIZ.a4x2[0] != winSIZ.a4x2[1] )
+	{
+		winSIZ.a4x2[0] = winSIZ.a4x2[1];
+		SDL_SetWindowSize( pSDLwin, winSIZ.z, winSIZ.w );
+	}
+	winDIVpx = winSIZ / I4x4( 2,2,1,1 );
+
+}
 gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	//ctor
 	gpmCLR;
@@ -185,37 +213,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	pGL->IBOnew( aIxD, gpmN(aIxD) );
 
 }
-void gpcWIN::gpeWINresize( void )
-{
-	for( U1 i = 0; i < 4; i++ )
-	{
-		if( apT[i] )
-		{
-			aT[i].join();
-			apT[i] = NULL;
-		}
 
-	}
-
-	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
-		throw InitError();
-	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
-
-	winSIZ.a4x2[1] = winSIZ.a4x2[0] / (gpdSIZ2CR*2);
-
-	winDIVcr.a4x2[0] = winSIZ.a4x2[1];
-	winDIVcr.a4x2[1] = winDIVcr.a4x2[0]*2;
-
-	winSIZ.a4x2[1] = winDIVcr.a4x2[1] & gpdSIZ2CR;
-
-	if( winSIZ.a4x2[0] != winSIZ.a4x2[1] )
-	{
-		winSIZ.a4x2[0] = winSIZ.a4x2[1];
-		SDL_SetWindowSize( pSDLwin, winSIZ.z, winSIZ.w );
-	}
-	winDIVpx = winSIZ / I4x4( 2,2,1,1 );
-
-}
 
 extern char gpsGLSLfrgREF[];
 void gpcWIN::WINrun( const char* pWELLCOME )
@@ -264,8 +262,9 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					if( i ? !(bSW&(1<<i)) : false )
 						continue;
 
-					I4x4 w = wDIVpx(i);
-					I4x2 FRMwh = apCRS[i]->gtFRMwh(), bgWH = pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960);
+					I4x4	w = wDIVpx(i);
+					I4x2	FRMwh = apCRS[i]->gtFRMwh(), layCR = wDIVcrLAY(),
+							bgWH = pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960);
 					if( pPICbg )
 						pGL->GLSLset( GLSLpic, gpsGLSLfrgREF )->SET_box( w.a4x2[0], w.a4x2[1] )->SET_tx( 0, pBGtx, bgWH )->DRW( w.a4x2[0], FRMwh );
 
@@ -275,7 +274,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					if( p_tx = p_pic->surDRWtx(pSDLrndr) )
 					{
 						pGL	->GLSLset( GLSLpic ) //pI[2].a4x2[0] )
-							->SET_box( pI[0].a4x2[0], pI[0].a4x2[1] )
+							->SET_box( pI[0], w, FRMwh )
 							->SET_tx( 0, p_tx, p_pic->txWH.a4x2[0] )->DRW( w.a4x2[0], FRMwh );
 					}
 
