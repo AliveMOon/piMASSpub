@@ -403,6 +403,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	win.mZ = mapCR.mapZN44.z;
 	win.mN = mapCR.mapZN44.w;
 	win.mZN = mapCR.mapZN44.a4x2[1].area();
+	I8x4 anRio;
 	if( U4 *pM = win.pM = mapCR.pMAP )
 	if( U4 *pC = win.pC = mapCR.pCOL )
 	if( U4 *pR = win.pR = mapCR.pROW )
@@ -627,6 +628,25 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					switch( alu.alf )
 					{
 						case gpeALF_SYNC:
+							if( alu.typ().x & 0x10 )
+							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
+								pGT->GTcnct( win );
+
+							break;
+						case gpeALF_RINP:
+							anRio.a8x2[0].x = alu.i8();
+							anRio.a8x2[0].y = anRio.a8x2[0].x&0xff;
+							anRio.a8x2[0].x >>= 0x10;
+							break;
+						case gpeALF_ROUT:
+							anRio.a8x2[1].x = alu.i8();
+							anRio.a8x2[1].y = anRio.a8x2[1].x&0xff;
+							anRio.a8x2[1].x >>= 0x10;
+							break;
+						case gpeALF_SLMP:
+							if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
+								break;
+
 							if( alu.typ().x & 0x10 )
 							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
 								pGT->GTcnct( win );

@@ -266,18 +266,22 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					I4x2	FRMwh = apCRS[i]->gtFRMwh(), layCR = wDIVcrLAY(),
 							bgWH = pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960);
 					if( pPICbg )
-						pGL->GLSLset( GLSLpic, gpsGLSLfrgREF )->SET_box( w.a4x2[0], w.a4x2[1] )->SET_tx( 0, pBGtx, bgWH )->DRW( w.a4x2[0], FRMwh );
+						pGL	->GLSLset( GLSLpic, gpsGLSLfrgREF )
+							->SET_box( w.a4x2[0], w.a4x2[1] )
+							->SET_tx( 0, pBGtx, bgWH )->DRW( w.a4x2[0], FRMwh );
 
+					glViewport( w.x, (winSIZ.w-w.w)-w.y, w.z, w.w );
 					if( U4 n = apCRS[i]->picBG.n_load/sizeof(apCRS[0]->aXYuvPC) )
 					for( I4x4* pI = (I4x4*)apCRS[i]->picBG.p_alloc, *pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
 					if( gpcPIC* p_pic = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
 					if( p_tx = p_pic->surDRWtx(pSDLrndr) )
 					{
 						pGL	->GLSLset( GLSLpic ) //pI[2].a4x2[0] )
-							->SET_box( pI[0], w, FRMwh )
+							->SET_box( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
 							->SET_tx( 0, p_tx, p_pic->txWH.a4x2[0] )->DRW( w.a4x2[0], FRMwh );
 					}
 
+					glViewport( 0, 0, winSIZ.z, winSIZ.w );
 					pGL->GLSLset( GLSLiso )->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
 					->SET_tx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
 					->SET_tx( 1, pBGtx, bgWH )																// tex1 -- BG background

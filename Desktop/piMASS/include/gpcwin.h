@@ -275,7 +275,7 @@ public:
 
 		return this;
 	}
-	gpcGL* SET_box( I4x4 xyWH, const I4x4& divPX, const I4x2& frm )
+	gpcGL* SET_box( I4x4 xyWH, const I4x4 divPX, const I4x2& frm )
 	{
 		xyWH &= divPX.a4x2[1];
 		xyWH /= frm;
