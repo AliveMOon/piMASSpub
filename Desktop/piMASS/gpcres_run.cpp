@@ -683,7 +683,26 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								{
 									// OUT
 									if( gpcLZY *pLZYout = win.piMASS->GTlzy.LZY(pGT->TnID&I8x2(1,2)+I8x2(0,1)) )
+									if( pLZYout->n_load )
 									{
+                                        x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
+										pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
+										i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+
+										if( !pS2 )
+										{
+											pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
+											if( !pS2 )
+												continue;
+										}
+										if( pS2 == pSRC )
+											continue;
+
+										gpcLZY hex; U8 s;
+										hex.lzyHEX( s = 0, pLZYout->p_alloc, pLZYout->n_load );
+										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
+										pS2->srcUPDT();
+
 
 									}
 									anRio.a8x2[1].x = 0;

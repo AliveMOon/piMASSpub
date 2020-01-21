@@ -64,8 +64,14 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	pINP->lzyINS( NULL, 0, s = 0, 18+4+nLEN );
 
 	if( pLZYout ? !pLZYout->n_load : true )
+	{
+		// inicializáljuk a bejövővel
+		iCNT++;
+		pLZYout = pLZYout->lzyADD( pLZYin->p_alloc, pLZYin->n_load, s = 0 );
 		return;
+	}
 
+	iCNT++;
 	pU2out = (U2*)pLZYout->p_alloc;
 	U4	nU2 = min( pLZYout->n_load, pLZYin->n_load )/sizeof(*pU2in),
 		iU2 = gpmMEMCMP( pU2in, pU2out, nU2*sizeof(*pU2in) )/sizeof(*pU2in),

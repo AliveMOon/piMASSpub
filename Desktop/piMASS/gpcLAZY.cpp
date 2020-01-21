@@ -30,7 +30,7 @@ gpcLZY* gpcLZY::lzyHEX( U8& n_start, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\"");
 	for( U4 i = 0, j, je; i < nBIN; i += 16 )
 	{
-		lzyFRMT( s = -1, "\n %0.8x ", i );
+		lzyFRMT( s = -1, "\r\n %0.8x ", i );
 		for( j = i, je = j+16; j < je; j++ )
 		{
 			if( j >= nBIN )
@@ -47,7 +47,7 @@ gpcLZY* gpcLZY::lzyHEX( U8& n_start, U1* pBIN, U4 nBIN )
 			lzyFRMT( s = -1, "%c", ((pBIN[j] >= 0x20) && (pBIN[j] < 0x80)) ? pBIN[j] : '.'  );
 		}
 	}
-	lzyFRMT( s = -1, "\n %0.8x\"", nBIN );
+	lzyFRMT( s = -1, "\r\n %0.8x\"", nBIN );
 	return this;
 }
 
