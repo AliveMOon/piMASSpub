@@ -11,6 +11,45 @@ gpcLZY* gpcLZY::lzyFRMT( U8& n_start, const char* p_format, ... )
 	U8 s = -1;
 	return lzyADD( (U1*)gps_lzy_pub1, n, n_start );
 }
+gpcLZY* gpcLZY::lzyHEX( U8& n_start, U1* pBIN, U4 nBIN )
+{
+	if( nBIN ? !pBIN : true )
+		return this;
+
+	if( !this )
+	{
+		gpcLZY* pTHIS = new gpcLZY();
+		if( !pTHIS )
+			return NULL;
+
+		return pTHIS->lzyHEX( n_start, pBIN, nBIN );
+	}
+
+	n_start = n_load;
+	U8 s;
+	lzyFRMT( s = -1, "\"");
+	for( U4 i = 0, j, je; i < nBIN; i += 16 )
+	{
+		lzyFRMT( s = -1, "\n %0.8x ", i );
+		for( j = i, je = j+16; j < je; j++ )
+		{
+			if( j >= nBIN )
+			{
+				lzyFRMT( s = -1, "   " );
+				continue;
+			}
+			lzyFRMT( s = -1, "%0.2x ", pBIN[j] );
+		}
+		for( j = i, je = j+16; j < je; j++ )
+		{
+			if( j >= nBIN )
+				break;
+			lzyFRMT( s = -1, "%c", ((pBIN[j] >= 0x20) && (pBIN[j] < 0x80)) ? pBIN[j] : '.'  );
+		}
+	}
+	lzyFRMT( s = -1, "\n %0.8x\"", nBIN );
+	return this;
+}
 
 U4 gpcLZY::tree_fnd( U4 id, U4& n )
 {

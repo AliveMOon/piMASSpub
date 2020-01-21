@@ -396,8 +396,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	win.nJDOIT.y = win.nJDOIT.x;
 
 	U1* pKEYbuff = win.gpsKEYbuff;
-	gpcSRC	tmp, *pSRC;
-	U4 xFND;
+	gpcSRC	tmp, *pSRC, *pS2;
+	U4 xFND, x_fnd;
 	int pic_id = 0;
 	I4x4 sprt[2] = {0}, trgWH = 0;
 	win.mZ = mapCR.mapZN44.z;
@@ -653,6 +653,55 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
 							{
 								pGT->GTcnct( win );
+								if( anRio.a8x2[1].x )
+								{
+									// OUT
+									if( gpcLZY *pLZYout = win.piMASS->GTlzy.LZY(pGT->TnID&I8x2(1,2)+I8x2(0,1)) )
+									{
+
+									}
+									anRio.a8x2[1].x = 0;
+								}
+
+								if( anRio.a8x2[0].x )
+								{
+									// INP
+									if( gpcLZY *pLZYin = win.piMASS->GTlzy.LZY(pGT->TnID&I8x2(1,2)) )
+									if( pLZYin->n_load )
+									{
+                                        x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0] );
+										pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
+
+										if( win.mZN != mapCR.mapZN44.a4x2[1].area() )
+										{
+											U4 iz = i%win.mZ, in = i/win.mZ;
+											win.mZ = mapCR.mapZN44.z;
+											win.mN = mapCR.mapZN44.w;
+											win.mZN = mapCR.mapZN44.a4x2[1].area();
+											pM = win.pM = mapCR.pMAP;
+											pC = win.pC = mapCR.pCOL;
+											pR = win.pR = mapCR.pROW;
+											ie = pC-pM;
+											i = in*win.mZ+iz;
+										}
+										if( !pS2 )
+										{
+											pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
+											if( !pS2 )
+												continue;
+										}
+										if( pS2 == pSRC )
+											continue;
+
+										gpcLZY hex; U8 s;
+										hex.lzyHEX( s = 0, pLZYin->p_alloc, pLZYin->n_load );
+										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
+										pS2->srcUPDT();
+
+
+									}
+									anRio.a8x2[0].x = 0;
+								}
 
 							}
 

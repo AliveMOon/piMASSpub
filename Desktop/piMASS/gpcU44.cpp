@@ -1,35 +1,6 @@
 #include "gpcSRC.h"
 extern U1 gpaALFadd[];
-char* gppsTYP[] = {
-	"U",
-	"*U",
-	"rU",
-	"*rU",
-	"F",
-	"*F",
-	"rF",
-	"*rF",
-	"I",
-	"*I",
-	"rI",
-	"*rI",
-	"F",
-	"*F",
-	"rF",
-	"*rF",
 
-};
-U1* U1x4::typ2str( U1* pBUFF )
-{
-	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-	// yz dimxy
-	if(  y*z > 1 )
-		sprintf( (char*)pBUFF, "%s%dx%dx%d", gppsTYP[x>>0x4], 1<<(x&0xf), y, z );
-	else
-		sprintf( (char*)pBUFF, "%s%d", gppsTYP[x>>0x4], 1<<(x&0xf) );
-
-	return pBUFF;
-}
 U4x2& U4x2::operator = ( const I8x2& an )
 {
 	if( an.alf )
@@ -50,6 +21,8 @@ U4x2::U4x2( const I4x2& i42 )
 	x = i42.x < 0 ? -i42.x : i42.x;
 	y = i42.y < 0 ? -i42.y : i42.y;
 }
+
+
 
 I8x2& I8x2::operator = ( const U1* pS )
 {

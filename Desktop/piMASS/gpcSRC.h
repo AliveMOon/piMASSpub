@@ -913,12 +913,10 @@ public:
 		pB = pA+i;
 		return i;
 	}
-	U8 iPUB()
-	{
+	U8 iPUB() {
 		return iB()+1;
 	}
-	U1* pPUB()
-	{
+	U1* pPUB() {
 		if( this ? pA : NULL )
 		{
 			if( pA[nL] != 0 )

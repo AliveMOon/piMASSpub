@@ -1992,9 +1992,12 @@ public:
     }
 	I4x2( U4x2 b )
     {
-        x = b.x;
-        y = b.y;
+		*this = b;
+        //x = b.x;
+        //y = b.y;
     }
+    I4x2( U8x2 b );
+    I4x2( I8x2 b );
     I4x2( int* pI )
     {
 		if( !pI )
@@ -2294,6 +2297,10 @@ public:
 		y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
 		return *this;
 	}
+
+	I4x2& operator = ( const U8x2& b );
+	I4x2& operator = ( const I8x2& b );
+
 
 	I8 sum( void ) const
 	{
@@ -4357,6 +4364,7 @@ szasz:
 		return this;
 	}
 	gpcLZY* lzyFRMT( U8& n_start, const char* p_format, ... );
+	gpcLZY* lzyHEX( U8& n_start, U1* pBIN, U4 nBIN );
 	gpcLZY* lzy_reqCLOSE( void )
 	{
 		if( !this )
@@ -4381,6 +4389,7 @@ szasz:
 	//U8 gpcLZY::tree_fnd( U8 id, U8& n )
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
+
 };
 
 
@@ -4562,7 +4571,7 @@ public:
 
 			if( rdAN(p) != an )
 				continue;
-
+			iAN = an;
 			pLZY = ppLZY[p];
 			return pLZY;
 		}
@@ -4578,7 +4587,7 @@ public:
 				gpmDELary(ppKILL);
 			}
 		}
-		wrAN(iLZYfr) = an;
+		wrAN(iLZYfr) = iAN = an;
 		return ppLZY[iLZYfr] = pLZY = new gpcLZY();
 	}
 };
