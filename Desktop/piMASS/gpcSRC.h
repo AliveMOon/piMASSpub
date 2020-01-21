@@ -472,7 +472,7 @@ public:
 
 		for( U1* pS = (U1*)pKILL, *pD = (U1*)pVOID, *pSe = pS+oz*oy ; pS < pSe; pS += oz, pD += nZ  )
 		{
-			gpmMEMCPY( pD, pS, oz );
+			gpmMEMCPYoff( pD, pS, oz );
 		}
 
 		gpmDELary( pKILL );
@@ -559,14 +559,14 @@ public:
 			if( iRST > 3 )
 			for( U4 i = 0, d = mapZN44.a4x2[1].sum(),s = outZN.a4x2[1].sum(); i < 4; i++ )
 			{
-				gpmMEMCPY( (pCOL + i*d), (pKC + i*s), outZN.z );
-				gpmMEMCPY( (pROW + i*d), (pKR + i*s), outZN.w );
+				gpmMEMCPYoff( (pCOL + i*d), (pKC + i*s), outZN.z );
+				gpmMEMCPYoff( (pROW + i*d), (pKR + i*s), outZN.w );
 
 			}
 
 			for( U4* pS = pK, *pD = pMAP; pS < pKC; pS += outZN.z, pD += mapZN44.z  )
 			{
-				gpmMEMCPY( pD, pS, outZN.z );
+				gpmMEMCPYoff( pD, pS, outZN.z );
 			}
 			gpmDELary(pK);
 		}
@@ -1148,6 +1148,7 @@ public:
 				rstLEV, iLEV, nLEV, topLEV;
 
 	/// GATE --------
+	gpcLZYall	GTlzy;
 	gpcGTall	GTacpt, GTcnct;
 	gpcLZY		*pJPGsnd;
 	/// PIC ---------

@@ -284,7 +284,7 @@ public:
 				nPICall += 0x10;
 				gpcPIC	**ppKILL = ppPIC;
 				ppPIC = new gpcPIC*[nPICall];
-				gpmMEMCPY( ppPIC, ppKILL, iPICfr ); // mert nGTld == iGTfr+1
+				gpmMEMCPYoff( ppPIC, ppKILL, iPICfr ); // mert nGTld == iGTfr+1
 				gpmDELary(ppKILL);
 			}
 		}

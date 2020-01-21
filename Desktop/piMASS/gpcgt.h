@@ -266,7 +266,8 @@ class gpcGT
 
 			return iCNT;
 		}
-		void		GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
+		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
+		void	GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );
 
 		U8 GTout( gpcWIN* pWIN );

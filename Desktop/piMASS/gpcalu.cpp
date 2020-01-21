@@ -9,7 +9,7 @@ U1* gpcALU::ALUdatHARD( gpcRES* pM, U4x2 xy, U1x4 ty4, I1 mul )
 	xy -= sub;
 
 	// typ:
-	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	// yz[ dimXY ] 		, w[] nBYTE = 1<<(x&0xf)
 	if( !(ty4.u4&gpeTYP_STRmsk) )
 	{

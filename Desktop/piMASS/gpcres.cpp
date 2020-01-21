@@ -26,7 +26,7 @@ gpcRES* gpcRES::null()
 			if( !ppDAT[a] )
 				continue;
 			// typ:
-			// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+			/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 			// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
 			gpmDELary(ppDAT[a]);
 		}
@@ -154,7 +154,7 @@ gpcALU& gpcALU::equ( gpcALU& b )
 	TanDT(b);
 
 	U1	*pD = new U1[nALLOC()];
-	gpmMEMCPY( pD, pDAT, AN().w );
+	gpmMEMCPYoff( pD, pDAT, AN().w );
 	pD[AN().w] = 0;
 	pDAT = pD;
 
@@ -678,7 +678,7 @@ U1* gpcALU::ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 )
 		return NULL;
 
 	// typ:
-	// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	// yz[ dimXY ] 		, w[] nBYTE = 1<<(x&0xf)
 	if( !(ty4.u4&gpeTYP_STRmsk) )
 	{
@@ -1603,7 +1603,7 @@ gpcALU& gpcALU::operator = ( U1* pSTR )
 	U1* pD = ALUdat( pRM, U4x2(n,0), gpeTYP_STR, I1x4(0) );
 	if( !pD )
 		return *this;
-	gpmMEMCPY( pD, pSTR, n );
+	gpmMEMCPYoff( pD, pSTR, n );
 	pD[n] = 0;
 	return *this;
 }

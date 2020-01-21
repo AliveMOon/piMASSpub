@@ -258,7 +258,8 @@ class gpcMASS;
 				(d) ? gpfALF2STR( (char*)(d), (gpeALF)alf )	\
 					: 0 									\
 			)
-#define gpmMEMCPY( d, s, n ) \
+/// WARNING ez beszo
+#define gpmMEMCPYoff( d, s, n ) \
 			((U1*)(														\
 				(														\
 				 	(n)													\
@@ -313,12 +314,12 @@ inline U1* gpfSTR( U1* pSTR, const U1* pU )
 	}
 	if( nU < nSTR )
 	{
-		gpmMEMCPY( pSTR, pU, nU );
+		gpmMEMCPYoff( pSTR, pU, nU );
 		pSTR[nU] = 0;
 		return pSTR;
 	}
 	pSTR = new U1[nU+1];
-	gpmMEMCPY( pSTR, pU, nU );
+	gpmMEMCPYoff( pSTR, pU, nU );
 	pSTR[nU] = 0;
 	return pSTR;
 }
@@ -2842,7 +2843,7 @@ public:
     }
 	I8x2( U8* pB )
     {
-		gpmMEMCPY( this, pB, 1 );
+		gpmMEMCPYoff( this, pB, 1 );
     }
     I8x2& operator = ( const U1* pS );
 	// cnt = fract * U42(1, w);
@@ -3209,7 +3210,7 @@ public:
     }
     Fx2( float* pF )
     {
-        gpmMEMCPY( this, pF, 1 );
+        gpmMEMCPYoff( this, pF, 1 );
     }
     Fx2( I4x2 xy )
     {
@@ -3370,7 +3371,7 @@ public:
     }
     Fx4( float* pF )
     {
-        gpmMEMCPY( this, pF, 1 );
+        gpmMEMCPYoff( this, pF, 1 );
     }
     Fx4( I4x2 xy, I4x2 zw = 0 )
     {
@@ -3581,7 +3582,7 @@ public:
     }
     D4( double* pD )
     {
-        gpmMEMCPY( this, pD, 1 );
+        gpmMEMCPYoff( this, pD, 1 );
     }
     double sum( void ) const
     {
@@ -4127,6 +4128,18 @@ public:
 		p_alloc[n_load] = 0;
 		return this;
 	}
+	gpcLZY* lzy_exp_rand( U8& n_start, U8 n_sub, U8 n_add, U1 n = 0 )
+	{
+		if( n_start <= (this ? n_load : 0) )
+			return lzy_exp( n_start, n_sub,n_add, n );
+
+		U8 pls = n_start-n_load;
+		n_start = n_load;
+		if( !this )
+			return lzyADD( NULL, n_add + pls, n_start, n );
+
+		return lzy_exp( n_start, n_sub, n_add + pls, n );
+	}
 	gpcLZY* lzy_exp( U8& n_start, U8 n_sub, U8 n_add, U1 n = 0 )
 	{
 		if( !this )
@@ -4222,7 +4235,7 @@ public:
 			return lzyADD( p_u1, n_u1, n_start, n );
 		}
 		lzy_exp( n_start, n_sub,  n_u1, n );
-		memcpy( p_alloc+n_start, p_u1, n_u1 );
+		gpmMEMCPYoff( p_alloc+n_start, p_u1, n_u1 );
 		return this;
 	}
 	gpcLZY& operator = ( const gpcLZY& plus )
@@ -4484,6 +4497,89 @@ public:
 			return pER;
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 		return (char*)(str.p_alloc + p_ix0[iX].x);
+	}
+};
+
+class gpcLZYall
+{
+	gpcLZY	lzyID,
+			**ppLZY, *pLZY;
+	I8x2	iAN;
+	U4		nLZYall, iLZYfr, nLZYld, iLZY;
+
+	I8x2 rdAN( U4 i )
+	{
+		if( i >= nLZYld )
+			return I8x2(0,0);
+		return ((I8x2*)lzyID.p_alloc)[i];
+	}
+	I8x2& wrAN( U4 i )
+	{
+		U8 s = i*sizeof(iAN);
+		lzyID.lzy_exp_rand( s, sizeof(iAN), sizeof(iAN) );
+		return ((I8x2*)lzyID.p_alloc)[i];
+	}
+public:
+	//U4 alfFND( U1* pS );
+	gpcLZY*	LZYi( U4 i )
+	{
+		if( pLZY ? iLZY == i : false )
+			return pLZY;
+
+		if( i < nLZYall )
+		{
+			if( ppLZY[i] )
+			{
+				iLZY = i;
+				iAN = rdAN(iLZY);
+				return pLZY = ppLZY[iLZY];
+			}
+		}
+		return NULL;
+	}
+
+	gpcLZY*	LZY( I8x2 an )
+	{
+		if( pLZY ? (iAN==an) : false )
+			return pLZY;
+
+		pLZY = NULL;
+		if( iLZYfr > nLZYld )
+			iLZYfr = nLZYld;
+		else if( !ppLZY )
+			iLZYfr = nLZYld = nLZYall = 0;
+		else if( ppLZY[iLZYfr] )
+			iLZYfr = nLZYld;
+
+		for( U4 p = 0; p < nLZYld; p++ )
+		{
+			if( !ppLZY[p] )
+			{
+				if( iLZYfr > p )
+					iLZYfr = p;
+				continue;
+			}
+
+			if( rdAN(p) != an )
+				continue;
+
+			pLZY = ppLZY[p];
+			return pLZY;
+		}
+		if( iLZYfr >= nLZYld )
+		{
+			nLZYld++;
+			if( nLZYld >= nLZYall )
+			{
+				nLZYall += 0x10;
+				gpcLZY	**ppKILL = ppLZY;
+				ppLZY = new gpcLZY*[nLZYall];
+				gpmMEMCPYoff( ppLZY, ppKILL, iLZYfr ); // mert nGTld == iGTfr+1
+				gpmDELary(ppKILL);
+			}
+		}
+		wrAN(iLZYfr) = an;
+		return ppLZY[iLZYfr] = pLZY = new gpcLZY();
 	}
 };
 

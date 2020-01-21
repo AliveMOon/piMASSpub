@@ -65,10 +65,10 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 				nMISo = pMISo->n_load;
 
 			pOUT = pOUT->putZN(
-									pMISo->p_alloc, nMISo,					/// pD, nD,
+									pMISo->p_alloc, nMISo,			/// pD, nD,
 									gpeNET4_0NYL,					/// NET4,
-									pMISo->n_load,							/// Z,
-									pWIN ? pWIN->mSEC.x : mSEC.x 			/// N
+									pMISo->n_load,					/// Z,
+									pWIN ? pWIN->mSEC.x : mSEC.x 	/// N
 							);
 			pMISo->lzyINS( NULL, 0, s = 0, nMISo );
 		}
@@ -93,7 +93,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 	if( !*p_str )
 	if( pINP->n_load < sizeof(gpcSYNC) )
-			return;
+		return;
 	else
 		nSYN = ((gpcSYNC*)p_str)->nB();
 
@@ -322,7 +322,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 				n_com = gpdVAN( (char*)p_row, "+-0123456789 \t;\r\n" );
 				if( n_com ){
 					n_cpy = min( n_com, (sizeof(s_com)-1) );
-					((U1*)gpmMEMCPY( s_com, p_row, n_cpy ))[n_cpy] = 0;
+					((U1*)gpmMEMCPYoff( s_com, p_row, n_cpy ))[n_cpy] = 0;
 				} else
 					*s_com = 0;
 
@@ -335,7 +335,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					if( n_atrib > (sizeof(s_atrib)-1) )
 						n_atrib = (sizeof(s_atrib)-1);
 
-					gpmMEMCPY( s_atrib, p_row+n_com, n_atrib )[n_atrib] = 0;
+					gpmMEMCPYoff( s_atrib, p_row+n_com, n_atrib )[n_atrib] = 0;
 				} else
 					*s_atrib = 0;
 
@@ -517,7 +517,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							nSKIP = p_next-p_row;
 							if( nSKIP )
 							{
-								((U1*)gpmMEMCPY( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+								((U1*)gpmMEMCPYoff( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
 								pSKIP = (U1*)s_atrib;
 							}
 
@@ -552,7 +552,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							nSKIP = p_next-p_row;
 							if( nSKIP )
 							{
-								((U1*)gpmMEMCPY( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+								((U1*)gpmMEMCPYoff( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
 								pSKIP = (U1*)s_atrib;
 							}
 
@@ -563,7 +563,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							nSKIP = p_next-p_row;
 							if( nSKIP )
 							{
-								((U1*)gpmMEMCPY( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+								((U1*)gpmMEMCPYoff( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
 								pSKIP = (U1*)s_atrib;
 							}
 						break;

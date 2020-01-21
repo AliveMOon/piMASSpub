@@ -32,12 +32,12 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe )
 	if( iA >= nL )
 	{
 		iA = sizeof(" \a");
-		gpmMEMCPY( pA, " \a", iA );
+		gpmMEMCPYoff( pA, " \a", iA );
 		iA--;
 	} else
 		iA = 0;
 
-	gpmMEMCPY( pA+iA, pS, nL );
+	gpmMEMCPYoff( pA+iA, pS, nL );
 	nL += iA;
 	pA[nL] = 0;
 
@@ -98,7 +98,7 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 	//assignment operator
 
 	/// elopunk mindent most
-	gpmMEMCPY( this, &B, 1 );
+	gpmMEMCPYoff( this, &B, 1 );
 	gpmZn( (U1*)&B.pALFtg, gpnZ );
 
 	qBLD();
@@ -136,7 +136,7 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 		// nL van
 		// i kissebb ez egyértelmű
 		pB = pA+i;
-		gpmMEMCPY( pA, BpA, nL );
+		gpmMEMCPYoff( pA, BpA, nL );
 		pA[nL] = 0;
 		return *this;
 	}
@@ -145,7 +145,7 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 	// potoljuk // az elejére rakunk egyet mert kell
 	pB = pA;
 	*pB = '\a';
-	gpmMEMCPY( pB+1, BpA, nL );
+	gpmMEMCPYoff( pB+1, BpA, nL );
 	nL++;
 	pA[nL] = 0;
 

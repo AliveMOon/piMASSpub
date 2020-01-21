@@ -198,7 +198,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;", nLEN );
 
 	nCMP = pE-pS;
-	//gpmMEMCPY( sPUB, pS, nCMP );
+	//gpmMEMCPYoff( sPUB, pS, nCMP );
 	//sPUB[nCMP] = 0;
 
 	p = gpfSTR2I8( pE, NULL );
@@ -228,7 +228,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 			return pGT;
 
 		*pGT->s_ip = '!';
-		gpmMEMCPY( pGT->s_ip+1, pS, nCMP );
+		gpmMEMCPYoff( pGT->s_ip+1, pS, nCMP );
 		pGT->s_ip[nCMP+1] = 0;
 		return pGT;
 	}
@@ -236,7 +236,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	if( iGTfr < nGTld )
 	{
 		pGT = new gpcGT( an, port );
-		gpmMEMCPY( pGT->s_ip, pS, nCMP );
+		gpmMEMCPYoff( pGT->s_ip, pS, nCMP );
 		pGT->s_ip[nCMP] = 0;
 
 		return ppGTalloc[iGTfr] = pGT;
@@ -248,12 +248,12 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		nGTalloc += 0x10;
 		gpcGT	**ppKILL = ppGTalloc;
 		ppGTalloc = new gpcGT*[nGTalloc];
-		gpmMEMCPY( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
+		gpmMEMCPYoff( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
 		gpmDELary(ppKILL);
 	}
 
 	pGT = new gpcGT( an, port );
-	gpmMEMCPY( pGT->s_ip, pS, nCMP );
+	gpmMEMCPYoff( pGT->s_ip, pS, nCMP );
 	pGT->s_ip[nCMP] = 0;
 
 	return ppGTalloc[iGTfr] = pGT;
@@ -299,7 +299,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
 		nGTalloc += 0x10;
 		gpcGT	**ppKILL = ppGTalloc;
 		ppGTalloc = new gpcGT*[nGTalloc];
-		gpmMEMCPY( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
+		gpmMEMCPYoff( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
 		gpmDELary(ppKILL);
 	}
 
@@ -359,7 +359,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 			ppGTalloc = new gpcGT*[nGTalloc];
 			if( pp_kill )
 			{
-				gpmMEMCPY( ppGTalloc, pp_kill, n_kill );
+				gpmMEMCPYoff( ppGTalloc, pp_kill, n_kill );
 			}
 			gpmZn( ppGTalloc+n_kill+1, (nGTalloc-n_kill-1) );
 			gpmDELary( pp_kill );
@@ -692,6 +692,25 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 
+/// ---------- SLMP -------------
+// SNo.NnSnUn..MsLen.Mtm.
+// +-->+>+>+-->+>+-->1--4   8  12  16  20  24	len 24 0x18
+// |234|2|2|234|2|234|234|234|234|2|23456|234
+// 500000FF03FF000018000004010000D*0000120001
+// +-->+>+>+-->+>+-->+-->5    11        21 24
+// D00000FF03FF0000440000
+// 0032 000A DEAD 0000
+// 0000 0000 0000 0000
+// 0000 0000 0000 0000
+// 0000 0000 0000 0000
+
+//                                   SNo.NnSnUn..MsLen.Mtm.
+//                                   +-->+>+>+-->+>+-->1--4   8  12  16  20  24	len 24 0x18
+//                                   +-->+>+>+-->+>+-->123456789012345678901234
+//                                   123456789012345678901234567890123456789012
+//                                   |234|2|2|234|2|234|234|234|234|2|23456|234
+//                                   500000FF03FF000018000004010000D*0000120001rn
+static const char gp_sSLMP_read[] = "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x";
 I8 gpcGT::GTcnct( gpcWIN& win )
 {
 	if( this ? msGTdie > win.mSEC.x : true )
@@ -796,13 +815,21 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			msGTdie = (win.mSEC.x+1500)|1;
 			return 0;
 		}
-
-		if( port & 1 )// telnetek
+		switch( TnID.alf )
 		{
-			pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, socket, iCNT );
-			iCNT++;
-			aGTcrs[0] = 'a';
-			//GTos(*this);
+			case gpeALF_SLMP:{
+				U4 nDEV = 512;
+				pOUT = pOUT->lzyFRMT( s = 0, gp_sSLMP_read, 0x18, 0, nDEV );
+				break;
+			}
+			default:
+				if( !(port&1) )// telnetek
+					break;
+
+				pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, socket, iCNT );
+				iCNT++;
+				aGTcrs[0] = 'a';
+				break;
 		}
 		msGTdie = 0;
 	}
@@ -816,17 +843,38 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		if( *p_err )
 			cerr << p_err << endl;
 
+		switch( TnID.alf )
+		{
+			case gpeALF_SLMP:
+				GTslmp( *this, &win );
+				break;
+			default:
+				if( aGTcrs[1] == 'h' )
+					break;
 
-		if( aGTcrs[1] != 'h' )
-			GTos( *this, &win ); //, &acpt );
+				GTos( *this, &win );
+				break;
+		}
 
 	}
 	else if( !pOUT )
 	if( pINP ? pINP->n_load : false )
+	switch( TnID.alf )
 	{
-		if( aGTcrs[1] != 'h' )
+		case gpeALF_SLMP:
+			GTslmp( *this, &win );
+			break;
+		default:
+			if( aGTcrs[1] == 'h' )
+				break;
+
 			GTos( *this, &win );
+			break;
 	}
+
+		/*if( aGTcrs[1] != 'h' )
+			GTos( *this, &win );
+	}*/
 
 	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 	{

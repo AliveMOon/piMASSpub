@@ -477,7 +477,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 			gpcGLSL **ppKILL = ppGLSL;
 			nGLSL += iGLSL + 0x4;
 			ppGLSL = new gpcGLSL*[nGLSL];
-			gpmMEMCPY( ppGLSL, ppKILL, iGLSL );
+			gpmMEMCPYoff( ppGLSL, ppKILL, iGLSL );
 			gpmDELary(ppKILL);
 			gpmZn( ppGLSL+iGLSL, nGLSL-iGLSL );
         }
@@ -488,8 +488,8 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 	}
 
 	gProgID = pGLSL->PrgID;
-	gpmMEMCPY( aTexID, pGLSL->aTexID, gpmN(aTexID) );
-	gpmMEMCPY( aUniID, pGLSL->aUniID, gpmN(aUniID) );
+	gpmMEMCPYoff( aTexID, pGLSL->aTexID, gpmN(aTexID) );
+	gpmMEMCPYoff( aUniID, pGLSL->aUniID, gpmN(aUniID) );
 	ATvxID = pGLSL->ATvxID;
 	ATuvID = pGLSL->ATuvID;
 	return this;

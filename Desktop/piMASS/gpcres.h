@@ -74,7 +74,7 @@ public:
 		if( nSTR )
 		{
 			an.aSTR[0] = new U1[nSTR+1];
-			gpmMEMCPY( an.aSTR[0], str.p_alloc, nSTR );
+			gpmMEMCPYoff( an.aSTR[0], str.p_alloc, nSTR );
 			an.aSTR[0][nSTR] = 0;
 		} else {
 			an = 0;
@@ -358,7 +358,7 @@ public:
 	gpcALU& TanDT( gpcALU& b )
 	{
 		// bizalmatlanok legyünk a b-vel?
-		//gpmMEMCPY( this, &b, 1 );
+		//gpmMEMCPYoff( this, &b, 1 );
 		type = b.type;
 		type.w = 0;
 		an = b.an;
@@ -512,7 +512,7 @@ public:
 		if( this ? !pDAT : true )
 			return 0;
 		// typ:
-		// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
 		if( typ().x&0x40 )
 		{
@@ -729,7 +729,7 @@ public:
 			nISA.y = nISA.x+0x10;
             pISA = new gpcISA[nISA.y];
             if( nISA.x )
-				gpmMEMCPY( pISA, pK, nISA.x );
+				gpmMEMCPYoff( pISA, pK, nISA.x );
 			gpmZn( pK, nISA.x ); // muszáj nehogy felszabaditsa az an.aSTR[0]-okat
 			gpmZn( pISA+nISA.x, nISA.y-nISA.x );
 

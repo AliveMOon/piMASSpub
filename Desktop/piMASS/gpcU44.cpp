@@ -21,7 +21,7 @@ char* gppsTYP[] = {
 };
 U1* U1x4::typ2str( U1* pBUFF )
 {
-	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	// yz dimxy
 	if(  y*z > 1 )
 		sprintf( (char*)pBUFF, "%s%dx%dx%d", gppsTYP[x>>0x4], 1<<(x&0xf), y, z );

@@ -173,7 +173,7 @@ class gpcCRS
 					*pRIGe	= pOA + nOL,
 					*pLFT	= (pSRC->pA = new U1[nNEW]) + iSTR.x;
 
-				gpmMEMCPY( pSRC->pA, pOA, iSTR.x );
+				gpmMEMCPYoff( pSRC->pA, pOA, iSTR.x );
 
 				for( ; pB < pE; pB++ )
 				{
@@ -211,7 +211,7 @@ class gpcCRS
 				iSTR.y = iSTR.x = pLFT-pSRC->pA;
 				if( pRIG < pRIGe )
 				{
-					gpmMEMCPY( pLFT, pRIG, pRIGe-pRIG );
+					gpmMEMCPYoff( pLFT, pRIG, pRIGe-pRIG );
 					pLFT += pRIGe-pRIG;
 				}
 				pSRC->nL = pLFT-pSRC->pA;

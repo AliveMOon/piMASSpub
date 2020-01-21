@@ -646,10 +646,15 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						case gpeALF_SLMP:
 							if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
 								break;
-
+							// typ: 0x10
+							///   -  -  -  |    : - - - -
+							/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 							if( alu.typ().x & 0x10 )
 							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
+							{
 								pGT->GTcnct( win );
+
+							}
 
 							break;
 						case gpeALF_TRGH:
