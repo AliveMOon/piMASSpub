@@ -49,16 +49,19 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	gpcLZY	*pLZYin = pWIN->piMASS->GTlzy.LZY( TnID&I8x2(1,2) ),
 			*pLZYout = pWIN->piMASS->GTlzy.LZY( TnID&I8x2(1,2)+I8x2(0,1) );
 
+	nLEN-=4; // kivonjuk a timert vagy mi a bubánatot
 	U2		*pU2in = (U2*)pLZYin->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc,
 			*pU2out = NULL;
+	pU2in++;
 
 	for( U4 i = 0; i < nLEN; i+=4 )
 	{
-		gpmMEMCPYoff( sWORD+2, pSTR+18 + i, 4 );
+		gpmMEMCPYoff( sWORD+2, pSTR+18+4 + i, 4 ); // +4 a timer
 		pU2in[i/4] = gpfSTR2U8( sWORD, NULL );
 
 	}
-	pINP->lzyINS( NULL, 0, s = 0, 18+nLEN );
+	iCNT++;
+	pINP->lzyINS( NULL, 0, s = 0, 18+4+nLEN );
 
 	if( pLZYout ? !pLZYout->n_load : true )
 		return;
