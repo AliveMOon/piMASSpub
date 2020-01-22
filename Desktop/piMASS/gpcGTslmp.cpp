@@ -75,7 +75,10 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			iCNT++;
 		}
 		pINP->lzyINS( NULL, 0, s = 0, nSUB );
-		return;
+		if( pINP->n_load )
+			return;
+		gpmDEL(pINP);
+		pU2in = pLZYin ? (U2*)pLZYin->p_alloc : NULL;
 	}
 
 
