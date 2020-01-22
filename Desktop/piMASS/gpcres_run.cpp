@@ -426,6 +426,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	win.mN = mapCR.mapZN44.w;
 	win.mZN = mapCR.mapZN44.a4x2[1].area();
 	I8x4 anRio;
+	gpcLZY hex; U8 s;
+
 	if( U4 *pM = win.pM = mapCR.pMAP )
 	if( U4 *pC = win.pC = mapCR.pCOL )
 	if( U4 *pR = win.pR = mapCR.pROW )
@@ -698,8 +700,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 										if( pS2 == pSRC )
 											continue;
 
-										gpcLZY hex; U8 s;
-										hex.lzyHEX( s = 0, pLZYout->p_alloc, pLZYout->n_load );
+										hex.lzyRST()->lzyHEXw( s = 0, pLZYout->p_alloc+sizeof(U2), pLZYout->n_load-sizeof(U2) );
 										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 										pS2->srcUPDT();
 
@@ -727,8 +728,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 										if( pS2 == pSRC )
 											continue;
 
-										gpcLZY hex; U8 s;
-										hex.lzyHEX( s = 0, pLZYin->p_alloc, pLZYin->n_load );
+										hex.lzyRST()->lzyHEXw( s = 0, pLZYin->p_alloc+sizeof(U2), pLZYin->n_load-sizeof(U2) );
 										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 										pS2->srcUPDT();
 

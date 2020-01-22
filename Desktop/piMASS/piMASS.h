@@ -4364,7 +4364,8 @@ szasz:
 		return this;
 	}
 	gpcLZY* lzyFRMT( U8& n_start, const char* p_format, ... );
-	gpcLZY* lzyHEX( U8& n_start, U1* pBIN, U4 nBIN );
+	gpcLZY* lzyHEXb( U8& n_start, U1* pBIN, U4 nBIN );
+	gpcLZY* lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN );
 	gpcLZY* lzy_reqCLOSE( void )
 	{
 		if( !this )

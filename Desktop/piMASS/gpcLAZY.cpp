@@ -11,7 +11,17 @@ gpcLZY* gpcLZY::lzyFRMT( U8& n_start, const char* p_format, ... )
 	U8 s = -1;
 	return lzyADD( (U1*)gps_lzy_pub1, n, n_start );
 }
-gpcLZY* gpcLZY::lzyHEX( U8& n_start, U1* pBIN, U4 nBIN )
+static const char* gpasADDR[] = {
+	"%0.2x|",
+	"%0.4x|",
+	"%0.8x|",
+	"%0.16llx|",
+	"//%0.2x|",
+	"//%0.4x|",
+	"//%0.8x|",
+	"//%0.16llx|",
+};
+gpcLZY* gpcLZY::lzyHEXb( U8& n_start, U1* pBIN, U4 nBIN )
 {
 	if( nBIN ? !pBIN : true )
 		return this;
@@ -22,35 +32,92 @@ gpcLZY* gpcLZY::lzyHEX( U8& n_start, U1* pBIN, U4 nBIN )
 		if( !pTHIS )
 			return NULL;
 
-		return pTHIS->lzyHEX( n_start, pBIN, nBIN );
+		return pTHIS->lzyHEXb( n_start, pBIN, nBIN );
 	}
 
 	n_start = n_load;
 	U8 s;
-	lzyFRMT( s = -1, "\"");
+
+	U1 nLOG = log2( nBIN );
+	char sLINE[0x100], *pLINE = sLINE, *pADDR;
+	//pLINE += sprintf( pLINE, "\"\r\n");
 	for( U4 i = 0, j, je; i < nBIN; i += 16 )
 	{
-		lzyFRMT( s = -1, "\r\n %0.8x ", i );
+		pLINE += sprintf( pLINE, gpasADDR[nLOG/8], i );
 		for( j = i, je = j+16; j < je; j++ )
 		{
 			if( j >= nBIN )
 			{
-				lzyFRMT( s = -1, "   " );
+				pLINE += sprintf( pLINE, "   " );
 				continue;
 			}
-			lzyFRMT( s = -1, "%0.2x ", pBIN[j] );
+			pLINE += sprintf( pLINE, "%0.2x ", pBIN[j] );
 		}
+		pLINE += sprintf( pLINE, "|" );
 		for( j = i, je = j+16; j < je; j++ )
 		{
 			if( j >= nBIN )
 				break;
-			lzyFRMT( s = -1, "%c", ((pBIN[j] >= 0x20) && (pBIN[j] < 0x80)) ? pBIN[j] : '.'  );
+			*pLINE = ((pBIN[j] >= 0x20) && (pBIN[j] < 0x80)) ? pBIN[j] : '.';
+			pLINE++;
 		}
+		*pLINE = 0;
+		lzyFRMT( s = -1, "\r\n%s", sLINE );
+		pLINE = sLINE;
 	}
-	lzyFRMT( s = -1, "\r\n %0.8x\"", nBIN );
+	pLINE += sprintf( pLINE, gpasADDR[nLOG/8], nBIN );
+	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
 
+gpcLZY* gpcLZY::lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN )
+{
+	if( nBIN ? !pBIN : true )
+		return this;
+
+	if( !this )
+	{
+		gpcLZY* pTHIS = new gpcLZY();
+		if( !pTHIS )
+			return NULL;
+
+		return pTHIS->lzyHEXw( n_start, pBIN, nBIN );
+	}
+
+	n_start = n_load;
+	U8 s;
+
+	U1 nLOG = log2( nBIN )/8+4;
+	char sLINE[0x400], *pLINE = sLINE, *pADDR;
+	//pLINE += sprintf( pLINE, "\"\r\n");
+	for( U4 i = 0, j, je; i < nBIN; i += 16 )
+	{
+		pLINE += sprintf( pLINE, gpasADDR[nLOG], i );
+		for( j = i, je = j+16; j < je; j+=2 )
+		{
+			if( j >= nBIN )
+			{
+				pLINE += sprintf( pLINE, "     " );
+				continue;
+			}
+			pLINE += sprintf( pLINE, "%0.4x ", *(U2*)(pBIN+j) );
+		}
+		pLINE += sprintf( pLINE, "|" );
+		for( j = i, je = j+16; j < je; j++ )
+		{
+			if( j >= nBIN )
+				break;
+			*pLINE = ((pBIN[j] >= 0x20) && (pBIN[j] < 0x80)) ? pBIN[j] : '.';
+			pLINE++;
+		}
+		*pLINE = 0;
+		lzyFRMT( s = -1, "\r\n%s", sLINE );
+		pLINE = sLINE;
+	}
+	pLINE += sprintf( pLINE, gpasADDR[nLOG], nBIN );
+	lzyFRMT( s = -1, "\r\n%s", sLINE );
+	return this;
+}
 U4 gpcLZY::tree_fnd( U4 id, U4& n )
 {
 	if( !this )
