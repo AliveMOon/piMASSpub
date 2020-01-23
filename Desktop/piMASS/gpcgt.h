@@ -3,6 +3,8 @@
 
 
 #include "gpcpic.h"
+#define gpdSLMPnDEV 512
+#define gpdSLMP_read "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x0000"
 //#define gpdRECVn (0x30000/12)
 class gpcWIN;
 class gpcGT;
@@ -266,6 +268,7 @@ class gpcGT
 
 			return iCNT;
 		}
+		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass );
 		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		void	GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );

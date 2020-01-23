@@ -684,7 +684,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								if( anRio.a8x2[1].x )
 								{
 									// OUT
-									if( gpcLZY *pLZYout = win.piMASS->GTlzy.LZY(pGT->TnID&I8x2(1,2)+I8x2(0,1)) )
+									if( gpcLZY *pLZYout = win.piMASS->GTlzy.LZY((pGT->TnID&I8x2(1,2))+I8x2(0,1)) )
 									if( pLZYout->n_load )
 									{
                                         x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );

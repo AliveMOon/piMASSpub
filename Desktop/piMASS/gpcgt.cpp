@@ -710,7 +710,7 @@ static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2019 =
 //                                   123456789012345678901234567890123456789012
 //                                   |234|2|2|234|2|234|234|234|234|2|23456|234
 //                                   500000FF03FF000018000004010000D*0000120001rn
-static const char gp_sSLMP_read[] = "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x";
+// static const char gp_sSLMP_read[] = "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x";
 I8 gpcGT::GTcnct( gpcWIN& win )
 {
 	if( this ? msGTdie > win.mSEC.x : true )
@@ -818,8 +818,8 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:{
-				U4 nDEV = 512;
-				pOUT = pOUT->lzyFRMT( s = 0, gp_sSLMP_read, 0x18, 0, nDEV );
+				//U4 nDEV = 512;
+				pOUT = pOUT->lzyFRMT( s = 0, gpdSLMP_read, 0x18, 0, gpdSLMPnDEV );
 				break;
 			}
 			default:
@@ -846,7 +846,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:
-				GTslmp( *this, &win );
+				//GTslmp( *this, &win );
 				break;
 			default:
 				if( aGTcrs[1] == 'h' )
@@ -859,18 +859,28 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	}
 	else if( !pOUT )
 	if( pINP ? pINP->n_load : false )
+	{
+		switch( TnID.alf )
+		{
+			case gpeALF_SLMP:
+				//GTslmp( *this, &win );
+				break;
+			default:
+				if( aGTcrs[1] == 'h' )
+					break;
+
+				GTos( *this, &win );
+				break;
+		}
+	}
+
 	switch( TnID.alf )
 	{
 		case gpeALF_SLMP:
 			GTslmp( *this, &win );
 			break;
-		default:
-			if( aGTcrs[1] == 'h' )
-				break;
-
-			GTos( *this, &win );
-			break;
 	}
+
 
 		/*if( aGTcrs[1] != 'h' )
 			GTos( *this, &win );

@@ -2,6 +2,7 @@
 #include "gpcwin.h"
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
+//extern char gp_sSLMP_read[];
 /// ---------- SLMP -------------
 // SNo.NnSnUn..MsLen.Mtm.
 // +-->+>+>+-->+>+-->1--4   8  12  16  20  24	len 24 0x18
@@ -13,7 +14,88 @@ extern char gpsTAB[], *gppTAB;
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
+gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass )
+{
+	U8 s = -1, nLEN;
+	U4 n = gpmSTRLEN( pSTR );
+	if( this ? !n : true )
+		return pANS->lzyFRMT( s, "nonsens" );
+	U1* pEND = pSTR+n, *pCOM;
+	I8x2 an;
+	U1 sCOM[] = "ABCD";
+	U4& com = *(U4*)sCOM, iCin, iCou;
+	U2 nU2, *pU2i = NULL, *pU2o = NULL;
+	gpcLZY	*pLZYin = NULL,
+			*pLZYout = NULL;
+	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ) )
+	{
+		pCOM = pSTR;
+		an.num = pEND-pSTR;
+		an = pCOM;
+		if( an.num )
+		{
+			com = *(U4*)pCOM;
+			pSTR += an.num;
+			if( !pLZYin )
+				pLZYin=mass.GTlzy.LZY( TnID&I8x2(1,2) );
 
+			if( pU2i = (U2*)pLZYin->p_alloc )
+			for( iCin = 1, nU2 = pLZYin->n_load/sizeof(U2); iCin < nU2; iCin+=8 )
+			{
+				if( *(U4*)(pU2i+iCin) == com )
+					break;	// iCin menjen végig
+			}
+
+			if( iCin >= nU2 )
+			{
+				iCou = iCin = nU2;
+				// nem vol egyáltalán
+				pU2o = pLZYout->u2VALID(pLZYin,pU2o);
+				if( !pU2o )
+					pU2o = (pLZYout=mass.GTlzy.LZY((TnID&I8x2(1,2))+I8x2(0,1)))->u2VALID(pLZYin);
+
+				if( pU2o )
+				for( iCou = 1, nU2 = pLZYout->n_load/sizeof(U2); iCou < nU2; iCou+=8 )
+				{
+					if( pU2o[iCou] ? *(U4*)(pU2o+iCou) == com : true )
+						break;
+				}
+			}
+
+			if( iCou > iCin )
+				iCou = iCin;
+
+			if( !pU2o )
+				pU2o = (pLZYout=mass.GTlzy.LZY((TnID&I8x2(1,2))+I8x2(0,1)))->u2VALID(pLZYin);
+
+			if( pU2o )
+				*(U4*)(pU2o+iCou) = com;
+
+		} else
+			pSTR += gpmVAN( pSTR, " \t\a\r\n;", nLEN );
+
+		switch( an.alf )
+		{
+			case gpeALF_FORMAT:
+				gpmZn( pU2o, nU2 );
+				break;
+
+			case gpeALF_HELO:
+			case gpeALF_HELLO:
+				return pANS->lzyFRMT( s = -1, "Hello! %d", iCou );
+			case gpeALF_HELP:
+				return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iCou );
+			case gpeALF_LINE:
+				return pANS->lzyFRMT( s = -1, "Line.txt %d", iCou );
+			case gpeALF_JOIN:
+				return pANS->lzyFRMT( s = -1, "Join.txt %d", iCou );
+			default:
+				*(U4*)(pU2o+iCou) = 0;
+				break;
+		}
+	}
+    return pANS->lzyFRMT( s, "ok" );
+}
 void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 {
 	U8 nOUT = GTout( pWIN ), s;
@@ -45,8 +127,8 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		// D00000FF03FF000044
 		//               xxxx
 		//             14+-->
-		//      4    8   12   16
-		// D000 00FF 03FF 000804
+		//     4   8  12 16
+		// D00000FF03FF000804
 		//18
 		// 0000 // EndCode
 		// 0000 0000 0000 0000
@@ -73,6 +155,7 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 			nSUB += 18+nLEN;
 			iCNT++;
+			nSYNsum++;
 		}
 		pINP->lzyINS( NULL, 0, s = 0, nSUB );
 		if( pINP->n_load )
@@ -86,7 +169,7 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( !nLEN )
 		return;
 
-	gpcLZY	*pLZYout = pWIN->piMASS->GTlzy.LZY( TnID&I8x2(1,2)+I8x2(0,1) );
+	gpcLZY	*pLZYout = pWIN->piMASS->GTlzy.LZY( (TnID&I8x2(1,2))+I8x2(0,1) );
 	if( !pLZYout )
 		return;	// valamiért nem tudott csinálni
 
@@ -111,7 +194,7 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	pU2out++;
 
 	U4 iU2 = gpmMEMCMP( pU2in, pU2out, nLEN*sizeof(*pU2in) )/sizeof(*pU2in),
-	i_cpy, n_cpy;
+	i_cpy, n_cpy, nOld = pOUT ? pOUT->n_load : 0;
 	while( iU2 < nLEN )
 	{
 		i_cpy = iU2;
@@ -124,25 +207,37 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 		if( n_cpy = iU2-i_cpy )
 		{
+			iU2 += n_cpy;
+			if( iU2 > nLEN )
+				iU2 = nLEN;
+			n_cpy = iU2-i_cpy;
+
+			nSYNsum++;
+			nSYNdo++;
 
 										//		             +------- Len: 0x28 = 32+8 = 40 --------+
 										// SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..Data............
 										// +-->+>+>+-->+>+-->1--4   8  12  16  20  24  28  32  36  40
-										// 500000FF03FF000028000014010000D*0000100004
+										// 500000FF03FF000028000014010000D*0000100004 123 123
+										// 500000FF03FF000020000014010000D*000000000265686f6c
 			pOUT = pOUT->lzyFRMT( s = -1, "500000FF03FF00%0.4x000014010000D*%0.6x%0.4x", 0x18 + 4*n_cpy, i_cpy, n_cpy );
-			pOUT->lzyINS( NULL, 4*n_cpy, s = -1, -1 );
-			for( ; i_cpy < iU2; i_cpy++ );
+			pOUT->lzyINS( NULL, 4*n_cpy + 4, s = -1, -1 );
+			for( ; i_cpy < iU2; i_cpy++ )
 				s += sprintf( (char*)pOUT->p_alloc+s, "%0.4x", pU2out[i_cpy] );
 
-			if( iU2 >= nLEN )
-				break;
+			s += sprintf( (char*)pOUT->p_alloc+s, "0000" );
+			//if( iU2 >= nLEN )
+			break;
 		}
 
 		iU2 += gpmMEMCMP( pU2in+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2in) )/sizeof(*pU2in);
 	}
+	if( nOld < (pOUT ? pOUT->n_load : 0) )
+	{
+		pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_read, 0x18, 0, gpdSLMPnDEV );
+	}
 
 	//nOUT = GTout( pWIN );
 	iCNT++;
-
-
 }
+

@@ -4107,6 +4107,50 @@ public:
 		p_alloc[n_load] = 0;
 		return this;
 	}
+	U2* u2VALID( gpcLZY* pLZY, U2* pU2 = NULL )
+	{
+		if( !this )
+			return NULL;
+
+		if( pU2 )
+		if( pLZY->n_load > n_load )
+			pU2 = NULL;
+
+		if( pU2 )
+			return (U2*)p_alloc;
+
+		if( pLZY->n_load > n_load )
+		{
+			U8 s = -1;
+			lzyADD(
+					pLZY->p_alloc+n_load,
+					pLZY->n_load-n_load, s
+				);
+		}
+		return (U2*)p_alloc;
+	}
+	U4* u4VALID( gpcLZY* pLZY, U4* pU4 = NULL )
+	{
+		if( !this )
+			return NULL;
+
+		if( pU4 )
+		if( pLZY->n_load > n_load )
+			pU4 = NULL;
+
+		if( pU4 )
+			return (U4*)p_alloc;
+
+		if( pLZY->n_load > n_load )
+		{
+			U8 s = -1;
+			lzyADD(
+					pLZY->p_alloc+n_load,
+					pLZY->n_load-n_load, s
+				);
+		}
+		return (U4*)p_alloc;
+	}
 	gpcLZY* lzyPLUS(  const gpcLZY* p_b, U8& n_start )
 	{
 		return lzyADD( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );

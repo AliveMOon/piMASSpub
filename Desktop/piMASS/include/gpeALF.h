@@ -760,6 +760,7 @@ typedef enum gpeALF: I8
 	gpeALF_HAND = gpdABCD('H', 'A', 'N', 'D'),
 	gpeALF_HEAD = gpdABCD('H', 'E', 'A', 'D'),
 	gpeALF_HELP = gpdABCD('H', 'E', 'L', 'P'),
+	gpeALF_HELO = gpdABCD('H', 'E', 'L', 'O'),
 	gpeALF_HOST = gpdABCD('H', 'O', 'S', 'T'),
 	gpeALF_HTML = gpdABCD('H', 'T', 'M', 'L'),
 	gpeALF_HTTP = gpdABCD('H', 'T', 'T', 'P'),
@@ -768,6 +769,7 @@ typedef enum gpeALF: I8
 	gpeALF_INIT = gpdABCD('I', 'N', 'I', 'T'),
 
 	gpeALF_ITEM = gpdABCD('I', 'T', 'E', 'M'),
+	gpeALF_JOIN = gpdABCD('J', 'O', 'I', 'N'),
 	gpeALF_JUMP = gpdABCD('J', 'U', 'M', 'P'),
 
 	gpeALF_KALT = gpdABCD('K', 'A', 'L', 'T'),
@@ -877,6 +879,7 @@ typedef enum gpeALF: I8
 	gpeALF_ENTER = gpdABCDE('E', 'N', 'T', 'E', 'R'),
 	gpeALF_ENTRY = gpdABCDE('E', 'N', 'T', 'R', 'Y'),
 	gpeALF_ERECT = gpdABCDE('E', 'R', 'E', 'C', 'T'),
+	gpeALF_HELLO = gpdABCDE('H', 'E', 'L', 'L', 'O'),
 	gpeALF_GETMX = gpdABCDE('G', 'E', 'T', 'M', 'X'),
 	gpeALF_GLOBA = gpdABCDE('G', 'L', 'O', 'B', 'A'),
 	gpeALF_HISTI = gpdABCDE('H', 'I', 'S', 'T', 'I'),
@@ -948,6 +951,7 @@ typedef enum gpeALF: I8
 	gpeALF_FERIKE = gpdABCDEF('F', 'E', 'R', 'I', 'K', 'E'),
 	gpeALF_FLINCH = gpdABCDEF('F', 'L', 'I', 'N', 'C', 'H'),
 	gpeALF_FORBID = gpdABCDEF('F', 'O', 'R', 'B', 'I', 'D'),
+	gpeALF_FORMAT = gpdABCDEF('F', 'O', 'R', 'M', 'A', 'T'),
 	gpeALF_GALAXY = gpdABCDEF('G', 'A', 'L', 'A', 'X', 'Y'),
 	gpeALF_JACKET = gpdABCDEF('J', 'A', 'C', 'K', 'E', 'T'),
 	gpeALF_KSHIFT = gpdABCDEF('K', 'S', 'H', 'I', 'F', 'T'),

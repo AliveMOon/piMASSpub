@@ -342,6 +342,13 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 				switch( cAN.alf )
 				{
+					case gpeALF_SLMP:{
+							U1* pA;
+							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
+							if( gpcGT* pGT = pALL->GT( sockSLMP ) )
+							if( pWIN ? pWIN->piMASS : NULL )
+								pOUT = pGT->GTslmpOS( pOUT, pA, *(pWIN->piMASS) );
+						} break;
 					case gpeALF_ACCOUNT:
 						// én vagyok a KLIENS,
 						// a SERVER megkér, hogy azonosítsam magam
