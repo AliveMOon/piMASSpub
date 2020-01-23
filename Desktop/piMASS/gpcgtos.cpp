@@ -36,7 +36,7 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 		return 0;
 
 	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
-	if( nOUT )
+	if( nOUT || TnID.alf == gpeALF_SLMP )
 		return nOUT;
 
 	// üres a pOUT töltsünk bele valamit

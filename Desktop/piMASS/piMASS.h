@@ -133,6 +133,7 @@
 #define gpdPICbg "/mnt/ram/bg.png"
 #define gpsMINI_CHAR "mini_char_16x32_8x32.png" //"mini_char_64x512.png"	// "mini_char_16x32.png" //
 #define gpsMINI_ISO "mini_ISO_32x32_1024x1536.png"
+#define gpdSLMPnDEV 512
 
 #include <exception>
 #include <mysys.h>
@@ -258,18 +259,20 @@ class gpcMASS;
 				(d) ? gpfALF2STR( (char*)(d), (gpeALF)alf )	\
 					: 0 									\
 			)
-/// WARNING ez beszo
-#define gpmMEMCPYoff( d, s, n ) \
-			((U1*)(														\
-				(														\
-				 	(n)													\
-					&&(d)												\
-					&&(s)												\
-					&&( ((U1*)(d)) != ((U1*)(s)) )						\
-				)											 			\
-				? ( memcpy( (d), (s), ((n)*sizeof(*(d))) ) )			\
-				: ( d )  												\
+#define gpmMEMCPY( d, s, n ) \
+			((U1*)(											\
+				(											\
+				 	(n)										\
+					&&(d)									\
+					&&(s)									\
+					&&( ((U1*)(d)) != ((U1*)(s)) )			\
+				)											\
+				? ( memcpy( (d), (s), (n) ) )				\
+				: ( d )  									\
 			))
+/// WARNING ez beszorozza a sizeof()-val
+#define gpmMEMCPYoff( d, s, n ) gpmMEMCPY( d, s, ((n)*sizeof(*(d))) )
+
 #define gpmSTRnCPY( d, s, n ) \
 			(														\
 				( (n)&&(d)&&(s)&&(((char*)(d))!=((char*)(s))) ) 	\
@@ -289,6 +292,7 @@ class gpcMASS;
 #define gpdPUB "+--- --  -   "
 #define gpdSIZ2CR I4x2(6,9)
 #define gpdCRall I4x2(1,2)
+
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
@@ -493,7 +497,7 @@ inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
 	return p2P;
 }
 
-inline U8 gp_memcmp( const void* pA, const void* pB, U8 n )
+inline U8 gp_memcmp( const void* pA, const void* pB, size_t n )
 {
 	if( !pA || !pB )
 		return 0;
@@ -503,7 +507,7 @@ inline U8 gp_memcmp( const void* pA, const void* pB, U8 n )
 
 	U1	*pAu1 = (U1*)pA,
 		*pBu1 = (U1*)pB;
-	U8 i = 0;
+	size_t i = 0;
 	while( n-i > 8 )
 	{
 		if( *(U8*)(pAu1+i) != *(U8*)(pBu1+i) )
@@ -557,7 +561,42 @@ inline U8 gp_memcmp( const void* pA, const void* pB, U8 n )
 	return (void*)(pAu1+n);*/
 }
 
+inline size_t gpfMEMMEM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL )
+{
+	size_t nT = nA, nFND;
+	U1* pT = pA;
+	if( nB > nA )
+	{
+		nA = nB;
+		nA = nT;
 
+		pA = pB;
+		pB = pT;
+	}
+	nT = 0;
+
+	for( U1 *pE = pA+(nA-nB); pA <= pE; pA++ )
+	{
+		if( *pA != *pB )
+			continue;
+		nFND = gp_memcmp( pA, pB, nB );
+		if( nFND < nB )
+		{
+			if( !ppFND )
+				continue;
+
+			if( nT < nFND )
+			{
+				nT = nFND;
+				*ppFND = pA;
+			}
+			continue;
+		}
+
+		return pA-pT;
+	}
+	return 0;
+}
 
 class UTF8
 {
@@ -2435,7 +2474,6 @@ public:
 
 
 
-
 	I4x4& operator += ( const I4x4& b )
 	{
 		a4x2[0] += b.a4x2[0];
@@ -4157,10 +4195,15 @@ public:
 	}
 	gpcLZY* lzySUB( U8& n_start, U8 n_sub )
 	{
-		if( !this )
+		if( this ? !n_sub : true )
 		{
 			n_start = 0;
 			return NULL;
+		}
+		if( !n_sub )
+		{
+			n_start = n_load;
+			return this;
 		}
 		if( n_start > n_load )
 		{

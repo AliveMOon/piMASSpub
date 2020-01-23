@@ -617,17 +617,29 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	}
 
 	//SetThreadPriority( whd, THREAD_PRIORITY_HIGHEST );
-	I8 n = pOUT->n_load, nSKIP;
-	if( false )
-	if( aGTcrs[0]  )
+	I8 n = pOUT->n_load, nSKIP, iSUB;
+
+	/// dadogás
+	if( aGTcrs[1] == 's' )
+	if( aGTcrs[0] == '\n' )
 	{
 		if( pOUT->p_alloc[n] )
 			pOUT->p_alloc[n] = 0;
 		char a_str[] = " ";
 		a_str[0] = aGTcrs[0];
 		n = gpdVAN( (char*)pOUT->p_alloc, a_str );
-		nSKIP = gpmNINCS((char*)pOUT->p_alloc + n, a_str);
-		n += nSKIP;
+		if( !n )
+		{
+			iSUB = gpmNINCS((char*)pOUT->p_alloc, a_str);
+			if( iSUB )
+				pOUT = pOUT->lzySUB( s = 0, iSUB );
+			n = gpdVAN( (char*)pOUT->p_alloc, a_str );
+		}
+		if( pOUT->p_alloc[n] == '\n')
+			n++;
+		//n = gpdVAN( (char*)pOUT->p_alloc, a_str );
+		/*nSKIP = gpmNINCS((char*)pOUT->p_alloc + n, a_str);
+		n += nSKIP;*/
 	}
 
 	if( n > n_buff )
@@ -818,8 +830,9 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:{
-				//U4 nDEV = 512;
-				pOUT = pOUT->lzyFRMT( s = 0, gpdSLMP_read, 0x18, 0, gpdSLMPnDEV );
+				aGTcrs[1] = 's';
+				aGTcrs[0] = '\n'; // háha ASCII
+				pOUT = pOUT->lzyFRMT( s = 0, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
 				break;
 			}
 			default:
@@ -880,11 +893,6 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			GTslmp( *this, &win );
 			break;
 	}
-
-
-		/*if( aGTcrs[1] != 'h' )
-			GTos( *this, &win );
-	}*/
 
 	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 	{

@@ -3,9 +3,92 @@
 
 
 #include "gpcpic.h"
-#define gpdSLMPnDEV 512
-#define gpdSLMP_read "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x0000"
+
+				          //		             +------- Len: 0x28 = 32+8 = 40 --------+
+				          //   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..Data............
+				          //   +-->+>+>+-->+>+-->1--4   8  12  16  20  24  28  32  36  40
+				          //   500000FF03FF000028000014010000D*0000100004
+				          //   +-->+>+>+-->+>+-->.x00.x04.x08.x0C.x10.x14.x18.x1c.x20  28  32  36  40
+				          // \n500000FF03FF000020000014010000D*000000000265686f6c
+
+#define gpdSLMP_recv_LN4SL6N4 "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x0000"
+//   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..
+#define gpdSLMP_send_LN4SL6N4 "500000FF03FF00%0.4x000014010000D*%0.6x%0.4x"
 //#define gpdRECVn (0x30000/12)
+
+class gpcSLMP
+{
+public:
+	union{
+		struct {
+			U1 aU1[21];
+		};
+		struct {
+			U2 	SER			__attribute__((packed));	// 2
+			U1	nNET 		__attribute__((packed)),	// 3
+				sRNG 		__attribute__((packed));	// 4
+			U2 	nUio		__attribute__((packed));	// 6
+			U1 	MlDrp		__attribute__((packed));	// 7
+			U2 	nLEN 		__attribute__((packed)),	// 9
+
+				tMON		__attribute__((packed)),	// 11	//  2
+				com			__attribute__((packed)),	// 13	//  4
+				subC		__attribute__((packed));	// 15	//  6
+			U1 	iDev[3]		__attribute__((packed)),	// 18	//  9
+				d0			__attribute__((packed));	// 19	// 10
+			U2 	nDev		__attribute__((packed));	// 21	// 12
+														// 21
+		}__attribute__((packed));
+	};
+	gpcSLMP(){};
+	gpcSLMP( 	U2 _SER,
+				U1 _nNET, U1 _sRNG,
+				U2 _nUio,
+				U1 _MlDrp,
+				U2 _nLEN,
+
+				U2 _tMON,
+				U2 _com,
+				U2 _subC,
+				U4 _iDev,
+				U1 _d0,
+				U2 _nDev
+	)
+	{
+		SER 		= _SER;
+		nNET 		= _nNET;
+		sRNG		= _sRNG;	// station range
+		nUio		= _nUio;
+		MlDrp		= _MlDrp;
+		nLEN		= _nLEN;	// RespDatLen
+		tMON		= _tMON;	// EndCD
+		com 		= _com;
+		subC		= _subC;
+		*(U4*)iDev	= _iDev;
+		d0			= _d0;
+		nDev		= _nDev;
+	}
+	size_t iEndCD()
+	{
+		return gpmOFF( gpcSLMP, tMON );
+	}
+	size_t nEND()
+	{
+		if( !this )
+			return ~0;
+		return nLEN*sizeof(U2) + iEndCD();
+	}
+	U1* pCPY()
+	{
+		return ((U1*)this)+iEndCD();
+	}
+	U4 setIDev( U4 i )
+	{
+		*(U4*)iDev = (i&0xffffff)|(((U4)d0)<<24);
+		return (i&0xffffff);
+	}
+
+} __attribute__((packed));
 class gpcWIN;
 class gpcGT;
 
@@ -270,6 +353,7 @@ class gpcGT
 		}
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass );
 		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
+		void 	GTslmpBIN( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		void	GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );
 
