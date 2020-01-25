@@ -11,10 +11,14 @@
 				          //   +-->+>+>+-->+>+-->.x00.x04.x08.x0C.x10.x14.x18.x1c.x20  28  32  36  40
 				          // \n500000FF03FF000020000014010000D*000000000265686f6c
 
-#define gpdSLMP_recv_LN4SL6N4 "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x0000"
+#define gpdSLMP_recv_LN4SL6N4 "500000FF03FF00%0.4X000004010000D*%0.6X%0.4X0000"
 //   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..
-#define gpdSLMP_send_LN4SL6N4 "500000FF03FF00%0.4x000014010000D*%0.6x%0.4x"
+#define gpdSLMP_send_LN4SL6N4 "500000FF03FF00%0.4X000014010000D*%0.6X%0.4X"
 //#define gpdRECVn (0x30000/12)
+#define gpdGTlzyID		I8x2(1,gpdLZYallGT)
+#define gpdGTlzyIDinp( p ) ((p)&gpdGTlzyID)
+#define gpdGTlzyIDout( p ) (((p)&gpdGTlzyID)+I8x2(0,1))
+#define gpdGTlzyIDusr( p ) (((p)&gpdGTlzyID)+I8x2(0,2))
 
 class gpcSLMP
 {
@@ -351,8 +355,8 @@ class gpcGT
 
 			return iCNT;
 		}
-		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass );
-		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
+		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
+		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 		void 	GTslmpBIN( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		void	GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );

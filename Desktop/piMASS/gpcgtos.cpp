@@ -347,7 +347,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
 							if( gpcGT* pGT = pALL->GT( sockSLMP ) )
 							if( pWIN ? pWIN->piMASS : NULL )
-								pOUT = pGT->GTslmpOS( pOUT, pA, *(pWIN->piMASS) );
+								pOUT = pGT->GTslmpOS( pOUT, pA, *(pWIN->piMASS), socket );
 						} break;
 					case gpeALF_ACCOUNT:
 						// én vagyok a KLIENS,

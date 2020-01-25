@@ -26,7 +26,7 @@ gpcSLMP gpaSLMP[] = {
 //	{ SNo.  , nNET, sRNG, nUio,   MlDrp, nLEN,	tMON,	com,	subC,	iDev,	  d0,	nDev  },
 	{ 0x0050, 0x00, 0xff, 0x03ff, 0x00, 0x000e, 0x0010, 0x1401, 0x0000, 0x000000, 0xa8, 0x0001  },
 };
-gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass )
+gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
@@ -37,8 +37,28 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass )
 	U1 sCOM[] = "ABCD";
 	U4& com = *(U4*)sCOM, iCin, iCou;
 	U2 nU2, *pU2i = NULL, *pU2o = NULL;
-	gpcLZY	*pLZYin = NULL,
-			*pLZYout = NULL;
+	gpcLZY	*pLZYinp = NULL,
+			*pLZYout = NULL,
+			*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+	U4 iSOCK = 0, nSOCK = 0;
+	if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
+	{
+        nSOCK = gpmLZYn(pLZYusr,sockUSR);
+        for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
+        {
+			if( pSOCK[iSOCK] != sockUSR )
+				continue;
+
+			break;
+        }
+	}
+	if( iSOCK >= nSOCK )
+	{
+		pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
+		iSOCK = nSOCK;
+		nSOCK = gpmLZYn(pLZYusr,sockUSR);
+	}
+
 	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ) )
 	{
 		pCOM = pSTR;
@@ -48,11 +68,11 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass )
 		{
 			com = *(U4*)pCOM;
 			pSTR += an.num;
-			if( !pLZYin )
-				pLZYin=mass.GTlzy.LZY( TnID&I8x2(1,2) );
+			if( !pLZYinp )
+				pLZYinp=mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) );
 
-			if( pU2i = (U2*)pLZYin->p_alloc )
-			for( iCin = 11, nU2 = pLZYin->n_load/sizeof(U2); iCin < nU2; iCin+=8 )
+			if( pU2i = (U2*)pLZYinp->p_alloc )
+			for( iCin = 1, nU2 = pLZYinp->n_load/sizeof(U2); iCin < nU2; iCin++ )
 			{
 				if( *(U4*)(pU2i+iCin) == com )
 					break;	// iCin menjen végig
@@ -62,12 +82,12 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass )
 			{
 				iCou = iCin = nU2;
 				// nem vol egyáltalán
-				pU2o = pLZYout->u2VALID(pLZYin,pU2o);
+				pU2o = pLZYout->u2VALID(pLZYinp,pU2o);
 				if( !pU2o )
-					pU2o = (pLZYout=mass.GTlzy.LZY((TnID&I8x2(1,2))+I8x2(0,1)))->u2VALID(pLZYin);
+					pU2o = (pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDout(TnID)))->u2VALID(pLZYinp);
 
 				if( pU2o )
-				for( iCou = 11, nU2 = pLZYout->n_load/sizeof(U2); iCou < nU2; iCou+=8 )
+				for( iCou = 1, nU2 = pLZYout->n_load/sizeof(U2); iCou < nU2; iCou++ )
 				{
 					if( pU2o[iCou] ? *(U4*)(pU2o+iCou) == com : true )
 						break;
@@ -78,7 +98,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass )
 				iCou = iCin;
 
 			if( !pU2o )
-				pU2o = (pLZYout=mass.GTlzy.LZY((TnID&I8x2(1,2))+I8x2(0,1)))->u2VALID(pLZYin);
+				pU2o = (pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDout(TnID)))->u2VALID(pLZYinp);
 
 			if( pU2o )
 				*(U4*)(pU2o+iCou) = com;
@@ -109,7 +129,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass )
 	}
     return pANS->lzyFRMT( s, "ok" );
 }
-void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
+void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )
@@ -119,18 +139,18 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		return GTslmpBIN( mom, pWIN, pALL );
 
 	U4 nLEN = 0;
-	gpcLZY	*pLZYin = pWIN->piMASS->GTlzy.LZY( TnID&I8x2(1,2) );
-	U2		*pU2in = pLZYin ? (U2*)pLZYin->p_alloc : NULL;
-
+	gpcMASS& mass = *(pWIN->piMASS);
+	gpcGT* pGTusr = NULL;
+	gpcLZY	*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
+			*pLZYout = mass.GTlzyALL.LZY( gpdGTlzyIDout(TnID) ),
+			*pLZYusr = NULL;
+	U2		*pU2inp = gpmLZYvali( U2, pLZYinp ),
+			*pU2out = gpmLZYvali( U2, pLZYout );
+	SOCKET	*pSOCK;
+	U4		nSOCK;
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
 	{
-		if( nSYNsum < nSYNdo )
-		{
-			nSYNsum = nSYNdo;
-			pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
-		}
-
 		U1	*pD000 = (U1*)strcasestr( (char*)pSTR, "d000" );
 		if( pD000 < pSTR )
 		{
@@ -157,7 +177,7 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		// 0000 0000 0000
 		// A090 A090 A490 EA92
 		// AE95 A895 A44A
-		if( pINP->n_load >= 18+nLEN+nSUB )
+		if( pINP->n_load >= 18+nSUB )
 		{
 			pD000 += 12;	// saláta
 			char 	sLEN[] = "0x000000", *pL = sLEN+2,
@@ -166,76 +186,131 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			gpmMEMCPYoff( pL, pD000, 6 );
 			pD000 += 6;
 			nLEN = gpfSTR2U8( sLEN, NULL );
-			pU2in = (U2*)pLZYin->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc;
-
-			for( U4 i = 0; i < nLEN; i+=4 )
+			if( pINP->n_load >= 18+nLEN+nSUB )
 			{
-				gpmMEMCPYoff( pW, pD000+i, 4 );
-				pU2in[i>>2] = gpfSTR2U8( sWORD, NULL );
-				if( i ? true : !pU2in[i>>2] )
-					continue;
-				switch( pU2in[i>>2] )
+				pU2inp = (U2*)pLZYinp->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc;
+
+				for( U4 i = 0; i < nLEN; i+=4 )
 				{
-					case 0xc050:
-						// ASCII-ból binárisba lett kapcsolva
-						aGTcrs[1] = 's';
-						aGTcrs[0] = 0; // NEM ASCII
+					gpmMEMCPYoff( pW, pD000+i, 4 );
+					pU2inp[i>>2] = gpfSTR2U8( sWORD, NULL );
+					if( i ? true : !pU2inp[i>>2] )
+					{
+						if( !pU2out )
+							continue;
 
-						pOUT = pOUT->lzyADD( gpaSLMP[1].aU1, sizeof(gpaSLMP[1]), s = -1 );
-						gpmDEL(pINP);
-						return;
+						pU2out[i>>2] = pU2inp[i>>2];
+						continue;
+					}
+					if( pALL )
+					{
+						pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+						if( !pSOCK )
+						{
+							pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+							pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+							nSOCK = gpmLZYn( pLZYusr, SOCKET );
+						}
+
+						for( U4 iS = 0; iS < nSOCK; iS++ )
+						{
+							pGTusr = pALL->GT( pSOCK[iS] );
+							if( !pGTusr )
+								continue;
+							pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n%s\r\n0x%x>", pD000-18, pGTusr->iCNT );
+
+						}
+					}
+					switch( pU2inp[i>>2] )
+					{
+						case 0xc050:
+							// ASCII-ból binárisba lett kapcsolva
+							i = nLEN;
+
+							/*aGTcrs[1] = 's';
+							aGTcrs[0] = 0; // NEM ASCII
+							pOUT = pOUT->lzyADD( gpaSLMP[1].aU1, sizeof(gpaSLMP[1]), s = -1 );
+							gpmDEL(pINP);
+							return;*/
+							break;
+						default:
+							i = nLEN;
+							break;
+					}
+
 				}
-				break;
-			}
 
-			nSUB += 18+nLEN;
-			iCNT++;
-			nSYNsum++;
+				nSUB += 18+nLEN;
+				iCNT++;
+				//nSYNsum++;
+				pINP->lzySUB( s = 0, nSUB );
+				nSUB = 0;
+				if( nSYNsum < nSYNdo )
+				{
+					if( *pU2inp )
+					{
+
+						return;
+					}
+
+					nSYNsum = nSYNdo;
+					pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
+					return;
+				}
+			}
 		}
-		pINP->lzyINS( NULL, 0, s = 0, nSUB );
+
+
+
+		pINP->lzySUB( s = 0, nSUB );
+		nSUB = 0;
 		if( pINP->n_load )
 			return;
+
+
+
 		gpmDEL(pINP);
-		pU2in = pLZYin ? (U2*)pLZYin->p_alloc : NULL;
+		pU2inp = gpmLZYvali( U2, pLZYinp);
 	}
 
 
-	nLEN = pU2in ? pLZYin->n_load : 0;
+	nLEN = pU2inp ? pLZYinp->n_load : 0;
 	if( !nLEN )
 		return;
 
-	gpcLZY	*pLZYout = pWIN->piMASS->GTlzy.LZY( (TnID&I8x2(1,2))+I8x2(0,1) );
+
 	if( !pLZYout )
 		return;	// valamiért nem tudott csinálni
 
 	if( !pLZYout->n_load )
 	{
 		// nem volt benne semmi azaz használjuk azt amit a robot adott
-		pLZYout->lzyADD( pU2in, nLEN, s = 0 );
+		pLZYout->lzyADD( pU2inp, nLEN, s = 0 );
 		iCNT++;
 		return;
 	}
 
-	U2* pU2out = (U2*)pLZYout->p_alloc;
+	if( !pU2out )
+		pU2out = gpmLZYvali( U2, pLZYout );
 	if( nLEN > pLZYout->n_load )
 		nLEN = pLZYout->n_load;
 
-	nLEN /= sizeof(*pU2in);
+	nLEN /= sizeof(*pU2inp);
 	if( nLEN < 2 )
 		return;
 
 	nLEN--;
-	pU2in++;
+	pU2inp++;
 	pU2out++;
 
-	U4 iU2 = gpmMEMCMP( pU2in, pU2out, nLEN*sizeof(*pU2in) )/sizeof(*pU2in),
-	i_cpy, n_cpy, nGD, nOld = pOUT ? pOUT->n_load : 0;
+	U4 iU2 = gpmMEMCMP( pU2inp, pU2out, nLEN*sizeof(*pU2inp) )/sizeof(*pU2inp),
+	i_cpy, n_cpy, iDEAD, nOld = pOUT ? pOUT->n_load : 0;
 	while( iU2 < nLEN )
 	{
 		i_cpy = iU2;
 		while( iU2 < nLEN )
 		{
-			if( pU2in[iU2] == pU2out[iU2] )
+			if( pU2inp[iU2] == pU2out[iU2] )
 				break;
 
 			iU2++;
@@ -243,12 +318,10 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 		if( n_cpy = iU2-i_cpy )
 		{
-			iU2 += n_cpy;
+			//iU2 += n_cpy;
 			if( iU2 > nLEN )
 				iU2 = nLEN;
 			n_cpy = iU2-i_cpy;
-
-
 
 			// \n send dadogjon
 			if( nOld )
@@ -270,29 +343,53 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 			pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_send_LN4SL6N4, 0x18 + 4*n_cpy, i_cpy, n_cpy );
 			pOUT->lzyINS( NULL, 4*n_cpy, s = -1, -1 );
-			for( ; i_cpy < iU2; i_cpy++ )
-				s += sprintf( (char*)pOUT->p_alloc+s, "%0.4x", pU2out[i_cpy] );
 
+			for( iDEAD = i_cpy; i_cpy < iU2; i_cpy++ )
+			{
+				s += sprintf( (char*)pOUT->p_alloc+s, "%0.4X\r\n", pU2out[i_cpy] )-2;
+				pU2out[i_cpy] = pU2inp[i_cpy];
+			}
+			pU2inp[iDEAD] = pU2out[iDEAD] = 0xdead;
 			//s += sprintf( (char*)pOUT->p_alloc+s, "0000" );
-			if( iU2 >= nLEN )
-				break;
+			//if( iU2 >= nLEN )
+			break;
 		}
 
-		iU2 += gpmMEMCMP( pU2in+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2in) )/sizeof(*pU2in);
+		iU2 += gpmMEMCMP( pU2inp+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
 	}
 
 	if( nOld < (pOUT ? pOUT->n_load : 0) )
 	{
-		if( nOld < pOUT->n_load )
+		nSYNsum = nSYNdo;
+		nSYNdo++;
+
+		if( pALL )
+		{
+			pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+			if( !pSOCK )
+			{
+				pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+				pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+				nSOCK = gpmLZYn( pLZYusr, SOCKET );
+			}
+
+			for( U4 iS = 0; iS < nSOCK; iS++ )
+			{
+				pGTusr = pALL->GT( pSOCK[iS] );
+				if( !pGTusr )
+					continue;
+				pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n%s", pOUT->p_alloc+nOld );
+			}
+		}
+		/*if( nOld < pOUT->n_load )
 		{
 			aGTcrs[1] = 's';
 			pOUT->p_alloc[pOUT->n_load] = aGTcrs[0] = '\n';
 			pOUT->n_load++;
 			pOUT->p_alloc[pOUT->n_load] = 0;
 		}
-		nSYNsum = nSYNdo;
-		nSYNdo++;
-		pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
+
+		pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );*/
 	}
 
 	//nOUT = GTout( pWIN );
@@ -306,8 +403,8 @@ void gpcGT::GTslmpBIN( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		return;
 
 	U4 nLEN = 0;
-	gpcLZY	*pLZYin = pWIN->piMASS->GTlzy.LZY( TnID&I8x2(1,2) );
-	U2		*pU2in = pLZYin ? (U2*)pLZYin->p_alloc : NULL;
+	gpcLZY	*pLZYinp = pWIN->piMASS->GTlzyALL.LZY( gpdGTlzyIDinp(TnID) );
+	U2		*pU2inp = pLZYinp ? (U2*)pLZYinp->p_alloc : NULL;
 
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
@@ -352,15 +449,15 @@ void gpcGT::GTslmpBIN( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		if( pINP->n_load >= pD000->nEND()+nSUB )
 		{
 			nLEN = pD000->nLEN;
-			pU2in = (U2*)pLZYin->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc;
-			gpmMEMCPY( pU2in, pD000->pCPY(), nLEN );
+			pU2inp = (U2*)pLZYinp->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc;
+			gpmMEMCPY( pU2inp, pD000->pCPY(), nLEN );
 			/*for( U4 i = 0; i < nLEN; i+=4 )
 			{
 				gpmMEMCPYoff( pW, pD000+i, 4 );
-				pU2in[i>>2] = gpfSTR2U8( sWORD, NULL );
-				if( i ? true : !pU2in[i>>2] )
+				pU2inp[i>>2] = gpfSTR2U8( sWORD, NULL );
+				if( i ? true : !pU2inp[i>>2] )
 					continue;
-				switch( pU2in[i>>2] )
+				switch( pU2inp[i>>2] )
 				{
 					case 0xc050:
 						// ASCII-ból binárisba lett kapcsolva
@@ -382,22 +479,22 @@ void gpcGT::GTslmpBIN( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		if( pINP->n_load )
 			return;
 		gpmDEL(pINP);
-		pU2in = pLZYin ? (U2*)pLZYin->p_alloc : NULL;
+		pU2inp = pLZYinp ? (U2*)pLZYinp->p_alloc : NULL;
 	}
 
 
-	nLEN = pU2in ? pLZYin->n_load : 0;
+	nLEN = pU2inp ? pLZYinp->n_load : 0;
 	if( !nLEN )
 		return;
 
-	gpcLZY	*pLZYout = pWIN->piMASS->GTlzy.LZY( (TnID&I8x2(1,2))+I8x2(0,1) );
+	gpcLZY	*pLZYout = pWIN->piMASS->GTlzyALL.LZY( gpdGTlzyIDout(TnID) );
 	if( !pLZYout )
 		return;	// valamiért nem tudott csinálni
 
 	if( !pLZYout->n_load )
 	{
 		// nem volt benne semmi azaz használjuk azt amit a robot adott
-		pLZYout->lzyADD( pU2in, nLEN, s = 0 );
+		pLZYout->lzyADD( pU2inp, nLEN, s = 0 );
 		iCNT++;
 		return;
 	}
@@ -406,22 +503,22 @@ void gpcGT::GTslmpBIN( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( nLEN > pLZYout->n_load )
 		nLEN = pLZYout->n_load;
 
-	nLEN /= sizeof(*pU2in);
+	nLEN /= sizeof(*pU2inp);
 	if( nLEN < 2 )
 		return;
 
 	nLEN--;
-	pU2in++;
+	pU2inp++;
 	pU2out++;
 
-	U4 iU2 = gpmMEMCMP( pU2in, pU2out, nLEN*sizeof(*pU2in) )/sizeof(*pU2in),
+	U4 iU2 = gpmMEMCMP( pU2inp, pU2out, nLEN*sizeof(*pU2inp) )/sizeof(*pU2inp),
 	i_cpy, n_cpy, nGD, nOld = pOUT ? pOUT->n_load : 0;
 	while( iU2 < nLEN )
 	{
 		i_cpy = iU2;
 		while( iU2 < nLEN )
 		{
-			if( pU2in[iU2] == pU2out[iU2] )
+			if( pU2inp[iU2] == pU2out[iU2] )
 				break;
 
 			iU2++;
@@ -449,7 +546,7 @@ void gpcGT::GTslmpBIN( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 		}
 
-		iU2 += gpmMEMCMP( pU2in+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2in) )/sizeof(*pU2in);
+		iU2 += gpmMEMCMP( pU2inp+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
 	}
 	if( nOld >= (pOUT ? pOUT->n_load : 0) )
 		return;

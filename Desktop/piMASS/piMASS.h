@@ -294,6 +294,7 @@ class gpcMASS;
 #define gpdCRall I4x2(1,2)
 
 
+
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 {
@@ -3854,8 +3855,9 @@ public:
 	}
 };
 
-
-
+#define gpdLZYallGT 4
+#define gpmLZYvali( a, b ) ((a*)( b ? b->p_alloc : NULL ))
+#define gpmLZYn( p, t ) ((p) ? ((p)->n_load/sizeof(t)) : 0 )
 class gpcLZY
 {
 public:

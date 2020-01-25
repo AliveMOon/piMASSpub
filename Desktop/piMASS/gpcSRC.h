@@ -1146,7 +1146,7 @@ public:
 				rstLEV, iLEV, nLEV, topLEV;
 
 	/// GATE --------
-	gpcLZYall	GTlzy;
+	gpcLZYall	GTlzyALL;
 	gpcGTall	GTacpt, GTcnct;
 	gpcLZY		*pJPGsnd;
 	/// PIC ---------
