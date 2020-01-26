@@ -4200,7 +4200,7 @@ public:
 		if( this ? !n_sub : true )
 		{
 			n_start = 0;
-			return NULL;
+			return this;
 		}
 		if( !n_sub )
 		{

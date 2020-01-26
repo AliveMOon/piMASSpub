@@ -11,14 +11,15 @@
 				          //   +-->+>+>+-->+>+-->.x00.x04.x08.x0C.x10.x14.x18.x1c.x20  28  32  36  40
 				          // \n500000FF03FF000020000014010000D*000000000265686f6c
 
-#define gpdSLMP_recv_LN4SL6N4 "500000FF03FF00%0.4X000004010000D*%0.6X%0.4X0000"
-//   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..
-#define gpdSLMP_send_LN4SL6N4 "500000FF03FF00%0.4X000014010000D*%0.6X%0.4X"
+#define gpdSLMP_recv_LN4SL6N4 "500000FF03FF00%0.4X000004010000D*%0.6d%0.4X"//"0000"
+						  //   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..
+#define gpdSLMP_send_LN4SL6N4 "500000FF03FF00%0.4X000014010000D*%0.6d%0.4X"
 //#define gpdRECVn (0x30000/12)
 #define gpdGTlzyID		I8x2(1,gpdLZYallGT)
 #define gpdGTlzyIDinp( p ) ((p)&gpdGTlzyID)
 #define gpdGTlzyIDout( p ) (((p)&gpdGTlzyID)+I8x2(0,1))
 #define gpdGTlzyIDusr( p ) (((p)&gpdGTlzyID)+I8x2(0,2))
+#define gpdGTlzyIDdif( p ) (((p)&gpdGTlzyID)+I8x2(0,3))
 
 class gpcSLMP
 {

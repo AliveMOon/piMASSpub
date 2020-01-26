@@ -894,7 +894,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			break;
 	}
 
-	if( aGTfd[gpeFDsnd].isFD(socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
+	if( aGTfd[gpeFDsnd].isFD(socket) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 	{
 		U8 s, nOUT = GTout( &win );
 		if( nOUT <= (gpdHUDn*2) )
