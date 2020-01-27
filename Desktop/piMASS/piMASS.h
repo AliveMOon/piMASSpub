@@ -3856,7 +3856,7 @@ public:
 };
 
 #define gpdLZYallGT 4
-#define gpmLZYvali( a, b ) ((a*)( b ? b->p_alloc : NULL ))
+#define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
 #define gpmLZYn( p, t ) ((p) ? ((p)->n_load/sizeof(t)) : 0 )
 class gpcLZY
 {
@@ -4147,27 +4147,26 @@ public:
 		p_alloc[n_load] = 0;
 		return this;
 	}
-	U2* u2VALID( gpcLZY* pLZY, U2* pU2 = NULL )
+	void* u2VALID( gpcLZY* pLZY, void* pTHIS = NULL )
 	{
 		if( !this )
-			return NULL;
+			return NULL; // ha nincsen thisLZY akkor nem lehet valós pU2
 
-		if( pU2 )
-		if( pLZY->n_load > n_load )
-			pU2 = NULL;
+		if( pTHIS != (void*)p_alloc )
+			pTHIS = NULL;
+		else if( pLZY->n_load > n_load )
+			pTHIS = NULL;	// pLZY nagyobb akkor sem jó pLZY-ben több az adat
 
-		if( pU2 )
-			return (U2*)p_alloc;
+		if( pTHIS )
+			return (void*)p_alloc; // tehát ha nem lett NULL akor VALID
 
-		if( pLZY->n_load > n_load )
-		{
-			U8 s = -1;
-			lzyADD(
-					pLZY->p_alloc+n_load,
-					pLZY->n_load-n_load, s
-				);
-		}
-		return (U2*)p_alloc;
+		if( pLZY->n_load <= n_load )
+			return (void*)p_alloc;
+
+		/// pLZY töltve lett, a fölét a IDE(this) is feltöltjük
+		U8 STRT = -1;
+		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
+		return (void*)p_alloc;
 	}
 	U4* u4VALID( gpcLZY* pLZY, U4* pU4 = NULL )
 	{

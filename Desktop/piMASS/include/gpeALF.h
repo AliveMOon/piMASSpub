@@ -659,6 +659,9 @@ typedef enum gpeALF: I8
 	gpeALF_PMY = gpdABC('P', 'M', 'Y'),
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
 	gpeALF_PNT = gpdABC('P', 'N', 'T'),
+
+	gpeALF_POS = gpdABC('P', 'O', 'S'),
+
 	gpeALF_PRG = gpdABC('P', 'R', 'G'),
 	gpeALF_REF = gpdABC('R', 'E', 'F'),
 	gpeALF_REG = gpdABC('R', 'E', 'G'),
@@ -839,6 +842,8 @@ typedef enum gpeALF: I8
 	gpeALF_SQRT = gpdABCD('S', 'Q', 'R', 'T'),
 	gpeALF_SYNC = gpdABCD('S', 'Y', 'N', 'C'),
 
+	gpeALF_TOOL = gpdABCD('T', 'O', 'O', 'L'),
+
 	gpeALF_TRGH = gpdABCD('T', 'R', 'G', 'H'),
 	gpeALF_TRGW = gpdABCD('T', 'R', 'G', 'W'),
 
@@ -913,8 +918,10 @@ typedef enum gpeALF: I8
 	gpeALF_SHARE = gpdABCDE('S', 'H', 'A', 'R', 'E'),
 	gpeALF_SHOES = gpdABCDE('S', 'H', 'O', 'E', 'S'),
 	gpeALF_SLEFT = gpdABCDE('S', 'L', 'E', 'F', 'T'),
-	gpeALF_STORE = gpdABCDE('S', 'T', 'O', 'R', 'E'),
 
+	gpeALF_SPEED = gpdABCDE('S', 'P', 'E', 'E', 'D'),
+
+	gpeALF_STORE = gpdABCDE('S', 'T', 'O', 'R', 'E'),
 	gpeALF_STACK = gpdABCDE('S', 'T', 'A', 'C', 'K'),
 	gpeALF_STONE = gpdABCDE('S', 'T', 'O', 'N', 'E'),
 	gpeALF_TABWH = gpdABCDE('T', 'A', 'B', 'W', 'H'),

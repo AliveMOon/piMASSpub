@@ -17,7 +17,7 @@
 //#define gpdRECVn (0x30000/12)
 #define gpdGTlzyID		I8x2(1,gpdLZYallGT)
 #define gpdGTlzyIDinp( p ) ((p)&gpdGTlzyID)
-#define gpdGTlzyIDout( p ) (((p)&gpdGTlzyID)+I8x2(0,1))
+#define gpdGTlzyIDref( p ) (((p)&gpdGTlzyID)+I8x2(0,1))
 #define gpdGTlzyIDusr( p ) (((p)&gpdGTlzyID)+I8x2(0,2))
 #define gpdGTlzyIDdif( p ) (((p)&gpdGTlzyID)+I8x2(0,3))
 
@@ -300,7 +300,22 @@ class gpcGT
 
             return msGTdie&1;
         }
+		gpcLZY* GTback()
+		{
+			if( !this )
+				return NULL;
+			U8 s;
+			pOUT = pOUT->lzyFRMT( s = -1, "  \r0x%x>", iCNT );
+			if( !pINP )
+				return pOUT;
 
+			pOUT = pOUT->lzyFRMT(
+									s = -1,
+									"%s",
+									pINP->p_alloc ? (char*)pINP->p_alloc : ""
+								);
+			return pOUT;
+		}
 		~gpcGT() { GTclose(); };
 		gpcGT( I8x2 id, I4 prt, SOCKET sock = INVALID_SOCKET )
 		{
@@ -358,7 +373,11 @@ class gpcGT
 		}
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
 		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
-		void 	GTslmpBIN( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
+
+		gpcLZY* GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
+		void 	GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
+		void 	GTslmpBINref( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
+
 		void	GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );
 
