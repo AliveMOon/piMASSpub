@@ -48,6 +48,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	}
 	///-----------------------------
 	U2 nU2 = gpmLZYn( pLZYinp, U2 ), *pU2i = NULL, *pU2o = NULL;
+	I2* pI2;
 	if( !nU2 )
 		return pANS->lzyFRMT( s, "nonsens" );
 
@@ -124,8 +125,9 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 							*(U4*)(pU2o+iEmpty) = comA;
 							gpmSTRnCPY( pU2o+iEmpty-6, "PxPyPzDaDbDc", 12 );
 						}
+
 					}
-					break;
+					continue;
 			}
 		} else if( iNUM > 7 )
 			return pANS->lzyFRMT( s, "nonsens" );
@@ -148,7 +150,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->u2VALID(pLZYinp);
 		if( !pU2o )
 			return pANS->lzyFRMT( s, "nonsens" );
-
+		pI2 = (I2*)pU2o;
 		iCou = iCin+2;
         switch(iNUM)
         {
@@ -161,9 +163,9 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 4:
 			case 5:
 				if( d8 != 0.0 )
-					pU2o[iCou+iNUM] = d8*16.0;
+					pI2[iCou+iNUM] = d8*16.0;
 				else
-					pU2o[iCou+iNUM] = an.num*16;
+					pI2[iCou+iNUM] = an.num*16;
 				break;
 			case 6:
 				// SPEED
@@ -183,7 +185,23 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
         }
 
 	}
-    return pANS->lzyFRMT( s, "ok" );
+	if( !pU2i )
+		return pANS->lzyFRMT( s, "nonsens" );
+
+	if( iCin < nU2 )
+	{
+		if( !pI2 )
+			pI2 = (I2*)pU2i;
+		comA = *(U4*)(pU2i+iCin);
+		iCou = iCin+2;
+		pANS = pANS->lzyFRMT(
+								s = -1, "%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f° B:%.2f° C:%.2f°", sCOM,
+								double(pI2[iCou])/16.0, double(pI2[iCou+1])/16.0, double(pI2[iCou+2])/16.0,
+								double(pI2[iCou+3])/16.0, double(pI2[iCou+4])/16.0, double(pI2[iCou+5])/16.0
+							);
+		return pANS;
+	}
+    return pANS->lzyFRMT( s = -1, "ok" );
 }
 
 void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
