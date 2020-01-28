@@ -14,7 +14,31 @@ extern char gpsTAB[], *gppTAB;
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
+gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
+{
+	U1 	sCOM[] = "ABCD";
+	U4 &comA = *(U4*)sCOM;
 
+	comA = *(U4*)pU2;
+	U4 spd = (*(U4*)(pU2+32));
+	U8 s;
+	pANS = pANS->lzyFRMT(
+							s = -1, "%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
+							sCOM,
+							double(*(U4*)(pU2+2+16+0))/100.0,
+							double(*(U4*)(pU2+2+16+2))/100.0,
+							double(*(U4*)(pU2+2+16+4))/100.0,
+
+							double(*(U4*)(pU2+2+48+0))/100.0,
+							double(*(U4*)(pU2+2+48+2))/100.0,
+							double(*(U4*)(pU2+2+48+4))/100.0,
+
+							spd&0xffffff,
+							spd>>24
+
+						);
+	return pANS;
+}
 gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
@@ -47,14 +71,15 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		nSOCK = gpmLZYn(pLZYusr,sockUSR);
 	}
 	///-----------------------------
-	U2 nU2 = gpmLZYn( pLZYinp, U2 ), *pU2i = NULL, *pU2o = NULL;
-	I2* pI2;
+	U2 *pU2i = NULL, *pU2o = NULL;
+	U4 nU2 = gpmLZYn( pLZYinp, *pU2i );
+	//I2* pI2;
 	if( !nU2 )
 		return pANS->lzyFRMT( s, "nonsens" );
 
 	U1 	sCOM[] = "ABCD",
 		*pCOM, *pEND = pSTR+n, *pNUM;
-	U4& comA = *(U4*)sCOM, iCin, iCou, iEmpty = 0, iNUM = -1, u4TMP;
+	U4& comA = *(U4*)sCOM, iCin = 0, iCin2 = 0, iEmpty = 0, iNUM = -1, spd;
 	// na nézzük mit akar
 	I8x2 an;
 	double d8;
@@ -70,7 +95,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			switch( an.alf )
 			{
 				case gpeALF_FORMAT:
-					pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->u2VALID(pLZYinp);
+					pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp);
 					if( !pU2o )
 						return pANS->lzyFRMT( s, "nonsens" );
 					gpmZn( pU2o, nU2 );
@@ -78,13 +103,13 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 				case gpeALF_HELO:
 				case gpeALF_HELLO:
-					return pANS->lzyFRMT( s = -1, "Hello! %d", iCou );
+					return pANS->lzyFRMT( s = -1, "Hello! %d", iCin );
 				case gpeALF_HELP:
-					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iCou );
+					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iCin );
 				case gpeALF_LINE:
-					return pANS->lzyFRMT( s = -1, "Line.txt %d", iCou );
+					return pANS->lzyFRMT( s = -1, "Line.txt %d", iCin );
 				case gpeALF_JOIN:
-					return pANS->lzyFRMT( s = -1, "Join.txt %d", iCou );
+					return pANS->lzyFRMT( s = -1, "Join.txt %d", iCin );
 
 				case gpeALF_POS:
 					iNUM = 0;
@@ -100,10 +125,14 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					break;
 				default:
 					if( an.num >= 4 ) {
+
+
+
+
 						comA = *(U4*)pCOM;
 						iEmpty = nU2;
 						if( pU2i = (U2*)pLZYinp->p_alloc )
-						for( iCin = 17, nU2 = iEmpty; iCin < nU2; iCin+=32 )
+						for( iCin = 129, nU2 = iEmpty; iCin < nU2; iCin+=64 )
 						{
 							if( *(U4*)(pU2i+iCin) == comA )
 								break;	// iCin menjen végig
@@ -118,21 +147,37 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						if( iCin >= nU2 )
 						if( iEmpty < nU2 )
 						{
-							pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->u2VALID(pLZYinp);
+							iCin = iEmpty;	// ha kiszeded nem olvas init adatokat
+
+							pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp);
 							if( !pU2o )
 								return pANS->lzyFRMT( s, "nonsens" );
 
 							*(U4*)(pU2o+iEmpty) = comA;
-							gpmSTRnCPY( pU2o+iEmpty-6, "PxPyPzDaDbDc", 12 );
+							gpmSTRnCPY( pU2o+iEmpty+2		, "posXposYposZ", 12 );
+							gpmSTRnCPY( pU2o+iEmpty+8		, "ACT:", 4 );
+							gpmSTRnCPY( pU2o+iEmpty+16		, "TRG:", 4 );
+							gpmSTRnCPY( pU2o+iEmpty+24		, "DIF:", 4 );
+							gpmSTRnCPY( pU2o+iEmpty+32+2	, "degXdegYdegZ", 12 );
+							gpmSTRnCPY( pU2o+iEmpty+32+8	, "ACT:", 4 );
+							gpmSTRnCPY( pU2o+iEmpty+32+16	, "TRG:", 4 );
+							gpmSTRnCPY( pU2o+iEmpty+32+24	, "DIF:", 4 );
+
 						}
 
+						if( iCin2 >= 129 )
+						if( iCin2 != iCin )
+							pANS = gpcGTslmpSTAT( pANS, pU2i+iCin2 );
+
+						iCin2 = iCin;
 					}
-					continue;
 			}
+			continue;
 		} else if( iNUM > 7 )
 			return pANS->lzyFRMT( s, "nonsens" );
-		else
-			iNUM++;
+
+		if( iCin < 129 )
+			return pANS->lzyFRMT( s, "Who?" );
 
 
 		pNUM = pSTR;
@@ -147,59 +192,68 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				d8 += strtod( (char*)pSTR, (char**)&pSTR );
 		}
 
-		pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->u2VALID(pLZYinp);
+		pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp);
 		if( !pU2o )
 			return pANS->lzyFRMT( s, "nonsens" );
-		pI2 = (I2*)pU2o;
-		iCou = iCin+2;
+		//pI4 = (I4*)pU2o;
+		//iCou = iCin+2;
         switch(iNUM)
         {
 				// POS
 			case 0:
 			case 1:
 			case 2:
+				((I4*)(pU2o+iCin+2+16))[iNUM%3] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
 				// DIR
 			case 3:
 			case 4:
 			case 5:
-				if( d8 != 0.0 )
-					pI2[iCou+iNUM] = d8*16.0;
-				else
-					pI2[iCou+iNUM] = an.num*16;
+				((I4*)(pU2o+iCin+2+48))[iNUM%3] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 6:
 				// SPEED
-				u4TMP = (*(U4*)(pU2o+iCou+iNUM))>>24;
+				spd = (*(U4*)(pU2o+iCin+32))>>24;
 				for( U1 i = 0; i < 6; i++ )
 				{
-					u4TMP <<= 4;
-					u4TMP |= an.num%10;
-					an.num /= 10;
+					spd <<= 4;
+					spd |= (an.num/100000)%10;
+					an.num *= 10;
 				}
-				*(U4*)(pU2o+iCou+iNUM) = u4TMP;
+				*(U4*)(pU2o+iCin+32) = spd;
 				break;
 			case 7:
 				// TOOL
-				((char*)(pU2o+iCou+iNUM))[1] = an.num;
+				((char*)(pU2o+iCin+32+1))[1] = an.num;
 				break;
         }
 
+		iNUM++;
 	}
 	if( !pU2i )
 		return pANS->lzyFRMT( s, "nonsens" );
 
 	if( iCin < nU2 )
 	{
-		if( !pI2 )
-			pI2 = (I2*)pU2i;
-		comA = *(U4*)(pU2i+iCin);
-		iCou = iCin+2;
+		/*comA = *(U4*)(pU2i+iCin);
+		//iCou = iCin+2;
+		U4 spd = (*(U4*)(pU2i+iCin+32));
 		pANS = pANS->lzyFRMT(
-								s = -1, "%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f° B:%.2f° C:%.2f°", sCOM,
-								double(pI2[iCou])/16.0, double(pI2[iCou+1])/16.0, double(pI2[iCou+2])/16.0,
-								double(pI2[iCou+3])/16.0, double(pI2[iCou+4])/16.0, double(pI2[iCou+5])/16.0
-							);
-		return pANS;
+								s = -1, "%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
+								sCOM,
+								double(*(U4*)(pU2i+iCin+2+16+0))/100.0,
+								double(*(U4*)(pU2i+iCin+2+16+2))/100.0,
+								double(*(U4*)(pU2i+iCin+2+16+4))/100.0,
+
+								double(*(U4*)(pU2i+iCin+2+48+0))/100.0,
+								double(*(U4*)(pU2i+iCin+2+48+2))/100.0,
+								double(*(U4*)(pU2i+iCin+2+48+4))/100.0,
+
+								spd&0xffffff,
+								spd>>24
+
+							);*/
+		return gpcGTslmpSTAT( pANS, pU2i+iCin );
 	}
     return pANS->lzyFRMT( s = -1, "ok" );
 }
@@ -512,9 +566,9 @@ gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUS
 			{
 				iCou = iCin = nU2;
 				// nem vol egyáltalán
-				pU2o = (U2*)(pLZYout->u2VALID(pLZYinp,pU2o));
+				pU2o = (U2*)(pLZYout->pVALID(pLZYinp,pU2o));
 				if( !pU2o )
-					pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->u2VALID(pLZYinp));
+					pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp));
 
 				if( pU2o )
 				for( iCou = 17, nU2 = pLZYout->n_load/sizeof(U2); iCou < nU2; iCou+=8 )
@@ -528,7 +582,7 @@ gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUS
 				iCou = iCin;
 
 			if( !pU2o )
-				pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->u2VALID(pLZYinp));
+				pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp));
 
 			if( pU2o )
 				*(U4*)(pU2o+iCou) = com;

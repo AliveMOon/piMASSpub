@@ -371,6 +371,7 @@ class gpcGT
 
 			return iCNT;
 		}
+		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
 		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 

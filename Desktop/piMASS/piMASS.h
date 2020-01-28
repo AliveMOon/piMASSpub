@@ -4147,7 +4147,7 @@ public:
 		p_alloc[n_load] = 0;
 		return this;
 	}
-	void* u2VALID( gpcLZY* pLZY, void* pTHIS = NULL )
+	void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL )
 	{
 		if( !this )
 			return NULL; // ha nincsen thisLZY akkor nem lehet valós pU2
@@ -4168,7 +4168,7 @@ public:
 		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
 		return (void*)p_alloc;
 	}
-	U4* u4VALID( gpcLZY* pLZY, U4* pU4 = NULL )
+	/*U4* VALID( gpcLZY* pLZY, U4* pU4 = NULL )
 	{
 		if( !this )
 			return NULL;
@@ -4190,6 +4190,28 @@ public:
 		}
 		return (U4*)p_alloc;
 	}
+	I4* VALID( gpcLZY* pLZY, I4* pI4 = NULL )
+	{
+		if( !this )
+			return NULL;
+
+		if( pI4 )
+		if( pLZY->n_load > n_load )
+			pI4 = NULL;
+
+		if( pI4 )
+			return (U4*)p_alloc;
+
+		if( pLZY->n_load > n_load )
+		{
+			U8 s = -1;
+			lzyADD(
+					pLZY->p_alloc+n_load,
+					pLZY->n_load-n_load, s
+				);
+		}
+		return (I4*)p_alloc;
+	}*/
 	gpcLZY* lzyPLUS(  const gpcLZY* p_b, U8& n_start )
 	{
 		return lzyADD( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
