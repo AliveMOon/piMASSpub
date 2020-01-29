@@ -23,7 +23,7 @@ gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
 	U4 spd = (*(U4*)(pU2+32));
 	U8 s;
 	pANS = pANS->lzyFRMT(
-							s = -1, "%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
+							s = -1, "\r\n%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
 							sCOM,
 							double(*(U4*)(pU2+2+16+0))/100.0,
 							double(*(U4*)(pU2+2+16+2))/100.0,
@@ -234,28 +234,9 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		return pANS->lzyFRMT( s, "nonsens" );
 
 	if( iCin < nU2 )
-	{
-		/*comA = *(U4*)(pU2i+iCin);
-		//iCou = iCin+2;
-		U4 spd = (*(U4*)(pU2i+iCin+32));
-		pANS = pANS->lzyFRMT(
-								s = -1, "%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
-								sCOM,
-								double(*(U4*)(pU2i+iCin+2+16+0))/100.0,
-								double(*(U4*)(pU2i+iCin+2+16+2))/100.0,
-								double(*(U4*)(pU2i+iCin+2+16+4))/100.0,
-
-								double(*(U4*)(pU2i+iCin+2+48+0))/100.0,
-								double(*(U4*)(pU2i+iCin+2+48+2))/100.0,
-								double(*(U4*)(pU2i+iCin+2+48+4))/100.0,
-
-								spd&0xffffff,
-								spd>>24
-
-							);*/
 		return gpcGTslmpSTAT( pANS, pU2i+iCin );
-	}
-    return pANS->lzyFRMT( s = -1, "ok" );
+
+	return pANS->lzyFRMT( s = -1, "ok" );
 }
 
 void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
@@ -434,8 +415,11 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 	while( iU2 < nLEN )
 	{
-		i_cpy = iU2;
-		while( iU2 < nLEN )
+		i_cpy = iU2&(~0x7);
+		iU2 = i_cpy+8;
+		if( iU2 > nLEN )
+			iU2 = nLEN;
+		else while( iU2 < nLEN )
 		{
 			if( pU2inp[iU2] == pU2out[iU2] )
 				break;
