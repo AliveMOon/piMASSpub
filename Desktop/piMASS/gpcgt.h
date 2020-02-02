@@ -362,8 +362,8 @@ class gpcGT
 			if( this ? sGTent[0] : true )
 				return false;
 
-			U8 s;
-			pOUT = pOUT->lzyFRMT( s = -1, "%s%x>", bENT?"\r\n":"    \r",iCNT );
+			U8 s = -1;
+			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
 			return true;
 		}
 		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
