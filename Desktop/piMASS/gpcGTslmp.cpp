@@ -54,7 +54,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	U4 iSOCK = 0, nSOCK = 0;
 	if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
 	{
-        nSOCK = gpmLZYn(pLZYusr,sockUSR);
+        nSOCK = gpmLZYload(pLZYusr,sockUSR);
         for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
         {
 			if( pSOCK[iSOCK] != sockUSR )
@@ -68,11 +68,11 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		// új felhasználó!
 		pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
 		iSOCK = nSOCK;
-		nSOCK = gpmLZYn(pLZYusr,sockUSR);
+		nSOCK = gpmLZYload(pLZYusr,sockUSR);
 	}
 	///-----------------------------
 	U2 *pU2i = NULL, *pU2o = NULL;
-	U4 nU2 = gpmLZYn( pLZYinp, *pU2i );
+	U4 nU2 = gpmLZYload( pLZYinp, *pU2i );
 	//I2* pI2;
 	if( !nU2 )
 		return pANS->lzyFRMT( s, "nonsens" );
@@ -125,9 +125,6 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					break;
 				default:
 					if( an.num >= 4 ) {
-
-
-
 
 						comA = *(U4*)pCOM;
 						iEmpty = nU2;
@@ -245,7 +242,7 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	if( nOUT )
 		return;
 
-	if( aGTcrs[1] == 's' && !aGTcrs[0] )
+	if( sGTent[2] == 's' && sGTent[0] == 'b' )
 		return GTslmpBINref( mom, pWIN, pALL );
 
 	U4 nLEN = 0, nU2;
@@ -325,7 +322,7 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 				{
 					pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 					pSOCK = gpmLZYvali( SOCKET, pLZYusr );
-					nSOCK = gpmLZYn( pLZYusr, SOCKET );
+					nSOCK = gpmLZYload( pLZYusr, SOCKET );
 				}
 
 				for( U4 iS = 0; iS < nSOCK; iS++ )
@@ -437,8 +434,8 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			// \n send dadogjon
 			if( nOld )
 			{
-				aGTcrs[1] = 's';
-				pOUT->p_alloc[pOUT->n_load] = aGTcrs[0] = '\n';
+				sGTent[2] = 's';
+				pOUT->p_alloc[pOUT->n_load] = sGTent[0] = '\n';
 				pOUT->n_load++;
 				pOUT->p_alloc[pOUT->n_load] = 0;
 			}
@@ -473,7 +470,7 @@ void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			{
 				//pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 				pSOCK = gpmLZYvali( SOCKET, pLZYusr=mass.GTlzyALL.LZY(gpdGTlzyIDusr(TnID)) ); //pLZYusr );
-				nSOCK = gpmLZYn( pLZYusr, SOCKET );
+				nSOCK = gpmLZYload( pLZYusr, SOCKET );
 			}
 
 			for( U4 iS = 0; iS < nSOCK; iS++ )
@@ -511,7 +508,7 @@ gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUS
 	U4 iSOCK = 0, nSOCK = 0;
 	if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
 	{
-        nSOCK = gpmLZYn(pLZYusr,sockUSR);
+        nSOCK = gpmLZYload(pLZYusr,sockUSR);
         for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
         {
 			if( pSOCK[iSOCK] != sockUSR )
@@ -524,7 +521,7 @@ gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUS
 	{
 		pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
 		iSOCK = nSOCK;
-		nSOCK = gpmLZYn(pLZYusr,sockUSR);
+		nSOCK = gpmLZYload(pLZYusr,sockUSR);
 	}
 
 	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ) )
@@ -602,7 +599,7 @@ void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	if( nOUT )
 		return;
 
-	if( aGTcrs[1] == 's' && !aGTcrs[0] )
+	if( sGTent[2] == 's' && sGTent[0] == 'b' )
 		return GTslmpBINref( mom, pWIN, pALL );
 
 	U4 nLEN = 0, nU2;
@@ -682,7 +679,7 @@ void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 				{
 					pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 					pSOCK = gpmLZYvali( SOCKET, pLZYusr );
-					nSOCK = gpmLZYn( pLZYusr, SOCKET );
+					nSOCK = gpmLZYload( pLZYusr, SOCKET );
 				}
 
 				for( U4 iS = 0; iS < nSOCK; iS++ )
@@ -791,8 +788,8 @@ void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			// \n send dadogjon
 			if( nOld )
 			{
-				aGTcrs[1] = 's';
-				pOUT->p_alloc[pOUT->n_load] = aGTcrs[0] = '\n';
+				sGTent[2] = 's';
+				pOUT->p_alloc[pOUT->n_load] = sGTent[0] = '\n';
 				pOUT->n_load++;
 				pOUT->p_alloc[pOUT->n_load] = 0;
 			}
@@ -827,7 +824,7 @@ void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			{
 				//pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 				pSOCK = gpmLZYvali( SOCKET, pLZYusr=mass.GTlzyALL.LZY(gpdGTlzyIDusr(TnID)) ); //pLZYusr );
-				nSOCK = gpmLZYn( pLZYusr, SOCKET );
+				nSOCK = gpmLZYload( pLZYusr, SOCKET );
 			}
 
 			for( U4 iS = 0; iS < nSOCK; iS++ )
@@ -875,7 +872,7 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 		}*/
 		if( (U1*)strcasestr( (char*)pSTR, "d000" ) == pSTR )
 		{
-			aGTcrs[0] = '/n';
+			sGTent[0] = '\n';	// visza kapcsol ASCII-ba
 			return GTslmp( mom, pWIN, pALL );
 		}
 		gpcSLMP* pD000 = (gpcSLMP*)(pSTR + gpfMEMMEM( pSTR, pINP->n_load, (U1*)&gpaSLMPbin[0].SER, sizeof(gpaSLMPbin[0].SER) ));
@@ -996,8 +993,8 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 			pSLMP->nDev += n_cpy-1;
 			pSLMP->nLEN += (n_cpy-1)*sizeof(*pU2out);
 			gpmMEMCPY( pSLMP+1, pU2out+i_cpy, n_cpy*sizeof(*pU2out) );
-			aGTcrs[1] = 's';
-			aGTcrs[0] = 0;
+			sGTent[2] = 's';
+			sGTent[0] = 'b'; // bin
 
 			if( iU2 >= nLEN )
 				break;
@@ -1012,8 +1009,8 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 	nSYNsum = nSYNdo;
 	nSYNdo++;
 
-	aGTcrs[1] = 's';
-	aGTcrs[0] = 0; // NEM ASCII
+	sGTent[2] = 's';
+	sGTent[0] = 'b'; // bin
 
 	pOUT = pOUT->lzyADD( gpaSLMPbin[1].aU1, sizeof(gpaSLMPbin[1]), s = -1 );
 	iCNT++;

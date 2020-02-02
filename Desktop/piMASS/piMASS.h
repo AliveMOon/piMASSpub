@@ -3857,7 +3857,7 @@ public:
 
 #define gpdLZYallGT 4
 #define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
-#define gpmLZYn( p, t ) ((p) ? ((p)->n_load/sizeof(t)) : 0 )
+#define gpmLZYload( p, t ) ((p) ? ((p)->n_load/sizeof(t)) : 0 )
 class gpcLZY
 {
 public:
@@ -4476,6 +4476,7 @@ szasz:
 	gpcLZY* lzyFRMT( U8& n_start, const char* p_format, ... );
 	gpcLZY* lzyHEXb( U8& n_start, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN );
+	gpcLZY* lzyHEXl( U8& n_start, U1* pBIN, U4 nBIN );
 	gpcLZY* lzy_reqCLOSE( void )
 	{
 		if( !this )

@@ -603,14 +603,14 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 		if( !pPUB )
 			return p_err;
 
-		pOUT = pOUT->lzyPLUS( pPUB, s = -1 );
-		gpmDEL( pPUB );
-		if( !aGTcrs[1] )
-		if( aGTcrs[0] )
+		pOUT = pPUB;
+		pPUB = NULL;
+		if( !sGTent[2] )
+		if( sGTent[0] )
 		{
-			pOUT = pOUT->lzyFRMT( s = -1, ";" );
+			pOUT = pOUT->lzyFRMT( s = -1, (char*)sGTent );
 		} else {
-			pOUT = pOUT->lzyFRMT( s = -1, "\r\n%x>", socket );
+			GTprmpt();
 			if( pINP )
 				pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 		}
@@ -620,20 +620,20 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	I8 n = pOUT->n_load, nSKIP, iSUB;
 
 	/// dadogás
-	if( aGTcrs[1] == 's' )
-	if( aGTcrs[0] == '\n' )
+	if( sGTent[2] == 's' )
+	if( sGTent[0] == '\n' )
 	{
 		if( pOUT->p_alloc[n] )
 			pOUT->p_alloc[n] = 0;
-		char a_str[] = " ";
-		a_str[0] = aGTcrs[0];
-		n = gpdVAN( (char*)pOUT->p_alloc, a_str );
+		/*char a_str[] = " ";
+		a_str[0] = sGTent[0];*/
+		n = gpdVAN( (char*)pOUT->p_alloc, (char*)sGTent );
 		if( !n )
 		{
-			iSUB = gpmNINCS((char*)pOUT->p_alloc, a_str);
+			iSUB = gpmNINCS((char*)pOUT->p_alloc, (char*)sGTent );
 			if( iSUB )
 				pOUT = pOUT->lzySUB( s = 0, iSUB );
-			n = gpdVAN( (char*)pOUT->p_alloc, a_str );
+			n = gpdVAN( (char*)pOUT->p_alloc, (char*)sGTent );
 		}
 		if( pOUT->p_alloc[n] == '\n')
 			n++;
@@ -702,7 +702,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 }
 
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
-static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
+static const char gp_sHELLO_acc[] = "account 0x%x;\r\xff\xfc\1;\r -= Welcome in piMASS 2020 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 
 /// ---------- SLMP -------------
 // SNo.NnSnUn..MsLen.Mtm.
@@ -830,8 +830,8 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:{
-				aGTcrs[1] = 's';
-				aGTcrs[0] = '\n'; // háha ASCII
+				sGTent[1] = 's';
+				sGTent[0] = '\n'; // háha ASCII
 				pOUT = pOUT->lzyFRMT( s = 0, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
 				break;
 			}
@@ -841,7 +841,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 				pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, socket, iCNT );
 				iCNT++;
-				aGTcrs[0] = 'a';
+				//aGTcrs[0] = 'a';
 				break;
 		}
 		msGTdie = 0;
@@ -862,7 +862,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				//GTslmp( *this, &win );
 				break;
 			default:
-				if( aGTcrs[1] == 'h' )
+				if( sGTent[2] == 'h' )
 					break;
 
 				GTos( *this, &win );
@@ -879,7 +879,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				//GTslmp( *this, &win );
 				break;
 			default:
-				if( aGTcrs[1] == 'h' )
+				if( sGTent[2] == 'h' )
 					break;
 
 				GTos( *this, &win );
@@ -1122,26 +1122,34 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				pACC->addr_in = clientaddr;
 				pACC->GTclr();
 				U8 n_start = -1;
-				if( pACC->port & 1 )// telnetek
+
+				//else
+				switch( pACC->port )
 				{
-					pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->socket, pACC->iCNT );
-					pACC->iCNT++;
-					pACC->aGTcrs[0] = 'a';
-					pACC->GTos(*this);
-				}
-				else switch( pACC->port )
-				{
+					/*case 6001:
+						pACC->aGTcrs[0] = 'a';
+						pACC->GTos( *this );
+						break;*/
 					case 23: // telnet
 						pACC->pOUT = pACC->pOUT->lzyFRMT( n_start,  gp_sHELLO, pACC->iCNT );
-						pACC->aGTcrs[0] = 'a';
+						pACC->sGTent[2] = 'a';
 						pACC->GTos( *this );
 						break;
 					case 80: // http
-						pACC->aGTcrs[1] = 'h';
+						pACC->sGTent[2] = 'h';
 						break;
 					default:
-						pACC->pOUT = pACC->pOUT->lzyFRMT( n_start,  gp_sHELLO, pACC->iCNT );
+						if( pACC->port & 1 )// telnetek
+						{
+							pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->socket, pACC->iCNT );
+							pACC->iCNT++;
+							pACC->sGTent[2] = 'a';
+							pACC->GTos(*this);
+							break;
+						}
 
+						pACC->pOUT = pACC->pOUT->lzyFRMT( n_start,  gp_sHELLO, pACC->iCNT );
+						break;
 				}
 
 				pACC->GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
@@ -1197,39 +1205,41 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 			if( p_gt )
 			{
-				if( p_gt->aGTcrs[1] == 'h' )
+				if( p_gt->sGTent[2] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
 					p_gt->GTos( *this, &win, &cnct ); //, win.piMASS ? &win.piMASS->GTcnct : NULL );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
-			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
+			for( U8 p = 0, s = -1; p < GTacc.nGTld; p++ )
 			{
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
 				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
 			}
+			gpmDEL(pOUT);
 		}
 		else if( p_gt->pINP ? !p_gt->pOUT : false )
 		{
             if( p_gt )
 			{
-				if( p_gt->aGTcrs[1] == 'h' )
+				if( p_gt->sGTent[2] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
 					p_gt->GTos( *this, &win, &cnct );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
-			for( U8 p = 0, s = -1; p < GTacc.nGTld; p )
+			for( U8 p = 0, s = -1; p < GTacc.nGTld; p++ )
 			{
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
 				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
 			}
+			gpmDEL(pOUT);
 		}
 
 

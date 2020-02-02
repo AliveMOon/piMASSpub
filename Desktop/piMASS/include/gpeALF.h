@@ -177,6 +177,9 @@ typedef enum gpeALFu4: U4
 	gpeALFu4_MOV = gpdABC('M', 'O', 'V'),
 	gpeALFu4_MPG = gpdABC('M', 'R', 'B'),
 	gpeALFu4_MRB = gpdABC('M', 'R', 'B'),
+
+	gpeALFu4_MSG = gpdABC('M', 'S', 'G'),
+
 	gpeALFu4_MUL = gpdABC('M', 'U', 'L'),
 	gpeALFu4_NEW = gpdABC('N', 'E', 'W'),
 	gpeALFu4_OFF = gpdABC('O', 'F', 'F'),
@@ -647,6 +650,9 @@ typedef enum gpeALF: I8
 	gpeALF_MOV = gpdABC('M', 'O', 'V'),
 	gpeALF_MPG = gpdABC('M', 'R', 'B'),
 	gpeALF_MRB = gpdABC('M', 'R', 'B'),
+
+	gpeALF_MSG = gpdABC('M', 'S', 'G'),
+
 	gpeALF_MUL = gpdABC('M', 'U', 'L'),
 	gpeALF_NEW = gpdABC('N', 'E', 'W'),
 	gpeALF_NON = gpdABC('N', 'O', 'N'),

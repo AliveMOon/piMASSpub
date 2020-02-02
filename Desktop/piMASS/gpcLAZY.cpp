@@ -118,6 +118,54 @@ gpcLZY* gpcLZY::lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
+gpcLZY* gpcLZY::lzyHEXl( U8& n_start, U1* pBIN, U4 nBIN )
+{
+	if( nBIN ? !pBIN : true )
+		return this;
+
+	if( !this )
+	{
+		gpcLZY* pTHIS = new gpcLZY();
+		if( !pTHIS )
+			return NULL;
+
+		return pTHIS->lzyHEXw( n_start, pBIN, nBIN );
+	}
+
+	n_start = n_load;
+	U8 s;
+
+	U1 nLOG = log2( nBIN )/8+4;
+	char sLINE[0x400], *pLINE = sLINE, *pADDR;
+	//pLINE += sprintf( pLINE, "\"\r\n");
+	for( U4 i = 0, j, je; i < nBIN; i += 16 )
+	{
+		pLINE += sprintf( pLINE, gpasADDR[nLOG], i );
+		for( j = i, je = j+16; j < je; j += sizeof(U4) )
+		{
+			if( j >= nBIN )
+			{
+				pLINE += sprintf( pLINE, "         " );
+				continue;
+			}
+			pLINE += sprintf( pLINE, "%0.8x ", *(U4*)(pBIN+j) );
+		}
+		pLINE += sprintf( pLINE, "|" );
+		for( j = i, je = j+16; j < je; j++ )
+		{
+			if( j >= nBIN )
+				break;
+			*pLINE = ((pBIN[j] >= 0x20) && (pBIN[j] < 0x80)) ? pBIN[j] : '.';
+			pLINE++;
+		}
+		*pLINE = 0;
+		lzyFRMT( s = -1, "\r\n%s", sLINE );
+		pLINE = sLINE;
+	}
+	pLINE += sprintf( pLINE, gpasADDR[nLOG], nBIN );
+	lzyFRMT( s = -1, "\r\n%s", sLINE );
+	return this;
+}
 U4 gpcLZY::tree_fnd( U4 id, U4& n )
 {
 	if( !this )

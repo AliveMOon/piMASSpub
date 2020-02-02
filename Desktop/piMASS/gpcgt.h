@@ -231,7 +231,7 @@ class gpcGT
 {
 	public:
 		I8x2		TnID, gt_ip;
-		I4			port, iCNT;
+		I4			port, iCNT, nOSin;
 
 		SOCKET		socket, sockAT, sockCNCT;
 		SOCKADDR	sockAddr;
@@ -267,7 +267,7 @@ class gpcGT
 		char	s_ip[0x400],
 				s_telnet[80*25+4];
 
-		U1		aGTcrs[2],
+		U1		sGTent[4],
 				sHOST[0x100],
 				sUSER[0x100],
 				sFILE[0x100],
@@ -280,10 +280,6 @@ class gpcGT
 		bool bLOOP()
 		{
 			return bSW&2;
-			/*if( !mSEC.x )
-				return false;
-
-			return mSEC.x == mSEC.y;*/
 		}
 		bool bGTdie()
         {
@@ -361,19 +357,19 @@ class gpcGT
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );
 		char*	GTsnd( char* p_err, char* s_buff, U4 n_buff );
 
-		U4 GTprmpt( void )
+		bool GTprmpt( bool bENT = true  )
 		{
-			if(!this)
-				return 0;
-			U8 s;
-			if( !aGTcrs[0] )
-				pOUT = pOUT->lzyFRMT( s = -1, "\r\n%x>", iCNT );
+			if( this ? sGTent[0] : true )
+				return false;
 
-			return iCNT;
+			U8 s;
+			pOUT = pOUT->lzyFRMT( s = -1, "%s%x>", bENT?"\r\n":"    \r",iCNT );
+			return true;
 		}
 		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
 		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
+		void	GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 
 		gpcLZY* GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
 		void 	GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );

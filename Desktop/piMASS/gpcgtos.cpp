@@ -73,6 +73,15 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 			pMISo->lzyINS( NULL, 0, s = 0, nMISo );
 		}
 	}
+	if( gpmLZYload(pOUT, U1) )
+		return pOUT ? pOUT->n_load : 0;
+
+	if( !gpmLZYload(pPUB, U1) )
+		return 0;
+
+	gpmDEL( pOUT );
+	pOUT = pPUB;
+	pPUB = NULL;
 
 	return pOUT ? pOUT->n_load : 0;
 }
@@ -80,6 +89,15 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 {
 	if( !this )
 		return;
+	switch( sGTent[2] )
+	{
+		case 'h':	//HTML
+		case 's':	//SLMP
+			return;
+		case 'a': 	//ACCEPT telnet
+		default:
+			break;
+	}
 
 	U8 nOUT = GTout( pWIN ), s;
 
@@ -102,7 +120,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 	while( nSYN )
 	{
-		aGTcrs[0] = ';';
+		sGTent[0] = ';';
 
 		U1* pDAT = p_str+sizeof(gpcSYNC);
 		gpcSYNC& syn = ((gpcSYNC*)pDAT)[-1];
@@ -252,7 +270,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	bool b_back = false;
 	while( *p_back == '\b' )
 	{
-		b_back = !aGTcrs[0];
+		b_back = !sGTent[0];
 		I8	n_sub = p_sub-pINP->p_alloc,
 			n_back = gpmNINCS( p_back, "\b" ),
 			n_str = p_back-pINP->p_alloc;
@@ -283,10 +301,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		pINPload = p_str+pINP->n_load;
 		p_back = p_str+gpdVAN( (char*)p_str, "\b" );
 	}
-	if( b_back )
-	if( !aGTcrs[0] )
+
+	if( nOSin != pINP->n_load )
 	{
-		pOUT = pOUT->lzyFRMT( s = -1, "  \r0x%x>", iCNT );
+		nOSin = pINP->n_load;
+		if( GTprmpt( false ) )
 		if( pINP )
 			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 	}
@@ -308,9 +327,9 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			iCNT++;
 			if( *p_row_end == ';' )
 			{
-				aGTcrs[0] = ';';
+				sGTent[0] = ';';
 			} else {
-				aGTcrs[0] = 0;
+				sGTent[0] = 0;
 				p_next += gpdVAN( (char*)p_next, ">" );
 				p_next += gpmNINCS( p_next, ">" );
 			}
@@ -342,6 +361,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 				switch( cAN.alf )
 				{
+
 					case gpeALF_SLMP:{
 							U1* pA;
 							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
@@ -356,22 +376,23 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						// ha a SERVER rákeres a KLIENSei között erre a
 						// socket-re és az iső stimmel
 						// nagy valszeg, hogy ez egy LOOP
-						sockAT = gpfSTR2U8( (U1*)s_atrib, NULL );
 						if( pWIN->bINI_hst_usr() ) {
-							mSEC.y = pWIN ? pWIN->mSEC.x+1 : 0;
-							pOUT = pOUT->lzyFRMT(
-														s = -1,	"%shost %s;"
-																"%suser %s;"
-																"%sfile %s;"
-																"%ssock 0x%x;"
-																"%smsec 0x%x;",
-														aGTcrs[0] ? "" : "\r\n", pWIN->sHOST,
-														aGTcrs[0] ? "" : "\r\n", pWIN->sUSER,
-														aGTcrs[0] ? "" : "\r\n", pWIN->gpsMASSname,
-														aGTcrs[0] ? "" : "\r\n", socket,
-														aGTcrs[0] ? "" : "\r\n", mSEC.y
+							sockAT = gpfSTR2U8( (U1*)s_atrib, NULL );
+							const char* pENT = (sGTent[0]?(char*)sGTent:"\r\n");
+								mSEC.y = pWIN ? pWIN->mSEC.x+1 : 0;
+								pOUT = pOUT->lzyFRMT(
+															s = -1,	"%shost %s;"
+																	"%suser %s;"
+																	"%sfile %s;"
+																	"%ssock 0x%x;"
+																	"%smsec 0x%x;",
+															pENT, pWIN->sHOST,
+															pENT, pWIN->sUSER,
+															pENT, pWIN->gpsMASSname,
+															pENT, socket,
+															pENT, mSEC.y
 
-													);
+														);
 						} break;
 					case gpeALF_HOST: {
 							pHOST = sHOST+sprintf( (char*)sHOST, "%s", s_atrib );
@@ -404,28 +425,29 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						} break;
 
 
-
 					case gpeALF_GATELIST:
-						pOUT = mom.GTos_GATELIST( pOUT, "\r\n", gppTAB ); //gpsTAB );
+						pOUT = mom.GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB ); //gpsTAB );
 						if( !pALL )
 							break;
 						for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
 						{
 							if( !pALL->ppGTalloc[i] )
 								continue;
-							pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, "\r\n", gppTAB );
+							pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
 						}
 						break;
-
+					case gpeALF_MSG:{
+							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "%smsg%0.8x: %s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
+						} break;
 					case gpeALF_HELP:
-						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", aGTcrs[0] ? "" : "\r\n" );
+						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", (sGTent[0]?(char*)sGTent:"\r\n") );
 						break;
 					case gpeALF_EYE: {
 							isEVNT.null();
 							isEVNT.id = gpeNET4_0EYE;
 							isEVNT.n = TnID.num;
 							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzyFRMT(s = -1, "%s event", aGTcrs[0] ? "" : "\r\n" );
+							pOUT = pOUT->lzyFRMT(s = -1, "%s event", (sGTent[0]?(char*)sGTent:"\r\n") );
 						} break;
 
 
@@ -582,7 +604,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						pOUT = pOUT->lzyFRMT(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
 						break;*/
 					default:
-						pOUT = pOUT->lzyFRMT( s = -1, "%snonsens", aGTcrs[0] ? "" : "\r\n" );
+						pOUT = pOUT->lzyFRMT( s = -1, "%snonsens", (sGTent[0]?(char*)sGTent:"\r\n") );
 						break;
 				}
 				p_sub = p_next; // p_row_end;
@@ -620,11 +642,12 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		}
 		if( pOUT )
 		if( nOUT < pOUT->n_load )
-		if( aGTcrs[0] )
+		if( sGTent[0] )
 		{
-			pOUT = pOUT->lzyFRMT( s = -1, ";" );
+			pOUT = pOUT->lzyFRMT( s = -1, (char*)sGTent );
 		} else {
-			pOUT = pOUT->lzyFRMT( s = -1, "\b\r\n0x%x>", iCNT );
+			GTprmpt();
+			//pOUT = pOUT->lzyFRMT( s = -1, "\b\r\n0x%x>", iCNT );
 		}
 
 	}
