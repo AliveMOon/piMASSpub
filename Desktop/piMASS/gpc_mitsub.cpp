@@ -253,7 +253,30 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	iCNT++;
 }
 
+gpcLZY* gpcGT::gpcGTzsndSTAT( gpcLZY* pANS, gpcZSnDrc& zs )
+{
+	U1 	sCOM[] = "ABCD";
+	U4 &comA = *(U4*)sCOM;
 
+	comA = zs.HD.x;
+	U8 s;
+	pANS = pANS->lzyFRMT(
+							s = -1, "\r\n%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
+							sCOM,
+							double(zs.MoXYZ.y)/100.0,
+							double(zs.MoXYZ.z)/100.0,
+							double(zs.MoXYZ.w)/100.0,
+
+							double(zs.MoABC.y)/100.0,
+							double(zs.MoABC.z)/100.0,
+							double(zs.MoABC.w)/100.0,
+
+							spd&0xffffff,
+							spd>>24
+
+						);
+	return pANS;
+}
 gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
@@ -380,12 +403,8 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				d8 += strtod( (char*)pSTR, (char**)&pSTR );
 		}
 
-		pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp);
-		if( !pU2o )
-			return pANS->lzyFRMT( s, "nonsens" );
-		//pI4 = (I4*)pU2o;
-		//iCou = iCin+2;
-        switch(iNUM)
+
+		switch(iNUM)
         {
 				// POS
 			case 0:
@@ -406,7 +425,7 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 10:
 			case 11:
 				// LINK
-				pOUT[iZS].aMoL1to6[iNUM/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pOUT[iZS].aMoL1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 7:
 				// TOOL
@@ -420,7 +439,7 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		return pANS->lzyFRMT( s, "nonsens" );
 
 	if( iCin < nU2 )
-		return gpcGTslmpSTAT( pANS, pU2i+iCin );
+		return gpcGTzsndSTAT( pANS, pINP[iZS] );
 
 	return pANS->lzyFRMT( s = -1, "ok" );
 }
