@@ -14,6 +14,7 @@ extern char gpsTAB[], *gppTAB;
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
+
 gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
 {
 	U1 	sCOM[] = "ABCD";
@@ -39,6 +40,7 @@ gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
 						);
 	return pANS;
 }
+
 gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;

@@ -21,8 +21,42 @@
 #define gpdGTlzyIDusr( p ) (((p)&gpdGTlzyID)+I8x2(0,2))
 #define gpdGTlzyIDdif( p ) (((p)&gpdGTlzyID)+I8x2(0,3))
 
-class gpcSLMP
+
+
+#define gpdZSnDrc160( p ) (p.HD.y&0x1)
+#define gpdZSnDrc161( p ) (p.HD.y&0x2)
+
+class gpcZSnDrc
 {
+public:
+	U4x4	HD;
+	I4x4 	difi,
+			outXYZ,	inpXYZ,
+			outABC, inpABC,
+			OUTxyz, INPxyz,
+			OUTabc, INPabc,
+			aOUT1to6[2],	aINP1to6[2],
+			aOUToff1to6[2],	aINPoff1to6[2];
+
+	gpcZSnDrc* DnZSfrm( U4 nm = 0 )
+	{
+		if( !this )
+			return NULL;
+		gpmCLR;
+		HD.x = nm;
+		return this;
+	}
+	gpcZSnDrc() { DnZSfrm(); };
+
+	U4 bSTAT( gpcZSnDrc& out )
+	{
+		if( !this )
+			return 0;
+
+		return gpdZSnDrc( nx, gpeZSnDrc160 );
+	}
+};
+class gpcSLMP {
 public:
 	union{
 		struct {
@@ -119,8 +153,7 @@ public:
 	gpcLZY* join( gpcLZY* pOUT, gpcGT& mom, gpcLZY* pEXE = NULL );
 };
 
-class gpcHUD
-{
+class gpcHUD {
 public:
 	gpeNET4		id;
 	U4			n;
@@ -172,8 +205,7 @@ public:
 
 };
 
-class gpcFD
-{
+class gpcFD {
 public:
 	int		nFD, maxSCK;
 	fd_set	fdS;
@@ -206,8 +238,7 @@ public:
 
 
 
-class gpcGTall
-{
+class gpcGTall {
 public:
 	gpcGT	**ppGTalloc, *pGT;
 	U4		nGTalloc, iGTfr, nGTld;
@@ -313,16 +344,14 @@ class gpcGT
 			return pOUT;
 		}
 		~gpcGT() { GTclose(); };
-		gpcGT( I8x2 id, I4 prt, SOCKET sock = INVALID_SOCKET )
-		{
+		gpcGT( I8x2 id, I4 prt, SOCKET sock = INVALID_SOCKET ) {
 			gpmCLR;
 			TnID = id;
 			port = prt;
 			socket = sock;
 			sockAT = sockCNCT = INVALID_SOCKET;
 		}
-		gpcGT* GTclr()
-		{
+		gpcGT* GTclr() {
 			if( this )
 			{
 				GTacc.clr();
@@ -343,8 +372,7 @@ class gpcGT
 			}
 			return this;
 		}
-		gpcGT* GTclose()
-		{
+		gpcGT* GTclose() {
 			GTclr();
 			gpfSOC_CLOSE( socket );
 			gpfSOC_CLOSE( sockCNCT );
@@ -357,8 +385,7 @@ class gpcGT
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );
 		char*	GTsnd( char* p_err, char* s_buff, U4 n_buff );
 
-		bool GTprmpt( bool bENT = true  )
-		{
+		bool GTprmpt( bool bENT = true  ) {
 			if( this ? sGTent[0] : true )
 				return false;
 
@@ -367,6 +394,7 @@ class gpcGT
 			return true;
 		}
 		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
+		gpcLZY* GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
 		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 		void	GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );

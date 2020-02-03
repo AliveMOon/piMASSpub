@@ -3,8 +3,7 @@
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
 
-void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
-{
+void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )
 		return;
@@ -253,3 +252,165 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 	iCNT++;
 }
+
+
+gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
+{
+	U8 s = -1, nLEN;
+	U4 n = gpmSTRLEN( pSTR );
+	if( this ? !n : true )
+		return pANS->lzyFRMT( s, "nonsens" );
+
+	gpcLZY	*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
+			*pLZYout = NULL,
+			*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+	///-----------------------------
+	/// UJ felhasználó?
+	U4 iSOCK = 0, nSOCK = 0;
+	if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
+	{
+        nSOCK = gpmLZYload(pLZYusr,sockUSR);
+        for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
+        {
+			if( pSOCK[iSOCK] != sockUSR )
+				continue;
+			// nem új bent van a listában
+			break;
+        }
+	}
+	if( iSOCK >= nSOCK )
+	{
+		// új felhasználó!
+		pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
+		iSOCK = nSOCK;
+		nSOCK = gpmLZYload(pLZYusr,sockUSR);
+	}
+	///-----------------------------
+
+	U4 nZSnD = gpmLZYload( pLZYinp, gpcZSnDrc ), iZSnD = nZSnD;
+	if( !nZSnD )
+		return pANS->lzyFRMT( s, "nonsens" );
+
+	gpcZSnDrc* pOUT = (gpcZSnDrc*)(pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID( pLZYinp );
+	if( !pOUT )
+		return pANS->lzyFRMT( s, "nonsens" );
+	gpcZSnDrc* pINP = (gpcZSnDrc*)pLZYinp->p_alloc;
+
+	U1 	sCOM[] = "ABCD",
+		*pCOM, *pEND = pSTR+n, *pNUM;
+	U4& comA = *(U4*)sCOM, iNUM;
+	I8x2 an;
+	double d8;
+
+	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;," ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;," ) )
+	{
+		an.num = pEND-(pCOM = pSTR);
+		an = pCOM;
+		pSTR += an.num;
+		if( an.alf )
+		{
+			iNUM = 0;
+			switch( an.alf )
+			{
+				case gpeALF_FORMAT:
+					gpmZn( pOUT, nZSnD );
+					continue;
+
+				case gpeALF_HELO:
+				case gpeALF_HELLO:
+					return pANS->lzyFRMT( s = -1, "Hello! %d", iZSnD );
+				case gpeALF_HELP:
+					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iZSnD );
+				case gpeALF_LINE:
+					return pANS->lzyFRMT( s = -1, "Line.txt %d", iZSnD );
+				case gpeALF_JOIN:
+					return pANS->lzyFRMT( s = -1, "Join.txt %d", iZSnD );
+
+				case gpeALF_POS:
+					iNUM = 0;
+					break;
+				case gpeALF_DIR:
+					iNUM = 3;
+					break;
+				case gpeALF_SPEED:
+					iNUM = 6;
+					break;
+				case gpeALF_TOOL:
+					iNUM = 7;
+					break;
+				default:
+					if( an.num >= 4 ) {
+
+
+					}
+			}
+			continue;
+		} else if( iNUM > 7 )
+			return pANS->lzyFRMT( s, "nonsens" );
+
+		if( iCin < 129 )
+			return pANS->lzyFRMT( s, "Who?" );
+
+
+		pNUM = pSTR;
+		an.num = gpfSTR2I8( pNUM, &pSTR );
+		if( *pSTR != '.' )
+			d8 = 0.0;
+		else {
+			d8 = an.num;
+			if( an.num < 0 )
+				d8 -= strtod( (char*)pSTR, (char**)&pSTR );
+			else
+				d8 += strtod( (char*)pSTR, (char**)&pSTR );
+		}
+
+		pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp);
+		if( !pU2o )
+			return pANS->lzyFRMT( s, "nonsens" );
+		//pI4 = (I4*)pU2o;
+		//iCou = iCin+2;
+        switch(iNUM)
+        {
+				// POS
+			case 0:
+			case 1:
+			case 2:
+				((I4*)(pU2o+iCin+2+16))[iNUM%3] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
+				// DIR
+			case 3:
+			case 4:
+			case 5:
+				((I4*)(pU2o+iCin+2+48))[iNUM%3] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
+			case 6:
+				// SPEED
+				spd = (*(U4*)(pU2o+iCin+32))>>24;
+				for( U1 i = 0; i < 6; i++ )
+				{
+					spd <<= 4;
+					spd |= (an.num/100000)%10;
+					an.num *= 10;
+				}
+				*(U4*)(pU2o+iCin+32) = spd;
+				break;
+			case 7:
+				// TOOL
+				((char*)(pU2o+iCin+32+1))[1] = an.num;
+				break;
+        }
+
+		iNUM++;
+	}
+	if( !pU2i )
+		return pANS->lzyFRMT( s, "nonsens" );
+
+	if( iCin < nU2 )
+		return gpcGTslmpSTAT( pANS, pU2i+iCin );
+
+	return pANS->lzyFRMT( s = -1, "ok" );
+}
+
+
+
+
