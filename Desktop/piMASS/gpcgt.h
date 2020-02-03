@@ -23,27 +23,43 @@
 
 
 
-#define gpdZSnDrc160( p ) (p.HD.y&0x1)
-#define gpdZSnDrc161( p ) (p.HD.y&0x2)
+#define gpdZSnDrcSTART( p ) (p.HD.y&0x1)
+#define gpdZSnDrcDONE( p ) (p.HD.y&0x2)
 
 class gpcZSnDrc
 {
 public:
-	U4x4	HD;
 	I4x4 	difi,
-			outXYZ,	inpXYZ,
-			outABC, inpABC,
-			OUTxyz, INPxyz,
-			OUTabc, INPabc,
-			aOUT1to6[2],	aINP1to6[2],
-			aOUToff1to6[2],	aINPoff1to6[2];
+			MoXYZ, MiXYZ,
+			MoABC, MiABC,
+			Ooxyz, Oixyz,
+			Ooabc, Oiabc,
+			aMoL1to6[2], aMiL1to6[2],
+			aOoL1to6[2], aOiL1to6[2];
+	U4x4	HD;
 
 	gpcZSnDrc* DnZSfrm( U4 nm = 0 )
 	{
 		if( !this )
 			return NULL;
 		gpmCLR;
+		if( !nm )
+			return this;
+
 		HD.x = nm;
+		MoXYZ.x = gpeNZSnm_POS0;
+		MiXYZ.x = gpeNZSnm_iPOS;
+		MoABC.x = gpeNZSnm_DIR0;
+		MiABC.x = gpeNZSnm_iDIR;
+		aMoL1to6[0].x = gpeNZSnm_LN13;
+		aMoL1to6[1].x = gpeNZSnm_LN46;
+		aMiL1to6[0].x = gpeNZSnm_iL13;
+		aMiL1to6[1].x = gpeNZSnm_iL46;
+
+		OoXYZ.x = gpeNZSnm_oPOS;
+		OiXYZ.x = gpeNZSnm_oiPS;
+		OoABC.x = gpeNZSnm_oDIR;
+		OiABC.x = gpeNZSnm_oiDR;
 		return this;
 	}
 	gpcZSnDrc() { DnZSfrm(); };
@@ -53,7 +69,7 @@ public:
 		if( !this )
 			return 0;
 
-		return gpdZSnDrc( nx, gpeZSnDrc160 );
+		return gpdZSnDrcSTART( out );
 	}
 };
 class gpcSLMP {

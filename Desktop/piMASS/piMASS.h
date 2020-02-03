@@ -3781,6 +3781,35 @@ typedef enum gpeNET4:U4
 	gpeNET4_PREV	= MAKE_ID( 'P', 'R', 'E', 'V' ),
 } gpeNET4;
 
+typedef enum gpeNET4:U4
+{
+	gpeZSnm_null, // = 0,
+	gpeNZSnm_iDIR = MAKE_ID( 'i', 'd', 'i', 'r'	),
+	gpeNZSnm_DIR0 = MAKE_ID( 'd', 'i', 'r', 0 	),
+	gpeNZSnm_iPOS = MAKE_ID( 'i', 'p', 'o', 's'	),
+	gpeNZSnm_POS0 = MAKE_ID( 'p', 'o', 's', 0	),
+
+	gpeNZSnm_iL13 = MAKE_ID( 'i', 'l', '1', '3'	),
+	gpeNZSnm_LN13 = MAKE_ID( 'l', 'n', '1', '3'	),
+
+	gpeNZSnm_LNK1 = MAKE_ID( 'l', 'n', 'k', '1'	),
+	gpeNZSnm_LNK2 = MAKE_ID( 'l', 'n', 'k', '2'	),
+	gpeNZSnm_LNK3 = MAKE_ID( 'l', 'n', 'k', '3'	),
+
+	gpeNZSnm_iL46 = MAKE_ID( 'i', 'l', '4', '5'	),
+	gpeNZSnm_LN46 = MAKE_ID( 'l', 'n', '4', '6'	),
+
+	gpeNZSnm_LNK4 = MAKE_ID( 'l', 'n', 'k', '4'	),
+	gpeNZSnm_LNK5 = MAKE_ID( 'l', 'n', 'k', '5'	),
+	gpeNZSnm_LNK6 = MAKE_ID( 'l', 'n', 'k', '6'	),
+
+
+	gpeNZSnm_oiDR = MAKE_ID( 'o', 'i', 'd', 'r'	),
+	gpeNZSnm_oDIR = MAKE_ID( 'o', 'd', 'i', 'r'	),
+	gpeNZSnm_oiPS = MAKE_ID( 'o', 'i', 'p', 's'	),
+	gpeNZSnm_oPOS = MAKE_ID( 'o', 'f', 'p', 's'	),
+
+} gpeNET4;
 class gpcCMPL;
 
 

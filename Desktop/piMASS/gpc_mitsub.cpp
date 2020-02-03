@@ -287,8 +287,8 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	}
 	///-----------------------------
 
-	U4 nZSnD = gpmLZYload( pLZYinp, gpcZSnDrc ), iZSnD = nZSnD;
-	if( !nZSnD )
+	U4 nZS = gpmLZYload( pLZYinp, gpcZSnDrc ), iZS = nZS;
+	if( !nZS )
 		return pANS->lzyFRMT( s, "nonsens" );
 
 	gpcZSnDrc* pOUT = (gpcZSnDrc*)(pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID( pLZYinp );
@@ -298,7 +298,7 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 	U1 	sCOM[] = "ABCD",
 		*pCOM, *pEND = pSTR+n, *pNUM;
-	U4& comA = *(U4*)sCOM, iNUM;
+	U4& comA = *(U4*)sCOM, iNUM, nNUM, iE = nZS;
 	I8x2 an;
 	double d8;
 
@@ -313,42 +313,58 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			switch( an.alf )
 			{
 				case gpeALF_FORMAT:
-					gpmZn( pOUT, nZSnD );
+					gpmZn( pOUT, nZS );
 					continue;
 
 				case gpeALF_HELO:
 				case gpeALF_HELLO:
-					return pANS->lzyFRMT( s = -1, "Hello! %d", iZSnD );
+					return pANS->lzyFRMT( s = -1, "Hello! %d", iZS );
 				case gpeALF_HELP:
-					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iZSnD );
+					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iZS );
 				case gpeALF_LINE:
-					return pANS->lzyFRMT( s = -1, "Line.txt %d", iZSnD );
+					return pANS->lzyFRMT( s = -1, "Line.txt %d", iZS );
 				case gpeALF_JOIN:
-					return pANS->lzyFRMT( s = -1, "Join.txt %d", iZSnD );
+					return pANS->lzyFRMT( s = -1, "Join.txt %d", iZS );
 
 				case gpeALF_POS:
-					iNUM = 0;
+					iNUM = 0; nNUM = 3;
 					break;
 				case gpeALF_DIR:
-					iNUM = 3;
+					iNUM = 3; nNUM = 3;
 					break;
-				case gpeALF_SPEED:
-					iNUM = 6;
+				case gpeALF_LINK:
+					iNUM = 6; nNUM = 6;
 					break;
 				case gpeALF_TOOL:
 					iNUM = 7;
 					break;
 				default:
 					if( an.num >= 4 ) {
-
-
-					}
+						comA = *(U4*)pCOM;
+						for( iEmpty = nZS, iZS = 1; iZS < nZS; iZS++ )
+						{
+							if( pINP[iZS].dif.au4x2[0].x == comA )
+								break;
+							if( pINP[iZS].dif.au4x2[0].x )
+								continue;
+							if( iE < iZS )
+								continue;
+							iEmpty = iZSnD;
+						}
+						if( iZSnD >= nZSnD )
+						if( iEmpty < nZSnD )
+						{
+							// új robot
+							iZSnD = iEmpty;
+							pOUT[iZSnD].DnZSfrm( comA );
+						}
+					} break;
 			}
 			continue;
 		} else if( iNUM > 7 )
 			return pANS->lzyFRMT( s, "nonsens" );
 
-		if( iCin < 129 )
+		if( iZS < 1 )
 			return pANS->lzyFRMT( s, "Who?" );
 
 
@@ -375,24 +391,22 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 0:
 			case 1:
 			case 2:
-				((I4*)(pU2o+iCin+2+16))[iNUM%3] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pOUT[iZS].MoXYZ.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 				// DIR
 			case 3:
 			case 4:
 			case 5:
-				((I4*)(pU2o+iCin+2+48))[iNUM%3] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pOUT[iZS].MoABC.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 6:
-				// SPEED
-				spd = (*(U4*)(pU2o+iCin+32))>>24;
-				for( U1 i = 0; i < 6; i++ )
-				{
-					spd <<= 4;
-					spd |= (an.num/100000)%10;
-					an.num *= 10;
-				}
-				*(U4*)(pU2o+iCin+32) = spd;
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+				// LINK
+				pOUT[iZS].aMoL1to6[iNUM/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 7:
 				// TOOL
