@@ -133,7 +133,7 @@
 #define gpdPICbg "/mnt/ram/bg.png"
 #define gpsMINI_CHAR "mini_char_16x32_8x32.png" //"mini_char_64x512.png"	// "mini_char_16x32.png" //
 #define gpsMINI_ISO "mini_ISO_32x32_1024x1536.png"
-#define gpdSLMPnDEV 512
+
 
 #include <exception>
 #include <mysys.h>
@@ -2415,6 +2415,10 @@ public:
 		};
 		struct
         {
+			I4 aXYZW[4];
+		};
+		struct
+        {
 			I4x2 a4x2[2];
 		};
 
@@ -3781,35 +3785,45 @@ typedef enum gpeNET4:U4
 	gpeNET4_PREV	= MAKE_ID( 'P', 'R', 'E', 'V' ),
 } gpeNET4;
 
-typedef enum gpeNET4:U4
+typedef enum gpeZS:U4
 {
-	gpeZSnm_null, // = 0,
-	gpeNZSnm_iDIR = MAKE_ID( 'i', 'd', 'i', 'r'	),
-	gpeNZSnm_DIR0 = MAKE_ID( 'd', 'i', 'r', 0 	),
-	gpeNZSnm_iPOS = MAKE_ID( 'i', 'p', 'o', 's'	),
-	gpeNZSnm_POS0 = MAKE_ID( 'p', 'o', 's', 0	),
+	gpeZS_null, // = 0,
+	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
 
-	gpeNZSnm_iL13 = MAKE_ID( 'i', 'l', '1', '3'	),
-	gpeNZSnm_LN13 = MAKE_ID( 'l', 'n', '1', '3'	),
+	gpeZS_DIR0 = MAKE_ID( 'D', 'I', 'R',  0 	),
+	gpeZS_iPOS = MAKE_ID( 'i', 'P', 'O', 'S'	),
+	gpeZS_POS0 = MAKE_ID( 'P', 'O', 'S',  0		),
+	// alias
+	gpeZS_XYZ0 = MAKE_ID( 'X', 'Y', 'Z',  0		),
+	gpeZS_ABC0 = MAKE_ID( 'A', 'B', 'C',  0 	),
 
-	gpeNZSnm_LNK1 = MAKE_ID( 'l', 'n', 'k', '1'	),
-	gpeNZSnm_LNK2 = MAKE_ID( 'l', 'n', 'k', '2'	),
-	gpeNZSnm_LNK3 = MAKE_ID( 'l', 'n', 'k', '3'	),
+	gpeZS_iA13 = MAKE_ID( 'i', 'A', '1', '3'	),
+	gpeZS_oA13 = MAKE_ID( 'o', 'A', '1', '3'	),
 
-	gpeNZSnm_iL46 = MAKE_ID( 'i', 'l', '4', '5'	),
-	gpeNZSnm_LN46 = MAKE_ID( 'l', 'n', '4', '6'	),
+	gpeZS_AXI1 = MAKE_ID( 'A', 'X', 'I', '1'	),
+	gpeZS_AXI2 = MAKE_ID( 'A', 'X', 'I', '2'	),
+	gpeZS_AXI3 = MAKE_ID( 'A', 'X', 'I', '3'	),
 
-	gpeNZSnm_LNK4 = MAKE_ID( 'l', 'n', 'k', '4'	),
-	gpeNZSnm_LNK5 = MAKE_ID( 'l', 'n', 'k', '5'	),
-	gpeNZSnm_LNK6 = MAKE_ID( 'l', 'n', 'k', '6'	),
+	gpeZS_iA46 = MAKE_ID( 'i', 'A', '4', '5'	),
+	gpeZS_oA46 = MAKE_ID( 'o', 'A', '4', '6'	),
+
+	gpeZS_AXI4 = MAKE_ID( 'A', 'X', 'I', '4'	),
+	gpeZS_AKI5 = MAKE_ID( 'A', 'X', 'I', '5'	),
+	gpeZS_AXI6 = MAKE_ID( 'A', 'X', 'I', '6'	),
+
+	gpeZS_AXIS = MAKE_ID( 'A', 'X', 'I', 'S'	),
+	gpeZS_LINK = MAKE_ID( 'L', 'I', 'N', 'K'	),
 
 
-	gpeNZSnm_oiDR = MAKE_ID( 'o', 'i', 'd', 'r'	),
-	gpeNZSnm_oDIR = MAKE_ID( 'o', 'd', 'i', 'r'	),
-	gpeNZSnm_oiPS = MAKE_ID( 'o', 'i', 'p', 's'	),
-	gpeNZSnm_oPOS = MAKE_ID( 'o', 'f', 'p', 's'	),
+	gpeZS_idir = MAKE_ID( 'i', 'd', 'i', 'r'	),
+	gpeZS_dir0 = MAKE_ID( 'd', 'i', 'r',  0		),
+	gpeZS_ipos = MAKE_ID( 'i', 'p', 'o', 's'	),
+	gpeZS_pos0 = MAKE_ID( 'p', 'o', 's',  0		),
+	// alias
+	gpeZS_xyz0 = MAKE_ID( 'x', 'y', 'z',  0		),
+	gpeZS_abc0 = MAKE_ID( 'a', 'b', 'c',  0 	),
 
-} gpeNET4;
+} gpeZS;
 class gpcCMPL;
 
 
@@ -3885,8 +3899,12 @@ public:
 };
 
 #define gpdLZYallGT 4
-#define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
-#define gpmLZYload( p, t ) ((p) ? ((p)->n_load/sizeof(t)) : 0 )
+//#define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
+#define gpmLZYvaliPD( a, b, n ) ((a*)( (b) ? (b)->p_alloc+(n) : NULL ))
+#define gpmLZYvali( a, b ) gpmLZYvaliPD( a, (b), 0 )
+
+#define gpmLZYloadPD( p, t, n ) ((p) ? (((p->n_load)-(n))/sizeof(t)) : 0 )
+#define gpmLZYload( p, t ) gpmLZYloadPD( p, t, (U8)0 )
 class gpcLZY
 {
 public:
@@ -4197,50 +4215,7 @@ public:
 		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
 		return (void*)p_alloc;
 	}
-	/*U4* VALID( gpcLZY* pLZY, U4* pU4 = NULL )
-	{
-		if( !this )
-			return NULL;
 
-		if( pU4 )
-		if( pLZY->n_load > n_load )
-			pU4 = NULL;
-
-		if( pU4 )
-			return (U4*)p_alloc;
-
-		if( pLZY->n_load > n_load )
-		{
-			U8 s = -1;
-			lzyADD(
-					pLZY->p_alloc+n_load,
-					pLZY->n_load-n_load, s
-				);
-		}
-		return (U4*)p_alloc;
-	}
-	I4* VALID( gpcLZY* pLZY, I4* pI4 = NULL )
-	{
-		if( !this )
-			return NULL;
-
-		if( pI4 )
-		if( pLZY->n_load > n_load )
-			pI4 = NULL;
-
-		if( pI4 )
-			return (U4*)p_alloc;
-
-		if( pLZY->n_load > n_load )
-		{
-			U8 s = -1;
-			lzyADD(
-					pLZY->p_alloc+n_load,
-					pLZY->n_load-n_load, s
-				);
-		}
-		return (I4*)p_alloc;
-	}*/
 	gpcLZY* lzyPLUS(  const gpcLZY* p_b, U8& n_start )
 	{
 		return lzyADD( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );

@@ -18,8 +18,8 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			*pLZYout = mass.GTlzyALL.LZY( gpdGTlzyIDref(TnID) ),
 			*pLZYusr = NULL,
 			*pLZYdead = NULL;
-	U2		*pU2inp = gpmLZYvali( U2, pLZYinp ),
-			*pU2out = gpmLZYvali( U2, pLZYout ),
+	U2		*pU2inp = gpmLZYvaliPD( U2, pLZYinp, 0 ),
+			*pU2out = gpmLZYvaliPD( U2, pLZYout, 0 ),
 			*pU2dead = NULL;
 	SOCKET	*pSOCK;
 	U4		nSOCK, iLEN = 0;
@@ -253,30 +253,530 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	iCNT++;
 }
 
-gpcLZY* gpcGT::gpcGTzsndSTAT( gpcLZY* pANS, gpcZSnDrc& zs )
-{
-	U1 	sCOM[] = "ABCD";
-	U4 &comA = *(U4*)sCOM;
+U1 gpsSLMPabc[] =
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
 
-	comA = zs.HD.x;
-	U8 s;
-	pANS = pANS->lzyFRMT(
-							s = -1, "\r\n%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
-							sCOM,
-							double(zs.MoXYZ.y)/100.0,
-							double(zs.MoXYZ.z)/100.0,
-							double(zs.MoXYZ.w)/100.0,
+				"  ! " // !
+				"  ! "
+				"  ! "
+				"  ! "
+				"  ! "
+				"    "
+				"  ! "
+				"    "
 
-							double(zs.MoABC.y)/100.0,
-							double(zs.MoABC.z)/100.0,
-							double(zs.MoABC.w)/100.0,
+				"! ! " // "
+				"! ! "
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
 
-							spd&0xffffff,
-							spd>>24
+				"! ! " // #
+				"!!!!"
+				"! ! "
+				"! ! "
+				"! ! "
+				"!!!!"
+				"! ! "
+				"    "
 
-						);
-	return pANS;
-}
+				"  ! " // $
+				" !!!"
+				"! ! "
+				" !! "
+				"  !!"
+				"!!! "
+				"  ! "
+				"    "
+
+				"    " // %
+				"   !"
+				"! ! "
+				"  ! "
+				" !  "
+				" ! !"
+				"!   "
+				"    "
+
+				"    " // &
+				" !  "
+				"! ! "
+				" !  "
+				"!  !"
+				"! ! "
+				" ! !"
+				"    "
+
+				"  ! " // (
+				" !  "
+				" !  "
+				" !  "
+				" !  "
+				" !  "
+				"  ! "
+				"    "
+
+				" !  " // )
+				"  ! "
+				"  ! "
+				"  ! "
+				"  ! "
+				"  ! "
+				" !  "
+				"    "
+
+				"    " // *
+				" ! !"
+				"  ! "
+				" !!!"
+				"  ! "
+				" ! !"
+				"    "
+				"    "
+
+				"    " // +
+				"  ! "
+				"  ! "
+				" !!!"
+				"  ! "
+				"  ! "
+				"    "
+				"    "
+
+				"    " // ,
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
+				"  ! "
+				" !  "
+
+				"    " // -
+				"    "
+				"    "
+				" !!!"
+				"    "
+				"    "
+				"    "
+				"    "
+
+				"    " // .
+				"    "
+				"    "
+				"    "
+				"    "
+				"    "
+				"  ! "
+				"    "
+
+				"    " // /
+				"   !"
+				"  ! "
+				"  ! "
+				" !  "
+				" !  "
+				"!   "
+				"    "
+
+				" !! " // 0
+				"!  !"
+				"! !!"
+				"! !!"
+				"!! !"
+				"!! !"
+				" !! "
+				"    "
+
+				"!!  " // 1
+				" !  "
+				" !  "
+				" !  "
+				" !  "
+				" !  "
+				"!!! "
+				"    "
+
+				" !! " // 2
+				"!  !"
+				"   !"
+				"  ! "
+				" !  "
+				"!   "
+				"!!!!"
+				"    "
+
+				" !! " // 3
+				"!  !"
+				"   !"
+				" !! "
+				"   !"
+				"!  !"
+				" !! "
+				"    "
+
+				" !  " // 4
+				" !  "
+				"!   "
+				"! ! "
+				"!!!!"
+				"  ! "
+				"  ! "
+				"    "
+
+				"!!!!" // 5
+				"!   "
+				"!!! "
+				"   !"
+				"   !"
+				"!  !"
+				" !! "
+				"    "
+
+				" !! " // 6
+				"!  !"
+				"!   "
+				"!!! "
+				"!  !"
+				"!  !"
+				" !! "
+				"    "
+
+				"!!!! " // 7
+				"   !"
+				"   !"
+				"  ! "
+				" !  "
+				"!   "
+				"!   "
+				"    "
+
+				" !! " // 8
+				"!  !"
+				"!  !"
+				" !! "
+				"!  !"
+				"!  !"
+				" !! "
+				"    "
+
+				" !! " // 9
+				"!  !"
+				"!  !"
+				" !!!"
+				"   !"
+				"   !"
+				" !! "
+				"    "
+
+				"    " // :
+				"    "
+				"    "
+				"  ! "
+				"    "
+				"    "
+				"  ! "
+				"    "
+
+				"    " // ;
+				"    "
+				"    "
+				"  ! "
+				"    "
+				"    "
+				"  ! "
+				" !  "
+
+				"    " // <
+				"  ! "
+				" !  "
+				"!   "
+				" !  "
+				"  ! "
+				"    "
+				"    "
+
+				"    " // =
+				"    "
+				" !! "
+				"    "
+				" !! "
+				"    "
+				"    "
+				"    "
+
+				"    " // >
+				"!   "
+				" !  "
+				"  ! "
+				" !  "
+				"!   "
+				"    "
+				"    "
+
+				" !! " // ?
+				"!  !"
+				"   !"
+				"  ! "
+				" !  "
+				"    "
+				" !  "
+				"    "
+
+				" !! " // @
+				"!  !"
+				"! !!"
+				"! !!"
+				"!   "
+				"!   "
+				" !! "
+				"    "
+
+				" !  " // A
+				"! ! "
+				"! ! "
+				"!!! "
+				"! ! "
+				"! ! "
+				"! ! "
+				"    "
+
+				"!!  " // B
+				"! ! "
+				"! ! "
+				"!!  "
+				"! ! "
+				"! ! "
+				"!!  "
+				"    "
+
+				" !  " // C
+				"! ! "
+				"!   "
+				"!   "
+				"!   "
+				"! ! "
+				" !  "
+				"    "
+
+				"!!  " // D
+				"! ! "
+				"! ! "
+				"! ! "
+				"! ! "
+				"! ! "
+				"!!  "
+				"    "
+
+				"!!! " // E
+				"!   "
+				"!   "
+				"!!  "
+				"!   "
+				"!   "
+				"!!! "
+				"    "
+
+				"!!! " // F
+				"!   "
+				"!   "
+				"!!  "
+				"!   "
+				"!   "
+				"!   "
+				"    "
+
+				" !  " // G
+				"! ! "
+				"!   "
+				"! ! "
+				"! ! "
+				"! ! "
+				" !! "
+				"    "
+
+				"! ! " // H
+				"! ! "
+				"! ! "
+				"!!! "
+				"! ! "
+				"! ! "
+				"! ! "
+				"    "
+
+				" !  " // I
+				"    "
+				"!!  "
+				" !  "
+				" !  "
+				" !  "
+				"!!! "
+				"    "
+
+				"  ! " // J
+				"    "
+				"!!! "
+				"  ! "
+				"  ! "
+				"  ! "
+				"  ! "
+				"!!  "
+
+				"!  !" // K
+				"!  !"
+				"! ! "
+				"!!  "
+				"! ! "
+				"!  !"
+				"!  !"
+				"    "
+
+				"!   " // L
+				"!   "
+				"!   "
+				"!   "
+				"!   "
+				"!   "
+				"!!!!"
+				"    "
+
+				"!!!!" // M
+				"!!! "
+				" !  "
+				"    "
+				"! ! "
+				"!!! "
+				"!!! "
+				"!!! "
+
+				"!  !" // N
+				"!! !"
+				"!! !"
+				"! !!"
+				"! !!"
+				"!  !"
+				"!  !"
+				"    "
+
+				" !  " // O
+				"! ! "
+				"! ! "
+				"! ! "
+				"! ! "
+				"! ! "
+				" !  "
+				"    "
+
+				"!!  " // P
+				"! ! "
+				"! ! "
+				"! ! "
+				"!!  "
+				"!   "
+				"!   "
+				"    "
+
+				" !  " // Q
+				"! ! "
+				"! ! "
+				"! ! "
+				"! ! "
+				" !! "
+				"  ! "
+				"    "
+
+				"!!  " // R
+				"! ! "
+				"! ! "
+				"! ! "
+				"!!  "
+				"! ! "
+				"!  !"
+				"    "
+
+				" !! " // S
+				"!  !"
+				"!   "
+				" !! "
+				"   !"
+				"   !"
+				"!!! "
+				"    "
+
+				"!!! " // T
+				" !  "
+				" !  "
+				" !  "
+				" !  "
+				" !  "
+				" !  "
+				"    "
+
+				"! ! " // U
+				"! ! "
+				"! ! "
+				"! ! "
+				"! ! "
+				"! ! "
+				" !! "
+				"    "
+
+				"!  !" // V
+				"!  !"
+				"!  !"
+				"!  !"
+				"! ! "
+				"!!  "
+				"!   "
+				"    "
+
+				"!!! " // W
+				"!!! "
+				"!!! "
+				"! ! "
+				"    "
+				" !  "
+				"!!! "
+				"!!!!"
+
+				"!  !" // X
+				"!  !"
+				" !! "
+				" !  "
+				" !! "
+				"!  !"
+				"!  !"
+				"    "
+
+				"!  !" // Y
+				"!  !"
+				"!  !"
+				" ! !"
+				"  ! "
+				" !  "
+				"!   "
+				"    "
+
+				"!!!!" // 7
+				"   !"
+				"  ! "
+				" !  "
+				"!   "
+				"!   "
+				"!!!!"
+				"    "
+
+				;
 gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
@@ -310,14 +810,16 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	}
 	///-----------------------------
 
-	U4 nZS = gpmLZYload( pLZYinp, gpcZSnDrc ), iZS = nZS;
+	U4 nZS = gpmLZYloadPD( pLZYinp, gpcZSnDrc, 0x20 ), iZS = nZS;
 	if( !nZS )
 		return pANS->lzyFRMT( s, "nonsens" );
 
-	gpcZSnDrc* pOUT = (gpcZSnDrc*)(pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID( pLZYinp );
-	if( !pOUT )
+	pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID));
+	if( !pLZYout )
 		return pANS->lzyFRMT( s, "nonsens" );
-	gpcZSnDrc* pINP = (gpcZSnDrc*)pLZYinp->p_alloc;
+
+	gpcZSnDrc	*pZSnDo = (gpcZSnDrc*)gpmLZYvaliPD( U1, pLZYout, 0x20 ),
+				*pZSnDi = (gpcZSnDrc*)gpmLZYvaliPD( U1, pLZYinp, 0x20 );
 
 	U1 	sCOM[] = "ABCD",
 		*pCOM, *pEND = pSTR+n, *pNUM;
@@ -332,11 +834,12 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		pSTR += an.num;
 		if( an.alf )
 		{
+			comA = *(U4*)pCOM;
 			iNUM = 0;
 			switch( an.alf )
 			{
 				case gpeALF_FORMAT:
-					gpmZn( pOUT, nZS );
+					gpmZn( pZSnDo, nZS );
 					continue;
 
 				case gpeALF_HELO:
@@ -349,45 +852,80 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				case gpeALF_JOIN:
 					return pANS->lzyFRMT( s = -1, "Join.txt %d", iZS );
 
+				case gpeALF_KOSZON:{
+						U4	nR = sizeof(gpsSLMPabc),
+							nC = nR/(4*8);
+						pANS = pANS->lzyFRMT( s = -1, "CSOKOLOM %s BACSI!", pSTR );
+
+					} return pANS;
 				case gpeALF_POS:
-					iNUM = 0; nNUM = 3;
-					break;
+				case gpeALF_XYZ:{
+						switch( comA&0xffffff )
+						{
+							case gpeZS_XYZ0:
+							case gpeZS_POS0:
+								iNUM = 0;
+								break;
+							default:
+								iNUM = 12;
+								break;
+						}
+						nNUM = 3;
+					} break;
 				case gpeALF_DIR:
-					iNUM = 3; nNUM = 3;
-					break;
+				case gpeALF_ABC:{
+						switch( comA&0xffffff )
+						{
+							case gpeZS_ABC0:
+							case gpeZS_DIR0:
+								iNUM = 3;
+								break;
+							default:
+								iNUM = 15;
+								break;
+						}
+						nNUM = 3;
+					} break;
 				case gpeALF_LINK:
-					iNUM = 6; nNUM = 6;
-					break;
-				case gpeALF_TOOL:
-					iNUM = 7;
-					break;
+				case gpeALF_AXIS:{
+						switch( comA )
+						{
+							case gpeZS_AXIS:
+							case gpeZS_LINK:
+								iNUM = 6;
+								break;
+							default:
+								iNUM = 18;
+								break;
+						}
+						nNUM = 6;
+					} break;
 				default:
 					if( an.num >= 4 ) {
-						comA = *(U4*)pCOM;
-						for( iEmpty = nZS, iZS = 1; iZS < nZS; iZS++ )
+						for( iE = nZS, iZS = 1; iZS < nZS; iZS++ )
 						{
-							if( pINP[iZS].dif.au4x2[0].x == comA )
+							if( pZSnDi[iZS].NMnDIF.au4x2[0].x == comA )
 								break;
-							if( pINP[iZS].dif.au4x2[0].x )
+							if( pZSnDi[iZS].NMnDIF.au4x2[0].x )
 								continue;
 							if( iE < iZS )
 								continue;
-							iEmpty = iZSnD;
+							iE = iZS;
 						}
-						if( iZSnD >= nZSnD )
-						if( iEmpty < nZSnD )
+						if( iZS >= nZS )
+						if( iE < nZS )
 						{
 							// új robot
-							iZSnD = iEmpty;
-							pOUT[iZSnD].DnZSfrm( comA );
+							iZS = iE;
+							pZSnDo[iZS].DnZSfrm( comA );
 						}
 					} break;
 			}
 			continue;
-		} else if( iNUM > 7 )
+		} else if( iNUM > 23 )
 			return pANS->lzyFRMT( s, "nonsens" );
 
-		if( iZS < 1 )
+		if( iZS%nZS < 1 )
 			return pANS->lzyFRMT( s, "Who?" );
 
 
@@ -410,13 +948,13 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 0:
 			case 1:
 			case 2:
-				pOUT[iZS].MoXYZ.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pZSnDo[iZS].oXYZ.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 				// DIR
 			case 3:
 			case 4:
 			case 5:
-				pOUT[iZS].MoABC.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pZSnDo[iZS].oABC.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 6:
 			case 7:
@@ -424,25 +962,46 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 9:
 			case 10:
 			case 11:
-				// LINK
-				pOUT[iZS].aMoL1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				// AXIS
+				pZSnDo[iZS].aoAX1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
-			case 7:
-				// TOOL
-				((char*)(pU2o+iCin+32+1))[1] = an.num;
+
+			// OFFSET - eltolás
+				// POS
+			case 12:
+			case 13:
+			case 14:
+				pZSnDo[iZS].oxyz.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
+				// DIR
+			case 15:
+			case 16:
+			case 17:
+				pZSnDo[iZS].oabc.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
+			case 18:
+			case 19:
+			case 20:
+			case 21:
+			case 22:
+			case 23:
+				// AXIS
+				pZSnDo[iZS].aoax1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
+			default:
 				break;
         }
 
 		iNUM++;
 	}
-	if( !pU2i )
-		return pANS->lzyFRMT( s, "nonsens" );
 
-	if( iCin < nU2 )
-		return gpcGTzsndSTAT( pANS, pINP[iZS] );
+	if( iZS < nZS )
+		return pZSnDi[iZS].ANSstat( pANS );
 
 	return pANS->lzyFRMT( s = -1, "ok" );
 }
+
+
 
 
 

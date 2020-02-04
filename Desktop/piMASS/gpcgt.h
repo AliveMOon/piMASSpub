@@ -4,6 +4,7 @@
 
 #include "gpcpic.h"
 
+#define gpdSLMPnDEV 512
 				          //		             +------- Len: 0x28 = 32+8 = 40 --------+
 				          //   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..Data............
 				          //   +-->+>+>+-->+>+-->1--4   8  12  16  20  24  28  32  36  40
@@ -23,20 +24,21 @@
 
 
 
-#define gpdZSnDrcSTART( p ) (p.HD.y&0x1)
-#define gpdZSnDrcDONE( p ) (p.HD.y&0x2)
-
+#define gpdZSnDrcSTART( p ) (p.CTRL.y&0x1)
+#define gpdZSnDrcDONE( p ) (p.CTRL.y&0x2)
+#define gpdSLMP GTslmp_ZSnDrc // GTslmp
+#define gpdSLMPos GTzsndOS	//GTslmpOS
 class gpcZSnDrc
 {
 public:
-	I4x4 	difi,
-			MoXYZ, MiXYZ,
-			MoABC, MiABC,
-			Ooxyz, Oixyz,
-			Ooabc, Oiabc,
-			aMoL1to6[2], aMiL1to6[2],
-			aOoL1to6[2], aOiL1to6[2];
-	U4x4	HD;
+	I4x4 	NMnDIF,
+			oXYZ, iXYZ,
+			oABC, iABC,
+			oxyz, ixyz,
+			oabc, iabc,
+			aoAX1to6[2], aiAX1to6[2],
+			aoax1to6[2], aiax1to6[2];
+	U4x4	CTRL;
 
 	gpcZSnDrc* DnZSfrm( U4 nm = 0 )
 	{
@@ -46,20 +48,25 @@ public:
 		if( !nm )
 			return this;
 
-		HD.x = nm;
-		MoXYZ.x = gpeNZSnm_POS0;
-		MiXYZ.x = gpeNZSnm_iPOS;
-		MoABC.x = gpeNZSnm_DIR0;
-		MiABC.x = gpeNZSnm_iDIR;
-		aMoL1to6[0].x = gpeNZSnm_LN13;
-		aMoL1to6[1].x = gpeNZSnm_LN46;
-		aMiL1to6[0].x = gpeNZSnm_iL13;
-		aMiL1to6[1].x = gpeNZSnm_iL46;
+		NMnDIF.x = nm;
 
-		OoXYZ.x = gpeNZSnm_oPOS;
-		OiXYZ.x = gpeNZSnm_oiPS;
-		OoABC.x = gpeNZSnm_oDIR;
-		OiABC.x = gpeNZSnm_oiDR;
+		oXYZ.x = gpeZS_POS0;
+		iXYZ.x = gpeZS_iPOS;
+		oABC.x = gpeZS_DIR0;
+		iABC.x = gpeZS_iDIR;
+
+		// TENGELY
+		aoAX1to6[0].x = gpeZS_oA13;
+		aoAX1to6[1].x = gpeZS_oA46;
+		aiAX1to6[0].x = gpeZS_iA13;
+		aiAX1to6[1].x = gpeZS_iA46;
+
+		// OFFSET - eltolás
+		oxyz.x = gpeZS_pos0;
+		ixyz.x = gpeZS_ipos;
+
+		oabc.x = gpeZS_dir0;
+		iabc.x = gpeZS_idir;
 		return this;
 	}
 	gpcZSnDrc() { DnZSfrm(); };
@@ -70,6 +77,42 @@ public:
 			return 0;
 
 		return gpdZSnDrcSTART( out );
+	}
+
+	gpcLZY* ANSstat( gpcLZY* pANS )
+	{
+		U1 	sCOM[] = "ABCD";
+		U4 &comA = *(U4*)sCOM;
+
+		comA = NMnDIF.x;
+		U8 s;
+		pANS = pANS->lzyFRMT(
+								s = -1,
+
+										"\r\n%s X:%.2fmm Y:%.2fmm Z:%.2fmm "
+										"A:%.2fdg B:%.2fdg C:%.2fdg "
+										"\r\nOFF x:%.2fmm y:%.2fmm z:%.2fmm "
+										"a:%.2fdg b:%.2fdg c:%.2fdg "
+										,
+								sCOM,
+								double(oXYZ.y)/100.0,
+								double(oXYZ.z)/100.0,
+								double(oXYZ.w)/100.0,
+
+								double(oABC.y)/100.0,
+								double(oABC.z)/100.0,
+								double(oABC.w)/100.0,
+
+								double(oxyz.y)/100.0,
+								double(oxyz.z)/100.0,
+								double(oxyz.w)/100.0,
+
+								double(oabc.y)/100.0,
+								double(oabc.z)/100.0,
+								double(oabc.w)/100.0
+
+							);
+		return pANS;
 	}
 };
 class gpcSLMP {
@@ -409,9 +452,14 @@ class gpcGT
 			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
 			return true;
 		}
-		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
+
+		//gpcLZY*	gpcGTzsndSTAT( gpcLZY* pANS, gpcZSnDrc& zs );
 		gpcLZY* GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
+		void 	GTslmp_ZSnDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
+
+		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
+
 		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 		void	GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 

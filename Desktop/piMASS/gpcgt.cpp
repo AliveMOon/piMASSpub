@@ -859,7 +859,6 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:
-				//GTslmp( *this, &win );
 				break;
 			default:
 				if( sGTent[2] == 'h' )
@@ -876,7 +875,6 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:
-				//GTslmp( *this, &win );
 				break;
 			default:
 				if( sGTent[2] == 'h' )
@@ -890,7 +888,8 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	switch( TnID.alf )
 	{
 		case gpeALF_SLMP:
-			GTslmp( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			gpdSLMP( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			//GTslmp( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
 			break;
 	}
 

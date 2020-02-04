@@ -573,6 +573,7 @@ typedef enum gpeALF: I8
 	gpeALF_2 = gpdAB('Z', 'Z'),
 	//- 3 -----------------
 	gpeALF_AAA = gpdABC('A', 'A', 'A'),
+	gpeALF_ABC = gpdABC('A', 'B', 'C'),
 	gpeALF_ABS = gpdABC('A', 'B', 'S'),
 	gpeALF_ACE = gpdABC('A', 'C', 'E'), // access
 	gpeALF_ACT = gpdABC('A', 'C', 'T'),
@@ -715,6 +716,7 @@ typedef enum gpeALF: I8
 	gpeALF_WMY = gpdABC('W', 'M', 'Y'),
 	gpeALF_YPR = gpdABC('Y', 'P', 'R'),
 	gpeALF_XOR = gpdABC('X', 'O', 'R'),
+	gpeALF_XYZ = gpdABC('X', 'Y', 'Z'),
 	gpeALF_ZIP = gpdABC('Z', 'I', 'P'),
 	gpeALF_3 = gpdABC('Z', 'Z', 'Z'),
 	//- 4 -----------------
@@ -724,6 +726,7 @@ typedef enum gpeALF: I8
 	gpeALF_ADDM = gpdABCD('A', 'D', 'D', 'M'),
 	gpeALF_ANDM = gpdABCD('A', 'N', 'D', 'M'),
 	gpeALF_ASIN = gpdABCD('A', 'S', 'I', 'N'),
+	gpeALF_AXIS = gpdABCD('A', 'X', 'I', 'S'),
 	gpeALF_BELG = gpdABCD('B', 'E', 'L', 'G'),
 	gpeALF_BGLG = gpdABCD('B', 'G', 'L', 'G'),
 	gpeALF_BONE = gpdABCD('B', 'O', 'N', 'E'),
@@ -786,6 +789,7 @@ typedef enum gpeALF: I8
 
 	gpeALF_LIST = gpdABCD('L', 'I', 'S', 'T'),
 	gpeALF_LINE = gpdABCD('L', 'I', 'N', 'E'),
+	gpeALF_LINK = gpdABCD('L', 'I', 'N', 'K'),
 	gpeALF_LEFT = gpdABCD('L', 'E', 'F', 'T'),
 	gpeALF_LELG = gpdABCD('L', 'E', 'L', 'G'),
 	gpeALF_LOOP = gpdABCD('L', 'O', 'O', 'P'),
@@ -968,6 +972,7 @@ typedef enum gpeALF: I8
 	gpeALF_GALAXY = gpdABCDEF('G', 'A', 'L', 'A', 'X', 'Y'),
 	gpeALF_JACKET = gpdABCDEF('J', 'A', 'C', 'K', 'E', 'T'),
 	gpeALF_KSHIFT = gpdABCDEF('K', 'S', 'H', 'I', 'F', 'T'),
+	gpeALF_KOSZON = gpdABCDEF('K', 'O', 'S', 'Z', 'O', 'N'),
 	gpeALF_LISTEN = gpdABCDEF('L', 'I', 'S', 'T', 'E', 'N'),
 
 	gpeALF_NEWROW = gpdABCDEF('N', 'E', 'W', 'R', 'O', 'W'),
