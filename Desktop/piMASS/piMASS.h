@@ -2603,6 +2603,10 @@ public:
 	{
 		return a4x2[0]*b.a4x2[0] + a4x2[1]*b.a4x2[1];
 	}
+	U8 qlen (void ) const
+	{
+		return (*this) * (*this);
+	}
 
 	I4x4 operator % (const I4x4& b) const
 	{
@@ -2689,6 +2693,18 @@ public:
 	I4x4 zwxy( void ) const
 	{
 		return I4x4( z, w, x, y );
+	}
+	I4x4& _yzw( const I4x4& b )
+	{
+		y = b.y;
+		a4x2[1] = b.a4x2[1];
+		return *this;
+	}
+	I4x4 _yzw( void ) const
+	{
+		I4x4 o = *this;
+		o.x = 0;
+		return o;
 	}
 
 	I4x4* index( U4 n_i ) {
@@ -3822,6 +3838,13 @@ typedef enum gpeZS:U4
 	// alias
 	gpeZS_xyz0 = MAKE_ID( 'x', 'y', 'z',  0		),
 	gpeZS_abc0 = MAKE_ID( 'a', 'b', 'c',  0 	),
+
+	gpeZS_ia13 = MAKE_ID( 'i', 'a', '1', '3'	),
+	gpeZS_ia46 = MAKE_ID( 'i', 'a', '4', '5'	),
+	gpeZS_oa13 = MAKE_ID( 'o', 'a', '1', '3'	),
+	gpeZS_oa46 = MAKE_ID( 'o', 'a', '4', '6'	),
+
+	gpeZS_CTRL = MAKE_ID( 'C', 'T', 'R', 'L'	),
 
 } gpeZS;
 class gpcCMPL;

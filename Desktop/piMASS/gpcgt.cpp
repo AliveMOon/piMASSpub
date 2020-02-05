@@ -702,7 +702,8 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 }
 
 static const char gp_sHELLO[] = " -= Welcome in piMASS 2019 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
-static const char gp_sHELLO_acc[] = "account 0x%x;\r\xff\xfc\1;\r -= Welcome in piMASS 2020 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
+//static const char gp_sHELLO_acc[] = "account 0x%x;\r\xff\xfc\1;\r -= Welcome in piMASS 2020 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
+static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2020 =-\r\n    -= Writen by Dezso Bodor =-\r\n  -= more info use 'help' command =-\r\n%X>";
 
 /// ---------- SLMP -------------
 // SNo.NnSnUn..MsLen.Mtm.

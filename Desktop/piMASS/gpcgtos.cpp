@@ -365,9 +365,20 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					case gpeALF_SLMP:{
 							U1* pA;
 							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
-							if( gpcGT* pGT = pALL->GT( sockSLMP ) )
-							if( pWIN ? pWIN->piMASS : NULL )
-								pOUT = pGT->gpdSLMPos( pOUT, pA, *(pWIN->piMASS), socket );
+							gpcGT* pGT = pALL->GT( sockSLMP );
+							if( pGT ? pGT->TnID.alf == gpeALF_SLMP : false )
+							{
+								if( pWIN ? pWIN->piMASS : NULL )
+									pOUT = pGT->gpdSLMPos( pOUT, pA, *(pWIN->piMASS), socket );
+							} else {
+								pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
+								for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
+								{
+									if( !pALL->ppGTalloc[i] )
+										continue;
+									pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
+								}
+							}
 						} break;
 					case gpeALF_ACCOUNT:
 						// én vagyok a KLIENS,

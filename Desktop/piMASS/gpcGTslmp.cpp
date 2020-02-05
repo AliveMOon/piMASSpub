@@ -24,7 +24,7 @@ void gpcGT::GTslmp_ZSnDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	if( sGTent[2] == 's' && sGTent[0] == 'b' )
 		return GTslmpBINref( mom, pWIN, pALL );
 
-	U4 nLEN = 0, nPAD = 0x10; //nPADu2 = nPAD/sizeof(U2);
+	U4 nLEN = 0, nPAD = 0x10, nPADu2 = nPAD/sizeof(U2);
 	gpcMASS& mass = *(pWIN->piMASS);
 	gpcGT* pGTusr = NULL;
 	gpcLZY	*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
@@ -94,17 +94,23 @@ void gpcGT::GTslmp_ZSnDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		pLZYinp->lzyINS( NULL,	nPAD+(nLEN/2)-sizeof(U2),
 						 s=0,	nPAD+(nLEN/2)-sizeof(U2) );
 		pU2inp = gpmLZYvaliPD( U2, pLZYinp, nPAD );
-		*(U4*)pLZYinp->p_alloc = 0xdeadfeed;
 
-		gpfMEMSET( pLZYinp->p_alloc+4, nPAD-4, pLZYinp->p_alloc, 4 );
+		*(U4*)pLZYinp->p_alloc = 0xdeadfeed;
+		gpfMEMSET( pLZYinp->p_alloc+sizeof(U4), (nPAD/sizeof(U4))-1, pLZYinp->p_alloc, sizeof(U4) );
+
+		//gpfMEMSET( pLZYinp->p_alloc+4, nPAD-4, pLZYinp->p_alloc, 4 );
 
 		pU2inp[-1] = gpfSTR2U8( gpmMEMCPY( pW, pD000, 4 )-2, NULL );
 		if( !(pU2inp[-1]) )
 		{
 			/// Good!
-			iLEN = 0;
+			U2 *pU2iOF4 = pU2inp-1;
+			for( iLEN = 4; iLEN < nLEN; iLEN +=4 )
+				pU2iOF4[iLEN>>2] = gpfSTR2U8( gpmMEMCPY( pW, pD000+iLEN, 4 )-2, NULL );
+
+			/*iLEN = 0;
 			for( U4 e = nLEN-4; iLEN < e; iLEN+=4 )
-				pU2inp[iLEN>>2] = gpfSTR2U8( gpmMEMCPY( pW, pD000+iLEN+4, 4 )-2, NULL );
+				pU2inp[iLEN>>2] = gpfSTR2U8( gpmMEMCPY( pW, pD000+iLEN+4, 4 )-2, NULL );*/
 		} else {
 			/// error
 			if( pALL )
@@ -159,7 +165,7 @@ void gpcGT::GTslmp_ZSnDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
 			return;
 		}
-		if( iLEN <= 0 )
+		if( iLEN <= 4 )
 			return;
 
 		if( pINP->n_load )
@@ -195,13 +201,17 @@ void gpcGT::GTslmp_ZSnDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	if( nU2 < 2 )
 		return;
 
-	//nLEN /= sizeof(*pU2inp);
-	//if( nLEN < 2 )
-	//	return;
-
-	/*nU2--;
-	pU2inp++;
-	pU2out++;*/
+	/// ---------------------------------
+	/// ZSnDrc filter
+	/// ---------------------------------
+	U4 iZSpU2 = ((0x20-nPAD)/sizeof(*pU2inp));
+	gpcZSnDrc	*pZSnDo = (gpcZSnDrc*)(pU2out + iZSpU2 ),
+				*pZSnDi = (gpcZSnDrc*)(pU2inp + iZSpU2 );
+	for( U4 iZS = strtZS, nZS = ((U1*)(pU2inp+nU2) - (U1*)pZSnDi )/sizeof(*pZSnDi); iZS < nZS; iZS++ )
+	{
+		 pZSnDi[iZS] &= pZSnDo[iZS];
+	}
+	/// ---------------------------------
 
 	U4 	iU2 = gpmMEMCMP( pU2inp, pU2out, nU2*sizeof(*pU2inp) )/sizeof(*pU2inp),
 		i_cpy, n_cpy,
@@ -209,6 +219,7 @@ void gpcGT::GTslmp_ZSnDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 	while( iU2 < nU2 )
 	{
+
 		i_cpy = iU2&(~0x7);
 		iU2 = i_cpy+8;
 		if( iU2 > nU2 )

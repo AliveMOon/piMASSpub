@@ -22,10 +22,16 @@
 #define gpdGTlzyIDusr( p ) (((p)&gpdGTlzyID)+I8x2(0,2))
 #define gpdGTlzyIDdif( p ) (((p)&gpdGTlzyID)+I8x2(0,3))
 
+#define strtZS 1
+#define ZShs1i 0x1
+#define ZShs1o 0x2
+#define ZShs2i 0x4
+#define ZShs2o 0x8
 
 
-#define gpdZSnDrcSTART( p ) (p.CTRL.y&0x1)
-#define gpdZSnDrcDONE( p ) (p.CTRL.y&0x2)
+
+/*#define gpdZSnDrcSTART( p ) (p.CTRL.y&0x1)
+#define gpdZSnDrcDONE( p ) (p.CTRL.y&0x2)*/
 #define gpdSLMP GTslmp_ZSnDrc // GTslmp
 #define gpdSLMPos GTzsndOS	//GTslmpOS
 class gpcZSnDrc
@@ -39,9 +45,39 @@ public:
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
 	U4x4	CTRL;
+	gpcZSnDrc& operator &= ( gpcZSnDrc& in );
 
-	gpcZSnDrc* DnZSfrm( U4 nm = 0 )
+	bool bHS1i()	{ return !!(CTRL.y&ZShs1i);		}
+	U4 setHS1i() 	{ return (CTRL.y|=ZShs1i); 		}
+	U4 rsetHS1i()	{ return (CTRL.y&=(~ZShs1i));	}
+
+	bool bHS1o()	{ return !!(CTRL.y&ZShs1o);		}
+	U4 setHS1o()	{ return (CTRL.y|=ZShs1o); 		}
+	U4 rsetHS1o()	{ return (CTRL.y&=(~ZShs1o));	}
+
+
+
+	bool bHS2i() 	{ return !!(CTRL.z&ZShs2i);		}
+	U4 setHS2i() 	{ return (CTRL.z|=ZShs2i); 		}
+	U4 rsetHS2i() 	{ return (CTRL.z&=(~ZShs2i));	}
+
+	bool bHS2o() 	{ return !!(CTRL.z&ZShs2o);		}
+	U4 setHS2o() 	{ return (CTRL.z|=ZShs2o); 		}
+	U4 rsetHS2o() 	{ return (CTRL.z&=(~ZShs2o));	}
+
+	bool operator == ( const gpcZSnDrc& b ) const
 	{
+		if( sizeof(b) == gpmMEMCMP( &b, this, sizeof(b) ) )
+			return true;
+
+		return false;
+	}
+	bool operator != ( const gpcZSnDrc& b ) const
+	{
+		return !(*this == b);
+	}
+
+	gpcZSnDrc* DnZSfrm( U4 nm = 0 ) {
 		if( !this )
 			return NULL;
 		gpmCLR;
@@ -61,6 +97,12 @@ public:
 		aiAX1to6[0].x = gpeZS_iA13;
 		aiAX1to6[1].x = gpeZS_iA46;
 
+		aoax1to6[0].x = gpeZS_oa13;
+		aoax1to6[1].x = gpeZS_oa46;
+		aiax1to6[0].x = gpeZS_ia13;
+		aiax1to6[1].x = gpeZS_ia46;
+
+		CTRL.x = gpeZS_CTRL;
 		// OFFSET - eltolás
 		oxyz.x = gpeZS_pos0;
 		ixyz.x = gpeZS_ipos;
@@ -71,13 +113,13 @@ public:
 	}
 	gpcZSnDrc() { DnZSfrm(); };
 
-	U4 bSTAT( gpcZSnDrc& out )
+	/*U4 bSTAT( gpcZSnDrc& out )
 	{
 		if( !this )
 			return 0;
 
 		return gpdZSnDrcSTART( out );
-	}
+	}*/
 
 	gpcLZY* ANSstat( gpcLZY* pANS )
 	{
@@ -386,14 +428,23 @@ class gpcGT
 
             return msGTdie&1;
         }
+        bool GTprmpt( bool bENT = true  ) {
+			if( this ? sGTent[0] : true )
+				return false;
+
+			U8 s = -1;
+			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
+			return true;
+		}
 		gpcLZY* GTback()
 		{
 			if( !this )
 				return NULL;
-			U8 s;
-			pOUT = pOUT->lzyFRMT( s = -1, "  \r0x%x>", iCNT );
+			GTprmpt();
+			//pOUT = pOUT->lzyFRMT( s = -1, "  \r0x%x>", iCNT );
 			if( !pINP )
 				return pOUT;
+			U8 s;
 
 			pOUT = pOUT->lzyFRMT(
 									s = -1,
@@ -444,14 +495,7 @@ class gpcGT
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );
 		char*	GTsnd( char* p_err, char* s_buff, U4 n_buff );
 
-		bool GTprmpt( bool bENT = true  ) {
-			if( this ? sGTent[0] : true )
-				return false;
 
-			U8 s = -1;
-			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
-			return true;
-		}
 
 		//gpcLZY*	gpcGTzsndSTAT( gpcLZY* pANS, gpcZSnDrc& zs );
 		gpcLZY* GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );

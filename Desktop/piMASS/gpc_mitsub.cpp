@@ -777,12 +777,157 @@ U1 gpsSLMPabc[] =
 				"    "
 
 				;
+gpcZSnDrc& gpcZSnDrc::operator &= ( gpcZSnDrc& out )
+{
+	if( *this == out )
+	{
+		if( CTRL.w )
+		if( bHS1i() )
+		{
+			// kint van a jel
+			if( !bHS1o() )
+			{
+				// még olvasse||végrehajt
+				// várni kell rá pullingolni
+				*this = out;
+				out.CTRL.x++;
+				CTRL.w = 0;		// pullingolni mintha az robin
+								// nem lenne meg a parancs
+								// potolni akarja majd
+				return *this;
+			}
+
+			// megértette||megérkezett
+			out.CTRL.w = 0;
+			out.rsetHS1i();
+			out.rsetHS1o();
+		}
+		return *this;
+	}
+
+	// most jött, vissza ne küldjük
+	out.iXYZ = iXYZ;
+	out.iABC = iABC;
+	out.ixyz = ixyz;
+	out.iabc = iabc;
+	gpmMEMCPY( out.aiAX1to6, aiAX1to6, sizeof(aiAX1to6) );
+	gpmMEMCPY( out.aiax1to6, aiax1to6, sizeof(aiax1to6) );
+
+	// THIS ez a IN most jött ropogos
+	// az out amit akarok vagy korábbi állapot
+	if( out.bHS2i() )
+	{
+		// akart valamit és jeleztük, hogy olvastuk
+		if( bHS2o() )
+		{
+			// még olvassa
+			// ne küldjük mégegyszer
+			out.CTRL.z |= CTRL.z; //setHS2o(); // átveszük, hogy még olvassa
+			*this = out; // ha ugyanaz nem küldheti
+		} else {
+			// már tud róla hogy olvastuk törölhetjük
+			out.CTRL.w = 0;	// töröljük a kedvéért
+			out.rsetHS2i(); // a miénket
+			out.rsetHS2o();	// az övét is
+		}
+		return *this;
+	}
+	else if( bHS2o() )
+	{
+		// na valamit akart a HAVER
+		out.CTRL.w = CTRL.w; // elrakjuk
+		out.setHS2i(); // jelzem megvan
+
+		rsetHS2i(); // force találat legyen
+
+		// na mit csináljunk az infó szerint
+		switch( out.CTRL.w )
+		{
+			default:
+				// ha nem ismerjük semmit
+				// majd más foglalkozik vele
+				break;
+		}
+		return *this;
+	}
+
+
+	if( out.CTRL.w )
+	if( out.bHS1i() )
+	{
+		// kint van a jel
+		if( !bHS1o() )
+		{
+			// még olvasse||végrehajt
+			// várni kell rá pullingolni
+			*this = out;
+			CTRL.w = 0;		// pullingolni
+			return *this;
+		}
+
+		// megértette
+		out.CTRL.w = 0;
+		out.rsetHS1i();
+		out.rsetHS1o();
+		return *this;
+	}
+
+
+	I4x4 dir;
+	U8 dif;
+
+	oXYZ._yzw(iXYZ);
+	oABC._yzw(iABC);
+	oxyz._yzw(ixyz);
+	oabc._yzw(iabc);
+	gpmMEMCPY( out.aiAX1to6, aiAX1to6, sizeof(aiAX1to6) );
+	gpmMEMCPY( out.aiax1to6, aiax1to6, sizeof(aiax1to6) );
+
+	dir = (out.oXYZ - oXYZ)._yzw();
+	dif = dir.qlen();
+    if( dif )
+	{
+		out.CTRL.w |= 1;
+
+	}
+	dir = (out.oABC - oABC)._yzw();
+	dif = dir.qlen();
+	if( dif )
+	{
+		out.CTRL.w |= 2;
+
+	}
+
+	dir = (out.oxyz - oxyz)._yzw();
+	dif = dir.qlen();
+    if( dif )
+	{
+		out.CTRL.w |= 4;
+
+	}
+
+	dir = (out.oabc - oabc)._yzw();
+	dif = dir.qlen();
+	if( dif )
+	{
+		out.CTRL.w |= 8;
+
+	}
+
+	if( out.CTRL.w )
+	{
+		out.setHS1i();
+		return *this;
+	}
+
+	return *this;
+}
 gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
 	if( this ? !n : true )
-		return pANS->lzyFRMT( s, "nonsens" );
+		return pANS->lzyFRMT( s = -1, "nonsens" );
 
 	gpcLZY	*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
 			*pLZYout = NULL,
@@ -812,15 +957,14 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 	U4 nZS = gpmLZYloadPD( pLZYinp, gpcZSnDrc, 0x20 ), iZS = nZS;
 	if( !nZS )
-		return pANS->lzyFRMT( s, "nonsens" );
+		return pANS->lzyFRMT( s = -1, "nonsens" );
 
 	pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID));
 	if( !pLZYout )
-		return pANS->lzyFRMT( s, "nonsens" );
+		return pANS->lzyFRMT( s = -1, "nonsens" );
 
 	gpcZSnDrc	*pZSnDo = (gpcZSnDrc*)gpmLZYvaliPD( U1, pLZYout, 0x20 ),
 				*pZSnDi = (gpcZSnDrc*)gpmLZYvaliPD( U1, pLZYinp, 0x20 );
-
 	U1 	sCOM[] = "ABCD",
 		*pCOM, *pEND = pSTR+n, *pNUM;
 	U4& comA = *(U4*)sCOM, iNUM, nNUM, iE = nZS;
@@ -839,7 +983,9 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			switch( an.alf )
 			{
 				case gpeALF_FORMAT:
-					gpmZn( pZSnDo, nZS );
+					*(U4*)pLZYout->p_alloc = 0xdeadfeed;
+					gpfMEMSET( pLZYout->p_alloc+sizeof(U4), 0x10-sizeof(U4), pLZYout->p_alloc, sizeof(U4) );
+					gpmZn( pLZYout->p_alloc+0x10, pLZYout->n_load+0x10 );
 					continue;
 
 				case gpeALF_HELO:
@@ -923,10 +1069,20 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			}
 			continue;
 		} else if( iNUM > 23 )
-			return pANS->lzyFRMT( s, "nonsens" );
+			return pANS->lzyFRMT( s = -1, "nonsens" );
 
-		if( iZS%nZS < 1 )
-			return pANS->lzyFRMT( s, "Who?" );
+		if( iZS >= nZS )
+		{
+			pANS = pANS->lzyFRMT( s = -1, "Who?" );
+			for( iZS = strtZS; iZS < nZS; iZS++ )
+			{
+				if( !pZSnDi[iZS].NMnDIF.au4x2[0].x )
+					continue;
+				comA = pZSnDi[iZS].NMnDIF.au4x2[0].x;
+				pANS = pANS->lzyFRMT( s = -1, "\r\n%s", sCOM );
+			}
+			return pANS;
+		}
 
 
 		pNUM = pSTR;
