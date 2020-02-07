@@ -777,146 +777,93 @@ U1 gpsSLMPabc[] =
 				"    "
 
 				;
-gpcZSnDrc& gpcZSnDrc::operator &= ( gpcZSnDrc& out )
+
+gpcZSnDrc& gpcZSnDrc::out( gpcZSnDrc& D, gpcZSnDrc& ZS )
 {
-	if( *this == out )
+	// az OUT-ban vagyunk
+	// addig küld az SLMP amig a D-ben az nem lesz mint
+	// az OUT-ban tehát this-ben
+	if( bHS1() )
 	{
-		if( CTRL.w )
-		if( bHS1i() )
-		{
-			// kint van a jel
-			if( !bHS1o() )
-			{
-				// még olvasse||végrehajt
-				// várni kell rá pullingolni
-				*this = out;
-				out.CTRL.x++;
-				CTRL.w = 0;		// pullingolni mintha az robin
-								// nem lenne meg a parancs
-								// potolni akarja majd
-				return *this;
-			}
+		// OUT-ba el lett küldve
+        if( ZS.bHS1() )
+        {
+			// megvan ZS jelzet olvasta
+			CTRL.z = CTRL.w = 0; // törlünk ZS kedvéért
 
-			// megértette||megérkezett
-			out.CTRL.w = 0;
-			out.rsetHS1i();
-			out.rsetHS1o();
-		}
-		return *this;
-	}
 
-	// most jött, vissza ne küldjük
-	out.iXYZ = iXYZ;
-	out.iABC = iABC;
-	out.ixyz = ixyz;
-	out.iabc = iabc;
-	gpmMEMCPY( out.aiAX1to6, aiAX1to6, sizeof(aiAX1to6) );
-	gpmMEMCPY( out.aiax1to6, aiax1to6, sizeof(aiax1to6) );
-
-	// THIS ez a IN most jött ropogos
-	// az out amit akarok vagy korábbi állapot
-	if( out.bHS2i() )
-	{
-		// akart valamit és jeleztük, hogy olvastuk
-		if( bHS2o() )
-		{
-			// még olvassa
-			// ne küldjük mégegyszer
-			out.CTRL.z |= CTRL.z; //setHS2o(); // átveszük, hogy még olvassa
-			*this = out; // ha ugyanaz nem küldheti
+			rstHS1(D);
 		} else {
-			// már tud róla hogy olvastuk törölhetjük
-			out.CTRL.w = 0;	// töröljük a kedvéért
-			out.rsetHS2i(); // a miénket
-			out.rsetHS2o();	// az övét is
-		}
-		return *this;
-	}
-	else if( bHS2o() )
-	{
-		// na valamit akart a HAVER
-		out.CTRL.w = CTRL.w; // elrakjuk
-		out.setHS2i(); // jelzem megvan
-
-		rsetHS2i(); // force találat legyen
-
-		// na mit csináljunk az infó szerint
-		switch( out.CTRL.w )
-		{
-			default:
-				// ha nem ismerjük semmit
-				// majd más foglalkozik vele
-				break;
-		}
-		return *this;
-	}
-
-
-	if( out.CTRL.w )
-	if( out.bHS1i() )
-	{
-		// kint van a jel
-		if( !bHS1o() )
-		{
-			// még olvasse||végrehajt
-			// várni kell rá pullingolni
-			*this = out;
-			CTRL.w = 0;		// pullingolni
+			// még ZS nem olvasta PULLing
+			// nem szabad *this = ZSo; tartjuk a D-hez magunkat
+			D = *this;
+			/// PULLING 1
+			setHS1(D);
 			return *this;
 		}
 
-		// megértette
-		out.CTRL.w = 0;
-		out.rsetHS1i();
-		out.rsetHS1o();
+	}
+
+	// eltároljuk a friss adatokat
+	i(D.i(ZS));
+
+	if( bHS2() )
+	{
+		if( ZS.bHS2() )
+		{
+			// megértette hogy értettük
+			CTRL.z = CTRL.w = 0; // törlünk ZS kedvéért
+
+			rstHS2(D);
+			return *this;
+		}
+		// olvassa olvasse könnyeit hulajtja
+		/// PULLING 2
+		setHS2(D);
 		return *this;
 	}
-
-
-	I4x4 dir;
-	U8 dif;
-
-	oXYZ._yzw(iXYZ);
-	oABC._yzw(iABC);
-	oxyz._yzw(ixyz);
-	oabc._yzw(iabc);
-	gpmMEMCPY( out.aiAX1to6, aiAX1to6, sizeof(aiAX1to6) );
-	gpmMEMCPY( out.aiax1to6, aiax1to6, sizeof(aiax1to6) );
-
-	dir = (out.oXYZ - oXYZ)._yzw();
-	dif = dir.qlen();
-    if( dif )
+	if( ZS.bHS2() )
 	{
-		out.CTRL.w |= 1;
+		// ZS akar valamit
+		D.CTRL.z = CTRL.z = ZS.CTRL.z; // hiba szám
 
+		setHS2(D); // OLVASTUK
+		return *this;
 	}
-	dir = (out.oABC - oABC)._yzw();
+	// minden kötelező vége jöhet a free style
+
+	I4x4 dir = (oXYZ - D.oXYZ)._yzw();
+	U8 dif = dir.qlen();
+	if( dif )
+	{
+		CTRL.w |= 1;
+	}
+
+	dir = (oABC - D.oABC)._yzw();
 	dif = dir.qlen();
 	if( dif )
 	{
-		out.CTRL.w |= 2;
-
+		CTRL.w |= 2;
 	}
 
-	dir = (out.oxyz - oxyz)._yzw();
-	dif = dir.qlen();
-    if( dif )
-	{
-		out.CTRL.w |= 4;
-
-	}
-
-	dir = (out.oabc - oabc)._yzw();
+	dir = (oxyz - D.oxyz)._yzw();
 	dif = dir.qlen();
 	if( dif )
 	{
-		out.CTRL.w |= 8;
-
+		CTRL.w |= 4;
 	}
 
-	if( out.CTRL.w )
+	dir = (oabc - D.oabc)._yzw();
+	dif = dir.qlen();
+	if( dif )
 	{
-		out.setHS1i();
+		CTRL.w |= 8;
+	}
+
+	if( CTRL.w )
+	{
+		// itt kell leellenőrizni mondjuk az ütközést
+		setHS1(D);
 		return *this;
 	}
 
@@ -955,12 +902,14 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	}
 	///-----------------------------
 
-	U4 nZS = gpmLZYloadPD( pLZYinp, gpcZSnDrc, 0x20 ), iZS = nZS;
-	if( !nZS )
-		return pANS->lzyFRMT( s = -1, "nonsens" );
+
 
 	pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID));
 	if( !pLZYout )
+		return pANS->lzyFRMT( s = -1, "nonsens" );
+
+	U4 nZS = gpmLZYloadPD( pLZYout, gpcZSnDrc, 0x20 ), iZS = nZS;
+	if( !nZS )
 		return pANS->lzyFRMT( s = -1, "nonsens" );
 
 	gpcZSnDrc	*pZSnDo = (gpcZSnDrc*)gpmLZYvaliPD( U1, pLZYout, 0x20 ),
@@ -1074,7 +1023,7 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		if( iZS >= nZS )
 		{
 			pANS = pANS->lzyFRMT( s = -1, "Who?" );
-			for( iZS = strtZS; iZS < nZS; iZS++ )
+			for( iZS = gpdZSstrt; iZS < nZS; iZS++ )
 			{
 				if( !pZSnDi[iZS].NMnDIF.au4x2[0].x )
 					continue;

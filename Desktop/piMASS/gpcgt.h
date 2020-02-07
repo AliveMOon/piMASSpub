@@ -11,8 +11,12 @@
 				          //   500000FF03FF000028000014010000D*0000100004
 				          //   +-->+>+>+-->+>+-->.x00.x04.x08.x0C.x10.x14.x18.x1c.x20  28  32  36  40
 				          // \n500000FF03FF000020000014010000D*000000000265686f6c
+#define gpdSLMP_recv_MdLN4SL6N4 "500000FF03FF00%0.4X000004010000M*%0.6d%0.4X"
+#define gpdSLMP_recv_DdLN4SL6N4 "500000FF03FF00%0.4X000004010000D*%0.6d%0.4X"//"0000"
+#define gpdSLMP_recv_YxLN4SL6N4 "500000FF03FF00%0.4X000004010000Y*%0.6X%0.4X"
 
-#define gpdSLMP_recv_LN4SL6N4 "500000FF03FF00%0.4X000004010000D*%0.6d%0.4X"//"0000"
+#define gpdSLMP_recv_LN4SL6N4 gpdSLMP_recv_DdLN4SL6N4
+
 						  //   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..
 #define gpdSLMP_send_LN4SL6N4 "500000FF03FF00%0.4X000014010000D*%0.6d%0.4X"
 //#define gpdRECVn (0x30000/12)
@@ -22,7 +26,10 @@
 #define gpdGTlzyIDusr( p ) (((p)&gpdGTlzyID)+I8x2(0,2))
 #define gpdGTlzyIDdif( p ) (((p)&gpdGTlzyID)+I8x2(0,3))
 
-#define strtZS 1
+#define gpdZSstrt 1
+#define ZShs1 0x1
+#define ZShs2 0x2
+
 #define ZShs1i 0x1
 #define ZShs1o 0x2
 #define ZShs2i 0x4
@@ -45,7 +52,45 @@ public:
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
 	U4x4	CTRL;
+	gpcZSnDrc& out( gpcZSnDrc& pev, gpcZSnDrc& inp );
 	gpcZSnDrc& operator &= ( gpcZSnDrc& in );
+
+	gpcZSnDrc& i( gpcZSnDrc& ZS )
+	{
+		iXYZ._yzw( ZS.iXYZ );
+		iABC._yzw( ZS.iABC );
+		ixyz._yzw( ZS.ixyz );
+		iabc._yzw( ZS.iabc );
+		aiAX1to6[0]._yzw( ZS.aiAX1to6[0] );
+		aiAX1to6[1]._yzw( ZS.aiAX1to6[1] );
+		aiax1to6[0]._yzw( ZS.aiax1to6[0] );
+		aiax1to6[1]._yzw( ZS.aiax1to6[1] );
+
+		return *this;
+	}
+
+	bool bHS1()	{ return !!(CTRL.y&ZShs1);	}
+	U4 setHS1( gpcZSnDrc& D ) {
+		D.CTRL.y&=(~ZShs1);
+		return (CTRL.y|=ZShs1);
+	}
+	U4 rstHS1( gpcZSnDrc& D ) {
+		D.CTRL.y|=ZShs1;
+		return (CTRL.y&=(~ZShs1));
+	}
+
+	bool bHS2()	{ return !!(CTRL.y&ZShs2);	}
+	U4 setHS2( gpcZSnDrc& D ) {
+		D.CTRL.y&=(~ZShs2);
+		return (CTRL.y|=ZShs2);
+	}
+	U4 rstHS2( gpcZSnDrc& D ) {
+		D.CTRL.y|=ZShs2;
+		return (CTRL.y&=(~ZShs2));
+	}
+
+
+
 
 	bool bHS1i()	{ return !!(CTRL.y&ZShs1i);		}
 	U4 setHS1i() 	{ return (CTRL.y|=ZShs1i); 		}

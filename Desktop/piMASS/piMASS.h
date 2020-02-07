@@ -3923,10 +3923,10 @@ public:
 
 #define gpdLZYallGT 4
 //#define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
-#define gpmLZYvaliPD( a, b, n ) ((a*)( (b) ? (b)->p_alloc+(n) : NULL ))
+#define gpmLZYvaliPD( a, b, n ) ((a*)( (b) ? ((b)->p_alloc ? (b)->p_alloc+(n) : NULL ) : NULL ))
 #define gpmLZYvali( a, b ) gpmLZYvaliPD( a, (b), 0 )
 
-#define gpmLZYloadPD( p, t, n ) ((p) ? (((p->n_load)-(n))/sizeof(t)) : 0 )
+#define gpmLZYloadPD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
 #define gpmLZYload( p, t ) gpmLZYloadPD( p, t, (U8)0 )
 class gpcLZY
 {
