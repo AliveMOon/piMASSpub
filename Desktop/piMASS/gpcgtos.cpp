@@ -303,11 +303,19 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	}
 
 	if( nOSin != pINP->n_load )
+	if( p_str < p_null )
+	switch( p_null[-1] )
 	{
-		nOSin = pINP->n_load;
-		if( GTprmpt( false ) )
-		if( pINP )
-			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
+		case '\r':
+		case '\n':
+		case ';':
+			break;
+		default:
+			nOSin = pINP->n_load;
+			if( GTprmpt( false ) )
+			//if( pINP )
+				pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
+			break;
 	}
 
 	I8x2 cAN( gpeALF_NONSENSE, 0 );
@@ -444,21 +452,21 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						{
 							if( !pALL->ppGTalloc[i] )
 								continue;
-							pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
+							pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, gpmGTent, gppTAB );
 						}
 						break;
 					case gpeALF_MSG:{
 							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "%smsg%0.8x: %s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
 						} break;
 					case gpeALF_HELP:
-						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", (sGTent[0]?(char*)sGTent:"\r\n") );
+						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", gpmGTent );
 						break;
 					case gpeALF_EYE: {
 							isEVNT.null();
 							isEVNT.id = gpeNET4_0EYE;
 							isEVNT.n = TnID.num;
 							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzyFRMT(s = -1, "%s event", (sGTent[0]?(char*)sGTent:"\r\n") );
+							pOUT = pOUT->lzyFRMT(s = -1, "%s event", gpmGTent ); //(sGTent[0]?(char*)sGTent:"\r\n") );
 						} break;
 
 
@@ -615,7 +623,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						pOUT = pOUT->lzyFRMT(s = -1, "%s event", !*s_prompt ? "\r\n" : "");
 						break;*/
 					default:
-						pOUT = pOUT->lzyFRMT( s = -1, "%snonsens", (sGTent[0]?(char*)sGTent:"\r\n") );
+						pOUT = pOUT->lzyFRMT( s = -1, "%snonsens", gpmGTent );
 						break;
 				}
 				p_sub = p_next; // p_row_end;

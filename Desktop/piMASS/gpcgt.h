@@ -4,6 +4,8 @@
 
 #include "gpcpic.h"
 
+#define gpmGTent (sGTent[0]?(char*)sGTent:"\r\n")
+
 #define gpdSLMPnDEV 512
 				          //		             +------- Len: 0x28 = 32+8 = 40 --------+
 				          //   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..Data............
