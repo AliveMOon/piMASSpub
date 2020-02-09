@@ -198,7 +198,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;", nLEN );
 
 	nCMP = pE-pS;
-	//gpmMEMCPYoff( sPUB, pS, nCMP );
+	//gpmMCPYof( sPUB, pS, nCMP );
 	//sPUB[nCMP] = 0;
 
 	p = gpfSTR2I8( pE, NULL );
@@ -224,11 +224,11 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		if( !pGT->bGTdie() )
 			return pGT;
 
-		if( gpmMEMCMP( pS, pGT->s_ip + (*pGT->s_ip == '!'), nCMP ) == nCMP )
+		if( gpmMCMP( pS, pGT->s_ip + (*pGT->s_ip == '!'), nCMP ) == nCMP )
 			return pGT;
 
 		*pGT->s_ip = '!';
-		gpmMEMCPYoff( pGT->s_ip+1, pS, nCMP );
+		gpmMCPYof( pGT->s_ip+1, pS, nCMP );
 		pGT->s_ip[nCMP+1] = 0;
 		return pGT;
 	}
@@ -236,7 +236,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	if( iGTfr < nGTld )
 	{
 		pGT = new gpcGT( an, port );
-		gpmMEMCPYoff( pGT->s_ip, pS, nCMP );
+		gpmMCPYof( pGT->s_ip, pS, nCMP );
 		pGT->s_ip[nCMP] = 0;
 
 		return ppGTalloc[iGTfr] = pGT;
@@ -248,12 +248,12 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		nGTalloc += 0x10;
 		gpcGT	**ppKILL = ppGTalloc;
 		ppGTalloc = new gpcGT*[nGTalloc];
-		gpmMEMCPYoff( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
+		gpmMCPYof( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
 		gpmDELary(ppKILL);
 	}
 
 	pGT = new gpcGT( an, port );
-	gpmMEMCPYoff( pGT->s_ip, pS, nCMP );
+	gpmMCPYof( pGT->s_ip, pS, nCMP );
 	pGT->s_ip[nCMP] = 0;
 
 	return ppGTalloc[iGTfr] = pGT;
@@ -299,7 +299,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
 		nGTalloc += 0x10;
 		gpcGT	**ppKILL = ppGTalloc;
 		ppGTalloc = new gpcGT*[nGTalloc];
-		gpmMEMCPYoff( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
+		gpmMCPYof( ppGTalloc, ppKILL, iGTfr ); // mert nGTld == iGTfr+1
 		gpmDELary(ppKILL);
 	}
 
@@ -359,7 +359,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 			ppGTalloc = new gpcGT*[nGTalloc];
 			if( pp_kill )
 			{
-				gpmMEMCPYoff( ppGTalloc, pp_kill, n_kill );
+				gpmMCPYof( ppGTalloc, pp_kill, n_kill );
 			}
 			gpmZn( ppGTalloc+n_kill+1, (nGTalloc-n_kill-1) );
 			gpmDELary( pp_kill );

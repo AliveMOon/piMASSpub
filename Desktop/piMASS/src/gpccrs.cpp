@@ -1861,7 +1861,7 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 	if( pS ? !nCPY : true )
 		return pBUFF;
 
-	gpmMEMCPYoff( pBUFF, pS, nCPY );
+	gpmMCPYof( pBUFF, pS, nCPY );
 	pBUFF[nCPY] = 0;
 
 	return pBUFF+nCPY;
@@ -1982,7 +1982,7 @@ void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcP
 		if( pB < pE )
 		if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
 		{
-			//gpmMEMCPYoff( edANIN, selANIN, 2 );
+			//gpmMCPYof( edANIN, selANIN, 2 );
 			if( pSRC )
 			{
 				if( max( iSTR.y, iSTR.x ) > pSRC->nL )
@@ -2010,7 +2010,7 @@ void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcP
 					*pRIGe	= pOA + nOL,
 					*pLFT	= (pSRC->pA = new U1[nNEW]) + iSTR.x;
 
-				gpmMEMCPYoff( pSRC->pA, pOA, iSTR.x );
+				gpmMCPYof( pSRC->pA, pOA, iSTR.x );
 
 				for( ; pB < pE; pB++ )
 				{
@@ -2048,7 +2048,7 @@ void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcP
 				iSTR.y = iSTR.x = pLFT-pSRC->pA;
 				if( pRIG < pRIGe )
 				{
-					gpmMEMCPYoff( pLFT, pRIG, pRIGe-pRIG );
+					gpmMCPYof( pLFT, pRIG, pRIGe-pRIG );
 					pLFT += pRIGe-pRIG;
 				}
 				pSRC->nL = pLFT-pSRC->pA;

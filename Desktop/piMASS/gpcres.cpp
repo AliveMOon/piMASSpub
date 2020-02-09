@@ -154,7 +154,7 @@ gpcALU& gpcALU::equ( gpcALU& b )
 	TanDT(b);
 
 	U1	*pD = new U1[nALLOC()];
-	gpmMEMCPYoff( pD, pDAT, AN().w );
+	gpmMCPYof( pD, pDAT, AN().w );
 	pD[AN().w] = 0;
 	pDAT = pD;
 
@@ -1603,7 +1603,7 @@ gpcALU& gpcALU::operator = ( U1* pSTR )
 	U1* pD = ALUdat( pRM, U4x2(n,0), gpeTYP_STR, I1x4(0) );
 	if( !pD )
 		return *this;
-	gpmMEMCPYoff( pD, pSTR, n );
+	gpmMCPYof( pD, pSTR, n );
 	pD[n] = 0;
 	return *this;
 }

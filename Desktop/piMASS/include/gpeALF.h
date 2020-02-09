@@ -727,6 +727,7 @@ typedef enum gpeALF: I8
 	gpeALF_ANDM = gpdABCD('A', 'N', 'D', 'M'),
 	gpeALF_ASIN = gpdABCD('A', 'S', 'I', 'N'),
 	gpeALF_AXIS = gpdABCD('A', 'X', 'I', 'S'),
+	gpeALF_BILL = gpdABCD('B', 'I', 'L', 'L'),
 	gpeALF_BELG = gpdABCD('B', 'E', 'L', 'G'),
 	gpeALF_BGLG = gpdABCD('B', 'G', 'L', 'G'),
 	gpeALF_BONE = gpdABCD('B', 'O', 'N', 'E'),
@@ -781,6 +782,7 @@ typedef enum gpeALF: I8
 	gpeALF_INIT = gpdABCD('I', 'N', 'I', 'T'),
 
 	gpeALF_ITEM = gpdABCD('I', 'T', 'E', 'M'),
+	gpeALF_JOHN = gpdABCD('J', 'O', 'H', 'N'),
 	gpeALF_JOIN = gpdABCD('J', 'O', 'I', 'N'),
 	gpeALF_JUMP = gpdABCD('J', 'U', 'M', 'P'),
 

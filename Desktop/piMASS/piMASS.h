@@ -245,7 +245,7 @@ class gpcMASS;
 #define gpmGLBOFF(a) (void*)(a)
 
 #define gpmOFF( st, m ) ( (size_t)(&((st*)NULL)->m) )
-#define gpmOFFOFF(st, m,n) (GPM_OFF(st, m)-GPM_OFF(st, n))
+#define gpmOFFOFF(st, m, n ) (GPM_OFF(st, m)-GPM_OFF(st, n))
 
 #define gpmSTRCPY( d, s ) \
 			(												\
@@ -259,7 +259,7 @@ class gpcMASS;
 				(d) ? gpfALF2STR( (char*)(d), (gpeALF)alf )	\
 					: 0 									\
 			)
-#define gpmMEMCPY( d, s, n ) \
+#define gpmMCPY( d, s, n ) \
 			((U1*)(											\
 				(											\
 				 	(n)										\
@@ -271,7 +271,7 @@ class gpcMASS;
 				: ( d )  									\
 			))
 /// WARNING ez beszorozza a sizeof()-val
-#define gpmMEMCPYoff( d, s, n ) gpmMEMCPY( d, s, ((n)*sizeof(*(d))) )
+#define gpmMCPYof( d, s, n ) gpmMCPY( d, s, ((n)*sizeof(*(d))) )
 
 #define gpmSTRnCPY( d, s, n ) \
 			(														\
@@ -285,7 +285,7 @@ class gpcMASS;
 
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
-#define gpmMEMCMP gp_memcmp
+#define gpmMCMP gp_memcmp
 #define gpmUnB( u )		( abs(u)>0x7fFF ? (abs(u)>0x7fffFFFF ? 8 : 4) : (abs(u)>0x7f ? 2 : 1)  )
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
@@ -319,12 +319,12 @@ inline U1* gpfSTR( U1* pSTR, const U1* pU )
 	}
 	if( nU < nSTR )
 	{
-		gpmMEMCPYoff( pSTR, pU, nU );
+		gpmMCPYof( pSTR, pU, nU );
 		pSTR[nU] = 0;
 		return pSTR;
 	}
 	pSTR = new U1[nU+1];
-	gpmMEMCPYoff( pSTR, pU, nU );
+	gpmMCPYof( pSTR, pU, nU );
 	pSTR[nU] = 0;
 	return pSTR;
 }
@@ -1694,6 +1694,10 @@ public:
         {
             U4 aXYZW[4];
         };
+        struct
+        {
+            U2 aU2[8];
+        };
 
     };
 
@@ -2694,16 +2698,16 @@ public:
 	{
 		return I4x4( z, w, x, y );
 	}
-	I4x4& _yzw( const I4x4& b )
+	I4x4& xyz_( I4x4 b )
 	{
-		y = b.y;
-		a4x2[1] = b.a4x2[1];
+		a4x2[0] = b.a4x2[0];
+		z = b.z;
 		return *this;
 	}
-	I4x4 _yzw( void ) const
+	I4x4 xyz_( void ) const
 	{
 		I4x4 o = *this;
-		o.x = 0;
+		o.w = 0;
 		return o;
 	}
 
@@ -2909,7 +2913,7 @@ public:
     }
 	I8x2( U8* pB )
     {
-		gpmMEMCPYoff( this, pB, 1 );
+		gpmMCPYof( this, pB, 1 );
     }
     I8x2& operator = ( const U1* pS );
 	// cnt = fract * U42(1, w);
@@ -3276,7 +3280,7 @@ public:
     }
     Fx2( float* pF )
     {
-        gpmMEMCPYoff( this, pF, 1 );
+        gpmMCPYof( this, pF, 1 );
     }
     Fx2( I4x2 xy )
     {
@@ -3437,7 +3441,7 @@ public:
     }
     Fx4( float* pF )
     {
-        gpmMEMCPYoff( this, pF, 1 );
+        gpmMCPYof( this, pF, 1 );
     }
     Fx4( I4x2 xy, I4x2 zw = 0 )
     {
@@ -3648,7 +3652,7 @@ public:
     }
     D4( double* pD )
     {
-        gpmMEMCPYoff( this, pD, 1 );
+        gpmMCPYof( this, pD, 1 );
     }
     double sum( void ) const
     {
@@ -3806,6 +3810,9 @@ typedef enum gpeZS:U4
 	gpeZS_null, // = 0,
 	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
 
+	gpeZS_BILL = MAKE_ID( 'B', 'I', 'L', 'L'	),
+	gpeZS_JOHN = MAKE_ID( 'J', 'O', 'H', 'N'	),
+
 	gpeZS_DIR0 = MAKE_ID( 'D', 'I', 'R',  0 	),
 	gpeZS_iPOS = MAKE_ID( 'i', 'P', 'O', 'S'	),
 	gpeZS_POS0 = MAKE_ID( 'P', 'O', 'S',  0		),
@@ -3845,6 +3852,8 @@ typedef enum gpeZS:U4
 	gpeZS_oa46 = MAKE_ID( 'o', 'a', '4', '6'	),
 
 	gpeZS_CTRL = MAKE_ID( 'C', 'T', 'R', 'L'	),
+	gpeZS_iCTR = MAKE_ID( 'i', 'C', 'T', 'R'	),
+	gpeZS_oCTR = MAKE_ID( 'o', 'C', 'T', 'R'	),
 
 } gpeZS;
 class gpcCMPL;
@@ -3928,6 +3937,7 @@ public:
 
 #define gpmLZYloadPD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
 #define gpmLZYload( p, t ) gpmLZYloadPD( p, t, (U8)0 )
+
 class gpcLZY
 {
 public:
@@ -3935,14 +3945,20 @@ public:
 	{
 		struct{
 			U1* p_alloc, aSET[8];
-			U8 n_load, n_alloc;
+			size_t //U8
+			n_load, n_alloc;
 		};
 		struct{
 			U8		*p_a8;
 			gpeWIP	aWIP[8];
-			U8		n_l8, n_a8;
+			size_t //U8
+					n_l8, n_a8;
 		};
 	};
+	size_t nLD()
+	{
+		return this ? n_load : 0;
+	}
 
 	U4 nPC( void );
 	void wait( void )
@@ -4379,7 +4395,7 @@ public:
 			return lzyADD( p_u1, n_u1, n_start, n );
 		}
 		lzy_exp( n_start, n_sub,  n_u1, n );
-		gpmMEMCPYoff( p_alloc+n_start, p_u1, n_u1 );
+		gpmMCPYof( p_alloc+n_start, p_u1, n_u1 );
 		return this;
 	}
 	gpcLZY& operator = ( const gpcLZY& plus )
@@ -4722,7 +4738,7 @@ public:
 				nLZYall += 0x10;
 				gpcLZY	**ppKILL = ppLZY;
 				ppLZY = new gpcLZY*[nLZYall];
-				gpmMEMCPYoff( ppLZY, ppKILL, iLZYfr ); // mert nGTld == iGTfr+1
+				gpmMCPYof( ppLZY, ppKILL, iLZYfr ); // mert nGTld == iGTfr+1
 				gpmDELary(ppKILL);
 			}
 		}

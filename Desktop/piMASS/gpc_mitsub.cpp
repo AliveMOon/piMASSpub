@@ -65,19 +65,19 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		char 	sLEN[] = "0x000000",	*pL = sLEN+2,
 				sWORD[] = "0x0000",		*pW = sWORD+2;
 
-		nLEN = gpfSTR2U8( gpmMEMCPY( pL, pD000, 6 )-2, NULL );
+		nLEN = gpfSTR2U8( gpmMCPY( pL, pD000, 6 )-2, NULL );
 		pD000 += 6;
 		if( pINP->n_load < 18+nLEN+nSUB )
 			return; // még nem jött le az egész
 
 		iCNT++;
 		pU2inp = (U2*)(pLZYinp->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc);
-		*pU2inp = gpfSTR2U8( gpmMEMCPY( pW, pD000, 4 )-2, NULL );
+		*pU2inp = gpfSTR2U8( gpmMCPY( pW, pD000, 4 )-2, NULL );
 		if( !*pU2inp )
 		{
 			/// Good!
 			for( iLEN = 4; iLEN < nLEN; iLEN+=4 )
-				pU2inp[iLEN>>2] = gpfSTR2U8( gpmMEMCPY( pW, pD000+iLEN, 4 )-2, NULL );
+				pU2inp[iLEN>>2] = gpfSTR2U8( gpmMCPY( pW, pD000+iLEN, 4 )-2, NULL );
 		} else {
 			/// error
 			if( pALL )
@@ -172,7 +172,7 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	pU2inp++;
 	pU2out++;
 
-	U4 	iU2 = gpmMEMCMP( pU2inp, pU2out, nLEN*sizeof(*pU2inp) )/sizeof(*pU2inp),
+	U4 	iU2 = gpmMCMP( pU2inp, pU2out, nLEN*sizeof(*pU2inp) )/sizeof(*pU2inp),
 		i_cpy, n_cpy,
 		nOld = pOUT ? pOUT->n_load : 0;
 
@@ -221,7 +221,7 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 				break;
 		}
 
-		iU2 += gpmMEMCMP( pU2inp+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
+		iU2 += gpmMCMP( pU2inp+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
 	}
 
 	if( nOld < (pOUT ? pOUT->n_load : 0) )
@@ -777,8 +777,144 @@ U1 gpsSLMPabc[] =
 				"    "
 
 				;
+gpcZS& gpcZS::operator = ( const gpcDrc& D )
+{
+	gpmMCPYof( &aPOS,	&D.oXYZ, 3 );
+	gpmMCPYof( &aABC,	&D.oABC, 3 );
+	gpmMCPYof( &apos,	&D.oxyz, 3 );
+	gpmMCPYof( &aabc,	&D.oabc, 3 );
+	gpmMCPYof( aJ16,	&D.aoAX1to6[0], 3 );
+	gpmMCPYof( aJ16+3,	&D.aoAX1to6[1], 3 );
+	gpmMCPYof( aj16,	&D.aoax1to6[0], 3 );
+	gpmMCPYof( aj16+3,	&D.aoax1to6[1], 3 );
+	return *this;
+}
+gpcZS::gpcZS( const gpcDrc& D )
+{
+	gpmCLR;
+	*this = D;
+}
+gpcDrc& gpcDrc::judo( gpcZS& inp )
+{
+	*this = inp;
 
-gpcZSnDrc& gpcZSnDrc::out( gpcZSnDrc& D, gpcZSnDrc& ZS )
+	if( bHS1o() )
+	{
+		// kint van a HS1 jelünk
+		if( bHS1i() )
+		{
+			// megvan ZS jelzet olvasta
+            oCTRL.z = oCTRL.w = 0; // törlünk ZS kedvéért
+            rstHS1();
+			return *this;
+        }
+        /// PULLING HS1
+		setHS1();
+		return *this;
+	}
+
+	if( bHS2o() )
+	{
+		// kint van a HS2 jelünk, hogy olvastuk
+		if( bHS2i() )
+		{
+			// megvan ZS jelzet megértette, hogy olvastuk
+            oCTRL.z = oCTRL.w = 0; // törlünk ZS kedvéért
+            rstHS2();
+			return *this;
+        }
+        /// PULLING HS2
+		setHS2();
+		return *this;
+	}
+
+	if( bHS2i() )
+	{
+		// ZS hibat jelzett
+		switch( iCTRL.z ) // na mi a hiba
+		{
+			default:
+				oCTRL.z = iCTRL.z;
+				oCTRL.w = 0;
+				break;
+		}
+		rstHS2();
+		return *this;
+	}
+	if( !NMnDIF.x )
+		return *this;
+
+	I4x4 dir = (oXYZ - iXYZ).xyz_();
+	I8 dif = dir.qlen(), mm = sqrt(dif/100);
+	if( mm < 400 )
+	{
+		if( mm > 250 )
+		{
+			iXYZ &= I4x4( 450,450,450, 1 );
+			iXYZ /= I4x4( mm,mm,mm, 1 );
+		} else {
+			// safe space
+			iXYZ.x = 350;
+			iXYZ.y = (NMnDIF.x == gpeZS_BILL) ? -450 : 450;
+			iXYZ.z = 734;
+		}
+		iXYZ &= I4x4( 100,100,100, 1 );
+		dir = (oXYZ - iXYZ).xyz_();
+		dif = dir.qlen();
+		mm = sqrt(dif/100);
+		oxyz &= I4x4( 0,0,0, 1 );
+		ixyz.xyz_(oxyz);
+	}
+    if( mm > 50 )
+    {
+		dir &= I4x4( 50, 50, 50, 0 );
+		dir /= I4x4( mm,mm,mm, 1 );
+		dir &= I4x4( 100,100,100, 0 );
+		oXYZ.xyz_( dir+iXYZ );
+		dir = (oXYZ - iXYZ).xyz_();
+		dif = dir.qlen();
+		mm = sqrt(dif/100);
+		oxyz &= I4x4( 0,0,0, 1 );
+		ixyz.xyz_(oxyz);
+    }
+	if( dif )
+	{
+		CTRL.w |= 1;
+	}
+
+	dir = (oABC - iABC).xyz_();
+	dif = dir.qlen();
+	if( dif )
+	{
+		CTRL.w |= 2;
+	}
+
+	dir = (oxyz - ixyz).xyz_();
+	dif = dir.qlen();
+	if( dif )
+	{
+		CTRL.w |= 4;
+	}
+
+	dir = (oabc - iabc).xyz_();
+	dif = dir.qlen();
+	if( dif )
+	{
+		CTRL.w |= 8;
+	}
+
+	if( CTRL.w )
+	{
+		// itt kell le ellenőrizni mondjuk az ütközésre
+		setHS1(D);
+		return *this;
+	}
+
+	/// join adatok most egyenlőre nem
+
+	return *this;
+}
+/*gpcDrc& gpcDrc::out( gpcDrc& D, gpcDrc& ZS )
 {
 	// az OUT-ban vagyunk
 	// addig küld az SLMP amig a D-ben az nem lesz mint
@@ -832,28 +968,28 @@ gpcZSnDrc& gpcZSnDrc::out( gpcZSnDrc& D, gpcZSnDrc& ZS )
 	}
 	// minden kötelező vége jöhet a free style
 
-	I4x4 dir = (oXYZ - D.oXYZ)._yzw();
+	I4x4 dir = (oXYZ - D.oXYZ).xyz_();
 	U8 dif = dir.qlen();
 	if( dif )
 	{
 		CTRL.w |= 1;
 	}
 
-	dir = (oABC - D.oABC)._yzw();
+	dir = (oABC - D.oABC).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
 		CTRL.w |= 2;
 	}
 
-	dir = (oxyz - D.oxyz)._yzw();
+	dir = (oxyz - D.oxyz).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
 		CTRL.w |= 4;
 	}
 
-	dir = (oabc - D.oabc)._yzw();
+	dir = (oabc - D.oabc).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
@@ -868,55 +1004,61 @@ gpcZSnDrc& gpcZSnDrc::out( gpcZSnDrc& D, gpcZSnDrc& ZS )
 	}
 
 	return *this;
-}
-gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
+}*/
+gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
 	if( this ? !n : true )
 		return pANS->lzyFRMT( s = -1, "nonsens" );
 
-	gpcLZY	*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
+	gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ) );
+	gpcLZY	//*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
 			*pLZYout = NULL,
 			*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 	///-----------------------------
 	/// UJ felhasználó?
-	U4 iSOCK = 0, nSOCK = 0;
-	if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
-	{
-        nSOCK = gpmLZYload(pLZYusr,sockUSR);
-        for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
-        {
-			if( pSOCK[iSOCK] != sockUSR )
-				continue;
-			// nem új bent van a listában
-			break;
-        }
-	}
-	if( iSOCK >= nSOCK )
-	{
-		// új felhasználó!
-		pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
-		iSOCK = nSOCK;
-		nSOCK = gpmLZYload(pLZYusr,sockUSR);
-	}
+	///-----------------------------
+		U4 iSOCK = 0, nSOCK = 0;
+		if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
+		{
+			nSOCK = gpmLZYload(pLZYusr,sockUSR);
+			for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
+			{
+				if( pSOCK[iSOCK] != sockUSR )
+					continue;
+				// nem új bent van a listában
+				break;
+			}
+		}
+		if( iSOCK >= nSOCK )
+		{
+			// új felhasználó!
+			pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
+			iSOCK = nSOCK;
+			nSOCK = gpmLZYload(pLZYusr,sockUSR);
+		}
 	///-----------------------------
 
 
 
-	pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID));
-	if( !pLZYout )
+	//pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID));
+	//if( !pLZYout )
+	//	return pANS->lzyFRMT( s = -1, "nonsens" );
+
+
+	if( !pZSnD )
 		return pANS->lzyFRMT( s = -1, "nonsens" );
 
-	U4 nZS = gpmLZYloadPD( pLZYout, gpcZSnDrc, 0x20 ), iZS = nZS;
-	if( !nZS )
-		return pANS->lzyFRMT( s = -1, "nonsens" );
-
-	gpcZSnDrc	*pZSnDo = (gpcZSnDrc*)gpmLZYvaliPD( U1, pLZYout, 0x20 ),
-				*pZSnDi = (gpcZSnDrc*)gpmLZYvaliPD( U1, pLZYinp, 0x20 );
+	gpcZSnD& ZSnD =	*pZSnD;
+	U4	nD = 2,
+		iD = nD, oD = 2;
+	gpcDrc* pD = NULL;
+	/*gpcDrc	*pDo = (gpcDrc*)gpmLZYvaliPD( U1, pLZYout, gpdZSio128 ),
+			*pDi = (gpcDrc*)gpmLZYvaliPD( U1, pLZYinp, gpdZSio128 );*/
 	U1 	sCOM[] = "ABCD",
 		*pCOM, *pEND = pSTR+n, *pNUM;
-	U4& comA = *(U4*)sCOM, iNUM, nNUM, iE = nZS;
+	U4& comA = *(U4*)sCOM, iNUM, nNUM, iE = 2;
 	I8x2 an;
 	double d8;
 
@@ -932,20 +1074,18 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			switch( an.alf )
 			{
 				case gpeALF_FORMAT:
-					*(U4*)pLZYout->p_alloc = 0xdeadfeed;
-					gpfMEMSET( pLZYout->p_alloc+sizeof(U4), 0x10-sizeof(U4), pLZYout->p_alloc, sizeof(U4) );
-					gpmZn( pLZYout->p_alloc+0x10, pLZYout->n_load+0x10 );
+					gpmZn( pZSnD, sizeof(*pZSnD) );
 					continue;
 
 				case gpeALF_HELO:
 				case gpeALF_HELLO:
-					return pANS->lzyFRMT( s = -1, "Hello! %d", iZS );
+					return pANS->lzyFRMT( s = -1, "Hello! %d", iD );
 				case gpeALF_HELP:
-					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iZS );
+					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iD );
 				case gpeALF_LINE:
-					return pANS->lzyFRMT( s = -1, "Line.txt %d", iZS );
+					return pANS->lzyFRMT( s = -1, "Line.txt %d", iD );
 				case gpeALF_JOIN:
-					return pANS->lzyFRMT( s = -1, "Join.txt %d", iZS );
+					return pANS->lzyFRMT( s = -1, "Join.txt %d", iD );
 
 				case gpeALF_KOSZON:{
 						U4	nR = sizeof(gpsSLMPabc),
@@ -995,43 +1135,39 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						}
 						nNUM = 6;
 					} break;
+				case gpeALF_BILL:
+						iD = 0;
+						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
+							break;
+						ZSnD.aDrc[iD].DnZSfrm( comA );
+						break;
+				case gpeALF_JOHN:
+						iD = 1;
+						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
+							break;
+						ZSnD.aDrc[iD].DnZSfrm( comA );
+					 break;
 				default:
-					if( an.num >= 4 ) {
-						for( iE = nZS, iZS = 1; iZS < nZS; iZS++ )
-						{
-							if( pZSnDi[iZS].NMnDIF.au4x2[0].x == comA )
-								break;
-							if( pZSnDi[iZS].NMnDIF.au4x2[0].x )
-								continue;
-							if( iE < iZS )
-								continue;
-							iE = iZS;
-						}
-						if( iZS >= nZS )
-						if( iE < nZS )
-						{
-							// új robot
-							iZS = iE;
-							pZSnDo[iZS].DnZSfrm( comA );
-						}
-					} break;
+					iNUM = 23;
+					break;
 			}
 			continue;
 		} else if( iNUM > 23 )
 			return pANS->lzyFRMT( s = -1, "nonsens" );
 
-		if( iZS >= nZS )
+		if( iD >= 2 )
 		{
 			pANS = pANS->lzyFRMT( s = -1, "Who?" );
-			for( iZS = gpdZSstrt; iZS < nZS; iZS++ )
+			for( iD = 0; iD < 2; iD++ )
 			{
-				if( !pZSnDi[iZS].NMnDIF.au4x2[0].x )
+				if( !ZSnD.aDrc[iD].NMnDIF.au4x2[0].x )
 					continue;
-				comA = pZSnDi[iZS].NMnDIF.au4x2[0].x;
+				comA = ZSnD.aDrc[iD].NMnDIF.au4x2[0].x;
 				pANS = pANS->lzyFRMT( s = -1, "\r\n%s", sCOM );
 			}
 			return pANS;
 		}
+
 
 
 		pNUM = pSTR;
@@ -1046,6 +1182,14 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				d8 += strtod( (char*)pSTR, (char**)&pSTR );
 		}
 
+		if( pD )
+		if( oD != iD )
+		{
+			pANS = pD->ANSstat( pANS );
+			oD = iD;
+		}
+		pD = ZSnD.aDrc+iD;
+
 
 		switch(iNUM)
         {
@@ -1053,13 +1197,13 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 0:
 			case 1:
 			case 2:
-				pZSnDo[iZS].oXYZ.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->oXYZ.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 				// DIR
 			case 3:
 			case 4:
 			case 5:
-				pZSnDo[iZS].oABC.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->oABC.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 6:
 			case 7:
@@ -1068,7 +1212,7 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 10:
 			case 11:
 				// AXIS
-				pZSnDo[iZS].aoAX1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->aoAX1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 
 			// OFFSET - eltolás
@@ -1076,13 +1220,13 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 12:
 			case 13:
 			case 14:
-				pZSnDo[iZS].oxyz.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->oxyz.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 				// DIR
 			case 15:
 			case 16:
 			case 17:
-				pZSnDo[iZS].oabc.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->oabc.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 18:
 			case 19:
@@ -1091,19 +1235,18 @@ gpcLZY* gpcGT::GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 22:
 			case 23:
 				// AXIS
-				pZSnDo[iZS].aoax1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->aoax1to6[(iNUM%6)/3].aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			default:
 				break;
         }
-
 		iNUM++;
 	}
 
-	if( iZS < nZS )
-		return pZSnDi[iZS].ANSstat( pANS );
+	if( pD )
+		return pD->ANSstat( pANS );
 
-	return pANS->lzyFRMT( s = -1, "ok" );
+	return pANS->lzyFRMT( s = -1, "nonsens" );
 }
 
 

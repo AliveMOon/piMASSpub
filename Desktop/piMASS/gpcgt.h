@@ -28,7 +28,11 @@
 #define gpdGTlzyIDusr( p ) (((p)&gpdGTlzyID)+I8x2(0,2))
 #define gpdGTlzyIDdif( p ) (((p)&gpdGTlzyID)+I8x2(0,3))
 
+
 #define gpdZSstrt 1
+
+
+
 #define ZShs1 0x1
 #define ZShs2 0x2
 
@@ -39,12 +43,32 @@
 
 
 
-/*#define gpdZSnDrcSTART( p ) (p.CTRL.y&0x1)
-#define gpdZSnDrcDONE( p ) (p.CTRL.y&0x2)*/
-#define gpdSLMP GTslmp_ZSnDrc // GTslmp
-#define gpdSLMPos GTzsndOS	//GTslmpOS
-class gpcZSnDrc
-{
+/*#define gpdDrcSTART( p ) (p.CTRL.y&0x1)
+#define gpdDrcDONE( p ) (p.CTRL.y&0x2)*/
+#define gpdSLMP GTslmpDrc // GTslmp
+#define gpdSLMPos GTdrcOS	//GTslmpOS
+class gpcDrc;
+
+class gpcZS {
+public:
+	U4x4	DEDI,						// b0
+			io128;						// b128
+	I4		aPOS[3],					// b256
+			aABC[3],					// b352
+			apos[3],					// b448
+			aabc[3],					// b544
+            aJ16[6],					// b640
+            aj16[6];					// b832
+			// b1024
+
+	gpcZS(){
+		gpmCLR;
+	};
+	gpcZS& operator = ( const gpcDrc& D );
+	gpcZS( const gpcDrc& D );
+};
+
+class gpcDrc {
 public:
 	I4x4 	NMnDIF,
 			oXYZ, iXYZ,
@@ -53,78 +77,53 @@ public:
 			oabc, iabc,
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
-	U4x4	CTRL;
-	gpcZSnDrc& out( gpcZSnDrc& pev, gpcZSnDrc& inp );
-	gpcZSnDrc& operator &= ( gpcZSnDrc& in );
-
-	gpcZSnDrc& i( gpcZSnDrc& ZS )
+	U4x4	oCTRL, iCTRL;
+	gpcDrc& out( gpcDrc& pev, gpcDrc& inp );
+	gpcDrc& operator &= ( gpcDrc& in );
+	gpcDrc& operator = ( const gpcZS& zs )
 	{
-		iXYZ._yzw( ZS.iXYZ );
-		iABC._yzw( ZS.iABC );
-		ixyz._yzw( ZS.ixyz );
-		iabc._yzw( ZS.iabc );
-		aiAX1to6[0]._yzw( ZS.aiAX1to6[0] );
-		aiAX1to6[1]._yzw( ZS.aiAX1to6[1] );
-		aiax1to6[0]._yzw( ZS.aiax1to6[0] );
-		aiax1to6[1]._yzw( ZS.aiax1to6[1] );
+		gpmMCPYof( &iXYZ, &zs.aPOS, 3 );
+        gpmMCPYof( &iABC, &zs.aABC, 3 );
+        gpmMCPYof( &ixyz, &zs.apos, 3 );
+        gpmMCPYof( &iabc, &zs.aabc, 3 );
+        gpmMCPYof( &aiAX1to6[0], zs.aJ16, 3 );
+        gpmMCPYof( &aiAX1to6[1], zs.aJ16+3, 3 );
+		gpmMCPYof( &aiax1to6[0], zs.aj16, 3 );
+        gpmMCPYof( &aiax1to6[1], zs.aj16+3, 3 );
+        gpmMCPYof( &iCTRL.y, &zs.io128.y, 3 );
+        return *this;
+	}
+
+	gpcDrc& i( const gpcDrc& b )
+	{
+		iXYZ.xyz_( b.iXYZ );
+		iABC.xyz_( b.iABC );
+		ixyz.xyz_( b.ixyz );
+		iabc.xyz_( b.iabc );
+		aiAX1to6[0].xyz_( b.aiAX1to6[0] );
+		aiAX1to6[1].xyz_( b.aiAX1to6[1] );
+		aiax1to6[0].xyz_( b.aiax1to6[0] );
+		aiax1to6[1].xyz_( b.aiax1to6[1] );
 
 		return *this;
 	}
 
-	bool bHS1()	{ return !!(CTRL.y&ZShs1);	}
-	U4 setHS1( gpcZSnDrc& D ) {
-		D.CTRL.y&=(~ZShs1);
-		return (CTRL.y|=ZShs1);
-	}
-	U4 rstHS1( gpcZSnDrc& D ) {
-		D.CTRL.y|=ZShs1;
-		return (CTRL.y&=(~ZShs1));
-	}
-
-	bool bHS2()	{ return !!(CTRL.y&ZShs2);	}
-	U4 setHS2( gpcZSnDrc& D ) {
-		D.CTRL.y&=(~ZShs2);
-		return (CTRL.y|=ZShs2);
-	}
-	U4 rstHS2( gpcZSnDrc& D ) {
-		D.CTRL.y|=ZShs2;
-		return (CTRL.y&=(~ZShs2));
-	}
 
 
 
-
-	bool bHS1i()	{ return !!(CTRL.y&ZShs1i);		}
-	U4 setHS1i() 	{ return (CTRL.y|=ZShs1i); 		}
-	U4 rsetHS1i()	{ return (CTRL.y&=(~ZShs1i));	}
-
-	bool bHS1o()	{ return !!(CTRL.y&ZShs1o);		}
-	U4 setHS1o()	{ return (CTRL.y|=ZShs1o); 		}
-	U4 rsetHS1o()	{ return (CTRL.y&=(~ZShs1o));	}
-
-
-
-	bool bHS2i() 	{ return !!(CTRL.z&ZShs2i);		}
-	U4 setHS2i() 	{ return (CTRL.z|=ZShs2i); 		}
-	U4 rsetHS2i() 	{ return (CTRL.z&=(~ZShs2i));	}
-
-	bool bHS2o() 	{ return !!(CTRL.z&ZShs2o);		}
-	U4 setHS2o() 	{ return (CTRL.z|=ZShs2o); 		}
-	U4 rsetHS2o() 	{ return (CTRL.z&=(~ZShs2o));	}
-
-	bool operator == ( const gpcZSnDrc& b ) const
+	bool operator == ( const gpcDrc& b ) const
 	{
-		if( sizeof(b) == gpmMEMCMP( &b, this, sizeof(b) ) )
+		if( sizeof(b) == gpmMCMP( &b, this, sizeof(b) ) )
 			return true;
 
 		return false;
 	}
-	bool operator != ( const gpcZSnDrc& b ) const
+	bool operator != ( const gpcDrc& b ) const
 	{
 		return !(*this == b);
 	}
 
-	gpcZSnDrc* DnZSfrm( U4 nm = 0 ) {
+	gpcDrc* DnZSfrm( U4 nm = 0 ) {
 		if( !this )
 			return NULL;
 		gpmCLR;
@@ -133,43 +132,43 @@ public:
 
 		NMnDIF.x = nm;
 
-		oXYZ.x = gpeZS_POS0;
-		iXYZ.x = gpeZS_iPOS;
-		oABC.x = gpeZS_DIR0;
-		iABC.x = gpeZS_iDIR;
+		oXYZ.w = gpeZS_POS0;
+		iXYZ.w = gpeZS_iPOS;
+		oABC.w = gpeZS_DIR0;
+		iABC.w = gpeZS_iDIR;
+		// OFFSET - eltolás
+		oxyz.w = gpeZS_pos0;
+		ixyz.w = gpeZS_ipos;
+		oabc.w = gpeZS_dir0;
+		iabc.w = gpeZS_idir;
 
 		// TENGELY
-		aoAX1to6[0].x = gpeZS_oA13;
-		aoAX1to6[1].x = gpeZS_oA46;
-		aiAX1to6[0].x = gpeZS_iA13;
-		aiAX1to6[1].x = gpeZS_iA46;
+		aoAX1to6[0].w = gpeZS_oA13;
+		aoAX1to6[1].w = gpeZS_oA46;
+		aiAX1to6[0].w = gpeZS_iA13;
+		aiAX1to6[1].w = gpeZS_iA46;
 
-		aoax1to6[0].x = gpeZS_oa13;
-		aoax1to6[1].x = gpeZS_oa46;
-		aiax1to6[0].x = gpeZS_ia13;
-		aiax1to6[1].x = gpeZS_ia46;
+		aoax1to6[0].w = gpeZS_oa13;
+		aoax1to6[1].w = gpeZS_oa46;
+		aiax1to6[0].w = gpeZS_ia13;
+		aiax1to6[1].w = gpeZS_ia46;
 
-		CTRL.x = gpeZS_CTRL;
-		// OFFSET - eltolás
-		oxyz.x = gpeZS_pos0;
-		ixyz.x = gpeZS_ipos;
+		oCTRL.x = gpeZS_oCTR;
+		iCTRL.x = gpeZS_iCTR;
 
-		oabc.x = gpeZS_dir0;
-		iabc.x = gpeZS_idir;
 		return this;
 	}
-	gpcZSnDrc() { DnZSfrm(); };
-
-	/*U4 bSTAT( gpcZSnDrc& out )
+	gpcDrc() { DnZSfrm(); };
+	gpcDrc( const gpcZS& zs, U4 nm = 0 )
 	{
-		if( !this )
-			return 0;
+		if( nm != NMnDIF.x )
+			DnZSfrm( nm );
 
-		return gpdZSnDrcSTART( out );
-	}*/
+		*this = zs;
+	}
 
-	gpcLZY* ANSstat( gpcLZY* pANS )
-	{
+
+	gpcLZY* ANSstat( gpcLZY* pANS ) {
 		U1 	sCOM[] = "ABCD";
 		U4 &comA = *(U4*)sCOM;
 
@@ -203,7 +202,87 @@ public:
 							);
 		return pANS;
 	}
+
+
+	bool bHS1i() { return !!(iCTRL.y&ZShs1);	}
+	bool bHS1o() { return !!(oCTRL.y&ZShs1);	}
+	U4 setHS1() {
+		iCTRL.y&=(~ZShs1);
+		return (oCTRL.y|=ZShs1);
+	}
+	U4 rstHS1() {
+		iCTRL.y|=ZShs1;
+		return (oCTRL.y&=(~ZShs1));
+	}
+
+	bool bHS2i() { return !!(iCTRL.y&ZShs2);	}
+	bool bHS2o() { return !!(oCTRL.y&ZShs2);	}
+	U4 setHS2() {
+		iCTRL.y&=(~ZShs2);
+		return (oCTRL.y|=ZShs2);
+	}
+	U4 rstHS2() {
+		iCTRL.y|=ZShs2;
+		return (oCTRL.y&=(~ZShs2));
+	}
+
+	gpcDrc& judo( gpcZS& inp );
 };
+
+class gpcZSnD
+{
+	public:
+		U4x4	ioSW;
+		gpcZS 	aZSio[6];
+		gpcDrc	aDrc[2];
+		gpcZSnD() { gpmCLR; };
+		U1 iTURN()
+		{
+			return (ioSW.y-ioSW.z)&3;
+		}
+		U2* pU2io()
+		{
+			if( !this )
+				return NULL;
+			return (U2*)&(aZSio[ioSW.y&3]);
+		}
+		gpcDrc* pDrc()
+		{
+			if( !this )
+				return NULL;
+			return &aDrc[ioSW.y&3];
+		}
+		U2* pU2cr()
+		{
+			if( !this )
+				return NULL;
+
+			return (U2*)pDrc();
+		}
+
+		U2* pU2out()
+		{
+			if( !this )
+				return NULL;
+			return (U2*)&(aZSio[(ioSW.y&2)+0]);
+		}
+		U2* pU2inp()
+		{
+			if( !this )
+				return NULL;
+			return (U2*)&(aZSio[(ioSW.y&2)+1]);
+		}
+		U4 iDEV() {
+			if( !this )
+				return 0;
+
+			return (ioSW.y&3)*10000;
+		}
+		U4 nDEV() {
+			return sizeof(gpcZS)/sizeof(U2);
+		}
+};
+
 class gpcSLMP {
 public:
 	union{
@@ -544,9 +623,9 @@ class gpcGT
 
 
 
-		//gpcLZY*	gpcGTzsndSTAT( gpcLZY* pANS, gpcZSnDrc& zs );
-		gpcLZY* GTzsndOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
-		void 	GTslmp_ZSnDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
+		//gpcLZY*	gpcGTdrcSTAT( gpcLZY* pANS, gpcDrc& zs );
+		gpcLZY* GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
+		void 	GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 
 		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
