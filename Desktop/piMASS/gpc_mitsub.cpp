@@ -65,19 +65,19 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		char 	sLEN[] = "0x000000",	*pL = sLEN+2,
 				sWORD[] = "0x0000",		*pW = sWORD+2;
 
-		nLEN = gpfSTR2U8( gpmMCPY( pL, pD000, 6 )-2, NULL );
+		nLEN = gpfSTR2U8( gpmMcpy( pL, pD000, 6 )-2, NULL );
 		pD000 += 6;
 		if( pINP->n_load < 18+nLEN+nSUB )
 			return; // még nem jött le az egész
 
 		iCNT++;
 		pU2inp = (U2*)(pLZYinp->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc);
-		*pU2inp = gpfSTR2U8( gpmMCPY( pW, pD000, 4 )-2, NULL );
+		*pU2inp = gpfSTR2U8( gpmMcpy( pW, pD000, 4 )-2, NULL );
 		if( !*pU2inp )
 		{
 			/// Good!
 			for( iLEN = 4; iLEN < nLEN; iLEN+=4 )
-				pU2inp[iLEN>>2] = gpfSTR2U8( gpmMCPY( pW, pD000+iLEN, 4 )-2, NULL );
+				pU2inp[iLEN>>2] = gpfSTR2U8( gpmMcpy( pW, pD000+iLEN, 4 )-2, NULL );
 		} else {
 			/// error
 			if( pALL )
@@ -172,7 +172,7 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	pU2inp++;
 	pU2out++;
 
-	U4 	iU2 = gpmMCMP( pU2inp, pU2out, nLEN*sizeof(*pU2inp) )/sizeof(*pU2inp),
+	U4 	iU2 = gpmMcmp( pU2inp, pU2out, nLEN*sizeof(*pU2inp) )/sizeof(*pU2inp),
 		i_cpy, n_cpy,
 		nOld = pOUT ? pOUT->n_load : 0;
 
@@ -221,7 +221,7 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 				break;
 		}
 
-		iU2 += gpmMCMP( pU2inp+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
+		iU2 += gpmMcmp( pU2inp+iU2, pU2out+iU2, (nLEN-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
 	}
 
 	if( nOld < (pOUT ? pOUT->n_load : 0) )
@@ -779,14 +779,14 @@ U1 gpsSLMPabc[] =
 				;
 gpcZS& gpcZS::operator = ( const gpcDrc& D )
 {
-	gpmMCPYof( &aPOS,	&D.oXYZ, 3 );
-	gpmMCPYof( &aABC,	&D.oABC, 3 );
-	gpmMCPYof( &apos,	&D.oxyz, 3 );
-	gpmMCPYof( &aabc,	&D.oabc, 3 );
-	gpmMCPYof( aJ16,	&D.aoAX1to6[0], 3 );
-	gpmMCPYof( aJ16+3,	&D.aoAX1to6[1], 3 );
-	gpmMCPYof( aj16,	&D.aoax1to6[0], 3 );
-	gpmMCPYof( aj16+3,	&D.aoax1to6[1], 3 );
+	gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
+	gpmMcpyOF( &aABC,	&D.oABC, 3 );
+	gpmMcpyOF( &apos,	&D.oxyz, 3 );
+	gpmMcpyOF( &aabc,	&D.oabc, 3 );
+	gpmMcpyOF( aJ16,	&D.aoAX1to6[0], 3 );
+	gpmMcpyOF( aJ16+3,	&D.aoAX1to6[1], 3 );
+	gpmMcpyOF( aj16,	&D.aoax1to6[0], 3 );
+	gpmMcpyOF( aj16+3,	&D.aoax1to6[1], 3 );
 	return *this;
 }
 gpcZS::gpcZS( const gpcDrc& D )
@@ -879,34 +879,35 @@ gpcDrc& gpcDrc::judo( gpcZS& inp )
     }
 	if( dif )
 	{
-		CTRL.w |= 1;
+		oCTRL.w |= 1;
 	}
 
 	dir = (oABC - iABC).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
-		CTRL.w |= 2;
+		oCTRL.w |= 2;
 	}
 
 	dir = (oxyz - ixyz).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
-		CTRL.w |= 4;
+		oCTRL.w |= 4;
 	}
 
 	dir = (oabc - iabc).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
-		CTRL.w |= 8;
+		oCTRL.w |= 8;
 	}
 
-	if( CTRL.w )
+	if( oCTRL.w )
 	{
 		// itt kell le ellenőrizni mondjuk az ütközésre
-		setHS1(D);
+		//
+		setHS1();
 		return *this;
 	}
 

@@ -82,15 +82,15 @@ public:
 	gpcDrc& operator &= ( gpcDrc& in );
 	gpcDrc& operator = ( const gpcZS& zs )
 	{
-		gpmMCPYof( &iXYZ, &zs.aPOS, 3 );
-        gpmMCPYof( &iABC, &zs.aABC, 3 );
-        gpmMCPYof( &ixyz, &zs.apos, 3 );
-        gpmMCPYof( &iabc, &zs.aabc, 3 );
-        gpmMCPYof( &aiAX1to6[0], zs.aJ16, 3 );
-        gpmMCPYof( &aiAX1to6[1], zs.aJ16+3, 3 );
-		gpmMCPYof( &aiax1to6[0], zs.aj16, 3 );
-        gpmMCPYof( &aiax1to6[1], zs.aj16+3, 3 );
-        gpmMCPYof( &iCTRL.y, &zs.io128.y, 3 );
+		gpmMcpyOF( &iXYZ, &zs.aPOS, 3 );
+        gpmMcpyOF( &iABC, &zs.aABC, 3 );
+        gpmMcpyOF( &ixyz, &zs.apos, 3 );
+        gpmMcpyOF( &iabc, &zs.aabc, 3 );
+        gpmMcpyOF( &aiAX1to6[0], zs.aJ16, 3 );
+        gpmMcpyOF( &aiAX1to6[1], zs.aJ16+3, 3 );
+		gpmMcpyOF( &aiax1to6[0], zs.aj16, 3 );
+        gpmMcpyOF( &aiax1to6[1], zs.aj16+3, 3 );
+        gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
         return *this;
 	}
 
@@ -113,7 +113,7 @@ public:
 
 	bool operator == ( const gpcDrc& b ) const
 	{
-		if( sizeof(b) == gpmMCMP( &b, this, sizeof(b) ) )
+		if( sizeof(b) == gpmMcmp( &b, this, sizeof(b) ) )
 			return true;
 
 		return false;

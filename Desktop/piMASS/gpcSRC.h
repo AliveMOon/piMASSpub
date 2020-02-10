@@ -472,7 +472,7 @@ public:
 
 		for( U1* pS = (U1*)pKILL, *pD = (U1*)pVOID, *pSe = pS+oz*oy ; pS < pSe; pS += oz, pD += nZ  )
 		{
-			gpmMCPYof( pD, pS, oz );
+			gpmMcpyOF( pD, pS, oz );
 		}
 
 		gpmDELary( pKILL );
@@ -559,14 +559,14 @@ public:
 			if( iRST > 3 )
 			for( U4 i = 0, d = mapZN44.a4x2[1].sum(),s = outZN.a4x2[1].sum(); i < 4; i++ )
 			{
-				gpmMCPYof( (pCOL + i*d), (pKC + i*s), outZN.z );
-				gpmMCPYof( (pROW + i*d), (pKR + i*s), outZN.w );
+				gpmMcpyOF( (pCOL + i*d), (pKC + i*s), outZN.z );
+				gpmMcpyOF( (pROW + i*d), (pKR + i*s), outZN.w );
 
 			}
 
 			for( U4* pS = pK, *pD = pMAP; pS < pKC; pS += outZN.z, pD += mapZN44.z  )
 			{
-				gpmMCPYof( pD, pS, outZN.z );
+				gpmMcpyOF( pD, pS, outZN.z );
 			}
 			gpmDELary(pK);
 		}
@@ -933,9 +933,9 @@ public:
 	{
         if( nS != nL )
 			return false;
-		return gpmMCMP( pA, pS, nL ) == nL;
+		return gpmMcmp( pA, pS, nL ) == nL;
 
-		/*U4 nCMP = gpmMCMP( pA, pS, nL )-pA;
+		/*U4 nCMP = gpmMcmp( pA, pS, nL )-pA;
 		return nCMP == nL;*/
 	}
 

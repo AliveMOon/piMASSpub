@@ -477,7 +477,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 			gpcGLSL **ppKILL = ppGLSL;
 			nGLSL += iGLSL + 0x4;
 			ppGLSL = new gpcGLSL*[nGLSL];
-			gpmMCPYof( ppGLSL, ppKILL, iGLSL );
+			gpmMcpyOF( ppGLSL, ppKILL, iGLSL );
 			gpmDELary(ppKILL);
 			gpmZn( ppGLSL+iGLSL, nGLSL-iGLSL );
         }
@@ -488,8 +488,8 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 	}
 
 	gProgID = pGLSL->PrgID;
-	gpmMCPYof( aTexID, pGLSL->aTexID, gpmN(aTexID) );
-	gpmMCPYof( aUniID, pGLSL->aUniID, gpmN(aUniID) );
+	gpmMcpyOF( aTexID, pGLSL->aTexID, gpmN(aTexID) );
+	gpmMcpyOF( aUniID, pGLSL->aUniID, gpmN(aUniID) );
 	ATvxID = pGLSL->ATvxID;
 	ATuvID = pGLSL->ATuvID;
 	return this;
@@ -503,7 +503,7 @@ GLuint gpcGL::GLSLvrtx( const char* pS ) {
 		return gVxSID;
 
 	if( VxSsrc.n_load ? VxSsrc.n_load == nS : false )
-	if( gpmMCMP( VxSsrc.p_alloc, pS, VxSsrc.n_load ) == VxSsrc.n_load )
+	if( gpmMcmp( VxSsrc.p_alloc, pS, VxSsrc.n_load ) == VxSsrc.n_load )
 			return gVxSID;
 
 	//VxSlog.lzyRST();
@@ -562,7 +562,7 @@ GLuint  gpcGL::GLSLfrg( const char* pS ) {
 		return gFrSID;
 
 	if( frSsrc.n_load ? frSsrc.n_load == nS : false )
-	if( gpmMCMP( frSsrc.p_alloc, pS, frSsrc.n_load ) == frSsrc.n_load )
+	if( gpmMcmp( frSsrc.p_alloc, pS, frSsrc.n_load ) == frSsrc.n_load )
 			return gFrSID;
 
 	//FrSlog.lzyRST();

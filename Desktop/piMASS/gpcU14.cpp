@@ -57,7 +57,7 @@ U1x4* U1x4::frmFILL( I4x2 cr, U1x4 u, I4x4 whp  )
 		return this;
 
 	for(	U1x4	*pS = this, *pD = this+(whp.z*cr.y); pD > pS; pD -= whp.z )
-		gpmMCPYof( pD, pS, cr.x );
+		gpmMcpyOF( pD, pS, cr.x );
 
 
 	return this;

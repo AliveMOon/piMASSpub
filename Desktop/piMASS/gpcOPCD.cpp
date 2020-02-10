@@ -289,7 +289,7 @@ U1* gpcMASS::msRST( U1* pS0 )
 				continue;
 // "op ALF" -------------------------------
 			nS = pE-(U1*)gpasOPER[i];
-			pS = (U1*)gpmMCPYof( pPUB, gpasOPER[i], nS );
+			pS = (U1*)gpmMcpyOF( pPUB, gpasOPER[i], nS );
 			pS[nS] = 0;
 			pPUB += nS+1;
 
@@ -304,7 +304,7 @@ U1* gpcMASS::msRST( U1* pS0 )
 // "ALF" ----------------------------
 			pE++;
 			nS = strlen( (char*)pE ); //pE-(U1*)gpasOPER[i];
-			pS = (U1*)gpmMCPYof( pPUB, pE, nS );
+			pS = (U1*)gpmMcpyOF( pPUB, pE, nS );
 			pS[nS] = 0;
 			pPUB += nS+1;
 
@@ -321,7 +321,7 @@ U1* gpcMASS::msRST( U1* pS0 )
 			gpcOPCD opcd = gpaOPCi[i];
 			nS = opcd.nSTR;
 			pS = opcd.pSTR;
-			pS = (U1*)gpmMCPYof( pPUB, pS, nS );
+			pS = (U1*)gpmMcpyOF( pPUB, pS, nS );
 			pPUB[nS] = 0;
 			pPUB += nS+1;
 

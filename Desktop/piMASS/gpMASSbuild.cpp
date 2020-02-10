@@ -604,7 +604,7 @@ void gpcSRC::cmpi( gpcMASS& mass, bool bDBG )
 								U4 nSTRmom = gpmSTRLEN( pSTRmom );
 								if( nSTRmom+1 == nSTR )
 								{
-									nSTRmom = (gpmMCMP( pSTRmom, pSTR, nSTRmom ))-pSTRmom;
+									nSTRmom = (gpmMcmp( pSTRmom, pSTR, nSTRmom ))-pSTRmom;
 									if( nSTR == nSTRmom+1 )
 									{
 										pNEW->wip = gpeALF_CONSTR;
