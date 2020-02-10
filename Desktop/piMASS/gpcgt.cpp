@@ -1121,7 +1121,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 			{
 				pACC->addr_in = clientaddr;
 				pACC->GTclr();
-				U8 n_start = -1;
+				U8 iSTRT = -1;
 
 				//else
 				switch( pACC->port )
@@ -1131,7 +1131,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 						pACC->GTos( *this );
 						break;*/
 					case 23: // telnet
-						pACC->pOUT = pACC->pOUT->lzyFRMT( n_start,  gp_sHELLO, pACC->iCNT );
+						pACC->pOUT = pACC->pOUT->lzyFRMT( iSTRT,  gp_sHELLO, pACC->iCNT );
 						pACC->sGTent[2] = 'a';
 						pACC->GTos( *this );
 						break;
@@ -1141,14 +1141,14 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 					default:
 						if( pACC->port & 1 )// telnetek
 						{
-							pACC->pOUT = pACC->pOUT->lzyFRMT(n_start, gp_sHELLO_acc, pACC->socket, pACC->iCNT );
+							pACC->pOUT = pACC->pOUT->lzyFRMT(iSTRT, gp_sHELLO_acc, pACC->socket, pACC->iCNT );
 							pACC->iCNT++;
 							pACC->sGTent[2] = 'a';
 							pACC->GTos(*this);
 							break;
 						}
 
-						pACC->pOUT = pACC->pOUT->lzyFRMT( n_start,  gp_sHELLO, pACC->iCNT );
+						pACC->pOUT = pACC->pOUT->lzyFRMT( iSTRT,  gp_sHELLO, pACC->iCNT );
 						break;
 				}
 

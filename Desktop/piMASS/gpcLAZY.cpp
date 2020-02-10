@@ -1,6 +1,6 @@
 #include "piMASS.h"
 char	gps_lzy_pub1[1024*0x100];
-gpcLZY* gpcLZY::lzyFRMT( U8& n_start, const char* p_format, ... )
+gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 {
 	va_list vl;
 	va_start(vl, p_format);
@@ -9,7 +9,7 @@ gpcLZY* gpcLZY::lzyFRMT( U8& n_start, const char* p_format, ... )
 	if( n < 1 )
 		return this;
 	U8 s = -1;
-	return lzyADD( (U1*)gps_lzy_pub1, n, n_start );
+	return lzyADD( (U1*)gps_lzy_pub1, n, iSTRT );
 }
 static const char* gpasADDR[] = {
 	"%0.2x|",
@@ -21,7 +21,7 @@ static const char* gpasADDR[] = {
 	"//%0.8x|",
 	"//%0.16llx|",
 };
-gpcLZY* gpcLZY::lzyHEXb( U8& n_start, U1* pBIN, U4 nBIN )
+gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN )
 {
 	if( nBIN ? !pBIN : true )
 		return this;
@@ -32,10 +32,10 @@ gpcLZY* gpcLZY::lzyHEXb( U8& n_start, U1* pBIN, U4 nBIN )
 		if( !pTHIS )
 			return NULL;
 
-		return pTHIS->lzyHEXb( n_start, pBIN, nBIN );
+		return pTHIS->lzyHEXb( iSTRT, pBIN, nBIN );
 	}
 
-	n_start = n_load;
+	iSTRT = n_load;
 	U8 s;
 
 	U1 nLOG = log2( nBIN );
@@ -70,7 +70,7 @@ gpcLZY* gpcLZY::lzyHEXb( U8& n_start, U1* pBIN, U4 nBIN )
 	return this;
 }
 
-gpcLZY* gpcLZY::lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN )
+gpcLZY* gpcLZY::lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN )
 {
 	if( nBIN ? !pBIN : true )
 		return this;
@@ -81,10 +81,10 @@ gpcLZY* gpcLZY::lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN )
 		if( !pTHIS )
 			return NULL;
 
-		return pTHIS->lzyHEXw( n_start, pBIN, nBIN );
+		return pTHIS->lzyHEXw( iSTRT, pBIN, nBIN );
 	}
 
-	n_start = n_load;
+	iSTRT = n_load;
 	U8 s;
 
 	U1 nLOG = log2( nBIN )/8+4;
@@ -118,7 +118,7 @@ gpcLZY* gpcLZY::lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
-gpcLZY* gpcLZY::lzyHEXl( U8& n_start, U1* pBIN, U4 nBIN )
+gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN )
 {
 	if( nBIN ? !pBIN : true )
 		return this;
@@ -129,10 +129,10 @@ gpcLZY* gpcLZY::lzyHEXl( U8& n_start, U1* pBIN, U4 nBIN )
 		if( !pTHIS )
 			return NULL;
 
-		return pTHIS->lzyHEXw( n_start, pBIN, nBIN );
+		return pTHIS->lzyHEXw( iSTRT, pBIN, nBIN );
 	}
 
-	n_start = n_load;
+	iSTRT = n_load;
 	U8 s;
 
 	U1 nLOG = log2( nBIN )/8+4;

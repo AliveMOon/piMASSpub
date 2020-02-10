@@ -551,6 +551,9 @@ U4STR aSIZEOF[] = {
 	{ sizeof(Fx2),		"Fx2" },
 	{ sizeof(gpcSLMP),  "gpcSLMP" },
 	{ sizeof(gpcDrc),  "gpcDrc" },
+	{ sizeof(gpcZS),  "gpcZS" },
+	{ sizeof(gpcZSnD),  "gpcZSnD" },
+	{ sizeof(gpcLZY),  "gpcLZY" },
 };
 
 #ifdef _WIN64

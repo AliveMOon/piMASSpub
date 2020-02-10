@@ -682,32 +682,28 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
 
 								if( anRio.a8x2[1].x )
+								if( gpcLZY *pLZYinp = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+								if( gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, pLZYinp ) )
 								{
-									// OUT
-									if( gpcLZY *pLZYout = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDref(pGT->TnID)) )
-									if( pLZYout->n_load )
+									x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
+									pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
+									i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+
+									if( !pS2 )
 									{
-                                        x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
-										pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
-										i = jDOitREF( win, i, ie, &pM, &pC, &pR );
-
+										pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
 										if( !pS2 )
-										{
-											pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
-											if( !pS2 )
-												continue;
-										}
-										if( pS2 == pSRC )
 											continue;
-
-										hex.lzyRST()->lzyHEXl( s = 0, pLZYout->p_alloc, pLZYout->n_load );
-										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
-										pS2->srcUPDT();
-
-
 									}
-									anRio.a8x2[1].x = 0;
+									if( pS2 == pSRC )
+										continue;
+									hex.lzyFRMT( s=0, "\r\n\"\r\n" );
+									hex.lzyRST()->lzyZSnD( s=-1, *pZSnD );
+									hex.lzyFRMT( s=-1, "\"\r\n" );
+									pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
+									pS2->srcUPDT();
 								}
+
 
 								if( anRio.a8x2[0].x )
 								{

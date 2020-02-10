@@ -915,6 +915,19 @@ gpcDrc& gpcDrc::judo( gpcZS& inp )
 
 	return *this;
 }
+gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs )
+{
+	if( !&zs ) {
+		iSTRT = nLD();
+		return this;
+	}
+	gpcLZY* pANS = this;
+
+	for( U1 i = 0, n = gpmN(zs.aDrc); i < n; i++ )
+		pANS = zs.aDrc[i].ANSstat( pANS );
+
+	return this;
+}
 /*gpcDrc& gpcDrc::out( gpcDrc& D, gpcDrc& ZS )
 {
 	// az OUT-ban vagyunk
@@ -1014,8 +1027,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		return pANS->lzyFRMT( s = -1, "nonsens" );
 
 	gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ) );
-	gpcLZY	//*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
-			*pLZYout = NULL,
+	gpcLZY	*pLZYout = NULL,
 			*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 	///-----------------------------
 	/// UJ felhasználó?
@@ -1075,7 +1087,15 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			switch( an.alf )
 			{
 				case gpeALF_FORMAT:
-					gpmZn( pZSnD, sizeof(*pZSnD) );
+					for( U1 iD = 0, e = gpmN(ZSnD.aDrc); iD < e; iD++ )
+					{
+						ZSnD.aZSio[iD*2] = ZSnD.aDrc[iD].DrcFRMT( iD ? gpeZS_BILL : gpeZS_JOHN );
+					}
+					ZSnD.aZSio[1].null();
+					ZSnD.aZSio[3].null();
+					ZSnD.aZSio[4].null();
+					ZSnD.aZSio[5].null();
+					//gpmZn( pZSnD, sizeof(*pZSnD) );
 					continue;
 
 				case gpeALF_HELO:
@@ -1140,13 +1160,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						iD = 0;
 						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
 							break;
-						ZSnD.aDrc[iD].DnZSfrm( comA );
+						ZSnD.aDrc[iD].DrcFRMT( comA );
 						break;
 				case gpeALF_JOHN:
 						iD = 1;
 						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
 							break;
-						ZSnD.aDrc[iD].DnZSfrm( comA );
+						ZSnD.aDrc[iD].DrcFRMT( comA );
 					 break;
 				default:
 					iNUM = 23;

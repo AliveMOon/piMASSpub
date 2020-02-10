@@ -286,6 +286,7 @@ class gpcMASS;
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
 #define gpmMcmp gp_memcmp
+#define gpmMcmpOF(d,s,n) (gpmMcmp( (d), (s), (n)*sizeof(*d) )/sizeof(*d))
 #define gpmUnB( u )		( abs(u)>0x7fFF ? (abs(u)>0x7fffFFFF ? 8 : 4) : (abs(u)>0x7f ? 2 : 1)  )
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
@@ -2611,6 +2612,10 @@ public:
 	{
 		return (*this) * (*this);
 	}
+	I4x4 operator & (const I4x4& b ) const
+	{
+		return I4x4( a4x2[0]&b.a4x2[0], a4x2[1]&b.a4x2[1] );
+	}
 
 	I4x4 operator % (const I4x4& b) const
 	{
@@ -3938,6 +3943,8 @@ public:
 #define gpmLZYloadPD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
 #define gpmLZYload( p, t ) gpmLZYloadPD( p, t, (U8)0 )
 
+class gpcZSnD;
+
 class gpcLZY
 {
 public:
@@ -3945,14 +3952,14 @@ public:
 	{
 		struct{
 			U1* p_alloc, aSET[8];
-			size_t //U8
-			n_load, n_alloc;
+
+			U8 //size_t // ha x32 CPU-n size_t 20 byte lesz és nem 32 azaz nem 16B aligned
+				n_load, n_alloc;
 		};
 		struct{
 			U8		*p_a8;
 			gpeWIP	aWIP[8];
-			size_t //U8
-					n_l8, n_a8;
+			U8 n_l8, n_a8;
 		};
 	};
 	size_t nLD()
@@ -4170,14 +4177,14 @@ public:
 		return this;
 	}
 
-	gpcLZY* lzyADD( const void* p_void, U8 n_byte, U8& n_start, U1 n = 0 )
+	gpcLZY* lzyADD( const void* p_void, U8 n_byte, U8& iSTRT, U1 n = 0 )
 	{
 		if( !n_byte )
 			return this;
 
 		if( !this )
 		{
-			n_start = 0;
+			iSTRT = 0;
 			gpcLZY* p_lazy = new gpcLZY( n );
 			p_lazy->n_alloc = gpmPAD( n_byte*p_lazy->aSET[gpeLZYxN], 0x10 );
 			p_lazy->p_alloc = gpmALLOC( p_lazy->n_alloc+0x10 ); //, 0x10 );
@@ -4203,10 +4210,10 @@ public:
 				aSET[gpeLZYxN] = n;
 
 
-		if( n_start > n_load )
-			n_start = n_load;
+		if( iSTRT > n_load )
+			iSTRT = n_load;
 		else
-			n_load = n_start;
+			n_load = iSTRT;
 
 		if( p_alloc ? (n_load+n_byte > n_alloc) : true )
 		{
@@ -4255,56 +4262,56 @@ public:
 		return (void*)p_alloc;
 	}
 
-	gpcLZY* lzyPLUS(  const gpcLZY* p_b, U8& n_start )
+	gpcLZY* lzyPLUS(  const gpcLZY* p_b, U8& iSTRT )
 	{
-		return lzyADD( p_b->p_alloc, p_b->n_load, n_start, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
+		return lzyADD( p_b->p_alloc, p_b->n_load, iSTRT, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
 	}
-	gpcLZY* lzySUB( U8& n_start, U8 n_sub )
+	gpcLZY* lzySUB( U8& iSTRT, U8 n_sub )
 	{
 		if( this ? !n_sub : true )
 		{
-			n_start = 0;
+			iSTRT = 0;
 			return this;
 		}
 		if( !n_sub )
 		{
-			n_start = n_load;
+			iSTRT = n_load;
 			return this;
 		}
-		if( n_start > n_load )
+		if( iSTRT > n_load )
 		{
-			n_start = n_load;
+			iSTRT = n_load;
 			return this;
 		}
-		if( n_start+n_sub >= n_load )
+		if( iSTRT+n_sub >= n_load )
 		{
-			n_sub = n_load-n_start;
+			n_sub = n_load-iSTRT;
 		} else {
-			U8 n_hi = n_load-(n_start+n_sub);
-			memcpy( p_alloc+n_start, p_alloc+n_start+n_sub, n_hi );
+			U8 n_hi = n_load-(iSTRT+n_sub);
+			memcpy( p_alloc+iSTRT, p_alloc+iSTRT+n_sub, n_hi );
 		}
 
 		n_load -= n_sub;
 		p_alloc[n_load] = 0;
 		return this;
 	}
-	gpcLZY* lzy_exp_rand( U8& n_start, U8 n_sub, U8 n_add, U1 n = 0 )
+	gpcLZY* lzy_exp_rand( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 )
 	{
-		if( n_start <= (this ? n_load : 0) )
-			return lzy_exp( n_start, n_sub,n_add, n );
+		if( iSTRT <= (this ? n_load : 0) )
+			return lzy_exp( iSTRT, n_sub,n_add, n );
 
-		U8 pls = n_start-n_load;
-		n_start = n_load;
+		U8 pls = iSTRT-n_load;
+		iSTRT = n_load;
 		if( !this )
-			return lzyADD( NULL, n_add + pls, n_start, n );
+			return lzyADD( NULL, n_add + pls, iSTRT, n );
 
-		return lzy_exp( n_start, n_sub, n_add + pls, n );
+		return lzy_exp( iSTRT, n_sub, n_add + pls, n );
 	}
-	gpcLZY* lzy_exp( U8& n_start, U8 n_sub, U8 n_add, U1 n = 0 )
+	gpcLZY* lzy_exp( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 )
 	{
 		if( !this )
 		{
-			return lzyADD( NULL, n_add, n_start, n );
+			return lzyADD( NULL, n_add, iSTRT, n );
 		}
 
 		if( !n )
@@ -4317,19 +4324,19 @@ public:
 		else if( !aSET[gpeLZYxN] )
 				aSET[gpeLZYxN] = n;
 
-		if( n_start > n_load )
+		if( iSTRT > n_load )
 		{
-			n_start = n_load;
+			iSTRT = n_load;
 			n_sub = 0;
 		}
-		else if( n_start+n_sub >= n_load )
+		else if( iSTRT+n_sub >= n_load )
 		{
-			n_sub = n_load-n_start;
+			n_sub = n_load-iSTRT;
 		}
-		U8 src_hi = n_start+n_sub,
-			dst_hi = n_start+n_add,
+		U8 src_hi = iSTRT+n_sub,
+			dst_hi = iSTRT+n_add,
 			n_hi = n_load-src_hi,
-			new_load = n_start + n_add + n_hi;
+			new_load = iSTRT + n_add + n_hi;
 		U1* p_kill = NULL;
 
 		if( new_load > n_alloc )
@@ -4337,7 +4344,7 @@ public:
 			n_alloc += gpmPAD( (n_add*n), 0x10 );
 			p_kill = p_alloc;
 			p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
-			memcpy( p_alloc, p_kill, n_start );
+			memcpy( p_alloc, p_kill, iSTRT );
 			memcpy( p_alloc+dst_hi, p_kill+src_hi, n_hi );
 			n_load = new_load;
 			p_alloc[n_load] = 0;
@@ -4387,15 +4394,15 @@ public:
 		return this;
 	}
 
-	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& n_start, U8 n_sub, U1 n = 0 )
+	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub, U1 n = 0 )
 	{
 		if( !this )
 		{
 			//start = n_u1;
-			return lzyADD( p_u1, n_u1, n_start, n );
+			return lzyADD( p_u1, n_u1, iSTRT, n );
 		}
-		lzy_exp( n_start, n_sub,  n_u1, n );
-		gpmMcpyOF( p_alloc+n_start, p_u1, n_u1 );
+		lzy_exp( iSTRT, n_sub,  n_u1, n );
+		gpmMcpyOF( p_alloc+iSTRT, p_u1, n_u1 );
 		return this;
 	}
 	gpcLZY& operator = ( const gpcLZY& plus )
@@ -4412,14 +4419,13 @@ public:
 		return lzyADD( plus.p_alloc, plus.n_load, s );
 	}
 
-	gpcLZY* lzyRD( char* p_file, U8& n_start, U1 n = 0 )
-	{
+	gpcLZY* lzyRD( char* p_file, U8& iSTRT, U1 n = 0 ) {
 		/// READ FILE
 		if( !p_file )
 			return this;
 
 		if( !this )
-			n_start = 0;
+			iSTRT = 0;
 
 		if( gpfACE(p_file, 4) < 0 )
 			return this;
@@ -4445,11 +4451,11 @@ public:
 
 		if( n_byte > 0 )
 		{
-			p_lazy = p_lazy->lzyADD( NULL, n_byte, n_start, n );
+			p_lazy = p_lazy->lzyADD( NULL, n_byte, iSTRT, n );
 			if( !p_lazy )
 				goto szasz;
 			U8 n;
-			U1* p_l = p_lazy->p_alloc + n_start, *p_e = p_l+n_byte;
+			U1* p_l = p_lazy->p_alloc + iSTRT, *p_e = p_l+n_byte;
 			while( p_l < p_e )
 			{
 				n = fread( p_l, 1, n_byte, p_f );
@@ -4466,8 +4472,7 @@ public:
 
 		return p_lazy;
 	}
-	gpcLZY* lzyWR( const char* p_file, bool b_over = true )
-	{
+	gpcLZY* lzyWR( const char* p_file, bool b_over = true ) {
 		/// WRITE FILE
 		if( this ? !n_load : true )
 			return this;
@@ -4516,10 +4521,11 @@ close:
 szasz:
 		return this;
 	}
-	gpcLZY* lzyFRMT( U8& n_start, const char* p_format, ... );
-	gpcLZY* lzyHEXb( U8& n_start, U1* pBIN, U4 nBIN );
-	gpcLZY* lzyHEXw( U8& n_start, U1* pBIN, U4 nBIN );
-	gpcLZY* lzyHEXl( U8& n_start, U1* pBIN, U4 nBIN );
+	gpcLZY* lzyFRMT( U8& iSTRT, const char* p_format, ... );
+	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
+	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
+	gpcLZY* lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN );
+	gpcLZY* lzyZSnD( U8& iSTRT, gpcZSnD& zs );
 	gpcLZY* lzy_reqCLOSE( void )
 	{
 		if( !this )

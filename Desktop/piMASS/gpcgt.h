@@ -47,6 +47,7 @@
 #define gpdDrcDONE( p ) (p.CTRL.y&0x2)*/
 #define gpdSLMP GTslmpDrc // GTslmp
 #define gpdSLMPos GTdrcOS	//GTslmpOS
+
 class gpcDrc;
 
 class gpcZS {
@@ -60,9 +61,9 @@ public:
             aJ16[6],					// b640
             aj16[6];					// b832
 			// b1024
-
+	gpcZS& null() { gpmCLR; return *this; }
 	gpcZS(){
-		gpmCLR;
+		null();
 	};
 	gpcZS& operator = ( const gpcDrc& D );
 	gpcZS( const gpcDrc& D );
@@ -123,18 +124,15 @@ public:
 		return !(*this == b);
 	}
 
-	gpcDrc* DnZSfrm( U4 nm = 0 ) {
-		if( !this )
-			return NULL;
+	gpcDrc& DrcFRMT( U4 nm = 0 ) {
 		gpmCLR;
 		if( !nm )
-			return this;
+			return *this;
 
 		NMnDIF.x = nm;
-
-		oXYZ.w = gpeZS_POS0;
+		iXYZ = oXYZ = I4x4( 450,  0,700,gpeZS_POS0)&I4x4(100,100,100, 1);
+		iABC = oABC = I4x4( 180,  0, 90,gpeZS_DIR0)&I4x4(100,100,100, 1);
 		iXYZ.w = gpeZS_iPOS;
-		oABC.w = gpeZS_DIR0;
 		iABC.w = gpeZS_iDIR;
 		// OFFSET - eltolás
 		oxyz.w = gpeZS_pos0;
@@ -156,18 +154,24 @@ public:
 		oCTRL.x = gpeZS_oCTR;
 		iCTRL.x = gpeZS_iCTR;
 
-		return this;
+		return *this;
 	}
-	gpcDrc() { DnZSfrm(); };
+	gpcDrc() { DrcFRMT(); };
 	gpcDrc( const gpcZS& zs, U4 nm = 0 )
 	{
 		if( nm != NMnDIF.x )
-			DnZSfrm( nm );
+			DrcFRMT( nm );
 
 		*this = zs;
 	}
 
+	U2 hs12()
+	{
+		if(!this )
+			return 0;
 
+		return (bHS1i()<<0xc)|(bHS1o()<<0x8)|(bHS2i()<<0x4)|(bHS2o());
+	}
 	gpcLZY* ANSstat( gpcLZY* pANS ) {
 		U1 	sCOM[] = "ABCD";
 		U4 &comA = *(U4*)sCOM;
@@ -177,16 +181,37 @@ public:
 		pANS = pANS->lzyFRMT(
 								s = -1,
 
-										"\r\n%s X:%.2fmm Y:%.2fmm Z:%.2fmm "
-										"A:%.2fdg B:%.2fdg C:%.2fdg "
-										"\r\nOFF x:%.2fmm y:%.2fmm z:%.2fmm "
-										"a:%.2fdg b:%.2fdg c:%.2fdg "
+										"\r\n//\t%s\tHS12:%0.4X\tiX:%4.2fmm iY:%4.2fmm iZ:%4.2fmm "
+										"iA:%4.2fdg iB:%4.2fdg iC:%4.2fdg "
+										"\r\n//\t\tOFF\t\t\tix:%4.2fmm iy:%4.2fmm iz:%4.2fmm "
+										"ia:%4.2fdg ib:%4.2fdg ic:%4.2fdg "
+
+										"\r\n//\t\tOUT:\t\toX:%4.2fmm oY:%4.2fmm oZ:%4.2fmm "
+										"oA:%4.2fdg oB:%4.2fdg oC:%4.2fdg "
+										"\r\n//\t\tOFF\t\t\tox:%4.2fmm oy:%4.2fmm oz:%4.2fmm "
+										"oa:%4.2fdg ob:%4.2fdg oc:%4.2fdg "
 										,
-								sCOM,
+								*sCOM ? (char*)sCOM : "?",
+
+								hs12(),
+// INP
+								double(iXYZ.y)/100.0,
+								double(iXYZ.z)/100.0,
+								double(iXYZ.w)/100.0,
+								double(iABC.y)/100.0,
+								double(iABC.z)/100.0,
+								double(iABC.w)/100.0,
+
+								double(ixyz.y)/100.0,
+								double(ixyz.z)/100.0,
+								double(ixyz.w)/100.0,
+								double(iabc.y)/100.0,
+								double(iabc.z)/100.0,
+								double(iabc.w)/100.0,
+// OUT
 								double(oXYZ.y)/100.0,
 								double(oXYZ.z)/100.0,
 								double(oXYZ.w)/100.0,
-
 								double(oABC.y)/100.0,
 								double(oABC.z)/100.0,
 								double(oABC.w)/100.0,
@@ -194,7 +219,6 @@ public:
 								double(oxyz.y)/100.0,
 								double(oxyz.z)/100.0,
 								double(oxyz.w)/100.0,
-
 								double(oabc.y)/100.0,
 								double(oabc.z)/100.0,
 								double(oabc.w)/100.0
