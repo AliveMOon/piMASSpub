@@ -779,6 +779,7 @@ U1 gpsSLMPabc[] =
 				;
 gpcZS& gpcZS::operator = ( const gpcDrc& D )
 {
+	gpmMcpyOF( &io128.y,	&D.oCTRL.y, 3 );
 	gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
 	gpmMcpyOF( &aABC,	&D.oABC, 3 );
 	gpmMcpyOF( &apos,	&D.oxyz, 3 );
@@ -787,6 +788,19 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 	gpmMcpyOF( aJ16+3,	&D.aoAX1to6[1], 3 );
 	gpmMcpyOF( aj16,	&D.aoax1to6[0], 3 );
 	gpmMcpyOF( aj16+3,	&D.aoax1to6[1], 3 );
+	return *this;
+}
+gpcZS& gpcZS::operator &= ( const gpcDrc& D )
+{
+	gpmMcpyOF( &io128.y,	&D.iCTRL.y, 3 );
+	/*gpmMcpyOF( &aPOS,	&D.iXYZ, 3 );
+	gpmMcpyOF( &aABC,	&D.iABC, 3 );
+	gpmMcpyOF( &apos,	&D.ixyz, 3 );
+	gpmMcpyOF( &aabc,	&D.iabc, 3 );
+	gpmMcpyOF( aJ16,	&D.aiAX1to6[0], 3 );
+	gpmMcpyOF( aJ16+3,	&D.aiAX1to6[1], 3 );
+	gpmMcpyOF( aj16,	&D.aiax1to6[0], 3 );
+	gpmMcpyOF( aj16+3,	&D.aiax1to6[1], 3 );*/
 	return *this;
 }
 gpcZS::gpcZS( const gpcDrc& D )
@@ -928,97 +942,7 @@ gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs )
 
 	return this;
 }
-/*gpcDrc& gpcDrc::out( gpcDrc& D, gpcDrc& ZS )
-{
-	// az OUT-ban vagyunk
-	// addig küld az SLMP amig a D-ben az nem lesz mint
-	// az OUT-ban tehát this-ben
-	if( bHS1() )
-	{
-		// OUT-ba el lett küldve
-        if( ZS.bHS1() )
-        {
-			// megvan ZS jelzet olvasta
-			CTRL.z = CTRL.w = 0; // törlünk ZS kedvéért
 
-
-			rstHS1(D);
-		} else {
-			// még ZS nem olvasta PULLing
-			// nem szabad *this = ZSo; tartjuk a D-hez magunkat
-			D = *this;
-			/// PULLING 1
-			setHS1(D);
-			return *this;
-		}
-
-	}
-
-	// eltároljuk a friss adatokat
-	i(D.i(ZS));
-
-	if( bHS2() )
-	{
-		if( ZS.bHS2() )
-		{
-			// megértette hogy értettük
-			CTRL.z = CTRL.w = 0; // törlünk ZS kedvéért
-
-			rstHS2(D);
-			return *this;
-		}
-		// olvassa olvasse könnyeit hulajtja
-		/// PULLING 2
-		setHS2(D);
-		return *this;
-	}
-	if( ZS.bHS2() )
-	{
-		// ZS akar valamit
-		D.CTRL.z = CTRL.z = ZS.CTRL.z; // hiba szám
-
-		setHS2(D); // OLVASTUK
-		return *this;
-	}
-	// minden kötelező vége jöhet a free style
-
-	I4x4 dir = (oXYZ - D.oXYZ).xyz_();
-	U8 dif = dir.qlen();
-	if( dif )
-	{
-		CTRL.w |= 1;
-	}
-
-	dir = (oABC - D.oABC).xyz_();
-	dif = dir.qlen();
-	if( dif )
-	{
-		CTRL.w |= 2;
-	}
-
-	dir = (oxyz - D.oxyz).xyz_();
-	dif = dir.qlen();
-	if( dif )
-	{
-		CTRL.w |= 4;
-	}
-
-	dir = (oabc - D.oabc).xyz_();
-	dif = dir.qlen();
-	if( dif )
-	{
-		CTRL.w |= 8;
-	}
-
-	if( CTRL.w )
-	{
-		// itt kell leellenőrizni mondjuk az ütközést
-		setHS1(D);
-		return *this;
-	}
-
-	return *this;
-}*/
 gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
@@ -1087,15 +1011,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			switch( an.alf )
 			{
 				case gpeALF_FORMAT:
-					for( U1 iD = 0, e = gpmN(ZSnD.aDrc); iD < e; iD++ )
-					{
-						ZSnD.aZSio[iD*2] = ZSnD.aDrc[iD].DrcFRMT( iD ? gpeZS_BILL : gpeZS_JOHN );
-					}
-					ZSnD.aZSio[1].null();
-					ZSnD.aZSio[3].null();
-					ZSnD.aZSio[4].null();
-					ZSnD.aZSio[5].null();
-					//gpmZn( pZSnD, sizeof(*pZSnD) );
+					ZSnD.format();
 					continue;
 
 				case gpeALF_HELO:
@@ -1160,13 +1076,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						iD = 0;
 						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
 							break;
-						ZSnD.aDrc[iD].DrcFRMT( comA );
+						ZSnD.aDrc[iD].format( comA );
 						break;
 				case gpeALF_JOHN:
 						iD = 1;
 						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
 							break;
-						ZSnD.aDrc[iD].DrcFRMT( comA );
+						ZSnD.aDrc[iD].format( comA );
 					 break;
 				default:
 					iNUM = 23;

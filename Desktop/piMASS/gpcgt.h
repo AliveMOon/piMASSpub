@@ -30,7 +30,7 @@
 
 
 #define gpdZSstrt 1
-
+#define gpdZSbad 10
 
 
 #define ZShs1 0x1
@@ -66,6 +66,7 @@ public:
 		null();
 	};
 	gpcZS& operator = ( const gpcDrc& D );
+	gpcZS& operator &= ( const gpcDrc& D );
 	gpcZS( const gpcDrc& D );
 };
 
@@ -83,14 +84,14 @@ public:
 	gpcDrc& operator &= ( gpcDrc& in );
 	gpcDrc& operator = ( const gpcZS& zs )
 	{
-		gpmMcpyOF( &iXYZ, &zs.aPOS, 3 );
-        gpmMcpyOF( &iABC, &zs.aABC, 3 );
-        gpmMcpyOF( &ixyz, &zs.apos, 3 );
-        gpmMcpyOF( &iabc, &zs.aabc, 3 );
-        gpmMcpyOF( &aiAX1to6[0], zs.aJ16, 3 );
-        gpmMcpyOF( &aiAX1to6[1], zs.aJ16+3, 3 );
-		gpmMcpyOF( &aiax1to6[0], zs.aj16, 3 );
-        gpmMcpyOF( &aiax1to6[1], zs.aj16+3, 3 );
+		gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
+        gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
+        gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
+        gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
+        gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
+        gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
+		gpmMcpyOF( &aiax1to6[0].x, zs.aj16, 3 );
+        gpmMcpyOF( &aiax1to6[1].x, zs.aj16+3, 3 );
         gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
         return *this;
 	}
@@ -124,7 +125,7 @@ public:
 		return !(*this == b);
 	}
 
-	gpcDrc& DrcFRMT( U4 nm = 0 ) {
+	gpcDrc& format( U4 nm = 0 ) {
 		gpmCLR;
 		if( !nm )
 			return *this;
@@ -156,11 +157,11 @@ public:
 
 		return *this;
 	}
-	gpcDrc() { DrcFRMT(); };
+	gpcDrc() { format(); };
 	gpcDrc( const gpcZS& zs, U4 nm = 0 )
 	{
-		if( nm != NMnDIF.x )
-			DrcFRMT( nm );
+		if( nm != NMnDIF.au4x2[0].x )
+			format( nm );
 
 		*this = zs;
 	}
@@ -195,33 +196,33 @@ public:
 
 								hs12(),
 // INP
+								double(iXYZ.x)/100.0,
 								double(iXYZ.y)/100.0,
 								double(iXYZ.z)/100.0,
-								double(iXYZ.w)/100.0,
+								double(iABC.x)/100.0,
 								double(iABC.y)/100.0,
 								double(iABC.z)/100.0,
-								double(iABC.w)/100.0,
 
+								double(ixyz.x)/100.0,
 								double(ixyz.y)/100.0,
 								double(ixyz.z)/100.0,
-								double(ixyz.w)/100.0,
+								double(iabc.x)/100.0,
 								double(iabc.y)/100.0,
 								double(iabc.z)/100.0,
-								double(iabc.w)/100.0,
 // OUT
+								double(oXYZ.x)/100.0,
 								double(oXYZ.y)/100.0,
 								double(oXYZ.z)/100.0,
-								double(oXYZ.w)/100.0,
+								double(oABC.x)/100.0,
 								double(oABC.y)/100.0,
 								double(oABC.z)/100.0,
-								double(oABC.w)/100.0,
 
+								double(oxyz.x)/100.0,
 								double(oxyz.y)/100.0,
 								double(oxyz.z)/100.0,
-								double(oxyz.w)/100.0,
+								double(oabc.x)/100.0,
 								double(oabc.y)/100.0,
-								double(oabc.z)/100.0,
-								double(oabc.w)/100.0
+								double(oabc.z)/100.0
 
 							);
 		return pANS;
@@ -260,6 +261,27 @@ class gpcZSnD
 		gpcZS 	aZSio[6];
 		gpcDrc	aDrc[2];
 		gpcZSnD() { gpmCLR; };
+
+		gpcZSnD* format()
+		{
+			if( !this )
+				return NULL;
+			// OUT -------------
+			for( U1 iD = 0, e = gpmN(aDrc); iD < e; iD++ )
+				aZSio[iD*2] = aDrc[iD].format( iD ? gpeZS_JOHN : gpeZS_BILL );
+			// INP ------------
+			aZSio[1].null();
+			aZSio[3].null();
+			// REF -------------
+			aZSio[4].null();
+			aZSio[5].null();
+			return this;
+		}
+		gpcZSnD* reset()
+		{
+			gpmCLR;
+			return format();
+		}
 		U1 iTURN()
 		{
 			return (ioSW.y-ioSW.z)&3;
@@ -299,11 +321,26 @@ class gpcZSnD
 		U4 iDEV() {
 			if( !this )
 				return 0;
+			U1 iD = gpdZSbad;
+			switch( ioSW.y&3 )
+			{
+				case 3:
+					iD += 20000;
+					break;
+				case 2:
+					iD += 1024;
+					break;
 
-			return (ioSW.y&3)*10000;
+				case 1:
+					iD += 10000;
+					break;
+				default:
+					break;
+			}
+			return iD; //(ioSW.y&3)*10000 + gpdZSbad;
 		}
 		U4 nDEV() {
-			return sizeof(gpcZS)/sizeof(U2);
+			return (sizeof(gpcZS)/sizeof(U2))-gpdZSbad;
 		}
 };
 

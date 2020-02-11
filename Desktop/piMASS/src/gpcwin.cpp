@@ -224,6 +224,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 	gppKEYbuff = ( gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,pWELLCOME ) );
 	I8x2 GLSLpic(0,1), GLSLiso(0,0);
 	while( gppKEYbuff ) {
+		usleep(50);
 		mSEC.y = mSEC.x;
 		mSEC.x = SDL_GetTicks();
 		mSEC.z = mSEC.x-mSEC.y;

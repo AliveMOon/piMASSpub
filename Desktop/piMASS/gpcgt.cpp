@@ -833,7 +833,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			case gpeALF_SLMP:{
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
-				pOUT = pOUT->lzyFRMT( s = 0, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
+				pOUT = pOUT->lzyFRMT( s = 0, gpdSLMP_recv_LN4SL6N4, 0x18, 0, sizeof(gpcZS)/sizeof(U2) ); //gpdSLMPnDEV );
 				break;
 			}
 			default:
@@ -891,6 +891,8 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		case gpeALF_SLMP:
 			gpdSLMP( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
 			//GTslmp( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			break;
+		default:
 			break;
 	}
 

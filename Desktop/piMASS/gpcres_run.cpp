@@ -681,17 +681,17 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								if( cnt == pGT->iCNT )
 									anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
 
-								if( anRio.a8x2[1].x )
+								if( anRio.a8x2[0].x )
 								if( gpcLZY *pLZYinp = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
 								if( gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, pLZYinp ) )
 								{
-									x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
+									x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0] );
 									pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
 									i = jDOitREF( win, i, ie, &pM, &pC, &pR );
 
 									if( !pS2 )
 									{
-										pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
+										pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
 										if( !pS2 )
 											continue;
 									}
@@ -705,26 +705,26 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								}
 
 
-								if( anRio.a8x2[0].x )
+								if( anRio.a8x2[1].x )
 								{
 									// INP
 									if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
 									if( pLZYin->n_load )
 									{
-                                        x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0] );
+                                        x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
 										pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
 										i = jDOitREF( win, i, ie, &pM, &pC, &pR );
 
 										if( !pS2 )
 										{
-											pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
+											pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
 											if( !pS2 )
 												continue;
 										}
 										if( pS2 == pSRC )
 											continue;
 
-										hex.lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
+										hex.lzyRST()->lzyHEXw( s = 0, pLZYin->p_alloc, pLZYin->n_load );
 										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 										pS2->srcUPDT();
 
