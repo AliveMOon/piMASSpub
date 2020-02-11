@@ -158,6 +158,21 @@ extern char gpsTAB[], *gppTAB;
 
 	return *this;
 }*/
+
+
+U4 gpaiPAD[] = {
+	2, 0, 2, 0,
+};
+U4 gpaiDEV[] = {
+	gpdZSbad, 10000, gpdZSbad+1024, 20000,
+};
+U4 gpanDEV[] = {
+	(sizeof(gpcZS)/sizeof(U2))-2,
+	(sizeof(gpcZS)/sizeof(U2))-2,
+	(sizeof(gpcZS)/sizeof(U2))-2,
+	(sizeof(gpcZS)/sizeof(U2))-2,
+};
+
 void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 {
 	U8 nOUT = GTout( pWIN ), s;
@@ -249,7 +264,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			eD0 = (1+(sizeof(gpcZS)/sizeof(U2)))*4;
 			if( eD0 > nD0 )
 				eD0 = nD0;
-			for( iD0 = 4, pU2 += gpdZSbad; iD0 < eD0; iD0 +=4, pU2++ )
+			for( iD0 = 4, pU2 += 2; iD0 < eD0; iD0 +=4, pU2++ )
 				*pU2 = gpfSTR2U8( gpmMcpy(pW,pD0+iD0,4)-2, NULL );
 
 			if( iD0 > 4 )
@@ -272,11 +287,12 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 				// jött valami értelmes kérdezhetünk másikat
 
 				pZSnD->ioSW.y++;
-				if( pZSnD->iTURN() )
+				if( pZSnD->iPULL() )
 				{
 					pOUT = pOUT->lzyFRMT(
 											s = -1, gpdSLMP_recv_LN4SL6N4, 24,
-											pZSnD->iDEV(), pZSnD->nDEV()
+													gpaiDEV[pZSnD->ioSW.y&3],
+													gpanDEV[pZSnD->ioSW.y&3]
 										);
 				} // else vége lett a kötnek
 			}
@@ -309,7 +325,8 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 					// nyugta?
 					pOUT = pOUT->lzyFRMT(
 											s = -1, gpdSLMP_recv_LN4SL6N4, 24,
-											pZSnD->iDEV(), pZSnD->nDEV()
+													gpaiDEV[pZSnD->ioSW.y&3],
+													gpanDEV[pZSnD->ioSW.y&3]
 										);
 					break;
 				case 0x0000: // good!
@@ -343,16 +360,20 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 		// pZSnD->ioSW.z-be tárolom kit kell kérdezni
 		pZSnD->ioSW.y = pZSnD->ioSW.z+1;
-		pOUT = pOUT->lzyFRMT(	s = -1, gpdSLMP_recv_LN4SL6N4, 24,
-								pZSnD->iDEV(), pZSnD->nDEV()	);
+		pOUT = pOUT->lzyFRMT(
+								s = -1, gpdSLMP_recv_LN4SL6N4, 24,
+								gpaiDEV[pZSnD->ioSW.y&3],
+								gpanDEV[pZSnD->ioSW.y&3]
+							);
 		return;
 	}
 
-	if( pZSnD->iTURN() )
+	if( pZSnD->iPULL() )
 	{
 		pOUT = pOUT->lzyFRMT(
 								s = -1, gpdSLMP_recv_LN4SL6N4, 24,
-								pZSnD->iDEV(), pZSnD->nDEV()
+								gpaiDEV[pZSnD->ioSW.y&3],
+								gpanDEV[pZSnD->ioSW.y&3]
 							);
 		return;
 	}

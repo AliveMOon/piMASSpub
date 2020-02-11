@@ -280,9 +280,10 @@ class gpcZSnD
 		gpcZSnD* reset()
 		{
 			gpmCLR;
+			ioSW.y = 1; // BILL outjának lekérdezésével kezdjük
 			return format();
 		}
-		U1 iTURN()
+		U1 iPULL()
 		{
 			return (ioSW.y-ioSW.z)&3;
 		}
@@ -321,20 +322,21 @@ class gpcZSnD
 		U4 iDEV() {
 			if( !this )
 				return 0;
-			U1 iD = gpdZSbad;
+			U1 iD = 0;
 			switch( ioSW.y&3 )
 			{
 				case 3:
-					iD += 20000;
+					return 20000;
 					break;
 				case 2:
-					iD += 1024;
+					return 1024+gpdZSbad;
 					break;
 
 				case 1:
-					iD += 10000;
+					return 10000;
 					break;
 				default:
+					return gpdZSbad;
 					break;
 			}
 			return iD; //(ioSW.y&3)*10000 + gpdZSbad;
