@@ -779,7 +779,8 @@ U1 gpsSLMPabc[] =
 				;
 gpcZS& gpcZS::operator = ( const gpcDrc& D )
 {
-	gpmMcpyOF( &io128.y,	&D.oCTRL.y, 3 );
+	//gpmMcpyOF( &io128.y,	&D.oCTRL.y, 3 );
+	//  majd az ÉS ha kell
 	gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
 	gpmMcpyOF( &aABC,	&D.oABC, 3 );
 	gpmMcpyOF( &apos,	&D.oxyz, 3 );

@@ -47,24 +47,27 @@
 #define gpdDrcDONE( p ) (p.CTRL.y&0x2)*/
 #define gpdSLMP GTslmpDrc // GTslmp
 #define gpdSLMPos GTdrcOS	//GTslmpOS
-#define gpdZSnRW 	gpmOFFOFF( gpcZS, io128.y, R2D2s )
-#define gpdZSnRWu2	(gpdZSnRW/sizeof(U2))
-
+#define gpdZSnW 	gpmOFFOFF( gpcZS, io128.y, oMxyzEspd )
+#define gpdZSnWu2	(gpdZSnW/sizeof(U2))
+#define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
+#define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 class gpcDrc;
 
 class gpcZS {
 public:
-	U4x4	DEDI,						// b0
-			io128;						// b128
-	I4		aPOS[3],					// b256
-			aABC[3],					// b352
-			apos[3],					// b448
-			aabc[3],					// b544
-            aJ16[6],					// b640
-            aj16[6];					// b832
+	U4x4	DEDI,		// b0
+			io128;		// b128
+	I4		aPOS[3],	// b256
+			aABC[3],	// b352
+			apos[3],	// b448
+			aabc[3],	// b544
+            aJ16[6],	// b640
+            aj16[6];	// b832
 			// b1024
-	I4x4	R2D2s;						// b1024
-			//b1152
+	I4x4	oMxyzEspd,	// b1024
+			oMabcNsnt,	// b1152
+			oEkey;		// b1280
+			//b1308
 	gpcZS& null() { gpmCLR; return *this; }
 	gpcZS(){
 		null();
@@ -262,7 +265,8 @@ public:
 class gpcZSnD
 {
 	public:
-		U4x4	ioSW;
+		U4x4	pc,
+				ioSW;
 		gpcZS 	aZSio[6];
 		gpcDrc	aDrc[2];
 		gpcZSnD() { gpmCLR; };
@@ -295,10 +299,17 @@ class gpcZSnD
 			ioSW.w = iBILL;
 			return format();
 		}
-		U4 step()
+		U4 stpPULL()
 		{
 			ioSW.y += 2;
 			return ioSW.y;
+		}
+		U4 stpPUSH()
+		{
+			ioSW.w -= 2;
+			ioSW.z = ioSW.w+4;
+			ioSW.y = ioSW.w+1;
+			return !!(ioSW.w&2);
 		}
 		bool bWAIT()
 		{

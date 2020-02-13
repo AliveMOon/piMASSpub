@@ -181,8 +181,8 @@ U4x4 gpaZSrobi[] = {
 };
 U4x4 gpaZSwr[] = {
 	//	write,	nW, 		read,		nR
-	{ 	0xA,  	gpdZSnRWu2,	10000, 	(gpdZSnRW+sizeof(I4x4))/sizeof(U2)	},
-	{ 	0x40A,  gpdZSnRWu2,	20000, 	(gpdZSnRW+sizeof(I4x4))/sizeof(U2)	},
+	{ 	0xA,  	gpdZSnWu2,	10000, gpdZSnRu2	},
+	{ 	0x40A,  gpdZSnWu2,	20000, gpdZSnRu2	},
 };
 void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 {
@@ -277,14 +277,15 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			if( eD0 > nD0 )
 				eD0 = nD0;
 
-			for( iD0 = 4, pU2 += 10; iD0 < eD0; iD0 +=4, pU2++ )
+			for( 	iD0 = 4; //, pU2 += 10;
+					iD0 < eD0; iD0 +=4, pU2++ )
 				*pU2 = gpfSTR2U8( gpmMcpy(pW,pD0+iD0,4)-2, NULL );
 
 			if( iD0 > 4 )
 			{
 				// nem fecsegés, hanem adat
 				pZSnD->aDrc[pZSnD->iDrc()] = pZSnD->ioZS();
-				pZSnD->step();
+				pZSnD->stpPULL();
 				if( pZSnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pZSnD->pulling( pOUT, gpaZSwr );
 			}
@@ -361,11 +362,9 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// ---------------------------------
 	/// Drc filter
 	/// ---------------------------------
-	ioSW.w -= 2;
-	pZSnD->ioSW.z = ioSW.w+4;
-	pZSnD->ioSW.y = ioSW.w+1;
+	iD0 = pZSnD->stpPUSH();
 
-	iD0 = !!(ioSW.w&2);
+
 
 	U2	*pB = (U2*)&(
 						pZSnD->aZSio[4+iD0]
@@ -376,7 +375,15 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						pZSnD->aZSio[iD0*2]
 						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
 					); // pA-ban azaz új out lesz
-	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // csak a iCTRL
+
+    // itt kell majd variálni, hogy elösször maradjanak a control bitek
+    // és a következő körben írjuk be
+    if( false ) // egyenlőre off
+		pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // csak a iCTRL
+
+
+
+
 
 	U4	iU2 = gpaZSwr[iD0].x,
 		nU2 = gpaZSwr[iD0].y;
@@ -439,8 +446,8 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	nSYNsum = nSYNdo;
 	nSYNdo++;
 	pZSnD->ioSW.y |= 1;
-	sGTent[2] = 's';
-	sGTent[0] = '\n';
+	//sGTent[2] = 's';
+	//sGTent[0] = '\n';
 	return;
 }
 
