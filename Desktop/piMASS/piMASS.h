@@ -245,7 +245,7 @@ class gpcMASS;
 #define gpmGLBOFF(a) (void*)(a)
 
 #define gpmOFF( st, m ) ( (size_t)(&((st*)NULL)->m) )
-#define gpmOFFOFF(st, m, n ) (GPM_OFF(st, m)-GPM_OFF(st, n))
+#define gpmOFFOFF(st, m, n ) (gpmOFF(st, n)-gpmOFF(st, m))
 
 #define gpmSTRCPY( d, s ) \
 			(												\

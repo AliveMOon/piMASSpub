@@ -47,6 +47,8 @@
 #define gpdDrcDONE( p ) (p.CTRL.y&0x2)*/
 #define gpdSLMP GTslmpDrc // GTslmp
 #define gpdSLMPos GTdrcOS	//GTslmpOS
+#define gpdZSnRW 	gpmOFFOFF( gpcZS, io128.y, R2D2s )
+#define gpdZSnRWu2	(gpdZSnRW/sizeof(U2))
 
 class gpcDrc;
 
@@ -61,6 +63,8 @@ public:
             aJ16[6],					// b640
             aj16[6];					// b832
 			// b1024
+	I4x4	R2D2s;						// b1024
+			//b1152
 	gpcZS& null() { gpmCLR; return *this; }
 	gpcZS(){
 		null();
@@ -68,6 +72,7 @@ public:
 	gpcZS& operator = ( const gpcDrc& D );
 	gpcZS& operator &= ( const gpcDrc& D );
 	gpcZS( const gpcDrc& D );
+
 };
 
 class gpcDrc {
@@ -253,7 +258,7 @@ public:
 
 	gpcDrc& judo( gpcZS& inp );
 };
-
+#define gpdZSnDnull ((gpcZSnD*)NULL)
 class gpcZSnD
 {
 	public:
@@ -279,20 +284,62 @@ class gpcZSnD
 		}
 		gpcZSnD* reset()
 		{
+			if( !this )
+				return NULL;
 			gpmCLR;
 			ioSW.y = 1; // BILL outjának lekérdezésével kezdjük
 			return format();
 		}
-		U1 iPULL()
+		U1 iDrc()
 		{
-			return (ioSW.y-ioSW.z)&3;
+			return (ioSW.y>>1)&1;
 		}
-		U2* pU2io()
+		U1 iWR()
+		{
+			// 0 Write
+			// 1 Read
+			return ioSW.y&1;
+		}
+		U1 iCMP()
+		{
+			return ioSW.w&1;
+		}
+
+		U2* pZSioU2()
 		{
 			if( !this )
 				return NULL;
 			return (U2*)&(aZSio[ioSW.y&3]);
 		}
+		gpcZS& ioZS()
+		{
+			return aZSio[ioSW.y&3];
+		}
+
+		bool bPULL()
+		{
+			if( !this )
+				return false;
+
+			if( ioSW.y < ioSW.z )
+				ioSW.y = ioSW.z+1;
+			U4 d = ioSW.y-ioSW.z;
+			if( d > 3 )
+				return false;
+			// 0 Write
+			// 1 Read	pullingolni kell true
+			return iWR();
+		}
+
+		gpcLZY* pulling( gpcLZY* pOUT, U4x4* pZSrw )
+		{
+			U8 s = -1;
+			U4	i = this ? iDrc():1,
+				n = pZSrw[i].w;
+			i = pZSrw[i].z;
+			return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
+		}
+
 		gpcDrc* pDrc()
 		{
 			if( !this )
@@ -319,31 +366,7 @@ class gpcZSnD
 				return NULL;
 			return (U2*)&(aZSio[(ioSW.y&2)+1]);
 		}
-		U4 iDEV() {
-			if( !this )
-				return 0;
-			U1 iD = 0;
-			switch( ioSW.y&3 )
-			{
-				case 3:
-					return 20000;
-					break;
-				case 2:
-					return 1024+gpdZSbad;
-					break;
 
-				case 1:
-					return 10000;
-					break;
-				default:
-					return gpdZSbad;
-					break;
-			}
-			return iD; //(ioSW.y&3)*10000 + gpdZSbad;
-		}
-		U4 nDEV() {
-			return (sizeof(gpcZS)/sizeof(U2))-gpdZSbad;
-		}
 };
 
 class gpcSLMP {

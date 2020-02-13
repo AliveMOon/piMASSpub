@@ -724,10 +724,7 @@ static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2020 =
 //                                   |234|2|2|234|2|234|234|234|234|2|23456|234
 //                                   500000FF03FF000018000004010000D*0000120001rn
 // static const char gp_sSLMP_read[] = "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x";
-extern U4 gpaiPAD[];
-extern U4 gpaiDEV[];
-extern U4 gpanDEV[];
-
+extern U4x4 gpaZSwr[];
 I8 gpcGT::GTcnct( gpcWIN& win )
 {
 	if( this ? msGTdie > win.mSEC.x : true )
@@ -837,7 +834,12 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 			case gpeALF_SLMP:{
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
-				pOUT = pOUT->lzyFRMT( s = 0, gpdSLMP_recv_LN4SL6N4, 0x18, gpaiDEV[1], gpanDEV[1] ); // BILL outjaval kezdjük
+				pOUT = gpdZSnDnull->pulling( pOUT, gpaZSwr );
+				/*pOUT = pOUT->lzyFRMT(
+										s = 0,
+										gpdSLMP_recv_LN4SL6N4, 24,
+										gpaZSwr[0].z, gpaZSwr[0].w
+									); // BILL outját olvasuk ki elsöre */
 				break;
 			}
 			default:
