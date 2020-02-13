@@ -282,14 +282,51 @@ class gpcZSnD
 			aZSio[5].null();
 			return this;
 		}
-		gpcZSnD* reset()
+		gpcZSnD* reset( U1 iBILL )
 		{
 			if( !this )
 				return NULL;
 			gpmCLR;
-			ioSW.y = 1; // BILL outjának lekérdezésével kezdjük
+			if(iBILL)
+				iBILL <<= 1;
+
+			ioSW.y = iBILL+1;	// BILL PULL
+			ioSW.z = iBILL+4;	// BILL CMP
+			ioSW.w = iBILL;
 			return format();
 		}
+		U4 step()
+		{
+			ioSW.y += 2;
+			return ioSW.y;
+		}
+		bool bWAIT()
+		{
+			if( !this )
+				return true;	// akkor is várni kell ha !this azaz nincs semi
+			// ha ioSW.w >= ioSW.y igaz, még nem jött válasz
+			return ioSW.w >= ioSW.y;
+		}
+		bool bNEXT()
+		{
+			// ha ioSW.y >= ioSW.z igaz már vége a körnek
+			return ioSW.y >= ioSW.z;
+		}
+		bool bPULL()
+		{
+			if( bWAIT() )
+				return false;
+			// ioSW.w < ioSW.y
+			if( bNEXT() )
+				return false;
+			// 0 Write
+			if( !iWR() )
+				return false;
+			// 1 Read pullingolni lehet
+			ioSW.w = ioSW.y+1;
+			return true;
+		}
+
 		U1 iDrc()
 		{
 			return (ioSW.y>>1)&1;
@@ -299,10 +336,6 @@ class gpcZSnD
 			// 0 Write
 			// 1 Read
 			return ioSW.y&1;
-		}
-		U1 iCMP()
-		{
-			return ioSW.w&1;
 		}
 
 		U2* pZSioU2()
@@ -316,20 +349,6 @@ class gpcZSnD
 			return aZSio[ioSW.y&3];
 		}
 
-		bool bPULL()
-		{
-			if( !this )
-				return false;
-
-			if( ioSW.y < ioSW.z )
-				ioSW.y = ioSW.z+1;
-			U4 d = ioSW.y-ioSW.z;
-			if( d > 3 )
-				return false;
-			// 0 Write
-			// 1 Read	pullingolni kell true
-			return iWR();
-		}
 
 		gpcLZY* pulling( gpcLZY* pOUT, U4x4* pZSrw )
 		{

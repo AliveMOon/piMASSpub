@@ -261,7 +261,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		{
 			pLZYinp->lzyINS( NULL, sizeof(gpcZSnD), s=0, sizeof(gpcZSnD) );
 			pZSnD = gpmLZYvali( gpcZSnD, pLZYinp );
-			pZSnD->reset();
+			pZSnD->reset( 0 );
 
 			pU2inp = pZSnD->pU2inp();
 		}
@@ -270,6 +270,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		pZSnD->ioSW.aU2[0] = gpfSTR2U8( gpmMcpy(pW,pD0,4)-2, NULL );
 		if( pZSnD->iWR() && !pZSnD->ioSW.aU2[0] )
 		{
+			// olcastunk && nincsen hiba
 			/// Good!
 			pU2 = pU2io = pZSnD->pZSioU2();
 			eD0 = gpaZSwr[pZSnD->iDrc()].a4x2[pZSnD->iWR()].y*4; // 0000 u2ASCii
@@ -281,8 +282,9 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 			if( iD0 > 4 )
 			{
+				// nem fecsegés, hanem adat
 				pZSnD->aDrc[pZSnD->iDrc()] = pZSnD->ioZS();
-				pZSnD->ioSW.y += 2;
+				pZSnD->step();
 				if( pZSnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pZSnD->pulling( pOUT, gpaZSwr );
 			}
@@ -343,11 +345,12 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		pU2inp = pZSnD->pU2inp();
 	}
 
-	if( !pZSnD )
+	if( pZSnD->bWAIT() )
 		return;
 
-	gpcZSnD& ZSnD = *pZSnD;
-	if( ZSnD.bPULL() ) // lekérdeztünk mindenkit?
+	iCNT++;
+	//gpcZSnD& ZSnD = *pZSnD;
+	if( pZSnD->bPULL() ) // lekérdeztünk mindenkit?
 	{
 		nSYNsum = nSYNdo;
 		pOUT = pZSnD->pulling( pOUT, gpaZSwr );
@@ -358,45 +361,32 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// ---------------------------------
 	/// Drc filter
 	/// ---------------------------------
-	U2	*pA = NULL, *pB = NULL;
-	U4	iU2 = 0, nU2 = 0;
-	for( eD0 = pZSnD->ioSW.w+2; ZSnD.ioSW.w < eD0; ZSnD.ioSW.w++ )
-	{
-		iD0 = ZSnD.iCMP();
+	ioSW.w -= 2;
+	pZSnD->ioSW.z = ioSW.w+4;
+	pZSnD->ioSW.y = ioSW.w+1;
 
-		pB = (U2*)&(
-						ZSnD.aZSio[4+iD0]
-						= ZSnD.aDrc[iD0]
-					); // pB-ben a JUDO elötti
+	iD0 = !!(ioSW.w&2);
 
-		pA = (U2*)&(
+	U2	*pB = (U2*)&(
+						pZSnD->aZSio[4+iD0]
+						= pZSnD->aDrc[iD0]
+					), // pB-ben a JUDO elötti
+		*pA = (U2*)&(
 						//pZSnD->aZSio[4+iD0]
-						ZSnD.aZSio[iD0*2]
-						= ZSnD.aDrc[iD0].judo( ZSnD.aZSio[iD0*2+1] )
+						pZSnD->aZSio[iD0*2]
+						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
 					); // pA-ban azaz új out lesz
+	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // csak a iCTRL
 
-		ZSnD.aZSio[4+iD0] &= ZSnD.aDrc[iD0]; // csak a iCTRL
-
-		iU2 = gpaZSwr[iD0].x;
+	U4	iU2 = gpaZSwr[iD0].x,
 		nU2 = gpaZSwr[iD0].y;
-		iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2 );
-		if( nU2 <= iU2 )
-			continue;
-		// talált különbséget
-		// beállítjuk a pZSnD->ioSW,
-		// hogy ezt kérdezze legközelebb
-		iCNT++;
-		ZSnD.ioSW.z = (ZSnD.ioSW.y+4)&~3;
-		if( iD0 )
-			ZSnD.ioSW.z++;
-		ZSnD.ioSW.w++;
-		break;
-	}
-	/// ---------------------------------
-	if( pA ? iD0 >= 2 : true )
+	iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2 );
+	if( iU2 >= nU2 )
 		return;
 
-	//pU2out = pZSnD->pU2out();
+	// talált különbséget
+	// beállítjuk a pZSnD->ioSW,
+	// hogy ezt kérdezze legközelebb
 	U4 i_cpy, n_cpy, nGD;
 	while( iU2 < nU2 )
 	{
@@ -443,152 +433,15 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2-iU2);
 	}
 
-	if( pOUT->nLD() )
-	{
-		nSYNsum = nSYNdo;
-		nSYNdo++;
-		sGTent[2] = 's';
-		sGTent[0] = '\n';
-	} else {
-		// mégis ugyan az lett
-		pZSnD->ioSW.y = pZSnD->ioSW.z+1;
-	}
+	if( !pOUT->nLD() )
+		return;
 
+	nSYNsum = nSYNdo;
+	nSYNdo++;
+	pZSnD->ioSW.y |= 1;
+	sGTent[2] = 's';
+	sGTent[0] = '\n';
 	return;
-	/*U4 nU2 = pZSnD->nDEV();
-	if( !nU2 )
-		return;
-
-	if( !pLZYout )
-		return;	// valamiért nem tudott csinálni
-
-	if( !pLZYout->n_load )
-	{
-		// nem volt benne semmi azaz használjuk azt amit a robot adott
-		*pLZYout = *pLZYinp;
-		pLZYout->n_load /= 2;
-		iCNT++;
-		return;
-	}
-
-	if( !pU2out )
-		pU2out = gpmLZYvaliPD( U2, pLZYout, nPAD );
-
-	if( nU2 > gpmLZYloadPD( pLZYout, U2, nPAD ) )
-		nU2 = gpmLZYloadPD( pLZYout, U2, nPAD );
-	if( nU2 < 2 )
-		return;
-
-	/// ---------------------------------
-	/// Drc filter
-	/// ---------------------------------
-	if( pU2inp[-5] == pU2inp[-3] )
-	{
-		U4 iZSpU2 = ((0x20-nPAD)/sizeof(*pU2inp));
-		gpcDrc	*pDo = (gpcDrc*)(pU2out + iZSpU2 ),
-				*pDi = (gpcDrc*)(pU2inp + iZSpU2 ),
-				*pDii = (gpcDrc*)(pU2inp + nINPu2p2 + iZSpU2 );
-		for(
-			U4	iZS = gpdZSstrt, nZS = (((U1*)(pU2inp+nU2))-((U1*)pDi))/sizeof(*pDi);
-				iZS < nZS;
-				iZS++
-		)
-		{
-			pDo[iZS].out( pDi[iZS], pDii[iZS] );
-		}
-	}
-	/// ---------------------------------
-
-	U4 	iU2 = gpmMcmp( pU2inp, pU2out, nU2*sizeof(*pU2inp) )/sizeof(*pU2inp),
-		i_cpy, n_cpy, nGD;
-
-	nOld = pOUT ? pOUT->n_load : 0;
-
-	gpdZSioSW(p) = 1;
-	while( iU2 < nU2 )
-	{
-		i_cpy = iU2&(~0x7);
-		iU2 = i_cpy+8;
-		if( iU2 > nU2 )
-			iU2 = nU2;
-		else {
-			while( iU2 < nU2 )
-			{
-				nGD = gpmMcmp( pU2inp+iU2, pU2out+iU2, (nU2-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
-				if( nGD > 16 )
-					break;
-				iU2 += 16;
-			}
-			if( iU2 > nU2 )
-				iU2 = nU2;
-		}
-
-		if( n_cpy = iU2-i_cpy )
-		{
-			//iU2 += n_cpy;
-			if( iU2 > nU2 )
-				iU2 = nU2;
-			n_cpy = iU2-i_cpy;
-
-			// \n send dadogjon
-			if( false && nOld )
-			{
-				sGTent[2] = 's';
-				pOUT->p_alloc[pOUT->n_load] = sGTent[0] = '\n';
-				pOUT->n_load++;
-				pOUT->p_alloc[pOUT->n_load] = 0;
-			}
-			//		               +------- Len: 0x28 = 32+8 = 40 --------+
-			//   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..Data............
-			//   +-->+>+>+-->+>+-->.1--.4  .8  .12 .16 .20 .24 .28 .32 .36 .40
-			//   +-->+>+>+-->+>+-->.x00.x04.x08.x0C.x10.x14.x18.x1c.x20.x24.0x28
-			//   500000FF03FF000028000014010000D*0000100004.   .   .   .   .
-			// \n500000FF03FF000020000014010000D*000000000265686f6c
-			pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_send_LN4SL6N4, 0x18 + 4*n_cpy, i_cpy, n_cpy );
-			pOUT->lzyINS( NULL, 4*n_cpy, s = -1, -1 );
-			//gpmMcpyOF( pU2inp+i_cpy, pU2out+i_cpy, iU2-i_cpy );
-			for(  ; i_cpy < iU2; i_cpy++ )
-				s += sprintf( (char*)pOUT->p_alloc+s, "%0.4X", pU2out[i_cpy] );
-			//break;
-			if( iU2 >= nU2 )
-				break;
-		}
-
-		iU2 += gpmMcmp( pU2inp+iU2, pU2out+iU2, (nU2-iU2)*sizeof(*pU2inp) )/sizeof(*pU2inp);
-	}
-
-	if( nOld < (pOUT ? pOUT->n_load : 0) )
-	{
-		gpdZSioSW(p) = 0;
-		nSYNsum = nSYNdo;
-		nSYNdo++; // küldtem valamit várom a választ
-
-		if( pALL )
-		{
-			pSOCK = gpmLZYvali( SOCKET, pLZYusr );
-			if( !pSOCK )
-			{
-				//pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
-				pSOCK = gpmLZYvali( SOCKET, pLZYusr=mass.GTlzyALL.LZY(gpdGTlzyIDusr(TnID)) ); //pLZYusr );
-				nSOCK = gpmLZYload( pLZYusr, SOCKET );
-			}
-
-			for( U4 iS = 0; iS < nSOCK; iS++ )
-			{
-				pGTusr = pALL->GT( pSOCK[iS] );
-				if( !pGTusr )
-					continue;
-				pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r%s\r\n", pOUT->p_alloc+nOld );
-				pGTusr->GTback();
-			}
-		}
-	}
-	else if( gpdZSioSW(p) )
-	{
-		pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_recv_LN4SL6N4, 0x18, pU2inp[-4]*pU2inp[-2], gpdSLMPnDEV );
-	}
-
-	iCNT++;*/
 }
 
 gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
