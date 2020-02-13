@@ -181,8 +181,8 @@ U4x4 gpaZSrobi[] = {
 };
 U4x4 gpaZSwr[] = {
 	//	write,	nW, 		read,		nR
-	{ 	0xA,  	gpdZSnRWu2,	0x2710,  	(gpdZSnRW+sizeof(I4x4))/sizeof(U2)	},
-	{ 	0x40A,  gpdZSnRWu2,	0x2710*2, 	(gpdZSnRW+sizeof(I4x4))/sizeof(U2)	},
+	{ 	0xA,  	gpdZSnRWu2,	10000, 	(gpdZSnRW+sizeof(I4x4))/sizeof(U2)	},
+	{ 	0x40A,  gpdZSnRWu2,	20000, 	(gpdZSnRW+sizeof(I4x4))/sizeof(U2)	},
 };
 void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 {
@@ -276,7 +276,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			if( eD0 > nD0 )
 				eD0 = nD0;
 
-			for( iD0 = 4, pU2 += 2; iD0 < eD0; iD0 +=4, pU2++ )
+			for( iD0 = 4, pU2 += 10; iD0 < eD0; iD0 +=4, pU2++ )
 				*pU2 = gpfSTR2U8( gpmMcpy(pW,pD0+iD0,4)-2, NULL );
 
 			if( iD0 > 4 )
@@ -359,7 +359,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// Drc filter
 	/// ---------------------------------
 	U2	*pA = NULL, *pB = NULL;
-	U4	iU2 = 0, nU2 = sizeof(gpcZS);
+	U4	iU2 = 0, nU2 = 0;
 	for( eD0 = pZSnD->ioSW.w+2; ZSnD.ioSW.w < eD0; ZSnD.ioSW.w++ )
 	{
 		iD0 = ZSnD.iCMP();
@@ -377,8 +377,9 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 		ZSnD.aZSio[4+iD0] &= ZSnD.aDrc[iD0]; // csak a iCTRL
 
-
-		iU2 = gpmMcmpOF( pB, pA, nU2 );
+		iU2 = gpaZSwr[iD0].x;
+		nU2 = gpaZSwr[iD0].y;
+		iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2 );
 		if( nU2 <= iU2 )
 			continue;
 		// talált különbséget
@@ -450,7 +451,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		sGTent[0] = '\n';
 	} else {
 		// mégis ugyan az lett
-		pZSnD->ioSW.y = pZSnD->ioSW.z;
+		pZSnD->ioSW.y = pZSnD->ioSW.z+1;
 	}
 
 	return;
