@@ -294,7 +294,13 @@ class gpcMASS;
 #define gpdSIZ2CR I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
-
+#define mm100(a) (a*100)
+#define zsIO 20
+#define zsIN 400
+#define zsINin (zsIN-zsIO)
+#define zsIN100 mm100(zsIN)
+#define zsOU (zsIN+zsIO)
+#define zsOU100 mm100(zsOU)
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
@@ -2881,6 +2887,50 @@ public:
 			avgr += this[j].y;
 
 		return avgr / n;
+	}
+
+	I4x4& zs100( I4x4& prev )
+	{
+		I4x4 T = *this, S = prev;
+		T.w = S.w = 0;
+		if( T.z < 10000 )
+			T.z = 10000; // 10mm
+		I4 T1, S100, S1;
+		for( I4 T100 = sqrt(T.qlen()), n = 0; T100 < zsIN100; T100 = sqrt(T.qlen()), n++ )
+		{
+			switch( n )
+			{
+				case 0:
+					S100 = sqrt(S.qlen());
+					if( S100 > zsIN100 )
+						continue;
+					prev.x = prev.y = prev.z = (zsOU+zsIO)*100;
+					S = prev;
+					S.w = 0;
+					S100 = sqrt(S.qlen());
+					continue;
+				case 1:
+					T1 = T100/100;
+					if( T1 > zsINin )
+					{
+						T &= I4x4( zsOU,zsOU,zsOU, 0 );
+						T /= I4x4( T1,T1,T1, 1 );
+						continue;
+					}
+					// az a lényeg ebben az esetben
+					// a prev pozicióból befele toljuk
+					// és nem kifele, ha lehet
+					S1 = S100/100;
+					T1 = S1-zsIO;
+					if( T1 < zsOU )
+						T1 = zsOU;
+					T &= I4x4( T1,T1,T1, 0 );
+					T /= I4x4( S1,S1,S1, 1 );
+					break;
+			}
+		}
+		x = T.x; y = T.y; z = T.z;
+		return *this;
 	}
 };
 

@@ -362,7 +362,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// ---------------------------------
 	/// Drc filter
 	/// ---------------------------------
-	iD0 = pZSnD->stpPUSH();
+	iD0 = pZSnD->stpPUSH( false );
 
 
 
@@ -375,11 +375,23 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						pZSnD->aZSio[iD0*2]
 						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
 					); // pA-ban azaz új out lesz
-
+	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0];
     // itt kell majd variálni, hogy elösször maradjanak a control bitek
     // és a következő körben írjuk be
-    if( false ) // egyenlőre off
-		pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // csak a iCTRL
+   /* switch( pZSnD->pc.aXYZW[iD0] )
+    {
+		case 0:
+
+			break;
+		case 1:
+			pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // csak a iCTRL
+			break;
+		case 2:
+
+			break;
+
+    }
+    if( false ) // egyenlőre off*/
 
 
 

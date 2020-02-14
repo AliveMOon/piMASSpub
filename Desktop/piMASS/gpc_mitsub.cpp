@@ -922,6 +922,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp )
 	{
 		// itt kell le ellenőrizni mondjuk az ütközésre
 		//
+		oCTRL.z = 11;
 		setHS1();
 		return *this;
 	}

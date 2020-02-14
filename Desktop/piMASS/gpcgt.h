@@ -88,12 +88,16 @@ public:
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
 	U4x4	oCTRL, iCTRL;
+
 	gpcDrc& out( gpcDrc& pev, gpcDrc& inp );
 	gpcDrc& operator &= ( gpcDrc& in );
-	gpcDrc& operator = ( const gpcZS& zs )
+	gpcDrc& operator = ( gpcZS& zs )
 	{
 		gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
+		iXYZ.zs100( zs.oMxyzEspd );
+
         gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
+
         gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
         gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
         gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
@@ -304,9 +308,9 @@ class gpcZSnD
 			ioSW.y += 2;
 			return ioSW.y;
 		}
-		U4 stpPUSH()
+		U4 stpPUSH( bool bSW )
 		{
-			ioSW.w -= 2;
+			ioSW.w -= bSW ? 2 : 4;
 			ioSW.z = ioSW.w+4;
 			ioSW.y = ioSW.w+1;
 			return !!(ioSW.w&2);
