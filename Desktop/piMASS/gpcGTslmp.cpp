@@ -193,7 +193,6 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	if( sGTent[2] == 's' && sGTent[0] == 'b' )
 		return GTslmpBINref( mom, pWIN, pALL );
 
-	U4 nD0 = 0;
 	//, nPAD = gpdZSpad, nPADu2 = nPAD/sizeof(U2);
 	gpcMASS& mass = *(pWIN->piMASS);
 	gpcGT* pGTusr = NULL;
@@ -208,7 +207,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			*pU2inp = pZSnD->pU2inp();
 
 	SOCKET	*pSOCK;
-	U4 nSOCK, iD0 = 0, eD0;
+	U4 nSOCK, nD0 = 0, iD0 = 0, eD0, iDRC;
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
 	{
@@ -283,8 +282,9 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 			if( iD0 > 4 )
 			{
+				iDRC = pZSnD->iDrc();
 				// nem fecsegés, hanem adat
-				pZSnD->aDrc[pZSnD->iDrc()] = pZSnD->ioZS();
+				pZSnD->aDrc[iDRC] = pZSnD->ioZS();
 				pZSnD->stpPULL();
 				if( pZSnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pZSnD->pulling( pOUT, gpaZSwr );
@@ -317,11 +317,6 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 				case 0x4031:
 					// nyugta?
 					pOUT = pZSnD->pulling( pOUT, gpaZSwr );
-					/*pOUT = pOUT->lzyFRMT(
-											s = -1, gpdSLMP_recv_LN4SL6N4, 24,
-													gpaiDEV[pZSnD->ioSW.y&3],
-													gpanDEV[pZSnD->ioSW.y&3]
-										);*/
 					break;
 				case 0x0000: // good!
 					break;
@@ -365,7 +360,6 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	iD0 = pZSnD->stpPUSH( false );
 
 
-
 	U2	*pB = (U2*)&(
 						pZSnD->aZSio[4+iD0]
 						= pZSnD->aDrc[iD0]
@@ -375,25 +369,10 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						pZSnD->aZSio[iD0*2]
 						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
 					); // pA-ban azaz új out lesz
-	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0];
+
+	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // ez a pB
     // itt kell majd variálni, hogy elösször maradjanak a control bitek
     // és a következő körben írjuk be
-   /* switch( pZSnD->pc.aXYZW[iD0] )
-    {
-		case 0:
-
-			break;
-		case 1:
-			pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // csak a iCTRL
-			break;
-		case 2:
-
-			break;
-
-    }
-    if( false ) // egyenlőre off*/
-
-
 
 
 

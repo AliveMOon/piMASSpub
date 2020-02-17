@@ -779,8 +779,17 @@ U1 gpsSLMPabc[] =
 				;
 gpcZS& gpcZS::operator = ( const gpcDrc& D )
 {
-	//gpmMcpyOF( &io128.y,	&D.oCTRL.y, 3 );
+	//if( (D.bHS1o()&&D.bHS1i()) || (D.bHS2o() && !D.bHS2i()) )
+	if( D.bHS1i() || (D.bHS2o() && !D.bHS2i()) )
+	{
+		// töröljük ha megértette
+		gpmCLR;
+		return *this;
+	}
+
+	gpmMcpyOF( &io128.y,	&D.oCTRL.y, 3 );
 	//  majd az ÉS ha kell
+
 	gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
 	gpmMcpyOF( &aABC,	&D.oABC, 3 );
 	gpmMcpyOF( &apos,	&D.oxyz, 3 );
@@ -793,7 +802,23 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 }
 gpcZS& gpcZS::operator &= ( const gpcDrc& D )
 {
-	gpmMcpyOF( &io128.y,	&D.iCTRL.y, 3 );
+	//if( (D.bHS1o()&&D.bHS1i()) || (D.bHS2o() && !D.bHS2i()) )
+	if( D.bHS1i() || (D.bHS2o() && !D.bHS2i()) )
+	{
+		//gpmMcpyOF( &io128.y, &D.iCTRL.y, 3 );
+		gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
+		gpmMcpyOF( &aABC,	&D.oABC, 3 );
+		gpmMcpyOF( &apos,	&D.oxyz, 3 );
+		gpmMcpyOF( &aabc,	&D.oabc, 3 );
+		gpmMcpyOF( aJ16,	&D.aoAX1to6[0], 3 );
+		gpmMcpyOF( aJ16+3,	&D.aoAX1to6[1], 3 );
+		gpmMcpyOF( aj16,	&D.aoax1to6[0], 3 );
+		gpmMcpyOF( aj16+3,	&D.aoax1to6[1], 3 );
+		//return *this;
+	}
+
+	gpmMcpyOF( &io128.y, &D.iCTRL.y, 3 );
+
 	/*gpmMcpyOF( &aPOS,	&D.iXYZ, 3 );
 	gpmMcpyOF( &aABC,	&D.iABC, 3 );
 	gpmMcpyOF( &apos,	&D.ixyz, 3 );
@@ -808,6 +833,73 @@ gpcZS::gpcZS( const gpcDrc& D )
 {
 	gpmCLR;
 	*this = D;
+}
+
+I4x4 gpaCAGE[] =
+{
+	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
+	{ mm100(1500), 0, mm100(320), mm100(800) },
+	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+
+	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
+	{ mm100(1500), 0, mm100(320), mm100(800) },
+	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+};
+
+gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
+	gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
+	if( iXYZ.qlen_xyz() < 32*32 )
+	{
+		gpmMcpyOF( &iXYZ.x, &zs.oMxyzEspd, 3 );
+		if( iXYZ.qlen_xyz() < 32*32 )
+			iXYZ.x = iXYZ.y = iXYZ.z = mm100(450);
+
+	}
+	U4 n = gpmN(gpaCAGE), i = 0, e = 0;
+	switch( NMnDIF.x )
+	{
+		case gpeZS_BILL:
+			i = 0;
+			e = n/2;
+			break;
+		case gpeZS_JOHN:
+			i = n/2;
+			e = n;
+			break;
+		default:
+			oXYZ.xyz_(
+				 (iXYZ-I4x4(0,0,mm100(320))).TSr( oXYZ-I4x4(0,0,mm100(320)), zsOU100 ).mxR(mm100(zsOU100+220))
+				+I4x4(0,0,mm100(320))
+			);
+			break;
+	}
+	I4x4 a = oXYZ.xyz_(), b = iXYZ.xyz_();
+	I8 dd = (a-b).qlen_xyz(), d = sqrt(dd), abba;
+	while( i < e )
+	{
+		a = (oXYZ-gpaCAGE[i]).xyz_();
+		b = (iXYZ-gpaCAGE[i]).xyz_();
+        a = b.TSr( a, gpaCAGE[i].w+mm100(100) ); // mm100(100)-a magának TOOL nak is adunk vele egy sugarat
+        abba = (a-b).qlen_xyz();
+        if( dd > abba )
+        {
+			oXYZ.xyz_( a+gpaCAGE[i] );
+			dd = abba;
+        }
+		i++;
+	}
+	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
+
+
+
+	gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
+	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
+	gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
+	gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
+	gpmMcpyOF( &aiax1to6[0].x, zs.aj16, 3 );
+	gpmMcpyOF( &aiax1to6[1].x, zs.aj16+3, 3 );
+	gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
+	return *this;
 }
 gpcDrc& gpcDrc::judo( gpcZS& inp )
 {
@@ -824,9 +916,13 @@ gpcDrc& gpcDrc::judo( gpcZS& inp )
 			return *this;
         }
         /// PULLING HS1
-		setHS1();
-		return *this;
+        if(oCTRL.z)
+        {
+			setHS1();
+			return *this;
+        }
 	}
+
 
 	if( bHS2o() )
 	{
@@ -859,52 +955,61 @@ gpcDrc& gpcDrc::judo( gpcZS& inp )
 	if( !NMnDIF.x )
 		return *this;
 
-	I4x4 dir = (oXYZ - iXYZ).xyz_();
-	I8 dif = dir.qlen(), mm = sqrt(dif/100);
-	if( mm < 400 )
+	if( oCTRL.z )
 	{
-		if( mm > 250 )
-		{
-			iXYZ &= I4x4( 450,450,450, 1 );
-			iXYZ /= I4x4( mm,mm,mm, 1 );
-		} else {
-			// safe space
-			iXYZ.x = 350;
-			iXYZ.y = (NMnDIF.x == gpeZS_BILL) ? -450 : 450;
-			iXYZ.z = 734;
-		}
-		iXYZ &= I4x4( 100,100,100, 1 );
-		dir = (oXYZ - iXYZ).xyz_();
-		dif = dir.qlen();
-		mm = sqrt(dif/100);
-		oxyz &= I4x4( 0,0,0, 1 );
-		ixyz.xyz_(oxyz);
+		setHS1();
+		return *this;
 	}
+
+	I8 dif = iXYZ.qlen_xyz(), mm = sqrt(dif)/100;
+	if( mm < 400 )
+		return *this;
+
+	I4x4 dir = oXYZ - iXYZ;
+	dif = dir.qlen_xyz();
+	mm = sqrt(dif)/100;
     if( mm > 50 )
     {
 		dir &= I4x4( 50, 50, 50, 0 );
 		dir /= I4x4( mm,mm,mm, 1 );
-		dir &= I4x4( 100,100,100, 0 );
+		dif = dir.qlen();
+		mm = sqrt(dif)/100;
+		if( mm > 50 )
+		{
+			dir &= I4x4( 50, 50, 50, 0 );
+			dir /= I4x4( mm,mm,mm, 1 );
+			dif = dir.qlen();
+			mm = sqrt(dif)/100;
+		}
 		oXYZ.xyz_( dir+iXYZ );
 		dir = (oXYZ - iXYZ).xyz_();
-		dif = dir.qlen();
-		mm = sqrt(dif/100);
+
+		mm = sqrt(dif)/100;
 		oxyz &= I4x4( 0,0,0, 1 );
 		ixyz.xyz_(oxyz);
     }
 	if( dif )
 	{
-		oCTRL.w |= 1;
+		oCTRL.z |= 1;
 	}
 
 	dir = (oABC - iABC).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
-		oCTRL.w |= 2;
+		oCTRL.z |= 2;
 	}
 
-	dir = (oxyz - ixyz).xyz_();
+	if( oCTRL.z )
+	{
+		// itt kell le ellenőrizni mondjuk az ütközésre
+		//
+		oCTRL.w = 0;
+		oCTRL.z = 11;
+		return *this;
+	}
+
+	/*dir = (oxyz - ixyz).xyz_();
 	dif = dir.qlen();
 	if( dif )
 	{
@@ -916,16 +1021,9 @@ gpcDrc& gpcDrc::judo( gpcZS& inp )
 	if( dif )
 	{
 		oCTRL.w |= 8;
-	}
+	}*/
 
-	if( oCTRL.w )
-	{
-		// itt kell le ellenőrizni mondjuk az ütközésre
-		//
-		oCTRL.z = 11;
-		setHS1();
-		return *this;
-	}
+
 
 	/// join adatok most egyenlőre nem
 
@@ -1076,19 +1174,26 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					} break;
 				case gpeALF_BILL:
 						iD = 0;
-						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
+
+						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_BILL )
 							break;
-						ZSnD.aDrc[iD].format( comA );
+						ZSnD.aDrc[iD].format( gpeZS_BILL );
 						break;
 				case gpeALF_JOHN:
 						iD = 1;
-						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == comA )
+						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_JOHN )
 							break;
-						ZSnD.aDrc[iD].format( comA );
+						ZSnD.aDrc[iD].format( gpeZS_JOHN );
 					 break;
 				default:
 					iNUM = 23;
 					break;
+			}
+			if( pD )
+			if( oD != iD )
+			{
+				pANS = pD->ANSstat( pANS );
+				oD = iD;
 			}
 			continue;
 		} else if( iNUM > 23 )
@@ -1121,12 +1226,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				d8 += strtod( (char*)pSTR, (char**)&pSTR );
 		}
 
-		if( pD )
-		if( oD != iD )
-		{
-			pANS = pD->ANSstat( pANS );
-			oD = iD;
-		}
+
 		pD = ZSnD.aDrc+iD;
 
 

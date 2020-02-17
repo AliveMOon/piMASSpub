@@ -89,24 +89,10 @@ public:
 			aoax1to6[2], aiax1to6[2];
 	U4x4	oCTRL, iCTRL;
 
-	gpcDrc& out( gpcDrc& pev, gpcDrc& inp );
+	gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	gpcDrc& operator &= ( gpcDrc& in );
-	gpcDrc& operator = ( gpcZS& zs )
-	{
-		gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
-		iXYZ.zs100( zs.oMxyzEspd );
+	gpcDrc& operator = ( gpcZS& zs );
 
-        gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
-
-        gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
-        gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
-        gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
-        gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
-		gpmMcpyOF( &aiax1to6[0].x, zs.aj16, 3 );
-        gpmMcpyOF( &aiax1to6[1].x, zs.aj16+3, 3 );
-        gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
-        return *this;
-	}
 
 	gpcDrc& i( const gpcDrc& b )
 	{
@@ -143,7 +129,7 @@ public:
 			return *this;
 
 		NMnDIF.x = nm;
-		iXYZ = oXYZ = I4x4( 450,  0,700,gpeZS_POS0)&I4x4(100,100,100, 1);
+		iXYZ = oXYZ = I4x4( 400,  0, 300+400, gpeZS_POS0)&I4x4(100,100,100, 1);
 		iABC = oABC = I4x4( 180,  0, 90,gpeZS_DIR0)&I4x4(100,100,100, 1);
 		iXYZ.w = gpeZS_iPOS;
 		iABC.w = gpeZS_iDIR;
@@ -241,8 +227,8 @@ public:
 	}
 
 
-	bool bHS1i() { return !!(iCTRL.y&ZShs1);	}
-	bool bHS1o() { return !!(oCTRL.y&ZShs1);	}
+	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
+	bool bHS1o() const { return !!(oCTRL.y&ZShs1);	}
 	U4 setHS1() {
 		iCTRL.y&=(~ZShs1);
 		return (oCTRL.y|=ZShs1);
@@ -252,8 +238,8 @@ public:
 		return (oCTRL.y&=(~ZShs1));
 	}
 
-	bool bHS2i() { return !!(iCTRL.y&ZShs2);	}
-	bool bHS2o() { return !!(oCTRL.y&ZShs2);	}
+	bool bHS2i() const  { return !!(iCTRL.y&ZShs2);	}
+	bool bHS2o() const  { return !!(oCTRL.y&ZShs2);	}
 	U4 setHS2() {
 		iCTRL.y&=(~ZShs2);
 		return (oCTRL.y|=ZShs2);
@@ -368,7 +354,7 @@ class gpcZSnD
 		gpcLZY* pulling( gpcLZY* pOUT, U4x4* pZSrw )
 		{
 			U8 s = -1;
-			U4	i = this ? iDrc():1,
+			U4	i = this ? iDrc():0,
 				n = pZSrw[i].w;
 			i = pZSrw[i].z;
 			return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );

@@ -294,7 +294,7 @@ class gpcMASS;
 #define gpdSIZ2CR I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
-#define mm100(a) (a*100)
+#define mm100(a) ((a)*100)
 #define zsIO 20
 #define zsIN 400
 #define zsINin (zsIN-zsIO)
@@ -2458,6 +2458,7 @@ public:
         a4x2[0] = _xy;
         a4x2[1] = _zw;
     }
+    I4x4( const I8x4& b );
     I4x4& operator = ( I4 i )
     {
 		x = y = z = w = i;
@@ -2889,49 +2890,12 @@ public:
 		return avgr / n;
 	}
 
-	I4x4& zs100( I4x4& prev )
-	{
-		I4x4 T = *this, S = prev;
-		T.w = S.w = 0;
-		if( T.z < 10000 )
-			T.z = 10000; // 10mm
-		I4 T1, S100, S1;
-		for( I4 T100 = sqrt(T.qlen()), n = 0; T100 < zsIN100; T100 = sqrt(T.qlen()), n++ )
-		{
-			switch( n )
-			{
-				case 0:
-					S100 = sqrt(S.qlen());
-					if( S100 > zsIN100 )
-						continue;
-					prev.x = prev.y = prev.z = (zsOU+zsIO)*100;
-					S = prev;
-					S.w = 0;
-					S100 = sqrt(S.qlen());
-					continue;
-				case 1:
-					T1 = T100/100;
-					if( T1 > zsINin )
-					{
-						T &= I4x4( zsOU,zsOU,zsOU, 0 );
-						T /= I4x4( T1,T1,T1, 1 );
-						continue;
-					}
-					// az a lényeg ebben az esetben
-					// a prev pozicióból befele toljuk
-					// és nem kifele, ha lehet
-					S1 = S100/100;
-					T1 = S1-zsIO;
-					if( T1 < zsOU )
-						T1 = zsOU;
-					T &= I4x4( T1,T1,T1, 0 );
-					T /= I4x4( S1,S1,S1, 1 );
-					break;
-			}
-		}
-		x = T.x; y = T.y; z = T.z;
-		return *this;
-	}
+    I8 qlen_xyz() const
+    {
+		return (I8)x*x + (I8)y*y + (I8)z*z;
+    }
+	I4x4 TSr( I4x4 T, I4 r );
+	I4x4 mxR( I4 r );
 };
 
 
@@ -3020,6 +2984,11 @@ public:
 	I8x2 operator / (const I8x2& b) const
 	{
 		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff ,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
+	}
+
+	I8x2 operator % (const I8x2& b) const
+	{
+		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
 	}
 
 	I8x2 operator + (const I4x2& b) const
@@ -3212,6 +3181,61 @@ public:
     {
         x = _x; y = _y; z = _z; w = _w;
     }
+    I8x4( const I8x2& xy, const I8x2& zw )
+    {
+        a8x2[0] = xy;
+        a8x2[1] = zw;
+    }
+    I8x4( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; };
+    I8x4& operator = ( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; return *this; };
+    I8x4& operator *= ( I8 b )
+    {
+		if( !b )
+		{
+			gpmCLR;
+			return *this;
+		}
+		if( b == 1 )
+			return *this;
+		x *= b;
+        y *= b;
+        z *= b;
+        w *= b;
+        return *this;
+    }
+    I8x4& operator /= ( I8 b )
+    {
+		if( !b )
+		{
+			x = y = z = w = 0x7FFFffffFFFFffff;
+			return *this;
+		}
+		if( b == 1 )
+			return *this;
+		x /= b;
+        y /= b;
+        z /= b;
+        w /= b;
+        return *this;
+    }
+    I8x4& operator %= ( I8 b )
+    {
+		if( !b )
+		{
+			x = y = z = w = 0x7FFFffffFFFFffff;
+			return *this;
+		}
+		if( abs(b) == 1 )
+		{
+			gpmCLR;
+			return *this;
+		}
+		x %= b;
+        y %= b;
+        z %= b;
+        w %= b;
+        return *this;
+    }
     I8x4& operator = ( U8 b )
     {
 		gpmCLR;
@@ -3231,6 +3255,31 @@ public:
 	}
 	I8x4& AB( U1* pA, U1* pB, U1** ppA = NULL, U1** ppB = NULL );
 
+	I8 qlen_xyz() { return x*x+y*y+z*z; }
+	I8 operator * ( const I8x4& b ) const
+	{
+		return x*b.x + y*b.y + z*b.z + w*b.w;
+	}
+	I8x4 operator & ( const I8x4& b ) const
+	{
+		return I8x4( x*b.x, y*b.y, z*b.z, w*b.w );
+	}
+	I8x4 operator + ( const I8x4& b ) const
+	{
+		return I8x4( a8x2[0]+b.a8x2[0], a8x2[1]+b.a8x2[1] );
+	}
+	I8x4 operator - ( const I8x4& b ) const
+	{
+		return I8x4( a8x2[0]-b.a8x2[0], a8x2[1]-b.a8x2[1] );
+	}
+	I8x4 operator / ( const I8x4& b ) const
+	{
+		return I8x4( a8x2[0]/b.a8x2[0], a8x2[1]/b.a8x2[1] );
+	}
+	I8x4 operator % ( const I8x4& b ) const
+	{
+		return I8x4( a8x2[0]%b.a8x2[0], a8x2[1]%b.a8x2[1] );
+	}
     I8 tree_add( gpeALF alf, I8 n_t )
     {
 		return tree_add( (I8)alf, n_t );
