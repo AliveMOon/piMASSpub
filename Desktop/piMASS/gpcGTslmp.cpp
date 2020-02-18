@@ -14,150 +14,6 @@ extern char gpsTAB[], *gppTAB;
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
 // 0000 0000 0000 0000
-/*gpcDrc& gpcDrc::operator &= ( gpcDrc& out ) {
-	if( *this == out )
-	{
-		if( CTRL.w )
-		if( bHS1i() )
-		{
-			// kint van a jel
-			if( !bHS1o() )
-			{
-				// még olvasse||végrehajt
-				// várni kell rá pullingolni
-				*this = out;
-				out.CTRL.x++;
-				CTRL.w = 0;		// pullingolni mintha az robin
-								// nem lenne meg a parancs
-								// potolni akarja majd
-				return *this;
-			}
-
-			// megértette||megérkezett
-			out.CTRL.w = 0;
-			out.rsetHS1i();
-			out.rsetHS1o();
-		}
-		return *this;
-	}
-
-	// most jött, vissza ne küldjük
-	out.iXYZ = iXYZ;
-	out.iABC = iABC;
-	out.ixyz = ixyz;
-	out.iabc = iabc;
-	gpmMcpy( out.aiAX1to6, aiAX1to6, sizeof(aiAX1to6) );
-	gpmMcpy( out.aiax1to6, aiax1to6, sizeof(aiax1to6) );
-
-	// THIS ez a IN most jött ropogos
-	// az out amit akarok vagy korábbi állapot
-	if( out.bHS2i() )
-	{
-		// akart valamit és jeleztük, hogy olvastuk
-		if( bHS2o() )
-		{
-			// még olvassa
-			// ne küldjük mégegyszer
-			out.CTRL.z |= CTRL.z; //setHS2o(); // átveszük, hogy még olvassa
-			*this = out; // ha ugyanaz nem küldheti
-		} else {
-			// már tud róla hogy olvastuk törölhetjük
-			out.CTRL.w = 0;	// töröljük a kedvéért
-			out.rsetHS2i(); // a miénket
-			out.rsetHS2o();	// az övét is
-		}
-		return *this;
-	}
-	else if( bHS2o() )
-	{
-		// na valamit akart a HAVER
-		out.CTRL.w = CTRL.w; // elrakjuk
-		out.setHS2i(); // jelzem megvan
-
-		rsetHS2i(); // force találat legyen
-
-		// na mit csináljunk az infó szerint
-		switch( out.CTRL.w )
-		{
-			default:
-				// ha nem ismerjük semmit
-				// majd más foglalkozik vele
-				break;
-		}
-		return *this;
-	}
-
-
-	if( out.CTRL.w )
-	if( out.bHS1i() )
-	{
-		// kint van a jel
-		if( !bHS1o() )
-		{
-			// még olvasse||végrehajt
-			// várni kell rá pullingolni
-			*this = out;
-			CTRL.w = 0;		// pullingolni
-			return *this;
-		}
-
-		// megértette
-		out.CTRL.w = 0;
-		out.rsetHS1i();
-		out.rsetHS1o();
-		return *this;
-	}
-
-
-	I4x4 dir;
-	U8 dif;
-
-	oXYZ.xyz_(iXYZ);
-	oABC.xyz_(iABC);
-	oxyz.xyz_(ixyz);
-	oabc.xyz_(iabc);
-	gpmMcpy( out.aiAX1to6, aiAX1to6, sizeof(aiAX1to6) );
-	gpmMcpy( out.aiax1to6, aiax1to6, sizeof(aiax1to6) );
-
-	dir = (out.oXYZ - oXYZ).xyz_();
-	dif = dir.qlen();
-    if( dif )
-	{
-		out.CTRL.w |= 1;
-
-	}
-	dir = (out.oABC - oABC).xyz_();
-	dif = dir.qlen();
-	if( dif )
-	{
-		out.CTRL.w |= 2;
-
-	}
-
-	dir = (out.oxyz - oxyz).xyz_();
-	dif = dir.qlen();
-    if( dif )
-	{
-		out.CTRL.w |= 4;
-
-	}
-
-	dir = (out.oabc - oabc).xyz_();
-	dif = dir.qlen();
-	if( dif )
-	{
-		out.CTRL.w |= 8;
-
-	}
-
-	if( out.CTRL.w )
-	{
-		out.setHS1i();
-		return *this;
-	}
-
-	return *this;
-}*/
 
 
 U4 gpaiPAD[] = {
@@ -322,6 +178,9 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 					break;
 				case 0xc050:
 					break;
+				case 0xc051:
+					pOUT = pZSnD->pulling( pOUT, gpaZSwr );
+					break;
 				default:
 					break;
 			}
@@ -342,7 +201,11 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	}
 
 	if( pZSnD->bWAIT() )
+	{
+		if( pZSnD ? pZSnD->pc.x > 10 : false )
+			pOUT = pZSnD->pulling( pOUT, gpaZSwr );
 		return;
+	}
 
 	iCNT++;
 	//gpcZSnD& ZSnD = *pZSnD;
@@ -370,24 +233,45 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
 					); // pA-ban azaz új out lesz
 
-	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // ez a pB
     // itt kell majd variálni, hogy elösször maradjanak a control bitek
     // és a következő körben írjuk be
-
-
+	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // ez a pB
 
 	U4	iU2 = gpaZSwr[iD0].x,
 		nU2 = gpaZSwr[iD0].y;
 	iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2 );
 	if( iU2 >= nU2 )
+	{
+		// nem volt különbség
+		pOUT = pZSnD->pulling( pOUT, gpaZSwr );
 		return;
+	}
+
+
 
 	// talált különbséget
 	// beállítjuk a pZSnD->ioSW,
 	// hogy ezt kérdezze legközelebb
-	U4 i_cpy, n_cpy, nGD;
-	while( iU2 < nU2 )
-	{
+	U4 i_cpy = iU2, n_cpy, nGD;
+	if( i_cpy ) {
+		if( n_cpy = nU2-i_cpy )
+		{
+			// \n send dadogjon
+
+			//		               +------- Len: 0x28 = 32+8 = 40 --------+
+			//   SNo.NnSnUn..MsLen.Mtm.Com.Sub.D.Slot..Nw..Data............
+			//   +-->+>+>+-->+>+-->.1--.4  .8  .12 .16 .20 .24 .28 .32 .36 .40
+			//   +-->+>+>+-->+>+-->.x00.x04.x08.x0C.x10.x14.x18.x1c.x20.x24.0x28
+			//   500000FF03FF000028000014010000D*0000100004.   .   .   .   .
+			// \n500000FF03FF000020000014010000D*000000000265686f6c
+			pOUT = pOUT->lzyFRMT( s = -1, "%s" gpdSLMP_send_LN4SL6N4, pOUT->nLD() ? "\n": "", 0x18 + 4*n_cpy, i_cpy, n_cpy );
+			pOUT->lzyINS( NULL, 4*n_cpy, s = -1, -1 );
+			for(  ; i_cpy < nU2; i_cpy++ )
+				s += sprintf( (char*)pOUT->p_alloc+s, "%0.4X", pA[i_cpy] );
+		}
+		iU2 = nU2;
+	}
+	else while( iU2 < nU2 ) {
 		i_cpy = iU2&(~0x7);
 		iU2 = i_cpy+8;
 		if( iU2 > nU2 )
@@ -432,10 +316,16 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	}
 
 	if( !pOUT->nLD() )
+	{
+		pOUT = pZSnD->pulling( pOUT, gpaZSwr );
 		return;
+	}
 
 	nSYNsum = nSYNdo;
 	nSYNdo++;
+	if( pZSnD->ioSW.y&1  )
+		return;
+
 	pZSnD->ioSW.y |= 1;
 	//sGTent[2] = 's';
 	//sGTent[0] = '\n';

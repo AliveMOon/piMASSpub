@@ -253,7 +253,7 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	iCNT++;
 }
 
-U1 gpsSLMPabc[] =
+U1 gpsSLMPabc[] = {
 				"    "
 				"    "
 				"    "
@@ -776,76 +776,115 @@ U1 gpsSLMPabc[] =
 				"!!!!"
 				"    "
 
-				;
-gpcZS& gpcZS::operator = ( const gpcDrc& D )
-{
-	//if( (D.bHS1o()&&D.bHS1i()) || (D.bHS2o() && !D.bHS2i()) )
-	if( D.bHS1i() || (D.bHS2o() && !D.bHS2i()) )
-	{
-		// töröljük ha megértette
-		gpmCLR;
-		return *this;
-	}
+				};
 
-	gpmMcpyOF( &io128.y,	&D.oCTRL.y, 3 );
-	//  majd az ÉS ha kell
-
-	gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
-	gpmMcpyOF( &aABC,	&D.oABC, 3 );
-	gpmMcpyOF( &apos,	&D.oxyz, 3 );
-	gpmMcpyOF( &aabc,	&D.oabc, 3 );
-	gpmMcpyOF( aJ16,	&D.aoAX1to6[0], 3 );
-	gpmMcpyOF( aJ16+3,	&D.aoAX1to6[1], 3 );
-	gpmMcpyOF( aj16,	&D.aoax1to6[0], 3 );
-	gpmMcpyOF( aj16+3,	&D.aoax1to6[1], 3 );
-	return *this;
-}
 gpcZS& gpcZS::operator &= ( const gpcDrc& D )
 {
-	//if( (D.bHS1o()&&D.bHS1i()) || (D.bHS2o() && !D.bHS2i()) )
-	if( D.bHS1i() || (D.bHS2o() && !D.bHS2i()) )
+	gpmCLR;
+	io128.y = -1;
+	//gpmMcpyOF( &io128.y, &D.iCTRL.y, 3 );
+
+	/*switch( D.oCTRL.z )
 	{
-		//gpmMcpyOF( &io128.y, &D.iCTRL.y, 3 );
-		gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
-		gpmMcpyOF( &aABC,	&D.oABC, 3 );
-		gpmMcpyOF( &apos,	&D.oxyz, 3 );
-		gpmMcpyOF( &aabc,	&D.oabc, 3 );
-		gpmMcpyOF( aJ16,	&D.aoAX1to6[0], 3 );
-		gpmMcpyOF( aJ16+3,	&D.aoAX1to6[1], 3 );
-		gpmMcpyOF( aj16,	&D.aoax1to6[0], 3 );
-		gpmMcpyOF( aj16+3,	&D.aoax1to6[1], 3 );
-		//return *this;
-	}
-
-	gpmMcpyOF( &io128.y, &D.iCTRL.y, 3 );
-
-	/*gpmMcpyOF( &aPOS,	&D.iXYZ, 3 );
-	gpmMcpyOF( &aABC,	&D.iABC, 3 );
-	gpmMcpyOF( &apos,	&D.ixyz, 3 );
-	gpmMcpyOF( &aabc,	&D.iabc, 3 );
-	gpmMcpyOF( aJ16,	&D.aiAX1to6[0], 3 );
-	gpmMcpyOF( aJ16+3,	&D.aiAX1to6[1], 3 );
-	gpmMcpyOF( aj16,	&D.aiax1to6[0], 3 );
-	gpmMcpyOF( aj16+3,	&D.aiax1to6[1], 3 );*/
+		case 0:
+			gpmMcpyOF( &apos,	&D.ixyz, 3 );
+			gpmMcpyOF( &aabc,	&D.iabc, 3 );
+			break;
+		case 11:
+			gpmMcpyOF( &aPOS,	&D.iXYZ, 3 );
+			gpmMcpyOF( &aABC,	&D.iABC, 3 );
+			break;
+		default:
+			gpmMcpyOF( aJ16,	&D.aiAX1to6[0], 3 );
+			gpmMcpyOF( aJ16+3,	&D.aiAX1to6[1], 3 );
+			gpmMcpyOF( aj16,	&D.aiax1to6[0], 3 );
+			gpmMcpyOF( aj16+3,	&D.aiax1to6[1], 3 );
+			break;
+	}*/
 	return *this;
 }
+gpcZS& gpcZS::operator = ( const gpcDrc& D )
+{
+	gpmCLR;
+	if( D.bHS1i() )
+		return *this;
+	if( D.oCTRL.z >= 0x20000 )
+	{
+		gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
+		return *this;
+	}
+	else if( D.oCTRL.z >= 0x10000 )
+	{
+		if( D.bHS2o() )
+			gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
+		return *this;
+	}
+	if( !D.oCTRL.z )
+		return *this;
+
+	gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
+	if( D.bHS2o() || D.bHS2i() )
+		return *this;
+
+	if( D.oCTRL.z >= 0x8000 )
+		io128.z &= 0x7fff;
+	switch( D.oCTRL.z )
+	{
+		case 0:
+			break;
+		case 11:
+			gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
+			gpmMcpyOF( &aABC,	&D.oABC, 3 );
+			break;
+		default:
+			gpmMcpyOF( &apos,	&D.oxyz, 3 );
+			gpmMcpyOF( &aabc,	&D.oabc, 3 );
+			gpmMcpyOF( aJ16,	&D.aoAX1to6[0], 3 );
+			gpmMcpyOF( aJ16+3,	&D.aoAX1to6[1], 3 );
+			gpmMcpyOF( aj16,	&D.aoax1to6[0], 3 );
+			gpmMcpyOF( aj16+3,	&D.aoax1to6[1], 3 );
+			break;
+	}
+	return *this;
+}
+
+
 gpcZS::gpcZS( const gpcDrc& D )
 {
 	gpmCLR;
 	*this = D;
 }
 
-I4x4 gpaCAGE[] =
-{
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
-	{ mm100(1500), 0, mm100(320), mm100(800) },
-	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
-
+I4x4 gpaCAGEbill[] = {
 	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
 	{ mm100(1500), 0, mm100(320), mm100(800) },
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
 };
+I4x4 gpaCAGEjohn[] = {
+	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
+	{ mm100(1500), 0, mm100(320), mm100(800) },
+	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+};
+I4x4 gpcDrc::cage( I4x4* pCAGE, U4 n ) {
+	I4x4 T = trgXYZ.xyz_(), S = iXYZ.xyz_(), a, b;
+	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
+	for( U4 i = 0; i < n; i++ )
+	{
+		a = (S-pCAGE[i]).xyz_();
 
+		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
+        b = a.TSr( T-pCAGE[i], pCAGE[i].w+mm100(100) );
+        abba = (b-a).qlen_xyz();
+        ab = sqrt(abba);
+        if( dd > abba )
+        {
+			T = b+pCAGE[i].xyz_();
+			dd = abba;
+        }
+		i++;
+	}
+	return T;
+}
 gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
 	if( iXYZ.qlen_xyz() < 32*32 )
@@ -853,43 +892,8 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 		gpmMcpyOF( &iXYZ.x, &zs.oMxyzEspd, 3 );
 		if( iXYZ.qlen_xyz() < 32*32 )
 			iXYZ.x = iXYZ.y = iXYZ.z = mm100(450);
-
-	}
-	U4 n = gpmN(gpaCAGE), i = 0, e = 0;
-	switch( NMnDIF.x )
-	{
-		case gpeZS_BILL:
-			i = 0;
-			e = n/2;
-			break;
-		case gpeZS_JOHN:
-			i = n/2;
-			e = n;
-			break;
-		default:
-			oXYZ.xyz_(
-				 (iXYZ-I4x4(0,0,mm100(320))).TSr( oXYZ-I4x4(0,0,mm100(320)), zsOU100 ).mxR(mm100(zsOU100+220))
-				+I4x4(0,0,mm100(320))
-			);
-			break;
-	}
-	I4x4 a = oXYZ.xyz_(), b = iXYZ.xyz_();
-	I8 dd = (a-b).qlen_xyz(), d = sqrt(dd), abba;
-	while( i < e )
-	{
-		a = (oXYZ-gpaCAGE[i]).xyz_();
-		b = (iXYZ-gpaCAGE[i]).xyz_();
-        a = b.TSr( a, gpaCAGE[i].w+mm100(100) ); // mm100(100)-a magának TOOL nak is adunk vele egy sugarat
-        abba = (a-b).qlen_xyz();
-        if( dd > abba )
-        {
-			oXYZ.xyz_( a+gpaCAGE[i] );
-			dd = abba;
-        }
-		i++;
 	}
 	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
-
 
 
 	gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
@@ -901,132 +905,122 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
 	return *this;
 }
-gpcDrc& gpcDrc::judo( gpcZS& inp )
-{
+gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	*this = inp;
-
-	if( bHS1o() )
-	{
-		// kint van a HS1 jelünk
-		if( bHS1i() )
-		{
-			// megvan ZS jelzet olvasta
-            oCTRL.z = oCTRL.w = 0; // törlünk ZS kedvéért
-            rstHS1();
-			return *this;
-        }
-        /// PULLING HS1
-        if(oCTRL.z)
-        {
-			setHS1();
-			return *this;
-        }
-	}
-
-
-	if( bHS2o() )
-	{
-		// kint van a HS2 jelünk, hogy olvastuk
-		if( bHS2i() )
-		{
-			// megvan ZS jelzet megértette, hogy olvastuk
-            oCTRL.z = oCTRL.w = 0; // törlünk ZS kedvéért
-            rstHS2();
-			return *this;
-        }
-        /// PULLING HS2
-		setHS2();
-		return *this;
-	}
-
-	if( bHS2i() )
-	{
-		// ZS hibat jelzett
-		switch( iCTRL.z ) // na mi a hiba
-		{
-			default:
-				oCTRL.z = iCTRL.z;
-				oCTRL.w = 0;
-				break;
-		}
-		rstHS2();
-		return *this;
-	}
-	if( !NMnDIF.x )
-		return *this;
-
 	if( oCTRL.z )
 	{
-		setHS1();
+		if(bHS2o()) {
+			// kint van a HS2 jelünk, hogy olvastuk
+			if(!bHS2i())
+			{
+				/// 3.HS2 elvette a jelet ZS megértette, hogy olvastuk
+				oCTRL.z |= 0x20000;
+				xHS2o(); // mi is elvesszük
+				return *this;
+			}
+			/// 2.HS2 még nem tud róla
+			/// PULLING HS2
+			oHS2o();
+			return *this;
+		}
+
+		if(bHS2i()) {
+			/// 1.HS2 valami történt
+			// jelzünk hogy olvastuk
+			oHS2o();
+			switch(iCTRL.z)
+			{
+				case 0:
+					// megérkeztünk
+					/*iXYZ.xyz_(oXYZ);
+					iABC.xyz_(oABC);*/
+					break;
+				default:
+					// ZS hibat jelzett
+					// trg-be eltároljuk hol van most
+					// ne is akarcon tovább menni
+					trgXYZ.xyz_( oXYZ.xyz_(iXYZ) );
+					trgABC.xyz_( oABC.xyz_(iABC) );
+					break;
+
+			}
+			return *this;
+		}
+
+		if( oCTRL.z >= 0x10000 )
+		{
+			if( oCTRL.z >= 0x20000 )
+				oCTRL.z = 0;
+			return *this;
+		}
+
+		if(bHS1o()) {
+			// kint van a HS1 jelünk
+			if( bHS1i() ) {
+				/// 3.HS1 megvan ZS jelzet olvasta
+				// elveszük a jelet
+				xHS1o();
+				oCTRL.z |= 0x10000;
+				return *this;
+			}
+			/// PULLING HS1
+			oHS1o();
+			return *this;
+		} else {
+			/// 2.HS1 na most már ott kell lenie a jelnek
+			// felbilentjük
+			if( bHS1i() )
+				oCTRL.z |= 0x8000;
+			oHS1o();
+		}
+
 		return *this;
 	}
+
+	if( !NMnDIF.x )
+		return *this;
 
 	I8 dif = iXYZ.qlen_xyz(), mm = sqrt(dif)/100;
 	if( mm < 400 )
 		return *this;
 
-	I4x4 dir = oXYZ - iXYZ;
+	I4x4 dir = trgXYZ - iXYZ;
 	dif = dir.qlen_xyz();
-	mm = sqrt(dif)/100;
-    if( mm > 50 )
-    {
-		dir &= I4x4( 50, 50, 50, 0 );
-		dir /= I4x4( mm,mm,mm, 1 );
-		dif = dir.qlen();
-		mm = sqrt(dif)/100;
-		if( mm > 50 )
-		{
-			dir &= I4x4( 50, 50, 50, 0 );
-			dir /= I4x4( mm,mm,mm, 1 );
-			dif = dir.qlen();
-			mm = sqrt(dif)/100;
-		}
-		oXYZ.xyz_( dir+iXYZ );
-		dir = (oXYZ - iXYZ).xyz_();
-
-		mm = sqrt(dif)/100;
-		oxyz &= I4x4( 0,0,0, 1 );
-		ixyz.xyz_(oxyz);
-    }
 	if( dif )
 	{
+		switch( NMnDIF.x )
+		{
+			case gpeZS_BILL:
+				oXYZ.xyz_( iXYZ.lim_xyz( cage(gpaCAGEbill,gpmN(gpaCAGEbill)), mm100(50)) );
+				break;
+			case gpeZS_JOHN:
+				oXYZ.xyz_( iXYZ.lim_xyz( cage(gpaCAGEjohn,gpmN(gpaCAGEjohn)), mm100(50)) );
+				//oXYZ.xyz_( cage(gpaCAGEjohn,gpmN(gpaCAGEjohn)).lim_xyz(mm100(50)) );
+				break;
+			default:
+				oXYZ.xyz_( iXYZ );
+				break;
+		}
 		oCTRL.z |= 1;
 	}
 
-	dir = (oABC - iABC).xyz_();
-	dif = dir.qlen();
+	dir = (trgABC - iABC).lim_xyz(mm100(10));
+	dif = dir.qlen_xyz();
 	if( dif )
-	{
 		oCTRL.z |= 2;
-	}
 
 	if( oCTRL.z )
 	{
 		// itt kell le ellenőrizni mondjuk az ütközésre
 		//
 		oCTRL.w = 0;
-		oCTRL.z = 11;
+		oCTRL.z = 11; // linearis XYZ ABC
+		/// 1.HS1 elöbb ki X-eljük a HS1-et, nehogy ZS megszaladjon
+		xHS1o();
 		return *this;
 	}
 
-	/*dir = (oxyz - ixyz).xyz_();
-	dif = dir.qlen();
-	if( dif )
-	{
-		oCTRL.w |= 4;
-	}
-
-	dir = (oabc - iabc).xyz_();
-	dif = dir.qlen();
-	if( dif )
-	{
-		oCTRL.w |= 8;
-	}*/
-
-
-
 	/// join adatok most egyenlőre nem
-
 	return *this;
 }
 gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs )
@@ -1236,13 +1230,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 0:
 			case 1:
 			case 2:
-				pD->oXYZ.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->trgXYZ.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 				// DIR
 			case 3:
 			case 4:
 			case 5:
-				pD->oABC.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->trgABC.aXYZW[(iNUM%nNUM)+1] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 6:
 			case 7:

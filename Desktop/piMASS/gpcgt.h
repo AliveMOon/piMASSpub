@@ -81,20 +81,20 @@ public:
 class gpcDrc {
 public:
 	I4x4 	NMnDIF,
-			oXYZ, iXYZ,
-			oABC, iABC,
+			trgXYZ, oXYZ, iXYZ,
+			trgABC, oABC, iABC,
 			oxyz, ixyz,
 			oabc, iabc,
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
 	U4x4	oCTRL, iCTRL;
 
-	gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
+	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
+	I4x4 cage( I4x4* pCAGE, U4 n );
 	gpcDrc& operator &= ( gpcDrc& in );
 	gpcDrc& operator = ( gpcZS& zs );
 
-
-	gpcDrc& i( const gpcDrc& b )
+	/*gpcDrc& i( const gpcDrc& b )
 	{
 		iXYZ.xyz_( b.iXYZ );
 		iABC.xyz_( b.iABC );
@@ -106,10 +106,7 @@ public:
 		aiax1to6[1].xyz_( b.aiax1to6[1] );
 
 		return *this;
-	}
-
-
-
+	}*/
 
 	bool operator == ( const gpcDrc& b ) const
 	{
@@ -129,10 +126,12 @@ public:
 			return *this;
 
 		NMnDIF.x = nm;
-		iXYZ = oXYZ = I4x4( 400,  0, 300+400, gpeZS_POS0)&I4x4(100,100,100, 1);
-		iABC = oABC = I4x4( 180,  0, 90,gpeZS_DIR0)&I4x4(100,100,100, 1);
+		iXYZ = oXYZ = trgXYZ = I4x4( 400,  0, 300+400, gpeZS_POS0)&I4x4(100,100,100, 1);
+		iABC = oABC = trgABC = I4x4( 180,  0, 90,gpeZS_DIR0)&I4x4(100,100,100, 1);
 		iXYZ.w = gpeZS_iPOS;
 		iABC.w = gpeZS_iDIR;
+		oXYZ.w = gpeZS_oPOS;
+		oABC.w = gpeZS_oDIR;
 		// OFFSET - eltolás
 		oxyz.w = gpeZS_pos0;
 		ixyz.w = gpeZS_ipos;
@@ -189,6 +188,11 @@ public:
 										"oA:%4.2fdg oB:%4.2fdg oC:%4.2fdg "
 										"\r\n//\t\tOFF\t\t\tox:%4.2fmm oy:%4.2fmm oz:%4.2fmm "
 										"oa:%4.2fdg ob:%4.2fdg oc:%4.2fdg "
+
+										"\r\n//\t\tOUT:\t\ttX:%4.2fmm tY:%4.2fmm tZ:%4.2fmm "
+										"tA:%4.2fdg tB:%4.2fdg tC:%4.2fdg "
+										"\r\n//\t\tOFF\t\t\tox:%4.2fmm oy:%4.2fmm oz:%4.2fmm "
+										"oa:%4.2fdg ob:%4.2fdg oc:%4.2fdg "
 										,
 								*sCOM ? (char*)sCOM : "?",
 
@@ -220,6 +224,20 @@ public:
 								double(oxyz.z)/100.0,
 								double(oabc.x)/100.0,
 								double(oabc.y)/100.0,
+								double(oabc.z)/100.0,
+// TRG
+								double(trgXYZ.x)/100.0,
+								double(trgXYZ.y)/100.0,
+								double(trgXYZ.z)/100.0,
+								double(trgABC.x)/100.0,
+								double(trgABC.y)/100.0,
+								double(trgABC.z)/100.0,
+
+								double(oxyz.x)/100.0,
+								double(oxyz.y)/100.0,
+								double(oxyz.z)/100.0,
+								double(oabc.x)/100.0,
+								double(oabc.y)/100.0,
 								double(oabc.z)/100.0
 
 							);
@@ -229,22 +247,26 @@ public:
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
 	bool bHS1o() const { return !!(oCTRL.y&ZShs1);	}
-	U4 setHS1() {
+	bool bHS1iNo() const { return bHS1i()&&bHS1o(); }
+	bool bHS1iOo() const { return bHS1i()||bHS1o(); }
+	U4 oHS1o() {
 		iCTRL.y&=(~ZShs1);
 		return (oCTRL.y|=ZShs1);
 	}
-	U4 rstHS1() {
+	U4 xHS1o() {
 		iCTRL.y|=ZShs1;
 		return (oCTRL.y&=(~ZShs1));
 	}
 
 	bool bHS2i() const  { return !!(iCTRL.y&ZShs2);	}
 	bool bHS2o() const  { return !!(oCTRL.y&ZShs2);	}
-	U4 setHS2() {
+	bool bHS2iNo() const { return bHS2i()&&bHS2o(); }
+	bool bHS2iOo() const { return bHS2i()||bHS2o(); }
+	U4 oHS2o() {
 		iCTRL.y&=(~ZShs2);
 		return (oCTRL.y|=ZShs2);
 	}
-	U4 rstHS2() {
+	U4 xHS2o() {
 		iCTRL.y|=ZShs2;
 		return (oCTRL.y&=(~ZShs2));
 	}
@@ -306,6 +328,7 @@ class gpcZSnD
 			if( !this )
 				return true;	// akkor is várni kell ha !this azaz nincs semi
 			// ha ioSW.w >= ioSW.y igaz, még nem jött válasz
+			pc.x++;
 			return ioSW.w >= ioSW.y;
 		}
 		bool bNEXT()
@@ -328,8 +351,10 @@ class gpcZSnD
 			return true;
 		}
 
-		U1 iDrc()
+		U1 iDrc( bool bPULL = false )
 		{
+			if( bPULL )
+				ioSW.y |= 1;
 			return (ioSW.y>>1)&1;
 		}
 		U1 iWR()
@@ -354,9 +379,11 @@ class gpcZSnD
 		gpcLZY* pulling( gpcLZY* pOUT, U4x4* pZSrw )
 		{
 			U8 s = -1;
-			U4	i = this ? iDrc():0,
+			U4	i = this ? iDrc( true ):0,
 				n = pZSrw[i].w;
 			i = pZSrw[i].z;
+			if( this )
+				pc.x = 0;
 			return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
 		}
 

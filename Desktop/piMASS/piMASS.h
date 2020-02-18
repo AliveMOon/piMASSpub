@@ -2414,7 +2414,59 @@ public:
 		return *this;
 	}
 };
+typedef enum gpeZS:U4
+{
+	gpeZS_null, // = 0,
+	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
+	gpeZS_oDIR = MAKE_ID( 'o', 'D', 'I', 'R'	),
 
+	gpeZS_BILL = MAKE_ID( 'B', 'I', 'L', 'L'	),
+	gpeZS_JOHN = MAKE_ID( 'J', 'O', 'H', 'N'	),
+
+	gpeZS_DIR0 = MAKE_ID( 'D', 'I', 'R',  0 	),
+	gpeZS_iPOS = MAKE_ID( 'i', 'P', 'O', 'S'	),
+	gpeZS_oPOS = MAKE_ID( 'o', 'P', 'O', 'S'	),
+	gpeZS_POS0 = MAKE_ID( 'P', 'O', 'S',  0		),
+	// alias
+	gpeZS_XYZ0 = MAKE_ID( 'X', 'Y', 'Z',  0		),
+	gpeZS_ABC0 = MAKE_ID( 'A', 'B', 'C',  0 	),
+
+	gpeZS_iA13 = MAKE_ID( 'i', 'A', '1', '3'	),
+	gpeZS_oA13 = MAKE_ID( 'o', 'A', '1', '3'	),
+
+	gpeZS_AXI1 = MAKE_ID( 'A', 'X', 'I', '1'	),
+	gpeZS_AXI2 = MAKE_ID( 'A', 'X', 'I', '2'	),
+	gpeZS_AXI3 = MAKE_ID( 'A', 'X', 'I', '3'	),
+
+	gpeZS_iA46 = MAKE_ID( 'i', 'A', '4', '5'	),
+	gpeZS_oA46 = MAKE_ID( 'o', 'A', '4', '6'	),
+
+	gpeZS_AXI4 = MAKE_ID( 'A', 'X', 'I', '4'	),
+	gpeZS_AKI5 = MAKE_ID( 'A', 'X', 'I', '5'	),
+	gpeZS_AXI6 = MAKE_ID( 'A', 'X', 'I', '6'	),
+
+	gpeZS_AXIS = MAKE_ID( 'A', 'X', 'I', 'S'	),
+	gpeZS_LINK = MAKE_ID( 'L', 'I', 'N', 'K'	),
+
+
+	gpeZS_idir = MAKE_ID( 'i', 'd', 'i', 'r'	),
+	gpeZS_dir0 = MAKE_ID( 'd', 'i', 'r',  0		),
+	gpeZS_ipos = MAKE_ID( 'i', 'p', 'o', 's'	),
+	gpeZS_pos0 = MAKE_ID( 'p', 'o', 's',  0		),
+	// alias
+	gpeZS_xyz0 = MAKE_ID( 'x', 'y', 'z',  0		),
+	gpeZS_abc0 = MAKE_ID( 'a', 'b', 'c',  0 	),
+
+	gpeZS_ia13 = MAKE_ID( 'i', 'a', '1', '3'	),
+	gpeZS_ia46 = MAKE_ID( 'i', 'a', '4', '5'	),
+	gpeZS_oa13 = MAKE_ID( 'o', 'a', '1', '3'	),
+	gpeZS_oa46 = MAKE_ID( 'o', 'a', '4', '6'	),
+
+	gpeZS_CTRL = MAKE_ID( 'C', 'T', 'R', 'L'	),
+	gpeZS_iCTR = MAKE_ID( 'i', 'C', 'T', 'R'	),
+	gpeZS_oCTR = MAKE_ID( 'o', 'C', 'T', 'R'	),
+
+} gpeZS;
 class I4x4
 {
 public:
@@ -2427,6 +2479,10 @@ public:
 		struct
         {
 			I4 aXYZW[4];
+		};
+		struct
+        {
+			gpeZS aZS[4];
 		};
 		struct
         {
@@ -2475,8 +2531,32 @@ public:
 		return pBUFF;
     }
 
+	I4x4 len_xyz( I4 r )
+	{
+		I8 l = qlen_xyz();
+		if( !l )
+			return 0;
+		l = sqrt(l);
+		return I4x4( ((I8)x*(I8)r)/l, ((I8)y*(I8)r)/l, ((I8)z*(I8)r)/l, w );
+	}
+	I4x4 lim_xyz( I4 r )
+	{
+		I8 l = qlen_xyz();
+		if( l < r*r )
+			return *this;
 
-
+		return len_xyz(r);
+	}
+	I4x4 lim_xyz( const I4x4& b, I4 r ) const
+	{
+		I4x4 d = b-xyz_();
+		I8 l = d.qlen_xyz();
+		if( l < r*r )
+			return b;
+		d = d.len_xyz(r);
+		d.w = b.w;
+		return xyz_()+d;
+	}
 
     bool operator != ( const I4x4& b ) const
 	{
@@ -3909,57 +3989,7 @@ typedef enum gpeNET4:U4
 	gpeNET4_PREV	= MAKE_ID( 'P', 'R', 'E', 'V' ),
 } gpeNET4;
 
-typedef enum gpeZS:U4
-{
-	gpeZS_null, // = 0,
-	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
 
-	gpeZS_BILL = MAKE_ID( 'B', 'I', 'L', 'L'	),
-	gpeZS_JOHN = MAKE_ID( 'J', 'O', 'H', 'N'	),
-
-	gpeZS_DIR0 = MAKE_ID( 'D', 'I', 'R',  0 	),
-	gpeZS_iPOS = MAKE_ID( 'i', 'P', 'O', 'S'	),
-	gpeZS_POS0 = MAKE_ID( 'P', 'O', 'S',  0		),
-	// alias
-	gpeZS_XYZ0 = MAKE_ID( 'X', 'Y', 'Z',  0		),
-	gpeZS_ABC0 = MAKE_ID( 'A', 'B', 'C',  0 	),
-
-	gpeZS_iA13 = MAKE_ID( 'i', 'A', '1', '3'	),
-	gpeZS_oA13 = MAKE_ID( 'o', 'A', '1', '3'	),
-
-	gpeZS_AXI1 = MAKE_ID( 'A', 'X', 'I', '1'	),
-	gpeZS_AXI2 = MAKE_ID( 'A', 'X', 'I', '2'	),
-	gpeZS_AXI3 = MAKE_ID( 'A', 'X', 'I', '3'	),
-
-	gpeZS_iA46 = MAKE_ID( 'i', 'A', '4', '5'	),
-	gpeZS_oA46 = MAKE_ID( 'o', 'A', '4', '6'	),
-
-	gpeZS_AXI4 = MAKE_ID( 'A', 'X', 'I', '4'	),
-	gpeZS_AKI5 = MAKE_ID( 'A', 'X', 'I', '5'	),
-	gpeZS_AXI6 = MAKE_ID( 'A', 'X', 'I', '6'	),
-
-	gpeZS_AXIS = MAKE_ID( 'A', 'X', 'I', 'S'	),
-	gpeZS_LINK = MAKE_ID( 'L', 'I', 'N', 'K'	),
-
-
-	gpeZS_idir = MAKE_ID( 'i', 'd', 'i', 'r'	),
-	gpeZS_dir0 = MAKE_ID( 'd', 'i', 'r',  0		),
-	gpeZS_ipos = MAKE_ID( 'i', 'p', 'o', 's'	),
-	gpeZS_pos0 = MAKE_ID( 'p', 'o', 's',  0		),
-	// alias
-	gpeZS_xyz0 = MAKE_ID( 'x', 'y', 'z',  0		),
-	gpeZS_abc0 = MAKE_ID( 'a', 'b', 'c',  0 	),
-
-	gpeZS_ia13 = MAKE_ID( 'i', 'a', '1', '3'	),
-	gpeZS_ia46 = MAKE_ID( 'i', 'a', '4', '5'	),
-	gpeZS_oa13 = MAKE_ID( 'o', 'a', '1', '3'	),
-	gpeZS_oa46 = MAKE_ID( 'o', 'a', '4', '6'	),
-
-	gpeZS_CTRL = MAKE_ID( 'C', 'T', 'R', 'L'	),
-	gpeZS_iCTR = MAKE_ID( 'i', 'C', 'T', 'R'	),
-	gpeZS_oCTR = MAKE_ID( 'o', 'C', 'T', 'R'	),
-
-} gpeZS;
 class gpcCMPL;
 
 
