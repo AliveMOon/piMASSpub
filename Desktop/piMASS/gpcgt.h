@@ -179,20 +179,20 @@ public:
 		pANS = pANS->lzyFRMT(
 								s = -1,
 
-										"\r\n//\t%s\tHS12:%0.4X\tiX:%4.2fmm iY:%4.2fmm iZ:%4.2fmm "
-										"iA:%4.2fdg iB:%4.2fdg iC:%4.2fdg "
-										"\r\n//\t\tOFF\t\t\tix:%4.2fmm iy:%4.2fmm iz:%4.2fmm "
-										"ia:%4.2fdg ib:%4.2fdg ic:%4.2fdg "
+										"\r\n//\t%s HS12:%0.4X\tiX:%7.2fmm iY:%7.2fmm iZ:%7.2fmm "
+										"iA:%7.2fdg iB:%7.2fdg iC:%7.2fdg "
+										"\r\n//\t\tOFF\t\t\tix:%7.2fmm iy:%7.2fmm iz:%7.2fmm "
+										"ia:%7.2fdg ib:%7.2fdg ic:%7.2fdg "
 
-										"\r\n//\t\tOUT:\t\toX:%4.2fmm oY:%4.2fmm oZ:%4.2fmm "
-										"oA:%4.2fdg oB:%4.2fdg oC:%4.2fdg "
-										"\r\n//\t\tOFF\t\t\tox:%4.2fmm oy:%4.2fmm oz:%4.2fmm "
-										"oa:%4.2fdg ob:%4.2fdg oc:%4.2fdg "
+										"\r\n//\t\tOUT:\t\toX:%7.2fmm oY:%7.2fmm oZ:%7.2fmm "
+										"oA:%7.2fdg oB:%7.2fdg oC:%7.2fdg "
+										"\r\n//\t\tOFF\t\t\tox:%7.2fmm oy:%7.2fmm oz:%7.2fmm "
+										"oa:%7.2fdg ob:%7.2fdg oc:%7.2fdg "
 
-										"\r\n//\t\tOUT:\t\ttX:%4.2fmm tY:%4.2fmm tZ:%4.2fmm "
-										"tA:%4.2fdg tB:%4.2fdg tC:%4.2fdg "
-										"\r\n//\t\tOFF\t\t\tox:%4.2fmm oy:%4.2fmm oz:%4.2fmm "
-										"oa:%4.2fdg ob:%4.2fdg oc:%4.2fdg "
+										"\r\n//\t\tTRG:\t\ttX:%7.2fmm tY:%7.2fmm tZ:%7.2fmm "
+										"tA:%7.2fdg tB:%7.2fdg tC:%7.2fdg "
+										"\r\n//\t\tOFF\t\t\tox:%7.2fmm oy:%7.2fmm oz:%7.2fmm "
+										"oa:%7.2fdg ob:%7.2fdg oc:%7.2fdg "
 										,
 								*sCOM ? (char*)sCOM : "?",
 

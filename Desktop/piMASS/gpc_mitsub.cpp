@@ -1014,7 +1014,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		// itt kell le ellenőrizni mondjuk az ütközésre
 		//
 		oCTRL.w = 0;
-		oCTRL.z = 11; // linearis XYZ ABC
+		oCTRL.z = 10; // linearis XYZ ABC
 		/// 1.HS1 elöbb ki X-eljük a HS1-et, nehogy ZS megszaladjon
 		xHS1o();
 		return *this;
