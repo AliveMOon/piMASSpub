@@ -806,6 +806,32 @@ gpcZS& gpcZS::operator &= ( const gpcDrc& D )
 gpcZS& gpcZS::operator = ( const gpcDrc& D )
 {
 	gpmCLR;
+	switch( D.JD.y )
+	{
+		case 1:
+		case 2:
+		case 3:
+			{
+				gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
+				switch( D.oCTRL.z )
+				{
+					case 10:
+						gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
+						gpmMcpyOF( &aABC,	&D.oABC, 3 );
+						break;
+					default:
+
+						break;
+				}
+			} break;
+		default:
+			break;
+	}
+	return *this;
+}
+/*gpcZS& gpcZS::operator = ( const gpcDrc& D )
+{
+	gpmCLR;
 	if( D.bHS1i() )
 		return *this;
 	if( D.oCTRL.z >= 0x20000 )
@@ -846,7 +872,7 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 			break;
 	}
 	return *this;
-}
+}*/
 
 
 gpcZS::gpcZS( const gpcDrc& D )
@@ -855,36 +881,7 @@ gpcZS::gpcZS( const gpcDrc& D )
 	*this = D;
 }
 
-I4x4 gpaCAGEbill[] = {
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
-	{ mm100(1500), 0, mm100(320), mm100(800) },
-	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
-};
-I4x4 gpaCAGEjohn[] = {
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
-	{ mm100(1500), 0, mm100(320), mm100(800) },
-	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
-};
-I4x4 gpcDrc::cage( I4x4* pCAGE, U4 n ) {
-	I4x4 T = trgXYZ.xyz_(), S = iXYZ.xyz_(), a, b;
-	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
-	for( U4 i = 0; i < n; i++ )
-	{
-		a = (S-pCAGE[i]).xyz_();
 
-		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
-        b = a.TSr( T-pCAGE[i], pCAGE[i].w+mm100(100) );
-        abba = (b-a).qlen_xyz();
-        ab = sqrt(abba);
-        if( dd > abba )
-        {
-			T = b+pCAGE[i].xyz_();
-			dd = abba;
-        }
-		i++;
-	}
-	return T;
-}
 gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
 	if( iXYZ.qlen_xyz() < 32*32 )

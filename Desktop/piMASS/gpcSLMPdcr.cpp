@@ -3,27 +3,73 @@
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
 
+I4x4 gpaCAGEbill[] = {
+	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
+	{ mm100(1500), 0, mm100(320), mm100(800) },
+	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+};
+I4x4 gpaCAGEjohn[] = {
+	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
+	{ mm100(1500), 0, mm100(320), mm100(800) },
+	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+};
+I4x4 gpcDrc::cage( I4x4* pCAGE, U4 n ) {
+	I4x4 T = trgXYZ.xyz_(), S = iXYZ.xyz_(), a, b;
+	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
+	for( U4 i = 0; i < n; i++ )
+	{
+		a = (S-pCAGE[i]).xyz_();
+
+		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
+        b = a.TSr( T-pCAGE[i], pCAGE[i].w+mm100(100) );
+        abba = (b-a).qlen_xyz();
+        ab = sqrt(abba);
+        if( dd > abba )
+        {
+			T = b+pCAGE[i].xyz_();
+			dd = abba;
+        }
+		i++;
+	}
+	return T;
+}
+
 gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	*this = inp;
 	switch( JD.y )
 	{
-		case 6:
-			JD.y = 0;
-			return *this;
-		case 5:
+		case 7: {
+				JD.y = 0;
+				if( JD.z )
+				{
+					JD.x = 0;
+					return *this;
+				}
+
+				switch(JD.x)
+				{
+					case 0:
+						JD.x = 1;
+						break;
+					default:
+						JD.x = 1;
+						break;
+				}
+			} return *this;
+		case 6:	/// 5.HS2 0-ra várunk
 			if(bHS2i()) {
 				// még nem vette a jelet PULLING
 				oHS2o();
 				return *this;
 			}
-			JD.y = 6;
+			JD.y = 7;
 			// vette az adást mi is elvesszük
 			xHS2o();
 			return *this;
-		case 4: /// 4.HS2 jelre várunk
+		case 5: /// 4.HS2 jelre várunk
 			if(bHS2i()) {
 				// jelzünk hogy olvastuk
-				JD.y = 5;
+				JD.y = 6;
 				// kirakjuk a jelet
 				oHS2o();
 
@@ -47,6 +93,14 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			/// PULLING
 			xHS1o();
 			return *this;
+		case 4:
+			if(bHS1i()) {
+				/// PULLING HS1 : még nem vette el a jelet
+				xHS1o();
+				return *this;
+			}
+			JD.y = 5;
+			return *this;
 		case 3: /// 3.HS1 ZS jelére várunk
 			if(bHS1i()) {
 				// 3.HS1 megvan ZS jelzet olvasta
@@ -65,7 +119,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			JD.y = bHS1i() ? 2 : 3;
 			return *this;
 		default:
-
+			break;
 	}
 
 
@@ -108,7 +162,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		JD.y = 0;
 		switch( JD.x )
 		{
-			case 0: // ALAPH kell
+			case 0: // ALAPHelyzet kell
 				oCTRL.w = 0;
 				oCTRL.z = 1;
 				JD.y = 1;
