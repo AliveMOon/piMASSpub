@@ -88,7 +88,7 @@ public:
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
 	U4x4	oCTRL, iCTRL, JD;
-
+	I4x4	okXYZ, okABC;
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	I4x4 cage( I4x4* pCAGE, U4 n );
 	gpcDrc& operator &= ( gpcDrc& in );
@@ -351,12 +351,12 @@ class gpcZSnD
 			return true;
 		}
 
-		U1 iDrc( bool bPULL = false )
-		{
+		U1 iDrc( bool bPULL = false );
+		/*{
 			if( bPULL )
 				ioSW.y |= 1;
 			return (ioSW.y>>1)&1;
-		}
+		}*/
 		U1 iWR()
 		{
 			// 0 Write
@@ -376,8 +376,8 @@ class gpcZSnD
 		}
 
 
-		gpcLZY* pulling( gpcLZY* pOUT, U4x4* pZSrw )
-		{
+		gpcLZY* pulling( gpcLZY* pOUT, U4x4* pZSrw );
+		/*{
 			U8 s = -1;
 			U4	i = this ? iDrc( true ):0,
 				n = pZSrw[i].w;
@@ -385,7 +385,7 @@ class gpcZSnD
 			if( this )
 				pc.x = 0;
 			return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
-		}
+		}*/
 
 		gpcDrc* pDrc()
 		{

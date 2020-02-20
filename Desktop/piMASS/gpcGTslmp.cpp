@@ -163,7 +163,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 					pGTusr = pALL->GT( pSOCK[iS] );
 					if( pGTusr->bGTdie() )
 						continue;
-					pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n%s\r\n", pD0-18, pGTusr->iCNT );
+					pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n %d.%s\r\n", pGTusr->iCNT, pD0-18 );
 					pGTusr->GTback();
 				}
 			}
@@ -222,7 +222,8 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// ---------------------------------
 	iD0 = pZSnD->stpPUSH( false );
 
-
+	U4x4& JD = pZSnD->aDrc[iD0].JD;
+	U4 JDy = JD.y;
 	U2	*pB = (U2*)&(
 						pZSnD->aZSio[4+iD0]
 						= pZSnD->aDrc[iD0]
@@ -232,6 +233,64 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						pZSnD->aZSio[iD0*2]
 						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
 					); // pA-ban azaz új out lesz
+	if( JDy == JD.y )
+	{
+		pOUT = pZSnD->pulling( pOUT, gpaZSwr );
+		return;
+	}
+	char sANSW[0x100], *pANSW = sANSW;
+	switch( JDy+JD.y*0x10 )
+	{
+		case 0x10:
+			pANSW += sprintf( pANSW, "Turn start X:%d", JD.x  );
+			break;
+		case 0x21:
+			pANSW += sprintf( pANSW, "not init zs160 X:%d", JD.x );
+			break;
+		case 0x31:
+			pANSW += sprintf( pANSW, "d160 turn on X:%d", JD.x );
+			break;
+		case 0x32:
+			pANSW += sprintf( pANSW, "? X:%d", JD.x );
+			break;
+		case 0x43:
+			pANSW += sprintf( pANSW, "Wait zs160 X:%d", JD.x );
+			break;
+		case 0x54:
+			pANSW += sprintf( pANSW, "zs160 ok! Wait zs161 X:%d", JD.x );
+			break;
+		case 0x65:
+			pANSW += sprintf( pANSW, "zs161 on! d161 on! Err:%d X:%d", JD.x );
+			break;
+		case 0x76:
+			pANSW += sprintf( pANSW, "zs161 off! d161 off! Err:%d X:%d", JD.z, JD.x );
+			break;
+		case 0x07:
+			pANSW += sprintf( pANSW, "Turn end! Err:%d X:%d", JD.z, JD.x );
+			break;
+		default:
+			pANSW = sANSW;
+			break;
+	}
+	if( sANSW < pANSW )
+	{
+		pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+		if( !pSOCK )
+		{
+			pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+			pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+			nSOCK = gpmLZYload( pLZYusr, SOCKET );
+		}
+
+		for( U4 iS = 0; iS < nSOCK; iS++ )
+		{
+			pGTusr = pALL->GT( pSOCK[iS] );
+			if( pGTusr->bGTdie() )
+				continue;
+			pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n %d.%s\r\n", pGTusr->iCNT, sANSW );
+			pGTusr->GTback();
+		}
+	}
 
     // itt kell majd variálni, hogy elösször maradjanak a control bitek
     // és a következő körben írjuk be
@@ -554,8 +613,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	return pANS->lzyFRMT( s = -1, "ok" );
 }
 
-void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
-{
+void gpcGT::GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )
 		return;
