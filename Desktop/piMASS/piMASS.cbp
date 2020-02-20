@@ -68,6 +68,7 @@
 		<Unit filename="gpcI4x4.cpp" />
 		<Unit filename="gpcLAZY.cpp" />
 		<Unit filename="gpcOPCD.cpp" />
+		<Unit filename="gpcSLMPdcr.cpp" />
 		<Unit filename="gpcSRC.cpp" />
 		<Unit filename="gpcSRC.h" />
 		<Unit filename="gpcU14.cpp" />

@@ -87,7 +87,7 @@ public:
 			oabc, iabc,
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
-	U4x4	oCTRL, iCTRL;
+	U4x4	oCTRL, iCTRL, JD;
 
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	I4x4 cage( I4x4* pCAGE, U4 n );
