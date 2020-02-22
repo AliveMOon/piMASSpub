@@ -13,8 +13,108 @@ I4x4 gpaCAGEjohn[] = {
 	{ mm100(1500), 0, mm100(320), mm100(800) },
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
 };
+
+gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
+		U1 	sCOM[] = "ABCD";
+		U4 &comA = *(U4*)sCOM;
+
+		comA = NMnDIF.x;
+		U8 s;
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// %s HS12:%0.4X", *sCOM ? (char*)sCOM : "?", hs12() );
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// POS:  n:%d"
+										"\r\n//\tiXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n//\toXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n//\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm;"
+										,
+										(U4)(sqrt((tXYZ-iXYZ).xyz_().qlen())/mm100(100)),
+										double(iXYZ.x)/100.0,
+										double(iXYZ.y)/100.0,
+										double(iXYZ.z)/100.0,
+
+										double(oXYZ.x)/100.0,
+										double(oXYZ.y)/100.0,
+										double(oXYZ.z)/100.0,
+
+										double(tXYZ.x)/100.0,
+										double(tXYZ.y)/100.0,
+										double(tXYZ.z)/100.0
+							);
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// DIR:  n:%d"
+										"\r\n//\tiABC %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n//\toABC %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n//\ttABC %7.2fdg, %7.2fdg, %7.2fdg;"
+										,
+										(U4)(sqrt((tABC-iABC).xyz_().qlen())/mm100(100)),
+										double(iABC.x)/100.0,
+										double(iABC.y)/100.0,
+										double(iABC.z)/100.0,
+
+										double(oABC.x)/100.0,
+										double(oABC.y)/100.0,
+										double(oABC.z)/100.0,
+
+										double(tABC.x)/100.0,
+										double(tABC.y)/100.0,
+										double(tABC.z)/100.0
+							);
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// pos:"
+										"\r\n//\tixyz %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n//\toxyz %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n//\ttxyz %7.2fmm, %7.2fmm, %7.2fmm;"
+										,
+										double(ixyz.x)/100.0,
+										double(ixyz.y)/100.0,
+										double(ixyz.z)/100.0,
+
+										double(oxyz.x)/100.0,
+										double(oxyz.y)/100.0,
+										double(oxyz.z)/100.0,
+
+										double(txyz.x)/100.0,
+										double(txyz.y)/100.0,
+										double(txyz.z)/100.0
+							);
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// dir:"
+										"\r\n//\tiabc %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n//\toabc %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n//\ttabc %7.2fdg, %7.2fdg, %7.2fdg;"
+										,
+										double(iabc.x)/100.0,
+										double(iabc.y)/100.0,
+										double(iabc.z)/100.0,
+
+										double(oabc.x)/100.0,
+										double(oabc.y)/100.0,
+										double(oabc.z)/100.0,
+
+										double(tabc.x)/100.0,
+										double(tabc.y)/100.0,
+										double(tabc.z)/100.0
+							);
+		return pANS;
+	}
+
+gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i )
+{
+	if( !&zs ) {
+		iSTRT = nLD();
+		return this;
+	}
+	gpcLZY* pANS = this;
+	U1 n = gpmN(zs.aDrc);
+	if( i < n )
+	{
+		pANS = zs.aDrc[i].answSTAT( pANS );
+		return this;
+	}
+
+	for( U1 i = 0, n = gpmN(zs.aDrc); i < n; i++ )
+		pANS = zs.aDrc[i].answSTAT( pANS );
+	return this;
+}
+
 I4x4 gpcDrc::cage( I4x4* pCAGE, U4 n ) {
-	I4x4 T = trgXYZ.xyz_(), S = iXYZ.xyz_(), a, b;
+	I4x4 T = tXYZ.xyz_(), S = iXYZ.xyz_(), a, b;
 	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
@@ -104,8 +204,8 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 						// ZS hibat jelzett
 						// trg-be eltároljuk hol van most
 						// ne is akarcon tovább menni
-						trgXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-						trgABC.xyz_( oABC.xyz_(iABC) );
+						tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
+						tABC.xyz_( oABC.xyz_(iABC) );
 						break;
 				}
 				return *this;
@@ -155,7 +255,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	{
 		iXYZ.xyz_( okXYZ );
 	}
-	I4x4 dir = trgXYZ - iXYZ;
+	I4x4 dir = tXYZ - iXYZ;
 	dif = dir.qlen_xyz();
 	if( dif )
 	{
@@ -175,7 +275,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		oCTRL.z |= 1;
 	}
 
-	dir = (trgABC - iABC).lim_xyz(mm100(10));
+	dir = (tABC - iABC).lim_xyz(mm100(10));
 	dif = dir.qlen_xyz();
 	if( dif )
 		oCTRL.z |= 2;
@@ -191,8 +291,8 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				oCTRL.w = 0;
 				oCTRL.z = 1;
                 JD.y = 0;
-				trgXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-				trgABC.xyz_( oABC.xyz_(iABC) );
+				tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
+				tABC.xyz_( oABC.xyz_(iABC) );
 				JD.x = 1;
 				break;
 			case 1: // ALAPH ready!
@@ -362,7 +462,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			if( pD )
 			if( oD != iD )
 			{
-				pANS = pD->ANSstat( pANS );
+				pANS = pD->answSTAT( pANS );
 				oD = iD;
 			}
 			continue;
@@ -406,13 +506,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 0:
 			case 1:
 			case 2:
-				pD->trgXYZ.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->tXYZ.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 				// DIR
 			case 3:
 			case 4:
 			case 5:
-				pD->trgABC.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->tABC.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 			case 6:
 			case 7:
@@ -453,7 +553,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	}
 
 	if( pD )
-		return pD->ANSstat( pANS );
+		return pD->answSTAT( pANS );
 
 	return pANS->lzyFRMT( s = -1, "nonsens" );
 }

@@ -816,51 +816,6 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 	}
 	return *this;
 }
-/*gpcZS& gpcZS::operator = ( const gpcDrc& D )
-{
-	gpmCLR;
-	if( D.bHS1i() )
-		return *this;
-	if( D.oCTRL.z >= 0x20000 )
-	{
-		gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
-		return *this;
-	}
-	else if( D.oCTRL.z >= 0x10000 )
-	{
-		if( D.bHS2o() )
-			gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
-		return *this;
-	}
-	if( !D.oCTRL.z )
-		return *this;
-
-	gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
-	if( D.bHS2o() || D.bHS2i() )
-		return *this;
-
-	if( D.oCTRL.z >= 0x8000 )
-		io128.z &= 0x7fff;
-	switch( D.oCTRL.z )
-	{
-		case 0:
-			break;
-		case 11:
-			gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
-			gpmMcpyOF( &aABC,	&D.oABC, 3 );
-			break;
-		default:
-			gpmMcpyOF( &apos,	&D.oxyz, 3 );
-			gpmMcpyOF( &aabc,	&D.oabc, 3 );
-			gpmMcpyOF( aJ16,	&D.aoAX1to6[0], 3 );
-			gpmMcpyOF( aJ16+3,	&D.aoAX1to6[1], 3 );
-			gpmMcpyOF( aj16,	&D.aoax1to6[0], 3 );
-			gpmMcpyOF( aj16+3,	&D.aoax1to6[1], 3 );
-			break;
-	}
-	return *this;
-}*/
-
 
 gpcZS::gpcZS( const gpcDrc& D )
 {
@@ -890,19 +845,7 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	return *this;
 }
 
-gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs )
-{
-	if( !&zs ) {
-		iSTRT = nLD();
-		return this;
-	}
-	gpcLZY* pANS = this;
 
-	for( U1 i = 0, n = gpmN(zs.aDrc); i < n; i++ )
-		pANS = zs.aDrc[i].ANSstat( pANS );
-
-	return this;
-}
 
 
 

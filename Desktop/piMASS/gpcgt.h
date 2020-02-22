@@ -81,10 +81,10 @@ public:
 class gpcDrc {
 public:
 	I4x4 	NMnDIF,
-			trgXYZ, oXYZ, iXYZ,
-			trgABC, oABC, iABC,
-			oxyz, ixyz,
-			oabc, iabc,
+			tXYZ, oXYZ, iXYZ,
+			tABC, oABC, iABC,
+			txyz, oxyz, ixyz,
+			tabc, oabc, iabc,
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
 	U4x4	oCTRL, iCTRL, JD;
@@ -126,17 +126,21 @@ public:
 			return *this;
 
 		NMnDIF.x = nm;
-		iXYZ = oXYZ = trgXYZ = I4x4( 400,  0, 300+400, gpeZS_POS0)&I4x4(100,100,100, 1);
-		iABC = oABC = trgABC = I4x4( 180,  0, 90,gpeZS_DIR0)&I4x4(100,100,100, 1);
+		iXYZ = oXYZ = tXYZ = I4x4( 400,  0, 300+400, gpeZS_POS0)&I4x4(100,100,100, 1);
+		iABC = oABC = tABC = I4x4( 180,  0, 90,gpeZS_DIR0)&I4x4(100,100,100, 1);
 		iXYZ.w = gpeZS_iPOS;
 		iABC.w = gpeZS_iDIR;
 		oXYZ.w = gpeZS_oPOS;
 		oABC.w = gpeZS_oDIR;
+		tXYZ.w = gpeZS_tPOS;
+		tABC.w = gpeZS_tDIR;
 		// OFFSET - eltolás
-		oxyz.w = gpeZS_pos0;
+		oxyz.w = gpeZS_opos;
 		ixyz.w = gpeZS_ipos;
-		oabc.w = gpeZS_dir0;
+		txyz.w = gpeZS_tpos;
+		oabc.w = gpeZS_odir;
 		iabc.w = gpeZS_idir;
+		txyz.w = gpeZS_tpos;
 
 		// TENGELY
 		aoAX1to6[0].w = gpeZS_oA13;
@@ -170,79 +174,80 @@ public:
 
 		return (bHS1i()<<0xc)|(bHS1o()<<0x8)|(bHS2i()<<0x4)|(bHS2o());
 	}
-	gpcLZY* ANSstat( gpcLZY* pANS ) {
-		U1 	sCOM[] = "ABCD";
-		U4 &comA = *(U4*)sCOM;
-
-		comA = NMnDIF.x;
-		U8 s;
-		pANS = pANS->lzyFRMT(
-								s = -1,
-
-										"\r\n//\t%s HS12:%0.4X\tiX:%7.2fmm iY:%7.2fmm iZ:%7.2fmm "
-										"iA:%7.2fdg iB:%7.2fdg iC:%7.2fdg "
-										"\r\n//\t\tOFF\t\t\tix:%7.2fmm iy:%7.2fmm iz:%7.2fmm "
-										"ia:%7.2fdg ib:%7.2fdg ic:%7.2fdg "
-
-										"\r\n//\t\tOUT:\t\toX:%7.2fmm oY:%7.2fmm oZ:%7.2fmm "
-										"oA:%7.2fdg oB:%7.2fdg oC:%7.2fdg "
-										"\r\n//\t\tOFF\t\t\tox:%7.2fmm oy:%7.2fmm oz:%7.2fmm "
-										"oa:%7.2fdg ob:%7.2fdg oc:%7.2fdg "
-
-										"\r\n//\t\tTRG:\t\ttX:%7.2fmm tY:%7.2fmm tZ:%7.2fmm "
-										"tA:%7.2fdg tB:%7.2fdg tC:%7.2fdg "
-										"\r\n//\t\tOFF\t\t\tox:%7.2fmm oy:%7.2fmm oz:%7.2fmm "
-										"oa:%7.2fdg ob:%7.2fdg oc:%7.2fdg "
-										,
-								*sCOM ? (char*)sCOM : "?",
-
-								hs12(),
-// INP
-								double(iXYZ.x)/100.0,
-								double(iXYZ.y)/100.0,
-								double(iXYZ.z)/100.0,
-								double(iABC.x)/100.0,
-								double(iABC.y)/100.0,
-								double(iABC.z)/100.0,
-
-								double(ixyz.x)/100.0,
-								double(ixyz.y)/100.0,
-								double(ixyz.z)/100.0,
-								double(iabc.x)/100.0,
-								double(iabc.y)/100.0,
-								double(iabc.z)/100.0,
-// OUT
-								double(oXYZ.x)/100.0,
-								double(oXYZ.y)/100.0,
-								double(oXYZ.z)/100.0,
-								double(oABC.x)/100.0,
-								double(oABC.y)/100.0,
-								double(oABC.z)/100.0,
-
-								double(oxyz.x)/100.0,
-								double(oxyz.y)/100.0,
-								double(oxyz.z)/100.0,
-								double(oabc.x)/100.0,
-								double(oabc.y)/100.0,
-								double(oabc.z)/100.0,
-// TRG
-								double(trgXYZ.x)/100.0,
-								double(trgXYZ.y)/100.0,
-								double(trgXYZ.z)/100.0,
-								double(trgABC.x)/100.0,
-								double(trgABC.y)/100.0,
-								double(trgABC.z)/100.0,
-
-								double(oxyz.x)/100.0,
-								double(oxyz.y)/100.0,
-								double(oxyz.z)/100.0,
-								double(oabc.x)/100.0,
-								double(oabc.y)/100.0,
-								double(oabc.z)/100.0
-
-							);
-		return pANS;
-	}
+	gpcLZY* answSTAT( gpcLZY* pANS );
+//	 {
+//		U1 	sCOM[] = "ABCD";
+//		U4 &comA = *(U4*)sCOM;
+//
+//		comA = NMnDIF.x;
+//		U8 s;
+//		pANS = pANS->lzyFRMT(
+//								s = -1,
+//
+//										"\r\n//\t%s HS12:%0.4X\tiX:%7.2fmm iY:%7.2fmm iZ:%7.2fmm "
+//										"iA:%7.2fdg iB:%7.2fdg iC:%7.2fdg "
+//										"\r\n//\t\tOFF\t\t\tix:%7.2fmm iy:%7.2fmm iz:%7.2fmm "
+//										"ia:%7.2fdg ib:%7.2fdg ic:%7.2fdg "
+//
+//										"\r\n//\t\tOUT:\t\toX:%7.2fmm oY:%7.2fmm oZ:%7.2fmm "
+//										"oA:%7.2fdg oB:%7.2fdg oC:%7.2fdg "
+//										"\r\n//\t\tOFF\t\t\tox:%7.2fmm oy:%7.2fmm oz:%7.2fmm "
+//										"oa:%7.2fdg ob:%7.2fdg oc:%7.2fdg "
+//
+//										"\r\n//\t\tTRG:\t\ttX:%7.2fmm tY:%7.2fmm tZ:%7.2fmm "
+//										"tA:%7.2fdg tB:%7.2fdg tC:%7.2fdg "
+//										"\r\n//\t\tOFF\t\t\tox:%7.2fmm oy:%7.2fmm oz:%7.2fmm "
+//										"oa:%7.2fdg ob:%7.2fdg oc:%7.2fdg "
+//										,
+//								*sCOM ? (char*)sCOM : "?",
+//
+//								hs12(),
+//// INP
+//								double(iXYZ.x)/100.0,
+//								double(iXYZ.y)/100.0,
+//								double(iXYZ.z)/100.0,
+//								double(iABC.x)/100.0,
+//								double(iABC.y)/100.0,
+//								double(iABC.z)/100.0,
+//
+//								double(ixyz.x)/100.0,
+//								double(ixyz.y)/100.0,
+//								double(ixyz.z)/100.0,
+//								double(iabc.x)/100.0,
+//								double(iabc.y)/100.0,
+//								double(iabc.z)/100.0,
+//// OUT
+//								double(oXYZ.x)/100.0,
+//								double(oXYZ.y)/100.0,
+//								double(oXYZ.z)/100.0,
+//								double(oABC.x)/100.0,
+//								double(oABC.y)/100.0,
+//								double(oABC.z)/100.0,
+//
+//								double(oxyz.x)/100.0,
+//								double(oxyz.y)/100.0,
+//								double(oxyz.z)/100.0,
+//								double(oabc.x)/100.0,
+//								double(oabc.y)/100.0,
+//								double(oabc.z)/100.0,
+//// TRG
+//								double(tXYZ.x)/100.0,
+//								double(tXYZ.y)/100.0,
+//								double(tXYZ.z)/100.0,
+//								double(tABC.x)/100.0,
+//								double(tABC.y)/100.0,
+//								double(tABC.z)/100.0,
+//
+//								double(oxyz.x)/100.0,
+//								double(oxyz.y)/100.0,
+//								double(oxyz.z)/100.0,
+//								double(oabc.x)/100.0,
+//								double(oabc.y)/100.0,
+//								double(oabc.z)/100.0
+//
+//							);
+//		return pANS;
+//	}
 
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
@@ -352,11 +357,6 @@ class gpcZSnD
 		}
 
 		U1 iDrc( bool bPULL = false );
-		/*{
-			if( bPULL )
-				ioSW.y |= 1;
-			return (ioSW.y>>1)&1;
-		}*/
 		U1 iWR()
 		{
 			// 0 Write
@@ -374,18 +374,7 @@ class gpcZSnD
 		{
 			return aZSio[ioSW.y&3];
 		}
-
-
 		gpcLZY* pulling( gpcLZY* pOUT, U4x4* pZSrw );
-		/*{
-			U8 s = -1;
-			U4	i = this ? iDrc( true ):0,
-				n = pZSrw[i].w;
-			i = pZSrw[i].z;
-			if( this )
-				pc.x = 0;
-			return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
-		}*/
 
 		gpcDrc* pDrc()
 		{

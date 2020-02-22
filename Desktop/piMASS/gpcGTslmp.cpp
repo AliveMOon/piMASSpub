@@ -2,6 +2,33 @@
 #include "gpcwin.h"
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
+
+gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
+{
+	U1 	sCOM[] = "ABCD";
+	U4 &comA = *(U4*)sCOM;
+
+	comA = *(U4*)pU2;
+	U4 spd = (*(U4*)(pU2+32));
+	U8 s;
+	pANS = pANS->lzyFRMT(
+							s = -1, "\r\n%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
+							sCOM,
+							double(*(U4*)(pU2+2+16+0))/100.0,
+							double(*(U4*)(pU2+2+16+2))/100.0,
+							double(*(U4*)(pU2+2+16+4))/100.0,
+
+							double(*(U4*)(pU2+2+48+0))/100.0,
+							double(*(U4*)(pU2+2+48+2))/100.0,
+							double(*(U4*)(pU2+2+48+4))/100.0,
+
+							spd&0xffffff,
+							spd>>24
+
+						);
+	return pANS;
+}
+
 //extern char gp_sSLMP_read[];
 /// ---------- SLMP -------------
 // SNo.NnSrUn..MsLen.Mtm.
@@ -287,7 +314,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			pGTusr = pALL->GT( pSOCK[iS] );
 			if( pGTusr->bGTdie() )
 				continue;
-			pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n %d.%s\r\n", pGTusr->iCNT, sANSW );
+			pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n %d.%s", pGTusr->iCNT, sANSW );
 			pGTusr->GTback();
 		}
 	}
@@ -391,31 +418,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	return;
 }
 
-gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
-{
-	U1 	sCOM[] = "ABCD";
-	U4 &comA = *(U4*)sCOM;
 
-	comA = *(U4*)pU2;
-	U4 spd = (*(U4*)(pU2+32));
-	U8 s;
-	pANS = pANS->lzyFRMT(
-							s = -1, "\r\n%s x:%.2fmm y:%.2fmm z:%.2fmm A:%.2f. B:%.2f. C:%.2f. spd:%0.6x tool:%d",
-							sCOM,
-							double(*(U4*)(pU2+2+16+0))/100.0,
-							double(*(U4*)(pU2+2+16+2))/100.0,
-							double(*(U4*)(pU2+2+16+4))/100.0,
-
-							double(*(U4*)(pU2+2+48+0))/100.0,
-							double(*(U4*)(pU2+2+48+2))/100.0,
-							double(*(U4*)(pU2+2+48+4))/100.0,
-
-							spd&0xffffff,
-							spd>>24
-
-						);
-	return pANS;
-}
 
 gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR ) {
 	U8 s = -1, nLEN;

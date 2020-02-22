@@ -224,7 +224,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 	gppKEYbuff = ( gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,pWELLCOME ) );
 	I8x2 GLSLpic(0,1), GLSLiso(0,0);
 	while( gppKEYbuff ) {
-		usleep(50);
+		usleep(33);
 		mSEC.y = mSEC.x;
 		mSEC.x = SDL_GetTicks();
 		mSEC.z = mSEC.x-mSEC.y;
@@ -268,8 +268,9 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							bgWH = pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960);
 					if( pPICbg )
 						pGL	->GLSLset( GLSLpic, gpsGLSLfrgREF )
-							->SET_box( w.a4x2[0], w.a4x2[1] )
-							->SET_tx( 0, pBGtx, bgWH )->DRW( w.a4x2[0], FRMwh );
+							->glSETbox( w.a4x2[0], w.a4x2[1] )
+							->glSETcnl( 0, Fx4(0.25f,0.25f,0.5f,1.0f) )
+							->glSETtx( 0, pBGtx, bgWH )->glDRW( w.a4x2[0], FRMwh );
 
 					glViewport( w.x, (winSIZ.w-w.w)-w.y, w.z, w.w );
 					if( U4 n = apCRS[i]->picBG.n_load/sizeof(apCRS[0]->aXYuvPC) )
@@ -278,16 +279,17 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					if( p_tx = p_pic->surDRWtx(pSDLrndr) )
 					{
 						pGL	->GLSLset( GLSLpic ) //pI[2].a4x2[0] )
-							->SET_box( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
-							->SET_tx( 0, p_tx, p_pic->txWH.a4x2[0] )->DRW( w.a4x2[0], FRMwh );
+							->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
+							->glSETcnl( 0, Fx4(0.7f,0.7f,0.7f,1.0f) )
+							->glSETtx( 0, p_tx, p_pic->txWH.a4x2[0] )->glDRW( w.a4x2[0], FRMwh );
 					}
 
 					glViewport( 0, 0, winSIZ.z, winSIZ.w );
-					pGL->GLSLset( GLSLiso )->SET_box( w.a4x2[0], w.a4x2[1] ) //aVX4 )
-					->SET_tx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
-					->SET_tx( 1, pBGtx, bgWH )																// tex1 -- BG background
-					->SET_tx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )											// tex2 -- MINIiso
-					->DRW( w.a4x2[0], FRMwh );
+					pGL->GLSLset( GLSLiso )->glSETbox( w.a4x2[0], w.a4x2[1] ) //aVX4 )
+					->glSETtx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
+					->glSETtx( 1, pBGtx, bgWH )																// tex1 -- BG background
+					->glSETtx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )											// tex2 -- MINIiso
+					->glDRW( w.a4x2[0], FRMwh );
 				}
 
 				pGL->SWP( pSDLwin );

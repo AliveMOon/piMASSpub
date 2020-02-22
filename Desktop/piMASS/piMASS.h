@@ -2419,6 +2419,7 @@ typedef enum gpeZS:U4
 	gpeZS_null, // = 0,
 	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
 	gpeZS_oDIR = MAKE_ID( 'o', 'D', 'I', 'R'	),
+	gpeZS_tDIR = MAKE_ID( 't', 'D', 'I', 'R'	),
 
 	gpeZS_BILL = MAKE_ID( 'B', 'I', 'L', 'L'	),
 	gpeZS_JOHN = MAKE_ID( 'J', 'O', 'H', 'N'	),
@@ -2426,6 +2427,7 @@ typedef enum gpeZS:U4
 	gpeZS_DIR0 = MAKE_ID( 'D', 'I', 'R',  0 	),
 	gpeZS_iPOS = MAKE_ID( 'i', 'P', 'O', 'S'	),
 	gpeZS_oPOS = MAKE_ID( 'o', 'P', 'O', 'S'	),
+	gpeZS_tPOS = MAKE_ID( 't', 'P', 'O', 'S'	),
 	gpeZS_POS0 = MAKE_ID( 'P', 'O', 'S',  0		),
 	// alias
 	gpeZS_XYZ0 = MAKE_ID( 'X', 'Y', 'Z',  0		),
@@ -2450,8 +2452,12 @@ typedef enum gpeZS:U4
 
 
 	gpeZS_idir = MAKE_ID( 'i', 'd', 'i', 'r'	),
+	gpeZS_odir = MAKE_ID( 'o', 'd', 'i', 'r'	),
+	gpeZS_tdir = MAKE_ID( 't', 'd', 'i', 'r'	),
 	gpeZS_dir0 = MAKE_ID( 'd', 'i', 'r',  0		),
 	gpeZS_ipos = MAKE_ID( 'i', 'p', 'o', 's'	),
+	gpeZS_opos = MAKE_ID( 'o', 'p', 'o', 's'	),
+	gpeZS_tpos = MAKE_ID( 't', 'p', 'o', 's'	),
 	gpeZS_pos0 = MAKE_ID( 'p', 'o', 's',  0		),
 	// alias
 	gpeZS_xyz0 = MAKE_ID( 'x', 'y', 'z',  0		),
@@ -4654,7 +4660,7 @@ szasz:
 	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN );
-	gpcLZY* lzyZSnD( U8& iSTRT, gpcZSnD& zs );
+	gpcLZY* lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i = 3 );
 	gpcLZY* lzy_reqCLOSE( void )
 	{
 		if( !this )

@@ -231,7 +231,7 @@ public:
 
 
 
-	gpcGL* SET_box( I4x2 xy, const I4x2& wh )
+	gpcGL* glSETbox( I4x2 xy, const I4x2& wh )
 	{
 		if( this ? !wh.area() : true )
 			return NULL;
@@ -275,15 +275,24 @@ public:
 
 		return this;
 	}
-	gpcGL* SET_box( I4x4 xyWH, const I4x4 divPX, const I4x2& frm )
+	gpcGL* glSETbox( I4x4 xyWH, const I4x4 divPX, const I4x2& frm )
 	{
 		xyWH &= divPX.a4x2[1];
 		xyWH /= frm;
 		xyWH.a4x2[0] += divPX.a4x2[0];
-		return SET_box( xyWH.a4x2[0], xyWH.a4x2[1] );
+		return glSETbox( xyWH.a4x2[0], xyWH.a4x2[1] );
 	}
+	gpcGL* glSETcnl( U4 i, Fx4 xyzw )
+	{
+		if( !this )
+			return NULL;
 
-	gpcGL* SET_tx( U4 i, SDL_Texture* pTX, I4x2 wh )
+		if( aUniID[4] > -1 )
+			glUniform4fv( aUniID[4]+i, 4, (GLfloat*)&xyzw );
+
+		return this;
+	}
+	gpcGL* glSETtx( U4 i, SDL_Texture* pTX, I4x2 wh )
 	{
 		if( !this )
 			return NULL;
@@ -304,7 +313,7 @@ public:
 		aTXwh[i] = wh;
 		return this;
 	}
-	gpcGL* DRW( I4x2 xy, I4x2 wh ) {
+	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
 		if( !this )
 			return NULL;
 
