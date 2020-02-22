@@ -1,7 +1,27 @@
 #include "gpcSRC.h"
 extern U1 gpaALFadd[];
 I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
-I4x4 I4x4::TSr( I4x4 T, I4 r )
+I4x4 I4x4::TSrBOX( I4x4 T, I4 r )
+{
+	// a vektorokból korábban ki kell vonni az origot
+	if( T.xyz_() == xyz_() )
+		return xyz_();
+	I4x4 D4 = T.xyz_()-xyz_();
+	I4x2 Smx = xyz_().ABS().mx(),
+		 Dmx = D4.ABS().mx();
+	if( Smx.x < r )
+		return xyz_();
+
+	I8x4	S8 = xyz_(),
+			T8 = T.xyz_(),
+			D8 = D4, L8;
+	L8 = (D8*(Smx.x-r))/Dmx.x;
+
+
+
+	return L8+xyz_();
+}
+I4x4 I4x4::TSrBALL( I4x4 T, I4 r )
 {
 	// a vektorokból korábban ki kell vonni az origot
 	if( T.xyz_() == xyz_() )

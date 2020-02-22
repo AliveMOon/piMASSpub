@@ -3,15 +3,26 @@
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
 
-I4x4 gpaCAGEbill[] = {
+I4x4 gpaCAGEbillBALL[] = {
 	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
 	{ mm100(1500), 0, mm100(320), mm100(800) },
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
 };
-I4x4 gpaCAGEjohn[] = {
+I4x4 gpaCAGEbillBOX[] = {
+	{ mm100(600), mm100(600), mm100(-200), mm100(330) }, // asztal_bill
+	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
+	{ mm100(1500/2), mm100(4900), mm100(0), mm100(4000) }, // MIMI2bill
+};
+
+I4x4 gpaCAGEjohnBALL[] = {
 	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
 	{ mm100(1500), 0, mm100(320), mm100(800) },
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+};
+I4x4 gpaCAGEjohnBOX[] = {
+	{ mm100(1500-600), mm100(-600), mm100(-200), mm100(330) }, // asztal_john
+	{ mm100(-500-2000), mm100(0), mm100(0), mm100(2000) }, // MIMI_john
+	{ mm100(1500/2), mm100(-4900), mm100(0), mm100(4000) }, // MIMI2john
 };
 
 gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
@@ -113,15 +124,15 @@ gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i )
 	return this;
 }
 
-I4x4 gpcDrc::cage( I4x4* pCAGE, U4 n ) {
-	I4x4 T = tXYZ.xyz_(), S = iXYZ.xyz_(), a, b;
+I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
+	I4x4 S = iXYZ.xyz_(), a, b;
 	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
 		a = (S-pCAGE[i]).xyz_();
 
 		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
-        b = a.TSr( T-pCAGE[i], pCAGE[i].w+mm100(100) );
+        b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+mm100(100) );
         abba = (b-a).qlen_xyz();
         ab = sqrt(abba);
         if( dd > abba )
@@ -129,7 +140,26 @@ I4x4 gpcDrc::cage( I4x4* pCAGE, U4 n ) {
 			T = b+pCAGE[i].xyz_();
 			dd = abba;
         }
-		i++;
+	}
+	return T;
+}
+I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n ) {
+	I4x4 S = iXYZ.xyz_(), a, b;
+	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
+	for( U4 i = 0; i < n; i++ )
+	{
+		a = (S-pCAGE[i]).xyz_();
+
+		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
+        b = a.TSrBOX( T-pCAGE[i], pCAGE[i].w+mm100(100) );
+        abba = (b-a).qlen_xyz();
+        ab = sqrt(abba);
+        if( dd > abba )
+        {
+			T = b+pCAGE[i].xyz_();
+			dd = abba;
+        }
+
 	}
 	return T;
 }
@@ -255,18 +285,22 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	{
 		iXYZ.xyz_( okXYZ );
 	}
-	I4x4 dir = tXYZ - iXYZ;
+	I4x4 dir = tXYZ - iXYZ, tmp;
 	dif = dir.qlen_xyz();
 	if( dif )
 	{
 		switch( NMnDIF.x )
 		{
 			case gpeZS_BILL:
-				oXYZ.xyz_( iXYZ.lim_xyz( cage(gpaCAGEbill,gpmN(gpaCAGEbill)), mm100(100)) );
+				tmp = cageBALL( tXYZ.xyz_(), gpaCAGEbillBALL,gpmN(gpaCAGEbillBALL) );
+				tmp = cageBOX( tmp, gpaCAGEbillBOX,gpmN(gpaCAGEbillBOX) );
+				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(100)) );
 				break;
 			case gpeZS_JOHN:
-				oXYZ.xyz_( iXYZ.lim_xyz( cage(gpaCAGEjohn,gpmN(gpaCAGEjohn)), mm100(50)) );
-				//oXYZ.xyz_( cage(gpaCAGEjohn,gpmN(gpaCAGEjohn)).lim_xyz(mm100(50)) );
+				tmp = cageBALL( tXYZ.xyz_(), gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL) );
+				tmp = cageBOX( tmp, gpaCAGEjohnBOX,gpmN(gpaCAGEjohnBOX) );
+				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(100)) );
+				//oXYZ.xyz_( iXYZ.lim_xyz( cageBALL(gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL)), mm100(100)) );
 				break;
 			default:
 				oXYZ.xyz_( iXYZ );

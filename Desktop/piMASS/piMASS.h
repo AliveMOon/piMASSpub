@@ -2031,6 +2031,66 @@ public:
 	}
 };
 
+typedef enum gpeZS:U4
+{
+	gpeZS_null, // = 0,
+	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
+	gpeZS_oDIR = MAKE_ID( 'o', 'D', 'I', 'R'	),
+	gpeZS_tDIR = MAKE_ID( 't', 'D', 'I', 'R'	),
+
+	gpeZS_BILL = MAKE_ID( 'B', 'I', 'L', 'L'	),
+	gpeZS_JOHN = MAKE_ID( 'J', 'O', 'H', 'N'	),
+
+	gpeZS_DIR0 = MAKE_ID( 'D', 'I', 'R',  0 	),
+	gpeZS_iPOS = MAKE_ID( 'i', 'P', 'O', 'S'	),
+	gpeZS_oPOS = MAKE_ID( 'o', 'P', 'O', 'S'	),
+	gpeZS_tPOS = MAKE_ID( 't', 'P', 'O', 'S'	),
+	gpeZS_POS0 = MAKE_ID( 'P', 'O', 'S',  0		),
+	// alias
+	gpeZS_XYZ0 = MAKE_ID( 'X', 'Y', 'Z',  0		),
+	gpeZS_ABC0 = MAKE_ID( 'A', 'B', 'C',  0 	),
+
+	gpeZS_iA13 = MAKE_ID( 'i', 'A', '1', '3'	),
+	gpeZS_oA13 = MAKE_ID( 'o', 'A', '1', '3'	),
+
+	gpeZS_AXI1 = MAKE_ID( 'A', 'X', 'I', '1'	),
+	gpeZS_AXI2 = MAKE_ID( 'A', 'X', 'I', '2'	),
+	gpeZS_AXI3 = MAKE_ID( 'A', 'X', 'I', '3'	),
+
+	gpeZS_iA46 = MAKE_ID( 'i', 'A', '4', '5'	),
+	gpeZS_oA46 = MAKE_ID( 'o', 'A', '4', '6'	),
+
+	gpeZS_AXI4 = MAKE_ID( 'A', 'X', 'I', '4'	),
+	gpeZS_AKI5 = MAKE_ID( 'A', 'X', 'I', '5'	),
+	gpeZS_AXI6 = MAKE_ID( 'A', 'X', 'I', '6'	),
+
+	gpeZS_AXIS = MAKE_ID( 'A', 'X', 'I', 'S'	),
+	gpeZS_LINK = MAKE_ID( 'L', 'I', 'N', 'K'	),
+
+
+	gpeZS_idir = MAKE_ID( 'i', 'd', 'i', 'r'	),
+	gpeZS_odir = MAKE_ID( 'o', 'd', 'i', 'r'	),
+	gpeZS_tdir = MAKE_ID( 't', 'd', 'i', 'r'	),
+	gpeZS_dir0 = MAKE_ID( 'd', 'i', 'r',  0		),
+	gpeZS_ipos = MAKE_ID( 'i', 'p', 'o', 's'	),
+	gpeZS_opos = MAKE_ID( 'o', 'p', 'o', 's'	),
+	gpeZS_tpos = MAKE_ID( 't', 'p', 'o', 's'	),
+	gpeZS_pos0 = MAKE_ID( 'p', 'o', 's',  0		),
+	// alias
+	gpeZS_xyz0 = MAKE_ID( 'x', 'y', 'z',  0		),
+	gpeZS_abc0 = MAKE_ID( 'a', 'b', 'c',  0 	),
+
+	gpeZS_ia13 = MAKE_ID( 'i', 'a', '1', '3'	),
+	gpeZS_ia46 = MAKE_ID( 'i', 'a', '4', '5'	),
+	gpeZS_oa13 = MAKE_ID( 'o', 'a', '1', '3'	),
+	gpeZS_oa46 = MAKE_ID( 'o', 'a', '4', '6'	),
+
+	gpeZS_CTRL = MAKE_ID( 'C', 'T', 'R', 'L'	),
+	gpeZS_iCTR = MAKE_ID( 'i', 'C', 'T', 'R'	),
+	gpeZS_oCTR = MAKE_ID( 'o', 'C', 'T', 'R'	),
+
+} gpeZS;
+
 class I4x2
 {
 public:
@@ -2060,8 +2120,7 @@ public:
         y = pI[1];
     }
 	// cnt = fract * U42(1, w);
-	I4x2& cnt2fract(U4 w, U8 cnt)
-	{
+	I4x2& cnt2fract(U4 w, U8 cnt) {
 		U1 lg = log2(w * w);
 		w = 1<<(lg/2);
 		U8 X = w * w;
@@ -2414,65 +2473,9 @@ public:
 		return *this;
 	}
 };
-typedef enum gpeZS:U4
-{
-	gpeZS_null, // = 0,
-	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
-	gpeZS_oDIR = MAKE_ID( 'o', 'D', 'I', 'R'	),
-	gpeZS_tDIR = MAKE_ID( 't', 'D', 'I', 'R'	),
-
-	gpeZS_BILL = MAKE_ID( 'B', 'I', 'L', 'L'	),
-	gpeZS_JOHN = MAKE_ID( 'J', 'O', 'H', 'N'	),
-
-	gpeZS_DIR0 = MAKE_ID( 'D', 'I', 'R',  0 	),
-	gpeZS_iPOS = MAKE_ID( 'i', 'P', 'O', 'S'	),
-	gpeZS_oPOS = MAKE_ID( 'o', 'P', 'O', 'S'	),
-	gpeZS_tPOS = MAKE_ID( 't', 'P', 'O', 'S'	),
-	gpeZS_POS0 = MAKE_ID( 'P', 'O', 'S',  0		),
-	// alias
-	gpeZS_XYZ0 = MAKE_ID( 'X', 'Y', 'Z',  0		),
-	gpeZS_ABC0 = MAKE_ID( 'A', 'B', 'C',  0 	),
-
-	gpeZS_iA13 = MAKE_ID( 'i', 'A', '1', '3'	),
-	gpeZS_oA13 = MAKE_ID( 'o', 'A', '1', '3'	),
-
-	gpeZS_AXI1 = MAKE_ID( 'A', 'X', 'I', '1'	),
-	gpeZS_AXI2 = MAKE_ID( 'A', 'X', 'I', '2'	),
-	gpeZS_AXI3 = MAKE_ID( 'A', 'X', 'I', '3'	),
-
-	gpeZS_iA46 = MAKE_ID( 'i', 'A', '4', '5'	),
-	gpeZS_oA46 = MAKE_ID( 'o', 'A', '4', '6'	),
-
-	gpeZS_AXI4 = MAKE_ID( 'A', 'X', 'I', '4'	),
-	gpeZS_AKI5 = MAKE_ID( 'A', 'X', 'I', '5'	),
-	gpeZS_AXI6 = MAKE_ID( 'A', 'X', 'I', '6'	),
-
-	gpeZS_AXIS = MAKE_ID( 'A', 'X', 'I', 'S'	),
-	gpeZS_LINK = MAKE_ID( 'L', 'I', 'N', 'K'	),
 
 
-	gpeZS_idir = MAKE_ID( 'i', 'd', 'i', 'r'	),
-	gpeZS_odir = MAKE_ID( 'o', 'd', 'i', 'r'	),
-	gpeZS_tdir = MAKE_ID( 't', 'd', 'i', 'r'	),
-	gpeZS_dir0 = MAKE_ID( 'd', 'i', 'r',  0		),
-	gpeZS_ipos = MAKE_ID( 'i', 'p', 'o', 's'	),
-	gpeZS_opos = MAKE_ID( 'o', 'p', 'o', 's'	),
-	gpeZS_tpos = MAKE_ID( 't', 'p', 'o', 's'	),
-	gpeZS_pos0 = MAKE_ID( 'p', 'o', 's',  0		),
-	// alias
-	gpeZS_xyz0 = MAKE_ID( 'x', 'y', 'z',  0		),
-	gpeZS_abc0 = MAKE_ID( 'a', 'b', 'c',  0 	),
 
-	gpeZS_ia13 = MAKE_ID( 'i', 'a', '1', '3'	),
-	gpeZS_ia46 = MAKE_ID( 'i', 'a', '4', '5'	),
-	gpeZS_oa13 = MAKE_ID( 'o', 'a', '1', '3'	),
-	gpeZS_oa46 = MAKE_ID( 'o', 'a', '4', '6'	),
-
-	gpeZS_CTRL = MAKE_ID( 'C', 'T', 'R', 'L'	),
-	gpeZS_iCTR = MAKE_ID( 'i', 'C', 'T', 'R'	),
-	gpeZS_oCTR = MAKE_ID( 'o', 'C', 'T', 'R'	),
-
-} gpeZS;
 class I4x4
 {
 public:
@@ -2980,8 +2983,33 @@ public:
     {
 		return (I8)x*x + (I8)y*y + (I8)z*z;
     }
-	I4x4 TSr( I4x4 T, I4 r );
+	I4x4 TSrBALL( I4x4 T, I4 r );
+	I4x4 TSrBOX( I4x4 T, I4 r );
 	I4x4 mxR( I4 r );
+	I4x4 ABS()
+	{
+		return I4x4( a4x2[0].abs(), a4x2[1].abs() );
+	}
+	I4x2 mx()
+	{
+		I4x2 o(x,0);
+		if( o.x < y )
+		{
+			o.x = y;
+			o.y = 1;
+		}
+		if( o.x < z )
+		{
+			o.x = z;
+			o.y = 2;
+		}
+		if( o.x < w )
+		{
+			o.x = w;
+			o.y = 3;
+		}
+		return o;
+	}
 };
 
 
@@ -3452,6 +3480,11 @@ public:
 		}
 		return lurd;
 	}
+	I8x4 ABS() const
+	{
+		return I8x4( a8x2[0].abs(), a8x2[1].abs() );
+	}
+
 };
 
 class Fx2

@@ -90,7 +90,8 @@ public:
 	U4x4	oCTRL, iCTRL, JD;
 	I4x4	okXYZ, okABC;
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
-	I4x4 cage( I4x4* pCAGE, U4 n );
+	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
+	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
 	gpcDrc& operator &= ( gpcDrc& in );
 	gpcDrc& operator = ( gpcZS& zs );
 
