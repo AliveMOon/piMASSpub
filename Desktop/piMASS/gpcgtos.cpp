@@ -13,12 +13,12 @@ gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pT
 									s = -1,
 									"%s%0.8x %s %s"
 									" %d %s"
-									" %s %s"
+									" %s %s %s"
 									" %d %d %s"
 									" %d/%d%s",
 									pTAB, socket, s_type, s_ip,
 									port, bGTdie() ? "die" : "live", //(socket < 0) ? "die" : "live"),
-                                    sHOST, sUSER,
+                                    sHOST, sUSER, pFILE > sFILE ? (char*)sFILE : "",
                                     mSEC.x, mSEC.y, bLOOP() ? "LP" : "<>",
                                     nSYNdo, nSYNsum,
 									p_enter

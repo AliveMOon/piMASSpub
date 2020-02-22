@@ -724,7 +724,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 										if( pS2 == pSRC )
 											continue;
 
-										hex.lzyRST()->lzyHEXw( s = 0, pLZYin->p_alloc, pLZYin->n_load );
+										hex.lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
 										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 										pS2->srcUPDT();
 

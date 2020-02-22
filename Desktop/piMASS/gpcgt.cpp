@@ -818,7 +818,8 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 		fd_set cnct_w;
 		FD_ZERO( &cnct_w );
 		FD_SET( socket, &cnct_w );
-		int rc = select( socket+1, NULL, &cnct_w, NULL, &tv );
+		int rc = select( socket+1,
+							NULL, &cnct_w, NULL, &tv );
 		if( rc > 0 && FD_ISSET( socket, &cnct_w ) )
 		{
 			sockCNCT = INVALID_SOCKET;
