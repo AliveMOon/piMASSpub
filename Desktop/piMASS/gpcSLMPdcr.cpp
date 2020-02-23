@@ -158,7 +158,7 @@ I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n ) {
 		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
         b = a.TSrBOX( T-pCAGE[i], pCAGE[i].w+mm100(100) );
         abba = (b-a).qlen_xyz();
-        if( dd < abba )
+        if( dd <= abba )
 			continue;
 		dd = abba;
 	}

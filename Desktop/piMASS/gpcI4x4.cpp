@@ -59,9 +59,11 @@ I4x4 I4x4::TSrBALL( I4x4 T, I8 r )
 		d = sqrt(dd),
 		b = (S8*D8)/d,
 		bb = b*b;
+	if( b > 0 )
+		return T.xyz_();// kifele megy had menjen
 
-	if( bb < rr )
-		return T.xyz_();
+	/*if( bb < rr )
+		return T.xyz_();*/
 
 	I8 mm = ss - bb,
 		m = sqrt(mm);
