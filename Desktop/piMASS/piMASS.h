@@ -3010,6 +3010,26 @@ public:
 		}
 		return o;
 	}
+	I4x2 mn()
+	{
+		I4x2 o(x,0);
+		if( o.x > y )
+		{
+			o.x = y;
+			o.y = 1;
+		}
+		if( o.x > z )
+		{
+			o.x = z;
+			o.y = 2;
+		}
+		if( o.x > w )
+		{
+			o.x = w;
+			o.y = 3;
+		}
+		return o;
+	}
 };
 
 
@@ -3049,6 +3069,34 @@ public:
 		gpmMcpyOF( this, pB, 1 );
     }
     I8x2& operator = ( const U1* pS );
+
+    I8x2& operator += ( const I8x2& b )
+    {
+		x += b.x;
+		y += b.y;
+		return *this;
+    }
+    I8x2& operator -= ( const I8x2& b )
+    {
+		x -= b.x;
+		y -= b.y;
+		return *this;
+    }
+
+    I8x2& operator += ( const I4x2& b )
+    {
+		x += b.x;
+		y += b.y;
+		return *this;
+    }
+    I8x2& operator -= ( const I4x2& b )
+    {
+		x -= b.x;
+		y -= b.y;
+		return *this;
+    }
+
+
 	// cnt = fract * U42(1, w);
 	I8x2& cnt2fract( U4 w, U8 cnt )
 	{
@@ -3302,6 +3350,33 @@ public:
     }
     I8x4( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; };
     I8x4& operator = ( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; return *this; };
+
+    I8x4& operator += ( const I8x4& b )
+    {
+		a8x2[0] += b.a8x2[0];
+		a8x2[1] += b.a8x2[1];
+		return *this;
+    }
+    I8x4& operator -= ( const I8x4& b )
+    {
+		a8x2[0] -= b.a8x2[0];
+		a8x2[1] -= b.a8x2[1];
+		return *this;
+    }
+
+	I8x4& operator += ( const I4x4& b )
+    {
+		a8x2[0] += b.a4x2[0];
+		a8x2[1] += b.a4x2[1];
+		return *this;
+    }
+    I8x4& operator -= ( const I4x4& b )
+    {
+		a8x2[0] -= b.a4x2[0];
+		a8x2[1] -= b.a4x2[1];
+		return *this;
+    }
+
     I8x4& operator *= ( I8 b )
     {
 		if( !b )
@@ -3483,6 +3558,46 @@ public:
 	I8x4 ABS() const
 	{
 		return I8x4( a8x2[0].abs(), a8x2[1].abs() );
+	}
+	I8x2 mx()
+	{
+		I8x2 o(x,0);
+		if( o.x < y )
+		{
+			o.x = y;
+			o.y = 1;
+		}
+		if( o.x < z )
+		{
+			o.x = z;
+			o.y = 2;
+		}
+		if( o.x < w )
+		{
+			o.x = w;
+			o.y = 3;
+		}
+		return o;
+	}
+	I8x2 mn()
+	{
+		I8x2 o(x,0);
+		if( o.x > y )
+		{
+			o.x = y;
+			o.y = 1;
+		}
+		if( o.x > z )
+		{
+			o.x = z;
+			o.y = 2;
+		}
+		if( o.x > w )
+		{
+			o.x = w;
+			o.y = 3;
+		}
+		return o;
 	}
 
 };

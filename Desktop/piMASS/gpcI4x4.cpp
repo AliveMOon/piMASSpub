@@ -1,5 +1,11 @@
 #include "gpcSRC.h"
 extern U1 gpaALFadd[];
+I8x4 gpaCAGEboxMUL[] = {
+	{0,1,1,0},
+	{1,0,1,0},
+	{1,1,0,0},
+
+};
 I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
 I4x4 I4x4::TSrBOX( I4x4 T, I4 r )
 {
@@ -7,19 +13,28 @@ I4x4 I4x4::TSrBOX( I4x4 T, I4 r )
 	if( T.xyz_() == xyz_() )
 		return xyz_();
 	I4x4 D4 = T.xyz_()-xyz_();
-	I4x2 Smx = xyz_().ABS().mx(),
-		 Dmx = D4.ABS().mx();
-	if( Smx.x < r )
-		return xyz_();
+	I4x2 SabsMX = xyz_().ABS().mx();
 
-	I8x4	S8 = xyz_(),
-			T8 = T.xyz_(),
-			D8 = D4, L8;
-	L8 = (D8*(Smx.x-r))/Dmx.x;
+	if( SabsMX.x <= r )
+		return xyz_();		// ben van a dobozban, nehogy megmozduljon
+							// marad ahol van ez hiba
 
+	if( D4.aXYZW[SabsMX.y]*aXYZW[SabsMX.y] > 0 )
+		return T.xyz_();	// ha pozició és az írány szorzata pozitív azaz azonos írányú akkor távolodik
+							// az jó távolodjon
+	if( !D4.aXYZW[SabsMX.y] )
+		return T.xyz_(); 	// soha nem éri el a dobozt valahol a végtelenben vagy azon túl egy kicsivel
 
+	I8x4	D8 = D4;
 
-	return L8+xyz_();
+	D8 *= (SabsMX.x-r);
+	D8 /= D4.aXYZW[SabsMX.y] > 0 ? D4.aXYZW[SabsMX.y] : -D4.aXYZW[SabsMX.y];
+	D8 += xyz_();
+
+	if( (D8&gpaCAGEboxMUL[SabsMX.y]).ABS().mx().x > r )
+		return T.xyz_();
+
+	return D8;
 }
 I4x4 I4x4::TSrBALL( I4x4 T, I4 r )
 {

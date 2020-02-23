@@ -556,6 +556,17 @@ U4STR aSIZEOF[] = {
 	{ sizeof(gpcLZY),  "gpcLZY" },
 };
 
+I4x4 gpaCAGEtst[] = {
+	{ 600, 600, 600, gpeZS_BILL }, { -1600, 0, 600, gpeZS_BILL },
+	{ 600, 600, 600, gpeZS_BILL }, { 600, 1600, 600, gpeZS_BILL },
+	{ 600, 600, 600, gpeZS_BILL }, { -1600, 1600, 600, gpeZS_BILL },
+	{ 600, 600, 600, gpeZS_BILL }, { 1600, 0, 600, gpeZS_BILL },
+};
+
+extern I4x4 gpaCAGEbillBALL[],
+			gpaCAGEbillBOX[];
+extern U4	gpnCAGEbillBALL,
+			gpnCAGEbillBOX;
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -581,6 +592,18 @@ int main( int nA, char *apA[] )
 		*gppMASSfile = 0;
 	}
 
+	gpcDrc tstCAGE;
+	I4x4 tmp;
+	for( U4 i = 0, e = gpmN(gpaCAGEtst); i < e; i += 2 )
+	{
+		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mm100(1) );
+		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mm100(1) );
+		cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).str( gpsMAINpub ) << endl;
+		tmp = tstCAGE.cageBALL( tstCAGE.tXYZ.xyz_(), gpaCAGEbillBALL, gpnCAGEbillBALL );
+		cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).str( gpsMAINpub ) << endl;
+		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
+		cout << "tstCAGE.tXYZboxx:" << (tmp/mm100(1)).str( gpsMAINpub ) << endl;
+	}
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
 	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );
 	*gpsKEYbuff = 0;

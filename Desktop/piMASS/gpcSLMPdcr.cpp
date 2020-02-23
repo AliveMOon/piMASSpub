@@ -13,6 +13,8 @@ I4x4 gpaCAGEbillBOX[] = {
 	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
 	{ mm100(1500/2), mm100(4900), mm100(0), mm100(4000) }, // MIMI2bill
 };
+U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
+	gpnCAGEbillBOX = gpmN(gpaCAGEbillBOX);
 
 I4x4 gpaCAGEjohnBALL[] = {
 	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
@@ -24,6 +26,8 @@ I4x4 gpaCAGEjohnBOX[] = {
 	{ mm100(-500-2000), mm100(0), mm100(0), mm100(2000) }, // MIMI_john
 	{ mm100(1500/2), mm100(-4900), mm100(0), mm100(4000) }, // MIMI2john
 };
+U4	gpnCAGEjohnBALL = gpmN(gpaCAGEjohnBALL),
+	gpnCAGEjohnBOX = gpmN(gpaCAGEjohnBOX);
 
 gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 		U1 	sCOM[] = "ABCD";
@@ -126,42 +130,45 @@ gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i )
 
 I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
 	I4x4 S = iXYZ.xyz_(), a, b;
-	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
+	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
 		a = (S-pCAGE[i]).xyz_();
-
 		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
         b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+mm100(100) );
         abba = (b-a).qlen_xyz();
-        ab = sqrt(abba);
-        if( dd > abba )
-        {
-			T = b+pCAGE[i].xyz_();
-			dd = abba;
-        }
+        if( dd < abba )
+			continue;
+		dd = abba;
 	}
-	return T;
+	if( dd >= dd0 )
+		return T;
+
+	I8x4 D8 = T-S;
+	D8 *= sqrt(dd)-mm100(1);
+	D8 /= sqrt(dd0);
+	return S+D8;
 }
 I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n ) {
 	I4x4 S = iXYZ.xyz_(), a, b;
-	I8 dd = (T-S).qlen_xyz(), d = sqrt(dd), abba, ab;
+	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
 		a = (S-pCAGE[i]).xyz_();
-
 		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
         b = a.TSrBOX( T-pCAGE[i], pCAGE[i].w+mm100(100) );
         abba = (b-a).qlen_xyz();
-        ab = sqrt(abba);
-        if( dd > abba )
-        {
-			T = b+pCAGE[i].xyz_();
-			dd = abba;
-        }
-
+        if( dd < abba )
+			continue;
+		dd = abba;
 	}
-	return T;
+	if( dd >= dd0 )
+		return T;
+
+	I8x4 D8 = T-S;
+	D8 *= sqrt(dd)-mm100(1);
+	D8 /= sqrt(dd0);
+	return S+D8;
 }
 U1 gpcZSnD::iDrc( bool bPULL )
 {
