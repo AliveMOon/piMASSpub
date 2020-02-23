@@ -557,10 +557,10 @@ U4STR aSIZEOF[] = {
 };
 
 I4x4 gpaCAGEtst[] = {
-	{ 600, 600, 600, gpeZS_BILL }, { -1600, 0, 600, gpeZS_BILL },
 	{ 600, 600, 600, gpeZS_BILL }, { 600, 1600, 600, gpeZS_BILL },
-	{ 600, 600, 600, gpeZS_BILL }, { -1600, 1600, 600, gpeZS_BILL },
 	{ 600, 600, 600, gpeZS_BILL }, { 1600, 0, 600, gpeZS_BILL },
+	{ 600, 600, 600, gpeZS_BILL }, { -1600, 0, 600, gpeZS_BILL },
+	{ 600, 600, 600, gpeZS_BILL }, { -1600, 1600, 600, gpeZS_BILL },
 };
 
 extern I4x4 gpaCAGEbillBALL[],
@@ -599,7 +599,8 @@ int main( int nA, char *apA[] )
 		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mm100(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mm100(1) );
 		cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).str( gpsMAINpub ) << endl;
-		tmp = tstCAGE.cageBALL( tstCAGE.tXYZ.xyz_(), gpaCAGEbillBALL, gpnCAGEbillBALL );
+		tmp = tstCAGE.tXYZ.xyz_();
+		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
 		cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).str( gpsMAINpub ) << endl;
 		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
 		cout << "tstCAGE.tXYZboxx:" << (tmp/mm100(1)).str( gpsMAINpub ) << endl;

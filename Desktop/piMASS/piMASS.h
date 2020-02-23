@@ -2983,9 +2983,9 @@ public:
     {
 		return (I8)x*x + (I8)y*y + (I8)z*z;
     }
-	I4x4 TSrBALL( I4x4 T, I4 r );
-	I4x4 TSrBOX( I4x4 T, I4 r );
-	I4x4 mxR( I4 r );
+	I4x4 TSrBALL( I4x4 T, I8 r );
+	I4x4 TSrBOX( I4x4 T, I8 r );
+	I4x4 mxR( I8 r );
 	I4x4 ABS()
 	{
 		return I4x4( a4x2[0].abs(), a4x2[1].abs() );

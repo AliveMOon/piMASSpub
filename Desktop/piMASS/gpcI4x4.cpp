@@ -7,7 +7,7 @@ I8x4 gpaCAGEboxMUL[] = {
 
 };
 I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
-I4x4 I4x4::TSrBOX( I4x4 T, I4 r )
+I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 {
 	// a vektorokból korábban ki kell vonni az origot
 	if( T.xyz_() == xyz_() )
@@ -19,7 +19,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I4 r )
 		return xyz_();		// ben van a dobozban, nehogy megmozduljon
 							// marad ahol van ez hiba
 
-	if( D4.aXYZW[SabsMX.y]*aXYZW[SabsMX.y] > 0 )
+	if( ((I8)D4.aXYZW[SabsMX.y]*(I8)aXYZW[SabsMX.y]) > 0 )
 		return T.xyz_();	// ha pozició és az írány szorzata pozitív azaz azonos írányú akkor távolodik
 							// az jó távolodjon
 	if( !D4.aXYZW[SabsMX.y] )
@@ -36,7 +36,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I4 r )
 
 	return D8;
 }
-I4x4 I4x4::TSrBALL( I4x4 T, I4 r )
+I4x4 I4x4::TSrBALL( I4x4 T, I8 r )
 {
 	// a vektorokból korábban ki kell vonni az origot
 	if( T.xyz_() == xyz_() )
@@ -76,7 +76,7 @@ I4x4 I4x4::TSrBALL( I4x4 T, I4 r )
 	I8 chk = sqrt(T8.qlen_xyz());
 	return T8;
 }
-I4x4 I4x4::mxR( I4 r )
+I4x4 I4x4::mxR( I8 r )
 {
 	I8x4 S8 = *this;
 	I8 s = S8.qlen_xyz();

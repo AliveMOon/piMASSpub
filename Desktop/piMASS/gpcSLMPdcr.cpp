@@ -4,14 +4,14 @@ extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
 
 I4x4 gpaCAGEbillBALL[] = {
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
 	{ mm100(1500), 0, mm100(320), mm100(800) },
+	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
 };
 I4x4 gpaCAGEbillBOX[] = {
-	{ mm100(600), mm100(600), mm100(-200), mm100(330) }, // asztal_bill
-	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
 	{ mm100(1500/2), mm100(4900), mm100(0), mm100(4000) }, // MIMI2bill
+	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
+	{ mm100(600), mm100(600), mm100(-200), mm100(330) }, // asztal_bill
 };
 U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 	gpnCAGEbillBOX = gpmN(gpaCAGEbillBOX);
@@ -137,7 +137,7 @@ I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
 		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
         b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+mm100(100) );
         abba = (b-a).qlen_xyz();
-        if( dd < abba )
+        if( dd <= abba )
 			continue;
 		dd = abba;
 	}

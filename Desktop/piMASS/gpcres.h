@@ -807,14 +807,8 @@ public:
 		return resISA()->str( str );
 	}
 
-	U4 iL()
-	{
-		return iLEV;
-	}
-	gpcRES* pRM()
-	{
-		return pMOM;
-	}
+	U4 iL() { return iLEV; }
+	gpcRES* pRM() { return pMOM; }
 	gpcRES* null();
 
 	gpcRES( gpcRES* pM = NULL )
@@ -823,8 +817,8 @@ public:
         if( !pM )
 			return;
 
-		if( pMOM = pM )
-			iLEV = pMOM->iLEV+1;
+		pMOM = pM;
+		iLEV = pMOM->iLEV+1;
 	}
 
 	~gpcRES()
