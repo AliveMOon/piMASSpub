@@ -1397,10 +1397,15 @@ public:
 
     U4x2& operator = ( const I8x2& an );
 	// cnt = fract * U4x2(1, w);
+    U4 strA4Nplus( U1* pBUFF )
+    {
+		U4 n = gpfALF2STR( pBUFF, a4 );
+		return n+sprintf( (char*)(pBUFF+n), "%d", n4 );
+    }
 	U1* strA4N( U1* pBUFF )
     {
-		sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, a4 )), "%d", n4 );
-		return pBUFF;
+		//sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, a4 )), "%d", n4 );
+		return pBUFF + gpfALF2STR( pBUFF, a4 );
     }
     U1* strVAR( U1* pBUFF )
     {
@@ -2394,11 +2399,15 @@ public:
 		x = y = i;
 		return *this;
 	}
-
+	U4 strA4Nplus( U1* pBUFF )
+    {
+		U4 nn = gpfALF2STR( pBUFF, x );
+		return nn+sprintf( (char*)(pBUFF+nn), "%d", y );
+    }
 	U1* strA4N( U1* pBUFF )
     {
-		sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, x )), "%d", y );
-		return pBUFF;
+		//sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, x )), "%d", y );
+		return pBUFF + strA4Nplus( pBUFF );
     }
 
 	I4x2& operator = ( const U4x2& b )

@@ -52,7 +52,7 @@ gpcLZY* gpcRES::res2mini( gpcLZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 			pLZY->lzyFRMT( s = -1, "\r\n" );
 			continue;
 		}
-		if( alu.typ().x & 0x10 )
+		if(alu.bSTR())
 		{
 			pLZY->lzyFRMT( s = -1, "%s\"%s\"", gppTABrun-deep, pD );
 			if( nA > 1 )
@@ -61,11 +61,8 @@ gpcLZY* gpcRES::res2mini( gpcLZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep )
 		}
 		U4 		nAN = alu.AN().z, d, xp1, xe,
 				nB	= alu.typ().w,
-				//nX	= X.area(),
-				nXB	= alu.txySOF(); //txySOF(); // nX*nB;
-
-		U4x2	T = alu.trafo(); //  alu.txySOF(), nXB*alu.AN.a4x2[0].x );
-		//U4		d =  (a.xy-sub)*T;
+				nXB	= alu.txySOF();
+		U4x2	T = alu.trafo();
 
 		for( xy.y = 0; xy.y < alu.AN().y; xy.y++ )
 		{

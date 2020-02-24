@@ -1,6 +1,6 @@
 #include "gpcSRC.h"
 extern U1 gpaALFadd[];
-I8x4 gpaCAGEboxMUL[] = {
+I8x4 gpaCAGEboxMSK[] = {
 	{0,1,1,0},
 	{1,0,1,0},
 	{1,1,0,0},
@@ -31,7 +31,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 	D8 /= D4.aXYZW[SabsMX.y] > 0 ? D4.aXYZW[SabsMX.y] : -D4.aXYZW[SabsMX.y];
 	D8 += xyz_();
 
-	if( (D8&gpaCAGEboxMUL[SabsMX.y]).ABS().mx().x > r )
+	if( (D8&gpaCAGEboxMSK[SabsMX.y]).ABS().mx().x > r )
 		return T.xyz_();
 
 	return D8;

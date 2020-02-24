@@ -32,6 +32,7 @@ bool gpcCRS::miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 allWH ) {
 /// 		miniRDYgl
 ///
 ///------------------------------
+U1 gpsTITLE[0x100];
 void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT )
 {
 	if( miniLOCK( pPIC, pRNDR, win.wDIVcrALLOCK() ) )
@@ -122,21 +123,10 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	}
 
 	/// pCp pRp ----------------------------------------
-	I4	*psCp = win.apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR ), // mapZN.ALLLOC-al dolgozik
+	I4	*psCp = win.apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR ), // mapZN.ALLOC-al dolgozik
 		*psRp = win.apCRS[selID]->pRp;
-
 	/// end pCp pRp ----------------------------------------
-
-	/*for( U4 c = 0; c < mZN.x; c++ )
-		xyWH.z += pC[c];
-
-	for( U4 r = 0; r < mZN.y; r++ )
-		xyWH.w += pR[r];*/
-
-	//xyWH.z = psCp[mZN.x];
-	//xyWH.w = psRp[mZN.y];
-
-	I4x2 brdr = I4x2( psCp[mZN.x], psRp[mZN.y] );
+	I4x2 brdr = I4x2( psCp[mZN.x],psRp[mZN.y] );
 
 
 	if( (CRSfrm.x+brdr.x < 1) || (CRSfrm.y+brdr.y < 1) )
@@ -197,7 +187,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	/*xyWH.a4x2[0] = CRSfrm.a4x2[0];
 	xyWH.z = psCp[mZN.x];
 	xyWH.w = psRp[mZN.y];*/
-
+	U1* pTITLE = gpsTITLE;
 	for( U4 r = 0,a; r < mZN.y; r++ )
 	{
 		xyCR.y = psRp[r]+CRSfrm.y;
@@ -256,13 +246,30 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				}
 				continue;
 			}
-			if( pSRC = mass.SRCfnd( pM[i+c] ) )
-			if( pSRC->picID )
+
+			pTITLE = gpsTITLE;
+			if( pSRC = mass.SRCfnd(pM[i+c]) )
 			{
-				/// CELL PICTURES BACK GROUND -------------------
-				//xyWH azonos a xyPIC[0]-val!
-				aXYuvPC[2].a4x2[1].x = pSRC->picID-1;
-				picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+				gpcRES* pRES = pSRC->apOUT[3];
+				if( pRES )
+				{
+					U4	n = pRES->nFND(),
+						i = pRES->iFND( gpeALF_NAME );
+					if( i < n )
+					{
+						gpcALU& alu = pRES->ALU( i );
+						if( alu.typ().x&0x10 )
+							pTITLE += sprintf( (char*)pTITLE, "%s", (char*)alu.pDAT );
+
+					}
+				}
+				if( pSRC->picID )
+				{
+					/// CELL PICTURES BACK GROUND -------------------
+					//xyWH azonos a xyPIC[0]-val!
+					aXYuvPC[2].a4x2[1].x = pSRC->picID-1;
+					picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+				}
 			}
 
 
@@ -290,6 +297,9 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				if( bON ? iON == i+c : false )	// rajta a pointer
 					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
 
+				if( pTITLE > gpsTITLE )
+					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( gpsTITLE, gpeCLR_white );
+
 				continue;
 			}
 
@@ -307,24 +317,23 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				c16fr = gpeCLR_white;
 			}
 
-			//pMINI[off+offFRM].pos( xyWH.a4x2[0], fxyz )->frm( xyWH.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyWH.a4x2[0], 0 )  );
 			pMINI[off+offFRM].pos( xyCR.a4x2[0], fxyz )
 							->frmBRDR( xyCR.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
-			/*pSRC->SRCfrm(
-							pMINI + off + offFRM,
 
-							xyWH,
 
-							c16fr,
-							fxyz
+			if( pTITLE > gpsTITLE )
+				pTITLE += sprintf( (char*)pTITLE, " " );
 
-						);*/
 			if( a == lurdAN.x && r == lurdAN.y )
-				pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].strA4N(sSTR), c16fr );
+				pTITLE += lurdAN.a4x2[0].strA4Nplus(pTITLE); // pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].strA4N(sSTR), c16fr );
 			else if( a == lurdAN.z && r == lurdAN.w )
-				pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].strA4N(sSTR), c16fr );
+				pTITLE += lurdAN.a4x2[1].strA4Nplus(pTITLE); // pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].strA4N(sSTR), c16fr );
 			else if( bON ? iON == i+c : false )
-				pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+				pTITLE += onAN.strA4Nplus(pTITLE); //  pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+
+
+			if( pTITLE > gpsTITLE )
+				pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( gpsTITLE, gpeCLR_white );
 
 			pSRC->SRCmini(
 							pMINI + off,

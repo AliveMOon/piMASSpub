@@ -366,7 +366,7 @@ public:
 		pDAT = b.pDAT;
 		return *this;
 	}
-
+	bool bSTR() { return typ().x&0x10; }
 	U1x4& typ()
 	{
 		return type.typ();
@@ -831,8 +831,7 @@ public:
 	gpcLZY* 	res2mini( gpcLZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep );
 	gpcRES* 	RESrun( gpcRES* pOUT, gpcLZY* pLZY, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
 
-	gpcALU& ALU( U4 iA )
-	{
+	gpcALU& ALU( U4 iA ) {
 		alu = this;
 
 		if( iA >= nA )
@@ -849,8 +848,7 @@ public:
 		alu.nALL	= pnALL ? pnALL[iA]	: 0;
 		return alu;
 	}
-	gpcRES* chg( gpcALU& ali )
-	{
+	gpcRES* chg( gpcALU& ali ) {
 		if( !this )
 			return NULL;
 
@@ -976,12 +974,8 @@ public:
 		return ALU( nCPY );
 	}
 
-	U4 nFND()
-	{
-		return this ? nA : 0;
-	}
-    U4 iFND( gpeALF alf )
-    {
+	U4 nFND() { return this ? nA : 0; }
+    U4 iFND( gpeALF alf ) {
 		if( !this )
 			return 0;
 

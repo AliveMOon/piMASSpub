@@ -467,7 +467,7 @@ class gpcWIN
 
 		U1		sHOST[0x100],
 				sUSER[0x100],
-				gpsKEYbuff[0x100],
+				gpsKEYbuff[0x10000],
 				*pHOST, *pUSER,
 				*gppKEYbuff,
 				*gppMOUSEbuff;

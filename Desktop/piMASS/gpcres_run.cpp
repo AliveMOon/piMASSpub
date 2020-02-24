@@ -416,7 +416,6 @@ U4 gpcMASS::jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR )
 U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
 	win.nJDOIT.y = win.nJDOIT.x;
-
 	U1* pKEYbuff = win.gpsKEYbuff;
 	gpcSRC	tmp, *pSRC, *pS2;
 	U4 xFND, x_fnd;
@@ -539,13 +538,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							} break;
 
 						case gpeALF_PIC:{
-								if( alu.typ().x & 0x10 )
-								{
-									// ez a kép neve
-									pic_id = PIC.alfFND( (U1*)alu.pDAT );
-								} else
-									pic_id = alu.u8();
-
+								pic_id =	alu.bSTR() ?
+											PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
+											: alu.u8();						// száma
 								// be kell mapolni a rublika háterének
 								if( pPIC = PIC.PIC( pic_id ) )
 								{
@@ -625,14 +620,15 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							break;
 
 						case gpeALF_TRG:{
-								U8 trg_id = 0;
-
-								if( alu.typ().x & 0x10 )
+								U8 trg_id =	alu.bSTR() ?
+											PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
+											: alu.u8();						// száma
+								/*if(alu.bSTR())
 								{
 									// ez a kép neve
 									trg_id = PIC.alfFND( (U1*)alu.pDAT );
 								} else
-									trg_id = alu.u8();
+									trg_id = alu.u8();*/
 
 								if( pTRG = PIC.PIC( trg_id ) )
                                     break;
@@ -651,8 +647,11 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				} else { //	gpeALF_ZZZZZ // 5 char
 					switch( alu.alf )
 					{
+						/*case gpeALF_NAME:// nevet deklarál mondjuk a rublikának
+							pSRC
+							break;*/
 						case gpeALF_SYNC:
-							if( alu.typ().x & 0x10 )
+							if(alu.bSTR())
 							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
 								pGT->GTcnct( win );
 
@@ -673,7 +672,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							// typ: 0x10
 							///   -  -  -  |    : - - - -
 							/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-							if( alu.typ().x & 0x10 )
+							if(alu.bSTR())
 							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
 							{
 								I4 cnt = pGT->iCNT;
@@ -762,7 +761,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			{
 				case gpeALF_SPRITE: {
 						U8 spr_id = 0;
-						if( alu.typ().x & 0x10 )
+						if(alu.bSTR())
 						{
 							// ez a kép neve
 							spr_id = PIC.alfFND( (U1*)alu.pDAT );
