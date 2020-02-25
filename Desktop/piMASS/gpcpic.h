@@ -106,7 +106,7 @@ public:
 	U4				id, iSRC, aiQC[2], nPIXall, nPIX, bppS, nPKavg;
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
-	SDL_Texture		*pTX;
+	SDL_Texture		*pTX, *pT2;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;

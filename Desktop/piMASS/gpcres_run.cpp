@@ -469,7 +469,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 		for(
 			U4	a = 0, ae = res.nFND(),
-				nCNL = 0, mskPIC = 0;
+				nCNL = 0, mskPIC = 0, mCLR;
 				a < ae;
 				a++
 			)
@@ -484,7 +484,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				else if( alu.alf < gpeALF_AAAA ) {
 				switch( alu.alf ) {
 					case gpeALF_CLR: {
-
+							mCLR = alu.u8();
 						} break;
 					case gpeALF_CAM:{
 							I4 iCAM = alu.u8();
@@ -562,10 +562,12 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_GPU:if( pTRG && pGL ) {
 
 							pGL
+							->glSETtrg( pTRG, trgWH.a4x2[1], mCLR&1, mCLR&2 )
+							->glSETbox( trgWH.a4x2[0], trgWH.a4x2[1] )
                             ->GLSLset( alu )
                             ->glSETcnl( 0, aGLcnl, nCNL )
 							->glSETtx( mskPIC, aGLpPIC )
-							;
+							->glDRW( trgWH.a4x2[0], trgWH.a4x2[1] );
 
 
 						} break;

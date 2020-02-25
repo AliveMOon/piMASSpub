@@ -323,9 +323,46 @@ char gpsGLSLfrgISO[] = {
 
 "}\n"
 };
+gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
+	if( this ? !pRNDR : true )
+		return NULL;
 
-GLint gpcGLSL::GLSLvrtx( const char* pSvrtx )
-{
+	if( pT )
+	{
+		if( pT->txWH.a4x2[0] != wh )
+		{
+			gpmSDL_FreeTX( pT->pT2 );
+		}
+
+		if( !pT->pT2 )
+		{
+			pT->pT2 = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
+			if( !pT->pT2 )
+				return NULL;
+			pT->txWH.a4x2[0] = wh;
+		}
+		if( pT2 != pT->pT2 )
+		{
+			SDL_RenderPresent(pRNDR);
+		}
+
+		SDL_SetRenderTarget( pRNDR, pT2 = pT->pT2 );
+	}
+
+	GLbitfield b = 0;
+	if( bCLR )
+		b |= GL_COLOR_BUFFER_BIT;
+	if( bDEP )
+		b |= GL_DEPTH_BUFFER_BIT;
+
+	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
+	glClearDepth(1.0);
+	glClear( b );
+
+	return this;
+}
+
+GLint gpcGLSL::GLSLvrtx( const char* pSvrtx ) {
 	if( !pSvrtx )
 		pSvrtx = gpsGLSLvx;
 	U8 s;
@@ -353,8 +390,7 @@ GLint gpcGLSL::GLSLvrtx( const char* pSvrtx )
 
 	return isSUCC;
 }
-GLint gpcGLSL::GLSLfrg( const char* pSfrg )
-{
+GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 	if( !pSfrg )
 		pSfrg = gpsGLSLfrgISO;
 	U8 s;
@@ -383,8 +419,7 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg )
 	return isSUCC;
 }
 
-GLint gpcGLSL::GLSLlnk( const char** ppUlst )
-{
+GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 
 	if( (nSUCC&0x7) == 0x7 )
 		return GL_TRUE;
@@ -447,8 +482,7 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst )
 
 	return GL_TRUE;
 }
-gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV )
-{
+gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV ) {
 	if( !this )
 		return this;
 
@@ -464,8 +498,7 @@ gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV )
 
 	return GLSLset( an, pF, pV  );
 }
-gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
-{
+gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 	if( pGLSL  ? pGLSL->an == an : false )
 		return this;
 

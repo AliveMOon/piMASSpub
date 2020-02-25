@@ -140,7 +140,8 @@ public:
 			boxXY, 	boxWH,
 			aTXwh[0x10];
 
-	SDL_Texture	*pTRG,
+	SDL_Texture	*pT2,
+				*pTRG,
 				*pTXchar,
 				*pTXiso;
 
@@ -155,7 +156,7 @@ public:
 	}
 
 	gpcGL( gpcWIN& win );
-
+	gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, bool bC = true, bool bD = true );
 	gpcGL* TRG( SDL_Renderer* pSDLrndr, I4x2 lXY, const I4x2& tWH, float ms, bool bCLR = true, bool bDEP = true )
 	{
 		if( !this )
@@ -168,6 +169,12 @@ public:
 			return NULL;
 
 		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
+		if( pT2 )
+		{
+			SDL_RenderPresent(pRNDR);
+			pT2 = NULL;
+			SDL_SetRenderTarget( pRNDR, NULL );
+		}
 
 		if( pTRG )
 		if( trgWHpx != tWH )
