@@ -51,11 +51,11 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	}
 	I4x2 &div = win.wDIVcr( id ).a4x2[0];
 	I4x4 fxyz;
-	fxyz.z = pPIC->txWH.x;
+	fxyz.z = pPIC->txWH.z;
 
 	U4	off = 	  (div.x ? fxyz.z/2: 0)
-				+ (div.y ? pPIC->txWH.a4x2[0].area()/4: 0),
-		offFRM = pPIC->txWH.a4x2[0].area()/2;
+				+ (div.y ? pPIC->txWH.a4x2[1].area()/4: 0),
+		offFRM = pPIC->txWH.a4x2[1].area()/2;
 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
 	{
@@ -371,11 +371,11 @@ void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Render
 	}
 	I4x2 &div = win.wDIVcr( id ).a4x2[0];
 	I4x4 fxyz;
-	fxyz.z = pPIC->txWH.x;
+	fxyz.z = pPIC->txWH.z;
 
 	U4	off = 	  (div.x ? fxyz.z/2: 0)
-				+ (div.y ? pPIC->txWH.a4x2[0].area()/4: 0),
-		offFRM = pPIC->txWH.a4x2[0].area()/2;
+				+ (div.y ? pPIC->txWH.a4x2[1].area()/4: 0),
+		offFRM = pPIC->txWH.a4x2[1].area()/2;
 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
 	{

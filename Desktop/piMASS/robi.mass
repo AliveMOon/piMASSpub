@@ -16,8 +16,8 @@
  trgw = 960;
  trgh = 960;
  
- picO="cam1";
- picI="mask";
+ pici="cam1";
+ pico="mask";
  picII="space";
  cnlx = trgw*ix/iw;
  cnly = trgh*iy/ih;
@@ -32,14 +32,15 @@
 #version 120																
 varying vec2 fr_uv;														
 uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		
+uniform sampler2D	tex1;					// MINI_CHAR_xXy_zXw.png		
 uniform vec4 		aCNL[8];				// CNL							
 void main()																
 {																		
-	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0];
+	gl_FragColor = texture2D( tex0, fr_uv );  //aCNL[0].x*0.01;
  
  					
-	if( gl_FragColor.a < (1/0x100) )									
- 		discard;														
+	//if( gl_FragColor.a < (1/0x100) )									
+ 	//	discard;														
 }																		
  	
  "  
@@ -147,7 +148,7 @@ uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png
 uniform vec4 		aCNL[8];				// CNL							
 void main()																
 {																		
-	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0];
+	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0].xyxy;
  
  					
 	if( gl_FragColor.a < (1/0x100) )									
@@ -276,7 +277,7 @@ void main()
 //0750|00000000 00000000 00000000 00000000 |................
 //0760|00000000 00000000 00000000 00000000 |................
 //0770|00000000 00000000 00000000 00000000 |................
-//0780| c3	 
+//0780| c3	  
  
  trg = "space";
  trgw = 512;

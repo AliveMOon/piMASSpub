@@ -539,8 +539,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								pVTX = NULL;
 						} break;
 					case gpeALF_PIX: if( pGL ? alu.bSTR() : false ) {
+							char* pPIX = (char*)alu.pDAT;
 							gpcALU& aNM = res.ALU(gpeALF_NAME);
-							pGL->GLSLset( aNM, (char*)alu.pDAT, pVTX );
+							pGL->GLSLset( aNM, pPIX, pVTX );
 						} break;
 
 					case gpeALF_TRG:{
@@ -562,7 +563,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_GPU:if( pTRG && pGL ) {
 
 							pGL
-							->glSETtrg( pTRG, trgWH.a4x2[1], mCLR&1, mCLR&2 )
+							->glSETtrg( pTRG, trgWH.a4x2[1], true, true )
 							->glSETbox( trgWH.a4x2[0], trgWH.a4x2[1] )
                             ->GLSLset( alu )
                             ->glSETcnl( 0, aGLcnl, nCNL )

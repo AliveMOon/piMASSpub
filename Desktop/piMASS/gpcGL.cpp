@@ -329,24 +329,37 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
 
 	if( pT )
 	{
-		if( pT->txWH.a4x2[0] != wh )
+		if( pT->txWH.a4x2[1] != wh )
 		{
-			gpmSDL_FreeTX( pT->pT2 );
+			gpmSDL_FreeTX( pT->pRTX );
 		}
 
-		if( !pT->pT2 )
+		if( !pT->pRTX )
 		{
-			pT->pT2 = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
-			if( !pT->pT2 )
+			pT->pRTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
+			if( !pT->pRTX )
 				return NULL;
-			pT->txWH.a4x2[0] = wh;
+			pT->txWH.a4x2[1] = wh;
 		}
-		if( pT2 != pT->pT2 )
+		if( pRTX != pT->pRTX )
 		{
-			SDL_RenderPresent(pRNDR);
-		}
+			//SDL_RenderPresent(pRNDR);
+			SDL_SetRenderTarget( pRNDR, NULL );
+			SDL_RenderCopy( pRNDR, pRTX, NULL, NULL );
+			if( pPICrtx )
+			{
+				if( pPICrtx->pSRF )
+					SDL_RenderReadPixels(pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
 
-		SDL_SetRenderTarget( pRNDR, pT2 = pT->pT2 );
+			}
+		}
+		pPICrtx = pT;
+		SDL_SetRenderTarget( pRNDR, pRTX = pPICrtx->pRTX );
+		gpmSDL_FreeTX(pPICrtx->pTX);
+		if( !pPICrtx->pSRF )
+			pPICrtx->pSRF = SDL_CreateRGBSurface( 0, wh.x, wh.y, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
+		pPICrtx->pREF = NULL;
+		//pPICrtx->nCPY = 0;
 	}
 
 	GLbitfield b = 0;
@@ -539,7 +552,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 			return NULL;
 		pGLSL = ppGLSL[iGLSL];
 	}
-	else if( pF )
+	else if( pF ///BUG )
 	{
 		gpcGLSL* pKILL = ppGLSL[iGLSL];
 		ppGLSL[iGLSL] = ppGLSL[iGLSL]->pNEW( an, pF, pV );

@@ -140,8 +140,8 @@ public:
 			boxXY, 	boxWH,
 			aTXwh[0x10];
 
-	SDL_Texture	*pT2,
-				*pTRG,
+	gpcPIC* pPICrtx;
+	SDL_Texture	*pRTX, *pTRG,
 				*pTXchar,
 				*pTXiso;
 
@@ -169,11 +169,24 @@ public:
 			return NULL;
 
 		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
-		if( pT2 )
+		if( pRTX )
 		{
-			SDL_RenderPresent(pRNDR);
-			pT2 = NULL;
 			SDL_SetRenderTarget( pRNDR, NULL );
+			SDL_RenderCopy( pRNDR, pRTX, NULL, NULL ); //&t2Rect );
+
+			int w = 0, h = 0, acc = 0;
+			U4 frm;
+			SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
+			if( pPICrtx )
+			{
+				if( !pPICrtx->pSRF )
+					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
+				if( pPICrtx->pSRF )
+					SDL_RenderReadPixels( pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
+				pPICrtx->pREF = NULL;
+			}
+			pPICrtx = NULL;
+			pRTX = NULL;
 		}
 
 		if( pTRG )
@@ -323,7 +336,7 @@ public:
 			if( (msk&1) ? !ppPIC[i] : true )
 				continue;
 
-			glSETtx( i, ppPIC[i]->surDRWtx(pRNDR), ppPIC[i]->txWH.a4x2[0] );
+			glSETtx( i, ppPIC[i]->surDRWtx(pRNDR), ppPIC[i]->txWH.a4x2[1] );
 		}
 		return this;
 	}

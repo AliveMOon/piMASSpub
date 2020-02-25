@@ -251,7 +251,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 					I4x4	w = wDIVpx(i);
 					I4x2	FRMwh = apCRS[i]->gtFRMwh(), layCR = wDIVcrLAY(),
-							bgWH = pPICbg ? pPICbg->txWH.a4x2[0] : I4x2(1280,960);
+							bgWH = pPICbg ? pPICbg->txWH.a4x2[1] : I4x2(1280,960);
 					if( pPICbg )
 						pGL
 						->GLSLset( GLSLpic, gpsGLSLfrgREF )
@@ -269,7 +269,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						->GLSLset( GLSLpic ) //pI[2].a4x2[0] )
 						->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
 						->glSETcnl( 0, Fx4(0.7f,0.7f,0.7f,1.0f) )
-						->glSETtx( 0, p_tx, p_pic->txWH.a4x2[0] )->glDRW( w.a4x2[0], FRMwh );
+						->glSETtx( 0, p_tx, p_pic->txWH.a4x2[1] )->glDRW( w.a4x2[0], FRMwh );
 					}
 
 					glViewport( 0, 0, winSIZ.z, winSIZ.w );
@@ -278,7 +278,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					->glSETbox( w.a4x2[0], w.a4x2[1] )
 					->glSETtx( 0, pGL->pTXiso, I4x2(32,32) )													// tex0 -- CHAR set
 					->glSETtx( 1, pBGtx, bgWH )																// tex1 -- BG background
-					->glSETtx( 2, pPIC->pTX, pPIC->txWH.a4x2[0] )											// tex2 -- MINIiso
+					->glSETtx( 2, pPIC->pTX, pPIC->txWH.a4x2[1] )											// tex2 -- MINIiso
 					->glDRW( w.a4x2[0], FRMwh );
 				}
 

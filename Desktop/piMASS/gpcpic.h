@@ -103,10 +103,12 @@ public:
 	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
 	gpcLZY			*pPACK;
-	U4				id, iSRC, aiQC[2], nPIXall, nPIX, bppS, nPKavg;
+	U4				id, iSRC, aiQC[2], nPIXall, nPIX,
+					bppS, nPKavg;
+
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
-	SDL_Texture		*pTX, *pT2;
+	SDL_Texture		*pTX, *pRTX;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
@@ -170,7 +172,7 @@ public:
 		if( !pTX )
 		{
 			pTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, wh.x, wh.y );
-			txWH = wh;
+			txWH.a4x2[1] = wh;
 		}
 
 
@@ -200,6 +202,7 @@ public:
 		if( pREF == pS )
 			return pTX;
 
+
 		int w = 0, h = 0, acc = 0;
 		U4 frm;
 		pREF = pS;
@@ -214,6 +217,7 @@ public:
 				pTX = SDL_CreateTexture( pRNDR, pREF->format->format, SDL_TEXTUREACCESS_STREAMING, pREF->w, pREF->h );
 
 			}
+
 			if( pTX )
 			{
 				void* pLOCK;
