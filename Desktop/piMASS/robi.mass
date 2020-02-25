@@ -16,28 +16,18 @@
  trgw = 960;
  trgh = 960;
  
- pic="cam1"
- piic="mask"
- gpu="paint"
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+ picO="cam1";
+ picI="mask";
+ picII="space";
+ cnlx = trgw*ix/iw;
+ cnly = trgh*iy/ih;
+ cnlz = 8;
+ cnlw = cnlz*mlb;
+ gpu="paint";
  
   d1	 
  name="paint"
- frgm ="
+ pix ="
 
 #version 120																
 varying vec2 fr_uv;														
@@ -116,7 +106,56 @@ void main()
 //	iabc    0.00dg,    0.00dg,    0.00dg 
 //	oabc    0.00dg,    0.00dg,    0.00dg 
 //	tabc    0.00dg,    0.00dg,    0.00dg;"
- e2	    a3	 
+ c2	  
+ 
+ trg = "mask";
+ trgw = c1.trgw;
+ trgh = c1.trgh;
+ 
+ picO="mask2";
+ picI="space";
+ cnlx = c1.cnlx;
+ cnly = c1.cnly;
+ cnlz = c1.cnlz;
+ cnlw = c1.cnlw;
+ cnlIx = 2
+ gpu="pena";
+ piccpy = mlb;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  d2	  
+ name="pena"
+ pix ="
+
+#version 120																
+varying vec2 fr_uv;														
+uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		
+uniform vec4 		aCNL[8];				// CNL							
+void main()																
+{																		
+	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0];
+ 
+ 					
+	if( gl_FragColor.a < (1/0x100) )									
+ 		discard;														
+}																		
+ 	
+ "  
+  e2	    a3	 
 //0000|00000001 00000000 00000000 00000000 |................
 //0010|00000000 00000001 00000004 00000004 |................
 //0020|00000000 00000000 00000000 00000000 |................
@@ -237,4 +276,27 @@ void main()
 //0750|00000000 00000000 00000000 00000000 |................
 //0760|00000000 00000000 00000000 00000000 |................
 //0770|00000000 00000000 00000000 00000000 |................
-//0780| e3	    e4	    e5	    e6	    e7	    e8	    e9	    e10	    e11	    e12	    e13	    e14	    e15	    e16	    e17	    e18	    e19	    e20	    e21	    e22	    e23	    e24	    e25	    e26	    e27	    e28	    
+//0780| c3	 
+ 
+ trg = "space";
+ trgw = 512;
+ trgh = trgw;
+ 
+ picO="cam1";
+ tool = 1;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  e3	    e4	    e5	    e6	    e7	    e8	    e9	    e10	    e11	    e12	    e13	    e14	    e15	    e16	    e17	    e18	    e19	    e20	    e21	    e22	    e23	    e24	    e25	    e26	    e27	    e28	    

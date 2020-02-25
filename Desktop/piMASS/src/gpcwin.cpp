@@ -256,8 +256,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				SDL_Texture *pBGtx = (pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL),
 							*p_tx;
 				pGL->TRG( pSDLrndr, 0, winSIZ.a4x2[0], mSEC.x );
-
-				//pGL->GLSLset( I8x2( 0, 0 ) );
 				for( U1 i = 0; i < 4; i++ )
 				{
 					if( i ? !(bSW&(1<<i)) : false )
