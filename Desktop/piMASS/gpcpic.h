@@ -2,11 +2,14 @@
 #define GPCPIC_H
 
 #include "piMASS.h"
+
 //#include "gpcSRC.h"
 //GLOVAL(void)
 bool gpfSRFjpgSAVE( U1* pFILE, SDL_Surface* pSRF, I4 q );
 gpcLZY* gpfSRF2JPG( gpcLZY* pBUFF, SDL_Surface* pSRF, I4 q );
 #ifndef gpdSYSpi
+
+
 class gpcCAMubi
 {
     U1 frm;
@@ -233,8 +236,14 @@ class gpcPICall
 	gpcPIC	**ppPIC, *pPIC;
 	U4		nPICall, iPICfr, nPICld;
 public:
-	U4 alfFND( U1* pS );
-
+	U4		alfFND( U1* pS );
+	gpcPIC*	aluFND( gpcALU& alu );
+//	{
+//		U4 i =	alu.bSTR() ?
+//				PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
+//				: alu.u8();
+//
+//	}
 	gpcPIC*	PIC( U4 i )
 	{
 		if( pPIC ? pPIC->id == i : false )

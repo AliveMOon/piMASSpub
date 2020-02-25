@@ -40,7 +40,7 @@ gpcGL::gpcGL( gpcWIN& win )
 		cout << SDL_GetError() << endl;
 }
 
-char gpsGLSLvx[] =
+char gpsGLSLvx[] = {
 "#version 120																\n"
 "attribute	vec2	v_vx;													\n"
 "attribute	vec2	v_uv;													\n"
@@ -49,8 +49,9 @@ char gpsGLSLvx[] =
 "{																			\n"
 "	gl_Position			= vec4( v_vx*vec2(2.0,-2.0)+vec2(-1.0,1.0), 0, 1);	\n"
 "	fr_uv				= v_uv;												\n"
-"}																			\n\0";
-char gpsGLSLfrgREF[] =
+"}																			\n\0"
+};
+char gpsGLSLfrgREF[] = {
 "#version 120																\n"
 "varying vec2 fr_uv;														\n"
 "uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
@@ -62,9 +63,9 @@ char gpsGLSLfrgREF[] =
 " 		discard;															\n"
 "}																			\n"
 
-"\n\0";
-
-char gpsGLSLfrgISO[] =
+"\n\0"
+};
+char gpsGLSLfrgISO[] = {
 "#version 120																							\n"
 "varying vec2 fr_uv;																					\n"
 "uniform sampler2D tex0;					// MINI_CHAR_xXy_zXw.png									\n"
@@ -320,7 +321,8 @@ char gpsGLSLfrgISO[] =
 "	}																									\n"
 "	gl_FragColor += Bc/(6+B+gl_FragColor.a);											\n"
 
-"}\n";
+"}\n"
+};
 
 GLint gpcGLSL::GLSLvrtx( const char* pSvrtx )
 {
@@ -445,7 +447,23 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst )
 
 	return GL_TRUE;
 }
+gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV )
+{
+	if( !this )
+		return this;
 
+	I8x2 an(0,14);
+	if(alu.bSTR())
+	{
+		an = (U1*)alu.pDAT;
+		an.num = gpfSTR2U8( alu.pDAT+an.num );
+	} else {
+		an.x = alu.u8();
+		an.num = 0;
+	}
+
+	return GLSLset( an, pF, pV  );
+}
 gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 {
 	if( pGLSL  ? pGLSL->an == an : false )
@@ -487,6 +505,18 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV )
 		if( !ppGLSL[iGLSL] )
 			return NULL;
 		pGLSL = ppGLSL[iGLSL];
+	}
+	else if( pF )
+	{
+		gpcGLSL* pKILL = ppGLSL[iGLSL];
+		ppGLSL[iGLSL] = ppGLSL[iGLSL]->pNEW( an, pF, pV );
+		if(pKILL != ppGLSL[iGLSL])
+		if(ppGLSL[iGLSL])
+		{
+			gpmDEL(pKILL);
+		} else
+			ppGLSL[iGLSL] = pKILL;
+
 	}
 
 	gProgID = pGLSL->PrgID;

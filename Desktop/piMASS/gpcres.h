@@ -366,11 +366,14 @@ public:
 		pDAT = b.pDAT;
 		return *this;
 	}
-	bool bSTR() { return typ().x&0x10; }
-	U1x4& typ()
-	{
-		return type.typ();
-	}
+	U1x4& typ() { return type.typ(); }
+
+	U1 typX() const { return ((gpcALU*)this)->typ().x; };
+	U1 typY() const { return ((gpcALU*)this)->typ().y; };
+	U1 typZ() const { return ((gpcALU*)this)->typ().z; };
+	U1 typW() const { return ((gpcALU*)this)->typ().w; };
+
+	bool bSTR() const { return typX()&0x10; }
 	U1x4& typ( U4 b )
 	{
 		type.u4 = b;
@@ -508,41 +511,41 @@ public:
 		return *this;
 	}
 
-	U8 u8() {
+	U8 u8() const {
 		if( this ? !pDAT : true )
 			return 0;
 		// typ:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
-		if( typ().x&0x40 )
+		if( typX()&0x40 )
 		{
-			if( typ().w > 4 )
+			if( typW() > 4 )
 				return ((double*)pDAT)[0];
 
 			return ((float*)pDAT)[0];
 		}
-		if( typ().x&0x80 )
+		if( typX()&0x80 )
 		{
-			if( typ().w > 2 )
+			if( typW() > 2 )
 			{
-				if( typ().w > 4 )
+				if( typW() > 4 )
 					return ((I8*)pDAT)[0];
 
 				return ((I4*)pDAT)[0];
 			}
-			if( typ().w > 1 )
+			if( typW() > 1 )
 				return ((I2*)pDAT)[0];
 
 			return ((I1*)pDAT)[0];
 		}
-		if( typ().w > 2 )
+		if( typW() > 2 )
 		{
-			if( typ().w > 4 )
+			if( typW() > 4 )
 				return ((U8*)pDAT)[0];
 
 			return ((U4*)pDAT)[0];
 		}
-		if( typ().w > 1 )
+		if( typW() > 1 )
 			return ((U2*)pDAT)[0];
 		else
 			return ((U1*)pDAT)[0];

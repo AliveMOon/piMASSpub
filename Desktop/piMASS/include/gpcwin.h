@@ -147,10 +147,8 @@ public:
 	gpcGLSL		**ppGLSL, *pGLSL;
 	U4			iGLSL, eGLSL, nGLSL;
 
+	gpcGL* GLSLset( const gpcALU& alu, const char* pF = NULL, const char* pV = NULL );
 	gpcGL* GLSLset( const I8x2& an, const char* pF = NULL, const char* pV = NULL  );
-
-
-
 	~gpcGL()
 	{
 		SDL_GL_DeleteContext( gCntxt );
@@ -170,9 +168,6 @@ public:
 			return NULL;
 
 		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
-		//SDL_SetRenderTarget( pRNDR, NULL );
-		//SDL_RenderClear( pRNDR );
-		//glUseProgram( gProgID );
 
 		if( pTRG )
 		if( trgWHpx != tWH )
@@ -183,14 +178,6 @@ public:
 				return NULL;
 			//pTXchar = SDL_CreateTextureFromSurface( pRNDR, pSRFchar );
 		}
-
-		/*if( aUniID[2] < 1 )
-		{
-			aUniID[0] = glGetUniformLocation( gProgID, "tgPX" 	);
-			aUniID[1] = glGetUniformLocation( gProgID, "DIVxy" 	);
-			aUniID[2] = glGetUniformLocation( gProgID, "FRMwh" 	);
-			aUniID[3] = glGetUniformLocation( gProgID, "aTX" 	);
-		}*/
 
 		luXY = lXY;
 		trgWHpx = tWH;
@@ -237,17 +224,9 @@ public:
 			return NULL;
 
 		Fx4 aV4[4];
-
 		glUseProgram( gProgID );
-
 		if( boxXY == xy && boxWH == wh )
-		{
-			/*glBindBuffer( GL_ARRAY_BUFFER, VXbID );
-			//glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableVertexAttribArray( ATvxID );
-			glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(*aV4), 0 );*/
 			return this;
-		}
 
 		if( boxWH.area() )
 			glDeleteBuffers(1,&VXbID);
@@ -275,6 +254,10 @@ public:
 
 		return this;
 	}
+	gpcGL* glSETbox( const I4x4& w )
+	{
+		return glSETbox( w.a4x2[0], w.a4x2[1] );
+	}
 	gpcGL* glSETbox( I4x4 xyWH, const I4x4 divPX, const I4x2& frm )
 	{
 		xyWH &= divPX.a4x2[1];
@@ -289,6 +272,16 @@ public:
 
 		if( aUniID[4] > -1 )
 			glUniform4fv( aUniID[4]+i, 4, (GLfloat*)&xyzw );
+
+		return this;
+	}
+	gpcGL* glSETcnl( U4 i, Fx4* pXYZW, U4 n )
+	{
+		if( !this )
+			return NULL;
+
+		if( aUniID[4] > -1 )
+			glUniform4fv( aUniID[4]+i, 4*n, (GLfloat*)pXYZW );
 
 		return this;
 	}
@@ -311,6 +304,20 @@ public:
 			glUniform2f( aUniID[3]+i, (float)wh.x, (float)wh.y );
 
 		aTXwh[i] = wh;
+		return this;
+	}
+	gpcGL* glSETtx( U4 msk, gpcPIC** ppPIC )
+	{
+		if( !this )
+			return NULL;
+		SDL_Surface* pSURF;
+		for( I4 i = 0; msk; i++, msk>>=1 )
+		{
+			if( (msk&1) ? !ppPIC[i] : true )
+				continue;
+
+			glSETtx( i, ppPIC[i]->surDRWtx(pRNDR), ppPIC[i]->txWH.a4x2[0] );
+		}
 		return this;
 	}
 	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {

@@ -389,13 +389,16 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	U1* pKEYbuff = win.gpsKEYbuff;
 	gpcSRC	tmp, *pSRC, *pS2;
 	U4 xFND, x_fnd;
-	int pic_id = 0;
+	//int aGLpic[0] = 0;
 	I4x4 sprt[2] = {0}, trgWH = 0;
 	win.mZ = mapCR.mapZN44.z;
 	win.mN = mapCR.mapZN44.w;
 	win.mZN = mapCR.mapZN44.a4x2[1].area();
 	I8x4 anRio;
 	gpcLZY hex; U8 s;
+	gpcGL *pGL = win.pGL;
+	char* pVTX = NULL;
+
 
 	if( U4 *pM = win.pM = mapCR.pMAP )
 	if( U4 *pC = win.pC = mapCR.pCOL )
@@ -403,8 +406,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	if( pM < pC )
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{
-		if( pSRC && pic_id )
-			pSRC->picID = pic_id;
+		if( pSRC && aGLpic[0] )
+			pSRC->picID = aGLpic[0];
 
 		if( !pM[i] )
 			continue;
@@ -414,7 +417,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		if( !pSRC )
 			continue;
 
-		pic_id = pSRC->picID = 0;
+		aGLpic[0] = pSRC->picID = 0;
 		gpmDEL( pSRC->apOUT[0] );
 		if( pSRC->qBLD() )
 		{
@@ -464,7 +467,12 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		gpcRES& res = *pSRC->apOUT[3];
 		gpcPIC	*pTRG = NULL, *pPIC = NULL, *pSPR = NULL;
 
-		for( U4 a = 0, ae = res.nFND(); a < ae; a++ )
+		for(
+			U4	a = 0, ae = res.nFND(),
+				nCNL = 0, mskPIC = 0;
+				a < ae;
+				a++
+			)
 		{
 			gpcALU& alu = res.ALU(a);
 			if( alu.alf < gpeALF_AAAAAA )
@@ -482,37 +490,37 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							I4 iCAM = alu.u8();
 							if( !iCAM )
 								break;
-							if( pPIC = PIC.PIC( I8x2(alu.alf,iCAM) ) )
+							if( aGLpPIC[0] = PIC.PIC( I8x2(alu.alf,iCAM) ) )
 							{
 								if( !pCAM )
 									pCAM = new gpcPICAM;
-								U1* pRGB = pPIC->getPIX( pCAM, win.mSEC.y ); //50 );
+								U1* pRGB = aGLpPIC[0]->getPIX( pCAM, win.mSEC.y ); //50 );
 								if( pRGB )
 								{
 									if( pCAM->bGD() )
 									{
-										gpmDEL( pPIC->pPACK );
-										win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, pPIC->id+1, win.mSEC.y, INVALID_SOCKET, 0 ), win.msSYN );
+										gpmDEL( aGLpPIC[0]->pPACK );
+										win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, aGLpPIC[0]->id+1, win.mSEC.y, INVALID_SOCKET, 0 ), win.msSYN );
 									}
 
 									if( !win.pPICbg )
 									{
-										win.pPICbg = pPIC;
+										win.pPICbg = aGLpPIC[0];
 									}
 								}
-								else if( pPIC->pSHR )
-										win.pPICbg = pPIC;
+								else if( aGLpPIC[0]->pSHR )
+										win.pPICbg = aGLpPIC[0];
 							}
 						} break;
 
-					case gpeALF_PIC:{
-							pic_id =	alu.bSTR() ?
+					case gpeALF_PIC: {
+							aGLpic[0] =	alu.bSTR() ?
 										PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
 										: alu.u8();						// száma
 							// be kell mapolni a rublika háterének
-							if( pPIC = PIC.PIC( pic_id ) )
+							if( aGLpPIC[0] = PIC.PIC( aGLpic[0] ) )
 							{
-								pic_id++;
+								aGLpic[0]++;
 								break;
 							}
 
@@ -520,20 +528,44 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							U1* pS = (U1*)alu.pDAT;
 							alfN = pS;
 							alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
-							if( !(pPIC = PIC.PIC( alfN )) )
+							if( !(aGLpPIC[0] = PIC.PIC( alfN )) )
 								break;
 
 						} break;
-					case gpeALF_GPU:{
-							U4 gID =	alu.bSTR() ?
-										GPU.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
-										: alu.u8();
 
+					case gpeALF_VTX: if( pGL ? alu.bSTR() : false ) {
+							pVTX = (char*)alu.pDAT;
+							if( !*pVTX )
+								pVTX = NULL;
+						} break;
+					case gpeALF_PIX: if( pGL ? alu.bSTR() : false ) {
+							gpcALU& aNM = res.ALU(gpeALF_NAME);
+							pGL->GLSLset( aNM, (char*)alu.pDAT, pVTX );
+						} break;
+
+					case gpeALF_TRG:{
+							U8 trg_id =	alu.bSTR() ?
+										PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
+										: alu.u8();						// száma
+							if( pTRG = PIC.PIC( trg_id ) )
+								break;
+
+							I8x2 alfN(0,14);
+							U1* pS = (U1*)alu.pDAT;
+							alfN = pS;
+							alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+							if( !(pTRG = PIC.PIC( alfN )) )
+								break;
 
 						} break;
-					case gpeALF_PIX:
-						if( )
-						if(U1* pGLSL=alu.bSTR()) {
+
+					case gpeALF_GPU:if( pTRG && pGL ) {
+
+							pGL
+                            ->GLSLset( alu )
+                            ->glSETcnl( 0, aGLcnl, nCNL )
+							->glSETtx( mskPIC, aGLpPIC )
+							;
 
 
 						} break;
@@ -600,146 +632,343 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						sprt[0].w = alu.i8();
 						break;
 
-					case gpeALF_TRG:{
-							U8 trg_id =	alu.bSTR() ?
-										PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
-										: alu.u8();						// száma
-							/*if(alu.bSTR())
-							{
-								// ez a kép neve
-								trg_id = PIC.alfFND( (U1*)alu.pDAT );
-							} else
-								trg_id = alu.u8();*/
 
-							if( pTRG = PIC.PIC( trg_id ) )
-								break;
-
-							I8x2 alfN(0,14);
-							U1* pS = (U1*)alu.pDAT;
-							alfN = pS;
-							alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
-							if( !(pTRG = PIC.PIC( alfN )) )
-								break;
-
-						} break;
 					default:
 						break;
 				}
-				} else { //	gpeALF_ZZZZZ // 5 char
-					switch( alu.alf )
-					{
-						/*case gpeALF_NAME:// nevet deklarál mondjuk a rublikának
-							pSRC
-							break;*/
-						case gpeALF_SYNC:
-							if(alu.bSTR())
-							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
-								pGT->GTcnct( win );
+				} else switch( alu.alf ) { //	gpeALF_ZZZZZ // 5 char
 
-							break;
-						case gpeALF_RINP:
-							anRio.a8x2[0].x = alu.i8();
-							anRio.a8x2[0].y = anRio.a8x2[0].x&0xff;
-							anRio.a8x2[0].x >>= 0x10;
-							break;
-						case gpeALF_ROUT:
-							anRio.a8x2[1].x = alu.i8();
-							anRio.a8x2[1].y = anRio.a8x2[1].x&0xff;
-							anRio.a8x2[1].x >>= 0x10;
-							break;
-						case gpeALF_SLMP:
-							if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
+
+
+					case gpeALF_PICo:{
+							aGLpPIC[0] = PIC.aluFND( alu );
+							if( !aGLpPIC[0] )
 								break;
-							// typ: 0x10
-							///   -  -  -  |    : - - - -
-							/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-							if(alu.bSTR())
-							if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
-							{
-								I4 cnt = pGT->iCNT;
-								pGT->GTcnct( win );
-								if( cnt == pGT->iCNT )
-									anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
 
-								if( anRio.a8x2[0].x )
-								if( gpcLZY *pLZYinp = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
-								if( gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, pLZYinp ) )
-								for( U1 i = 0; i < 2; i++ )
+							aGLpic[0] = aGLpPIC[0]->id+1;
+							mskPIC |= 1;
+						} break;
+					case gpeALF_PICi:{
+							aGLpPIC[1] = PIC.aluFND( alu );
+							if( !aGLpPIC[1] )
+								break;
+
+							aGLpic[1] = aGLpPIC[1]->id+1;
+							mskPIC |= 1<<1;
+						} break;
+					case gpeALF_PICv:{
+							aGLpPIC[5] = PIC.aluFND( alu );
+							if( !aGLpPIC[5] )
+								break;
+
+							aGLpic[5] = aGLpPIC[5]->id+1;
+							mskPIC |= 1<<5;
+						} break;
+					case gpeALF_PICx:{
+							aGLpPIC[10] = PIC.aluFND( alu );
+							if( !aGLpPIC[10] )
+								break;
+
+							aGLpic[10] = aGLpPIC[10]->id+1;
+							mskPIC |= 1<<10;
+						} break;
+
+
+
+					case gpeALF_CNLX:
+					case gpeALF_CNLY:
+					case gpeALF_CNLZ:
+					case gpeALF_CNLW:
+						aGLcnl[0].aXYZW[alu.alf-gpeALF_CNLX] = alu.d8();
+						if( nCNL < 1 )
+							nCNL = 1;
+						break;
+					case gpeALF_CNLoX:
+					case gpeALF_CNLoY:
+					case gpeALF_CNLoZ:
+					case gpeALF_CNLoW:
+						aGLcnl[0].aXYZW[alu.alf-gpeALF_CNLoX] = alu.d8();
+						if( nCNL < 1 )
+							nCNL = 1;
+						break;
+					case gpeALF_CNLiX:
+					case gpeALF_CNLiY:
+					case gpeALF_CNLiZ:
+					case gpeALF_CNLiW:
+						aGLcnl[1].aXYZW[alu.alf-gpeALF_CNLiX] = alu.d8();
+						if( nCNL < 2 )
+							nCNL = 2;
+						break;
+					case gpeALF_CNLvX:
+					case gpeALF_CNLvY:
+					case gpeALF_CNLvZ:
+					case gpeALF_CNLvW:
+						aGLcnl[5].aXYZW[alu.alf-gpeALF_CNLvX] = alu.d8();
+						if( nCNL < 6 )
+							nCNL = 6;
+						break;
+					case gpeALF_CNLxX:
+					case gpeALF_CNLxY:
+					case gpeALF_CNLxZ:
+					case gpeALF_CNLxW:
+						aGLcnl[10].aXYZW[alu.alf-gpeALF_CNLvX] = alu.d8();
+						if( nCNL < 11 )
+							nCNL = 11;
+						break;
+
+					/*case gpeALF_NAME:// nevet deklarál mondjuk a rublikának
+						pSRC
+						break;*/
+					case gpeALF_SYNC:
+						if(alu.bSTR())
+						if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
+							pGT->GTcnct( win );
+
+						break;
+					case gpeALF_RINP:
+						anRio.a8x2[0].x = alu.i8();
+						anRio.a8x2[0].y = anRio.a8x2[0].x&0xff;
+						anRio.a8x2[0].x >>= 0x10;
+						break;
+					case gpeALF_ROUT:
+						anRio.a8x2[1].x = alu.i8();
+						anRio.a8x2[1].y = anRio.a8x2[1].x&0xff;
+						anRio.a8x2[1].x >>= 0x10;
+						break;
+					case gpeALF_SLMP: {
+						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
+							break;
+						// typ: 0x10
+						///   -  -  -  |    : - - - -
+						/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+						if(alu.bSTR())
+						if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
+						{
+							I4 cnt = pGT->iCNT;
+							pGT->GTcnct( win );
+							if( cnt == pGT->iCNT )
+								anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
+
+							if( anRio.a8x2[0].x )
+							if( gpcLZY *pLZYinp = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, pLZYinp ) )
+							for( U1 i = 0; i < 2; i++ )
+							{
+								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
+								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+
+								if( !pS2 )
 								{
-									x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
+									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
+									if( !pS2 )
+										continue;
+								}
+								if( pS2 == pSRC )
+									continue;
+								hex.lzyFRMT( s=0, "\r\n\"\r\n" );
+								hex.lzyRST()->lzyZSnD( s=-1, *pZSnD, i );
+								hex.lzyFRMT( s=-1, "\"\r\n" );
+								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
+								pS2->srcUPDT();
+							}
+
+
+							if( anRio.a8x2[1].x )
+							{
+								// INP
+								if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+								if( pLZYin->n_load )
+								{
+									x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
 									pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
 									i = jDOitREF( win, i, ie, &pM, &pC, &pR );
 
 									if( !pS2 )
 									{
-										pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
+										pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
 										if( !pS2 )
 											continue;
 									}
 									if( pS2 == pSRC )
 										continue;
-									hex.lzyFRMT( s=0, "\r\n\"\r\n" );
-									hex.lzyRST()->lzyZSnD( s=-1, *pZSnD, i );
-									hex.lzyFRMT( s=-1, "\"\r\n" );
+
+									hex.lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
 									pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 									pS2->srcUPDT();
+
+
 								}
-
-
-								if( anRio.a8x2[1].x )
-								{
-									// INP
-									if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
-									if( pLZYin->n_load )
-									{
-                                        x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
-										pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
-										i = jDOitREF( win, i, ie, &pM, &pC, &pR );
-
-										if( !pS2 )
-										{
-											pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
-											if( !pS2 )
-												continue;
-										}
-										if( pS2 == pSRC )
-											continue;
-
-										hex.lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
-										pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
-										pS2->srcUPDT();
-
-
-									}
-									anRio.a8x2[0].x = 0;
-								}
-
+								anRio.a8x2[0].x = 0;
 							}
 
-							break;
-						case gpeALF_TRGH:
-							trgWH.w = alu.u8();
-							break;
-						case gpeALF_TRGW:
-							trgWH.z = alu.u8();
-							break;
-						case gpeALF_UNSEL:
-							if( alu.u8()&1 )
-								pSRC->bSW |= gpeMASSunselMSK;
-							else
-								pSRC->bSW &= ~gpeMASSunselMSK;
-							break;
-						case gpeALF_GPIO:
+						}
 
-							break;
-						default:
-							break;
-					}
+						} break;
+					case gpeALF_TRGH:
+						trgWH.w = alu.u8();
+						break;
+					case gpeALF_TRGW:
+						trgWH.z = alu.u8();
+						break;
+					case gpeALF_UNSEL:
+						if( alu.u8()&1 )
+							pSRC->bSW |= gpeMASSunselMSK;
+						else
+							pSRC->bSW &= ~gpeMASSunselMSK;
+						break;
+					case gpeALF_GPIO:
+
+						break;
+					default:
+						break;
 				}
-
+				//}
 			}
 			else switch( alu.alf )
 			{
+				case gpeALF_CNLiiX:
+				case gpeALF_CNLiiY:
+				case gpeALF_CNLiiZ:
+				case gpeALF_CNLiiW:
+					aGLcnl[2].aXYZW[alu.alf-gpeALF_CNLiiX] = alu.d8();
+					if( nCNL < 3 )
+						nCNL = 3;
+					break;
+				case gpeALF_CNLiiiX:
+				case gpeALF_CNLiiiY:
+				case gpeALF_CNLiiiZ:
+				case gpeALF_CNLiiiW:
+					aGLcnl[3].aXYZW[alu.alf-gpeALF_CNLiiiX] = alu.d8();
+					if( nCNL < 4 )
+						nCNL = 4;
+					break;
+				case gpeALF_CNLivX:
+				case gpeALF_CNLivY:
+				case gpeALF_CNLivZ:
+				case gpeALF_CNLivW:
+					aGLcnl[4].aXYZW[alu.alf-gpeALF_CNLivX] = alu.d8();
+					if( nCNL < 5 )
+						nCNL = 5;
+					break;
+				case gpeALF_CNLviX:
+				case gpeALF_CNLviY:
+				case gpeALF_CNLviZ:
+				case gpeALF_CNLviW:
+					aGLcnl[6].aXYZW[alu.alf-gpeALF_CNLviX] = alu.d8();
+					if( nCNL < 7 )
+						nCNL = 7;
+					break;
+				case gpeALF_CNLviiX:
+				case gpeALF_CNLviiY:
+				case gpeALF_CNLviiZ:
+				case gpeALF_CNLviiW:
+					aGLcnl[7].aXYZW[alu.alf-gpeALF_CNLviiX] = alu.d8();
+					if( nCNL < 8 )
+						nCNL = 8;
+					break;
+				case gpeALF_CNLixX:
+				case gpeALF_CNLixY:
+				case gpeALF_CNLixZ:
+				case gpeALF_CNLixW:
+					aGLcnl[8].aXYZW[alu.alf-gpeALF_CNLixX] = alu.d8();
+					if( nCNL < 9 )
+						nCNL = 9;
+					break;
+				case gpeALF_CNLxiX:
+				case gpeALF_CNLxiY:
+				case gpeALF_CNLxiZ:
+				case gpeALF_CNLxiW:
+					aGLcnl[11].aXYZW[alu.alf-gpeALF_CNLxiX] = alu.d8();
+					if( nCNL < 12 )
+						nCNL = 12;
+					break;
+				case gpeALF_CNLxiiX:
+				case gpeALF_CNLxiiY:
+				case gpeALF_CNLxiiZ:
+				case gpeALF_CNLxiiW:
+					aGLcnl[12].aXYZW[alu.alf-gpeALF_CNLxiiX] = alu.d8();
+					if( nCNL < 13 )
+						nCNL = 13;
+					break;
+
+
+
+				case gpeALF_PICii:{
+							aGLpPIC[2] = PIC.aluFND( alu );
+							if( !aGLpPIC[2] )
+								break;
+
+							aGLpic[2] = aGLpPIC[2]->id+1;
+							mskPIC |= 1<<3;
+						} break;
+				case gpeALF_PICiii:{
+							aGLpPIC[3] = PIC.aluFND( alu );
+							if( !aGLpPIC[3] )
+								break;
+
+							aGLpic[3] = aGLpPIC[3]->id+1;
+							mskPIC |= 1<<4;
+						} break;
+				case gpeALF_PICiv:{
+							aGLpPIC[4] = PIC.aluFND( alu );
+							if( !aGLpPIC[4] )
+								break;
+
+							aGLpic[4] = aGLpPIC[4]->id+1;
+							mskPIC |= 1<<4;
+						} break;
+				case gpeALF_PICvi:{
+							aGLpPIC[6] = PIC.aluFND( alu );
+							if( !aGLpPIC[6] )
+								break;
+
+							aGLpic[6] = aGLpPIC[6]->id+1;
+							mskPIC |= 1<<6;
+						} break;
+				case gpeALF_PICvii:{
+							aGLpPIC[7] = PIC.aluFND( alu );
+							if( !aGLpPIC[7] )
+								break;
+
+							aGLpic[7] = aGLpPIC[7]->id+1;
+							mskPIC |= 1<<7;
+						} break;
+				case gpeALF_PICviii:{
+							aGLpPIC[8] = PIC.aluFND( alu );
+							if( !aGLpPIC[8] )
+								break;
+
+							aGLpic[8] = aGLpPIC[8]->id+1;
+							mskPIC |= 1<<8;
+						} break;
+				case gpeALF_PICix:{
+							aGLpPIC[9] = PIC.aluFND( alu );
+							if( !aGLpPIC[9] )
+								break;
+
+							aGLpic[9] = aGLpPIC[9]->id+1;
+							mskPIC |= 1<<9;
+						} break;
+				case gpeALF_PICxi:{
+							aGLpPIC[11] = PIC.aluFND( alu );
+							if( !aGLpPIC[11] )
+								break;
+
+							aGLpic[11] = aGLpPIC[11]->id+1;
+							mskPIC |= 1<<11;
+						} break;
+				case gpeALF_PICxii:{
+							aGLpPIC[12] = PIC.aluFND( alu );
+							if( !aGLpPIC[12] )
+								break;
+
+							aGLpic[12] = aGLpPIC[12]->id+1;
+							mskPIC |= 1<<12;
+						} break;
+
+
+
 				case gpeALF_SPRITE: {
 						U8 spr_id = 0;
 						if(alu.bSTR())

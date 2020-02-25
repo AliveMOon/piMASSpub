@@ -660,7 +660,9 @@ typedef enum gpeALF: I8
 	gpeALF_OFF = gpdABC('O', 'F', 'F'),
 	gpeALF_ORM = gpdABC('O', 'R', 'M'),
 	gpeALF_OUT = gpdABC('O', 'U', 'T'),
+	/// PIC 0 -----------------------------------------------
 	gpeALF_PIC = gpdABC('P', 'I', 'C'),
+	/// PIX dx PixelShader gl FragmentShader
 	gpeALF_PIX = gpdABC('P', 'I', 'X'),
 	gpeALF_PMX = gpdABC('P', 'M', 'X'),
 	gpeALF_PMY = gpdABC('P', 'M', 'Y'),
@@ -711,6 +713,8 @@ typedef enum gpeALF: I8
 	gpeALF_VAR = gpdABC('V', 'A', 'R'),
 	gpeALF_VEC = gpdABC('V', 'E', 'C'),
 	gpeALF_VOX = gpdABC('V', 'O', 'X'),
+	/// VTX dx gl VertexShader
+	gpeALF_VTX = gpdABC('V', 'T', 'X'),
 	gpeALF_WIN = gpdABC('W', 'I', 'N'),
 	gpeALF_WMX = gpdABC('W', 'M', 'X'),
 	gpeALF_WMY = gpdABC('W', 'M', 'Y'),
@@ -739,6 +743,12 @@ typedef enum gpeALF: I8
 	gpeALF_COMS = gpdABCD('C', 'O', 'M', 'S'),
 
 	gpeALF_COPY = gpdABCD('C', 'O', 'P', 'Y'),
+
+	gpeALF_CNLX = gpdABCD('C', 'N', 'L', 'X'),
+	gpeALF_CNLY = gpdABCD('C', 'N', 'L', 'Y'),
+	gpeALF_CNLZ = gpdABCD('C', 'N', 'L', 'Z'),
+	gpeALF_CNLW = gpdABCD('C', 'N', 'L', 'W'),
+
 	gpeALF_CRSA = gpdABCD('C', 'R', 'S', 'A'),
 	gpeALF_CRSL = gpdABCD('C', 'R', 'S', 'L'),
 	gpeALF_CRSN = gpdABCD('C', 'R', 'S', 'N'),
@@ -826,6 +836,18 @@ typedef enum gpeALF: I8
 	gpeALF_PARA = gpdABCD('P', 'A', 'R', 'A'),
 	gpeALF_PASS = gpdABCD('P', 'A', 'S', 'S'),
 
+
+	/// PICo 0 -----------------------------------------------
+	gpeALF_PICo = gpdABCD('P', 'I', 'C', 'O'),
+	/// i 1
+	gpeALF_PICi = gpdABCD('P', 'I', 'C', 'I'),
+	/// v 5
+	gpeALF_PICv = gpdABCD('P', 'I', 'C', 'V'),
+	/// x 10
+	gpeALF_PICx = gpdABCD('P', 'I', 'C', 'X'),
+
+
+
 	gpeALF_PIXN = gpdABCD('P', 'I', 'X', 'N'),
 	gpeALF_POLY = gpdABCD('P', 'O', 'L', 'Y'),
 	gpeALF_PORT = gpdABCD('P', 'O', 'R', 'T'),
@@ -885,6 +907,31 @@ typedef enum gpeALF: I8
 	gpeALF_BUBLE = gpdABCDE('B', 'U', 'B', 'L', 'E'),
 	gpeALF_CACHE = gpdABCDE('C', 'A', 'C', 'H', 'E'),
 	gpeALF_CLASS = gpdABCDE('C', 'L', 'A', 'S', 'S'),
+
+	/// CNL -----------------------------------------------
+	/// i 1
+	gpeALF_CNLiX = gpdABCDE('C', 'N', 'L', 'I', 'X'),
+	gpeALF_CNLiY = gpdABCDE('C', 'N', 'L', 'I', 'Y'),
+	gpeALF_CNLiZ = gpdABCDE('C', 'N', 'L', 'I', 'Z'),
+	gpeALF_CNLiW = gpdABCDE('C', 'N', 'L', 'I', 'W'),
+	/// o 0
+	gpeALF_CNLoX = gpdABCDE('C', 'N', 'L', 'O', 'X'),
+	gpeALF_CNLoY = gpdABCDE('C', 'N', 'L', 'O', 'Y'),
+	gpeALF_CNLoZ = gpdABCDE('C', 'N', 'L', 'O', 'Z'),
+	gpeALF_CNLoW = gpdABCDE('C', 'N', 'L', 'O', 'W'),
+	/// v 5
+	gpeALF_CNLvX = gpdABCDE('C', 'N', 'L', 'V', 'X'),
+	gpeALF_CNLvY = gpdABCDE('C', 'N', 'L', 'V', 'Y'),
+	gpeALF_CNLvZ = gpdABCDE('C', 'N', 'L', 'V', 'Z'),
+	gpeALF_CNLvW = gpdABCDE('C', 'N', 'L', 'V', 'W'),
+	/// x 10
+	gpeALF_CNLxX = gpdABCDE('C', 'N', 'L', 'X', 'X'),
+	gpeALF_CNLxY = gpdABCDE('C', 'N', 'L', 'X', 'Y'),
+	gpeALF_CNLxZ = gpdABCDE('C', 'N', 'L', 'X', 'Z'),
+	gpeALF_CNLxW = gpdABCDE('C', 'N', 'L', 'X', 'W'),
+
+
+
 	gpeALF_COLOR = gpdABCDE('C', 'O', 'L', 'O', 'R'),
 	gpeALF_CONST = gpdABCDE('C', 'O', 'N', 'S', 'T'),
 	gpeALF_COUNT = gpdABCDE('C', 'O', 'U', 'N', 'T'),
@@ -918,7 +965,17 @@ typedef enum gpeALF: I8
 	gpeALF_PASTE = gpdABCDE('P', 'A', 'S', 'T', 'E'),
 	gpeALF_PICQC = gpdABCDE('P', 'I', 'C', 'Q', 'C'),
 	gpeALF_PRINT = gpdABCDE('P', 'R', 'I', 'N', 'T'),
+
+
+	/// PICii 2 -----------------------------------------------
+	gpeALF_PICii = gpdABCDE('P', 'I', 'C', 'I', 'I'),	// 2
+	gpeALF_PICiv = gpdABCDE('P', 'I', 'C', 'I', 'V'),	// 4
+	gpeALF_PICvi = gpdABCDE('P', 'I', 'C', 'V', 'I'),	// 6
+	gpeALF_PICix = gpdABCDE('P', 'I', 'C', 'I', 'X'),	// 9
+	gpeALF_PICxi = gpdABCDE('P', 'I', 'C', 'X', 'I'),	// 11
+
 	gpeALF_REPIC = gpdABCDE('R', 'E', 'P', 'I', 'C'),
+
 
 	gpeALF_RESET = gpdABCDE('R', 'E', 'S', 'E', 'T'),
 
@@ -966,6 +1023,36 @@ typedef enum gpeALF: I8
 	gpeALF_ABOARD = gpdABCDEF('A', 'B', 'O', 'A', 'R', 'D'),
 	gpeALF_BUBLER = gpdABCDEF('B', 'U', 'B', 'L', 'E', 'R'),
 	gpeALF_CONSTR = gpdABCDEF('C', 'O', 'N', 'S', 'T', 'R'),
+
+
+	/// CNL -----------------------------------------------
+	/// ii 2
+	gpeALF_CNLiiX = gpdABCDEF('C', 'N', 'L', 'I', 'I', 'X'),
+	gpeALF_CNLiiY = gpdABCDEF('C', 'N', 'L', 'I', 'I', 'Y'),
+	gpeALF_CNLiiZ = gpdABCDEF('C', 'N', 'L', 'I', 'I', 'Z'),
+	gpeALF_CNLiiW = gpdABCDEF('C', 'N', 'L', 'I', 'I', 'W'),
+	/// iv 4
+	gpeALF_CNLivX = gpdABCDEF('C', 'N', 'L', 'I', 'V', 'X'),
+	gpeALF_CNLivY = gpdABCDEF('C', 'N', 'L', 'I', 'V', 'Y'),
+	gpeALF_CNLivZ = gpdABCDEF('C', 'N', 'L', 'I', 'V', 'Z'),
+	gpeALF_CNLivW = gpdABCDEF('C', 'N', 'L', 'I', 'V', 'W'),
+	/// vi 6
+	gpeALF_CNLviX = gpdABCDEF('C', 'N', 'L', 'V', 'I', 'X'),
+	gpeALF_CNLviY = gpdABCDEF('C', 'N', 'L', 'V', 'I', 'Y'),
+	gpeALF_CNLviZ = gpdABCDEF('C', 'N', 'L', 'V', 'I', 'Z'),
+	gpeALF_CNLviW = gpdABCDEF('C', 'N', 'L', 'V', 'I', 'W'),
+	/// ix 9
+	gpeALF_CNLixX = gpdABCDEF('C', 'N', 'L', 'I', 'X', 'X'),
+	gpeALF_CNLixY = gpdABCDEF('C', 'N', 'L', 'I', 'X', 'Y'),
+	gpeALF_CNLixZ = gpdABCDEF('C', 'N', 'L', 'I', 'X', 'Z'),
+	gpeALF_CNLixW = gpdABCDEF('C', 'N', 'L', 'I', 'X', 'W'),
+	/// xi 11
+	gpeALF_CNLxiX = gpdABCDEF('C', 'N', 'L', 'X', 'I', 'X'),
+	gpeALF_CNLxiY = gpdABCDEF('C', 'N', 'L', 'X', 'I', 'Y'),
+	gpeALF_CNLxiZ = gpdABCDEF('C', 'N', 'L', 'X', 'I', 'Z'),
+	gpeALF_CNLxiW = gpdABCDEF('C', 'N', 'L', 'X', 'I', 'W'),
+
+
 	gpeALF_ELAPSE = gpdABCDEF('E', 'L', 'A', 'P', 'S', 'E'),
 	gpeALF_FERIKE = gpdABCDEF('F', 'E', 'R', 'I', 'K', 'E'),
 	gpeALF_FLINCH = gpdABCDEF('F', 'L', 'I', 'N', 'C', 'H'),
@@ -986,6 +1073,12 @@ typedef enum gpeALF: I8
 	gpeALF_PLANET = gpdABCDEF('P', 'L', 'A', 'N', 'E', 'T'),
 	gpeALF_POLYER = gpdABCDEF('P', 'O', 'L', 'Y', 'E', 'R'),
 	gpeALF_PRAGMA = gpdABCDEF('P', 'R', 'A', 'G', 'M', 'A'),
+
+	/// PICiii 3 -----------------------------------------------
+	gpeALF_PICiii = gpdABCDEF('P', 'I', 'C', 'I', 'I', 'I'), // 3
+	gpeALF_PICvii = gpdABCDEF('P', 'I', 'C', 'V', 'I', 'I'), // 7
+	gpeALF_PICxii = gpdABCDEF('P', 'I', 'C', 'X', 'I', 'I'), // 12
+
 	gpeALF_REGGIO = gpdABCDEF('R', 'E', 'G', 'G', 'I', 'O'),
 	gpeALF_RENAME = gpdABCDEF('R', 'E', 'N', 'A', 'M', 'E'),
 	gpeALF_RETURN = gpdABCDEF('R', 'E', 'T', 'U', 'R', 'N'),
@@ -1010,6 +1103,26 @@ typedef enum gpeALF: I8
 	gpeALF_AAAAAAA = gpdABCDEFG('A', 'A', 'A', 'A', 'A', 'A', 'A'),
 	gpeALF_ACCOUNT = gpdABCDEFG('A', 'C', 'C', 'O', 'U', 'N', 'T'),
 	gpeALF_CAMLIST = gpdABCDEFG('C', 'A', 'M', 'L', 'I', 'S', 'T'),
+
+	/// CNL -----------------------------------------------
+	/// iii 3
+	gpeALF_CNLiiiX = gpdABCDEFG('C', 'N', 'L', 'I', 'I', 'I', 'X'),
+	gpeALF_CNLiiiY = gpdABCDEFG('C', 'N', 'L', 'I', 'I', 'I', 'Y'),
+	gpeALF_CNLiiiZ = gpdABCDEFG('C', 'N', 'L', 'I', 'I', 'I', 'Z'),
+	gpeALF_CNLiiiW = gpdABCDEFG('C', 'N', 'L', 'I', 'I', 'I', 'W'),
+	/// vii 7
+	gpeALF_CNLviiX = gpdABCDEFG('C', 'N', 'L', 'V', 'I', 'I', 'X'),
+	gpeALF_CNLviiY = gpdABCDEFG('C', 'N', 'L', 'V', 'I', 'I', 'Y'),
+	gpeALF_CNLviiZ = gpdABCDEFG('C', 'N', 'L', 'V', 'I', 'I', 'Z'),
+	gpeALF_CNLviiW = gpdABCDEFG('C', 'N', 'L', 'V', 'I', 'I', 'W'),
+	/// xii 12
+	gpeALF_CNLxiiX = gpdABCDEFG('C', 'N', 'L', 'X', 'I', 'I', 'X'),
+	gpeALF_CNLxiiY = gpdABCDEFG('C', 'N', 'L', 'X', 'I', 'I', 'Y'),
+	gpeALF_CNLxiiZ = gpdABCDEFG('C', 'N', 'L', 'X', 'I', 'I', 'Z'),
+	gpeALF_CNLxiiW = gpdABCDEFG('C', 'N', 'L', 'X', 'I', 'I', 'W'),
+
+
+
 	gpeALF_CONNECT = gpdABCDEFG('C', 'O', 'N', 'N', 'E', 'C', 'T'),
 	gpeALF_COMMAND = gpdABCDEFG('C', 'O', 'M', 'M', 'A', 'N', 'D'),
 
@@ -1025,8 +1138,14 @@ typedef enum gpeALF: I8
 	gpeALF_MWLQKWU = gpdABCDEFG('M', 'W', 'L', 'Q', 'K', 'W', 'U'),
 	gpeALF_U4      = gpeALF_MWLQKWU,
 
+
 	gpeALF_PICCPYE = gpdABCDEFG('P', 'I', 'C', 'C', 'P', 'Y', 'E'),
+	/// PICviii -----------------------------------------------
+	gpeALF_PICviii = gpdABCDEFG('P', 'I', 'C', 'v', 'i', 'i', 'i'), // 8
+
 	gpeALF_PICLIST = gpdABCDEFG('P', 'I', 'C', 'L', 'I', 'S', 'T'),
+
+
 	gpeALF_REFERER = gpdABCDEFG('R', 'E', 'F', 'E', 'R', 'E', 'R'),
 	gpeALF_RESTART = gpdABCDEFG('R', 'E', 'S', 'T', 'A', 'R', 'T'),
 	//gpeALF_INCLUDE =	gpdABCDEFG( 'I','N','C','L','U','D','E' ),

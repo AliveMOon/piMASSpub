@@ -212,7 +212,7 @@ class I4x4;
 class I8x2;
 class I8x4;
 class gpcMASS;
-
+class gpcALU;
 //#define gpm_bool( b, p ) if( b ){ (p) }
 
 #define gpdGT_NoDALEY 1 	//0 //
@@ -3771,6 +3771,10 @@ public:
 		struct
 		{
 			float x,y,z,w;
+		};
+		struct
+		{
+			float aXYZW[4];
 		};
 		struct
 		{

@@ -278,3 +278,18 @@ U4 gpcPICall::alfFND( U1* pS )
 	}
 	return nPICld;
 }
+gpcPIC*	gpcPICall::aluFND( gpcALU& alu )
+{
+	U4 i =	alu.bSTR() ?
+			alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
+			: alu.u8();
+
+	if( pPIC = PIC(i) )
+		return pPIC;
+
+	I8x2 alfN(0,14);
+	U1* pS = (U1*)alu.pDAT;
+	alfN = pS;
+	alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+	return PIC( alfN );
+}
