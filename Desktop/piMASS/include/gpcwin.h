@@ -77,36 +77,8 @@ public:
 
 		return nT;
 	}
-	gpcGLSL* pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  )
-	{
-		if( !this )
-		{
-			gpcGLSL* pTHIS = new gpcGLSL( an, pF, pV );
-			if( !pTHIS )
-				return NULL;
+	gpcGLSL* pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  );
 
-			if( (pTHIS->nSUCC&0x7) != 0x7 )
-			{
-				gpmDEL(pTHIS);
-				return NULL;
-			}
-
-			return pTHIS->pNEW( an, pF, pV );
-		}
-		fndTX( pATtx );
-		// ATTRIBUTES ----------------------
-		ATvxID = glGetAttribLocation( PrgID, pATvx );
-		if( ATvxID < 0 )
-			return this;
-		nSUCC |= 8;
-
-		ATuvID = glGetAttribLocation( PrgID, pATuv );
-		if( ATuvID < 0 )
-			return this;
-
-		nSUCC |= 0x10;
-		return this;
-	}
 };
 class gpcGL
 {
@@ -172,7 +144,7 @@ public:
 		if( pRTX )
 		{
 			SDL_SetRenderTarget( pRNDR, NULL );
-			SDL_RenderCopy( pRNDR, pRTX, NULL, NULL ); //&t2Rect );
+			SDL_RenderCopy( pRNDR, pRTX, NULL, NULL );
 
 			int w = 0, h = 0, acc = 0;
 			U4 frm;

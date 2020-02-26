@@ -353,8 +353,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	}
 }
 
-void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT )
-{
+void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT ) {
 	if( miniLOCK( pPIC, pRNDR, win.wDIVcrALLOCK() ) )
 		return;
 	//U4 xFND;

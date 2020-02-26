@@ -343,32 +343,37 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
 		}
 		if( pRTX != pT->pRTX )
 		{
+
 			//SDL_RenderPresent(pRNDR);
 			SDL_SetRenderTarget( pRNDR, NULL );
 			SDL_RenderCopy( pRNDR, pRTX, NULL, NULL );
+
 			if( pPICrtx )
 			{
 				if( pPICrtx->pSRF )
 					SDL_RenderReadPixels(pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
 
 			}
+
 		}
 		pPICrtx = pT;
 		SDL_SetRenderTarget( pRNDR, pRTX = pPICrtx->pRTX );
+		//pRTX = SDL_GetRenderTarget(pRNDR);
 		gpmSDL_FreeTX(pPICrtx->pTX);
 		if( !pPICrtx->pSRF )
 			pPICrtx->pSRF = SDL_CreateRGBSurface( 0, wh.x, wh.y, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
 		pPICrtx->pREF = NULL;
 		//pPICrtx->nCPY = 0;
+		//SDL_RenderClear();
 	}
 
-	GLbitfield b = 0;
+	GLbitfield b = GL_STENCIL_BUFFER_BIT;
 	if( bCLR )
 		b |= GL_COLOR_BUFFER_BIT;
 	if( bDEP )
 		b |= GL_DEPTH_BUFFER_BIT;
 
-	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
+	glClearColor( 0.0f, 0.0f, 0.25, 1.0f );
 	glClearDepth(1.0);
 	glClear( b );
 	glViewport( 0, 0, wh.x, wh.y );
@@ -494,6 +499,36 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 	}
 
 	return GL_TRUE;
+}
+gpcGLSL* gpcGLSL::pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx, const char* pATuv, const char* pATtx )
+{
+	if( !this )
+	{
+		gpcGLSL* pTHIS = new gpcGLSL( an, pF, pV );
+		if( !pTHIS )
+			return NULL;
+
+		if( (pTHIS->nSUCC&0x7) != 0x7 )
+		{
+			gpmDEL(pTHIS);
+			return NULL;
+		}
+
+		return pTHIS->pNEW( an, pF, pV, pATvx, pATuv, pATtx );
+	}
+	fndTX( pATtx );
+	// ATTRIBUTES ----------------------
+	ATvxID = glGetAttribLocation( PrgID, pATvx );
+	if( ATvxID < 0 )
+		return this;
+	nSUCC |= 8;
+
+	ATuvID = glGetAttribLocation( PrgID, pATuv );
+	if( ATuvID < 0 )
+		return this;
+
+	nSUCC |= 0x10;
+	return this;
 }
 gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV ) {
 	if( !this )

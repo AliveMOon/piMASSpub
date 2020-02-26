@@ -684,7 +684,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_CNLY:
 					case gpeALF_CNLZ:
 					case gpeALF_CNLW:
-						aGLcnl[0].aXYZW[alu.alf-gpeALF_CNLX] = alu.d8();
+						aGLcnl[0].aXYZW[(alu.alf-gpeALF_CNLT)%4] = alu.d8();
 						if( nCNL < 1 )
 							nCNL = 1;
 						break;
@@ -692,7 +692,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_CNLoY:
 					case gpeALF_CNLoZ:
 					case gpeALF_CNLoW:
-						aGLcnl[0].aXYZW[alu.alf-gpeALF_CNLoX] = alu.d8();
+						aGLcnl[0].aXYZW[(alu.alf-gpeALF_CNLoT)%4] = alu.d8();
 						if( nCNL < 1 )
 							nCNL = 1;
 						break;
@@ -700,7 +700,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_CNLiY:
 					case gpeALF_CNLiZ:
 					case gpeALF_CNLiW:
-						aGLcnl[1].aXYZW[alu.alf-gpeALF_CNLiX] = alu.d8();
+						aGLcnl[1].aXYZW[(alu.alf-gpeALF_CNLiT)%4] = alu.d8();
 						if( nCNL < 2 )
 							nCNL = 2;
 						break;
@@ -708,7 +708,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_CNLvY:
 					case gpeALF_CNLvZ:
 					case gpeALF_CNLvW:
-						aGLcnl[5].aXYZW[alu.alf-gpeALF_CNLvX] = alu.d8();
+						aGLcnl[5].aXYZW[(alu.alf-gpeALF_CNLvT)%4] = alu.d8();
 						if( nCNL < 6 )
 							nCNL = 6;
 						break;
@@ -716,7 +716,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_CNLxY:
 					case gpeALF_CNLxZ:
 					case gpeALF_CNLxW:
-						aGLcnl[10].aXYZW[alu.alf-gpeALF_CNLvX] = alu.d8();
+						aGLcnl[10].aXYZW[(alu.alf-gpeALF_CNLxT)%4] = alu.d8();
 						if( nCNL < 11 )
 							nCNL = 11;
 						break;
@@ -836,7 +836,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLiiY:
 				case gpeALF_CNLiiZ:
 				case gpeALF_CNLiiW:
-					aGLcnl[2].aXYZW[alu.alf-gpeALF_CNLiiX] = alu.d8();
+					aGLcnl[2].aXYZW[(alu.alf-gpeALF_CNLiiT)%4] = alu.d8();
 					if( nCNL < 3 )
 						nCNL = 3;
 					break;
@@ -844,7 +844,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLiiiY:
 				case gpeALF_CNLiiiZ:
 				case gpeALF_CNLiiiW:
-					aGLcnl[3].aXYZW[alu.alf-gpeALF_CNLiiiX] = alu.d8();
+					aGLcnl[3].aXYZW[(alu.alf-gpeALF_CNLiiiT)%4] = alu.d8();
 					if( nCNL < 4 )
 						nCNL = 4;
 					break;
@@ -852,7 +852,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLivY:
 				case gpeALF_CNLivZ:
 				case gpeALF_CNLivW:
-					aGLcnl[4].aXYZW[alu.alf-gpeALF_CNLivX] = alu.d8();
+					aGLcnl[4].aXYZW[(alu.alf-gpeALF_CNLivT)%4] = alu.d8();
 					if( nCNL < 5 )
 						nCNL = 5;
 					break;
@@ -860,7 +860,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLviY:
 				case gpeALF_CNLviZ:
 				case gpeALF_CNLviW:
-					aGLcnl[6].aXYZW[alu.alf-gpeALF_CNLviX] = alu.d8();
+					aGLcnl[6].aXYZW[(alu.alf-gpeALF_CNLviT)%4] = alu.d8();
 					if( nCNL < 7 )
 						nCNL = 7;
 					break;
@@ -868,7 +868,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLviiY:
 				case gpeALF_CNLviiZ:
 				case gpeALF_CNLviiW:
-					aGLcnl[7].aXYZW[alu.alf-gpeALF_CNLviiX] = alu.d8();
+					aGLcnl[7].aXYZW[(alu.alf-gpeALF_CNLviiT)%4] = alu.d8();
 					if( nCNL < 8 )
 						nCNL = 8;
 					break;
@@ -876,7 +876,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLixY:
 				case gpeALF_CNLixZ:
 				case gpeALF_CNLixW:
-					aGLcnl[8].aXYZW[alu.alf-gpeALF_CNLixX] = alu.d8();
+					aGLcnl[8].aXYZW[(alu.alf-gpeALF_CNLixT)%4] = alu.d8();
 					if( nCNL < 9 )
 						nCNL = 9;
 					break;
@@ -884,7 +884,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLxiY:
 				case gpeALF_CNLxiZ:
 				case gpeALF_CNLxiW:
-					aGLcnl[11].aXYZW[alu.alf-gpeALF_CNLxiX] = alu.d8();
+					aGLcnl[11].aXYZW[(alu.alf-gpeALF_CNLxiT)%4] = alu.d8();
 					if( nCNL < 12 )
 						nCNL = 12;
 					break;
@@ -892,7 +892,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				case gpeALF_CNLxiiY:
 				case gpeALF_CNLxiiZ:
 				case gpeALF_CNLxiiW:
-					aGLcnl[12].aXYZW[alu.alf-gpeALF_CNLxiiX] = alu.d8();
+					aGLcnl[12].aXYZW[(alu.alf-gpeALF_CNLxiiT)%4] = alu.d8();
 					if( nCNL < 13 )
 						nCNL = 13;
 					break;
@@ -905,7 +905,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								break;
 
 							aGLpic[2] = aGLpPIC[2]->id+1;
-							mskPIC |= 1<<3;
+							mskPIC |= 1<<2;
 						} break;
 				case gpeALF_PICiii:{
 							aGLpPIC[3] = PIC.aluFND( alu );
@@ -913,7 +913,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								break;
 
 							aGLpic[3] = aGLpPIC[3]->id+1;
-							mskPIC |= 1<<4;
+							mskPIC |= 1<<3;
 						} break;
 				case gpeALF_PICiv:{
 							aGLpPIC[4] = PIC.aluFND( alu );
