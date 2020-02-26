@@ -10,40 +10,43 @@
  f = fps; 
   b1	 
  pic = "gui";
- unsel = 1; c1	 
+ unsel = 1;
+  c1	 
+ name="paint"
+ pix ="
+
+#version 120																
+varying vec2 fr_uv;														
+uniform sampler2D	tex0;							
+uniform sampler2D	tex1;					
+uniform vec2		aTX[8];		
+uniform vec4 		aCNL[8];											
+void main()																
+{																		
+	gl_FragColor =	texture2D( tex0, fr_uv );
+	gl_FragColor.rg += 0.0f 
+ 						- // 1.0f*
+ 						(fr_uv - (aCNL[0].xy/aTX[0]));
+	gl_FragColor /= 2.0;														
+}																		
+ 	
+  "  
+  d1	 
  
  trg = "gui";
- trgw = 960;
- trgh = 960;
+ trgw = 480;
+ trgh = 480;
  
- pici="cam1";
- pico="mask";
+ pico="cam1";
+ pici="mask";
  picII="space";
  cnlx = trgw*ix/iw;
  cnly = trgh*iy/ih;
  cnlz = 8;
  cnlw = cnlz*mlb;
  gpu="paint";
- 
-  d1	 
- name="paint"
- pix ="
 
-#version 120																
-varying vec2 fr_uv;														
-uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		
-uniform sampler2D	tex1;					// MINI_CHAR_xXy_zXw.png		
-uniform vec4 		aCNL[8];				// CNL							
-void main()																
-{																		
-	gl_FragColor = texture2D( tex0, fr_uv );  //aCNL[0].x*0.01;
- 
- 					
-	//if( gl_FragColor.a < (1/0x100) )									
- 	//	discard;														
-}																		
- 	
- "  
+ f = fps; 
   e1	  
  
  
@@ -108,17 +111,37 @@ void main()
 //	oabc    0.00dg,    0.00dg,    0.00dg 
 //	tabc    0.00dg,    0.00dg,    0.00dg;"
  c2	  
+ name="pena"
+ pix ="
+
+#version 120																
+varying vec2 fr_uv;														
+uniform sampler2D	tex0;							
+uniform vec2		aTX[8];		
+uniform vec4 		aCNL[8];											
+void main()																
+{																		
+	gl_FragColor =	texture2D( tex0, fr_uv )
+					+aCNL[0].xyxy;
+ 
+ 					
+	if( gl_FragColor.a < (1/0x100) )									
+ 		discard;														
+}																		
+ 	
+ "  
+  d2	  
  
  trg = "mask";
- trgw = c1.trgw;
- trgh = c1.trgh;
+ trgw = d1.trgw;
+ trgh = d1.trgh;
  
  picO="mask2";
  picI="space";
- cnlx = c1.cnlx;
- cnly = c1.cnly;
- cnlz = c1.cnlz;
- cnlw = c1.cnlw;
+ cnlx = d1.cnlx;
+ cnly = d1.cnly;
+ cnlz = d1.cnlz;
+ cnlw = d1.cnlw;
  cnlIx = 2
  gpu="pena";
  piccpy = mlb;
@@ -138,24 +161,6 @@ void main()
  
  
  
-  d2	  
- name="pena"
- pix ="
-
-#version 120																
-varying vec2 fr_uv;														
-uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		
-uniform vec4 		aCNL[8];				// CNL							
-void main()																
-{																		
-	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0].xyxy;
- 
- 					
-	if( gl_FragColor.a < (1/0x100) )									
- 		discard;														
-}																		
- 	
- "  
   e2	    a3	 
 //0000|00000001 00000000 00000000 00000000 |................
 //0010|00000000 00000001 00000004 00000004 |................

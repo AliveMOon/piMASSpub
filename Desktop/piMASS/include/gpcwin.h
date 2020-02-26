@@ -38,16 +38,16 @@ public:
 			frgLOG, frgSRC,
 			lnkLOG;
 	U4 nSUCC;
-	I8x2	an;
+	I8x2	ID;
 private:
 	GLint GLSLvrtx( const char* pSvrtx );
 	GLint GLSLfrg( const char* pSfrg );
 	GLint GLSLlnk( const char** ppUlst = NULL );
 
-	gpcGLSL( const I8x2& _an, const char* pSfrg, const char* pSvrtx )
+	gpcGLSL( const I8x2& an, const char* pSfrg, const char* pSvrtx )
 	{
 		gpmCLR;
-		an = _an;
+		ID = an;
 		if( GLSLvrtx( pSvrtx ) != GL_TRUE )
 			return;
 
@@ -77,11 +77,11 @@ public:
 
 		return nT;
 	}
-	gpcGLSL* pNEW( const I8x2& an, const char* pSfrag, const char* pSvrtx, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  )
+	gpcGLSL* pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  )
 	{
 		if( !this )
 		{
-			gpcGLSL* pTHIS = new gpcGLSL( an, pSfrag, pSvrtx );
+			gpcGLSL* pTHIS = new gpcGLSL( an, pF, pV );
 			if( !pTHIS )
 				return NULL;
 
@@ -91,7 +91,7 @@ public:
 				return NULL;
 			}
 
-			return pTHIS->pNEW( an, pSfrag, pSvrtx );
+			return pTHIS->pNEW( an, pF, pV );
 		}
 		fndTX( pATtx );
 		// ATTRIBUTES ----------------------
@@ -263,7 +263,10 @@ public:
 		aV4[2].aF2[0] = xy + wh;
 		aV4[3].aF2[0] = xy + I4x2( 0, wh.y );
 
-		aV4[0].div( Fx4( trgWHpx, I4x2(1,1) ), gpmN(aV4) );
+		if( pPICrtx )
+			aV4[0].div( Fx4( pPICrtx->txWH.a4x2[1], I4x2(1,1) ), gpmN(aV4) );
+		else
+			aV4[0].div( Fx4( trgWHpx, I4x2(1,1) ), gpmN(aV4) );
 
 		if( VXbID > 0 )
 			glDeleteBuffers(1,  &VXbID );
@@ -291,7 +294,7 @@ public:
 			return NULL;
 
 		if( aUniID[4] > -1 )
-			glUniform4fv( aUniID[4]+i, 4, (GLfloat*)&xyzw );
+			glUniform4fv( aUniID[4]+i, 1, (GLfloat*)&xyzw );
 
 		return this;
 	}
@@ -301,7 +304,7 @@ public:
 			return NULL;
 
 		if( aUniID[4] > -1 )
-			glUniform4fv( aUniID[4]+i, 4*n, (GLfloat*)pXYZW );
+			glUniform4fv( aUniID[4]+i, n, (GLfloat*)pXYZW );
 
 		return this;
 	}
@@ -340,6 +343,7 @@ public:
 		}
 		return this;
 	}
+	gpcGL* glDONE(){ glUseProgram(0); return this; }
 	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
 		if( !this )
 			return NULL;

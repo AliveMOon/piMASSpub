@@ -280,7 +280,7 @@ class gpcALU;
 				: ( (U1*)d )  									\
 			)
 
-#define gpmSTRLEN( s )			((s)? strlen((char*)(s)) : 0)
+#define gpmSTRLEN( s ) ((s)? ( *(char*)s ? strlen((char*)(s)) : 0 ) : 0)
 #define gpmVAN( d, v, l ) gpfVAN( (U1*)(d), (U1*)v, l )
 
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }

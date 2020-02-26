@@ -371,7 +371,7 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 	glClearDepth(1.0);
 	glClear( b );
-
+	glViewport( 0, 0, wh.x, wh.y );
 	return this;
 }
 
@@ -477,7 +477,7 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 	aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
 	aUniID[3] = glGetUniformLocation( PrgID, "aTX" 		);
 	aUniID[4] = glGetUniformLocation( PrgID, "aCNL"		);
-	nU = 4;
+	nU = 5;
 
 	if( !ppUlst )
 		return GL_TRUE;
@@ -512,31 +512,66 @@ gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV ) {
 	return GLSLset( an, pF, pV  );
 }
 gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
-	if( pGLSL  ? pGLSL->an == an : false )
-		return this;
+	if( !this )
+		return NULL;
 
-	pGLSL = NULL;
-	eGLSL = nGLSL;
-    for( iGLSL = 0; iGLSL < nGLSL; iGLSL++ )
-    {
-		if( !ppGLSL[iGLSL] )
-		{
-			if( eGLSL > iGLSL )
-				eGLSL = iGLSL;
-			continue;
-		}
+	if( pGLSL ? pGLSL->ID != an : true )
+		pGLSL = NULL;
 
-        if( ppGLSL[iGLSL]->an != an )
-			continue;
-
-		pGLSL = ppGLSL[iGLSL];
-		break;
-    }
-	if( iGLSL > eGLSL )
-		iGLSL = eGLSL;
+	if( pGLSL )
+	if( pF || pV )
+		pGLSL = NULL;
 
 	if( !pGLSL )
 	{
+		eGLSL = nGLSL;
+		for( iGLSL = 0; iGLSL < nGLSL; iGLSL++ )
+		{
+			if( !ppGLSL[iGLSL] )
+			{
+				if( eGLSL > iGLSL )
+					eGLSL = iGLSL;
+				continue;
+			}
+
+			if( ppGLSL[iGLSL]->ID != an )
+				continue;
+
+			pGLSL = ppGLSL[iGLSL];
+			break;
+		}
+		if( iGLSL > eGLSL )
+			iGLSL = eGLSL;
+	}
+
+	gpcGLSL* pKILL = NULL;
+	if( pGLSL )
+	{
+		U4 nCMP = gpmSTRLEN(pV);
+		if( nCMP )
+		if( nCMP != pGLSL->vrtxSRC.n_load )
+			pKILL = pGLSL;
+		else if( gpmMcmp( pGLSL->vrtxSRC.p_alloc, pV, nCMP ) != nCMP )
+			pKILL = pGLSL;
+
+		nCMP = gpmSTRLEN(pF);
+		if( nCMP )
+		if( nCMP != pGLSL->frgSRC.n_load )
+			pKILL = pGLSL;
+		else if( gpmMcmp( pGLSL->frgSRC.p_alloc, pF, nCMP ) != nCMP )
+			pKILL = pGLSL;
+
+        if( pKILL )
+        {
+			pGLSL = ((gpcGLSL*)NULL)->pNEW( an, pF, pV );
+			if( pGLSL )
+			{
+				ppGLSL[iGLSL] = pGLSL;
+				gpmDEL(pKILL);
+			}
+        }
+
+	} else {
 	    if( iGLSL >= nGLSL )
         {
 			iGLSL = nGLSL;
@@ -552,18 +587,8 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 			return NULL;
 		pGLSL = ppGLSL[iGLSL];
 	}
-	else if( pF ///BUG )
-	{
-		gpcGLSL* pKILL = ppGLSL[iGLSL];
-		ppGLSL[iGLSL] = ppGLSL[iGLSL]->pNEW( an, pF, pV );
-		if(pKILL != ppGLSL[iGLSL])
-		if(ppGLSL[iGLSL])
-		{
-			gpmDEL(pKILL);
-		} else
-			ppGLSL[iGLSL] = pKILL;
-
-	}
+	if( !pGLSL )
+		return NULL;
 
 	gProgID = pGLSL->PrgID;
 	gpmMcpyOF( aTexID, pGLSL->aTexID, gpmN(aTexID) );

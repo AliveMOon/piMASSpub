@@ -1,0 +1,9 @@
+R&D
+smart techechnology
+e = m*89875517873681764
+
+
+Severity	Code	Description	Project	File	Line	Suppression State
+Error	MSB3686	Unable to create Xaml task.  Compilation failed.  
+Could not write to output file 'c:\Users\Dezső\AppData\Local\Temp\5h3awm2x.dll' -- 'Access is denied. '
+	GP_ENGINEx64	C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets	70	
