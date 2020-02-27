@@ -139,26 +139,23 @@ public:
 
 		if( !pRNDR )
 			return NULL;
-
-		glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
 		if( pRTX )
 		{
-			SDL_SetRenderTarget( pRNDR, NULL );
-			SDL_RenderCopy( pRNDR, pRTX, NULL, NULL );
-
-			int w = 0, h = 0, acc = 0;
-			U4 frm;
-			SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
-			if( pPICrtx )
+			if(pPICrtx)
 			{
-				if( !pPICrtx->pSRF )
-					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
+				if(!pPICrtx->pSRF)
+				{
+					int w=0, h=0, acc=0;
+					U4 frm;
+					SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
+					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
+				}
 				if( pPICrtx->pSRF )
 					SDL_RenderReadPixels( pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
 				pPICrtx->pREF = NULL;
 			}
-			pPICrtx = NULL;
-			pRTX = NULL;
+			pPICrtx=NULL;
+			SDL_SetRenderTarget(pRNDR,pRTX=NULL);
 		}
 
 		if( pTRG )
@@ -168,7 +165,6 @@ public:
 			pTRG = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, tWH.x, tWH.y );
 			if( !pTRG )
 				return NULL;
-			//pTXchar = SDL_CreateTextureFromSurface( pRNDR, pSRFchar );
 		}
 
 		luXY = lXY;
@@ -357,7 +353,7 @@ public:
 			return this;
 
 		glUseProgram(oPrgID);
-		SDL_RenderClear( pRNDR );
+		//SDL_RenderClear( pRNDR );
 
 		return this;
 	}

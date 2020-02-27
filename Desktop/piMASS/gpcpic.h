@@ -166,12 +166,16 @@ public:
 			int w = 0, h = 0, acc = 0;
 			U4 frm;
 			SDL_QueryTexture( pTX, &frm, &acc, &w, &h );
-			if( SDL_PIXELFORMAT_RGBA8888  != frm || wh.x != w || wh.y != h || acc != SDL_TEXTUREACCESS_STREAMING )
+			if(    SDL_PIXELFORMAT_RGBA8888  != frm
+				|| wh.x != w || wh.y != h
+				|| acc != SDL_TEXTUREACCESS_STREAMING )
 				gpmSDL_FreeTX(pTX);
 		}
 		if( !pTX )
 		{
-			pTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, wh.x, wh.y );
+			pTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_RGBA8888,
+											SDL_TEXTUREACCESS_STREAMING,
+											 wh.x, wh.y );
 			txWH.a4x2[1] = wh;
 		}
 
@@ -184,6 +188,7 @@ public:
 		ptch /= sizeof(*pLOCK);
 		return pLOCK;
 	}
+
 	SDL_Texture* surDRWtx( SDL_Renderer* pRNDR ) {
 		SDL_Surface* pS = pREF;
 		if( pSHR )
@@ -210,12 +215,14 @@ public:
 		if( pREF ? pTX : NULL )
 		{
 			SDL_QueryTexture( pTX, &frm, &acc, &w, &h );
-			if( (pREF->format ? pREF->format->format : 0)  != frm || pREF->w != w || pREF->h != h || acc != SDL_TEXTUREACCESS_STREAMING )
+			if( (pREF->format ? pREF->format->format : 0)  != frm
+				|| pREF->w != w || pREF->h != h
+				|| acc != SDL_TEXTUREACCESS_STREAMING )
 			{
 				gpmSDL_FreeTX(pTX);
-
-				pTX = SDL_CreateTexture( pRNDR, pREF->format->format, SDL_TEXTUREACCESS_STREAMING, pREF->w, pREF->h );
-
+				pTX = SDL_CreateTexture( pRNDR, pREF->format->format,
+												SDL_TEXTUREACCESS_STREAMING,
+												pREF->w, pREF->h );
 			}
 
 			if( pTX )
