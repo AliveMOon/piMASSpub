@@ -317,7 +317,11 @@ public:
 			return NULL;
 
 		if( aUniID[0] > -1 )
+		if( pPICrtx )
+			glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w );
+		else
 			glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y );
+
 		if( aUniID[1] > -1 )
 			glUniform2f( aUniID[1], (float)xy.x, (float)xy.y );
 		if( aUniID[2] > -1 )

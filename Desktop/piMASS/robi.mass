@@ -27,7 +27,7 @@ void main()
 {																		
  	vec2	flpUV = fr_uv*vec2(1,-1) + vec2(0,1),
  			crs = abs(
- 						flpUV*(tgPX/2.0) - aCNL[0].xy
+ 						flpUV*tgPX - aCNL[0].xy
  					);
 	vec3	c = vec3(0,0,0), r = c, 
 			a = texture2D( tex0, flpUV ).rgb,	// cam
@@ -135,7 +135,7 @@ void main()
 {																		
 	vec2	flpUV = fr_uv*vec2(1,-1) + vec2(0,1),
  			crs = abs(
- 						flpUV*(tgPX/2.0) - aCNL[0].xy
+ 						flpUV*tgPX - aCNL[0].xy
  					);
 
  
@@ -303,6 +303,7 @@ void main()
  trgh = trgw;
  
  picO="cam1";
+ pici="mask";
  tool = 1;
  e3	  
  
