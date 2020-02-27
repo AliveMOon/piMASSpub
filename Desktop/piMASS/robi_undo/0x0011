@@ -170,7 +170,6 @@ void main()
  cnlIx = 2
  gpu="pena";
  piccpy = mlb;
- f = fps;
    e2	 
  pic = 	//"cam1";
  		"gui";

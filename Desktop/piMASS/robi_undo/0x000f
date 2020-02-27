@@ -29,32 +29,12 @@ void main()
  			crs = abs(
  						flpUV*(tgPX/2.0) - aCNL[0].xy
  					);
-	vec3	c = vec3(0,0,0), r = c, 
-			a = texture2D( tex0, flpUV ).rgb,	// cam
-			b = texture2D( tex1, flpUV ).rgb;	// mask
-	if( flpUV.y < (15.0/31.0) )
-	{
-		c = texture2D(	tex0, 
-						flpUV
-						/ vec2(1.0,15.0/31.0)
-					).rgb;
-		r = texture2D(	tex1,
-						(c.rg*vec2(8.0,-8.0)+vec2(8.0,23.0))/vec2(30.0,31.0) 
-					).rgb
-			+texture2D(	tex1,
-						(c.bg*vec2(-8.0,-8.0)+vec2(8.0,23.0))/vec2(30.0,31.0) 
-					).rgb
-			+texture2D(	tex1,
-						(c.br*vec2(-8.0,8.0)+vec2(8.0,23.0))/vec2(30.0,31.0) 
-					).rgb;
-	}
-	else if( flpUV.x < 16.0/30.0 )
-	{
-		c.rg  = max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2( 1.0,-1.0))/8.0;
-		c.bg += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0,-1.0))/8.0;
-		c.br += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0, 1.0))/8.0;
- 	}
-	gl_FragColor.rgb = (max( r,b*3.0)+c)/4.0;
+
+ 
+	gl_FragColor =	texture2D( tex0, flpUV )
+ 				*	texture2D( tex1, flpUV )
+ 				*	(aCNL[0].w+8.0)/16.0;  
+ 					
  	gl_FragColor.r += 
  		vec2( 1-min(	
 						1,
@@ -139,8 +119,7 @@ void main()
  					);
 
  
-	gl_FragColor.rgb =	vec3(0,0,0);
-				//* texture2D( tex0, flpUV );
+	gl_FragColor =	texture2D( tex0, flpUV );
  				//*	texture2D( tex1, flpUV )
  				//*	(aCNL[0].w+8.0)/16.0;  
  					
@@ -170,7 +149,6 @@ void main()
  cnlIx = 2
  gpu="pena";
  piccpy = mlb;
- f = fps;
    e2	 
  pic = 	//"cam1";
  		"gui";
