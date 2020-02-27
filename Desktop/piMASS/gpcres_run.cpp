@@ -972,7 +972,30 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							mskPIC |= 1<<12;
 						} break;
 
+				case gpeALF_PICCPY: if( pTRG && aGLpPIC[1] ) {
 
+							if( !alu.u8() )
+								break;
+							U4 i = alu.u8();
+
+							if( !aGLpPIC[i]->pSRF )
+							{
+								if( pTRG->pRTX )
+								{
+									int w=0, h=0, acc=0;
+									U4 frm;
+									SDL_QueryTexture( pTRG->pRTX, &frm, &acc, &w, &h );
+									aGLpPIC[i]->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
+								}
+							}
+							if( !aGLpPIC[i]->pSRF )
+								break;
+							SDL_RenderReadPixels(	win.pSDLrndr, NULL, 0,
+													aGLpPIC[i]->pSRF->pixels,
+													aGLpPIC[i]->pSRF->pitch 	);
+							aGLpPIC[i]->pREF = NULL;
+
+						} break;
 
 				case gpeALF_SPRITE: {
 						U8 spr_id = 0;

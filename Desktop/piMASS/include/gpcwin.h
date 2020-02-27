@@ -288,7 +288,7 @@ public:
 
 		glUniform1i( aTexID[i], i );
 		glActiveTexture( GL_TEXTURE0+i );
-		glEnable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_2D);
 		SDL_GL_BindTexture( pTX, NULL, NULL );
 
 		if( aUniID[3] > -1 )
@@ -305,7 +305,13 @@ public:
 		for( I4 i = 0; msk; i++, msk>>=1 )
 		{
 			if( (msk&1) ? !ppPIC[i] : true )
+			{
 				continue;
+
+				if( aUniID[3] > -1 )
+					glUniform2f( aUniID[3]+i, 0, 0 );
+				continue;
+			}
 
 			glSETtx( i, ppPIC[i]->surDRWtx(pRNDR), ppPIC[i]->txWH.a4x2[1] );
 		}

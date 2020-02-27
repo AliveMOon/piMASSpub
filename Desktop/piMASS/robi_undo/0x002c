@@ -62,7 +62,7 @@ void main()
 						/ vec2(14.0/30.0,7.0/31.0)
 					).rgb*2.0;
 	}
-	gl_FragColor.rgb = (max( r,b*3.0)+c)/6.0;
+	gl_FragColor.rgb = (max( r,b*3.0)+c)/4.0;
  	gl_FragColor.b += 
  		vec2( 1-min(	
 						1,
@@ -150,13 +150,13 @@ void main()
  
 	gl_FragColor.rgb = 
 						texture2D( tex0, flpUV ).rgb*0.0
-						+ texture2D( tex1, flpUV ).rgb // *0.5 
+						+ texture2D( tex1, flpUV ).rgb*0.125 
  					    + vec2( 1-min(	
 										1,
 										(length(crs)/(8+aCNL[0].w))
 									),
 									0
-						  ).grg*0.5;
+						  ).grg;
 }	
   "  
   d2	  

@@ -24,8 +24,7 @@ uniform vec2		tgPX;
 uniform vec2		aTX[8];		
 uniform vec4 		aCNL[8];											
 void main()																
-{	
-	gl_FragColor = vec4(0,0,0,1);
+{																		
  	vec2	flpUV = fr_uv*vec2(1,-1) + vec2(0,1),
  			crs = abs(
  						flpUV*tgPX - aCNL[0].xy
@@ -55,15 +54,8 @@ void main()
 		c.bg += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0,-1.0))/8.0;
 		c.br += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0, 1.0))/8.0;
  	}
-	else if( flpUV.y < (22.0/31.0) )
-	{
-		c = texture2D(	tex0, 
-						(flpUV-vec2(16.0/30.0,15.0/31.0))
-						/ vec2(14.0/30.0,7.0/31.0)
-					).rgb*2.0;
-	}
-	gl_FragColor.rgb = (max( r,b*3.0)+c)/6.0;
- 	gl_FragColor.b += 
+	gl_FragColor.rgb = (max( r,b*3.0)+c)/4.0;
+ 	gl_FragColor.r += 
  		vec2( 1-min(	
 						1,
 						(length(crs)/(8+aCNL[0].w))
@@ -71,7 +63,7 @@ void main()
  			 0
  			).r;
  	
- 	//gl_FragColor.a = 1; 
+ 	gl_FragColor.a = 1; 
  }	
   "  
   d1	 
@@ -141,22 +133,26 @@ uniform vec2		aTX[8];
 uniform vec4 		aCNL[8];											
 void main()																
 {																		
-	gl_FragColor = vec4(0,0,0,1);
- 	vec2	flpUV = fr_uv*vec2(1,-1) + vec2(0,1),
+	vec2	flpUV = fr_uv*vec2(1,-1) + vec2(0,1),
  			crs = abs(
  						flpUV*tgPX - aCNL[0].xy
  					);
 
  
-	gl_FragColor.rgb = 
-						texture2D( tex0, flpUV ).rgb*0.0
-						+ texture2D( tex1, flpUV ).rgb // *0.5 
- 					    + vec2( 1-min(	
-										1,
-										(length(crs)/(8+aCNL[0].w))
-									),
-									0
-						  ).grg*0.5;
+	gl_FragColor.rgb =	vec3(0,0,0);
+				//* texture2D( tex0, flpUV );
+ 				//*	texture2D( tex1, flpUV )
+ 				//*	(aCNL[0].w+8.0)/16.0;  
+ 					
+ 	gl_FragColor.rgb += 
+ 		vec2( 1-min(	
+						1,
+						(length(crs)/(8+aCNL[0].w))
+					),
+ 			 0
+ 			).rrr;
+ 	
+ 	gl_FragColor.a = 1; 
 }	
   "  
   d2	  
@@ -165,8 +161,8 @@ void main()
  trgw = d1.trgw;
  trgh = d1.trgh;
  
- pico="space";
- pici="maski";
+ picO="cam1"; //mask2";
+ picI="space";
  cnlx = d1.cnlx;
  cnly = d1.cnly;
  cnlz = d1.cnlz;

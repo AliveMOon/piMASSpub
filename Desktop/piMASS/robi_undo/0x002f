@@ -156,7 +156,7 @@ void main()
 										(length(crs)/(8+aCNL[0].w))
 									),
 									0
-						  ).grg*0.5;
+						  ).grg;
 }	
   "  
   d2	  
