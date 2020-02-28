@@ -373,6 +373,9 @@ public:
 	U1 typZ() const { return ((gpcALU*)this)->typ().z; };
 	U1 typW() const { return ((gpcALU*)this)->typ().w; };
 
+	// typ: 0x10
+	///   -  -  -  |    : - - - -
+	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	bool bSTR() const { return typX()&0x10; }
 	U1x4& typ( U4 b )
 	{

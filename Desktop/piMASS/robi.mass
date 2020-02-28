@@ -1,6 +1,6 @@
  a0	 
  
- R# o# b# i#                                                                  e0	 										 a1	  
+ R# o# b# i#                                                                  d0	 									 e0	 										 a1	  
  telnet = 6001;
  rout = 0x10003;
  rinp = 0x10002;
@@ -146,17 +146,24 @@ void main()
  			crs = abs(
  						flpUV*tgPX - aCNL[0].xy
  					);
-
+					
+	if(	
+		(flpUV.y>(15.0/31.0)) 
+		&& (flpUV.x<(16.0/30.0)) 
+	)
+	{
+		gl_FragColor.rgb += texture2D( tex0, 
+										(flpUV-vec2(0,15.0/31.0)) 
+										/vec2(16.0/30.0,16.0/31.0)
+									).rgb*0.777;
+	}
  
-	gl_FragColor.rgb = 
-						texture2D( tex0, flpUV ).rgb*0.0
-						+ texture2D( tex1, flpUV ).rgb // *0.5 
- 					    + vec2( 1-min(	
-										1,
+	gl_FragColor.rgb += texture2D( tex1, flpUV ).rgb 
+ 					    + ( 1-min(	1,
 										(length(crs)/(8+aCNL[0].w))
-									),
-									0
-						  ).grg*0.5;
+									)
+						)
+						* vec3( 0.0, 0.5, 0.0 );
 }	
   "  
   d2	  

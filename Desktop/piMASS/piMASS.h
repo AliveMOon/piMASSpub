@@ -542,31 +542,6 @@ inline U8 gp_memcmp( const void* pA, const void* pB, size_t n )
 	}
 	return n;
 
-	/*for( U8 i = 0; i < n; i++ )
-	{
-		if( n-i > 8 )
-		{
-			if( *(U8*)(pAu1+i) == *(U8*)(pBu1+i) )
-			{
-				i += 7;
-				continue;
-			}
-		}
-		if( n-i > 4 )
-		{
-			if( *(U4*)(pAu1+i) == *(U4*)(pBu1+i) )
-			{
-				i += 3;
-				continue;
-			}
-		}
-
-		if( pAu1[i] == pBu1[i] )
-			continue;
-
-		return (void*)(pAu1+i);
-	}
-	return (void*)(pAu1+n);*/
 }
 
 inline size_t gpfMEMMEM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL )
@@ -813,6 +788,51 @@ public:
 		a *= z;
 		return a;
     }
+	U1 mn() const
+	{
+		U1 o = x;
+		if( o > y )
+			o = y;
+		if( o > z )
+			o = z;
+		if( o >= w )
+			return w;
+
+		return o;
+	}
+	U1 mx() const
+	{
+		U1 o = x;
+		if( o < y )
+			o = y;
+		if( o < z )
+			o = z;
+		if( o <= w )
+			return w;
+
+		return o;
+	}
+
+	U1 mn_xyz() const
+	{
+		U1 o = x;
+		if( o > y )
+			o = y;
+		if( o >= z )
+			return z;
+
+		return o;
+	}
+	U1 mx_xyz() const
+	{
+		U1 o = x;
+		if( o < y )
+			o = y;
+		if( o <= z )
+			return z;
+
+		return o;
+	}
 
     U1x4& mx( U1x4 xyzw )
     {
@@ -2208,6 +2228,11 @@ public:
 		return I4x2( b.x ? x/b.x : 0x7fffffff,  b.y ? y/b.y : 0x7fffffff );
 	}
 
+	I4x2 operator + ( int b ) const
+	{
+		return I4x2( x+b,  y+b );
+	}
+
 	I4x2 operator + (const I4x2& b) const
 	{
 		return I4x2( x+b.x,  y+b.y );
@@ -2215,6 +2240,11 @@ public:
 	I4x2 operator + (const U4x2& b) const
 	{
 		return I4x2( x+b.x,  y+b.y );
+	}
+
+	I4x2 operator - ( int b ) const
+	{
+		return I4x2( x-b,  y-b );
 	}
 
 	I4x2 operator - (const I4x2& b) const

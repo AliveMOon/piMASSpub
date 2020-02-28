@@ -680,75 +680,55 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 
 
-					case gpeALF_CNLX:
-					case gpeALF_CNLY:
-					case gpeALF_CNLZ:
-					case gpeALF_CNLW:
+					case gpeALF_CNLX:	case gpeALF_CNLY:	case gpeALF_CNLZ:	case gpeALF_CNLW:	{
 						aGLcnl[0].aXYZW[(alu.alf-gpeALF_CNLT)%4] = alu.d8();
 						if( nCNL < 1 )
 							nCNL = 1;
-						break;
-					case gpeALF_CNLoX:
-					case gpeALF_CNLoY:
-					case gpeALF_CNLoZ:
-					case gpeALF_CNLoW:
+						} break;
+					case gpeALF_CNLoX:	case gpeALF_CNLoY:	case gpeALF_CNLoZ:	case gpeALF_CNLoW:	{
 						aGLcnl[0].aXYZW[(alu.alf-gpeALF_CNLoT)%4] = alu.d8();
 						if( nCNL < 1 )
 							nCNL = 1;
-						break;
-					case gpeALF_CNLiX:
-					case gpeALF_CNLiY:
-					case gpeALF_CNLiZ:
-					case gpeALF_CNLiW:
+						} break;
+					case gpeALF_CNLiX:	case gpeALF_CNLiY:	case gpeALF_CNLiZ:	case gpeALF_CNLiW:	{
 						aGLcnl[1].aXYZW[(alu.alf-gpeALF_CNLiT)%4] = alu.d8();
 						if( nCNL < 2 )
 							nCNL = 2;
-						break;
-					case gpeALF_CNLvX:
-					case gpeALF_CNLvY:
-					case gpeALF_CNLvZ:
-					case gpeALF_CNLvW:
+						} break;
+					case gpeALF_CNLvX:	case gpeALF_CNLvY:	case gpeALF_CNLvZ:	case gpeALF_CNLvW:	{
 						aGLcnl[5].aXYZW[(alu.alf-gpeALF_CNLvT)%4] = alu.d8();
 						if( nCNL < 6 )
 							nCNL = 6;
-						break;
-					case gpeALF_CNLxX:
-					case gpeALF_CNLxY:
-					case gpeALF_CNLxZ:
-					case gpeALF_CNLxW:
+						} break;
+					case gpeALF_CNLxX:	case gpeALF_CNLxY:	case gpeALF_CNLxZ:	case gpeALF_CNLxW:	{
 						aGLcnl[10].aXYZW[(alu.alf-gpeALF_CNLxT)%4] = alu.d8();
 						if( nCNL < 11 )
 							nCNL = 11;
-						break;
+						} break;
 
-					/*case gpeALF_NAME:// nevet deklarál mondjuk a rublikának
-						pSRC
-						break;*/
-					case gpeALF_SYNC:
-						if(alu.bSTR())
+					case gpeALF_SYNC: if(alu.bSTR()) {
 						if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
 							pGT->GTcnct( win );
+					} break;
 
-						break;
-					case gpeALF_RINP:
+
+					case gpeALF_RINP: {
 						anRio.a8x2[0].x = alu.i8();
 						anRio.a8x2[0].y = anRio.a8x2[0].x&0xff;
 						anRio.a8x2[0].x >>= 0x10;
-						break;
-					case gpeALF_ROUT:
+						} break;
+					case gpeALF_ROUT: {
 						anRio.a8x2[1].x = alu.i8();
 						anRio.a8x2[1].y = anRio.a8x2[1].x&0xff;
 						anRio.a8x2[1].x >>= 0x10;
-						break;
-					case gpeALF_SLMP: {
+						} break;
+					case gpeALF_SLMP: if(alu.bSTR()) {
 						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
 							break;
-						// typ: 0x10
-						///   -  -  -  |    : - - - -
-						/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-						if(alu.bSTR())
-						if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
-						{
+						gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() );
+						if( !pGT )
+							break;
+
 							I4 cnt = pGT->iCNT;
 							pGT->GTcnct( win );
 							if( cnt == pGT->iCNT )
@@ -779,37 +759,36 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							}
 
 
-							if( anRio.a8x2[1].x )
+							if( !anRio.a8x2[1].x )
+								break;
+
+							// INP
+							if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( pLZYin->n_load )
 							{
-								// INP
-								if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
-								if( pLZYin->n_load )
+								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
+								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+
+								if( !pS2 )
 								{
-									x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
-									pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
-									i = jDOitREF( win, i, ie, &pM, &pC, &pR );
-
+									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
 									if( !pS2 )
-									{
-										pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
-										if( !pS2 )
-											continue;
-									}
-									if( pS2 == pSRC )
 										continue;
-
-									hex.lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
-									pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
-									pS2->srcUPDT();
-
-
 								}
-								anRio.a8x2[0].x = 0;
+								if( pS2 == pSRC )
+									continue;
+
+								hex.lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
+								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
+								pS2->srcUPDT();
+
+
 							}
-
-						}
-
+							anRio.a8x2[0].x = 0;
 						} break;
+
+
 					case gpeALF_TRGH:
 						trgWH.w = alu.u8();
 						break;
@@ -825,6 +804,82 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 					case gpeALF_GPIO:
 
 						break;
+					case gpeALF_TOOL: if( pTRG ) {
+							U4 i = alu.u8();
+							SDL_Surface* apP[0x4];
+							switch( i )
+							{
+								case 1: {
+										if( pTRG->pSRF )
+										{
+											if( pTRG->pSRF->w*pTRG->pSRF->h != 512*512 )
+												gpmSDL_FreeSRF( pTRG->pSRF );
+										}
+										if( !pTRG->pSRF )
+										{
+											pTRG->txWH.z = pTRG->txWH.w = 512;
+											pTRG->pSRF = SDL_CreateRGBSurface( 0, 512, 512, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
+										}
+										gpmZn( (U1x4*)pTRG->pSRF->pixels, pTRG->txWH.a4x2[1].area() );
+										pTRG->aiQC[0] = pTRG->aiQC[1]+1;
+										pTRG->pREF = NULL;
+
+										apP[0] = pTRG->pSRF;
+										apP[1] = aGLpPIC[0]->surDRW();
+										apP[2] = aGLpPIC[1]->surDRW();
+										if( !apP[0] || !apP[1] )
+											break;
+
+										I4x2 	trfT( 1, apP[0]->w ),
+												trfA( 1, apP[1]->w ),
+												trfB( 1, apP[2]->w ),
+												boxA( apP[1]->w, apP[1]->h ),
+												boxB((trfB.y*14)/30,(apP[2]->h*7)/31),
+												xyOFF,
+												xyB((trfB.y*16)/30,(apP[2]->h*15)/31), RG,BG,BR;
+										U1x4 	aT[4], *pT = (U1x4*)apP[0]->pixels,
+												a, *pA = (U1x4*)apP[1]->pixels,
+												b, *pB = (U1x4*)apP[2]->pixels;
+										for( U4 i = 0,
+												e = boxB.area(),
+												ixA, ixB, ixT;
+												i < e;
+												i++ )
+										{
+											xyOFF = I4x2(i%boxB.x,i/boxB.x);
+											ixB = (xyB+xyOFF)*trfB;
+											b = pB[ixB];
+											if( !b.mx_xyz() )
+												continue;
+
+											ixA = ((xyOFF&boxA)/boxB)*trfA;
+											a = pA[ixA];
+
+											RG = I4x2(  a.x, a.y )+255; // RG
+											BG = I4x2( -a.z, a.y )+255; // BG
+											BR = I4x2( -a.z,-a.x )+255; // BR
+											ixT = RG*trfT;
+											aT[0] = pT[ixT];
+											pT[ixT] = a;
+
+											ixT = BG*trfT;
+											aT[1] = pT[ixT];
+											pT[ixT] = a;
+
+											ixT = BR*trfT;
+											aT[2] = pT[ixT];
+											pT[ixT] = a;
+										}
+
+
+									} break;
+								default:
+									break;
+							}
+
+
+
+						} break;
 					default:
 						break;
 				}
@@ -832,72 +887,46 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			}
 			else switch( alu.alf )
 			{
-				case gpeALF_CNLiiX:
-				case gpeALF_CNLiiY:
-				case gpeALF_CNLiiZ:
-				case gpeALF_CNLiiW:
+				case gpeALF_CNLiiX: case gpeALF_CNLiiY: case gpeALF_CNLiiZ: case gpeALF_CNLiiW: {
 					aGLcnl[2].aXYZW[(alu.alf-gpeALF_CNLiiT)%4] = alu.d8();
 					if( nCNL < 3 )
 						nCNL = 3;
-					break;
-				case gpeALF_CNLiiiX:
-				case gpeALF_CNLiiiY:
-				case gpeALF_CNLiiiZ:
-				case gpeALF_CNLiiiW:
+					} break;
+				case gpeALF_CNLiiiX: case gpeALF_CNLiiiY: case gpeALF_CNLiiiZ: case gpeALF_CNLiiiW: {
 					aGLcnl[3].aXYZW[(alu.alf-gpeALF_CNLiiiT)%4] = alu.d8();
 					if( nCNL < 4 )
 						nCNL = 4;
-					break;
-				case gpeALF_CNLivX:
-				case gpeALF_CNLivY:
-				case gpeALF_CNLivZ:
-				case gpeALF_CNLivW:
+					} break;
+				case gpeALF_CNLivX: case gpeALF_CNLivY: case gpeALF_CNLivZ: case gpeALF_CNLivW: {
 					aGLcnl[4].aXYZW[(alu.alf-gpeALF_CNLivT)%4] = alu.d8();
 					if( nCNL < 5 )
 						nCNL = 5;
-					break;
-				case gpeALF_CNLviX:
-				case gpeALF_CNLviY:
-				case gpeALF_CNLviZ:
-				case gpeALF_CNLviW:
+					} break;
+				case gpeALF_CNLviX: case gpeALF_CNLviY: case gpeALF_CNLviZ: case gpeALF_CNLviW: {
 					aGLcnl[6].aXYZW[(alu.alf-gpeALF_CNLviT)%4] = alu.d8();
 					if( nCNL < 7 )
 						nCNL = 7;
-					break;
-				case gpeALF_CNLviiX:
-				case gpeALF_CNLviiY:
-				case gpeALF_CNLviiZ:
-				case gpeALF_CNLviiW:
+					} break;
+				case gpeALF_CNLviiX: case gpeALF_CNLviiY: case gpeALF_CNLviiZ: case gpeALF_CNLviiW: {
 					aGLcnl[7].aXYZW[(alu.alf-gpeALF_CNLviiT)%4] = alu.d8();
 					if( nCNL < 8 )
 						nCNL = 8;
-					break;
-				case gpeALF_CNLixX:
-				case gpeALF_CNLixY:
-				case gpeALF_CNLixZ:
-				case gpeALF_CNLixW:
-					aGLcnl[8].aXYZW[(alu.alf-gpeALF_CNLixT)%4] = alu.d8();
-					if( nCNL < 9 )
-						nCNL = 9;
-					break;
-				case gpeALF_CNLxiX:
-				case gpeALF_CNLxiY:
-				case gpeALF_CNLxiZ:
-				case gpeALF_CNLxiW:
+					} break;
+				case gpeALF_CNLixX: case gpeALF_CNLixY: case gpeALF_CNLixZ: case gpeALF_CNLixW: {
+						aGLcnl[8].aXYZW[(alu.alf-gpeALF_CNLixT)%4] = alu.d8();
+						if( nCNL < 9 )
+							nCNL = 9;
+					} break;
+				case gpeALF_CNLxiX: case gpeALF_CNLxiY: case gpeALF_CNLxiZ: case gpeALF_CNLxiW: {
 					aGLcnl[11].aXYZW[(alu.alf-gpeALF_CNLxiT)%4] = alu.d8();
 					if( nCNL < 12 )
 						nCNL = 12;
-					break;
-				case gpeALF_CNLxiiX:
-				case gpeALF_CNLxiiY:
-				case gpeALF_CNLxiiZ:
-				case gpeALF_CNLxiiW:
+					} break;
+				case gpeALF_CNLxiiX: case gpeALF_CNLxiiY: case gpeALF_CNLxiiZ: case gpeALF_CNLxiiW: {
 					aGLcnl[12].aXYZW[(alu.alf-gpeALF_CNLxiiT)%4] = alu.d8();
 					if( nCNL < 13 )
 						nCNL = 13;
-					break;
-
-
+					} break;
 
 				case gpeALF_PICii:{
 							aGLpPIC[2] = PIC.aluFND( alu );
@@ -972,11 +1001,13 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							mskPIC |= 1<<12;
 						} break;
 
-				case gpeALF_PICCPY: if( pTRG && aGLpPIC[1] ) {
-
-							if( !alu.u8() )
-								break;
+				case gpeALF_PICCPY: if( pTRG ) {
 							U4 i = alu.u8();
+							if( !i )
+								break;
+							if( i < gpmN( aGLpPIC ) ? !aGLpPIC[i] : true )
+								break;
+
 
 							if( !aGLpPIC[i]->pSRF )
 							{

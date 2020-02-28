@@ -136,14 +136,15 @@ public:
 
 	SDL_Surface* surDRW()
 	{
-		if( pSHR )
-			return pSHR;
-		if( pSRF )
+		if( !pSHR )
 			return pSRF;
-		return NULL;
+
+		if( pSRF ? aiQC[0] <= aiQC[1] : true )
+			return pSHR;
+
+		return pSRF;
 	}
-	bool unLOCK( void )
-	{
+	bool unLOCK( void ) {
 		if( this ? (!pLOCK||!pTX) : true )
 			return false;
 
@@ -152,8 +153,7 @@ public:
 		pLOCK = NULL;
 		return true;
 	}
-	U1x4* u1x4LOCK( SDL_Renderer* pRNDR, U4x2 wh, int& ptch )
-	{
+	U1x4* u1x4LOCK( SDL_Renderer* pRNDR, U4x2 wh, int& ptch ) {
 		if( !this )
 			return NULL;
 		if( pLOCK )
@@ -190,7 +190,7 @@ public:
 	}
 
 	SDL_Texture* surDRWtx( SDL_Renderer* pRNDR ) {
-		SDL_Surface* pS = pREF;
+		SDL_Surface* pS = surDRW(); /*pREF;
 		if( pSHR )
 		{
 			if( pSRF )
@@ -202,7 +202,7 @@ public:
 			} else
 				pS = pSHR;
 		} else if( pSRF )
-			pS = pSRF;
+			pS = pSRF;*/
 
 		if( pREF == pS )
 			return pTX;

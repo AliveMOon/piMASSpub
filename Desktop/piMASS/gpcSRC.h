@@ -1141,9 +1141,9 @@ public:
 
 	//gpcLZY		*apDICTopcd[0x1000];
 	//gpcLZYdct	*apDICTix[0x1000];
-	U4			 anDICTix[0x1000],
-				//aLEVsp[0x100],
-				rstLEV, iLEV, nLEV, topLEV;
+	U4	anDICTix[0x1000],
+		//aLEVsp[0x100],
+		rstLEV, iLEV, nLEV, topLEV;
 
 	/// aGLcnl --------
 	Fx4		aGLcnl[0x10];
