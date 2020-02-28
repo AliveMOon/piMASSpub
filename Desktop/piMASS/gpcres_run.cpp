@@ -398,7 +398,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	gpcLZY hex; U8 s;
 	gpcGL *pGL = win.pGL;
 	char* pVTX = NULL;
-
+	gpcPIC* aGLpPIC[0x10];
+	SDL_Texture* apTX[0x10];
 
 	if( U4 *pM = win.pM = mapCR.pMAP )
 	if( U4 *pC = win.pC = mapCR.pCOL )
@@ -562,7 +563,12 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						} break;
 
 					case gpeALF_GPU:if( pTRG && pGL ) {
-
+							for( I4 i = 0, msk = mskPIC; msk; i++, msk>>=1 )
+							{
+								apTX[i] = 	aGLpPIC[i]
+											? aGLpPIC[i]->surDRWtx(pGL->pRNDR)
+											: NULL;
+							}
 							pGL
 							->glSETtrg( pTRG, trgWH.a4x2[1], true, true )
                             ->GLSLset( alu )
@@ -661,6 +667,23 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							aGLpic[1] = aGLpPIC[1]->id+1;
 							mskPIC |= 1<<1;
 						} break;
+					case gpeALF_PICii:{
+							aGLpPIC[2] = PIC.aluFND( alu );
+							if( !aGLpPIC[2] )
+								break;
+
+							aGLpic[2] = aGLpPIC[2]->id+1;
+							mskPIC |= 1<<2;
+						} break;
+
+					case gpeALF_PICiv:{
+							aGLpPIC[4] = PIC.aluFND( alu );
+							if( !aGLpPIC[4] )
+								break;
+
+							aGLpic[4] = aGLpPIC[4]->id+1;
+							mskPIC |= 1<<4;
+						} break;
 					case gpeALF_PICv:{
 							aGLpPIC[5] = PIC.aluFND( alu );
 							if( !aGLpPIC[5] )
@@ -668,6 +691,14 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 							aGLpic[5] = aGLpPIC[5]->id+1;
 							mskPIC |= 1<<5;
+						} break;
+					case gpeALF_PICvi:{
+							aGLpPIC[6] = PIC.aluFND( alu );
+							if( !aGLpPIC[6] )
+								break;
+
+							aGLpic[6] = aGLpPIC[6]->id+1;
+							mskPIC |= 1<<6;
 						} break;
 					case gpeALF_PICx:{
 							aGLpPIC[10] = PIC.aluFND( alu );
@@ -677,6 +708,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							aGLpic[10] = aGLpPIC[10]->id+1;
 							mskPIC |= 1<<10;
 						} break;
+
 
 
 
@@ -789,12 +821,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						} break;
 
 
-					case gpeALF_TRGH:
-						trgWH.w = alu.u8();
-						break;
-					case gpeALF_TRGW:
-						trgWH.z = alu.u8();
-						break;
+					case gpeALF_TRGH: trgWH.w = alu.u8(); break;
+					case gpeALF_TRGW: trgWH.z = alu.u8(); break;
 					case gpeALF_UNSEL:
 						if( alu.u8()&1 )
 							pSRC->bSW |= gpeMASSunselMSK;
@@ -838,8 +866,10 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 												xyOFF,
 												xyB((trfB.y*16)/30,(apP[2]->h*15)/31), RG,BG,BR;
 										U1x4 	aT[4], *pT = (U1x4*)apP[0]->pixels,
-												a, *pA = (U1x4*)apP[1]->pixels,
+												a,
 												b, *pB = (U1x4*)apP[2]->pixels;
+										U1		*pA = (U1*)apP[1]->pixels;
+
 										for( U4 i = 0,
 												e = boxB.area(),
 												ixA, ixB, ixT;
@@ -853,7 +883,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 												continue;
 
 											ixA = ((xyOFF&boxA)/boxB)*trfA;
-											a = pA[ixA];
+											a.u4 = *(U4*)(pA+ixA*3);
 
 											RG = I4x2(  a.x, a.y )+255; // RG
 											BG = I4x2( -a.z, a.y )+255; // BG
@@ -928,78 +958,52 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						nCNL = 13;
 					} break;
 
-				case gpeALF_PICii:{
-							aGLpPIC[2] = PIC.aluFND( alu );
-							if( !aGLpPIC[2] )
-								break;
 
-							aGLpic[2] = aGLpPIC[2]->id+1;
-							mskPIC |= 1<<2;
-						} break;
+
 				case gpeALF_PICiii:{
-							aGLpPIC[3] = PIC.aluFND( alu );
-							if( !aGLpPIC[3] )
-								break;
-
-							aGLpic[3] = aGLpPIC[3]->id+1;
-							mskPIC |= 1<<3;
-						} break;
-				case gpeALF_PICiv:{
-							aGLpPIC[4] = PIC.aluFND( alu );
-							if( !aGLpPIC[4] )
-								break;
-
-							aGLpic[4] = aGLpPIC[4]->id+1;
-							mskPIC |= 1<<4;
-						} break;
-				case gpeALF_PICvi:{
-							aGLpPIC[6] = PIC.aluFND( alu );
-							if( !aGLpPIC[6] )
-								break;
-
-							aGLpic[6] = aGLpPIC[6]->id+1;
-							mskPIC |= 1<<6;
-						} break;
+						aGLpPIC[3] = PIC.aluFND( alu );
+						if( !aGLpPIC[3] )
+							break;
+						aGLpic[3] = aGLpPIC[3]->id+1;
+						mskPIC |= 1<<3;
+					} break;
 				case gpeALF_PICvii:{
-							aGLpPIC[7] = PIC.aluFND( alu );
-							if( !aGLpPIC[7] )
-								break;
-
-							aGLpic[7] = aGLpPIC[7]->id+1;
-							mskPIC |= 1<<7;
-						} break;
+						aGLpPIC[7] = PIC.aluFND( alu );
+						if( !aGLpPIC[7] )
+							break;
+						aGLpic[7] = aGLpPIC[7]->id+1;
+						mskPIC |= 1<<7;
+					} break;
 				case gpeALF_PICviii:{
-							aGLpPIC[8] = PIC.aluFND( alu );
-							if( !aGLpPIC[8] )
-								break;
-
-							aGLpic[8] = aGLpPIC[8]->id+1;
-							mskPIC |= 1<<8;
-						} break;
+						aGLpPIC[8] = PIC.aluFND( alu );
+						if( !aGLpPIC[8] )
+							break;
+						aGLpic[8] = aGLpPIC[8]->id+1;
+						mskPIC |= 1<<8;
+					} break;
 				case gpeALF_PICix:{
-							aGLpPIC[9] = PIC.aluFND( alu );
-							if( !aGLpPIC[9] )
-								break;
-
-							aGLpic[9] = aGLpPIC[9]->id+1;
-							mskPIC |= 1<<9;
-						} break;
+						aGLpPIC[9] = PIC.aluFND( alu );
+						if( !aGLpPIC[9] )
+							break;
+						aGLpic[9] = aGLpPIC[9]->id+1;
+						mskPIC |= 1<<9;
+					} break;
 				case gpeALF_PICxi:{
-							aGLpPIC[11] = PIC.aluFND( alu );
-							if( !aGLpPIC[11] )
-								break;
-
-							aGLpic[11] = aGLpPIC[11]->id+1;
-							mskPIC |= 1<<11;
-						} break;
+						aGLpPIC[11] = PIC.aluFND( alu );
+						if( !aGLpPIC[11] )
+							break;
+						aGLpic[11] = aGLpPIC[11]->id+1;
+						mskPIC |= 1<<11;
+					} break;
 				case gpeALF_PICxii:{
-							aGLpPIC[12] = PIC.aluFND( alu );
-							if( !aGLpPIC[12] )
-								break;
+						aGLpPIC[12] = PIC.aluFND( alu );
+						if( !aGLpPIC[12] )
+							break;
+						aGLpic[12] = aGLpPIC[12]->id+1;
+						mskPIC |= 1<<12;
+					} break;
 
-							aGLpic[12] = aGLpPIC[12]->id+1;
-							mskPIC |= 1<<12;
-						} break;
+
 
 				case gpeALF_PICCPY: if( pTRG ) {
 							U4 i = alu.u8();

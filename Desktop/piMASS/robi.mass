@@ -40,20 +40,23 @@ void main()
 						/ vec2(1.0,15.0/31.0)
 					).rgb;
 		r = texture2D(	tex1,
-						(c.rg*vec2(8.0,-8.0)+vec2(8.0,23.0))/vec2(30.0,31.0) 
+						(c.rg*vec2(8.0,8.0)+vec2(8.0,23.0))/vec2(30.0,31.0)
+						//*vec2(1,-1) + vec2(0,1) 
 					).rgb
 			+texture2D(	tex1,
-						(c.bg*vec2(-8.0,-8.0)+vec2(8.0,23.0))/vec2(30.0,31.0) 
+						(c.bg*vec2(-8.0,8.0)+vec2(8.0,23.0))/vec2(30.0,31.0)
+						//*vec2(1,-1) + vec2(0,1) 
 					).rgb
 			+texture2D(	tex1,
-						(c.br*vec2(-8.0,8.0)+vec2(8.0,23.0))/vec2(30.0,31.0) 
+						(c.br*vec2(-8.0,-8.0)+vec2(8.0,23.0))/vec2(30.0,31.0)
+						//*vec2(1,-1) + vec2(0,1) 
 					).rgb;
 	}
 	else if( flpUV.x < 16.0/30.0 )
 	{
-		c.rg  = max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2( 1.0,-1.0))/8.0;
-		c.bg += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0,-1.0))/8.0;
-		c.br += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0, 1.0))/8.0;
+		c.rg  = max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2( 1.0, 1.0))/8.0;
+		c.bg += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0, 1.0))/8.0;
+		c.br += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0,-1.0))/8.0;
  	}
 	else if( flpUV.y < (22.0/31.0) )
 	{
@@ -62,7 +65,7 @@ void main()
 						/ vec2(14.0/30.0,7.0/31.0)
 					).rgb*2.0;
 	}
-	gl_FragColor.rgb = (max( r,b*3.0)+c)/6.0;
+	gl_FragColor.rgb = (max( r,b*3.0)+c*2)/6.0;
  	gl_FragColor.b += 
  		vec2( 1-min(	
 						1,
@@ -134,8 +137,9 @@ pix ="
 
 #version 120																
 varying vec2 fr_uv;														
-uniform sampler2D	tex0;							
-uniform sampler2D	tex1;
+uniform sampler2D	tex0,	// space							
+					tex1,	// maski
+					tex2;	// src pl.: cam	
 uniform vec2		tgPX;					
 uniform vec2		aTX[8];		
 uniform vec4 		aCNL[8];											
@@ -143,36 +147,47 @@ void main()
 {																		
 	gl_FragColor = vec4(0,0,0,1);
  	vec2	flpUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
- 			crs = abs(
- 						flpUV*tgPX - aCNL[0].xy
- 					);
-					
-	if(	
-		(flpUV.y>(15.0/31.0)) 
-		&& (flpUV.x<(16.0/30.0)) 
-	)
+ 			crs = abs( flpUV*tgPX - aCNL[0].xy );
+	vec3	a = vec3(0,0,0), 
+			b = texture2D( tex1, flpUV ).rgb * min(1,aTX[1].x);				
+	if( flpUV.y>(15.0/31.0) ) 
+	if( flpUV.x<(16.0/30.0) ) 
 	{
-		gl_FragColor.rgb += texture2D( tex0, 
-										(flpUV-vec2(0,15.0/31.0)) 
-										/vec2(16.0/30.0,16.0/31.0)
-									).rgb;
+		a = texture2D( tex0, 
+							(flpUV-vec2(0,15.0/31.0)) 
+							/vec2(16.0/30.0,16.0/31.0)
+					).rgb;
 	}
- 	gl_FragColor.rgb += texture2D( tex1, flpUV ).rgb;
-	gl_FragColor.rgb += ( 1-min( 1,
-									length(crs)/(8+aCNL[0].w)
-								)
-						)
-						* vec3( 0.0, 0.5, 0.0 );
+	else if( flpUV.y>(22.0/31.0) ) 
+	{
+		vec2 crs2 = abs(
+						flpUV*tgPX 
+						- (aCNL[0].xy + tgPX*vec2(0,7.0/31.0))
+ 					);
+		float r = min( 1, length(crs2)/4.0 );
+		if( r < 1.0 )
+		{
+			b = texture2D( tex2, 
+							(flpUV-vec2(16.0/30.0,22.0/31.0))
+							/vec2(14.0/30.0,7.0/31.0)
+						).rgb;
+		}
+	} 
+	
+ 	gl_FragColor.rgb = max( a, b );
+	if( min( 1, length(crs)/4.0 ) < 0.5 )
+		gl_FragColor.rgb += vec3( 0.0, 0.0, 1.0 );
 }	
   "  
   d2	  
  
  trg = "mask";
- trgw = d1.trgw;
- trgh = d1.trgh;
+ trgw = 480;
+ trgh = 480;
  
  pico="space";
  pici="maski";
+ picii="cam1";
  cnlx = d1.cnlx;
  cnly = d1.cnly;
  cnlz = d1.cnlz;
@@ -310,7 +325,7 @@ void main()
  
  trg = "space";
  trgw = 512;
- trgh = trgw;
+ trgh = 512;
  
  picO="cam1";
  pici="mask";

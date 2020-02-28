@@ -208,21 +208,24 @@ public:
 			return pTX;
 
 
-		int w = 0, h = 0, acc = 0;
+		int //w = 0, h = 0,
+			acc = 0;
 		U4 frm;
 		pREF = pS;
 
 		if( pREF ? pTX : NULL )
 		{
-			SDL_QueryTexture( pTX, &frm, &acc, &w, &h );
+			SDL_QueryTexture( pTX, &frm, &acc, &txWH.z, &txWH.w );
 			if( (pREF->format ? pREF->format->format : 0)  != frm
-				|| pREF->w != w || pREF->h != h
+				|| pREF->w != txWH.z || pREF->h != txWH.w
 				|| acc != SDL_TEXTUREACCESS_STREAMING )
 			{
 				gpmSDL_FreeTX(pTX);
 				pTX = SDL_CreateTexture( pRNDR, pREF->format->format,
 												SDL_TEXTUREACCESS_STREAMING,
 												pREF->w, pREF->h );
+				txWH.z = pREF->w;
+				txWH.w = pREF->h;
 			}
 
 			if( pTX )

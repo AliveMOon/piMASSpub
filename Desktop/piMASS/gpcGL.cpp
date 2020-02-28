@@ -40,6 +40,14 @@ gpcGL::gpcGL( gpcWIN& win )
 		cout << "char" << (int)win.pSRFiso << endl;
 	else
 		cout << SDL_GetError() << endl;
+
+	/*glGenSamplers( 1, aSMPid );
+	glSamplerParameteri(aSMPid[0], GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(aSMPid[0], GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glSamplerParameteri(aSMPid[0], GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glSamplerParameteri(aSMPid[0], GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+	glSamplerParameterf(aSMPid[0], GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);*/
+
 }
 
 char gpsGLSLvx[] = {

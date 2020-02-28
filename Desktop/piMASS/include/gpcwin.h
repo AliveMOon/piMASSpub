@@ -95,7 +95,8 @@ public:
 			gFrSID,
 			VaID,
 			VXbID,
-			IXbID;
+			IXbID //,aSMPid[3]
+			;
 
 	SDL_GLContext	gCntxt;
 	GLenum			glewErr;
@@ -284,12 +285,17 @@ public:
 		if( aTexID[i] < 0 )
 			return this;
 		if( !pTX )
+		{
+			if( aUniID[3] > -1 )
+				glUniform2f( aUniID[3]+i, 0, 0 );
 			return this;
+		}
 
 		glUniform1i( aTexID[i], i );
 		glActiveTexture( GL_TEXTURE0+i );
-		glDisable(GL_TEXTURE_2D);
 		SDL_GL_BindTexture( pTX, NULL, NULL );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		//glBindSampler(i,aSMPid[0]);
 
 		if( aUniID[3] > -1 )
 			glUniform2f( aUniID[3]+i, (float)wh.x, (float)wh.y );
@@ -317,6 +323,7 @@ public:
 		}
 		return this;
 	}
+
 	gpcGL* glDONE(){ glUseProgram(0); return this; }
 	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
 		if( !this )
