@@ -1,6 +1,6 @@
  a0	 
  
- R# o# b# i#                                                                  d0	 									 e0	 										 a1	  
+ R# o# b# i#                                                                  d0	  									 e0	 										 a1	  
  telnet = 6001;
  rout = 0x10003;
  rinp = 0x10002;
@@ -142,7 +142,7 @@ uniform vec4 		aCNL[8];
 void main()																
 {																		
 	gl_FragColor = vec4(0,0,0,1);
- 	vec2	flpUV = fr_uv*vec2(1,-1) + vec2(0,1),
+ 	vec2	flpUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
  			crs = abs(
  						flpUV*tgPX - aCNL[0].xy
  					);
@@ -155,13 +155,12 @@ void main()
 		gl_FragColor.rgb += texture2D( tex0, 
 										(flpUV-vec2(0,15.0/31.0)) 
 										/vec2(16.0/30.0,16.0/31.0)
-									).rgb*0.777;
+									).rgb;
 	}
- 
-	gl_FragColor.rgb += texture2D( tex1, flpUV ).rgb 
- 					    + ( 1-min(	1,
-										(length(crs)/(8+aCNL[0].w))
-									)
+ 	gl_FragColor.rgb += texture2D( tex1, flpUV ).rgb;
+	gl_FragColor.rgb += ( 1-min( 1,
+									length(crs)/(8+aCNL[0].w)
+								)
 						)
 						* vec3( 0.0, 0.5, 0.0 );
 }	
@@ -316,6 +315,7 @@ void main()
  picO="cam1";
  pici="mask";
  tool = 1;
+ f = fps;
  e3	  
  
  

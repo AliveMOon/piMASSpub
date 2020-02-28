@@ -860,15 +860,15 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 											BR = I4x2( -a.z,-a.x )+255; // BR
 											ixT = RG*trfT;
 											aT[0] = pT[ixT];
-											pT[ixT] = a;
+											pT[ixT].u4 |= b.u4;
 
 											ixT = BG*trfT;
 											aT[1] = pT[ixT];
-											pT[ixT] = a;
+											pT[ixT].u4 |= b.u4;
 
 											ixT = BR*trfT;
 											aT[2] = pT[ixT];
-											pT[ixT] = a;
+											pT[ixT].u4 |= b.u4;
 										}
 
 
