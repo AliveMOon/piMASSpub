@@ -18,8 +18,8 @@
 
 #version 120																
 varying vec2 fr_uv;														
-uniform sampler2D	tex0;							
-uniform sampler2D	tex1;
+uniform sampler2D	tex0,
+					tex1;
 uniform vec2		tgPX;					
 uniform vec2		aTX[8];		
 uniform vec4 		aCNL[8];											
@@ -65,16 +65,9 @@ void main()
 						/ vec2(14.0/30.0,7.0/31.0)
 					).rgb*2.0;
 	}
-	gl_FragColor.rgb = (max( r,b*3.0)+c*2)/6.0;
- 	gl_FragColor.b += 
- 		vec2( 1-min(	
-						1,
-						(length(crs)/(8+aCNL[0].w))
-					),
- 			 0
- 			).r;
- 	
- 	//gl_FragColor.a = 1; 
+	gl_FragColor.rgb = (max( r,b*3.0)+c)/6.0;
+ 	gl_FragColor.b += 1 - min( 1, min(abs(crs.x),abs(crs.y)) );
+ 	 
  }	
   "  
   d1	 
@@ -164,8 +157,7 @@ void main()
 						flpUV*tgPX 
 						- (aCNL[0].xy + tgPX*vec2(0,7.0/31.0))
  					);
-		float r = min( 1, length(crs2)/4.0 );
-		if( r < 1.0 )
+		if( (length(crs2)/4.0) < 1 )
 		{
 			b = texture2D( tex2, 
 							(flpUV-vec2(16.0/30.0,22.0/31.0))
@@ -175,7 +167,7 @@ void main()
 	} 
 	
  	gl_FragColor.rgb = max( a, b );
-	if( min( 1, length(crs)/4.0 ) < 0.5 )
+	if( (length(crs)/4.0) < 1.0 )
 		gl_FragColor.rgb += vec3( 0.0, 0.0, 1.0 );
 }	
   "  

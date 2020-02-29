@@ -675,7 +675,6 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							aGLpic[2] = aGLpPIC[2]->id+1;
 							mskPIC |= 1<<2;
 						} break;
-
 					case gpeALF_PICiv:{
 							aGLpPIC[4] = PIC.aluFND( alu );
 							if( !aGLpPIC[4] )
@@ -708,7 +707,20 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							aGLpic[10] = aGLpPIC[10]->id+1;
 							mskPIC |= 1<<10;
 						} break;
-
+					case gpeALF_PICix:{
+						aGLpPIC[9] = PIC.aluFND( alu );
+						if( !aGLpPIC[9] )
+							break;
+						aGLpic[9] = aGLpPIC[9]->id+1;
+						mskPIC |= 1<<9;
+					} break;
+					case gpeALF_PICxi:{
+							aGLpPIC[11] = PIC.aluFND( alu );
+							if( !aGLpPIC[11] )
+								break;
+							aGLpic[11] = aGLpPIC[11]->id+1;
+							mskPIC |= 1<<11;
+						} break;
 
 
 
@@ -872,7 +884,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 										for( U4 i = 0,
 												e = boxB.area(),
-												ixA, ixB, ixT;
+												ixA = boxB.y*trfB.y, ixB, ixT;
 												i < e;
 												i++ )
 										{
@@ -882,12 +894,10 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 											if( !b.mx_xyz() )
 												continue;
 
-											ixA = ((xyOFF&boxA)/boxB)*trfA;
-											a.u4 = *(U4*)(pA+ixA*3);
-
-											RG = I4x2(  a.x, a.y )+255; // RG
-											BG = I4x2( -a.z, a.y )+255; // BG
-											BR = I4x2( -a.z,-a.x )+255; // BR
+											a = pB[ixB+ixA];
+											RG = I4x2(  a.z, a.y )+255; // RG
+											BG = I4x2( -a.x, a.y )+255; // BG
+											BR = I4x2( -a.x,-a.z )+255; // BR
 											ixT = RG*trfT;
 											aT[0] = pT[ixT];
 											pT[ixT].u4 |= b.u4;
@@ -981,20 +991,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						aGLpic[8] = aGLpPIC[8]->id+1;
 						mskPIC |= 1<<8;
 					} break;
-				case gpeALF_PICix:{
-						aGLpPIC[9] = PIC.aluFND( alu );
-						if( !aGLpPIC[9] )
-							break;
-						aGLpic[9] = aGLpPIC[9]->id+1;
-						mskPIC |= 1<<9;
-					} break;
-				case gpeALF_PICxi:{
-						aGLpPIC[11] = PIC.aluFND( alu );
-						if( !aGLpPIC[11] )
-							break;
-						aGLpic[11] = aGLpPIC[11]->id+1;
-						mskPIC |= 1<<11;
-					} break;
+
 				case gpeALF_PICxii:{
 						aGLpPIC[12] = PIC.aluFND( alu );
 						if( !aGLpPIC[12] )
