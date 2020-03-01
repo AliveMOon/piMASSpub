@@ -840,6 +840,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							pSRC->bSW |= gpeMASSunselMSK;
 						else
 							pSRC->bSW &= ~gpeMASSunselMSK;
+
 						break;
 					case gpeALF_GPIO:
 
@@ -913,22 +914,38 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								break;
 							}
 							U4	n1 = apP[3] ? aGLpPIC[2]->txWH.a4x2[1].area() : 0,
-								n1x4 = n1*sizeof(U1x4);
+								n1x4 = n1*sizeof(U1x4), nCMP = 0;
 							if( n1 )
 							if( gpcLZY *pLZYin = win.piMASS->PIClzyALL.LZY(aGLpPIC[2]->TnID) )
 							{
 								U1x4	*pU1x4 = (U1x4*)pLZYin->p_alloc,
 										*pDB = NULL;
+								char	*pFILE = win.gppMASSfile,
+										s_buff[0x200];
+
+								pFILE += sprintf( pFILE, "%s", win.gpsMASSname );
+								char* pPR = strrchr( win.gppMASSfile, '.' );
+								if( pPR )
+									pFILE = pPR+sprintf( pPR, "_dir/" );
+								cout << "dir?:"<< win.gpsMASSpath;
+								if( gpfACE(win.gpsMASSpath, 4) < 0 )
+								{
+									cout << "mkdir:"<< win.gpsMASSpath << endl;
+									gpfMKDR( s_buff, win.gpsMASSpath );
+								} else {
+									cout << " OK"<< endl;
+								}
 
 								if( !pLZYin->n_load )
 								{
 									U8 s = 0;
-									pLZYin->lzyADD( NULL, 0x10+ n1*0x100*sizeof(*pU1x4), s, 1 );
+									pLZYin->lzyADD( NULL, 0x10 + n1*0x100*sizeof(*pU1x4), s, 1 );
 									pU1x4 = (U1x4*)pLZYin->p_alloc;
 									for( U4 i = 1; i < 0x100; i++ )
 									{
 										(aGLpPIC[2]->TnID+I8x2(0,i))
-										.an2str( (U1*)win.gppMASSfile, (U1*)".png" );
+										.an2str( (U1*)pFILE, (U1*)".png" );
+										cout << win.gpsMASSpath;
 
 										if( gpfACE( win.gpsMASSpath, 4) > -1 )
 										{
@@ -937,6 +954,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 											{
 												gpmMcpyOF( pDB, apP[4]->pixels, n1 );
 												pDB->x = 0x10;
+												pDB->y = 1;
 											}
 											if( i == ix05 )
 											{
@@ -947,7 +965,11 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 												aGLpPIC[2]->pREF = NULL;
 											} else
 												gpmSDL_FreeSRF(apP[4]);
-										}
+
+											cout << " OK" << endl;
+										} else
+											cout << " NO" << endl;
+
 									}
 
 								}
@@ -955,28 +977,43 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								pDB = pU1x4 + 4 + n1*(U4)pU1x4->x;
 								if(pU1x4->x == ix05 )
 								{
-
-									if( gpmMcmpOF( (pDB+1), (((U1x4*)(apP[3]->pixels))+1), n1-1 ) < n1-1 )
+									nCMP = gpmMcmpOF( (pDB+1), (((U1x4*)(apP[3]->pixels))+1), n1-1 );
+									cout << i << ":" << (int)pDB->x << "/" << (int)pDB->y << ":" << nCMP << "/" << n1-1 << endl;
+									if( nCMP < n1-1 )
 									{
 										pDB->x = 0; // jelzi, hogy változás van
 									}
-									else if( pDB->x < 0x10 )
+									else if( pDB->x < pDB->y )
 									{
 										pDB->x++;
-										if( pDB->x == 0x10 )
+										if( pDB->x == pDB->y )
 										{
+											pDB->y = pDB->x+1;
 											IMG_SavePNG( apP[3], "/mnt/ram/space.png" );
 
 											(aGLpPIC[2]->TnID
 											+I8x2(0,pU1x4->x))
-											.an2str( (U1*)win.gppMASSfile, (U1*)".png" );
-											//pSPR->pSRF = IMG_Load( win.gpsMASSpath );
+											.an2str( (U1*)pFILE, (U1*)".png" );
+											cout << "save "<< win.gpsMASSpath << endl;
+
 
 											if( gpfACE( win.gpsMASSpath, 4) > -1 )
 											{
+												cout << "kill "<< win.gpsMASSpath << endl;
 												rename( win.gpsMASSpath, "/mnt/ram/space.kill" );
 											}
-											rename( "/mnt/ram/space.png", win.gpsMASSpath );
+											cout << "rename /mnt/ram/space.png "<< win.gpsMASSpath << endl;
+											if( int err = rename( "/mnt/ram/space.png", win.gpsMASSpath ) )
+											{
+												gpcLZY load;
+												U8 s;
+												load.lzyRD( "/mnt/ram/space.png", s = 0, 1 );
+												load.lzyWR( win.gpsMASSpath, true );
+
+												cout << " ERR " << err << endl;
+
+											} else
+												cout << " OK" << endl;
 
 											if( gpfACE("/mnt/ram/space.kill", 4) > -1 )
 											{
@@ -987,7 +1024,11 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
                                    }
 								} else {
 									if( pU1x4->x )
+									{
 										gpmMcpyOF( pDB, apP[3]->pixels, n1 );
+										pDB->x = 0x10;
+										pDB->y = 1;
+									}
 
 									pU1x4->x = ix05;
 									pDB = pU1x4 + 4 + n1*(U4)pU1x4->x;

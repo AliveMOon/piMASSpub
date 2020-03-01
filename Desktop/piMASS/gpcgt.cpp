@@ -812,7 +812,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 		// BIND
 		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
-		cout << p_print << endl;
+		//cout << p_print << endl;
 		p_print = p_err;
 
 		fd_set cnct_w;
@@ -836,11 +836,6 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
 				pOUT = gpdZSnDnull->pulling( pOUT, gpaZSwr );
-				/*pOUT = pOUT->lzyFRMT(
-										s = 0,
-										gpdSLMP_recv_LN4SL6N4, 24,
-										gpaZSwr[0].z, gpaZSwr[0].w
-									); // BILL outját olvasuk ki elsöre */
 				break;
 			}
 			default:
