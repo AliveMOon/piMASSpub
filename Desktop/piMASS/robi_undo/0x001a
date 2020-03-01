@@ -191,6 +191,7 @@ void main()
  cnlIx = 2
  gpu="pena";
  piccpy = mlb;
+ picsave = mrb;
  f = fps;
    e2	 
  pic = 	//"cam1";
@@ -325,7 +326,6 @@ void main()
  
  picO="cam1";
  pici="mask";
- picii="maski";
  tool = 1;
  f = fps;
  e3	  

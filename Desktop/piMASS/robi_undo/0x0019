@@ -325,7 +325,6 @@ void main()
  
  picO="cam1";
  pici="mask";
- picii="maski";
  tool = 1;
  f = fps;
  e3	  

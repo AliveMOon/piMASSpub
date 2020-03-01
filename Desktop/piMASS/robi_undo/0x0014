@@ -51,10 +51,6 @@ void main()
 						(c.br*vec2(-8.0,-8.0)+vec2(8.0,23.0))/vec2(30.0,31.0)
 						//*vec2(1,-1) + vec2(0,1) 
 					).rgb;
- 		if( r.r+r.g+r.b > r.r*1.5 )
- 			r = vec3(0,0,1);
- 		else
- 			r *= 2.0;
 	}
 	else if( flpUV.x < 16.0/30.0 )
 	{
@@ -172,7 +168,7 @@ void main()
 	
  	gl_FragColor.rgb = max( a, b );
 	if( (length(crs)/4.0) < 1.0 )
-		gl_FragColor.rgb = vec3( 1.0, 0.0, 0.0 );
+		gl_FragColor.rgb += vec3( 1.0, 0.0, 0.0 );
 }	
   "  
   d2	  
@@ -325,7 +321,6 @@ void main()
  
  picO="cam1";
  pici="mask";
- picii="maski";
  tool = 1;
  f = fps;
  e3	  

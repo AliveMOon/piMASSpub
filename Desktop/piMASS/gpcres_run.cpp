@@ -845,83 +845,203 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 						break;
 					case gpeALF_TOOL: if( pTRG ) {
-							U4 i = alu.u8();
-							SDL_Surface* apP[0x4];
-							switch( i )
+						U4 i = alu.u8();
+						SDL_Surface* apP[0x5];
+						switch( i )
+						{
+						case 1: { /// SPACE TOOL ----------------------------
+
+							if( pTRG->pSRF )
+							if( pTRG->pSRF->w*pTRG->pSRF->h != 512*512 )
+								gpmSDL_FreeSRF( pTRG->pSRF );
+
+							if( !pTRG->pSRF )
 							{
-								case 1: {
-										if( pTRG->pSRF )
-										{
-											if( pTRG->pSRF->w*pTRG->pSRF->h != 512*512 )
-												gpmSDL_FreeSRF( pTRG->pSRF );
-										}
-										if( !pTRG->pSRF )
-										{
-											pTRG->txWH.z = pTRG->txWH.w = 512;
-											pTRG->pSRF = SDL_CreateRGBSurface( 0, 512, 512, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
-										}
-										gpmZn( (U1x4*)pTRG->pSRF->pixels, pTRG->txWH.a4x2[1].area() );
-										pTRG->aiQC[0] = pTRG->aiQC[1]+1;
-										pTRG->pREF = NULL;
-
-										apP[0] = pTRG->pSRF;
-										apP[1] = aGLpPIC[0]->surDRW();
-										apP[2] = aGLpPIC[1]->surDRW();
-										if( !apP[0] || !apP[1] )
-											break;
-
-										I4x2 	trfT( 1, apP[0]->w ),
-												trfA( 1, apP[1]->w ),
-												trfB( 1, apP[2]->w ),
-												boxA( apP[1]->w, apP[1]->h ),
-												boxB((trfB.y*14)/30,(apP[2]->h*7)/31),
-												xyOFF,
-												xyB((trfB.y*16)/30,(apP[2]->h*15)/31), RG,BG,BR;
-										U1x4 	aT[4], *pT = (U1x4*)apP[0]->pixels,
-												a,
-												b, *pB = (U1x4*)apP[2]->pixels;
-										U1		*pA = (U1*)apP[1]->pixels;
-
-										for( U4 i = 0,
-												e = boxB.area(),
-												ixA = boxB.y*trfB.y, ixB, ixT;
-												i < e;
-												i++ )
-										{
-											xyOFF = I4x2(i%boxB.x,i/boxB.x);
-											ixB = (xyB+xyOFF)*trfB;
-											b = pB[ixB];
-											if( !b.mx_xyz() )
-												continue;
-
-											a = pB[ixB+ixA];
-											RG = I4x2(  a.z, a.y )+255; // RG
-											BG = I4x2( -a.x, a.y )+255; // BG
-											BR = I4x2( -a.x,-a.z )+255; // BR
-											ixT = RG*trfT;
-											aT[0] = pT[ixT];
-											pT[ixT].u4 |= b.u4;
-
-											ixT = BG*trfT;
-											aT[1] = pT[ixT];
-											pT[ixT].u4 |= b.u4;
-
-											ixT = BR*trfT;
-											aT[2] = pT[ixT];
-											pT[ixT].u4 |= b.u4;
-										}
-
-
-									} break;
-								default:
-									break;
+								pTRG->txWH.z = pTRG->txWH.w = 512;
+								pTRG->pSRF = SDL_CreateRGBSurface( 0, 512, 512, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
 							}
+							gpmZn( (U1x4*)pTRG->pSRF->pixels, pTRG->txWH.a4x2[1].area() );
+							pTRG->aiQC[0] = pTRG->aiQC[1]+1;
+							pTRG->pREF = NULL;
+
+							apP[0] = pTRG->pSRF;			// TARGET
+							apP[1] = aGLpPIC[0]->surDRW();	// CAM
+							apP[2] = aGLpPIC[1]->surDRW();	// MASK
+							apP[3] = aGLpPIC[2]->surDRW();	// MASKi // ezt cserélgetjük
+							if( !apP[0] || !apP[1] )
+								break;
+
+							I4x2	trfT( 1, apP[0]->w ),
+									trfA( 1, apP[1]->w ),
+									trfB( 1, apP[2]->w ),
+									boxA( apP[1]->w, apP[1]->h ),
+									boxB((trfB.y*14)/30,(apP[2]->h*7)/31),
+									xyOFF,
+									xyB((trfB.y*16)/30,(apP[2]->h*15)/31), RG,BG,BR;
+							U1x4 	aT[4], *pT = (U1x4*)apP[0]->pixels,
+									a,
+									b, *pB = (U1x4*)apP[2]->pixels;
+							U1		*pA = (U1*)apP[1]->pixels;
+
+							U4x4 aHISTI[0x100], aqu;
+							gpmZ(aHISTI);
+							U4	i, e = boxB.area(),
+								ixB2 = boxB.y*trfB.y, ixA, ixB, ixT, ix05 = 0, sum;
+							for( i = 0; i < e; i++ )
+							{
+								xyOFF = I4x2(i%boxB.x,i/boxB.x);
+								ixA = ((xyOFF&trfA)/trfB)*trfA;
+								a.u4 = *(U4*)(pA+ixA*3);
+								aHISTI[a.x].x++;
+								aHISTI[a.y].y++;
+								aHISTI[a.z].z++;
+							}
+							for( i = 0, aqu = 0; i < 0x100; i++ )
+							{
+								aqu.x += aHISTI[i].x;
+								aqu.y += aHISTI[i].y;
+								aqu.z += aHISTI[i].z;
+
+								sum = (aqu.x+aqu.y+aqu.z);
+								if( ix05 )
+									continue;
+
+								if( (sum*2)/3 < e )
+									continue;
+
+								ix05 = i;
+								break;
+							}
+							U4	n1 = apP[3] ? aGLpPIC[2]->txWH.a4x2[1].area() : 0,
+								n1x4 = n1*sizeof(U1x4);
+							if( n1 )
+							if( gpcLZY *pLZYin = win.piMASS->PIClzyALL.LZY(aGLpPIC[2]->TnID) )
+							{
+								U1x4	*pU1x4 = (U1x4*)pLZYin->p_alloc,
+										*pDB = NULL;
+
+								if( !pLZYin->n_load )
+								{
+									U8 s = 0;
+									pLZYin->lzyADD( NULL, 0x10+ n1*0x100*sizeof(*pU1x4), s, 1 );
+									pU1x4 = (U1x4*)pLZYin->p_alloc;
+									for( U4 i = 1; i < 0x100; i++ )
+									{
+										(aGLpPIC[2]->TnID+I8x2(0,i))
+										.an2str( (U1*)win.gppMASSfile, (U1*)".png" );
+
+										if( gpfACE( win.gpsMASSpath, 4) > -1 )
+										{
+											apP[4] = IMG_Load( win.gpsMASSpath );
+											if( apP[4]->pitch*apP[4]->h == n1x4 )
+											{
+												gpmMcpyOF( pDB, apP[4]->pixels, n1 );
+												pDB->x = 0x10;
+											}
+											if( i == ix05 )
+											{
+												gpmSDL_FreeSRF(apP[3]);
+												aGLpPIC[2]->pSRF = apP[3] = apP[4];
+												apP[4] = NULL;
+												pU1x4->x = ix05;
+												aGLpPIC[2]->pREF = NULL;
+											} else
+												gpmSDL_FreeSRF(apP[4]);
+										}
+									}
+
+								}
+
+								pDB = pU1x4 + 4 + n1*(U4)pU1x4->x;
+								if(pU1x4->x == ix05 )
+								{
+
+									if( gpmMcmpOF( (pDB+1), (((U1x4*)(apP[3]->pixels))+1), n1-1 ) < n1-1 )
+									{
+										pDB->x = 0; // jelzi, hogy változás van
+									}
+									else if( pDB->x < 0x10 )
+									{
+										pDB->x++;
+										if( pDB->x == 0x10 )
+										{
+											IMG_SavePNG( apP[3], "/mnt/ram/space.png" );
+
+											(aGLpPIC[2]->TnID
+											+I8x2(0,pU1x4->x))
+											.an2str( (U1*)win.gppMASSfile, (U1*)".png" );
+											//pSPR->pSRF = IMG_Load( win.gpsMASSpath );
+
+											if( gpfACE( win.gpsMASSpath, 4) > -1 )
+											{
+												rename( win.gpsMASSpath, "/mnt/ram/space.kill" );
+											}
+											rename( "/mnt/ram/space.png", win.gpsMASSpath );
+
+											if( gpfACE("/mnt/ram/space.kill", 4) > -1 )
+											{
+												remove( "/mnt/ram/space.kill" );
+											}
+
+										}
+                                   }
+								} else {
+									if( pU1x4->x )
+										gpmMcpyOF( pDB, apP[3]->pixels, n1 );
+
+									pU1x4->x = ix05;
+									pDB = pU1x4 + 4 + n1*(U4)pU1x4->x;
+									pDB->x = 0;
+									gpmMcpyOF( (U1x4*)apP[3]->pixels, pDB, n1 );
+									aGLpPIC[2]->pREF = NULL;
+								}
+							}
+
+							ixT = ix05*apP[0]->w + 0x100;
+							for( i = 0, aqu = 0; i < 0x100; i++ )
+							{
+								aqu.x += aHISTI[i].x;
+								aqu.y += aHISTI[i].y;
+								aqu.z += aHISTI[i].z;
+
+								pT[i+ixT].z = (aqu.x*255/e);
+								pT[i+ixT].y = (aqu.y*255/e);
+								pT[i+ixT].x = (aqu.z*255/e);
+							}
+							for( i = 0; i < e; i++ )
+							{
+								xyOFF = I4x2(i%boxB.x,i/boxB.x);
+								ixB = (xyB+xyOFF)*trfB;
+								b = pB[ixB];
+								if( !b.mx_xyz() )
+									continue;
+
+								a = pB[ixB+ixB2];
+								RG = I4x2(  a.z, a.y )+255; // RG
+								BG = I4x2( -a.x, a.y )+255; // BG
+								BR = I4x2( -a.x,-a.z )+255; // BR
+								ixT = RG*trfT;
+								aT[0] = pT[ixT];
+								pT[ixT].u4 |= b.u4;
+
+								ixT = BG*trfT;
+								aT[1] = pT[ixT];
+								pT[ixT].u4 |= b.u4;
+
+								ixT = BR*trfT;
+								aT[2] = pT[ixT];
+								pT[ixT].u4 |= b.u4;
+							}
+							} break;
+						default:{
+							}break;
+						}
 
 
 
 						} break;
-					default:
-						break;
+					default:{
+					} break;
 				}
 				//}
 			}

@@ -1155,6 +1155,7 @@ public:
 	gpcGTall	GTacpt, GTcnct;
 	gpcLZY		*pJPGsnd;
 	/// PIC ---------
+	gpcLZYall	PIClzyALL;
 	gpcPICall	PIC;
 	/// CAM ---------
 	gpcPICAM*	pCAM;
