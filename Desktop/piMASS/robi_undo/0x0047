@@ -115,18 +115,18 @@ void main()
 	gl_FragColor = vec4(0,0,0,1);
 	vec2	flpUV = fr_uv*vec2(1.0,-15.0/31) + vec2(0.0, 15.0/31);
  	vec2	flpUV1 = fr_uv*vec2(1.0,-1.0) + vec2(0.0, 1.0 ), 
- 			off = 1.0/tgPX, uv;
-	vec3 ize;
+ 			off = 0.875/tgPX, uv;
+	
 	gl_FragColor.rgb = texture2D( tex0, flpUV ).rgb;
- 	for( int i = -2; i <= 2; ++i )
-	for( int j = -2; j <= 2; ++j )
+ 	for( int i = -1; i <= 1; ++i )
+	for( int j = -1; j <= 1; ++j )
 	{
 		uv = vec2(i,j);
-		ize = texture2D( tex0, flpUV+off*uv ).rgb*length(uv)/2.0;
-		gl_FragColor.a += length(ize);
-		gl_FragColor.rgb += ize*length(ize);
+
+ 
+ 		gl_FragColor.rgb += texture2D( tex0, flpUV+off*uv ).rgb;
 	}		
- 	gl_FragColor /= gl_FragColor.a;
+ 	gl_FragColor.rgb /= 10.0;
  					  //*texture2D( tex1, flpUV1 ).rgb;
 }
  "
@@ -234,8 +234,7 @@ void main()
  pic = 	//"cam1";
  		"gui";
  unsel = 1;
-  g2	 
-   pic= "dilet" a3	 
+  g2	  a3	 
 //0000|00000001 00000000 00000000 00000000 |................
 //0010|00000000 00000001 00000004 00000004 |................
 //0020|00000000 00000000 00000000 00000000 |................

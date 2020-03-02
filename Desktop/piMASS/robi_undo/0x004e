@@ -122,7 +122,7 @@ void main()
 	for( int j = -2; j <= 2; ++j )
 	{
 		uv = vec2(i,j);
-		ize = texture2D( tex0, flpUV+off*uv ).rgb*length(uv)/2.0;
+		ize = texture2D( tex0, flpUV+off*uv ).rgb;
 		gl_FragColor.a += length(ize);
 		gl_FragColor.rgb += ize*length(ize);
 	}		

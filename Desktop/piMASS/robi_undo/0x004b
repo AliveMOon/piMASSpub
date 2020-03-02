@@ -115,16 +115,16 @@ void main()
 	gl_FragColor = vec4(0,0,0,1);
 	vec2	flpUV = fr_uv*vec2(1.0,-15.0/31) + vec2(0.0, 15.0/31);
  	vec2	flpUV1 = fr_uv*vec2(1.0,-1.0) + vec2(0.0, 1.0 ), 
- 			off = 1.0/tgPX, uv;
+ 			off = 1/tgPX, uv;
 	vec3 ize;
 	gl_FragColor.rgb = texture2D( tex0, flpUV ).rgb;
- 	for( int i = -2; i <= 2; ++i )
-	for( int j = -2; j <= 2; ++j )
+ 	for( int i = -1; i <= 1; ++i )
+	for( int j = -1; j <= 1; ++i )
 	{
 		uv = vec2(i,j);
-		ize = texture2D( tex0, flpUV+off*uv ).rgb*length(uv)/2.0;
+		ize = texture2D( tex0, flpUV+off*uv ).rgb;
 		gl_FragColor.a += length(ize);
-		gl_FragColor.rgb += ize*length(ize);
+		gl_FragColor.rgb += ize;
 	}		
  	gl_FragColor /= gl_FragColor.a;
  					  //*texture2D( tex1, flpUV1 ).rgb;
