@@ -24,7 +24,7 @@ U1* gpcALU::ALUdatHARD( gpcRES* pM, U4x2 xy, U1x4 ty4, I1 mul )
 
 			U4 nAN2 = nALLOC(); //gpmPAD( AN().w, 0x10 ); //.a4x2[0].area()+1, 0x10 );
 			pDAT = new U1[nAN2];
-			gpmZn( (U1*)pDAT, AN().w );
+			gpmZnOF( (U1*)pDAT, AN().w );
 			pM->chg( *this );
 
 			return (U1*)pDAT;

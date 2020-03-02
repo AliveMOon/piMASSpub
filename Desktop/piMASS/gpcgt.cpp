@@ -361,7 +361,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 			{
 				gpmMcpyOF( ppGTalloc, pp_kill, n_kill );
 			}
-			gpmZn( ppGTalloc+n_kill+1, (nGTalloc-n_kill-1) );
+			gpmZnOF( ppGTalloc+n_kill+1, (nGTalloc-n_kill-1) );
 			gpmDELary( pp_kill );
 		}
 		else if( ppGTalloc[iGTfr] )

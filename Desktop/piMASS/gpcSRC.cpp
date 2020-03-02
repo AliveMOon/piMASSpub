@@ -99,7 +99,7 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 
 	/// elopunk mindent most
 	gpmMcpyOF( this, &B, 1 );
-	gpmZn( (U1*)&B.pALFtg, gpnZ );
+	gpmZnOF( (U1*)&B.pALFtg, gpnZ );
 
 	qBLD();
 

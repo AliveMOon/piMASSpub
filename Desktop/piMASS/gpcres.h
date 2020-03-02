@@ -736,8 +736,8 @@ public:
             pISA = new gpcISA[nISA.y];
             if( nISA.x )
 				gpmMcpyOF( pISA, pK, nISA.x );
-			gpmZn( pK, nISA.x ); // muszáj nehogy felszabaditsa az an.aSTR[0]-okat
-			gpmZn( pISA+nISA.x, nISA.y-nISA.x );
+			gpmZnOF( pK, nISA.x ); // muszáj nehogy felszabaditsa az an.aSTR[0]-okat
+			gpmZnOF( pISA+nISA.x, nISA.y-nISA.x );
 
 			gpmDELary(pK);
 		}
@@ -868,7 +868,7 @@ public:
 				if( ali.pDAT )
 				{
 					ppDAT = new void*[nA];
-					gpmZn( ppDAT, nA );
+					gpmZnOF( ppDAT, nA );
 				}
 			}
 			else if( ppDAT[ali.iA] != ali.pDAT )
@@ -883,7 +883,7 @@ public:
 				if( ali.pRES )
 				{
 					ppR = new gpcRES*[nA];
-					gpmZn( ppR, nA );
+					gpmZnOF( ppR, nA );
 				}
 			}
 			else if( ppR[ali.iA] != ali.pRES )

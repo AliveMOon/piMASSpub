@@ -478,7 +478,7 @@ gpcLZY* gpcGT::GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					pU2o = pU2o ? pU2o : (U2*)(pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp);
 					if( !pU2o )
 						return pANS->lzyFRMT( s, "nonsens" );
-					gpmZn( pU2o, nU2 );
+					gpmZnOF( pU2o, nU2 );
 					continue;
 
 				case gpeALF_HELO:
@@ -953,7 +953,7 @@ gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUS
 		switch( an.alf )
 		{
 			case gpeALF_FORMAT:
-				gpmZn( pU2o, nU2 );
+				gpmZnOF( pU2o, nU2 );
 				break;
 
 			case gpeALF_HELO:

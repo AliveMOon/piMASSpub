@@ -468,7 +468,7 @@ public:
 		oz *= *(U1*)&typ;
 
 		pVOID = (void*)(new U1[nZ*nN]);
-		gpmZn( (U1*)pVOID, nZ*nN );
+		gpmZnOF( (U1*)pVOID, nZ*nN );
 
 		for( U1* pS = (U1*)pKILL, *pD = (U1*)pVOID, *pSe = pS+oz*oy ; pS < pSe; pS += oz, pD += nZ  )
 		{
@@ -547,7 +547,7 @@ public:
 		*pROW = gpdSRC_ROWw;
 		*pMAP = 0;
 
-		//gpmZn( pMAP, nARE );
+		//gpmZnOF( pMAP, nARE );
 		gpfMEMSET( (pMAP+1), nARE-1, pMAP, sizeof(*pMAP) );
 		gpfMEMSET( (pCOL+1), mapZN44.z-1, pCOL, sizeof(*pCOL) );
 		gpfMEMSET( (pROW+1), mapZN44.w-1, pROW, sizeof(*pROW) );
@@ -987,7 +987,7 @@ class gpcCLASS {
 				if( !ppC )
 					return NULL;
 
-				gpmZn( ppC+nCLASS, nADD );
+				gpmZnOF( ppC+nCLASS, nADD );
 				nCLASS = paLZY->n_load/sizeof(pFND) ;
 			}
 		}

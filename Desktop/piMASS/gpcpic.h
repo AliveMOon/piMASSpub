@@ -190,26 +190,12 @@ public:
 	}
 
 	SDL_Texture* surDRWtx( SDL_Renderer* pRNDR ) {
-		SDL_Surface* pS = surDRW(); /*pREF;
-		if( pSHR )
-		{
-			if( pSRF )
-			{
-				if( aiQC[0] > aiQC[1] )
-					pS = pSRF;
-				else
-					pS = pSHR;
-			} else
-				pS = pSHR;
-		} else if( pSRF )
-			pS = pSRF;*/
+		SDL_Surface* pS = surDRW();
 
 		if( pREF == pS )
 			return pTX;
 
-
-		int //w = 0, h = 0,
-			acc = 0;
+		int acc = 0;
 		U4 frm;
 		pREF = pS;
 

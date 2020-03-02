@@ -105,11 +105,11 @@ gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	/*U4 nNEW = gpmPAD( nLD2+1, 0x10 );
 	U1		*pS = (U1*)tmp.pDAT,
 			*pD = new U1[nNEW];
-	gpmZn( pD, nNEW );
+	gpmZnOF( pD, nNEW );
 	pDAT = pD;*/
 	U1		*pS = (U1*)tmp.pDAT,
 			*pD = new U1[nALLOC()];
-	gpmZn( pD, AN().w );
+	gpmZnOF( pD, AN().w );
 	pD[AN().w] = 0;
 	pDAT = pD;
 

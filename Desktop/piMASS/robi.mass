@@ -172,7 +172,7 @@ void main()
 	
  	gl_FragColor.rgb = max( a, b );
 	if( (length(crs)/4.0) < 1.0 )
-		gl_FragColor.rgb = vec3( 0.0, 0.0, 1.0 );
+		gl_FragColor.rgb = vec3( 1.0, 0.0, 0.0 );
 }	
   "  
   d2	  

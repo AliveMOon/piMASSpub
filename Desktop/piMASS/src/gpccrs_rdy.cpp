@@ -60,8 +60,8 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	for( U4 h = 0; h < CRSfrm.w; h++ )
 	{
 		fxyz.w = h*fxyz.z;
-		gpmZn( pMINI + off + fxyz.w, CRSfrm.z );
-		gpmZn( pMINI + off + fxyz.w + offFRM, CRSfrm.z );
+		gpmZnOF( pMINI + off + fxyz.w, CRSfrm.z );
+		gpmZnOF( pMINI + off + fxyz.w + offFRM, CRSfrm.z );
 	}
 
 	if( bESC )
@@ -379,8 +379,8 @@ void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Render
 	for( U4 h = 0; h < CRSfrm.w; h++ )
 	{
 		fxyz.w = h*fxyz.z;
-		gpmZn( pMINI + off + fxyz.w, CRSfrm.z );
-		gpmZn( pMINI + off + fxyz.w + offFRM, CRSfrm.z );
+		gpmZnOF( pMINI + off + fxyz.w, CRSfrm.z );
+		gpmZnOF( pMINI + off + fxyz.w + offFRM, CRSfrm.z );
 	}
 
 	if( bESC )

@@ -391,7 +391,7 @@ bool gpcCRS::miniOFF( gpcPIC* pPIC, SDL_Renderer* pRNDR ) {
 
 		//pCRS =
 		pMINI = new U1x4[nMINI];
-		gpmZn( pMINI, nMINI );
+		gpmZnOF( pMINI, nMINI );
 		return false; // resized mini, print new
 	}
 
@@ -824,7 +824,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 		//pCRS =
 		pMINI = new U1x4[nMINI];
-		gpmZn( pMINI, nMINI );
+		gpmZnOF( pMINI, nMINI );
 		return true; // resized mini, print new
 	}
 
@@ -1376,7 +1376,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 		//pCRS =
 		pMINI = new U1x4[nMINI];
-		gpmZn( pMINI, nMINI );
+		gpmZnOF( pMINI, nMINI );
 		return true; // resized mini, print new
 	}
 
@@ -1890,7 +1890,7 @@ void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcP
 		CRSfrm.y = CRSfrm.w;
 		bESC = true;
 	}
-	gpmZn( pMINI, nMINI );
+	gpmZnOF( pMINI, nMINI );
 	if( bESC )
 	{
 		return;
@@ -1965,11 +1965,11 @@ void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcP
 		}
 		if( bESC )
 		{
-			gpmZn( pMINI, nMINI );
+			gpmZnOF( pMINI, nMINI );
 			return;
 		}
 
-		gpmZn( pMINI, nMINI );
+		gpmZnOF( pMINI, nMINI );
 		miniALL.y = CRSfrm.y;
 		gpeCLR	c16bg = gpeCLR_blue,
 				c16fr = gpeCLR_blue2,

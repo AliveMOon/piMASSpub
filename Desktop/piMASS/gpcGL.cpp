@@ -622,7 +622,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 			ppGLSL = new gpcGLSL*[nGLSL];
 			gpmMcpyOF( ppGLSL, ppKILL, iGLSL );
 			gpmDELary(ppKILL);
-			gpmZn( ppGLSL+iGLSL, nGLSL-iGLSL );
+			gpmZnOF( ppGLSL+iGLSL, nGLSL-iGLSL );
         }
 		ppGLSL[iGLSL] = ppGLSL[iGLSL]->pNEW( an, pF, pV );
 		if( !ppGLSL[iGLSL] )

@@ -856,12 +856,11 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							if( pTRG->pSRF->w*pTRG->pSRF->h != 512*512 )
 								gpmSDL_FreeSRF( pTRG->pSRF );
 
-							if( !pTRG->pSRF )
-							{
+							if( !pTRG->pSRF ) {
 								pTRG->txWH.z = pTRG->txWH.w = 512;
 								pTRG->pSRF = SDL_CreateRGBSurface( 0, 512, 512, 32, 0,0,0,0 ); // rmask, gmask,bmask, amask );
 							}
-							gpmZn( (U1x4*)pTRG->pSRF->pixels, pTRG->txWH.a4x2[1].area() );
+							gpmZnOF( (U1x4*)pTRG->pSRF->pixels, pTRG->txWH.a4x2[1].area() );
 							pTRG->aiQC[0] = pTRG->aiQC[1]+1;
 							pTRG->pREF = NULL;
 
@@ -888,8 +887,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							gpmZ(aHISTI);
 							U4	i, e = boxB.area(),
 								ixB2 = boxB.y*trfB.y, ixA, ixB, ixT, ix05 = 0, sum;
-							for( i = 0; i < e; i++ )
-							{
+							for( i = 0; i < e; i++ ) {
 								xyOFF = I4x2(i%boxB.x,i/boxB.x);
 								ixA = ((xyOFF&trfA)/trfB)*trfA;
 								a.u4 = *(U4*)(pA+ixA*3);
@@ -897,8 +895,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								aHISTI[a.y].y++;
 								aHISTI[a.z].z++;
 							}
-							for( i = 0, aqu = 0; i < 0x100; i++ )
-							{
+							for( i = 0, aqu = 0; i < 0x100; i++ ) {
 								aqu.x += aHISTI[i].x;
 								aqu.y += aHISTI[i].y;
 								aqu.z += aHISTI[i].z;
@@ -913,70 +910,78 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								ix05 = i;
 								break;
 							}
-							U4	n1 = apP[3] ? aGLpPIC[2]->txWH.a4x2[1].area() : 0,
+							U4	n1 = apP[2] ? aGLpPIC[1]->txWH.a4x2[1].area() : 0,
 								n1x4 = n1*sizeof(U1x4), nCMP = 0;
 							if( n1 )
-							if( gpcLZY *pLZYin = win.piMASS->PIClzyALL.LZY(aGLpPIC[2]->TnID) )
-							{
+							if( gpcLZY *pLZYin = win.piMASS->PIClzyALL.LZY(aGLpPIC[1]->TnID) ) {
 								U1x4	*pU1x4 = (U1x4*)pLZYin->p_alloc,
 										*pDB = NULL;
 								char	*pFILE = win.gppMASSfile,
-										s_buff[0x200];
+										*p_buff = pFILE+0x100;
 
 								pFILE += sprintf( pFILE, "%s", win.gpsMASSname );
 								char* pPR = strrchr( win.gppMASSfile, '.' );
 								if( pPR )
 									pFILE = pPR+sprintf( pPR, "_dir/" );
 								cout << "dir?:"<< win.gpsMASSpath;
-								if( gpfACE(win.gpsMASSpath, 4) < 0 )
-								{
+								if( gpfACE(win.gpsMASSpath, 4) < 0 ) {
 									cout << "mkdir:"<< win.gpsMASSpath << endl;
-									gpfMKDR( s_buff, win.gpsMASSpath );
+									gpfMKDR( p_buff, win.gpsMASSpath );
 								} else {
 									cout << " OK"<< endl;
 								}
 
-								if( !pLZYin->n_load )
-								{
+								if( !pLZYin->n_load ) {
 									U8 s = 0;
 									pLZYin->lzyADD( NULL, 0x10 + n1*0x100*sizeof(*pU1x4), s, 1 );
 									pU1x4 = (U1x4*)pLZYin->p_alloc;
 									for( U4 i = 1; i < 0x100; i++ )
 									{
+
 										(aGLpPIC[2]->TnID+I8x2(0,i))
 										.an2str( (U1*)pFILE, (U1*)".png" );
 										cout << win.gpsMASSpath;
 
 										if( gpfACE( win.gpsMASSpath, 4) > -1 )
 										{
+											pDB = pU1x4 + 4 + n1*i;
 											apP[4] = IMG_Load( win.gpsMASSpath );
 											if( apP[4]->pitch*apP[4]->h == n1x4 )
 											{
-												gpmMcpyOF( pDB, apP[4]->pixels, n1 );
+												for( U4 i = 0; i < n1; i++ )
+												{
+													pDB[i].z = ((U1x4*)apP[4]->pixels)[i].x;
+													pDB[i].y = ((U1x4*)apP[4]->pixels)[i].y;
+													pDB[i].x = ((U1x4*)apP[4]->pixels)[i].z;
+													pDB[i].w = ((U1x4*)apP[4]->pixels)[i].w;
+
+												}
+												//gpmMcpyOF( pDB, apP[4]->pixels, n1 );
 												pDB->x = 0x10;
 												pDB->y = 1;
 											}
-											if( i == ix05 )
-											{
-												gpmSDL_FreeSRF(apP[3]);
-												aGLpPIC[2]->pSRF = apP[3] = apP[4];
-												apP[4] = NULL;
-												pU1x4->x = ix05;
-												aGLpPIC[2]->pREF = NULL;
-											} else
-												gpmSDL_FreeSRF(apP[4]);
+
+											gpmSDL_FreeSRF(apP[4]);
 
 											cout << " OK" << endl;
 										} else
 											cout << " NO" << endl;
 
 									}
-
+									gpmZnOF( pU1x4, 0x10 );
 								}
 
 								pDB = pU1x4 + 4 + n1*(U4)pU1x4->x;
-								if(pU1x4->x == ix05 )
+								if( !apP[3] )
 								{
+									aGLpPIC[2]->txWH.a4x2[1] = aGLpPIC[1]->txWH.a4x2[1];
+									aGLpPIC[2]->pSRF = apP[3] = SDL_CreateRGBSurface( 0, apP[2]->w, apP[2]->h, 32, 0,0,0,0 );
+									gpmMcpyOF( (U1x4*)apP[3]->pixels, pDB, n1 );
+									aGLpPIC[2]->pREF = NULL;
+									break;
+								}
+
+								if(pU1x4->x == ix05 ) {
 									nCMP = gpmMcmpOF( (pDB+1), (((U1x4*)(apP[3]->pixels))+1), n1-1 );
 									cout << i << ":" << (int)pDB->x << "/" << (int)pDB->y << ":" << nCMP << "/" << n1-1 << endl;
 									if( nCMP < n1-1 )
@@ -1022,9 +1027,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 										}
                                    }
-								} else {
-									if( pU1x4->x )
-									{
+								}
+								else {
+									if( pU1x4->x ) {
 										gpmMcpyOF( pDB, apP[3]->pixels, n1 );
 										pDB->x = 0x10;
 										pDB->y = 1;
@@ -1039,8 +1044,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							}
 
 							ixT = ix05*apP[0]->w + 0x100;
-							for( i = 0, aqu = 0; i < 0x100; i++ )
-							{
+							for( i = 0, aqu = 0; i < 0x100; i++ ) {
 								aqu.x += aHISTI[i].x;
 								aqu.y += aHISTI[i].y;
 								aqu.z += aHISTI[i].z;
@@ -1049,8 +1053,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								pT[i+ixT].y = (aqu.y*255/e);
 								pT[i+ixT].x = (aqu.z*255/e);
 							}
-							for( i = 0; i < e; i++ )
-							{
+							for( i = 0; i < e; i++ ) {
 								xyOFF = I4x2(i%boxB.x,i/boxB.x);
 								ixB = (xyB+xyOFF)*trfB;
 								b = pB[ixB];

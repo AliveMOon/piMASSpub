@@ -240,7 +240,7 @@ class gpcALU;
 #define gpmCLR	if( this ) bzero( this, sizeof(*this) )
 #define gpmN( p ) ( sizeof(p)/sizeof(*p) )
 #define gpmZ( p ) bzero( &p, sizeof(p) )
-#define gpmZn( p, n ) bzero( (p), (n)*sizeof(*(p)) )
+#define gpmZnOF( p, n ) bzero( (p), (n)*sizeof(*(p)) )
 
 #define gpmGLBOFF(a) (void*)(a)
 
