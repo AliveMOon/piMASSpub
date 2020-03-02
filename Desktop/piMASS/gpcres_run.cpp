@@ -939,7 +939,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									{
 
 										(aGLpPIC[2]->TnID+I8x2(0,i))
-										.an2str( (U1*)pFILE, (U1*)".png" );
+										.an2str( (U1*)pFILE, (U1*)".png", true, true );
 										cout << win.gpsMASSpath;
 
 										if( gpfACE( win.gpsMASSpath, 4) > -1 )
@@ -981,7 +981,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									break;
 								}
 
-								if(pU1x4->x == ix05 ) {
+								if(pU1x4->x==ix05) {
 									nCMP = gpmMcmpOF( (pDB+1), (((U1x4*)(apP[3]->pixels))+1), n1-1 );
 									cout << i << ":" << (int)pDB->x << "/" << (int)pDB->y << ":" << nCMP << "/" << n1-1 << endl;
 									if( nCMP < n1-1 )
@@ -990,6 +990,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									}
 									else if( pDB->x < pDB->y )
 									{
+
 										pDB->x++;
 										if( pDB->x == pDB->y )
 										{
@@ -998,7 +999,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 											(aGLpPIC[2]->TnID
 											+I8x2(0,pU1x4->x))
-											.an2str( (U1*)pFILE, (U1*)".png" );
+											.an2str( (U1*)pFILE, (U1*)".png", true, true );
 											cout << "save "<< win.gpsMASSpath << endl;
 
 

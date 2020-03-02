@@ -3333,7 +3333,7 @@ public:
 	}
 	I8x2& A( U1* pA, U1** ppA );
 
-	U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false )
+	/*U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false )
 	{
 		if( !p_buff )
 			return 0;
@@ -3346,6 +3346,23 @@ public:
 		p_buff += gpfALF2STR( p_buff, alf ); //, b_hex );
 		//_strupr( p_begin );
 		p_buff += sprintf( (char*)p_buff, b_hex ? "%llx": "%lld", max(num,0) );
+		if( p_post )
+			p_buff += sprintf( (char*)p_buff, "%s", p_post );
+		return p_buff-p_begin;
+	}*/
+	U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false )
+	{
+		if( !p_buff )
+			return 0;
+		if( !this )
+		{
+			*p_buff = 0;
+			return 0;
+		}
+		U1* p_begin = p_buff;
+		p_buff += gpfALF2STR( p_buff, alf ); //, b_hex );
+		//_strupr( p_begin );
+		p_buff += sprintf( (char*)p_buff, b_hex ? (b0x0? "0x%0.8llx": "%llx" ): "%lld", max(num,0) );
 		if( p_post )
 			p_buff += sprintf( (char*)p_buff, "%s", p_post );
 		return p_buff-p_begin;
