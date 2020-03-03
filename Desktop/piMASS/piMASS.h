@@ -922,6 +922,49 @@ public:
 		}
         return p4;
 	}
+	U1x4* zyxw( void* pV, U4 n )
+	{
+		U1x4 *p1 = this,
+			 *p2 = (U1x4*)pV;
+		for( U4 i = 0; i < n; i++ )
+		{
+			p1[i].x = p2[i].z;
+			p1[i].y = p2[i].y;
+			p1[i].z = p2[i].x;
+			p1[i].w = p2[i].w;
+		}
+		return this;
+	}
+	U1x4* zwxy( void* pV, U4 n )
+	{
+		U1x4 *p1 = this,
+			 *p2 = (U1x4*)pV;
+		for( U4 i = 0; i < n; i++ )
+		{
+			p1[i].x = p2[i].z;
+			p1[i].y = p2[i].w;
+			p1[i].z = p2[i].x;
+			p1[i].w = p2[i].y;
+		}
+		return this;
+	}
+
+	U1x4* AND( void* pV, U4 n )
+	{
+		U1x4 *p1 = this,
+			 *p2 = (U1x4*)pV;
+		for( U4 i = 0; i < n; i++ )
+			p1[i].u4 &= p2[i].u4;
+		return this;
+	}
+	U1x4* OR( void* pV, U4 n )
+	{
+		U1x4 *p1 = this,
+			 *p2 = (U1x4*)pV;
+		for( U4 i = 0; i < n; i++ )
+			p1[i].u4 |= p2[i].u4;
+		return this;
+	}
 };
 
 class I1x4
@@ -5033,6 +5076,9 @@ class gpcLZYall
 		return ((I8x2*)lzyID.p_alloc)[i];
 	}
 public:
+	U1 aPUB[0x1000];
+
+
 	//U4 alfFND( U1* pS );
 	gpcLZY*	LZYi( U4 i )
 	{

@@ -71,6 +71,7 @@
 		<Unit filename="gpcSLMPdcr.cpp" />
 		<Unit filename="gpcSRC.cpp" />
 		<Unit filename="gpcSRC.h" />
+		<Unit filename="gpcTOOL.cpp" />
 		<Unit filename="gpcU14.cpp" />
 		<Unit filename="gpcU44.cpp" />
 		<Unit filename="gpc_mitsub.cpp" />

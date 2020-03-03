@@ -134,8 +134,7 @@ public:
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc );
 
-	SDL_Surface* surDRW()
-	{
+	SDL_Surface* surDRW() {
 		if( !pSHR )
 			return pSRF;
 
@@ -229,6 +228,8 @@ public:
 
 		return pTX = SDL_CreateTextureFromSurface( pRNDR, pREF );
 	}
+	U1x4* TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
+						char* pNAME, char *pPATH, char *pFILE );
 };
 
 class gpcPICall
