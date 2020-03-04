@@ -857,6 +857,13 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								win.gpsMASSpath ,win.gppMASSfile );
 
 							} break;
+						case 2: { /// EXPLODE TOOL ----------------------------
+							pTRG->TOOLexplode(
+								win.piMASS->PIClzyALL, aGLpPIC,
+								win.gpsMASSname,
+								win.gpsMASSpath ,win.gppMASSfile );
+
+							} break;
 						default:{
 							}break;
 						}

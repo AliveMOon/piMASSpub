@@ -1,6 +1,54 @@
 #include "gpcwin.h"
 SDL_Surface* gpapP[0x10];
+U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
+							char* pNAME, char *pPATH, char *pFILE )
+{
+	gpapP[0] = surDRW();			// TARGET
+	gpapP[1] = ppPIC[0]->surDRW();	// dilet
+	if( !gpapP[1] )
+		return gpapP[0] ? (U1x4*)gpapP[0]->pixels : NULL;
 
+	if( gpapP[0] )
+	if( gpapP[0]->h != gpapP[1]->h*2 || gpapP[0]->pitch != gpapP[1]->pitch )
+		gpmSDL_FreeSRF(gpapP[0]);
+
+	if( !gpapP[0] )
+	{
+		txWH.a4x2[1] = ppPIC[0]->txWH.a4x2[1]&I4x2(1,2);
+		gpapP[0] = pSRF = SDL_CreateRGBSurface( 0, txWH.z, txWH.w, 32, 0,0,0,0 );
+		if( !pSRF )
+			return NULL;
+	}
+	aiQC[0] = aiQC[1]+1;
+	pREF = NULL;
+
+	///--------------------
+	//gpapP[2] = ppPIC[1]->surDRW();	// cam1
+
+	I4	w = txWH.a4x2[1].x, half = w*gpapP[1]->h,
+		aDIR[] = { -w, +1, w, -1 };
+
+	U4	*pR = (U4*)gpapP[0]->pixels,
+		*pM = pR+half;
+
+	U1x4* pI = (U1x4*)gpapP[1]->pixels, in;
+	gpmZnOF( pM, half );
+
+	U4 bugID = 1;
+	bool bIN, bPREV;
+	U1 rule;
+
+	for( I4 s = 1, nR; s < half-w-1; s++ )
+	{
+		nR = pI->bug( pR, pM, s, aDIR, half );
+		if( nR < 9 )
+			continue;
+
+
+
+	}
+	return (U1x4*)gpapP[0]->pixels;
+}
 U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 							char* pNAME, char *pPATH, char *pFILE )
 {
@@ -16,7 +64,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	aiQC[0] = aiQC[1]+1;
 	pREF = NULL;
 	gpmZ(gpapP);
-	gpapP[0] = pSRF;			// TARGET
+	gpapP[0] = pSRF;				// TARGET
 	gpapP[1] = ppPIC[0]->surDRW();	// CAM
 	gpapP[2] = ppPIC[1]->surDRW();	// MASK
 	gpapP[3] = ppPIC[2]->surDRW();	// MASKi // ezt cserélgetjük

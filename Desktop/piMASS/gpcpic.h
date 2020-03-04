@@ -230,6 +230,8 @@ public:
 	}
 	U1x4* TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 						char* pNAME, char *pPATH, char *pFILE );
+	U1x4* TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
+						char* pNAME, char *pPATH, char *pFILE );
 };
 
 class gpcPICall

@@ -965,6 +965,77 @@ public:
 			p1[i].u4 |= p2[i].u4;
 		return this;
 	}
+	U4 bug( U4* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX = 0 )
+	{
+		if( pMSK[b] )
+			return 0;
+		U1x4 in = this[b];
+		if( !(in.u4&0xffffff) )
+			return 0;
+
+		U4* pRi = pR, nO, n_stp = 0;
+		I4	w = pD[2],
+			s = b, bx, by,
+			aR[] = {-w,0,w,0};
+		U1 rule;
+		I1 dir = 1;
+		pMSK[b] = *pRi = b;
+		bool b_pre = true, b_in;
+
+		b+=dir;
+		by = b-b%w;
+
+		while( s != b || ((nO = pRi-pR)&1) )
+		{
+			bx = b-by;
+
+			rule =	   (b  >= 0	)		// lent van
+					| ((b  >= by)<<1)	// jobra van
+					| ((bx <  w	)<<2)	// balra van
+					| ((b  <  n )<<3);	// fent van
+
+			b_in = false;
+			if( rule == 0xf )
+			{
+				if( !pMSK[b] )
+					b_in = this[b].u4 == in.u4;
+
+				if( !b_in )
+					pMSK[b] = s;
+			}
+
+
+
+			if( b_in != b_pre )
+			if( dir&1 )
+			{
+				*pRi = b;
+				pRi++;
+			}
+
+			if( b_in )
+			{
+				if( b_in != b_pre )
+					n_stp++;
+
+				dir--;
+				if(dir<0)
+					dir = 3;
+			} else {
+                dir++;
+                dir %= 4;
+			}
+
+			b_pre=b_in;
+			b	+= pD[dir];
+			by	+= aR[dir];
+		}
+
+		if( nX ? nO > nX : false )
+			return 0;
+
+		return nO;
+	}
 };
 
 class I1x4
