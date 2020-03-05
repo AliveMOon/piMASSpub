@@ -96,14 +96,115 @@ public:
 	}
 
 };
+class gpcBOB
+{
+public:
+	U4 		mom, 	id,
+			nRDall, nRD,
+			nAREA,	iW,
+			nKIDall, iKID;
+	I4x4	lurd;
+	I4x2	*pRD, *pRDsrt, wCNTR;
+	gpcBOB	**ppKID;
+	~gpcBOB(){
+		gpmDELary(pRD);
 
+		if( !ppKID )
+			return;
+
+		for( U4 i = 0; i < iKID; i++ )
+			gpmDEL(ppKID[i]);
+
+		delete[] ppKID;
+	};
+	gpcBOB(){ gpmCLR; };
+	gpcBOB* pBOB( U1x4* pI, U4* pM, I4x2 Mwh, U4 m, U4 i, I4x2* pR, U4 nR, U4 nRx )
+	{
+		if( !this )
+		{
+			gpcBOB* pTHIS = new gpcBOB;
+			if( !pTHIS )
+				return NULL;
+
+			return pTHIS->pBOB( pI, pM, Mwh, m, i, pR, nR, nRx );
+		}
+		mom = m;
+		id = i;
+
+        if( nRDall <= gpmPAD(nR*4,0x10) )
+        {
+			nRDall = gpmPAD(nR*4,0x10)+0x10;
+			gpmDELary(pRD);
+			pRD = new I4x2[nRDall];
+        }
+
+
+
+        gpmMcpyOF( pRD, pR, nR );
+        gpmMcpyOF( pRDsrt = pRD+nR, pR, nR );
+
+		pRDsrt->median( nR, pRDsrt+nR,true );
+		nAREA = 0;
+		U8 w8 = 0, nW = 0;
+		lurd.a4x2[0] = Mwh;
+		lurd.a4x2[0].null();
+
+		for( U4 i = 0, a,b,ab; i < nR; i+= 2 )
+		{
+			b = pRDsrt[i+1].y-1;
+			a = pRDsrt[i+0].y+1;
+			w8 += a+b;
+			nW++;
+
+			ab = b-a;
+			if( ab < 1 )
+				continue;
+			gpmMsetOF( pM+a, ab, &id );
+			nAREA += ab; /// AREA
+			a %= Mwh.x;
+			b /= Mwh.x;
+			if( lurd.x > a )
+				lurd.x = a;
+			if( lurd.y > b )
+				lurd.y = b;
+
+			if( lurd.z < a+ab )
+				lurd.z = a+ab;
+			if( lurd.w < b )
+				lurd.w = b;
+
+		}
+		w8 /= nW*2;
+		iW = w8;
+		wCNTR.x = iW%Mwh.x;
+		wCNTR.y = iW/Mwh.x;
+
+		if( nRD < 9 || nRD > nRx )
+		{
+			nRD = 0;
+			return this;
+		}
+
+		if( !pI )
+			return this;
+		/// na lehet gyerekeket nemzeni
+		// van kép hozzá
+
+
+        return this;
+	}
+
+};
 class gpcPIC
 {
 public:
 	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;
 	gpcLZY			*pPACK;
-	U4				id, iSRC, aiQC[2], nPIXall, nPIX,
+	U4				id, iSRC, aiQC[2],
+					nPIXall, nPIX,
+					nBOBall, nBOB,
+
 					bppS, nPKavg;
 
 	SDL_Surface		*pSRF, *pSHR, *pREF;
@@ -113,6 +214,8 @@ public:
 
 	I4x4			xyOUT, xySRC, txWH;
 	gpcPIC			*pSRC;
+	gpcBOB			**ppBOB;
+
 	bool			bTHRD;
 	std::thread		T;
 	//U1		*pPIX;

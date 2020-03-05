@@ -105,9 +105,9 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
     return this;
 }
-U4 U1x4::bugW( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
+U4 U1x4::bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX )
 {
-	if(pMSK[b])
+	if(pMSK[b]!=mom)
 		return 0;
 	pMSK[b] = b;
 	U1 in = this[b].w;
@@ -144,7 +144,7 @@ U4 U1x4::bugW( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
 		b_in = false;
 		if( rule == 0xf )
 		{
-			if( pMSK[b] ? pMSK[b] == s : false )
+			if( pMSK[b] == mom ? false : pMSK[b] == s )
 				b_in = true;
 			else if( b_in = this[b].w == in )
 				pMSK[b] = s;
@@ -180,18 +180,6 @@ U4 U1x4::bugW( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
 	if( nX ? nX < pRi->x : false )
 		return 0;
 
-	pRr->median( pR->x=pRi->x, pRr+pR->x,true );
-	pR->y = 0;
-	for( U4 i = 0, a,b,ab; i < pRi->x; i+= 2 )
-	{
-		b = pRr[i+1].y-1;
-		a = pRr[i+0].y+1;
-		ab = b-a;
-		if( ab < 1 )
-			continue;
 
-		gpfMset( pMSK+a, ab, &s, sizeof(s) );
-		pR->y += ab; /// AREA
-	}
-	return pR->x;
+	return pR->x = pRi->x;
 }

@@ -412,7 +412,7 @@ enum gpeFD {
 
 #include "gpeALF.h"
 
-inline void* gpfMset( void* pD, U8 n, void* pS, U8 nS )
+inline void* gpfMset( void* pD, size_t n, void* pS, size_t nS )
 {
 	if( !n || !nS )
 		return pD;
@@ -429,7 +429,7 @@ inline void* gpfMset( void* pD, U8 n, void* pS, U8 nS )
 		*p_b = p_a+nS,
 		*p_e = p_a+n*nS;
 
-	U8 a,b;
+	size_t a,b;
 	while( p_b < p_e )
 	{
 		a = p_b-p_a;
@@ -442,6 +442,7 @@ inline void* gpfMset( void* pD, U8 n, void* pS, U8 nS )
 	}
 	return pD;
 }
+#define gpmMsetOF( d, n, s ) gpfMset((d), (n), (s), sizeof(*(s))  )
 int inline gpfACE( const char* p_file, I4 mode )
 {
 	//	00	Existence only
@@ -1130,7 +1131,7 @@ public:
 
 
 
-	U4 bugW( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX = 0 );
+	U4 bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
 
 };
 

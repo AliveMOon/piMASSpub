@@ -25,7 +25,8 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	///--------------------
 	//gpapP[2] = ppPIC[1]->surDRW();	// cam1
 
-	I4	w = txWH.a4x2[1].x, half = w*gpapP[1]->h,
+	I4	w = txWH.a4x2[1].x, h = gpapP[1]->h,
+		half = w*h, wph = w+h, wph2 = wph*2,
 		aDIR[] = { -w, +1, w, -1 };
 
 	U4		*pM = (U4*)gpapP[0]->pixels;
@@ -54,16 +55,61 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		pI[i].w |= 0x10;
 	}
 
+	U4 mom = 0, nBtrd = 0;
+	nBOB = 0;
 
 	for( I4 s = 1, nR; s < half-w-1; s++ )
 	{
-		nR = pI->bugW( pRi, pM, s, aDIR, half );
-		if( pRi->x < 9 )
-			continue;
-		if( pRi->x > w*2 )
+		nR = pI->bugW( pRi, pM, mom, s, aDIR, half );
+
+		if( nBOBall <= nBOB )
+		{
+			nBOBall = nBOB+0x10;
+			gpcBOB** ppKILL = ppBOB;
+			ppBOB = new gpcBOB*[nBOBall];
+			if( nBOB )
+				gpmMcpyOF( ppBOB, ppKILL, nBOB );
+			gpmZnOF( ppBOB+nBOB, nBOBall-nBOB );
+			gpmDELary(ppKILL);
+		}
+
+		ppBOB[nBOB] = ppBOB[nBOB]->pBOB(	pI, pM,
+											I4x2( w, h ),
+											mom, s, pRi+1,
+											pRi->x, wph2 );
+
+		if( ppBOB[nBOB] ? !ppBOB[nBOB]->nRD : true )
 			continue;
 
-		pRi += pRi->x+1;
+		nBOB++;
+		if( nBtrd+4 > nBOB )
+			continue;
+		// kipakoljk a gyerekeket
+		for( U4 e = nBOB; nBtrd < e; nBtrd++ )
+        {
+			if( ppBOB[nBtrd] ? !ppBOB[nBtrd]->iKID : true )
+				continue;
+			for( U4 i = 0; i < ppBOB[nBtrd]->iKID; i++ )
+			{
+				if( ppBOB[nBtrd] ? !ppBOB[nBtrd]->ppKID[i] : true )
+					continue;
+
+				if( nBOBall <= nBOB )
+				{
+					nBOBall = nBOB+0x10;
+					gpcBOB** ppKILL = ppBOB;
+					ppBOB = new gpcBOB*[nBOBall];
+					if( nBOB )
+						gpmMcpyOF( ppBOB, ppKILL, nBOB );
+					gpmZnOF( ppBOB+nBOB, nBOBall-nBOB );
+					gpmDELary(ppKILL);
+				}
+				gpmDEL(ppBOB[nBOB]);
+				ppBOB[nBOB] = ppBOB[nBtrd]->ppKID[i];
+				ppBOB[nBtrd]->ppKID[i] = NULL;
+			}
+
+        }
 	}
 	return (U1x4*)gpapP[0]->pixels;
 }
