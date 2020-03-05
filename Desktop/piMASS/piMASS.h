@@ -412,7 +412,7 @@ enum gpeFD {
 
 #include "gpeALF.h"
 
-inline void* gpfMEMSET( void* pD, U8 n, void* pS, U8 nS )
+inline void* gpfMset( void* pD, U8 n, void* pS, U8 nS )
 {
 	if( !n || !nS )
 		return pD;
@@ -965,77 +965,8 @@ public:
 			p1[i].u4 |= p2[i].u4;
 		return this;
 	}
-	U4 bug( U4* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX = 0 )
-	{
-		if( pMSK[b] )
-			return 0;
-		U1x4 in = this[b];
-		if( !(in.u4&0xffffff) )
-			return 0;
+	U4 bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX = 0 );
 
-		U4* pRi = pR, nO, n_stp = 0;
-		I4	w = pD[2],
-			s = b, bx, by,
-			aR[] = {-w,0,w,0};
-		U1 rule;
-		I1 dir = 1;
-		pMSK[b] = *pRi = b;
-		bool b_pre = true, b_in;
-
-		b+=dir;
-		by = b-b%w;
-
-		while( s != b || ((nO = pRi-pR)&1) )
-		{
-			bx = b-by;
-
-			rule =	   (b  >= 0	)		// lent van
-					| ((b  >= by)<<1)	// jobra van
-					| ((bx <  w	)<<2)	// balra van
-					| ((b  <  n )<<3);	// fent van
-
-			b_in = false;
-			if( rule == 0xf )
-			{
-				if( !pMSK[b] )
-					b_in = this[b].u4 == in.u4;
-
-				if( !b_in )
-					pMSK[b] = s;
-			}
-
-
-
-			if( b_in != b_pre )
-			if( dir&1 )
-			{
-				*pRi = b;
-				pRi++;
-			}
-
-			if( b_in )
-			{
-				if( b_in != b_pre )
-					n_stp++;
-
-				dir--;
-				if(dir<0)
-					dir = 3;
-			} else {
-                dir++;
-                dir %= 4;
-			}
-
-			b_pre=b_in;
-			b	+= pD[dir];
-			by	+= aR[dir];
-		}
-
-		if( nX ? nO > nX : false )
-			return 0;
-
-		return nO;
-	}
 };
 
 class I1x4
@@ -1823,8 +1754,7 @@ public:
 
 
 
-class U4x4
-{
+class U4x4 {
 public:
     union
     {
@@ -2039,8 +1969,7 @@ public:
 	U4  dict_find( U1* p_src, U4x4& w );
 };
 
-class U8x4
-{
+class U8x4 {
 public:
     union
     {
@@ -2170,8 +2099,7 @@ public:
 	}
 };
 
-typedef enum gpeZS:U4
-{
+typedef enum gpeZS:U4 {
 	gpeZS_null, // = 0,
 	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),
 	gpeZS_oDIR = MAKE_ID( 'o', 'D', 'I', 'R'	),
@@ -2230,8 +2158,7 @@ typedef enum gpeZS:U4
 
 } gpeZS;
 
-class I4x2
-{
+class I4x2 {
 public:
     I4 x,y;
 
@@ -2625,6 +2552,131 @@ public:
 			y = b.y;
 		return *this;
 	}
+	I4 average( U4 n ) {
+		// vigyázz ez sorrendezi az értékeket
+		if( !this || n < 1 )
+			return 0;
+
+		if( n < 2 )
+		{
+			return this[0].y;
+		}
+		else if( n < 3 )
+		{
+			return (this[1].y+this[0].y)/2;
+		}
+
+		I8 avgr = 0;
+		for( U4 j = 0; j < n; j++ )
+			avgr += this[j].y;
+
+		return avgr / n;
+	}
+	I4 median( U4 n, I4x2* p_tree, bool b_inc = false ) {
+		// b_inc == true - incrementált növekvő sorban leszenk
+		// b_inc == false - dekrementáslt csökkenő sorban leszenk (nem definiálod akkor ez, azaz csökenő )
+		if( !this || n < 1 )
+			return 0;
+
+		if( n < 2 )
+			return this->y;
+
+		U4	i, j, l, r;
+		I4x2 x;
+
+		r = n;
+		while( r >= 1 )
+		{
+			// az öszes elem számát "r" elosztom 2-tővel kerekítés nélkül
+			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "l" lesz a küszöb
+			l = ldiv( r, 2 ).quot;
+			while( r > 0 )
+			{
+				// a következő elemet berakom az x-be
+				x = this[r-1];
+
+				i = r;
+				if ( i*2 <= n )
+				{
+					// i mutatja majd azt a helyet ahonva az x et be akarnám rakni
+					while( i*2 <= n )
+					{
+						j = i*2;
+						// azt jelenti, hogy az i nek van ága
+						if( j+1 <= n )
+						if( p_tree[j+1].y < p_tree[j].y )
+							j++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
+
+						if( x.y > p_tree[j].y )
+						{
+							// azt jelenti hogy az x nagyobb volt mint az ág ezért lejebb rakom a tartalmát
+							p_tree[i] = p_tree[j];
+							// és következő ciklusban az ágról akarom folytatni
+							i = j;
+						} else {
+							// azt jelenti, nincs ennél magasabb szám az ágakon
+							break;
+						}
+					}//while
+					p_tree[i] = x;
+				} else {
+					p_tree[r] = x;
+				}
+
+				// r-et csökkentem jöhet a következő elem
+				r--;
+			}
+		}
+		l = ldiv( r, 2).quot;
+		r = n;
+		i = 1;
+		while ( r >= 1 )
+		{
+			x = p_tree[r];
+			p_tree[r] = p_tree[1];
+			r--;
+			l = 1;
+			while ( l <= r )
+			{
+				i = l*2;
+				if ( i <= r )
+				{
+					if ( i+1 <= r )
+						if ( p_tree[i+1].y < p_tree[i].y )
+							i++;
+
+					if ( x.y > p_tree[i].y )
+					{
+						p_tree[l] = p_tree[i];
+					} else {
+						p_tree[l] = x;
+						break;
+					}
+				} else {
+					p_tree[l] = x;
+					break;
+				}
+				l = i;
+			}//while
+
+		}
+
+		if( b_inc )
+		{
+			for( U4 i = 0; i < n; i++ )
+				this[i] = p_tree[n-i];
+			if( n < 3 )
+				return average( n );
+			return this[n/2].y;
+		}
+
+		gpmMcpyOF( this, p_tree+1, n );
+		if( n < 3 )
+			return average( n );
+
+		return this[n/2].y;
+	}
+
 };
 
 

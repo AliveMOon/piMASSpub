@@ -51,7 +51,7 @@ U1x4* U1x4::pos( I4x2 pxy, const I4x4& whp )
 U1x4* U1x4::frmFILL( I4x2 cr, U1x4 u, I4x4 whp  )
 {
 	cr.mn(whp.a4x2[0]) -= 1;
-	gpfMEMSET( this, cr.x, &u, sizeof(u) );
+	gpfMset( this, cr.x, &u, sizeof(u) );
 
 	if( cr.mn() < 1 )
 		return this;
@@ -104,4 +104,94 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
 
     return this;
+}
+U4 U1x4::bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
+{
+	if( pMSK[b] )
+		return 0;
+	U1x4 in = this[b];
+	if( !(in.u4&0xffffff) )
+		return 0;
+
+	I4x2	*pRr = pR+1,
+			*pRi = pRr;
+
+	U4	nR, n_stp = 0;
+	I4	w = pD[2],
+		s = b, bx, by,
+		aR[] = {-w,0,w,0};
+	U1 rule;
+	I1 dir = 1;
+
+	pMSK[s] = s;
+	*pRi = 0;
+
+	b++;
+	by = b-b%w;
+
+	bool b_pre = true, b_in;
+
+	while( s != b || (pRi->x&1) )
+	{
+		bx = b-by;
+
+		rule =	   (b  >= 0	)		// lent van
+				| ((b  >= by)<<1)	// jobra van
+				| ((bx <  w	)<<2)	// balra van
+				| ((b  <  n )<<3);	// fent van
+
+		b_in = false;
+		if( rule == 0xf )
+		{
+			if( pMSK[b] ? pMSK[b] == s : true )
+				b_in = this[b].u4 == in.u4;
+
+			//if( b_in )
+				pMSK[b] = s;
+		}
+
+
+		if( b_in != b_pre )
+		if( dir&1 )
+		{
+			pRi->y = b;
+			pRi++;
+			pRi->x = pRi-pRr;
+		}
+
+		if( b_in )
+		{
+			if( b_in != b_pre )
+				n_stp++;
+
+			dir--;
+			if(dir<0)
+				dir = 3;
+		} else {
+			dir++;
+			dir %= 4;
+		}
+
+		b_pre=b_in;
+		b	+= pD[dir];
+		by	+= aR[dir];
+	}
+
+	if( nX ? nX < pRi->x : false )
+		return 0;
+
+	pRr->median( pR->x=pRi->x, pRr+pR->x,true );
+	pR->y = 0;
+	for( U4 i = 0, a,b,ab; i < pRi->x; i+= 2 )
+	{
+		b = pRr[i+1].y-1;
+		a = pRr[i+0].y+1;
+		ab = b-a;
+		if( ab < 1 )
+			continue;
+
+		gpfMset( pMSK+a, ab, &s, sizeof(s) );
+		pR->y += ab;
+	}
+	return pR->x;
 }

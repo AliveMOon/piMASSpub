@@ -949,7 +949,7 @@ public:
 		{
 			pOP = new I1x4[nA];
 			pOP->u4 = 0;
-			gpfMEMSET( pOP+1, nCPY, pOP, sizeof(*pOP) );
+			gpfMset( pOP+1, nCPY, pOP, sizeof(*pOP) );
 			if( pKILL )
 			{
 				memcpy( pOP, pKILL, nCPY*sizeof(*pOP) );

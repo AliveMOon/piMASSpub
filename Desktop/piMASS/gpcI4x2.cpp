@@ -24,3 +24,4 @@ I4x2& I4x2::operator = ( const I8x2& b )
 	y = b.y;
 	return *this;
 }
+

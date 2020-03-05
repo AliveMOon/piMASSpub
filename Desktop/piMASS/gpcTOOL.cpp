@@ -28,11 +28,11 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	I4	w = txWH.a4x2[1].x, half = w*gpapP[1]->h,
 		aDIR[] = { -w, +1, w, -1 };
 
-	U4	*pR = (U4*)gpapP[0]->pixels,
-		*pM = pR+half;
-
-	U1x4* pI = (U1x4*)gpapP[1]->pixels, in;
+	U4		*pM = (U4*)gpapP[0]->pixels;
 	gpmZnOF( pM, half );
+
+	I4x2	*pR = (I4x2*)(pM+half), *pRi = pR;
+	U1x4* pI = (U1x4*)gpapP[1]->pixels;
 
 	U4 bugID = 1;
 	bool bIN, bPREV;
@@ -40,12 +40,13 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 	for( I4 s = 1, nR; s < half-w-1; s++ )
 	{
-		nR = pI->bug( pR, pM, s, aDIR, half );
-		if( nR < 9 )
+		nR = pI->bug( pRi, pM, s, aDIR, half );
+		if( pRi->x < 9 )
+			continue;
+		if( pRi->x > w*2 )
 			continue;
 
-
-
+		pRi += pRi->x+1;
 	}
 	return (U1x4*)gpapP[0]->pixels;
 }

@@ -520,10 +520,10 @@ public:
 				*pC = gpdSRC_COLw;
 				*pR = 1;
 
-				gpfMEMSET( (pC+1), mapZN44.z-1, pC, sizeof(*pC) );
-				gpfMEMSET( (pR+1), mapZN44.w-1, pR, sizeof(*pR) );
+				gpfMset( (pC+1), mapZN44.z-1, pC, sizeof(*pC) );
+				gpfMset( (pR+1), mapZN44.w-1, pR, sizeof(*pR) );
 
-				//gpfMEMSET( pCOL+mapZN44.a4x2[1].sum(), 3, pCOL, mapZN44.a4x2[1].sum() );
+				//gpfMset( pCOL+mapZN44.a4x2[1].sum(), 3, pCOL, mapZN44.a4x2[1].sum() );
 			}
 			return pMAP;
 		}
@@ -548,11 +548,11 @@ public:
 		*pMAP = 0;
 
 		//gpmZnOF( pMAP, nARE );
-		gpfMEMSET( (pMAP+1), nARE-1, pMAP, sizeof(*pMAP) );
-		gpfMEMSET( (pCOL+1), mapZN44.z-1, pCOL, sizeof(*pCOL) );
-		gpfMEMSET( (pROW+1), mapZN44.w-1, pROW, sizeof(*pROW) );
+		gpfMset( (pMAP+1), nARE-1, pMAP, sizeof(*pMAP) );
+		gpfMset( (pCOL+1), mapZN44.z-1, pCOL, sizeof(*pCOL) );
+		gpfMset( (pROW+1), mapZN44.w-1, pROW, sizeof(*pROW) );
 
-		gpfMEMSET( pCOL+mapZN44.a4x2[1].sum(), 3, pCOL, mapZN44.a4x2[1].sum() );
+		gpfMset( pCOL+mapZN44.a4x2[1].sum(), 3, pCOL, mapZN44.a4x2[1].sum() );
 
 		if( pK )
 		{
