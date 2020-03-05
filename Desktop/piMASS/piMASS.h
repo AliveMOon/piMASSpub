@@ -965,6 +965,141 @@ public:
 			p1[i].u4 |= p2[i].u4;
 		return this;
 	}
+	/// 13
+	U1x4& swpYX()
+	{
+		U1 t = x;
+		x = y;
+		y = t;
+		return *this;
+	}
+	/// 25
+	U1x4& swpZX()
+	{
+		U1 t = x;
+		x = z;
+		z = t;
+		return *this;
+	}
+	/// 36
+	U1x4& swpZY()
+	{
+		U1 t = y;
+		y = z;
+		z = t;
+		return *this;
+	}
+
+	/// 49
+	U1x4& swpWX()
+	{
+		U1 t = x;
+		x = w;
+		w = t;
+		return *this;
+	}
+
+	/// 5A
+	U1x4& swpWY()
+	{
+		U1 t = y;
+		y = w;
+		w = t;
+		return *this;
+	}
+	/// 6C
+	U1x4& swpWZ()
+	{
+		U1 t = z;
+		z = w;
+		w = t;
+		return *this;
+	}
+
+	U1 swp4()
+	{
+		if( !u4 )
+			return 0;
+
+		U1 o = 0;
+		U1x4 s = *this;
+
+		if(s.y>s.x)
+		{
+			s.swpYX();
+			o.w = 0x1;
+		}
+		if(s.z>s.x)
+		{
+			s.swpZX();
+			o.w |= 0x02;
+		}
+		if(s.z>s.y)
+		{
+			s.swpZY();
+			o.w |= 0x04;
+		}
+		if( !w )
+			return o
+
+		if(s.w>s.x)
+		{
+			s.swpWX();
+			o.w |= 0x08;
+		}
+
+		if(s.w>s.y)
+		{
+			s.swpWY();
+			o.w |= 0x10;
+		}
+
+		if(s.w>s.z)
+		{
+			s.swpWZ();
+			o.w |= 0x20;
+		}
+
+		return o;
+	}
+	U1x4& swp4( U1 s )
+	{
+		if( !(s&0x3f) )
+			return *this;
+
+		if( s&0x20 )
+			swpWZ();
+		if( s&0x10 )
+			swpWY();
+		if( s&0x08 )
+			swpWX();
+
+		if( s&0x04 )
+			swpZY();
+		if( s&0x02 )
+			swpZX();
+		if( s&0x01 )
+			swpZX();
+
+		return *this;
+	}
+
+	U1x4& swp3( U1 s )
+	{
+		if( !(s&0xf) )
+			return *this;
+
+		if( s&0x04 )
+			swpZY();
+		if( s&0x02 )
+			swpZX();
+		if( s&0x01 )
+			swpZX();
+
+		return *this;
+	}
+
+
 	U4 bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX = 0 );
 
 };
