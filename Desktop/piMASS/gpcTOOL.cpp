@@ -37,10 +37,27 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	U4 bugID = 1;
 	bool bIN, bPREV;
 	U1 rule;
+	/*
+	U1 aSQRT[0x100];
+	aSQRT[0] = 0;
+	aSQRT[1] = 1;
+
+	for( U4 i = 2; i < 0x100; i++ )
+		aSQRT[i] = sqrt(i);*/
+
+	for( U4 i = 0; i < half; i++ )
+	{
+		if( pI[i].u4&0xffffff )
+			pI[i].w = pI[i].srt3();
+		else
+			continue;
+		pI[i].w |= 0x10;
+	}
+
 
 	for( I4 s = 1, nR; s < half-w-1; s++ )
 	{
-		nR = pI->bug( pRi, pM, s, aDIR, half );
+		nR = pI->bugW( pRi, pM, s, aDIR, half );
 		if( pRi->x < 9 )
 			continue;
 		if( pRi->x > w*2 )

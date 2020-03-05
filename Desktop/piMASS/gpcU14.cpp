@@ -105,12 +105,13 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
     return this;
 }
-U4 U1x4::bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
+U4 U1x4::bugW( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
 {
-	if( pMSK[b] )
+	if(pMSK[b])
 		return 0;
-	U1x4 in = this[b];
-	if( !(in.u4&0xffffff) )
+	pMSK[b] = b;
+	U1 in = this[b].w;
+	if(!in)
 		return 0;
 
 	I4x2	*pRr = pR+1,
@@ -127,11 +128,11 @@ U4 U1x4::bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
 	*pRi = 0;
 
 	b++;
-	by = b-b%w;
+	by = s-s%w;
 
 	bool b_pre = true, b_in;
 
-	while( s != b || (pRi->x&1) )
+	while( s == b ? dir != 2 : true ) //s != b || (pRi->x&1) )
 	{
 		bx = b-by;
 
@@ -143,10 +144,9 @@ U4 U1x4::bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
 		b_in = false;
 		if( rule == 0xf )
 		{
-			if( pMSK[b] ? pMSK[b] == s : true )
-				b_in = this[b].u4 == in.u4;
-
-			//if( b_in )
+			if( pMSK[b] ? pMSK[b] == s : false )
+				b_in = true;
+			else if( b_in = this[b].w == in )
 				pMSK[b] = s;
 		}
 
@@ -191,7 +191,7 @@ U4 U1x4::bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX )
 			continue;
 
 		gpfMset( pMSK+a, ab, &s, sizeof(s) );
-		pR->y += ab;
+		pR->y += ab; /// AREA
 	}
 	return pR->x;
 }

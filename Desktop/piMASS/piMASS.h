@@ -1015,8 +1015,7 @@ public:
 		w = t;
 		return *this;
 	}
-
-	U1 swp4()
+	U1 srt3()
 	{
 		if( !u4 )
 			return 0;
@@ -1027,41 +1026,84 @@ public:
 		if(s.y>s.x)
 		{
 			s.swpYX();
-			o.w = 0x1;
+			o = 0x1;
 		}
 		if(s.z>s.x)
 		{
 			s.swpZX();
-			o.w |= 0x02;
+			o |= 0x02;
 		}
 		if(s.z>s.y)
 		{
 			s.swpZY();
-			o.w |= 0x04;
+			o |= 0x04;
 		}
+
+		return o;
+	}
+	U1 srt4()
+	{
+		if( !u4 )
+			return 0;
+
+		U1 o = 0;
+		U1x4 s = *this;
+
+		if(s.y>s.x)
+		{
+			s.swpYX();
+			o = 0x1;
+		}
+		if(s.z>s.x)
+		{
+			s.swpZX();
+			o |= 0x02;
+		}
+		if(s.z>s.y)
+		{
+			s.swpZY();
+			o |= 0x04;
+		}
+
+		/// srt3
 		if( !w )
-			return o
+			return o;
 
 		if(s.w>s.x)
 		{
 			s.swpWX();
-			o.w |= 0x08;
+			o |= 0x08;
 		}
 
 		if(s.w>s.y)
 		{
 			s.swpWY();
-			o.w |= 0x10;
+			o |= 0x10;
 		}
 
 		if(s.w>s.z)
 		{
 			s.swpWZ();
-			o.w |= 0x20;
+			o |= 0x20;
 		}
 
 		return o;
 	}
+	U1x4& swp3( U1 s )
+	{
+		if( !(s&0xf) )
+			return *this;
+
+		if( s&0x04 )
+			swpZY();
+		if( s&0x02 )
+			swpZX();
+		if( s&0x01 )
+			swpYX();
+
+		return *this;
+	}
+
 	U1x4& swp4( U1 s )
 	{
 		if( !(s&0x3f) )
@@ -1079,28 +1121,16 @@ public:
 		if( s&0x02 )
 			swpZX();
 		if( s&0x01 )
-			swpZX();
-
-		return *this;
-	}
-
-	U1x4& swp3( U1 s )
-	{
-		if( !(s&0xf) )
-			return *this;
-
-		if( s&0x04 )
-			swpZY();
-		if( s&0x02 )
-			swpZX();
-		if( s&0x01 )
-			swpZX();
+			swpYX();
 
 		return *this;
 	}
 
 
-	U4 bug( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX = 0 );
+
+
+
+	U4 bugW( I4x2* pR, U4* pMSK, I4 b, I4* pD, U4 n, U4 nX = 0 );
 
 };
 
