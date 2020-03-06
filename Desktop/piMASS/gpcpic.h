@@ -228,6 +228,19 @@ public:
 	std::thread		T;
 	//U1		*pPIX;
 
+	~gpcPIC()
+	{
+		unLOCK();
+		for( U4 i = 0; i < nBOB; i++ )
+			gpmDEL(ppBOB[i]);
+
+		gpmDELary(ppBOB);
+		gpmSDL_FreeTX(pTX);
+		gpmSDL_FreeTX(pRTX);
+		gpmSDL_FreeSRF(pSRF);
+		gpmSDL_FreeSRF(pSHR);
+
+	}
 	gpcPIC(){ gpmCLR; pFILE = sFILE; };
 	gpcPIC( I8x2 an, U4 i )
 	{

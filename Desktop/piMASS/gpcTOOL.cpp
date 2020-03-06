@@ -4,21 +4,130 @@ SDL_Surface* gpapP[0x10];
 class gpcTRDbug
 {
 public:
-	U1x4	*pQ;
+	U1x4	*pQ; //,*pOUT;
 	I4x2	*pR;
 	I4		*pD;
-	U4		*pM,
-			s, m, wh, e, mx, nDONE, nALL, nR, w;
+	gpcBOB	**ppBOB;
+	U4		nBOBall, nBOB, frBOB,
+			*pM,
+			s, m, wh, e,
+			//mx,
+			nDONE, nALL, nR,
+			w, h;
 
+	gpcBOB* pB() {
+		if( nBOBall <= nBOB )
+		{
+			nBOBall = nBOB+0x10;
+			gpcBOB** ppKILL = ppBOB;
+			ppBOB = new gpcBOB*[nBOBall];
+			if( nBOB )
+				gpmMcpyOF( ppBOB, ppKILL, nBOB );
+			gpmZnOF( ppBOB+nBOB, nBOBall-nBOB );
+			gpmDELary(ppKILL);
+		}
 
+		return ppBOB[nBOB];
+	}
+	U4 flsB() {
+		while( frBOB < nBOB )
+		{
+			if(ppBOB[frBOB])
+			{
+				frBOB++;
+				continue;
+			}
+
+			nBOB--;
+			if(!ppBOB[nBOB])
+				continue;
+
+			ppBOB[frBOB] = ppBOB[nBOB];
+			frBOB++;
+			ppBOB[nBOB] = NULL;
+		}
+		return frBOB;
+	}
+	gpcTRDbug& operator -= ( gpcBOB* pB ) {
+		if( !pB )
+			return *this;
+
+		flsB();
+
+		for( U4 i = 0; i < nBOB; i++ )
+		{
+			if( ppBOB[i] != pB )
+				continue;
+
+			ppBOB[frBOB=i] = NULL;
+			while( frBOB < nBOB )
+			{
+				nBOB--;
+				if(!ppBOB[nBOB])
+					continue;
+
+				ppBOB[frBOB] = ppBOB[nBOB];
+				frBOB++;
+				ppBOB[nBOB] = NULL;
+			}
+			break;
+		}
+
+		return *this;
+	}
+	gpcTRDbug& operator = ( gpcBOB* pB ) {
+		if( !pB )
+			return *this;
+
+		flsB();
+
+		for( U4 i = 0; i < nBOB; i++ )
+		{
+			if( ppBOB[i] == pB )
+				return *this;
+			if( ppBOB[i] ? true : (frBOB<i) )
+				continue;
+			frBOB = i;
+		}
+
+		if( frBOB < nBOB )
+		{
+			ppBOB[frBOB] = pB;
+			return *this;
+		}
+
+		if( nBOBall <= nBOB )
+		{
+			nBOBall = nBOB+0x10;
+			gpcBOB** ppKILL = ppBOB;
+			ppBOB = new gpcBOB*[nBOBall];
+			if( nBOB )
+				gpmMcpyOF( ppBOB, ppKILL, nBOB );
+			gpmZnOF( ppBOB+nBOB, nBOBall-nBOB );
+			gpmDELary(ppKILL);
+		}
+
+		ppBOB[frBOB] = pB;
+		nBOB++;
+		frBOB = nBOB;
+		return *this;
+	}
+	~gpcTRDbug() {
+		for( U4 i = 0; i < nBOB; i++ )
+			gpmDEL(ppBOB[i]);
+
+		gpmDELary(ppBOB);
+	}
 	gpcTRDbug(){ gpmCLR; };
 	void loop()
 	{
 		if( !this )
 			return;
 		w = pD[2];
+		h = wh/w;
 		nDONE = 1;
-		for( ; s < nALL; s++ )
+
+		for( ; s < wh; s++ )
 		{
 			if( s%w >= e )
 			{
@@ -28,9 +137,8 @@ public:
 			if(pM[s]!=m)
 				continue;
 
-			nR = pQ->bugU1( pR, pM, m, s, pD, wh, e, mx );
-
-
+			nR = pQ->bugU1( pR, pM, m, s, pD, wh, e, 0 );
+			*this = pB()->pBOB( (U1*)pQ, pM, I4x2(w,h), m, s, pR+1, pR->x, (w+h)*2 );
 
 		}
 
