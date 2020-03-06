@@ -169,10 +169,7 @@ void gpcGTall::clr()
 	gpmDELary(ppGTalloc);
 	gpmCLR;
 }
-/*gpcGT::~gpcGT()
-{
-	GTclose();
-}*/
+
 gpcGT* gpcGTall::GT( SOCKET sock )
 {
 	if( !this )

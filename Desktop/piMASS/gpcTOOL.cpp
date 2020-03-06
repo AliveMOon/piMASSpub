@@ -1,5 +1,49 @@
 #include "gpcwin.h"
 SDL_Surface* gpapP[0x10];
+
+class gpcTRDbug
+{
+public:
+	U1x4	*pQ;
+	I4x2	*pR;
+	I4		*pD;
+	U4		*pM,
+			s, m, wh, e, mx, nDONE, nALL, nR, w;
+
+
+	gpcTRDbug(){ gpmCLR; };
+	void loop()
+	{
+		if( !this )
+			return;
+		w = pD[2];
+		nDONE = 1;
+		for( ; s < nALL; s++ )
+		{
+			if( s%w >= e )
+			{
+				s += w-e-1;
+				continue;
+			}
+			if(pM[s]!=m)
+				continue;
+
+			nR = pQ->bugU1( pR, pM, m, s, pD, wh, e, mx );
+
+
+
+		}
+
+		m = pM[s];
+		//nDONE = nALL;
+	}
+};
+
+void TRDexp( gpcTRDbug* pT )
+{
+	return pT->loop();
+}
+
 U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 							char* pNAME, char *pPATH, char *pFILE )
 {
@@ -26,56 +70,97 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	//gpapP[2] = ppPIC[1]->surDRW();	// cam1
 
 
-	I4	w = txWH.a4x2[1].x, h = gpapP[1]->h,
-		half = w*h, wph = w+h, wph2 = wph*2,
-		dwn = half-w,
+	I4	w = txWH.a4x2[1].x,		wQ = w>>1,
+		h = txWH.a4x2[1].y>>1,	hQ = h>>1,
+		wh = w*h, 				whQ = wh>>1,
+		wph = w+h, wph2 = wph*2,
+		dwn = wh-w,
 		aDIR[] = { -w, +1, w, -1 };
+
 	U1x4* pI = (U1x4*)gpapP[1]->pixels;
 
-	U1	*pU1 = (U1*)gpapP[0]->pixels;
-	U4	*pM = (U4*)(pU1+half);
-	gpmZnOF( pU1, half*5 );
+	U1	*pQ = (U1*)gpapP[0]->pixels;
+	gpmZnOF( pQ, wh*(1+4) ); // U1-től törlünk
 
-	I4x2	*pR = (I4x2*)(pM+half), *pRi = pR;
+	U4	*pM = (U4*)(pQ+wh);
+	I4x2	*pR = (I4x2*)(pM+wh), *pRi = pR,
+			vQ, ofQ(wQ, hQ), trfQ(1,w);
 
 	U4 bugID = 1;
 	bool bIN, bPREV;
-	U1 rule;
-	/*
-	U1 aSQRT[0x100];
-	aSQRT[0] = 0;
-	aSQRT[1] = 1;
-
-	for( U4 i = 2; i < 0x100; i++ )
-		aSQRT[i] = sqrt(i);*/
-	U1 srt;
-	for( I4 i = 0, ix; i < half; i++ )
+	U1 rule, srt;
+	for( I4 i = (w+1)*2, q, ix, e = wh-i; i < e; i++ )
 	{
+		vQ = I4x2( i%w, i/w );
+		if( vQ.x < 2 || vQ.x > (w-2) )
+			continue;
+
 		srt = ((U4)pI[i].srt3()*0x100)>>3;
-		pU1[i] = srt;
 		if( !srt )
 			continue;
-		ix = i%w;
-		if( ix )
-			pU1[i-1] = srt;
-		if( ix < w-1 )
-			pU1[i+1] = srt;
-		if( i>w )
-			pU1[i-w] = srt;
-		if( i>dwn)
-			continue;
-		pU1[i+w] = srt;
+
+		q = (
+				((vQ&0x100000001)&ofQ)
+				+(vQ/2)
+			)*trfQ;
+
+		pQ[q] = srt;
+
+		ix = q%w;
+		pQ[q-1] = pQ[q+1] =
+		pQ[q-w] = pQ[q+w] = srt;
 	}
 
 	U4 mom = 0, nBtrd = 0;
 	nBOB = 0;
 
-	for( I4 s = 1, nR; s < half-w-1; s++ )
+	gpcTRDbug		aBUG[4];
+	std::thread 	aTRD[4];
+	for( U4 i = 0, e = 4*2, q; i < e; i++ )
+	{
+		vQ = I4x2( i%4, i/4 );
+        if( vQ.y )
+        {
+			aTRD[vQ.x].join();
+			if( aBUG[vQ.x].nDONE )
+			{
+
+				//aBUG[vQ.x].nDONE = 0;
+			}
+			//t = vQ.y;
+        } else {
+			q = (
+				((vQ&0x100000001)&ofQ)
+				+(vQ/2)
+			)*trfQ;
+			aBUG[vQ.x].pQ = (U1x4*)(pQ+q);
+			aBUG[vQ.x].pM = pM+q;
+			aBUG[vQ.x].pD = aDIR;
+			aBUG[vQ.x].pR = pR + vQ.x*wh/8;
+			aBUG[vQ.x].s = aDIR[2]+1;
+			aBUG[vQ.x].m = 0;
+			aBUG[vQ.x].wh = wh/2;
+			aBUG[vQ.x].e = aDIR[2]/2;
+			aBUG[vQ.x].nDONE = 0;
+		}
+
+		if( aBUG[vQ.x].nDONE )
+			continue;
+
+		aTRD[vQ.x] = std::thread( TRDexp, aBUG+vQ.x );
+	}
+
+
+	return (U1x4*)gpapP[0]->pixels;
+
+	for( I4 s = 1, nR; s < dwn-1; s++ )
 	{
 		if(pM[s]!=mom)
 			continue;
 
-		nR = ((U1x4*)pU1)->bugU1( pRi, pM, mom, s, aDIR, half );
+
+
+		nR = ((U1x4*)pQ)->bugU1( pRi, pM, mom, s, aDIR, wh );
 
 		if( nBOBall <= nBOB )
 		{
@@ -88,7 +173,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			gpmDELary(ppKILL);
 		}
 
-		ppBOB[nBOB] = ppBOB[nBOB]->pBOB(	pU1, pM,
+		ppBOB[nBOB] = ppBOB[nBOB]->pBOB(	pQ, pM,
 											I4x2( w, h ),
 											mom, s, pRi+1,
 											pRi->x, wph2 );
@@ -131,8 +216,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	return (U1x4*)gpapP[0]->pixels;
 }
 U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
-							char* pNAME, char *pPATH, char *pFILE )
-{
+							char* pNAME, char *pPATH, char *pFILE ) {
 	if( pSRF )
 	if( pSRF->w*pSRF->h != 512*512 )
 		gpmSDL_FreeSRF( pSRF );

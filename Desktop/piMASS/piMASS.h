@@ -925,17 +925,10 @@ public:
 	}
 	U1x4* zyxw( void* pV, U4 n )
 	{
-		U1x4 *p1 = this,
-			 *p2 = (U1x4*)pV;
+		gpmMcpyOF( this, pV, n );
 		for( U4 i = 0; i < n; i++ )
-		{
-			p1[i].u4 = p2[i].u4;
-			p1[i].swpZX();
-			/*p1[i].x = p2[i].z;
-			p1[i].y = p2[i].y;
-			p1[i].z = p2[i].x;
-			p1[i].w = p2[i].w;*/
-		}
+			this[i].swpZX();
+
 		return this;
 	}
 	U1x4* zwxy( void* pV, U4 n )
@@ -954,18 +947,38 @@ public:
 
 	U1x4* AND( void* pV, U4 n )
 	{
-		U1x4 *p1 = this,
-			 *p2 = (U1x4*)pV;
-		for( U4 i = 0; i < n; i++ )
-			p1[i].u4 &= p2[i].u4;
+		if( this ? !n : true )
+			return this;
+
+		U4 i = 0;
+		for( U4	ni = n>>1;
+				i<ni;
+				i++ )
+			((U8*)this)[i] &= ((U8*)pV)[i];
+
+		if( !(n&1) )
+			return this;
+
+		i <<= 1;
+		((U4*)this)[i] &= ((U4*)pV)[i];
 		return this;
 	}
 	U1x4* OR( void* pV, U4 n )
 	{
-		U1x4 *p1 = this,
-			 *p2 = (U1x4*)pV;
-		for( U4 i = 0; i < n; i++ )
-			p1[i].u4 |= p2[i].u4;
+		if( this ? !n : true )
+			return this;
+
+		U4 i = 0;
+		for( U4	ni = n>>1;
+				i<ni;
+				i++ )
+			((U8*)this)[i] |= ((U8*)pV)[i];
+
+		if( !(n&1) )
+			return this;
+
+		i <<= 1;
+		((U4*)this)[i] |= ((U4*)pV)[i];
 		return this;
 	}
 	/// 13
@@ -1132,7 +1145,7 @@ public:
 
 
 
-	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
+	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 e = 0, U4 nX = 0 );
 	U4 bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
 
 };
@@ -2328,7 +2341,14 @@ typedef enum gpeZS:U4 {
 
 class I4x2 {
 public:
-    I4 x,y;
+	union{
+		struct{
+			I4 x,y;
+		};
+		struct{
+			U8 u8;
+		};
+	};
 
     I4x2(){};
     I4x2( I4 _x, I4 _y = 0 )
@@ -2413,10 +2433,28 @@ public:
 	}
 
 
-
 	I8 operator * (const I4x2& b) const
 	{
 		return (I8)x*b.x + (I8)y * b.y;
+	}
+
+
+	I4x2 operator & (U8 b) const
+	{
+		if( !b )
+			return 0;
+
+		I4x2 a(0);
+		a.u8 = u8&b;
+		return a;
+	}
+
+	I4x2 operator >> (int b) const
+	{
+		if(!b)
+			return *this;
+
+		return I4x2( x>>b,  y>>b );
 	}
 
 	I4x2 operator & (const I4x2& b) const

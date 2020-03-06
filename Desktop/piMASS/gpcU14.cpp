@@ -105,7 +105,7 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
     return this;
 }
-U4 U1x4::bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX )
+U4 U1x4::bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 e, U4 nX )
 {
 	if(pMSK[b]!=mom)
 		return 0;
@@ -132,14 +132,15 @@ U4 U1x4::bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX )
 	by = s-s%w;
 
 	bool b_pre = true, b_in;
-
+	if( !e )
+		e = w;
 	while( s == b ? dir != 2 : true ) //s != b || (pRi->x&1) )
 	{
 		bx = b-by;
 
 		rule =	   (b  >= 0	)		// lent van
 				| ((b  >= by)<<1)	// jobra van
-				| ((bx <  w	)<<2)	// balra van
+				| ((bx <  e	)<<2)	// balra van
 				| ((b  <  n )<<3);	// fent van
 
 		b_in = false;
