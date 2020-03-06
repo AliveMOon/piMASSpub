@@ -72,6 +72,9 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 	for( I4 s = 1, nR; s < half-w-1; s++ )
 	{
+		if(pM[s]!=mom)
+			continue;
+
 		nR = ((U1x4*)pU1)->bugU1( pRi, pM, mom, s, aDIR, half );
 
 		if( nBOBall <= nBOB )

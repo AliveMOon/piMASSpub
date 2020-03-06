@@ -100,7 +100,7 @@ void main()
  unsel = 1;  f1	 
  
  trg = "dilet"
- trgw = 128
+ trgw = 256
  trgh = 128
  pico = "gui"
  pici = "dilet"
@@ -123,8 +123,8 @@ void main()
  			off = 1.0/tgPX, uv;
 	vec3 ize;
 	gl_FragColor.rgb = texture2D( tex0, flpUV ).rgb;
- 	for( int i = -1; i <= 1; ++i )
-	for( int j = -1; j <= 1; ++j )
+ 	for( int i = -2; i <= 2; ++i )
+	for( int j = -2; j <= 2; ++j )
 	{
 		uv = vec2(i,j);
 		ize = texture2D( tex0, flpUV+off*uv ).rgb*length(uv)/2.0;
@@ -376,7 +376,7 @@ void main()
  d3	   
  
  trg = "exp";
- trgw = 128;
+ trgw = 256;
  trgh = 256;
  
  pico="dilet";

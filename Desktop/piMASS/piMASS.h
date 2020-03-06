@@ -929,10 +929,12 @@ public:
 			 *p2 = (U1x4*)pV;
 		for( U4 i = 0; i < n; i++ )
 		{
-			p1[i].x = p2[i].z;
+			p1[i].u4 = p2[i].u4;
+			p1[i].swpZX();
+			/*p1[i].x = p2[i].z;
 			p1[i].y = p2[i].y;
 			p1[i].z = p2[i].x;
-			p1[i].w = p2[i].w;
+			p1[i].w = p2[i].w;*/
 		}
 		return this;
 	}
