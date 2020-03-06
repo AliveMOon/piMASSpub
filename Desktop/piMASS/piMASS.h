@@ -1018,10 +1018,10 @@ public:
 	}
 	U1 srt3()
 	{
-		if( !u4 )
+		if( !(u4&0xffffff) )
 			return 0;
 
-		U1 o = 0;
+		U1 o = 0x10;
 		U1x4 s = *this;
 
 		if(s.y>s.x)
@@ -1130,7 +1130,7 @@ public:
 
 
 
-
+	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
 	U4 bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
 
 };

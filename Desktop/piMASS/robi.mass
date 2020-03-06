@@ -1,6 +1,6 @@
  a0	 
  
- R# o# b# i#                                                                  d0	  																							 e0	 										 f0	  			 g0	  																	 a1	  
+ R# o# b# i#                                                                  d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rout = 0x10003;
  rinp = 0x10002;
@@ -97,12 +97,16 @@ void main()
  f = fps; 
   e1	 					 		
  pic = "mask"; //d2.trg;
- unsel = 1;  f1	 trg = "dilet"
- trgw = 480
- trgh = 240
+ unsel = 1;  f1	 
+ 
+ trg = "dilet"
+ trgw = 128
+ trgh = 128
  pico = "gui"
  pici = "dilet"
- gpu = "dilet"  g1	  name="dilet"
+ gpu = "dilet"  g1	 
+
+ name="dilet"
  pix = "
  #version 120																
 varying vec2 fr_uv;														
@@ -119,8 +123,8 @@ void main()
  			off = 1.0/tgPX, uv;
 	vec3 ize;
 	gl_FragColor.rgb = texture2D( tex0, flpUV ).rgb;
- 	for( int i = -2; i <= 2; ++i )
-	for( int j = -2; j <= 2; ++j )
+ 	for( int i = -1; i <= 1; ++i )
+	for( int j = -1; j <= 1; ++j )
 	{
 		uv = vec2(i,j);
 		ize = texture2D( tex0, flpUV+off*uv ).rgb*length(uv)/2.0;
@@ -131,7 +135,7 @@ void main()
  					  //*texture2D( tex1, flpUV1 ).rgb;
 }
  "
- pic = "dilet" a2	
+ pic = "dilet" a2	 
 // BILL HS12:0000
 // POS:  n:0
 //	iXYZ  600.00mm,  599.97mm,  499.97mm 
@@ -149,7 +153,7 @@ void main()
 //	iabc    0.00dg,    0.00dg,    0.00dg 
 //	oabc    0.00dg,    0.00dg,    0.00dg 
 //	tabc    0.00dg,    0.00dg,    0.00dg;"
- b2	
+ b2	 
 // JOHN HS12:0000
 // POS:  n:7
 //	iXYZ  811.14mm,  469.00mm,  366.88mm 
@@ -237,7 +241,7 @@ void main()
  		"gui";
  unsel = 1;
   g2	 
-   pic= "dilet" a3	
+   pic= "dilet" a3	 
 //0000|00000001 00000000 00000000 00000000 |................
 //0010|00000000 00000001 00000004 00000004 |................
 //0020|00000000 00000000 00000000 00000000 |................
@@ -372,8 +376,8 @@ void main()
  d3	   
  
  trg = "exp";
- trgw = 480;
- trgh = 480;
+ trgw = 128;
+ trgh = 256;
  
  pico="dilet";
  pici="cam1";

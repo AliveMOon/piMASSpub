@@ -105,6 +105,85 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
     return this;
 }
+U4 U1x4::bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX )
+{
+	if(pMSK[b]!=mom)
+		return 0;
+	pMSK[b] = b;
+	U1	*pU1 = (U1*)this,
+		in = pU1[b];
+	if(!in)
+		return 0;
+
+	I4x2	*pRr = pR+1,
+			*pRi = pRr;
+
+	U4	nR, n_stp = 0;
+	I4	w = pD[2],
+		s = b, bx, by,
+		aR[] = {-w,0,w,0};
+	U1 rule;
+	I1 dir = 1;
+
+	pMSK[s] = s;
+	*pRi = 0;
+
+	b++;
+	by = s-s%w;
+
+	bool b_pre = true, b_in;
+
+	while( s == b ? dir != 2 : true ) //s != b || (pRi->x&1) )
+	{
+		bx = b-by;
+
+		rule =	   (b  >= 0	)		// lent van
+				| ((b  >= by)<<1)	// jobra van
+				| ((bx <  w	)<<2)	// balra van
+				| ((b  <  n )<<3);	// fent van
+
+		b_in = false;
+		if( rule == 0xf )
+		{
+			if( pMSK[b] == mom ? false : pMSK[b] == s )
+				b_in = true;
+			else if( b_in = pU1[b] == in )
+				pMSK[b] = s;
+		}
+
+
+		if( b_in != b_pre )
+		if( dir&1 )
+		{
+			pRi->y = b;
+			pRi++;
+			pRi->x = pRi-pRr;
+		}
+
+		if( b_in )
+		{
+			if( b_in != b_pre )
+				n_stp++;
+
+			dir--;
+			if(dir<0)
+				dir = 3;
+		} else {
+			dir++;
+			dir %= 4;
+		}
+
+		b_pre=b_in;
+		b	+= pD[dir];
+		by	+= aR[dir];
+	}
+
+	if( nX ? nX < pRi->x : false )
+		return 0;
+
+
+	return pR->x = pRi->x;
+}
 U4 U1x4::bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX )
 {
 	if(pMSK[b]!=mom)

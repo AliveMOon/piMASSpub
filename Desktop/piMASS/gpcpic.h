@@ -118,7 +118,7 @@ public:
 		delete[] ppKID;
 	};
 	gpcBOB(){ gpmCLR; };
-	gpcBOB* pBOB( U1x4* pI, U4* pM, I4x2 Mwh, U4 m, U4 i, I4x2* pR, U4 nR, U4 nRx )
+	gpcBOB* pBOB( U1* pU1, U4* pM, I4x2 Mwh, U4 m, U4 i, I4x2* pR, U4 nR, U4 nRx )
 	{
 		if( !this )
 		{
@@ -126,7 +126,7 @@ public:
 			if( !pTHIS )
 				return NULL;
 
-			return pTHIS->pBOB( pI, pM, Mwh, m, i, pR, nR, nRx );
+			return pTHIS->pBOB( pU1, pM, Mwh, m, i, pR, nR, nRx );
 		}
 		mom = m;
 		id = i;
@@ -153,12 +153,14 @@ public:
 		{
 			b = pRDsrt[i+1].y-1;
 			a = pRDsrt[i+0].y+1;
-			w8 += a+b;
-			nW++;
 
 			ab = b-a;
 			if( ab < 1 )
 				continue;
+
+			w8 += a+b;
+			nW += 2;
+
 			gpmMsetOF( pM+a, ab, &id );
 			nAREA += ab; /// AREA
 			a %= Mwh.x;
@@ -174,7 +176,13 @@ public:
 				lurd.w = b;
 
 		}
-		w8 /= nW*2;
+		if( !nW )
+		{
+			nRD = 0;
+			return this;
+		}
+
+		w8 /= nW;
 		iW = w8;
 		wCNTR.x = iW%Mwh.x;
 		wCNTR.y = iW/Mwh.x;
@@ -185,7 +193,7 @@ public:
 			return this;
 		}
 
-		if( !pI )
+		if( !pU1 )
 			return this;
 		/// na lehet gyerekeket nemzeni
 		// van kép hozzá
