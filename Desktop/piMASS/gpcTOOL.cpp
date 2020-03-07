@@ -13,7 +13,8 @@ public:
 			s, m, wh, e,
 			//mx,
 			nDONE, nALL, nR,
-			w, h;
+			w, h, n_run, n_join;
+	std::thread trd;
 
 	gpcBOB* pB() {
 		if( nBOBall <= nBOB )
@@ -115,7 +116,8 @@ public:
 	~gpcTRDbug() {
 		for( U4 i = 0; i < nBOB; i++ )
 			gpmDEL(ppBOB[i]);
-
+		if( n_join < n_run )
+			trd.join();
 		gpmDELary(ppBOB);
 	}
 	gpcTRDbug(){ gpmCLR; };
@@ -223,39 +225,42 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	nBOB = 0;
 
 	gpcTRDbug		aBUG[4];
-	std::thread 	aTRD[4];
-	for( U4 i = 0, e = 4*2, q; i < e; i++ )
+	for( U4 i = 0, e = 4*2, q, t; i < e; i++ )
 	{
-		vQ = I4x2( i%4, i/4 );
-        if( vQ.y )
+		vQ = I4x2( i%2, i/2 );
+		t = i%4;
+        if( i/4 )
         {
-			aTRD[vQ.x].join();
-			if( aBUG[vQ.x].nDONE )
+			aBUG[t].trd.join();
+			aBUG[t].n_join++;
+			if( aBUG[t].nDONE )
 			{
 
 				//aBUG[vQ.x].nDONE = 0;
 			}
-			//t = vQ.y;
+
         } else {
 			q = (
 				((vQ&0x100000001)&ofQ)
 				+(vQ/2)
 			)*trfQ;
-			aBUG[vQ.x].pQ = (U1x4*)(pQ+q);
-			aBUG[vQ.x].pM = pM+q;
-			aBUG[vQ.x].pD = aDIR;
-			aBUG[vQ.x].pR = pR + vQ.x*wh/8;
-			aBUG[vQ.x].s = aDIR[2]+1;
-			aBUG[vQ.x].m = 0;
-			aBUG[vQ.x].wh = wh/2;
-			aBUG[vQ.x].e = aDIR[2]/2;
-			aBUG[vQ.x].nDONE = 0;
+			aBUG[t].pQ = (U1x4*)(pQ+q);
+			aBUG[t].pM = pM+q;
+			aBUG[t].pD = aDIR;
+			aBUG[t].pR = pR + t*wh/16;
+			aBUG[t].s = aDIR[2]+1;
+			aBUG[t].m = 0;
+			aBUG[t].wh = wh/2;
+			aBUG[t].e = aDIR[2]/2;
+			aBUG[t].nDONE = 0;
+			aBUG[t].n_run = 0;
 		}
 
-		if( aBUG[vQ.x].nDONE )
+		if( aBUG[t].nDONE )
 			continue;
 
-		aTRD[vQ.x] = std::thread( TRDexp, aBUG+vQ.x );
+		aBUG[t].trd = std::thread( TRDexp, aBUG+t );
+		aBUG[t].n_run++;
 	}
 
 

@@ -100,8 +100,8 @@ void main()
  unsel = 1;  f1	 
  
  trg = "dilet"
- trgw = 256;
- trgh = 128;
+ trgw = 256
+ trgh = 128
  pico = "gui"
  pici = "dilet"
  gpu = "dilet"  g1	 
@@ -376,8 +376,8 @@ void main()
  d3	   
  
  trg = "exp";
- trgw = 256;
- trgh = 128;
+ trgw = 512;
+ trgh = 256;
  
  pico="dilet";
  pici="cam1";
