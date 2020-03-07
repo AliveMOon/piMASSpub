@@ -101,10 +101,10 @@ class gpcBOB
 public:
 	U4 		mom, 	id,
 			nRDall, nRD,
-			nAREA,	iW,
+			nAREA,	//iW,
 			nKIDall, iKID;
 	I4x4	lurd;
-	I4x2	*pRD, *pRDsrt, wCNTR;
+	I4x2	*pRD, *pRDsrt, wCNTR, lurdC;
 	gpcBOB	**ppKID;
 	~gpcBOB(){
 		gpmDELary(pRD);
@@ -118,18 +118,23 @@ public:
 		delete[] ppKID;
 	};
 	gpcBOB(){ gpmCLR; };
-	gpcBOB* pBOB( U1* pU1, U4* pM, I4x2 Mwh, U4 m, U4 i, I4x2* pR, U4 nR, U4 nRx )
-	{
+	gpcBOB* pBOB(	U1* pU1, U4* pM, U1 l,
+					I4x2 Mwh, U4 m,
+					I4x2* pR, U4 nR, U4 nRx,
+					I4 rght ) {
 		if( !this )
 		{
 			gpcBOB* pTHIS = new gpcBOB;
 			if( !pTHIS )
 				return NULL;
 
-			return pTHIS->pBOB( pU1, pM, Mwh, m, i, pR, nR, nRx );
+		return pTHIS->pBOB( pU1, pM, l,
+							Mwh, m,
+							pR, nR, nRx,
+							rght );
 		}
 		mom = m;
-		id = i;
+		id = 0;
 
         if( nRDall <= gpmPAD(nR*4,0x10) )
         {
@@ -145,23 +150,19 @@ public:
 
 		pRDsrt->median( nR, pRDsrt+nR,true );
 		nAREA = 0;
-		U8 w8 = 0, nW = 0;
+		U8 wA = 0, wB = 0, nW = 0;
 		lurd.a4x2[0] = Mwh;
-		lurd.a4x2[0].null();
+		lurd.a4x2[1].null();
 
-		for( U4 i = 0, a,b,ab; i < nR; i+= 2 )
+		for( I4 i = 0, a,b,ab; i < nR; i+= 2 )
 		{
-			b = pRDsrt[i+1].y-1;
-			a = pRDsrt[i+0].y+1;
-
-			ab = b-a;
+			ab = pRDsrt[i+1].y - pRDsrt[i].y;
 			if( ab < 1 )
 				continue;
+			a = pRDsrt[i].y;
+			b = a+ab;
 
-			w8 += a+b;
-			nW += 2;
-
-			gpmMsetOF( pM+a, ab, &id );
+			nW++;
 			nAREA += ab; /// AREA
 			a %= Mwh.x;
 			b /= Mwh.x;
@@ -175,6 +176,9 @@ public:
 			if( lurd.w < b )
 				lurd.w = b;
 
+			wA += a+ab/2;
+			wB += b;
+
 		}
 		if( !nW )
 		{
@@ -182,15 +186,31 @@ public:
 			return this;
 		}
 
-		w8 /= nW;
-		iW = w8;
-		wCNTR.x = iW%Mwh.x;
-		wCNTR.y = iW/Mwh.x;
-
-		if( nRD < 9 || nRD > nRx )
+		wCNTR.x = wA/nW;
+		wCNTR.y = wB/nW;
+		lurdC = (lurd.a4x2[0]+lurd.a4x2[1])/2;
+		if( nR < 9 || nR > nRx )
 		{
 			nRD = 0;
 			return this;
+		}
+		nRD = nR;
+
+		U1x4& n0x100 = *(U1x4*)&id;
+		U4 wh = (rght*Mwh.x)>>8;
+		n0x100.x = (wCNTR.x<<8)/rght;
+		n0x100.y = (wCNTR.y<<8)/Mwh.x;
+		n0x100.z = 0xff-((nAREA*nAREA)/(wh*wh));
+		n0x100.w = l;
+
+		//id = n0x100.u4;
+		for( I4 i = 0,ab; i < nR; i+= 2 )
+		{
+			ab = pRDsrt[i+1].y-pRDsrt[i].y;
+			if( ab < 1 )
+				continue;
+
+			gpmMsetOF( pM+pRDsrt[i].y, ab, &id );
 		}
 
 		if( !pU1 )

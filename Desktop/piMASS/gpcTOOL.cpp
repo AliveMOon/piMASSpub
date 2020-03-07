@@ -10,7 +10,7 @@ public:
 	gpcBOB	**ppBOB;
 	U4		nBOBall, nBOB, frBOB,
 			*pM,
-			s, m, wh, e,
+			s, m, wh, rght,
 			//mx,
 			nDONE, nALL, nR,
 			w, h, n_run, n_join;
@@ -121,6 +121,7 @@ public:
 		gpmDELary(ppBOB);
 	}
 	gpcTRDbug(){ gpmCLR; };
+	gpcBOB* pBOB;
 	void loop()
 	{
 		if( !this )
@@ -128,21 +129,36 @@ public:
 		w = pD[2];
 		h = wh/w;
 		nDONE = 1;
+		U1 l = 0x1;
 
 		for( ; s < wh; s++ )
 		{
-			if( s%w >= e )
+			if( s%w >= rght )
 			{
-				s += w-e-1;
+				s += w-rght-1;
 				continue;
 			}
 			if(pM[s]!=m)
 				continue;
 
-			nR = pQ->bugU1( pR, pM, m, s, pD, wh, e, 0 );
-			*this = pB()->pBOB( (U1*)pQ, pM, I4x2(w,h), m, s, pR+1, pR->x, (w+h)*2 );
+			nR = pQ->bugU1( pR, pM, m,
+							s, pD, wh,
+							rght, 0 );
+			pBOB = pB()->pBOB(	(U1*)pQ, pM, l,
+								I4x2(w,h), m,
+								pR+1, pR->x, (w+h)*2,
+								rght );
+			if( !pBOB )
+				continue;
+			if( pBOB->nAREA <= 16 )
+			{
+				gpmDEL(pBOB);
+				continue;
+			}
 
+			*this = pBOB;
 		}
+
 
 		m = pM[s];
 		//nDONE = nALL;
@@ -251,7 +267,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			aBUG[t].s = aDIR[2]+1;
 			aBUG[t].m = 0;
 			aBUG[t].wh = wh/2;
-			aBUG[t].e = aDIR[2]/2;
+			aBUG[t].rght = aDIR[2]/2;
 			aBUG[t].nDONE = 0;
 			aBUG[t].n_run = 0;
 		}
@@ -263,70 +279,8 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		aBUG[t].n_run++;
 	}
 
-
 	return (U1x4*)gpapP[0]->pixels;
 
-	for( I4 s = 1, nR; s < dwn-1; s++ )
-	{
-		if(pM[s]!=mom)
-			continue;
-
-
-
-		nR = ((U1x4*)pQ)->bugU1( pRi, pM, mom, s, aDIR, wh );
-
-		if( nBOBall <= nBOB )
-		{
-			nBOBall = nBOB+0x10;
-			gpcBOB** ppKILL = ppBOB;
-			ppBOB = new gpcBOB*[nBOBall];
-			if( nBOB )
-				gpmMcpyOF( ppBOB, ppKILL, nBOB );
-			gpmZnOF( ppBOB+nBOB, nBOBall-nBOB );
-			gpmDELary(ppKILL);
-		}
-
-		ppBOB[nBOB] = ppBOB[nBOB]->pBOB(	pQ, pM,
-											I4x2( w, h ),
-											mom, s, pRi+1,
-											pRi->x, wph2 );
-
-		if( ppBOB[nBOB] ? !ppBOB[nBOB]->nRD : true )
-			continue;
-
-		nBOB++;
-		continue;
-
-		if( nBtrd+4 > nBOB )
-			continue;
-		// kipakoljk a gyerekeket
-		for( U4 e = nBOB; nBtrd < e; nBtrd++ )
-        {
-			if( ppBOB[nBtrd] ? !ppBOB[nBtrd]->iKID : true )
-				continue;
-			for( U4 i = 0; i < ppBOB[nBtrd]->iKID; i++ )
-			{
-				if( ppBOB[nBtrd] ? !ppBOB[nBtrd]->ppKID[i] : true )
-					continue;
-
-				if( nBOBall <= nBOB )
-				{
-					nBOBall = nBOB+0x10;
-					gpcBOB** ppKILL = ppBOB;
-					ppBOB = new gpcBOB*[nBOBall];
-					if( nBOB )
-						gpmMcpyOF( ppBOB, ppKILL, nBOB );
-					gpmZnOF( ppBOB+nBOB, nBOBall-nBOB );
-					gpmDELary(ppKILL);
-				}
-				gpmDEL(ppBOB[nBOB]);
-				ppBOB[nBOB] = ppBOB[nBtrd]->ppKID[i];
-				ppBOB[nBtrd]->ppKID[i] = NULL;
-			}
-
-        }
-	}
-	return (U1x4*)gpapP[0]->pixels;
 }
 U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 							char* pNAME, char *pPATH, char *pFILE ) {
