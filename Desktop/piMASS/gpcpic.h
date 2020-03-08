@@ -162,35 +162,47 @@ public:
 		}
 		for( I4 i = 0,a,b,ab; i < nR; i+= 2 )
 		{
-			pRDsrt[i+1].y--;
-			pRDsrt[i].y++;
-
-			ab = pRDsrt[i+1].y - pRDsrt[i].y;
+			a = pRDsrt[i].x;
+			b = pRDsrt[i+1].x;
+			/// ennek az a lényege
+			/// az ALU egyébként is kiszámolja a hányadost
+			/// és a maradékot egy lépésben
+			pRD[a].YdivRQ( Mwh.x ).x++;
+			pRD[b].YdivRQ( Mwh.x ).x--;
+			ab = pRD[b].x - pRD[a].x;
 			if(ab<1)
 				continue;
-			a = pRDsrt[i].y;
-			b = a+ab;
 
 			nW++;
 			nAREA += ab; /// AREA
-			a %= Mwh.x;
-			b /= Mwh.x;
-			if(	lurd.x>a )
-				lurd.x=a;
-			if( lurd.y>b )
-				lurd.y=b;
+			if(	lurd.x>pRD[a].x )
+				lurd.x=pRD[a].x;
+			if( lurd.y>pRD[a].y )
+				lurd.y=pRD[a].y;
 
-			if( lurd.z<a+ab )
-				lurd.z=a+ab;
-			if( lurd.w<b )
-				lurd.w=b;
+			if( lurd.z<pRD[b].x )
+				lurd.z=pRD[b].x;
+			if( lurd.w<pRD[b].y )
+				lurd.w=pRD[b].y;
 
-			wA += a+ab/2;
-			wB += b;
+			wA += pRD[a].x+ab/2;
+			wB += pRD[a].y;
 
 		}
+		//lurd += I4x4(1,1,-1,-1);
+		if( !nW )
+		{
+			nAREA = nRD = 0;
+			return this;
+		}
 
-		if( !nW || (nAREA > nA) )
+		if( (lurd.a4x2[1]-lurd.a4x2[0]).mn() < 4 )
+		{
+			nAREA = nRD = 0;
+			return this;
+		}
+
+		if(nAREA > nA)
 		{
 			nAREA = nRD = 0;
 			return this;
@@ -207,20 +219,31 @@ public:
 		nRD = nR;
 
 		U1x4& n0x100 = *(U1x4*)&id;
-		U4 wh = (rg*Mwh.x)>>8;
+		I4 h = Mwh.y, wh = (rg*h)>>8;
 		n0x100.x = (wCNTR.x<<8)/rg;
 		n0x100.y = (wCNTR.y<<8)/Mwh.x;
 		n0x100.z = 0xff-((nAREA*nAREA)/(wh*wh));
 		n0x100.w = l;
-
+		I4x2 trfQ(1,Mwh.x);
 		//id = n0x100.u4;
-		for( I4 i = 0,ab; i < nR; i+= 2 )
+		for( I4 i = 0, a, b, ab, hx = h-1; i < nR; i+= 2 )
 		{
-			ab = pRDsrt[i+1].y-pRDsrt[i].y;
+			a = pRDsrt[i].x;
+			/*if( pRD[a].y < 1 || pRD[a].y > hx )
+				continue;*/
+
+			b = pRDsrt[i+1].x;
+
+			if( pRD[a].x < 1 )
+				pRD[a].x = 1;
+			if( pRD[b].x >= rg )
+				pRD[b].x = rg-1;
+
+			ab = pRD[b].x-pRD[a].x;
 			if(ab<1)
 				continue;
 
-			gpmMsetOF( pM+pRDsrt[i].y, ab, &id );
+			gpmMsetOF( pM + pRD[a]*trfQ, ab, &id );
 		}
 
 		//if( !pU1 )
@@ -241,7 +264,7 @@ public:
 	gpcLZY			*pPACK;
 	U4				id, iSRC, aiQC[2],
 					nPIXall, nPIX,
-					nBOBall, nBOB,
+					nBOBall, //nBOB,
 
 					bppS, nPKavg;
 
@@ -252,7 +275,7 @@ public:
 
 	I4x4			xyOUT, xySRC, txWH;
 	gpcPIC			*pSRC;
-	gpcBOB			**ppBOB;
+	//gpcBOB			**ppBOB;
 
 	bool			bTHRD;
 	std::thread		T;
@@ -261,10 +284,10 @@ public:
 	~gpcPIC()
 	{
 		unLOCK();
-		for( U4 i = 0; i < nBOB; i++ )
+		/*for( U4 i = 0; i < nBOB; i++ )
 			gpmDEL(ppBOB[i]);
 
-		gpmDELary(ppBOB);
+		gpmDELary(ppBOB);*/
 		gpmSDL_FreeTX(pTX);
 		gpmSDL_FreeTX(pRTX);
 		gpmSDL_FreeSRF(pSRF);

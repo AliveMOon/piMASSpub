@@ -219,7 +219,7 @@ public:
 										pM, l, s,
 										I4x2(w,h), m,
 										pR+1, pR->x, (w+h)*2,
-										pMOM->lurd.z, (pMOM->nAREA*5)/6 );
+										pMOM->lurd.z, (pMOM->nAREA*7)/8 );
 
 					if( !pBOB )
 						continue;
@@ -282,7 +282,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		wh = w*h, 				whQ = wh>>1,
 		wph = w+h, wph2 = wph*2,
 		dwn = wh-w,
-		aDIR[] = { -w, +1, w, -1 };
+		aDIR[] = { -w, +1, w, -1 };	// URDL
 
 	U1x4* pI = (U1x4*)gpapP[1]->pixels;
 
@@ -319,7 +319,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	}
 
 	U4 mom = 0, nBtrd = 0;
-	nBOB = 0;
+	//nBOB = 0;
 
 	gpcTRDbug		aBUG[4];
 	U8 nB = 0, nA = 0;
@@ -337,7 +337,9 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 				if(!aBUG[t].ppBOB[j])
 					continue;
 				nA += aBUG[t].ppBOB[j]->nAREA;
+
 				//aBUG[vQ.x].nDONE = 0;
+
 			}
 
         } else {

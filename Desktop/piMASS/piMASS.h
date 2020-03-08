@@ -2343,7 +2343,10 @@ class I4x2 {
 public:
 	union{
 		struct{
-			I4 x,y;
+			int x,y;
+		};
+		struct{
+			div_t qr;
 		};
 		struct{
 			U8 u8;
@@ -2777,6 +2780,41 @@ public:
 			avgr += this[j].y;
 
 		return avgr / n;
+	}
+	I4x2& swp()
+	{
+		int t = x;
+		x = y;
+		y = t;
+		return *this;
+	}
+	I4x2& YdivQR( int b )
+	{
+		if( b<2 ? true : b < -1 )
+		{
+			x = y;
+			y = !b ? ~0 : 0;
+			return *this;
+		}
+		/// ennek az a lényege
+		/// az ALU egyébként is kiszámolja a hányadost
+		/// és a maradékot egy lépésben
+		qr = div(y,b);
+		return *this;
+	}
+	I4x2& YdivRQ( int b )
+	{
+		return YdivQR(b).swp();
+	}
+	I4x2& XdivQR( int b )
+	{
+		y = x;
+		return YdivQR(b);
+	}
+	I4x2& XdivRQ( int b )
+	{
+		y = x;
+		return YdivQR(b).swp();
 	}
 	I4 median( U4 n, I4x2* p_tree, bool b_inc = false ) {
 		// b_inc == true - incrementált növekvő sorban leszenk

@@ -149,10 +149,15 @@ U4 U1x4::bugU1( I4x2* pR, U4* pM, I4 mom,
 		if(b>=by)			// jobra van
 		if(b<n)				// fent van
 		{
-			if( (pM[b]==mom) ? false : pM[b]==s )
+			/*if( (pM[b]==mom) ? false : pM[b]==s )
 				b_in=true;
 			else if( b_in = (pU1[b]==in) )
+				pM[b]=s;*/
+
+			if( (pM[b]==mom) || (pM[b]==s) )
+			if( b_in = (pU1[b]==in) )
 				pM[b]=s;
+
 		}
 
 		if( dir&1 )
