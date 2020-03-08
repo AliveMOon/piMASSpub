@@ -234,10 +234,10 @@ public:
 
 			b = pRDsrt[i+1].x;
 
-			if( pRD[a].x < 1 )
-				pRD[a].x = 1;
-			if( pRD[b].x >= rg )
-				pRD[b].x = rg-1;
+			/*if( pRD[a].x < 0 )
+				pRD[a].x = 0;
+			if( pRD[b].x > rg-1 )
+				pRD[b].x = rg-1;*/
 
 			ab = pRD[b].x-pRD[a].x;
 			if(ab<1)
