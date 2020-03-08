@@ -99,7 +99,7 @@ public:
 class gpcBOB
 {
 public:
-	U4 		mom, 	id,
+	U4 		mom, 	id, strt,
 			nRDall, nRD,
 			nAREA,	//iW,
 			nKIDall, iKID;
@@ -118,22 +118,25 @@ public:
 		delete[] ppKID;
 	};
 	gpcBOB(){ gpmCLR; };
-	gpcBOB* pBOB(	U1* pU1, U4* pM, U1 l,
+	gpcBOB* pBOB(	//U1* pU1,
+					U4* pM, U1 l, U4 s,
 					I4x2 Mwh, U4 m,
 					I4x2* pR, U4 nR, U4 nRx,
-					I4 rght ) {
+					I4 rg, I4 nA ) {
 		if( !this )
 		{
 			gpcBOB* pTHIS = new gpcBOB;
 			if( !pTHIS )
 				return NULL;
 
-		return pTHIS->pBOB( pU1, pM, l,
-							Mwh, m,
-							pR, nR, nRx,
-							rght );
+			return pTHIS->pBOB( //pU1,
+								pM, l, s,
+								Mwh, m,
+								pR, nR, nRx,
+								rg, nA );
 		}
 		mom = m;
+		strt = s;
 		id = 0;
 
         if( nRDall <= gpmPAD(nR*4,0x10) )
@@ -151,13 +154,19 @@ public:
 		pRDsrt->median( nR, pRDsrt+nR,true );
 		nAREA = 0;
 		U8 wA = 0, wB = 0, nW = 0;
-		lurd.a4x2[0] = Mwh;
+		lurd.a4x2[0] = I4x2(rg,Mwh.y);
 		lurd.a4x2[1].null();
-
-		for( I4 i = 0, a,b,ab; i < nR; i+= 2 )
+		if( !nA )
 		{
+			nA = rg*Mwh.y;
+		}
+		for( I4 i = 0,a,b,ab; i < nR; i+= 2 )
+		{
+			pRDsrt[i+1].y--;
+			pRDsrt[i].y++;
+
 			ab = pRDsrt[i+1].y - pRDsrt[i].y;
-			if( ab < 1 )
+			if(ab<1)
 				continue;
 			a = pRDsrt[i].y;
 			b = a+ab;
@@ -166,23 +175,24 @@ public:
 			nAREA += ab; /// AREA
 			a %= Mwh.x;
 			b /= Mwh.x;
-			if( lurd.x > a )
-				lurd.x = a;
-			if( lurd.y > b )
-				lurd.y = b;
+			if(	lurd.x>a )
+				lurd.x=a;
+			if( lurd.y>b )
+				lurd.y=b;
 
-			if( lurd.z < a+ab )
-				lurd.z = a+ab;
-			if( lurd.w < b )
-				lurd.w = b;
+			if( lurd.z<a+ab )
+				lurd.z=a+ab;
+			if( lurd.w<b )
+				lurd.w=b;
 
 			wA += a+ab/2;
 			wB += b;
 
 		}
-		if( !nW )
+
+		if( !nW || (nAREA > nA) )
 		{
-			nRD = 0;
+			nAREA = nRD = 0;
 			return this;
 		}
 
@@ -191,14 +201,14 @@ public:
 		lurdC = (lurd.a4x2[0]+lurd.a4x2[1])/2;
 		if( nR < 9 || nR > nRx )
 		{
-			nRD = 0;
+			nAREA = nRD = 0;
 			return this;
 		}
 		nRD = nR;
 
 		U1x4& n0x100 = *(U1x4*)&id;
-		U4 wh = (rght*Mwh.x)>>8;
-		n0x100.x = (wCNTR.x<<8)/rght;
+		U4 wh = (rg*Mwh.x)>>8;
+		n0x100.x = (wCNTR.x<<8)/rg;
 		n0x100.y = (wCNTR.y<<8)/Mwh.x;
 		n0x100.z = 0xff-((nAREA*nAREA)/(wh*wh));
 		n0x100.w = l;
@@ -207,14 +217,14 @@ public:
 		for( I4 i = 0,ab; i < nR; i+= 2 )
 		{
 			ab = pRDsrt[i+1].y-pRDsrt[i].y;
-			if( ab < 1 )
+			if(ab<1)
 				continue;
 
 			gpmMsetOF( pM+pRDsrt[i].y, ab, &id );
 		}
 
-		if( !pU1 )
-			return this;
+		//if( !pU1 )
+		//	return this;
 		/// na lehet gyerekeket nemzeni
 		// van kép hozzá
 

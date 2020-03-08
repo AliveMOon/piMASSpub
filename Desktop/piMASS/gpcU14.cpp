@@ -105,12 +105,12 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
     return this;
 }
-U4 U1x4::bugU1( I4x2* pR, U4* pMSK, I4 mom,
+U4 U1x4::bugU1( I4x2* pR, U4* pM, I4 mom,
 				I4 b, I4* pD, U4 n,
-				U4 rg, U4 nX ) {
-	if(pMSK[b]!=mom)
+				I4 rg, U4 nX ) {
+	if(pM[b]!=mom)
 		return 0;
-	pMSK[b] = b;
+	pM[b] = b;
 	U1	*pU1 = (U1*)this,
 		in = pU1[b];
 	if(!in)
@@ -126,36 +126,37 @@ U4 U1x4::bugU1( I4x2* pR, U4* pMSK, I4 mom,
 	U1 rule;
 	I1 dir = 1;
 
-	pMSK[s] = s;
+	pM[s] = s;
 	*pRi = 0;
 
 	b++;
 	by = s-s%w;
 
 	bool b_pre = true, b_in;
-	if( !rg )
+	if( rg < 1 )
 		rg = w;
+	else if( rg > w )
+		rg = w;
+
 	while( s == b ? dir != 2 : true ) //s != b || (pRi->x&1) )
 	{
-		bx = b-by;
-
-		rule =	   (b  >= 0	)		// lent van
-				| ((b  >= by)<<1)	// jobra van
-				| ((bx <  rg)<<2)	// balra van
-				| ((b  <  n )<<3);	// fent van
-
 		b_in = false;
-		if( rule == 0xf )
+		bx=b-by;
+
+		if(bx>=0)
+		if(bx<rg) 			// balra van
+		if(b>=0)			// lent van
+		if(b>=by)			// jobra van
+		if(b<n)				// fent van
 		{
-			if( pMSK[b] == mom ? false : pMSK[b] == s )
-				b_in = true;
-			else if( b_in = pU1[b] == in )
-				pMSK[b] = s;
+			if( (pM[b]==mom) ? false : pM[b]==s )
+				b_in=true;
+			else if( b_in = (pU1[b]==in) )
+				pM[b]=s;
 		}
 
-
-		if( b_in != b_pre )
 		if( dir&1 )
+		if( b_in != b_pre )
 		{
 			pRi->y = b;
 			pRi++;

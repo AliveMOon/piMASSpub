@@ -121,7 +121,7 @@ public:
 		gpmDELary(ppBOB);
 	}
 	gpcTRDbug(){ gpmCLR; };
-	gpcBOB* pBOB;
+	gpcBOB* pBOB, *pMOM;
 	void loop()
 	{
 		if( !this )
@@ -130,7 +130,8 @@ public:
 		h = wh/w;
 		nDONE = 1;
 		U1 l = 0x1;
-
+		U8 nAsum = 0, nAVG = 0, nMX = 0;
+		I4x4 LURD( 0x10000,0x10000, 0,0 );
 		for( ; s < wh; s++ )
 		{
 			if( s%w >= rght )
@@ -144,10 +145,12 @@ public:
 			nR = pQ->bugU1( pR, pM, m,
 							s, pD, wh,
 							rght, 0 );
-			pBOB = pB()->pBOB(	(U1*)pQ, pM, l,
+			pBOB = pB()->pBOB(
+								pM, l, s,
 								I4x2(w,h), m,
 								pR+1, pR->x, (w+h)*2,
-								rght );
+								rght, 0
+							);
 			if( !pBOB )
 				continue;
 			if( pBOB->nAREA <= 16 )
@@ -157,6 +160,84 @@ public:
 			}
 
 			*this = pBOB;
+			LURD.a4x2[0].mn( pBOB->lurd.a4x2[0] );
+			LURD.a4x2[1].mx( pBOB->lurd.a4x2[1] );
+			nMX = max( nMX, pBOB->nAREA );
+			nAsum += pBOB->nAREA;
+		}
+		if( !nBOB)
+			return;
+
+		U4 iB = 0, nB, nNEW = nBOB, mn;
+		I4x4 ij, trfQ(1, w);
+		U1 u1, *pQ1 = (U1*)pQ;
+		while( nNEW )
+		{
+			l++;
+			if( l > 6 )
+				break;
+			LURD += I4x4(1,1,-1,-1);
+			mn = (LURD.a4x2[1]-LURD.a4x2[0] ).mn();
+			if( mn < 16 )
+				break;
+			nAVG = nAsum/nNEW;
+			if( nAVG <= 32 )
+				break;
+			if( nAVG >= nMX )
+				break;
+
+			nMX = nAsum = 0;
+
+
+			LURD.swpZWXY();
+			for( nB = nBOB; iB < nB; iB++ )
+			{
+				pMOM = ppBOB[iB];
+				if( pMOM ? pMOM->nAREA < nAVG : true )
+					continue;
+				u1 = pQ1[pMOM->strt];
+				m = pMOM->id;
+				ij = pMOM->lurd+I4x4(1,1,-1,-1);
+				for( U4 i = ij.x; ij.y < ij.w; ij.y++ )
+				for( ij.x = i; ij.x < ij.z; ij.x++ )
+				{
+					s = ij*trfQ;
+					if( pM[s] != m )
+						continue;
+
+					if( (pM[s]>>24) != (l-1) )
+						continue;
+
+					if( pQ1[s] == u1 )
+						continue;
+
+					nR = pQ->bugU1( pR, pM, m,
+									s, pD, wh,
+									pMOM->lurd.z, 0 );
+
+					pBOB = pB()->pBOB(
+										pM, l, s,
+										I4x2(w,h), m,
+										pR+1, pR->x, (w+h)*2,
+										pMOM->lurd.z, (pMOM->nAREA*5)/6 );
+
+					if( !pBOB )
+						continue;
+
+					if( pBOB->nAREA <= 16 )
+					{
+						gpmDEL(pBOB);
+						continue;
+					}
+
+					*this = pBOB;
+					LURD.a4x2[0].mn( pBOB->lurd.a4x2[0] );
+					LURD.a4x2[1].mx( pBOB->lurd.a4x2[1] );
+					nMX = max( nMX, pBOB->nAREA );
+					nAsum += pBOB->nAREA;
+				}
+			}
+			nNEW = nBOB-iB;
 		}
 
 
@@ -218,7 +299,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	for( I4 i = (w+1)*2, q, ix, e = wh-i; i < e; i++ )
 	{
 		vQ = I4x2( i%w, i/w );
-		if( vQ.x < 2 || vQ.x > (w-2) )
+		if( vQ.x < 3 || vQ.x > (w-3) )
 			continue;
 
 		srt = ((U4)pI[i].srt3()*0x100)>>3;
@@ -241,6 +322,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	nBOB = 0;
 
 	gpcTRDbug		aBUG[4];
+	U8 nB = 0, nA = 0;
 	for( U4 i = 0, e = 4*2, q, t; i < e; i++ )
 	{
 		vQ = I4x2( i%2, i/2 );
@@ -249,9 +331,12 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
         {
 			aBUG[t].trd.join();
 			aBUG[t].n_join++;
-			if( aBUG[t].nDONE )
+			nB += aBUG[t].nBOB;
+			for( U4 j = 0; j < aBUG[t].nBOB; j++ )
 			{
-
+				if(!aBUG[t].ppBOB[j])
+					continue;
+				nA += aBUG[t].ppBOB[j]->nAREA;
 				//aBUG[vQ.x].nDONE = 0;
 			}
 

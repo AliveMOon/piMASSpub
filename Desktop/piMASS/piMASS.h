@@ -1145,7 +1145,7 @@ public:
 
 
 
-	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 e = 0, U4 nX = 0 );
+	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, I4 rg = 0, U4 nX = 0 );
 	U4 bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
 
 };
@@ -3401,8 +3401,7 @@ public:
 	{
 		return I4x4( a4x2[0].abs(), a4x2[1].abs() );
 	}
-	I4x2 mx()
-	{
+	I4x2 mx() {
 		I4x2 o(x,0);
 		if( o.x < y )
 		{
@@ -3421,8 +3420,7 @@ public:
 		}
 		return o;
 	}
-	I4x2 mn()
-	{
+	I4x2 mn() {
 		I4x2 o(x,0);
 		if( o.x > y )
 		{
@@ -3440,6 +3438,13 @@ public:
 			o.y = 3;
 		}
 		return o;
+	}
+	I4x4& swpZWXY()
+	{
+		I4x2 t = a4x2[1];
+		a4x2[1] = a4x2[0];
+		a4x2[0] = t;
+		return *this;
 	}
 };
 
