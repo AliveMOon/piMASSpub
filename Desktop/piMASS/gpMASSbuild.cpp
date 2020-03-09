@@ -284,8 +284,8 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	psHD += sprintf( 	psHD, "\r\nbSW:0x%0.8x",
 						bSW );
 	if( psHD > gpsHD )
-		cout << gpsHD;
-	cout << "." ;
+		std::cout << gpsHD;
+	std::cout << "." ;
 }
 
 

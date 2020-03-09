@@ -454,7 +454,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		}
 		else if( tmp.bENTR( *this, aSP44[nSP] ) )
 		{
-			cout << "[ENTER]"; // << endl;
+			std::cout << "[ENTER]"; // <<std::endl;;
 		}
 
 		aSP44[momLV].a4x2[1].mx(  aSP44[nSP].a4x2[0] );
@@ -575,20 +575,20 @@ int main(int nA, char** apA )
 int main( int nA, char *apA[] )
 #endif
 {
-	cout << endl;
+	std::cout <<std::endl;;
 	for( U4 i = 0, e = gpmN(aSIZEOF); i < e; i++  )
 	{
-		cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 << endl;
+		std::cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 <<std::endl;;
 	}
-    cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR << endl;
+    std::cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<std::endl;;
 	gpf_aALF_init();
 
 	if( nA > 0 )
 	{
 		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, apA[0] );
 
-		cout << "Start in:" << gpsEXEpath << endl;
-		cout << "Exe is:" << gpsEXEname << endl;
+		std::cout << "Start in:" << gpsEXEpath <<std::endl;;
+		std::cout << "Exe is:" << gpsEXEname <<std::endl;;
 		*gppMASSfile = 0;
 	}
 
@@ -598,12 +598,12 @@ int main( int nA, char *apA[] )
 	{
 		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mm100(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mm100(1) );
-		cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).str( gpsMAINpub ) << endl;
+		std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).str( gpsMAINpub ) <<std::endl;;
 		tmp = tstCAGE.tXYZ.xyz_();
 		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
-		cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).str( gpsMAINpub ) << endl;
+		std::cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).str( gpsMAINpub ) <<std::endl;;
 		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
-		cout << "tstCAGE.tXYZboxx:" << (tmp/mm100(1)).str( gpsMAINpub ) << endl;
+		std::cout << "tstCAGE.tXYZboxx:" << (tmp/mm100(1)).str( gpsMAINpub ) <<std::endl;;
 	}
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
 	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );
@@ -616,12 +616,12 @@ int main( int nA, char *apA[] )
 
 		for( int i = 1; i < nA; i++ )
 		{
-			cout << apA[i] << endl;
+			std::cout << apA[i] <<std::endl;;
 			if( strcasestr( apA[i], ".mass" ) )
 			{
 				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, apA[i] );
 
-				cout << "MASS is:" << gpsMASSname << endl;
+				std::cout << "MASS is:" << gpsMASSname <<std::endl;;
 				continue;
 			}
 		}
@@ -639,7 +639,7 @@ int main( int nA, char *apA[] )
 
 		strcpy( gppMASSfile, gpsMASSname );
 		U8 s;
-		cout << "Load:"<< gpsMASSpath << endl;
+		std::cout << "Load:"<< gpsMASSpath <<std::endl;;
 		if( gpfACE(gpsMASSpath, 4) > -1 )
 			gpMASS.lzyRD( gpsMASSpath, s = -1, -1 );
 

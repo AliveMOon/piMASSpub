@@ -167,7 +167,7 @@
 /*#include "gpcSCHL.h"
 #include "gpcOPCD.h"*/
 
-using namespace std;
+//using namespace std;
 
 #define NULL nullptr
 
@@ -3775,11 +3775,23 @@ public:
 			return 0;
 		}
 		U1* p_begin = p_buff;
-		p_buff += gpfALF2STR( p_buff, alf ); //, b_hex );
+		p_buff += gpfALF2STR( p_buff, alf );
+
+		I8 nn = num;
+		if( nn < 0)
+		{
+			nn = -nn;
+			b_hex = b0x0 = true;
+		}
 		//_strupr( p_begin );
-		p_buff += sprintf( (char*)p_buff, b_hex ? (b0x0? "0x%0.8llx": "%llx" ): "%lld", max(num,0) );
+		const char* pPAT	= b_hex
+					? ( b0x0	? "0x%0.8llx"
+								: "%llx" )
+					: "%lld";
+		p_buff += sprintf( (char*)p_buff, pPAT, nn );
 		if( p_post )
 			p_buff += sprintf( (char*)p_buff, "%s", p_post );
+
 		return p_buff-p_begin;
 	}
 

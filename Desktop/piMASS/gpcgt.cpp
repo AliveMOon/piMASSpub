@@ -809,7 +809,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 		// BIND
 		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
-		//cout << p_print << endl;
+		//std::cout << p_print <<std::endl;
 		p_print = p_err;
 
 		fd_set cnct_w;
@@ -854,7 +854,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	{
 		p_err = GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 		if( *p_err )
-			cerr << p_err << endl;
+			std::cerr << p_err <<std::endl;
 
 		switch( TnID.alf )
 		{
@@ -925,7 +925,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 
 		p_err = GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 		if( *p_err )
-			cerr << p_err << endl;
+			std::cerr << p_err <<std::endl;
 	}
 
 	aGTfd[gpeFDrcv].setFD( socket );
@@ -986,7 +986,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 		p_err += sprintf( p_err, "OK" );
 		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
-		cout << p_print << endl;
+		std::cout << p_print <<std::endl;
 		p_print = p_err;
 
 		// BIND
@@ -1014,7 +1014,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 			return -1;
 		}
 		p_err += sprintf( p_err, "OK" );
-		cout << p_print << endl;
+		std::cout << p_print <<std::endl;
 		p_print = p_err;
 
 		p_err += sprintf( p_err, "\n\t\tLITEN LISTENER - " );
@@ -1202,7 +1202,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 		{
 			p_err = p_gt->GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 			if( *p_err )
-				cerr << p_err << endl;
+				std::cerr << p_err <<std::endl;
 
 			if( p_gt )
 			{
@@ -1276,7 +1276,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 			p_err = p_gt->GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
 			if( *p_err )
-				cerr << p_err << endl;
+				std::cerr << p_err <<std::endl;
 		}
 	}
 	aGTfd->zero(3);
@@ -1295,7 +1295,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				|| 	aGTfd[gpeFDrcv].isFD( p_gt->socket )
 			)
 			{
-				cerr << "miért?" << endl;
+				std::cerr << "miért?" <<std::endl;
 			} else
 				gpfSOC_CLOSE( p_gt->socket );
 

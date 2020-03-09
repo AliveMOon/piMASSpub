@@ -408,13 +408,13 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					apCRS[i]->miniDRWtx( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 				else
 					apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
-				//cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
+				//std::cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
 			}
 			//if( pSDLrndr)
 			//	SDL_RenderPresent( pSDLrndr );
 
 			//SDL_UpdateWindowSurface( pSDLwin );
-			//cout << "s" << SDL_GetTicks() << endl;
+			//std::cout << "s" << SDL_GetTicks() <<std::endl;
 		}
 
 

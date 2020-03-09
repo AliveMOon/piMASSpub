@@ -9,14 +9,14 @@ gpcGL::gpcGL( gpcWIN& win )
 	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
 	if( !gCntxt )
 	{
-		cout << endl << "gpcGL init error" << endl;
+		std::cout <<std::endl << "gpcGL init error" <<std::endl;
 		return;
 	}
 	glewExperimental = GL_TRUE;
 	glewErr = glewInit();
 	if( glewErr != GLEW_OK )
 	{
-		cout << endl << "gpcGL GLEW_NOK error" << endl;
+		std::cout <<std::endl << "gpcGL GLEW_NOK error" <<std::endl;
 		return;
 	}
 
@@ -31,15 +31,15 @@ gpcGL::gpcGL( gpcWIN& win )
 
 	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
 	if( pTXchar )
-		cout << "char" << (int)win.pSRFchar << endl;
+		std::cout << "char" << (int)win.pSRFchar <<std::endl;
 	else
-		cout << SDL_GetError() << endl;
+		std::cout << SDL_GetError() <<std::endl;
 
 	pTXiso = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFiso );
 	if( pTXiso )
-		cout << "char" << (int)win.pSRFiso << endl;
+		std::cout << "char" << (int)win.pSRFiso <<std::endl;
 	else
-		cout << SDL_GetError() << endl;
+		std::cout << SDL_GetError() <<std::endl;
 
 	/*glGenSamplers( 1, aSMPid );
 	glSamplerParameteri(aSMPid[0], GL_TEXTURE_WRAP_S, GL_REPEAT);

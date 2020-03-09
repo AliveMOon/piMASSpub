@@ -229,15 +229,8 @@ public:
 		for( I4 i = 0, a, b, ab, hx = h-1; i < nR; i+= 2 )
 		{
 			a = pRDsrt[i].x;
-			/*if( pRD[a].y < 1 || pRD[a].y > hx )
-				continue;*/
 
 			b = pRDsrt[i+1].x;
-
-			/*if( pRD[a].x < 0 )
-				pRD[a].x = 0;
-			if( pRD[b].x > rg-1 )
-				pRD[b].x = rg-1;*/
 
 			ab = pRD[b].x-pRD[a].x;
 			if(ab<1)
@@ -281,6 +274,8 @@ public:
 	std::thread		T;
 	//U1		*pPIX;
 
+
+
 	~gpcPIC()
 	{
 		unLOCK();
@@ -310,7 +305,32 @@ public:
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc );
+	SDL_Surface* surFREE( SDL_Surface* pF )
+	{
+		if( !pF )
+			return pF;
+		bool bFREE = pSRF == pF;
+		if( bFREE )
+		{
+			gpmSDL_FreeSRF(pSRF);
+			if( pSHR == pF )
+				pSHR = NULL;
+		}
 
+		if( pSHR == pF )
+		{
+			gpmSDL_FreeSRF(pSHR);
+			bFREE = true;
+		}
+
+		if( pREF == pF )
+			pREF = NULL;
+
+		if( bFREE )
+			return NULL;
+
+		return pF;
+	}
 	SDL_Surface* surDRW() {
 		if( !pSHR )
 			return pSRF;
@@ -409,6 +429,10 @@ public:
 						char* pNAME, char *pPATH, char *pFILE );
 	U1x4* TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 						char* pNAME, char *pPATH, char *pFILE );
+
+	U1x4* food( U1x4* pPET, U4 i, U4 n,
+				char* pPATH, char* pDIR, char* pEXP = ".png" );
+
 };
 
 class gpcPICall
