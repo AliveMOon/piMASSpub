@@ -100,11 +100,11 @@ class gpcBOB
 {
 public:
 	U4 		mom, 	id, strt,
-			nRDall, nRD,
-			nAREA,	//iW,
+			nRDall, nRD, nRDr, nX,
+			nAREA,	//nHsum,
 			nKIDall, iKID;
 	I4x4	lurd;
-	I4x2	*pRD, *pRDsrt, wCNTR, lurdC;
+	I4x2	*pRD, *pRDsrt, *pX, wCNTR, lurdC;
 	gpcBOB	**ppKID;
 	~gpcBOB(){
 		gpmDELary(pRD);
@@ -218,6 +218,7 @@ public:
 		}
 		nRD = nR;
 
+
 		U1x4& n0x100 = *(U1x4*)&id;
 		I4 h = Mwh.y, wh = (rg*h)>>8;
 		n0x100.x = (wCNTR.x<<8)/rg;
@@ -226,17 +227,17 @@ public:
 		n0x100.w = l;
 		I4x2 trfQ(1,Mwh.x);
 		//id = n0x100.u4;
-		for( I4 i = 0, a, b, ab, hx = h-1; i < nR; i+= 2 )
+		for( I4 i = 0, a, b, xx, hx = h-1; i < nR; i+= 2 )
 		{
 			a = pRDsrt[i].x;
 
 			b = pRDsrt[i+1].x;
 
-			ab = pRD[b].x-pRD[a].x;
-			if(ab<1)
+			xx = pRD[b].x-pRD[a].x;
+			if(xx<1)
 				continue;
 
-			gpmMsetOF( pM + pRD[a]*trfQ, ab, &id );
+			gpmMsetOF( pM + pRD[a]*trfQ, xx, &id );
 		}
 
 		//if( !pU1 )
@@ -247,7 +248,81 @@ public:
 
         return this;
 	}
+	gpcBOB* X()
+	{
+		if( this ? !!pX : true )
+			return this;
 
+
+		nRDr = sqrt((lurd.a4x2[0]-wCNTR).abs().MX((lurd.a4x2[0]-wCNTR).abs()).qlen());
+		pX = pRD+nRD*2;
+
+		I4x2* pKILL = NULL;
+        if( pRDsrt <= pX+nRD )
+        {
+			if( nRDall <= gpmPAD( pX-pRD+nRD*2, 0x10) )
+			{
+				nRDall = gpmPAD( pX-pRD+nRD*2, 0x10)+0x10;
+				pKILL = pRD;
+				pRD = new I4x2[nRDall];
+				pX = pRD + (pX-pKILL);
+				pRDsrt = pX+nRD;
+			}
+        }
+		if( pKILL )
+		{
+			gpmMcpyOF( pRD, pKILL, pX-pRD );
+			delete[]pKILL;
+		}
+
+		U4	sum = 0;
+		for( U4 i = 0,r; i < nRD; i++ )
+        {
+			pRD[i] -= wCNTR;
+			pX[i].x = i;
+			r = sqrt(pRD[i].qlen());
+			sum += r;
+			pX[i].y = r;
+        }
+		pX->median( nRD, pRDsrt );
+		nX = 0;
+		for( U4 i = 0; i < nRD; i += 9 )
+		{
+			pX[i].y = pX[i].x;
+			pX[nX] = pX[i];
+			nX++;
+		}
+
+		pX->median( nX, pRDsrt,true );
+		I4x2 X = pRD[pX[0].x], A, B, L;
+		I8 bb, m, b, a, alt;
+		for( U4 i = 0,ib,ia; i < nX; i++ )
+		{
+			ib = (i+1)%nX;
+			B = pRD[pX[ib].x]-X;
+			L = B.SCRlft();
+			b = sqrt(L.qlen());
+			alt = 0;
+			for( U4 j = pX[i].x+1, e = pX[ib].x >= j ? pX[ib].x : pX[ib].x+nRD;
+					j < e; j++ )
+			{
+				ia = j;
+				if( ia > nRD )
+					ia -= nRD;
+
+				A = pRD[ia]-X;
+				a = (L*A)/b;
+				if( alt < a )
+					continue;
+				alt = a;
+				pX[i].y = ia;
+			}
+
+			X += B;
+		}
+
+		return this;
+	}
 };
 class gpcPIC
 {

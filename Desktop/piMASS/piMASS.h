@@ -2721,12 +2721,12 @@ public:
 		return x*x + y*y;
 	}
 
-	I4 mn( void )
+	I4 mn()
 	{
 		return x < y ? x:y;
 	}
 
-	I4 mx( void )
+	I4 mx()
 	{
 		return x > y ? x:y;
 	}
@@ -2921,6 +2921,22 @@ public:
 		return this[n/2].y;
 	}
 
+	I4x2 left()
+	{
+		return I4x2(-y,x);
+	}
+	I4x2 right()
+	{
+		return I4x2(y,-x);
+	}
+	I4x2 SCRlft()
+	{
+		return right();
+	}
+	I4x2 SCRrig()
+	{
+		return left();
+	}
 };
 
 

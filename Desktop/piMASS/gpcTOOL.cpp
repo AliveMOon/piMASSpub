@@ -230,11 +230,13 @@ public:
 						continue;
 					}
 
-					*this = pBOB;
+
+					*this = pBOB->X();
 					LURD.a4x2[0].mn( pBOB->lurd.a4x2[0] );
 					LURD.a4x2[1].mx( pBOB->lurd.a4x2[1] );
 					nMX = max( nMX, pBOB->nAREA );
 					nAsum += pBOB->nAREA;
+
 				}
 			}
 			nNEW = nBOB-iB;
