@@ -7,8 +7,6 @@
  slmp = "192.168.1.90 10000"
  cam = 1
  pic = "cam1"; 
- 
- bob = "exp";
  f = fps; 
   b1	 
  pic = 	//"cam1";

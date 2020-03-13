@@ -89,6 +89,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 	aXYuvPC[1].a4x2[1] = I4x2(1,1);
 	aXYuvPC[2].a4x2[0] = I4x2(0,1);
 	picBG.lzyRST();
+	bobBG.lzyRST();
 
 
 	/// nagyon vigyázz itt nem BIZTOS, hogy a saját, PC és pR-rel dolgozik,
@@ -270,6 +271,11 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 					aXYuvPC[2].a4x2[1].x = pSRC->picID-1;
 					picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
 				}
+				if( pSRC->bobID )
+				{
+					aXYuvPC[2].a4x2[1].x = pSRC->bobID-1;
+					bobBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+				}
 			}
 
 
@@ -281,7 +287,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 							->frmBRDR( xyCR.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
 
 				pSRC->SRCmini(
-									pMINI+off, //pMINI + off + offFRM,
+									pMINI+off,
 
 									xyCR.a4x2[0],
 

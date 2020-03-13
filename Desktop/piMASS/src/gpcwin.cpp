@@ -272,6 +272,18 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						->glSETtx( 0, p_tx, p_pic->txWH.a4x2[1] )->glDRW( w.a4x2[0], FRMwh );
 					}
 
+					if( U4 n = apCRS[i]->bobBG.n_load/sizeof(apCRS[0]->aXYuvPC) )
+					for( I4x4* pI = (I4x4*)apCRS[i]->bobBG.p_alloc, *pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
+					if( gpcPIC* pB = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
+					for( U4 nB = pB->nBOB, b = 0; b < nB; b++ )
+					if( gpcBOB* pBOB = pB->ppBOB[b] )
+					{
+						pGL
+						->glSETbob( pBOB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
+						->glDRW( w.a4x2[0], FRMwh );
+						//pGL;
+					}
+
 					glViewport( 0, 0, winSIZ.z, winSIZ.w );
 					pGL
 					->GLSLset(GLSLiso)

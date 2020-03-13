@@ -205,10 +205,33 @@ public:
 		return VXbID;
 	}
 
-
-
-	gpcGL* glSETbox( I4x2 xy, const I4x2& wh )
+	gpcGL* glSETbob( gpcBOB* pBOB, I4x4 xyWH, const I4x4 divPX, const I4x2& frm )
 	{
+		if(!this)
+			return NULL;
+
+		if( pBOB ? !pBOB->nX : true )
+			return NULL;
+
+
+		xyWH &= divPX.a4x2[1];
+		xyWH /= frm;
+		xyWH.a4x2[0] += divPX.a4x2[0];
+		U4 n = pBOB->nX;
+		Fx4* pV4 = new Fx4[n*4];
+		for( U4 i = 0; i < n; i++ )
+		{
+
+		}
+		VBOnew( (float*)pV4, n, 4 );
+
+		return NULL;
+
+		return this;
+	}
+
+
+	gpcGL* glSETbox( I4x2 xy, const I4x2& wh ) {
 		if( this ? !wh.area() : true )
 			return NULL;
 

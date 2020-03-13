@@ -398,7 +398,8 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	gpcLZY hex; U8 s;
 	gpcGL *pGL = win.pGL;
 	char* pVTX = NULL;
-	gpcPIC* aGLpPIC[0x10];
+	gpcPIC	*aGLpPIC[0x10],
+			*aGLpBOB[0x10];
 	SDL_Texture* apTX[0x10];
 
 	if( U4 *pM = win.pM = mapCR.pMAP )
@@ -407,8 +408,14 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 	if( pM < pC )
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{
-		if( pSRC && aGLpic[0] )
-			pSRC->picID = aGLpic[0];
+		if( pSRC  ) {
+			if( aGLpic[0] )
+				pSRC->picID = aGLpic[0];
+			if( aGLpic[0xf] )
+				pSRC->bobID = aGLpic[0xf];
+
+			aGLpic[0xf] = 0;
+		}
 
 		if( !pM[i] )
 			continue;
@@ -420,14 +427,12 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 		aGLpic[0] = pSRC->picID = 0;
 		gpmDEL( pSRC->apOUT[0] );
-		if( pSRC->qBLD() )
-		{
+		if( pSRC->qBLD() ) {
 			pSRC->msBLD = win.mSEC.x + pSRC->msBLTdly;
 			pSRC->rdyBLD();
 		}
 
-		if( pSRC->msBLD ? pSRC->msBLD <= win.mSEC.x : false )
-		{
+		if( pSRC->msBLD ? pSRC->msBLD <= win.mSEC.x : false ) {
 			gpmDEL( pSRC->pEXE );
 			pSRC->pEXE = pSRC->pEXE->compiEASY( pSRC->pSRCstart( true ), NULL, NULL, NULL );
 
@@ -473,8 +478,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				nCNL = 0, mskPIC = 0, mCLR;
 				a < ae;
 				a++
-			)
-		{
+		) {
 			gpcALU& alu = res.ALU(a);
 			if( alu.alf < gpeALF_AAAAAA )
 			{
@@ -513,7 +517,16 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 										win.pPICbg = aGLpPIC[0];
 							}
 						} break;
-
+					case gpeALF_BOB: {
+							aGLpic[0xf] = alu.bSTR() ?
+										PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
+										: alu.u8();						// száma
+							if( aGLpBOB[0] = PIC.PIC( aGLpic[0xf] ) )
+							{
+								aGLpic[0xf]++;
+								break;
+							}
+						} break;
 					case gpeALF_PIC: {
 							aGLpic[0] =	alu.bSTR() ?
 										PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
@@ -876,8 +889,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				}
 				//}
 			}
-			else switch( alu.alf )
-			{
+			else switch( alu.alf ) {
 				case gpeALF_CNLiiX: case gpeALF_CNLiiY: case gpeALF_CNLiiZ: case gpeALF_CNLiiW: {
 					aGLcnl[2].aXYZW[(alu.alf-gpeALF_CNLiiT)%4] = alu.d8();
 					if( nCNL < 3 )

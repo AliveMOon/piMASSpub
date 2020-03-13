@@ -23,7 +23,7 @@ class gpcCRS
 
 		U4x4 aCRS[2];
 		bool bESC, bED;
-		gpcLZY	picBG, picUPL;
+		gpcLZY	picBG, bobBG, picUPL;
 
 		gpcCRS( gpcWIN& win, U1 _id );
 		virtual ~gpcCRS();

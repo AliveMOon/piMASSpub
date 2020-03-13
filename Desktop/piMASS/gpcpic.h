@@ -96,29 +96,30 @@ public:
 	}
 
 };
-class gpcBOB
-{
+class gpcBOB {
 public:
 	U4 		mom, 	id, strt,
 			nRDall, nRD, nRDr, nX,
-			nAREA,	//nHsum,
-			nKIDall, iKID;
+			nAREA,			// a bobban szereplő pixelek száma
+			iAXIS, lAXIS,	// iAX pX[0] az egyik pont pX[iAXIS] másik pont
+			mRDr; 			// sugarak medianja
+			//nKIDall, iKID;
 	I4x4	lurd;
 	I4x2	*pRD, *pRDsrt, *pX, wCNTR, lurdC;
-	gpcBOB	**ppKID;
+	//gpcBOB	**ppKID;
 	~gpcBOB(){
 		gpmDELary(pRD);
 
-		if( !ppKID )
+		/*if( !ppKID )
 			return;
 
 		for( U4 i = 0; i < iKID; i++ )
 			gpmDEL(ppKID[i]);
 
-		delete[] ppKID;
+		delete[] ppKID;*/
 	};
 	gpcBOB(){ gpmCLR; };
-	gpcBOB* pBOB(	//U1* pU1,
+	gpcBOB* pBOB(
 					U4* pM, U1 l, U4 s,
 					I4x2 Mwh, U4 m,
 					I4x2* pR, U4 nR, U4 nRx,
@@ -129,11 +130,12 @@ public:
 			if( !pTHIS )
 				return NULL;
 
-			return pTHIS->pBOB( //pU1,
+			return pTHIS->pBOB(
 								pM, l, s,
 								Mwh, m,
 								pR, nR, nRx,
-								rg, nA );
+								rg, nA
+							);
 		}
 		mom = m;
 		strt = s;
@@ -284,8 +286,9 @@ public:
 			sum += r;
 			pX[i].y = r;
         }
-		pX->median( nRD, pRDsrt );
+		mRDr = pX->median( nRD, pRDsrt );
 		nX = 0;
+
 		for( U4 i = 0; i < nRD; i += 9 )
 		{
 			pX[i].y = pX[i].x;
@@ -294,33 +297,77 @@ public:
 		}
 
 		pX->median( nX, pRDsrt,true );
-		I4x2 X = pRD[pX[0].x], A, B, L;
-		I8 bb, m, b, a, alt;
-		for( U4 i = 0,ib,ia; i < nX; i++ )
+		I4x2 R, A, B, L;
+		I8 bb, b, a, alt;
+		U4 ib,ia;
+		for( U4 i = 1; i < nX; i++ )
 		{
-			ib = (i+1)%nX;
-			B = pRD[pX[ib].x]-X;
+			I4x2& X = pX[i-1];
+			R = pRD[X.x];
+
+			ib = pX[i].x;
+			if( ib >= nRD )
+				ib %= nRD;
+
+			B = pRD[ib]-R;
+			bb = B.qlen();
+			if( !bb )
+			{
+				// vége
+				nX--;
+				break;
+			}
+			b = sqrt(bb);
 			L = B.SCRlft();
-			b = sqrt(L.qlen());
 			alt = 0;
-			for( U4 j = pX[i].x+1, e = pX[ib].x >= j ? pX[ib].x : pX[ib].x+nRD;
-					j < e; j++ )
+			for( U4 j = (pX[ib].x+1) < nRD ? (pX[ib].x+1) : (pX[ib].x+1)%nRD,
+					e = pX[ib].x >= j ? pX[ib].x : pX[ib].x+nRD;
+
+					j < e;
+
+					j++ )
 			{
 				ia = j;
-				if( ia > nRD )
-					ia -= nRD;
+				if( ia >= nRD )
+					ia %= nRD;
 
-				A = pRD[ia]-X;
+				A = pRD[ia]-R;
 				a = (L*A)/b;
 				if( alt < a )
 					continue;
 				alt = a;
-				pX[i].y = ia;
+				X.y = ia;
 			}
-
-			X += B;
 		}
-
+		lAXIS = 0;
+		ib = ia = 0;
+		for( U4 i = 0; i < nX-1; i++ )
+		{
+			R = pRD[pX[i].x];
+			for( U4 j = i+1; j < nX; j++ )
+			{
+				b = pX[j].x;
+				if( b >= nRD )
+					b %= nRD;
+				B = pRD[ib]-R;
+				bb = B.qlen();
+                if( lAXIS >= bb )
+					continue;
+				lAXIS = bb;
+				ia = i;
+				ib = j;
+			}
+		}
+		if( ia && (ia != ib) )
+		{
+			// tmp
+			gpmMcpyOF( pX+nX,		pX,		ia );
+			gpmMcpyOF( pX, 			pX+ia,	nX-ia );
+			gpmMcpyOF( pX+(nX-ia),	pX+nX,	ia );
+			ib -= ia;
+		}
+		iAXIS = ib;
+		lAXIS = sqrt(lAXIS);
 		return this;
 	}
 };
@@ -332,7 +379,7 @@ public:
 	gpcLZY			*pPACK;
 	U4				id, iSRC, aiQC[2],
 					nPIXall, nPIX,
-					nBOBall, //nBOB,
+					nBOBall, nBOB,
 
 					bppS, nPKavg;
 
@@ -343,7 +390,7 @@ public:
 
 	I4x4			xyOUT, xySRC, txWH;
 	gpcPIC			*pSRC;
-	//gpcBOB			**ppBOB;
+	gpcBOB			**ppBOB;
 
 	bool			bTHRD;
 	std::thread		T;
@@ -354,10 +401,10 @@ public:
 	~gpcPIC()
 	{
 		unLOCK();
-		/*for( U4 i = 0; i < nBOB; i++ )
+		for( U4 i = 0; i < nBOB; i++ )
 			gpmDEL(ppBOB[i]);
 
-		gpmDELary(ppBOB);*/
+		gpmDELary(ppBOB);
 		gpmSDL_FreeTX(pTX);
 		gpmSDL_FreeTX(pRTX);
 		gpmSDL_FreeSRF(pSRF);

@@ -326,7 +326,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	U4 mom = 0, nBtrd = 0;
 
 	gpcTRDbug aBUG[4];
-	U8 nB = 0, nA = 0, trd=0;
+	U8 nB = 0, nA = 0, trd=0, nF = 0, nF2, k;
 	for( U4 i = 0, e = gpmN(aBUG), q; i < e; i++ )
 	{
 		vQ = I4x2( i%2, i/2 );
@@ -358,8 +358,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	gpdEXPdbgCOUT std::cout << "Explode: nTRD " << trd <<std::endl;
 	aBUG[trd].loop();
 	gpdEXPdbgCOUT std::cout << "Explode: mainLOOP " << trd <<std::endl;
-	for( U4 i = 0; i <= trd; i++ )
-	{
+	for( U4 i = 0; i <= trd; i++ ) {
 		if( aBUG[i].n_join < aBUG[i].n_run )
 		{
 			aBUG[i].trd.join();
@@ -370,10 +369,140 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		{
 			if(!aBUG[i].ppBOB[j])
 				continue;
+			// iAXIS lAXIX
+			/// wCNTR mRDr
+			/// nAREA
+
 			nA += aBUG[i].ppBOB[j]->nAREA;
 		}
 	}
-	gpdEXPdbgCOUT std::cout << "Explode: " << nB << "/" << nA <<std::endl;
+	if( nB ) {
+		gpcBOB *pBA,*pBB;
+		U4 nFall = nB*3;
+		I4x2* pF = new I4x2[nFall], *pK;
+		nF = 0;
+		nF2 ;
+		for( U4 i = 0, j; i <= trd; i++ )
+		{
+			for( j = 0; j < aBUG[i].nBOB; j++ )
+			{
+				pBB = aBUG[i].ppBOB[j];
+				if( pBB ? !pBB->mRDr : true )
+					continue;
+				pF[nF].x = (i<<24) + j;
+				pF[nF].y = pBB->mRDr;
+				nF++;
+			}
+			switch(i)
+			{
+				case 0:
+					nF2 = nF;
+					continue;
+				case 1: {
+					pF->median( nF, pF+nF, true );
+					gpmMcpyOF( pF, pF+nF/4, nF/2 );
+					nF /= 2;
+					nF2 = nF;
+				} continue;
+			}
+			pF->median( nF, pF+nF, true );
+			gpmMcpyOF( pF, pF+nF/4, nF/2 );
+			nF /= 2;
+		}
+		nF2 = nF*nF;
+		if( nF2+nF > nFall )
+		{
+			nFall = nF2+nF;
+			pK = pF;
+			pF = new I4x2[nFall];
+            gpmMcpyOF( pF, pK, nF );
+            delete[] pK;
+		}
+		pK = pF+nF;
+		k = 0;
+		for( U4 i = 0,t,b,j; i < nF; i++ )
+		{
+			b = pF[i].x;
+			pBA = aBUG[b>>24].ppBOB[b&0xffffff];
+			for( j = i+1; j < nF; j++ )
+			{
+				b = pF[j].x;
+				pBB = aBUG[b>>24].ppBOB[b&0xffffff];
+				pK[k].x = (i<<16)|j;
+				pK[k].y = (pBA->mRDr+pBB->mRDr) - sqrt( (pBA->wCNTR-pBB->wCNTR).qlen() );
+				k++;
+			}
+		}
+		pK->median( k, pK+k );
+		for( U4 i = 0; i < k; i++, k = i )
+		if( pK[k].y < 0 )
+			break;
+
+		if( k )
+		{
+			if( k > 0x8 )
+				k = 0x8;
+			U4 n = 0, k2 = k*2;
+			if( nBOBall < 0x20 )
+			{
+				gpcBOB** ppKILL = ppBOB;
+				nBOBall = 0x20;
+				ppBOB = new gpcBOB*[nBOBall];
+				if( ppKILL )
+				{
+					gpmMcpyOF( ppBOB, ppKILL, nBOB );
+				}
+				gpmZnOF( ppBOB+nBOB, nBOBall-nBOB);
+			}
+            for( U4 i = min(nBOB+k2,nBOBall)-1; k2 <= i; i-- )
+            {
+				// copyback
+				gpmDEL(ppBOB[i]);
+				ppBOB[i] = ppBOB[i-k2];
+				ppBOB[i-k2] = NULL;
+            }
+
+            for( U4 i = 0,b,t,j; i < k; i++ )
+            {
+				b = pK[i].x;
+				for( j = 0; j < 2; j++, b >>= 0x10 )
+				{
+					t = pF[b&0xffff].x;
+					pBB = aBUG[t>>24].ppBOB[t&0xffffff];
+					if( !pBB )
+						continue;
+
+					gpmDEL( ppBOB[n] );
+					ppBOB[n] = pBB;
+					n++;
+					aBUG[t>>24].ppBOB[t&0xffffff] = NULL;
+				}
+            }
+            nBOB += k2;
+            if( nBOB > nBOBall )
+				nBOB = nBOBall;
+
+
+			//gpdEXPdbgCOUT
+			if( nBOB )
+			{
+				std::cout << "Explode: " << nB << "/" << nA <<std::endl;
+				for( U4 i = 0; i < k2; i++)
+				if( pBB = ppBOB[i] )
+					std::cout << i << "BOB:"
+								<< pBB->wCNTR.x
+								<< "x"
+								<< pBB->wCNTR.y
+								<< "r"
+								<< pBB->mRDr
+								<< "A"
+								<< pBB->nAREA <<std::endl;
+			}
+			delete[] pF;
+		} else
+			delete[] pF;
+	}
+	//gpdEXPdbgCOUT std::cout << "Explode: " << nB << "/" << nA <<std::endl;
 	return (U1x4*)gpapP[0]->pixels;
 
 }
