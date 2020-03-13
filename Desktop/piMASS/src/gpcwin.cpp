@@ -209,7 +209,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 	U1 aXY[] = "00", c = 0;
 
 	gppKEYbuff = ( gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,pWELLCOME ) );
-	I8x2 GLSLpic(0,1), GLSLiso(0,0);
+	I8x2 GLSLline(0,2), GLSLpic(0,1), GLSLiso(0,0);
 	Fx4 tmpFx4;
 	while( gppKEYbuff ) {
 		usleep(33);
@@ -269,7 +269,9 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						->GLSLset( GLSLpic ) //pI[2].a4x2[0] )
 						->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
 						->glSETcnl( 0, Fx4(0.7f,0.7f,0.7f,1.0f) )
-						->glSETtx( 0, p_tx, p_pic->txWH.a4x2[1] )->glDRW( w.a4x2[0], FRMwh );
+						->glSETtx( 0, p_tx, p_pic->txWH.a4x2[1] )
+						->glDRW( w.a4x2[0], FRMwh );
+						//->glDRW( 0, w.a4x2[0], FRMwh );
 					}
 
 					if( U4 n = apCRS[i]->bobBG.n_load/sizeof(apCRS[0]->aXYuvPC) )
@@ -279,8 +281,9 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					if( gpcBOB* pBOB = pB->ppBOB[b] )
 					{
 						pGL
+						->GLSLset( GLSLpic )
 						->glSETbob( pBOB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
-						->glDRW( w.a4x2[0], FRMwh );
+						->glDRW( 1, w.a4x2[0], FRMwh );
 						//pGL;
 					}
 
