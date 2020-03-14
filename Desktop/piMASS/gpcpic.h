@@ -371,8 +371,7 @@ public:
 		return this;
 	}
 };
-class gpcPIC
-{
+class gpcPIC {
 public:
 	I8x2			TnID, alfN;
 	U1				sFILE[gpdMAX_PATH], *pFILE;

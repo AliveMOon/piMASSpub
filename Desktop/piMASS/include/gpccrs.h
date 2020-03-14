@@ -25,6 +25,7 @@ class gpcCRS
 		bool bESC, bED;
 		gpcLZY	picBG, bobBG, picUPL;
 
+
 		gpcCRS( gpcWIN& win, U1 _id );
 		virtual ~gpcCRS();
 		U1*		gtUTF8( U1* pBUFF ), id;
@@ -44,8 +45,7 @@ class gpcCRS
 			return bED = !bED;
 		}
 
-		I4* ZNpos( const I4x2& mZN, I4* pC, I4* pR )
-		{
+		I4* ZNpos( const I4x2& mZN, I4* pC, I4* pR ) {
 			if( (nCp <= mZN.x) || (nRp <= mZN.y) )
 			{
 				nCp = mZN.x+1;
@@ -94,8 +94,7 @@ class gpcCRS
 			return CRSfrm.a4x2[0];
 		}
 		I4x2 stFRMwh(	gpcWIN& win, //U1 iDIV,
-						I4 c, I4 r, I4 mag = 0 )
-		{
+						I4 c, I4 r, I4 mag = 0 ) {
 			I4x2 CR = win.wDIVcr(id).a4x2[1];
 			if( c > CR.x || r > CR.y )
 			{

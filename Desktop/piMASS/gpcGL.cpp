@@ -24,9 +24,9 @@ gpcGL::gpcGL( gpcWIN& win )
 
 	trgWHpx = win.winSIZ.a4x2[1];
 	pTRG = SDL_CreateTexture(
-									win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-									trgWHpx.x, trgWHpx.y
-								);
+								win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+								trgWHpx.x, trgWHpx.y
+							);
 	gVxSucc = GL_FALSE;
 
 	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
@@ -68,9 +68,23 @@ char gpsGLSLfrgREF[] = {
 "uniform vec4 		aCNL[8];				// CNL							\n"
 "void main()																\n"
 "{																			\n"
-"	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0];						\n"
+"	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0]*0.789f;						\n"
 "	if( gl_FragColor.a < (1/0x100) )										\n"
 " 		discard;															\n"
+"}																			\n"
+
+"\n\0"
+};
+char gpsGLSLfrgLINE[] = {
+"#version 120																\n"
+"varying vec2 fr_uv;														\n"
+"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
+"uniform vec4 		aCNL[8];				// CNL							\n"
+"void main()																\n"
+"{																			\n"
+"	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); //*aCNL[0];					\n"
+//"	if( gl_FragColor.a < (1/0x100) )										\n"
+//" 		discard;														\n"
 "}																			\n"
 
 "\n\0"

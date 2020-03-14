@@ -203,6 +203,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 
 
 extern char gpsGLSLfrgREF[];
+extern char gpsGLSLfrgLINE[];
 void gpcWIN::WINrun( const char* pWELLCOME )
 {
 	U4 scan, bug = 0, nBUG;
@@ -244,12 +245,14 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				SDL_Texture *pBGtx = (pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL),
 							*p_tx;
 				pGL->TRG( pSDLrndr, 0, winSIZ.a4x2[0], mSEC.x );
-				for( U1 i = 0; i < 4; i++ )
+				gpcPIC* pP; gpcBOB* pB;
+
+				for( U1 i = 0, n; i < 4; i++ )
 				{
 					if( i ? !(bSW&(1<<i)) : false )
 						continue;
 
-					I4x4	w = wDIVpx(i);
+					I4x4	w = wDIVpx(i), *pI, *pIe;
 					I4x2	FRMwh = apCRS[i]->gtFRMwh(), layCR = wDIVcrLAY(),
 							bgWH = pPICbg ? pPICbg->txWH.a4x2[1] : I4x2(1280,960);
 					if( pPICbg )
@@ -260,31 +263,35 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						->glSETtx( 0, pBGtx, bgWH )->glDRW( w.a4x2[0], FRMwh );
 
 					glViewport( w.x, (winSIZ.w-w.w)-w.y, w.z, w.w );
-					if( U4 n = apCRS[i]->picBG.n_load/sizeof(apCRS[0]->aXYuvPC) )
-					for( I4x4* pI = (I4x4*)apCRS[i]->picBG.p_alloc, *pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
-					if( gpcPIC* p_pic = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
-					if( p_tx = p_pic->surDRWtx(pSDLrndr) )
+
+
+					n = apCRS[i]->picBG.n_load/sizeof(apCRS[0]->aXYuvPC);
+					if( pI = n ? (I4x4*)apCRS[i]->picBG.p_alloc : NULL )
+					for( pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
+					if( pP = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
+					if( p_tx = pP->surDRWtx(pSDLrndr) )
 					{
 						pGL
 						->GLSLset( GLSLpic ) //pI[2].a4x2[0] )
 						->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
 						->glSETcnl( 0, Fx4(0.7f,0.7f,0.7f,1.0f) )
-						->glSETtx( 0, p_tx, p_pic->txWH.a4x2[1] )
+						->glSETtx( 0, p_tx, pP->txWH.a4x2[1] )
 						->glDRW( w.a4x2[0], FRMwh );
 						//->glDRW( 0, w.a4x2[0], FRMwh );
 					}
 
-					if( U4 n = apCRS[i]->bobBG.n_load/sizeof(apCRS[0]->aXYuvPC) )
-					for( I4x4* pI = (I4x4*)apCRS[i]->bobBG.p_alloc, *pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
-					if( gpcPIC* pB = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
-					for( U4 nB = pB->nBOB, b = 0; b < nB; b++ )
-					if( gpcBOB* pBOB = pB->ppBOB[b] )
+					n = apCRS[i]->bobBG.n_load/sizeof(apCRS[0]->aXYuvPC);
+					if( pI = n ? (I4x4*)apCRS[i]->bobBG.p_alloc : NULL )
+					for( pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
+					if( pP = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
+					for( U4 nB = pP->nBOB, b = 0; b < nB; b++ )
+					if( pB = pP->ppBOB[b] )
 					{
 						pGL
-						->GLSLset( GLSLpic )
-						->glSETbob( pBOB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
-						->glDRW( 1, w.a4x2[0], FRMwh );
-						//pGL;
+						->GLSLset( GLSLline, gpsGLSLfrgLINE )
+						->glSETbob( pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
+						->glDRW( 2, w.a4x2[0], FRMwh );
+
 					}
 
 					glViewport( 0, 0, winSIZ.z, winSIZ.w );

@@ -80,6 +80,13 @@ public:
 	gpcGLSL* pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  );
 
 };
+
+static const GLenum gpaDRWmod[] = {
+			GL_TRIANGLE_FAN,
+			GL_LINES,
+			GL_LINE_STRIP,
+		};
+
 class gpcGL
 {
 public:
@@ -123,7 +130,7 @@ public:
 	U4			iGLSL, eGLSL, nGLSL,
 
 				aIXn[0x10],
-				nBUFF;
+				nBUFF, nV;
 	U4x2 aVXn[0x10];
 	Fx4* pV;
 
@@ -136,8 +143,9 @@ public:
 
 	gpcGL( gpcWIN& win );
 	gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, bool bC = true, bool bD = true );
-	gpcGL* TRG( SDL_Renderer* pSDLrndr, I4x2 lXY, const I4x2& tWH, float ms, bool bCLR = true, bool bDEP = true )
-	{
+	gpcGL* TRG( SDL_Renderer* pSDLrndr,
+				I4x2 lXY, const I4x2& tWH, float ms,
+				bool bCLR = true, bool bDEP = true ) {
 		if( !this )
 			return NULL;
 
@@ -213,50 +221,48 @@ public:
 	}
 	GLuint viBOline( const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
-		if( aVXid[1] > 0 )
+		if(aVXid[1])
 			glDeleteBuffers(1,  &aVXid[1] );
 		aVXn[1] = U4x2( nX, nD );
 		glGenBuffers( 1, &aVXid[1] );
 		glBindBuffer( GL_ARRAY_BUFFER, aVXid[1] );
-		glBufferData( GL_ARRAY_BUFFER, aVXn[1].area() * sizeof(*pD), pD, GL_STATIC_DRAW );
+		U4 n_byte = aVXn[1].area() * sizeof(*pD);
+		glBufferData( GL_ARRAY_BUFFER, n_byte, pD, GL_STATIC_DRAW );
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-		if( nBUFF < aVXn[1].y*4 )
+		aIXn[1] = aVXn[1].y; // *2;
+		if(nBUFF>aIXn[1])
+			return aVXid[1];
+
+		if(aIXid[1]>0)
+			glDeleteBuffers( 1, &aIXid[1] );
+
+		GLuint* pKILL = pBUFF;
+		U4 i = nBUFF;
+		nBUFF = gpmPAD( aIXn[1]*2, 0x10 );
+		pBUFF = new U4[nBUFF];
+		if(i)
 		{
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-			if( aIXid[1] > 0 )
-				glDeleteBuffers(1,  &aIXid[1] );
-			GLuint* pKILL = pBUFF;
-			U4 nKILL = nBUFF;
-			nBUFF = aVXn[1].y*4;
-			pBUFF = new GLuint[nBUFF];
-			if( nKILL )
-			{
-				gpmMcpyOF(pBUFF, pKILL, nKILL);
-				gpmDELary(pKILL);
-			} else {
-				pBUFF[0] = 0;
-				pBUFF[1] = 1;
-				nKILL = 2;
-			}
-
-			for( GLuint i = nKILL; i < nBUFF; i+=2 )
-			{
-				pBUFF[i] = pBUFF[i-1];
-				pBUFF[i+1] = pBUFF[i]+1;
-			}
-			glGenBuffers( 1, &aIXid[1] );
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[1] );
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, nBUFF * sizeof(*pBUFF), pBUFF, GL_STATIC_DRAW );
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+			gpmMcpyOF(pBUFF,pKILL,i);
+			gpmDELary(pKILL);
+		} else {
+			*pBUFF = 0;
+			i = 1;
 		}
-		aIXn[1] = aVXn[1].y*2;
-
+		for( ; i < nBUFF; i++ )
+		{
+			pBUFF[i] = i; /* p;
+			i++; p++;
+			pBUFF[i] = p;*/
+		}
+		glGenBuffers( 1, &aIXid[1] );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[1] );
+		n_byte = nBUFF*sizeof(*pBUFF);
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, nBUFF*sizeof(*pBUFF), pBUFF, GL_STATIC_DRAW );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 		return aVXid[1];
 	}
-
-	gpcGL* glSETbob( gpcBOB* pBOB, I4x4 xyWH, const I4x4 divPX, const I4x2& frm )
-	{
+	gpcGL* glSETbob( gpcBOB* pBOB, I4x4 xyWH, const I4x4 divPX, const I4x2& frm ) {
 		if(!this)
 			return NULL;
 
@@ -267,29 +273,41 @@ public:
 		xyWH &= divPX.a4x2[1];
 		xyWH /= frm;
 		xyWH.a4x2[0] += divPX.a4x2[0];
+		boxXY = xyWH.a4x2[0];
+		boxWH = xyWH.a4x2[1];
+
 		U4 n = pBOB->nX;
-		Fx4* pV = new Fx4[n*2];
-		U4 j = 0;
-		for( U4 i = j; i < n; i++ )
+		if( nV < n*3 )
 		{
-			I4x2& ixy = pBOB->pX[i];
-			pV[j].aF2[0] = pBOB->pRD[ixy.x];
-			pV[j].aF2[1] = I4x2(j, n );
+			nV = gpmPAD( n*3, 0x10 );
+			gpmDELary(pV);
+			pV = new Fx4[nV];
+		}
+
+		U4 j = 0;
+		I4x2 wC = pBOB->wCNTR;
+		for( U4 i = 0, m; i < n; i++ )
+		{
+			I4x2 ixy = pBOB->pX[i];
+			m = ixy.mx();
+			if( m >= pBOB->nRD )
+				ixy %= pBOB->nRD;
+			pV[j].aF2[0] = pBOB->pRD[ixy.x]+wC;
+			pV[j].aF2[1] = I4x2(j,n);
 			j++;
-			pV[j].aF2[0] = pBOB->pRD[ixy.y];
+			pV[j].aF2[0] = pBOB->pRD[ixy.y]+wC;
 			pV[j].aF2[1] = I4x2(j,n);
 			j++;
 		}
 		pV[j] = pV[0];
 		j++;
 
-		pV[0].div( Fx4( trgWHpx, I4x2(1,1) ), j );
+		pV[0].div( Fx4(trgWHpx,I4x2(1,1)), j );
 		viBOline( (float*)pV, j, 4 );
+
 
 		return this;
 	}
-
-
 	gpcGL* glSETbox( I4x2 xy, const I4x2& wh ) {
 		if( this ? !wh.area() : true )
 			return NULL;
@@ -399,7 +417,6 @@ public:
 		}
 		return this;
 	}
-
 	gpcGL* glDONE(){ glUseProgram(0); return this; }
 	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
 		if( !this )
@@ -450,7 +467,6 @@ public:
 		if( aUniID[2] > -1 )
 			glUniform2f( aUniID[2], (float)wh.x, (float)wh.y );
 
-
 		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
 		glEnableVertexAttribArray( ATvxID );
 		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
@@ -458,18 +474,17 @@ public:
 
 		glBindBuffer( GL_ARRAY_BUFFER, aVXid[mode] );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[mode] );
-		switch(mode)
-		{
+
+		glDrawElements( gpaDRWmod[mode], aIXn[mode], GL_UNSIGNED_INT, NULL );
+		/*switch(mode) {
 			case 0:
-				glDrawElements( GL_TRIANGLE_FAN, aIXn[0], GL_UNSIGNED_INT, NULL );
+				glDrawElements( GL_TRIANGLE_FAN, aIXn[mode], GL_UNSIGNED_INT, NULL );
 				break;
 			case 1:
-				glDrawElements( GL_LINES, aIXn[1], GL_UNSIGNED_INT, NULL );
-				/*glBindBuffer( GL_ARRAY_BUFFER, aVXid[1] );
-				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, idIXline );*/
+				glDrawElements( GL_LINES, aIXn[mode], GL_UNSIGNED_INT, NULL );
 				break;
 
-		}
+		}*/
 
 
 		glDisableVertexAttribArray( ATvxID );
