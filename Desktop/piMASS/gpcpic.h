@@ -105,7 +105,7 @@ public:
 			mRDr; 			// sugarak medianja
 			//nKIDall, iKID;
 	I4x4	lurd;
-	I4x2	picWH, *pRD, *pRDsrt, *pX, wCNTR, lurdC;
+	I4x2	picWH, *pRD, *pRDf, *pX, *pRDsrt, wCNTR, lurdC;
 	//gpcBOB	**ppKID;
 	~gpcBOB(){
 		gpmDELary(pRD);
@@ -149,11 +149,9 @@ public:
         }
 
 
+		gpmMcpyOF( pRDf=pRD+nR, gpmMcpyOF(pRD,pR,nR), nR );
 
-        gpmMcpyOF( pRD, pR, nR );
-        gpmMcpyOF( pRDsrt = pRD+nR, pR, nR );
-
-		pRDsrt->median( nR, pRDsrt+nR,true );
+		pRDf->median( nR, pRDsrt=pRDf+nR, true );
 		nAREA = 0;
 		U8 wA = 0, wB = 0, nW = 0;
 		lurd.a4x2[0] = picWH = I4x2(rg,Mwh.y);
@@ -164,8 +162,8 @@ public:
 		}
 		for( I4 i = 0,a,b,ab; i < nR; i+= 2 )
 		{
-			a = pRDsrt[i].x;
-			b = pRDsrt[i+1].x;
+			a = pRDf[i].x;
+			b = pRDf[i+1].x;
 			/// ennek az a lényege
 			/// az ALU egyébként is kiszámolja a hányadost
 			/// és a maradékot egy lépésben
@@ -231,10 +229,8 @@ public:
 		//id = n0x100.u4;
 		for( I4 i = 0, a, b, xx, hx = h-1; i < nR; i+= 2 )
 		{
-			a = pRDsrt[i].x;
-
-			b = pRDsrt[i+1].x;
-
+			a = pRDf[i].x;
+			b = pRDf[i+1].x;
 			xx = pRD[b].x-pRD[a].x;
 			if(xx<1)
 				continue;
@@ -257,18 +253,21 @@ public:
 
 
 		nRDr = sqrt((lurd.a4x2[0]-wCNTR).abs().MX((lurd.a4x2[0]-wCNTR).abs()).qlen());
-		pX = pRD+nRD*2;
+		pX = pRDf+nRD;
 
 		I4x2* pKILL = NULL;
+
         if( pRDsrt <= pX+nRD )
         {
 			if( nRDall <= gpmPAD( pX-pRD+nRD*2, 0x10) )
 			{
 				nRDall = gpmPAD( pX-pRD+nRD*2, 0x10)+0x10;
 				pKILL = pRD;
-				pRD = new I4x2[nRDall];
-				pX = pRD + (pX-pKILL);
-				pRDsrt = pX+nRD;
+
+				pRD		= new I4x2[nRDall];
+				pRDf	= pRD + nRD;
+				pX		= pRDf + nRD;
+				pRDsrt	= pX+nRD;
 			}
         }
 		if( pKILL )
@@ -277,73 +276,62 @@ public:
 			delete[]pKILL;
 		}
 
-		U4	sum = 0;
-		for( U4 i = 0,r; i < nRD; i++ )
-        {
-			pRD[i] -= wCNTR;
-			pX[i].x = i;
-			r = sqrt(pRD[i].qlen());
-			sum += r;
-			pX[i].y = r;
-        }
-		mRDr = pX->median( nRD, pRDsrt );
+		//U4	sum = 0;
 		nX = 0;
+		pX[nX].x = 0;
 
-		for( U4 i = 0; i < nRD; i += 9 )
-		{
-			pX[i].y = pX[i].x;
-			pX[nX] = pX[i];
-			nX++;
-		}
-
-		pX->median( nX, pRDsrt,true );
 		I4x2 R, A, B, L;
-		I8 bb, b, a, alt;
+		I8 bb, b, a, aa;
 		U4 ib,ia;
-		for( U4 i = 1; i < nX; i++ )
+
+		for( U4 i = 0; i < nRD; i++ )
 		{
-			I4x2& X = pX[i-1];
-			R = pRD[X.x];
-
-			ib = pX[i].x;
-			if( ib >= nRD )
-				ib %= nRD;
-
-			B = pRD[ib]-R;
+			pRD[i] -= wCNTR;
+			if( pX[nX].x == i )
+			{
+				R = pRD[i];
+				a = b = 0;
+				continue;
+			}
+			B = pRD[i]-R;
 			bb = B.qlen();
-			if( !bb )
+			if( b >= bb )
 			{
-				// vége
-				nX--;
-				break;
-			}
-			b = sqrt(bb);
-			L = B.SCRlft();
-			alt = 0;
-			for( U4 j = (pX[ib].x+1) < nRD ? (pX[ib].x+1) : (pX[ib].x+1)%nRD,
-					e = pX[ib].x >= j ? pX[ib].x : pX[ib].x+nRD;
-
-					j < e;
-
-					j++ )
-			{
-				ia = j;
-				if( ia >= nRD )
-					ia %= nRD;
-
-				A = pRD[ia]-R;
-				a = (L*A)/b;
-				if( alt < a )
+				L = B.SCRlft();
+				aa = (L*A)/sqrt(bb);
+				if( a <= aa )
+				{
+					a = aa;
 					continue;
-				alt = a;
-				X.y = ia;
+				}
+				nX++;
+				pX[nX].x = i+1;
+                continue;
 			}
+			if( a )
+			{
+				nX++;
+				pX[nX].x = i+1;
+                continue;
+			}
+
+			b = bb;
+			pX[nX].y = i;
+			A = B;
 		}
 		lAXIS = 0;
 		ib = ia = 0;
-		for( U4 i = 0; i < nX-1; i++ )
+		mRDr = 0;
+		if( nX < 2 )
+			return this;
+
+
+
+		U4 i = 0;
+		for( ; i < nX-1; i++ )
 		{
 			R = pRD[pX[i].x];
+			mRDr += sqrt(R.qlen());
 			for( U4 j = i+1; j < nX; j++ )
 			{
 				b = pX[j].x;
@@ -358,6 +346,9 @@ public:
 				ib = j;
 			}
 		}
+
+		mRDr /= i;
+
 		if( ia && (ia != ib) )
 		{
 			// tmp

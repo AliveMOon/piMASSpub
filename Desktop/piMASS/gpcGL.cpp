@@ -401,7 +401,7 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
 	return this;
 }
 
-GLint gpcGLSL::GLSLvrtx( const char* pSvrtx ) {
+GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {
 	if( !pSvrtx )
 		pSvrtx = gpsGLSLvx;
 	U8 s;
@@ -418,12 +418,13 @@ GLint gpcGLSL::GLSLvrtx( const char* pSvrtx ) {
 		glGetShaderiv( vrtxID, GL_INFO_LOG_LENGTH, &nLOG );
 		if( nLOG )
 		{
-			vrtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
-			glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vrtxLOG.p_alloc );
+			vtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
+			glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vtxLOG.p_alloc );
 		}
 	} else {
-		frgLOG.lzyRST();
-		vrtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
+		pVTX = (char*)pSvrtx;
+		vtxLOG.lzyRST();
+		vtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
 		nSUCC |= 1;
 	}
 
@@ -451,6 +452,7 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 			glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
 		}
 	} else {
+		pFRG = (char*)pSfrg;
 		frgLOG.lzyRST();
 		frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
 		nSUCC |= 2;
@@ -603,29 +605,37 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 	gpcGLSL* pKILL = NULL;
 	if( pGLSL )
 	{
-		U4 nCMP = gpmSTRLEN(pV);
-		if( nCMP )
-		if( nCMP != pGLSL->vrtxSRC.n_load )
-			pKILL = pGLSL;
-		else if( gpmMcmp( pGLSL->vrtxSRC.p_alloc, pV, nCMP ) != nCMP )
-			pKILL = pGLSL;
+		U4 nCMP = 0;
+		if( pGLSL->pVTX != pV )
+		{
+			nCMP = gpmSTRLEN(pV);
+			if( nCMP )
+			if( nCMP != pGLSL->vtxSRC.n_load )
+				pKILL = pGLSL;
+			else if( gpmMcmp( pGLSL->vtxSRC.p_alloc, pV, nCMP ) != nCMP )
+				pKILL = pGLSL;
+		}
 
-		nCMP = gpmSTRLEN(pF);
-		if( nCMP )
-		if( nCMP != pGLSL->frgSRC.n_load )
-			pKILL = pGLSL;
-		else if( gpmMcmp( pGLSL->frgSRC.p_alloc, pF, nCMP ) != nCMP )
-			pKILL = pGLSL;
+		if( !pKILL )
+		if( pGLSL->pFRG != pF )
+		{
+			nCMP = gpmSTRLEN(pF);
+			if( nCMP )
+			if( nCMP != pGLSL->frgSRC.n_load )
+				pKILL = pGLSL;
+			else if( gpmMcmp( pGLSL->frgSRC.p_alloc, pF, nCMP ) != nCMP )
+				pKILL = pGLSL;
+		}
 
-        if( pKILL )
-        {
+		if( pKILL )
+		{
 			pGLSL = ((gpcGLSL*)NULL)->pNEW( an, pF, pV );
 			if( pGLSL )
 			{
 				ppGLSL[iGLSL] = pGLSL;
 				gpmDEL(pKILL);
 			}
-        }
+		}
 
 	} else {
 	    if( iGLSL >= nGLSL )
@@ -654,7 +664,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 	return this;
 }
 
-GLuint gpcGL::GLSLvrtx( const char* pS ) {
+GLuint gpcGL::GLSLvtx( const char* pS ) {
 	if( !pS )
 		pS = gpsGLSLvx;
 	U8 s = -1, nS = gpmSTRLEN(pS);

@@ -2716,7 +2716,7 @@ public:
 		return abs().area()+abs().sum();
 	}
 
-	U8 qlen (void ) const
+	I8 qlen (void ) const
 	{
 		return x*x + y*y;
 	}

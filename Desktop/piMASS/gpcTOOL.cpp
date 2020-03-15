@@ -383,32 +383,19 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		nF = 0;
 		nF2 ;
 		for( U4 i = 0, j; i <= trd; i++ )
+		for( j = 0; j < aBUG[i].nBOB; j++ )
 		{
-			for( j = 0; j < aBUG[i].nBOB; j++ )
-			{
-				pBB = aBUG[i].ppBOB[j];
-				if( pBB ? !pBB->mRDr : true )
-					continue;
-				pF[nF].x = (i<<24) + j;
-				pF[nF].y = pBB->mRDr;
-				nF++;
-			}
-			switch(i)
-			{
-				case 0:
-					nF2 = nF;
-					continue;
-				case 1: {
-					pF->median( nF, pF+nF, true );
-					gpmMcpyOF( pF, pF+nF/4, nF/2 );
-					nF /= 2;
-					nF2 = nF;
-				} continue;
-			}
-			pF->median( nF, pF+nF, true );
-			gpmMcpyOF( pF, pF+nF/4, nF/2 );
-			nF /= 2;
+			pBB = aBUG[i].ppBOB[j];
+			if( pBB ? !pBB->mRDr : true )
+				continue;
+			pF[nF].x = (i<<24) + j;
+			pF[nF].y = pBB->mRDr;
+			nF++;
 		}
+
+		pF->median( nF, pF+nF, true );
+		nF /= 3;
+
 		nF2 = nF*nF;
 		if( nF2+nF > nFall )
 		{
@@ -429,13 +416,13 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 				b = pF[j].x;
 				pBB = aBUG[b>>24].ppBOB[b&0xffffff];
 				pK[k].x = (i<<16)|j;
-				pK[k].y = (pBA->mRDr+pBB->mRDr) - sqrt( (pBA->wCNTR-pBB->wCNTR).qlen() );
+				pK[k].y = sqrt((pBA->wCNTR-pBB->wCNTR).qlen()) + abs(pBA->mRDr-pBB->mRDr) ;
 				k++;
 			}
 		}
-		pK->median( k, pK+k );
+		int m = pK->median( k, pK+k, true ); //, true );
 		for( U4 i = 0; i < k; i++, k = i )
-		if( pK[k].y < 0 )
+		if( pK[k].y > m )
 			break;
 
 		if( k )

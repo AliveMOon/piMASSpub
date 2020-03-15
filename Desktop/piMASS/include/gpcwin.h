@@ -34,13 +34,14 @@ public:
 
 	GLuint	vrtxID,
 			frgID;
-	gpcLZY	vrtxLOG, vrtxSRC,
+	char	*pVTX, *pFRG;
+	gpcLZY	vtxLOG, vtxSRC,
 			frgLOG, frgSRC,
 			lnkLOG;
 	U4 nSUCC;
 	I8x2	ID;
 private:
-	GLint GLSLvrtx( const char* pSvrtx );
+	GLint GLSLvtx( const char* pSvrtx );
 	GLint GLSLfrg( const char* pSfrg );
 	GLint GLSLlnk( const char** ppUlst = NULL );
 
@@ -48,7 +49,7 @@ private:
 	{
 		gpmCLR;
 		ID = an;
-		if( GLSLvrtx( pSvrtx ) != GL_TRUE )
+		if( GLSLvtx( pSvrtx ) != GL_TRUE )
 			return;
 
 		if( GLSLfrg( pSfrg ) != GL_TRUE )
@@ -511,7 +512,7 @@ public:
 		return this;
 	}
 
-	GLuint GLSLvrtx( const char* pS = NULL );
+	GLuint GLSLvtx( const char* pS = NULL );
 	GLuint GLSLfrg( const char* pS = NULL );
 	GLuint GLSLlnk( ) {
 		U8 s;
