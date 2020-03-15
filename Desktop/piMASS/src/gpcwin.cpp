@@ -269,28 +269,33 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					if( pI = n ? (I4x4*)apCRS[i]->picBG.p_alloc : NULL )
 					for( pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
 					if( pP = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
-					if( p_tx = pP->surDRWtx(pSDLrndr) )
 					{
-						pGL
-						->GLSLset( GLSLpic ) //pI[2].a4x2[0] )
-						->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
-						->glSETcnl( 0, Fx4(0.7f,0.7f,0.7f,1.0f) )
-						->glSETtx( 0, p_tx, pP->txWH.a4x2[1] )
-						->glDRW( w.a4x2[0], FRMwh );
-						//->glDRW( 0, w.a4x2[0], FRMwh );
+						pGL->GLSLset( GLSLpic );
+						if( p_tx = pP->surDRWtx(pSDLrndr) )
+						{
+							pGL
+							->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
+							->glSETcnl( 0, Fx4(0.875f,0.75f,0.875f,1.0f) )
+							->glSETtx( 0, p_tx, pP->txWH.a4x2[1] )
+							//->glDRW( w.a4x2[0], FRMwh );
+							->glDRW( 0, w.a4x2[0], FRMwh );
+						}
 					}
 
 					n = apCRS[i]->bobBG.n_load/sizeof(apCRS[0]->aXYuvPC);
 					if( pI = n ? (I4x4*)apCRS[i]->bobBG.p_alloc : NULL )
 					for( pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
 					if( pP = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
-					for( U4 nB = pP->nBOB, b = 0; b < nB; b++ )
-					if( pB = pP->ppBOB[b] )
 					{
-						pGL
-						->GLSLset( GLSLline, gpsGLSLfrgLINE )
-						->glSETbob( pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
-						->glDRW( 2, w.a4x2[0], FRMwh );
+						pGL->GLSLset( GLSLline, gpsGLSLfrgLINE );
+						for( U4 nB = pP->nBOB, b = 0, m = 2; b < nB; b++ )
+						if( pB = pP->ppBOB[b] )
+						{
+							pGL
+							->glSETbob( m, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
+							->glSETcnl( 0, Fx4(1.0f,0.0f,0.0f,1.0f) )
+							->glDRW( m, w.a4x2[0], FRMwh );
+						}
 
 					}
 

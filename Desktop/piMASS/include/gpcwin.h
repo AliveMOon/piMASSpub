@@ -204,6 +204,7 @@ public:
 	}
 	GLuint IBOnew( const GLuint* pD, U4 nD ) {
 		//Create IBO
+		aIXn[0] = nD;
 		glGenBuffers( 1, &aIXid[0] );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[0] );
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, nD * sizeof(*pD), pD, GL_STATIC_DRAW );
@@ -219,27 +220,28 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		return aVXid[0];
 	}
-	GLuint viBOline( const GLfloat* pD, U4 nD, U4 nX ) {
+	GLuint viBO( U1 md, const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
-		if(aVXid[1])
-			glDeleteBuffers(1,  &aVXid[1] );
-		aVXn[1] = U4x2( nX, nD );
-		glGenBuffers( 1, &aVXid[1] );
-		glBindBuffer( GL_ARRAY_BUFFER, aVXid[1] );
-		U4 n_byte = aVXn[1].area() * sizeof(*pD);
+		if(aVXid[md])
+			glDeleteBuffers(1,  &aVXid[md] );
+		aVXn[md] = U4x2( nX, nD );
+		glGenBuffers( 1, &aVXid[md] );
+		glBindBuffer( GL_ARRAY_BUFFER, aVXid[md] );
+
+		U4 n_byte = aVXn[md].area() * sizeof(*pD);
 		glBufferData( GL_ARRAY_BUFFER, n_byte, pD, GL_STATIC_DRAW );
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-		aIXn[1] = aVXn[1].y; // *2;
-		if(nBUFF>aIXn[1])
-			return aVXid[1];
+		aIXn[md] = aVXn[md].y; // *2;
+		if(nBUFF>aIXn[md])
+			return aVXid[md];
 
-		if(aIXid[1]>0)
-			glDeleteBuffers( 1, &aIXid[1] );
+		if(aIXid[md]>0)
+			glDeleteBuffers( 1, &aIXid[md] );
 
 		GLuint* pKILL = pBUFF;
 		U4 i = nBUFF;
-		nBUFF = gpmPAD( aIXn[1]*2, 0x10 );
+		nBUFF = gpmPAD( aIXn[md]*2, 0x10 );
 		pBUFF = new U4[nBUFF];
 		if(i)
 		{
@@ -255,20 +257,20 @@ public:
 			i++; p++;
 			pBUFF[i] = p;*/
 		}
-		glGenBuffers( 1, &aIXid[1] );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[1] );
+		glGenBuffers( 1, &aIXid[md] );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[md] );
 		n_byte = nBUFF*sizeof(*pBUFF);
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, nBUFF*sizeof(*pBUFF), pBUFF, GL_STATIC_DRAW );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, n_byte, pBUFF, GL_STATIC_DRAW );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-		return aVXid[1];
+		return aVXid[md];
 	}
-	gpcGL* glSETbob( gpcBOB* pBOB, I4x4 xyWH, const I4x4 divPX, const I4x2& frm ) {
+	gpcGL* glSETbob( U1 md, gpcBOB* pBOB, I4x4 xyWH, const I4x4 divPX, const I4x2& frm ) {
 		if(!this)
 			return NULL;
 
 		if( pBOB ? !pBOB->nX : true )
 			return NULL;
-
+		glUseProgram( gProgID );
 
 		xyWH &= divPX.a4x2[1];
 		xyWH /= frm;
@@ -285,25 +287,30 @@ public:
 		}
 
 		U4 j = 0;
-		I4x2 wC = pBOB->wCNTR;
+		I4x2 wC = pBOB->wCNTR, ixy;
 		for( U4 i = 0, m; i < n; i++ )
 		{
-			I4x2 ixy = pBOB->pX[i];
+			ixy = pBOB->pX[i];
 			m = ixy.mx();
 			if( m >= pBOB->nRD )
 				ixy %= pBOB->nRD;
-			pV[j].aF2[0] = pBOB->pRD[ixy.x]+wC;
+			pV[j].aF2[0] = pBOB->pRD[ixy.x];
 			pV[j].aF2[1] = I4x2(j,n);
 			j++;
-			pV[j].aF2[0] = pBOB->pRD[ixy.y]+wC;
+			pV[j].aF2[0] = pBOB->pRD[ixy.y];
 			pV[j].aF2[1] = I4x2(j,n);
 			j++;
 		}
 		pV[j] = pV[0];
 		j++;
 
-		pV[0].div( Fx4(trgWHpx,I4x2(1,1)), j );
-		viBOline( (float*)pV, j, 4 );
+		pV[0].add(  Fx4( wC,			I4x2(0)		), j );
+		pV[0].mul(  Fx4( xyWH.a4x2[1],	I4x2(1,1)	)
+				   /Fx4( pBOB->picWH,	I4x2(1,1)	), j );
+
+		pV[0].add( Fx4(xyWH.a4x2[0],	I4x2(0)		), j );
+		pV[0].div( Fx4(trgWHpx,			I4x2(1,1)	), j );
+		viBO( md, (float*)pV, j, 4 );
 
 
 		return this;
@@ -455,6 +462,8 @@ public:
 	gpcGL* glDRW( U1 mode, I4x2 xy, I4x2 wh ) {
 		if( !this )
 			return NULL;
+		/*if( mode )
+			return NULL;*/
 
 		if( aUniID[0] > -1 )
 		if( pPICrtx )
@@ -467,25 +476,15 @@ public:
 		if( aUniID[2] > -1 )
 			glUniform2f( aUniID[2], (float)wh.x, (float)wh.y );
 
+		glBindBuffer( GL_ARRAY_BUFFER, aVXid[mode] );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[mode] );
+
 		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
 		glEnableVertexAttribArray( ATvxID );
 		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
 		glEnableVertexAttribArray( ATuvID );
 
-		glBindBuffer( GL_ARRAY_BUFFER, aVXid[mode] );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[mode] );
-
 		glDrawElements( gpaDRWmod[mode], aIXn[mode], GL_UNSIGNED_INT, NULL );
-		/*switch(mode) {
-			case 0:
-				glDrawElements( GL_TRIANGLE_FAN, aIXn[mode], GL_UNSIGNED_INT, NULL );
-				break;
-			case 1:
-				glDrawElements( GL_LINES, aIXn[mode], GL_UNSIGNED_INT, NULL );
-				break;
-
-		}*/
-
 
 		glDisableVertexAttribArray( ATvxID );
 		glDisableVertexAttribArray( ATuvID );

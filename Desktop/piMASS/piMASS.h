@@ -3222,9 +3222,8 @@ public:
 		return I4x4( a4x2[0]&b, a4x2[1]&b );
 	}
 
-
-	I4x4 lurd( void )
-	{
+	I4x2 lurdWH(){ return a4x2[1]-a4x2[0];};
+	I4x4 lurd( void ) {
 		// left - up - right - down
 		I4x4  lurd = *this;
 		if( x > z )
@@ -3451,10 +3450,7 @@ public:
 	I4x4 TSrBALL( I4x4 T, I8 r );
 	I4x4 TSrBOX( I4x4 T, I8 r );
 	I4x4 mxR( I8 r );
-	I4x4 ABS()
-	{
-		return I4x4( a4x2[0].abs(), a4x2[1].abs() );
-	}
+	I4x4 ABS() { return I4x4( a4x2[0].abs(), a4x2[1].abs() ); }
 	I4x2 mx() {
 		I4x2 o(x,0);
 		if( o.x < y )
@@ -3493,8 +3489,7 @@ public:
 		}
 		return o;
 	}
-	I4x4& swpZWXY()
-	{
+	I4x4& swpZWXY() {
 		I4x2 t = a4x2[1];
 		a4x2[1] = a4x2[0];
 		a4x2[0] = t;

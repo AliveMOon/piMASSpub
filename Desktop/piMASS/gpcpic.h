@@ -105,7 +105,7 @@ public:
 			mRDr; 			// sugarak medianja
 			//nKIDall, iKID;
 	I4x4	lurd;
-	I4x2	*pRD, *pRDsrt, *pX, wCNTR, lurdC;
+	I4x2	picWH, *pRD, *pRDsrt, *pX, wCNTR, lurdC;
 	//gpcBOB	**ppKID;
 	~gpcBOB(){
 		gpmDELary(pRD);
@@ -156,7 +156,7 @@ public:
 		pRDsrt->median( nR, pRDsrt+nR,true );
 		nAREA = 0;
 		U8 wA = 0, wB = 0, nW = 0;
-		lurd.a4x2[0] = I4x2(rg,Mwh.y);
+		lurd.a4x2[0] = picWH = I4x2(rg,Mwh.y);
 		lurd.a4x2[1].null();
 		if( !nA )
 		{
