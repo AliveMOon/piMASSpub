@@ -1031,7 +1031,37 @@ public:
 		w = t;
 		return *this;
 	}
-	U1 srt3()
+	U1 srt3( U1 lim )
+	{
+		if( !(u4&0xffffff) )
+			return 0;
+
+		U1 o = 0x10;
+		U1x4 s = *this;
+
+		if(s.y>s.x)
+		{
+			s.swpYX();
+			o = 0x1;
+		}
+		if(s.z>s.x)
+		{
+			s.swpZX();
+			o |= 0x02;
+		}
+		if(s.z>s.y)
+		{
+			s.swpZY();
+			o |= 0x04;
+		}
+		if( !lim )
+			return o;
+		if( s.x > lim )
+			return o;
+
+		return 0;
+	}
+	U1 srt3( )
 	{
 		if( !(u4&0xffffff) )
 			return 0;

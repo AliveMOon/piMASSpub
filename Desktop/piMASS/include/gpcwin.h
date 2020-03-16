@@ -254,9 +254,7 @@ public:
 		}
 		for( ; i < nBUFF; i++ )
 		{
-			pBUFF[i] = i; /* p;
-			i++; p++;
-			pBUFF[i] = p;*/
+			pBUFF[i] = i;
 		}
 		glGenBuffers( 1, &aIXid[md] );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[md] );
@@ -265,7 +263,7 @@ public:
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 		return aVXid[md];
 	}
-	gpcGL* glSETbob( U1 md, gpcBOB* pBOB, I4x4 xyWH, const I4x4 divPX, const I4x2& frm ) {
+	gpcGL* glSETbob( U1 md, U4 b, gpcBOB* pBOB, I4x4 xyWH, const I4x4 divPX, const I4x2& frm ) {
 		if(!this)
 			return NULL;
 
@@ -286,19 +284,21 @@ public:
 			gpmDELary(pV);
 			pV = new Fx4[nV];
 		}
-
+		pBOB->nDRW++;
+		I4x2	wC = pBOB->wCNTR, ixy, inD = pBOB->inDRW( b ),
+				*pX = pBOB->pX+inD.x,
+				*pRD = pBOB->pRD;
 		U4 j = 0;
-		I4x2 wC = pBOB->wCNTR, ixy;
-		for( U4 i = 0, m; i < n; i++ )
+		for( U4 i = 0, m, nRD = pBOB->nRD; i < inD.y; i++ )
 		{
-			ixy = pBOB->pX[i];
+			ixy = pX[i];
 			m = ixy.mx();
-			if( m >= pBOB->nRD )
-				ixy %= pBOB->nRD;
-			pV[j].aF2[0] = pBOB->pRD[ixy.x];
+			if( m >= nRD )
+				ixy %= nRD;
+			pV[j].aF2[0] = pRD[ixy.x];
 			pV[j].aF2[1] = I4x2(j,n);
 			j++;
-			pV[j].aF2[0] = pBOB->pRD[ixy.y];
+			pV[j].aF2[0] = pRD[ixy.y];
 			pV[j].aF2[1] = I4x2(j,n);
 			j++;
 		}

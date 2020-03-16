@@ -99,7 +99,7 @@ public:
 class gpcBOB {
 public:
 	U4 		mom, 	id, strt,
-			nRDall, nRD, nRDr, nX, aiL[0x10], nL,
+			nRDall, nRD, nRDr, nX, aiL[0x10], nL, nDRW,
 			nAREA,			// a bobban szereplő pixelek száma
 			iAXIS, lAXIS,	// iAX pX[0] az egyik pont pX[iAXIS] másik pont
 			mRDr; 			// sugarak medianja
@@ -107,6 +107,13 @@ public:
 	I4x4	lurd;
 	I4x2	picWH, *pRD, *pRDf, *pX, *pRDsrt, wCNTR, lurdC;
 	//gpcBOB	**ppKID;
+	U4 iDRW() { return nDRW%nL; }
+	I4x2 inDRW( U4 b )
+	{
+		U4 i = (nDRW+b)%nL;
+		return U4x2( aiL[i], aiL[i+1]-aiL[i] );
+	}
+
 	~gpcBOB(){
 		gpmDELary(pRD);
 
@@ -287,7 +294,7 @@ public:
 		*pRD -= wCNTR;
 		I4x2	A, B, L,
 				R = *pRD;
-		mRDr = 0;
+		mRDr = sqrt(R.qlen());
 
 		for( i = nX = 1; i < nRD; i++ )
 		{
@@ -298,14 +305,15 @@ public:
 
             if( b >= bb )
             	continue;
+			bb = sqrt(b=bb);
 
 			L = B.SCRlft();
 			pX[nX].x = i;
-			b = bb;
-
-			bb = sqrt(bb);
-			for( U4 j = pX[nX-1].y; j < pX[nX].x; j++ )
+			for( U4 j = pX[nX-1].y; j < i; j++ )
 			{
+				if( a )
+					a = (L*(pRD[ia]-R))/bb;
+
 				aa = (L*(pRD[j]-R))/bb;
 				if( a >= aa )
 					continue;
@@ -337,7 +345,7 @@ public:
 		nL++;
 		aiL[nL] = nX;
 
-		for( i = aiL[nL-1], xx; i < aiL[nL]; nX++ )
+		for( i = aiL[nL-1]; i < aiL[nL]; nX++ )
 		{
 			pX[nX] = pX[i];
 			i++;
@@ -346,7 +354,7 @@ public:
 			R = pRD[pX[nX].x];
 			L = (pRD[xx]-R).SCRlft();
 			aa = (L*(pRD[pX[nX].y]-R))/sqrt(L.qlen());
-			if( aa < 1 )
+			if( aa*aa > 1 )
 				continue;
 
 

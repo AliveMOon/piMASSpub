@@ -292,7 +292,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						if( pB = pP->ppBOB[b] )
 						{
 							pGL
-							->glSETbob( m, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
+							->glSETbob( m, b, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
 							->glSETcnl( 0, Fx4(1.0f,0.0f,0.0f,1.0f) )
 							->glDRW( m, w.a4x2[0], FRMwh );
 						}
