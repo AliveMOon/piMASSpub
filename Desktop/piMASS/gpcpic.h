@@ -99,7 +99,7 @@ public:
 class gpcBOB {
 public:
 	U4 		mom, 	id, strt,
-			nRDall, nRD, nRDr, nX,
+			nRDall, nRD, nRDr, nX, aiL[0x10], nL,
 			nAREA,			// a bobban szereplő pixelek száma
 			iAXIS, lAXIS,	// iAX pX[0] az egyik pont pX[iAXIS] másik pont
 			mRDr; 			// sugarak medianja
@@ -277,89 +277,137 @@ public:
 		}
 
 		//U4	sum = 0;
-		nX = 0;
-		pX[nX].x = 0;
+		nL = nX = 0;
+		aiL[nL] = 0;
+		pX[nX] = 0;
 
-		I4x2 R, A, B, L;
-		I8 bb, b, a, aa;
-		U4 ib,ia;
+		I8 bb, b = 0, a = 0, aa;
+		U4 ib = 0, ia = 0, i, x, xx;
 
-		for( U4 i = 0; i < nRD; i++ )
+		*pRD -= wCNTR;
+		I4x2	A, B, L,
+				R = *pRD;
+		mRDr = 0;
+
+		for( i = nX = 1; i < nRD; i++ )
 		{
 			pRD[i] -= wCNTR;
-			if( pX[nX].x == i )
-			{
-				R = pRD[i];
-				a = b = 0;
-				continue;
-			}
+			mRDr += sqrt(pRD[i].qlen());
 			B = pRD[i]-R;
 			bb = B.qlen();
-			if( b >= bb )
+
+            if( b >= bb )
+            	continue;
+
+			L = B.SCRlft();
+			pX[nX].x = i;
+			b = bb;
+
+			bb = sqrt(bb);
+			for( U4 j = pX[nX-1].y; j < pX[nX].x; j++ )
 			{
-				L = B.SCRlft();
-				aa = (L*A)/sqrt(bb);
-				if( a <= aa )
-				{
-					a = aa;
+				aa = (L*(pRD[j]-R))/bb;
+				if( a >= aa )
 					continue;
-				}
-				nX++;
-				pX[nX].x = i+1;
-                continue;
+
+				a = aa;
+				pX[nX-1].y = j;
+			}
+		}
+		mRDr /= nRD;
+		R = pRD[pX[nX].y=pX[nX].x];
+		B = *pRD - R;
+		bb = sqrt(b);
+		L = B.SCRlft();
+		a = 0;
+
+
+		for( U4 j = pX[nX].y; j < nRD; j++ )
+		{
+			aa = (L*(pRD[j]-R))/bb;
+			if( a >= aa )
+				continue;
+
+			a = aa;
+			pX[nX].y = j;
+		}
+		nX++;
+		iAXIS = pX[1].x;
+		lAXIS = bb;
+		nL++;
+		aiL[nL] = nX;
+
+		for( i = aiL[nL-1], xx; i < aiL[nL]; nX++ )
+		{
+			pX[nX] = pX[i];
+			i++;
+			xx = ( i < aiL[nL] ) ? pX[i].x : 0;
+
+			R = pRD[pX[nX].x];
+			L = (pRD[xx]-R).SCRlft();
+			aa = (L*(pRD[pX[nX].y]-R))/sqrt(L.qlen());
+			if( aa < 1 )
+				continue;
+
+
+			//ib = pX[nX].y;
+			L = (pRD[pX[nX].y]-R).SCRlft();
+			bb = sqrt(L.qlen());
+			a = 0;
+			for( U4 j = pX[nX].x+1; j < pX[nX].y; j++ )
+			{
+				aa = (L*(pRD[j]-R))/bb;
+				if( a >= aa )
+					continue;
+				a = aa;
+                ia = j;
 			}
 			if( a )
+				pX[nX].y = ia;
+			else
+				pX[nX].y = (pX[nX].y+pX[nX].x)/2;
+			nX++;
+
+
+			pX[nX].x = pX[i].y;
+			pX[nX].y = xx ? xx : nRD;
+
+			R = pRD[pX[nX].x];
+			L = (pRD[xx]-R).SCRlft();
+			bb = sqrt(L.qlen());
+			a = 0;
+			if(bb)
+			for( U4 j = pX[nX].x+1; j < pX[nX].y; j++ )
 			{
-				nX++;
-				pX[nX].x = i+1;
-                continue;
-			}
-
-			b = bb;
-			pX[nX].y = i;
-			A = B;
-		}
-		lAXIS = 0;
-		ib = ia = 0;
-		mRDr = 0;
-		if( nX < 2 )
-			return this;
-
-
-
-		U4 i = 0;
-		for( ; i < nX-1; i++ )
-		{
-			R = pRD[pX[i].x];
-			mRDr += sqrt(R.qlen());
-			for( U4 j = i+1; j < nX; j++ )
-			{
-				b = pX[j].x;
-				if( b >= nRD )
-					b %= nRD;
-				B = pRD[ib]-R;
-				bb = B.qlen();
-                if( lAXIS >= bb )
+				aa = (L*(pRD[j]-R))/bb;
+				if( a >= aa )
 					continue;
-				lAXIS = bb;
-				ia = i;
-				ib = j;
+				a = aa;
+                ia = j;
 			}
+			if( a )
+				pX[nX].y = ia;
+			else
+				pX[nX].y = (pX[nX].y+pX[nX].x)/2;
+
+
 		}
 
-		mRDr /= i;
+		nL++;
+		aiL[nL] = nX;
 
-		if( ia && (ia != ib) )
+		for( U4 j = pX[nX].y; j < nRD; j++ )
 		{
-			// tmp
-			gpmMcpyOF( pX+nX,		pX,		ia );
-			gpmMcpyOF( pX, 			pX+ia,	nX-ia );
-			gpmMcpyOF( pX+(nX-ia),	pX+nX,	ia );
-			ib -= ia;
+			aa = (L*(pRD[j]-R))/bb;
+			if( a >= aa )
+				continue;
+
+			a = aa;
+			pX[nX].y = j;
 		}
-		iAXIS = ib;
-		lAXIS = sqrt(lAXIS);
+
 		return this;
+
 	}
 };
 class gpcPIC {
