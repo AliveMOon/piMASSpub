@@ -1061,33 +1061,34 @@ public:
 
 		return 0;
 	}
-	U1 srt3( )
+	U1x4 srt3()
 	{
 		if( !(u4&0xffffff) )
 			return 0;
 
-		U1 o = 0x80;
 		U1x4 s = *this;
-
 		if(s.y>s.x)
 		{
 			s.swpYX();
-			o = 0x1;
+			s.w = 0x1;
 		}
 		if(s.z>s.x)
 		{
 			s.swpZX();
-			o |= 0x02;
+			s.w |= 0x02;
 		}
 		if(s.z>s.y)
 		{
 			s.swpZY();
-			o |= 0x04;
+			s.w |= 0x04;
 		}
-		U4 ex = ((s.x-s.z)+(s.x-s.y));
-		ex*=ex;
-		o |= (ex>>(8+5))&0xf8;
-		return o;
+		if(!s.x)
+			return 0;
+		s.x &= ~7;
+		s.y &= 0xf0;
+		s.y |= s.z>>4;
+		s.x |= s.w;
+		return s;
 	}
 	U1 srt4()
 	{

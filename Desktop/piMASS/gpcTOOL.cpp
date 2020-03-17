@@ -287,7 +287,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		dwn = wh-w,
 		aDIR[] = { -w, +1, w, -1 }, any = 0;	// URDL
 
-	U1x4	*pI = (U1x4*)gpapP[1]->pixels;
+	U1x4	*pI = (U1x4*)gpapP[1]->pixels, s3;
 	U1		*pQ = (U1*)gpapP[0]->pixels, srt;
 
 
@@ -303,9 +303,14 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		if( vQ.x < 3 || vQ.x > (w-3) )
 			continue;
 
-		srt = pI[i].srt3(); //((U4)pI[i].srt3()*0x100)>>3;
-		if( !srt )
+		s3 = pI[i].srt3(); //((U4)pI[i].srt3()*0x100)>>3;
+		if( !s3.x )
 			continue;
+		srt = s3.x>>6;
+		srt *= srt;
+		srt &= ~0x7;
+		srt |= s3.w; //|0x8;
+
 		any++;
 		q = (
 				((vQ&0x100000001)&ofQ)
@@ -386,10 +391,10 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		for( j = 0; j < aBUG[i].nBOB; j++ )
 		{
 			pBB = aBUG[i].ppBOB[j];
-			if( pBB ? !pBB->wR : true )
+			if( pBB ? !pBB->nRND : true )
 				continue;
 			pF[nF].x = (i<<24) + j;
-			pF[nF].y = pBB->wR;
+			pF[nF].y = pBB->nRND;
 			nF++;
 		}
 
@@ -416,7 +421,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 				b = pF[j].x;
 				pBB = aBUG[b>>24].ppBOB[b&0xffffff];
 				pK[k].x = (i<<16)|j;
-				pK[k].y = sqrt((pBA->wCNTR-pBB->wCNTR).qlen()) + abs(pBA->wR-pBB->wR) ;
+				pK[k].y = sqrt((pBA->wCNTR-pBB->wCNTR).qlen()) + abs(pBA->nRND-pBB->nRND) ;
 				k++;
 			}
 		}
@@ -481,7 +486,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 								<< "x"
 								<< pBB->wCNTR.y
 								<< "r"
-								<< pBB->wR
+								<< pBB->nRND
 								<< "A"
 								<< pBB->nAREA <<std::endl;
 			}

@@ -102,8 +102,8 @@ void main()
  unsel = 1;  f1	 
  
  trg = "dilet"
- trgw = 256;
- trgh = 256;
+ trgw = 384;
+ trgh = 384;
  pico = "gui"
  pici = "dilet"
  gpu = "dilet"  g1	 
@@ -135,7 +135,7 @@ void main()
 	}		
  	gl_FragColor /= gl_FragColor.a;
  
- if( 
+ /*if( 
  	max(
  			max(gl_FragColor.r, gl_FragColor.b),
  			
@@ -143,7 +143,7 @@ void main()
 		) < 32.0/256.0 
  ) 
  	gl_FragColor *= 0.0;
- 				  //*texture2D( tex1, flpUV1 ).rgb;
+ 				  //*texture2D( tex1, flpUV1 ).rgb;*/
 }
  "
  pic = "dilet" a2	

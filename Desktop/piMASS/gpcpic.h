@@ -102,7 +102,7 @@ public:
 			nRDall, nRD, lurdR, nX, aiL[0x10], nL, nDRW,
 			nAREA,			// a bobban szereplő pixelek száma
 			iAXIS, lAXIS,	// iAX pX[0] az egyik pont pX[iAXIS] másik pont
-			wR; 			// sugarak medianja
+			nRND; 			// sugarak medianja
 			//nKIDall, iKID;
 	I4x4	lurd;
 	I4x2	picWH, *pRD, *pRDf, *pX, *pRDsrt, wCNTR, lurdC;
@@ -294,9 +294,6 @@ public:
 		I8 bb, b = 0, a = 0, aa;
 		U4 ib = 0, ja = 0, i, j, x, xx, e;
 
-
-		//I8 sumR = 0;
-
 		for( i = 1; i < nRD; i++ )
 		{
 			pRD[i] -= wCNTR;
@@ -323,7 +320,7 @@ public:
 			}
 		}
 		pX[0].y = ja;
-		wR = lurdR;
+
 
 		iAXIS = ja = pX[1].y = pX[1].x;
 		R = pRD[iAXIS];
@@ -412,8 +409,20 @@ public:
 			}
 		}
 
+
+
 		if(aiL[nL]<nX)
 			aiL[nL]=nX;
+
+		R = pRD[pX[aiL[nL-1]].y];
+		nRND = sqrt((R-*pRD).qlen());
+		for( i = aiL[nL-1]+1; i < nX; i++ )
+		{
+			nRND += sqrt((pRD[pX[i].x]-R).qlen());
+			R = pRD[pX[i].y];
+			nRND += sqrt((R-pRD[pX[i].x]).qlen());
+		}
+		nRND += sqrt((*pRD-R).qlen());
 
 		return this;
 
