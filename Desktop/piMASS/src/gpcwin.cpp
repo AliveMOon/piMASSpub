@@ -275,10 +275,10 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						{
 							pGL
 							->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
-							->glSETcnl( 0, Fx4(0.875f,0.75f,0.875f,1.0f) )
+							->glSETcnl( 0, Fx4(0.9f,0.9f,0.9f,1.0f) )
 							->glSETtx( 0, p_tx, pP->txWH.a4x2[1] )
-							//->glDRW( w.a4x2[0], FRMwh );
-							->glDRW( 0, w.a4x2[0], FRMwh );
+							->glDRW( w.a4x2[0], FRMwh );
+							//->glDRW( 0, w.a4x2[0], FRMwh );
 						}
 					}
 
@@ -292,7 +292,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						if( pB = pP->ppBOB[b] )
 						{
 							pGL
-							->glSETbob( m, b, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
+							->glSETbob( m, b*0, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
 							->glSETcnl( 0, Fx4(1.0f,0.0f,0.0f,1.0f) )
 							->glDRW( m, w.a4x2[0], FRMwh );
 						}

@@ -303,7 +303,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		if( vQ.x < 3 || vQ.x > (w-3) )
 			continue;
 
-		srt = ((U4)pI[i].srt3()*0x100)>>3;
+		srt = pI[i].srt3(); //((U4)pI[i].srt3()*0x100)>>3;
 		if( !srt )
 			continue;
 		any++;
@@ -370,7 +370,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			if(!aBUG[i].ppBOB[j])
 				continue;
 			// iAXIS lAXIX
-			/// wCNTR mRDr
+			/// wCNTR wR
 			/// nAREA
 
 			nA += aBUG[i].ppBOB[j]->nAREA;
@@ -386,10 +386,10 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		for( j = 0; j < aBUG[i].nBOB; j++ )
 		{
 			pBB = aBUG[i].ppBOB[j];
-			if( pBB ? !pBB->mRDr : true )
+			if( pBB ? !pBB->wR : true )
 				continue;
 			pF[nF].x = (i<<24) + j;
-			pF[nF].y = pBB->mRDr;
+			pF[nF].y = pBB->wR;
 			nF++;
 		}
 
@@ -416,7 +416,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 				b = pF[j].x;
 				pBB = aBUG[b>>24].ppBOB[b&0xffffff];
 				pK[k].x = (i<<16)|j;
-				pK[k].y = sqrt((pBA->wCNTR-pBB->wCNTR).qlen()) + abs(pBA->mRDr-pBB->mRDr) ;
+				pK[k].y = sqrt((pBA->wCNTR-pBB->wCNTR).qlen()) + abs(pBA->wR-pBB->wR) ;
 				k++;
 			}
 		}
@@ -481,7 +481,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 								<< "x"
 								<< pBB->wCNTR.y
 								<< "r"
-								<< pBB->mRDr
+								<< pBB->wR
 								<< "A"
 								<< pBB->nAREA <<std::endl;
 			}

@@ -99,10 +99,10 @@ public:
 class gpcBOB {
 public:
 	U4 		mom, 	id, strt,
-			nRDall, nRD, nRDr, nX, aiL[0x10], nL, nDRW,
+			nRDall, nRD, lurdR, nX, aiL[0x10], nL, nDRW,
 			nAREA,			// a bobban szereplő pixelek száma
 			iAXIS, lAXIS,	// iAX pX[0] az egyik pont pX[iAXIS] másik pont
-			mRDr; 			// sugarak medianja
+			wR; 			// sugarak medianja
 			//nKIDall, iKID;
 	I4x4	lurd;
 	I4x2	picWH, *pRD, *pRDf, *pX, *pRDsrt, wCNTR, lurdC;
@@ -258,8 +258,9 @@ public:
 		if( this ? !!pX : true )
 			return this;
 
+		I4x2 dif = (lurd.a4x2[1]-lurd.a4x2[0]).abs();
+		lurdR = (dif.x+dif.y)/2;
 
-		nRDr = sqrt((lurd.a4x2[0]-wCNTR).abs().MX((lurd.a4x2[0]-wCNTR).abs()).qlen());
 		pX = pRDf+nRD;
 
 		I4x2* pKILL = NULL;
@@ -283,136 +284,136 @@ public:
 			delete[]pKILL;
 		}
 
-		//U4	sum = 0;
 		nL = nX = 0;
 		aiL[nL] = 0;
 		pX[nX] = 0;
-
-		I8 bb, b = 0, a = 0, aa;
-		U4 ib = 0, ia = 0, i, x, xx;
-
 		*pRD -= wCNTR;
 		I4x2	A, B, L,
 				R = *pRD;
-		mRDr = sqrt(R.qlen());
 
-		for( i = nX = 1; i < nRD; i++ )
+		I8 bb, b = 0, a = 0, aa;
+		U4 ib = 0, ja = 0, i, j, x, xx, e;
+
+
+		//I8 sumR = 0;
+
+		for( i = 1; i < nRD; i++ )
 		{
 			pRD[i] -= wCNTR;
-			mRDr += sqrt(pRD[i].qlen());
 			B = pRD[i]-R;
 			bb = B.qlen();
 
             if( b >= bb )
             	continue;
 			bb = sqrt(b=bb);
-
 			L = B.SCRlft();
-			pX[nX].x = i;
-			for( U4 j = pX[nX-1].y; j < i; j++ )
+
+			pX[1].x = i;
+			for( j = ja; j < i; j++ )
 			{
-				if( a )
-					a = (L*(pRD[ia]-R))/bb;
+				if(a)
+					a = (L*(pRD[ja]-R))/bb;
 
 				aa = (L*(pRD[j]-R))/bb;
 				if( a >= aa )
 					continue;
 
 				a = aa;
-				pX[nX-1].y = j;
+				ja = j;
 			}
 		}
-		mRDr /= nRD;
-		R = pRD[pX[nX].y=pX[nX].x];
+		pX[0].y = ja;
+		wR = lurdR;
+
+		iAXIS = ja = pX[1].y = pX[1].x;
+		R = pRD[iAXIS];
 		B = *pRD - R;
-		bb = sqrt(b);
+		lAXIS = bb = sqrt(b);
+
 		L = B.SCRlft();
 		a = 0;
-
-
-		for( U4 j = pX[nX].y; j < nRD; j++ )
+		for( j = ja; j < nRD; j++ )
 		{
 			aa = (L*(pRD[j]-R))/bb;
 			if( a >= aa )
 				continue;
 
 			a = aa;
-			pX[nX].y = j;
+			ja = j;
 		}
-		nX++;
-		iAXIS = pX[1].x;
-		lAXIS = bb;
-		nL++;
-		aiL[nL] = nX;
-
-		for( i = aiL[nL-1]; i < aiL[nL]; nX++ )
+		pX[1].y = ja;
+		nX = 2;
+		e = gpmN(aiL);
+		e = 4;
+		for( nL = 1; nL < e; nL++ )
 		{
-			pX[nX] = pX[i];
-			i++;
-			xx = ( i < aiL[nL] ) ? pX[i].x : 0;
-
-			R = pRD[pX[nX].x];
-			L = (pRD[xx]-R).SCRlft();
-			aa = (L*(pRD[pX[nX].y]-R))/sqrt(L.qlen());
-			if( aa*aa > 1 )
-				continue;
-
-
-			//ib = pX[nX].y;
-			L = (pRD[pX[nX].y]-R).SCRlft();
-			bb = sqrt(L.qlen());
-			a = 0;
-			for( U4 j = pX[nX].x+1; j < pX[nX].y; j++ )
+			if( nL > 1 )
+			if( aiL[nL-1]-aiL[nL-2] >= nX-aiL[nL-1] )
 			{
-				aa = (L*(pRD[j]-R))/bb;
-				if( a >= aa )
-					continue;
-				a = aa;
-                ia = j;
+				nL--;
+				nX=aiL[nL];
+				break;
 			}
-			if( a )
-				pX[nX].y = ia;
-			else
-				pX[nX].y = (pX[nX].y+pX[nX].x)/2;
-			nX++;
 
-
-			pX[nX].x = pX[i].y;
-			pX[nX].y = xx ? xx : nRD;
-
-			R = pRD[pX[nX].x];
-			L = (pRD[xx]-R).SCRlft();
-			bb = sqrt(L.qlen());
-			a = 0;
-			if(bb)
-			for( U4 j = pX[nX].x+1; j < pX[nX].y; j++ )
+			aiL[nL] = nX;
+			for( x = aiL[nL-1]; x < aiL[nL]; nX++ )
 			{
-				aa = (L*(pRD[j]-R))/bb;
-				if( a >= aa )
+				pX[nX] = pX[x];
+				x++;
+				xx = ( x < aiL[nL] ) ? pX[x].x : 0;
+
+				ja = pX[nX].x;
+				R = pRD[ja];
+				L = (pRD[xx]-R).SCRlft();
+
+				ib = pX[nX].y;
+				B = pRD[ib]-R;
+
+				aa = (L*B)/sqrt(L.qlen());
+				if( aa > 3 )
 					continue;
-				a = aa;
-                ia = j;
+
+
+				L = B.SCRlft();
+				bb = sqrt(L.qlen());
+				a = 0;
+				ja++;
+				for( U4 j = ja; j < ib; j++ )
+				{
+					aa = (L*(pRD[j]-R))/bb;
+					if( a >= aa )
+						continue;
+					a = aa;
+					ja = j;
+				}
+				pX[nX].y = ja;
+				nX++;
+
+
+				pX[nX].x = ja = ib;
+				pX[nX].y = ib = (xx ? xx : nRD);
+
+				R = pRD[ja];
+				L = (pRD[xx]-R).SCRlft();
+				bb = sqrt(L.qlen());
+				a = 0;
+				ja++;
+				if(bb)
+				for( U4 j = ja; j < ib; j++ )
+				{
+					aa = (L*(pRD[j]-R))/bb;
+					if( a >= aa )
+						continue;
+					a = aa;
+					ja = j;
+				}
+				pX[nX].y = ja;
+
 			}
-			if( a )
-				pX[nX].y = ia;
-			else
-				pX[nX].y = (pX[nX].y+pX[nX].x)/2;
-
-
 		}
 
-		nL++;
-		aiL[nL] = nX;
-
-		for( U4 j = pX[nX].y; j < nRD; j++ )
-		{
-			aa = (L*(pRD[j]-R))/bb;
-			if( a >= aa )
-				continue;
-
-			a = aa;
-			pX[nX].y = j;
-		}
+		if(aiL[nL]<nX)
+			aiL[nL]=nX;
 
 		return this;
 

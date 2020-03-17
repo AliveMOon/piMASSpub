@@ -606,7 +606,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 	if( pGLSL )
 	{
 		U4 nCMP = 0;
-		if( pGLSL->pVTX != pV )
+		//if( pGLSL->pVTX != pV )
 		{
 			nCMP = gpmSTRLEN(pV);
 			if( nCMP )
@@ -617,7 +617,7 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 		}
 
 		if( !pKILL )
-		if( pGLSL->pFRG != pF )
+		//if( pGLSL->pFRG != pF )
 		{
 			nCMP = gpmSTRLEN(pF);
 			if( nCMP )

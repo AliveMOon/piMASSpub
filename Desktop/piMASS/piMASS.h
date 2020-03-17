@@ -1066,7 +1066,7 @@ public:
 		if( !(u4&0xffffff) )
 			return 0;
 
-		U1 o = 0x10;
+		U1 o = 0x80;
 		U1x4 s = *this;
 
 		if(s.y>s.x)
@@ -1084,7 +1084,9 @@ public:
 			s.swpZY();
 			o |= 0x04;
 		}
-
+		U4 ex = ((s.x-s.z)+(s.x-s.y));
+		ex*=ex;
+		o |= (ex>>(8+5))&0xf8;
 		return o;
 	}
 	U1 srt4()
