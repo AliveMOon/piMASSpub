@@ -370,7 +370,7 @@ public:
 				B = pRD[ib]-R;
 
 				aa = (L*B)/sqrt(L.qlen());
-				if( aa > 3 )
+				if( aa*aa > 16 )
 					continue;
 
 
