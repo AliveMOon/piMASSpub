@@ -4,7 +4,7 @@ SDL_Surface* gpapP[0x10];
 class gpcTRDbug
 {
 public:
-	U1x4	*pQ; //,*pOUT;
+	U1x4	*pI, *pQ; //,*pOUT;
 	I4x2	*pR;
 	I4		*pD;
 	gpcBOB	**ppBOB;
@@ -128,6 +128,20 @@ public:
 			return;
 		w = pD[2];
 		h = wh/w;
+		U1x4 s3;
+		U1 srt, *p_q = (U1*)pQ;
+		for( U4 y = (w+1)*2, ye = wh*2-w; y<ye; y += w*2 )
+		{
+			for( U4 x = 4, xe = w-4; x < xe; x+=2 )
+			{
+				s3 = pI[x+y].srt3();
+				if( !s3.x )
+					continue;
+				srt = ((((U4)s3.x*(U4)(s3.x>>4))>>8) & ~0x7)|s3.w;
+                p_q[(x+y)/2] = srt;
+			}
+		}
+
 		nDONE = 1;
 		U1 l = 0x1;
 		U8 nAsum = 0, nAVG = 0, nMX = 0;
@@ -153,7 +167,7 @@ public:
 							);
 			if( !pBOB )
 				continue;
-			if( pBOB->nAREA <= 16 )
+			if( pBOB->nAREA <= 9 )
 			{
 				gpmDEL(pBOB);
 				continue;
@@ -174,11 +188,11 @@ public:
 		while( nNEW )
 		{
 			l++;
-			if( l > 6 )
+			if( l > 5 )
 				break;
 			LURD += I4x4(1,1,-1,-1);
 			mn = (LURD.a4x2[1]-LURD.a4x2[0] ).mn();
-			if( mn < 16 )
+			if( mn < 3 )
 				break;
 			nAVG = nAsum/nNEW;
 			if( nAVG <= 32 )
@@ -224,7 +238,7 @@ public:
 					if( !pBOB )
 						continue;
 
-					if( pBOB->nAREA <= 16 )
+					if( pBOB->nAREA <= 9 )
 					{
 						gpmDEL(pBOB);
 						continue;
@@ -297,35 +311,8 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	I4x2	*pR = (I4x2*)(pM+wh), *pRi = pR,
 			vQ, ofQ(wQ, hQ), trfQ(1,w);
 
-	for( I4 i = (w+1)*2, q, ix, e = wh-i; i < e; i++ )
-	{
-		vQ = I4x2( i%w, i/w );
-		if( vQ.x < 3 || vQ.x > (w-3) )
-			continue;
 
-		s3 = pI[i].srt3(); //((U4)pI[i].srt3()*0x100)>>3;
-		if( !s3.x )
-			continue;
-		srt = s3.x>>6;
-		srt *= srt;
-		srt &= ~0x7;
-		srt |= s3.w; //|0x8;
-
-		any++;
-		q = (
-				((vQ&0x100000001)&ofQ)
-				+(vQ/2)
-			)*trfQ;
-
-		pQ[q] = srt;
-
-		ix = q%w;
-		pQ[q-1] = pQ[q+1] =
-		pQ[q-w] = pQ[q+w] = srt;
-	}
 	gpdEXPdbgCOUT std::cout << "Explode: " << any <<std::endl;
-	if( !any )
-		return (U1x4*)gpapP[0]->pixels;
 
 
 	U4 mom = 0, nBtrd = 0;
@@ -339,6 +326,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			((vQ&0x100000001)&ofQ)
 			+(vQ/2)
 		)*trfQ;
+		aBUG[i].pI = pI+(vQ*trfQ);
 		aBUG[i].pQ = (U1x4*)(pQ+q);
 		aBUG[i].pM = pM+q;
 		aBUG[i].pD = aDIR;
@@ -350,7 +338,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		aBUG[i].nDONE = 0;
 		aBUG[i].n_run = 0;
 
-		if( i >= 2 )
+		if( i >= 3 )
 		{
 			trd = i;
 			break;
@@ -399,7 +387,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		}
 
 		pF->median( nF, pF+nF, true );
-		nF /= 3;
+		nF /= 2;
 
 		nF2 = nF*nF;
 		if( nF2+nF > nFall )
@@ -486,6 +474,8 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 								<< "x"
 								<< pBB->wCNTR.y
 								<< "r"
+								<< pBB->wR
+								<< "rnd"
 								<< pBB->nRND
 								<< "A"
 								<< pBB->nAREA <<std::endl;

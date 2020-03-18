@@ -103,7 +103,7 @@ void main()
  
  trg = "dilet"
  trgw = 256;
- trgh = 128;
+ trgh = 256;
  pico = "gui"
  pici = "dilet"
  gpu = "dilet"  g1	 
@@ -146,7 +146,7 @@ void main()
  				  //*texture2D( tex1, flpUV1 ).rgb;*/
 }
  "
- pic = "dilet" a2	 
+ pic = "dilet" a2	
 // BILL HS12:0000
 // POS:  n:0
 //	iXYZ  450.00mm,  450.00mm,  450.00mm 
@@ -164,7 +164,7 @@ void main()
 //	iabc    0.00dg,    0.00dg,    0.00dg 
 //	oabc    0.00dg,    0.00dg,    0.00dg 
 //	tabc    0.00dg,    0.00dg,    0.00dg;"
- b2	 
+ b2	
 // JOHN HS12:0000
 // POS:  n:5
 //	iXYZ  450.00mm,  450.00mm,  450.00mm 
@@ -252,7 +252,7 @@ void main()
  		"gui";
  unsel = 1;
   g2	 
-   pic= "dilet" a3	 
+   pic= "dilet" a3	
 //0000|00000003 00000000 00000000 00000000 |................
 //0010|00000000 00000003 00000004 00000004 |................
 //0020|00000000 00000000 00000000 00000000 |................

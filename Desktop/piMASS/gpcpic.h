@@ -102,10 +102,11 @@ public:
 			nRDall, nRD, lurdR, nX, aiL[0x10], nL, nDRW,
 			nAREA,			// a bobban szereplő pixelek száma
 			iAXIS, lAXIS,	// iAX pX[0] az egyik pont pX[iAXIS] másik pont
-			nRND; 			// sugarak medianja
+			nRND, 			// kerület
+			wR;				// sugar
 			//nKIDall, iKID;
 	I4x4	lurd;
-	I4x2	picWH, *pRD, *pRDf, *pX, *pRDsrt, wCNTR, lurdC;
+	I4x2	picWH, *pRD, *pFILL, *pX, *pRDsrt, wCNTR, lurdC;
 	//gpcBOB	**ppKID;
 	U4 iDRW() { return nDRW%nL; }
 	I4x2 inDRW( U4 b )
@@ -156,9 +157,9 @@ public:
         }
 
 
-		gpmMcpyOF( pRDf=pRD+nR, gpmMcpyOF(pRD,pR,nR), nR );
+		gpmMcpyOF( pFILL=pRD+nR, gpmMcpyOF(pRD,pR,nR), nR );
 
-		pRDf->median( nR, pRDsrt=pRDf+nR, true );
+		pFILL->median( nR, pRDsrt=pFILL+nR, true );
 		nAREA = 0;
 		U8 wA = 0, wB = 0, nW = 0;
 		lurd.a4x2[0] = picWH = I4x2(rg,Mwh.y);
@@ -167,49 +168,63 @@ public:
 		{
 			nA = rg*Mwh.y;
 		}
-		for( I4 i = 0,a,b,ab; i < nR; i+= 2 )
+		I4 i = 0,a,b,ab;
+
+		for( nRD = 0; nRD < nR; nRD++ )
 		{
-			a = pRDf[i].x;
-			b = pRDf[i+1].x;
+			a = pFILL[nRD].x;
+
+			nRD++;
+			b = pFILL[nRD].x;
 			/// ennek az a lényege
 			/// az ALU egyébként is kiszámolja a hányadost
 			/// és a maradékot egy lépésben
-			pRD[a].YdivRQ( Mwh.x ).x++;
-			pRD[b].YdivRQ( Mwh.x ).x--;
-			ab = pRD[b].x - pRD[a].x;
-			if(ab<1)
+			pRD[a].YdivRQ( Mwh.x ).x;	//++; //pFILL[nRD].y++;
+			pRD[b].YdivRQ( Mwh.x ).x;	//--;
+			ab = pRD[b].x-pRD[a].x;
+			if( ab < 2 )
+			{
+				pFILL[nRD].x = 0;
 				continue;
-
+			}
+			ab--;
 			nW++;
 			nAREA += ab; /// AREA
-			if(	lurd.x>pRD[a].x )
-				lurd.x=pRD[a].x;
-			if( lurd.y>pRD[a].y )
-				lurd.y=pRD[a].y;
-
-			if( lurd.z<pRD[b].x )
-				lurd.z=pRD[b].x;
-			if( lurd.w<pRD[b].y )
-				lurd.w=pRD[b].y;
-
+			pFILL[nRD].x = ab;
 			wA += pRD[a].x+ab/2;
 			wB += pRD[a].y;
 
+			if(	lurd.x>pRD[a].x )
+				lurd.x=pRD[a].x;
+			if( lurd.z<pRD[b].x )
+				lurd.z=pRD[b].x;
 		}
-		//lurd += I4x4(1,1,-1,-1);
-		if( !nW )
+
+
+		if( nW > 3 ? (nAREA > nA) : true )
 		{
 			nAREA = nRD = 0;
 			return this;
 		}
 
-		if( (lurd.a4x2[1]-lurd.a4x2[0]).mn() < 4 )
+		if( lurd.y>pRD->y )
+			lurd.y=pRD->y;
+		if( lurd.w<pRD[pFILL[nRD-2].x].y )
+			lurd.w=pRD[pFILL[nRD-2].x].y;
+
+		if( (lurd.w-lurd.y) < 3 )
+		{
+			nAREA = nRD = 0;
+			return this;
+		}
+		else if( (lurd.w-lurd.y) > Mwh.y )
 		{
 			nAREA = nRD = 0;
 			return this;
 		}
 
-		if(nAREA > nA)
+
+		if( (lurd.z-lurd.x) < 3 )
 		{
 			nAREA = nRD = 0;
 			return this;
@@ -218,12 +233,11 @@ public:
 		wCNTR.x = wA/nW;
 		wCNTR.y = wB/nW;
 		lurdC = (lurd.a4x2[0]+lurd.a4x2[1])/2;
-		if( nR < 9 || nR > nRx )
+		if( nRD < 4 || nRD > nRx )
 		{
 			nAREA = nRD = 0;
 			return this;
 		}
-		nRD = nR;
 
 
 		U1x4& n0x100 = *(U1x4*)&id;
@@ -232,17 +246,21 @@ public:
 		n0x100.y = (wCNTR.y<<8)/Mwh.x;
 		n0x100.z = 0xff-((nAREA*nAREA)/(wh*wh));
 		n0x100.w = l;
-		I4x2 trfQ(1,Mwh.x);
+		U4* pM1 = pM+1;
+		//I4x2 trfQ(1,Mwh.x);
 		//id = n0x100.u4;
-		for( I4 i = 0, a, b, xx, hx = h-1; i < nR; i+= 2 )
+		for( i = 1; i < nR; i+= 2 )
 		{
-			a = pRDf[i].x;
-			b = pRDf[i+1].x;
-			xx = pRD[b].x-pRD[a].x;
-			if(xx<1)
+			if( !pFILL[i].x )
 				continue;
+			//xx = pFILL[i].x;
+			if( pFILL[i].x == 1)
+				pM1[pFILL[i-1].y] = id;
+			else
+				// szar mert nem is inttel tölti fel, memset( pM1+pFILL[i-1].y+1, id, pFILL[i].x*sizeof(id) );
+				gpmMsetOF( pM1+pFILL[i-1].y+1, pFILL[i].x, &id );
 
-			gpmMsetOF( pM + pRD[a]*trfQ, xx, &id );
+
 		}
 
 		//if( !pU1 )
@@ -253,6 +271,30 @@ public:
 
         return this;
 	}
+	I4x2* pSRTx( U4 n )
+	{
+		U4 nADD = (nX ? nRD : nX)*n;
+		if( pRDsrt > pRD + nRD*3+nADD )
+			return pRDsrt;
+
+
+		I4x2* pKILL = pRD;
+		nRDall = gpmPAD( nRD*3+nADD, 0x10)+0x10;
+
+		pRD		= new I4x2[nRDall];
+		pFILL	= pRD + nRD;
+		pX		= pFILL + nRD;
+		pRDsrt	= pX + nADD;
+
+		if( !pKILL )
+			return pRDsrt;
+
+
+		gpmMcpyOF( pRD, pKILL, nRD*2 + nX );
+		delete[]pKILL;
+
+		return pRDsrt;
+	}
 	gpcBOB* X()
 	{
 		if( this ? !!pX : true )
@@ -261,39 +303,21 @@ public:
 		I4x2 dif = (lurd.a4x2[1]-lurd.a4x2[0]).abs();
 		lurdR = (dif.x+dif.y)/2;
 
-		pX = pRDf+nRD;
-
-		I4x2* pKILL = NULL;
-
-        if( pRDsrt <= pX+nRD )
-        {
-			if( nRDall <= gpmPAD( pX-pRD+nRD*2, 0x10) )
-			{
-				nRDall = gpmPAD( pX-pRD+nRD*2, 0x10)+0x10;
-				pKILL = pRD;
-
-				pRD		= new I4x2[nRDall];
-				pRDf	= pRD + nRD;
-				pX		= pRDf + nRD;
-				pRDsrt	= pX+nRD;
-			}
-        }
-		if( pKILL )
-		{
-			gpmMcpyOF( pRD, pKILL, pX-pRD );
-			delete[]pKILL;
-		}
+		pRDsrt = pSRTx(4);
 
 		nL = nX = 0;
 		aiL[nL] = 0;
-		pX[nX] = 0;
+		pX[0] = 0;
+
+		I8 bb, b = 0, a = 0, aa;
+		U4	ib = 0, ja = 0,
+			i, j,
+			x, xx,
+			e;
+
 		*pRD -= wCNTR;
 		I4x2	A, B, L,
 				R = *pRD;
-
-		I8 bb, b = 0, a = 0, aa;
-		U4 ib = 0, ja = 0, i, j, x, xx, e;
-
 		for( i = 1; i < nRD; i++ )
 		{
 			pRD[i] -= wCNTR;
@@ -302,10 +326,11 @@ public:
 
             if( b >= bb )
             	continue;
+
+			ib = i;
 			bb = sqrt(b=bb);
 			L = B.SCRlft();
 
-			pX[1].x = i;
 			for( j = ja; j < i; j++ )
 			{
 				if(a)
@@ -320,6 +345,7 @@ public:
 			}
 		}
 		pX[0].y = ja;
+		pX[1].x = ib;
 
 
 		iAXIS = ja = pX[1].y = pX[1].x;
@@ -340,6 +366,8 @@ public:
 		}
 		pX[1].y = ja;
 		nX = 2;
+
+
 		e = gpmN(aiL);
 		e = 4;
 		for( nL = 1; nL < e; nL++ )
@@ -353,6 +381,8 @@ public:
 			}
 
 			aiL[nL] = nX;
+			pRDsrt = pSRTx(4);
+
 			for( x = aiL[nL-1]; x < aiL[nL]; nX++ )
 			{
 				pX[nX] = pX[x];
@@ -367,7 +397,7 @@ public:
 				B = pRD[ib]-R;
 
 				aa = (L*B)/sqrt(L.qlen());
-				if( aa*aa > 16 )
+				if( aa*aa < 4 )
 					continue;
 
 
@@ -375,7 +405,18 @@ public:
 				bb = sqrt(L.qlen());
 				a = 0;
 				ja++;
-				for( U4 j = ja; j < ib; j++ )
+				if( nL%2 )
+				{
+					for( U4 j = ja; j < ib; j++ )
+					{
+						aa = (L*(pRD[j]-R))/bb;
+						if( a >= aa*aa )
+							continue;
+						a = aa*aa;
+						ja = j;
+					}
+				}
+				else for( U4 j = ja; j < ib; j++ )
 				{
 					aa = (L*(pRD[j]-R))/bb;
 					if( a >= aa )
@@ -396,7 +437,18 @@ public:
 				a = 0;
 				ja++;
 				if(bb)
-				for( U4 j = ja; j < ib; j++ )
+				if( nL%2 )
+				{
+					for( U4 j = ja; j < ib; j++ )
+					{
+						aa = (L*(pRD[j]-R))/bb;
+						if( a >= aa*aa )
+							continue;
+						a = aa*aa;
+						ja = j;
+					}
+				}
+				else for( U4 j = ja; j < ib; j++ )
 				{
 					aa = (L*(pRD[j]-R))/bb;
 					if( a >= aa )

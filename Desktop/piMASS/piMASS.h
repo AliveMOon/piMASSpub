@@ -2794,7 +2794,7 @@ public:
 			y = b.y;
 		return *this;
 	}
-	I4 average( U4 n ) {
+	I4 average( I4 n ) {
 		// vigyázz ez sorrendezi az értékeket
 		if( !this || n < 1 )
 			return 0;
@@ -2918,11 +2918,11 @@ public:
 				i = l*2;
 				if ( i <= r )
 				{
-					if ( i+1 <= r )
-						if ( p_tree[i+1].y < p_tree[i].y )
-							i++;
+					if( i+1 <= r )
+					if( p_tree[i+1].y < p_tree[i].y )
+						i++;
 
-					if ( x.y > p_tree[i].y )
+					if( x.y > p_tree[i].y )
 					{
 						p_tree[l] = p_tree[i];
 					} else {
