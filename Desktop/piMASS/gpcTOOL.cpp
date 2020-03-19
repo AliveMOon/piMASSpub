@@ -1,6 +1,9 @@
 #include "gpcwin.h"
 SDL_Surface* gpapP[0x10];
 
+
+
+
 class gpcTRDbug
 {
 public:
@@ -172,7 +175,7 @@ public:
 				gpmDEL(pBOB);
 				continue;
 			}
-
+			pBOB->srt3 = ((U1*)pQ)[s];
 			*this = pBOB;
 			LURD.a4x2[0].mn( pBOB->lurd.a4x2[0] );
 			LURD.a4x2[1].mx( pBOB->lurd.a4x2[1] );
@@ -244,7 +247,7 @@ public:
 						continue;
 					}
 
-
+					pBOB->srt3 = ((U1*)pQ)[s];
 					*this = pBOB->X();
 					LURD.a4x2[0].mn( pBOB->lurd.a4x2[0] );
 					LURD.a4x2[1].mx( pBOB->lurd.a4x2[1] );
@@ -268,8 +271,7 @@ void TRDexp( gpcTRDbug* pT )
 }
 #define gpdEXPdbgCOUT if(false)
 U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
-							char* pNAME, char *pPATH, char *pFILE )
-{
+							char* pNAME, char *pPATH, char *pFILE ) {
 	gpapP[0] = surDRW();			// TARGET
 	gpapP[1] = ppPIC[0]->surDRW();	// dilet
 	U1x4* pPIX = gpapP[0] ? (U1x4*)gpapP[0]->pixels : NULL;
@@ -289,9 +291,15 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		if( !pSRF )
 			return NULL;
 	}
-	aiQC[0] = aiQC[1]+1;
-	pREF = NULL;
 
+	if( aiQC[0]%3 )
+	{
+		aiQC[0]++;
+		return pPIX;
+	}
+	aiQC[0] = aiQC[1]+1;
+
+	pREF = NULL;
 	///--------------------
 
 	I4	w = txWH.a4x2[1].x,		wQ = w>>1,
@@ -312,7 +320,8 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			vQ, ofQ(wQ, hQ), trfQ(1,w);
 
 
-	gpdEXPdbgCOUT std::cout << "Explode: " << any <<std::endl;
+	gpdEXPdbgCOUT
+	std::cout << "Explode: " << any <<std::endl;
 
 
 	U4 mom = 0, nBtrd = 0;
@@ -348,8 +357,12 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		aBUG[i].n_run++;
 		trd++;
 	}
-	gpdEXPdbgCOUT std::cout << "Explode: nTRD " << trd <<std::endl;
+
+	gpdEXPdbgCOUT
+	std::cout << "Explode: nTRD " << trd <<std::endl;
+
 	aBUG[trd].loop();
+
 	gpdEXPdbgCOUT std::cout << "Explode: mainLOOP " << trd <<std::endl;
 	for( U4 i = 0; i <= trd; i++ ) {
 		if( aBUG[i].n_join < aBUG[i].n_run )
@@ -463,7 +476,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 				nBOB = nBOBall;
 
 
-			//gpdEXPdbgCOUT
+			gpdEXPdbgCOUT
 			if( nBOB )
 			{
 				std::cout << "Explode: " << nB << "/" << nA <<std::endl;
@@ -504,6 +517,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 	(TnID+I8x2(0,i)).
 	an2str( (U1*)pDIR, (U1*)pEXP, true, true );
 	std::cout << "FOOD:" << pPATH <<std::endl;
+
 	SDL_Surface* pTMP = NULL;
 	if( gpfACE( pPATH, 4) > -1 )
 	{
@@ -673,7 +687,10 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 		if(pU1x4->x==ix05) {
 			nCMP = gpmMcmpOF( (pDB+1), (((U1x4*)(gpapP[3]->pixels))+1), n1-1 );
+
+			gpdSPCdbgCOUT
 			std::cout << i << ":" << (int)pDB->x << "/" << (int)pDB->y << ":" << (int)nCMP << "/" << (int)n1-1 <<std::endl;
+
 			if( nCMP < n1-1 ) {
 				pDB->x = 0; // jelzi, hogy változás van
 			}
@@ -806,3 +823,72 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 	return (U1x4*)pSRF->pixels;
 }
+class gpcTRDspc
+{
+public:
+
+	U1		sPATH[0x100], *pFILE;
+	U1x4	*pSRC, *pO, *pSPC, x05;
+	U4x4	aHISTI[0x40];
+	I4x2	Swh, Owh;
+	I8x2	ALFid;
+	U4x4*	pMAP;
+
+	std::thread trd;
+
+	void loop()
+	{
+		if(!pSRC)
+			return;
+		U1x4 c;
+		// a space most 0x200 X 0x200 lesz
+		// 4 X 4 azaz 16 terület
+		// 0x100 / 4 -> 0x40 dec 64 || csat 6 felső bit zaj kinyír
+		// a FOOD 0x80 X 0x80 azaz 128x128
+		/// 64*32
+		/// 0x40 X 0x20 -> 0x80 X 0x40
+		gpmZ(aHISTI);
+		for( U4 y = 0, ys = Iwh.x*2; y < 0x40; y+=2 )
+		{
+			for( U4 x = 0, ixy = y*ys; x < 0x80; x+=2, ixy+=2 )
+			{
+				c = pSRC[ixy]>>2;
+				aHISTI[c.x].x++;
+				aHISTI[c.y].y++;
+				aHISTI[c.z].z++;
+
+
+			}
+		}
+		for( x05.w = 1; x05.w < 0x80; x05.w++ )
+		{
+			aHISTI[x05.w] += aHISTI[x05.w-1];
+			if( aHISTI[x05.w].x < 0x40*0x10 )
+				x05.x = x05.w;
+			if( aHISTI[x05.w].y < 0x40*0x10 )
+				x05.y = x05.w;
+			if( aHISTI[x05.w].z < 0x40*0x10 )
+				x05.z = x05.w;
+		}
+		x05.w = x05.x|x05.y|x05.z;
+		// 8 alatt van a pixelek fele gáz tök sötét
+		//x05>>=3; // igy végülis 0xf0f0f lehet a vektor SUM 0xfff ~4095
+		if( pMAP->x != x05.w )
+		{
+            // csere nem stimmel
+            /// régi elmentése
+			if( pMAP->x ) // x 1 és 0x3f3f3f között ~0x400000 // 0 tök sötét le van szarva
+			if( pMAP->y )
+			{
+				// természetesen ha frissítve lett mentjük
+
+			}
+
+            /// új FOOD
+			pMAP->y = 0;
+			pMAP->x = x05.w;
+		}
+
+
+	}
+};

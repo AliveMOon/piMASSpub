@@ -835,8 +835,7 @@ public:
 		return o;
 	}
 
-    U1x4& mx( U1x4 xyzw )
-    {
+    U1x4& mx( U1x4 xyzw ) {
 		if( x < xyzw.x )
 			x = xyzw.x;
 		if( y < xyzw.y )
@@ -848,8 +847,7 @@ public:
 
 		return *this;
     }
-    U1x4& mn( U1x4 xyzw )
-    {
+    U1x4& mn( U1x4 xyzw ) {
 		if( x > xyzw.x )
 			x = xyzw.x;
 		if( y > xyzw.y )
@@ -861,8 +859,7 @@ public:
 
 		return *this;
     }
-	U1x4& typ()
-	{
+	U1x4& typ() {
 		if( w )
 			return *this;
 
@@ -877,8 +874,7 @@ public:
 		w = 1<<(x&0xf);
 		return *this;
 	}
-	U1x4& typMX( U1x4 tp )
-	{
+	U1x4& typMX( U1x4 tp ) {
 		U1	sh1 = x&0xf;
 		if( sh1 < tp.x&0xf ) 	// sh: 0B?1 1WH2 2LF4 3QD8
 			sh1 = tp.x&0xf;
@@ -907,8 +903,7 @@ public:
 	U1x4* frmFILL( I4x2 cr, U1x4 u, I4x4 whp );
 	U1x4* frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  );
 
-	U1x4* print( U1* p_str, gpeCLR clr )
-	{
+	U1x4* print( U1* p_str, gpeCLR clr ) {
 		if( this ? !p_str : true )
 			return this;
 
@@ -923,16 +918,14 @@ public:
 		}
         return p4;
 	}
-	U1x4* zyxw( void* pV, U4 n )
-	{
+	U1x4* zyxw( void* pV, U4 n ) {
 		gpmMcpyOF( this, pV, n );
 		for( U4 i = 0; i < n; i++ )
 			this[i].swpZX();
 
 		return this;
 	}
-	U1x4* zwxy( void* pV, U4 n )
-	{
+	U1x4* zwxy( void* pV, U4 n ) {
 		U1x4 *p1 = this,
 			 *p2 = (U1x4*)pV;
 		for( U4 i = 0; i < n; i++ )
@@ -945,8 +938,7 @@ public:
 		return this;
 	}
 
-	U1x4* AND( void* pV, U4 n )
-	{
+	U1x4* AND( void* pV, U4 n ) {
 		if( this ? !n : true )
 			return this;
 
@@ -963,8 +955,7 @@ public:
 		((U4*)this)[i] &= ((U4*)pV)[i];
 		return this;
 	}
-	U1x4* OR( void* pV, U4 n )
-	{
+	U1x4* OR( void* pV, U4 n ) {
 		if( this ? !n : true )
 			return this;
 
@@ -982,24 +973,21 @@ public:
 		return this;
 	}
 	/// 13
-	U1x4& swpYX()
-	{
+	U1x4& swpYX() {
 		U1 t = x;
 		x = y;
 		y = t;
 		return *this;
 	}
 	/// 25
-	U1x4& swpZX()
-	{
+	U1x4& swpZX() {
 		U1 t = x;
 		x = z;
 		z = t;
 		return *this;
 	}
 	/// 36
-	U1x4& swpZY()
-	{
+	U1x4& swpZY() {
 		U1 t = y;
 		y = z;
 		z = t;
@@ -1007,8 +995,7 @@ public:
 	}
 
 	/// 49
-	U1x4& swpWX()
-	{
+	U1x4& swpWX() {
 		U1 t = x;
 		x = w;
 		w = t;
@@ -1016,23 +1003,20 @@ public:
 	}
 
 	/// 5A
-	U1x4& swpWY()
-	{
+	U1x4& swpWY() {
 		U1 t = y;
 		y = w;
 		w = t;
 		return *this;
 	}
 	/// 6C
-	U1x4& swpWZ()
-	{
+	U1x4& swpWZ() {
 		U1 t = z;
 		z = w;
 		w = t;
 		return *this;
 	}
-	U1 srt3( U1 lim )
-	{
+	U1 srt3( U1 lim ) {
 		if( !(u4&0xffffff) )
 			return 0;
 
@@ -1061,8 +1045,7 @@ public:
 
 		return 0;
 	}
-	U1x4 srt3()
-	{
+	U1x4 srt3() {
 		if( !(u4&0xffffff) )
 			return 0;
 
@@ -1090,8 +1073,7 @@ public:
 		s.x |= s.w;
 		return s;
 	}
-	U1 srt4()
-	{
+	U1 srt4() {
 		if( !u4 )
 			return 0;
 
@@ -1138,8 +1120,7 @@ public:
 
 		return o;
 	}
-	U1x4& swp3( U1 s )
-	{
+	U1x4& swp3( U1 s ) {
 		if( !(s&0xf) )
 			return *this;
 
@@ -1153,8 +1134,7 @@ public:
 		return *this;
 	}
 
-	U1x4& swp4( U1 s )
-	{
+	U1x4& swp4( U1 s ) {
 		if( !(s&0x3f) )
 			return *this;
 
@@ -1175,7 +1155,26 @@ public:
 		return *this;
 	}
 
-
+	U1x4 operator << ( I1 b ) const {
+		if( !b )
+			return *this;
+		if( b < 8 )
+			return U1x4( x<<b, y<<b, z<<b, w<<b );
+		return 0;
+	}
+	U1x4 operator << ( const U1x4& b ) const {
+		return U1x4( x<<b.x, y<<b.y, z<<b.z, w<<b.w );
+	}
+	U1x4 operator >> ( I1 b ) const {
+		if( !b )
+			return *this;
+		if( b < 8 )
+			return U1x4( x>>b, y>>b, z>>b, w>>b );
+		return 0;
+	}
+	U1x4 operator >> ( const U1x4& b ) const {
+		return U1x4( x>>b.x, y>>b.y, z>>b.z, w>>b.w );
+	}
 
 
 	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, I4 rg = 0, U4 nX = 0 );
@@ -4445,34 +4444,7 @@ public:
 
 
 
-    /*Fx4& add( Fx2 b, U4 n )
-	{
-		for( U4 i = 0; i < n; i++ )
-			this[i] += b;
 
-		return *this;
-	}
-	Fx4& sub( Fx2 b, U4 n )
-	{
-		for( U4 i = 0; i < n; i++ )
-			this[i] -= b;
-
-		return *this;
-	}
-	Fx4& mul( Fx2 b, U4 n )
-	{
-		for( U4 i = 0; i < n; i++ )
-			this[i] &= b;
-
-		return *this;
-	}
-	Fx4& div( Fx2 b, U4 n )
-	{
-		for( U4 i = 0; i < n; i++ )
-			this[i] /= b;
-
-		return *this;
-	}*/
 
 
 
@@ -4501,6 +4473,72 @@ public:
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] /= b;
+
+		return *this;
+	}
+
+	/// 13
+	Fx4& swpYX()
+	{
+		float t = x;
+		x = y;
+		y = t;
+		return *this;
+	}
+	/// 25
+	Fx4& swpZX()
+	{
+		float t = x;
+		x = z;
+		z = t;
+		return *this;
+	}
+	/// 36
+	Fx4& swpZY()
+	{
+		float t = y;
+		y = z;
+		z = t;
+		return *this;
+	}
+
+	/// 49
+	Fx4& swpWX()
+	{
+		float t = x;
+		x = w;
+		w = t;
+		return *this;
+	}
+
+	/// 5A
+	Fx4& swpWY()
+	{
+		float t = y;
+		y = w;
+		w = t;
+		return *this;
+	}
+	/// 6C
+	Fx4& swpWZ()
+	{
+		float t = z;
+		z = w;
+		w = t;
+		return *this;
+	}
+
+	Fx4& swp3( U1 s )
+	{
+		if( !(s&0x7) )
+			return *this;
+
+		if( s&0x04 )
+			swpZY();
+		if( s&0x02 )
+			swpZX();
+		if( s&0x01 )
+			swpYX();
 
 		return *this;
 	}

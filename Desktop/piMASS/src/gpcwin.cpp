@@ -287,13 +287,14 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					for( pIe = pI+n*3; pI < pIe; pI += gpmN(apCRS[0]->aXYuvPC) )
 					if( pP = piMASS->PIC.PIC(pI[2].a4x2[1].x) )
 					{
+						pP->nJDOIT = nJDOIT;
 						pGL->GLSLset( GLSLline, gpsGLSLfrgLINE );
 						for( U4 nB = pP->nBOB, b = 0, m = 2; b < nB; b++ )
 						if( pB = pP->ppBOB[b] )
 						{
 							pGL
-							->glSETbob( m, b*0, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
-							->glSETcnl( 0, Fx4(1.0f,0.0f,0.0f,1.0f) )
+							->glSETbob( m, nJDOIT.w, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
+							->glSETcnl( 0, Fx4(1.0f,0.125f,0.025f,1.0f).swp3(pB->srt3) ) // Fx4(1.0f,0.0f,0.0f,1.0f) )
 							->glDRW( m, w.a4x2[0], FRMwh );
 						}
 

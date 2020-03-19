@@ -385,6 +385,7 @@ U4 gpcMASS::jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR )
 
 U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
+	win.nJDOIT.w++;
 	win.nJDOIT.y = win.nJDOIT.x;
 	U1* pKEYbuff = win.gpsKEYbuff;
 	gpcSRC	tmp, *pSRC, *pS2;

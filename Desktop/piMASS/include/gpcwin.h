@@ -284,7 +284,7 @@ public:
 			gpmDELary(pV);
 			pV = new Fx4[nV];
 		}
-		pBOB->nDRW++;
+		//pBOB->nDRW++;
 		I4x2	wC = pBOB->wCNTR, ixy, inD = pBOB->inDRW( b ),
 				*pX = pBOB->pX+inD.x,
 				*pRD = pBOB->pRD;

@@ -98,8 +98,8 @@ public:
 };
 class gpcBOB {
 public:
-	U4 		mom, 	id, strt,
-			nRDall, nRD, lurdR, nX, aiL[0x10], nL, nDRW,
+	U4 		mom, id, strt, srt3,
+			nRDall, nRD, lurdR, nX, aiL[0x10], nL, iQC,
 			nAREA,			// a bobban szereplő pixelek száma
 			iAXIS, lAXIS,	// iAX pX[0] az egyik pont pX[iAXIS] másik pont
 			nRND, 			// kerület
@@ -108,23 +108,26 @@ public:
 	I4x4	lurd;
 	I4x2	picWH, *pRD, *pFILL, *pX, *pRDsrt, wCNTR, lurdC;
 	//gpcBOB	**ppKID;
-	U4 iDRW() { return nDRW%nL; }
-	I4x2 inDRW( U4 b )
+	I4x2 inDRW( U4 qc )
 	{
-		U4 i = (nDRW+b)%nL;
-		return U4x2( aiL[i], aiL[i+1]-aiL[i] );
+		if( !nL )
+			return 0;
+
+		qc -= iQC;
+		U4 i = nL-1;
+		if( qc/nL )
+		{
+			if( qc%nL )
+				i -= qc%nL;
+			else
+				iQC = qc;
+		}
+
+		return I4x2( aiL[i], aiL[i+1]-aiL[i] );
 	}
 
 	~gpcBOB(){
 		gpmDELary(pRD);
-
-		/*if( !ppKID )
-			return;
-
-		for( U4 i = 0; i < iKID; i++ )
-			gpmDEL(ppKID[i]);
-
-		delete[] ppKID;*/
 	};
 	gpcBOB(){ gpmCLR; };
 	gpcBOB* pBOB(
@@ -466,6 +469,7 @@ public:
 		if(aiL[nL]<nX)
 			aiL[nL]=nX;
 
+
 		R = pRD[pX[aiL[nL-1]].y];
 		nRND = sqrt((R-*pRD).qlen());
 		for( i = aiL[nL-1]+1; i < nX; i++ )
@@ -497,6 +501,7 @@ public:
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
+	U4x4			nJDOIT;
 	gpcPIC			*pSRC;
 	gpcBOB			**ppBOB;
 
@@ -573,7 +578,6 @@ public:
 	bool unLOCK( void ) {
 		if( this ? (!pLOCK||!pTX) : true )
 			return false;
-
 
 		SDL_UnlockTexture(pTX);
 		pLOCK = NULL;
