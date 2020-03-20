@@ -827,15 +827,100 @@ class gpcTRDspc
 {
 public:
 
-	U1		sPATH[0x100], *pFILE;
-	U1x4	*pSRC, *pO, *pSPC, x05;
+	U1		sRAM[0x100], *pRAM,
+			sPATH[0x100], *pDIR;
+	U1x4	*pSRC,						// pl. CAM
+			//*pMSKr, *pFRNTr, *pBACKr,	// RNDR
+			*pS, *pF, *pB,				// COPY
+			*pSPC,						// fresh spc
+			x05;
 	U4x4	aHISTI[0x40];
-	I4x2	Swh, Owh;
+	I4x2	s_wh, Owh;
 	I8x2	ALFid;
 	U4x4*	pMAP;
 
 	std::thread trd;
 
+	SDL_Surface* food( U4 x = 0 )
+	{
+		/// új FOOD
+		pMAP->z = 10;
+		pMAP->y = 0;
+		pMAP->x = x ? x : x05.w;
+
+		(ALFid+I8x2(0,pMAP->x))
+		.an2str( pDIR, (U1*)".png", true, true );
+		/// LOAD
+		SDL_Surface* pSRF = IMG_Load( (char*)sPATH );
+		// helyére pakolász
+		U1x4 *p_s = (U1x4*)pSRF->pixels;
+		//							//	w		all = dm*h			ds	dm		ss	sm
+		// rndTRG_CPY-ből a SPaCe	//
+		pS[0]
+		.cpyX( 	p_s,					0x40*4,	s_wh.x*0x100, 	4,	s_wh.x*4,	1,	0x80 );
+		pS[s_wh.x*0x100]
+		.cpyX( 	p_s+0x80*0x40,			0x80*4,	s_wh.x*0x100, 	4,	s_wh.x*4,	1,	0x80 );
+
+		// rndTRG_CPY-ből a FRONT
+		pF->cpyX( p_s+0x40, 			0x40*2,	s_wh.x*0x80,	2,	s_wh.x*2, 	1,	0x80 );
+		// rndTRG_CPY-ből a BACK
+		pB->cpyX( p_s+0x40+0x80*0x20,	0x40*2,	s_wh.x*0x80,	2,	s_wh.x*2, 	1,	0x80 );
+		return pSRF;
+
+	}
+	SDL_Surface* save( U4 x = 0, bool bNO = false )
+	{
+		if(x)
+			pMAP->x = x;
+
+		SDL_Surface* pSRF = SDL_CreateRGBSurface( 0, 0x80, 0x80, 32, 0,0,0,0 );
+		U1x4 *p_d = (U1x4*)pSRF->pixels;
+
+		// rndTRG_CPY-ből a SPaCe
+		((U1x4*)pSRF->pixels)[0]
+		.cpyX( pS, 0x80, 0x80*0x80, 1, 0x80, 4, s_wh.x*4 );
+
+		// rndTRG_CPY-ből a FRONT
+		((U1x4*)pSRF->pixels)[0x40]
+		.cpyX( pF, 0x40, 0x80*0x20, 1, 0x80, 2, s_wh.x*2 );
+		// rndTRG_CPY-ből a BACK
+		((U1x4*)pSRF->pixels)[0x40+0x80*0x20]
+		.cpyX( pB, 0x40, 0x80*0x20,	1, 0x80, 2, s_wh.x*2 );
+		if( !bNO )
+			return pSRF;
+
+		(ALFid+I8x2(0,pMAP->x))
+		.an2str( pDIR, (U1*)".png", true, true );
+		pRAM = sRAM+sprintf( (char*)sRAM, "/mnt/ram/" );
+		gpmSTRCPY(pRAM,pDIR);
+		if( gpmACE(sRAM, 4) > -1 )
+			remove((char*)sRAM);
+
+		IMG_SavePNG( pSRF, (char*)sRAM );
+		if( gpmACE( sPATH, 4) > -1 )
+		{
+			(ALFid+I8x2(0,pMAP->x))
+			.an2str( pRAM, (U1*)".kill", true, true );
+			rename( (char*)sPATH, (char*)sRAM );
+		}
+
+		gpmSTRCPY(pRAM,pDIR);
+		if( int err = rename( (char*)sRAM, (char*)sPATH ) )
+		{
+			gpcLZY load; U8 s = 0;
+			load.lzyRD( (char*)sRAM, s, 1 );
+			load.lzyWR( (char*)sPATH, true );
+			//std::cout << " ERR " << err <<std::endl;
+
+		}
+
+		(ALFid+I8x2(0,pMAP->x))
+		.an2str( pRAM, (U1*)".kill", true, true );
+		if( gpmACE(sRAM, 4) > -1 )
+			remove((char*)sRAM);
+
+		return pSRF;
+	}
 	void loop()
 	{
 		if(!pSRC)
@@ -846,11 +931,11 @@ public:
 		// 0x100 / 4 -> 0x40 dec 64 || csat 6 felső bit zaj kinyír
 		// a FOOD 0x80 X 0x80 azaz 128x128
 		/// 64*32
-		/// 0x40 X 0x20 -> 0x80 X 0x40
+		/// 0x40 X 0x20 -x4-> 0x100 X 0x80
 		gpmZ(aHISTI);
-		for( U4 y = 0, ys = Iwh.x*2; y < 0x40; y+=2 )
+		for( U4 y = 0, ys = s_wh.x*4; y < 0x80; y+=4 )
 		{
-			for( U4 x = 0, ixy = y*ys; x < 0x80; x+=2, ixy+=2 )
+			for( U4 x = 0, ixy = y*ys; x < 0x100; x+=4, ixy+=4 )
 			{
 				c = pSRC[ixy]>>2;
 				aHISTI[c.x].x++;
@@ -860,7 +945,7 @@ public:
 
 			}
 		}
-		for( x05.w = 1; x05.w < 0x80; x05.w++ )
+		for( x05.w = 1; x05.w < 0x40; x05.w++ )
 		{
 			aHISTI[x05.w] += aHISTI[x05.w-1];
 			if( aHISTI[x05.w].x < 0x40*0x10 )
@@ -870,24 +955,48 @@ public:
 			if( aHISTI[x05.w].z < 0x40*0x10 )
 				x05.z = x05.w;
 		}
-		x05.w = x05.x|x05.y|x05.z;
-		// 8 alatt van a pixelek fele gáz tök sötét
-		//x05>>=3; // igy végülis 0xf0f0f lehet a vektor SUM 0xfff ~4095
-		if( pMAP->x != x05.w )
+
+		x05.w = x05.srt3().x;
+		SDL_Surface* pTMP = NULL;
+		if( pMAP->x == x05.w )
 		{
-            // csere nem stimmel
-            /// régi elmentése
+			// marad a régiben
 			if( pMAP->x ) // x 1 és 0x3f3f3f között ~0x400000 // 0 tök sötét le van szarva
 			if( pMAP->y )
+			if( pMAP->y == pMAP->z )
+			{
+				// azért időnként elmentjük
+				pTMP = save();
+
+				pMAP->z++;
+				pMAP->y = 0;
+			} else
+				pMAP->y++;
+
+
+
+		} else {
+
+            // csere nem stimmel
+            /// régi elmentése ha változott
+			if( pMAP->x ) // x 1 és 0x3f3f3f között ~0x400000 // 0 tök sötét le van szarva
+			if( pMAP->y )
+			if( pMAP->y < pMAP->z )
 			{
 				// természetesen ha frissítve lett mentjük
-
+				pTMP = save();
+				gpmSDL_FreeSRF(pTMP);
 			}
 
             /// új FOOD
+            pMAP->z = 10;
 			pMAP->y = 0;
 			pMAP->x = x05.w;
+			/// LOAD
+			pTMP = food();
 		}
+		gpmSDL_FreeSRF(pTMP);
+
 
 
 	}

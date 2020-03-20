@@ -455,6 +455,7 @@ int inline gpfACE( const char* p_file, I4 mode )
 	int io = ace( p_file, mode );
 	return io;
 }
+#define gpmACE( p, m ) gpfACE( (char*)(p), (m) )
 bool inline gpfMKDR( char* p_buff, const char* p_new )
 {
 	if( p_new ? !*p_new : true )
@@ -1175,11 +1176,48 @@ public:
 	U1x4 operator >> ( const U1x4& b ) const {
 		return U1x4( x>>b.x, y>>b.y, z>>b.z, w>>b.w );
 	}
-
+	U1x4& operator >>= ( U1 b )
+	{
+		if( !b )
+			return *this;
+		if( b > 7 )
+			return null();
+		x >>= b;
+		y >>= b;
+		z >>= b;
+		w >>= b;
+		return *this;
+	}
+	U1x4& operator <<= ( U1 b )
+	{
+		if( !b )
+			return *this;
+		if( b > 7 )
+			return null();
+		x <<= b;
+		y <<= b;
+		z <<= b;
+		w <<= b;
+		return *this;
+	}
 
 	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, I4 rg = 0, U4 nX = 0 );
 	U4 bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
+	U1x4* cpyX( U1x4 *p_s,
+				U4 w, 		U4 all,
+				U4 ds = 1,	U4 dm = 0,
+				U4 ss = 1,	U4 sm = 0 )
+	{
+		U1x4* p_d = this;
+		for( U4 y = 0; y < all; y += dm )
+		{
+			for( U4 d = 0, s = 0; d < w; d += ds, s += ss )
+				p_d[d] = p_s[s];
 
+			p_s += sm;
+			p_d += dm;
+		}
+	}
 };
 
 class I1x4
