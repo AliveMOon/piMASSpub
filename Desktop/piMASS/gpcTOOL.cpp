@@ -125,8 +125,7 @@ public:
 	}
 	gpcTRDbug(){ gpmCLR; };
 	gpcBOB* pBOB, *pMOM;
-	void loop()
-	{
+	void loop() {
 		if( !this )
 			return;
 		w = pD[2];
@@ -265,8 +264,7 @@ public:
 	}
 };
 
-void TRDexp( gpcTRDbug* pT )
-{
+void TRDexp( gpcTRDbug* pT ) {
 	return pT->loop();
 }
 #define gpdEXPdbgCOUT if(false)
@@ -502,8 +500,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 }
 U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
-				char* pPATH, char* pDIR, char* pEXP )
-{
+				char* pPATH, char* pDIR, char* pEXP ) {
 	if( this ? !pPET : true )
 		return NULL;
 
@@ -554,7 +551,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 	return pPET;
 }
 #define gpdSPCdbgCOUT if(false)
-U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
+U1x4* gpcPIC::TOOLspace0(	gpcLZYall& MANus, gpcPIC** ppPIC,
 							char* pNAME, char *pPATH, char *pFILE ) {
 	if( pSRF )
 	if( pSRF->w*pSRF->h != 512*512 )
@@ -830,46 +827,51 @@ public:
 	U1		sRAM[0x100], *pRAM,
 			sPATH[0x100], *pDIR;
 	U1x4	*pSRC,						// pl. CAM
-			//*pMSKr, *pFRNTr, *pBACKr,	// RNDR
-			*pS, *pF, *pB,				// COPY
-			*pSPC,						// fresh spc
+			*pScpy, *pFcpy, *pBcpy,		// COPY
+			*pSpen, *pFpen, *pBpen,		// RNDR
+			*pSspc, *pFspc, *pBspc,		// RNDR
 			x05;
 	U4x4	aHISTI[0x40];
-	I4x2	s_wh, Owh;
+	I4x2	srcWH, spcWH;
 	I8x2	ALFid;
 	U4x4*	pMAP;
+	U4		n_join,n_run;
 
 	std::thread trd;
 
-	SDL_Surface* food( U4 x = 0 )
-	{
+
+	~gpcTRDspc() {
+		if( n_join < n_run )
+			trd.join();
+	}
+
+	SDL_Surface* food( U4 x = 0 ) {
 		/// új FOOD
 		pMAP->z = 10;
 		pMAP->y = 0;
 		pMAP->x = x ? x : x05.w;
 
 		(ALFid+I8x2(0,pMAP->x))
-		.an2str( pDIR, (U1*)".png", true, true );
+		.an2str( pDIR, (U1*)"spc.png", true, true );
 		/// LOAD
 		SDL_Surface* pSRF = IMG_Load( (char*)sPATH );
 		// helyére pakolász
 		U1x4 *p_s = (U1x4*)pSRF->pixels;
-		//							//	w		all = dm*h			ds	dm		ss	sm
-		// rndTRG_CPY-ből a SPaCe	//
-		pS[0]
-		.cpyX( 	p_s,					0x40*4,	s_wh.x*0x100, 	4,	s_wh.x*4,	1,	0x80 );
-		pS[s_wh.x*0x100]
-		.cpyX( 	p_s+0x80*0x40,			0x80*4,	s_wh.x*0x100, 	4,	s_wh.x*4,	1,	0x80 );
+		//								//	w		all = dm*h			ds	dm		ss	sm
+		// rndTRG_CPY-ből a SPaCe		//
+		pSspc[0]
+		.cpyX( 	p_s,						0x40*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	0x80 );
+		pSspc[spcWH.x*0x100]
+		.cpyX( 	p_s+0x80*0x40,				0x80*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	0x80 );
 
 		// rndTRG_CPY-ből a FRONT
-		pF->cpyX( p_s+0x40, 			0x40*2,	s_wh.x*0x80,	2,	s_wh.x*2, 	1,	0x80 );
+		pFspc->cpyX( p_s+0x40, 				0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	0x80 );
 		// rndTRG_CPY-ből a BACK
-		pB->cpyX( p_s+0x40+0x80*0x20,	0x40*2,	s_wh.x*0x80,	2,	s_wh.x*2, 	1,	0x80 );
+		pBspc->cpyX( p_s+0x40+0x80*0x20,	0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	0x80 );
 		return pSRF;
 
 	}
-	SDL_Surface* save( U4 x = 0, bool bNO = false )
-	{
+	SDL_Surface* save( U4 x = 0, bool bNO = false ) {
 		if(x)
 			pMAP->x = x;
 
@@ -878,19 +880,19 @@ public:
 
 		// rndTRG_CPY-ből a SPaCe
 		((U1x4*)pSRF->pixels)[0]
-		.cpyX( pS, 0x80, 0x80*0x80, 1, 0x80, 4, s_wh.x*4 );
+		.cpyX( pSspc, 0x80, 0x80*0x80, 1, 0x80, 4, spcWH.x*4 );
 
 		// rndTRG_CPY-ből a FRONT
 		((U1x4*)pSRF->pixels)[0x40]
-		.cpyX( pF, 0x40, 0x80*0x20, 1, 0x80, 2, s_wh.x*2 );
+		.cpyX( pFspc, 0x40, 0x80*0x20, 1, 0x80, 2, spcWH.x*2 );
 		// rndTRG_CPY-ből a BACK
 		((U1x4*)pSRF->pixels)[0x40+0x80*0x20]
-		.cpyX( pB, 0x40, 0x80*0x20,	1, 0x80, 2, s_wh.x*2 );
+		.cpyX( pBspc, 0x40, 0x80*0x20,	1, 0x80, 2, spcWH.x*2 );
 		if( !bNO )
 			return pSRF;
 
 		(ALFid+I8x2(0,pMAP->x))
-		.an2str( pDIR, (U1*)".png", true, true );
+		.an2str( pDIR, (U1*)"spc.png", true, true );
 		pRAM = sRAM+sprintf( (char*)sRAM, "/mnt/ram/" );
 		gpmSTRCPY(pRAM,pDIR);
 		if( gpmACE(sRAM, 4) > -1 )
@@ -921,8 +923,7 @@ public:
 
 		return pSRF;
 	}
-	void loop()
-	{
+	void loop() {
 		if(!pSRC)
 			return;
 		U1x4 c;
@@ -933,20 +934,19 @@ public:
 		/// 64*32
 		/// 0x40 X 0x20 -x4-> 0x100 X 0x80
 		gpmZ(aHISTI);
-		for( U4 y = 0, ys = s_wh.x*4; y < 0x80; y+=4 )
+		for( U4 y = 0, ys = srcWH.x*4; y < 0x80; y+=4 )
+		for( U4 x = 0, ixy = y*ys; x < 0x100; x+=4, ixy+=4 )
 		{
-			for( U4 x = 0, ixy = y*ys; x < 0x100; x+=4, ixy+=4 )
-			{
-				c = pSRC[ixy]>>2;
-				aHISTI[c.x].x++;
-				aHISTI[c.y].y++;
-				aHISTI[c.z].z++;
-
-
-			}
+			c = pSRC[ixy]>>2;
+			aHISTI[c.x].x++;
+			aHISTI[c.y].y++;
+			aHISTI[c.z].z++;
 		}
+
 		for( x05.w = 1; x05.w < 0x40; x05.w++ )
 		{
+			// 0x40*0x10 a 0x40*0x20 szelet felét kell elérni
+			// x05 azaz x0.5
 			aHISTI[x05.w] += aHISTI[x05.w-1];
 			if( aHISTI[x05.w].x < 0x40*0x10 )
 				x05.x = x05.w;
@@ -958,27 +958,24 @@ public:
 
 		x05.w = x05.srt3().x;
 		SDL_Surface* pTMP = NULL;
-		if( pMAP->x == x05.w )
-		{
+		if( pMAP->x == x05.w ) {
 			// marad a régiben
 			if( pMAP->x ) // x 1 és 0x3f3f3f között ~0x400000 // 0 tök sötét le van szarva
 			if( pMAP->y )
-			if( pMAP->y == pMAP->z )
-			{
+			if( pMAP->y == pMAP->z ) {
 				// azért időnként elmentjük
 				pTMP = save();
 
 				pMAP->z++;
-				pMAP->y = 0;
+				pMAP->y = pMAP->z+1;
 			} else
 				pMAP->y++;
-
-
 
 		} else {
 
             // csere nem stimmel
-            /// régi elmentése ha változott
+            /// az a lényeg, ha le van nyomva az egér gomb a RNDR képte átmásolja a maskii-be
+            /// és ha most egy újabb körben is azonos akkor azt akarjuk eltárolni
 			if( pMAP->x ) // x 1 és 0x3f3f3f között ~0x400000 // 0 tök sötét le van szarva
 			if( pMAP->y )
 			if( pMAP->y < pMAP->z )
@@ -997,7 +994,132 @@ public:
 		}
 		gpmSDL_FreeSRF(pTMP);
 
+		if( !pFcpy )
+			return;
 
+		U1x4 fC, fP, bC, bP;
+		U4 n = 0, xyP;
+		I4x2 RG, BG, BR, trfT(1,spcWH.x);
+		for( U4 y = 0, ys = spcWH.x*2; y < 0x40; y+=2 )
+		for( U4 x = 0, ixy = y*ys; x < 0x80; x+=2, ixy+=2 )
+		{
+			fP = pFpen[ixy];
+			if( !fP.mx_xyz() )
+				continue;
+
+			if( pFcpy[ixy].u4 != fP.u4 )
+				continue;
+			// a CPY ben is ugyan ez szerepel
+			bC = pBcpy[ixy] & (U4)~0x030303;
+			bP = pBpen[ixy] & (U4)~0x030303;
+			if( bC.u4!= bP.u4 )
+				continue;
+
+			RG = I4x2(  bP.z, bP.y )+255; // RG
+			BG = I4x2( -bP.x, bP.y )+255; // BG
+			BR = I4x2( -bP.x,-bP.z )+255; // BR
+			xyP = RG*trfT;
+			pSspc[xyP].u4 |= fP.u4;
+			xyP = BG*trfT;
+			pSspc[xyP].u4 |= fP.u4;
+			xyP = BR*trfT;
+			pSspc[xyP].u4 |= fP.u4;
+			n++;
+		}
+		if( n )
+		{
+			// talált azonos pixeleket
+			// el kéne tárolni
+			pMAP->y = 1;
+			pMAP->z = 10;
+		}
 
 	}
 };
+void TRDspc( gpcTRDspc* pT ) {
+	return pT->loop();
+}
+U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
+							char* pNAME, char *pPATH, char *pFILE ) {
+	gpapP[0] = surDRW();			// space 	TRG
+	gpapP[1] = ppPIC[0]->surDRW();	// cam		pico
+	gpapP[2] = ppPIC[1]->surDRW();	// penna	pici
+	gpapP[3] = ppPIC[2]->surDRW();	// cpy		picii
+
+	char* pDIR = pFILE+sprintf( pFILE, "%s/", pNAME );
+	pDIR = strrchr( pFILE, '.' );
+	if( pDIR )
+		pDIR += sprintf( pDIR, "_dir/" );
+	else
+		pDIR = pFILE+gpmSTRLEN(pFILE);
+	if( gpfACE(pPATH, 4) < 0 ) {
+		std::cout << "mkdir:"<< pPATH <<std::endl;
+		gpfMKDR( (char*)MANus.aPUB, pPATH );
+	}
+
+	gpcTRDspc aSPC[0x10];
+	U4 trd = 0;
+	if( gpapP[1] )
+	{
+		// cam pico
+		aSPC[0].srcWH	= *gpapP[1];
+		aSPC[0].pSRC	= (U1x4*)gpapP[1]->pixels;
+	}
+
+	I4x2	of4x4,of2x2,
+			trfSPC(1, gpapP[0]->w ),
+			trfSRC(1, gpapP[1]->w );
+	for( U4 i = 0, e = gpmN(aSPC)-1, nDIR = pDIR-pPATH; i <= e; trd = i, i++ )
+	{
+		of2x2 = (of4x4 = I4x2(i%4,i/4))%2;
+		if(i)
+		{
+			aSPC[trd].srcWH = aSPC[0].srcWH;
+			aSPC[trd].pSRC = aSPC[0].pSRC + (of2x2+(of4x4&I4x2(0x80,0x40)))*trfSRC;
+			aSPC[trd].n_run++;
+			aSPC[trd].trd = std::thread( TRDspc, aSPC+trd );
+		}
+
+
+		gpmMcpy( aSPC[trd].sPATH, pPATH, nDIR )[nDIR] = 0;
+		aSPC[trd].pDIR = aSPC[trd].sPATH + nDIR;
+
+
+		// space trg
+		aSPC[trd].spcWH = *gpapP[0];
+
+		aSPC[trd].pSspc =
+		aSPC[trd].pFspc = gpapP[0] ? (U1x4*)gpapP[0]->pixels : NULL;
+
+		aSPC[trd].pMAP	= ((U4x4*)(aSPC[trd].pSspc + 320*aSPC[trd].spcWH.x))+i;
+
+		aSPC[trd].pSspc += (of4x4 + I4x2(32,320+32))*trfSPC;
+		aSPC[trd].pFspc += (of2x2 + (of4x4&I4x2(64,32)) + I4x2(320,320))*trfSPC;
+		aSPC[trd].pBspc = aSPC[trd].pFspc + I4x2(0,160)*trfSPC;
+
+
+		// penna pici
+		aSPC[trd].pSpen =
+		aSPC[trd].pBpen =
+		aSPC[trd].pFpen 	= gpapP[2] ? (U1x4*)gpapP[2]->pixels : NULL;
+
+		// cpy picii
+		aSPC[trd].pScpy =
+		aSPC[trd].pBcpy =
+		aSPC[trd].pFcpy 	= gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
+
+
+	}
+	// egyet a föszálban is csinálunk, hogy ne join-nel teljen az idő
+	// legjobb ha mind végez míg ez
+	aSPC[trd].loop();
+
+	for( U4 i = 0; i <= trd; i++ )
+	if( aSPC[i].n_join < aSPC[i].n_run )
+	{
+		aSPC[i].trd.join();
+		aSPC[i].n_join = aSPC[i].n_run;
+	}
+
+	pREF = NULL;
+}

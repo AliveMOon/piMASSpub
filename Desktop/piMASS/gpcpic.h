@@ -659,8 +659,11 @@ public:
 
 		return pTX = SDL_CreateTextureFromSurface( pRNDR, pREF );
 	}
+	U1x4* TOOLspace0(	gpcLZYall& MANus, gpcPIC** ppPIC,
+						char* pNAME, char *pPATH, char *pFILE );
 	U1x4* TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 						char* pNAME, char *pPATH, char *pFILE );
+
 	U1x4* TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 						char* pNAME, char *pPATH, char *pFILE );
 

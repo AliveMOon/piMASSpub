@@ -233,8 +233,8 @@ void main()
   d2	  
  
  trg = "mask";
- trgw = 480;
- trgh = 480;
+ trgw = 640;
+ trgh = 896;
  
  pico="space";
  pici="maski";
@@ -376,8 +376,8 @@ void main()
 //0780| c3	  
  
  trg = "space";
- trgw = 512;
- trgh = 512;
+ trgw = 640;
+ trgh = 896;
  
  picO="cam1";
  pici="mask";

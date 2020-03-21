@@ -790,8 +790,7 @@ public:
 		a *= z;
 		return a;
     }
-	U1 mn() const
-	{
+	U1 mn() const {
 		U1 o = x;
 		if( o > y )
 			o = y;
@@ -802,8 +801,7 @@ public:
 
 		return o;
 	}
-	U1 mx() const
-	{
+	U1 mx() const {
 		U1 o = x;
 		if( o < y )
 			o = y;
@@ -815,8 +813,7 @@ public:
 		return o;
 	}
 
-	U1 mn_xyz() const
-	{
+	U1 mn_xyz() const {
 		U1 o = x;
 		if( o > y )
 			o = y;
@@ -825,8 +822,7 @@ public:
 
 		return o;
 	}
-	U1 mx_xyz() const
-	{
+	U1 mx_xyz() const {
 		U1 o = x;
 		if( o < y )
 			o = y;
@@ -1155,6 +1151,27 @@ public:
 
 		return *this;
 	}
+	U1x4 operator & ( U4 b ) const { return u4&b; }
+	U1x4 operator | ( U4 b ) const { return u4|b; }
+	U1x4 operator ^ ( U4 b ) const { return u4^b; }
+
+
+	U1x4 operator & ( U1 b ) const {
+		if( !b )
+			return 0;
+
+		return u4&(0x1010101*(U4)b);
+	}
+	U1x4 operator | ( U1 b ) const {
+		if( !b )
+			return 0;
+
+		return u4|(0x1010101*(U4)b);
+	}
+	U1x4 operator ^ ( U1 b ) const {
+		return u4^(0x1010101*(U4)b);
+	}
+
 
 	U1x4 operator << ( I1 b ) const {
 		if( !b )
@@ -1710,8 +1727,17 @@ public:
     }
     U4x2( const I8x2& an );
     U4x2( const I4x2& i42 );
-
-    U4x2& operator = ( const I8x2& an );
+	U4x2( const SDL_Surface& srf )
+	{
+		x = srf.w;
+		y = srf.h;
+	}
+    U4x2& operator = ( const SDL_Surface& srf ) {
+		x = srf.w;
+		y = srf.h;
+		return *this;
+	}
+	U4x2& operator = ( const I8x2& an );
 	// cnt = fract * U4x2(1, w);
     U4 strA4Nplus( U1* pBUFF )
     {
@@ -2434,6 +2460,16 @@ public:
         //x = b.x;
         //y = b.y;
     }
+    I4x2( const SDL_Surface& srf )
+	{
+		x = srf.w;
+		y = srf.h;
+	}
+    I4x2& operator = ( const SDL_Surface& srf ) {
+		x = srf.w;
+		y = srf.h;
+		return *this;
+	}
     I4x2( U8x2 b );
     I4x2( I8x2 b );
     I4x2( int* pI )
