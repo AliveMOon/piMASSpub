@@ -1041,7 +1041,18 @@ void TRDspc( gpcTRDspc* pT ) {
 }
 U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 							char* pNAME, char *pPATH, char *pFILE ) {
-	gpapP[0] = surDRW();			// space 	TRG
+
+	if( pSRF )
+	if( pSRF->w*pSRF->h != 640*896 )
+		gpmSDL_FreeSRF( pSRF );
+	if( !pSRF ) {
+		txWH.a4x2[1] = I4x2(640,896);
+		pSRF = SDL_CreateRGBSurface( 0, txWH.z, txWH.w, 32, 0,0,0,0 );
+	}
+	aiQC[0] = aiQC[1]+1;
+	pREF = NULL;
+	gpmZ(gpapP);
+	gpapP[0] = pSRF;				// space 	TRG
 	gpapP[1] = ppPIC[0]->surDRW();	// cam		pico
 	gpapP[2] = ppPIC[1]->surDRW();	// penna	pici
 	gpapP[3] = ppPIC[2]->surDRW();	// cpy		picii
@@ -1080,7 +1091,6 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			aSPC[trd].trd = std::thread( TRDspc, aSPC+trd );
 		}
 
-
 		gpmMcpy( aSPC[trd].sPATH, pPATH, nDIR )[nDIR] = 0;
 		aSPC[trd].pDIR = aSPC[trd].sPATH + nDIR;
 
@@ -1090,7 +1100,6 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 		aSPC[trd].pSspc =
 		aSPC[trd].pFspc = gpapP[0] ? (U1x4*)gpapP[0]->pixels : NULL;
-
 		aSPC[trd].pMAP	= ((U4x4*)(aSPC[trd].pSspc + 320*aSPC[trd].spcWH.x))+i;
 
 		aSPC[trd].pSspc += (of4x4 + I4x2(32,320+32))*trfSPC;
@@ -1100,14 +1109,20 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 		// penna pici
 		aSPC[trd].pSpen =
-		aSPC[trd].pBpen =
-		aSPC[trd].pFpen 	= gpapP[2] ? (U1x4*)gpapP[2]->pixels : NULL;
+		aSPC[trd].pFpen = gpapP[2] ? (U1x4*)gpapP[2]->pixels : NULL;
+
+		aSPC[trd].pSpen += (of4x4 + I4x2(32,320+32))*trfSPC;
+		aSPC[trd].pFpen += (of2x2 + (of4x4&I4x2(64,32)) + I4x2(320,320))*trfSPC;
+		aSPC[trd].pBpen = aSPC[trd].pFpen + I4x2(0,160)*trfSPC;
+
 
 		// cpy picii
 		aSPC[trd].pScpy =
-		aSPC[trd].pBcpy =
-		aSPC[trd].pFcpy 	= gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
+		aSPC[trd].pFcpy = gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
 
+		aSPC[trd].pScpy += (of4x4 + I4x2(32,320+32))*trfSPC;
+		aSPC[trd].pFcpy += (of2x2 + (of4x4&I4x2(64,32)) + I4x2(320,320))*trfSPC;
+		aSPC[trd].pBcpy = aSPC[trd].pFcpy + I4x2(0,160)*trfSPC;
 
 	}
 	// egyet a föszálban is csinálunk, hogy ne join-nel teljen az idő
@@ -1121,5 +1136,5 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		aSPC[i].n_join = aSPC[i].n_run;
 	}
 
-	pREF = NULL;
+
 }
