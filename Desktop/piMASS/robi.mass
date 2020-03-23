@@ -12,7 +12,7 @@
  f = fps; 
   b1	 
  pic = 	//"cam1";
- 		"gui";
+ 	"gui";
  unsel = 1;
   c1	 
  name="head"
@@ -20,72 +20,116 @@
 
 #version 120																
 varying vec2 fr_uv;														
-uniform sampler2D	tex0,
-					tex1;
+uniform sampler2D	tex0,	// cam1
+					tex1;	// mask // pena
+			//tex2;	// space
 uniform vec2		tgPX;					
 uniform vec2		aTX[8];		
-uniform vec4 		aCNL[8];											
+uniform vec4 		aCNL[8];
+
+#define v2base	vec2(20.0, 28.0)
+#define v2out	vec2(20.0, 10.0)
+#define v2frnt	vec2(10.0, 10.0)
+#define v2back	vec2(10.0, 15.0)
+#define v2fbWH	vec2(10.0, 5.0)
+#define v2spc	vec2(10.0,20.0)
+
+#define v2rg	vec2( 8.0, 8.0)
+#define v2bg	vec2(-8.0, 8.0)
+#define v2br	vec2(-8.0,-8.0)
+
+#define v2rgB	(vec2( 8.0, 8.0)/v2base)
+#define v2bgB	(vec2(-8.0, 8.0)/v2base)
+#define v2brB	(vec2(-8.0,-8.0)/v2base)
+
+#define v2outB	(v2out/v2base)
+#define v2spcB	(v2spc/v2base)
+#define v2frntB (v2frnt/v2base)
+#define v2backB (v2back/v2base)
+#define v2fbWHB (v2fbWH/v2base) 	
+
+#define	v2src	vec2(320,160)	 
+
 void main()																
-{	
-	gl_FragColor = vec4(0,0,0,1);
- 	vec2	flpUV = fr_uv*vec2(1,-1) + vec2(0,1),
- 			crs = abs(
- 						flpUV*tgPX - aCNL[0].xy
- 					);
-	vec3	c = vec3(0,0,0), r = c, 
-			a = texture2D( tex0, flpUV ).rgb,	// cam
-			b = texture2D( tex1, flpUV ).rgb;	// mask
-	if( flpUV.y < (15.0/31.0) )
+{
+	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1), Suv;
+	
+	gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );	// mask
+	vec3	src = vec3(0,0,0),
+			spc = vec3(0,0,0);
+	
+	if( fUV.y < v2outB.y )
 	{
-		c = texture2D(	tex0, 
-						flpUV
-						/ vec2(1.0,15.0/31.0)
-					).rgb;
-		r = texture2D(	tex1,
-						(c.rg*vec2(8.0,8.0)+vec2(8.0,23.0))/vec2(30.0,31.0)
-						//*vec2(1,-1) + vec2(0,1) 
-					).rgb
-			*texture2D(	tex1,
-						(c.bg*vec2(-8.0,8.0)+vec2(8.0,23.0))/vec2(30.0,31.0)
-						//*vec2(1,-1) + vec2(0,1) 
-					).rgb
-			*texture2D(	tex1,
-						(c.br*vec2(-8.0,-8.0)+vec2(8.0,23.0))/vec2(30.0,31.0)
-						//*vec2(1,-1) + vec2(0,1) 
-					).rgb;
- 		if( length(r-vec3(1,0,0))<1.0 )
- 			r = vec3(3,0,0);
- 		else if( length(r-vec3(0,1,0))<1.0 )
- 			r = vec3(0,3,0);
- 		else if( length(r-vec3(0,0,1))<1.0 )
- 			r = vec3(0,0,3);
+		vec2	sUV = fUV/v2outB,
+				Ouv = floor(sUV*4.0)/255.0;
+		Suv = floor(sUV*v2src);
+		src	= ( floor(texture2D( tex0, sUV ).rgb*64.0)*4.0 )/255.0;
+		gl_FragColor.rgb += src/3.0;
+		
+		spc	= texture2D( tex1, ((src.rg+Ouv)*v2rg+v2spc)/v2base ).rgb
+			* texture2D( tex1, ((src.bg+Ouv)*v2bg+v2spc)/v2base ).rgb
+			* texture2D( tex1, ((src.br+Ouv)*v2br+v2spc)/v2base ).rgb;
+		
+		if( length(spc-vec3(1,0,0))<1.0 )
+ 			spc = vec3(3,0,0);
+ 		else if( length(spc-vec3(0,1,0))<1.0 )
+ 			spc = vec3(0,3,0);
+ 		else if( length(spc-vec3(0,0,1))<1.0 )
+ 			spc = vec3(0,0,3);
  		else
- 			r =vec3(0,0,0);	
+ 			spc = vec3(0,0,0);
+ 		
+ 		gl_FragColor.rgb = max( spc, gl_FragColor.rgb );
 	}
-	else if( flpUV.x < 16.0/30.0 )
+	else if( fUV.y < v2spcB.y )
 	{
-		c.rg  = max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2( 1.0, 1.0))/8.0;
-		c.bg += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0, 1.0))/8.0;
-		c.br += max(vec2(0.0,0.0), (flpUV*30.0 - vec2(8.0,23.0))*vec2(-1.0,-1.0))/8.0;
- 	}
-	else if( flpUV.y < (22.0/31.0) )
-	{
-		c = texture2D(	tex0, 
-						(flpUV-vec2(16.0/30.0,15.0/31.0))
-						/ vec2(14.0/30.0,7.0/31.0)
-					).rgb*2.0;
+		if( fUV.x < v2spcB.x )
+		{
+			spc.br = (fUV-v2spcB)/v2brB;
+			if( spc.r > 1.0 )
+			{
+				if( spc.b < 0.25 )
+					gl_FragColor.r = 1.0;
+				else if( spc.b < 0.5 )
+					gl_FragColor.g = 1.0;
+				else if( spc.b < 0.75 )
+					gl_FragColor.b = 1.0;
+			}
+			else if( max(spc.b,spc.r) < 1.0 )
+				gl_FragColor.br += floor(spc.br*16.0)/48.0;
+		} else {
+			if( fUV.y < v2backB.y )
+			{
+				src = texture2D( tex0, (fUV-v2frntB)/v2fbWHB ).rgb/3.0;
+				gl_FragColor.rgb = max( src, gl_FragColor.rgb );
+			}
+		}
+		
+	} else {
+		if( fUV.x < v2spcB.x )
+		{
+			spc.bg = (fUV-v2spcB)/v2bgB;
+			if( max(spc.b,spc.g) < 1.0 )
+				gl_FragColor.bg += floor(spc.bg*16.0)/48.0;
+		} else {
+			spc.rg = (fUV-v2spcB)/v2rgB;
+			if( max(spc.r,spc.g) < 1.0 )
+				gl_FragColor.rg += floor(spc.rg*16.0)/48.0;
+		}
 	}
-	gl_FragColor.rgb = (max( r,b*3.0)+c)/6.0;
- 	gl_FragColor.b += 1 - min( 1, min(abs(crs.x),abs(crs.y)) );
- 	 
- }	
+	
+	
+	
+	vec2 crs = abs( fUV*tgPX - aCNL[0].xy );
+	gl_FragColor.b += 1 - min( 1, min(abs(crs.x),abs(crs.y)) );
+}	
   "  
  
  pico = "exp" d1	 
  
  trg = "gui";
- trgw = 480;
- trgh = 480;
+ trgw = 640;
+ trgh = 896;
  
  pico="cam1";
  pici="mask";
@@ -193,40 +237,86 @@ uniform sampler2D	tex0,	// space
 					tex2;	// src pl.: cam	
 uniform vec2		tgPX;					
 uniform vec2		aTX[8];		
-uniform vec4 		aCNL[8];											
+uniform vec4 		aCNL[8];
+
+#define v2base	vec2(20.0, 28.0)
+											
+#define v2out	vec2(20.0, 10.0)
+#define v2outB	(v2out/v2base)
+
+#define v2spc	vec2(10.0,20.0)
+#define v2spcB	(v2spc/v2base)
+#define v2rg	vec2( 8.0, 8.0)
+#define v2rgB	(v2rg/v2base)
+
+
+#define v2fbWH	vec2(10.0, 5.0)
+#define v2fbWHB (v2fbWH/v2base)
+
+#define v2frnt	vec2(v2spc.x,v2out.y)
+#define v2frntB (v2frnt/v2base)
+
+#define v2back	(v2frnt+vec2(0.0,v2fbWH.y))
+#define v2backB (v2back/v2base)
+#define v2pen	vec2(19.0,21.0)
+#define v2penB	(v2pen/v2base)
 void main()																
 {																		
-	gl_FragColor = vec4(0,0,0,1);
- 	vec2	flpUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
- 			crs = abs( flpUV*tgPX - aCNL[0].xy );
-	vec3	a = vec3(0,0,0), 
-			b = texture2D( tex1, flpUV ).rgb * min(1,aTX[1].x);				
-	if( flpUV.y>(15.0/31.0) ) 
-	if( flpUV.x<(16.0/30.0) ) 
-	{
-		a = texture2D( tex0, 
-							(flpUV-vec2(0,15.0/31.0)) 
-							/vec2(16.0/30.0,16.0/31.0)
-					).rgb;
-	}
-	else if( flpUV.y>(22.0/31.0) ) 
-	{
-		vec2 crs2 = abs(
-						flpUV*tgPX 
-						- (aCNL[0].xy + tgPX*vec2(0,7.0/31.0))
- 					);
-		if( (length(crs2)/4.0) < 1 )
-		{
-			b = texture2D( tex2, 
-							(flpUV-vec2(16.0/30.0,22.0/31.0))
-							/vec2(14.0/30.0,7.0/31.0)
-						).rgb;
-		}
-	} 
+	vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0);
 	
- 	gl_FragColor.rgb = max( a, b );
-	if( (length(crs)/4.0) < 1.0 )
-		gl_FragColor.rgb = vec3( 0.0, 1.0, 0.0 );
+	// maski // CPY
+	float valid = min(1,aTX[1].x);
+	if( valid > 0.0 )
+		gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );
+	else
+		gl_FragColor = vec2( 0, 1.0 ).xxxy;
+	
+	if(  
+		   ( fUV.y < v2backB.y )
+		|| ( fUV.y > v2spcB.y  )
+		|| ( fUV.x < v2backB.x ) 	
+	)	
+		gl_FragColor.rgb = floor(gl_FragColor.rgb/0.99); 
+	
+	vec2	cUV = aCNL[0].xy/tgPX,
+			crs = abs(fUV-cUV)*tgPX;
+	
+	if(	
+		  ( fUV.x > (v2spcB.x+v2rgB.x) ) 
+		&&( fUV.y > v2spcB.y )
+		&&( fUV.y < (v2spcB.y+v2rgB.y*0.25) )
+	)
+	{
+		if(
+			   ( cUV.y > v2outB.y ) 
+			&& ( cUV.y < (v2outB.y+v2rgB.y*0.25) ) 
+		    && ( cUV.x < v2spcB.x )
+		)
+		{
+			vec3 brs = texture2D( tex1, floor(cUV*v2base + 0.5)/v2base ).rgb*valid;
+			if( max(brs.r,max(brs.g,brs.b)) < (1.0/3.0) )
+			{
+				float b = floor( (v2spcB.x-cUV.x)*8.0 );
+				if( b <= 1.0 )
+					brs = vec2(1.0, 0.0).xyy;
+				else if( b <= 2.0 )
+					brs = vec2(1.0, 0.0).yxy;
+				else if( b <= 3.0 )
+					brs = vec2(1.0, 0.0).yyx;
+				else
+					brs *= 0.0;
+			}
+			gl_FragColor.rgb = brs;
+		}
+		
+	} 
+	else if( (length(crs)/4.0) < 1.0 ) 
+	{
+		
+			gl_FragColor.rgb = texture2D( tex1, v2penB ).rgb*valid;
+	}
+		
+	
 }	
   "
  pico = "dilet"  

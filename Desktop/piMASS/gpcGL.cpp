@@ -451,12 +451,13 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 			frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
 		}
-	} else {
-		pFRG = (char*)pSfrg;
-		frgLOG.lzyRST();
-		frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
-		nSUCC |= 2;
+		return isSUCC;
 	}
+
+	pFRG = (char*)pSfrg;
+	frgLOG.lzyRST();
+	frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
+	nSUCC |= 2;
 	return isSUCC;
 }
 
