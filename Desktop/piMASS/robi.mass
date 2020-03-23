@@ -21,7 +21,7 @@
 #version 120																
 varying vec2 fr_uv;														
 uniform sampler2D	tex0,	// cam1
-					tex1;	// mask // pena
+					tex1;	// penna
 			//tex2;	// space
 uniform vec2		tgPX;					
 uniform vec2		aTX[8];		
@@ -54,7 +54,7 @@ void main()
 {
 	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1), Suv;
 	
-	gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );	// mask
+	gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );	// penna
 	vec3	src = vec3(0,0,0),
 			spc = vec3(0,0,0);
 	
@@ -86,7 +86,7 @@ void main()
 		if( fUV.x < v2spcB.x )
 		{
 			spc.br = (fUV-v2spcB)/v2brB;
-			if( spc.r > 1.0 )
+			/*if( spc.r > 1.0 )
 			{
 				if( spc.b < 0.25 )
 					gl_FragColor.r = 1.0;
@@ -95,7 +95,7 @@ void main()
 				else if( spc.b < 0.75 )
 					gl_FragColor.b = 1.0;
 			}
-			else if( max(spc.b,spc.r) < 1.0 )
+			else*/ if( max(spc.b,spc.r) < 1.0 )
 				gl_FragColor.br += floor(spc.br*16.0)/48.0;
 		} else {
 			if( fUV.y < v2backB.y )
@@ -132,7 +132,7 @@ void main()
  trgh = 896;
  
  pico="cam1";
- pici="mask";
+ pici="penna";
  picII="space";
  cnlx = trgw*ix/iw;
  cnly = trgh*iy/ih;
@@ -142,7 +142,7 @@ void main()
 
  f = fps; 
   e1	 					 		
- pic = "mask"; //d2.trg;
+ pic = "penna"; //d2.trg;
  unsel = 1;  f1	 
  
  trg = "dilet"
@@ -227,7 +227,7 @@ void main()
 //	oabc    0.00dg,    0.00dg,    0.00dg 
 //	tabc    0.00dg,    0.00dg,    0.00dg;"
  c2	  
- name="pena"
+ name="penna"
 pix ="
 
 #version 120																
@@ -271,50 +271,52 @@ void main()
 	else
 		gl_FragColor = vec2( 0, 1.0 ).xxxy;
 	
-	if(  
-		   ( fUV.y < v2backB.y )
-		|| ( fUV.y > v2spcB.y  )
-		|| ( fUV.x < v2backB.x ) 	
-	)	
+	if( ( fUV.x < v2backB.x ) || (fUV.y<v2backB.y) || (fUV.y>v2spcB.y) )
+	{
 		gl_FragColor.rgb = floor(gl_FragColor.rgb/0.99); 
-	
+		if( (fUV.y<(v2spcB.y-v2rgB.y)) && (fUV.y>v2outB.y) )
+		{
+			float c = v2backB.x-fUV.x;
+			if( c > 0 )
+			if( c < 0.125 )
+				gl_FragColor.r = 1.0;
+			else if( c < 0.25 )
+				gl_FragColor.g = 1.0;
+			else if( c < 0.375 )
+				gl_FragColor.b = 1.0;
+		}
+	}
 	vec2	cUV = aCNL[0].xy/tgPX,
 			crs = abs(fUV-cUV)*tgPX;
 	
+	bool b_pat = ( cUV.y > v2outB.y ) 
+			&& ( cUV.y < (v2outB.y+v2rgB.y*0.25) ) 
+		    && ( cUV.x < v2spcB.x );	
 	if(	
 		  ( fUV.x > (v2spcB.x+v2rgB.x) ) 
 		&&( fUV.y > v2spcB.y )
 		&&( fUV.y < (v2spcB.y+v2rgB.y*0.25) )
-	)
+	) // a kijelölt szin négyzetében van a textura
 	{
-		if(
-			   ( cUV.y > v2outB.y ) 
+		if(	b_pat
+			/*   ( cUV.y > v2outB.y ) 
 			&& ( cUV.y < (v2outB.y+v2rgB.y*0.25) ) 
-		    && ( cUV.x < v2spcB.x )
-		)
+		    && ( cUV.x < v2spcB.x )*/
+		) // paletán van megváltoztatjuk
 		{
-			vec3 brs = texture2D( tex1, floor(cUV*v2base + 0.5)/v2base ).rgb*valid;
-			if( max(brs.r,max(brs.g,brs.b)) < (1.0/3.0) )
-			{
-				float b = floor( (v2spcB.x-cUV.x)*8.0 );
-				if( b <= 1.0 )
-					brs = vec2(1.0, 0.0).xyy;
-				else if( b <= 2.0 )
-					brs = vec2(1.0, 0.0).yxy;
-				else if( b <= 3.0 )
-					brs = vec2(1.0, 0.0).yyx;
-				else
-					brs *= 0.0;
-			}
-			gl_FragColor.rgb = brs;
+			float c = v2backB.x-cUV.x;
+			if( c > 0.0 )
+			if( c <= 0.125 )
+				gl_FragColor.rgb = vec2(1.0, 0.0).xyy;
+			else if( c <= 0.25 )
+				gl_FragColor.rgb = vec2(1.0, 0.0).yxy;
+			else if( c <= 0.375 )
+				gl_FragColor.rgb = vec2(1.0, 0.0).yyx;
 		}
 		
-	} 
-	else if( (length(crs)/4.0) < 1.0 ) 
-	{
-		
-			gl_FragColor.rgb = texture2D( tex1, v2penB ).rgb*valid;
-	}
+	} else	if( !b_pat )
+			if( (length(crs)/8.0) < 1.0 ) 
+				gl_FragColor.rgb = texture2D( tex1, v2penB ).rgb*valid;
 		
 	
 }	
@@ -322,7 +324,7 @@ void main()
  pico = "dilet"  
   d2	  
  
- trg = "mask";
+ trg = "penna";
  trgw = 640;
  trgh = 896;
  
@@ -334,7 +336,7 @@ void main()
  cnlz = d1.cnlz;
  cnlw = d1.cnlw;
  cnlIx = 2
- gpu="pena";
+ gpu="penna";
  piccpy = mlb;
  f = fps;
    e2	 
@@ -470,7 +472,7 @@ void main()
  trgh = 896;
  
  picO="cam1";
- pici="mask";
+ pici="penna";
  picii="maski";
  tool = 1;
  f = fps;
