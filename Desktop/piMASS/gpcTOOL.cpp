@@ -859,10 +859,19 @@ public:
 		/// LOAD
 		SDL_Surface* pSRF = IMG_Load( (char*)sPATH );
 		if( !pSRF )
+		{
+			/*U4	//of = (id&1)+((id>>2)&1),
+				shf8 = (id%3)*8;
+			for( U4 y = 0; y < 0x40; y+=2 )
+			for( U4 x = 0, ixy = x+y*spcWH.x; x < 0x80; x+=2, ixy+=2 )
+			{
+				pFspc[ixy] = (U4)255<<shf8;
+			}*/
 			return NULL;
+		}
 		// helyére pakolász
 		U1x4 *p_s = (U1x4*)pSRF->pixels;
-		//								//	w		all = dm*h			ds	dm		ss	sm
+		//								//	w		all = dm*h		ds	dm			ss	sm
 		// rndTRG_CPY-ből a SPaCe		//
 		pSspc[0]
 		.cpyX( 	p_s,						0x40*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	0x80 );
@@ -910,8 +919,9 @@ public:
 			.an2str( pRAM, (U1*)".kill", true, true );
 			rename( (char*)sPATH, (char*)sRAM );
 		}
-		std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;
+
 		gpmSTRCPY(pRAM,pDIR);
+		std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;
 		if( int err = rename( (char*)sRAM, (char*)sPATH ) )
 		{
 			gpcLZY load; U8 s = 0;
@@ -942,27 +952,30 @@ public:
 		U1* p_s = (U1*)pSRC;
 		U4	of = (id&1)+((id>>2)&1),
 			of4 = of<<2,
-			shf8 = (id%3)*8;
-		for( U4 y = 0, ys = srcWH.x*4; y < 0x100; y+=4 )
-		for( U4 x = (y+of4)&4, ixy = x+y*ys; x < 0x200; x+=8, ixy+=8 )
+			shf8 = (id%3)*8,
+			nXY = 0;
+		for( U4 y = 0, ys = srcWH.x*4; y < 0x80; y+=4 )
+		for( U4 x = 0, //(of4+y)&4,
+				ixy = x+y*ys; x < 0x100; x+=8, ixy+=8 )
 		{
+			//pSPC[(x+y*spcWH.x)] = (U4)255<<shf8;
+			nXY++;
 			c = (U1x4)(p_s[ixy*3])>>2;
-			pSPC[(x+y*spcWH.x)>>2] = (U4)255<<shf8;
 			aHISTI[c.x].x++;
 			aHISTI[c.y].y++;
 			aHISTI[c.z].z++;
 		}
-
+		nXY /= 2;
 		for( x05.w = 1; x05.w < 0x40; x05.w++ )
 		{
 			// 0x40*0x10 a 0x40*0x20 szelet felét kell elérni
 			// x05 azaz x0.5
 			aHISTI[x05.w] += aHISTI[x05.w-1];
-			if( aHISTI[x05.w].x < 0x40*0x10 )
+			if( aHISTI[x05.w].x < nXY )
 				x05.x = x05.w;
-			if( aHISTI[x05.w].y < 0x40*0x10 )
+			if( aHISTI[x05.w].y < nXY )
 				x05.y = x05.w;
-			if( aHISTI[x05.w].z < 0x40*0x10 )
+			if( aHISTI[x05.w].z < nXY )
 				x05.z = x05.w;
 		}
 
@@ -1084,7 +1097,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
-	gpcTRDspc aSPC[0x10];
+	gpcTRDspc aSPC[0x20];
 	U4 trd = 0;
 
 	// cam pico
@@ -1095,7 +1108,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 
 
-	I4x2	of4x4 = 0,//of2x2,
+	I4x2	of4x4 = 0, of2x2,
 			trfSPC(1, gpapP[0]->w ),
 			trfSRC(1, gpapP[1]->w );
 
@@ -1114,6 +1127,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		}
 
 		of4x4 = I4x2(i%4,i/4);
+		of2x2 = of4x4%2;
 
 		gpmMcpy( aSPC[i].sPATH, pPATH, nDIR )[nDIR] = 0;
 		aSPC[i].pDIR = aSPC[i].sPATH + nDIR;
@@ -1128,7 +1142,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		aSPC[i].pMAP	= ((U4x4*)(aSPC[i].pSspc + 320*aSPC[i].spcWH.x))+i;
 
 		aSPC[i].pSspc 	+= (of4x4 + I4x2(32,320+32)) *trfSPC;
-		aSPC[i].pFspc 	+= ((of4x4&I4x2(0x20,0x10)) + I4x2(320,320))*trfSPC;
+		aSPC[i].pFspc 	+= (of2x2 + (of4x4&I4x2(0x40,0x20)) + I4x2(320,320))*trfSPC;
 		aSPC[i].pBspc 	= aSPC[i].pFspc + I4x2(0,160)*trfSPC;
 
 
@@ -1151,7 +1165,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		aSPC[i].pFcpy 	+= aSPC[i].pFspc-aSPC[i].pSPC;
 		aSPC[i].pBcpy 	+= aSPC[i].pBspc-aSPC[i].pSPC;
 
-		aSPC[i].pSPC 	+= (of4x4&I4x2(0x40,0x20)) * trfSPC;
+		aSPC[i].pSPC 	+= (of2x2*2 + (of4x4&I4x2(0x40,0x20))) * trfSPC;
 	}
 	// egyet a föszálban is csinálunk, hogy ne join-nel teljen az idő
 	// legjobb ha mind végez míg ez

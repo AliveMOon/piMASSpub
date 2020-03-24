@@ -268,7 +268,7 @@ void main()
 				gl_FragColor.b = 1.0;
 		}
 	} else {
-		if( (length(crs-v2penOFbPIX)/8.0) < 1.0 ) 
+		if( (length(crs-v2penOFbPIX)/6.0) < 1.0 ) 
 			gl_FragColor.rgb = texture2D( tex2, (fUV-v2backB)/v2fbWHB ).rgb*valid;
 	}
 	
@@ -302,7 +302,7 @@ void main()
 	} 
 	else if( !b_pat )
 	{
-		if( (length(crs)/8.0) < 1.0 ) 
+		if( (length(crs)/6.0) < 1.0 ) 
 			gl_FragColor.rgb = texture2D( tex1, v2patB ).rgb*valid;
 
 	}
