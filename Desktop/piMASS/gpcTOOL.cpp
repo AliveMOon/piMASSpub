@@ -857,6 +857,8 @@ public:
 		(ALFid+I8x2(0,pMAP->x))
 		.an2str( pDIR, (U1*)"spc.png", true, true );
 		/// LOAD
+		if( id < 4 )
+			return NULL;
 		SDL_Surface* pSRF = IMG_Load( (char*)sPATH );
 		if( !pSRF )
 		{
@@ -871,17 +873,25 @@ public:
 		}
 		// helyére pakolász
 		U1x4 *p_s = (U1x4*)pSRF->pixels;
-		//								//	w		all = dm*h		ds	dm			ss	sm
+		U4 ptch = pSRF->w;
+		if( ptch != pSRF->pitch/sizeof(*p_s) )
+		{
+			ptch = pSRF->pitch/sizeof(*p_s);
+			std::cout	<< " food.w:"	<< pSRF->w
+						<< " pitch:"	<< ptch <<std::endl;
+		}
+		p_s->zyxw( NULL, ptch*0x80 );
+		//								//	dw		dwh = dsy*y		dsx	dsy			ssx	ssy
 		// rndTRG_CPY-ből a SPaCe		//
 		pSspc[0]
-		.cpyX( 	p_s,						0x40*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	0x80 );
+		.cpyX( 	p_s,						0x40*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	ptch );
 		pSspc[spcWH.x*0x100]
-		.cpyX( 	p_s+0x80*0x40,				0x80*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	0x80 );
+		.cpyX( 	p_s + ptch*0x40,			0x80*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	ptch );
 
 		// rndTRG_CPY-ből a FRONT
-		pFspc->cpyX( p_s+0x40, 				0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	0x80 );
+		pFspc->cpyX( p_s+0x40, 				0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	ptch );
 		// rndTRG_CPY-ből a BACK
-		pBspc->cpyX( p_s+0x40+0x80*0x20,	0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	0x80 );
+		pBspc->cpyX( p_s+0x40+ptch*0x20,	0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	ptch );
 		return pSRF;
 
 	}
@@ -891,17 +901,26 @@ public:
 
 		SDL_Surface* pSRF = SDL_CreateRGBSurface( 0, 0x80, 0x80, 32, 0,0,0,0 );
 		U1x4 *p_d = (U1x4*)pSRF->pixels;
+		U4 ptch = pSRF->w, ssy = spcWH.x;
+		if( ptch != pSRF->pitch/sizeof(*p_d) )
+		{
+			ptch = pSRF->pitch/sizeof(*p_d);
+			std::cout	<< " save.w:"	<< pSRF->w
+						<< " pitch:"	<< ptch <<std::endl;
+		}
+		// SPaCe
+		p_d[0x00]
+					//	dw		dwh = dsy*y		dsx	dsy		ssx	ssy
+		.cpyX( pSspc, 	0x80, 	ptch*0x80, 		1, 	ptch, 	4, 	ssy*4 );
 
-		// rndTRG_CPY-ből a SPaCe
-		((U1x4*)pSRF->pixels)[0]
-		.cpyX( pSspc, 0x80, 0x80*0x80, 1, 0x80, 4, spcWH.x*4 );
-
-		// rndTRG_CPY-ből a FRONT
-		((U1x4*)pSRF->pixels)[0x40]
-		.cpyX( pFspc, 0x40, 0x80*0x20, 1, 0x80, 2, spcWH.x*2 );
-		// rndTRG_CPY-ből a BACK
-		((U1x4*)pSRF->pixels)[0x40+0x80*0x20]
-		.cpyX( pBspc, 0x40, 0x80*0x20,	1, 0x80, 2, spcWH.x*2 );
+		// FRONT
+		p_d[0x40]
+					//	dw		dwh = dsy*y		dsx	dsy		ssx	ssy
+		.cpyX( pFspc, 	0x40,	ptch*0x20,		1,	ptch,	2,	ssy*2 );
+		// BACK
+		p_d[0x40+ptch*0x20]
+					//	dw		dwh = dsy*y		dsx	dsy		ssx	ssy
+		.cpyX( pBspc,	0x40,	ptch*0x20,		1,	ptch,	2,	ssy*2 );
 		if( bNO )
 			return pSRF;
 
@@ -921,12 +940,13 @@ public:
 		}
 
 		gpmSTRCPY(pRAM,pDIR);
-		std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;
 		if( int err = rename( (char*)sRAM, (char*)sPATH ) )
 		{
+			std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;
 			gpcLZY load; U8 s = 0;
 			load.lzyRD( (char*)sRAM, s, 1 );
 			load.lzyWR( (char*)sPATH, true );
+			remove((char*)sRAM);
 			//std::cout << " ERR " << err <<std::endl;
 
 		}
@@ -1024,27 +1044,63 @@ public:
 		if( !pFcpy )
 			return;
 
-		U1x4 fC, fP, bC, bP;
-		U4 n = 0, xyP;
-		I4x2 RG, BG, BR, trfT(1,spcWH.x);
-		for( U4 y = 0, ys = spcWH.x*2; y < 0x40; y+=2 )
-		for( U4 x = 0, ixy = y*ys; x < 0x80; x+=2, ixy+=2 )
+		U1x4 fC, fP, v;
+		U4 bC, bP, n = 0, xyP;
+		I4x2 trfT(1,spcWH.x);
+		for( U4 i = 0, iy = spcWH.x*2, ie = iy*0x20; i < ie; i += iy )
+		for( U4 x = i, xe = x+0x80; x < xe; x+=2 )
 		{
-			fP = pFpen[ixy];
+			fP.u4 = pFpen[x].u4&0xffffff;
+			if( !fP.mx_xyz() )
+				continue;
+			if( (pFcpy[x].u4&0xffffff) != fP.u4 )
+				continue;
+
+			bC = pBcpy[x].u4 & ~0x030303;
+			bP = pBpen[x].u4 & ~0x030303;
+			if( bC != bP )
+				continue;
+
+			pFspc[x] = fP;
+			pBspc[x].u4 =
+			v.u4 		=bP;
+
+			pBcpy[x] = pFcpy[x] = 0;
+
+			xyP = I4x2( 0x100+v.z, 0x100+v.y )*trfT;// RG
+			pSspc[xyP].u4 |= fP.u4;
+			xyP = I4x2( 0x100-v.x, 0x100+v.y )*trfT;// BG
+			pSspc[xyP].u4 |= fP.u4;
+			xyP = I4x2( 0x100-v.x, 0x100-v.z )*trfT;// BR
+			pSspc[xyP].u4 |= fP.u4;
+			n++;
+		}
+
+		/*I4x2 RG, BG, BR;
+		for( U4 y = 0, ys = spcWH.x;	y < 0x40; y+=2 )
+		for( U4 x = 0, ixy = y*ys;		x < 0x80; x+=2, ixy+=2 )
+		{
+			fP.u4 = pFpen[ixy].u4&0xffffff;
 			if( !fP.mx_xyz() )
 				continue;
 
-			if( pFcpy[ixy].u4 != fP.u4 )
+			if( (pFcpy[ixy].u4&0xffffff) != fP.u4 )
 				continue;
+
 			// a CPY ben is ugyan ez szerepel
 			bC = pBcpy[ixy] & (U4)~0x030303;
 			bP = pBpen[ixy] & (U4)~0x030303;
 			if( bC.u4!= bP.u4 )
 				continue;
 
-			RG = I4x2(  bP.z, bP.y )+255; // RG
-			BG = I4x2( -bP.x, bP.y )+255; // BG
-			BR = I4x2( -bP.x,-bP.z )+255; // BR
+			pFspc[ixy] = fP;
+			pBspc[ixy] = bP;
+
+			pBcpy[ixy] = pFcpy[ixy] = 0;
+
+			RG = I4x2( 0x100+bP.z, 0x100+bP.y ); // RG
+			BG = I4x2( 0x100-bP.x, 0x100+bP.y ); // BG
+			BR = I4x2( 0x100-bP.x, 0x100-bP.z ); // BR
 			xyP = RG*trfT;
 			pSspc[xyP].u4 |= fP.u4;
 			xyP = BG*trfT;
@@ -1052,7 +1108,7 @@ public:
 			xyP = BR*trfT;
 			pSspc[xyP].u4 |= fP.u4;
 			n++;
-		}
+		}*/
 		if( n )
 		{
 			// talált azonos pixeleket
@@ -1097,31 +1153,97 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
-	gpcTRDspc aSPC[0x20];
-	U4 trd = 0;
+	gpcTRDspc aSPC[0x10];
+	U4 e = gpmN(aSPC), trd = 0, nDIR = pDIR-pPATH;
 
 	// cam pico
-	aSPC[0].srcWH	= *gpapP[1];
 	aSPC[0].pSRC	= (U1x4*)gpapP[1]->pixels; // cam pico
+	aSPC[0].srcWH	= *gpapP[1];
+
+	aSPC[0].pSPC 	= (U1x4*)gpapP[0]->pixels;
+	aSPC[0].spcWH = *gpapP[0];
+	if( aSPC[0].spcWH.x != gpapP[0]->pitch/sizeof(*aSPC[0].pSPC) )
+	{
+		std::cout	<< " spcWH.x:"	<< aSPC[0].spcWH.x
+					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*aSPC[0].pSPC)) <<std::endl;
+		aSPC[0].spcWH.x = gpapP[0]->pitch/sizeof(*aSPC[0].pSPC);
+	}
+
+	I4x2	of4x4 = 0, of2x2,
+			trfSPC(1, aSPC[0].spcWH.x ),
+			trfSRC(1, aSPC[0].srcWH.x );
+
 	aSPC[0].ALFid 	= TnID;
 	aSPC[0].ALFid.num = 0;
 
+	aSPC[0].pSspc 	=
+	aSPC[0].pFspc 	=
+	aSPC[0].pSPC 	= (U1x4*)gpapP[0]->pixels;
+	aSPC[0].pMAP	= ((U4x4*)(aSPC[0].pSspc + 320*aSPC[0].spcWH.x));
+
+	aSPC[0].pSspc 	+= I4x2(32,320+32)*trfSPC;
+	aSPC[0].pFspc 	+= I4x2(320,320)*trfSPC;
+	aSPC[0].pBspc 	= aSPC[0].pFspc + I4x2(0,160)*trfSPC;
+
+	I4x4 ofSFB( aSPC[0].pSspc-aSPC[0].pSPC,
+				aSPC[0].pFspc-aSPC[0].pSPC,
+				aSPC[0].pBspc-aSPC[0].pSPC );
+
+	// penna pici
+	aSPC[0].pBpen	=
+	aSPC[0].pSpen 	=
+	aSPC[0].pFpen 	= (U1x4*)gpapP[2]->pixels;
+
+	aSPC[0].pSpen 	+= ofSFB.x;
+	aSPC[0].pFpen 	+= ofSFB.y;
+	aSPC[0].pBpen 	+= ofSFB.z;
 
 
-	I4x2	of4x4 = 0, of2x2,
-			trfSPC(1, gpapP[0]->w ),
-			trfSRC(1, gpapP[1]->w );
+	// cpy picii
+	aSPC[0].pBcpy	=
+	aSPC[0].pScpy	=
+	aSPC[0].pFcpy	= gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
 
-	for( U4 i = 0, e = gpmN(aSPC), nDIR = pDIR-pPATH; i <= e; trd = i, i++ )
+	aSPC[0].pScpy 	+= ofSFB.x;
+	aSPC[0].pFcpy 	+= ofSFB.y;
+	aSPC[0].pBcpy 	+= ofSFB.z;
+
+	gpmMcpy( aSPC[0].sPATH, pPATH, nDIR )[nDIR] = 0;
+	aSPC[0].pDIR = aSPC[0].sPATH + nDIR;
+	aSPC[0].id = trd = 0;
+
+	for( U4 i = 0; i <= e;  i++ )
 	{
 		if(i)
 		{
-			aSPC[trd].ALFid = aSPC[0].ALFid;
-			aSPC[trd].ALFid.num |= i<<8;
-			aSPC[trd].srcWH = aSPC[0].srcWH;
-			aSPC[trd].pSRC = aSPC[0].pSRC + (of4x4&I4x2(0x40,0x20))*trfSRC;
-			//aSPC[trd].n_run++;
-			//aSPC[trd].trd = std::thread( TRDspc, aSPC+trd );
+			memcpy( aSPC+trd, aSPC, gpmOFF(gpcTRDspc,trd) );
+
+			aSPC[trd].id = trd;
+			aSPC[trd].ALFid.num += aSPC[trd].id<<16;
+			aSPC[trd].pDIR = aSPC[trd].sPATH + nDIR;
+
+			ofSFB.x = (of4x4&I4x2(0x40,0x20))*trfSRC;
+			ofSFB.y = of4x4*trfSPC;
+			ofSFB.z = of2x2*trfSPC + ofSFB.x;
+			aSPC[trd].pSRC	+= ofSFB.x;
+
+			aSPC[trd].pSspc += ofSFB.y;
+			aSPC[trd].pFspc += ofSFB.z;
+			aSPC[trd].pBspc += ofSFB.z;
+
+			aSPC[trd].pSpen += ofSFB.y;
+			aSPC[trd].pFpen += ofSFB.z;
+			aSPC[trd].pBpen += ofSFB.z;
+
+			aSPC[trd].pScpy += ofSFB.y;
+			aSPC[trd].pFcpy += ofSFB.z;
+			aSPC[trd].pBcpy += ofSFB.z;
+
+			aSPC[trd].pSPC	+= ofSFB.z*2 - ofSFB.x;
+			aSPC[trd].pMAP	+= i;
+
+			aSPC[trd].n_run++;
+			aSPC[trd].trd = std::thread( TRDspc, aSPC+trd );
 			if( i>=e )
 				break;
 		}
@@ -1129,31 +1251,36 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		of4x4 = I4x2(i%4,i/4);
 		of2x2 = of4x4%2;
 
-		gpmMcpy( aSPC[i].sPATH, pPATH, nDIR )[nDIR] = 0;
-		aSPC[i].pDIR = aSPC[i].sPATH + nDIR;
+		//gpmMcpy( aSPC[i].sPATH, pPATH, nDIR )[nDIR] = 0;
+		//aSPC[i].pDIR = aSPC[i].sPATH + nDIR;
+		aSPC[i].id = trd = i;
 
-		aSPC[i].id = i;
-		aSPC[i].spcWH = *gpapP[0];
+		/*
 
 		// space trg
-		aSPC[i].pSPC 	=
 		aSPC[i].pSspc 	=
-		aSPC[i].pFspc 	= gpapP[0] ? (U1x4*)gpapP[0]->pixels : NULL;
+		aSPC[i].pFspc 	=
+		aSPC[i].pSPC 	= (U1x4*)gpapP[0]->pixels;
+
 		aSPC[i].pMAP	= ((U4x4*)(aSPC[i].pSspc + 320*aSPC[i].spcWH.x))+i;
 
 		aSPC[i].pSspc 	+= (of4x4 + I4x2(32,320+32)) *trfSPC;
 		aSPC[i].pFspc 	+= (of2x2 + (of4x4&I4x2(0x40,0x20)) + I4x2(320,320))*trfSPC;
 		aSPC[i].pBspc 	= aSPC[i].pFspc + I4x2(0,160)*trfSPC;
 
+		ofSFB.x = aSPC[i].pSspc-aSPC[i].pSPC;
+		ofSFB.y = aSPC[i].pFspc-aSPC[i].pSPC;
+		ofSFB.z = aSPC[i].pBspc-aSPC[i].pSPC;
+
 
 		// penna pici
 		aSPC[i].pBpen	=
 		aSPC[i].pSpen 	=
-		aSPC[i].pFpen 	= gpapP[2] ? (U1x4*)gpapP[2]->pixels : NULL;
+		aSPC[i].pFpen 	= (U1x4*)gpapP[2]->pixels;
 
-		aSPC[i].pSpen 	+= aSPC[i].pSspc-aSPC[i].pSPC;
-		aSPC[i].pFpen 	+= aSPC[i].pFspc-aSPC[i].pSPC;
-		aSPC[i].pBpen 	+= aSPC[i].pBspc-aSPC[i].pSPC;
+		aSPC[i].pSpen 	+= ofSFB.x;
+		aSPC[i].pFpen 	+= ofSFB.y;
+		aSPC[i].pBpen 	+= ofSFB.z;
 
 
 		// cpy picii
@@ -1161,22 +1288,23 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		aSPC[i].pScpy	=
 		aSPC[i].pFcpy	= gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
 
-		aSPC[i].pScpy 	+= aSPC[i].pSspc-aSPC[i].pSPC;
-		aSPC[i].pFcpy 	+= aSPC[i].pFspc-aSPC[i].pSPC;
-		aSPC[i].pBcpy 	+= aSPC[i].pBspc-aSPC[i].pSPC;
+		aSPC[i].pScpy 	+= ofSFB.x;
+		aSPC[i].pFcpy 	+= ofSFB.y;
+		aSPC[i].pBcpy 	+= ofSFB.z;
 
 		aSPC[i].pSPC 	+= (of2x2*2 + (of4x4&I4x2(0x40,0x20))) * trfSPC;
+	*/
 	}
 	// egyet a föszálban is csinálunk, hogy ne join-nel teljen az idő
 	// legjobb ha mind végez míg ez
-	trd = 5;
+	//trd = 2;
 	aSPC[trd].loop();
 
-	aSPC[6].loop();
+	/*aSPC[6].loop();
 	aSPC[9].loop();
-	aSPC[10].loop();
+	aSPC[10].loop();*/
 
-	if( trd == 15 )
+	if( trd >= e-1 )
 	for( U4 i = 0; i < trd; i++ )
 	if( aSPC[i].n_join < aSPC[i].n_run )
 	{

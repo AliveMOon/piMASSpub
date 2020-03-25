@@ -1221,20 +1221,24 @@ public:
 
 	U4 bugU1( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, I4 rg = 0, U4 nX = 0 );
 	U4 bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX = 0 );
+
 	U1x4* cpyX( U1x4 *p_s,
-				U4 w, 		U4 all,
-				U4 ds = 1,	U4 dm = 0,
-				U4 ss = 1,	U4 sm = 0 )
+				U4 dw, 		U4 dwh,
+				U4 dsx = 1,	U4 dsy = 0,
+				U4 ssx = 1,	U4 ssy = 0 )
 	{
 		U1x4* p_d = this;
-		for( U4 y = 0; y < all; y += dm )
-		{
-			for( U4 d = 0, s = 0; d < w; d += ds, s += ss )
+		for( U1x4*	p_de = p_d+dwh;
+
+					p_d < p_de;
+
+					p_d += dsy,
+					p_s += ssy )
+		for( U4 d = 0, s = 0; d < dw; d += dsx, s += ssx )
 				p_d[d] = p_s[s];
 
-			p_s += sm;
-			p_d += dm;
-		}
+
+
 	}
 };
 

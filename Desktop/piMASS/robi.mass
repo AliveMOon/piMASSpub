@@ -101,7 +101,7 @@ void main()
 				gl_FragColor.rg += floor(spc.rg*16.0)/48.0;
 		}
 	}
-
+	// szálkereszt
 	vec2 crs = abs( fUV*tgPX - aCNL[0].xy );
 	gl_FragColor.b += 1 - min( 1, min(abs(crs.x),abs(crs.y)) );
 }	
@@ -246,12 +246,11 @@ void main()
 			crs = abs(fUV-cUV)*tgPX;
 	
 	// maski // CPY
-	float valid = min(1,aTX[1].x);
-	if( valid > 0.0 )
-		gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );
+	float valid = min(1.0,aTX[1].x);
+	if( valid > 0.0 ) // MAX( CPY, SPaCe )
+		gl_FragColor = max( texture2D( tex1, fUV ), texture2D( tex0, fUV ) );
 	else
-		gl_FragColor = vec2( 0, 1.0 ).xxxy;
-	gl_FragColor.rgb = max( gl_FragColor.rgb, texture2D( tex0, fUV ).rgb );
+		gl_FragColor = texture2D( tex0, fUV );
 	
 	if( ( fUV.x < v2backB.x ) || (fUV.y<v2backB.y) || (fUV.y>v2spcB.y) )
 	{
@@ -267,12 +266,10 @@ void main()
 			else if( c < 0.375 )
 				gl_FragColor.b = 1.0;
 		}
-	} else {
-		if( (length(crs-v2penOFbPIX)/6.0) < 1.0 ) 
+	} 
+	else if( (length(crs-v2penOFbPIX)/6.0) < 1.0 ) 
 			gl_FragColor.rgb = texture2D( tex2, (fUV-v2backB)/v2fbWHB ).rgb*valid;
-	}
-	
-	
+		
 	bool b_pat = ( cUV.y > v2outB.y ) 
 			&& ( cUV.y < (v2outB.y+v2rgB.y*0.25) ) 
 		    && ( cUV.x < v2spcB.x );
@@ -281,13 +278,9 @@ void main()
 		  ( fUV.x > (v2spcB.x+v2rgB.x) ) 
 		&&( fUV.y > v2spcB.y )
 		&&( fUV.y < (v2spcB.y+v2rgB.y*0.25) )
-	) // a kijelölt szin négyzetében van a textura
+	) // a tinta szinénnek négyzetében van a textura
 	{
-		if(	b_pat
-			/*   ( cUV.y > v2outB.y ) 
-			&& ( cUV.y < (v2outB.y+v2rgB.y*0.25) ) 
-		    && ( cUV.x < v2spcB.x )*/
-		) // paletán van megváltoztatjuk
+		if(	b_pat ) // paletán van a cursor megváltoztathatjuk
 		{
 			float c = v2backB.x-cUV.x;
 			if( c > 0.0 )
@@ -298,15 +291,10 @@ void main()
 			else if( c <= 0.375 )
 				gl_FragColor.rgb = vec2(1.0, 0.0).yyx;
 		}
-		
 	} 
 	else if( !b_pat )
-	{
-		if( (length(crs)/6.0) < 1.0 ) 
+	if( (length(crs)/6.0) < 1.0 ) 
 			gl_FragColor.rgb = texture2D( tex1, v2patB ).rgb*valid;
-
-	}
-			
 	
 }	
   "
