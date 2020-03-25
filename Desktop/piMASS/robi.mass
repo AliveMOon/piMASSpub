@@ -1,6 +1,6 @@
  a0	 
  
- R# o# b# i#                                                                  b0																					  d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
+ R# o# b# i#                                                                  b0	 																	  d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rout = 0x10003;
  rinp = 0x10002;
@@ -226,7 +226,7 @@ uniform vec4 		aCNL[8];
 #define v2outB	(v2out/v2base)
 #define v2spc	vec2(10.0,20.0)
 #define v2spcB	(v2spc/v2base)
-#define v2rg	vec2( 8.0, 8.0)
+#define v2rg	vec2(8.0,8.0)
 #define v2rgB	(v2rg/v2base)
 #define v2fbWH	vec2(10.0, 5.0)
 #define v2fbWHB (v2fbWH/v2base)

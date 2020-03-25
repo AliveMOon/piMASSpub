@@ -857,20 +857,12 @@ public:
 		(ALFid+I8x2(0,pMAP->x))
 		.an2str( pDIR, (U1*)"spc.png", true, true );
 		/// LOAD
-		if( id < 4 )
-			return NULL;
+		/*if( id < 4 )
+			return NULL;*/
 		SDL_Surface* pSRF = IMG_Load( (char*)sPATH );
 		if( !pSRF )
-		{
-			/*U4	//of = (id&1)+((id>>2)&1),
-				shf8 = (id%3)*8;
-			for( U4 y = 0; y < 0x40; y+=2 )
-			for( U4 x = 0, ixy = x+y*spcWH.x; x < 0x80; x+=2, ixy+=2 )
-			{
-				pFspc[ixy] = (U4)255<<shf8;
-			}*/
 			return NULL;
-		}
+
 		// helyére pakolász
 		U1x4 *p_s = (U1x4*)pSRF->pixels;
 		U4 ptch = pSRF->w;
@@ -889,9 +881,9 @@ public:
 		.cpyX( 	p_s + ptch*0x40,			0x80*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	ptch );
 
 		// rndTRG_CPY-ből a FRONT
-		pFspc->cpyX( p_s+0x40, 				0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	ptch );
+		pFspc->cpyX( p_s+0x40, 				0x40*2,	spcWH.x*0x40,	2,	spcWH.x*2, 	1,	ptch );
 		// rndTRG_CPY-ből a BACK
-		pBspc->cpyX( p_s+0x40+ptch*0x20,	0x40*2,	spcWH.x*0x80,	2,	spcWH.x*2, 	1,	ptch );
+		pBspc->cpyX( p_s+0x40+ptch*0x20,	0x40*2,	spcWH.x*0x40,	2,	spcWH.x*2, 	1,	ptch );
 		return pSRF;
 
 	}
@@ -1044,16 +1036,17 @@ public:
 		if( !pFcpy )
 			return;
 
-		U1x4 fC, fP, v;
+		U1x4	fC, // fP,
+				v;
 		U4 bC, bP, n = 0, xyP;
 		I4x2 trfT(1,spcWH.x);
 		for( U4 i = 0, iy = spcWH.x*2, ie = iy*0x20; i < ie; i += iy )
 		for( U4 x = i, xe = x+0x80; x < xe; x+=2 )
 		{
-			fP.u4 = pFpen[x].u4&0xffffff;
-			if( !fP.mx_xyz() )
+			fC.u4 = pFcpy[x].u4&0xffffff;
+			if( !fC.u4 )
 				continue;
-			if( (pFcpy[x].u4&0xffffff) != fP.u4 )
+			if( (pFpen[x].u4&0xffffff) != fC.u4 )
 				continue;
 
 			bC = pBcpy[x].u4 & ~0x030303;
@@ -1061,54 +1054,20 @@ public:
 			if( bC != bP )
 				continue;
 
-			pFspc[x] = fP;
-			pBspc[x].u4 =
-			v.u4 		=bP;
+			pFspc[x] = fC;
+			pBspc[x].u4 = v.u4 = bP;
 
 			pBcpy[x] = pFcpy[x] = 0;
 
 			xyP = I4x2( 0x100+v.z, 0x100+v.y )*trfT;// RG
-			pSspc[xyP].u4 |= fP.u4;
+			pSspc[xyP].u4 |= fC.u4;
 			xyP = I4x2( 0x100-v.x, 0x100+v.y )*trfT;// BG
-			pSspc[xyP].u4 |= fP.u4;
+			pSspc[xyP].u4 |= fC.u4;
 			xyP = I4x2( 0x100-v.x, 0x100-v.z )*trfT;// BR
-			pSspc[xyP].u4 |= fP.u4;
+			pSspc[xyP].u4 |= fC.u4;
 			n++;
 		}
 
-		/*I4x2 RG, BG, BR;
-		for( U4 y = 0, ys = spcWH.x;	y < 0x40; y+=2 )
-		for( U4 x = 0, ixy = y*ys;		x < 0x80; x+=2, ixy+=2 )
-		{
-			fP.u4 = pFpen[ixy].u4&0xffffff;
-			if( !fP.mx_xyz() )
-				continue;
-
-			if( (pFcpy[ixy].u4&0xffffff) != fP.u4 )
-				continue;
-
-			// a CPY ben is ugyan ez szerepel
-			bC = pBcpy[ixy] & (U4)~0x030303;
-			bP = pBpen[ixy] & (U4)~0x030303;
-			if( bC.u4!= bP.u4 )
-				continue;
-
-			pFspc[ixy] = fP;
-			pBspc[ixy] = bP;
-
-			pBcpy[ixy] = pFcpy[ixy] = 0;
-
-			RG = I4x2( 0x100+bP.z, 0x100+bP.y ); // RG
-			BG = I4x2( 0x100-bP.x, 0x100+bP.y ); // BG
-			BR = I4x2( 0x100-bP.x, 0x100-bP.z ); // BR
-			xyP = RG*trfT;
-			pSspc[xyP].u4 |= fP.u4;
-			xyP = BG*trfT;
-			pSspc[xyP].u4 |= fP.u4;
-			xyP = BR*trfT;
-			pSspc[xyP].u4 |= fP.u4;
-			n++;
-		}*/
 		if( n )
 		{
 			// talált azonos pixeleket
@@ -1250,50 +1209,8 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 		of4x4 = I4x2(i%4,i/4);
 		of2x2 = of4x4%2;
-
-		//gpmMcpy( aSPC[i].sPATH, pPATH, nDIR )[nDIR] = 0;
-		//aSPC[i].pDIR = aSPC[i].sPATH + nDIR;
 		aSPC[i].id = trd = i;
 
-		/*
-
-		// space trg
-		aSPC[i].pSspc 	=
-		aSPC[i].pFspc 	=
-		aSPC[i].pSPC 	= (U1x4*)gpapP[0]->pixels;
-
-		aSPC[i].pMAP	= ((U4x4*)(aSPC[i].pSspc + 320*aSPC[i].spcWH.x))+i;
-
-		aSPC[i].pSspc 	+= (of4x4 + I4x2(32,320+32)) *trfSPC;
-		aSPC[i].pFspc 	+= (of2x2 + (of4x4&I4x2(0x40,0x20)) + I4x2(320,320))*trfSPC;
-		aSPC[i].pBspc 	= aSPC[i].pFspc + I4x2(0,160)*trfSPC;
-
-		ofSFB.x = aSPC[i].pSspc-aSPC[i].pSPC;
-		ofSFB.y = aSPC[i].pFspc-aSPC[i].pSPC;
-		ofSFB.z = aSPC[i].pBspc-aSPC[i].pSPC;
-
-
-		// penna pici
-		aSPC[i].pBpen	=
-		aSPC[i].pSpen 	=
-		aSPC[i].pFpen 	= (U1x4*)gpapP[2]->pixels;
-
-		aSPC[i].pSpen 	+= ofSFB.x;
-		aSPC[i].pFpen 	+= ofSFB.y;
-		aSPC[i].pBpen 	+= ofSFB.z;
-
-
-		// cpy picii
-		aSPC[i].pBcpy	=
-		aSPC[i].pScpy	=
-		aSPC[i].pFcpy	= gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
-
-		aSPC[i].pScpy 	+= ofSFB.x;
-		aSPC[i].pFcpy 	+= ofSFB.y;
-		aSPC[i].pBcpy 	+= ofSFB.z;
-
-		aSPC[i].pSPC 	+= (of2x2*2 + (of4x4&I4x2(0x40,0x20))) * trfSPC;
-	*/
 	}
 	// egyet a föszálban is csinálunk, hogy ne join-nel teljen az idő
 	// legjobb ha mind végez míg ez
