@@ -4,8 +4,7 @@ SDL_Surface* gpapP[0x10];
 
 
 
-class gpcTRDbug
-{
+class gpcTRDbug {
 public:
 	U1x4	*pI, *pQ; //,*pOUT;
 	I4x2	*pR;
@@ -822,10 +821,11 @@ U1x4* gpcPIC::TOOLspace0(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 	return (U1x4*)pSRF->pixels;
 }
+#define gpdLZYdbSPClim 0x10
 class gpcTRDspc
 {
 public:
-
+	gpcLZY*	pDB;
 	U1		sRAM[0x100], *pRAM,
 			sPATH[0x100], *pDIR;
 	U1x4	*pSRC,						// pl. CAM
@@ -853,6 +853,26 @@ public:
 		pMAP->z = 10;
 		pMAP->y = 0;
 		pMAP->x = x ? x : x05.w;
+		U4 ptch = 0x80;
+		U4x4* pM = pDB->xFND( pMAP->x, ptch*0x80, gpdLZYdbSPClim );
+		U1x4* p_u = NULL, *p_s = NULL;
+		if( pM )
+		{
+			p_u = pDB->pU1x4( *pM, ptch*0x80 );
+			if( pM->y )
+			{
+				pSspc[0]
+				.cpyX( 	p_u,						0x40*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	ptch );
+				pSspc[spcWH.x*0x100]
+				.cpyX( 	p_u + ptch*0x40,			0x80*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	ptch );
+
+				// rndTRG_CPY-ből a FRONT
+				pFspc->cpyX( p_u+0x40, 				0x40*2,	spcWH.x*0x40,	2,	spcWH.x*2, 	1,	ptch );
+				// rndTRG_CPY-ből a BACK
+				pBspc->cpyX( p_u+0x40+ptch*0x20,	0x40*2,	spcWH.x*0x40,	2,	spcWH.x*2, 	1,	ptch );
+				return NULL;
+			}
+		}
 
 		(ALFid+I8x2(0,pMAP->x))
 		.an2str( pDIR, (U1*)"spc.png", true, true );
@@ -864,15 +884,27 @@ public:
 			return NULL;
 
 		// helyére pakolász
-		U1x4 *p_s = (U1x4*)pSRF->pixels;
-		U4 ptch = pSRF->w;
+		p_s = (U1x4*)pSRF->pixels;
 		if( ptch != pSRF->pitch/sizeof(*p_s) )
 		{
-			ptch = pSRF->pitch/sizeof(*p_s);
-			std::cout	<< " food.w:"	<< pSRF->w
-						<< " pitch:"	<< ptch <<std::endl;
+			U4 p = pSRF->pitch/sizeof(*p_s);
+			std::cout	<< " food.w:"	<< ptch
+						<< " pitch:"	<< p <<std::endl;
+			if( p_u )
+			{
+				p_u[0].cpyX( p_s, min(ptch,p), ptch*min(0x80,pSRF->h), 1, min(ptch,p) );
+				p_s = p_u->zyxw( p_s, ptch*0x80 );
+				p_u = NULL;
+			}
 		}
-		p_s->zyxw( NULL, ptch*0x80 );
+
+		if( pM ? p_u : NULL )
+		{
+			pM->y = ptch*0x80;
+			p_s = p_u->zyxw( p_s, ptch*0x80 );
+		} else
+			p_s->zyxw( NULL, ptch*0x80 );
+
 		//								//	dw		dwh = dsy*y		dsx	dsy			ssx	ssy
 		// rndTRG_CPY-ből a SPaCe		//
 		pSspc[0]
@@ -913,6 +945,14 @@ public:
 		p_d[0x40+ptch*0x20]
 					//	dw		dwh = dsy*y		dsx	dsy		ssx	ssy
 		.cpyX( pBspc,	0x40,	ptch*0x20,		1,	ptch,	2,	ssy*2 );
+
+		if( U4x4* pM = pDB->xFND(pMAP->x,ptch*0x80,gpdLZYdbSPClim) )
+		if( U1x4* p_u = pDB->pU1x4(*pM,ptch*0x80) )
+		{
+			pM->y = ptch*0x80;
+			gpmMcpyOF( p_u, p_d, ptch*0x80 );
+		}
+
 		if( bNO )
 			return pSRF;
 
@@ -938,15 +978,18 @@ public:
 			gpcLZY load; U8 s = 0;
 			load.lzyRD( (char*)sRAM, s, 1 );
 			load.lzyWR( (char*)sPATH, true );
-			remove((char*)sRAM);
-			//std::cout << " ERR " << err <<std::endl;
+			//remove((char*)sRAM);
+			std::cout << " LZYcpy: " << sRAM << " to " << sPATH <<std::endl;
 
 		}
 
 		(ALFid+I8x2(0,pMAP->x))
 		.an2str( pRAM, (U1*)".kill", true, true );
 		if( gpmACE(sRAM, 4) > -1 )
+		{
 			remove((char*)sRAM);
+			std::cout << " KILL:" << sRAM <<std::endl;
+		}
 
 		return pSRF;
 	}
@@ -1179,6 +1222,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 			aSPC[trd].id = trd;
 			aSPC[trd].ALFid.num += aSPC[trd].id<<16;
+			aSPC[trd].pDB = MANus.LZY( aSPC[trd].ALFid );
 			aSPC[trd].pDIR = aSPC[trd].sPATH + nDIR;
 
 			ofSFB.x = (of4x4&I4x2(0x40,0x20))*trfSRC;

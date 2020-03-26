@@ -599,7 +599,7 @@ int main( int nA, char *apA[] )
 		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mm100(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mm100(1) );
 		std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).str( gpsMAINpub ) <<std::endl;;
-		tmp = tstCAGE.tXYZ.xyz_();
+		tmp = tstCAGE.tXYZ.xyz0();
 		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
 		std::cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).str( gpsMAINpub ) <<std::endl;;
 		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );

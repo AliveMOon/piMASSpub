@@ -41,7 +41,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 										"\r\n//\toXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm;"
 										,
-										(U4)(sqrt((tXYZ-iXYZ).xyz_().qlen())/mm100(100)),
+										(U4)(sqrt((tXYZ-iXYZ).xyz0().qlen())/mm100(100)),
 										double(iXYZ.x)/100.0,
 										double(iXYZ.y)/100.0,
 										double(iXYZ.z)/100.0,
@@ -59,7 +59,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 										"\r\n//\toABC %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\ttABC %7.2fdg, %7.2fdg, %7.2fdg;"
 										,
-										(U4)(sqrt((tABC-iABC).xyz_().qlen())/mm100(100)),
+										(U4)(sqrt((tABC-iABC).xyz0().qlen())/mm100(100)),
 										double(iABC.x)/100.0,
 										double(iABC.y)/100.0,
 										double(iABC.z)/100.0,
@@ -129,11 +129,11 @@ gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i )
 }
 
 I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
-	I4x4 S = iXYZ.xyz_(), a, b;
+	I4x4 S = iXYZ.xyz0(), a, b;
 	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
-		a = (S-pCAGE[i]).xyz_();
+		a = (S-pCAGE[i]).xyz0();
 		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
         b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+mm100(100) );
         abba = (b-a).qlen_xyz();
@@ -150,11 +150,11 @@ I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
 	return S+D8;
 }
 I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n ) {
-	I4x4 S = iXYZ.xyz_(), a, b;
+	I4x4 S = iXYZ.xyz0(), a, b;
 	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
-		a = (S-pCAGE[i]).xyz_();
+		a = (S-pCAGE[i]).xyz0();
 		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
         b = a.TSrBOX( T-pCAGE[i], pCAGE[i].w+mm100(100) );
         abba = (b-a).qlen_xyz();
@@ -299,12 +299,12 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		switch( NMnDIF.x )
 		{
 			case gpeZS_BILL:
-				tmp = cageBALL( tXYZ.xyz_(), gpaCAGEbillBALL,gpmN(gpaCAGEbillBALL) );
+				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEbillBALL,gpmN(gpaCAGEbillBALL) );
 				tmp = cageBOX( tmp, gpaCAGEbillBOX,gpmN(gpaCAGEbillBOX) );
 				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(100)) );
 				break;
 			case gpeZS_JOHN:
-				tmp = cageBALL( tXYZ.xyz_(), gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL) );
+				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL) );
 				tmp = cageBOX( tmp, gpaCAGEjohnBOX,gpmN(gpaCAGEjohnBOX) );
 				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(100)) );
 				//oXYZ.xyz_( iXYZ.lim_xyz( cageBALL(gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL)), mm100(100)) );
