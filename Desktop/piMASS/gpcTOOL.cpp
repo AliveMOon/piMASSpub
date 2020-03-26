@@ -978,9 +978,9 @@ public:
 			gpcLZY load; U8 s = 0;
 			load.lzyRD( (char*)sRAM, s, 1 );
 			load.lzyWR( (char*)sPATH, true );
-			//remove((char*)sRAM);
 			std::cout << " LZYcpy: " << sRAM << " to " << sPATH <<std::endl;
-
+			remove((char*)sRAM);
+			std::cout << " KILL:" << sRAM <<std::endl;
 		}
 
 		(ALFid+I8x2(0,pMAP->x))

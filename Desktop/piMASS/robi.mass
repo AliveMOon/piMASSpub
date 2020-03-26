@@ -54,6 +54,10 @@ void main()
 	
 	if( fUV.y < v2outB.y )
 	{
+		/*vec2 pxUV = fUV*tgPX,	// 640x320
+			 of2x2 = floor(fract(pxUV/2.0)*2.0),
+			 of4x4 = min(floor(pxUV/(tgPX/5.0)),vec2(3,3)), // 0-3,0-3*/
+			 
 		vec2	sUV = fUV/v2outB,
 				Ouv = floor(sUV*4.0)/255.0;
 		Suv = floor(sUV*v2src);
