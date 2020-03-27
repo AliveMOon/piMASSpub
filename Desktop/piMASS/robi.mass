@@ -45,7 +45,8 @@ uniform vec4 		aCNL[8];
 #define v2backB (v2back/v2base)
 #define v2fbWHB (v2fbWH/v2base)
 #define v2sLUb	(v2sLU/v2base)	
-#define	v2src	vec2(320,160)	 
+#define	v2src	vec2(320,160)
+#define spcOF	256	 
 void main()																
 {
 	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1);
@@ -56,36 +57,54 @@ void main()
 	if( fUV.y < v2outB.y )
 	{
 		vec2	srcUV = fUV/v2outB;
-		src	= floor(texture2D( tex0, srcUV ).rgb*64.0)*4.0;
+		src	= floor(texture2D( tex0, srcUV ).rgb*(255.0/4.0))*4.0;
 		
 		vec2 	tg2x2 	= aTX[0]/2.0,
-				tg5		= aTX[0]/5.0,
+				tg5		= tg2x2/5.0,
+				pix1 	= floor(srcUV*aTX[0]),
 				pix2 	= floor(srcUV*tg2x2),			// 320x160
-				ix22	= floor(fract(pix2/2.0)*2.0),	// 01010,01010
-				ix5		= pix2/tg5,				// 01234
-				ix501	= floor(fract(ix5)*2.0),// 01010
+				ix22	= floor(fract(pix1/2.0)*2.0),	// 01010,01010
+				ix5		= pix2/tg5,					// 01234		
+				ix501	= floor(fract(ix5/2.0)*2.0),// 01010
 				
-				ix50	= floor(ix5)-ix501,		// 00224		
-				ix51	= floor(ix5)-1.0+ix501, // 01133
+				ix50	= min( vec2(3), floor(ix5)-ix501 ),			//  00223		
+				ix51	= max( vec2(0), floor(ix5)-1.0 + ix501),	//mx00123
+																	//  01133
 				spcUV 	= vec2( 
 							ix22.x < 1.0 ? ix50.x:ix51.x, 
 							ix22.y < 1.0 ? ix50.y:ix51.y 
-						) + v2sLUb*tgPX; 
+						); 
+		spcUV += v2sLUb*tgPX + spcOF;
+		vec4 src2 = vec4( src.rgb, 1 );
+				
+		spc	= texture2D( tex1, (spcUV + src2.rg				)/tgPX ).rgb
+			+ texture2D( tex1, (spcUV + src2.bg*vec2(-1,1)	)/tgPX ).rgb
+			+ texture2D( tex1, (spcUV - src2.br				)/tgPX ).rgb;
 		
-		spc	= texture2D( tex1, (vec2(256+src.r,256+src.g)+spcUV)/tgPX ).rgb
-			* texture2D( tex1, (vec2(256-src.b,256+src.g)+spcUV)/tgPX ).rgb
-			* texture2D( tex1, (vec2(256-src.b,256-src.r)+spcUV)/tgPX ).rgb;
+		/*
+		src2.rg = (spcUV+src.rg)/tgPX;
+		src2.ba = (spcUV-src.br)/tgPX;
 		
-		if( length(spc-vec3(1,0,0))<1.0 )
+		float ix = (src2.r + src2.g)*2.0;
+		gl_FragColor.rgb = 
+			floor( fract(max(vec3(0),vec3( ix/2.0, ix/4.0, ix/8.0 )))*2.0 );*/
+			
+			
+			
+		/*//spcUV -= v2sLUb*tgPX;
+		float ix = spcUV.x + spcUV.y;
+		gl_FragColor.rgb =  floor(fract( max( vec3(0), vec3( ix/2.0, ix/4.0, ix/8.0 )))*2.0 );
+		*/
+		/*if( length(spc-vec3(1,0,0))<1.0 )
  			spc = vec3(3,0,0);
  		else if( length(spc-vec3(0,1,0))<1.0 )
  			spc = vec3(0,3,0);
  		else if( length(spc-vec3(0,0,1))<1.0 )
  			spc = vec3(0,0,3);
  		else
- 			spc = vec3(0,0,0);
+ 			spc = vec3(0,0,0);*/
  		
- 		gl_FragColor.rgb = max( spc, gl_FragColor.rgb );
+ 		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/1024.0), src ), 2.0) );
 	}
 	else if( fUV.y < v2spcB.y )
 	{
@@ -160,7 +179,7 @@ void main()
 	gl_FragColor = vec4(0,0,0,1);
 	vec2	flpUV = fr_uv*vec2(1.0,-15.0/31) + vec2(0.0, 15.0/31);
  	vec2	flpUV1 = fr_uv*vec2(1.0,-1.0) + vec2(0.0, 1.0 ), 
- 			off = 1.0/tgPX, uv;
+ 			off = 0.3/tgPX, uv;
 	vec3 ize;
 	gl_FragColor.rgb = texture2D( tex0, flpUV ).rgb;
  	for( int i = -2; i <= 2; ++i )
