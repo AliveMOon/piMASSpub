@@ -46,7 +46,7 @@ uniform vec4 		aCNL[8];
 #define v2fbWHB (v2fbWH/v2base)
 #define v2sLUb	(v2sLU/v2base)	
 #define	v2src	vec2(320,160)
-#define spcOF	256	 
+#define spcOF	257	 
 void main()																
 {
 	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1);
@@ -57,7 +57,6 @@ void main()
 	if( fUV.y < v2outB.y )
 	{
 		vec2	srcUV = fUV/v2outB;
-		src	= floor(texture2D( tex0, srcUV ).rgb*(255.0/4.0))*4.0;
 		
 		vec2 	tg2x2 	= aTX[0]/2.0,
 				tg5		= tg2x2/5.0,
@@ -75,36 +74,13 @@ void main()
 							ix22.y < 1.0 ? ix50.y:ix51.y 
 						); 
 		spcUV += v2sLUb*tgPX + spcOF;
-		vec4 src2 = vec4( src.rgb, 1 );
-				
-		spc	= texture2D( tex1, (spcUV + src2.rg				)/tgPX ).rgb
-			+ texture2D( tex1, (spcUV + src2.bg*vec2(-1,1)	)/tgPX ).rgb
-			+ texture2D( tex1, (spcUV - src2.br				)/tgPX ).rgb;
 		
-		/*
-		src2.rg = (spcUV+src.rg)/tgPX;
-		src2.ba = (spcUV-src.br)/tgPX;
-		
-		float ix = (src2.r + src2.g)*2.0;
-		gl_FragColor.rgb = 
-			floor( fract(max(vec3(0),vec3( ix/2.0, ix/4.0, ix/8.0 )))*2.0 );*/
-			
-			
-			
-		/*//spcUV -= v2sLUb*tgPX;
-		float ix = spcUV.x + spcUV.y;
-		gl_FragColor.rgb =  floor(fract( max( vec3(0), vec3( ix/2.0, ix/4.0, ix/8.0 )))*2.0 );
-		*/
-		/*if( length(spc-vec3(1,0,0))<1.0 )
- 			spc = vec3(3,0,0);
- 		else if( length(spc-vec3(0,1,0))<1.0 )
- 			spc = vec3(0,3,0);
- 		else if( length(spc-vec3(0,0,1))<1.0 )
- 			spc = vec3(0,0,3);
- 		else
- 			spc = vec3(0,0,0);*/
- 		
- 		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/1024.0), src ), 2.0) );
+		src	= floor(texture2D( tex0, srcUV ).rgb*(255.0/4.0))*4.0;
+		spc	= texture2D( tex1, (spcUV + src.rg				)/tgPX ).rgb
+			+ texture2D( tex1, (spcUV + src.bg*vec2(-1,1)	)/tgPX ).rgb
+			+ texture2D( tex1, (spcUV - src.br				)/tgPX ).rgb;
+		 		
+ 		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/2048.0), src ), 3.0) );
 	}
 	else if( fUV.y < v2spcB.y )
 	{
@@ -353,8 +329,8 @@ void main()
  unsel = 1;
   g2	 
    pic= "dilet" a3	
-//0000|00000004 00000000 00000000 00000000 |................
-//0010|00000000 00000003 00000004 00000004 |................
+//0000|00000001 00000000 00000000 00000000 |................
+//0010|00000000 00000001 00000004 00000004 |................
 //0020|00000000 00000000 00000000 00000000 |................
 //0030|00000000 00000000 00000000 00000000 |................
 //0040|00000000 00000000 00000000 00000000 |................

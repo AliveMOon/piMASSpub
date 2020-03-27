@@ -914,6 +914,9 @@ public:
         return p4;
 	}
 	U1x4* zyxw( void* pV, U4 n ) {
+		if( !this )
+			return NULL;
+
 		gpmMcpyOF( this, pV, n );
 		for( U4 i = 0; i < n; i++ )
 			this[i].swpZX();

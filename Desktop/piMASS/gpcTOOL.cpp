@@ -553,7 +553,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 }
 
 #define gpdSPCdbgCOUT if(false)
-#define gpdLZYdbSPClim 0x10
+#define gpdLZYdbSPClim 0x20
 class gpcTRDspc
 {
 public:
@@ -620,17 +620,18 @@ public:
 		if( ptch != pSRF->pitch/sizeof(*p_s) )
 		{
 			U4 p = pSRF->pitch/sizeof(*p_s);
-			std::cout	<< " food.w:"	<< ptch
-						<< " pitch:"	<< p <<std::endl;
 			if( p_u )
 			{
+				std::cout	<< " food.w:"	<< ptch
+							<< " pitch:"	<< p <<std::endl;
+
 				p_u[0].cpyX( p_s, min(ptch,p), ptch*min(0x80,pSRF->h), 1, min(ptch,p) );
 				p_s = p_u->zyxw( p_s, ptch*0x80 );
 				p_u = NULL;
 			}
 		}
 
-		if( pM ? p_u : NULL )
+		if(p_u)
 		{
 			pM->y = ptch*0x80;
 			p_s = p_u->zyxw( p_s, ptch*0x80 );
@@ -832,6 +833,8 @@ public:
 
 			pBcpy[x] = pFcpy[x] = 0;
 
+			/// ! zyx	///
+			///   RGB ! ///
 			xyP = I4x2( 0x100+v.z, 0x100+v.y )*trfT;// RG
 			pSspc[xyP].u4 |= fC.u4;
 			xyP = I4x2( 0x100-v.x, 0x100+v.y )*trfT;// BG
