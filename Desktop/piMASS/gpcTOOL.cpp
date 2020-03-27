@@ -1056,7 +1056,7 @@ public:
 		} else {
 
             // csere nem stimmel
-            /// az a lényeg, ha le van nyomva az egér gomb a RNDR képte átmásolja a maskii-be
+            /// az a lényeg, ha le van nyomva az egér gomb a RNDR képet átmásolja a maskii-be
             /// és ha most egy újabb körben is azonos akkor azt akarjuk eltárolni
 			if( pMAP->x ) // x 1 és 0x3f3f3f között ~0x400000 // 0 tök sötét le van szarva
 			if( pMAP->y )

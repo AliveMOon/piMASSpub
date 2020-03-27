@@ -381,13 +381,10 @@ enum gpeCLR: U1
 enum gpeLZYset : U1
 {
 	gpeLZYoff,
-	gpeLZY1,
-	gpeLZY2,
-	gpeLZY3,
-	gpeLZY4,
 	gpeLZYwipSTK,
 	gpeLZYwip,
 	gpeLZYxN,
+	gpeLZYxSOF,
 };
 enum gpeWIP : U1
 {
@@ -857,19 +854,19 @@ public:
 
 		return *this;
     }
+	// typ:
+	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+	/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 	U1x4& typ() {
 		if( w )
 			return *this;
 
-		if( !y )
-			y = 1;
-		if( !z )
-			z = 1;
-
-		if( x&0x40 )
+		if( !y ) y = 1;
+		if( !z ) z = 1;
+		if( x&0x40 )	// float or double
 			x = ((x&0xf) < 2 ) ? 0xc2 : 0xc3;
 
-		w = 1<<(x&0xf);
+		w = 1<<(x&0xf);	//
 		return *this;
 	}
 	U1x4& typMX( U1x4 tp ) {
@@ -4907,17 +4904,20 @@ public:
 	union
 	{
 		struct{
-			U1* p_alloc, aSET[8];
+			U1* p_alloc, aXYZW[4], aSET[4];
 
 			U8 //size_t // ha x32 CPU-n size_t 20 byte lesz és nem 32 azaz nem 16B aligned
 				n_load, n_alloc;
 		};
 		struct{
 			U8		*p_a8;
-			gpeWIP	aWIP[8];
-			U8 n_l8, n_a8;
+			U4		type;	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+							/// yz[ dimXY ] 	, nBYTE = 1<<(x&0xf)
+			gpeWIP	aWIP[4];
+			U8		n_l8, n_a8;
 		};
 	};
+	U1x4& typ() { return *(U1x4*)&type; }
 	U4x4* pMAP( U4 nX, U4 nLIM, size_t nBYTE )
 	{
 		if( !this )
