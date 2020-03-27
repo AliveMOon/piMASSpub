@@ -32,6 +32,7 @@ uniform vec4 		aCNL[8];
 #define v2back	vec2(10.0, 15.0)
 #define v2fbWH	vec2(10.0, 5.0)
 #define v2spc	vec2(10.0,20.0)
+#define v2sLU 	vec2(2.0,12.0)
 #define v2rg	vec2( 8.0, 8.0)
 #define v2bg	vec2(-8.0, 8.0)
 #define v2br	vec2(-8.0,-8.0)
@@ -42,31 +43,38 @@ uniform vec4 		aCNL[8];
 #define v2spcB	(v2spc/v2base)
 #define v2frntB (v2frnt/v2base)
 #define v2backB (v2back/v2base)
-#define v2fbWHB (v2fbWH/v2base) 	
+#define v2fbWHB (v2fbWH/v2base)
+#define v2sLUb	(v2sLU/v2base)	
 #define	v2src	vec2(320,160)	 
 void main()																
 {
-	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1), Suv;
-	
+	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1);
 	gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );	// penna
 	vec3	src = vec3(0,0,0),
 			spc = vec3(0,0,0);
 	
 	if( fUV.y < v2outB.y )
 	{
-		/*vec2 pxUV = fUV*tgPX,	// 640x320
-			 of2x2 = floor(fract(pxUV/2.0)*2.0),
-			 of4x4 = min(floor(pxUV/(tgPX/5.0)),vec2(3,3)), // 0-3,0-3*/
-			 
-		vec2	sUV = fUV/v2outB,
-				Ouv = floor(sUV*4.0)/255.0;
-		Suv = floor(sUV*v2src);
-		src	= ( floor(texture2D( tex0, sUV ).rgb*64.0)*4.0 )/255.0;
-		gl_FragColor.rgb += src/3.0;
+		vec2	srcUV = fUV/v2outB;
+		src	= floor(texture2D( tex0, srcUV ).rgb*64.0)*4.0;
 		
-		spc	= texture2D( tex1, ((src.rg+Ouv)*v2rg+v2spc)/v2base ).rgb
-			* texture2D( tex1, ((src.bg+Ouv)*v2bg+v2spc)/v2base ).rgb
-			* texture2D( tex1, ((src.br+Ouv)*v2br+v2spc)/v2base ).rgb;
+		vec2 	tg2x2 	= aTX[0]/2.0,
+				tg5		= aTX[0]/5.0,
+				pix2 	= floor(srcUV*tg2x2),			// 320x160
+				ix22	= floor(fract(pix2/2.0)*2.0),	// 01010,01010
+				ix5		= pix2/tg5,				// 01234
+				ix501	= floor(fract(ix5)*2.0),// 01010
+				
+				ix50	= floor(ix5)-ix501,		// 00224		
+				ix51	= floor(ix5)-1.0+ix501, // 01133
+				spcUV 	= vec2( 
+							ix22.x < 1.0 ? ix50.x:ix51.x, 
+							ix22.y < 1.0 ? ix50.y:ix51.y 
+						) + v2sLUb*tgPX; 
+		
+		spc	= texture2D( tex1, (vec2(256+src.r,256+src.g)+spcUV)/tgPX ).rgb
+			* texture2D( tex1, (vec2(256-src.b,256+src.g)+spcUV)/tgPX ).rgb
+			* texture2D( tex1, (vec2(256-src.b,256-src.r)+spcUV)/tgPX ).rgb;
 		
 		if( length(spc-vec3(1,0,0))<1.0 )
  			spc = vec3(3,0,0);

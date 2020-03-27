@@ -3,7 +3,7 @@
 
 # creat RAMDISK and mount it to /mnt/ram
 # none /mnt/ram 
-tmpfs /mnt/ram tmpfs nodev,nosuid,size=8M 0 0
+tmpfs /mnt/ram tmpfs nodev,nosuid,size=32M 0 0
 
 -------------------------------------------------------------
 
