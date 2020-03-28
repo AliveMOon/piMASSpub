@@ -1014,7 +1014,7 @@ public:
 		w = t;
 		return *this;
 	}
-	U1 srt3( U1 lim ) {
+	/*U1 srt3( U1 lim ) {
 		if( !(u4&0xffffff) )
 			return 0;
 
@@ -1042,35 +1042,47 @@ public:
 			return o;
 
 		return 0;
-	}
+	}*/
 	U1x4 srt3() {
 		if( !(u4&0xffffff) )
 			return 0;
 
 		U1x4 s = *this;
+		s.w = 1;
 		if(s.y>s.x)
 		{
 			s.swpYX();
-			s.w = 0x1;
+			s.w |= 0x2;
 		}
 		if(s.z>s.x)
 		{
 			s.swpZX();
-			s.w |= 0x02;
+			s.w |= 0x04;
 		}
 		if(s.z>s.y)
 		{
 			s.swpZY();
-			s.w |= 0x04;
+			s.w |= 0x08;
 		}
-		if(!s.x)
-			return 0;
-		s.x &= ~7;
-		s.y &= 0xf0;
-		s.y |= s.z>>4;
-		s.x |= s.w;
+
+		s.x = (s.x&0xf0)|s.w;
+		s.y = (s.y&0xf0)|(s.z>>4);
 		return s;
 	}
+	U1x4& swp3( U1 s ) {
+		if(s&1)
+		{
+			if( s&0x08 )
+				swpZY();
+			if( s&0x04 )
+				swpZX();
+			if( s&0x02 )
+				swpYX();
+		}
+
+		return *this;
+	}
+
 	U1 srt4() {
 		if( !u4 )
 			return 0;
@@ -1118,21 +1130,9 @@ public:
 
 		return o;
 	}
-	U1x4& swp3( U1 s ) {
-		if( !(s&0xf) )
-			return *this;
 
-		if( s&0x04 )
-			swpZY();
-		if( s&0x02 )
-			swpZX();
-		if( s&0x01 )
-			swpYX();
 
-		return *this;
-	}
-
-	U1x4& swp4( U1 s ) {
+	/*U1x4& swp4( U1 s ) {
 		if( !(s&0x3f) )
 			return *this;
 
@@ -1151,7 +1151,7 @@ public:
 			swpYX();
 
 		return *this;
-	}
+	}*/
 	U1x4 operator & ( U4 b ) const { return u4&b; }
 	U1x4 operator | ( U4 b ) const { return u4|b; }
 	U1x4 operator ^ ( U4 b ) const { return u4^b; }
