@@ -28,6 +28,8 @@ uniform vec2		aTX[8];
 uniform vec4 		aCNL[8];
 #define v2base	vec2(20.0, 28.0)
 #define v2out	vec2(20.0, 10.0)
+#define v2outB	(v2out/v2base)
+
 #define v2frnt	vec2(10.0, 10.0)
 #define v2back	vec2(10.0, 15.0)
 #define v2fbWH	vec2(10.0, 5.0)
@@ -39,26 +41,42 @@ uniform vec4 		aCNL[8];
 #define v2rgB	(vec2( 8.0, 8.0)/v2base)
 #define v2bgB	(vec2(-8.0, 8.0)/v2base)
 #define v2brB	(vec2(-8.0,-8.0)/v2base)
-#define v2outB	(v2out/v2base)
 #define v2spcB	(v2spc/v2base)
 #define v2frntB (v2frnt/v2base)
 #define v2backB (v2back/v2base)
 #define v2fbWHB (v2fbWH/v2base)
 #define v2sLUb	(v2sLU/v2base)	
 #define	v2src	vec2(320,160)
-#define spcOF	257	 
+#define spcOF	257	
+vec4 srt( vec3 c )
+{
+	vec4 o = vec4(0);
+	if( c.g > c.r ) {
+		c.rg = c.gr; 
+		o.a = 2.0;
+	}
+	if( c.b > c.r ) {
+		c.rb = c.br; 
+		o.a += 4.0;
+	}
+	if( c.b > c.g ) {
+		c.rb = c.br; 
+		o.a += 8.0;
+	}
+	o.rgb = c;
+	if( c.r > 0.0 )
+		o.a += 1.0;
+	return o;
+} 
 void main()																
 {
 	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1);
 	gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );	// penna
-	vec3	src = vec3(0,0,0),
-			spc = vec3(0,0,0);
-	
+	vec3	src = vec3(0.0), spc = vec3(0.0);
 	if( fUV.y < v2outB.y )
 	{
-		vec2	srcUV = fUV/v2outB;
-		
-		vec2 	tg2x2 	= aTX[0]/2.0,
+		vec2	srcUV = fUV/v2outB, w, su = vec2(0), uv,
+				tg2x2 	= aTX[0]/2.0,
 				tg5		= tg2x2/5.0,
 				pix1 	= floor(srcUV*aTX[0]),
 				pix2 	= floor(srcUV*tg2x2),			// 320x160
@@ -72,15 +90,29 @@ void main()
 				spcUV 	= vec2( 
 							ix22.x < 1.0 ? ix50.x:ix51.x, 
 							ix22.y < 1.0 ? ix50.y:ix51.y 
-						); 
-		spcUV += v2sLUb*tgPX + spcOF;
-		
+						),
+				spcPX = v2sLUb*tgPX + spcOF; 
 		src	= floor(texture2D( tex0, srcUV ).rgb*(255.0/4.0))*4.0;
-		spc	= texture2D( tex1, (spcUV + src.rg				)/tgPX ).rgb
-			+ texture2D( tex1, (spcUV + src.bg*vec2(-1,1)	)/tgPX ).rgb
-			+ texture2D( tex1, (spcUV - src.br				)/tgPX ).rgb;
-		 		
- 		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/2048.0), src ), 3.0) );
+		for( int i = 0; i < 4; i++ )
+		for( int j = 0; j < 4; j++ )
+		{
+			uv = vec2(i,j);	w = (uv-spcUV)*vec2(2.0,1.0);
+			uv += spcPX;
+			su.x = (46.0-dot( w, w ));
+			su.y += su.x;
+			spc	+= (  texture2D( tex1, (uv+src.rg			)/tgPX )
+					+ texture2D( tex1, (uv+src.bg*vec2(-1,1))/tgPX )
+					+ texture2D( tex1, (uv-src.br			)/tgPX )).rgb
+					* su.x;
+		}
+		vec4 s4 = srt( spc/su.y );
+		spc = floor(fract(s4.aaa/vec3(2.0,4.0,8.0))*2.0);
+		
+		
+ 		gl_FragColor.rgb = max( 
+								spc, 
+								pow( dot( vec3(1.0/1024.0), src ), 3.0) 
+							);
 	}
 	else if( fUV.y < v2spcB.y )
 	{
@@ -150,33 +182,35 @@ uniform sampler2D	tex0,
 uniform vec2		tgPX;					
 uniform vec2		aTX[8];		
 uniform vec4 		aCNL[8];											
+#define v2base	vec2(20.0, 28.0)
+#define v2out	vec2(20.0, 10.0)
+#define v2oLU	(vec2(20.0, 10.0)/5.0)
+#define v2oRD	(v2oLU*4.0)
+#define v2oLURD (v2oLU*3.0)
+#define v2oLUb	(v2oLU/v2base)
+
+#define v2outB	(v2out/v2base)
 void main()																
 {	
 	gl_FragColor = vec4(0,0,0,1);
-	vec2	flpUV = fr_uv*vec2(1.0,-15.0/31) + vec2(0.0, 15.0/31);
- 	vec2	flpUV1 = fr_uv*vec2(1.0,-1.0) + vec2(0.0, 1.0 ), 
- 			off = 0.3/tgPX, uv;
+	//vec2	flpUV = fr_uv*vec2(1.0,-15.0/31) + vec2(0.0, 15.0/31);
+	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1),
+			lurdUV = fUV*(v2oLUb*3)+v2oLUb,
+	//vec2	flpUV = fr_uv*v2outB + vec2(0.0, 15.0/31);
+ 	
+ 	//vec2	flpUV1 = fr_uv*vec2(1.0,-1.0) + vec2(0.0, 1.0 ), 
+ 			off = 0.3/aTX[0], uv;
 	vec3 ize;
-	gl_FragColor.rgb = texture2D( tex0, flpUV ).rgb;
+	gl_FragColor.rgb = texture2D( tex0, lurdUV ).rgb;
  	for( int i = -2; i <= 2; ++i )
 	for( int j = -2; j <= 2; ++j )
 	{
 		uv = vec2(i,j);
-		ize = texture2D( tex0, flpUV+off*uv ).rgb*length(uv)/2.0;
+		ize = texture2D( tex0, lurdUV+off*uv ).rgb*length(uv)/2.0;
 		gl_FragColor.a += length(ize);
 		gl_FragColor.rgb += ize*length(ize);
 	}		
  	gl_FragColor /= gl_FragColor.a;
- 
- /*if( 
- 	max(
- 			max(gl_FragColor.r, gl_FragColor.b),
- 			
- 			gl_FragColor.g
-		) < 32.0/256.0 
- ) 
- 	gl_FragColor *= 0.0;
- 				  //*texture2D( tex1, flpUV1 ).rgb;*/
 }
  "
  pic = "dilet" a2	
