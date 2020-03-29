@@ -29,48 +29,36 @@ uniform vec4 		aCNL[8];
 #define v2base	vec2(20.0, 28.0)
 #define v2out	vec2(20.0, 10.0)
 #define v2outB	(v2out/v2base)
-
+#define v2spc	vec2(10.0,20.0)
+#define v2spcB	(v2spc/v2base)
 #define v2frnt	vec2(10.0, 10.0)
 #define v2back	vec2(10.0, 15.0)
+#define v2frntB (v2frnt/v2base)
+#define v2backB (v2back/v2base)
 #define v2fbWH	vec2(10.0, 5.0)
-#define v2spc	vec2(10.0,20.0)
+#define v2fbWHB (v2fbWH/v2base)
 #define v2sLU 	vec2(2.0,12.0)
-#define v2rg	vec2( 8.0, 8.0)
-#define v2bg	vec2(-8.0, 8.0)
-#define v2br	vec2(-8.0,-8.0)
+#define v2sLUb	(v2sLU/v2base)	
+
 #define v2rgB	(vec2( 8.0, 8.0)/v2base)
 #define v2bgB	(vec2(-8.0, 8.0)/v2base)
 #define v2brB	(vec2(-8.0,-8.0)/v2base)
-#define v2spcB	(v2spc/v2base)
-#define v2frntB (v2frnt/v2base)
-#define v2backB (v2back/v2base)
-#define v2fbWHB (v2fbWH/v2base)
-#define v2sLUb	(v2sLU/v2base)	
 #define	v2src	vec2(320,160)
+
 #define spcOF	256	
 vec4 srt( vec3 c )
 {
-	vec4 o = vec4(0);
-	if( c.g > c.r ) {
-		c.rg = c.gr; 
-		o.a = 2.0;
-	}
-	if( c.b > c.r ) {
-		c.rb = c.br; 
-		o.a += 4.0;
-	}
-	if( c.b > c.g ) {
-		c.rb = c.br; 
-		o.a += 8.0;
-	}
-	o.rgb = c;
-	if( c.r > 0.0 )
-		o.a += 1.0;
-	return o;
+	float a = 0;
+	if( c.g > c.r ) { c.rg = c.gr; a = 2.0; }
+	if( c.b > c.r ) { c.rb = c.br; a += 4.0; }
+	if( c.b > c.g ) { c.rb = c.br; a += 8.0; }
+	if( c.r > 0.0 ) a += 1.0;
+	return vec4( c, a );
 } 
 void main()																
 {
-	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1);
+	const vec2 f = vec2(1,-1);
+	vec2	fUV = fr_uv*f+vec2(0,1);
 	gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );	// penna
 	vec3	src = vec3(0.0), spc = vec3(0.0);
 	if( fUV.y < v2outB.y )
@@ -93,40 +81,27 @@ void main()
 						),
 				spcPX = v2sLUb*tgPX + spcOF; 
 		src	= floor( texture2D( tex0, srcUV ).rgb*(255.0/4.0))*4.0;
-		for( int i = 0; i < 4; i++ )
-		for( int j = 0; j < 4; j++ )
+		for( int i = 0; i < 4; i++ ) for( int j = 0; j < 4; j++ )
 		{
 			uv = vec2(i,j);	w = (uv-spcUV)*vec2(2.0,1.0);
 			uv += spcPX;
-			su.x = (46.0-dot( w, w ));
-			su.y += su.x;
-			spc	+= (  texture2D( tex1, (uv+src.rg			)/tgPX )
-					+ texture2D( tex1, (uv+src.bg*vec2(-1,1))/tgPX )
-					+ texture2D( tex1, (uv-src.br			)/tgPX )).rgb
+			su.x = (46.0-dot( w, w )); su.y += su.x;
+			spc	+= (  texture2D( tex1, (uv+src.rg		)/tgPX )
+					+ texture2D( tex1, (uv+src.bg*f.yx	)/tgPX )
+					+ texture2D( tex1, (uv-src.br		)/tgPX )).rgb
 					* su.x;
 		}
 		vec4 s4 = srt( spc/su.y );
 		s4.a = floor(fract(s4.a/8.0)*8.0);
 		vec2 o = vec2(s4.r,0);
 		
-		if( s4.a < 1.0 )
-			spc = o.yyy;
-		else if( s4.a < 3.0 )
-			spc = o.xyy;
-		else if( s4.a < 5.0 )
-			spc = o.yxy;
-		else if( s4.a < 8.0 )
-			spc = o.yyx;
-		else 
-			spc = o.yyy;
+		if( s4.a < 1.0 ) 		spc = o.yyy;
+		else if( s4.a < 3.0 )	spc = o.xyy;
+		else if( s4.a < 5.0 ) 	spc = o.yxy;
+		else if( s4.a < 8.0 ) 	spc = o.yyx;
+		else					spc = o.yyy;
 		
-		/*spc = floor(fract(s4.aaa/vec3(2.0,4.0,8.0))*2.0)/2.0;
-		spc += floor(s4.r*16.0)/16.0;*/
-		
- 		gl_FragColor.rgb = max( 
-								spc, 
-								pow( dot( vec3(1.0/1024.0), src ), 3.0) 
-							);
+ 		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/1024.0), src ), 4.0) );
 	}
 	else if( fUV.y < v2spcB.y )
 	{

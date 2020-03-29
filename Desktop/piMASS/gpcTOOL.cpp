@@ -742,25 +742,31 @@ public:
 		U4	of = (id&1)+((id>>2)&1),
 			of4 = of<<2,
 			shf8 = (id%3)*8,
-			nXY = 0;
-		for( U4 y = 0, ys = srcWH.x*4; y < 0x80; y+=4 )
-		for( U4 x = 0, //(of4+y)&4,
-				ixy = x+y*ys; x < 0x100; x+=8, ixy+=8 )
+			nXY = 0, ys = srcWH.x, x,y, ixy;
+		for( y = 0; y < 0x80; y+=8 )
+		for( x = 0, ixy = y*ys;
+
+				x < 0x100;
+
+				x+=8, ixy+=8 )
 		{
 			//pSPC[(x+y*spcWH.x)] = (U4)255<<shf8;
 			nXY++;
-			c = (U1x4)(p_s[ixy*3])>>2;
+			c = ((U1x4*)(p_s+ixy*3))->xyz0()>>2;
 			aHISTI[c.x].x++;
 			aHISTI[c.y].y++;
 			aHISTI[c.z].z++;
 		}
-		for( U4 y = 0x22, ys = srcWH.x*4; y < 0x60; y+=4 )
-		for( U4 x = 0x42, //(of4+y)&4,
-				ixy = x+y*ys; x < 0xc0; x+=8, ixy+=8 )
+		for( y = 0x22; y < 0x60; y+=8 )
+		for( x = 0x42, ixy = x+y*ys;
+
+				x < 0xc0;
+
+				x+=8, ixy+=8 )
 		{
 			//pSPC[(x+y*spcWH.x)] = (U4)255<<shf8;
 			nXY++;
-			c = (U1x4)(p_s[ixy*3])>>2;
+			c = ((U1x4*)(p_s+ixy*3))->xyz0()>>2;
 			aHISTI[c.x].x++;
 			aHISTI[c.y].y++;
 			aHISTI[c.z].z++;
@@ -1003,7 +1009,7 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 				break;
 		}
 
-		of4x4 = I4x2(i%4,i/4);
+		of4x4 = I4x2(i).XdivRQ(4); //I4x2(i%4,i/4);
 		of2x2 = of4x4%2;
 		aSPC[i].id = trd = i;
 
@@ -1119,7 +1125,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	SPC.pDIR = SPC.sPATH + nDIR;
 	SPC.id = aiQC[0]%0x10; //trd = 0;
 
-	of4x4 = I4x2(SPC.id%4,SPC.id/4);
+	of4x4 = I4x2(SPC.id).XdivRQ(4);
 	of2x2 = of4x4%2;
 
 	SPC.ALFid.num += SPC.id<<16;

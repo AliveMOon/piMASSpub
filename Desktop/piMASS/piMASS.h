@@ -1240,6 +1240,14 @@ public:
 
 
 	}
+	U1x4 xyz0() const
+	{
+		return U1x4(x,y,z);
+	}
+	U1x4 xy00() const
+	{
+		return U1x4(x,y);
+	}
 };
 
 class I1x4
