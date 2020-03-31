@@ -140,8 +140,8 @@ public:
 				s3 = pI[x+y].srt3();
 				if( !s3.x )
 					continue;
-				srt = s3.x; //((((U4)s3.x*(U4)(s3.x>>4))>>8) & ~0x7)|s3.w;
-                p_q[(x+y)/2] = srt;
+				//srt = ((s3.x>>2)& ~0xf)|(s3.x&0xf);
+                p_q[(x+y)/2] = s3.x&0x0f; // srt; //s3.x; //srt;
 			}
 		}
 
@@ -399,7 +399,10 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 		}
 
 		pF->median( nF, pF+nF, true );
-		nF /= 2;
+		nF *= 6;
+		nF /= 7;
+		//pF->median( nF, pF+nF, true );
+
 
 		nF2 = nF*nF;
 		if( nF2+nF > nFall )
@@ -421,7 +424,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 				b = pF[j].x;
 				pBB = aBUG[b>>24].ppBOB[b&0xffffff];
 				pK[k].x = (i<<16)|j;
-				pK[k].y = sqrt((pBA->wCNTR-pBB->wCNTR).qlen()) + abs(pBA->nRND-pBB->nRND) ;
+				pK[k].y = sqrt((pBA->wCNTR-pBB->wCNTR).qlen()) + abs((int)pBA->nRND-(int)pBB->nRND) ;
 				k++;
 			}
 		}
@@ -848,10 +851,10 @@ public:
 				continue;
 
 
-			pBspc[x].u4 = pBpen[x].u4;
+			v.u4 = (pBspc[x].u4 = pBpen[x].u4)&~0x030303;
 
-			v.e8(pBspc[x]);
-			v.u4 &= ~0x030303;
+			/*v.e8(pBspc[x]);
+			v.u4 &= ~0x030303;*/
 
 			GD = pBcpy[x].u4 = pFcpy[x].u4 = 0;
 

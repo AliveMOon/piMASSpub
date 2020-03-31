@@ -873,7 +873,6 @@ public:
 		}
 		I4x4 wDIVcr( U1 iDIV )
 		{
-			//SDL_Rect
 			I4x4 div;
 
 			switch( iDIV%4)

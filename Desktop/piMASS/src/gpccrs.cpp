@@ -9,7 +9,8 @@ gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
 	gpmCLR;
 	id = _id;
 	win.apCRS[id] = this;
-	CRSfrm.a4x2[1] = win.wFRM( 0 );
+	CRSfrm.a4x2[1] = win.wFRM( 0 )*6;
+	CRSfrm.a4x2[1].mn( win.wDIVcr(0).a4x2[1] );
 	//wDIVfrm = win.wDIV(0).xyWH;
 
 }

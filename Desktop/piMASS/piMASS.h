@@ -292,7 +292,7 @@ class gpcALU;
 #define gpmFnB( f )		( abs(f)>0xffFFFF ? 8 : 4)		// float 23bit felbontású
 #define gpmSHnB( b )	( b>2 ? (b>4 ? 3 : 2) : (b>1 ? 1 : 0)  )
 #define gpdPUB "+--- --  -   "
-#define gpdSIZ2CR I4x2(6,9)
+#define gpdSIZ2CR  I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
 #define mm100(a) ((a)*100)
@@ -2450,21 +2450,9 @@ public:
 	};
 
     I4x2(){};
-    I4x2( I4 _x, I4 _y = 0 )
-    {
-        x = _x; y = _y;
-    }
-	I4x2( U4x2 b )
-    {
-		*this = b;
-        //x = b.x;
-        //y = b.y;
-    }
-    I4x2( const SDL_Surface& srf )
-	{
-		x = srf.w;
-		y = srf.h;
-	}
+    I4x2( I4 _x, I4 _y = 0 ) { x = _x; y = _y; }
+	I4x2( U4x2 b ) { *this = b; }
+    I4x2( const SDL_Surface& srf ) { x = srf.w; y = srf.h; }
     I4x2& operator = ( const SDL_Surface& srf ) {
 		x = srf.w;
 		y = srf.h;
@@ -2472,8 +2460,7 @@ public:
 	}
     I4x2( U8x2 b );
     I4x2( I8x2 b );
-    I4x2( int* pI )
-    {
+    I4x2( int* pI ) {
 		if( !pI )
 		{
 			gpmCLR;
@@ -2511,8 +2498,7 @@ public:
 		return *this;
 	}
 
-	I4x2 operator * ( int b ) const
-	{
+	I4x2 operator * ( int b ) const {
 		if( !b )
 			return 0;
 		if( b == 1 )
@@ -2664,11 +2650,7 @@ public:
 
 		return *this;
 	}
-	I4x2& null( void )
-	{
-		gpmCLR;
-		return *this;
-	}
+	I4x2& null( void ) { gpmCLR; return *this; }
 
 	I4x2& operator += ( const U4x2& u )
 	{
@@ -2806,52 +2788,21 @@ public:
 	I4x2& operator = ( const U8x2& b );
 	I4x2& operator = ( const I8x2& b );
 
+	I4x2 abs( void ) const { return I4x2( x<0?-x:x, y<0?-y:y ); }
 
-	I8 sum( void ) const
-	{
-		return (I8)x+y;
-	}
+	I8 sum( void ) const { return (I8)x+y; }
+	I8 area( void ) const { return x*y; }
+	U8 are_sum( void ) const { return abs().area()+abs().sum(); }
 
-	I8 area( void ) const
-	{
-		return x*y;
-	}
+	I8 qlen (void ) const { return x*x + y*y; }
 
-	U8 are_sum( void )
-	{
-		return abs().area()+abs().sum();
-	}
+	I4 mn() { return x < y ? x:y; }
+	I4 mx() { return x > y ? x:y; }
 
-	I8 qlen (void ) const
-	{
-		return x*x + y*y;
-	}
 
-	I4 mn()
-	{
-		return x < y ? x:y;
-	}
-
-	I4 mx()
-	{
-		return x > y ? x:y;
-	}
-
-	I4x2 abs( void )
-	{
-		return I4x2( x<0?-x:x, y<0?-y:y );
-	}
-
-	I4x2 MX( const I4x2 b )
-	{
-		return  I4x2( x>b.x?x:b.x, y>b.y?y:b.y );
-	}
-	I4x2 MN( const I4x2 b )
-	{
-		return  I4x2( x<b.x?x:b.x, y<b.y?y:b.y );
-	}
-	I4x2& mx( const I4x2 b )
-	{
+	I4x2 MX( const I4x2 b ) const { return  I4x2( x>b.x?x:b.x, y>b.y?y:b.y ); }
+	I4x2 MN( const I4x2 b ) const { return  I4x2( x<b.x?x:b.x, y<b.y?y:b.y ); }
+	I4x2& mx( const I4x2 b ) {
 		if( x < b.x )
 			x = b.x;
 		if( y < b.y )
@@ -2859,8 +2810,7 @@ public:
 		return *this;
 	}
 
-	I4x2& mn( const I4x2 b )
-	{
+	I4x2& mn( const I4x2 b ) {
 		if( x > b.x )
 			x = b.x;
 		if( y > b.y )

@@ -1,6 +1,6 @@
  a0	 
  
- R# o# b# i#                                                                  b0  	 												 d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
+ R# o# b# i#                                                                  b0	 b0  	 												 d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rout = 0x10003;
  rinp = 0x10002;
@@ -53,7 +53,7 @@ void main() {
 				ix51	= max( vec2(0), floor(ix5)-1.0 + ix501),	// 01133
 				spcUV 	= vec2( ix22.x < 1.0 ? ix50.x:ix51.x, ix22.y < 1.0 ? ix50.y:ix51.y ),
 				spcPX	= v2sLUb*tgPX + spcOF;
-		src = texture2D( tex0, srcUV ).rgb; src	= floor( src.rgb*src.rgb*(255.0/4.0))*4.0;
+		src = texture2D( tex0, srcUV ).rgb; src	= floor( src*(255.0/4.0))*4.0;
 		for( int i = 0; i < 4; i++ ) for( int j = 0; j < 4; j++ ) {
 			uv = vec2(i,j);	w = (uv-spcUV)*vec2(2.0,1.0);
 			uv += spcPX; su.x = (46.0-dot( w, w )); su.y += su.x;
@@ -66,7 +66,7 @@ void main() {
 		if(s4.a >= 1.0)	if(s4.a  < 3.0)		spc = o.xyy;
 						else if(s4.a < 5.0)	spc = o.yxy;
 						else if(s4.a < 8.0)	spc = o.yyx;
-		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/1024.0), src ), 4.0) );
+		gl_FragColor.rgb = min( f.xxx, max( spc*2.0, pow( dot( vec3(1.0/1024.0), src ), 4.0) ));
 	} else if( fUV.y < v2spcB.y ) {
 		if( fUV.x < v2spcB.x ) {
 			spc.br = (fUV-v2spcB)/(vec2(-8.0, -8.0)/v2base);
@@ -138,7 +138,7 @@ void main()
 	//vec2	flpUV = fr_uv*v2outB + vec2(0.0, 15.0/31);
  	
  	//vec2	flpUV1 = fr_uv*vec2(1.0,-1.0) + vec2(0.0, 1.0 ), 
- 			off = 1.0/aTX[0], uv;
+ 			off = 1.75/aTX[0], uv;
 	vec3 ize;
 	gl_FragColor.rgb = texture2D( tex0, lurdUV ).rgb;
  	for( int i = -2; i <= 2; ++i )
@@ -262,6 +262,10 @@ void main()
 	else
 		gl_FragColor = texture2D( tex0, fUV );
 	
+	bool b_pat = ( cUV.y > v2outB.y ) 
+			&& ( cUV.y < (v2outB.y+v2rgB.y*0.25) ) 
+		    && ( cUV.x < v2spcB.x );
+			
 	if( ( fUV.x < v2backB.x ) || (fUV.y<v2backB.y) || (fUV.y>v2spcB.y) )
 	{
 		gl_FragColor.rgb = floor(gl_FragColor.rgb/0.99); 
@@ -277,12 +281,11 @@ void main()
 				gl_FragColor.b = 1.0;
 		}
 	} 
-	else if( (length(crs-v2penOFbPIX)/6.0) < 1.0 ) 
+	else if( !b_pat )
+	if( (length(crs-v2penOFbPIX)/6.0) < 1.0 ) 
 			gl_FragColor.rgb = texture2D( tex2, (fUV-v2backB)/v2fbWHB ).rgb*valid;
 		
-	bool b_pat = ( cUV.y > v2outB.y ) 
-			&& ( cUV.y < (v2outB.y+v2rgB.y*0.25) ) 
-		    && ( cUV.x < v2spcB.x );
+	
 			
 	if(	
 		  ( fUV.x > (v2spcB.x+v2rgB.x) ) 
