@@ -1,12 +1,12 @@
  a0	 
  
- R# o# b# i#                                                                  b0	 																	  d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
+ R# o# b# i#                                                                  b0  	 												 d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rout = 0x10003;
  rinp = 0x10002;
  slmp = "192.168.1.90 10000"
  cam = 1
- pic = "cam1"; 
+ pic = "clip"; 
  
  bob = "exp";
  f = fps; 
@@ -17,124 +17,89 @@
   c1	 
  name="head"
  pix ="
-
 #version 120																
 varying vec2 fr_uv;														
-uniform sampler2D	tex0,	// cam1
-					tex1;	// penna
-					//tex2;	// space
-uniform vec2		tgPX;					
-uniform vec2		aTX[8];		
+uniform sampler2D	tex0,	tex1;		// cam1 // penna
+uniform vec2		tgPX,	aTX[8];		
 uniform vec4 		aCNL[8];
-#define v2base	vec2(20.0, 28.0)
-#define v2out	vec2(20.0, 10.0)
-#define v2outB	(v2out/v2base)
-#define v2spc	vec2(10.0,20.0)
-#define v2spcB	(v2spc/v2base)
-#define v2frnt	vec2(10.0, 10.0)
-#define v2back	vec2(10.0, 15.0)
-#define v2frntB (v2frnt/v2base)
+#define v2base	vec2(20.0,	28.0)
+#define v2outB	(vec2(20.0,	10.0)/v2base)
+#define v2spcB	(vec2(10.0,	20.0)/v2base)
+#define v2back	vec2(10.0,	15.0)
+#define v2frntB (vec2(10.0,	10.0)/v2base)
 #define v2backB (v2back/v2base)
 #define v2fbWH	vec2(10.0, 5.0)
 #define v2fbWHB (v2fbWH/v2base)
-#define v2sLU 	vec2(2.0,12.0)
-#define v2sLUb	(v2sLU/v2base)	
-
-#define v2rgB	(vec2( 8.0, 8.0)/v2base)
+#define v2sLUb	(vec2(2.0,12.0)/v2base)	
 #define v2bgB	(vec2(-8.0, 8.0)/v2base)
-#define v2brB	(vec2(-8.0,-8.0)/v2base)
 #define	v2src	vec2(320,160)
-
 #define spcOF	256	
-vec4 srt( vec3 c )
-{
+vec4 srt( vec3 c ) {
 	float a = 0;
-	if( c.g > c.r ) { c.rg = c.gr; a = 2.0; }
+	if( c.g > c.r ) { c.rg = c.gr; a  = 2.0; }
 	if( c.b > c.r ) { c.rb = c.br; a += 4.0; }
 	if( c.b > c.g ) { c.rb = c.br; a += 8.0; }
 	if( c.r > 0.0 ) a += 1.0;
 	return vec4( c, a );
 } 
-void main()																
-{
+void main() {
 	const vec2 f = vec2(1,-1);
 	vec2	fUV = fr_uv*f+vec2(0,1);
 	gl_FragColor = vec4( texture2D( tex1, fUV ).rgb, 1.0 );	// penna
 	vec3	src = vec3(0.0), spc = vec3(0.0);
-	if( fUV.y < v2outB.y )
-	{
+	if( fUV.y < v2outB.y ) {
 		vec2	srcUV = fUV/v2outB, w, su = vec2(0), uv,
-				tg2x2 	= aTX[0]/2.0,
-				tg5		= tg2x2/5.0,
+				tg2x2 	= aTX[0]/2.0, tg5 = tg2x2/5.0,
 				pix1 	= floor(srcUV*aTX[0]),
 				pix2 	= floor(srcUV*tg2x2),			// 320x160
 				ix22	= floor(fract(pix1/2.0)*2.0),	// 01010,01010
-				ix5		= pix2/tg5,					// 01234		
-				ix501	= floor(fract(ix5/2.0)*2.0),// 01010
-				
+				ix5		= pix2/tg5,						// 01234		
+				ix501	= floor(fract(ix5/2.0)*2.0),	// 01010
 				ix50	= min( vec2(3), floor(ix5)-ix501 ),			//  00223		
 				ix51	= max( vec2(0), floor(ix5)-1.0 + ix501),	//mx00123
 																	//  01133
-				spcUV 	= vec2( 
-							ix22.x < 1.0 ? ix50.x:ix51.x, 
-							ix22.y < 1.0 ? ix50.y:ix51.y 
-						),
-				spcPX = v2sLUb*tgPX + spcOF; 
-		src	= floor( texture2D( tex0, srcUV ).rgb*(255.0/4.0))*4.0;
-		for( int i = 0; i < 4; i++ ) for( int j = 0; j < 4; j++ )
-		{
+				spcUV 	= vec2( ix22.x < 1.0 ? ix50.x:ix51.x, 
+								ix22.y < 1.0 ? ix50.y:ix51.y ),
+				spcPX = v2sLUb*tgPX + spcOF;
+		src = texture2D( tex0, srcUV ).rgb;
+		src	= floor( src.rgb*src.rgb*(255.0/4.0))*4.0;
+		for( int i = 0; i < 4; i++ ) for( int j = 0; j < 4; j++ ) {
 			uv = vec2(i,j);	w = (uv-spcUV)*vec2(2.0,1.0);
-			uv += spcPX;
-			su.x = (46.0-dot( w, w )); su.y += su.x;
+			uv += spcPX; su.x = (46.0-dot( w, w )); su.y += su.x;
 			spc	+= (  texture2D( tex1, (uv+src.rg		)/tgPX )
 					+ texture2D( tex1, (uv+src.bg*f.yx	)/tgPX )
-					+ texture2D( tex1, (uv-src.br		)/tgPX )).rgb
-					* su.x;
+					+ texture2D( tex1, (uv-src.br		)/tgPX )).rgb * su.x;
 		}
-		vec4 s4 = srt( spc/su.y );
-		s4.a = floor(fract(s4.a/8.0)*8.0);
-		vec2 o = vec2(s4.r,0);
-		
-		if( s4.a < 1.0 ) 		spc = o.yyy;
-		else if( s4.a < 3.0 )	spc = o.xyy;
-		else if( s4.a < 5.0 ) 	spc = o.yxy;
-		else if( s4.a < 8.0 ) 	spc = o.yyx;
-		else					spc = o.yyy;
-		
- 		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/1024.0), src ), 4.0) );
-	}
-	else if( fUV.y < v2spcB.y )
-	{
-		if( fUV.x < v2spcB.x )
-		{
-			spc.br = (fUV-v2spcB)/v2brB;
+		vec4 s4 = srt( spc/su.y ); s4.a = floor(fract(s4.a/8.0)*8.0);
+		vec2 o = vec2(s4.r,0);	spc = o.yyy;
+		if(s4.a >= 1.0)
+		if(s4.a  < 3.0)		spc = o.xyy;
+		else if(s4.a < 5.0)	spc = o.yxy;
+		else if(s4.a < 8.0)	spc = o.yyx;
+		gl_FragColor.rgb = max( spc, pow( dot( vec3(1.0/1024.0), src ), 4.0) );
+	} else if( fUV.y < v2spcB.y ) {
+		if( fUV.x < v2spcB.x ) {
+			spc.br = (fUV-v2spcB)/(vec2(-8.0, -8.0)/v2base);
 			if( max(spc.b,spc.r) < 1.0 )
 				gl_FragColor.br += floor(spc.br*16.0)/48.0;
-		} else {
-			if( fUV.y < v2backB.y )
-			{
-				src = texture2D( tex0, (fUV-v2frntB)/v2fbWHB ).rgb/3.0;
-				gl_FragColor.rgb = max( src, gl_FragColor.rgb );
-			}
+		} else if( fUV.y < v2backB.y ) {
+			src = texture2D( tex0, (fUV-v2frntB)/v2fbWHB ).rgb/3.0;
+			gl_FragColor.rgb = max( src, gl_FragColor.rgb );
 		}
+	} else if( fUV.x < v2spcB.x ) {
+		spc.bg = (fUV-v2spcB)/(vec2(-8.0,8.0)/v2base);
+		if( max(spc.b,spc.g) < 1.0 )
+			gl_FragColor.bg += floor(spc.bg*16.0)/48.0;
 	} else {
-		if( fUV.x < v2spcB.x )
-		{
-			spc.bg = (fUV-v2spcB)/v2bgB;
-			if( max(spc.b,spc.g) < 1.0 )
-				gl_FragColor.bg += floor(spc.bg*16.0)/48.0;
-		} else {
-			spc.rg = (fUV-v2spcB)/v2rgB;
-			if( max(spc.r,spc.g) < 1.0 )
-				gl_FragColor.rg += floor(spc.rg*16.0)/48.0;
-		}
+		spc.rg = (fUV-v2spcB)/(vec2(8.0, 8.0)/v2base);
+		if( max(spc.r,spc.g) < 1.0 )
+			gl_FragColor.rg += floor(spc.rg*16.0)/48.0;
 	}
 	// szálkereszt
 	vec2 crs = abs( fUV*tgPX - aCNL[0].xy );
 	gl_FragColor.b += 1 - min( 1, min(abs(crs.x),abs(crs.y)) );
 }	
-  "  
- 
+  " 
  pico = "exp" d1	 
  
  trg = "gui";
@@ -188,7 +153,7 @@ void main()
 	//vec2	flpUV = fr_uv*v2outB + vec2(0.0, 15.0/31);
  	
  	//vec2	flpUV1 = fr_uv*vec2(1.0,-1.0) + vec2(0.0, 1.0 ), 
- 			off = 0.3/aTX[0], uv;
+ 			off = 1.0/aTX[0], uv;
 	vec3 ize;
 	gl_FragColor.rgb = texture2D( tex0, lurdUV ).rgb;
  	for( int i = -2; i <= 2; ++i )
@@ -202,7 +167,37 @@ void main()
  	gl_FragColor /= gl_FragColor.a;
 }
  "
- pic = "dilet" a2	
+ pic = "dilet" h1	 
+ 
+ trg = "clip"
+ trgw = 512;
+ trgh = 256;
+ pico = "cam1"
+ gpu = "clip"  i1	 
+
+ name="clip"
+ pix = "
+ #version 120																
+varying vec2 fr_uv;														
+uniform sampler2D	tex0;
+uniform vec2		tgPX;					
+uniform vec2		aTX[8];		
+uniform vec4 		aCNL[8];											
+#define v2base	vec2(20.0, 28.0)
+#define v2oLU	(vec2(20.0, 28.0)/5.0)
+#define v2oLUb	(v2oLU/v2base)
+void main()																
+{	
+	gl_FragColor = vec4(0,0,0,1);
+	//vec2	flpUV = fr_uv*vec2(1.0,-15.0/31) + vec2(0.0, 15.0/31);
+	vec2	fUV = fr_uv*vec2(1,-1)+vec2(0,1),
+			lurdUV = fUV*(v2oLUb*3)+v2oLUb,
+			off = 1.0/aTX[0];
+	gl_FragColor.rgb = texture2D( tex0, lurdUV ).rgb;
+ 	
+}
+ "
+ pic = "clip" a2	
 // BILL HS12:0000
 // POS:  n:0
 //	iXYZ  450.00mm,  450.00mm,  450.00mm 
@@ -486,7 +481,7 @@ void main()
  d3	   
  
  trg = "exp";
- trgw = 256;
+ trgw = 512;
  trgh = 256;
  
  pico="dilet";

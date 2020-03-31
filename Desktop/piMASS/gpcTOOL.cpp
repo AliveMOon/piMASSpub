@@ -848,7 +848,10 @@ public:
 				continue;
 
 
-			pBspc[x].u4 = v.u4 = bP;
+			pBspc[x].u4 = pBpen[x].u4;
+
+			v.e8(pBspc[x]);
+			v.u4 &= ~0x030303;
 
 			GD = pBcpy[x].u4 = pFcpy[x].u4 = 0;
 

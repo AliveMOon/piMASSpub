@@ -263,3 +263,4 @@ U4 U1x4::bugW( I4x2* pR, U4* pMSK, I4 mom, I4 b, I4* pD, U4 n, U4 nX )
 
 	return pR->x = pRi->x;
 }
+

@@ -1014,35 +1014,7 @@ public:
 		w = t;
 		return *this;
 	}
-	/*U1 srt3( U1 lim ) {
-		if( !(u4&0xffffff) )
-			return 0;
 
-		U1 o = 0x10;
-		U1x4 s = *this;
-
-		if(s.y>s.x)
-		{
-			s.swpYX();
-			o = 0x1;
-		}
-		if(s.z>s.x)
-		{
-			s.swpZX();
-			o |= 0x02;
-		}
-		if(s.z>s.y)
-		{
-			s.swpZY();
-			o |= 0x04;
-		}
-		if( !lim )
-			return o;
-		if( s.x > lim )
-			return o;
-
-		return 0;
-	}*/
 	U1x4 srt3() {
 		if( !(u4&0xffffff) )
 			return 0;
@@ -1132,29 +1104,10 @@ public:
 	}
 
 
-	/*U1x4& swp4( U1 s ) {
-		if( !(s&0x3f) )
-			return *this;
-
-		if( s&0x20 )
-			swpWZ();
-		if( s&0x10 )
-			swpWY();
-		if( s&0x08 )
-			swpWX();
-
-		if( s&0x04 )
-			swpZY();
-		if( s&0x02 )
-			swpZX();
-		if( s&0x01 )
-			swpYX();
-
-		return *this;
-	}*/
 	U1x4 operator & ( U4 b ) const { return u4&b; }
 	U1x4 operator | ( U4 b ) const { return u4|b; }
 	U1x4 operator ^ ( U4 b ) const { return u4^b; }
+
 
 
 	U1x4 operator & ( U1 b ) const {
@@ -1247,6 +1200,28 @@ public:
 	U1x4 xy00() const
 	{
 		return U1x4(x,y);
+	}
+	U1x4& e8xyz_( const U1x4& b )
+	{
+		U4 bb = b.x;
+		x = (bb*bb)>>8;
+		bb = b.y;
+		y = (bb*bb)>>8;
+		bb = b.y;
+		z = (bb*bb)>>8;
+		return *this;
+	}
+	U1x4& e8( const U1x4& b )
+	{
+		U4 bb = b.x;
+		x = (bb*bb)>>8;
+		bb = b.y;
+		y = (bb*bb)>>8;
+		bb = b.y;
+		z = (bb*bb)>>8;
+		bb = b.w;
+		w = (bb*bb)>>8;
+		return *this;
 	}
 };
 
