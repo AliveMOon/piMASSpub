@@ -555,6 +555,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 	return pPET;
 }
 
+#define gpdSPCdbgOFF if(false)
 #define gpdSPCdbgCOUT if(false)
 #define gpdLZYdbSPClim 0x20
 class gpcTRDspc
@@ -565,11 +566,11 @@ public:
 			sPATH[0x100], *pDIR;
 	U1x4	*pSRC,						// pl. CAM
 			*pScpy, *pFcpy, *pBcpy,		// COPY
-			*pSpen, *pFpen, *pBpen,		// RNDR
+			*pSpen,	*pFpen, *pBpen,		// RNDR
 			*pSspc, *pFspc, *pBspc,		// RNDR
 			*pSPC,
 			x05;
-	U4x4	aHISTI[0x40];
+	U4x4	aHISTI[0x100];
 	I4x2	srcWH, spcWH;
 	I8x2	ALFid;
 	U4x4*	pMAP;
@@ -731,6 +732,7 @@ public:
 		return pSRF;
 	}
 	void DO() {
+
 		if(!pSRC)
 			return;
 		U1x4 c;
@@ -745,13 +747,9 @@ public:
 		U4	of = (id&1)+((id>>2)&1),
 			of4 = of<<2,
 			shf8 = (id%3)*8,
-			nXY = 0, ys = srcWH.x, x,y, ixy;
+			nXY = 0, ys = srcWH.x, x,y, ixy, xe;
 		for( y = 0; y < 0x80; y+=8 )
-		for( x = 0, ixy = y*ys;
-
-				x < 0x100;
-
-				x+=8, ixy+=8 )
+		for( x = 0, ixy = y*ys; x < 0x100; x+=8, ixy+=8 )
 		{
 			//pSPC[(x+y*spcWH.x)] = (U4)255<<shf8;
 			nXY++;
@@ -761,11 +759,7 @@ public:
 			aHISTI[c.z].z++;
 		}
 		for( y = 0x22; y < 0x60; y+=8 )
-		for( x = 0x42, ixy = x+y*ys;
-
-				x < 0xc0;
-
-				x+=8, ixy+=8 )
+		for( x = 0x42, ixy = x+y*ys; x < 0xc0; x+=8, ixy+=8 )
 		{
 			//pSPC[(x+y*spcWH.x)] = (U4)255<<shf8;
 			nXY++;
@@ -790,6 +784,7 @@ public:
 
 		x05.w = x05.srt3().x;
 		SDL_Surface* pTMP = NULL;
+		//gpdSPCdbgCOUT
 
 		if( pMAP->x == x05.w ) {
 			// marad a régiben
@@ -832,12 +827,15 @@ public:
 		if( !pFcpy )
 			return;
 
+		std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;
+
+
 		U1x4	fC, GD,// fP,
 				v;
 		U4 bC, bP, n = 0, xyP;
 		I4x2 trfT(1,spcWH.x);
-		for( U4 i = 0, iy = spcWH.x*2, ie = iy*0x20; i < ie; i += iy )
-		for( U4 x = i, xe = x+0x80; x < xe; x+=2 )
+		for( y = 0, ixy = ys*0x40; y < ixy; y += ys*2 )
+		for( x = y, xe = x+0x80; x < xe; x+=2 )
 		{
 			fC.u4 = pFcpy[x].u4&0xffffff;
 			if( !fC.u4 )
@@ -850,25 +848,20 @@ public:
 			if( bC != bP )
 				continue;
 
-
 			v.u4 = (pBspc[x].u4 = pBpen[x].u4)&~0x030303;
-
-			/*v.e8(pBspc[x]);
-			v.u4 &= ~0x030303;*/
-
 			GD = pBcpy[x].u4 = pFcpy[x].u4 = 0;
 
 			/// ! zyx	///
 			///   RGB ! ///
-			xyP = I4x2( 0x100+v.z, 0x100+v.y )*trfT;// RG
+			xyP = I4x2( 0x100+(int)v.z, 0x100+(int)v.y )*trfT;// RG
 			GD.u4 |= (pSspc[xyP]>>=2).u4;
 			pSspc[xyP].u4 |= fC.u4;
 
-			xyP = I4x2( 0x100-v.x, 0x100+v.y )*trfT;// BG
+			xyP = I4x2( 0x100-(int)v.x, 0x100+(int)v.y )*trfT;// BG
 			GD.u4 |= (pSspc[xyP]>>=2).u4;
 			pSspc[xyP].u4 |= fC.u4;
 
-			xyP = I4x2( 0x100-v.x, 0x100-v.z )*trfT;// BR
+			xyP = I4x2( 0x100-(int)v.x, 0x100-(int)v.z )*trfT;// BR
 			GD.u4 |= (pSspc[xyP]>>=2).u4;
 			pSspc[xyP].u4 |= fC.u4;
 
@@ -947,7 +940,7 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	aSPC[0].pSPC 	= (U1x4*)gpapP[0]->pixels;
 	aSPC[0].pMAP	= ((U4x4*)(aSPC[0].pSspc + 320*aSPC[0].spcWH.x));
 
-	aSPC[0].pSspc 	+= I4x2(32,320+32)*trfSPC;
+	aSPC[0].pSspc 	+= I4x2(64,320+64)*trfSPC;
 	aSPC[0].pFspc 	+= I4x2(320,320)*trfSPC;
 	aSPC[0].pBspc 	= aSPC[0].pFspc + I4x2(0,160)*trfSPC;
 
@@ -969,10 +962,12 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	aSPC[0].pBcpy	=
 	aSPC[0].pScpy	=
 	aSPC[0].pFcpy	= gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
-
-	aSPC[0].pScpy 	+= ofSFB.x;
-	aSPC[0].pFcpy 	+= ofSFB.y;
-	aSPC[0].pBcpy 	+= ofSFB.z;
+	if( aSPC[0].pFcpy )
+	{
+		aSPC[0].pScpy 	+= ofSFB.x;
+		aSPC[0].pFcpy 	+= ofSFB.y;
+		aSPC[0].pBcpy 	+= ofSFB.z;
+	}
 
 	gpmMcpy( aSPC[0].sPATH, pPATH, nDIR )[nDIR] = 0;
 	aSPC[0].pDIR = aSPC[0].sPATH + nDIR;
@@ -1002,9 +997,12 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			aSPC[trd].pFpen += ofSFB.z;
 			aSPC[trd].pBpen += ofSFB.z;
 
-			aSPC[trd].pScpy += ofSFB.y;
-			aSPC[trd].pFcpy += ofSFB.z;
-			aSPC[trd].pBcpy += ofSFB.z;
+			if( aSPC[trd].pFcpy )
+			{
+				aSPC[trd].pScpy += ofSFB.y;
+				aSPC[trd].pFcpy += ofSFB.z;
+				aSPC[trd].pBcpy += ofSFB.z;
+			}
 
 			aSPC[trd].pSPC	+= ofSFB.z*2 - ofSFB.x;
 			aSPC[trd].pMAP	+= i;
@@ -1122,10 +1120,12 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	SPC.pBcpy	=
 	SPC.pScpy	=
 	SPC.pFcpy	= gpapP[3] ? (U1x4*)gpapP[3]->pixels : NULL;
-
-	SPC.pScpy 	+= ofSFB.x;
-	SPC.pFcpy 	+= ofSFB.y;
-	SPC.pBcpy 	+= ofSFB.z;
+	if( SPC.pFcpy )
+	{
+		SPC.pScpy 	+= ofSFB.x;
+		SPC.pFcpy 	+= ofSFB.y;
+		SPC.pBcpy 	+= ofSFB.z;
+	}
 
 	gpmMcpy( SPC.sPATH, pPATH, nDIR )[nDIR] = 0;
 	SPC.pDIR = SPC.sPATH + nDIR;
@@ -1149,11 +1149,12 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	SPC.pSpen += ofSFB.y;
 	SPC.pFpen += ofSFB.z;
 	SPC.pBpen += ofSFB.z;
-
-	SPC.pScpy += ofSFB.y;
-	SPC.pFcpy += ofSFB.z;
-	SPC.pBcpy += ofSFB.z;
-
+	if( SPC.pFcpy )
+	{
+		SPC.pScpy += ofSFB.y;
+		SPC.pFcpy += ofSFB.z;
+		SPC.pBcpy += ofSFB.z;
+	}
 	SPC.pSPC	+= ofSFB.z*2 - ofSFB.x;
 	SPC.pMAP	+= SPC.id;
 
