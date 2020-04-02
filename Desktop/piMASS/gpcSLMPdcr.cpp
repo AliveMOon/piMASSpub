@@ -283,7 +283,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	if( !NMnDIF.x )
 		return *this;
 
-	I8 dif = iXYZ.qlen_xyz(), mm = sqrt(dif)/100;
+	I8 dif = iXYZ.qlen_xyz(), mm = sqrt(dif)/100, A, B;
 	if( mm < 400 )
 		return *this;
 
@@ -316,10 +316,11 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		oCTRL.z |= 1;
 	}
 
-	dir = (tABC - iABC).lim_xyz(mm100(10));
-	dif = dir.qlen_xyz();
-	if( dif )
+	dir = tABC.chkABC( iABC, mm100(1) );
+	if( dir.w ) {
+
 		oCTRL.z |= 2;
+	}
 
 	if( oCTRL.z )
 	{

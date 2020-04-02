@@ -3555,6 +3555,8 @@ public:
 		a4x2[0] = t;
 		return *this;
 	}
+	I4x4 chkABC( const I4x4& b, float dim ) const;
+
 };
 
 
@@ -4212,6 +4214,7 @@ public:
 		x = xy.x; y = xy.y;
 		return *this;
     }
+
     Fx2& operator += ( const Fx2& xy )
     {
 		x += xy.x; y += xy.y;
@@ -4227,11 +4230,17 @@ public:
 		x *= xy.x; y *= xy.y;
 		return *this;
     }
+    Fx2& operator %= ( const Fx2& xy )
+    {
+		x = frac(x/xy.x); y = frac(y/xy.y);
+		return *this;
+    }
     Fx2& operator /= ( const Fx2& xy )
     {
 		x /= xy.x; y /= xy.y;
 		return *this;
     }
+
     double sum( void ) const
     {
         return x+y;
@@ -4353,6 +4362,20 @@ public:
         aF2[0] = xy;
         aF2[1] = zw;
     }
+    Fx4( const I4x4 i4 )
+    {
+        aF2[0] = i4.a4x2[0];
+        aF2[1] = i4.a4x2[1];
+    }
+	Fx4& operator = ( const I4x4 i4 )
+    {
+        aF2[0] = i4.a4x2[0];
+        aF2[1] = i4.a4x2[1];
+        return *this;
+    }
+
+
+
     double sum( void ) const
     {
         return x+y+z+w;
@@ -4427,6 +4450,32 @@ public:
 		aF2[1] = b;
 		return *this;
     }
+
+    Fx4& operator += ( const float b )
+    {
+		aF2[0] += b;
+		aF2[1] += b;
+		return *this;
+    }
+    Fx4& operator -= ( const float b )
+    {
+		aF2[0] -= b;
+		aF2[1] -= b;
+		return *this;
+    }
+    Fx4& operator &= ( const float b )
+    {
+		aF2[0] &= b;
+		aF2[1] &= b;
+		return *this;
+    }
+    Fx4& operator /= ( const float b )
+    {
+		aF2[0] /= b;
+		aF2[1] /= b;
+		return *this;
+    }
+
     Fx4& operator += ( const Fx2& b )
     {
 		aF2[0] += b;
@@ -4470,6 +4519,12 @@ public:
     {
 		aF2[0] &= b.aF2[0];
 		aF2[1] &= b.aF2[1];
+		return *this;
+    }
+    Fx4& operator %= ( const Fx4& b )
+    {
+		aF2[0] %= b.aF2[0];
+		aF2[1] %= b.aF2[1];
 		return *this;
     }
     Fx4& operator /= ( const Fx4& b )
@@ -4565,8 +4620,7 @@ public:
 		return *this;
 	}
 
-	Fx4& swp3( U1 s )
-	{
+	Fx4& swp3( U1 s ) {
 		if( !(s&0x7) )
 			return *this;
 
@@ -4579,6 +4633,8 @@ public:
 
 		return *this;
 	}
+
+
 };
 
 class D4

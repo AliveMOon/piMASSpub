@@ -6,7 +6,20 @@ I8x4 gpaCAGEboxMSK[] = {
 	{1,1,0,0},
 
 };
+
 I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
+
+I4x4 I4x4::chkABC( const I4x4& b, float dim ) const
+{
+	Fx4 fa = *this, fb = b;
+	fa /= dim*180.0/PI;
+	fb /= dim*180.0/PI;
+
+	I4x4 chk( (cos(fa.x)-cos(fb.x))*dim, (cos(fa.y)-cos(fb.y))*dim, (cos(fa.z)-cos(fb.z))*dim );
+	chk.w = chk.qlen_xyz();
+
+	return chk;
+}
 I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 {
 	// a vektorokból korábban ki kell vonni az origot
