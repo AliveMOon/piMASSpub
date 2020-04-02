@@ -153,7 +153,7 @@ public:
 				aIXn[0x10],
 				nBUFF, nV;
 	U4x2 aVXn[0x10];
-	Fx4* pV;
+	F4* pV;
 
 	gpcGL* GLSLset( const gpcALU& alu, const char* pF = NULL, const char* pV = NULL );
 	gpcGL* GLSLset( const I8x2& an, const char* pF = NULL, const char* pV = NULL  );
@@ -302,7 +302,7 @@ public:
 		{
 			nV = gpmPAD( n*3, 0x10 );
 			gpmDELary(pV);
-			pV = new Fx4[nV];
+			pV = new F4[nV];
 		}
 		//pBOB->nDRW++;
 		I4x2	wC = pBOB->wCNTR, ixy, inD = pBOB->inDRW( b ),
@@ -325,12 +325,12 @@ public:
 		pV[j] = pV[0];
 		j++;
 
-		pV[0].add(  Fx4( wC,			I4x2(0)		), j );
-		pV[0].mul(  Fx4( xyWH.a4x2[1],	I4x2(1,1)	)
-				   /Fx4( pBOB->picWH,	I4x2(1,1)	), j );
+		pV[0].add(  F4( wC,			I4x2(0)		), j );
+		pV[0].mul(  F4( xyWH.a4x2[1],	I4x2(1,1)	)
+				   /F4( pBOB->picWH,	I4x2(1,1)	), j );
 
-		pV[0].add( Fx4(xyWH.a4x2[0],	I4x2(0)		), j );
-		pV[0].div( Fx4(trgWHpx,			I4x2(1,1)	), j );
+		pV[0].add( F4(xyWH.a4x2[0],	I4x2(0)		), j );
+		pV[0].div( F4(trgWHpx,			I4x2(1,1)	), j );
 		viBO( md, (float*)pV, j, 4 );
 
 
@@ -340,7 +340,7 @@ public:
 		if( this ? !wh.area() : true )
 			return NULL;
 
-		Fx4 aV4[4];
+		F4 aV4[4];
 		glUseProgram( gProgID );
 		if( boxXY == xy && boxWH == wh )
 			return this;
@@ -351,9 +351,9 @@ public:
 		xy -= luXY;
 
 		aV4[0].aF2[1] = 0;
-		aV4[1].aF2[1] = Fx2( 1, 0 );
-		aV4[2].aF2[1] = Fx2( 1, 1 );
-		aV4[3].aF2[1] = Fx2( 0, 1 );
+		aV4[1].aF2[1] = F2( 1, 0 );
+		aV4[2].aF2[1] = F2( 1, 1 );
+		aV4[3].aF2[1] = F2( 0, 1 );
 
 		aV4[0].aF2[0] = xy;
 		aV4[1].aF2[0] = xy + I4x2( wh.x, 0 );
@@ -361,9 +361,9 @@ public:
 		aV4[3].aF2[0] = xy + I4x2( 0, wh.y );
 
 		if( pPICrtx )
-			aV4[0].div( Fx4( pPICrtx->txWH.a4x2[1], I4x2(1,1) ), gpmN(aV4) );
+			aV4[0].div( F4( pPICrtx->txWH.a4x2[1], I4x2(1,1) ), gpmN(aV4) );
 		else
-			aV4[0].div( Fx4( trgWHpx, I4x2(1,1) ), gpmN(aV4) );
+			aV4[0].div( F4( trgWHpx, I4x2(1,1) ), gpmN(aV4) );
 
 		if( aVXid[0] > 0 )
 			glDeleteBuffers(1,  &aVXid[0] );
@@ -383,7 +383,7 @@ public:
 		xyWH.a4x2[0] += divPX.a4x2[0];
 		return glSETbox( xyWH.a4x2[0], xyWH.a4x2[1] );
 	}
-	gpcGL* glSETcnl( U4 i, Fx4 xyzw ) {
+	gpcGL* glSETcnl( U4 i, F4 xyzw ) {
 		if( !this )
 			return NULL;
 
@@ -392,7 +392,7 @@ public:
 
 		return this;
 	}
-	gpcGL* glSETcnl( U4 i, Fx4* pXYZW, U4 n ) {
+	gpcGL* glSETcnl( U4 i, F4* pXYZW, U4 n ) {
 		if( !this )
 			return NULL;
 
@@ -464,9 +464,9 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, aVXid[0] );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[0] );
 
-		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
+		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), 0 );
 		glEnableVertexAttribArray( ATvxID );
-		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
+		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), gpmGLBOFF(sizeof(F2)) );
 		glEnableVertexAttribArray( ATuvID );
 
 		glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
@@ -500,9 +500,9 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, aVXid[mode] );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[mode] );
 
-		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), 0 );
+		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), 0 );
 		glEnableVertexAttribArray( ATvxID );
-		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(Fx4), gpmGLBOFF(sizeof(Fx2)) );
+		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), gpmGLBOFF(sizeof(F2)) );
 		glEnableVertexAttribArray( ATuvID );
 
 		glDrawElements( gpaDRWmod[mode], aIXn[mode], GL_UNSIGNED_INT, NULL );

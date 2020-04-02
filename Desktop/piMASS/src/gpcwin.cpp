@@ -211,7 +211,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 	gppKEYbuff = ( gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,pWELLCOME ) );
 	I8x2 GLSLline(0,2), GLSLpic(0,1), GLSLiso(0,0);
-	Fx4 tmpFx4;
+	F4 tmpFx4;
 	while( gppKEYbuff ) {
 		usleep(33);
 		mSEC.y = mSEC.x;
@@ -258,7 +258,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						pGL
 						->GLSLset( GLSLpic, gpsGLSLfrgREF )
 						->glSETbox( w.a4x2[0], w.a4x2[1] )
-						->glSETcnl( 0, Fx4(0.25f,0.25f,0.5f,1.0f) )
+						->glSETcnl( 0, F4(0.25f,0.25f,0.5f,1.0f) )
 						->glSETtx( 0, pBGtx, bgWH )->glDRW( w.a4x2[0], FRMwh );
 
 					glViewport( w.x, (winSIZ.w-w.w)-w.y, w.z, w.w );
@@ -274,7 +274,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						{
 							pGL
 							->glSETbox( pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh ) // w, FRMwh )
-							->glSETcnl( 0, Fx4(0.9f,0.9f,0.9f,1.0f) )
+							->glSETcnl( 0, F4(0.9f,0.9f,0.9f,1.0f) )
 							->glSETtx( 0, p_tx, pP->txWH.a4x2[1] )
 							->glDRW( w.a4x2[0], FRMwh );
 							//->glDRW( 0, w.a4x2[0], FRMwh );
@@ -293,7 +293,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						{
 							pGL
 							->glSETbob( m, nJDOIT.w, pB, pI[0], I4x4( 0, 0, winSIZ.z, winSIZ.w ), FRMwh )
-							->glSETcnl( 0, Fx4(1.0f,0.125f,0.025f,1.0f).swp3(pB->srt3) ) // Fx4(1.0f,0.0f,0.0f,1.0f) )
+							->glSETcnl( 0, F4(1.0f,0.125f,0.025f,1.0f).swp3(pB->srt3) ) // F4(1.0f,0.0f,0.0f,1.0f) )
 							->glDRW( m, w.a4x2[0], FRMwh );
 						}
 

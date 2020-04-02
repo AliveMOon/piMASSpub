@@ -283,8 +283,8 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	if( !NMnDIF.x )
 		return *this;
 
-	I8 dif = iXYZ.qlen_xyz(), mm = sqrt(dif)/100, A, B;
-	if( mm < 400 )
+	I8 dif = iXYZ.qlen_xyz(), mmA = sqrt(dif), mmB = mmA;
+	if( mmA < mm100(400) )
 		return *this;
 
 	oCTRL.z = 0;
@@ -296,6 +296,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	dif = dir.qlen_xyz();
 	if( dif )
 	{
+		mmA = sqrt(dif);
 		switch( NMnDIF.x )
 		{
 			case gpeZS_BILL:
@@ -307,18 +308,29 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL) );
 				tmp = cageBOX( tmp, gpaCAGEjohnBOX,gpmN(gpaCAGEjohnBOX) );
 				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(100)) );
-				//oXYZ.xyz_( iXYZ.lim_xyz( cageBALL(gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL)), mm100(100)) );
 				break;
 			default:
 				oXYZ.xyz_( iXYZ );
 				break;
 		}
-		oCTRL.z |= 1;
+		dir = oXYZ - iXYZ;
+		mmB = sqrt(dif = dir.qlen_xyz());
+		if( dif )
+			oCTRL.z |= 1;
 	}
 
 	dir = tABC.chkABC( iABC, mm100(1) );
 	if( dir.w ) {
 
+		F4x4 tMX,iMX;
+		tMX.ypr(tABC, mm100(180)/PI );
+		iMX.ypr(iABC, mm100(180)/PI );
+		F4	tYPR = tMX.eula()*(180.0/PI),
+			iYPR = iMX.eula()*(180.0/PI);
+		if( mmB < mmA )
+		{
+			// fel lett osztva a mozgás
+		}
 		oCTRL.z |= 2;
 	}
 

@@ -11,7 +11,7 @@ I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
 
 I4x4 I4x4::chkABC( const I4x4& b, float dim ) const
 {
-	Fx4 fa = *this, fb = b;
+	F4 fa = *this, fb = b;
 	fa /= dim*180.0/PI;
 	fb /= dim*180.0/PI;
 

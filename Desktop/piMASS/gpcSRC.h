@@ -1167,7 +1167,7 @@ public:
 		rstLEV, iLEV, nLEV, topLEV;
 
 	/// aGLcnl --------
-	Fx4		aGLcnl[0x10];
+	F4		aGLcnl[0x10];
 	int		aGLpic[0x10];
 	//gpcPIC* aGLpPIC[0x10];
 

@@ -3,3 +3,34 @@ cos(x*pi/2);
 max( 0,sqrt(1-x^2) )-max( 0,sqrt(1-(x-1)^2) );
 sqrt(1-x^2)*2;
 sqrt(1-(x-1)^2)
+
+float4x4& ypr( const float4& ypr )
+	{
+		float	cosy = cosf(ypr.x), siny = sinf(ypr.x),
+				cosp = cosf(ypr.y), sinp = sinf(ypr.y),
+				cosr = cosf(ypr.z), sinr = sinf(ypr.z);
+	
+		_11 = cosr*cosy + sinr*sinp*siny;	_12 = sinr*cosp;	_13 = -cosr*siny + sinr*sinp*cosy;	_14 = 0.0f;
+		_21 = -sinr*cosy + cosr*sinp*siny;	_22 = cosr*cosp;	_23 = sinr*siny + cosr*sinp*cosy;	_24 = 0.0f;
+		_31 = cosp*siny;					_32 = -sinp;		_33 = cosp*cosy;					_34 = 0.0f;
+		
+		_41 = _42 = _43 = 0.0f;				_44 = 1.0f;
+
+		return *this;
+	}
+	float4x4& AXr( const float3& vec, float rad )
+	{
+		double l = float4( vec ).qlen();
+		float	cosr = cosf(rad), sinr = sinf(rad), t = 1-cosr,
+				x = vec.x/l, y = vec.y/l, z = vec.z/l,
+				x2 = x*x, y2 = y*y, z2 = z*z;
+		_11 = t*x2+cosr;	_12 = t*x*y+sinr*z; _13 = t*x*z-sinr*y; _14 = 0.0f;
+		_21 = t*x*y-sinr*z;	_22 = t*y2+cosr;	_23 = t*y*z+sinr*x; _24 = 0.0f;
+		_31 = t*x*z+sinr*y; _32 = t*y*z-sinr*x;	_33 = t*z2+cosr;	_34 = 0.0f;
+		
+		_41 = _42 = _43 = 0.0f;			_44 = 1.0f;
+	
+		//D3DXMatrixRotationAxis((D3DXMATRIX*)this, (D3DXVECTOR3*)&vec, rad);
+	
+		return *this;
+	}

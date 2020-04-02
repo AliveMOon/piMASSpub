@@ -200,8 +200,9 @@ enum gpeLX:U8
 
 class float2;
 class float3;
-class float4;		// ez a Fx4 négyes singleP vektor
+class float4;		// ez a F4 négyes singleP vektor
 class float4x4;		// ja ez itt a matrix lenne
+class F4x4;
 class D4;
 class U2x4;
 class U4x4;
@@ -3560,8 +3561,7 @@ public:
 };
 
 
-class I8x2
-{
+class I8x2 {
 public:
 	union{
 		struct {
@@ -3871,8 +3871,7 @@ public:
 };
 
 
-class I8x4
-{
+class I8x4 {
 public:
     union
     {
@@ -4167,29 +4166,28 @@ public:
 
 };
 
-class Fx2
-{
+class F2 {
 public:
     float x,y;
-    Fx2(){};
+    F2(){};
 
-    Fx2( I4 _x, I4 _y = 0 )
+    F2( I4 _x, I4 _y = 0 )
     {
         x = _x; y = _y;
     }
-    Fx2( float _x, float _y = 0.0 )
+    F2( float _x, float _y = 0.0 )
     {
         x = _x; y = _y;
     }
-    Fx2( float* pF )
+    F2( float* pF )
     {
         gpmMcpyOF( this, pF, 1 );
     }
-    Fx2( I4x2 xy )
+    F2( I4x2 xy )
     {
         x = xy.x; y = xy.y;
     }
-    bool operator != ( const Fx2& b )
+    bool operator != ( const F2& b )
     {
 		if( x != b.x )
 			return true;
@@ -4198,48 +4196,76 @@ public:
 
 		return false;
     }
-    bool operator == ( const Fx2& b )
+    bool operator == ( const F2& b )
     {
 		return !(*this!=b);
     }
 
-    Fx2& operator = ( I4 b )
+    F2& operator = ( I4 b )
     {
 		x = b; y = 0;
 		return *this;
     }
 
-    Fx2& operator = ( const I4x2& xy )
+    F2& operator = ( const I4x2& xy )
     {
 		x = xy.x; y = xy.y;
 		return *this;
     }
 
-    Fx2& operator += ( const Fx2& xy )
+	F2& operator += ( const float b )
+    {
+		x += b; y += b;
+		return *this;
+    }
+    F2& operator -= ( const float b )
+    {
+		x -= b; y -= b;
+		return *this;
+    }
+    F2& operator &= ( const float b )
+    {
+		x *= b; y *= b;
+		return *this;
+    }
+    F2& operator %= ( const float b )
+    {
+		x = frac(x/b); y = frac(y/b);
+		return *this;
+    }
+    F2& operator /= ( const float b )
+    {
+		x /= b; y /= b;
+		return *this;
+    }
+
+
+    F2& operator += ( const F2& xy )
     {
 		x += xy.x; y += xy.y;
 		return *this;
     }
-    Fx2& operator -= ( const Fx2& xy )
+    F2& operator -= ( const F2& xy )
     {
 		x -= xy.x; y -= xy.y;
 		return *this;
     }
-    Fx2& operator &= ( const Fx2& xy )
+    F2& operator &= ( const F2& xy )
     {
 		x *= xy.x; y *= xy.y;
 		return *this;
     }
-    Fx2& operator %= ( const Fx2& xy )
+    F2& operator %= ( const F2& xy )
     {
 		x = frac(x/xy.x); y = frac(y/xy.y);
 		return *this;
     }
-    Fx2& operator /= ( const Fx2& xy )
+    F2& operator /= ( const F2& xy )
     {
 		x /= xy.x; y /= xy.y;
 		return *this;
     }
+
 
     double sum( void ) const
     {
@@ -4249,75 +4275,75 @@ public:
     {
         return x*x+y*y;
     }
-    Fx2 norm( void ) const
+    F2 norm( void ) const
 	{
         float l = sqrt(qlen());
-		return Fx2( x/l, y/l );
+		return F2( x/l, y/l );
 	}
-	float dot( const Fx2& b ) const
+	float dot( const F2& b ) const
 	{
         return x*b.x + y*b.y;
 	}
 
-	Fx2 operator + ( float b ) const
+	F2 operator + ( float b ) const
 	{
-        return Fx2( x+b, y+b );
+        return F2( x+b, y+b );
 	}
-	Fx2 operator - ( float b ) const
+	F2 operator - ( float b ) const
 	{
-        return Fx2( x-b, y-b );
+        return F2( x-b, y-b );
 	}
-	Fx2 operator * ( float b ) const
+	F2 operator * ( float b ) const
 	{
-        return Fx2( x*b, y*b );
+        return F2( x*b, y*b );
 	}
-	Fx2 operator / ( float b ) const
+	F2 operator / ( float b ) const
 	{
-        return Fx2( x/b, y/b );
+        return F2( x/b, y/b );
 	}
 
-	Fx2 operator + ( const Fx2& b ) const
+	F2 operator + ( const F2& b ) const
 	{
-        return Fx2( x+b.x, y+b.y );
+        return F2( x+b.x, y+b.y );
 	}
-	Fx2 operator - ( const Fx2& b ) const
+	F2 operator - ( const F2& b ) const
 	{
-        return Fx2( x-b.x, y-b.y );
+        return F2( x-b.x, y-b.y );
 	}
-	float operator * ( const Fx2& b ) const
+	float operator * ( const F2& b ) const
 	{
         return x*b.x+y*b.y;
 	}
-	Fx2 operator & ( const Fx2& b ) const
+	F2 operator & ( const F2& b ) const
 	{
-        return Fx2( x*b.x, y*b.y );
+        return F2( x*b.x, y*b.y );
 	}
-	Fx2 operator / ( const Fx2& b ) const
+	F2 operator / ( const F2& b ) const
 	{
-        return Fx2( x/b.x, y/b.y );
+        return F2( x/b.x, y/b.y );
 	}
-	Fx2& add( Fx2 b, U4 n )
+	F2& add( F2 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] += b;
 
 		return *this;
 	}
-	Fx2& sub( Fx2 b, U4 n )
+	F2& sub( F2 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] -= b;
 
 		return *this;
 	}
-	Fx2& mul( Fx2 b, U4 n )
+	F2& mul( F2 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] &= b;
 
 		return *this;
 	}
-	Fx2& div( Fx2 b, U4 n )
+	F2& div( F2 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] /= b;
@@ -4326,7 +4352,7 @@ public:
 	}
 };
 
-class Fx4
+class F4
 {
 public:
 	union
@@ -4337,100 +4363,84 @@ public:
 		};
 		struct
 		{
+			float ry,rp,rr,r0;
+		};
+		struct
+		{
 			float aXYZW[4];
 		};
 		struct
 		{
-			Fx2	aF2[2];
+			F2	aF2[2];
 		};
 	};
-    Fx4(){};
-    Fx4( I4 _x, I4 _y, I4 _z, I4 _w )
+
+    F4(){};
+    F4( I4 _x, I4 _y, I4 _z, I4 _w )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
-    Fx4( float _x, float _y = 0.0, float _z = 0.0, float _w = 0.0 )
+    F4( float _x, float _y = 0.0, float _z = 0.0, float _w = 0.0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
-    Fx4( float* pF )
+    F4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 )
+    {
+        x = _x; y = _y; z = _z; w = _w;
+    }
+    F4( float* pF )
     {
         gpmMcpyOF( this, pF, 1 );
     }
-    Fx4( I4x2 xy, I4x2 zw = 0 )
+    F4( I4x2 xy, I4x2 zw = 0 )
     {
         aF2[0] = xy;
         aF2[1] = zw;
     }
-    Fx4( const I4x4 i4 )
+    F4( const I4x4 i4 )
     {
         aF2[0] = i4.a4x2[0];
         aF2[1] = i4.a4x2[1];
     }
-	Fx4& operator = ( const I4x4 i4 )
+	F4& operator = ( const I4x4 i4 )
     {
         aF2[0] = i4.a4x2[0];
         aF2[1] = i4.a4x2[1];
         return *this;
     }
-
-
-
-    double sum( void ) const
-    {
-        return x+y+z+w;
-    }
-    double sum_xyz( void ) const
-    {
-        return x+y+z;
-    }
-    double qlen( void ) const
-    {
-        return x*x+y*y+z*z+w*w;
-    }
-    double qlen_xyz( void ) const
-    {
-        return x*x+y*y+z*z;
-    }
-    Fx4 norm_xyz( void ) const
+	F4 sqrt() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z),sqrtf(w)); }
+    double sum( void ) const		{ return x+y+z+w; }
+    double sum_xyz( void ) const	{ return x+y+z; }
+    double qlen( void ) const		{ return x*x+y*y+z*z+w*w; }
+    double qlen_xyz( void ) const	{ return x*x+y*y+z*z; }
+    F4 norm_xyz( void ) const
 	{
-        double l = sqrt(qlen_xyz());
-		return Fx4( x/l, y/l, z/l );
+        float l = sqrtf(qlen_xyz());
+		return F4( x/l, y/l, z/l );
 	}
-	float dot_xyz( Fx4 b ) const
+	float dot_xyz( F4 b ) const { return x*b.x + y*b.y + z*b.z; }
+    F4 cross_xyz( F4 b ) const
 	{
-        return x*b.x + y*b.y + z*b.z;
-	}
-    Fx4 cross_xyz( Fx4 b ) const
-	{
-		return Fx4(
+		return F4(
 						y * b.z - z * b.y,
 						z * b.x - x * b.z,
 						x * b.y - y * b.x
 				);
 	}
-	Fx4 operator + ( const Fx4& b ) const
-	{
-        return Fx4( x+b.x, y+b.y, z+b.z, w+b.w );
-	}
-	Fx4 operator - ( const Fx4& b ) const
-	{
-        return Fx4( x-b.x, y-b.y, z-b.z, w-b.w );
-	}
-	float operator * ( const Fx4& b ) const
-	{
-        return x*b.x + y*b.y + z*b.z + w*b.w;
-	}
-	Fx4 operator & ( const Fx4& b ) const
-	{
-        return Fx4( x*b.x, y*b.y, z*b.z, w*b.w );
-	}
-	Fx4 operator / ( const Fx4& b ) const
-	{
-        return Fx4( x/b.x, y/b.y, z/b.z, w/b.w );
-	}
+	F4 operator	+ ( const float b ) const { return F4( x+b, y+b, z+b, w+b ); }
+	F4 operator	- ( const float b ) const { return F4( x-b, y-b, z-b, w-b ); }
+	F4 operator	* ( const float b ) const { return F4( x*b, y*b, z*b, w*b ); }
+	F4 operator	% ( const float b ) const { return F4( frac(x/b), frac(y/b), frac(z/b), frac(w/b) ); }
+	F4 operator	/ ( const float b ) const { return F4( x/b, y/b, z/b, w/b ); }
 
-	bool operator != ( const Fx4& b )
+
+	F4 operator	+ ( const F4& b ) const { return F4( x+b.x, y+b.y, z+b.z, w+b.w ); }
+	F4 operator	- ( const F4& b ) const { return F4( x-b.x, y-b.y, z-b.z, w-b.w ); }
+	float operator	* ( const F4& b ) const { return     x*b.x + y*b.y + z*b.z + w*b.w; }
+	F4 operator	& ( const F4& b ) const { return F4( x*b.x, y*b.y, z*b.z, w*b.w ); }
+	F4 operator	/ ( const F4& b ) const { return F4( x/b.x, y/b.y, z/b.z, w/b.w ); }
+
+	bool operator != ( const F4& b )
     {
 		if( aF2[0] != b.aF2[0] )
 			return true;
@@ -4439,62 +4449,59 @@ public:
 
 		return false;
     }
-    bool operator == ( const Fx4& b )
-    {
+    bool operator == ( const F4& b ) {
 		return !(*this!=b);
     }
 
-    Fx4& operator = ( const I4x2& b )
-    {
+    F4& operator = ( const I4x2& b ) {
 		aF2[0] =
 		aF2[1] = b;
 		return *this;
     }
 
-    Fx4& operator += ( const float b )
-    {
+    F4& operator += ( const float b ) {
 		aF2[0] += b;
 		aF2[1] += b;
 		return *this;
     }
-    Fx4& operator -= ( const float b )
+    F4& operator -= ( const float b )
     {
 		aF2[0] -= b;
 		aF2[1] -= b;
 		return *this;
     }
-    Fx4& operator &= ( const float b )
+    F4& operator &= ( const float b )
     {
 		aF2[0] &= b;
 		aF2[1] &= b;
 		return *this;
     }
-    Fx4& operator /= ( const float b )
+    F4& operator /= ( const float b )
     {
 		aF2[0] /= b;
 		aF2[1] /= b;
 		return *this;
     }
 
-    Fx4& operator += ( const Fx2& b )
+    F4& operator += ( const F2& b )
     {
 		aF2[0] += b;
 		aF2[1] += b;
 		return *this;
     }
-    Fx4& operator -= ( const Fx2& b )
+    F4& operator -= ( const F2& b )
     {
 		aF2[0] -= b;
 		aF2[1] -= b;
 		return *this;
     }
-    Fx4& operator &= ( const Fx2& b )
+    F4& operator &= ( const F2& b )
     {
 		aF2[0] &= b;
 		aF2[1] &= b;
 		return *this;
     }
-    Fx4& operator /= ( const Fx2& b )
+    F4& operator /= ( const F2& b )
     {
 		aF2[0] /= b;
 		aF2[1] /= b;
@@ -4503,65 +4510,59 @@ public:
 
 
 
-	Fx4& operator += ( const Fx4& b )
-    {
+	F4& operator += ( const F4& b ) {
 		aF2[0] += b.aF2[0];
 		aF2[1] += b.aF2[1];
 		return *this;
     }
-    Fx4& operator -= ( const Fx4& b )
-    {
+    F4& operator -= ( const F4& b ) {
 		aF2[0] -= b.aF2[0];
 		aF2[1] -= b.aF2[1];
 		return *this;
     }
-    Fx4& operator &= ( const Fx4& b )
-    {
+    F4& operator &= ( const F4& b ) {
 		aF2[0] &= b.aF2[0];
 		aF2[1] &= b.aF2[1];
 		return *this;
     }
-    Fx4& operator %= ( const Fx4& b )
-    {
+    F4& operator %= ( const F4& b ) {
 		aF2[0] %= b.aF2[0];
 		aF2[1] %= b.aF2[1];
 		return *this;
     }
-    Fx4& operator /= ( const Fx4& b )
-    {
+    F4& operator /= ( const F4& b ) {
 		aF2[0] /= b.aF2[0];
 		aF2[1] /= b.aF2[1];
 		return *this;
     }
 
+	F4& operator *= ( const F4x4& b );
+	F4 operator * ( const F4x4& b ) const;
+	F4& operator /= ( const F4x4& b );
+	F4 operator / ( const F4x4& b ) const;
 
-
-
-
-
-
-	Fx4& add( Fx4 b, U4 n )
+	F4& add( F4 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] += b;
 
 		return *this;
 	}
-	Fx4& sub( Fx4 b, U4 n )
+	F4& sub( F4 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] -= b;
 
 		return *this;
 	}
-	Fx4& mul( Fx4 b, U4 n )
+	F4& mul( F4 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] &= b;
 
 		return *this;
 	}
-	Fx4& div( Fx4 b, U4 n )
+	F4& div( F4 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
 			this[i] /= b;
@@ -4570,7 +4571,7 @@ public:
 	}
 
 	/// 13
-	Fx4& swpYX()
+	F4& swpYX()
 	{
 		float t = x;
 		x = y;
@@ -4578,7 +4579,7 @@ public:
 		return *this;
 	}
 	/// 25
-	Fx4& swpZX()
+	F4& swpZX()
 	{
 		float t = x;
 		x = z;
@@ -4586,7 +4587,7 @@ public:
 		return *this;
 	}
 	/// 36
-	Fx4& swpZY()
+	F4& swpZY()
 	{
 		float t = y;
 		y = z;
@@ -4595,7 +4596,7 @@ public:
 	}
 
 	/// 49
-	Fx4& swpWX()
+	F4& swpWX()
 	{
 		float t = x;
 		x = w;
@@ -4604,7 +4605,7 @@ public:
 	}
 
 	/// 5A
-	Fx4& swpWY()
+	F4& swpWY()
 	{
 		float t = y;
 		y = w;
@@ -4612,7 +4613,7 @@ public:
 		return *this;
 	}
 	/// 6C
-	Fx4& swpWZ()
+	F4& swpWZ()
 	{
 		float t = z;
 		z = w;
@@ -4620,7 +4621,7 @@ public:
 		return *this;
 	}
 
-	Fx4& swp3( U1 s ) {
+	F4& swp3( U1 s ) {
 		if( !(s&0x7) )
 			return *this;
 
@@ -4633,6 +4634,261 @@ public:
 
 		return *this;
 	}
+
+	F4& col4x4( const float* pF )
+	{
+		x = pF[0];
+		y = pF[4];
+		z = pF[8];
+		w = pF[12];
+		return *this;
+	}
+
+
+
+};
+#define _11 x.x
+#define _12 x.y
+#define _13 x.z
+#define _14 x.w
+
+#define _21 y.x
+#define _22 y.y
+#define _23 y.z
+#define _24 y.w
+
+#define _31 z.x
+#define _32 z.y
+#define _33 z.z
+#define _34 z.w
+
+#define _41 t.x
+#define _42 t.y
+#define _43 t.z
+#define _44 t.w
+
+class F4x4
+{
+public:
+	F4 x,y,z,t;
+
+	/*union
+	{
+		struct
+		{
+			float aF4[0x10];
+		};
+		struct
+		{
+			F4 x,y,z,t;
+		};
+		struct
+		{
+			F4 aXYZT[4];
+		};
+
+	};*/
+    F4x4(){};
+    F4x4( float a ){
+		gpmCLR;
+		if( a==0.0 )
+		return; x.x = y.y = z.z = t.w = a;
+	};
+	F4x4( const F4* pA ) {
+		gpmMcpy( this, pA, sizeof(*this) );
+	}
+	F4x4( float* pA ) {
+		gpmMcpy( this, pA, sizeof(*this) );
+	}
+	F4x4& operator = ( float a ) {
+		gpmCLR;
+		if( a == 0.0 ) return *this;
+		x.x = y.y = z.z = t.w = a;
+		return *this;
+	};
+
+	F4x4& operator = ( const F4& a ) {
+		gpmCLR;
+		x.x = a.x;
+		y.y = a.y;
+		z.z = a.z;
+		t.w = a.w;
+		return *this;
+	};
+
+	F4x4& operator = ( const F4* pA ) {
+		gpmMcpy( this, pA, sizeof(*this) );
+		return *this;
+	};
+	F4 qlen() const
+	{
+		return F4( x.qlen(), y.qlen(), z.qlen(), t.qlen() );
+	}
+	F4x4& operator += ( const F4& b ) {
+		F4 l = qlen().sqrt();
+		x &= (l.x+b.x)/l.x;
+		y &= (l.y+b.y)/l.y;
+		z &= (l.z+b.z)/l.z;
+		t &= (l.w+b.w)/l.w;
+		return *this;
+	};
+	F4x4& operator -= ( const F4& b ) {
+		F4 l = qlen().sqrt();
+		x &= (l.x-b.x)/l.x;
+		y &= (l.y-b.y)/l.y;
+		z &= (l.z-b.z)/l.z;
+		t &= (l.w-b.w)/l.w;
+		return *this;
+	};
+	F4x4& operator &= ( const F4& b ) {
+		x &= b.x;
+		y &= b.y;
+		z &= b.z;
+		t &= b.w;
+		return *this;
+	};
+	F4x4& operator %= ( const F4& b ) {
+		x %= b.x;
+		y %= b.y;
+		z %= b.z;
+		t %= b.w;
+		return *this;
+	};
+	F4x4& operator /= ( const F4& b ) {
+		x /= b.x;
+		y /= b.y;
+		z /= b.z;
+		t /= b.w;
+		return *this;
+	};
+	F4x4 transp()
+	{
+		F4x4 c;
+		c.x.col4x4(&x.x);
+		c.y.col4x4(&x.y);
+		c.z.col4x4(&x.z);
+		c.t.col4x4(&x.w);
+	}
+	F4x4& operator *= ( const F4x4& b ) {
+        F4 v;
+		F4x4 c = *this;
+
+		v.col4x4(&b.x.x);
+		x.x = c.x*v;
+		y.x = c.y*v;
+		z.x = c.z*v;
+		t.x = c.t*v;
+
+		v.col4x4(&b.x.y);
+		x.y = c.x*v;
+		y.y = c.y*v;
+		z.y = c.z*v;
+		t.y = c.t*v;
+
+		v.col4x4(&b.x.z);
+		x.z = c.x*v;
+		y.z = c.y*v;
+		z.z = c.z*v;
+		t.z = c.t*v;
+
+		v.col4x4(&b.x.w);
+		x.w = c.x*v;
+		y.w = c.y*v;
+		z.w = c.z*v;
+		t.w = c.t*v;
+		return *this;
+	}
+
+	F4x4 operator * ( const F4x4& b ) const {
+        F4 v;
+		F4x4 c;
+
+		v.col4x4(&b.x.x);
+		c.x.x = x*v;
+		c.y.x = y*v;
+		c.z.x = z*v;
+		c.t.x = t*v;
+
+		v.col4x4(&b.x.y);
+		c.x.y = x*v;
+		c.y.y = y*v;
+		c.z.y = z*v;
+		c.t.y = t*v;
+
+		v.col4x4(&b.x.z);
+		c.x.z = x*v;
+		c.y.z = y*v;
+		c.z.z = z*v;
+		c.t.z = t*v;
+
+		v.col4x4(&b.x.w);
+		c.x.w = x*v;
+		c.y.w = y*v;
+		c.z.w = z*v;
+		c.t.w = t*v;
+		return *this;
+	}
+	F4x4 operator ^ ( const F4x4& b ) const {
+		F4x4 o(1.0);
+		o.x = b.x*x.x + b.y*x.y + b.z*x.z;
+		o.y = b.x*y.x + b.y*y.y + b.z*y.z;
+		o.z = b.x*z.x + b.y*z.y + b.z*z.z;
+		o.t = b.x*t.x + b.y*t.y + b.z*t.z + b.t;
+		return o;
+	}
+	F4 operator * ( const F4& b ) { return x*b.x + y*b.y + z*b.z + t*b.w; }
+
+	F4x4& ypr( F4 ypr, float toR = 1.0 )
+	{
+		ypr /= toR;
+		float	cy = cosf(ypr.x), sy = sinf(ypr.x),
+				cp = cosf(ypr.y), sp = sinf(ypr.y),
+				cr = cosf(ypr.z), sr = sinf(ypr.z);
+
+		_11 =  cr*cy + sr*sp*sy;	_12 = sr*cp;	_13 = -cr*sy + sr*sp*cy;	_14 = 0.0f;
+		_21 = -sr*cy + cr*sp*sy;	_22 = cr*cp;	_23 = sr*sy + cr*sp*cy;		_24 = 0.0f;
+		_31 =  cp*sy;				_32 = -sp;		_33 = cp*cy;				_34 = 0.0f;
+
+		_41 = _42 = _43 = 0.0f;				_44 = 1.0f;
+
+		return *this;
+	}
+	F4x4& AXr( F4 vec, float rad )
+	{
+		double	l = vec.qlen();
+		float	CR = cosf(rad), SR = sinf(rad), T = 1-CR,
+				X = vec.x/l, Y = vec.y/l, Z = vec.z/l,
+				X2 = X*X, Y2 = Y*Y, Z2 = Z*Z;
+
+		_11 = T*X2+CR;		_12 = T*X*Y+SR*Z; 	_13 = T*X*Z-SR*Y;
+		_21 = T*X*Y-SR*Z;	_22 = T*Y2+CR;		_23 = T*Y*Z+SR*X;
+		_31 = T*X*Z+SR*Y; 	_32 = T*Y*Z-SR*X;	_33 = T*Z2+CR;
+
+		_14 = _24 = _34 = _41 = _42 = _43 = 0.0f;
+		_44 = 1.0f;
+
+		//D3DXMatrixRotationAxis((D3DXMATRIX*)this, (D3DXVECTOR3*)&vec, rad);
+
+		return *this;
+	}
+
+	F4 eula()
+	{
+		F4 ypr;
+		if( fabs(y.x) > 0.998f )
+		{
+			ypr.ry = atan2( x.z, z.z );
+			ypr.rp = PI/2.0;
+			ypr.rr = 0;
+			return ypr;
+		}
+
+		ypr.ry = atan2( -z.x, x.x );
+		ypr.rp = atan2( -y.z, y.y );
+		ypr.rr = asin(y.x);
+		return ypr;
+	}
+
 
 
 };
@@ -4779,7 +5035,7 @@ typedef enum gpeNET4:U4
 
 	gpeNET4_U44	= MAKE_ID( sizeof(U4x4)		, 'U', '4', '4' ),
 	gpeNET4_I44	= MAKE_ID( sizeof(I4x2)		, 'I', '4', '4' ),
-	gpeNET4_F44	= MAKE_ID( sizeof(Fx4)		, 'F', '4', '4' ),
+	gpeNET4_F44	= MAKE_ID( sizeof(F4)		, 'F', '4', '4' ),
 
 	gpeNET4_U84	= MAKE_ID( sizeof(U8x4)		, 'U', '8', '4' ),
 	gpeNET4_I84	= MAKE_ID( sizeof(I8x4)		, 'I', '8', '4' ),
