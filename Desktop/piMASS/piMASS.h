@@ -1594,7 +1594,7 @@ public:
 
 
     U2x4& str2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
-    char* str( char* pBUFF, const char* pSP = ", "  )
+    char* pSTR( char* pBUFF, const char* pSP = ", "  )
     {
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
@@ -2081,7 +2081,7 @@ public:
 
 
     U4x4& str2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
-    char* str( char* pBUFF, const char* pSP = ", "  )
+    char* pSTR( char* pBUFF, const char* pSP = ", "  )
     {
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
@@ -3056,11 +3056,17 @@ public:
 		a4x2[1] = a4x2[0] = b;
 		return *this;
     }
-	char* str( char* pBUFF, const char* pSP = ", "  )
+    size_t str_t( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
     {
-		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
+		return sprintf( pBUFF, "%d%s%d%s%d%s%d%s%s", x,pSeP,y,pSeP,z,pSeP,w,pSeP, pENT );
+    }
+	char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
+    {
+		str_t( pBUFF, pSeP, pENT );
+		//sprintf( pBUFF, "%d%s%d%s%d%s%d%s%s", x,pSeP,y,pSeP,z,pSeP,w,pSeP, pENT );
 		return pBUFF;
     }
+
 
 	I4x4 len_xyz( I4 r )
 	{
@@ -3504,14 +3510,10 @@ public:
 		return avgr / n;
 	}
 
-    I8 qlen_xyz() const
-    {
-		return (I8)x*x + (I8)y*y + (I8)z*z;
-    }
+    I8 qlen_xyz() const { return (I8)x*x + (I8)y*y + (I8)z*z; }
 	I4x4 TSrBALL( I4x4 T, I8 r );
 	I4x4 TSrBOX( I4x4 T, I8 r );
 	I4x4 mxR( I8 r );
-	//I4x4 ABS() { return I4x4( a4x2[0].abs(), a4x2[1].abs() ); }
 	I4x2 mx() {
 		I4x2 o(x,0);
 		if( o.x < y )
@@ -3821,23 +3823,7 @@ public:
 	}
 	I8x2& A( U1* pA, U1** ppA );
 
-	/*U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false )
-	{
-		if( !p_buff )
-			return 0;
-		if( !this )
-		{
-			*p_buff = 0;
-			return 0;
-		}
-		U1* p_begin = p_buff;
-		p_buff += gpfALF2STR( p_buff, alf ); //, b_hex );
-		//_strupr( p_begin );
-		p_buff += sprintf( (char*)p_buff, b_hex ? "%llx": "%lld", max(num,0) );
-		if( p_post )
-			p_buff += sprintf( (char*)p_buff, "%s", p_post );
-		return p_buff-p_begin;
-	}*/
+
 	U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false )
 	{
 		if( !p_buff )
@@ -4408,6 +4394,10 @@ public:
         aF2[1] = i4.a4x2[1];
         return *this;
     }
+    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
+    {
+		return sprintf( pBUFF, "%8.2f%s%8.2f%s%8.2f%s%8.2f%s%s", x, pSeP, y, pSeP, z, pSeP, w, pSeP, pENT );
+    }
 	F4 sqrt() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z),sqrtf(w)); }
     double sum( void ) const		{ return x+y+z+w; }
     double sum_xyz( void ) const	{ return x+y+z; }
@@ -4700,6 +4690,17 @@ public:
 	F4x4( float* pA ) {
 		gpmMcpy( this, pA, sizeof(*this) );
 	}
+
+	size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
+    {
+		char* pB = pBUFF;
+		pB += x.str( pB, pSeP, pENT );
+		pB += y.str( pB, pSeP, pENT );
+		pB += z.str( pB, pSeP, pENT );
+		pB += t.str( pB, pSeP, pENT );
+		return pB-pBUFF;
+    }
+
 	F4x4& operator = ( float a ) {
 		gpmCLR;
 		if( a == 0.0 ) return *this;
@@ -4768,6 +4769,7 @@ public:
 		c.y.col4x4(&x.y);
 		c.z.col4x4(&x.z);
 		c.t.col4x4(&x.w);
+		return c;
 	}
 	F4x4& operator *= ( const F4x4& b ) {
         F4 v;
@@ -4826,7 +4828,7 @@ public:
 		c.y.w = y*v;
 		c.z.w = z*v;
 		c.t.w = t*v;
-		return *this;
+		return c;
 	}
 	F4x4 operator ^ ( const F4x4& b ) const {
 		F4x4 o(1.0);
@@ -4837,7 +4839,37 @@ public:
 		return o;
 	}
 	F4 operator * ( const F4& b ) { return x*b.x + y*b.y + z*b.z + t*b.w; }
+	F4x4& a( float r, float toR = 1.0 )
+	{
+		r /= toR;
+		float cr = cos(r), sr = sin(r);
+		gpmCLR;
 
+		t.w = x.x = 1.0;
+		y.y =  cr; y.z = sr;
+		z.y = -sr; z.z = cr;
+		return *this;
+	}
+	F4x4& b( float r, float toR = 1.0 )
+	{
+		r /= toR;
+		float cr = cos(r), sr = sin(r);
+		gpmCLR;
+		x.x = cr; x.z = -sr;
+		t.w = y.y = 1.0;
+		z.x = sr; z.z =  cr;
+		return *this;
+	}
+	F4x4& c( float r, float toR = 1.0 )
+	{
+		r /= toR;
+		float cr = cos(r), sr = sin(r);
+		gpmCLR;
+		x.x = cr; x.y = sr;
+		y.x =-sr; y.y = cr;
+		t.w = z.z = 1.0;
+		return *this;
+	}
 	F4x4& ypr( F4 ypr, float toR = 1.0 )
 	{
 		ypr /= toR;

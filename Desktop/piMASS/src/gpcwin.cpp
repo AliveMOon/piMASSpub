@@ -461,14 +461,14 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			gppKEYbuff += sprintf( (char*)gppKEYbuff, "move" );
 			gppMOUSEbuff = gppKEYbuff;
 
-			*gpsMAINpub = 0;
+			*sMAINpub = 0;
 			onDIV.y = onDIV.x;
 			onDIV.x = onDIVf( mouseXY.a4x2[0] );
 			if( apCRS[onDIV.x] )
 			{
 				SRCxycr = apCRS[onDIV.x]->scnZNCR(	*this, *piMASS, mouseXY.a4x2[0], bSHIFT ? srcDIV : onDIV.x  );
 
-				char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
+				char *pE = sMAINpub + gpfALF2STR( (U1*)sMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
 				pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
 				SRCin = apCRS[onDIV.x]->scnIN;
 
@@ -486,7 +486,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						//---------------------
 						gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s%s",
 													bSHIFT ? "#":"",
-													gpsMAINpub );
+													sMAINpub );
 					}
 					else if( bSHIFT && ( srcDIV != onDIV.x ) )
 					{
@@ -533,7 +533,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 			//SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
 
 		} else {
-			char *pE = gpsMAINpub + gpfALF2STR( (U1*)gpsMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
+			char *pE = sMAINpub + gpfALF2STR( (U1*)sMAINpub, apCRS[onDIV.x]->scnZN.x+1 );
 
 			pE += sprintf( pE, "%d", apCRS[onDIV.x]->scnZN.y );
 			SRCin = apCRS[onDIV.x]->scnIN;
@@ -551,8 +551,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						mSEC.w,
 						gpsMASSname,
 						mouseXY.x, mouseXY.y, onDIV.x,
-						SRCxycr.str(gpsMAINpub+0x40), gpsMAINpub,
-						SRCin.str(gpsMAINpub+0x80),
+						SRCxycr.pSTR(sMAINpub+0x40), sMAINpub,
+						SRCin.pSTR(sMAINpub+0x80),
 						(float)SRCin.x/SRCin.z, (float)SRCin.y/SRCin.w,
 						mouseW.x, mouseW.y,
 						nMB, nF,

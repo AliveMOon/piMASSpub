@@ -494,7 +494,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 
 U1	gpsKEYbuff[0x100], *gppKEYbuff = gpsKEYbuff, *gppMOUSEbuff = gpsKEYbuff;
-char gpsMAINpub[0x100], gpsTITLEpub[0x100];
+char gpsMNpub[0x1000], gpsTITLEpub[0x100];
 I8 gpnEVENT = 0, gpnTITLE = 0;
 class U4STR
 {
@@ -562,7 +562,13 @@ I4x4 gpaCAGEtst[] = {
 	{ 600, 600, 600, gpeZS_BILL }, { -1600, 0, 600, gpeZS_BILL },
 	{ 600, 600, 600, gpeZS_BILL }, { -1600, 1600, 600, gpeZS_BILL },
 };
+I4x4 gpaABC[]
+{
+		{ -160, 0, 0 },
+		{ -160, 33, 0 },
+		{ -160, 33, 14 },
 
+};
 extern I4x4 gpaCAGEbillBALL[],
 			gpaCAGEbillBOX[];
 extern U4	gpnCAGEbillBALL,
@@ -575,14 +581,38 @@ int main(int nA, char** apA )
 int main( int nA, char *apA[] )
 #endif
 {
-	std::cout <<std::endl;;
+	gpf_aALF_init();
+
+	std::cout <<std::endl;;;;
 	for( U4 i = 0, e = gpmN(aSIZEOF); i < e; i++  )
 	{
 		std::cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 <<std::endl;;
 	}
     std::cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<std::endl;;
-	gpf_aALF_init();
 
+	F4x4 tMX,iMX, A,B,C;
+	F4	iABC, tABC;
+	char* pSTR = NULL;
+	for( U4 i = 0; i < gpmN(gpaABC); i++ )
+	{
+		pSTR = gpsMNpub;
+		pSTR += gpaABC[i].str_t( pSTR, ",", "\r\n" );
+		A.a( gpaABC[i].x, 180.0/PI);
+		B.b( gpaABC[i].y, 180.0/PI);
+		C.c( gpaABC[i].z, 180.0/PI);
+		iMX = A*B*C; //abc( gpaABC[i], 180.0/PI );
+		tABC = iMX.eula()*(180.0/PI);
+		A.a( tABC.x, 180.0/PI);
+		B.b( tABC.y, 180.0/PI);
+		C.c( tABC.z, 180.0/PI);
+		tMX = A*B*C;
+		//tMX.abc(tABC, 180.0/PI );
+		pSTR += iMX.str( pSTR, ",", "\r\n" );
+		pSTR += tABC.str( pSTR, ",", "\r\n" );
+		pSTR += tMX.str( pSTR, ",", "\r\n" );
+		std::cout << gpsMNpub <<std::endl;
+	}
+	*gpsMNpub = 0;
 	if( nA > 0 )
 	{
 		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, apA[0] );
@@ -598,12 +628,12 @@ int main( int nA, char *apA[] )
 	{
 		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mm100(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mm100(1) );
-		std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).str( gpsMAINpub ) <<std::endl;;
+		std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).pSTR( gpsMNpub ) <<std::endl;;
 		tmp = tstCAGE.tXYZ.xyz0();
 		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
-		std::cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).str( gpsMAINpub ) <<std::endl;;
+		std::cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).pSTR( gpsMNpub ) <<std::endl;;
 		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
-		std::cout << "tstCAGE.tXYZboxx:" << (tmp/mm100(1)).str( gpsMAINpub ) <<std::endl;;
+		std::cout << "tstCAGE.tXYZboxx:" << (tmp/mm100(1)).pSTR( gpsMNpub ) <<std::endl;;
 	}
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
 	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );

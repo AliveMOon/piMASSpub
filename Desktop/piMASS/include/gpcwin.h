@@ -645,7 +645,7 @@ class gpcWIN
 				*gppKEYbuff,
 				*gppMOUSEbuff;
 
-		char 	gpsMAINpub[0x100],
+		char 	sMAINpub[0x1000],
 				gpsTITLEpub[0x100],
 				gpsMASSname[0x100],
 				gpsMASSpath[gpdMAX_PATH], *gppMASSfile;

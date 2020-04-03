@@ -101,7 +101,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	nALFtg = 0;
 	gpfALF2STR( gpsSTRpub, spcZN.x+1 );
 	psHD += sprintf( 	psHD, "\r\n-----------------\r\nHD:[%s%d] spc:%s V:%d H:%d C:%d \r\nbSW:0x%0.8x",
-						gpsSTRpub, spcZN.y, spcZN.str( psHD+0x100, "," ), nVERr, nHD, nBLD,
+						gpsSTRpub, spcZN.y, spcZN.pSTR( psHD+0x100, "," ), nVERr, nHD, nBLD,
 						bSW );
 
 	while( pB > pS )
