@@ -63,7 +63,6 @@ gpcDrc* gpcDrc::chk( I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL )
 	else
 		oXYZ.xyz_( tmp );
 
-
 	return this;
 }
 gpcDrc* gpcDrc::chk( I4 lim, U4 id )
@@ -233,7 +232,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			}
 
 			if( oD != iD )
-				pANS = pD->chk( 0, iD
+				pANS = pD->chk( mm100(gpdROBlim), iD
 								/*iD? gpaCAGEbillBOX : gpaCAGEjohnBOX,
 								iD? gpnCAGEbillBOX : gpnCAGEjohnBOX,
 								iD? gpaCAGEbillBALL : gpaCAGEjohnBALL,
@@ -337,7 +336,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		iNUM++;
 	}
 	if( pD )
-		return pD->chk( 0, iD
+		return pD->chk( mm100(gpdROBlim), iD
 						/*iD? gpaCAGEbillBOX : gpaCAGEjohnBOX,
 						iD? gpnCAGEbillBOX : gpnCAGEjohnBOX,
 						iD? gpaCAGEbillBALL : gpaCAGEjohnBALL,

@@ -3049,8 +3049,9 @@ public:
         a4x2[1] = _zw;
     }
     I4x4( const I8x4& b );
+	I4x4( const F4 f4 );
 
-    I4x4& operator = ( F4 f4 );
+    I4x4& operator = ( const F4 f4 );
     I4x4& operator = ( I4x2 b )
     {
 		a4x2[1] = a4x2[0] = b;
@@ -4155,6 +4156,7 @@ public:
 class F2 {
 public:
     float x,y;
+
     F2(){};
 
     F2( I4 _x, I4 _y = 0 )

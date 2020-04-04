@@ -13,6 +13,9 @@ extern U4	gpnCAGEjohnBALL,
 
 
 gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
+		if( !this )
+			return pANS;
+
 		U1 	sCOM[] = "ABCD";
 		U4 &comA = *(U4*)sCOM;
 
@@ -273,6 +276,18 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		iXYZ.xyz_( okXYZ );
 	}
 
+	F4x4 tMX, iMX;
+
+	iMX.ABC(iABC, mm100(180)/PI );
+	/*if( !ixyz.qlen_xyz() )
+	{
+		if( txyz.qlen_xyz() )
+		{
+			ixyz.xyz_( iXYZ + (iMX.z*sqrt((txyz-tXYZ).qlen_xyz())));
+		} else
+			ixyz.xyz_( iXYZ + (iMX.z*mm100(100)) );
+	}*/
+
 	if( !JD.x )
 	{
 		oCTRL.w = 0;
@@ -280,72 +295,82 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		JD.y = 0;
 		tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
 		tABC.xyz_( oABC.xyz_(iABC) );
+		txyz.xyz_( oxyz.xyz_(ixyz) );
 		JD.x = 1;
 		return *this;
 	}
 
+	// itt kell le ellenőrizni mondjuk az ütközésre
+	//
+	float ab = 1.0, k;
+	static const float K = (100.0*PI*2.0);
+
 	I4x4 	tmp,
-			iD = iABC.chkABC( tABC, mm100(1) ),
+			nD = iABC.chkABC( tABC, mm100(1) ),
 			dXYZ = tXYZ - iXYZ,
 			dxyz = txyz - ixyz,
 			dGRP = tGRP - iGRP;
 
-	iD.z = dGRP.qlen_xyz();
-
-	if( iD.x = dXYZ.qlen_xyz() )
+	nD.z = dGRP.qlen_xyz();
+	if( nD.x = dXYZ.qlen_xyz() )
 	{
-		mmA = sqrt(iD.x);
+		mmA = sqrt(nD.x);
+		U4 i = 3;
 		switch( NMnDIF.x )
 		{
 			case gpeZS_BILL:
-				chk( gpdROBlim, 0 );
-				/*tmp = cageBALL( tXYZ.xyz0(), gpaCAGEbillBALL, gpnCAGEbillBALL ); //gpmN(gpaCAGEbillBALL) );
-				tmp = cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX ); // gpmN(gpaCAGEbillBOX) );
-				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );*/
+				i = 0;
 				break;
 			case gpeZS_JOHN:
-				chk( gpdROBlim, 1 );
-				/*tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL, gpnCAGEjohnBALL ); //gpmN(gpaCAGEjohnBALL) );
-				tmp = cageBOX( tmp, gpaCAGEjohnBOX, gpnCAGEjohnBOX );
-				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );*/
+				i = 1;
 				break;
 			default:
-				chk( 3 );
-				//oXYZ.xyz_( iXYZ );
+				i = 3;
 				break;
 		}
+		chk( mm100(gpdROBlim), i );
 		dXYZ = oXYZ - iXYZ;
-		mmB = sqrt(iD.x = dXYZ.qlen_xyz());
-		if( iD.x )
+		mmB = sqrt(nD.x = dXYZ.qlen_xyz());
+		ab = float(mmB)/float(mmA);
+		if( nD.x )
 			oCTRL.z |= 1;
 	}
 	if( txyz.qlen_xyz() )
 	{
-        if( !ixyz.qlen_xyz() )
-        {
-
-        }
-		if( iD.y = dxyz.qlen_xyz()|iD.x )
+		nD.y = dxyz.qlen_xyz();
+		if( nD.x|(nD.y>10) )
 		{
+			tMX = 1.0;
+			tMX.z = txyz-tXYZ;
+			tMX.z /= sqrt(tMX.z.qlen_xyz());
+			tMX.x = iMX.y.cross_xyz(tMX.z);
+			tMX.y = tMX.z.cross_xyz(iMX.x);
+			float	xl = sqrt(tMX.x.qlen_xyz()),
+					yl = sqrt(tMX.y.qlen_xyz());
+			if( xl > yl )
+			{
+				tMX.x /= xl;
+				tMX.y = tMX.z.cross_xyz(tMX.x);
+			} else {
+				tMX.y /= yl;
+				tMX.x = iMX.y.cross_xyz(tMX.z);
+			}
 
-
-
-
+			tABC.xyz_( tMX.eABC()*(180.0/PI)*mm100(1) );
+			nD.w = iABC.chkABC( tABC, mm100(1) ).w;
 		}
 	}
 
 
 
-	if( iD.w ) {
+	if( nD.w ) {
 
-		F4x4 tMX, iMX; //, dMX;
+		 //, dMX;
 
 		// mátrixot csinálunk belőle
 		iMX.ABC(iABC, mm100(180)/PI );
 		tMX.ABC(tABC, mm100(180)/PI );
 
-		float	K = (100.0*PI*2.0), k,
-				ab = float(mmB)/float(mmA);
 		F4 rnd( K,K,K );
 		rnd &= (iMX.dot(tMX)/(2.0*PI));	// n karika * kerület
 
@@ -367,43 +392,42 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			{
 				// fel lett osztva a mozgás
 				F4x4 dMX = (tMX-iMX)*ab + iMX;
-				tABC = tMX.eABC()*(180.0/PI);
+				oABC.xyz_( tMX.eABC()*(180.0/PI)*mm100(1) );
+			} else {
+				oABC.xyz_( tABC );
 			}
 		}
 		oCTRL.z |= 2;
 	}
 
-	if( oCTRL.z )
-	{
-		// itt kell le ellenőrizni mondjuk az ütközésre
-		//
-		JD.y = 0;
-		switch( JD.x )
-		{
-			case 0: // ALAPHelyzet kell
-				oCTRL.w = 0;
-				oCTRL.z = 1;
-                JD.y = 0;
-				tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-				tABC.xyz_( oABC.xyz_(iABC) );
-				JD.x = 1;
-				break;
-			case 1: // ALAPH ready!
-				oCTRL.w = 0;
-				oCTRL.z = 10; // linearis XYZ ABC
-				JD.y = 1;
-				break;
-
-
-		}
-		/// 1.HS1 elöbb ki X-eljük a HS1-et, nehogy ZS megszaladjon
-		if( JD.y )
-			xHS1o();
+	if( !oCTRL.z )
 		return *this;
-	}
 
-	/// join adatok most egyenlőre nem
+
+	JD.y = 0;
+	switch( JD.x )
+	{
+		case 0: // ALAPHelyzet kell
+			oCTRL.w = 0;
+			oCTRL.z = 1;
+			JD.y = 0;
+			tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
+			tABC.xyz_( oABC.xyz_(iABC) );
+			JD.x = 1;
+			break;
+		case 1: // ALAPH ready!
+			oCTRL.w = 0;
+			oCTRL.z = 10; // linearis XYZ ABC
+			JD.y = 1;
+			break;
+
+
+	}
+	/// 1.HS1 elöbb ki X-eljük a HS1-et, nehogy ZS megszaladjon
+	if( JD.y )
+		xHS1o();
 	return *this;
+
 }
 
 

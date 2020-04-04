@@ -8,7 +8,14 @@ I8x4 gpaCAGEboxMSK[] = {
 };
 
 I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
-I4x4& I4x4::operator = ( F4 f4 )
+I4x4::I4x4( const F4 f4 )
+{
+	x = f4.x;
+	y = f4.y;
+	z = f4.z;
+	w = f4.w;
+}
+I4x4& I4x4::operator = ( const F4 f4 )
 {
 	x = f4.x;
 	y = f4.y;

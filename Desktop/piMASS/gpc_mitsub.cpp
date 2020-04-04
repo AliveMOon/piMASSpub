@@ -833,9 +833,21 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 			iXYZ.x = iXYZ.y = iXYZ.z = mm100(450);
 	}
 	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
-
-
 	gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
+
+	if( !ixyz.qlen_xyz() )
+	{
+		F4x4 mx;
+		mx.ABC(iABC, mm100(180)/PI );
+
+		if( txyz.qlen_xyz() )
+		{
+			ixyz.xyz_( iXYZ + (mx.z*sqrt((txyz-tXYZ).qlen_xyz())));
+		} else {
+			ixyz.xyz_( iXYZ + (mx.z*mm100(100)) );
+		}
+	}
+
 	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
 	gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
 	gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
