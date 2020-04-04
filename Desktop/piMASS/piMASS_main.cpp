@@ -573,6 +573,9 @@ extern I4x4 gpaCAGEbillBALL[],
 			gpaCAGEbillBOX[];
 extern U4	gpnCAGEbillBALL,
 			gpnCAGEbillBOX;
+//F4x4 tMX,iMX, A,B,C;
+//F4	iABC, tABC;
+
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )
 //int Main(int nA, char **apA )
@@ -590,29 +593,31 @@ int main( int nA, char *apA[] )
 	}
     std::cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<std::endl;;
 
-	F4x4 tMX,iMX, A,B,C;
-	F4	iABC, tABC;
-	char* pSTR = NULL;
-	for( U4 i = 0; i < gpmN(gpaABC); i++ )
-	{
-		pSTR = gpsMNpub;
-		pSTR += gpaABC[i].str_t( pSTR, ",", "\r\n" );
-		A.a( gpaABC[i].x, 180.0/PI);
-		B.b( gpaABC[i].y, 180.0/PI);
-		C.c( gpaABC[i].z, 180.0/PI);
-		iMX = A*B*C; //abc( gpaABC[i], 180.0/PI );
-		tABC = iMX.eula()*(180.0/PI);
-		A.a( tABC.x, 180.0/PI);
-		B.b( tABC.y, 180.0/PI);
-		C.c( tABC.z, 180.0/PI);
-		tMX = A*B*C;
-		//tMX.abc(tABC, 180.0/PI );
-		pSTR += iMX.str( pSTR, ",", "\r\n" );
-		pSTR += tABC.str( pSTR, ",", "\r\n" );
-		pSTR += tMX.str( pSTR, ",", "\r\n" );
-		std::cout << gpsMNpub <<std::endl;
-	}
-	*gpsMNpub = 0;
+
+//	char* pSTR = NULL;
+//	for( U4 i = 0; i < gpmN(gpaABC); i++ )
+//	{
+//		pSTR = gpsMNpub;
+//		pSTR += gpaABC[i].str_t( pSTR, ",", "\r\n" );
+//		iMX.ABC( gpaABC[i], 180.0/PI);
+//		//B.b( gpaABC[i].y, 180.0/PI);
+//		//C.c( gpaABC[i].z, 180.0/PI);
+//		//iMX = A*B*C; //abc( gpaABC[i], 180.0/PI );
+//		tABC = iMX.eABC()*(180.0/PI);
+//		tMX.ABC( tABC, 180.0/PI);
+//
+//		/*A.a( tABC.x, 180.0/PI);
+//		B.b( tABC.y, 180.0/PI);
+//		C.c( tABC.z, 180.0/PI);
+//		tMX = A*B*C;*/
+//		//tMX.abc(tABC, 180.0/PI );
+//		pSTR += iMX.str( pSTR, ",", "\r\n" );
+//		pSTR += tABC.str( pSTR, ",", "\r\n" );
+//		pSTR += tMX.str( pSTR, ",", "\r\n" );
+//		std::cout << gpsMNpub <<std::endl;
+//	}
+//	*gpsMNpub = 0;
+
 	if( nA > 0 )
 	{
 		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, apA[0] );

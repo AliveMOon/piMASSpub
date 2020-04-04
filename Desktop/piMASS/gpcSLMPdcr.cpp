@@ -302,12 +302,12 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			case gpeZS_BILL:
 				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEbillBALL,gpmN(gpaCAGEbillBALL) );
 				tmp = cageBOX( tmp, gpaCAGEbillBOX,gpmN(gpaCAGEbillBOX) );
-				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(100)) );
+				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );
 				break;
 			case gpeZS_JOHN:
 				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL) );
 				tmp = cageBOX( tmp, gpaCAGEjohnBOX,gpmN(gpaCAGEjohnBOX) );
-				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(100)) );
+				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );
 				break;
 			default:
 				oXYZ.xyz_( iXYZ );
@@ -322,14 +322,37 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	dir = tABC.chkABC( iABC, mm100(1) );
 	if( dir.w ) {
 
-		F4x4 tMX,iMX;
-		tMX.ypr(tABC, mm100(180)/PI );
-		iMX.ypr(iABC, mm100(180)/PI );
-		F4	tYPR = tMX.eula()*(180.0/PI),
-			iYPR = iMX.eula()*(180.0/PI);
-		if( mmB < mmA )
+		F4x4 tMX, iMX; //, dMX;
+
+		// mátrixot csinálunk belőle
+		tMX.ABC(tABC, mm100(180)/PI );
+		iMX.ABC(iABC, mm100(180)/PI );
+
+		float	K = (100.0*PI*2.0), k,
+				ab = float(mmB)/float(mmA);
+		F4 rnd( K,K,K );
+		rnd &= (iMX.dot(tMX)/(2.0*PI));	// n karika * kerület
+
+		k = rnd.xyz0().abs().mx();
+		if( k > 0.0 )
 		{
-			// fel lett osztva a mozgás
+			float lpk = gpdROBlim/k;
+
+			if( ab > lpk )
+			{
+				ab = lpk;
+				mmB *= gpdROBlim;
+				mmB /= k;
+				oXYZ.xyz_( iXYZ.lim_xyz(oXYZ,mmB) );
+			}
+
+
+			if( ab < 1.0 )
+			{
+				// fel lett osztva a mozgás
+				F4x4 dMX = (tMX-iMX)*ab + iMX;
+				tABC = tMX.eABC()*(180.0/PI);
+			}
 		}
 		oCTRL.z |= 2;
 	}

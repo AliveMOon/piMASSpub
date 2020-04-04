@@ -202,6 +202,8 @@ class float2;
 class float3;
 class float4;		// ez a F4 négyes singleP vektor
 class float4x4;		// ja ez itt a matrix lenne
+class F2;
+class F4;
 class F4x4;
 class D4;
 class U2x4;
@@ -296,6 +298,7 @@ class gpcALU;
 #define gpdSIZ2CR  I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
+#define gpdROBlim 50
 #define mm100(a) ((a)*100)
 #define zsIO 20
 #define zsIN 400
@@ -1025,7 +1028,7 @@ public:
 		if(s.y>s.x)
 		{
 			s.swpYX();
-			s.w |= 0x2;
+			s.w = 0x2;
 		}
 		if(s.z>s.x)
 		{
@@ -1062,21 +1065,21 @@ public:
 
 		U1 o = 0;
 		U1x4 s = *this;
-
+		s.w = 1;
 		if(s.y>s.x)
 		{
 			s.swpYX();
-			o = 0x1;
+			o |= 0x2;
 		}
 		if(s.z>s.x)
 		{
 			s.swpZX();
-			o |= 0x02;
+			o |= 0x04;
 		}
 		if(s.z>s.y)
 		{
 			s.swpZY();
-			o |= 0x04;
+			o |= 0x8;
 		}
 
 		/// srt3
@@ -1086,19 +1089,19 @@ public:
 		if(s.w>s.x)
 		{
 			s.swpWX();
-			o |= 0x08;
+			o |= 0x10;
 		}
 
 		if(s.w>s.y)
 		{
 			s.swpWY();
-			o |= 0x10;
+			o |= 0x20;
 		}
 
 		if(s.w>s.z)
 		{
 			s.swpWZ();
-			o |= 0x20;
+			o |= 0x40;
 		}
 
 		return o;
@@ -3046,11 +3049,8 @@ public:
         a4x2[1] = _zw;
     }
     I4x4( const I8x4& b );
-    I4x4& operator = ( I4 i )
-    {
-		x = y = z = w = i;
-		return *this;
-    }
+
+    I4x4& operator = ( F4 f4 );
     I4x4& operator = ( I4x2 b )
     {
 		a4x2[1] = a4x2[0] = b;
@@ -3355,8 +3355,8 @@ public:
 
 		for( I4 i = 0; i < n_i; i++ )
 		{
-			this[i] = i;
-			//this[i].y = 0;
+			this[i].x = i;
+			this[i].y = 0;
 		}
 		return this;
 	}
@@ -4349,6 +4349,10 @@ public:
 		};
 		struct
 		{
+			float A,B,C,D;
+		};
+		struct
+		{
 			float ry,rp,rr,r0;
 		};
 		struct
@@ -4362,7 +4366,7 @@ public:
 	};
 
     F4(){};
-    F4( I4 _x, I4 _y, I4 _z, I4 _w )
+    F4( I4 _x, I4 _y=0, I4 _z=0, I4 _w=0 )
     {
         x = _x; y = _y; z = _z; w = _w;
     }
@@ -4530,7 +4534,8 @@ public:
 	F4 operator * ( const F4x4& b ) const;
 	F4& operator /= ( const F4x4& b );
 	F4 operator / ( const F4x4& b ) const;
-
+	F4 xyz0() const { return F4(x,y,z); }
+	F4 abs() const { return F4(x>=0.0?x:-x,y>=0.0?y:-y,z>=0.0?z:-z,w>=0.0?w:-w); }
 	F4& add( F4 b, U4 n )
 	{
 		for( U4 i = 0; i < n; i++ )
@@ -4561,24 +4566,21 @@ public:
 	}
 
 	/// 13
-	F4& swpYX()
-	{
+	F4& swpYX() {
 		float t = x;
 		x = y;
 		y = t;
 		return *this;
 	}
 	/// 25
-	F4& swpZX()
-	{
+	F4& swpZX() {
 		float t = x;
 		x = z;
 		z = t;
 		return *this;
 	}
 	/// 36
-	F4& swpZY()
-	{
+	F4& swpZY() {
 		float t = y;
 		y = z;
 		z = t;
@@ -4586,8 +4588,7 @@ public:
 	}
 
 	/// 49
-	F4& swpWX()
-	{
+	F4& swpWX() {
 		float t = x;
 		x = w;
 		w = t;
@@ -4595,32 +4596,54 @@ public:
 	}
 
 	/// 5A
-	F4& swpWY()
-	{
+	F4& swpWY() {
 		float t = y;
 		y = w;
 		w = t;
 		return *this;
 	}
 	/// 6C
-	F4& swpWZ()
-	{
+	F4& swpWZ() {
 		float t = z;
 		z = w;
 		w = t;
 		return *this;
 	}
 
-	F4& swp3( U1 s ) {
-		if( !(s&0x7) )
-			return *this;
+	F4 srt3() {
+		if( qlen_xyz() == 0.0 )
+			return 0;
 
-		if( s&0x04 )
-			swpZY();
-		if( s&0x02 )
-			swpZX();
-		if( s&0x01 )
-			swpYX();
+		F4 s = *this;
+		s.w = 1;
+		if(s.y>s.x)
+		{
+			s.swpYX();
+			s.w += 2;
+		}
+		if(s.z>s.x)
+		{
+			s.swpZX();
+			s.w += 4;
+		}
+		if(s.z>s.y)
+		{
+			s.swpZY();
+			s.w += 8;
+		}
+
+		return s;
+	}
+	F4& swp3( U1 s ) {
+		if(s&1)
+		{
+			if( s&0x08 )
+				swpZY();
+			if( s&0x04 )
+				swpZX();
+			if( s&0x02 )
+				swpYX();
+		}
 
 		return *this;
 	}
@@ -4634,7 +4657,17 @@ public:
 		return *this;
 	}
 
+	float mx()
+	{
+		float m = srt3().x;
+		return m < w ? w : m;
+	}
 
+	float mn()
+	{
+		float m = srt3().z;
+		return m > w ? w : m;
+	}
 
 };
 #define _11 x.x
@@ -4662,28 +4695,15 @@ class F4x4
 public:
 	F4 x,y,z,t;
 
-	/*union
-	{
-		struct
-		{
-			float aF4[0x10];
-		};
-		struct
-		{
-			F4 x,y,z,t;
-		};
-		struct
-		{
-			F4 aXYZT[4];
-		};
-
-	};*/
     F4x4(){};
     F4x4( float a ){
 		gpmCLR;
 		if( a==0.0 )
 		return; x.x = y.y = z.z = t.w = a;
 	};
+	F4x4( const F4 _x, const F4 _y, const F4 _z, const F4 _t ) {
+		x = _x; y = _y; z = _z; t = _t;
+	}
 	F4x4( const F4* pA ) {
 		gpmMcpy( this, pA, sizeof(*this) );
 	}
@@ -4725,6 +4745,8 @@ public:
 	{
 		return F4( x.qlen(), y.qlen(), z.qlen(), t.qlen() );
 	}
+
+
 	F4x4& operator += ( const F4& b ) {
 		F4 l = qlen().sqrt();
 		x &= (l.x+b.x)/l.x;
@@ -4800,7 +4822,6 @@ public:
 		t.w = c.t*v;
 		return *this;
 	}
-
 	F4x4 operator * ( const F4x4& b ) const {
         F4 v;
 		F4x4 c;
@@ -4838,9 +4859,72 @@ public:
 		o.t = b.x*t.x + b.y*t.y + b.z*t.z + b.t;
 		return o;
 	}
-	F4 operator * ( const F4& b ) { return x*b.x + y*b.y + z*b.z + t*b.w; }
-	F4x4& a( float r, float toR = 1.0 )
-	{
+
+
+
+	F4x4 operator * ( const float b ) const {
+		F4x4 o;
+		o.x = x*b;
+		o.y = y*b;
+		o.z = z*b;
+		o.t = t*b;
+		return o;
+	}
+	F4x4 operator + ( const float b ) const {
+		F4x4 c = *this;
+		c.x += b;
+		c.y += b;
+		c.z += b;
+		c.t += b;
+		return c;
+	}
+	F4x4 operator - ( const float b ) const {
+		F4x4 c = *this;
+		c.x -= b;
+		c.y -= b;
+		c.z -= b;
+		c.t -= b;
+		return c;
+	}
+
+
+
+	F4x4 operator * ( const F4& b ) const {
+		F4x4 o;
+		o.x = x*b.x;
+		o.y = y*b.y;
+		o.z = z*b.z;
+		o.t = t*b.w;
+		return o;
+	}
+	F4 dot( const F4x4& b ) const {
+		F4 o;
+		o.x = x*b.x;
+		o.y = y*b.y;
+		o.z = z*b.z;
+		o.w = t*b.t;
+		return o;
+	}
+	F4x4 operator + ( const F4x4& b ) const {
+		F4x4 c = *this;
+		c.x += b.x;
+		c.y += b.y;
+		c.z += b.z;
+		c.t += b.t;
+		return c;
+	}
+	F4x4 operator - ( const F4x4& b ) const {
+		F4x4 c = *this;
+		c.x -= b.x;
+		c.y -= b.y;
+		c.z -= b.z;
+		c.t -= b.t;
+		return c;
+	}
+
+	F4x4& a( float r, float toR = 1.0 ) {
+		if( r == 0.0 )
+			return *this = 1.0;
 		r /= toR;
 		float cr = cos(r), sr = sin(r);
 		gpmCLR;
@@ -4850,8 +4934,9 @@ public:
 		z.y = -sr; z.z = cr;
 		return *this;
 	}
-	F4x4& b( float r, float toR = 1.0 )
-	{
+	F4x4& b( float r, float toR = 1.0 ) {
+		if( r == 0.0 )
+			return *this = 1.0;
 		r /= toR;
 		float cr = cos(r), sr = sin(r);
 		gpmCLR;
@@ -4860,8 +4945,9 @@ public:
 		z.x = sr; z.z =  cr;
 		return *this;
 	}
-	F4x4& c( float r, float toR = 1.0 )
-	{
+	F4x4& c( float r, float toR = 1.0 ) {
+		if( r == 0.0 )
+			return *this = 1.0;
 		r /= toR;
 		float cr = cos(r), sr = sin(r);
 		gpmCLR;
@@ -4870,8 +4956,26 @@ public:
 		t.w = z.z = 1.0;
 		return *this;
 	}
-	F4x4& ypr( F4 ypr, float toR = 1.0 )
-	{
+	F4x4& ABC( F4 abc, float toR = 1.0 ) {
+		a( abc.A, toR );
+		F4x4 bc;
+		bc.b( abc.B, toR );
+		*this *= bc;
+		bc.c( abc.C, toR );
+		return *this *= bc;
+	}
+	F4 eABC() {
+		F4 abc(0.0);
+
+        abc.A = atan2( -z.y, y.y );
+		abc.B = atan2( -x.z, x.x );
+		abc.C = asin(x.y);
+		return abc;
+	}
+
+
+
+	F4x4& ypr( F4 ypr, float toR = 1.0 ) {
 		ypr /= toR;
 		float	cy = cosf(ypr.x), sy = sinf(ypr.x),
 				cp = cosf(ypr.y), sp = sinf(ypr.y),
@@ -4885,8 +4989,7 @@ public:
 
 		return *this;
 	}
-	F4x4& AXr( F4 vec, float rad )
-	{
+	F4x4& AXr( F4 vec, float rad ) {
 		double	l = vec.qlen();
 		float	CR = cosf(rad), SR = sinf(rad), T = 1-CR,
 				X = vec.x/l, Y = vec.y/l, Z = vec.z/l,
@@ -4904,9 +5007,9 @@ public:
 		return *this;
 	}
 
-	F4 eula()
+	F4 eYPR()
 	{
-		F4 ypr;
+		F4 ypr(0.0);
 		if( fabs(y.x) > 0.998f )
 		{
 			ypr.ry = atan2( x.z, z.z );
