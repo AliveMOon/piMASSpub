@@ -30,7 +30,55 @@ I4x4 gpaCAGEjohnBOX[] = {
 U4	gpnCAGEjohnBALL = gpmN(gpaCAGEjohnBALL),
 	gpnCAGEjohnBOX = gpmN(gpaCAGEjohnBOX);
 
+I4x4* gpapBOX[] = {
+	gpaCAGEbillBOX,
+	gpaCAGEjohnBOX,
+};
+I4x4* gpapBALL[] = {
+	gpaCAGEbillBALL,
+	gpaCAGEjohnBALL,
+};
+U4 gpanBOX[] = {
+	gpnCAGEbillBOX,
+	gpnCAGEjohnBOX
+};
+U4 gpanBALL[] = {
+	gpnCAGEbillBALL,
+	gpnCAGEjohnBALL
+};
+gpcDrc* gpcDrc::chk( I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL )
+{
+	if( !this )
+		return NULL;
+	if( okXYZ.qlen_xyz() > mm100(400) )
+	{
+		iXYZ.xyz_( okXYZ );
+	}
 
+	I4x4 tmp;
+	tmp = cageBALL( tXYZ.xyz0(), pBALL, nBALL );
+	tmp = cageBOX( tmp, pBOX, nBOX );
+	if( lim )
+		oXYZ.xyz_( iXYZ.lim_xyz(tmp,lim) );
+	else
+		oXYZ.xyz_( tmp );
+
+
+	return this;
+}
+gpcDrc* gpcDrc::chk( I4 lim, U4 id )
+{
+	if( id > gpmN(gpanBALL) )
+	{
+		if( okXYZ.qlen_xyz() > mm100(400) )
+		{
+			iXYZ.xyz_( okXYZ );
+		}
+		oXYZ.xyz_( iXYZ );
+		return this;
+	}
+	return chk( lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id] );
+}
 
 gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
@@ -183,12 +231,16 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					iNUM = 23;
 					break;
 			}
-			if( pD )
+
 			if( oD != iD )
-			{
-				pANS = pD->answSTAT( pANS );
-				oD = iD;
-			}
+				pANS = pD->chk( 0, iD
+								/*iD? gpaCAGEbillBOX : gpaCAGEjohnBOX,
+								iD? gpnCAGEbillBOX : gpnCAGEjohnBOX,
+								iD? gpaCAGEbillBALL : gpaCAGEjohnBALL,
+								iD? gpnCAGEbillBALL : gpnCAGEjohnBALL*/
+							)->answSTAT( pANS );
+			pD = NULL;
+			oD = iD;
 			continue;
 		} else if( iNUM > 23 )
 			return pANS->lzyFRMT( s = -1, "nonsens" );
@@ -220,24 +272,30 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				d8 += strtod( (char*)pSTR, (char**)&pSTR );
 		}
 
-
 		pD = ZSnD.aDrc+iD;
-
-
 		switch(iNUM)
         {
-				// GRIP
-			case 24:
-			case 25:
-			case 26:
-				pD->tGRP.aXYZW[(iNUM-24)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
+
 				// POS
 			case 0:
 			case 1:
 			case 2:
 				pD->tXYZ.aXYZW[(iNUM-0)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
+			// pos
+			case 12:
+			case 13:
+			case 14:
+				pD->txyz.aXYZW[(iNUM-12)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
+				// GRIP
+			case 24:
+			case 25:
+			case 26:
+				pD->tGRP.aXYZW[(iNUM-24)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				break;
+
+
 				// DIR
 			case 3:
 			case 4:
@@ -255,12 +313,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				break;
 
 			// OFFSET - eltolás
-			// pos
-			case 12:
-			case 13:
-			case 14:
-				pD->oxyz.aXYZW[(iNUM-12)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
+
 				// DIR
 			case 15:
 			case 16:
@@ -283,9 +336,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
         }
 		iNUM++;
 	}
-
 	if( pD )
-		return pD->answSTAT( pANS );
+		return pD->chk( 0, iD
+						/*iD? gpaCAGEbillBOX : gpaCAGEjohnBOX,
+						iD? gpnCAGEbillBOX : gpnCAGEjohnBOX,
+						iD? gpaCAGEbillBALL : gpaCAGEjohnBALL,
+						iD? gpnCAGEbillBALL : gpnCAGEjohnBALL*/
+					)->answSTAT( pANS );
 
 	return pANS->lzyFRMT( s = -1, "nonsens" );
 }

@@ -285,46 +285,58 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	}
 
 	I4x4 	tmp,
+			iD = iABC.chkABC( tABC, mm100(1) ),
 			dXYZ = tXYZ - iXYZ,
 			dxyz = txyz - ixyz,
-			dABC = iABC.chkABC( tABC, mm100(1) ),
-			D( dXYZ.qlen_xyz(), dxyz.qlen_xyz(), dABC.w );
+			dGRP = tGRP - iGRP;
 
+	iD.z = dGRP.qlen_xyz();
 
-	//I4x4 dir = tXYZ - iXYZ, tmp;
-	if( D.x )
+	if( iD.x = dXYZ.qlen_xyz() )
 	{
-		mmA = sqrt(d.x);
+		mmA = sqrt(iD.x);
 		switch( NMnDIF.x )
 		{
 			case gpeZS_BILL:
-				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEbillBALL, gpnCAGEbillBALL ); //gpmN(gpaCAGEbillBALL) );
+				chk( gpdROBlim, 0 );
+				/*tmp = cageBALL( tXYZ.xyz0(), gpaCAGEbillBALL, gpnCAGEbillBALL ); //gpmN(gpaCAGEbillBALL) );
 				tmp = cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX ); // gpmN(gpaCAGEbillBOX) );
-				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );
+				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );*/
 				break;
 			case gpeZS_JOHN:
-				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL, gpnCAGEjohnBALL ); //gpmN(gpaCAGEjohnBALL) );
+				chk( gpdROBlim, 1 );
+				/*tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL, gpnCAGEjohnBALL ); //gpmN(gpaCAGEjohnBALL) );
 				tmp = cageBOX( tmp, gpaCAGEjohnBOX, gpnCAGEjohnBOX );
-				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );
+				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );*/
 				break;
 			default:
-				oXYZ.xyz_( iXYZ );
+				chk( 3 );
+				//oXYZ.xyz_( iXYZ );
 				break;
 		}
 		dXYZ = oXYZ - iXYZ;
-		mmB = sqrt(D.x = dXYZ.qlen_xyz());
-		if( D.x )
+		mmB = sqrt(iD.x = dXYZ.qlen_xyz());
+		if( iD.x )
 			oCTRL.z |= 1;
 	}
-	if( D.y )
+	if( txyz.qlen_xyz() )
 	{
+        if( !ixyz.qlen_xyz() )
+        {
+
+        }
+		if( iD.y = dxyz.qlen_xyz()|iD.x )
+		{
 
 
+
+
+		}
 	}
 
 
 
-	if( D.z ) {
+	if( iD.w ) {
 
 		F4x4 tMX, iMX; //, dMX;
 
