@@ -17,7 +17,7 @@
   c1	   
  
  trg = "exp";
- trgw = 512;
+ trgw = 256;
  trgh = 256;
  
  pico="dilet";
@@ -45,7 +45,7 @@
  unsel = 1;  f1	 
  
  trg = "dilet"
- trgw = 256;
+ trgw = 128;
  trgh = 128;
  pico = "gui"
  pici = "dilet"
