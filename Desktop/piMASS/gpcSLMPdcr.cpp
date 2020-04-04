@@ -2,32 +2,15 @@
 #include "gpcwin.h"
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
+extern I4x4 gpaCAGEbillBALL[],
+			gpaCAGEbillBOX[];
+extern U4	gpnCAGEbillBALL,
+			gpnCAGEbillBOX;
+extern I4x4 gpaCAGEjohnBALL[],
+			gpaCAGEjohnBOX[];
+extern U4	gpnCAGEjohnBALL,
+			gpnCAGEjohnBOX;
 
-I4x4 gpaCAGEbillBALL[] = {
-	{ mm100(1500), 0, mm100(320), mm100(800) },
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
-	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
-};
-I4x4 gpaCAGEbillBOX[] = {
-	{ mm100(1500/2), mm100(4900), mm100(0), mm100(4000) }, // MIMI2bill
-	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
-	{ mm100(600), mm100(600), mm100(-200), mm100(330) }, // asztal_bill
-};
-U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
-	gpnCAGEbillBOX = gpmN(gpaCAGEbillBOX);
-
-I4x4 gpaCAGEjohnBALL[] = {
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
-	{ mm100(1500), 0, mm100(320), mm100(800) },
-	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
-};
-I4x4 gpaCAGEjohnBOX[] = {
-	{ mm100(1500-600), mm100(-600), mm100(-200), mm100(330) }, // asztal_john
-	{ mm100(-500-2000), mm100(0), mm100(0), mm100(2000) }, // MIMI_john
-	{ mm100(1500/2), mm100(-4900), mm100(0), mm100(4000) }, // MIMI2john
-};
-U4	gpnCAGEjohnBALL = gpmN(gpaCAGEjohnBALL),
-	gpnCAGEjohnBOX = gpmN(gpaCAGEjohnBOX);
 
 gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 		U1 	sCOM[] = "ABCD";
@@ -109,8 +92,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 		return pANS;
 	}
 
-gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i )
-{
+gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i ) {
 	if( !&zs ) {
 		iSTRT = nLD();
 		return this;
@@ -170,14 +152,12 @@ I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n ) {
 	D8 /= sqrt(dd0);
 	return S+D8;
 }
-U1 gpcZSnD::iDrc( bool bPULL )
-{
+U1 gpcZSnD::iDrc( bool bPULL ) {
 	if( bPULL && !(ioSW.y&1) )
 		ioSW.y |= 1;
 	return (ioSW.y>>1)&1;
 }
-gpcLZY* gpcZSnD::pulling( gpcLZY* pOUT, U4x4* pZSrw )
-{
+gpcLZY* gpcZSnD::pulling( gpcLZY* pOUT, U4x4* pZSrw ) {
 	U8 s = -1;
 	U4	i = this ? iDrc( true ):0,
 		n = pZSrw[i].w;
@@ -292,41 +272,65 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	{
 		iXYZ.xyz_( okXYZ );
 	}
-	I4x4 dir = tXYZ - iXYZ, tmp;
-	dif = dir.qlen_xyz();
-	if( dif )
+
+	if( !JD.x )
 	{
-		mmA = sqrt(dif);
+		oCTRL.w = 0;
+		oCTRL.z = 1;
+		JD.y = 0;
+		tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
+		tABC.xyz_( oABC.xyz_(iABC) );
+		JD.x = 1;
+		return *this;
+	}
+
+	I4x4 	tmp,
+			dXYZ = tXYZ - iXYZ,
+			dxyz = txyz - ixyz,
+			dABC = iABC.chkABC( tABC, mm100(1) ),
+			D( dXYZ.qlen_xyz(), dxyz.qlen_xyz(), dABC.w );
+
+
+	//I4x4 dir = tXYZ - iXYZ, tmp;
+	if( D.x )
+	{
+		mmA = sqrt(d.x);
 		switch( NMnDIF.x )
 		{
 			case gpeZS_BILL:
-				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEbillBALL,gpmN(gpaCAGEbillBALL) );
-				tmp = cageBOX( tmp, gpaCAGEbillBOX,gpmN(gpaCAGEbillBOX) );
+				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEbillBALL, gpnCAGEbillBALL ); //gpmN(gpaCAGEbillBALL) );
+				tmp = cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX ); // gpmN(gpaCAGEbillBOX) );
 				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );
 				break;
 			case gpeZS_JOHN:
-				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL,gpmN(gpaCAGEjohnBALL) );
-				tmp = cageBOX( tmp, gpaCAGEjohnBOX,gpmN(gpaCAGEjohnBOX) );
+				tmp = cageBALL( tXYZ.xyz0(), gpaCAGEjohnBALL, gpnCAGEjohnBALL ); //gpmN(gpaCAGEjohnBALL) );
+				tmp = cageBOX( tmp, gpaCAGEjohnBOX, gpnCAGEjohnBOX );
 				oXYZ.xyz_( iXYZ.lim_xyz(tmp,mm100(gpdROBlim)) );
 				break;
 			default:
 				oXYZ.xyz_( iXYZ );
 				break;
 		}
-		dir = oXYZ - iXYZ;
-		mmB = sqrt(dif = dir.qlen_xyz());
-		if( dif )
+		dXYZ = oXYZ - iXYZ;
+		mmB = sqrt(D.x = dXYZ.qlen_xyz());
+		if( D.x )
 			oCTRL.z |= 1;
 	}
+	if( D.y )
+	{
 
-	dir = tABC.chkABC( iABC, mm100(1) );
-	if( dir.w ) {
+
+	}
+
+
+
+	if( D.z ) {
 
 		F4x4 tMX, iMX; //, dMX;
 
 		// mátrixot csinálunk belőle
-		tMX.ABC(tABC, mm100(180)/PI );
 		iMX.ABC(iABC, mm100(180)/PI );
+		tMX.ABC(tABC, mm100(180)/PI );
 
 		float	K = (100.0*PI*2.0), k,
 				ab = float(mmB)/float(mmA);
@@ -390,247 +394,4 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	return *this;
 }
 
-gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
-{
-	U8 s = -1, nLEN;
-	U4 n = gpmSTRLEN( pSTR );
-	if( this ? !n : true )
-		return pANS->lzyFRMT( s = -1, "nonsens" );
 
-	gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ) );
-	gpcLZY	*pLZYout = NULL,
-			*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
-	///-----------------------------
-	/// UJ felhasználó?
-	///-----------------------------
-		U4 iSOCK = 0, nSOCK = 0;
-		if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
-		{
-			nSOCK = gpmLZYload(pLZYusr,sockUSR);
-			for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
-			{
-				if( pSOCK[iSOCK] != sockUSR )
-					continue;
-				// nem új bent van a listában
-				break;
-			}
-		}
-		if( iSOCK >= nSOCK )
-		{
-			// új felhasználó!
-			pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
-			iSOCK = nSOCK;
-			nSOCK = gpmLZYload(pLZYusr,sockUSR);
-		}
-	///-----------------------------
-
-
-
-	//pLZYout = mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID));
-	//if( !pLZYout )
-	//	return pANS->lzyFRMT( s = -1, "nonsens" );
-
-
-	if( !pZSnD )
-		return pANS->lzyFRMT( s = -1, "nonsens" );
-
-	gpcZSnD& ZSnD =	*pZSnD;
-	U4	nD = 2,
-		iD = nD, oD = 2;
-	gpcDrc* pD = NULL;
-	/*gpcDrc	*pDo = (gpcDrc*)gpmLZYvaliPD( U1, pLZYout, gpdZSio128 ),
-			*pDi = (gpcDrc*)gpmLZYvaliPD( U1, pLZYinp, gpdZSio128 );*/
-	U1 	sCOM[] = "ABCD",
-		*pCOM, *pEND = pSTR+n, *pNUM;
-	U4& comA = *(U4*)sCOM, iNUM, nNUM, iE = 2;
-	I8x2 an;
-	double d8;
-
-	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;," ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;," ) )
-	{
-		an.num = pEND-(pCOM = pSTR);
-		an = pCOM;
-		pSTR += an.num;
-		if( an.alf )
-		{
-			comA = *(U4*)pCOM;
-			iNUM = 0;
-			switch( an.alf )
-			{
-				case gpeALF_FORMAT:
-					ZSnD.format();
-					continue;
-
-				case gpeALF_HELO:
-				case gpeALF_HELLO:
-					return pANS->lzyFRMT( s = -1, "Hello! %d", iD );
-				case gpeALF_HELP:
-					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iD );
-				case gpeALF_LINE:
-					return pANS->lzyFRMT( s = -1, "Line.txt %d", iD );
-				case gpeALF_JOIN:
-					return pANS->lzyFRMT( s = -1, "Join.txt %d", iD );
-
-				/*case gpeALF_KOSZON:{
-						U4	nR = sizeof(gpsSLMPabc),
-							nC = nR/(4*8);
-						pANS = pANS->lzyFRMT( s = -1, "CSOKOLOM %s BACSI!", pSTR );
-
-					} return pANS;*/
-				case gpeALF_POS:
-				case gpeALF_XYZ:{
-						switch( comA&0xffffff )
-						{
-							case gpeZS_XYZ0:
-							case gpeZS_POS0:
-								iNUM = 0;
-								break;
-							default:
-								iNUM = 12;
-								break;
-						}
-						nNUM = 3;
-					} break;
-				case gpeALF_DIR:
-				case gpeALF_ABC:{
-						switch( comA&0xffffff )
-						{
-							case gpeZS_ABC0:
-							case gpeZS_DIR0:
-								iNUM = 3;
-								break;
-							default:
-								iNUM = 15;
-								break;
-						}
-						nNUM = 3;
-					} break;
-				case gpeALF_LINK:
-				case gpeALF_AXIS:{
-						switch( comA )
-						{
-							case gpeZS_AXIS:
-							case gpeZS_LINK:
-								iNUM = 6;
-								break;
-							default:
-								iNUM = 18;
-								break;
-						}
-						nNUM = 6;
-					} break;
-				case gpeALF_BILL:
-						iD = 0;
-
-						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_BILL )
-							break;
-						ZSnD.aDrc[iD].format( gpeZS_BILL );
-						break;
-				case gpeALF_JOHN:
-						iD = 1;
-						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_JOHN )
-							break;
-						ZSnD.aDrc[iD].format( gpeZS_JOHN );
-					 break;
-				default:
-					iNUM = 23;
-					break;
-			}
-			if( pD )
-			if( oD != iD )
-			{
-				pANS = pD->answSTAT( pANS );
-				oD = iD;
-			}
-			continue;
-		} else if( iNUM > 23 )
-			return pANS->lzyFRMT( s = -1, "nonsens" );
-
-		if( iD >= 2 )
-		{
-			pANS = pANS->lzyFRMT( s = -1, "Who?" );
-			for( iD = 0; iD < 2; iD++ )
-			{
-				if( !ZSnD.aDrc[iD].NMnDIF.au4x2[0].x )
-					continue;
-				comA = ZSnD.aDrc[iD].NMnDIF.au4x2[0].x;
-				pANS = pANS->lzyFRMT( s = -1, "\r\n%s", sCOM );
-			}
-			return pANS;
-		}
-
-
-
-		pNUM = pSTR;
-		an.num = gpfSTR2I8( pNUM, &pSTR );
-		if( *pSTR != '.' )
-			d8 = 0.0;
-		else {
-			d8 = an.num;
-			if( an.num < 0 )
-				d8 -= strtod( (char*)pSTR, (char**)&pSTR );
-			else
-				d8 += strtod( (char*)pSTR, (char**)&pSTR );
-		}
-
-
-		pD = ZSnD.aDrc+iD;
-
-
-		switch(iNUM)
-        {
-				// POS
-			case 0:
-			case 1:
-			case 2:
-				pD->tXYZ.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
-				// DIR
-			case 3:
-			case 4:
-			case 5:
-				pD->tABC.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			case 10:
-			case 11:
-				// AXIS
-				pD->aoAX1to6[(iNUM%6)/3].aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
-
-			// OFFSET - eltolás
-				// POS
-			case 12:
-			case 13:
-			case 14:
-				pD->oxyz.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
-				// DIR
-			case 15:
-			case 16:
-			case 17:
-				pD->oabc.aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
-			case 18:
-			case 19:
-			case 20:
-			case 21:
-			case 22:
-			case 23:
-				// AXIS
-				pD->aoax1to6[(iNUM%6)/3].aXYZW[iNUM%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
-			default:
-				break;
-        }
-		iNUM++;
-	}
-
-	if( pD )
-		return pD->answSTAT( pANS );
-
-	return pANS->lzyFRMT( s = -1, "nonsens" );
-}

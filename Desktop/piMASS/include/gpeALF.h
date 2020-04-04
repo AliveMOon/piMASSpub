@@ -800,6 +800,8 @@ typedef enum gpeALF: I8
 
 	gpeALF_GPUC = gpdABCD('G', 'P', 'U', 'C'),	// gpeALF_GPU + VOXEL VERTEX
 
+	gpeALF_GRIP = gpdABCD('G', 'R', 'I', 'P'),
+
 	gpeALF_HAIR = gpdABCD('H', 'A', 'I', 'R'),
 	gpeALF_HAND = gpdABCD('H', 'A', 'N', 'D'),
 	gpeALF_HEAD = gpdABCD('H', 'E', 'A', 'D'),

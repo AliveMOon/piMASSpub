@@ -108,7 +108,8 @@ public:
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
 	U4x4	oCTRL, iCTRL, JD;
-	I4x4	okXYZ, okABC;
+	I4x4	okXYZ, okABC,
+			tGRP, oGRP, iGRP;
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
 	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );

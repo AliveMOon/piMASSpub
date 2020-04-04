@@ -62,6 +62,7 @@
 			<Add library="libjpeg" />
 		</Linker>
 		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpcDRCos.cpp" />
 		<Unit filename="gpcGL.cpp" />
 		<Unit filename="gpcGTslmp.cpp" />
 		<Unit filename="gpcI4x2.cpp" />

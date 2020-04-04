@@ -14,7 +14,7 @@
 	"gpcgt.h"
 	"gpcOPCD.h"
 
-1585272517 /home/pi/Desktop/piMASS//gpcgt.h
+1585994288 /home/pi/Desktop/piMASS//gpcgt.h
 	"gpcpic.h"
 
 1585378545 /home/pi/Desktop/piMASS//gpcpic.h
@@ -407,7 +407,7 @@
 	"gpcSRC.h"
 	"gpcres.h"
 
-1585272516 /home/pi/Desktop/piMASS/include/gpeALF.h
+1585997577 /home/pi/Desktop/piMASS/include/gpeALF.h
 	"piMASS.h"
 
 1576678042 /home/pi/Desktop/piMASS/include/gpcSCHL.h
@@ -419,7 +419,7 @@
 	"gpcSRC.h"
 	"gpcwin.h"
 
-1585272517 /home/pi/Desktop/piMASS/gpcgt.h
+1585994288 /home/pi/Desktop/piMASS/gpcgt.h
 	"gpcpic.h"
 
 1585378545 /home/pi/Desktop/piMASS/gpcpic.h
@@ -619,7 +619,7 @@
 1585958655 source:/home/pi/Desktop/piMASS/gpcI4x4.cpp
 	"gpcSRC.h"
 
-1585959939 source:/home/pi/Desktop/piMASS/gpcSLMPdcr.cpp
+1585998093 source:/home/pi/Desktop/piMASS/gpcSLMPdcr.cpp
 	"gpcgt.h"
 	"gpcwin.h"
 
@@ -628,4 +628,8 @@
 
 1585857679 source:/home/pi/Desktop/piMASS/gpcF4.cpp
 	"gpcSRC.h"
+
+1585995121 source:/home/pi/Desktop/piMASS/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
 
