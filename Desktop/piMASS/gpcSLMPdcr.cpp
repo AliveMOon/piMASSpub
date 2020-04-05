@@ -342,6 +342,26 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		{
 			tMX = 1.0;
 			tMX.z = txyz-tXYZ;
+			if( abs(ab) < 0.0001f )
+			{
+				tMX.z = iMX.z;
+			}
+			else if( ab < 1.0 )
+			{
+				F4 Yd = tMX.z-iMX.z, Yn;
+                float	yl = sqrt(Yd.qlen_xyz()), alf;
+                if( yl > 0.0 ) {
+					alf = acos(tMX.z.norm_xyz()*iMX.z)*ab; 	// tZ és iZ szöge alf
+
+					Yn = Yd/yl;		// normalizálom a Zb-t
+					tMX.x = Yn.cross_xyz(iMX.z).norm_xyz(); // egy x merölegest csinálunk a Yn x iZ síkra
+
+					Yd = iMX.z.cross_xyz(tMX.x.norm_xyz()).norm_xyz(); // Yd-t derékszögüre koorigáljuk x segitségével
+
+					tMX.z = Yd*sin(alf) + iMX.z*cos(alf);
+                }
+			}
+
 			tMX.z /= sqrt(tMX.z.qlen_xyz());
 			tMX.x = iMX.y.cross_xyz(tMX.z);
 			tMX.y = tMX.z.cross_xyz(iMX.x);
@@ -355,6 +375,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				tMX.y /= yl;
 				tMX.x = iMX.y.cross_xyz(tMX.z);
 			}
+
 
 			tABC.xyz_( tMX.eABC()*(180.0/PI)*mm100(1) );
 			nD.w = iABC.chkABC( tABC, mm100(1) ).w;

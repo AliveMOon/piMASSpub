@@ -29,11 +29,12 @@ I4x4 I4x4::chkABC( const I4x4& b, float dim ) const
 	// radiánokat csinálunk
 	fa /= dim*180.0/PI;
 	fb /= dim*180.0/PI;
+	fb = F4( cos(fa.x)-cos(fb.x), cos(fa.y)-cos(fb.y), cos(fa.z)-cos(fb.z) )*dim*180.0/PI;
+	fb.w = fb.qlen_xyz();
+	//I4x4 chk( (cos(fa.x)-cos(fb.x))*dim, (cos(fa.y)-cos(fb.y))*dim, (cos(fa.z)-cos(fb.z))*dim );
+	//chk.w = chk.qlen_xyz();
 
-	I4x4 chk( (cos(fa.x)-cos(fb.x))*dim, (cos(fa.y)-cos(fb.y))*dim, (cos(fa.z)-cos(fb.z))*dim );
-	chk.w = chk.qlen_xyz();
-
-	return chk;
+	return fb;
 }
 I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 {
