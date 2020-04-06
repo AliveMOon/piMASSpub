@@ -4415,6 +4415,7 @@ public:
 		return F4( x/l, y/l, z/l );
 	}
 	float dot_xyz( F4 b ) const { return x*b.x + y*b.y + z*b.z; }
+
     F4 cross_xyz( F4 b ) const
 	{
 		return F4(
@@ -4423,6 +4424,10 @@ public:
 						x * b.y - y * b.x
 				);
 	}
+	F4  cos() const { return F4(  cosf(x), cosf(y), cosf(z), cosf(w)); };
+	F4  sin() const { return F4(  sinf(x), sinf(y), sinf(z), sinf(w)); };
+	F4 acos() const { return F4( acosf(x),acosf(y),acosf(z),acosf(w)); };
+	F4 asin() const { return F4( asinf(x),asinf(y),asinf(z),asinf(w)); };
 	F4 operator	+ ( const float b ) const { return F4( x+b, y+b, z+b, w+b ); }
 	F4 operator	- ( const float b ) const { return F4( x-b, y-b, z-b, w-b ); }
 	F4 operator	* ( const float b ) const { return F4( x*b, y*b, z*b, w*b ); }

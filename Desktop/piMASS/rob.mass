@@ -1,0 +1,51 @@
+ a0	 
+ 
+ R# o# b# i#                                                                					  b0	 b0  d0	  																							 e0	 										 f0	 											 g0	  																	 a1	  
+ telnet = 6001;
+ rout = 0x10003;
+ rinp = 0x10002;
+ slmp = "192.168.1.90 10000"
+ cam = 1
+ pic = "clip"; 
+ 
+ bob = "exp";
+ f = fps; 
+  b1	 
+ pic = 	"cam1";
+ unsel = 1;
+  a2	
+// BILL HS12:0000
+// POS:  n:0
+//	iXYZ  600.00mm,  599.97mm,  499.97mm 
+//	oXYZ  600.00mm,  599.97mm,  499.97mm 
+//	tXYZ  600.00mm,  599.97mm,  499.97mm;
+// DIR:  n:0
+//	iABC -180.00dg,    0.00dg,   79.42dg 
+//	oABC -180.00dg,    0.00dg,   79.42dg 
+//	tABC -180.00dg,    0.00dg,   79.42dg;
+// pos:
+//	ixyz    0.00mm,    0.00mm,    0.00mm 
+//	oxyz    0.00mm,    0.00mm,    0.00mm 
+//	txyz    0.00mm,    0.00mm,    0.00mm;
+// dir:
+//	iabc    0.00dg,    0.00dg,    0.00dg 
+//	oabc    0.00dg,    0.00dg,    0.00dg 
+//	tabc    0.00dg,    0.00dg,    0.00dg;"
+ b2	
+// JOHN HS12:0000
+// POS:  n:5
+//	iXYZ  450.00mm,  450.00mm,  450.00mm 
+//	oXYZ  400.00mm,    0.00mm,  700.00mm 
+//	tXYZ  400.00mm,    0.00mm,  700.00mm;
+// DIR:  n:2
+//	iABC    0.00dg,    0.00dg,    0.00dg 
+//	oABC  180.00dg,    0.00dg,   90.00dg 
+//	tABC  180.00dg,    0.00dg,   90.00dg;
+// pos:
+//	ixyz    0.00mm,    0.00mm,    0.00mm 
+//	oxyz    0.00mm,    0.00mm,    0.00mm 
+//	txyz    0.00mm,    0.00mm,    0.00mm;
+// dir:
+//	iabc    0.00dg,    0.00dg,    0.00dg 
+//	oabc    0.00dg,    0.00dg,    0.00dg 
+//	tabc    0.00dg,    0.00dg,    0.00dg;"

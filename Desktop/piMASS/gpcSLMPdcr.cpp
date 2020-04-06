@@ -335,6 +335,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		if( nD.x )
 			oCTRL.z |= 1;
 	}
+
 	if( txyz.qlen_xyz() )
 	{
 		nD.y = dxyz.qlen_xyz();
@@ -384,7 +385,10 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 
 
 
-	if( nD.w ) {
+	if( nD.w < 10 )
+	{
+		tABC.xyz_(oABC.xyz_(iABC));
+	} else {
 
 		 //, dMX;
 
@@ -393,7 +397,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		tMX.ABC(tABC, mm100(180)/PI );
 
 		F4 rnd( K,K,K );
-		rnd &= (iMX.dot(tMX)/(2.0*PI));	// n karika * kerület
+		rnd &= (iMX.dot(tMX).acos()/(2.0*PI));	// n karika * kerület
 
 		k = rnd.xyz0().abs().mx();
 		if( k > 0.0 )

@@ -817,8 +817,7 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 	return *this;
 }
 
-gpcZS::gpcZS( const gpcDrc& D )
-{
+gpcZS::gpcZS( const gpcDrc& D ) {
 	gpmCLR;
 	*this = D;
 }
@@ -839,13 +838,10 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	{
 		F4x4 mx;
 		mx.ABC(iABC, mm100(180)/PI );
-
 		if( txyz.qlen_xyz() )
-		{
 			ixyz.xyz_( iXYZ + (mx.z*sqrt((txyz-tXYZ).qlen_xyz())));
-		} else {
-			ixyz.xyz_( iXYZ + (mx.z*mm100(100)) );
-		}
+		else
+			ixyz.xyz_( iXYZ + (mx.z*max(iXYZ.z,mm100(100))) );
 	}
 
 	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
