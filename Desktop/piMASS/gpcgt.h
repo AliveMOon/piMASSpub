@@ -118,19 +118,6 @@ public:
 	gpcDrc& operator &= ( gpcDrc& in );
 	gpcDrc& operator = ( gpcZS& zs );
 
-	/*gpcDrc& i( const gpcDrc& b )
-	{
-		iXYZ.xyz_( b.iXYZ );
-		iABC.xyz_( b.iABC );
-		ixyz.xyz_( b.ixyz );
-		iabc.xyz_( b.iabc );
-		aiAX1to6[0].xyz_( b.aiAX1to6[0] );
-		aiAX1to6[1].xyz_( b.aiAX1to6[1] );
-		aiax1to6[0].xyz_( b.aiax1to6[0] );
-		aiax1to6[1].xyz_( b.aiax1to6[1] );
-
-		return *this;
-	}*/
 
 	bool operator == ( const gpcDrc& b ) const
 	{

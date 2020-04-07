@@ -266,7 +266,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	if( !NMnDIF.x )
 		return *this;
 
-	I8 dif = iXYZ.qlen_xyz(), mmA = sqrt(dif), mmB = mmA;
+	I8 dif = iXYZ.qlen_xyz(), mmA = sqrt(dif), mmB = mmA, mmC;
 	if( mmA < mm100(400) )
 		return *this;
 
@@ -312,9 +312,11 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			dGRP = tGRP - iGRP;
 
 	nD.z = dGRP.qlen_xyz();
-	if( nD.x = dXYZ.qlen_xyz() )
+
+	mmA = dXYZ.qlen_xyz();
+	if( mmA )
 	{
-		mmA = sqrt(nD.x);
+		mmA = sqrt(mmA);
 		U4 i = 3;
 		switch( NMnDIF.x )
 		{
@@ -328,19 +330,25 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				i = 3;
 				break;
 		}
-		chk( mm100(gpdROBlim), i );
+		if( mmA/mm100(gpdROBlim) > 1 )
+			chk( mm100(gpdROBlim), i );
+		else
+			chk( mmA, i );
+
 		dXYZ = oXYZ - iXYZ;
-		mmB = sqrt(nD.x = dXYZ.qlen_xyz());
+
+		mmB = sqrt(dXYZ.qlen_xyz());
 		ab = float(mmB)/float(mmA);
-		if( nD.x )
+		if( mmB )
 			oCTRL.z |= 1;
 	}
 
 	if( txyz.qlen_xyz() )
 	{
-		nD.y = dxyz.qlen_xyz();
-		if( nD.x|(nD.y>10) )
+		mmC = dxyz.qlen_xyz();
+		if( mmB|(mmC>10) )
 		{
+			mmC = sqrt(mmC);
 			tMX = 1.0;
 			tMX.z = txyz-tXYZ;
 			if( abs(ab) < 0.0001f )
