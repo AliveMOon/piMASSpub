@@ -9,9 +9,9 @@ I4x4 gpaCAGEbillBALL[] = {
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
 };
 I4x4 gpaCAGEbillBOX[] = {
+	{ mm100(600), mm100(600), mm100(-200), mm100(330) }, // asztal_bill
 	{ mm100(1500/2), mm100(4900), mm100(0), mm100(4000) }, // MIMI2bill
 	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
-	{ mm100(600), mm100(600), mm100(-200), mm100(330) }, // asztal_bill
 };
 U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 	gpnCAGEbillBOX = gpmN(gpaCAGEbillBOX);
@@ -55,8 +55,7 @@ gpcDrc* gpcDrc::chk( I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL )
 		iXYZ.xyz_( okXYZ );
 	}
 
-	I4x4 tmp;
-	tmp = cageBALL( tXYZ.xyz0(), pBALL, nBALL );
+	I4x4 tmp = cageBALL( tXYZ.xyz0(), pBALL, nBALL );
 	tmp = cageBOX( tmp, pBOX, nBOX );
 	if( lim )
 		oXYZ.xyz_( iXYZ.lim_xyz(tmp,lim) );
