@@ -42,7 +42,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 	if( T.xyz0() == xyz0() )
 		return xyz0();
 	I4x4 D4 = T.xyz0()-xyz0();
-	I4x2 SabsMX = abs0().mx();
+	I4x2 SabsMX = abs_xyz0().mx();
 
 	if( SabsMX.x <= r )
 		return xyz0();		// ben van a dobozban, nehogy megmozduljon
@@ -60,7 +60,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 	D8 /= D4.aXYZW[SabsMX.y] > 0 ? D4.aXYZW[SabsMX.y] : -D4.aXYZW[SabsMX.y];
 	D8 += xyz0();
 
-	if( (D8&gpaCAGEboxMSK[SabsMX.y]).abs0().mx().x > r )
+	if( (D8&gpaCAGEboxMSK[SabsMX.y]).abs_xyz0().mx().x > r )
 		return T.xyz0();
 
 	return D8;

@@ -334,17 +334,29 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		if( mmABCD.y )
 		{
 			if( lim <= mmABCD.y+10 )
+			{
+				// elérte a lim-et azaz nem érte el a ketrecet
 				lim = mmABCD.y;
+			}
+			else if( mmABCD.y > mm100(10) )
+			{
+				// kisebb let mint amit elvártunk a ketrec nem engedte
+				dXYZ *= (I4)(mmABCD.y/100)-10;
+				dXYZ /= (I4)(mmABCD.y/100);
+				oXYZ.xyz_(dXYZ+iXYZ);
+				mmABCD.y -= mm100(10);
+				ab = float(mmABCD.y)/float(mmABCD.x);
+			}
 			oCTRL.z |= 1;
 		}
 	}
 
 	if( txyz.qlen_xyz() )
 	{
-		mmABCD.z = dxyz.qlen_xyz();
+		mmABCD.z = dxyz.abs_xyz0().mx().x;
 		if( mmABCD.y|(mmABCD.z>10) )
 		{
-			mmABCD.z = sqrt(mmABCD.z);
+			mmABCD.z = sqrt(dxyz.qlen_xyz());
 			tMX = 1.0;
 			tMX.z = (txyz-tXYZ).xyz0();
 			if( abs(ab) < 0.0001f )
@@ -440,6 +452,11 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	{
 		// ketrec gátolta
         // o-kat berakjuk a t-be
+        if( abs( oABC.y ) > mm100(100) )
+        {
+			oCTRL.z = 0;
+			return *this;
+        }
 		tXYZ.xyz_( oXYZ );
 		tABC.xyz_( oABC );
 		if( txyz.qlen_xyz() )

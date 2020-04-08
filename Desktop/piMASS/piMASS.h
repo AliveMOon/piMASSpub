@@ -3218,6 +3218,64 @@ public:
 	}
 
 
+	I4x4& operator *= ( U4 u )
+	{
+		a4x2[0] *= u;
+		a4x2[1] *= u;
+		return *this;
+	}
+	I4x4& operator *= ( I4 i )
+	{
+		a4x2[0] *= i;
+		a4x2[1] *= i;
+		return *this;
+	}
+	I4x4& operator *= ( float f )
+	{
+		a4x2[0] *= (I4)f;
+		a4x2[1] *= (I4)f;
+		return *this;
+	}
+
+	I4x4& operator %= ( U4 u )
+	{
+		a4x2[0] %= u;
+		a4x2[1] %= u;
+		return *this;
+	}
+	I4x4& operator %= ( I4 i )
+	{
+		a4x2[0] %= i;
+		a4x2[1] %= i;
+		return *this;
+	}
+	I4x4& operator %= ( float f )
+	{
+		a4x2[0] %= (I4)f;
+		a4x2[1] %= (I4)f;
+		return *this;
+	}
+
+	I4x4& operator /= ( U4 u )
+	{
+		a4x2[0] /= u;
+		a4x2[1] /= u;
+		return *this;
+	}
+	I4x4& operator /= ( I4 i )
+	{
+		a4x2[0] /= i;
+		a4x2[1] /= i;
+		return *this;
+	}
+	I4x4& operator /= ( float f )
+	{
+		a4x2[0] /= (I4)f;
+		a4x2[1] /= (I4)f;
+		return *this;
+	}
+
+
 
 	I4x4 operator + (const I4x4& b) const
 	{
@@ -3323,7 +3381,7 @@ public:
 	{
 		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
 	}
-	I4x4 abs0( void ) const
+	I4x4 abs_xyz0( void ) const
 	{
 		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z );
 	}
@@ -4101,7 +4159,7 @@ public:
 	{
 		return I8x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
 	}
-	I8x4 abs0( void ) const
+	I8x4 abs_xyz0( void ) const
 	{
 		return I8x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z );
 	}
