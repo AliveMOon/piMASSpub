@@ -1,3 +1,9 @@
+------ szimbolikus elérési út ----------
+sudo ln -s "/media/pi/DEBIAN 10_2/robout" /robo
+
+
+
+
 
 /etc/fstab :
 

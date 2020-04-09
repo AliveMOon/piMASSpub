@@ -3057,13 +3057,13 @@ public:
 		a4x2[1] = a4x2[0] = b;
 		return *this;
     }
-    size_t str_t( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
+    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
     {
 		return sprintf( pBUFF, "%d%s%d%s%d%s%d%s%s", x,pSeP,y,pSeP,z,pSeP,w,pSeP, pENT );
     }
 	char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
     {
-		str_t( pBUFF, pSeP, pENT );
+		str( pBUFF, pSeP, pENT );
 		//sprintf( pBUFF, "%d%s%d%s%d%s%d%s%s", x,pSeP,y,pSeP,z,pSeP,w,pSeP, pENT );
 		return pBUFF;
     }
