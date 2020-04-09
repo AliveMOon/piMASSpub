@@ -62,9 +62,6 @@
 #define ZShs2o 0x8
 
 
-
-/*#define gpdDrcSTART( p ) (p.CTRL.y&0x1)
-#define gpdDrcDONE( p ) (p.CTRL.y&0x2)*/
 #define gpdSLMP GTslmpDrc // GTslmp
 #define gpdSLMPos GTdrcOS	//GTslmpOS
 #define gpdZSnW 	gpmOFFOFF( gpcZS, io128.y, oMxyzEspd )

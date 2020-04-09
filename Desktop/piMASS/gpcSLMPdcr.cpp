@@ -401,7 +401,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 
 
 
-	if( itD < 10 )
+	if( itD < 55 )
 	{
 		tABC.xyz_(oABC.xyz_(iABC));
 	} else {

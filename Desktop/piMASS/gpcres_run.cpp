@@ -103,11 +103,11 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 
 			/// gpeISA_var	// --------------------------------------------------------------------------------------
  			case gpeISA_var: {	// --------------------------------------------------------------------------------------
-					A0 = IS.an.var;
+					A0 = IS.an.var;	/// gpcADR
 					if( !A0.an.alf )
 						break;
 
-					if( pDOT )
+					if( pDOT ) /// pANS->apOUT[3]
 					{
 						A0 = pDOT;
 						pDOT = NULL;
@@ -382,7 +382,7 @@ U4 gpcMASS::jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR )
 	ie = win.pC-win.pM;
 	return in*win.mZ+iz;
 }
-
+char sPUB[0x1000];
 U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
 	win.nJDOIT.w++;
@@ -780,6 +780,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						anRio.a8x2[1].y = anRio.a8x2[1].x&0xff;
 						anRio.a8x2[1].x >>= 0x10;
 						} break;
+
 					case gpeALF_SLMP: if(alu.bSTR()) {
 						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
 							break;
@@ -814,8 +815,25 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								hex.lzyFRMT( s=-1, "\"\r\n" );
 								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 								pS2->srcUPDT();
-							}
+								U2 hs2 = pZSnD->aDrc[i].hs12();
+								if( (hs2&0xff) ) {
+									if( (hs2&0xff) == 0x1 ) {
+										//// blabla IDE
+										gpcADR A0 = gpeALF_REND;	/// gpcADR
+										A0 = &res;
+										if( A0.pRM )
+										{
+											gpcALU aB = A0.pRM->ALU( A0.iA );
+											if(aB.bSTR())
+											if( char* p_pat = (char*)alu.pDAT ) {
 
+												sprintf( sPUB, p_pat, "ize" );
+												system( sPUB );
+											}
+										}
+									}
+								}
+							}
 
 							if( !anRio.a8x2[1].x )
 								break;

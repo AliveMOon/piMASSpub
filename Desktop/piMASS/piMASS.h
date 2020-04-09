@@ -298,7 +298,7 @@ class gpcALU;
 #define gpdSIZ2CR  I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
-#define gpdROBlim 50
+#define gpdROBlim 150
 #define mm100(a) ((a)*100)
 #define zsIO 20
 #define zsIN 400

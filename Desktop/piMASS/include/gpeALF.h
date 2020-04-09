@@ -880,6 +880,7 @@ typedef enum gpeALF: I8
 
 	//gpeALF_RESA =	gpdABCD( 'R','E','S','A' ),
 	gpeALF_REMM = gpdABCD('R', 'E', 'M', 'M'),
+	gpeALF_REND = gpdABCD('R', 'E', 'N', 'D'),
 
 	gpeALF_RINP = gpdABCD('R', 'I', 'N', 'P'),
 
