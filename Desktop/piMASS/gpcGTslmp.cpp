@@ -1252,7 +1252,7 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 		if( (U1*)strcasestr( (char*)pSTR, "d000" ) == pSTR )
 		{
 			sGTent[0] = '\n';	// visza kapcsol ASCII-ba
-			return gpdSLMP( mom, pWIN, pALL );
+			return GTslmpDrc( mom, pWIN, pALL );
 		}
 		gpcSLMP* pD000 = (gpcSLMP*)(pSTR + gpfMEMMEM( pSTR, pINP->n_load, (U1*)&gpaSLMPbin[0].SER, sizeof(gpaSLMPbin[0].SER) ));
 		if( (U1*)pD000 < pSTR )

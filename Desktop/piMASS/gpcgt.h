@@ -62,7 +62,7 @@
 #define ZShs2o 0x8
 
 
-#define gpdSLMP GTslmpDrc // GTslmp
+//#define gpdSLMP GTslmpDrc // GTslmp
 #define gpdSLMPos GTdrcOS	//GTslmpOS
 #define gpdZSnW 	gpmOFFOFF( gpcZS, io128.y, oMxyzEspd )
 #define gpdZSnWu2	(gpdZSnW/sizeof(U2))
@@ -104,9 +104,12 @@ public:
 			tabc, oabc, iabc,
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
-	U4x4	oCTRL, iCTRL, JD;
-	I4x4	okXYZ, okABC,
-			tGRP, oGRP, iGRP;
+	U4x4	oCTRL, iCTRL, JD;	// JD.z error num
+	I4x4	okXYZ, okABC, okxyz,
+			tGRP, oGRP, iGRP,
+			jdPRG,
+			jd0XYZ, jd0xyz, jd0ABC;
+	F4x4	jdmx;
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	gpcDrc* chk( I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
 	gpcDrc* chk( I4 lim, U4 id );
@@ -622,8 +625,8 @@ class gpcGT
 		{
 			if( !this )
 				return NULL;
+			// ott van felette
 			GTprmpt();
-			//pOUT = pOUT->lzyFRMT( s = -1, "  \r0x%x>", iCNT );
 			if( !pINP )
 				return pOUT;
 			U8 s;

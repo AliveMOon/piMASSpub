@@ -4734,6 +4734,30 @@ public:
 		return m > w ? w : m;
 	}
 
+	//I84 gr2cr_1m( void ) const
+	F4& gr2cr( const I4x2 xy, double rw )
+	{
+		double	rx = ::PI*((double(xy.x)/rw) + 0.25),
+				ry = ::PI*((double(xy.y)/rw) + 0.25),
+				ctgX = ::cos(rx)/::sin(rx),
+				ctgY = ::cos(ry)/::sin(ry),
+				ctgXY2 = ctgX*ctgX + ctgY*ctgY,
+				r0 = rw / ::sqrt(1.0+ctgXY2);
+
+		ctgX *= r0;
+		ctgY *= r0;
+		ctgXY2 = ctgX*ctgX + ctgY*ctgY;
+		r0 = ::sqrt( rw*rw - ctgXY2 );
+
+		x = ctgX;
+		y = ctgY;
+		z = r0;
+
+		w = ::sqrt(qlen_xyz());
+		return *this;
+	}
+
+
 };
 #define _11 x.x
 #define _12 x.y

@@ -888,7 +888,7 @@ I8 gpcGT::GTcnct( gpcWIN& win )
 	switch( TnID.alf )
 	{
 		case gpeALF_SLMP:
-			gpdSLMP( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			GTslmpDrc( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
 			//GTslmp( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
 			break;
 		default:

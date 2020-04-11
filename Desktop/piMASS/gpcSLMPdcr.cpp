@@ -221,11 +221,13 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 						iABC.xyz_(oABC);*/
 						okXYZ.xyz_(oXYZ);
 						okABC.xyz_(oABC);
+						okxyz.xyz_(oxyz);
+
 						break;
 					default:
 						// ZS hibat jelzett
 						// trg-be eltároljuk hol van most
-						// ne is akarcon tovább menni
+						// ne is akarjon tovább menni
 						tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
 						tABC.xyz_( oABC.xyz_(iABC) );
 						break;
@@ -269,13 +271,14 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		return *this;
 
 	I8x4 mmABCD( sqrt(iXYZ.qlen_xyz()) );
-	//I8	mmA = sqrt(iXYZ.qlen_xyz()), mmB = 0, mmC = 0, mmD = 0;
 	if( mmABCD.x < mm100(400) )
 		return *this;
 
 	oCTRL.z = 0;
-	if( sqrt(okXYZ.qlen_xyz()) > mm100(400) )
+	if( sqrt(okXYZ.qlen_xyz()) > mm100(400) ){
 		iXYZ.xyz_( okXYZ );
+		iABC.xyz_( okABC );
+	}
 
 	F4x4 tMX, iMX;
 
@@ -299,14 +302,12 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	static const float K = (100.0*PI*2.0);
 	I4 itD = iABC.chkABC( tABC, mm100(1) ).w, lim = 0;
 	I4x4 	tmp,
-			//nD = iABC.chkABC( tABC, mm100(1) ),
 			dXYZ = tXYZ - iXYZ,
 			dxyz = txyz - ixyz,
 			dGRP = tGRP - iGRP;
 
 	//nD.z
 	mmABCD.w = sqrt(dGRP.qlen_xyz());
-
 	mmABCD.x = dXYZ.qlen_xyz();
 	if( mmABCD.x )
 	{
@@ -443,10 +444,37 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		oCTRL.z |= 2;
 	}
 
-
-
 	if( !oCTRL.z )
+	{
+		if( jdPRG.x )
+		{
+			if( jdPRG.y < jdPRG.z )
+			{
+				if( !jdPRG.y )
+				{
+					jd0XYZ.xyz_(okXYZ);
+					jd0ABC.xyz_(okABC);
+					jd0xyz.xyz_(okxyz);
+
+					I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
+					jdmx.ABC(jd0ABC,mm100(180)/PI);
+
+
+				}
+				I4x2 xy = jdPRG.y;
+				xy.XdivRQ(jdPRG.w);
+				F4 cr;
+				cr.gr2cr( xy-(jdPRG.w/2), jdPRG.w );
+
+
+				jdPRG.y++;
+			} else {
+				jdPRG.null();
+			}
+		}
+
 		return *this;
+	}
 
 	if( lim > mmABCD.y )
 	{

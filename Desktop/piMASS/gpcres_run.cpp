@@ -817,33 +817,32 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								pS2->srcUPDT();
 								gpcDrc &D = pZSnD->aDrc[i];
 								U2 hs2 = D.hs12();
-								if( (hs2&0xff) ) {
-									if( (hs2&0xff) == 0x10 )
-										D.JD.w &= ~1;
-
-									if( (hs2&0xff) == 0x1 )
-									if( !(D.JD.w&1) )
+								if( D.JD.w != D.JD.y )
+								{
+									D.JD.w = D.JD.y;
+									switch( D.JD.w )
 									{
-										D.JD.w+=3;
-										//// blabla IDE
-										gpcADR A0 = gpeALF_REND;	/// gpcADR
-										A0 = &res;
-										if( A0.pRM )
-										{
-											gpcALU aB = A0.pRM->ALU( A0.iA );
-											if(aB.bSTR())
-											if( char* p_pat = (char*)alu.pDAT )
+										case 6:{
+											// 5->6 jelzünk hogy olvastuk a HS2i-t
+											gpcADR A0 = gpeALF_REND;	/// gpcADR
+											A0 = &res;
+											if( A0.pRM )
 											{
-												char* pP = gpsPUB+D.okXYZ.str(gpsPUB, "_" );
-												pP += D.okABC.str( pP, "_" );
-												pP += sprintf( pP, ".png" );
+												gpcALU aB = A0.pRM->ALU( A0.iA );
+												if(aB.bSTR())
+												if( char* p_pat = (char*)alu.pDAT )
+												{
+													char* pP = gpsPUB+D.okXYZ.str(gpsPUB, "_" );
+													pP += D.okABC.str( pP, "_" );
+													pP += sprintf( pP, ".png" );
 
-												sprintf( pP+1, p_pat, gpsPUB );
-												int o = system( pP+1 );
-												std::cout << o << ":" << pP+1 <<std::endl;;
+													sprintf( pP+1, p_pat, gpsPUB );
+													int o = system( pP+1 );
+													std::cout << o << ":" << pP+1 <<std::endl;;
 
+												}
 											}
-										}
+										} break;
 									}
 								}
 							}

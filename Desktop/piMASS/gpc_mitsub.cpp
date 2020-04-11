@@ -840,8 +840,12 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 		mx.ABC(iABC, mm100(180)/PI );
 		if( txyz.qlen_xyz() )
 			ixyz.xyz_( iXYZ + (mx.z*sqrt((txyz-tXYZ).qlen_xyz())));
-		else
-			ixyz.xyz_( iXYZ + (mx.z*max(iXYZ.z,mm100(100))) );
+		else {
+			if( (mx.z.z <= -COSSIN45) && (iXYZ.z > 0) )
+				ixyz.xyz_( iXYZ + (mx.z * (float(-iXYZ.z)/mx.z.z)) );	// lerakja z=0-ra
+			else
+				ixyz.xyz_( iXYZ + (mx.z*mm100(200)) );
+		}
 	}
 
 	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
