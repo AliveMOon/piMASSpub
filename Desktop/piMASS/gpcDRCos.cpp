@@ -9,7 +9,7 @@ I4x4 gpaCAGEbillBALL[] = {
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
 };
 I4x4 gpaCAGEbillBOX[] = {
-	{ mm100(600), mm100(600), mm100(-200), mm100(330) }, // asztal_bill
+	{ mm100(600), mm100(500), mm100(-200), mm100(330) }, // asztal_bill
 	{ mm100(1500/2), mm100(4900), mm100(0), mm100(4000) }, // MIMI2bill
 	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
 };
@@ -23,7 +23,7 @@ I4x4 gpaCAGEjohnBALL[] = {
 	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
 };
 I4x4 gpaCAGEjohnBOX[] = {
-	{ mm100(1500-600), mm100(-600), mm100(-200), mm100(330) }, // asztal_john
+	{ mm100(1500-600), mm100(-500), mm100(-200), mm100(330) }, // asztal_john
 	{ mm100(-500-2000), mm100(0), mm100(0), mm100(2000) }, // MIMI_john
 	{ mm100(1500/2), mm100(-4900), mm100(0), mm100(4000) }, // MIMI2john
 };
@@ -139,36 +139,25 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		an.num = pEND-(pCOM = pSTR);
 		an = pCOM;
 		pSTR += an.num;
-		if( an.alf )
-		{
+		if( an.alf ) {
 			comA = *(U4*)pCOM;
 			iNUM = 0;
 			switch( an.alf )
 			{
-				case gpeALF_FORMAT:
-					ZSnD.format();
-					continue;
+				case gpeALF_BILL:
+						iD = 0;
 
-				case gpeALF_HELO:
-				case gpeALF_HELLO:
-					return pANS->lzyFRMT( s = -1, "Hello! %d", iD );
-				case gpeALF_HELP:
-					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iD );
-				case gpeALF_LINE:
-					return pANS->lzyFRMT( s = -1, "Line.txt %d", iD );
-				case gpeALF_JOIN:
-					return pANS->lzyFRMT( s = -1, "Join.txt %d", iD );
+						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_BILL )
+							break;
+						ZSnD.aDrc[iD].format( gpeZS_BILL );
+						break;
+				case gpeALF_JOHN:
+						iD = 1;
+						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_JOHN )
+							break;
+						ZSnD.aDrc[iD].format( gpeZS_JOHN );
+					 break;
 
-				/*case gpeALF_KOSZON:{
-						U4	nR = sizeof(gpsSLMPabc),
-							nC = nR/(4*8);
-						pANS = pANS->lzyFRMT( s = -1, "CSOKOLOM %s BACSI!", pSTR );
-
-					} return pANS;*/
-				case gpeALF_GRIP:{
-						iNUM = 24;
-						nNUM = 3;
-					} break;
 
 				case gpeALF_POS:
 				case gpeALF_XYZ:{
@@ -198,6 +187,41 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						}
 						nNUM = 3;
 					} break;
+
+				case gpeALF_GRIP:{
+						iNUM = 24;
+						nNUM = 3;
+					} break;
+
+				case gpeALF_PRG: {
+						iNUM = 24+3;
+						nNUM = 4;
+					} break;
+
+
+
+				case gpeALF_FORMAT:
+					ZSnD.format();
+					continue;
+
+				case gpeALF_HELO:
+				case gpeALF_HELLO:
+					return pANS->lzyFRMT( s = -1, "Hello! %d", iD );
+				case gpeALF_HELP:
+					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iD );
+				case gpeALF_LINE:
+					return pANS->lzyFRMT( s = -1, "Line.txt %d", iD );
+				case gpeALF_JOIN:
+					return pANS->lzyFRMT( s = -1, "Join.txt %d", iD );
+
+				/*case gpeALF_KOSZON:{
+						U4	nR = sizeof(gpsSLMPabc),
+							nC = nR/(4*8);
+						pANS = pANS->lzyFRMT( s = -1, "CSOKOLOM %s BACSI!", pSTR );
+
+					} return pANS;*/
+
+
 				case gpeALF_LINK:
 				case gpeALF_AXIS:{
 						switch( comA )
@@ -212,21 +236,10 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						}
 						nNUM = 6;
 					} break;
-				case gpeALF_BILL:
-						iD = 0;
 
-						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_BILL )
-							break;
-						ZSnD.aDrc[iD].format( gpeZS_BILL );
-						break;
-				case gpeALF_JOHN:
-						iD = 1;
-						if( ZSnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_JOHN )
-							break;
-						ZSnD.aDrc[iD].format( gpeZS_JOHN );
-					 break;
+
 				default:
-					iNUM = 23;
+					iNUM = 31;
 					break;
 			}
 
@@ -240,7 +253,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			pD = NULL;
 			oD = iD;
 			continue;
-		} else if( iNUM > 23 )
+		} else if( iNUM > 31 )
 			return pANS->lzyFRMT( s = -1, "nonsens" );
 
 		if( iD >= 2 )
@@ -278,19 +291,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 0:
 			case 1:
 			case 2:
-				pD->tXYZ.aXYZW[(iNUM-0)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->tXYZ.aXYZW[(iNUM-0)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
 				break;
-			// pos
+				// pos
 			case 12:
 			case 13:
 			case 14:
-				pD->txyz.aXYZW[(iNUM-12)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
-				break;
-				// GRIP
-			case 24:
-			case 25:
-			case 26:
-				pD->tGRP.aXYZW[(iNUM-24)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->txyz.aXYZW[(iNUM-12)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
 				break;
 
 
@@ -298,8 +305,30 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 3:
 			case 4:
 			case 5:
-				pD->tABC.aXYZW[(iNUM-3)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
+				pD->tABC.aXYZW[(iNUM-3)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
 				break;
+
+				// GRIP
+			case 24:
+			case 25:
+			case 26:
+				pD->tGRP.aXYZW[(iNUM-24)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
+				break;
+				// PRG
+			case 27:
+			case 28:
+			case 29:
+			case 30:
+				pD->jd0PRG.aXYZW[(iNUM-27)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;
+				if(iNUM!=30)
+					break;
+
+				pD->jdPRG = I4x4( 1, 0, 1 );
+				pD->jdPRGstp();
+				break;
+			/// -----------------------------------------------
+
+
 			case 6:
 			case 7:
 			case 8:
@@ -310,7 +339,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				pD->aoAX1to6[((iNUM-6)%6)/3].aXYZW[(iNUM-6)%nNUM] = (d8 == 0.0) ? (I4)an.num*100 : (I4)(d8*100.0);
 				break;
 
-			// OFFSET - eltolás
+				// OFFSET - eltolás
 
 				// DIR
 			case 15:

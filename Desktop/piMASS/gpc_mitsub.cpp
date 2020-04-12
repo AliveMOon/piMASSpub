@@ -809,7 +809,6 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 		case 5:
 		case 6:
 			io128.y = D.oCTRL.y;
-			//gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
 			break;
 		default:
 			break;

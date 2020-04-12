@@ -298,7 +298,7 @@ class gpcALU;
 #define gpdSIZ2CR  I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
-#define gpdROBlim 150
+#define gpdROBlim 100
 #define mm100(a) ((a)*100)
 #define zsIO 20
 #define zsIN 400
@@ -4737,6 +4737,7 @@ public:
 	//I84 gr2cr_1m( void ) const
 	F4& gr2cr( const I4x2 xy, double rw )
 	{
+
 		double	rx = ::PI*((double(xy.x)/rw) + 0.25),
 				ry = ::PI*((double(xy.y)/rw) + 0.25),
 				ctgX = ::cos(rx)/::sin(rx),

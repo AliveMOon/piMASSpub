@@ -245,7 +245,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 
 	/// ---------------------------------
-	/// Drc filter
+	/// Drc judo filter
 	/// ---------------------------------
 	iD0 = pZSnD->stpPUSH( false );
 

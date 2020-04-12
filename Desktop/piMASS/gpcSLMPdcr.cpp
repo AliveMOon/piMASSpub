@@ -173,11 +173,53 @@ gpcLZY* gpcZSnD::pulling( gpcLZY* pOUT, U4x4* pZSrw ) {
 		ioSW.w += 4;
 	return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
 }
+bool gpcDrc::jdPRGstp()
+{
+	if( oCTRL.z )
+		return false;
 
+	if( jdPRG.x )
+	{
+		if( jdPRG.y >= jdPRG.z )
+		{
+			jdPRG.null();
+			return true;
+		}
+	} else
+		return true;
+
+	if( !jdPRG.y )
+	{
+		jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
+		if( !jdPRG.z )
+		{
+			jdPRG.null();
+			return true;
+		}
+		jd0XYZ.xyz_(okXYZ);
+		jd0ABC.xyz_(okABC);
+		jd0xyz.xyz_(okxyz);
+		jd0mx.ABC(jd0ABC,mm100(180)/PI);
+	}
+	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
+
+	I4x2 xy = jdPRG.y;
+	xy.XdivRQ(jdPRG.w) += jdPRG.w;
+	xy -= jd0PRG.a4x2[1];
+	xy %= jdPRG.w;
+
+	F4 cr;
+	cr.gr2cr( xy, jdPRG.w );
+	float d = cr.w/zl;
+	I4x4 vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
+	tXYZ.xyz_( jd0xyz - vec );
+
+	jdPRG.y++;
+	return true;
+}
 gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	*this = inp;
-	switch( JD.y )
-	{
+	switch( JD.y ) {
 		case 7: {
 				JD.y = 0;
 				if( JD.z )
@@ -334,7 +376,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		ab = float(mmABCD.y)/float(mmABCD.x);
 		if( mmABCD.y )
 		{
-			if( lim <= mmABCD.y+10 )
+			if( lim <= mmABCD.y+mm100(3) )
 			{
 				// elérte a lim-et azaz nem érte el a ketrecet
 				lim = mmABCD.y;
@@ -345,15 +387,22 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				dXYZ *= (I4)(mmABCD.y/100)-10;
 				dXYZ /= (I4)(mmABCD.y/100);
 				oXYZ.xyz_(dXYZ+iXYZ);
-				mmABCD.y -= mm100(10);
+
+				mmABCD.y = sqrt(dXYZ.qlen_xyz());
 				ab = float(mmABCD.y)/float(mmABCD.x);
+			} else {
+				// nagyon kicsit engedne
+				oXYZ.xyz_(iXYZ);
+				dXYZ.null();
+				ab = 0.0;
+				mmABCD.y = 0;
 			}
-			oCTRL.z |= 1;
+			if( mmABCD.y )
+				oCTRL.z |= 1;
 		}
 	}
 
-	if( txyz.qlen_xyz() )
-	{
+	if( txyz.qlen_xyz() ) {
 		mmABCD.z = dxyz.abs_xyz0().mx().x;
 		if( mmABCD.y|(mmABCD.z>10) )
 		{
@@ -402,8 +451,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 
 
 
-	if( itD < 55 )
-	{
+	if( itD < 55 ) {
 		tABC.xyz_(oABC.xyz_(iABC));
 	} else {
 
@@ -444,37 +492,8 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		oCTRL.z |= 2;
 	}
 
-	if( !oCTRL.z )
-	{
-		if( jdPRG.x )
-		{
-			if( jdPRG.y < jdPRG.z )
-			{
-				if( !jdPRG.y )
-				{
-					jd0XYZ.xyz_(okXYZ);
-					jd0ABC.xyz_(okABC);
-					jd0xyz.xyz_(okxyz);
-
-					I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
-					jdmx.ABC(jd0ABC,mm100(180)/PI);
-
-
-				}
-				I4x2 xy = jdPRG.y;
-				xy.XdivRQ(jdPRG.w);
-				F4 cr;
-				cr.gr2cr( xy-(jdPRG.w/2), jdPRG.w );
-
-
-				jdPRG.y++;
-			} else {
-				jdPRG.null();
-			}
-		}
-
+	if( jdPRGstp() )
 		return *this;
-	}
 
 	if( lim > mmABCD.y )
 	{

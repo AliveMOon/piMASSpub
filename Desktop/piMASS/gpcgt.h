@@ -108,8 +108,11 @@ public:
 	I4x4	okXYZ, okABC, okxyz,
 			tGRP, oGRP, iGRP,
 			jdPRG,
+
+			jd0PRG,
 			jd0XYZ, jd0xyz, jd0ABC;
-	F4x4	jdmx;
+	F4x4	jd0mx;
+
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	gpcDrc* chk( I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
 	gpcDrc* chk( I4 lim, U4 id );
@@ -212,7 +215,7 @@ public:
 		iCTRL.y|=ZShs2;
 		return (oCTRL.y&=(~ZShs2));
 	}
-
+	bool jdPRGstp();
 	gpcDrc& judo( gpcZS& inp );
 };
 #define gpdZSnDnull ((gpcZSnD*)NULL)
