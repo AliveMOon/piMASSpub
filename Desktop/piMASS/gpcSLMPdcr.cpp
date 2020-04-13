@@ -173,52 +173,48 @@ gpcLZY* gpcZSnD::pulling( gpcLZY* pOUT, U4x4* pZSrw ) {
 		ioSW.w += 4;
 	return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
 }
-bool gpcDrc::jdPRGstp()
-{
-	if( oCTRL.z )
-		return false;
 
-	if( jdPRG.x )
+gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
+	gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
+	if( iXYZ.qlen_xyz() < 32*32 )
 	{
-		if( jdPRG.y >= jdPRG.z )
-		{
-			jdPRG.null();
-			return true;
-		}
-	} else
-		return true;
-
-	if( !jdPRG.y )
-	{
-		jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
-		if( !jdPRG.z )
-		{
-			jdPRG.null();
-			return true;
-		}
-		jd0XYZ.xyz_(okXYZ);
-		jd0ABC.xyz_(okABC);
-		jd0xyz.xyz_(okxyz);
-		jd0mx.ABC(jd0ABC,mm100(180)/PI);
+		gpmMcpyOF( &iXYZ.x, &zs.oMxyzEspd, 3 );
+		if( iXYZ.qlen_xyz() < 32*32 )
+			iXYZ.x = iXYZ.y = iXYZ.z = mm100(450);
 	}
-	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
+	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
 
-	I4x2 xy = jdPRG.y;
-	xy.XdivRQ(jdPRG.w) += jdPRG.w;
-	xy -= jd0PRG.a4x2[1];
-	xy %= jdPRG.w;
+	ixyz = iXYZ.ABC2xyz( txyz, iABC );
 
-	F4 cr;
-	cr.gr2cr( xy, jdPRG.w );
-	float d = cr.w/zl;
-	I4x4 vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
-	tXYZ.xyz_( jd0xyz - vec );
+	//gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
+	//if( !ixyz.qlen_xyz() )
+	//{
+	/*F4x4 iMX;
+	iMX.ABC(iABC, mm100(180)/PI );
+	I4 Zxyz = txyz.qlen_xyz();
+	if( Zxyz ) {
+		Zxyz = sqrt((txyz-tXYZ).qlen_xyz());
+		ixyz.xyz_( iXYZ + (iMX.z*Zxyz) );
+	} else {
+		if( (iMX.z.z <= -COSSIN45) && (iXYZ.z > 0) )
+			ixyz.xyz_( iXYZ + (iMX.z * (float(-iXYZ.z)/iMX.z.z)) );	// lerakja z=0-ra
+		else
+			ixyz.xyz_( iXYZ + (iMX.z*mm100(200)) );
+	}*/
+	//}
 
-	jdPRG.y++;
-	return true;
+	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
+	gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
+	gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
+	gpmMcpyOF( &aiax1to6[0].x, zs.aj16, 3 );
+	gpmMcpyOF( &aiax1to6[1].x, zs.aj16+3, 3 );
+
+	gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
+	return *this;
 }
-gpcDrc& gpcDrc::judo( gpcZS& inp ) {
-	*this = inp;
+
+gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
+	*this = iZS;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
 		case 7: {
 				JD.y = 0;
@@ -250,6 +246,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			return *this;
 		case 5: /// 4.HS2 jelre várunk
 			if(bHS2i()) {
+				// megkaptuk
 				// jelzünk hogy olvastuk
 				JD.y = 6;
 				// kirakjuk a jelet
@@ -261,21 +258,26 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 						// megérkeztünk
 						/*iXYZ.xyz_(oXYZ);
 						iABC.xyz_(oABC);*/
+						/// XYZABCxyz 2. OK ------------- JD.z = 0
 						okXYZ.xyz_(oXYZ);
 						okABC.xyz_(oABC);
-						okxyz.xyz_(oxyz);
-
+						if( txyz.qlen_xyz() )
+							okxyz.xyz_(okXYZ.ABC2xyz(txyz,okABC));
+						else
+							okxyz.xyz_( 0 );
 						break;
 					default:
 						// ZS hibat jelzett
 						// trg-be eltároljuk hol van most
 						// ne is akarjon tovább menni
+						/// XYZABCxyz 3. NOK ------------- JD.z = ERR
 						tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
 						tABC.xyz_( oABC.xyz_(iABC) );
 						break;
 				}
 				return *this;
 			}
+			// még nemjött
 			/// PULLING
 			xHS1o();
 			return *this;
@@ -314,17 +316,8 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 
 	I8x4 mmABCD( sqrt(iXYZ.qlen_xyz()) );
 	if( mmABCD.x < mm100(400) )
-		return *this;
+		return *this;		// nem fut a R2D task
 
-	oCTRL.z = 0;
-	if( sqrt(okXYZ.qlen_xyz()) > mm100(400) ){
-		iXYZ.xyz_( okXYZ );
-		iABC.xyz_( okABC );
-	}
-
-	F4x4 tMX, iMX;
-
-	iMX.ABC(iABC, mm100(180)/PI );
 
 	if( !JD.x )
 	{
@@ -333,11 +326,26 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		JD.y = 0;
 		tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
 		tABC.xyz_( oABC.xyz_(iABC) );
-		txyz.xyz_( oxyz.xyz_(ixyz) );
+		txyz.xyz_( 0 ); //oxyz.xyz_(ixyz) );
 		JD.x = 1;
 		return *this;
 	}
-
+	/// CTRL.z = 0;
+	oCTRL.z = 0;
+	if( sqrt(okXYZ.qlen_xyz()) > mm100(200) ){
+		// ezt kaptuk a robitol
+		// ha netán akor sem mozdul
+		oXYZ.xyz_(iXYZ);
+		oABC.xyz_(iABC);
+		//oxyz.xyz_(ixyz);
+		// ha van ok felül írjuk amit a robi adott
+		// mindig abbol számoljunk
+		iXYZ.xyz_(okXYZ);
+		iABC.xyz_(okABC);
+		ixyz.xyz_(okxyz);
+	}
+	F4x4 tMX = 1.0, iMX;
+	iMX.ABC(iABC, mm100(180)/PI );
 	// itt kell le ellenőrizni mondjuk az ütközésre
 	//
 	float ab = 1.0, k;
@@ -347,14 +355,13 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			dXYZ = tXYZ - iXYZ,
 			dxyz = txyz - ixyz,
 			dGRP = tGRP - iGRP;
+	if( !txyz.qlen_xyz() )
+		dxyz.null();
 
 	//nD.z
 	mmABCD.w = sqrt(dGRP.qlen_xyz());
-	mmABCD.x = dXYZ.qlen_xyz();
-	if( mmABCD.x )
-	{
-		mmABCD.x = sqrt(mmABCD.x);
-		lim = ((mmABCD.x/mm100(gpdROBlim))<2) ? mmABCD.x : mm100(gpdROBlim);
+	mmABCD.x = dXYZ.abs0().mx().x; //qlen_xyz();
+	if( mmABCD.x ) {
 
 		U4 i = 3;
 		switch( NMnDIF.x )
@@ -370,13 +377,17 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				break;
 		}
 
+		// egyenlőre felfele kerekítjük,
+		// azaz ha nem tudja legalább 2-re felosztani a távot
+		// megprobálja egyszerre
+		lim = ((mmABCD.x/mm100(gpdROBlim))<2) ? mmABCD.x : mm100(gpdROBlim);
+
 		chk( lim, i );
 		dXYZ = oXYZ - iXYZ;
-		mmABCD.y = sqrt(dXYZ.qlen_xyz());
-		ab = float(mmABCD.y)/float(mmABCD.x);
+		mmABCD.y = dXYZ.abs0().mx().x;
 		if( mmABCD.y )
 		{
-			if( lim <= mmABCD.y+mm100(3) )
+			if( lim <= mmABCD.y + mm100(3) )
 			{
 				// elérte a lim-et azaz nem érte el a ketrecet
 				lim = mmABCD.y;
@@ -387,29 +398,32 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				dXYZ *= (I4)(mmABCD.y/100)-10;
 				dXYZ /= (I4)(mmABCD.y/100);
 				oXYZ.xyz_(dXYZ+iXYZ);
-
 				mmABCD.y = sqrt(dXYZ.qlen_xyz());
-				ab = float(mmABCD.y)/float(mmABCD.x);
 			} else {
 				// nagyon kicsit engedne
-				oXYZ.xyz_(iXYZ);
-				dXYZ.null();
-				ab = 0.0;
 				mmABCD.y = 0;
 			}
-			if( mmABCD.y )
-				oCTRL.z |= 1;
+		}
+
+		if( mmABCD.y )
+		{
+			oCTRL.z |= 1;
+			ab = float(mmABCD.y)/float(mmABCD.x);
+		} else {
+			oXYZ.xyz_(iXYZ);
+			dXYZ.null();
+			ab = 0.0;
 		}
 	}
 
 	if( txyz.qlen_xyz() ) {
-		mmABCD.z = dxyz.abs_xyz0().mx().x;
+		mmABCD.z = dxyz.abs0().mx().x;
 		if( mmABCD.y|(mmABCD.z>10) )
 		{
-			mmABCD.z = sqrt(dxyz.qlen_xyz());
+			//mmABCD.z = sqrt(dxyz.qlen_xyz());
 			tMX = 1.0;
 			tMX.z = (txyz-tXYZ).xyz0();
-			if( abs(ab) < 0.0001f )
+			/*if( abs(ab) < 0.0001f )
 			{
 				tMX.z = iMX.z;
 			}
@@ -427,9 +441,9 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 
 					tMX.z = Yd*sin(alf) + iMX.z*cos(alf);
                 }
-			}
+			}*/
 
-			tMX.z /= sqrt(tMX.z.qlen_xyz());
+			tMX.z /= sqrt(tMX.z.qlen_xyz());	// normalizál
 			tMX.x = iMX.y.cross_xyz(tMX.z);
 			tMX.y = tMX.z.cross_xyz(iMX.x);
 			float	xl = sqrt(tMX.x.qlen_xyz()),
@@ -440,10 +454,8 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 				tMX.y = tMX.z.cross_xyz(tMX.x);
 			} else {
 				tMX.y /= yl;
-				tMX.x = iMX.y.cross_xyz(tMX.z);
+				tMX.x = tMX.y.cross_xyz(tMX.z);
 			}
-
-
 			tABC.xyz_( tMX.eABC()*(180.0/PI)*mm100(1) );
 			itD = iABC.chkABC( tABC, mm100(1) ).w;
 		}
@@ -451,7 +463,7 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 
 
 
-	if( itD < 55 ) {
+	if( itD < mm100(SIN1*50) ) {	// kb: ~800
 		tABC.xyz_(oABC.xyz_(iABC));
 	} else {
 
@@ -468,8 +480,12 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 		if( k > 0.0 )
 		{
 			float lpk = gpdROBlim/k;
-
-			if( ab > lpk )
+			if( ab == 0.0 )
+			{
+				ab = lpk;
+				lim = mmABCD.y;
+			}
+			else if( ab > lpk )
 			{
 				ab = lpk;
 				mmABCD.y *= gpdROBlim;
@@ -484,7 +500,22 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 			{
 				// fel lett osztva a mozgás
 				F4x4 dMX = (tMX-iMX)*ab + iMX;
-				oABC.xyz_( tMX.eABC()*(180.0/PI)*mm100(1) );
+				dMX.z /= sqrt(dMX.z.qlen_xyz());	// normalizál
+
+				dMX.x = iMX.y.cross_xyz(dMX.z);
+				dMX.y = dMX.z.cross_xyz(iMX.x);
+				float	xl = sqrt(dMX.x.qlen_xyz()),
+						yl = sqrt(dMX.y.qlen_xyz());
+				if( xl > yl )
+				{
+					dMX.x /= xl;
+					dMX.y = dMX.z.cross_xyz(dMX.x);
+				} else {
+					dMX.y /= yl;
+					dMX.x = iMX.y.cross_xyz(dMX.z);
+				}
+
+				oABC.xyz_( dMX.eABC()*(180.0/PI)*mm100(1) );
 			} else {
 				oABC.xyz_( tABC );
 			}
@@ -499,15 +530,16 @@ gpcDrc& gpcDrc::judo( gpcZS& inp ) {
 	{
 		// ketrec gátolta
         // o-kat berakjuk a t-be
-        if( abs( oABC.y ) > mm100(100) )
+        /*if( abs( oABC.y ) > mm100(100) )
         {
 			oCTRL.z = 0;
 			return *this;
-        }
+        }*/
 		tXYZ.xyz_( oXYZ );
 		tABC.xyz_( oABC );
-		if( txyz.qlen_xyz() )
-			txyz.xyz_( oxyz );
+		/// akkor sem írjuk felül ez marad mint cél
+		//if( txyz.qlen_xyz() )
+		//	txyz.xyz_( oxyz );
 	}
 
 	JD.y = 0;

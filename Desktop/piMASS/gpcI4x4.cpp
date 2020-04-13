@@ -23,18 +23,34 @@ I4x4& I4x4::operator = ( const F4 f4 )
 	w = f4.w;
 	return *this;
 }
-I4x4 I4x4::chkABC( const I4x4& b, float dim ) const
+I4x4 I4x4::chkABC( const I4x4& b, float alf, float mul ) const
 {
 	F4 fa = *this, fb = b;
 	// radiánokat csinálunk
-	fa /= dim*180.0/PI;
-	fb /= dim*180.0/PI;
-	fb = F4( cos(fa.x)-cos(fb.x), cos(fa.y)-cos(fb.y), cos(fa.z)-cos(fb.z) )*dim*180.0/PI;
-	fb.w = fb.qlen_xyz();
-	//I4x4 chk( (cos(fa.x)-cos(fb.x))*dim, (cos(fa.y)-cos(fb.y))*dim, (cos(fa.z)-cos(fb.z))*dim );
-	//chk.w = chk.qlen_xyz();
+	fa /= alf*180.0/PI;
+	fb /= alf*180.0/PI;
+	fb = F4( cos(fa.x)-cos(fb.x), cos(fa.y)-cos(fb.y), cos(fa.z)-cos(fb.z) )*mul;
+	fb.w = sqrt(fb.qlen_xyz());
 
 	return fb;
+}
+I4x4 I4x4::ABC2xyz( I4x4 txyz, const I4x4& iABC ) const {
+
+	F4x4 iMX;
+	iMX.ABC(iABC, mm100(180)/PI ).t = txyz-*this;
+
+    txyz.w = txyz.abs0().mx().x ? iMX.t.abs0().mx() : 0;
+	if( txyz.w )
+		iMX.t.xyz_( iMX.z*sqrt(iMX.t.qlen_xyz()) );
+	else {
+		iMX.t.xyz_( iMX.z*mm100(200) );
+		if( (iMX.z.z <= -COSSIN45) && (z > 0) )
+			iMX.t.xyz_( iMX.t*(float(z)/(-iMX.t.z)) );
+	}
+
+	txyz.xyz_(iMX.t);
+	txyz.w = txyz.abs0().mx().x;
+	return txyz+xyz0();
 }
 I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 {
@@ -42,7 +58,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 	if( T.xyz0() == xyz0() )
 		return xyz0();
 	I4x4 D4 = T.xyz0()-xyz0();
-	I4x2 SabsMX = abs_xyz0().mx();
+	I4x2 SabsMX = abs0().mx();
 
 	if( SabsMX.x <= r )
 		return xyz0();		// ben van a dobozban, nehogy megmozduljon
@@ -60,7 +76,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 	D8 /= D4.aXYZW[SabsMX.y] > 0 ? D4.aXYZW[SabsMX.y] : -D4.aXYZW[SabsMX.y];
 	D8 += xyz0();
 
-	if( (D8&gpaCAGEboxMSK[SabsMX.y]).abs_xyz0().mx().x > r )
+	if( (D8&gpaCAGEboxMSK[SabsMX.y]).abs0().mx().x > r )
 		return T.xyz0();
 
 	return D8;

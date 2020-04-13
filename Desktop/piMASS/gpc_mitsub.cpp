@@ -822,39 +822,7 @@ gpcZS::gpcZS( const gpcDrc& D ) {
 }
 
 
-gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
-	gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
-	if( iXYZ.qlen_xyz() < 32*32 )
-	{
-		gpmMcpyOF( &iXYZ.x, &zs.oMxyzEspd, 3 );
-		if( iXYZ.qlen_xyz() < 32*32 )
-			iXYZ.x = iXYZ.y = iXYZ.z = mm100(450);
-	}
-	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
-	gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
 
-	if( !ixyz.qlen_xyz() )
-	{
-		F4x4 mx;
-		mx.ABC(iABC, mm100(180)/PI );
-		if( txyz.qlen_xyz() )
-			ixyz.xyz_( iXYZ + (mx.z*sqrt((txyz-tXYZ).qlen_xyz())));
-		else {
-			if( (mx.z.z <= -COSSIN45) && (iXYZ.z > 0) )
-				ixyz.xyz_( iXYZ + (mx.z * (float(-iXYZ.z)/mx.z.z)) );	// lerakja z=0-ra
-			else
-				ixyz.xyz_( iXYZ + (mx.z*mm100(200)) );
-		}
-	}
-
-	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
-	gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
-	gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
-	gpmMcpyOF( &aiax1to6[0].x, zs.aj16, 3 );
-	gpmMcpyOF( &aiax1to6[1].x, zs.aj16+3, 3 );
-	gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
-	return *this;
-}
 
 
 

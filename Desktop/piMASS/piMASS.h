@@ -231,6 +231,7 @@ class gpcALU;
 #define PI acos(-1.0)
 #define COS5 0.99619469809174553229501040247389
 #define SIN5 0.08715574274765817355806427083747
+#define SIN1 0.0174524064373
 #define RAD5 (5.0*PIp180)
 #define COSSIN45 0.70710678118654752440084436210485
 #define gpdSQRT2 1.4142135623730950488016887242097
@@ -3381,7 +3382,7 @@ public:
 	{
 		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
 	}
-	I4x4 abs_xyz0( void ) const
+	I4x4 abs0( void ) const
 	{
 		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z );
 	}
@@ -3389,18 +3390,8 @@ public:
 	{
 		return I4x4( z, w, x, y );
 	}
-	I4x4& xyz_( I4x4 b )
-	{
-		a4x2[0] = b.a4x2[0];
-		z = b.z;
-		return *this;
-	}
-	I4x4 xyz0( void ) const
-	{
-		I4x4 o = *this;
-		o.w = 0;
-		return o;
-	}
+	I4x4& xyz_( I4x4 b ) { a4x2[0] = b.a4x2[0]; z = b.z; return *this; }
+	I4x4 xyz0( void ) const { I4x4 o = *this; o.w = 0; return o; }
 
 	I4x4* index( U4 n_i ) {
 		if( !this )
@@ -3572,6 +3563,7 @@ public:
     I8 qlen_xyz() const { return (I8)x*x + (I8)y*y + (I8)z*z; }
 	I4x4 TSrBALL( I4x4 T, I8 r );
 	I4x4 TSrBOX( I4x4 T, I8 r );
+	I4x4 ABC2xyz( I4x4 txyz, const I4x4& iABC ) const;
 	I4x4 mxR( I8 r );
 	I4x2 mx() {
 		I4x2 o(x,0);
@@ -3617,7 +3609,7 @@ public:
 		a4x2[0] = t;
 		return *this;
 	}
-	I4x4 chkABC( const I4x4& b, float dim ) const;
+	I4x4 chkABC( const I4x4& b, float dim, float mul = mm100(100) ) const;
 
 };
 
@@ -4159,7 +4151,7 @@ public:
 	{
 		return I8x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
 	}
-	I8x4 abs_xyz0( void ) const
+	I8x4 abs0( void ) const
 	{
 		return I8x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z );
 	}
@@ -4599,6 +4591,7 @@ public:
 	F4 operator * ( const F4x4& b ) const;
 	F4& operator /= ( const F4x4& b );
 	F4 operator / ( const F4x4& b ) const;
+	F4& xyz_( F4 b ) { aF2[0] = b.aF2[0]; z = b.z; return *this; }
 	F4 xyz0() const { return F4(x,y,z); }
 	F4 abs() const { return F4(x>=0.0?x:-x,y>=0.0?y:-y,z>=0.0?z:-z,w>=0.0?w:-w); }
 	F4& add( F4 b, U4 n )
@@ -4722,6 +4715,11 @@ public:
 		return *this;
 	}
 
+	F4 abs0( void ) const
+	{
+		return F4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z );
+	}
+
 	float mx()
 	{
 		float m = srt3().x;
@@ -4738,8 +4736,8 @@ public:
 	F4& gr2cr( const I4x2 xy, double rw )
 	{
 
-		double	rx = ::PI*((double(xy.x)/rw) + 0.25),
-				ry = ::PI*((double(xy.y)/rw) + 0.25),
+		double	rx = ::PI*((double(xy.x)/(rw*2)) + 0.25),
+				ry = ::PI*((double(xy.y)/(rw*2)) + 0.25),
 				ctgX = ::cos(rx)/::sin(rx),
 				ctgY = ::cos(ry)/::sin(ry),
 				ctgXY2 = ctgX*ctgX + ctgY*ctgY,

@@ -152,7 +152,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		pZSnD->ioSW.aU2[0] = gpfSTR2U8( gpmMcpy(pW,pD0,4)-2, NULL );
 		if( pZSnD->iWR() && !pZSnD->ioSW.aU2[0] )
 		{
-			// olcastunk && nincsen hiba
+			// olvastunk && nincsen hiba
 			/// Good!
 			pU2 = pU2io = pZSnD->pZSioU2();
 			eD0 = gpaZSwr[pZSnD->iDrc()].a4x2[pZSnD->iWR()].y*4; // 0000 u2ASCii

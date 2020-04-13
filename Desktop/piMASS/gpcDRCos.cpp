@@ -78,6 +78,61 @@ gpcDrc* gpcDrc::chk( I4 lim, U4 id )
 	return chk( lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id] );
 }
 
+bool gpcDrc::jdPRGstp()
+{
+	// ha létre jött mozgá hagyja végre hajtani
+	if( oCTRL.z )
+		return false;
+
+	// ha megált  megnézi
+	// program végrehajtásával foglalkozik
+	if( jdPRG.x )
+	{
+		// igen
+		if( jdPRG.y >= jdPRG.z )
+		{
+			/// END --------------------------
+			// de pont befejezte
+			jdPRG.null();
+			tXYZ.xyz_(jd0XYZ);
+			return true;
+		}
+	} else
+		return true;	// nem akor pihi
+
+	// na nézzük a programot
+	if( !jdPRG.y )
+	{
+		/// START ----------------------------
+		jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
+		if( !jdPRG.z )
+		{
+			jdPRG.null();
+			return true;
+		}
+		jd0XYZ.xyz_(okXYZ);
+		jd0ABC.xyz_(okABC);
+		jd0xyz.xyz_(okxyz);
+		jd0mx.ABC(jd0ABC,mm100(180)/PI);
+	}
+
+	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
+
+	I4x2 xy = jdPRG.y;
+	xy.XdivRQ(jdPRG.w) += jdPRG.w;
+	xy -= jd0PRG.a4x2[1];
+	xy %= jdPRG.w;
+
+	F4 cr;
+	cr.gr2cr( xy, jdPRG.w );
+	float d = cr.w/zl;
+	I4x4 vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
+	tXYZ.xyz_( jd0xyz - vec );
+
+	jdPRG.y++;
+	return true;
+}
+
 gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 {
 	U8 s = -1, nLEN;
