@@ -37,13 +37,13 @@ I4x4 I4x4::chkABC( const I4x4& b, float alf, float mul ) const
 I4x4 I4x4::ABC2xyz( I4x4 txyz, const I4x4& iABC ) const {
 
 	F4x4 iMX;
-	iMX.ABC(iABC, mm100(180)/PI ).t = txyz-*this;
+	iMX.ABC(iABC, mmX(180)/PI ).t = txyz-*this;
 
     txyz.w = txyz.abs0().mx().x ? iMX.t.abs0().mx() : 0;
 	if( txyz.w )
 		iMX.t.xyz_( iMX.z*sqrt(iMX.t.qlen_xyz()) );
 	else {
-		iMX.t.xyz_( iMX.z*mm100(200) );
+		iMX.t.xyz_( iMX.z*mmX(200) );
 		if( (iMX.z.z <= -COSSIN45) && (z > 0) )
 			iMX.t.xyz_( iMX.t*(float(z)/(-iMX.t.z)) );
 	}

@@ -27,7 +27,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 										"\r\n//\toXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm;"
 										,
-										(U4)(sqrt((tXYZ-iXYZ).xyz0().qlen())/mm100(100)),
+										(U4)(sqrt((tXYZ-iXYZ).xyz0().qlen())/mmX(100)),
 										double(iXYZ.x)/100.0,
 										double(iXYZ.y)/100.0,
 										double(iXYZ.z)/100.0,
@@ -45,7 +45,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 										"\r\n//\toABC %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\ttABC %7.2fdg, %7.2fdg, %7.2fdg;"
 										,
-										(U4)(sqrt((tABC-iABC).xyz0().qlen())/mm100(100)),
+										(U4)(sqrt((tABC-iABC).xyz0().qlen())/mmX(100)),
 										double(iABC.x)/100.0,
 										double(iABC.y)/100.0,
 										double(iABC.z)/100.0,
@@ -119,8 +119,8 @@ I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
 	for( U4 i = 0; i < n; i++ )
 	{
 		a = (S-pCAGE[i]).xyz0();
-		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
-        b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+mm100(100) );
+		// +mmX(100)-a magának TOOL nak is adunk vele egy sugarat
+        b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+mmX(100) );
         abba = (b-a).qlen_xyz();
         if( dd <= abba )
 			continue;
@@ -130,7 +130,7 @@ I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
 		return T;
 
 	I8x4 D8 = T-S;
-	D8 *= sqrt(dd)-mm100(1);
+	D8 *= sqrt(dd)-mmX(1);
 	D8 /= sqrt(dd0);
 	return S+D8;
 }
@@ -140,8 +140,8 @@ I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n ) {
 	for( U4 i = 0; i < n; i++ )
 	{
 		a = (S-pCAGE[i]).xyz0();
-		// +mm100(100)-a magának TOOL nak is adunk vele egy sugarat
-        b = a.TSrBOX( T-pCAGE[i], pCAGE[i].w+mm100(100) );
+		// +mmX(100)-a magának TOOL nak is adunk vele egy sugarat
+        b = a.TSrBOX( T-pCAGE[i], pCAGE[i].w+mmX(100) );
         abba = (b-a).qlen_xyz();
         if( abba < 1 )
 			return S;
@@ -153,7 +153,7 @@ I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n ) {
 		return T;
 
 	I8x4 D8 = T-S;
-	D8 *= sqrt(dd)-mm100(1);
+	D8 *= sqrt(dd)-mmX(1);
 	D8 /= sqrt(dd0);
 	return S+D8;
 }
@@ -180,7 +180,7 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	{
 		gpmMcpyOF( &iXYZ.x, &zs.oMxyzEspd, 3 );
 		if( iXYZ.qlen_xyz() < 32*32 )
-			iXYZ.x = iXYZ.y = iXYZ.z = mm100(450);
+			iXYZ.x = iXYZ.y = iXYZ.z = mmX(450);
 	}
 	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
 
@@ -190,7 +190,7 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	//if( !ixyz.qlen_xyz() )
 	//{
 	/*F4x4 iMX;
-	iMX.ABC(iABC, mm100(180)/PI );
+	iMX.ABC(iABC, mmX(180)/PI );
 	I4 Zxyz = txyz.qlen_xyz();
 	if( Zxyz ) {
 		Zxyz = sqrt((txyz-tXYZ).qlen_xyz());
@@ -199,7 +199,7 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 		if( (iMX.z.z <= -COSSIN45) && (iXYZ.z > 0) )
 			ixyz.xyz_( iXYZ + (iMX.z * (float(-iXYZ.z)/iMX.z.z)) );	// lerakja z=0-ra
 		else
-			ixyz.xyz_( iXYZ + (iMX.z*mm100(200)) );
+			ixyz.xyz_( iXYZ + (iMX.z*mmX(200)) );
 	}*/
 	//}
 
@@ -315,7 +315,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		return *this;
 
 	I8x4 mmABCD( sqrt(iXYZ.qlen_xyz()) );
-	if( mmABCD.x < mm100(400) )
+	if( mmABCD.x < mmX(400) )
 		return *this;		// nem fut a R2D task
 
 
@@ -332,7 +332,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	}
 	/// CTRL.z = 0;
 	oCTRL.z = 0;
-	if( sqrt(okXYZ.qlen_xyz()) > mm100(200) ){
+	if( sqrt(okXYZ.qlen_xyz()) > mmX(200) ){
 		// ezt kaptuk a robitol
 		// ha netán akor sem mozdul
 		oXYZ.xyz_(iXYZ);
@@ -345,12 +345,12 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		ixyz.xyz_(okxyz);
 	}
 	F4x4 tMX = 1.0, iMX;
-	iMX.ABC(iABC, mm100(180)/PI );
+	iMX.ABC(iABC, mmX(180)/PI );
 	// itt kell le ellenőrizni mondjuk az ütközésre
 	//
 	float ab = 1.0, k;
 	static const float K = (100.0*PI*2.0);
-	I4 itD = iABC.chkABC( tABC, mm100(1) ).w, lim = 0;
+	I4 itD = iABC.chkABC( tABC, mmX(1) ).w, lim = 0;
 	I4x4 	tmp,
 			dXYZ = tXYZ - iXYZ,
 			dxyz = txyz - ixyz,
@@ -380,19 +380,19 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		// egyenlőre felfele kerekítjük,
 		// azaz ha nem tudja legalább 2-re felosztani a távot
 		// megprobálja egyszerre
-		lim = ((mmABCD.x/mm100(gpdROBlim))<2) ? mmABCD.x : mm100(gpdROBlim);
+		lim = ((mmABCD.x/mmX(gpdROBlim))<2) ? mmABCD.x : mmX(gpdROBlim);
 
 		chk( lim, i );
 		dXYZ = oXYZ - iXYZ;
 		mmABCD.y = dXYZ.abs0().mx().x;
 		if( mmABCD.y )
 		{
-			if( lim <= mmABCD.y + mm100(3) )
+			if( lim <= mmABCD.y + mmX(3) )
 			{
 				// elérte a lim-et azaz nem érte el a ketrecet
 				lim = mmABCD.y;
 			}
-			else if( mmABCD.y > mm100(10) )
+			else if( mmABCD.y > mmX(10) )
 			{
 				// kisebb let mint amit elvártunk a ketrec nem engedte
 				dXYZ *= (I4)(mmABCD.y/100)-10;
@@ -456,22 +456,22 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 				tMX.y /= yl;
 				tMX.x = tMX.y.cross_xyz(tMX.z);
 			}
-			tABC.xyz_( tMX.eABC()*(180.0/PI)*mm100(1) );
-			itD = iABC.chkABC( tABC, mm100(1) ).w;
+			tABC.xyz_( tMX.eABC()*(180.0/PI)*mmX(1) );
+			itD = iABC.chkABC( tABC, mmX(1) ).w;
 		}
 	}
 
 
 
-	if( itD < mm100(SIN1*50) ) {	// kb: ~800
+	if( itD < mmX(SIN1*50) ) {	// kb: ~800
 		tABC.xyz_(oABC.xyz_(iABC));
 	} else {
 
 		 //, dMX;
 
 		// mátrixot csinálunk belőle
-		iMX.ABC(iABC, mm100(180)/PI );
-		tMX.ABC(tABC, mm100(180)/PI );
+		iMX.ABC(iABC, mmX(180)/PI );
+		tMX.ABC(tABC, mmX(180)/PI );
 
 		F4 rnd( K,K,K );
 		rnd &= (iMX.dot(tMX).acos()/(2.0*PI));	// n karika * kerület
@@ -515,7 +515,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 					dMX.x = iMX.y.cross_xyz(dMX.z);
 				}
 
-				oABC.xyz_( dMX.eABC()*(180.0/PI)*mm100(1) );
+				oABC.xyz_( dMX.eABC()*(180.0/PI)*mmX(1) );
 			} else {
 				oABC.xyz_( tABC );
 			}
@@ -530,7 +530,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	{
 		// ketrec gátolta
         // o-kat berakjuk a t-be
-        /*if( abs( oABC.y ) > mm100(100) )
+        /*if( abs( oABC.y ) > mmX(100) )
         {
 			oCTRL.z = 0;
 			return *this;

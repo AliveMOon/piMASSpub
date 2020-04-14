@@ -631,14 +631,14 @@ int main( int nA, char *apA[] )
 	I4x4 tmp;
 	for( U4 i = 0, e = gpmN(gpaCAGEtst); i < e; i += 2 )
 	{
-		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mm100(1) );
-		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mm100(1) );
-		std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mm100(1)).pSTR( gpsMNpub ) <<std::endl;;
+		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mmX(1) );
+		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mmX(1) );
+		std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mmX(1)).pSTR( gpsMNpub ) <<std::endl;;
 		tmp = tstCAGE.tXYZ.xyz0();
 		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
-		std::cout << "tstCAGE.tXYZball:" << (tmp/mm100(1)).pSTR( gpsMNpub ) <<std::endl;;
+		std::cout << "tstCAGE.tXYZball:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;;
 		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
-		std::cout << "tstCAGE.tXYZboxx:" << (tmp/mm100(1)).pSTR( gpsMNpub ) <<std::endl;;
+		std::cout << "tstCAGE.tXYZboxx:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;;
 	}
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
 	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );

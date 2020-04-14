@@ -4,28 +4,28 @@ extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
 
 I4x4 gpaCAGEbillBALL[] = {
-	{ mm100(1500), 0, mm100(320), mm100(800) },
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
-	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+	{ mmX(1500), 0, mmX(320), mmX(800) },
+	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
+	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
 I4x4 gpaCAGEbillBOX[] = {
-	{ mm100(600), mm100(500), mm100(-200), mm100(330) }, // asztal_bill
-	{ mm100(1500/2), mm100(4900), mm100(0), mm100(4000) }, // MIMI2bill
-	{ mm100(-1000-2000), mm100(0), mm100(0), mm100(2000) }, // fal_bill
+	{ mmX(600), mmX(500), mmX(-250), mmX(330) }, // asztal_bill
+	{ mmX(1500/2), mmX(4900), mmX(0), mmX(4000) }, // MIMI2bill
+	{ mmX(-1000-2000), mmX(0), mmX(0), mmX(2000) }, // fal_bill
 };
 U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 	gpnCAGEbillBOX = gpmN(gpaCAGEbillBOX);
 
 
 I4x4 gpaCAGEjohnBALL[] = {
-	{ 0, 0, mm100(320), mm100(420) }, { 0, 0, mm100(-300), mm100(550) },
-	{ mm100(1500), 0, mm100(320), mm100(800) },
-	{ mm100(685), mm100(-469), mm100(366),  mm100(300) },
+	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
+	{ mmX(1500), 0, mmX(320), mmX(800) },
+	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
 I4x4 gpaCAGEjohnBOX[] = {
-	{ mm100(1500-600), mm100(-500), mm100(-200), mm100(330) }, // asztal_john
-	{ mm100(-500-2000), mm100(0), mm100(0), mm100(2000) }, // MIMI_john
-	{ mm100(1500/2), mm100(-4900), mm100(0), mm100(4000) }, // MIMI2john
+	{ mmX(1500-600), mmX(-500), mmX(-250), mmX(330) }, // asztal_john
+	{ mmX(-500-2000), mmX(0), mmX(0), mmX(2000) }, // MIMI_john
+	{ mmX(1500/2), mmX(-4900), mmX(0), mmX(4000) }, // MIMI2john
 };
 U4	gpnCAGEjohnBALL = gpmN(gpaCAGEjohnBALL),
 	gpnCAGEjohnBOX = gpmN(gpaCAGEjohnBOX);
@@ -50,7 +50,7 @@ gpcDrc* gpcDrc::chk( I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL )
 {
 	if( !this )
 		return NULL;
-	if( okXYZ.qlen_xyz() > mm100(400) )
+	if( okXYZ.qlen_xyz() > mmX(400) )
 	{
 		iXYZ.xyz_( okXYZ );
 	}
@@ -68,7 +68,7 @@ gpcDrc* gpcDrc::chk( I4 lim, U4 id )
 {
 	if( id > gpmN(gpanBALL) )
 	{
-		if( okXYZ.qlen_xyz() > mm100(400) )
+		if( okXYZ.qlen_xyz() > mmX(400) )
 		{
 			iXYZ.xyz_( okXYZ );
 		}
@@ -113,7 +113,7 @@ bool gpcDrc::jdPRGstp()
 		jd0XYZ.xyz_(okXYZ);
 		jd0ABC.xyz_(okABC);
 		jd0xyz.xyz_(okxyz);
-		jd0mx.ABC(jd0ABC,mm100(180)/PI);
+		jd0mx.ABC(jd0ABC,mmX(180)/PI);
 	}
 
 	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
@@ -299,7 +299,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			}
 
 			if( oD != iD )
-				pANS = pD->chk( mm100(gpdROBlim), iD
+				pANS = pD->chk( mmX(gpdROBlim), iD
 								/*iD? gpaCAGEbillBOX : gpaCAGEjohnBOX,
 								iD? gpnCAGEbillBOX : gpnCAGEjohnBOX,
 								iD? gpaCAGEbillBALL : gpaCAGEjohnBALL,
@@ -346,13 +346,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 0:
 			case 1:
 			case 2:
-				pD->tXYZ.aXYZW[(iNUM-0)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
+				pD->tXYZ.aXYZW[(iNUM-0)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 				// pos
 			case 12:
 			case 13:
 			case 14:
-				pD->txyz.aXYZW[(iNUM-12)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
+				pD->txyz.aXYZW[(iNUM-12)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 
 
@@ -360,14 +360,14 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case 3:
 			case 4:
 			case 5:
-				pD->tABC.aXYZW[(iNUM-3)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
+				pD->tABC.aXYZW[(iNUM-3)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 
 				// GRIP
 			case 24:
 			case 25:
 			case 26:
-				pD->tGRP.aXYZW[(iNUM-24)%nNUM] = (d8 == 0.0) ? (I4)an.num*mm100(1) : (I4)(d8*mm100(1));
+				pD->tGRP.aXYZW[(iNUM-24)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 				// PRG
 			case 27:
@@ -419,7 +419,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		iNUM++;
 	}
 	if( pD )
-		return pD->chk( mm100(gpdROBlim), iD
+		return pD->chk( mmX(gpdROBlim), iD
 						/*iD? gpaCAGEbillBOX : gpaCAGEjohnBOX,
 						iD? gpnCAGEbillBOX : gpnCAGEjohnBOX,
 						iD? gpaCAGEbillBALL : gpaCAGEjohnBALL,

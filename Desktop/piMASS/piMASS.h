@@ -300,13 +300,13 @@ class gpcALU;
 #define gpdCRall I4x2(1,2)
 
 #define gpdROBlim 100
-#define mm100(a) ((a)*100)
+#define mmX(a) ((a)*100)
 #define zsIO 20
 #define zsIN 400
 #define zsINin (zsIN-zsIO)
-#define zsIN100 mm100(zsIN)
+#define zsIN100 mmX(zsIN)
 #define zsOU (zsIN+zsIO)
-#define zsOU100 mm100(zsOU)
+#define zsOU100 mmX(zsOU)
 
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
@@ -3609,7 +3609,7 @@ public:
 		a4x2[0] = t;
 		return *this;
 	}
-	I4x4 chkABC( const I4x4& b, float dim, float mul = mm100(100) ) const;
+	I4x4 chkABC( const I4x4& b, float dim, float mul = mmX(100) ) const;
 
 };
 
