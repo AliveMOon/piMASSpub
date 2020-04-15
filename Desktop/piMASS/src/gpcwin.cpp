@@ -239,7 +239,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 			}
 
-			gpcPIC* pPIC = pGL ? piMASS->PIC.PIC( I8x2(gpeALF_TRG,0x10) ) : NULL;
+			gpcPIC* pPIC = pGL ? piMASS->PIC.PIC( I8x2(gpeALF_TRG,(I8)0x10) ) : NULL;
 			if( pPIC ) {
 				SDL_Texture *pBGtx = (pPICbg ? pPICbg->surDRWtx(pSDLrndr) : NULL),
 							*p_tx;

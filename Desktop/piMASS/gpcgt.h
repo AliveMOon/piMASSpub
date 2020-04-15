@@ -172,6 +172,7 @@ public:
 
 		return *this;
 	}
+	gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c );
 	gpcDrc() { format(); };
 	gpcDrc( const gpcZS& zs, U4 nm = 0 )
 	{

@@ -201,7 +201,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	p = gpfSTR2I8( pE, NULL );
 	if( p )
 		port = p;
-	I8x2 an( alf, port );
+	I8x2 an( alf, (I8)port );
 
 	for( U4 g = 0; g < nGTld; g++ )
 	{
@@ -288,7 +288,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
 		return pGT;
 	}
 	if( iGTfr < nGTld )
-		return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2( alf, 0 ), port );
+		return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2(alf), port );
 
 	nGTld++;
 	if( nGTld >= nGTalloc )
@@ -300,7 +300,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
 		gpmDELary(ppKILL);
 	}
 
-	return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2( alf, 0 ), port );
+	return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2(alf), port );
 }
 gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 {
@@ -1037,7 +1037,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 		} else {
 
 			gt_ip.num++;
-			I8x2 gt_an_ip( gpeALF_null, 0 );
+			I8x2 gt_an_ip(gpeALF_null);
 
 			// localhost-ot külön kell ellenőrizni (sajnos)
 			const U4 localhost_ip = 0x0100007f;

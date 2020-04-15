@@ -575,6 +575,7 @@ extern U4	gpnCAGEbillBALL,
 			gpnCAGEbillBOX;
 //F4x4 tMX,iMX, A,B,C;
 //F4	iABC, tABC;
+gpcDrc gpCHK( gpsMNpub, I4x4( 600, 500, 500 )*mmX(1), I4x4( 600, 500, 400 )*mmX(1), I4x4( 600, 500, 0 )*mmX(1) );
 
 #ifdef _WIN64
 //int WINAPI WinMain( int nA, char *apA[] )

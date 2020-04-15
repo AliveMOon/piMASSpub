@@ -318,7 +318,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			break;
 	}
 
-	I8x2 cAN( gpeALF_NONSENSE, 0 );
+	I8x2 cAN( gpeALF_NONSENSE );
 	U1* pSKIP = NULL; U4 nSKIP = 0;
 	if( p_str < p_null )
 	{

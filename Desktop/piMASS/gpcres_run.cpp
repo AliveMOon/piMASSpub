@@ -493,7 +493,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							mCLR = alu.u8();
 						} break;
 					case gpeALF_CAM:{
-							I4 iCAM = alu.u8();
+							I8 iCAM = alu.u8();
 							if( !iCAM )
 								break;
 							if( aGLpPIC[0] = PIC.PIC( I8x2(alu.alf,iCAM) ) )
@@ -820,6 +820,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								if( D.JD.w != D.JD.y )
 								{
 									D.JD.w = D.JD.y;
+									if( D.okXYZ.xyz0() == D.tXYZ.xyz0() )
 									switch( D.JD.w )
 									{
 										case 6:{

@@ -6,7 +6,22 @@ I8x4 gpaCAGEboxMSK[] = {
 	{1,1,0,0},
 
 };
-
+I8x4 I4x4::operator * ( int b ) const
+{
+	return I8x4( a4x2[0]*b, a4x2[1]*b );
+}
+I8x4 I4x4::operator & (const I4x2& b) const
+{
+	return I8x4( a4x2[0]&b, a4x2[1]&b );
+}
+I8x4 I4x4::operator & (const U4x2& b) const
+{
+	return I8x4( a4x2[0]&b, a4x2[1]&b );
+}
+I8x4 I4x4::operator & (const I4x4& b ) const
+{
+	return I8x4( a4x2[0]&b.a4x2[0], a4x2[1]&b.a4x2[1] );
+}
 I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
 I4x4::I4x4( const F4 f4 )
 {
@@ -96,7 +111,7 @@ I4x4 I4x4::TSrBALL( I4x4 T, I8 r )
 		if( ss < 32*32 )
 			return xyz0();
 
-		return (S8*r)/sqrt(ss);	// azért kell () ne hogy az r/s-t csinálja korábban
+		return (S8*r)/s;	// azért kell () ne hogy az r/s-t csinálja korábban
 	}
 
 	I8x4 D8 = T8-S8;

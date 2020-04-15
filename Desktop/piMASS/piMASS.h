@@ -2503,16 +2503,16 @@ public:
 		return *this;
 	}
 
-	I4x2 operator * ( int b ) const {
+	I8x2 operator * ( int b ) const;/* {
 		if( !b )
 			return 0;
 		if( b == 1 )
 			return *this;
 		if( b == -1 )
-			return I4x2( -x, -y );
+			return I8x2( -x, -y );
 
-		return I4x2( x*b, y*b );
-	}
+		return I8x2( (I8)x*(I8)b, (I8)y*(I8)b );
+	}*/
 	I4x2 operator / ( int b ) const
 	{
 		if( !b )
@@ -2557,10 +2557,10 @@ public:
 		return I4x2( x>>b,  y>>b );
 	}
 
-	I4x2 operator & (const I4x2& b) const
-	{
-		return I4x2( x*b.x,  y*b.y );
-	}
+	I8x2 operator & (const I4x2& b) const;
+	/*{
+		return I8x2( x*b.x,  y*b.y );
+	}*/
 
 	I4x2 operator % (const I4x2& b) const
 	{
@@ -2574,6 +2574,7 @@ public:
 	{
 		return I4x2( b.x ? x/b.x : 0x7fffffff,  b.y ? y/b.y : 0x7fffffff );
 	}
+	I4x2 operator / (const I8x2& b) const;
 
 	I4x2 operator + ( int b ) const
 	{
@@ -3296,10 +3297,10 @@ public:
 	{
 		return (*this) * (*this);
 	}
-	I4x4 operator & (const I4x4& b ) const
-	{
-		return I4x4( a4x2[0]&b.a4x2[0], a4x2[1]&b.a4x2[1] );
-	}
+	I8x4 operator & (const I4x4& b ) const;
+	/*{
+		return I8x4( a4x2[0]&b.a4x2[0], a4x2[1]&b.a4x2[1] );
+	}*/
 
 	I4x4 operator % (const I4x4& b) const
 	{
@@ -3318,10 +3319,10 @@ public:
 
 
 
-	I4x4 operator * ( int b ) const
-	{
-		return I4x4( a4x2[0]*b, a4x2[1]*b );
-	}
+	I8x4 operator * ( int b ) const;
+	/*{
+		return I8x4( a4x2[0]*b, a4x2[1]*b );
+	}*/
 	I4x4 operator / ( int b ) const
 	{
 		return I4x4( a4x2[0]/b, a4x2[1]/b );
@@ -3336,14 +3337,14 @@ public:
 		return a4x2[0]*b + a4x2[1]*b;
 	}
 
-	I4x4 operator & (const I4x2& b) const
-	{
-		return I4x4( a4x2[0]&b, a4x2[1]&b );
-	}
-	I4x4 operator & (const U4x2& b) const
-	{
-		return I4x4( a4x2[0]&b, a4x2[1]&b );
-	}
+	I8x4 operator & (const I4x2& b) const;
+	/*{
+		return I8x4( a4x2[0]&b, a4x2[1]&b );
+	}*/
+	I8x4 operator & (const U4x2& b) const;
+	/*{
+		return I8x4( a4x2[0]&b, a4x2[1]&b );
+	}*/
 
 	I4x2 lurdWH(){ return a4x2[1]-a4x2[0];};
 	I4x4 lurd( void ) {
@@ -3635,15 +3636,12 @@ public:
 	};
 
     I8x2(){};
-    I8x2( I8 _x, I8 _y = 0 )
-    {
-        x = _x; y = _y;
-    }
-    I8x2( U4x2 b )
-    {
-        x = b.x;
-        y = b.y;
-    }
+    I8x2( I4 _x, I4 _y = 0 ) { x = _x; y = _y; }
+    I8x2( U8 _x, U8 _y = 0 ) { x = _x; y = _y; }
+    I8x2( I8 _x, I8 _y = 0 ) { x = _x; y = _y; }
+    //I8x2( gpeALF a, I4 n = 0 ) { alf = a; num = n; }
+    I8x2( gpeALF a, I8 n = 0 ) { alf = a; num = n; }
+    I8x2( U4x2 b ) { x = b.x; y = b.y; }
 	I8x2( U8* pB )
     {
 		gpmMcpyOF( this, pB, 1 );
@@ -3706,9 +3704,14 @@ public:
 		}
 		return *this;
 	}
+
+	I8 operator * (const I4x2& b) const
+	{
+		return x*(I8)b.x + y*(I8)b.y;
+	}
 	I8 operator * (const I8x2& b) const
 	{
-		return (I8)x*b.x + (I8)y * b.y;
+		return x*b.x + y * b.y;
 	}
 	I8x2 operator & (const I8x2& b) const
 	{
@@ -3716,21 +3719,39 @@ public:
 	}
 	I8x2 operator & (const U8* pB ) const
 	{
-		return I8x2( x* pB[0],  y* pB[1] );
+		return I8x2( x*pB[0],  y*pB[1] );
+	}
+
+
+	I8x2 operator % (const U4x2& b) const
+	{
+		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
+	}
+	I8x2 operator % (const I4x2& b) const
+	{
+		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
+	}
+	I8x2 operator % (const I8x2& b) const
+	{
+		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
 	}
 
 	I8x2 operator / (const U4x2& b) const
 	{
 		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
 	}
+	I8x2 operator / (const I4x2& b) const
+	{
+		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff ,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
+	}
 	I8x2 operator / (const I8x2& b) const
 	{
 		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff ,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
 	}
 
-	I8x2 operator % (const I8x2& b) const
+	I8x2 operator & (const U4x2& b) const
 	{
-		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
+		return I8x2( x*b.x,  y*b.y );
 	}
 
 	I8x2 operator + (const I4x2& b) const
@@ -3768,6 +3789,38 @@ public:
 	{
 		return I8x2( x-pB[0], y-pB[1] );
 	}
+
+	I8x2 operator * ( const U4 b ) const { return *this&U4x2(b,b); }
+	I8x2 operator & ( const U4 b ) const { return I8x2( x&b, y&b ); }
+	I8x2 operator | ( const U4 b ) const { return I8x2( x|b, y|b ); }
+	I8x2 operator + ( const U4 b ) const { return *this+U4x2(b,b); }
+	I8x2 operator - ( const U4 b ) const { return *this-U4x2(b,b); }
+	I8x2 operator % ( const U4 b ) const { return *this%U4x2(b,b); }
+	I8x2 operator / ( const U4 b ) const { return *this/U4x2(b,b); }
+
+	I8x2 operator * ( const I4 b ) const { return *this&I4x2(b,b); }
+	I8x2 operator & ( const I4 b ) const { return I8x2( x&b, y&b ); }
+	I8x2 operator | ( const I4 b ) const { return I8x2( x|b, y|b ); }
+	I8x2 operator + ( const I4 b ) const { return *this+I4x2(b,b); }
+	I8x2 operator - ( const I4 b ) const { return *this-I4x2(b,b); }
+	I8x2 operator % ( const I4 b ) const { return *this%I4x2(b,b); }
+	I8x2 operator / ( const I4 b ) const { return *this/I4x2(b,b); }
+
+	I8x2 operator * ( const U8 b ) const { return *this&I8x2(b,b); }
+	I8x2 operator & ( const U8 b ) const { return I8x2( x&b, y&b ); }
+	I8x2 operator | ( const U8 b ) const { return I8x2( x|b, y|b ); }
+	I8x2 operator + ( const U8 b ) const { return *this+I8x2(b,b); }
+	I8x2 operator - ( const U8 b ) const { return *this-I8x2(b,b); }
+	I8x2 operator % ( const U8 b ) const { return *this%I8x2(b,b); }
+	I8x2 operator / ( const U8 b ) const { return *this/I8x2(b,b); }
+
+	I8x2 operator * ( const I8 b ) const { return *this&I8x2(b,b); }
+	I8x2 operator & ( const I8 b ) const { return I8x2( x&b, y&b ); }
+	I8x2 operator | ( const I8 b ) const { return I8x2( x|b, y|b ); }
+	I8x2 operator + ( const I8 b ) const { return *this+I8x2(b,b); }
+	I8x2 operator - ( const I8 b ) const { return *this-I8x2(b,b); }
+	I8x2 operator % ( const I8 b ) const { return *this%I8x2(b,b); }
+	I8x2 operator / ( const I8 b ) const { return *this/I8x2(b,b); }
 
 	bool operator != ( const I4x2& b ) const
 	{
@@ -4037,6 +4090,40 @@ public:
 	I8x4& AB( U1* pA, U1* pB, U1** ppA = NULL, U1** ppB = NULL );
 
 	I8 qlen_xyz() { return x*x+y*y+z*z; }
+
+	I8x4 operator * ( const U4 b ) const { return I8x4( a8x2[0]*b, a8x2[1]*b ); }
+	I8x4 operator & ( const U4 b ) const { return I8x4( a8x2[0]&b, a8x2[1]&b ); }
+	I8x4 operator | ( const U4 b ) const { return I8x4( a8x2[0]|b, a8x2[1]|b ); }
+	I8x4 operator + ( const U4 b ) const { return I8x4( a8x2[0]+b, a8x2[1]+b ); }
+	I8x4 operator - ( const U4 b ) const { return I8x4( a8x2[0]-b, a8x2[1]-b ); }
+	I8x4 operator % ( const U4 b ) const { return I8x4( a8x2[0]%b, a8x2[1]%b ); }
+	I8x4 operator / ( const U4 b ) const { return I8x4( a8x2[0]/b, a8x2[1]/b ); }
+
+	I8x4 operator * ( const I4 b ) const { return I8x4( a8x2[0]*b, a8x2[1]*b ); }
+	I8x4 operator & ( const I4 b ) const { return I8x4( a8x2[0]&b, a8x2[1]&b ); }
+	I8x4 operator | ( const I4 b ) const { return I8x4( a8x2[0]|b, a8x2[1]|b ); }
+	I8x4 operator + ( const I4 b ) const { return I8x4( a8x2[0]+b, a8x2[1]+b ); }
+	I8x4 operator - ( const I4 b ) const { return I8x4( a8x2[0]-b, a8x2[1]-b ); }
+	I8x4 operator % ( const I4 b ) const { return I8x4( a8x2[0]%b, a8x2[1]%b ); }
+	I8x4 operator / ( const I4 b ) const { return I8x4( a8x2[0]/b, a8x2[1]/b ); }
+
+	I8x4 operator * ( const U8 b ) const { return I8x4( a8x2[0]*b, a8x2[1]*b ); }
+	I8x4 operator & ( const U8 b ) const { return I8x4( a8x2[0]&b, a8x2[1]&b ); }
+	I8x4 operator | ( const U8 b ) const { return I8x4( a8x2[0]|b, a8x2[1]|b ); }
+	I8x4 operator + ( const U8 b ) const { return I8x4( a8x2[0]+b, a8x2[1]+b ); }
+	I8x4 operator - ( const U8 b ) const { return I8x4( a8x2[0]-b, a8x2[1]-b ); }
+	I8x4 operator % ( const U8 b ) const { return I8x4( a8x2[0]%b, a8x2[1]%b ); }
+	I8x4 operator / ( const U8 b ) const { return I8x4( a8x2[0]/b, a8x2[1]/b ); }
+
+	I8x4 operator * ( const I8 b ) const { return I8x4( a8x2[0]*b, a8x2[1]*b ); }
+	I8x4 operator & ( const I8 b ) const { return I8x4( a8x2[0]&b, a8x2[1]&b ); }
+	I8x4 operator | ( const I8 b ) const { return I8x4( a8x2[0]|b, a8x2[1]|b ); }
+	I8x4 operator + ( const I8 b ) const { return I8x4( a8x2[0]+b, a8x2[1]+b ); }
+	I8x4 operator - ( const I8 b ) const { return I8x4( a8x2[0]-b, a8x2[1]-b ); }
+	I8x4 operator % ( const I8 b ) const { return I8x4( a8x2[0]%b, a8x2[1]%b ); }
+	I8x4 operator / ( const I8 b ) const { return I8x4( a8x2[0]/b, a8x2[1]/b ); }
+
+
 	I8 operator * ( const I8x4& b ) const
 	{
 		return x*b.x + y*b.y + z*b.z + w*b.w;
@@ -4162,7 +4249,7 @@ public:
 	}*/
 	I8x2 mx()
 	{
-		I8x2 o(x,0);
+		I8x2 o(x,(I8)0);
 		if( o.x < y )
 		{
 			o.x = y;
@@ -4182,7 +4269,7 @@ public:
 	}
 	I8x2 mn()
 	{
-		I8x2 o(x,0);
+		I8x2 o(x,(I8)0);
 		if( o.x > y )
 		{
 			o.x = y;

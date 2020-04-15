@@ -212,7 +212,34 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
 	return *this;
 }
+gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c )
+{
+	gpmCLR;
+	iXYZ.xyz_(a);
+	tXYZ.xyz_(b);
 
+	oXYZ.xyz_( (tXYZ+iXYZ)/2 );
+
+	txyz.xyz_(c);
+
+	I4x4	iR = (iXYZ-txyz).xyz0(),
+			tR = (tXYZ-txyz).xyz0(),
+			oR = (oXYZ-txyz).xyz0();
+
+	U4	iRr = sqrt(iR.qlen_xyz())/0x100,
+		oRr = sqrt(oR.qlen_xyz())/0x100,
+		tRr = sqrt(tR.qlen_xyz())/0x100;
+
+	oXYZ.xyz_( (oR*tRr)/oRr + txyz );
+
+	std::cout << "iR   " << iR.pSTR( pbuff ) << "iRr " << iRr << std::endl;
+	std::cout << "tR   " << tR.pSTR( pbuff ) << "tRr " << tRr << std::endl;
+	std::cout << "oR   " << oR.pSTR( pbuff ) << "oRr " << oRr << std::endl;
+	std::cout << "a    " << a.pSTR( pbuff ) << std::endl;
+	std::cout << "oXYZ " << oXYZ.pSTR( pbuff ) << std::endl;
+	std::cout << "tXYZ " << tXYZ.pSTR( pbuff ) << std::endl;
+	std::cout << std::endl;
+}
 gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	*this = iZS;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
@@ -334,7 +361,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	oCTRL.z = 0;
 	if( sqrt(okXYZ.qlen_xyz()) > mmX(200) ){
 		// ezt kaptuk a robitol
-		// ha netán akor sem mozdul
+		// ha netán akkor sem mozdul
 		oXYZ.xyz_(iXYZ);
 		oABC.xyz_(iABC);
 		//oxyz.xyz_(ixyz);
@@ -360,9 +387,11 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 
 	//nD.z
 	mmABCD.w = sqrt(dGRP.qlen_xyz());
+
 	mmABCD.x = dXYZ.abs0().mx().x; //qlen_xyz();
 	if( mmABCD.x ) {
 
+		mmABCD.x = sqrt(dXYZ.qlen_xyz());
 		U4 i = 3;
 		switch( NMnDIF.x )
 		{
@@ -383,20 +412,49 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		lim = ((mmABCD.x/mmX(gpdROBlim))<2) ? mmABCD.x : mmX(gpdROBlim);
 
 		chk( lim, i );
+
 		dXYZ = oXYZ - iXYZ;
 		mmABCD.y = dXYZ.abs0().mx().x;
-		if( mmABCD.y )
-		{
+		if( mmABCD.y ) {
+			mmABCD.y = sqrt(dXYZ.qlen_xyz());
 			if( lim <= mmABCD.y + mmX(3) )
 			{
 				// elérte a lim-et azaz nem érte el a ketrecet
 				lim = mmABCD.y;
+				if( mmABCD.y < mmABCD.x )
+				if( txyz.qlen_xyz() )
+				{
+					// de nem érte el az tXYZ-t
+                    // azaz felosztotta a pályát
+					I4x4 oR = (oXYZ-txyz).xyz0(),
+						 tR = (tXYZ-txyz).xyz0();
+					I4	oRr = sqrt(oR.qlen_xyz()),
+						tRr = sqrt(tR.qlen_xyz());
+					if( oRr < tRr )
+					{
+						I4x4	SVoXYZ = oXYZ,
+								SVtXYZ = tXYZ;
+						// levágná az utat
+						tXYZ.xyz_( (oR*tRr)/oRr + txyz );
+                        // sért e ketrecet
+
+						chk( 0, i );
+						if( oXYZ.xyz0() != tXYZ.xyz0() )
+						{
+							tXYZ.xyz_( SVoXYZ );
+						} else {
+							dXYZ = oXYZ - iXYZ;
+							lim = mmABCD.y = sqrt(dXYZ.qlen_xyz());
+						}
+						tXYZ.xyz_( SVtXYZ );
+					}
+				}
 			}
 			else if( mmABCD.y > mmX(10) )
 			{
 				// kisebb let mint amit elvártunk a ketrec nem engedte
-				dXYZ *= (I4)(mmABCD.y/100)-10;
-				dXYZ /= (I4)(mmABCD.y/100);
+				dXYZ *= (I4)(mmABCD.y/mmX(1))-10;
+				dXYZ /= (I4)(mmABCD.y/mmX(1));
 				oXYZ.xyz_(dXYZ+iXYZ);
 				mmABCD.y = sqrt(dXYZ.qlen_xyz());
 			} else {
@@ -420,9 +478,10 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		mmABCD.z = dxyz.abs0().mx().x;
 		if( mmABCD.y|(mmABCD.z>10) )
 		{
-			//mmABCD.z = sqrt(dxyz.qlen_xyz());
 			tMX = 1.0;
-			tMX.z = (txyz-tXYZ).xyz0();
+			tMX.z.xyz_( txyz-tXYZ );
+
+			//mmABCD.z = sqrt(dxyz.qlen_xyz());
 			/*if( abs(ab) < 0.0001f )
 			{
 				tMX.z = iMX.z;
@@ -446,14 +505,14 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 			tMX.z /= sqrt(tMX.z.qlen_xyz());	// normalizál
 			tMX.x = iMX.y.cross_xyz(tMX.z);
 			tMX.y = tMX.z.cross_xyz(iMX.x);
-			float	xl = sqrt(tMX.x.qlen_xyz()),
-					yl = sqrt(tMX.y.qlen_xyz());
+			float	xl = tMX.x.qlen_xyz(),
+					yl = tMX.y.qlen_xyz();
 			if( xl > yl )
 			{
-				tMX.x /= xl;
+				tMX.x /= sqrt(xl);
 				tMX.y = tMX.z.cross_xyz(tMX.x);
 			} else {
-				tMX.y /= yl;
+				tMX.y /= sqrt(yl);
 				tMX.x = tMX.y.cross_xyz(tMX.z);
 			}
 			tABC.xyz_( tMX.eABC()*(180.0/PI)*mmX(1) );
@@ -512,7 +571,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 					dMX.y = dMX.z.cross_xyz(dMX.x);
 				} else {
 					dMX.y /= yl;
-					dMX.x = iMX.y.cross_xyz(dMX.z);
+					dMX.x = dMX.y.cross_xyz(dMX.z);
 				}
 
 				oABC.xyz_( dMX.eABC()*(180.0/PI)*mmX(1) );
