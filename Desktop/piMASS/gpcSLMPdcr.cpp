@@ -520,9 +520,9 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		}
 	}
 
+	//sin(PI/1800)
 
-
-	if( itD < mmX(SIN1*50) ) {	// kb: ~800
+	if( itD < 333 ) {	// kb: ~800
 		tABC.xyz_(oABC.xyz_(iABC));
 	} else {
 

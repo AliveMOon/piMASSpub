@@ -10,7 +10,7 @@ I4x4 gpaCAGEbillBALL[] = {
 };
 I4x4 gpaCAGEbillBOX[] = {
 	{ mmX(600), mmX(500), mmX(-250), mmX(330) }, // asztal_bill
-	{ mmX(1500/2), mmX(4900), mmX(0), mmX(4000) }, // MIMI2bill
+	{ mmX(1500/2), mmX(5100), mmX(0), mmX(4000) }, // MIMI2bill
 	{ mmX(-1000-2000), mmX(0), mmX(0), mmX(2000) }, // fal_bill
 };
 U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
@@ -25,7 +25,7 @@ I4x4 gpaCAGEjohnBALL[] = {
 I4x4 gpaCAGEjohnBOX[] = {
 	{ mmX(1500-600), mmX(-500), mmX(-250), mmX(330) }, // asztal_john
 	{ mmX(-500-2000), mmX(0), mmX(0), mmX(2000) }, // MIMI_john
-	{ mmX(1500/2), mmX(-4900), mmX(0), mmX(4000) }, // MIMI2john
+	{ mmX(1500/2), mmX(-5100), mmX(0), mmX(4000) }, // MIMI2john
 };
 U4	gpnCAGEjohnBALL = gpmN(gpaCAGEjohnBALL),
 	gpnCAGEjohnBOX = gpmN(gpaCAGEjohnBOX);
