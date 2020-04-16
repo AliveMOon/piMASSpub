@@ -114,8 +114,11 @@ public:
 	F4x4	jd0mx;
 
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
-	gpcDrc* chk( I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
-	gpcDrc* chk( I4 lim, U4 id );
+	I4x4 chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
+	I4x4 chkXYZ( I4 lim, U4 id );
+
+	I4x4 chkXYZ( I4x4 trg, I4 lim, U4 id );
+
 	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
 	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
 	gpcDrc& operator &= ( gpcDrc& in );
@@ -140,8 +143,8 @@ public:
 			return *this;
 
 		NMnDIF.x = nm;
-		iXYZ = oXYZ = tXYZ = I4x4( 400,  0, 300+400, gpeZS_POS0)&I4x4(100,100,100, 1);
-		iABC = oABC = tABC = I4x4( 180,  0, 90,gpeZS_DIR0)&I4x4(100,100,100, 1);
+		iXYZ = oXYZ = tXYZ = I4x4( 400,  0,	300+400,	gpeZS_POS0)&I4x2(mmX(1),1).xxxy();
+		iABC = oABC = tABC = I4x4( 180,  0, 90,			gpeZS_DIR0)&I4x2(degX(1),1).xxxy();
 		iXYZ.w = gpeZS_iPOS;
 		iABC.w = gpeZS_iDIR;
 		oXYZ.w = gpeZS_oPOS;
@@ -189,7 +192,7 @@ public:
 
 		return (bHS1i()<<0xc)|(bHS1o()<<0x8)|(bHS2i()<<0x4)|(bHS2o());
 	}
-	gpcLZY* answSTAT( gpcLZY* pANS );
+	gpcLZY* answSTAT( gpcLZY* pANS, U1 id );
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
 	bool bHS1o() const { return !!(oCTRL.y&ZShs1);	}

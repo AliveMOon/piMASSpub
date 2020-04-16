@@ -12,9 +12,10 @@ extern U4	gpnCAGEjohnBALL,
 			gpnCAGEjohnBOX;
 
 
-gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
+gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 		if( !this )
 			return pANS;
+		I4x4 cXYZ = chkXYZ( mmX(gpdROBlim), id );
 
 		U1 	sCOM[] = "ABCD";
 		U4 &comA = *(U4*)sCOM;
@@ -24,78 +25,83 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS ) {
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// %s HS12:%0.4X", *sCOM ? (char*)sCOM : "?", hs12() );
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// POS:  n:%d"
 										"\r\n//\tiXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n//\tcXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\toXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm;"
 										,
-										(U4)(sqrt((tXYZ-iXYZ).xyz0().qlen())/mmX(100)),
-										double(iXYZ.x)/100.0,
-										double(iXYZ.y)/100.0,
-										double(iXYZ.z)/100.0,
+										(U4)(sqrt((tXYZ-iXYZ).qlen_xyz())/mmX(1)),
+										double(iXYZ.x)/mmX(1),
+										double(iXYZ.y)/mmX(1),
+										double(iXYZ.z)/mmX(1),
 
-										double(oXYZ.x)/100.0,
-										double(oXYZ.y)/100.0,
-										double(oXYZ.z)/100.0,
+										double(cXYZ.x)/mmX(1),
+										double(cXYZ.y)/mmX(1),
+										double(cXYZ.z)/mmX(1),
 
-										double(tXYZ.x)/100.0,
-										double(tXYZ.y)/100.0,
-										double(tXYZ.z)/100.0
+										double(oXYZ.x)/mmX(1),
+										double(oXYZ.y)/mmX(1),
+										double(oXYZ.z)/mmX(1),
+
+										double(tXYZ.x)/mmX(1),
+										double(tXYZ.y)/mmX(1),
+										double(tXYZ.z)/mmX(1)
 							);
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// DIR:  n:%d"
 										"\r\n//\tiABC %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\toABC %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\ttABC %7.2fdg, %7.2fdg, %7.2fdg;"
 										,
-										(U4)(sqrt((tABC-iABC).xyz0().qlen())/mmX(100)),
-										double(iABC.x)/100.0,
-										double(iABC.y)/100.0,
-										double(iABC.z)/100.0,
+										(U4)(sqrt((tABC-iABC).qlen_xyz())/degX(1)),
+										double(iABC.x)/degX(1),
+										double(iABC.y)/degX(1),
+										double(iABC.z)/degX(1),
 
-										double(oABC.x)/100.0,
-										double(oABC.y)/100.0,
-										double(oABC.z)/100.0,
+										double(oABC.x)/degX(1),
+										double(oABC.y)/degX(1),
+										double(oABC.z)/degX(1),
 
-										double(tABC.x)/100.0,
-										double(tABC.y)/100.0,
-										double(tABC.z)/100.0
+										double(tABC.x)/degX(1),
+										double(tABC.y)/degX(1),
+										double(tABC.z)/degX(1)
 							);
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// pos:"
 										"\r\n//\tixyz %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\toxyz %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\ttxyz %7.2fmm, %7.2fmm, %7.2fmm;"
 										,
-										double(ixyz.x)/100.0,
-										double(ixyz.y)/100.0,
-										double(ixyz.z)/100.0,
+										double(ixyz.x)/mmX(1),
+										double(ixyz.y)/mmX(1),
+										double(ixyz.z)/mmX(1),
 
-										double(oxyz.x)/100.0,
-										double(oxyz.y)/100.0,
-										double(oxyz.z)/100.0,
+										double(oxyz.x)/mmX(1),
+										double(oxyz.y)/mmX(1),
+										double(oxyz.z)/mmX(1),
 
-										double(txyz.x)/100.0,
-										double(txyz.y)/100.0,
-										double(txyz.z)/100.0
+										double(txyz.x)/mmX(1),
+										double(txyz.y)/mmX(1),
+										double(txyz.z)/mmX(1)
 							);
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// dir:"
 										"\r\n//\tiabc %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\toabc %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\ttabc %7.2fdg, %7.2fdg, %7.2fdg;"
 										,
-										double(iabc.x)/100.0,
-										double(iabc.y)/100.0,
-										double(iabc.z)/100.0,
+										double(iabc.x)/degX(1),
+										double(iabc.y)/degX(1),
+										double(iabc.z)/degX(1),
 
-										double(oabc.x)/100.0,
-										double(oabc.y)/100.0,
-										double(oabc.z)/100.0,
+										double(oabc.x)/degX(1),
+										double(oabc.y)/degX(1),
+										double(oabc.z)/degX(1),
 
-										double(tabc.x)/100.0,
-										double(tabc.y)/100.0,
-										double(tabc.z)/100.0
+										double(tabc.x)/degX(1),
+										double(tabc.y)/degX(1),
+										double(tabc.z)/degX(1)
 							);
 		return pANS;
 	}
 
-gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i ) {
+gpcLZY* gpcLZY::lzyZSnDstat( U8& iSTRT, gpcZSnD& zs, U1 i ) {
 	if( !&zs ) {
 		iSTRT = nLD();
 		return this;
@@ -104,12 +110,12 @@ gpcLZY* gpcLZY::lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i ) {
 	U1 n = gpmN(zs.aDrc);
 	if( i < n )
 	{
-		pANS = zs.aDrc[i].answSTAT( pANS );
+		pANS = zs.aDrc[i].answSTAT( pANS, i );
 		return this;
 	}
 
 	for( U1 i = 0, n = gpmN(zs.aDrc); i < n; i++ )
-		pANS = zs.aDrc[i].answSTAT( pANS );
+		pANS = zs.aDrc[i].answSTAT( pANS, i );
 	return this;
 }
 
@@ -190,7 +196,7 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	//if( !ixyz.qlen_xyz() )
 	//{
 	/*F4x4 iMX;
-	iMX.ABC(iABC, mmX(180)/PI );
+	iMX.ABC(iABC, degX(180.0/PI) );
 	I4 Zxyz = txyz.qlen_xyz();
 	if( Zxyz ) {
 		Zxyz = sqrt((txyz-tXYZ).qlen_xyz());
@@ -212,8 +218,8 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
 	return *this;
 }
-gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c )
-{
+
+gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	gpmCLR;
 	iXYZ.xyz_(a);
 	tXYZ.xyz_(b);
@@ -240,6 +246,7 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c )
 	std::cout << "tXYZ " << tXYZ.pSTR( pbuff ) << std::endl;
 	std::cout << std::endl;
 }
+
 gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	*this = iZS;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
@@ -288,10 +295,11 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						/// XYZABCxyz 2. OK ------------- JD.z = 0
 						okXYZ.xyz_(oXYZ);
 						okABC.xyz_(oABC);
-						if( txyz.qlen_xyz() )
+						okxyz.xyz_(txyz);
+						/*if( txyz.qlen_xyz() )
 							okxyz.xyz_(okXYZ.ABC2xyz(txyz,okABC));
 						else
-							okxyz.xyz_( 0 );
+							okxyz.xyz_( 0 );*/
 						break;
 					default:
 						// ZS hibat jelzett
@@ -367,23 +375,25 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		//oxyz.xyz_(ixyz);
 		// ha van ok felül írjuk amit a robi adott
 		// mindig abbol számoljunk
-		iXYZ.xyz_(okXYZ);
+
+		/*iXYZ.xyz_(okXYZ);
 		iABC.xyz_(okABC);
-		ixyz.xyz_(okxyz);
+		ixyz.xyz_(okxyz);*/
 	}
+
 	F4x4 tMX = 1.0, iMX;
-	iMX.ABC(iABC, mmX(180)/PI );
+	iMX.ABC(iABC, degX(180.0/PI) );
 	// itt kell le ellenőrizni mondjuk az ütközésre
 	//
 	float ab = 1.0, k;
 	static const float K = (100.0*PI*2.0);
+
 	I4 itD = iABC.chkABC( tABC, mmX(1) ).w, lim = 0;
 	I4x4 	tmp,
 			dXYZ = tXYZ - iXYZ,
-			dxyz = txyz - ixyz,
 			dGRP = tGRP - iGRP;
-	if( !txyz.qlen_xyz() )
-		dxyz.null();
+	/*if( !txyz.qlen_xyz() )
+		dxyz.null();*/
 
 	//nD.z
 	mmABCD.w = sqrt(dGRP.qlen_xyz());
@@ -411,7 +421,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		// megprobálja egyszerre
 		lim = ((mmABCD.x/mmX(gpdROBlim))<2) ? mmABCD.x : mmX(gpdROBlim);
 
-		chk( lim, i );
+		oXYZ.xyz_( chkXYZ( lim, i ) );
 
 		dXYZ = oXYZ - iXYZ;
 		mmABCD.y = dXYZ.abs0().mx().x;
@@ -430,23 +440,39 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						 tR = (tXYZ-txyz).xyz0();
 					I4	oRr = sqrt(oR.qlen_xyz()),
 						tRr = sqrt(tR.qlen_xyz());
+
+
+					if( oRr )
 					if( oRr < tRr )
 					{
+						I4x4	trg = (oR*tRr)/oRr + txyz,
+								tmp = chkXYZ( trg, 0, i );
+						if( trg.xyz0() == tmp.xyz0() )
+						{
+							oXYZ.xyz_( tmp );
+							dXYZ = oXYZ - iXYZ;
+							lim = mmABCD.y = sqrt(dXYZ.qlen_xyz());
+						}
+						/*else {
+
+						}
+
+
 						I4x4	SVoXYZ = oXYZ,
 								SVtXYZ = tXYZ;
 						// levágná az utat
 						tXYZ.xyz_( (oR*tRr)/oRr + txyz );
                         // sért e ketrecet
 
-						chk( 0, i );
-						if( oXYZ.xyz0() != tXYZ.xyz0() )
+						chkXYZ( 0, i );
+						if( oXYZ.xyz0() == tXYZ.xyz0() )
 						{
-							tXYZ.xyz_( SVoXYZ );
-						} else {
 							dXYZ = oXYZ - iXYZ;
 							lim = mmABCD.y = sqrt(dXYZ.qlen_xyz());
+						} else {
+							oXYZ.xyz_( SVoXYZ );
 						}
-						tXYZ.xyz_( SVtXYZ );
+						tXYZ.xyz_( SVtXYZ );*/
 					}
 				}
 			}
@@ -475,6 +501,8 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	}
 
 	if( txyz.qlen_xyz() ) {
+		I4x4 dxyz = txyz - okxyz;
+
 		mmABCD.z = dxyz.abs0().mx().x;
 		if( mmABCD.y|(mmABCD.z>10) )
 		{
@@ -482,8 +510,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 			tMX.z.xyz_( txyz-tXYZ );
 
 			//mmABCD.z = sqrt(dxyz.qlen_xyz());
-			/*if( abs(ab) < 0.0001f )
-			{
+			/*if( abs(ab) < 0.0001f ) {
 				tMX.z = iMX.z;
 			}
 			else if( ab < 1.0 )
@@ -515,22 +542,19 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 				tMX.y /= sqrt(yl);
 				tMX.x = tMX.y.cross_xyz(tMX.z);
 			}
-			tABC.xyz_( tMX.eABC()*(180.0/PI)*mmX(1) );
-			itD = iABC.chkABC( tABC, mmX(1) ).w;
+			tABC.xyz_( tMX.eABC()*degX(180.0/PI) );
+			itD = iABC.chkABC( tABC, degX(1) ).w;
 		}
 	}
 
-	//sin(PI/1800)
-
-	if( itD < 333 ) {	// kb: ~800
+	if( itD < 11 ) {	// kb: ~800
 		tABC.xyz_(oABC.xyz_(iABC));
 	} else {
-
-		 //, dMX;
+		//, dMX;
 
 		// mátrixot csinálunk belőle
-		iMX.ABC(iABC, mmX(180)/PI );
-		tMX.ABC(tABC, mmX(180)/PI );
+		iMX.ABC(iABC, degX(180.0/PI) );
+		tMX.ABC(tABC, degX(180.0/PI) );
 
 		F4 rnd( K,K,K );
 		rnd &= (iMX.dot(tMX).acos()/(2.0*PI));	// n karika * kerület
@@ -574,7 +598,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 					dMX.x = dMX.y.cross_xyz(dMX.z);
 				}
 
-				oABC.xyz_( dMX.eABC()*(180.0/PI)*mmX(1) );
+				oABC.xyz_( dMX.eABC()*degX(180.0/PI) );
 			} else {
 				oABC.xyz_( tABC );
 			}
@@ -589,7 +613,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	{
 		// ketrec gátolta
         // o-kat berakjuk a t-be
-        /*if( abs( oABC.y ) > mmX(100) )
+        /*if( abs( oABC.y ) > degX(100) )
         {
 			oCTRL.z = 0;
 			return *this;

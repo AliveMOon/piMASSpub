@@ -313,7 +313,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		default:
 			nOSin = pINP->n_load;
 			if( GTprmpt( false ) )
-			//if( pINP )
 				pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 			break;
 	}

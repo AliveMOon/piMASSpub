@@ -811,7 +811,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								if( pS2 == pSRC )
 									continue;
 								hex.lzyFRMT( s=0, "\r\n\"\r\n" );
-								hex.lzyRST()->lzyZSnD( s=-1, *pZSnD, i );
+
+								hex.lzyRST()->lzyZSnDstat( s=-1, *pZSnD, i );
+
 								hex.lzyFRMT( s=-1, "\"\r\n" );
 								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 								pS2->srcUPDT();

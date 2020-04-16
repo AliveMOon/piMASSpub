@@ -722,8 +722,7 @@ static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2020 =
 //                                   500000FF03FF000018000004010000D*0000120001rn
 // static const char gp_sSLMP_read[] = "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x";
 extern U4x4 gpaZSwr[];
-I8 gpcGT::GTcnct( gpcWIN& win )
-{
+I8 gpcGT::GTcnct( gpcWIN& win ) {
 	if( this ? msGTdie > win.mSEC.x : true )
 		return 0;
 

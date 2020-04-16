@@ -38,13 +38,13 @@ I4x4& I4x4::operator = ( const F4 f4 )
 	w = f4.w;
 	return *this;
 }
-I4x4 I4x4::chkABC( const I4x4& b, float alf, float mul ) const
+I4x4 I4x4::chkABC( const I4x4& b, float alf, float mm ) const
 {
 	F4 fa = *this, fb = b;
 	// radiánokat csinálunk
 	fa /= alf*180.0/PI;
 	fb /= alf*180.0/PI;
-	fb = F4( cos(fa.x)-cos(fb.x), cos(fa.y)-cos(fb.y), cos(fa.z)-cos(fb.z) )*mul;
+	fb = F4( cos(fa.x)-cos(fb.x), cos(fa.y)-cos(fb.y), cos(fa.z)-cos(fb.z) )*mm;
 	fb.w = sqrt(fb.qlen_xyz());
 
 	return fb;
@@ -52,7 +52,7 @@ I4x4 I4x4::chkABC( const I4x4& b, float alf, float mul ) const
 I4x4 I4x4::ABC2xyz( I4x4 txyz, const I4x4& iABC ) const {
 
 	F4x4 iMX;
-	iMX.ABC(iABC, mmX(180)/PI ).t = txyz-*this;
+	iMX.ABC(iABC, degX(180.0/PI) ).t = txyz-*this;
 
     txyz.w = txyz.abs0().mx().x ? iMX.t.abs0().mx() : 0;
 	if( txyz.w )

@@ -42,3 +42,5 @@ I4x2 I4x2::operator / (const I8x2& b) const
 {
 	return I4x2( b.x ? x/b.x : 0x7fffffff ,  b.y ? y/b.y : 0x7fffffff );
 }
+
+I4x4 I4x2::xxxy() const { return I4x4(x,x,x,y); }

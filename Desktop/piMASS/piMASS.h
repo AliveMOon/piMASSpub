@@ -301,6 +301,7 @@ class gpcALU;
 
 #define gpdROBlim 100
 #define mmX(a) ((a)*100)
+#define degX(a) ((a)*100)
 #define zsIO 20
 #define zsIN 400
 #define zsINin (zsIN-zsIO)
@@ -2800,6 +2801,8 @@ public:
 	I8 area( void ) const { return x*y; }
 	U8 are_sum( void ) const { return abs().area()+abs().sum(); }
 
+	I4x4 xxxy() const;
+
 	I8 qlen (void ) const { return x*x + y*y; }
 
 	I4 mn() { return x < y ? x:y; }
@@ -3610,7 +3613,7 @@ public:
 		a4x2[0] = t;
 		return *this;
 	}
-	I4x4 chkABC( const I4x4& b, float dim, float mul = mmX(100) ) const;
+	I4x4 chkABC( const I4x4& b, float dim, float mm = mmX(100) ) const;
 
 };
 
@@ -6112,7 +6115,7 @@ szasz:
 	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN );
-	gpcLZY* lzyZSnD( U8& iSTRT, gpcZSnD& zs, U1 i = 3 );
+	gpcLZY* lzyZSnDstat( U8& iSTRT, gpcZSnD& zs, U1 i = 3 );
 	gpcLZY* lzy_reqCLOSE( void )
 	{
 		if( !this )
@@ -6154,8 +6157,7 @@ public:
 	{
 		gpmCLR;
 	}
-	U4 dict_find( U1* pS, U8 nS, U4& nIX )
-	{
+	U4 dict_find( U1* pS, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;
@@ -6187,8 +6189,7 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	gpcLZYdct* dict_add( U1* pS, U8 nS )
-	{
+	gpcLZYdct* dict_add( U1* pS, U8 nS ) {
 		if( !this )
 		{
 			gpcLZYdct* p_this = new gpcLZYdct(0);
