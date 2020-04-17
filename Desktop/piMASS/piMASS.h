@@ -3613,8 +3613,8 @@ public:
 		a4x2[0] = t;
 		return *this;
 	}
-	I4x4 chkABC( const I4x4& b, float dim, float mm = mmX(100) ) const;
-
+	//I4x4 chkABC( const I4x4& b, float dim, float mm = mmX(100) ) const;
+	I4x4 mmABC( const I4x4& b, float alf, float mm = mmX(100) ) const;
 };
 
 
@@ -4351,7 +4351,7 @@ public:
 		x -= b; y -= b;
 		return *this;
     }
-    F2& operator &= ( const float b )
+    F2& operator *= ( const float b )
     {
 		x *= b; y *= b;
 		return *this;
@@ -4478,6 +4478,23 @@ public:
 
 		return *this;
 	}
+
+	F2 left()
+	{
+		return F2(-y,x);
+	}
+	F2 right()
+	{
+		return F2(y,-x);
+	}
+	F2 SCRlft()
+	{
+		return right();
+	}
+	F2 SCRrig()
+	{
+		return left();
+	}
 };
 
 class F4
@@ -4544,7 +4561,13 @@ public:
     {
 		return sprintf( pBUFF, "%8.2f%s%8.2f%s%8.2f%s%8.2f%s%s", x, pSeP, y, pSeP, z, pSeP, w, pSeP, pENT );
     }
+    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
+    {
+		str( pBUFF, pSeP, pENT );
+		return pBUFF;
+    }
 	F4 sqrt() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z),sqrtf(w)); }
+    F4 sqrt_xyz0() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z)); }
     double sum( void ) const		{ return x+y+z+w; }
     double sum_xyz( void ) const	{ return x+y+z; }
     double qlen( void ) const		{ return x*x+y*y+z*z+w*w; }
@@ -4611,10 +4634,10 @@ public:
 		aF2[1] -= b;
 		return *this;
     }
-    F4& operator &= ( const float b )
+    F4& operator *= ( const float b )
     {
-		aF2[0] &= b;
-		aF2[1] &= b;
+		aF2[0] *= b;
+		aF2[1] *= b;
 		return *this;
     }
     F4& operator /= ( const float b )
@@ -4923,29 +4946,33 @@ public:
 	{
 		return F4( x.qlen(), y.qlen(), z.qlen(), t.qlen() );
 	}
+	F4 qlen_xyz() const
+	{
+		return F4( x.qlen_xyz(), y.qlen_xyz(), z.qlen_xyz(), t.qlen_xyz() );
+	}
 
 
 	F4x4& operator += ( const F4& b ) {
 		F4 l = qlen().sqrt();
-		x &= (l.x+b.x)/l.x;
-		y &= (l.y+b.y)/l.y;
-		z &= (l.z+b.z)/l.z;
-		t &= (l.w+b.w)/l.w;
+		x *= (l.x+b.x)/l.x;
+		y *= (l.y+b.y)/l.y;
+		z *= (l.z+b.z)/l.z;
+		t *= (l.w+b.w)/l.w;
 		return *this;
 	};
 	F4x4& operator -= ( const F4& b ) {
 		F4 l = qlen().sqrt();
-		x &= (l.x-b.x)/l.x;
-		y &= (l.y-b.y)/l.y;
-		z &= (l.z-b.z)/l.z;
-		t &= (l.w-b.w)/l.w;
+		x *= (l.x-b.x)/l.x;
+		y *= (l.y-b.y)/l.y;
+		z *= (l.z-b.z)/l.z;
+		t *= (l.w-b.w)/l.w;
 		return *this;
 	};
 	F4x4& operator &= ( const F4& b ) {
-		x &= b.x;
-		y &= b.y;
-		z &= b.z;
-		t &= b.w;
+		x *= b.x;
+		y *= b.y;
+		z *= b.z;
+		t *= b.w;
 		return *this;
 	};
 	F4x4& operator %= ( const F4& b ) {
@@ -5140,7 +5167,9 @@ public:
 		bc.b( abc.B, toR );
 		*this *= bc;
 		bc.c( abc.C, toR );
-		return *this *= bc;
+		*this *= bc;
+		*this /= qlen_xyz();
+		return *this;
 	}
 	F4 eABC() {
 		F4 abc(0.0);
@@ -5168,7 +5197,7 @@ public:
 		return *this;
 	}
 	F4x4& AXr( F4 vec, float rad ) {
-		double	l = vec.qlen();
+		double	l = sqrt(vec.qlen());
 		float	CR = cosf(rad), SR = sinf(rad), T = 1-CR,
 				X = vec.x/l, Y = vec.y/l, Z = vec.z/l,
 				X2 = X*X, Y2 = Y*Y, Z2 = Z*Z;
@@ -5185,8 +5214,7 @@ public:
 		return *this;
 	}
 
-	F4 eYPR()
-	{
+	F4 eYPR() {
 		F4 ypr(0.0);
 		if( fabs(y.x) > 0.998f )
 		{
@@ -5203,6 +5231,91 @@ public:
 	}
 
 
+	F4x4 lerp_xyz( const F4x4& b, float ab ) const {
+		if( ab <= 0.0002f )
+			return *this;
+		if( ab >= 0.9998f )
+			return b;
+
+		F4x4 axr, o = *this;
+
+		F4	No = x.norm_xyz(),
+			Ni = b.x.norm_xyz(), R;
+		float c = Ni*No, a = acos(c)*ab;
+		if( a>0.01f && a<(PI*0.99f) )
+		{
+			R = No.cross_xyz(Ni);
+			axr.AXr( R, a );
+			o *= axr;
+		}
+
+		No = o.y.norm_xyz();
+		Ni = b.y.norm_xyz();
+		c = Ni*No;
+		a = acos(c)*ab;
+		if( a>0.01f && a<(PI*0.99f) )
+		{
+			R = No.cross_xyz(Ni);
+			axr.AXr( R, a );
+			o *= axr;
+		}
+
+		No = o.z.norm_xyz();
+		Ni = b.z.norm_xyz();
+		c = Ni*No;
+		a = acos(c)*ab;
+		if( a>0.01f && a<(PI*0.99f) )
+		{
+			R = No.cross_xyz(Ni);
+			axr.AXr( R, a );
+			o *= axr;
+		}
+
+		return o;
+	}
+
+	F4x4 lerp_zyx( const F4x4& b, float ab ) const {
+		if( ab <= 0.0002f )
+			return *this;
+		if( ab >= 0.9998f )
+			return b;
+
+		F4x4 axr, o = *this;
+
+		F4	No = z.norm_xyz(),
+			Ni = b.z.norm_xyz(), R;
+		float c = Ni*No, a = acos(c)*ab;
+		if( a>0.01f && a<(PI*0.99f) )
+		{
+			R = No.cross_xyz(Ni);
+			axr.AXr( R, a );
+			o *= axr;
+		}
+
+		No = o.y.norm_xyz();
+		Ni = b.y.norm_xyz();
+		c = Ni*No;
+		a = acos(c)*ab;
+		if( a>0.01f && a<(PI*0.99f) )
+		{
+			R = No.cross_xyz(Ni);
+			axr.AXr( R, a );
+			o *= axr;
+		}
+
+		No = o.x.norm_xyz();
+		Ni = b.x.norm_xyz();
+		c = Ni*No;
+		a = acos(c)*ab;
+		if( a>0.01f && a<(PI*0.99f) )
+		{
+			R = No.cross_xyz(Ni);
+			axr.AXr( R, a );
+			o *= axr;
+		}
+
+		return o;
+	}
 
 };
 

@@ -20,7 +20,7 @@ float4x4& ypr( const float4& ypr )
 	}
 	float4x4& AXr( const float3& vec, float rad )
 	{
-		double l = float4( vec ).qlen();
+		double l = sqrt(float4( vec ).qlen());
 		float	cosr = cosf(rad), sinr = sinf(rad), t = 1-cosr,
 				x = vec.x/l, y = vec.y/l, z = vec.z/l,
 				x2 = x*x, y2 = y*y, z2 = z*z;

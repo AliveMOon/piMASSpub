@@ -38,7 +38,39 @@ I4x4& I4x4::operator = ( const F4 f4 )
 	w = f4.w;
 	return *this;
 }
-I4x4 I4x4::chkABC( const I4x4& b, float alf, float mm ) const
+I4x4 I4x4::mmABC( const I4x4& b, float alf, float mm ) const {
+	F4 radA = *this, radB = b;
+	radA /= alf;
+	radB /= alf;
+	F2	i0( sin(radA.x), cos(radA.x) ),
+		i1 = i0.right(),
+		t( sin(radB.x), cos(radB.x) );
+
+	radB.x = acos(t*i0);
+	if( t*i1 < 0.0 )
+		radB.x = -radB.x;
+
+	i0 = F2( sin(radA.y), cos(radA.y) );
+	i1 = i0.right();
+	t = F2( sin(radB.y), cos(radB.y) );
+
+	radB.y = acos(t*i0);
+	if( t*i1 < 0.0 )
+		radB.y = -radB.y;
+
+	i0 = F2( sin(radA.z), cos(radA.z) );
+	i1 = i0.right();
+	t = F2( sin(radB.z), cos(radB.z) );
+
+	radB.z = acos(t*i0);
+	if( t*i1 < 0.0 )
+		radB.z = -radB.z;
+
+	radB *= mm;
+	radB.w = radB.abs0().mx();
+	return radB;
+}
+/*I4x4 I4x4::chkABC( const I4x4& b, float alf, float mm ) const
 {
 	F4 fa = *this, fb = b;
 	// radiánokat csinálunk
@@ -48,7 +80,7 @@ I4x4 I4x4::chkABC( const I4x4& b, float alf, float mm ) const
 	fb.w = sqrt(fb.qlen_xyz());
 
 	return fb;
-}
+}*/
 I4x4 I4x4::ABC2xyz( I4x4 txyz, const I4x4& iABC ) const {
 
 	F4x4 iMX;
