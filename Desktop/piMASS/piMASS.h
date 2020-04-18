@@ -3017,6 +3017,10 @@ public:
 		};
 		struct
         {
+			I4 A,B,C,D;
+		};
+		struct
+        {
 			I4 aXYZW[4];
 		};
 		struct
@@ -4572,14 +4576,14 @@ public:
     double sum_xyz( void ) const	{ return x+y+z; }
     double qlen( void ) const		{ return x*x+y*y+z*z+w*w; }
     double qlen_xyz( void ) const	{ return x*x+y*y+z*z; }
-    F4 norm_xyz( void ) const
+    F4 N3( void ) const
 	{
         float l = sqrtf(qlen_xyz());
 		return F4( x/l, y/l, z/l );
 	}
 	float dot_xyz( F4 b ) const { return x*b.x + y*b.y + z*b.z; }
 
-    F4 cross_xyz( F4 b ) const
+    F4 X3( F4 b ) const
 	{
 		return F4(
 						y * b.z - z * b.y,
@@ -5168,17 +5172,10 @@ public:
 		*this *= bc;
 		bc.c( abc.C, toR );
 		*this *= bc;
-		*this /= qlen_xyz();
+		//*this /= qlen_xyz();
 		return *this;
 	}
-	F4 eABC() {
-		F4 abc(0.0);
 
-        abc.A = atan2( -z.y, y.y );
-		abc.B = atan2( -x.z, x.x );
-		abc.C = asin(x.y);
-		return abc;
-	}
 
 
 
@@ -5213,8 +5210,46 @@ public:
 
 		return *this;
 	}
+	F4 eulABC() {
 
-	F4 eYPR() {
+		F4 abc(0.0, acos(x.z)-(PI/2.0) ), N;	// B
+        if( fabs(x.z) > 0.9998f )
+        {
+			// nagyon erös a B
+			abc.C = acos(y.y);
+			if( y.x > 0.0 )
+				abc.C = -abc.C;
+			// csak BC tekerés kell
+			return abc;
+        }
+
+		N = F4(0,0,1).X3(x).N3();
+		abc.C = acos(N.y);
+		if( N.x > 0.0 )
+			abc.C = -abc.C;
+
+		abc.A = acos( N*z );
+		if( z.z < 0.0 )
+			abc.A = -abc.A;
+
+		/*F4	R = N.X3(F4(0,0,1)).N3(),
+			U = R.X3(N).N3();
+		if( U*z < 0.0 )
+			abc.A = -abc.A;*/
+
+		abc.A -= (PI/2.0);
+		return abc;
+	}
+	/*F4 eABC() {
+		F4 abc(0.0);
+
+        abc.A = atan2( -z.y, y.y );
+		abc.B = atan2( -x.z, x.x );
+		abc.C = asin(x.y);
+		return abc;
+	}*/
+
+	F4 eulYPR() {
 		F4 ypr(0.0);
 		if( fabs(y.x) > 0.998f )
 		{
@@ -5239,34 +5274,34 @@ public:
 
 		F4x4 axr, o = *this;
 
-		F4	No = x.norm_xyz(),
-			Ni = b.x.norm_xyz(), R;
+		F4	No = x.N3(),
+			Ni = b.x.N3(), R;
 		float c = Ni*No, a = acos(c)*ab;
 		if( a>0.01f && a<(PI*0.99f) )
 		{
-			R = No.cross_xyz(Ni);
+			R = No.X3(Ni);
 			axr.AXr( R, a );
 			o *= axr;
 		}
 
-		No = o.y.norm_xyz();
-		Ni = b.y.norm_xyz();
+		No = o.y.N3();
+		Ni = b.y.N3();
 		c = Ni*No;
 		a = acos(c)*ab;
 		if( a>0.01f && a<(PI*0.99f) )
 		{
-			R = No.cross_xyz(Ni);
+			R = No.X3(Ni);
 			axr.AXr( R, a );
 			o *= axr;
 		}
 
-		No = o.z.norm_xyz();
-		Ni = b.z.norm_xyz();
+		No = o.z.N3();
+		Ni = b.z.N3();
 		c = Ni*No;
 		a = acos(c)*ab;
 		if( a>0.01f && a<(PI*0.99f) )
 		{
-			R = No.cross_xyz(Ni);
+			R = No.X3(Ni);
 			axr.AXr( R, a );
 			o *= axr;
 		}
@@ -5282,34 +5317,34 @@ public:
 
 		F4x4 axr, o = *this;
 
-		F4	No = z.norm_xyz(),
-			Ni = b.z.norm_xyz(), R;
+		F4	No = z.N3(),
+			Ni = b.z.N3(), R;
 		float c = Ni*No, a = acos(c)*ab;
 		if( a>0.01f && a<(PI*0.99f) )
 		{
-			R = No.cross_xyz(Ni);
+			R = No.X3(Ni);
 			axr.AXr( R, a );
 			o *= axr;
 		}
 
-		No = o.y.norm_xyz();
-		Ni = b.y.norm_xyz();
+		No = o.y.N3();
+		Ni = b.y.N3();
 		c = Ni*No;
 		a = acos(c)*ab;
 		if( a>0.01f && a<(PI*0.99f) )
 		{
-			R = No.cross_xyz(Ni);
+			R = No.X3(Ni);
 			axr.AXr( R, a );
 			o *= axr;
 		}
 
-		No = o.x.norm_xyz();
-		Ni = b.x.norm_xyz();
+		No = o.x.N3();
+		Ni = b.x.N3();
 		c = Ni*No;
 		a = acos(c)*ab;
 		if( a>0.01f && a<(PI*0.99f) )
 		{
-			R = No.cross_xyz(Ni);
+			R = No.X3(Ni);
 			axr.AXr( R, a );
 			o *= axr;
 		}
@@ -5352,7 +5387,7 @@ public:
     {
         return x*x+y*y+z*z;
     }
-    D4 norm_xyz( void ) const
+    D4 N3( void ) const
 	{
         double l = sqrt(qlen_xyz());
 		return D4( x/l, y/l, z/l );
@@ -5361,7 +5396,7 @@ public:
 	{
         return x*b.x + y*b.y + z*b.z;
 	}
-    D4 cross_xyz( D4 b ) const
+    D4 X3( D4 b ) const
 	{
 		return D4(
 						y * b.z - z * b.y,

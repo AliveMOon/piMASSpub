@@ -247,51 +247,50 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	std::cout << std::endl;
 
 
-	iABC.xyz_( 0 );
-	tABC.xyz_( F4( 0, 120, 0 )*degX(1) );
+	iABC.xyz_( F4(  0, 30, 45 )*degX(1) );
+	tABC.xyz_( F4( 90, 90, 90 )*degX(1) );
 
-	oABC.xyz_( iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) ) );
+	oABC.xyz_( iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) )/2 + iABC );
 
 	F4x4	iMX, tMX, oMX;
 	float ab = 0.5;
 	iMX.ABC(iABC, degX(180.0/PI) );
+	oMX.ABC(oABC, degX(180.0/PI) );
 	tMX.ABC(tABC, degX(180.0/PI) );
-	oMX = iMX.lerp_zyx( tMX, ab );
+	//oMX = iMX.lerp_zyx( tMX, ab );
 
-	std::cout << "iABC   " << (iABC/degX(1)).pSTR( pbuff ) << std::endl;
-	std::cout << "tABC   " << (tABC/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl;
 	std::cout << std::endl;
 
 	std::cout << "iX   " << iMX.x.pSTR( pbuff ) << std::endl;
-	std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;
-	std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;
-
 	std::cout << "iY   " << iMX.y.pSTR( pbuff ) << std::endl;
-	std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;
-	std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "iZ   " << iMX.z.pSTR( pbuff ) << std::endl << std::endl;
 
-	std::cout << "iZ   " << iMX.z.pSTR( pbuff ) << std::endl;
-	std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl;
-	std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl;
-	std::cout << std::endl;
-
-    iABC.xyz_( iMX.eABC()*degX(180.0/PI) );
-    oABC.xyz_( oMX.eABC()*degX(180.0/PI) );
-	tABC.xyz_( tMX.eABC()*degX(180.0/PI) );
-
-	std::cout << "iABC   " << (iABC/degX(1)).pSTR( pbuff ) << std::endl;
-	std::cout << "oABC   " << (oABC/degX(1)).pSTR( pbuff ) << std::endl;
-	std::cout << "tABC   " << (tABC/degX(1)).pSTR( pbuff ) << std::endl;
-	std::cout << std::endl;
-
-	tMX.ABC(oABC, degX(180.0/PI) );
 	std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;
-	std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;
-
 	std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;
-	std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;
 
-	std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl;
+	std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl << std::endl;
+
+    iABC.xyz_( iMX.eulABC()*degX(180.0/PI) );
+    tABC.xyz_( oMX.eulABC()*degX(180.0/PI) );
+	//tABC.xyz_( tMX.eABC()*degX(180.0/PI) );
+
+	std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl << std::endl;
+
+	tMX.ABC(tABC, degX(180.0/PI) );
+	std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;
+
+	std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;
 	std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl;
 	std::cout << std::endl;
 }
@@ -567,31 +566,31 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 				F4 Yd = tMX.z-iMX.z, Yn;
                 float	yl = sqrt(Yd.qlen_xyz()), alf;
                 if( yl > 0.0 ) {
-					alf = acos(tMX.z.norm_xyz()*iMX.z)*ab; 	// tZ és iZ szöge alf
+					alf = acos(tMX.z.N3()*iMX.z)*ab; 	// tZ és iZ szöge alf
 
 					Yn = Yd/yl;		// normalizálom a Zb-t
-					tMX.x = Yn.cross_xyz(iMX.z).norm_xyz(); // egy x merölegest csinálunk a Yn x iZ síkra
+					tMX.x = Yn.X3(iMX.z).N3(); // egy x merölegest csinálunk a Yn x iZ síkra
 
-					Yd = iMX.z.cross_xyz(tMX.x.norm_xyz()).norm_xyz(); // Yd-t derékszögüre koorigáljuk x segitségével
+					Yd = iMX.z.X3(tMX.x.N3()).N3(); // Yd-t derékszögüre koorigáljuk x segitségével
 
 					tMX.z = Yd*sin(alf) + iMX.z*cos(alf);
                 }
 			}*/
 
 			tMX.z /= sqrt(tMX.z.qlen_xyz());	// normalizál
-			tMX.x = iMX.y.cross_xyz(tMX.z);
-			tMX.y = tMX.z.cross_xyz(iMX.x);
+			tMX.x = iMX.y.X3(tMX.z);
+			tMX.y = tMX.z.X3(iMX.x);
 			float	xl = tMX.x.qlen_xyz(),
 					yl = tMX.y.qlen_xyz();
 			if( xl > yl )
 			{
 				tMX.x /= sqrt(xl);
-				tMX.y = tMX.z.cross_xyz(tMX.x);
+				tMX.y = tMX.z.X3(tMX.x);
 			} else {
 				tMX.y /= sqrt(yl);
-				tMX.x = tMX.y.cross_xyz(tMX.z);
+				tMX.x = tMX.y.X3(tMX.z);
 			}
-			tABC.xyz_( tMX.eABC()*degX(180.0/PI) );
+			tABC.xyz_( tMX.eulABC()*degX(180.0/PI) );
 			itD = iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) );
 		}
 	}
@@ -639,22 +638,78 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 					lim = mmABCD.y;
 				}
 				oABC.xyz_( ((itD*mmABCD.y)/mmABCD.x)+iABC );
+				if( (oABC.A/degX(180)) > 1 )
+				{
+					I4x2 rq = oABC.A;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						oABC.A = rq.x-degX(180);
+					}
+				}
+				else if( (oABC.A/degX(180)) < -1 )
+				{
+					I4x2 rq = -oABC.A;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						oABC.A = (rq.x-degX(180))*-1;
+					}
+				}
+
+				if( (oABC.B/degX(180)) > 1 )
+				{
+					I4x2 rq = oABC.B;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						oABC.B = rq.x-degX(180);
+					}
+				}
+				else if( (oABC.B/degX(180)) < -1 )
+				{
+					I4x2 rq = -oABC.B;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						oABC.B = (rq.x-degX(180))*-1;
+					}
+				}
+
+				if( (oABC.C/degX(180)) > 1 )
+				{
+					I4x2 rq = oABC.C;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						oABC.C = rq.x-degX(180);
+					}
+				}
+				else if( (oABC.C/degX(180)) < -1 )
+				{
+					I4x2 rq = -oABC.C;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						oABC.C = (rq.x-degX(180))*-1;
+					}
+				}
 				// fel lett osztva a mozgás
 				//F4x4 dMX = iMX.lerp_xyz( tMX, ab );
 				/*F4x4 dMX = (tMX-iMX)*ab + iMX;
 				dMX.z /= sqrt(dMX.z.qlen_xyz());	// normalizál
 
-				dMX.x = iMX.y.cross_xyz(dMX.z);
-				dMX.y = dMX.z.cross_xyz(iMX.x);
+				dMX.x = iMX.y.X3(dMX.z);
+				dMX.y = dMX.z.X3(iMX.x);
 				float	xl = sqrt(dMX.x.qlen_xyz()),
 						yl = sqrt(dMX.y.qlen_xyz());
 				if( xl > yl )
 				{
 					dMX.x /= xl;
-					dMX.y = dMX.z.cross_xyz(dMX.x);
+					dMX.y = dMX.z.X3(dMX.x);
 				} else {
 					dMX.y /= yl;
-					dMX.x = dMX.y.cross_xyz(dMX.z);
+					dMX.x = dMX.y.X3(dMX.z);
 				}*/
 
 				//oABC.xyz_( dMX.eABC()*degX(180.0/PI) );
@@ -697,7 +752,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 			break;
 		case 1: // ALAPH ready!
 			oCTRL.w = 0;
-			oCTRL.z = 10; // linearis XYZ ABC
+			oCTRL.z = 11; // linearis XYZ ABC
 			JD.y = 1;
 			break;
 

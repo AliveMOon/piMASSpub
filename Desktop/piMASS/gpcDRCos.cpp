@@ -121,7 +121,7 @@ bool gpcDrc::jdPRGstp()
 	{
 		/// START ----------------------------
 		jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
-		if( !jdPRG.z )
+		if( jdPRG.z ? !okXYZ.abs0().mx().x : true )
 		{
 			jdPRG.null();
 			return true;
