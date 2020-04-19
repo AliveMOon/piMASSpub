@@ -192,23 +192,6 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 
 	ixyz = iXYZ.ABC2xyz( txyz, iABC );
 
-	//gpmMcpyOF( &ixyz.x, &zs.apos, 3 );
-	//if( !ixyz.qlen_xyz() )
-	//{
-	/*F4x4 iMX;
-	iMX.ABC(iABC, degX(180.0/PI) );
-	I4 Zxyz = txyz.qlen_xyz();
-	if( Zxyz ) {
-		Zxyz = sqrt((txyz-tXYZ).qlen_xyz());
-		ixyz.xyz_( iXYZ + (iMX.z*Zxyz) );
-	} else {
-		if( (iMX.z.z <= -COSSIN45) && (iXYZ.z > 0) )
-			ixyz.xyz_( iXYZ + (iMX.z * (float(-iXYZ.z)/iMX.z.z)) );	// lerakja z=0-ra
-		else
-			ixyz.xyz_( iXYZ + (iMX.z*mmX(200)) );
-	}*/
-	//}
-
 	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
 	gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
 	gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
@@ -502,26 +485,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 							dXYZ = oXYZ - iXYZ;
 							lim = mmABCD.y = sqrt(dXYZ.qlen_xyz());
 						}
-						/*else {
-
-						}
-
-
-						I4x4	SVoXYZ = oXYZ,
-								SVtXYZ = tXYZ;
-						// levágná az utat
-						tXYZ.xyz_( (oR*tRr)/oRr + txyz );
-                        // sért e ketrecet
-
-						chkXYZ( 0, i );
-						if( oXYZ.xyz0() == tXYZ.xyz0() )
-						{
-							dXYZ = oXYZ - iXYZ;
-							lim = mmABCD.y = sqrt(dXYZ.qlen_xyz());
-						} else {
-							oXYZ.xyz_( SVoXYZ );
-						}
-						tXYZ.xyz_( SVtXYZ );*/
 					}
 				}
 			}
@@ -556,27 +519,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		{
 			tMX = 1.0;
 			tMX.z.xyz_( txyz-tXYZ );
-
-			//mmABCD.z = sqrt(dxyz.qlen_xyz());
-			/*if( abs(ab) < 0.0001f ) {
-				tMX.z = iMX.z;
-			}
-			else if( ab < 1.0 )
-			{
-				F4 Yd = tMX.z-iMX.z, Yn;
-                float	yl = sqrt(Yd.qlen_xyz()), alf;
-                if( yl > 0.0 ) {
-					alf = acos(tMX.z.N3()*iMX.z)*ab; 	// tZ és iZ szöge alf
-
-					Yn = Yd/yl;		// normalizálom a Zb-t
-					tMX.x = Yn.X3(iMX.z).N3(); // egy x merölegest csinálunk a Yn x iZ síkra
-
-					Yd = iMX.z.X3(tMX.x.N3()).N3(); // Yd-t derékszögüre koorigáljuk x segitségével
-
-					tMX.z = Yd*sin(alf) + iMX.z*cos(alf);
-                }
-			}*/
-
 			tMX.z /= sqrt(tMX.z.qlen_xyz());	// normalizál
 			tMX.x = iMX.y.X3(tMX.z);
 			tMX.y = tMX.z.X3(iMX.x);
@@ -600,16 +542,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	} else {
 
 		k = ((K*float(itD.w))/degX(180.0));
-		/*
-		// mátrixot csinálunk belőle
-		iMX.ABC(iABC, degX(180.0/PI) );
-		tMX.ABC(tABC, degX(180.0/PI) );
-
-		F4 rnd( K,K,K );
-		rnd &= (iMX.dot(tMX).acos()/(2.0*PI));	// n karika * kerület
-
-
-		k = rnd.xyz0().abs().mx();*/
 		if( k > 0.0 )
 		{
 			float lpk = gpdROBlim/k;
@@ -694,25 +626,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						oABC.C = (rq.x-degX(180))*-1;
 					}
 				}
-				// fel lett osztva a mozgás
-				//F4x4 dMX = iMX.lerp_xyz( tMX, ab );
-				/*F4x4 dMX = (tMX-iMX)*ab + iMX;
-				dMX.z /= sqrt(dMX.z.qlen_xyz());	// normalizál
-
-				dMX.x = iMX.y.X3(dMX.z);
-				dMX.y = dMX.z.X3(iMX.x);
-				float	xl = sqrt(dMX.x.qlen_xyz()),
-						yl = sqrt(dMX.y.qlen_xyz());
-				if( xl > yl )
-				{
-					dMX.x /= xl;
-					dMX.y = dMX.z.X3(dMX.x);
-				} else {
-					dMX.y /= yl;
-					dMX.x = dMX.y.X3(dMX.z);
-				}*/
-
-				//oABC.xyz_( dMX.eABC()*degX(180.0/PI) );
 			} else {
 				oABC.xyz_( tABC );
 			}

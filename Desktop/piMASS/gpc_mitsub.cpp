@@ -778,48 +778,7 @@ U1 gpsSLMPabc[] = {
 
 				};
 
-gpcZS& gpcZS::operator &= ( const gpcDrc& D )
-{
-	gpmCLR;
-	io128.y = -1;
-	return *this;
-}
-gpcZS& gpcZS::operator = ( const gpcDrc& D )
-{
-	gpmCLR;
-	switch( D.JD.y )
-	{
-		case 1:
-		case 2:
-		case 3:
-			{
-				gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
-				switch( D.oCTRL.z )
-				{
-					case 10:
-						gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
-						gpmMcpyOF( &aABC,	&D.oABC, 3 );
-						break;
-					default:
 
-						break;
-				}
-			} break;
-		case 4:
-		case 5:
-		case 6:
-			io128.y = D.oCTRL.y;
-			break;
-		default:
-			break;
-	}
-	return *this;
-}
-
-gpcZS::gpcZS( const gpcDrc& D ) {
-	gpmCLR;
-	*this = D;
-}
 
 
 

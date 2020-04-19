@@ -4,7 +4,7 @@ extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
 
 I4x4 gpaCAGEbillBALL[] = {
-	{ mmX(1500), 0, mmX(320), mmX(800) },
+	{ mmX(1500), 0, mmX(320), mmX(700) },
 	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
@@ -19,7 +19,7 @@ U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 
 I4x4 gpaCAGEjohnBALL[] = {
 	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
-	{ mmX(1500), 0, mmX(320), mmX(800) },
+	{ mmX(1500), 0, mmX(320), mmX(700) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
 I4x4 gpaCAGEjohnBOX[] = {

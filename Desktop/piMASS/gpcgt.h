@@ -80,10 +80,10 @@ public:
 			aabc[3],	// b544
             aJ16[6],	// b640
             aj16[6];	// b832
-			// b1024
+
 	I4x4	oMxyzEspd,	// b1024
-			oMabcNsnt,	// b1152
-			oEkey;		// b1280
+			oMabcNsnt,	// b1280
+			oEkey;		// b1312
 			//b1308
 	gpcZS& null() { gpmCLR; return *this; }
 	gpcZS(){

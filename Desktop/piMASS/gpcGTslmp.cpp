@@ -67,6 +67,53 @@ U4x4 gpaZSwr[] = {
 	{ 	0xA,  	gpdZSnWu2,	10000, gpdZSnRu2	},
 	{ 	0x40A,  gpdZSnWu2,	20000, gpdZSnRu2	},
 };
+
+gpcZS& gpcZS::operator &= ( const gpcDrc& D )
+{
+	gpmCLR;
+	io128.y = -1;
+	return *this;
+}
+gpcZS& gpcZS::operator = ( const gpcDrc& D )
+{
+	gpmCLR;
+	switch( D.JD.y )
+	{
+		case 1:
+		case 2:
+		case 3:
+			{
+				switch( D.oCTRL.z )
+				{
+					case 10:
+					case 11:
+						if( D.JD.y > 1 )
+							gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
+
+						gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
+						gpmMcpyOF( &aABC,	&D.oABC, 3 );
+						break;
+					default:
+
+						break;
+				}
+			} break;
+		case 4:
+		case 5:
+		case 6:
+			io128.y = D.oCTRL.y;
+			break;
+		default:
+			break;
+	}
+	return *this;
+}
+
+gpcZS::gpcZS( const gpcDrc& D ) {
+	gpmCLR;
+	*this = D;
+}
+
 void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 {
 	U8 nOUT = GTout( pWIN ), s;
@@ -256,7 +303,6 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						= pZSnD->aDrc[iD0]
 					), // pB-ben a JUDO elötti
 		*pA = (U2*)&(
-						//pZSnD->aZSio[4+iD0]
 						pZSnD->aZSio[iD0*2]
 						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
 					); // pA-ban azaz új out lesz
