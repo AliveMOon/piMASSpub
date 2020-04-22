@@ -2476,6 +2476,13 @@ public:
         y = pI[1];
     }
 	// cnt = fract * U42(1, w);
+	I4x2& snail( I8 i )
+	{
+        x = sqrt(i);
+        y = i-x*(x+1);
+        if( y < 0 )
+		return *this;
+	}
 	I4x2& cnt2fract(U4 w, U8 cnt) {
 		U1 lg = log2(w * w);
 		w = 1<<(lg/2);

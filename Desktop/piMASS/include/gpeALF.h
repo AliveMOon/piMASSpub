@@ -890,6 +890,7 @@ typedef enum gpeALF: I8
 	gpeALF_ROUT = gpdABCD('R', 'O', 'U', 'T'),
 
 	gpeALF_SAVE = gpdABCD('S', 'A', 'V', 'E'),
+	gpeALF_SHLD = gpdABCD('S', 'H', 'L', 'D'),
 	gpeALF_SLMP = gpdABCD('S', 'L', 'M', 'P'),
 	gpeALF_SOCK = gpdABCD('S', 'O', 'C', 'K'),
 	gpeALF_STAR = gpdABCD('S', 'T', 'A', 'R'),
@@ -1019,6 +1020,8 @@ typedef enum gpeALF: I8
 	gpeALF_SHOES = gpdABCDE('S', 'H', 'O', 'E', 'S'),
 	gpeALF_SLEFT = gpdABCDE('S', 'L', 'E', 'F', 'T'),
 
+	gpeALF_SNAIL = gpdABCDE('S', 'N', 'A', 'I', 'L'),
+
 	gpeALF_SPEED = gpdABCDE('S', 'P', 'E', 'E', 'D'),
 
 	gpeALF_STORE = gpdABCDE('S', 'T', 'O', 'R', 'E'),
@@ -1126,6 +1129,7 @@ typedef enum gpeALF: I8
 
 	gpeALF_SIZEOF = gpdABCDEF('S', 'I', 'Z', 'E', 'O', 'F'),
 	gpeALF_SHADOW = gpdABCDEF('S', 'H', 'A', 'D', 'O', 'W'),
+	gpeALF_SHIELD = gpdABCDEF('S', 'H', 'I', 'E', 'L', 'D'),
 	gpeALF_SPRITE = gpdABCDEF('S', 'P', 'R', 'I', 'T', 'E'),
 	gpeALF_SRIGHT = gpdABCDEF('S', 'R', 'I', 'G', 'H', 'T'),
 	gpeALF_STEREO = gpdABCDEF('S', 'T', 'E', 'R', 'E', 'O'),

@@ -112,6 +112,7 @@ public:
 			jd0PRG,
 			jd0XYZ, jd0xyz, jd0ABC;
 	F4x4	jd0mx;
+	gpeALF	jdALF;
 
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	I4x4 chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
