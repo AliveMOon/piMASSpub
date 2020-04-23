@@ -2476,11 +2476,49 @@ public:
         y = pI[1];
     }
 	// cnt = fract * U42(1, w);
-	I4x2& snail( I8 i )
+	I4x2& snail( I4 i )
 	{
-        x = sqrt(i);
-        y = i-x*(x+1);
-        if( y < 0 )
+		if( !i )
+			return null();
+
+		bool bS = i < 0; if(bS) i *= -1;
+
+		I4	sq = floor(sqrt(i)),
+			i0 = sq*sq,
+
+			sq2 = sq+1,
+			i1 = sq2*sq,
+
+			i2 =sq2*sq2;
+		// i=1 sq=1 i0=1 sq2=2 i1=2 i2=4
+
+
+		if( i0&1 ) {
+			x = y = sq2/2;	//i=1 xy=2/2=1
+			// páratlan
+            if( i<i1) {
+				x -= i1-i;	//i=1 x=1-(2-1)= 0
+				y -= i2-i1;	//i=1 y=1-(4-2)=-1
+            } else {
+								//i=2 x=1
+				y -= i22-i;		//i=2 y=1-(4-2)=-1
+            }
+		} else {
+			// páros
+			x = y = i0/2;
+			if( i<i1) {
+				x -= i-i0;
+            } else {
+				x -= i1-i0;
+				y -= i-i1;
+            }
+		}
+
+		// i=1 sq=1 i0=1 sq2=2 i1=2 i2=4 x= 0 y=-1
+		// i=1 sq=1 i0=1 sq2=2 i1=2 i2=4 x= 1 y=-1
+		if( bS )
+			*this *= -1;
+
 		return *this;
 	}
 	I4x2& cnt2fract(U4 w, U8 cnt) {
