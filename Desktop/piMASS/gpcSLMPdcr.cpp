@@ -561,17 +561,18 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 			}
 
 
-			if( ab < 1.0 )
-			{
-				if( mmABCD.x >= degX(2) )
-				{
+			if( ab < 1.0 ) {
+				if( mmABCD.x >= degX(2) ) {
 					mmABCD.x /= degX(1);
 					mmABCD.y /= degX(1);
 					lim = mmABCD.y;
 				}
-				oABC.xyz_( ((itD*mmABCD.y)/mmABCD.x)+iABC );
-				if( (oABC.A/degX(180)) > 1 )
-				{
+				if( mmABCD.y )
+					oABC.xyz_( ((itD*mmABCD.y)/mmABCD.x)+iABC );
+				else if( ab > 0.0 ) {
+					oABC.xyz_( (F4(itD)*ab)+iABC );
+				}
+				if( (oABC.A/degX(180)) > 1 ) {
 					I4x2 rq = oABC.A;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
@@ -579,8 +580,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						oABC.A = rq.x-degX(180);
 					}
 				}
-				else if( (oABC.A/degX(180)) < -1 )
-				{
+				else if( (oABC.A/degX(180)) < -1 ) {
 					I4x2 rq = -oABC.A;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
@@ -589,8 +589,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 					}
 				}
 
-				if( (oABC.B/degX(180)) > 1 )
-				{
+				if( (oABC.B/degX(180)) > 1 ) {
 					I4x2 rq = oABC.B;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
@@ -598,8 +597,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						oABC.B = rq.x-degX(180);
 					}
 				}
-				else if( (oABC.B/degX(180)) < -1 )
-				{
+				else if( (oABC.B/degX(180)) < -1 ) {
 					I4x2 rq = -oABC.B;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
@@ -608,8 +606,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 					}
 				}
 
-				if( (oABC.C/degX(180)) > 1 )
-				{
+				if( (oABC.C/degX(180)) > 1 ) {
 					I4x2 rq = oABC.C;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
@@ -617,8 +614,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						oABC.C = rq.x-degX(180);
 					}
 				}
-				else if( (oABC.C/degX(180)) < -1 )
-				{
+				else if( (oABC.C/degX(180)) < -1 ) {
 					I4x2 rq = -oABC.C;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )

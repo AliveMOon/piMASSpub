@@ -146,8 +146,8 @@ bool gpcDrc::jdPRGstp()
 	switch( jdALF )
 	{
 		case gpeALF_SHLD: {
-				xy = jdPRG.y;
-				xy.XdivRQ(jdPRG.w) += jdPRG.w;
+				// jdPRG.y=0 x=0 y=0
+				(xy = jdPRG.y).XdivRQ(jdPRG.w) += jdPRG.w;
 				xy -= jd0PRG.a4x2[1];
 				xy %= jdPRG.w;
 				cr.gr2cr( xy, jdPRG.w );
@@ -156,9 +156,19 @@ bool gpcDrc::jdPRGstp()
 				tXYZ.xyz_( jd0xyz - vec );
 			} break;
 		case gpeALF_SNAIL: {
-				xy.snail( jdPRG.y ) += jdPRG.w;
+				// jdPRG.y=  0 x= 0 y= 0
+				// jdPRG.y= 25 x=-2 y=-3
+
+				// jdPRG.x=10 jdPRG.y=10 jdPRG.z=10x10=100 jdPRG.w=jdPRG.x=10
+				// jdPRG.y= 81 x=-4 y=-5
+				// jdPRG.y= 90 x= 5 y=-5
+				// jdPRG.y=100 x= 5 y= 5
+				vec.z = (jdPRG.w-1);
+				vec.a4x2[0].snail(vec.z*vec.z);
+				xy.snail( jdPRG.y ) -= vec.a4x2[0];
+				xy += jdPRG.w;
 				xy -= jd0PRG.a4x2[1];
-				xy %= jdPRG.w;
+				xy %= jdPRG.w; 							// %10 0->9
 				cr.gr2cr( xy, jdPRG.w );
 				d = cr.w/zl;
 				vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
