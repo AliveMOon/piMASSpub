@@ -2475,6 +2475,15 @@ public:
         x = pI[0];
         y = pI[1];
     }
+    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
+    {
+		return sprintf( pBUFF, "%d%s%d%s%s", x, pSeP, y, pSeP, pENT );
+    }
+    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
+    {
+		str( pBUFF, pSeP, pENT );
+		return pBUFF;
+    }
 	// cnt = fract * U42(1, w);
 	I4x2& snail( I4 i )
 	{
@@ -2490,32 +2499,39 @@ public:
 			i1 = sq2*sq,
 
 			i2 =sq2*sq2;
-		// i=1 sq=1 i0=1 sq2=2 i1=2 i2=4
+		// i=6 sq=2 i0=4 sq2=3 i1=6 i2=9
 
 
 		if( i0&1 ) {
-			x = y = sq2/2;	//i=1 xy=2/2=1
+			*this = sq2/2;	//i=3,2,1 xy=2/2=1
 			// páratlan
             if( i<i1) {
 				x -= i1-i;	//i=1 x=1-(2-1)= 0
 				y -= i2-i1;	//i=1 y=1-(4-2)=-1
             } else {
-								//i=2 x=1
-				y -= i22-i;		//i=2 y=1-(4-2)=-1
+				//x=x			//i=3;2 x=1
+				y -= i2-i;		//i=3;2 y=1-(4-3)=0
             }
 		} else {
 			// páros
-			x = y = i0/2;
+			*this = sq/2;	//i=5;4 xy=2/2=1
 			if( i<i1) {
-				x -= i-i0;
+				x -= i-i0;	//i=5;4 x=1-(5-4)= 0
+				//y=y		//i=5;4 y=1
             } else {
-				x -= i1-i0;
-				y -= i-i1;
+				x -= i1-i0;	//i=6 x=1-(6-4)=1-2=-1
+				y -= i-i1;	//i=6 x=1-(6-6) = 1
             }
 		}
 
+		// páratlan i0
 		// i=1 sq=1 i0=1 sq2=2 i1=2 i2=4 x= 0 y=-1
-		// i=1 sq=1 i0=1 sq2=2 i1=2 i2=4 x= 1 y=-1
+		// i=2 sq=1 i0=1 sq2=2 i1=2 i2=4 x= 1 y=-1
+		// i=3 sq=1 i0=1 sq2=2 i1=2 i2=4 x= 1 y= 0
+		// páros i0
+		// i=4 sq=2 i0=4 sq2=3 i1=6 i2=9 x= 1 y= 1
+		// i=5 sq=2 i0=4 sq2=3 i1=6 i2=9 x= 0 y= 1
+		// i=6 sq=2 i0=4 sq2=3 i1=6 i2=9 x=-1 y= 1
 		if( bS )
 			*this *= -1;
 

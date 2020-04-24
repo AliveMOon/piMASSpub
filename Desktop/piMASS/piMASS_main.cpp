@@ -594,6 +594,13 @@ int main( int nA, char *apA[] )
 	}
     std::cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<std::endl;;
 
+	I4x2 snail;
+	for( U4 i = 0; i < 100; i++ )
+	{
+		snail.snail(i);
+		std::cout << i << "->" << snail.pSTR(gpsMNpub) <<std::endl;
+	}
+
 
 //	char* pSTR = NULL;
 //	for( U4 i = 0; i < gpmN(gpaABC); i++ )
