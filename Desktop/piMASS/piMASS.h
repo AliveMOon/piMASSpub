@@ -299,6 +299,7 @@ class gpcALU;
 #define gpdSIZ2CR  I4x2(6,9)
 #define gpdCRall I4x2(1,2)
 
+#define ms2sec 1000
 #define gpdROBlim 100
 #define mmX(a) ((a)*100)
 #define degX(a) ((a)*100)

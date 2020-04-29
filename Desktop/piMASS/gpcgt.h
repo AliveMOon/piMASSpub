@@ -76,7 +76,7 @@ public:
 			io128;		// b128
 	I4		aPOS[3],	// b256
 			aABC[3],	// b352
-			apos[3],	// b448
+			apos[3],	// b448	//ms
 			aabc[3],	// b544
             aJ16[6],	// b640
             aj16[6];	// b832
@@ -113,6 +113,7 @@ public:
 			jd0XYZ, jd0xyz, jd0ABC;
 	F4x4	jd0mx;
 	gpeALF	jdALF;
+	I4x4	ms13R2;
 
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	I4x4 chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );

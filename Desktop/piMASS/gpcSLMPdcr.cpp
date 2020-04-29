@@ -27,7 +27,8 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 										"\r\n//\tiXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\tcXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\toXYZ %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm;"
+										"\r\n//\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n//\t13R2 %7.2fs,  %7.2fmm, %7.2fs, %7.2fs;"
 										,
 										(U4)(sqrt((tXYZ-iXYZ).qlen_xyz())/mmX(1)),
 										double(iXYZ.x)/mmX(1),
@@ -44,7 +45,13 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 
 										double(tXYZ.x)/mmX(1),
 										double(tXYZ.y)/mmX(1),
-										double(tXYZ.z)/mmX(1)
+										double(tXYZ.z)/mmX(1),
+
+										double( ms13R2.x )/ms2sec,
+										double( ms13R2.y )/ms2sec,
+										double( ms13R2.z )/ms2sec,
+										double( ms13R2.w )/ms2sec
+
 							);
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// DIR:  n:%d"
 										"\r\n//\tiABC %7.2fdg, %7.2fdg, %7.2fdg "
@@ -192,6 +199,9 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 
 	ixyz = iXYZ.ABC2xyz( txyz, iABC );
 
+	gpmMcpyOF( &ms13R2.x, &zs.apos, 3 );
+
+
 	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
 	gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
 	gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
@@ -332,6 +342,8 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						else
 							okxyz.xyz_( 0 );*/
 						break;
+					case 9115:	// a J5 túl erös akart lenni
+						JD.z = 0;
 					default:
 						// ZS hibat jelzett
 						// trg-be eltároljuk hol van most

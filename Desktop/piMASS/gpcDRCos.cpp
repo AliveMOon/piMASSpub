@@ -111,7 +111,10 @@ bool gpcDrc::jdPRGstp()
 			// de pont befejezte
 			jdPRG.null();
 			if( jd0XYZ.qlen_xyz() )
+			{
 				tXYZ.xyz_(jd0XYZ);
+				tABC.xyz_(jd0ABC);
+			}
 			return true;
 		}
 	} else

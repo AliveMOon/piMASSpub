@@ -215,6 +215,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 				iDRC = pZSnD->iDrc();
 				// nem fecsegés, hanem adat
 				pZSnD->aDrc[iDRC] = pZSnD->ioZS();
+				pZSnD->aDrc[iDRC].ms13R2.w = pWIN->mSEC.x;
 				pZSnD->stpPULL();
 				if( pZSnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pZSnD->pulling( pOUT, gpaZSwr );
