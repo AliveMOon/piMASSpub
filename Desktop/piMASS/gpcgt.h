@@ -113,7 +113,7 @@ public:
 			jd0XYZ, jd0xyz, jd0ABC;
 	F4x4	jd0mx;
 	gpeALF	jdALF;
-	I4x4	ms13R2;
+	I4x4	ms13R2, msSRT3;
 
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	I4x4 chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
@@ -269,6 +269,7 @@ class gpcZSnD
 		}
 		U4 stpPUSH( bool bSW )
 		{
+			/// bSW ? true BnJ : false only Bill
 			ioSW.w -= bSW ? 2 : 4;
 			ioSW.z = ioSW.w+4;
 			ioSW.y = ioSW.w+1;

@@ -3462,7 +3462,88 @@ public:
 	}
 	I4x4& xyz_( I4x4 b ) { a4x2[0] = b.a4x2[0]; z = b.z; return *this; }
 	I4x4 xyz0( void ) const { I4x4 o = *this; o.w = 0; return o; }
+	/// 13
+	I4x4& swpYX() {
+		float t = x;
+		x = y;
+		y = t;
+		return *this;
+	}
+	/// 25
+	I4x4& swpZX() {
+		float t = x;
+		x = z;
+		z = t;
+		return *this;
+	}
+	/// 36
+	I4x4& swpZY() {
+		float t = y;
+		y = z;
+		z = t;
+		return *this;
+	}
 
+	/// 49
+	I4x4& swpWX() {
+		float t = x;
+		x = w;
+		w = t;
+		return *this;
+	}
+
+	/// 5A
+	I4x4& swpWY() {
+		float t = y;
+		y = w;
+		w = t;
+		return *this;
+	}
+	/// 6C
+	I4x4& swpWZ() {
+		float t = z;
+		z = w;
+		w = t;
+		return *this;
+	}
+
+	I4x4 srt3() {
+		if( qlen_xyz() == 0.0 )
+			return 0;
+
+		I4x4 s = *this;
+		s.w = 1;
+		if(s.y>s.x)
+		{
+			s.swpYX();
+			s.w += 2;
+		}
+		if(s.z>s.x)
+		{
+			s.swpZX();
+			s.w += 4;
+		}
+		if(s.z>s.y)
+		{
+			s.swpZY();
+			s.w += 8;
+		}
+
+		return s;
+	}
+	I4x4& swp3( U1 s ) {
+		if(s&1)
+		{
+			if( s&0x08 )
+				swpZY();
+			if( s&0x04 )
+				swpZX();
+			if( s&0x02 )
+				swpYX();
+		}
+
+		return *this;
+	}
 	I4x4* index( U4 n_i ) {
 		if( !this )
 		{

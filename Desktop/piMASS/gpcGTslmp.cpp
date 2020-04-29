@@ -295,7 +295,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// ---------------------------------
 	/// Drc judo filter
 	/// ---------------------------------
-	iD0 = pZSnD->stpPUSH( false );
+	iD0 = pZSnD->stpPUSH( true );
 
 	U4x4& JD = pZSnD->aDrc[iD0].JD;
 	U4 JDy = JD.y;
@@ -370,8 +370,9 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
     // és a következő körben írjuk be
 	pZSnD->aZSio[4+iD0] &= pZSnD->aDrc[iD0]; // ez a pB
 
-	U4	iU2 = gpaZSwr[iD0].x,
-		nU2 = gpaZSwr[iD0].y;
+	U4	iU2 = gpaZSwr[0].x, //iD0].x, mert pB és pA már el van tolva?
+		nU2 = gpaZSwr[0].y,
+		offU2= gpaZSwr[iD0].x-gpaZSwr[0].x; //iD0].y;
 	iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2 );
 	if( iU2 >= nU2 )
 	{
@@ -397,7 +398,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			//   +-->+>+>+-->+>+-->.x00.x04.x08.x0C.x10.x14.x18.x1c.x20.x24.0x28
 			//   500000FF03FF000028000014010000D*0000100004.   .   .   .   .
 			// \n500000FF03FF000020000014010000D*000000000265686f6c
-			pOUT = pOUT->lzyFRMT( s = -1, "%s" gpdSLMP_send_LN4SL6N4, pOUT->nLD() ? "\n": "", 0x18 + 4*n_cpy, i_cpy, n_cpy );
+			pOUT = pOUT->lzyFRMT( s = -1, "%s" gpdSLMP_send_LN4SL6N4, pOUT->nLD() ? "\n": "", 0x18 + 4*n_cpy, offU2+i_cpy, n_cpy );
 			pOUT->lzyINS( NULL, 4*n_cpy, s = -1, -1 );
 			for(  ; i_cpy < nU2; i_cpy++ )
 				s += sprintf( (char*)pOUT->p_alloc+s, "%0.4X", pA[i_cpy] );
