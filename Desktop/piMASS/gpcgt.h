@@ -55,11 +55,14 @@
 
 #define ZShs1 0x1
 #define ZShs2 0x2
+#define ZShs3 0x4
 
 #define ZShs1i 0x1
 #define ZShs1o 0x2
 #define ZShs2i 0x4
 #define ZShs2o 0x8
+#define ZShs3i 0x10
+#define ZShs3o 0x20
 
 
 //#define gpdSLMP GTslmpDrc // GTslmp
@@ -68,6 +71,7 @@
 #define gpdZSnWu2	(gpdZSnW/sizeof(U2))
 #define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
+class gpcRES;
 class gpcDrc;
 
 class gpcZS {
@@ -114,7 +118,20 @@ public:
 	F4x4	jd0mx;
 	gpeALF	jdALF;
 	I4x4	ms13R2, msSRT3;
+	U4		n_trd, n_join;
+	std::thread trd;
 
+	~gpcDrc() {
+		if( n_join >= n_trd )
+			return;
+
+		trd.join();
+	}
+	gpcDrc& operator = ( const gpcDrc& d )
+	{
+		gpmMcpy( this, &d, gpmOFF(gpcDrc,n_trd) );
+		n_trd = n_join = 0;
+	}
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
 	I4x4 chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
 	I4x4 chkXYZ( I4 lim, U4 id );
@@ -138,9 +155,13 @@ public:
 	{
 		return !(*this == b);
 	}
+	bool async( char* pBUFF, gpcALU& alu, gpcRES* pRES );
 
 	gpcDrc& format( U4 nm = 0 ) {
-		gpmCLR;
+		U4 nn = gpmOFF(gpcDrc,n_trd);
+
+		gpmZn( this, nn );
+		//gpmCLR;
 		if( !nm )
 			return *this;
 
@@ -183,23 +204,23 @@ public:
 	{
 		if( nm != NMnDIF.au4x2[0].x )
 			format( nm );
-
 		*this = zs;
 	}
 
-	U2 hs12()
-	{
+	U4 hs123() {
 		if(!this )
 			return 0;
 
-		return (bHS1i()<<0xc)|(bHS1o()<<0x8)|(bHS2i()<<0x4)|(bHS2o());
+		return	 (bHS1i()<<0x14)|(bHS1o()<<0x10)
+				|(bHS2i()<<0x0c)|(bHS2o()<<0x08)
+				|(bHS3i()<<0x04)|(bHS3o());
 	}
 	gpcLZY* answSTAT( gpcLZY* pANS, U1 id );
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
 	bool bHS1o() const { return !!(oCTRL.y&ZShs1);	}
-	bool bHS1iNo() const { return bHS1i()&&bHS1o(); }
-	bool bHS1iOo() const { return bHS1i()||bHS1o(); }
+	//bool bHS1iNo() const { return bHS1i()&&bHS1o(); }
+	//bool bHS1iOo() const { return bHS1i()||bHS1o(); }
 	U4 oHS1o() {
 		iCTRL.y&=(~ZShs1);
 		return (oCTRL.y|=ZShs1);
@@ -221,6 +242,20 @@ public:
 		iCTRL.y|=ZShs2;
 		return (oCTRL.y&=(~ZShs2));
 	}
+
+	bool bHS3i() const  { return !!(iCTRL.y&ZShs3);	}
+	bool bHS3o() const  { return !!(oCTRL.y&ZShs3);	}
+	bool bHS3iNo() const { return bHS3i()&&bHS3o(); }
+	bool bHS3iOo() const { return bHS3i()||bHS3o(); }
+	U4 oHS3o() {
+		iCTRL.y&=(~ZShs3);
+		return (oCTRL.y|=ZShs3);
+	}
+	U4 xHS3o() {
+		iCTRL.y|=ZShs3;
+		return (oCTRL.y&=(~ZShs3));
+	}
+
 	bool jdPRGstp();
 	gpcDrc& judo( gpcZS& inp );
 };

@@ -2,12 +2,22 @@
 #include "gpcwin.h"
 extern U1 gpaALFadd[];
 extern char gpsTAB[], *gppTAB;
-
+///------------------------
+///
+/// CAGE BILL
+///
+///------------------------
+//------------------------
+// BALL
+//------------------------
 I4x4 gpaCAGEbillBALL[] = {
 	{ mmX(1500), 0, mmX(320), mmX(700) },
 	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
+//------------------------
+// BOX
+//------------------------
 I4x4 gpaCAGEbillBOX[] = {
 	{ mmX(600), mmX(500), mmX(-350), mmX(330) }, // asztal_bill
 	{ mmX(1500/2), mmX(5100), mmX(0), mmX(4000) }, // MIMI2bill
@@ -16,17 +26,28 @@ I4x4 gpaCAGEbillBOX[] = {
 U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 	gpnCAGEbillBOX = gpmN(gpaCAGEbillBOX);
 
-
+///------------------------
+///
+/// CAGE JOHN
+///
+///------------------------
+//------------------------
+// BALL
+//------------------------
 I4x4 gpaCAGEjohnBALL[] = {
 	{ mmX(1500), 0, mmX(320), mmX(700) },
 	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
+//------------------------
+// BOX
+//------------------------
 I4x4 gpaCAGEjohnBOX[] = {
 	{ mmX(1500-600), mmX(-500), mmX(-250), mmX(330) }, // asztal_john
 	{ mmX(-500-2000), mmX(0), mmX(0), mmX(2000) }, // MIMI_john
 	{ mmX(1500/2), mmX(-5100), mmX(0), mmX(4000) }, // MIMI2john
 };
+
 U4	gpnCAGEjohnBALL = gpmN(gpaCAGEjohnBALL),
 	gpnCAGEjohnBOX = gpmN(gpaCAGEjohnBOX);
 

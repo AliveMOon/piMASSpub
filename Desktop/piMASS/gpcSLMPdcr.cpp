@@ -22,7 +22,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 
 		comA = NMnDIF.x;
 		U8 s;
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// %s HS12:%0.4X", *sCOM ? (char*)sCOM : "?", hs12() );
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// %s HS123:%0.6X", *sCOM ? (char*)sCOM : "?", hs123() );
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// POS:  n:%d"
 										"\r\n//\tiXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\tcXYZ %7.2fmm, %7.2fmm, %7.2fmm "
@@ -294,6 +294,68 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	std::cout << std::endl;
 }
 
+void drc_trd( char* pBUFF )
+{
+	if( pBUFF ? !pBUFF : true )
+		return;
+	char	sBUFF[0x100];
+	strcpy( sBUFF, pBUFF );
+	int o = system( sBUFF );
+	std::cout << o << ":" << sBUFF <<std::endl;;
+}
+bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES )
+{
+	if( this ? !pBUFF : true )
+		return false;
+
+	U1 sNM[] = "ABCD";
+	U4	//hs2 = hs123(),
+		&nm = *(U4*)sNM;
+	if( JD.w == JD.y )
+		return false;
+
+	JD.w = JD.y;
+	if( okXYZ.xyz0() != tXYZ.xyz0() )
+		return false;
+
+	switch( JD.w )
+	{
+		case 6:{
+			// 5->6 jelzünk hogy olvastuk a HS2i-t
+			nm = NMnDIF.x;
+			gpcADR A0 = gpfSTR2ALF( sNM, sNM+4 );	/// gpcADR
+			A0 = pRES;
+			if( !A0.pRM )
+				return false;
+
+			gpcALU aB = A0.pRM->ALU( A0.iA );
+			if(!aB.bSTR())
+				return false;
+			if(!alu.pDAT)
+				return false;
+
+			char	//*p_pat = (char*)alu.pDAT,
+					*pP = pBUFF;
+
+			pP += okXYZ.str( pP, "_" );
+			pP += okABC.str( pP, "_" );
+			pP += sprintf( pP, ".png" );
+			pP++;
+			sprintf( pP, (char*)alu.pDAT, pBUFF );
+			if( n_join < n_trd )
+			{
+				trd.join();
+				n_join = n_trd;
+			}
+			trd = std::thread( drc_trd, pP );
+			n_trd++;
+
+			//int o = system( pP+1 );
+			//std::cout << o << ":" << pP+1 <<std::endl;;
+		} return true;
+	}
+	return false;
+}
 gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 	*this = iZS;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
@@ -360,6 +422,12 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 						break;
 				}
 				return *this;
+			}
+			else if( bHS3i() )
+			{
+				// robi 75%-nél tart
+
+
 			}
 			// még nemjött
 			/// PULLING

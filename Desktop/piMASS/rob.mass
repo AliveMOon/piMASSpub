@@ -6,7 +6,7 @@
  telnet = 6001;
  rout = 0x10003;
  rinp = 0x10002;
- rend = d0.mini;
+ bill = d0.mini;
  slmp = "192.168.1.90 10000"
  cam = 1
  pic = "clip"; 

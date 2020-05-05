@@ -312,35 +312,45 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		pOUT = pZSnD->pulling( pOUT, gpaZSwr );
 		return;
 	}
-	char sANSW[0x100], *pANSW = sANSW;
-	switch( JDy+JD.y*0x10 )
+	char sANSW[0x100], *pANSW = sANSW, sCOM[] = "ABCD";
+	U4& comA = *(U4*)sCOM, msg = JDy+JD.y*0x10;
+	comA = pZSnD->aDrc[iD0].NMnDIF.au4x2[0].x;
+	I4x4 iXYZ = pZSnD->aDrc[iD0].iXYZ;
+	switch( msg )
 	{
 		case 0x10:
-			pANSW += sprintf( pANSW, "Turn start X:%d", JD.x  );
+			pANSW += sprintf( pANSW, "%s Turn start X:%d", sCOM, JD.x  );
 			break;
 		case 0x21:
-			pANSW += sprintf( pANSW, "not init zs160 X:%d", JD.x );
+
+			pANSW += sprintf( pANSW, "%s not init zs160 X:%d", sCOM, JD.x );
 			break;
 		case 0x31:
-			pANSW += sprintf( pANSW, "d160 turn on X:%d", JD.x );
+			pANSW += sprintf( pANSW, "%s d160 turn on X:%d", sCOM, JD.x );
 			break;
 		case 0x32:
-			pANSW += sprintf( pANSW, "? X:%d", JD.x );
+			//pANSW += sprintf( pANSW, "%s ? X:%d", sCOM, JD.x );
 			break;
 		case 0x43:
-			pANSW += sprintf( pANSW, "Wait zs160 X:%d", JD.x );
+			pANSW += sprintf( pANSW, "%s Wait zs160 X:%d POS: %0.2fmm %0.2fmm %0.2fmm", sCOM, JD.x,
+										double(iXYZ.x)/mmX(1),
+										double(iXYZ.y)/mmX(1),
+										double(iXYZ.z)/mmX(1) );
 			break;
 		case 0x54:
-			pANSW += sprintf( pANSW, "zs160 ok! Wait zs161 X:%d", JD.x );
+			//pANSW += sprintf( pANSW, "%s zs160 ok! Wait zs161 X:%d", sCOM, JD.x );
 			break;
 		case 0x65:
-			pANSW += sprintf( pANSW, "zs161 on! d161 on! Err:%d X:%d", JD.x );
+			//pANSW += sprintf( pANSW, "%s zs161 on! d161 on! Err:%d X:%d", sCOM, JD.x );
 			break;
 		case 0x76:
-			pANSW += sprintf( pANSW, "zs161 off! d161 off! Err:%d X:%d", JD.z, JD.x );
+			pANSW += sprintf( pANSW, "%s Wait zs161 X:%d POS: %0.2fmm %0.2fmm %0.2fmm", sCOM, JD.x,
+										double(iXYZ.x)/mmX(1),
+										double(iXYZ.y)/mmX(1),
+										double(iXYZ.z)/mmX(1) );
 			break;
 		case 0x07:
-			pANSW += sprintf( pANSW, "Turn end! Err:%d X:%d", JD.z, JD.x );
+			pANSW += sprintf( pANSW, "%s Turn end! Err:%d X:%d", sCOM, JD.z, JD.x );
 			break;
 		default:
 			pANSW = sANSW;

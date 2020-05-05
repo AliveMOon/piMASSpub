@@ -489,9 +489,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 				}
 				else if( alu.alf < gpeALF_AAAA ) {
 				switch( alu.alf ) {
-					case gpeALF_CLR: {
-							mCLR = alu.u8();
-						} break;
+					case gpeALF_CLR: mCLR = alu.u8(); break;
 					case gpeALF_CAM:{
 							I8 iCAM = alu.u8();
 							if( !iCAM )
@@ -594,15 +592,9 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 
 						} break;
-					case gpeALF_SDX:
-						sprt[1].x = alu.i8();
-						break;
-					case gpeALF_SDY:
-						sprt[1].y = alu.i8();
-						break;
-					case gpeALF_SDW:
-						sprt[1].z = alu.i8();
-						break;
+					case gpeALF_SDX: sprt[1].x = alu.i8(); break;
+					case gpeALF_SDY: sprt[1].y = alu.i8(); break;
+					case gpeALF_SDW: sprt[1].z = alu.i8(); break;
 					case gpeALF_SDH:{
 						// ez indítja a rajzolást MOST
 						/// nem így lesz csak próba
@@ -644,18 +636,10 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							pTRG->pREF = NULL;
 							//SDL_UpdateWindowSurface( win.pSDLwin );
 						} break;
-					case gpeALF_SSX:
-						sprt[0].x = alu.i8();
-						break;
-					case gpeALF_SSY:
-						sprt[0].y = alu.i8();
-						break;
-					case gpeALF_SSW:
-						sprt[0].z = alu.i8();
-						break;
-					case gpeALF_SSH:
-						sprt[0].w = alu.i8();
-						break;
+					case gpeALF_SSX: sprt[0].x = alu.i8(); break;
+					case gpeALF_SSY: sprt[0].y = alu.i8(); break;
+					case gpeALF_SSW: sprt[0].z = alu.i8(); break;
+					case gpeALF_SSH: sprt[0].w = alu.i8(); break;
 
 
 					default:
@@ -817,8 +801,10 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								hex.lzyFRMT( s=-1, "\"\r\n" );
 								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 								pS2->srcUPDT();
-								gpcDrc &D = pZSnD->aDrc[i];
-								U2 hs2 = D.hs12();
+								pZSnD->aDrc[i].async( gpsPUB, alu, &res );
+								/*gpcDrc &D = pZSnD->aDrc[i];
+
+								U4 hs2 = D.hs123();
 								if( D.JD.w != D.JD.y )
 								{
 									D.JD.w = D.JD.y;
@@ -827,7 +813,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									{
 										case 6:{
 											// 5->6 jelzünk hogy olvastuk a HS2i-t
-											gpcADR A0 = gpeALF_REND;	/// gpcADR
+											gpcADR A0 = gpfSTR2ALF( sNM, sNM+4 );	/// gpcADR
 											A0 = &res;
 											if( A0.pRM )
 											{
@@ -847,7 +833,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 											}
 										} break;
 									}
-								}
+								}*/
 							}
 
 							if( !anRio.a8x2[1].x )
