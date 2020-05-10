@@ -76,7 +76,7 @@ public:
 		if( this )
 		{
 			if( *isa.aISA == gpeISA_str )
-				gpmDELary(an.aSTR[0]);
+				gpmDELary(an.apSTR[0]);
 			gpmDEL( pRES );
 			gpmCLR;
 		}
@@ -93,9 +93,9 @@ public:
 		U4 nSTR = min( str.n_load, gpmSTRLEN( str.p_alloc ) );
 		if( nSTR )
 		{
-			an.aSTR[0] = new U1[nSTR+1];
-			gpmMcpyOF( an.aSTR[0], str.p_alloc, nSTR );
-			an.aSTR[0][nSTR] = 0;
+			an.apSTR[0] = new U1[nSTR+1];
+			gpmMcpyOF( an.apSTR[0], str.p_alloc, nSTR );
+			an.apSTR[0][nSTR] = 0;
 		} else {
 			an = 0;
 		}

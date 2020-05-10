@@ -172,7 +172,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 
 
 			case gpeISA_str: {
-					pSTR = IS.an.aSTR[0];
+					pSTR = IS.an.apSTR[0];
 					//pB += sprintf( (char*)pB, "%s", (stk.apSTR[flg.iS] = IS.an.aSTR[0])) ;
 					//flg.iS++;
 				} break;

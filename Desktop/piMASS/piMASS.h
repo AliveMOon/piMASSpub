@@ -56,17 +56,22 @@
 
 	//#include <opencv2/core/core.hpp>
 	//#include <opencv2/highgui/highgui.hpp>
-
+	#define GLEW_STATIC
+    #include <GL/glew.h>
 	#ifdef gpdSYSpi
 		#include <raspicam/raspicam.h>
 		//#include <raspicam/raspicam_cv.h>
 		#include <wiringPi.h>
 		#define gpdU4x2nSTR 2
 		#define gpdCAMu raspicam::RaspiCam
+        #define gpdGT_LIST_tOUT 3
 	#else
+        #include <GLFW/glfw3.h>
+	    #define GL_GLES_PROTOTYPES 0
 		#define gpdU4x2nSTR 1
 	#define gpdCAMu gpcCAMubi
         #include <camU.h>
+        #define gpdGT_LIST_tOUT 7
 	#endif // gpdSYSpi
 
 	#include <unistd.h> // for usleep()
@@ -92,7 +97,8 @@
 	#include <X11/Xcursor/Xcursor.h>
 	#include <linux/limits.h>
 	//#include <bits/stdc++.h>
-	#include <GL/glew.h>
+	
+	//#include <GL/glew.h>
 
 	#include <pwd.h>
 
@@ -129,7 +135,7 @@
 #define gpdBLTtx( st, sxy, dt, dxy )  	SDL_RenderCopy( dt, st, sxy,  dxy )  //SDL_BlitSurface	//SDL_LowerBlit
 
 
-#define gpdGT_LIST_tOUT 3
+//#define gpdGT_LIST_tOUT 3
 #define gpdPICbg "/mnt/ram/bg.png"
 #define gpsMINI_CHAR "mini_char_16x32_8x32.png" //"mini_char_64x512.png"	// "mini_char_16x32.png" //
 #define gpsMINI_ISO "mini_ISO_32x32_1024x1536.png"
@@ -276,7 +282,7 @@ class gpcALU;
 				: ( d )  									\
 			))
 /// WARNING ez beszorozza a sizeof()-val
-#define gpmMcpyOF( d, s, n ) gpmMcpy( d, s, ((n)*sizeof(*(d))) )
+#define gpmMcpyOF( d, s, n ) gpmMcpy( (d), (s), ((n)*sizeof(*(d))) )
 
 #define gpmSTRnCPY( d, s, n ) \
 			(														\
@@ -1707,7 +1713,7 @@ public:
 		};
 		struct
 		{
-			U1* aSTR[gpeU4x2nSTR];
+			U1* apSTR[gpeU4x2nSTR];
 		};
 		struct
 		{

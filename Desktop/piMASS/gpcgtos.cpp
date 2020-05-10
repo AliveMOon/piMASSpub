@@ -100,6 +100,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	}
 
 	U8 nOUT = GTout( pWIN ), s;
+    if( nOUT )
+		return;
 
 	U1		s_com[0x400], s_answ[0x400];
 	char	s_atrib[0x400], s_prompt[0x100], s_cell[0x100];
@@ -161,7 +163,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 			case gpeNET4_0PIC:{
 					U1	*pPNT = pDAT+gpdVAN( (char*)pDAT, "." ),
 						*pEND = pPNT+gpdVAN( (char*)pPNT, " \a\t;\"\'" );
-					I8x2 TnID( 0, pPNT-pDAT );
+					I8x2 TnID( (I8)0, (I8)(pPNT-pDAT) );
 					TnID = pDAT;
 					TnID.num = gpfSTR2I8( pDAT+TnID.num, NULL );
 					if( !*pEND )
@@ -455,7 +457,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						}
 						break;
 					case gpeALF_MSG:{
-							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "%smsg%0.8x: %s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
+							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "msg%0.8x: %s%s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
 						} break;
 					case gpeALF_HELP:
 						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", gpmGTent );
