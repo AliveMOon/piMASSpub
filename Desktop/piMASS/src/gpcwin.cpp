@@ -448,7 +448,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		//nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 
 		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( *this );
-
+		*gpsTITLEpub = 0;
 		if(
 			(
 				nMOV =	abs( mouseXY.z-mouseXY.x)+abs( mouseXY.w-mouseXY.y)	// pntr pos
@@ -565,8 +565,8 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 		//if( SDL_PeepEvents( &ev, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
 		/*if( mSEC.x-msEVNT < gpdEV_tOUT )
 			continue;*/
-
-		SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
+		if( *gpsTITLEpub )
+			SDL_SetWindowTitle( pSDLwin, gpsTITLEpub );
 		nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 
 		gpnTITLE++;
@@ -656,13 +656,14 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				case SDL_WINDOWEVENT:
 					if( ev.window.event != SDL_WINDOWEVENT_RESIZED )
 						break;
+					I4x2 xy = winSIZ.a4x2[0];
 					SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
-					if( !(abs( winSIZ.z-winSIZ.x)+abs( winSIZ.w-winSIZ.y))	)
+					if( !(abs( xy.x-winSIZ.x)+abs( xy.y-winSIZ.y))	)
 						break;
 
 					gpeWINresize();
 
-					winSIZ.a4x2[1] = winSIZ.a4x2[0];
+					//winSIZ.a4x2[1] = winSIZ.a4x2[0];
 
 			}
 			if( c == 'x' )
