@@ -238,7 +238,7 @@ gpcALU& gpcALU::ins( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 	//U4 nNEW = gpmPAD( nLD2+1, 0x10 );
 	U1		*pS = (U1*)tmp.pDAT,
 			*pD = new U1[nALLOC()];
-	gpmZnOF( pD, AN().w );
+	gpmZn( pD, AN().w );
 	pD[AN().w] = 0;
 	pDAT = pD;
 
@@ -693,7 +693,7 @@ U1* gpcALU::ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 )
 
 			U4 nAN2 = nALLOC(); //gpmPAD( AN().w, 0x10 ); //.a4x2[0].area()+1, 0x10 );
 			pDAT = new U1[nAN2];
-			gpmZnOF( (U1*)pDAT, AN().w );
+			gpmZn( (U1*)pDAT, AN().w );
 			pM->chg( *this );
 
 			return (U1*)pDAT;

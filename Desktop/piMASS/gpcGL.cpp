@@ -31,13 +31,13 @@ gpcGL::gpcGL( gpcWIN& win )
 
 	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
 	if( pTXchar )
-		std::cout << "char" << (int)win.pSRFchar <<std::endl;
+		std::cout << "char" << (void*)win.pSRFchar <<std::endl;
 	else
 		std::cout << SDL_GetError() <<std::endl;
 
 	pTXiso = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFiso );
 	if( pTXiso )
-		std::cout << "char" << (int)win.pSRFiso <<std::endl;
+		std::cout << "char" << (void*)win.pSRFiso <<std::endl;
 	else
 		std::cout << SDL_GetError() <<std::endl;
 
@@ -395,7 +395,7 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
 		b |= GL_DEPTH_BUFFER_BIT;
 
 	glClearColor( 0.0f, 0.0f, 0.25, 1.0f );
-	glClearDepth(1.0);
+	glClearDepth((GLclampd)1.0);
 	glClear( b );
 	glViewport( 0, 0, wh.x, wh.y );
 	return this;
