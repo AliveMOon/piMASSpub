@@ -161,6 +161,12 @@ ProjBldOpt:
 #include <GL/glew.h>
 
 
+// GP_HP pc -------------------------------
+sudo apt-get install libglfw3 libglfw3-dev
+#include <GLFW/glfw3.h>
+
+
+
 
 
 
