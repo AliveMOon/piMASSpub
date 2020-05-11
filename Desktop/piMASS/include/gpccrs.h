@@ -68,27 +68,27 @@ class gpcCRS
 		I4* ZNpos( const I4x2& mZN, I4* pC, I4* pR ) {
 			if( (nCp <= mZN.x) || (nRp <= mZN.y) )
 			{
-				nCp = mZN.x+1;
-				nRp = mZN.y+1;
+				nCp = gpmPAD( mZN.x+1, 0x10 );
+				nRp = gpmPAD( mZN.y+1, 0x10 );
 				gpmDELary(pCp);
 			}
 			if( !pCp )
 			{
-				pCp = new I4[nCp+nRp];
-				pRp = pCp + nCp;
+                pCp = new I4[nCp+nRp];
+                pRp = pCp + nCp;
 			}
 
-
-			*pCp = 0;
-			for( U4 i = 0; i < nCp; i++ )
+			*pRp = *pCp = 0;
+			for( U4 i = 1, j = 0; i < nCp; i++ )
 			{
-				pCp[i+1] = pCp[i] + ( i < mZN.x ? pC[i] : gpdSRC_COLw );
+				pCp[i] = pCp[j] + ( j < mZN.x ? pC[j] : gpdSRC_COLw );
+				j = i;
 			}
 
-			*pRp = 0;
-			for( U4 i = 0; i < nRp; i++ )
+			for( U4 i = 1, j = 0; i < nRp; i++ )
 			{
-				pRp[i+1] = pRp[i] + ( i < mZN.y ? pR[i] : gpdSRC_ROWw );
+				pRp[i] = pRp[j] + ( j < mZN.y ? pR[j] : gpdSRC_ROWw );
+				j = i;
 			}
 			return pCp;
 		}

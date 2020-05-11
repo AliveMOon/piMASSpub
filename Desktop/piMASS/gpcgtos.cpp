@@ -100,8 +100,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	}
 
 	U8 nOUT = GTout( pWIN ), s;
-    if( nOUT )
-		return;
+    /*if( nOUT )
+		return;*/
 
 	U1		s_com[0x400], s_answ[0x400];
 	char	s_atrib[0x400], s_prompt[0x100], s_cell[0x100];

@@ -165,6 +165,8 @@ ProjBldOpt:
 sudo apt-get install libglfw3 libglfw3-dev
 #include <GLFW/glfw3.h>
 
+valgrind --leak-check=yes ./piMASS cam.mass
+
 
 
 
