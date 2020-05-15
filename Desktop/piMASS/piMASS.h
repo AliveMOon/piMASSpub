@@ -97,7 +97,7 @@
 	#include <X11/Xcursor/Xcursor.h>
 	#include <linux/limits.h>
 	//#include <bits/stdc++.h>
-	
+
 	//#include <GL/glew.h>
 
 	#include <pwd.h>
@@ -2388,7 +2388,23 @@ public:
 		return n_t;
 	}
 };
+typedef enum gpeDRCos:U4 {
+		gpeDRCos_POSx,	gpeDRCos_POSy, 	gpeDRCos_POSz,
+		gpeDRCos_ABCa,	gpeDRCos_ABCb, 	gpeDRCos_ABCc,
+		gpeDRCos_L1,	gpeDRCos_L2,	gpeDRCos_L3,
+		gpeDRCos_L4,	gpeDRCos_L5,	gpeDRCos_L6,
+		gpeDRCos_posx, 	gpeDRCos_posy, 	gpeDRCos_posz,
+		gpeDRCos_abcx, 	gpeDRCos_abcy, 	gpeDRCos_abcz,
+		gpeDRCos_l1,	gpeDRCos_l2,	gpeDRCos_l3,
+		gpeDRCos_l4,	gpeDRCos_l5,	gpeDRCos_l6,
+		gpeDRCos_GRPx,	gpeDRCos_GRPy, 	gpeDRCos_GRPz,
+		gpeDRCos_27,	gpeDRCos_28,	gpeDRCos_29,
+		gpeDRCos_30,	gpeDRCos_31,	gpeDRCos_32,
+		gpeDRCos_33,	gpeDRCos_34,	gpeDRCos_35,
+		gpeDRCos_prgA,	gpeDRCos_prgB, 	gpeDRCos_prgC, gpeDRCos_prgD,
 
+		gpeDRCos_NONS,
+	} gpeDRCos;
 typedef enum gpeZS:U4 {
 	gpeZS_null, // = 0,
 	gpeZS_iDIR = MAKE_ID( 'i', 'D', 'I', 'R'	),

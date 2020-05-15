@@ -782,6 +782,9 @@ typedef enum gpeALF: I8
 	gpeALF_DIMS = gpdABCD('D', 'I', 'M', 'S'),
 	gpeALF_DIVM = gpdABCD('D', 'I', 'V', 'M'),
 	gpeALF_DRAW = gpdABCD('D', 'R', 'A', 'W'),
+
+	gpeALF_DROP = gpdABCD('D', 'R', 'O', 'P'),	// DRCos
+
 	gpeALF_EDGE = gpdABCD('E', 'D', 'G', 'E'),
 	gpeALF_ELSE = gpdABCD('E', 'L', 'S', 'E'),
 	gpeALF_ENDD = gpdABCD('E', 'N', 'D', 'D'),

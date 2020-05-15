@@ -67,7 +67,7 @@ U4 gpanBALL[] = {
 	gpnCAGEbillBALL,
 	gpnCAGEjohnBALL
 };
-I4x4 gpcDrc::chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL )
+I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL )
 {
 	if( !this )
 		return I4x2(mmX(500)).xxxy();
@@ -85,7 +85,7 @@ I4x4 gpcDrc::chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBAL
 
 	return tmp;
 }
-I4x4 gpcDrc::chkXYZ( I4 lim, U4 id )
+I4x4 gpcDrc::cageXYZ( I4 lim, U4 id )
 {
 	if( id > gpmN(gpanBALL) )
 	{
@@ -94,13 +94,12 @@ I4x4 gpcDrc::chkXYZ( I4 lim, U4 id )
 		{
 			iXYZ.xyz_( okXYZ );
 		}
-		//oXYZ.xyz_( iXYZ );
 		return iXYZ;
 	}
 
-	return chkXYZ( tXYZ, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id] );
+	return cageXYZ( tXYZ, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id] );
 }
-I4x4 gpcDrc::chkXYZ( I4x4 trg, I4 lim, U4 id )
+I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id )
 {
 	if( id > gpmN(gpanBALL) )
 	{
@@ -112,7 +111,7 @@ I4x4 gpcDrc::chkXYZ( I4x4 trg, I4 lim, U4 id )
 		return iXYZ;
 	}
 
-	return chkXYZ( trg, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id] );
+	return cageXYZ( trg, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id] );
 }
 
 bool gpcDrc::jdPRGstp()
@@ -151,8 +150,25 @@ bool gpcDrc::jdPRGstp()
 			jdPRG.null();
 			return true;
 		}
+		// jd0PRG -> ban vannak a felhasználó számai
+		switch( jdALF )
+		{
+			case gpeALF_SHLD:
+			case gpeALF_SNAIL:
+					jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
+					break;
 
-		jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
+			case gpeALF_DROP:{
+					jdPRG.y = jdPRG.w = msSRT3.x;	// w-ben örizzük az indulási időt y aktuális idő
+					jdPRG.z = jdPRG.w+jd0PRG.w;		// z-ben pedig a kívánt megérkezési időt
+
+				} break;
+			default:
+				jdPRG.null();
+				eturn true;
+				break;
+		}
+
 		if( jdPRG.z ? !okXYZ.abs0().mx().x : true )
 		{
 			jdPRG.null();
@@ -160,10 +176,14 @@ bool gpcDrc::jdPRGstp()
 		}
 		jd0XYZ.xyz_(okXYZ);
 		jd0ABC.xyz_(okABC);
-		jd0xyz.xyz_(txyz);	// az okxyz nem jó mert ha nem történt mozgás nincsen benne semmi
+		jd0xyz.xyz_(okXYZ.ABC2xyz( txyz, okABC ));	// az okxyz nem jó mert ha nem történt mozgás nincsen benne semmi
 		jd0mx.ABC(jd0ABC,degX(180.0/PI));
+
+		jd1XYZ.xyz_(tXYZ);
+		jd1ABC.xyz_(tABC);
+		jd1xyz.xyz_(txyz);
 	}
-	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
+	//I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
 	I4x2 xy = jdPRG.y;
 	F4 cr; float d;
 	I4x4 vec;
@@ -177,16 +197,10 @@ bool gpcDrc::jdPRGstp()
 				cr.gr2cr( xy, jdPRG.w );
 				d = cr.w/zl;
 				vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
-				tXYZ.xyz_( jd0xyz - vec );
+				tXYZ.xyz_( jd1xyz - vec );
 			} break;
-		case gpeALF_SNAIL: {
-				// jdPRG.y=  0 x= 0 y= 0
-				// jdPRG.y= 25 x=-2 y=-3
 
-				// jdPRG.x=10 jdPRG.y=10 jdPRG.z=10x10=100 jdPRG.w=jdPRG.x=10
-				// jdPRG.y= 81 x=-4 y=-5
-				// jdPRG.y= 90 x= 5 y=-5
-				// jdPRG.y=100 x= 5 y= 5
+		case gpeALF_SNAIL: {
 				vec.z = (jdPRG.w-1);
 				vec.a4x2[0].snail(vec.z*vec.z);
 				xy.snail( jdPRG.y ) -= vec.a4x2[0];
@@ -196,7 +210,19 @@ bool gpcDrc::jdPRGstp()
 				cr.gr2cr( xy, jdPRG.w );
 				d = cr.w/zl;
 				vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
-				tXYZ.xyz_( jd0xyz - vec );
+				tXYZ.xyz_( jd1xyz - vec );
+			} break;
+
+		case gpeALF_DROP: {
+				jdPRG.y = msSRT3.x-1;
+				I8	t0 = jdPRG.y-jdPRG.w,
+					t1 = jdPRG.z-jdPRG.w;
+				if( t0 > 0 )
+				{
+					if( t0 > t1 )
+						t0 = t1;
+
+				}
 			} break;
 		default:
 			jdPRG.null();
@@ -270,7 +296,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		pSTR += an.num;
 		if( an.alf ) {
 			comA = *(U4*)pCOM;
-			iNUM = 0;
+			iNUM = gpeDRCos_NONS;
 			switch( an.alf )
 			{
 				case gpeALF_BILL:
@@ -294,10 +320,10 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						{
 							case gpeZS_XYZ0:
 							case gpeZS_POS0:
-								iNUM = 0;
+								iNUM = gpeDRCos_POSx;
 								break;
 							default:
-								iNUM = 12;
+								iNUM = gpeDRCos_posx;
 								break;
 						}
 						nNUM = 3;
@@ -308,48 +334,27 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						{
 							case gpeZS_ABC0:
 							case gpeZS_DIR0:
-								iNUM = 3;
+								iNUM = gpeDRCos_ABCx;
 								break;
 							default:
-								iNUM = 15;
+								iNUM = gpeDRCos_abcx;
 								break;
 						}
 						nNUM = 3;
 					} break;
 
 				case gpeALF_GRIP:{
-						iNUM = 24;
+						iNUM = gpeDRCos_GRPx;
 						nNUM = 3;
 					} break;
+
+				case gpeALF_DROP:
 				case gpeALF_SHLD:
 				case gpeALF_SNAIL: {
 						alf = an.alf;
-						iNUM = 24+3;
+						iNUM = gpeDRCos_prgA;
 						nNUM = 4;
 					} break;
-
-
-
-				case gpeALF_FORMAT:
-					ZSnD.format();
-					continue;
-
-				case gpeALF_HELO:
-				case gpeALF_HELLO:
-					return pANS->lzyFRMT( s = -1, "Hello! %d", iD );
-				case gpeALF_HELP:
-					return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iD );
-				case gpeALF_LINE:
-					return pANS->lzyFRMT( s = -1, "Line.txt %d", iD );
-				case gpeALF_JOIN:
-					return pANS->lzyFRMT( s = -1, "Join.txt %d", iD );
-
-				/*case gpeALF_KOSZON:{
-						U4	nR = sizeof(gpsSLMPabc),
-							nC = nR/(4*8);
-						pANS = pANS->lzyFRMT( s = -1, "CSOKOLOM %s BACSI!", pSTR );
-
-					} return pANS;*/
 
 
 				case gpeALF_LINK:
@@ -358,10 +363,10 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						{
 							case gpeZS_AXIS:
 							case gpeZS_LINK:
-								iNUM = 6;
+								iNUM = gpeDRCos_L1;
 								break;
 							default:
-								iNUM = 18;
+								iNUM = gpeDRCos_l1;
 								break;
 						}
 						nNUM = 6;
@@ -369,20 +374,19 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 
 				default:
-					iNUM = 31;
 					break;
 			}
 
 			if( oD != iD )
 			if( pD )
 			{
-				//pD->chkXYZ( mmX(gpdROBlim), iD );
+				//pD->cageXYZ( mmX(gpdROBlim), iD );
 				pANS = pD->answSTAT( pANS, iD );
 			}
 			pD = NULL;
 			oD = iD;
 			continue;
-		} else if( iNUM > 31 )
+		} else if( iNUM > gpeDRCos_NONS )
 			return pANS->lzyFRMT( s = -1, "nonsens" );
 
 		if( iD >= 2 )
@@ -417,40 +421,40 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
         {
 
 				// POS
-			case 0:
-			case 1:
-			case 2:
-				pD->tXYZ.aXYZW[(iNUM-0)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
+			case gpeDRCos_POSx:
+			case gpeDRCos_POSy:
+			case gpeDRCos_POSz:
+				pD->tXYZ.aXYZW[(iNUM-gpeDRCos_POSx)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 				// pos
-			case 12:
-			case 13:
-			case 14:
-				pD->txyz.aXYZW[(iNUM-12)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
+			case gpeDRCos_posx:
+			case gpeDRCos_posy:
+			case gpeDRCos_posz:
+				pD->txyz.aXYZW[(iNUM-gpeDRCos_posx)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 
 
 				// DIR
-			case 3:
-			case 4:
-			case 5:
+			case gpeDRCos_ABCa:
+			case gpeDRCos_ABCb:
+			case gpeDRCos_ABCc:
 				pD->okxyz.xyz_(pD->txyz.xyz_(0));
-				pD->tABC.aXYZW[(iNUM-3)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
+				pD->tABC.aXYZW[(iNUM-gpeDRCos_ABCa)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
 				break;
 
 				// GRIP
-			case 24:
-			case 25:
-			case 26:
-				pD->tGRP.aXYZW[(iNUM-24)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
+			case gpeDRCos_GRPx:
+			case gpeDRCos_GRPy:
+			case gpeDRCos_GRPz:
+				pD->tGRP.aXYZW[(iNUM-gpeDRCos_GRPx)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 				// PRG
-			case 27:
-			case 28:
-			case 29:
-			case 30:
-				pD->jd0PRG.aXYZW[(iNUM-27)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;
-				if(iNUM!=30)
+			case gpeDRCos_prgA:
+			case gpeDRCos_prgB:
+			case gpeDRCos_prgC:
+			case gpeDRCos_prgD:
+				pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;
+				if(iNUM!=gpeDRCos_prgA)
 					break;
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );

@@ -15,7 +15,7 @@ extern U4	gpnCAGEjohnBALL,
 gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 		if( !this )
 			return pANS;
-		I4x4 cXYZ = chkXYZ( mmX(gpdROBlim), id );
+		I4x4 cXYZ = cageXYZ( mmX(gpdROBlim), id );
 
 		U1 	sCOM[] = "ABCD";
 		U4 &comA = *(U4*)sCOM;
@@ -203,7 +203,7 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	}
 	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
 
-	ixyz = iXYZ.ABC2xyz( txyz, iABC );
+	ixyz.xyz_(iXYZ.ABC2xyz( txyz, iABC ) );
 
 	gpmMcpyOF( &ms13R2.x, &zs.apos, 3 );
 	msSRT3 = ms13R2.xyz0().srt3();
@@ -539,7 +539,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		// megprobálja egyszerre
 		lim = ((mmABCD.x/mmX(gpdROBlim))<2) ? mmABCD.x : mmX(gpdROBlim);
 
-		oXYZ.xyz_( chkXYZ( lim, i ) );
+		oXYZ.xyz_( cageXYZ( lim, i ) );
 
 		dXYZ = oXYZ - iXYZ;
 		mmABCD.y = dXYZ.abs0().mx().x;
@@ -564,7 +564,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 					if( oRr < tRr )
 					{
 						I4x4	trg = (oR*tRr)/oRr + txyz,
-								tmp = chkXYZ( trg, 0, i );
+								tmp = cageXYZ( trg, 0, i );
 						if( trg.xyz0() == tmp.xyz0() )
 						{
 							oXYZ.xyz_( tmp );

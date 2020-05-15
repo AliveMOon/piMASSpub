@@ -114,7 +114,8 @@ public:
 			jdPRG,
 
 			jd0PRG,
-			jd0XYZ, jd0xyz, jd0ABC;
+			jd0XYZ, jd0ABC, jd0xyz,
+			jd1XYZ, jd1ABC, jd1xyz;
 	F4x4	jd0mx;
 	gpeALF	jdALF;
 	I4x4	ms13R2, msSRT3;
@@ -133,10 +134,10 @@ public:
 		n_trd = n_join = 0;
 	}
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
-	I4x4 chkXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
-	I4x4 chkXYZ( I4 lim, U4 id );
+	I4x4 cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
+	I4x4 cageXYZ( I4 lim, U4 id );
 
-	I4x4 chkXYZ( I4x4 trg, I4 lim, U4 id );
+	I4x4 cageXYZ( I4x4 trg, I4 lim, U4 id );
 
 	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
 	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
