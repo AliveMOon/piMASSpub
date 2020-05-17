@@ -2414,6 +2414,7 @@ typedef enum gpeDRCos:U4 {
 		gpeDRCos_30,	gpeDRCos_31,	gpeDRCos_32,
 		gpeDRCos_33,	gpeDRCos_34,	gpeDRCos_35,
 		gpeDRCos_prgA,	gpeDRCos_prgB, 	gpeDRCos_prgC, gpeDRCos_prgD,
+		gpeDRCos_drpX,	gpeDRCos_drpY, 	gpeDRCos_drpZ, gpeDRCos_drpUP, gpeDRCos_drpT, gpeDRCos_drpW,
 
 		gpeDRCos_NONS,
 	} gpeDRCos;

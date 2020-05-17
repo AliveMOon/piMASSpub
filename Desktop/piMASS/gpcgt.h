@@ -113,7 +113,7 @@ public:
 			tGRP, oGRP, iGRP,
 			jdPRG,
 
-			jd0PRG,
+			jd0PRG, jd0DRPtu,
 			jd0XYZ, jd0ABC, jd0xyz,
 			jd1XYZ, jd1ABC, jd1xyz;
 	F4x4	jd0mx;

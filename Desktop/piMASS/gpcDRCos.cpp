@@ -158,11 +158,12 @@ bool gpcDrc::jdPRGstp()
 					jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
 					break;
 
-			case gpeALF_DROP:{
-					jdPRG.y = jdPRG.w = msSRT3.x;	// w-ben örizzük az indulási időt y aktuális idő
-					jdPRG.z = jdPRG.w+jd0PRG.w;		// z-ben pedig a kívánt megérkezési időt
+			case gpeALF_DROP:if( jd1XYZ.qlen_xyz()*jd0DRPtu.x ) {
 
-				} break;
+					jdPRG.y = jdPRG.w = msSRT3.x;	// w-ben örizzük az indulási időt y aktuális idő
+					jdPRG.z = jdPRG.w+jd0DRPtu.x;		// z-ben pedig a kívánt megérkezési időt
+					break;
+				}
 			default:
 				jdPRG.null();
 				return true;
@@ -180,7 +181,7 @@ bool gpcDrc::jdPRGstp()
 		jd0xyz.xyz_(jd0XYZ.ABC2xyz( txyz, jd0ABC ));	// az okxyz nem jó mert ha nem történt mozgás nincsen benne semmi
 		jd0mx.ABC(jd0ABC,degX(180.0/PI));
 
-		jd1XYZ.xyz_(tXYZ);
+
 		jd1ABC.xyz_(tABC);
 		jd1xyz.xyz_(txyz);
 	}
@@ -217,48 +218,14 @@ bool gpcDrc::jdPRGstp()
 		case gpeALF_DROP: {
 				// elöbb speciálisan a függölegesel foglalkozok pos.z-POS.z-vel
 				// nem veszük bele a kis pos-POS vektort
-				jdPRG.y = msSRT3.x + 500;
-				I8	ti = jdPRG.y-jdPRG.w,
+				jdPRG.y = msSRT3.x;
+				I8	ti = jdPRG.y-jdPRG.w + 500,
 					tn = jdPRG.z-jdPRG.w;
 
 				I4x4 up0 = (jd0XYZ-jd0xyz).xyz0(), up1 = (jd1XYZ-jd1xyz).xyz0(), upAVG = (up0+up1)/2;
-				tXYZ.xyz_( jd0XYZ.drop( jd1XYZ, upAVG, jd0PRG.x*mmX(1), ti, tn ) );
+				tXYZ.xyz_( jd0XYZ.drop( jd1XYZ, upAVG, jd1XYZ.w, ti, tn ) );
+				txyz.xyz_( tXYZ-upAVG );
 
-				/*I4x4 dXYZ = (jd1XYZ-jd0XYZ).xyz0();
-				I8	t0 = jdPRG.y-jdPRG.w,
-					t1 = jdPRG.z-jdPRG.w,
-
-
-					d = jd0PRG.x,
-					h = dXYZ.z, h2 = h*h,
-
-					A = abs(d)+abs(h), A2 = A*A,
-					v2 = A2-h2, v = sqrt(v2),
-
-					l2 = dXYZ.qlen_xyz(),
-					w2 = l2 - h2, w = sqrt(w),	// w végülis a dXYZ.xy00() hossza
-					B = w - ((v*w)/(v+A)),
-					K = gpfRAMANUJAN(A,B);
-
-				double	cA = double(h)/double(A),
-						// ha h<0 lefelé dobjuk
-						r0 = h < 0 ? acos(ca) : 0,
-						r1 = h < 0 ? PI : PI-acos(ca),
-						rD = r1-r0;
-
-
-				if( t0 > 0 )
-				{
-					if( t0 > t1 )
-					{
-						t0 = t1;
-						jdPRG.y = jdPRG.z;
-					}
-					I8x4	Axyz(0,0,A),
-							Bxyz = dXYZ.xy00()*B)/w;
-
-					tXYZ.xyz( );
-				}*/
 			} break;
 		default:
 			jdPRG.null();
@@ -384,7 +351,12 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						nNUM = 3;
 					} break;
 
-				case gpeALF_DROP:
+				case gpeALF_DROP: {
+						alf = an.alf;
+						iNUM = gpeDRCos_drpX;
+						nNUM = 4;
+					} break;
+
 				case gpeALF_SHLD:
 				case gpeALF_SNAIL: {
 						alf = an.alf;
@@ -407,8 +379,10 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						}
 						nNUM = 6;
 					} break;
-
-
+				case gpeALF_STAT:
+					pANS = ZSnD.aDrc[iD].answSTAT( pANS, iD );
+					break;
+				case gpeALF_STOP:
 				default:
 					break;
 			}
@@ -490,8 +464,28 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 			case gpeDRCos_prgC:
 			case gpeDRCos_prgD:
 				pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;
-				if(iNUM!=gpeDRCos_prgA)
+				if(iNUM!=gpeDRCos_prgD)
 					break;
+				pD->jdALF = alf;
+				pD->jdPRG = I4x4( 1, 0, 1 );
+				pD->jdPRGstp();
+				alf = gpeALF_null;
+				break;
+			case gpeDRCos_drpX:
+			case gpeDRCos_drpY:
+			case gpeDRCos_drpZ:
+			case gpeDRCos_drpUP:
+			case gpeDRCos_drpT:
+			case gpeDRCos_drpW:
+				if(iNUM<gpeDRCos_drpT)
+				{
+					pD->jd1XYZ.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
+					break;
+				} else {
+					pD->jd0DRPtu.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num*ms2sec : (I4)(d8*ms2sec);
+					if(iNUM<gpeDRCos_drpW)
+						break;
+				}
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );
 				pD->jdPRGstp();

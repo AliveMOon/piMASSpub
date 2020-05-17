@@ -897,8 +897,14 @@ typedef enum gpeALF: I8
 	gpeALF_SLMP = gpdABCD('S', 'L', 'M', 'P'),
 	gpeALF_SOCK = gpdABCD('S', 'O', 'C', 'K'),
 	gpeALF_STAR = gpdABCD('S', 'T', 'A', 'R'),
+
+	gpeALF_STAT = gpdABCD('S', 'T', 'A', 'T'),	// DRCos
+
 	gpeALF_STEP = gpdABCD('S', 'T', 'E', 'P'),
 	gpeALF_STON = gpdABCD('S', 'T', 'O', 'N'),
+
+	gpeALF_STOP = gpdABCD('S', 'T', 'O', 'P'),	// DRCos
+
 	gpeALF_STOW = gpdABCD('S', 'T', 'O', 'W'),
 	gpeALF_SUBM = gpdABCD('S', 'U', 'B', 'M'),
 	gpeALF_SQRT = gpdABCD('S', 'Q', 'R', 'T'),
