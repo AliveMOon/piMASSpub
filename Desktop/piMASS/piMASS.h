@@ -235,6 +235,7 @@ class gpcALU;
 #define max( a, b ) ( a > b ? a : b )
 #define min( a, b ) ( a < b ? a : b )
 #define PI acos(-1.0)
+#define PIp2 (PI/2.0)
 #define COS5 0.99619469809174553229501040247389
 #define SIN5 0.08715574274765817355806427083747
 #define SIN1 0.0174524064373
@@ -316,6 +317,17 @@ class gpcALU;
 #define zsOU (zsIN+zsIO)
 #define zsOU100 mmX(zsOU)
 
+double inline gpfRAMADZSAN( double a, double b )
+{
+	if(a==0.0)
+		return 4*b;
+	if(b==0.0)
+		return 4*a;
+	if( a==b )
+		return 2.0*a*PI;
+
+	return PI*(3.0*(a+b)-sqrt((3.0*a + b)*(a + 3.0*b)));
+}
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 {
@@ -1740,12 +1752,12 @@ public:
 	}
 	U4x2& operator = ( const I8x2& an );
 	// cnt = fract * U4x2(1, w);
-    U4 strA4Nplus( U1* pBUFF )
+    U4 strALF4N( U1* pBUFF )
     {
 		U4 n = gpfALF2STR( pBUFF, a4 );
 		return n+sprintf( (char*)(pBUFF+n), "%d", n4 );
     }
-	U1* strA4N( U1* pBUFF )
+	U1* pSTRalf4n( U1* pBUFF )
     {
 		//sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, a4 )), "%d", n4 );
 		return pBUFF + gpfALF2STR( pBUFF, a4 );
@@ -2394,7 +2406,7 @@ typedef enum gpeDRCos:U4 {
 		gpeDRCos_L1,	gpeDRCos_L2,	gpeDRCos_L3,
 		gpeDRCos_L4,	gpeDRCos_L5,	gpeDRCos_L6,
 		gpeDRCos_posx, 	gpeDRCos_posy, 	gpeDRCos_posz,
-		gpeDRCos_abcx, 	gpeDRCos_abcy, 	gpeDRCos_abcz,
+		gpeDRCos_abcA, 	gpeDRCos_abcB, 	gpeDRCos_abcC,
 		gpeDRCos_l1,	gpeDRCos_l2,	gpeDRCos_l3,
 		gpeDRCos_l4,	gpeDRCos_l5,	gpeDRCos_l6,
 		gpeDRCos_GRPx,	gpeDRCos_GRPy, 	gpeDRCos_GRPz,
@@ -2588,16 +2600,10 @@ public:
 		return *this;
 	}
 
-	I8x2 operator * ( int b ) const;/* {
-		if( !b )
-			return 0;
-		if( b == 1 )
-			return *this;
-		if( b == -1 )
-			return I8x2( -x, -y );
-
-		return I8x2( (I8)x*(I8)b, (I8)y*(I8)b );
-	}*/
+	I8x2 operator * ( I8 b ) const;
+	I8x2 operator * ( int b ) const; ///? { return *this * (I8)b };
+	I8x2 operator * ( float b ) const; // { return *this * (I8)b };
+	I8x2 operator * ( double b ) const; // { return *this * (I8)b };
 	I4x2 operator / ( int b ) const
 	{
 		if( !b )
@@ -2642,7 +2648,7 @@ public:
 		return I4x2( x>>b,  y>>b );
 	}
 
-	I8x2 operator & (const I4x2& b) const;
+	I8x2 operator & (const I4x2& b ) const;
 	/*{
 		return I8x2( x*b.x,  y*b.y );
 	}*/
@@ -2750,8 +2756,7 @@ public:
 		y += b.y;
 		return *this;
 	}
-	I4x2& operator -= ( const U4x2& u )
-	{
+	I4x2& operator -= ( const U4x2& u ) {
 		I4x2 b = u;
 		x -= b.x;
 		y -= b.y;
@@ -2759,14 +2764,12 @@ public:
 	}
 
 
-	I4x2& operator &= ( const I4x2& i )
-	{
+	I4x2& operator &= ( const I4x2& i ) {
 		x *= i.x;
 		y *= i.y;
 		return *this;
 	}
-	I4x2& operator /= ( const I4x2& i )
-	{
+	I4x2& operator /= ( const I4x2& i ) {
 		if( i.x )
 			x /= i.x;
 		else
@@ -2778,8 +2781,7 @@ public:
 			y = 0x7fffFFFF;
 		return *this;
 	}
-	I4x2& operator %= ( const I4x2& i )
-	{
+	I4x2& operator %= ( const I4x2& i ) {
 		if( i.x )
 			x %= i.x;
 		else
@@ -2793,84 +2795,72 @@ public:
 	}
 
 
-	I4x2& operator += ( const I4x2& b )
-	{
+	I4x2& operator += ( const I4x2& b ) {
 		x += b.x;
 		y += b.y;
 		return *this;
 	}
-	I4x2& operator -= ( const I4x2& b )
-	{
+	I4x2& operator -= ( const I4x2& b ) {
 		x -= b.x;
 		y -= b.y;
 		return *this;
 	}
-	I4x2& operator += ( U4 u )
-	{
+	I4x2& operator += ( U4 u ) {
 		if( u > 0x7fffFFFF )
 			u = 0x7fffFFFF;
 		x += u;
 		y += u;
 		return *this;
 	}
-	I4x2& operator += ( I4 i )
-	{
+	I4x2& operator += ( I4 i ) {
 		if( i < 0 )
 			i *= -1;
 		x += i;
 		y += i;
 		return *this;
 	}
-	I4x2& operator += ( float f )
-	{
+	I4x2& operator += ( float f ) {
 		x += f;
 		y += f;
 		return *this;
 	}
 
-	I4x2& operator -= ( U4 u )
-	{
+	I4x2& operator -= ( U4 u ) {
 		if( u > 0x7fffFFFF )
 			u = 0x7fffFFFF;
 		x -= u;
 		y -= u;
 		return *this;
 	}
-	I4x2& operator -= ( I4 i )
-	{
+	I4x2& operator -= ( I4 i ) {
 		if( i < 0 )
 			i *= -1;
 		x -= i;
 		y -= i;
 		return *this;
 	}
-	I4x2& operator -= ( float f )
-	{
+	I4x2& operator -= ( float f ) {
 		x -= f;
 		y -= f;
 		return *this;
 	}
-	I4x2& operator = ( int i )
-	{
+	I4x2& operator = ( int i ) {
 		if( !i )
 			return null();
 
 		x = y = i;
 		return *this;
 	}
-	U4 strA4Nplus( U1* pBUFF )
-    {
+	U4 strALF4N( U1* pBUFF ) {
 		U4 nn = gpfALF2STR( pBUFF, x );
 		return nn+sprintf( (char*)(pBUFF+nn), "%d", y );
     }
-	U1* strA4N( U1* pBUFF )
-    {
+	U1* pSTRalf4n( U1* pBUFF ) {
 		//sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, x )), "%d", y );
-		return pBUFF + strA4Nplus( pBUFF );
+		return pBUFF + strALF4N( pBUFF );
     }
 
-	I4x2& operator = ( const U4x2& b )
-	{
+	I4x2& operator = ( const U4x2& b ) {
 		x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
 		y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
 		return *this;
@@ -3141,7 +3131,9 @@ public:
         a4x2[0] = _xy;
         a4x2[1] = _zw;
     }
-    I4x4( const I8x4& b );
+    //I4x4( const I4x4 b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
+    I4x4( const I8x4 b );
+	//I4x4( const I8x4& b );
 	I4x4( const F4 f4 );
 
     I4x4& operator = ( const F4 f4 );
@@ -3370,50 +3362,23 @@ public:
 
 
 
-	I4x4 operator + (const I4x4& b) const
-	{
-		return I4x4( x+b.x, y+b.y, z+b.z, w+b.w );
-	}
+	I4x4 operator + (const I4x4& b) const { return I4x4( x+b.x, y+b.y, z+b.z, w+b.w ); }
+	I4x4 operator - (const I4x4& b) const { return I4x4( x-b.x, y-b.y, z-b.z, w-b.w ); }
 
-	I4x4 operator - (const I4x4& b) const
-	{
-		return I4x4( x-b.x, y-b.y, z-b.z, w-b.w );
-	}
-
-	I8 operator * (const I4x4& b) const
-	{
-		return a4x2[0]*b.a4x2[0] + a4x2[1]*b.a4x2[1];
-	}
-	U8 qlen (void ) const
-	{
-		return (*this) * (*this);
-	}
+	I8 operator * (const I4x4& b) const { return a4x2[0]*b.a4x2[0] + a4x2[1]*b.a4x2[1]; }
+	U8 qlen (void ) const { return (*this) * (*this); }
 	I8x4 operator & (const I4x4& b ) const;
-	/*{
-		return I8x4( a4x2[0]&b.a4x2[0], a4x2[1]&b.a4x2[1] );
-	}*/
-
-	I4x4 operator % (const I4x4& b) const
-	{
-		return I4x4( a4x2[0]%b.a4x2[0], a4x2[1]%b.a4x2[1] );
-	}
-
-	I4x4 operator / (const I4x4& b) const
-	{
-		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
-	}
-
-	I4x4 operator / (const U4x4& b) const
-	{
-		return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] );
-	}
+	I4x4 operator % (const I4x4& b) const { return I4x4( a4x2[0]%b.a4x2[0], a4x2[1]%b.a4x2[1] ); }
+	I4x4 operator / (const I4x4& b) const { return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] ); }
+	I4x4 operator / (const U4x4& b) const { return I4x4( a4x2[0]/b.a4x2[0], a4x2[1]/b.a4x2[1] ); }
 
 
 
 	I8x4 operator * ( int b ) const;
-	/*{
-		return I8x4( a4x2[0]*b, a4x2[1]*b );
-	}*/
+	I8x4 operator * ( I8 b ) const;
+	I8x4 operator * ( float b ) const;
+	I8x4 operator * ( double b ) const;
+
 	I4x4 operator / ( int b ) const
 	{
 		return I4x4( a4x2[0]/b, a4x2[1]/b );
@@ -3454,36 +3419,16 @@ public:
 		return lurd;
 	}
 
-	I4x4& null( void )
-	{
-		gpmCLR;
-		return *this;
-	}
+	I4x4& null( void ) { gpmCLR; return *this; }
+	I8 sum( void ) const { return (I8)x + y + z + w; }
+	I8 volume( void ) const { return x*y*z*w; }
 
-	I8 sum( void ) const
-	{
-		return (I8)x + y + z + w;
-	}
-
-	I8 volume( void ) const
-	{
-		return x*y*z*w;
-	}
-
-	I4x4 abs( void ) const
-	{
-		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
-	}
-	I4x4 abs0( void ) const
-	{
-		return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z );
-	}
-	I4x4 zwxy( void ) const
-	{
-		return I4x4( z, w, x, y );
-	}
+	I4x4 abs( void ) const { return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w ); }
+	I4x4 abs0( void ) const { return I4x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z ); }
+	I4x4 zwxy( void ) const { return I4x4( z, w, x, y ); }
 	I4x4& xyz_( I4x4 b ) { a4x2[0] = b.a4x2[0]; z = b.z; return *this; }
-	I4x4 xyz0( void ) const { I4x4 o = *this; o.w = 0; return o; }
+	I4x4 xy00( void ) const { return I4x4(x,y); }
+	I4x4 xyz0( void ) const { return I4x4(x,y,z); }
 	/// 13
 	I4x4& swpYX() {
 		float t = x;
@@ -3784,6 +3729,7 @@ public:
 	}
 	//I4x4 chkABC( const I4x4& b, float dim, float mm = mmX(100) ) const;
 	I4x4 mmABC( const I4x4& b, float alf, float mm = mmX(100) ) const;
+	I4x4 drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
 };
 
 

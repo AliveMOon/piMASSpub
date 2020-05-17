@@ -165,7 +165,7 @@ bool gpcDrc::jdPRGstp()
 				} break;
 			default:
 				jdPRG.null();
-				eturn true;
+				return true;
 				break;
 		}
 
@@ -176,14 +176,15 @@ bool gpcDrc::jdPRGstp()
 		}
 		jd0XYZ.xyz_(okXYZ);
 		jd0ABC.xyz_(okABC);
-		jd0xyz.xyz_(okXYZ.ABC2xyz( txyz, okABC ));	// az okxyz nem jó mert ha nem történt mozgás nincsen benne semmi
+		// itt a txyz azért van a füg.ben txyz-jd0XYZ hossza a sugarat adja meg
+		jd0xyz.xyz_(jd0XYZ.ABC2xyz( txyz, jd0ABC ));	// az okxyz nem jó mert ha nem történt mozgás nincsen benne semmi
 		jd0mx.ABC(jd0ABC,degX(180.0/PI));
 
 		jd1XYZ.xyz_(tXYZ);
 		jd1ABC.xyz_(tABC);
 		jd1xyz.xyz_(txyz);
 	}
-	//I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
+	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
 	I4x2 xy = jdPRG.y;
 	F4 cr; float d;
 	I4x4 vec;
@@ -214,15 +215,50 @@ bool gpcDrc::jdPRGstp()
 			} break;
 
 		case gpeALF_DROP: {
-				jdPRG.y = msSRT3.x-1;
+				// elöbb speciálisan a függölegesel foglalkozok pos.z-POS.z-vel
+				// nem veszük bele a kis pos-POS vektort
+				jdPRG.y = msSRT3.x + 500;
+				I8	ti = jdPRG.y-jdPRG.w,
+					tn = jdPRG.z-jdPRG.w;
+
+				I4x4 up0 = (jd0XYZ-jd0xyz).xyz0(), up1 = (jd1XYZ-jd1xyz).xyz0(), upAVG = (up0+up1)/2;
+				tXYZ.xyz_( jd0XYZ.drop( jd1XYZ, upAVG, jd0PRG.x*mmX(1), ti, tn ) );
+
+				/*I4x4 dXYZ = (jd1XYZ-jd0XYZ).xyz0();
 				I8	t0 = jdPRG.y-jdPRG.w,
-					t1 = jdPRG.z-jdPRG.w;
+					t1 = jdPRG.z-jdPRG.w,
+
+
+					d = jd0PRG.x,
+					h = dXYZ.z, h2 = h*h,
+
+					A = abs(d)+abs(h), A2 = A*A,
+					v2 = A2-h2, v = sqrt(v2),
+
+					l2 = dXYZ.qlen_xyz(),
+					w2 = l2 - h2, w = sqrt(w),	// w végülis a dXYZ.xy00() hossza
+					B = w - ((v*w)/(v+A)),
+					K = gpfRAMANUJAN(A,B);
+
+				double	cA = double(h)/double(A),
+						// ha h<0 lefelé dobjuk
+						r0 = h < 0 ? acos(ca) : 0,
+						r1 = h < 0 ? PI : PI-acos(ca),
+						rD = r1-r0;
+
+
 				if( t0 > 0 )
 				{
 					if( t0 > t1 )
+					{
 						t0 = t1;
+						jdPRG.y = jdPRG.z;
+					}
+					I8x4	Axyz(0,0,A),
+							Bxyz = dXYZ.xy00()*B)/w;
 
-				}
+					tXYZ.xyz( );
+				}*/
 			} break;
 		default:
 			jdPRG.null();
@@ -334,10 +370,10 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						{
 							case gpeZS_ABC0:
 							case gpeZS_DIR0:
-								iNUM = gpeDRCos_ABCx;
+								iNUM = gpeDRCos_ABCa;
 								break;
 							default:
-								iNUM = gpeDRCos_abcx;
+								iNUM = gpeDRCos_abcA;
 								break;
 						}
 						nNUM = 3;
@@ -476,11 +512,11 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 				// OFFSET - eltolás
 
-				// DIR
-			case 15:
-			case 16:
-			case 17:
-				pD->oabc.aXYZW[(iNUM-15)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
+				// dir
+			case gpeDRCos_abcA:
+			case gpeDRCos_abcB:
+			case gpeDRCos_abcC:
+				pD->oabc.aXYZW[(iNUM-gpeDRCos_abcA)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
 				break;
 			case 18:
 			case 19:

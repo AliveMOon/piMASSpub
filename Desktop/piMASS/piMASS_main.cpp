@@ -576,17 +576,8 @@ extern U4	gpnCAGEbillBALL,
 //F4x4 tMX,iMX, A,B,C;
 //F4	iABC, tABC;
 gpcDrc gpCHK( gpsMNpub, I4x4( 600, 500, 500 )*mmX(1), I4x4( 600, 500, 400 )*mmX(1), I4x4( 600, 500, 0 )*mmX(1) );
-
-#ifdef _WIN64
-//int WINAPI WinMain( int nA, char *apA[] )
-//int Main(int nA, char **apA )
-int main(int nA, char** apA )
-#else
-int main( int nA, char *apA[] )
-#endif
+void gpfMAINchk()
 {
-	gpf_aALF_init();
-
 	std::cout <<std::endl;;;;
 	for( U4 i = 0, e = gpmN(aSIZEOF); i < e; i++  )
 	{
@@ -600,8 +591,18 @@ int main( int nA, char *apA[] )
 		snail.snail(i);
 		std::cout << i << "->" << snail.pSTR(gpsMNpub) <<std::endl;
 	}
-
-
+	I4x4 j0 = I4x4( 0, 600, 1500 )*mmX(1), j1 = I4x4( 0, 0, 0 )*mmX(1), t0 = I4x4( 0, 600, 0 )*mmX(1),
+		 up0 = j0-t0, xyz;
+	for( I8 ti = 0, tn = 540*ms2sec; ti < tn; ti+=10*ms2sec )
+	{
+		xyz = j0.drop( j1, up0, mmX(100), ti, tn );
+		std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;
+	}
+	for( I8 ti = 0, tn = 540*ms2sec; ti < tn; ti+=10*ms2sec )
+	{
+		xyz = j1.drop( j0, up0, mmX(100), ti, tn );
+		std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;
+	}
 //	char* pSTR = NULL;
 //	for( U4 i = 0; i < gpmN(gpaABC); i++ )
 //	{
@@ -625,6 +626,18 @@ int main( int nA, char *apA[] )
 //		std::cout << gpsMNpub <<std::endl;
 //	}
 //	*gpsMNpub = 0;
+
+}
+#ifdef _WIN64
+//int WINAPI WinMain( int nA, char *apA[] )
+//int Main(int nA, char **apA )
+int main(int nA, char** apA )
+#else
+int main( int nA, char *apA[] )
+#endif
+{
+	gpf_aALF_init();
+	gpfMAINchk();
 
 	if( nA > 0 )
 	{

@@ -621,7 +621,7 @@ public:
 
 				dstPX.y *= dstPX.h;
 				dstPX.y += divPX.y;
-				crs.frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+				crs.frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).pSTRalf4n(sSTR) );
 			}
 		}
 
@@ -762,7 +762,7 @@ public:
 
 				dstPX.y *= dstPX.h;
 				dstPX.y += divPX.y;
-				crs.frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+				crs.frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, gpeCLR_white, 0,  (crs.scnZN.au4x2[0]+U4x2(1,0)).pSTRalf4n(sSTR) );
 			}
 		}
 
@@ -1020,7 +1020,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 					dstPX.y *= dstPX.h;
 					dstPX.y += divPX.y;
 
-					frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[0].strA4N(sSTR) );
+					frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[0].pSTRalf4n(sSTR) );
 				}
 
 
@@ -1050,7 +1050,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 					dstPX.y *= dstPX.h;
 					dstPX.y += divPX.y;
 
-					frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[1].strA4N(sSTR) );
+					frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, frmC, 0, lurdAN.a4x2[1].pSTRalf4n(sSTR) );
 				}
 
 				for( i = 0; i < ie; i++ )
@@ -1313,7 +1313,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 			dstPX.y *= dstPX.h;
 			dstPX.y += divPX.y;
-			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 0,  (scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+			frmDRW( dstPX, src, wh, win.pSRFwin, win.pSRFchar, gpeCLR_white, 0,  (scnZN.au4x2[0]+U4x2(1,0)).pSTRalf4n(sSTR) );
 		}
 	}
 
@@ -1572,7 +1572,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 					dstPX.y *= dstPX.h;
 					dstPX.y += divPX.y;
 
-					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, frmC, 0, lurdAN.a4x2[0].strA4N(sSTR) );
+					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, frmC, 0, lurdAN.a4x2[0].pSTRalf4n(sSTR) );
 				}
 
 
@@ -1602,7 +1602,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 					dstPX.y *= dstPX.h;
 					dstPX.y += divPX.y;
 
-					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, frmC, 0, lurdAN.a4x2[1].strA4N(sSTR) );
+					frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, frmC, 0, lurdAN.a4x2[1].pSTRalf4n(sSTR) );
 				}
 
 				for( i = 0; i < ie; i++ )
@@ -1793,7 +1793,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 			dstPX.y *= dstPX.h;
 			dstPX.y += divPX.y;
-			frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, gpeCLR_white, 0,  (scnZN.au4x2[0]+U4x2(1,0)).strA4N(sSTR) );
+			frmDRWtx( dstPX, src, wh, win.pSDLrndr, win.pTXize, gpeCLR_white, 0,  (scnZN.au4x2[0]+U4x2(1,0)).pSTRalf4n(sSTR) );
 		}
 	}
 

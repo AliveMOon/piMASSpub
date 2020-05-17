@@ -67,7 +67,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 
 
 			case gpeISA_an: {	// -------------------------------------------------------------------------------------
-						//pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
+						//pB += sprintf( (char*)pB, "%s", IS.an.pSTRalf4n( sBUFF ));
 						anFND = 0;
 						B = gpeALF_null;
 						if( IS.an.x ? IS.an.x > mZ : true )
@@ -79,7 +79,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 					} break;
 
 			case gpeISA_anFUN: {	// -------------------------------------------------------------------------------------
-					//pB += sprintf( (char*)pB, "%s", IS.an.strA4N( sBUFF ));
+					//pB += sprintf( (char*)pB, "%s", IS.an.pSTRalf4n( sBUFF ));
 					stk.aAN[flg.iA] = IS.an;
 					//flg.iA++;
 				} break;

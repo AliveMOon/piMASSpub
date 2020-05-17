@@ -10,6 +10,13 @@ I8x4 I4x4::operator * ( int b ) const
 {
 	return I8x4( a4x2[0]*b, a4x2[1]*b );
 }
+I8x4 I4x4::operator * ( I8 b ) const
+{
+	return I8x4( a4x2[0]*b, a4x2[1]*b );
+}
+I8x4 I4x4::operator * ( float b ) const { return *this * (I8)b; }
+I8x4 I4x4::operator * ( double b ) const { return *this * (I8)b; }
+
 I8x4 I4x4::operator & (const I4x2& b) const
 {
 	return I8x4( a4x2[0]&b, a4x2[1]&b );
@@ -22,7 +29,8 @@ I8x4 I4x4::operator & (const I4x4& b ) const
 {
 	return I8x4( a4x2[0]&b.a4x2[0], a4x2[1]&b.a4x2[1] );
 }
-I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
+I4x4::I4x4( const I8x4 b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
+//I4x4::I4x4( const I8x4& b ) { x = b.x; y = b.y; z = b.z; w = b.w; }
 I4x4::I4x4( const F4 f4 )
 {
 	x = f4.x;
@@ -128,8 +136,7 @@ I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
 
 	return D8;
 }
-I4x4 I4x4::TSrBALL( I4x4 T, I8 r )
-{
+I4x4 I4x4::TSrBALL( I4x4 T, I8 r ) {
 	// a vektorokból korábban ki kell vonni az origot
 	if( T.xyz0() == xyz0() )
 		return xyz0();
@@ -170,8 +177,7 @@ I4x4 I4x4::TSrBALL( I4x4 T, I8 r )
 	I8 chk = sqrt(T8.qlen_xyz());
 	return T8;
 }
-I4x4 I4x4::mxR( I8 r )
-{
+I4x4 I4x4::mxR( I8 r ) {
 	I8x4 S8 = *this;
 	I8 s = S8.qlen_xyz();
 	if( s < r*r )
@@ -180,4 +186,50 @@ I4x4 I4x4::mxR( I8 r )
 	S8 *= r;
 	S8 /= sqrt(s);
 	return S8;
+}
+I4x4 I4x4::drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
+{
+	if( !ti )
+		return *this;
+	if( ti >= tn )
+		return T;
+	if(d<0)
+		d*=-1;
+	I8x4	u4 = up.qlen_xyz() ? up.xyz0() : I4x4(0,0,1),
+			s4 = xyz0(),
+			t4 = T.xyz0(),
+			r4 = t4-s4;
+	I8 	uu = u4.qlen_xyz(), u = sqrt(uu),
+		h = (u4*r4)/u;
+
+	I8x4	h4 = (u4*h)/u,
+			w4 = r4-h4;
+	I8	hh = h*h, ah = h < 0 ? -h : h,
+		ww = w4.qlen_xyz(), w = sqrt(w),
+		a = d+ah, aa = a*a,
+
+		vv = aa-hh, v = sqrt(vv),
+		vw = ((v*w)/(v+a)),
+
+		b = w-vw;
+
+	I4x4 out = *this ;
+	if( h < 0 )
+		out += h4 + ((w4*vw)/w);
+	else
+		out += (w4*b)/w;
+
+	double	sa = double(ah)/double(a),
+			// ha h<0 lefelé dobjuk
+			rad0 = h < 0 ? asin(sa) : 0,
+			rad1 = h < 0 ? PI : PI-asin(sa),
+			radA = (rad1-rad0)*double(ti)/double(tn) + rad0;
+
+	out += (u4*(I8)(double(a)*sin(radA)))/u;
+	if(!b)
+		return out;
+
+	out += (w4*(I8)(double(b)*sin(radA-PIp2)))/w;
+
+	return out;
 }

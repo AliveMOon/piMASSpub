@@ -231,7 +231,7 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 			tR = (tXYZ-txyz).xyz0(),
 			oR = (oXYZ-txyz).xyz0();
 
-	U4	iRr = sqrt(iR.qlen_xyz())/0x100,
+	I4	iRr = sqrt(iR.qlen_xyz())/0x100,
 		oRr = sqrt(oR.qlen_xyz())/0x100,
 		tRr = sqrt(tR.qlen_xyz())/0x100;
 
@@ -303,8 +303,7 @@ void drc_trd( char* pBUFF )
 	int o = system( sBUFF );
 	std::cout << o << ":" << sBUFF <<std::endl;;
 }
-bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES )
-{
+bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
 	if( this ? !pBUFF : true )
 		return false;
 

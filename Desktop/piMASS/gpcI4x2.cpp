@@ -34,6 +34,16 @@ I8x2 I4x2::operator * ( int b ) const {
 
 	return I8x2( (I8)x*(I8)b, (I8)y*(I8)b );
 }
+I8x2 I4x2::operator * ( I8 b ) const {
+	if( !b )
+		return 0;
+	if( b == 1 )
+		return (I8x2)*this;
+	if( b == -1 )
+		return I8x2( -x, -y );
+
+	return I8x2( (I8)x*b, (I8)y*b );
+}
 I8x2 I4x2::operator & (const I4x2& b) const
 {
 	return I8x2( x*b.x,  y*b.y );

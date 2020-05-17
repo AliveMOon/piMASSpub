@@ -181,7 +181,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 		if( c16fr != gpeCLR_white )
 			continue;
 
-		pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+		pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 
 	}
 
@@ -242,7 +242,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 
 					// de rajta a pointer
 					pMINI[off+offFRM].pos( xyCR.a4x2[0], fxyz )->frmBRDR( xyCR.a4x2[1], gpeCLR_white, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
-					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 					continue;
 				}
 				continue;
@@ -301,7 +301,7 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 							);
 
 				if( bON ? iON == i+c : false )	// rajta a pointer
-					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 
 				if( pTITLE > gpsTITLE )
 					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( gpsTITLE, gpeCLR_white );
@@ -331,11 +331,11 @@ void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* 
 				pTITLE += sprintf( (char*)pTITLE, " " );
 
 			if( a == lurdAN.x && r == lurdAN.y )
-				pTITLE += lurdAN.a4x2[0].strA4Nplus(pTITLE); // pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].strA4N(sSTR), c16fr );
+				pTITLE += lurdAN.a4x2[0].strALF4N(pTITLE); // pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].pSTRalf4n(sSTR), c16fr );
 			else if( a == lurdAN.z && r == lurdAN.w )
-				pTITLE += lurdAN.a4x2[1].strA4Nplus(pTITLE); // pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].strA4N(sSTR), c16fr );
+				pTITLE += lurdAN.a4x2[1].strALF4N(pTITLE); // pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].pSTRalf4n(sSTR), c16fr );
 			else if( bON ? iON == i+c : false )
-				pTITLE += onAN.strA4Nplus(pTITLE); //  pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+				pTITLE += onAN.strALF4N(pTITLE); //  pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 
 
 			if( pTITLE > gpsTITLE )
@@ -520,7 +520,7 @@ void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Render
 		if( c16fr != gpeCLR_white )
 			continue;
 
-		pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+		pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 
 	}
 
@@ -569,7 +569,7 @@ void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Render
 
 					// de rajta a pointer
 					pMINI[off+offFRM].pos( xyWH.a4x2[0], fxyz )->frmBRDR( xyWH.a4x2[1], gpeCLR_white, 0xf, fxyz-I4x4( xyWH.a4x2[0].MX(0), 0 )  );
-					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 					continue;
 				}
 				continue;
@@ -606,7 +606,7 @@ void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Render
 							);
 
 				if( bON ? iON == i+c : false )	// rajta a pointer
-					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+					pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 
 				continue;
 			}
@@ -638,11 +638,11 @@ void gpcCRS::miniRDYgl_old( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Render
 
 						);*/
 			if( a == lurdAN.x && r == lurdAN.y )
-				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].strA4N(sSTR), c16fr );
+				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[0].pSTRalf4n(sSTR), c16fr );
 			else if( a == lurdAN.z && r == lurdAN.w )
-				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].strA4N(sSTR), c16fr );
+				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( lurdAN.a4x2[1].pSTRalf4n(sSTR), c16fr );
 			else if( bON ? iON == i+c : false )
-				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.strA4N(sSTR), gpeCLR_white );
+				pMINI[off+offFRM].pos( xyWH.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 
 			pSRC->SRCmini(
 							pMINI + off, xyWH.a4x2[0], //pMINI + off + offFRM,
