@@ -189,7 +189,7 @@ I4x4 I4x4::mxR( I8 r ) {
 }
 I4x4 I4x4::drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
 {
-	if( !ti )
+	if( ti <= 0 )
 		return *this;
 	if( ti >= tn )
 		return T;

@@ -113,7 +113,7 @@ public:
 			tGRP, oGRP, iGRP,
 			jdPRG,
 
-			jd0PRG, jd0DRPtu,
+			jd0PRG, //jd0DRPtu,
 			jd0XYZ, jd0ABC, jd0xyz,
 			jd1XYZ, jd1ABC, jd1xyz;
 	F4x4	jd0mx;
@@ -248,14 +248,8 @@ public:
 	bool bHS3o() const  { return !!(oCTRL.y&ZShs3);	}
 	bool bHS3iNo() const { return bHS3i()&&bHS3o(); }
 	bool bHS3iOo() const { return bHS3i()||bHS3o(); }
-	U4 oHS3o() {
-		iCTRL.y&=(~ZShs3);
-		return (oCTRL.y|=ZShs3);
-	}
-	U4 xHS3o() {
-		iCTRL.y|=ZShs3;
-		return (oCTRL.y&=(~ZShs3));
-	}
+	U4 oHS3o() { iCTRL.y&=(~ZShs3); return (oCTRL.y|=ZShs3); }
+	U4 xHS3o() { iCTRL.y|=ZShs3; return (oCTRL.y&=(~ZShs3)); }
 
 	bool jdPRGstp();
 	gpcDrc& judo( gpcZS& inp );

@@ -236,6 +236,7 @@ class gpcALU;
 #define min( a, b ) ( a < b ? a : b )
 #define PI acos(-1.0)
 #define PIp2 (PI/2.0)
+#define PI2 (PI*2.0)
 #define COS5 0.99619469809174553229501040247389
 #define SIN5 0.08715574274765817355806427083747
 #define SIN1 0.0174524064373
@@ -3153,6 +3154,33 @@ public:
 		//sprintf( pBUFF, "%d%s%d%s%d%s%d%s%s", x,pSeP,y,pSeP,z,pSeP,w,pSeP, pENT );
 		return pBUFF;
     }
+
+	I4x4 len_mx( I4 r )
+	{
+		I8 l = abs0().mx().x;
+		if( !l )
+			return 0;
+		l = sqrt(l);
+		return I4x4( ((I8)x*(I8)r)/l, ((I8)y*(I8)r)/l, ((I8)z*(I8)r)/l, w );
+	}
+	I4x4 lim_mx( I4 r )
+	{
+		I8 l = abs0().mx().x;
+		if( l < r )
+			return *this;
+
+		return len_mx(r);
+	}
+	I4x4 lim_mx( const I4x4& b, I4 r ) const
+	{
+		I4x4 v4 = b-xyz0();
+		I8 l = v4.abs0().mx().x;
+		if( l < r )
+			return b;
+		v4 = v4.len_xyz(r);
+		v4.w = b.w;
+		return v4+xyz0();
+	}
 
 
 	I4x4 len_xyz( I4 r )

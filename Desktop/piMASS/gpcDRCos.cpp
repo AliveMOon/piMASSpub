@@ -81,7 +81,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBA
 	I4x4 tmp = cageBALL( trg.xyz0(), pBALL, nBALL );
 	tmp = cageBOX( tmp, pBOX, nBOX );
 	if( lim )
-		return iXYZ.lim_xyz(tmp,lim);
+		return iXYZ.lim_mx(tmp,lim);
 
 	return tmp;
 }
@@ -114,6 +114,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id )
 	return cageXYZ( trg, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id] );
 }
 
+static char gpsJDprgPUB[0x100];
 bool gpcDrc::jdPRGstp()
 {
 	// ha létre jött mozgá hagyja végre hajtani
@@ -131,10 +132,17 @@ bool gpcDrc::jdPRGstp()
 			// de pont befejezte
 			jdPRG.null();
 			if( jd0XYZ.qlen_xyz() )
+			switch( jdALF )
 			{
-				tXYZ.xyz_(jd0XYZ);
-				tABC.xyz_(jd0ABC);
+				case gpeALF_null:
+				case gpeALF_DROP:
+					break;
+				default:
+					tXYZ.xyz_(jd0XYZ);
+					tABC.xyz_(jd0ABC);
+					break;
 			}
+
 			return true;
 		}
 	} else
@@ -158,10 +166,10 @@ bool gpcDrc::jdPRGstp()
 					jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
 					break;
 
-			case gpeALF_DROP:if( jd1XYZ.qlen_xyz()*jd0DRPtu.x ) {
+			case gpeALF_DROP:if( jd1XYZ.qlen_xyz() * max( 0, jd0PRG.y-jd0PRG.x) ) {
 
 					jdPRG.y = jdPRG.w = msSRT3.x;	// w-ben örizzük az indulási időt y aktuális idő
-					jdPRG.z = jdPRG.w+jd0DRPtu.x;		// z-ben pedig a kívánt megérkezési időt
+					jdPRG.z = jdPRG.w+jd0PRG.a4x2[0].sum();		// z-ben pedig a kívánt megérkezési időt
 					break;
 				}
 			default:
@@ -219,13 +227,13 @@ bool gpcDrc::jdPRGstp()
 				// elöbb speciálisan a függölegesel foglalkozok pos.z-POS.z-vel
 				// nem veszük bele a kis pos-POS vektort
 				jdPRG.y = msSRT3.x;
-				I8	ti = jdPRG.y-jdPRG.w + 500,
+				I8	ti = (jdPRG.y-jdPRG.w) + (ms2sec/2) - jd0PRG.x,
 					tn = jdPRG.z-jdPRG.w;
 
-				I4x4 up0 = (jd0XYZ-jd0xyz).xyz0(), up1 = (jd1XYZ-jd1xyz).xyz0(), upAVG = (up0+up1)/2;
-				tXYZ.xyz_( jd0XYZ.drop( jd1XYZ, upAVG, jd1XYZ.w, ti, tn ) );
-				txyz.xyz_( tXYZ-upAVG );
-
+				I4x4 up = (jd0XYZ-jd0xyz).xyz0();
+				tXYZ.xyz_( jd0XYZ.drop( jd1XYZ, up, jd1XYZ.w, ti, tn ) );
+				txyz.xyz_( tXYZ-up );
+				std::cout << ti << "/" << tn << "\t" << tXYZ.pSTR( gpsJDprgPUB ) <<std::endl;
 			} break;
 		default:
 			jdPRG.null();
@@ -292,7 +300,11 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 	I8x2 an;
 	double d8;
 	gpeALF alf = gpeALF_null;
-	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;," ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;," ) )
+	for(
+			 pSTR += gpmNINCS( pSTR, " \t\a\r\n;," );
+			*pSTR;
+			 pSTR += gpmNINCS( pSTR, " \t\a\r\n;," )
+		)
 	{
 		an.num = pEND-(pCOM = pSTR);
 		an = pCOM;
@@ -319,25 +331,46 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 				case gpeALF_POS:
 				case gpeALF_XYZ:{
+						if(iD >= nD )
+						{
+							iNUM = gpeDRCos_NONS;
+							break;
+						}
+
 						switch( comA&0xffffff )
 						{
 							case gpeZS_XYZ0:
 							case gpeZS_POS0:
 								iNUM = gpeDRCos_POSx;
+								if( ZSnD.aDrc[iD].okXYZ.qlen_xyz() )
+									ZSnD.aDrc[iD].tXYZ.xyz_( ZSnD.aDrc[iD].okXYZ );
+								else
+									ZSnD.aDrc[iD].tXYZ.xyz_( ZSnD.aDrc[iD].iXYZ );
 								break;
 							default:
 								iNUM = gpeDRCos_posx;
+								ZSnD.aDrc[iD].txyz.xyz_( ZSnD.aDrc[iD].ixyz );
 								break;
 						}
 						nNUM = 3;
 					} break;
 				case gpeALF_DIR:
 				case gpeALF_ABC:{
+						if(iD >= nD )
+						{
+							iNUM = gpeDRCos_NONS;
+							break;
+						}
+
 						switch( comA&0xffffff )
 						{
 							case gpeZS_ABC0:
 							case gpeZS_DIR0:
 								iNUM = gpeDRCos_ABCa;
+								if( ZSnD.aDrc[iD].okXYZ.qlen_xyz() )
+									ZSnD.aDrc[iD].tABC.xyz_( ZSnD.aDrc[iD].okABC );
+								else
+									ZSnD.aDrc[iD].tabc.xyz_( ZSnD.aDrc[iD].iABC );
 								break;
 							default:
 								iNUM = gpeDRCos_abcA;
@@ -347,11 +380,22 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					} break;
 
 				case gpeALF_GRIP:{
+
+						if(iD >= nD )
+						{
+							iNUM = gpeDRCos_NONS;
+							break;
+						}
 						iNUM = gpeDRCos_GRPx;
 						nNUM = 3;
 					} break;
 
 				case gpeALF_DROP: {
+						if(iD >= nD )
+						{
+							iNUM = gpeDRCos_NONS;
+							break;
+						}
 						alf = an.alf;
 						iNUM = gpeDRCos_drpX;
 						nNUM = 4;
@@ -359,6 +403,11 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 				case gpeALF_SHLD:
 				case gpeALF_SNAIL: {
+						if(iD >= nD )
+						{
+							iNUM = gpeDRCos_NONS;
+							break;
+						}
 						alf = an.alf;
 						iNUM = gpeDRCos_prgA;
 						nNUM = 4;
@@ -367,6 +416,13 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 
 				case gpeALF_LINK:
 				case gpeALF_AXIS:{
+
+						if(iD >= nD )
+						{
+							iNUM = gpeDRCos_NONS;
+							break;
+						}
+
 						switch( comA )
 						{
 							case gpeZS_AXIS:
@@ -380,8 +436,14 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 						nNUM = 6;
 					} break;
 				case gpeALF_STAT:
+					if(iD >= nD )
+					{
+						iNUM = gpeDRCos_NONS;
+						break;
+					}
+
 					pANS = ZSnD.aDrc[iD].answSTAT( pANS, iD );
-					break;
+					continue;
 				case gpeALF_STOP:
 				default:
 					break;
@@ -399,7 +461,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 		} else if( iNUM > gpeDRCos_NONS )
 			return pANS->lzyFRMT( s = -1, "nonsens" );
 
-		if( iD >= 2 )
+		if( iD >= nD )
 		{
 			pANS = pANS->lzyFRMT( s = -1, "Who?" );
 			for( iD = 0; iD < 2; iD++ )
@@ -482,7 +544,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					pD->jd1XYZ.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 					break;
 				} else {
-					pD->jd0DRPtu.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num*ms2sec : (I4)(d8*ms2sec);
+					pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num*ms2sec : (I4)(d8*ms2sec);
 					if(iNUM<gpeDRCos_drpW)
 						break;
 				}
