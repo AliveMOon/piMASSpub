@@ -36,7 +36,7 @@ U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 //------------------------
 I4x4 gpaCAGEjohnBALL[] = {
 	{ mmX(1500), 0, mmX(320), mmX(700) },
-	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
+	{ 0, 0, mmX(320), mmX(300) }, { 0, 0, mmX(-300), mmX(350) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
 //------------------------
@@ -115,7 +115,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id )
 }
 
 static char gpsJDprgPUB[0x100];
-bool gpcDrc::jdPRGstp()
+bool gpcDrc::jdPRGstp( U4 mSEC )
 {
 	// ha létre jött mozgá hagyja végre hajtani
 	if( oCTRL.z )
@@ -131,6 +131,7 @@ bool gpcDrc::jdPRGstp()
 			/// END --------------------------
 			// de pont befejezte
 			jdPRG.null();
+			MPosS = 0;
 			if( jd0XYZ.qlen_xyz() )
 			switch( jdALF )
 			{
@@ -167,7 +168,8 @@ bool gpcDrc::jdPRGstp()
 					break;
 
 			case gpeALF_DROP:if( jd1XYZ.qlen_xyz() * max( 0, jd0PRG.y-jd0PRG.x) ) {
-
+					//I4 lag = mSEC < ms13R2.w ? 0 : mSEC-ms13R2.w;
+					//std::cout << "lag: " << lag << std::endl;
 					jdPRG.y = jdPRG.w = msSRT3.x;	// w-ben örizzük az indulási időt y aktuális idő
 					jdPRG.z = jdPRG.w+jd0PRG.a4x2[0].sum();		// z-ben pedig a kívánt megérkezési időt
 					break;
@@ -226,8 +228,12 @@ bool gpcDrc::jdPRGstp()
 		case gpeALF_DROP: {
 				// elöbb speciálisan a függölegesel foglalkozok pos.z-POS.z-vel
 				// nem veszük bele a kis pos-POS vektort
-				jdPRG.y = msSRT3.x;
-				I8	ti = (jdPRG.y-jdPRG.w) + (ms2sec/2) - jd0PRG.x,
+				// I4 lag = mSEC < ms13R2.w ? 0 : mSEC-ms13R2.w;
+				// std::cout << "lag: " << lag << std::endl;
+				MPosS = msSRT3.x + AVGms*4 - jd0PRG.x;
+				MPosS -= jdPRG.y;
+				jdPRG.y += MPosS; // mikorra kéne ott lenni
+				I8	ti = jdPRG.y-jdPRG.w,
 					tn = jdPRG.z-jdPRG.w;
 
 				I4x4 up = (jd0XYZ-jd0xyz).xyz0();
@@ -244,7 +250,7 @@ bool gpcDrc::jdPRGstp()
 	return true;
 }
 
-gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
+gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC )
 {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
@@ -530,7 +536,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 					break;
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );
-				pD->jdPRGstp();
+				pD->jdPRGstp( mSEC );
 				alf = gpeALF_null;
 				break;
 			case gpeDRCos_drpX:
@@ -550,7 +556,7 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR )
 				}
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );
-				pD->jdPRGstp();
+				pD->jdPRGstp( mSEC );
 				alf = gpeALF_null;
 				break;
 			/// -----------------------------------------------

@@ -22,7 +22,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 
 		comA = NMnDIF.x;
 		U8 s;
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// %s HS123:%0.6X", *sCOM ? (char*)sCOM : "?", hs123() );
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// %s HS123:%0.6X E:%dms AVG:%dms", *sCOM ? (char*)sCOM : "?", hs123(), Ems, AVGms );
 		pANS = pANS->lzyFRMT( s = -1,	"\r\n// POS:  n:%d"
 										"\r\n//\tiXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n//\tcXYZ %7.2fmm, %7.2fmm, %7.2fmm "
@@ -94,7 +94,24 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 										double(txyz.y)/mmX(1),
 										double(txyz.z)/mmX(1)
 							);
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// dir:"
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n// ok:"
+										"\r\n//\tokXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n//\tokabc %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n//\tokxyz %7.2fmm, %7.2fmm, %7.2fmm;"
+										,
+										double(okXYZ.x)/mmX(1),
+										double(okXYZ.y)/mmX(1),
+										double(okXYZ.z)/mmX(1),
+
+										double(okABC.x)/degX(1),
+										double(okABC.y)/degX(1),
+										double(okABC.z)/degX(1),
+
+										double(okxyz.x)/mmX(1),
+										double(okxyz.y)/mmX(1),
+										double(okxyz.z)/mmX(1)
+							);
+		/*pANS = pANS->lzyFRMT( s = -1,	"\r\n// dir:"
 										"\r\n//\tiabc %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\toabc %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n//\ttabc %7.2fdg, %7.2fdg, %7.2fdg;"
@@ -110,7 +127,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 										double(tabc.x)/degX(1),
 										double(tabc.y)/degX(1),
 										double(tabc.z)/degX(1)
-							);
+							);*/
 		return pANS;
 	}
 
@@ -193,7 +210,7 @@ gpcLZY* gpcZSnD::pulling( gpcLZY* pOUT, U4x4* pZSrw ) {
 	return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
 }
 
-gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
+gpcDrc& gpcDrc::operator = ( const gpcZS& zs ) {
 	gpmMcpyOF( &iXYZ.x, &zs.aPOS, 3 );
 	if( iXYZ.qlen_xyz() < 32*32 )
 	{
@@ -205,9 +222,6 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 
 	ixyz.xyz_(iXYZ.ABC2xyz( txyz, iABC ) );
 
-	gpmMcpyOF( &ms13R2.x, &zs.apos, 3 );
-	msSRT3 = ms13R2.xyz0().srt3();
-
 	gpmMcpyOF( &iabc.x, &zs.aabc, 3 );
 	gpmMcpyOF( &aiAX1to6[0].x, zs.aJ16, 3 );
 	gpmMcpyOF( &aiAX1to6[1].x, zs.aJ16+3, 3 );
@@ -215,6 +229,21 @@ gpcDrc& gpcDrc::operator = ( gpcZS& zs ) {
 	gpmMcpyOF( &aiax1to6[1].x, zs.aj16+3, 3 );
 
 	gpmMcpyOF( &iCTRL.y, &zs.io128.y, 3 );
+
+	gpmMcpyOF( &ms13R2.x, &zs.apos, 3 );
+	U4 msX = msSRT3.x;
+	msSRT3 = ms13R2.xyz0().srt3();
+	if( !sMS )
+		sMS = msSRT3.x;
+	Ems = msSRT3.x-msX;
+	if( msX < msSRT3.x )
+	{
+		nMS++;
+		AVGms = (msSRT3.x-sMS)/nMS;
+
+		okXYZ.xyz_(iXYZ);
+		okABC.xyz_(iABC);
+	}
 	return *this;
 }
 
@@ -357,7 +386,7 @@ bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
 }
 static char gpsJDpub[0x100];
 
-gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
+gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 	*this = iZS;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
 		/*case 9: {
@@ -765,7 +794,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS ) {
 		oCTRL.z |= 2;
 	}
 
-	if( jdPRGstp() )
+	if( jdPRGstp( mSEC ) )
 		return *this;
 
 

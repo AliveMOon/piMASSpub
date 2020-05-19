@@ -92,6 +92,7 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 
 						gpmMcpyOF( &aPOS,	&D.oXYZ, 3 );
 						gpmMcpyOF( &aABC,	&D.oABC, 3 );
+						io128.w = D.MPosS;
 						break;
 					default:
 
@@ -305,7 +306,7 @@ void gpcGT::GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 					), // pB-ben a JUDO elötti
 		*pA = (U2*)&(
 						pZSnD->aZSio[iD0*2]
-						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1] )
+						= pZSnD->aDrc[iD0].judo( pZSnD->aZSio[iD0*2+1], pWIN->mSEC.x )
 					); // pA-ban azaz új out lesz
 	if( JDy == JD.y )
 	{

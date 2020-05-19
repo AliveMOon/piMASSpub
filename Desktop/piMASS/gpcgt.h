@@ -119,7 +119,7 @@ public:
 	F4x4	jd0mx;
 	gpeALF	jdALF;
 	I4x4	ms13R2, msSRT3;
-	U4		n_trd, n_join;
+	U4		n_trd, n_join, nMS, sMS, AVGms, Ems, MPosS;
 	std::thread trd;
 
 	~gpcDrc() {
@@ -142,7 +142,7 @@ public:
 	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
 	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
 	gpcDrc& operator &= ( gpcDrc& in );
-	gpcDrc& operator = ( gpcZS& zs );
+	gpcDrc& operator = ( const gpcZS& zs );
 
 
 	bool operator == ( const gpcDrc& b ) const
@@ -251,8 +251,8 @@ public:
 	U4 oHS3o() { iCTRL.y&=(~ZShs3); return (oCTRL.y|=ZShs3); }
 	U4 xHS3o() { iCTRL.y|=ZShs3; return (oCTRL.y&=(~ZShs3)); }
 
-	bool jdPRGstp();
-	gpcDrc& judo( gpcZS& inp );
+	bool jdPRGstp( U4 mSEC );
+	gpcDrc& judo( gpcZS& inp, U4 mSEC );
 };
 #define gpdZSnDnull ((gpcZSnD*)NULL)
 class gpcZSnD
@@ -723,7 +723,7 @@ class gpcGT
 
 
 		//gpcLZY*	gpcGTdrcSTAT( gpcLZY* pANS, gpcDrc& zs );
-		gpcLZY* GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
+		gpcLZY* GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC );
 		void 	GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 
 		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
