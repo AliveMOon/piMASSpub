@@ -187,6 +187,27 @@ I4x4 I4x4::mxR( I8 r ) {
 	S8 /= sqrt(s);
 	return S8;
 }
+double I4x4::dropRAD(const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
+{
+	if( ti < 0 )
+		ti = 0;
+	else if( ti > 0 )
+		ti = tn;
+
+	I8x4	u4 = up.qlen_xyz() ? up.xyz0() : I4x4(0,0,1),
+			r4 = T.xyz0()-xyz0();
+
+	I8 		uu = u4.qlen_xyz(), //u = sqrt(uu),
+			h = (up*r4)/sqrt(uu);
+	I8		ah = h < 0 ? -h : h,
+			a = d+ah;
+	double	sa = double(ah)/double(a),
+			// ha h<0 lefelé dobjuk
+			rad0 = h < 0 ? asin(sa) : 0,
+			rad1 = h < 0 ? PI : PI-asin(sa);
+
+	return (rad1-rad0)*double(ti)/double(tn) + rad0;
+}
 I4x4 I4x4::drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
 {
 	if( ti <= 0 )
@@ -196,9 +217,8 @@ I4x4 I4x4::drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
 	if(d<0)
 		d*=-1;
 	I8x4	u4 = up.qlen_xyz() ? up.xyz0() : I4x4(0,0,1),
-			s4 = xyz0(),
-			t4 = T.xyz0(),
-			r4 = t4-s4;
+			r4 = T.xyz0()-xyz0();
+
 	I8 	uu = u4.qlen_xyz(), u = sqrt(uu),
 		h = (u4*r4)/u;
 

@@ -616,7 +616,9 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 			if( lim <= sqrt(lXYZ.qlen_xyz())+mmX(3) )
 			{
 				// elérte a lim-et azaz nem érte el a ketrecet
-				if( (lim = mmABCD.y) < mmABCD.x )
+				lim = mmABCD.y;
+				if( false )
+				if( lim < mmABCD.x )
 				{
 					if( txyz.qlen_xyz() )
 					{

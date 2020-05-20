@@ -226,19 +226,42 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 			} break;
 
 		case gpeALF_DROP: {
-				// elöbb speciálisan a függölegesel foglalkozok pos.z-POS.z-vel
-				// nem veszük bele a kis pos-POS vektort
 				// I4 lag = mSEC < ms13R2.w ? 0 : mSEC-ms13R2.w;
 				// std::cout << "lag: " << lag << std::endl;
-				MPosS = msSRT3.x + AVGms*4 - jd0PRG.x;
-				MPosS -= jdPRG.y;
-				jdPRG.y += MPosS; // mikorra kéne ott lenni
-				I8	ti = jdPRG.y-jdPRG.w,
-					tn = jdPRG.z-jdPRG.w;
+				/// msSRT3.x robot ms // AVGms átlagos válasz idő
+				/// jd0PRG.x késleltetés
+				I8	tn = jdPRG.z-jdPRG.w,
+					preY = jdPRG.y,
+					preti = preY-jdPRG.w;
 
-				I4x4 up = (jd0XYZ-jd0xyz).xyz0();
-				tXYZ.xyz_( jd0XYZ.drop( jd1XYZ, up, jd1XYZ.w, ti, tn ) );
+				jdPRG.y = msSRT3.x + 4*ms2sec - jd0PRG.x;
+				I8 ti = jdPRG.y-jdPRG.w;
+
+				I4x4	up = (jd0XYZ-jd0xyz).xyz0(),
+						dti = jd0XYZ.drop( jd1XYZ, up, jd1XYZ.w, ti, tn );
+
+				if( (preti>0) && (ti<tn) )
+				{
+					double	radA = jd0XYZ.dropRAD( jd1XYZ, up, jd1XYZ.w, 0, tn ),
+							radB = jd0XYZ.dropRAD( jd1XYZ, up, jd1XYZ.w, tn, tn ),
+							piAB = radB-radA,
+							piA = radA > 0.0 ? PIp2-radA : radA,
+							th = double(tn)*piA/piAB;
+					if( ti > th )
+					if( preti < th )
+					{
+						ti = th;
+						jdPRG.y = ti+jdPRG.w;
+						dti = jd0XYZ.drop( jd1XYZ, up, jd1XYZ.w, ti, tn );
+						std::cout << "HI ";
+					}
+				}
+				MPosS = jdPRG.y-preY;
+				if( MPosS >= 4*ms2sec )
+					MPosS -= 2*ms2sec;
+				tXYZ.xyz_( dti );
 				txyz.xyz_( tXYZ-up );
+
 				std::cout << ti << "/" << tn << "\t" << tXYZ.pSTR( gpsJDprgPUB ) <<std::endl;
 			} break;
 		default:
@@ -333,8 +356,16 @@ gpcLZY* gpcGT::GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U
 							break;
 						ZSnD.aDrc[iD].format( gpeZS_JOHN );
 					 break;
-
-
+				case gpeALF_OK:{
+						if(iD >= nD )
+						{
+							iNUM = gpeDRCos_NONS;
+							break;
+						}
+						ZSnD.aDrc[iD].okXYZ.xyz_( ZSnD.aDrc[iD].tXYZ );
+						ZSnD.aDrc[iD].okABC.xyz_( ZSnD.aDrc[iD].tABC );
+						ZSnD.aDrc[iD].okxyz.xyz_( ZSnD.aDrc[iD].txyz );
+					} break;
 				case gpeALF_POS:
 				case gpeALF_XYZ:{
 						if(iD >= nD )

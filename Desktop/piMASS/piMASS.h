@@ -3758,6 +3758,8 @@ public:
 	}
 	//I4x4 chkABC( const I4x4& b, float dim, float mm = mmX(100) ) const;
 	I4x4 mmABC( const I4x4& b, float alf, float mm = mmX(100) ) const;
+
+	double dropRAD(const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
 	I4x4 drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
 };
 
