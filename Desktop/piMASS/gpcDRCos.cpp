@@ -257,8 +257,8 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 					}
 				}
 				MPosS = jdPRG.y-preY;
-				if( MPosS >= 4*ms2sec )
-					MPosS -= 2*ms2sec;
+				//if( MPosS >= 4*ms2sec )
+				//	MPosS -= 2*ms2sec;
 				tXYZ.xyz_( dti );
 				txyz.xyz_( tXYZ-up );
 

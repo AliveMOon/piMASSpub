@@ -82,6 +82,7 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D )
 		case 1:
 		case 2:
 		case 3:
+		case 9:
 			{
 				switch( D.oCTRL.z )
 				{

@@ -389,19 +389,6 @@ static char gpsJDpub[0x100];
 gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 	*this = iZS;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
-		/*case 9: {
-				if( !bHS3i() )
-				{
-					std::cout << "HS3X iXYZ: " << iXYZ.pSTR( gpsJDpub ) <<std::endl;
-					xHS3o();
-					JD.y = 5;
-					return *this;
-				}
-
-				oHS3o();
-				std::cout << "HS39 iXYZ: " << iXYZ.pSTR( gpsJDpub ) <<std::endl;
-				JD.y = 0;
-			} break;*/
 		case 7: {
 				JD.y = 0;
 				if( JD.z )
@@ -419,19 +406,20 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 						JD.x = 1;
 						break;
 				}
-			} return *this;
+			}
+			return *this;
 		case 6:	/// 5.HS2 0-ra várunk
 			if(bHS2i()) {
 				// még nem vette a jelet PULLING
-				xHS2o();
+				oHS2o();
 				return *this;
 			}
+			xHS2o();
 			JD.y = 7;
 			// vette az adást mi is elvesszuk
-			if( JD.z )
-				return *this;
-			xHS2o();
-			break;
+			//if( JD.z )
+			return *this;
+			//break;
 		case 5: /// 4.HS2 jelre várunk
 			if(bHS2i()) {
 				// megkaptuk
@@ -468,20 +456,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 				}
 				return *this;
 			}
-			else if( bHS3i() )
-			{
-				// robi 75%-nél tart
-				/*switch( jdALF )
-				{
-					gpeALF_DROP:
-						JD.y = 9;
-						oHS3o();
-						std::cout << "HS35 iXYZ: " << iXYZ.pSTR( gpsJDpub ) <<std::endl;
-						break;
-					default:
-						break;
-				}*/
-			}
 			// még nemjött
 			/// PULLING
 			xHS1o();
@@ -494,24 +468,47 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 			}
 			JD.y = 5;
 			return *this;
+		case 9: /// 3.HS1 ZS jelére várunk
+			if(bHS1i()) {
+				// 3.HS1 megvan ZS jelzet olvasta
+				JD.y = 4;
+				// elveszük a jelet
+				xHS1o();
+				xHS2o();
+				return *this;
+			}
+			oHS1o();
+			if( bHS2i() )
+				oHS2o();
+			else
+				xHS2o();
+
+			JD.y = 3;
+			return *this;
 		case 3: /// 3.HS1 ZS jelére várunk
 			if(bHS1i()) {
 				// 3.HS1 megvan ZS jelzet olvasta
 				JD.y = 4;
 				// elveszük a jelet
 				xHS1o();
+				xHS2o();
 				return *this;
 			}
 		case 2:
 			/// PULLING HS1 : kint marat nem volt INIT
-			JD.y = 3;
 			oHS1o();
-			xHS2o();
+			if( bHS2i() )
+				oHS2o();
+			else
+				xHS2o();
+
+			JD.y = JD.y == 3 ? 9 : 3;
 			return *this;
 		case 1: /// 1.HS1 apa kezdődik
 			//xHS3o();
 			oHS1o();
-			xHS2o();
+			if( bHS2i() )
+				oHS2o();
 			JD.y = bHS1i() ? 2 : 3;
 			return *this;
 		default:
@@ -545,13 +542,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 		// ha netán akkor sem mozdul
 		oXYZ.xyz_(iXYZ);
 		oABC.xyz_(iABC);
-		//oxyz.xyz_(ixyz);
-		// ha van ok felül írjuk amit a robi adott
-		// mindig abbol számoljunk
-
-		/*iXYZ.xyz_(okXYZ);
-		iABC.xyz_(okABC);
-		ixyz.xyz_(okxyz);*/
 	}
 
 	F4x4 tMX = 1.0, iMX;
@@ -566,8 +556,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 			tmp,
 			dXYZ = tXYZ - iXYZ, lXYZ,
 			dGRP = tGRP - iGRP;
-	/*if( !txyz.qlen_xyz() )
-		dxyz.null();*/
 
 	//nD.z
 	mmABCD.w = sqrt(dGRP.qlen_xyz());
@@ -575,7 +563,6 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 	mmABCD.x = dXYZ.abs0().mx().x;
 	if( mmABCD.x ) {
 
-		//mmABCD.x = sqrt(dXYZ.qlen_xyz());
 		U4 i = 3;
 		switch( NMnDIF.x )
 		{
@@ -702,8 +689,7 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 	} else {
 
 		k = ((K*float(itD.w))/degX(180.0));
-		if( k > 0.0 )
-		{
+		if( k > 0.0 ) {
 			float lpk = gpdROBlim/k;
 			if( ab == 0.0 )
 			{
@@ -826,14 +812,15 @@ gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
 			oCTRL.z = 11; // linearis XYZ ABC
 			JD.y = 1;
 			break;
-
-
 	}
 	/// 1.HS1 elöbb ki X-eljük a HS1-et, nehogy ZS megszaladjon
 	if( JD.y )
 	{
 		xHS1o();
-		xHS2o();
+		if( bHS2i() )
+			oHS2o();
+		else
+			xHS2o();
 	}
 	return *this;
 
