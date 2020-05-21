@@ -66,13 +66,48 @@
 
 
 //#define gpdSLMP GTslmpDrc // GTslmp
-#define gpdSLMPos GTdrcOS	//GTslmpOS
+//#define gpdSLMPos GTdrcOS	//GTslmpOS
 #define gpdZSnW 	gpmOFFOFF( gpcZS, io128.y, oMxyzEspd )
 #define gpdZSnWu2	(gpdZSnW/sizeof(U2))
 #define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 class gpcRES;
 class gpcDrc;
+
+class gpcROB {
+public:
+	U4x4	DEDI;			// b000	b032 b064  b096
+	U4		dedi, name;		// b128 b160
+	I4		aXYZ[3],		// b192 b224 b256
+			aABC[3];		// b288 b320 b352
+	U4		msS,			// b384
+			HS, 			// b416
+			PIX, COM,		// b448 b480
+			/// b480 idáig küldjük
+			msSLV,msMST, msR2D,	pad,// b512 b544 b576 b608
+			/// B640 idáig pullingol
+			iW, nW, nWu2,
+			nR, nRu2;
+	/*I4x4	oMxyzEspd,	// b1024
+			oMabcNsnt,	// b1280
+			oEkey;		// b1312
+			//b1308*/
+
+	gpcROB& null() {
+		gpmCLR;
+		iW = gpmOFF(gpcROB,dedi);
+		nW = gpmOFF(gpcROB,msSLV);
+		nR = gpmOFF(gpcROB,iW);
+		nWu2 = nW/sizeof(U2);
+		nRu2 = nR/sizeof(U2);
+		return *this;
+	}
+	gpcROB(){ null(); }
+	gpcROB& operator = ( const gpcDrc& D );
+	gpcROB& operator &= ( const gpcDrc& D );
+	gpcROB( const gpcDrc& D );
+
+};
 
 class gpcZS {
 public:
@@ -118,7 +153,7 @@ public:
 			jd1XYZ, jd1ABC, jd1xyz;
 	F4x4	jd0mx;
 	gpeALF	jdALF;
-	I4x4	ms13R2, msSRT3;
+	I4x4	msSMR2, msSRT3;
 	U4		n_trd, n_join, nMS, sMS, AVGms, Ems, MPosS;
 	std::thread trd;
 
@@ -142,7 +177,14 @@ public:
 	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
 	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
 	gpcDrc& operator &= ( gpcDrc& in );
+	gpcDrc( const gpcZS& zs, U4 nm = 0 )
+	{
+		if( nm != NMnDIF.au4x2[0].x )
+			format( nm );
+		*this = zs;
+	}
 	gpcDrc& operator = ( const gpcZS& zs );
+	gpcDrc& operator = ( const gpcROB& rob );
 
 
 	bool operator == ( const gpcDrc& b ) const
@@ -201,12 +243,7 @@ public:
 	}
 	gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c );
 	gpcDrc() { format(); };
-	gpcDrc( const gpcZS& zs, U4 nm = 0 )
-	{
-		if( nm != NMnDIF.au4x2[0].x )
-			format( nm );
-		*this = zs;
-	}
+
 
 	U4 hs123() {
 		if(!this )
@@ -253,10 +290,138 @@ public:
 
 	bool jdPRGstp( U4 mSEC );
 	gpcDrc& judo( gpcZS& inp, U4 mSEC );
+	gpcDrc& judo( gpcROB& iR, U4 mSEC );
 };
-#define gpdZSnDnull ((gpcZSnD*)NULL)
-class gpcZSnD
+#define gpdROBnDnull ((gpcROBnD*)NULL)
+class gpcROBnD
 {
+	public:
+		U4x4	pc,
+				ioSW;
+		gpcROB 	aROBio[6];
+		gpcDrc	aDrc[2];
+		gpcROBnD() { gpmCLR; };
+
+		gpcROBnD* format()
+		{
+			if( !this )
+				return NULL;
+			// OUT -------------
+			for( U1 iD = 0, e = gpmN(aDrc); iD < e; iD++ )
+				aROBio[iD*2] = aDrc[iD].format( iD ? gpeZS_JOHN : gpeZS_BILL );
+			// INP ------------
+			aROBio[1].null();
+			aROBio[3].null();
+			// REF -------------
+			aROBio[4].null();
+			aROBio[5].null();
+			return this;
+		}
+		gpcROBnD* reset( U1 iBILL )
+		{
+			if( !this )
+				return NULL;
+			gpmCLR;
+			if(iBILL)
+				iBILL <<= 1;
+
+			ioSW.y = iBILL+1;	// BILL PULL
+			ioSW.z = iBILL+4;	// BILL CMP
+			ioSW.w = iBILL;
+			return format();
+		}
+		U4 stpPULL()
+		{
+			ioSW.y += 2;
+			return ioSW.y;
+		}
+		U4 stpPUSH( bool bSW )
+		{
+			/// bSW ? true BnJ : false only Bill
+			ioSW.w -= bSW ? 2 : 4;
+			ioSW.z = ioSW.w+4;
+			ioSW.y = ioSW.w+1;
+			return !!(ioSW.w&2);
+		}
+		bool bWAIT()
+		{
+			if( !this )
+				return true;	// akkor is várni kell ha !this azaz nincs semi
+			// ha ioSW.w >= ioSW.y igaz, még nem jött válasz
+			pc.x++;
+			return ioSW.w >= ioSW.y;
+		}
+		bool bNEXT()
+		{
+			// ha ioSW.y >= ioSW.z igaz már vége a körnek
+			return ioSW.y >= ioSW.z;
+		}
+		bool bPULL()
+		{
+			if( bWAIT() )
+				return false;
+			// ioSW.w < ioSW.y
+			if( bNEXT() )
+				return false;
+			// 0 Write
+			if( !iWR() )
+				return false;
+			// 1 Read pullingolni lehet
+			ioSW.w = ioSW.y+1;
+			return true;
+		}
+
+		U1 iDrc( bool bPULL = false );
+		U1 iWR()
+		{
+			// 0 Write
+			// 1 Read
+			return ioSW.y&1;
+		}
+
+		U2* pROBioU2()
+		{
+			if( !this )
+				return NULL;
+			return (U2*)&(aROBio[ioSW.y&3]);
+		}
+		gpcROB& ioROB()
+		{
+			return aROBio[ioSW.y&3];
+		}
+		gpcLZY* pull( gpcLZY* pOUT, U4x4* pZSrw );
+
+		gpcDrc* pDrc()
+		{
+			if( !this )
+				return NULL;
+			return &aDrc[ioSW.y&3];
+		}
+		U2* pU2cr()
+		{
+			if( !this )
+				return NULL;
+
+			return (U2*)pDrc();
+		}
+
+		U2* pU2out()
+		{
+			if( !this )
+				return NULL;
+			return (U2*)&(aROBio[(ioSW.y&2)+0]);
+		}
+		U2* pU2inp()
+		{
+			if( !this )
+				return NULL;
+			return (U2*)&(aROBio[(ioSW.y&2)+1]);
+		}
+
+};
+
+#define gpdZSnDnull ((gpcZSnD*)NULL)
+class gpcZSnD {
 	public:
 		U4x4	pc,
 				ioSW;
@@ -382,6 +547,7 @@ class gpcZSnD
 
 };
 
+
 class gpcSLMP {
 public:
 	union{
@@ -457,8 +623,7 @@ public:
 class gpcWIN;
 class gpcGT;
 
-class gpcGT_DWNL
-{
+class gpcGT_DWNL {
 public:
 	I8x2 an;
 	U8	nIDX,
@@ -722,14 +887,16 @@ class gpcGT
 
 
 
-		//gpcLZY*	gpcGTdrcSTAT( gpcLZY* pANS, gpcDrc& zs );
-		gpcLZY* GTdrcOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC );
-		void 	GTslmpDrc( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
+		gpcLZY* GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC );
+		void	GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
+
+		gpcLZY* GTdrcOSzs( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC );
+		void 	GTslmpDrcZS( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 
 		gpcLZY* gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 );
 		gpcLZY* GTslmpOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );
 
-		void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
+		//void 	GTslmp( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 		void	GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 
 		gpcLZY* GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR );

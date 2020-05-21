@@ -721,6 +721,7 @@ static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2020 =
 //                                   |234|2|2|234|2|234|234|234|234|2|23456|234
 //                                   500000FF03FF000018000004010000D*0000120001rn
 // static const char gp_sSLMP_read[] = "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x";
+extern U4x4 gpaROBwr[];
 extern U4x4 gpaZSwr[];
 I8 gpcGT::GTcnct( gpcWIN& win ) {
 	if( this ? msGTdie > win.mSEC.x : true )
@@ -831,6 +832,12 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			case gpeALF_SLMP:{
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
+				pOUT = gpdROBnDnull->pull( pOUT, gpaROBwr );
+				break;
+			}
+			case gpeALF_SLMPo:{
+				sGTent[1] = 's';
+				sGTent[0] = '\n'; // háha ASCII
 				pOUT = gpdZSnDnull->pulling( pOUT, gpaZSwr );
 				break;
 			}
@@ -858,6 +865,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:
+			case gpeALF_SLMPo:
 				break;
 			default:
 				if( sGTent[2] == 'h' )
@@ -874,6 +882,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 		switch( TnID.alf )
 		{
 			case gpeALF_SLMP:
+			case gpeALF_SLMPo:
 				break;
 			default:
 				if( sGTent[2] == 'h' )
@@ -887,8 +896,10 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 	switch( TnID.alf )
 	{
 		case gpeALF_SLMP:
-			GTslmpDrc( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
-			//GTslmp( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			GTslmpDrcRob( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			break;
+		case gpeALF_SLMPo:
+			GTslmpDrcZS( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
 			break;
 		default:
 			break;

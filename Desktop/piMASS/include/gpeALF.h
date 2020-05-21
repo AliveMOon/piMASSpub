@@ -1028,6 +1028,7 @@ typedef enum gpeALF: I8
 	gpeALF_SHARE = gpdABCDE('S', 'H', 'A', 'R', 'E'),
 	gpeALF_SHOES = gpdABCDE('S', 'H', 'O', 'E', 'S'),
 	gpeALF_SLEFT = gpdABCDE('S', 'L', 'E', 'F', 'T'),
+	gpeALF_SLMPo = gpdABCDE('S', 'L', 'M', 'P', 'o'),
 
 	gpeALF_SNAIL = gpdABCDE('S', 'N', 'A', 'I', 'L'),
 

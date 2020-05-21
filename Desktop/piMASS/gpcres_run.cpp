@@ -765,7 +765,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						anRio.a8x2[1].x >>= 0x10;
 						} break;
 
-					case gpeALF_SLMP: if(alu.bSTR()) {
+					case gpeALF_SLMPo: if(alu.bSTR()) {
 						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
 							break;
 						gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() );
@@ -802,38 +802,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 								pS2->srcUPDT();
 								pZSnD->aDrc[i].async( gpsPUB, alu, &res );
-								/*gpcDrc &D = pZSnD->aDrc[i];
 
-								U4 hs2 = D.hs123();
-								if( D.JD.w != D.JD.y )
-								{
-									D.JD.w = D.JD.y;
-									if( D.okXYZ.xyz0() == D.tXYZ.xyz0() )
-									switch( D.JD.w )
-									{
-										case 6:{
-											// 5->6 jelzünk hogy olvastuk a HS2i-t
-											gpcADR A0 = gpfSTR2ALF( sNM, sNM+4 );	/// gpcADR
-											A0 = &res;
-											if( A0.pRM )
-											{
-												gpcALU aB = A0.pRM->ALU( A0.iA );
-												if(aB.bSTR())
-												if( char* p_pat = (char*)alu.pDAT )
-												{
-													char* pP = gpsPUB+D.okXYZ.str(gpsPUB, "_" );
-													pP += D.okABC.str( pP, "_" );
-													pP += sprintf( pP, ".png" );
-
-													sprintf( pP+1, p_pat, gpsPUB );
-													int o = system( pP+1 );
-													std::cout << o << ":" << pP+1 <<std::endl;;
-
-												}
-											}
-										} break;
-									}
-								}*/
 							}
 
 							if( !anRio.a8x2[1].x )
@@ -864,7 +833,74 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							}
 							anRio.a8x2[0].x = 0;
 						} break;
+					case gpeALF_SLMP: if(alu.bSTR()) {
+						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
+							break;
+						gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() );
+						if( !pGT )
+							break;
 
+							I4 cnt = pGT->iCNT;
+							pGT->GTcnct( win );
+							if( cnt == pGT->iCNT )
+								anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
+
+							if( anRio.a8x2[0].x )
+							if( gpcLZY *pLZYinp = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( gpcROBnD *pROBnD = gpmLZYvali( gpcROBnD, pLZYinp ) )
+							for( U1 i = 0; i < 2; i++ )
+							{
+								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
+								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+
+								if( !pS2 )
+								{
+									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
+									if( !pS2 )
+										continue;
+								}
+								if( pS2 == pSRC )
+									continue;
+								hex.lzyFRMT( s=0, "\r\n\"\r\n" );
+
+								hex.lzyRST()->lzyROBnDstat( s=-1, *pROBnD, i );
+
+								hex.lzyFRMT( s=-1, "\"\r\n" );
+								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
+								pS2->srcUPDT();
+								pROBnD->aDrc[i].async( gpsPUB, alu, &res );
+
+							}
+
+							if( !anRio.a8x2[1].x )
+								break;
+
+							// INP
+							if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( pLZYin->n_load )
+							{
+								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
+								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+
+								if( !pS2 )
+								{
+									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
+									if( !pS2 )
+										continue;
+								}
+								if( pS2 == pSRC )
+									continue;
+
+								hex.lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
+								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
+								pS2->srcUPDT();
+
+
+							}
+							anRio.a8x2[0].x = 0;
+						} break;
 
 					case gpeALF_TRGH: trgWH.w = alu.u8(); break;
 					case gpeALF_TRGW: trgWH.z = alu.u8(); break;
