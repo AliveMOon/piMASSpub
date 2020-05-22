@@ -359,8 +359,7 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	std::cout << std::endl;
 }
 
-void drc_trd( char* pBUFF )
-{
+void drc_trd( char* pBUFF ) {
 	if( pBUFF ? !pBUFF : true )
 		return;
 	char	sBUFF[0x100];
