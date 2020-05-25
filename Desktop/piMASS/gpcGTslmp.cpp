@@ -301,41 +301,34 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	switch( msg )
 	{
 		case 0x10:
-			pANSW += sprintf( pANSW, "%s Turn start X:%d", sCOM, JD.x  );
+			pANSW += sprintf( pANSW, "%s %0.2x START HS1o on!", sCOM, msg  );
+			break;
+		case 0x11:
+			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS1i on??", sCOM, msg  );
 			break;
 		case 0x21:
-
-			pANSW += sprintf( pANSW, "%s not init zs160 X:%d", sCOM, JD.x );
+			pANSW += sprintf( pANSW, "%s %0.2x HS1i on! HS1o off!", sCOM, msg  );
 			break;
 		case 0x31:
-			pANSW += sprintf( pANSW, "%s d160 turn on X:%d", sCOM, JD.x );
-			break;
-		case 0x32:
-			//pANSW += sprintf( pANSW, "%s ? X:%d", sCOM, JD.x );
+		case 0x33:
+			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i on?", sCOM, msg  );
 			break;
 		case 0x43:
-			pANSW += sprintf( pANSW, "%s Wait zs160 X:%d POS: %0.2fmm %0.2fmm %0.2fmm", sCOM, JD.x,
+			pANSW += sprintf( pANSW, 	"%s %0.2x HS2i on!  HS2o on!"
+										" Error:%d"
+										" POS: %0.2fmm %0.2fmm %0.2fmm ",
+										sCOM, msg, //JD.x,
+										JD.z,
 										double(iXYZ.x)/mmX(1),
 										double(iXYZ.y)/mmX(1),
-										double(iXYZ.z)/mmX(1) );
+										double(iXYZ.z)/mmX(1)
+										 );
 			break;
-		case 0x54:
-			//pANSW += sprintf( pANSW, "%s zs160 ok! Wait zs161 X:%d", sCOM, JD.x );
+		case 0x44:
+			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i off?", sCOM, msg  );
 			break;
-		case 0x65:
-			//pANSW += sprintf( pANSW, "%s zs161 on! d161 on! Err:%d X:%d", sCOM, JD.x );
-			break;
-		case 0x76:
-			pANSW += sprintf( pANSW, "%s Wait zs161 X:%d POS: %0.2fmm %0.2fmm %0.2fmm", sCOM, JD.x,
-										double(iXYZ.x)/mmX(1),
-										double(iXYZ.y)/mmX(1),
-										double(iXYZ.z)/mmX(1) );
-			break;
-		case 0x07:
-			pANSW += sprintf( pANSW, "%s Turn end! Err:%d X:%d", sCOM, JD.z, JD.x );
-			break;
-		default:
-			pANSW = sANSW;
+		case 0x40:
+			pANSW += sprintf( pANSW, "%s %0.2x END HS2i off! HS2o off!", sCOM, msg  );
 			break;
 	}
 	if( sANSW < pANSW )

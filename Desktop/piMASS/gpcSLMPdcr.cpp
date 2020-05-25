@@ -383,7 +383,7 @@ bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
 
 	switch( JD.w )
 	{
-		case 6:{
+		case 4:{
 			// 5->6 jelzünk hogy olvastuk a HS2i-t
 			nm = NMnDIF.x;
 			gpcADR A0 = gpfSTR2ALF( sNM, sNM+4 );	/// gpcADR
