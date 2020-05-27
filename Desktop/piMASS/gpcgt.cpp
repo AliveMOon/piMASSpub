@@ -835,7 +835,9 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 				pOUT = gpdROBnDnull->pull( pOUT, gpaROBwr );
 				break;
 			}
-			case gpeALF_SLMPo:{
+			case gpeALF_SLMPo:
+			break; // OFF
+			{
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
 				pOUT = gpdZSnDnull->pulling( pOUT, gpaZSwr );

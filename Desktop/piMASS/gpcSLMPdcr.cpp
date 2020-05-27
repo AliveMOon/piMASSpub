@@ -421,7 +421,7 @@ bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
 }
 static char gpsJDpub[0x100];
 
-gpcDrc& gpcDrc::judo( gpcZS& iZS, U4 mSEC ) {
+gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 	*this = iZS;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
 		case 7: {

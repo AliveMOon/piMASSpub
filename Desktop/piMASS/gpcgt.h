@@ -289,7 +289,7 @@ public:
 	U4 xHS3o() { iCTRL.y|=ZShs3; return (oCTRL.y&=(~ZShs3)); }
 
 	bool jdPRGstp( U4 mSEC );
-	gpcDrc& judo( gpcZS& inp, U4 mSEC );
+	gpcDrc& judoZS( gpcZS& inp, U4 mSEC );
 	gpcDrc& judo( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)
