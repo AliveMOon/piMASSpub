@@ -154,7 +154,9 @@ public:
 	F4x4	jd0mx;
 	gpeALF	jdALF;
 	I4x4	msSMR2, msSRT3;
-	U4		n_trd, n_join, nMS, sMS, AVGms, Ems, MPosS;
+	U4		n_trd,	n_join,
+			nMS,	sMS,	AVGms, Ems,
+			MPosS,	HS1ms;
 	std::thread trd;
 
 	~gpcDrc() {
