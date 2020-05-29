@@ -3155,6 +3155,36 @@ public:
 		return pBUFF;
     }
 
+
+	I4x4 mx_mx( I4 r )
+	{
+		I8 m = abs0().mx().x;
+		if( !m )
+			return 0;
+		m = abs0().mx().x;
+		return I4x4( ((I8)x*(I8)r)/m, ((I8)y*(I8)r)/m, ((I8)z*(I8)r)/m, w );
+	}
+
+	I4x4 lim_mx( I4 r )
+	{
+		I8 l = abs0().mx().x;
+		if( l < r )
+			return *this;
+
+		return mx_mx(r);
+	}
+	I4x4 lim_mx( const I4x4& b, I4 r ) const
+	{
+		I4x4 v4 = b-xyz0();
+		I8 l = v4.abs0().mx().x;
+		if( l < r )
+			return b;
+		v4 = v4.lim_mx(r);
+		v4.w = b.w;
+		return v4+xyz0();
+	}
+
+
 	I4x4 len_mx( I4 r )
 	{
 		I8 l = abs0().mx().x;
@@ -3163,25 +3193,6 @@ public:
 		l = sqrt(l);
 		return I4x4( ((I8)x*(I8)r)/l, ((I8)y*(I8)r)/l, ((I8)z*(I8)r)/l, w );
 	}
-	I4x4 lim_mx( I4 r )
-	{
-		I8 l = abs0().mx().x;
-		if( l < r )
-			return *this;
-
-		return len_mx(r);
-	}
-	I4x4 lim_mx( const I4x4& b, I4 r ) const
-	{
-		I4x4 v4 = b-xyz0();
-		I8 l = v4.abs0().mx().x;
-		if( l < r )
-			return b;
-		v4 = v4.len_xyz(r);
-		v4.w = b.w;
-		return v4+xyz0();
-	}
-
 
 	I4x4 len_xyz( I4 r )
 	{

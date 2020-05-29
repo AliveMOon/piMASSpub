@@ -47,6 +47,9 @@ gpcLZY* gpcROBnD::pull( gpcLZY* pOUT, U4x4* pROBrw ) {
 	return pOUT->lzyFRMT( s, gpdSLMP_recv_LN4SL6N4, 24, i, n );
 }
 gpcDrc& gpcDrc::operator = ( const gpcROB& rob ) {
+	if( rob.name != NMnDIF.x )
+		return *this;
+
 	gpmMcpyOF( &iXYZ.x, &rob.aXYZ, 3 );
 	if( iXYZ.qlen_xyz() < mmX(300) )
 		iXYZ.x = iXYZ.y = iXYZ.z = mmX(600);
@@ -499,45 +502,14 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
 
 		lXYZ = oXYZ - iXYZ;
 		mmABCD.y = lXYZ.abs0().mx().x;
-		if( mmABCD.x < 50 )
+		if( mmABCD.x < (mmX(1)/0x10) )
 		{
 			mmABCD.y = mmABCD.x = 0;
-		}
-		else if( mmABCD.y ) {
-			//mmABCD.y = sqrt(lXYZ.qlen_xyz());
-			if( lim <= sqrt(lXYZ.qlen_xyz())+mmX(3) )
+		} else if( mmABCD.y ) {
+			if( lim <= mmABCD.y+mmX(1) )
 			{
 				// elérte a lim-et azaz nem érte el a ketrecet
 				lim = mmABCD.y;
-				if( false )
-				if( lim < mmABCD.x )
-				{
-					if( txyz.qlen_xyz() )
-					{
-						// de nem érte el az tXYZ-t
-						// azaz felosztotta a pályát
-						I4x4 	iR = (iXYZ-txyz).xyz0(),
-								oR = (oXYZ-txyz).xyz0(),
-								tR = (tXYZ-txyz).xyz0();
-						I8	iRr = sqrt(iR.qlen_xyz()),
-							oRr = sqrt(oR.qlen_xyz()),
-							tRr = sqrt(tR.qlen_xyz()),
-							lRr = iRr + (((tRr-iRr)*(I8)mmABCD.y)/(I8)mmABCD.x);
-
-
-						if( lRr )
-						{
-							I4x4	trg = (oR*lRr)/oRr + txyz,
-									tmp = cageXYZ( trg, 0, i );
-							if( trg.xyz0() == tmp.xyz0() )
-							{
-								oXYZ.xyz_( tmp );
-								dXYZ = oXYZ - iXYZ;
-								//lim = mmABCD.y = sqrt(dXYZ.qlen_xyz());
-							}
-						}
-					}
-				}
 			}
 			else if( mmABCD.y > mmX(10) )
 			{

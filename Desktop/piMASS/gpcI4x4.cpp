@@ -225,7 +225,7 @@ I4x4 I4x4::drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
 	I8x4	h4 = (u4*h)/u,
 			w4 = r4-h4;
 	I8	hh = h*h, ah = h < 0 ? -h : h,
-		ww = w4.qlen_xyz(), w = sqrt(w),
+		ww = w4.qlen_xyz(), w = sqrt(ww),
 		a = d+ah, aa = a*a,
 
 		vv = aa-hh, v = sqrt(vv),

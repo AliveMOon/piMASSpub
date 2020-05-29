@@ -249,7 +249,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 					double	radA = jd0XYZ.dropRAD( jd1XYZ, up, jd1XYZ.w, 0, tn ),
 							radB = jd0XYZ.dropRAD( jd1XYZ, up, jd1XYZ.w, tn, tn ),
 							piAB = radB-radA,
-							piA = radA > 0.0 ? PIp2-radA : radA,
+							piA = radA > 0.0 ? PIp2-radA : PIp2,
 							th = double(tn)*piA/piAB;
 					if( ti > th )
 					if( preti < th )
