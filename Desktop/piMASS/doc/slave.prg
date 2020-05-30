@@ -98,1399 +98,1256 @@
 98    ' MsMX max speed amit a kb a robot tud mm/sec
 99    ' maximális sebeség a TB szerint ((MsMX*MsOP)/100.0) azaz "törtezünk" ((mm/sec)*70)/100
 100    ' minimális ido ami alatt megtenné (Md/((MsMX*MsOP)/100.0)) ez még mm/sec (nem mm/msec) ezért *1000.0
-101    '                           4       3   21             1      234
-102    Def FNMdOVRD(Mms,Md,MsMX)=((1000.0*(Md/((MsMX*M_OPovrd)/100.0)))/Mms)*100.0
-103    '
-104    'Tool (100,100,100,100)
-105    Mdarab=0 'Megfogó darab érzékelés tárolása
-106    MHibaszam=0 'Hibaszám tárolása
-107    MPosS=0 'Pozíció index tárolása
-108    MPosX=0 'X pozíció átvétele
-109    MPosY=0 'Y pozíció átvétele
-110    MPosZ=0 'Z pozíció átvétele
-111    MPosA=0 'A pozíció fok átvétele
-112    MPosB=0 'B pozíció fok átvétele
-113    MPosC=0 'C pozíció fok átvétele
-114    MPosXe=0 'X pozíció eltolás átvétele
-115    MPosYe=0 'Y pozíció eltolás átvétele
-116    MPosZe=0 'Z pozíció eltolás átvétele
-117    MPosAe=0 'A pozíció fok eltolás átvétele
-118    MPosBe=0 'B pozíció fok eltolás átvétele
-119    MPosCe=0 'C pozíció fok eltolás átvétele
-120    MPosJ1=0 'J1 tengely fok átvétele
-121    MPosJ2=0 'J2 tengely fok átvétele
-122    MPosJ3=0 'J3 tengely fok átvétele
-123    MPosJ4=0 'J4 tengely fok átvétele
-124    MPosJ5=0 'J5 tengely fok átvétele
-125    MPosJ6=0 'J6 tengely fok átvétele
-126    MPosJ1e=0 'J1 tengely fok eltolás átvétele
-127    MPosJ2e=0 'J2 tengely fok eltolás átvétele
-128    MPosJ3e=0 'J3 tengely fok eltolás átvétele
-129    MPosJ4e=0 'J4 tengely fok eltolás átvétele
-130    MPosJ5e=0 'J5 tengely fok eltolás átvétele
-131    MPosJ6e=0 'J6 tengely fok eltolás átvétele
-132    'MHibaszám jelentései:
-133    '900 - Rossz parancs küldése a robotnak
-134    '910 - Zero detect
-135    '911 - HS1 elött és után nem stimmel a pozició
-136    '912 - CAGE BOX detect error
-137    '920 - Servo OFF
-138    '930 - Range problem *S10
-139    '931 - Range problem *S11
-140    '999 - Alaphelyzetfelvételi hiba
-141    '
-142    MFel=0 'Ez a változó, ha nulla, akkor bármilyen parancs jöhet
-143    MELOZOTERULET=0
-144    MTERULET=0
-145    'MTERULET jelentései (milyen pozícióba képes menni):
-146    '10 - alaphelyzet pozíció jog
-147    '20 - szerviz pozício jog
-148    '30 - amegfogó ürítése jog
-149    '
-150    mXtemp=0 'alaphelyzet pozíció kereséshez
-151    mYtemp=0 'alaphelyzet pozíció kereséshez
-152    mZtemp=0 'alaphelyzet pozíció kereséshez
-153    'ptemp0=0 pozíció segéd alaphelyzethez
-154    'ptemp1=0 'pozíció segéd folyamathoz
-155    'jtemp1=0 'pozíció segéd forgatáshoz
-156    MTavol=0 'alaphelyzetbe értünk-e már?
-157    '===================================================
-158    '===================================================
-159    '---------------------------------------------------
-160    'Helyi változók felsorolás vége------------------
-161    '---------------------------------------------------
-162    '
-163    'Hiba esetén megszakítás generálódik
-164   '
-165   While (M_Err=0)
-166     Select ioCOM 'Mozgás végrehajtás parancs
-167       Case 0 'nope
-168         Mms = M_Timer(1)
-169         Ms=Mms/1000.0
-170         ioMsSLV = Mms
-171         Dly 0.001
-172         Break
-173       ' DANGER!! nincsen megálapodás róla IGNORE küldjön hibát
-174       'Case 1 'Alaphelyzet felvétel ES után
-175       '  GoSub *S1
-176       'Break
-177       'Case 2 'Alaphelyzet felvétel CIKLUS
-178       '  GoSub *S2
+101    '                          3   21             1      23
+102    Def FNMdMS(Md,MsMX)=1000.0*(Md/((MsMX*M_OPovrd)/100.0))
+103    Def FNMdOVRD(Mms,Md,MsMX)=100.0*FNMdMS(Md,MsMX)/Mms
+104    '                          54       3   21             1      234    5
+105    'Def FNMdOVRD(Mms,Md,MsMX)=((1000.0*(Md/((MsMX*M_OPovrd)/100.0)))/Mms)*100.0
+106    '
+107    'Tool (100,100,100,100)
+108    Mdarab=0 'Megfogó darab érzékelés tárolása
+109    MHibaszam=0 'Hibaszám tárolása
+110    MPosS=0 'Pozíció index tárolása
+111    MPosX=0 'X pozíció átvétele
+112    MPosY=0 'Y pozíció átvétele
+113    MPosZ=0 'Z pozíció átvétele
+114    MPosA=0 'A pozíció fok átvétele
+115    MPosB=0 'B pozíció fok átvétele
+116    MPosC=0 'C pozíció fok átvétele
+117    MPosXe=0 'X pozíció eltolás átvétele
+118    MPosYe=0 'Y pozíció eltolás átvétele
+119    MPosZe=0 'Z pozíció eltolás átvétele
+120    MPosAe=0 'A pozíció fok eltolás átvétele
+121    MPosBe=0 'B pozíció fok eltolás átvétele
+122    MPosCe=0 'C pozíció fok eltolás átvétele
+123    MPosJ1=0 'J1 tengely fok átvétele
+124    MPosJ2=0 'J2 tengely fok átvétele
+125    MPosJ3=0 'J3 tengely fok átvétele
+126    MPosJ4=0 'J4 tengely fok átvétele
+127    MPosJ5=0 'J5 tengely fok átvétele
+128    MPosJ6=0 'J6 tengely fok átvétele
+129    MPosJ1e=0 'J1 tengely fok eltolás átvétele
+130    MPosJ2e=0 'J2 tengely fok eltolás átvétele
+131    MPosJ3e=0 'J3 tengely fok eltolás átvétele
+132    MPosJ4e=0 'J4 tengely fok eltolás átvétele
+133    MPosJ5e=0 'J5 tengely fok eltolás átvétele
+134    MPosJ6e=0 'J6 tengely fok eltolás átvétele
+135    'MHibaszám jelentései:
+136    '900 - Rossz parancs küldése a robotnak
+137    '910 - Zero detect
+138    '911 - HS1 elött és után nem stimmel a pozició
+139    '912 - CAGE BOX detect error
+140    '920 - Servo OFF
+141    '930 - Range problem *S10
+142    '931 - Range problem *S11
+143    '999 - Alaphelyzetfelvételi hiba
+144    '
+145    MFel=0 'Ez a változó, ha nulla, akkor bármilyen parancs jöhet
+146    MELOZOTERULET=0
+147    MTERULET=0
+148    'MTERULET jelentései (milyen pozícióba képes menni):
+149    '10 - alaphelyzet pozíció jog
+150    '20 - szerviz pozício jog
+151    '30 - amegfogó ürítése jog
+152    '
+153    mXtemp=0 'alaphelyzet pozíció kereséshez
+154    mYtemp=0 'alaphelyzet pozíció kereséshez
+155    mZtemp=0 'alaphelyzet pozíció kereséshez
+156    'ptemp0=0 pozíció segéd alaphelyzethez
+157    'ptemp1=0 'pozíció segéd folyamathoz
+158    'jtemp1=0 'pozíció segéd forgatáshoz
+159    MTavol=0 'alaphelyzetbe értünk-e már?
+160    '===================================================
+161    '===================================================
+162    '---------------------------------------------------
+163    'Helyi változók felsorolás vége------------------
+164    '---------------------------------------------------
+165    '
+166    'Hiba esetén megszakítás generálódik
+167   '
+168   While (M_Err=0)
+169     Select ioCOM 'Mozgás végrehajtás parancs
+170       Case 0 'nope
+171         Mms = M_Timer(1)
+172         Ms=Mms/1000.0
+173         ioMsSLV = Mms
+174         Dly 0.001
+175         Break
+176       ' DANGER!! nincsen megálapodás róla IGNORE küldjön hibát
+177       'Case 1 'Alaphelyzet felvétel ES után
+178       '  GoSub *S1
 179       'Break
-180       'Case 3 'Szerviz pozíció felvétel
-181       '  GoSub *S3
+180       'Case 2 'Alaphelyzet felvétel CIKLUS
+181       '  GoSub *S2
 182       'Break
-183       'Case 4 'Megfogó kiürítése
-184       '  GoSub *S4
+183       'Case 3 'Szerviz pozíció felvétel
+184       '  GoSub *S3
 185       'Break
-186       Case 10 'XYZ ABC joint
-187         GoSub *S10
-188         Break
-189       Case 11 'XYZ ABC lineáris
-190         GoSub *S111
+186       'Case 4 'Megfogó kiürítése
+187       '  GoSub *S4
+188       'Break
+189       Case 10 'XYZ ABC joint
+190         GoSub *S10
 191         Break
-192       ' DANGER!! még nem nem tudtam foglalkozni vele IGNORE küldjön hibát
-193       'Case 12 'XYZ ABC lineáris erõre
-194       '  GoSub *S12
-195       'Break
-196       'Case 20 'XYZ ABC eltolás joint
-197       '  GoSub *S20
+192       Case 11 'XYZ ABC lineáris
+193         GoSub *S111
+194         Break
+195       ' DANGER!! még nem nem tudtam foglalkozni vele IGNORE küldjön hibát
+196       'Case 12 'XYZ ABC lineáris erõre
+197       '  GoSub *S12
 198       'Break
-199       'Case 21 'XYZ ABC eltolás lineáris
-200       '  GoSub *S21
+199       'Case 20 'XYZ ABC eltolás joint
+200       '  GoSub *S20
 201       'Break
-202       'Case 22 'XYZ ABC eltolás lineáris erõre
-203       '  GoSub *S22
+202       'Case 21 'XYZ ABC eltolás lineáris
+203       '  GoSub *S21
 204       'Break
-205       'Case 30 'J1-J6
-206       '  GoSub *S30
+205       'Case 22 'XYZ ABC eltolás lineáris erõre
+206       '  GoSub *S22
 207       'Break
-208       'Case 40 'J1-J6 eltolás
-209       '  GoSub *S40
+208       'Case 30 'J1-J6
+209       '  GoSub *S30
 210       'Break
-211       Default
-212         'IGNORE küldjön hibát
-213         GoSub *HS1
-214         MHibaszam=900
-215         GoSub *HS2
-216         Break
-217     End Select
-218   WEnd
-219   End
-220   '
-221   '
-222   '=================================================================
-223   '---------------------------------
-224   'Szubrutinok következnek-----
-225   '---------------------------------
-226   '=================================================================
-227   *S1 '=======================
-228   'Alaphelyzet
-229    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-230    'Inicializációs rész
-231    Fsc Off
-232    Servo On 'szervo
-233    Ovrd 5 'Sebesség
-234    Accel 5,5 'Gyorsulás, lassulás
-235    M_Tool=0
-236   MHibaszam=0 'Hiba nullázás
-237   Mdarab=0
-238   '=================================================================
-239   '=================================================================
-240   'Mozgás: Kamerás ellenõrzõ pozíciótól
-241    mXtemp = Deg(J_Curr.J4)
-242    mYtemp = Deg(J_Curr.J1)
-243    mZtemp = Deg(J_Curr.J2)
-244   If ((mXtemp>60 And mYtemp<15) Or (mXtemp>60 And mZtemp<-20)) Then
-245   'Kamerás pozícióban áll a robot!
-246   Cnt 0
-247   Mov jKamera
-248     Dly 0.01
-249   Mov jAlaph
-250     Dly 0.01
-251   EndIf
-252   '=================================================================
-253   '=================================================================
-254   'Mozgás: Lerakó területrõl
-255     ptemp0 = P_Curr 'Pillanatnyi pozíció
-256   If (ptemp0.X > (250)) Then
-257   'Lerakó pozícióban áll a fej!
-258   Cnt 0
-259   Dly 0.1
-260     ptemp0.Z=520
-261   Mvs ptemp0
-262     Dly 0.01
-263   Mov jLerakas
-264     Dly 0.01
-265   Mov jAlaph
-266     Dly 0.01
-267   EndIf
-268   '=================================================================
-269   '=================================================================
-270   'Mozgás: Felvételi pozíciótól
-271     ptemp0 = P_Curr 'Pillanatnyi pozíció
-272   If ((ptemp0.X) < (100)) Then
-273   'Felvételi pozícióban áll a fej!
-274   Cnt 0
-275     ptemp0.Z=520
-276   Mvs ptemp0
-277     Dly 0.01
-278   Mov jFelvetel
-279     Dly 0.01
-280   Mov jAlaph
-281     Dly 0.01
-282   EndIf
-283   '=================================================================
-284   '=================================================================
-285   ptemp0 = P_Curr 'Pillanatnyi pozíció
-286   If ((ptemp0.X <= (250)) And  (ptemp0.X >= (100))) Then
-287   Mov jAlaph
-288   Dly 0.01
-289   Else
-290   MHibaszam=999
-291   EndIf
-292   '=================================================================
-293   '=================================================================
-294   'Lekérdezés, hogy Alaph-ben vagyunk
-295    mXtemp = Deg(J_Curr.J1)
-296    mYtemp = Deg(jAlaph.J1)
-297    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
-298     Dly 0.1
-299    WEnd
-300    mXtemp = Deg(J_Curr.J2)
-301    mYtemp = Deg(jAlaph.J2)
-302    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
-303     Dly 0.1
-304    WEnd
-305    mXtemp = Deg(J_Curr.J3)
-306    mYtemp = Deg(jAlaph.J3)
-307    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
-308     Dly 0.1
-309    WEnd
-310    mXtemp = Deg(J_Curr.J4)
-311    mYtemp = Deg(jAlaph.J4)
-312    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
-313     Dly 0.1
-314    WEnd
-315    mXtemp = Deg(J_Curr.J5)
-316    mYtemp = Deg(jAlaph.J5)
-317    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
-318     Dly 0.1
-319    WEnd
-320    mXtemp = Deg(J_Curr.J6)
-321    mYtemp = Deg(jAlaph.J6)
-322    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
-323     Dly 0.1
-324    WEnd
-325   '
-326   'Belsõ változók beállítása
-327    MELOZOTERULET=10
-328    MTERULET=10
-329    MFel=0
-330   '
-331    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-332   Return '=======================
-333   '=================================================================
-334   '*************************************************************************
-335   '*************************************************************************
+211       'Case 40 'J1-J6 eltolás
+212       '  GoSub *S40
+213       'Break
+214       Default
+215         'IGNORE küldjön hibát
+216         GoSub *HS1
+217         MHibaszam=900
+218         GoSub *HS2
+219         Break
+220     End Select
+221   WEnd
+222   End
+223   '
+224   '
+225   '=================================================================
+226   '---------------------------------
+227   'Szubrutinok következnek-----
+228   '---------------------------------
+229   '=================================================================
+230   *S1 '=======================
+231   'Alaphelyzet
+232    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+233    'Inicializációs rész
+234    Fsc Off
+235    Servo On 'szervo
+236    Ovrd 5 'Sebesség
+237    Accel 5,5 'Gyorsulás, lassulás
+238    M_Tool=0
+239   MHibaszam=0 'Hiba nullázás
+240   Mdarab=0
+241   '=================================================================
+242   '=================================================================
+243   'Mozgás: Kamerás ellenõrzõ pozíciótól
+244    mXtemp = Deg(J_Curr.J4)
+245    mYtemp = Deg(J_Curr.J1)
+246    mZtemp = Deg(J_Curr.J2)
+247   If ((mXtemp>60 And mYtemp<15) Or (mXtemp>60 And mZtemp<-20)) Then
+248   'Kamerás pozícióban áll a robot!
+249   Cnt 0
+250   Mov jKamera
+251     Dly 0.01
+252   Mov jAlaph
+253     Dly 0.01
+254   EndIf
+255   '=================================================================
+256   '=================================================================
+257   'Mozgás: Lerakó területrõl
+258     ptemp0 = P_Curr 'Pillanatnyi pozíció
+259   If (ptemp0.X > (250)) Then
+260   'Lerakó pozícióban áll a fej!
+261   Cnt 0
+262   Dly 0.1
+263     ptemp0.Z=520
+264   Mvs ptemp0
+265     Dly 0.01
+266   Mov jLerakas
+267     Dly 0.01
+268   Mov jAlaph
+269     Dly 0.01
+270   EndIf
+271   '=================================================================
+272   '=================================================================
+273   'Mozgás: Felvételi pozíciótól
+274     ptemp0 = P_Curr 'Pillanatnyi pozíció
+275   If ((ptemp0.X) < (100)) Then
+276   'Felvételi pozícióban áll a fej!
+277   Cnt 0
+278     ptemp0.Z=520
+279   Mvs ptemp0
+280     Dly 0.01
+281   Mov jFelvetel
+282     Dly 0.01
+283   Mov jAlaph
+284     Dly 0.01
+285   EndIf
+286   '=================================================================
+287   '=================================================================
+288   ptemp0 = P_Curr 'Pillanatnyi pozíció
+289   If ((ptemp0.X <= (250)) And  (ptemp0.X >= (100))) Then
+290   Mov jAlaph
+291   Dly 0.01
+292   Else
+293   MHibaszam=999
+294   EndIf
+295   '=================================================================
+296   '=================================================================
+297   'Lekérdezés, hogy Alaph-ben vagyunk
+298    mXtemp = Deg(J_Curr.J1)
+299    mYtemp = Deg(jAlaph.J1)
+300    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
+301     Dly 0.1
+302    WEnd
+303    mXtemp = Deg(J_Curr.J2)
+304    mYtemp = Deg(jAlaph.J2)
+305    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
+306     Dly 0.1
+307    WEnd
+308    mXtemp = Deg(J_Curr.J3)
+309    mYtemp = Deg(jAlaph.J3)
+310    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
+311     Dly 0.1
+312    WEnd
+313    mXtemp = Deg(J_Curr.J4)
+314    mYtemp = Deg(jAlaph.J4)
+315    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
+316     Dly 0.1
+317    WEnd
+318    mXtemp = Deg(J_Curr.J5)
+319    mYtemp = Deg(jAlaph.J5)
+320    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
+321     Dly 0.1
+322    WEnd
+323    mXtemp = Deg(J_Curr.J6)
+324    mYtemp = Deg(jAlaph.J6)
+325    While ( mXtemp>mYtemp+20 Or mXtemp<mYtemp-20 )
+326     Dly 0.1
+327    WEnd
+328   '
+329   'Belsõ változók beállítása
+330    MELOZOTERULET=10
+331    MTERULET=10
+332    MFel=0
+333   '
+334    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+335   Return '=======================
 336   '=================================================================
-337   *S2 '=======================
-338   If (MFel=0) Then
-339   'Alaphelyzet
-340    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-341    'Inicializációs rész
-342     Ovrd MSebesseg 'Sebesség
-343    Accel Mgyors,Mlass 'Gyorsulás
-344   '
-345    M_Tool=0 'Nincs még semmilyen tool használva, a pozíciók beállításához használok csak tool-t, elmenteni már tool0-val mentem
-346   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-347    MTERULET=10 'amelyik terulethez kell állítani a tengelyeket
-348    GoSub *TERULETVALTAS
-349    Mov jAlaph
-350   Dly 0.01
-351   MHibaszam=0 'Hiba nullázás
-352   '
-353    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-354   EndIf
-355   Return '=======================
-356   '=================================================================
-357   '*************************************************************************
-358   '*************************************************************************
+337   '*************************************************************************
+338   '*************************************************************************
+339   '=================================================================
+340   *S2 '=======================
+341   If (MFel=0) Then
+342   'Alaphelyzet
+343    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+344    'Inicializációs rész
+345     Ovrd MSebesseg 'Sebesség
+346    Accel Mgyors,Mlass 'Gyorsulás
+347   '
+348    M_Tool=0 'Nincs még semmilyen tool használva, a pozíciók beállításához használok csak tool-t, elmenteni már tool0-val mentem
+349   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+350    MTERULET=10 'amelyik terulethez kell állítani a tengelyeket
+351    GoSub *TERULETVALTAS
+352    Mov jAlaph
+353   Dly 0.01
+354   MHibaszam=0 'Hiba nullázás
+355   '
+356    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+357   EndIf
+358   Return '=======================
 359   '=================================================================
-360   *S3 '=======================
-361   If (MFel=0) Then
-362   'Szerviz pozíció felvétele
-363    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-364    'Inicializációs rész
-365    Ovrd 10 'Sebesség
-366    Accel 10,10 'Gyorsulás
-367   '
-368    M_Tool=0 'Nincs még semmilyen tool használva, a pozíciók beállításához használok csak tool-t, elmenteni már tool0-val mentem
-369   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-370    MTERULET=20 'amelyik terulethez kell állítani a tengelyeket
-371    GoSub *TERULETVALTAS
-372    Mov jSzerviz
-373     Dly 0.01
-374    MFel=0
-375   '
-376    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-377   EndIf
-378   Return '=======================
-379   '=================================================================
-380   '*************************************************************************
-381   '*************************************************************************
+360   '*************************************************************************
+361   '*************************************************************************
+362   '=================================================================
+363   *S3 '=======================
+364   If (MFel=0) Then
+365   'Szerviz pozíció felvétele
+366    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+367    'Inicializációs rész
+368    Ovrd 10 'Sebesség
+369    Accel 10,10 'Gyorsulás
+370   '
+371    M_Tool=0 'Nincs még semmilyen tool használva, a pozíciók beállításához használok csak tool-t, elmenteni már tool0-val mentem
+372   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+373    MTERULET=20 'amelyik terulethez kell állítani a tengelyeket
+374    GoSub *TERULETVALTAS
+375    Mov jSzerviz
+376     Dly 0.01
+377    MFel=0
+378   '
+379    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+380   EndIf
+381   Return '=======================
 382   '=================================================================
-383   *S4 '=======================
-384   If (MFel=0) Then
-385   'Megfogó kiürítése
-386    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-387    'Inicializációs rész
-388     Ovrd MSebesseg 'Sebesség
-389    Accel Mgyors,Mlass 'Gyorsulás
-390   '
-391    M_Tool=0 'Nincs még semmilyen tool használva, a pozíciók beállításához használok csak tool-t, elmenteni már tool0-val mentem
-392   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-393    MTERULET=30 'amelyik terulethez kell állítani a tengelyeket
-394    GoSub *TERULETVALTAS
-395    Mov jMurites
-396     Dly 0.001
-397   Cnt 0
-398   Mvs pMurites
-399     Dly 0.01
-400   '
-401    Mdarab=0
-402    MFel=0
+383   '*************************************************************************
+384   '*************************************************************************
+385   '=================================================================
+386   *S4 '=======================
+387   If (MFel=0) Then
+388   'Megfogó kiürítése
+389    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+390    'Inicializációs rész
+391     Ovrd MSebesseg 'Sebesség
+392    Accel Mgyors,Mlass 'Gyorsulás
+393   '
+394    M_Tool=0 'Nincs még semmilyen tool használva, a pozíciók beállításához használok csak tool-t, elmenteni már tool0-val mentem
+395   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+396    MTERULET=30 'amelyik terulethez kell állítani a tengelyeket
+397    GoSub *TERULETVALTAS
+398    Mov jMurites
+399     Dly 0.001
+400   Cnt 0
+401   Mvs pMurites
+402     Dly 0.01
 403   '
-404    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-405   EndIf
-406   Return '=======================
-407   '=================================================================
-408   '=================================================================
-409   '**************************XYZ ABC joint**************************
+404    Mdarab=0
+405    MFel=0
+406   '
+407    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+408   EndIf
+409   Return '=======================
 410   '=================================================================
 411   '=================================================================
-412   *S10 '=======================
-413     '
-414     If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-415       'XYZ ABC joint
-416       GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-417       ptemp1=P_Curr
-418       ptemp1.X=(MPosX/100)
-419       ptemp1.Y=(MPosY/100)
-420       ptemp1.Z=(MPosZ/100)
-421       If Dist(P_Zero,ptemp1) < 300 Then
-422         MHibaszam=910 'Zero detect!!!
-423       Else 'Zero detect!!!
-424         ptemp1.A=Rad(MPosA/100)
-425         ptemp1.B=Rad(MPosB/100)
-426         ptemp1.C=Rad(MPosC/100)
-427         M1 = Abs(Cos(P_Curr.A)-Cos(ptemp1.A)) + Abs(Cos(P_Curr.B)-Cos(ptemp1.B)) + Abs(Cos(P_Curr.C)-Cos(ptemp1.C))
-428         '
-429         If Dist(P_Curr,ptemp1) > 0 Or M1 > 0 Then
-430           ' ha fut a R2D2.prg bekapcsolhatja tudtam hol a robot
-431           ' akkor nekem nem kell alahelyzet felvétel
-432           ' ha pedig S.A szolgáltatja az adatokatt akkor meg az ellenörzés sem kell
-433           If M_Svo=0 Then
-434             If M_Run(3)=1 Then
-435               Servo On 'szervo
-436             EndIf ' R2D2.prg
-437           EndIf ' M_Servo?
-438           Fsc Off
-439           M_Tool=0
-440           Ovrd MSebesseg 'Sebesség
-441           Accel Mgyors,Mlass 'Gyorsulás
-442           '
-443           Rem ezt kiszedtem mert amíg nincsenek felvéve területek
-444           Rem úgy gondolom bajos, lutri
-445           ' Cnt 1
-446           '
-447           'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-448           MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-449           'GoSub *TERULETVALTAS
-450           MELOZOTERULET=MTERULET
-451           MHibaszam=0
-452           '
-453           Cnt 0
-454           M1 = Dist(P_Zero,ptemp1) 'ha jol látom most jo ez is de egyébként lehet egy "doboz" közepe zero helyett
+412   '**************************XYZ ABC joint**************************
+413   '=================================================================
+414   '=================================================================
+415   *S10 '=======================
+416     '
+417     If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
+418       'XYZ ABC joint
+419       GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+420       ptemp1=P_Curr
+421       ptemp1.X=(MPosX/100)
+422       ptemp1.Y=(MPosY/100)
+423       ptemp1.Z=(MPosZ/100)
+424       If Dist(P_Zero,ptemp1) < 300 Then
+425         MHibaszam=910 'Zero detect!!!
+426       Else 'Zero detect!!!
+427         ptemp1.A=Rad(MPosA/100)
+428         ptemp1.B=Rad(MPosB/100)
+429         ptemp1.C=Rad(MPosC/100)
+430         M1 = Abs(Cos(P_Curr.A)-Cos(ptemp1.A)) + Abs(Cos(P_Curr.B)-Cos(ptemp1.B)) + Abs(Cos(P_Curr.C)-Cos(ptemp1.C))
+431         '
+432         If Dist(P_Curr,ptemp1) > 0 Or M1 > 0 Then
+433           ' ha fut a R2D2.prg bekapcsolhatja tudtam hol a robot
+434           ' akkor nekem nem kell alahelyzet felvétel
+435           ' ha pedig S.A szolgáltatja az adatokatt akkor meg az ellenörzés sem kell
+436           If M_Svo=0 Then
+437             If M_Run(3)=1 Then
+438               Servo On 'szervo
+439             EndIf ' R2D2.prg
+440           EndIf ' M_Servo?
+441           Fsc Off
+442           M_Tool=0
+443           Ovrd MSebesseg 'Sebesség
+444           Accel Mgyors,Mlass 'Gyorsulás
+445           '
+446           Rem ezt kiszedtem mert amíg nincsenek felvéve területek
+447           Rem úgy gondolom bajos, lutri
+448           ' Cnt 1
+449           '
+450           'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+451           MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+452           'GoSub *TERULETVALTAS
+453           MELOZOTERULET=MTERULET
+454           MHibaszam=0
 455           '
-456           M2=Abs(ptemp1.A)
-457              If M2<Abs(ptemp1.B) Then M2=Abs(ptemp1.B)
-458              If M2<Abs(ptemp1.C) Then M2=Abs(ptemp1.C)
-459           '
-460           M3 = Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
-461           '
-462           'If ((MPosX>-100000& And MPosX<100000& And MPosY>-100000& And MPosY<100000& And MPosZ>-30000 And MPosZ<150000&) And (MPosA>-36000& And MPosA<36000& And MPosB>-36000& And MPosB<36000& And MPosC>-36000& And MPosC<36000&)) Then
+456           Cnt 0
+457           M1 = Dist(P_Zero,ptemp1) 'ha jol látom most jo ez is de egyébként lehet egy "doboz" közepe zero helyett
+458           '
+459           M2=Abs(ptemp1.A)
+460              If M2<Abs(ptemp1.B) Then M2=Abs(ptemp1.B)
+461              If M2<Abs(ptemp1.C) Then M2=Abs(ptemp1.C)
+462           '
 463           M3 = Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
-464           If M1 < M3 And M2 < (M_PI*2.0) Then
-465             M1=PosCq(ptemp1)
-466             M2=0
-467             While (M1=0) And (M2<100)
-468               Select M2
-469                 Case 0 'talán rossz az f2
-470                   jtemp1 = PtoJ(ptemp1)
-471                   ptemp1 = JtoP(jtemp1)
-472                   Dly 1.0 'a userdefined screenen lassam itt van
-473                 Break
-474                 Case 1 'kérjünk egy közbenso állapotot
-475                   ptemp1=PosMid(P_Curr,ptemp1,0,0)
-476                   Dly 1.0 'a userdefined screenen lassam itt van
-477                 Break
-478                 Case 2 'talán rossz a min.f2
-479                   jtemp1 = PtoJ(ptemp1)
-480                   ptemp1 = JtoP(jtemp1)
-481                   Dly 1.0 'a userdefined screenen lassam itt van
-482                 Break
-483                 Case 3 '
-484                   ptemp1=PosMid(P_Curr,ptemp1,0,0)
-485                   M2=99
-486                   Dly 4.0 'a userdefined screenen lassam itt van
-487                 Break
-488               End Select
-489               M1 = PosCq(ptemp1)
-490               M2=M2+1
-491               Dly 1.0 'a userdefined screenen lassam itt van
-492               ' valami nem tetszett
-493             WEnd
-494             M1 = PosCq(ptemp1)
-495             If M1=1 Then
-496               Mov ptemp1
-497             Else
-498               'küldjön akkor is hibát ha netán sikerül mozogni
-499               'ezeket fel akarom jegyezni
-500               MHibaszam=931
-501               Dly 10.0 'a userdefined screenen lassam itt van
-502               ' valami nem tetszett
-503               ' esetleg le löjem, vagy sem? 10 másodperc van rá
-504               Mov ptemp1
-505             EndIf
-506             '
-507             MFel=0 'Bármelyik parancs következhet
-508             '
-509           Else ' CAGE BOX
-510             MHibaszam=911
-511           EndIf ' CAGE BOX?
-512         EndIf ' MOVE? Dist?
-513       EndIf  'Zero detect?
-514       GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-515     Else 'MFel?
-516       MHibaszam=900
-517     EndIf 'MFel?
-518   Return '=======================
-519   '=================================================================
-520   '=================================================================
-521   '************************XYZ ABC lineáris**************************
+464           '
+465           'If ((MPosX>-100000& And MPosX<100000& And MPosY>-100000& And MPosY<100000& And MPosZ>-30000 And MPosZ<150000&) And (MPosA>-36000& And MPosA<36000& And MPosB>-36000& And MPosB<36000& And MPosC>-36000& And MPosC<36000&)) Then
+466           M3 = Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
+467           If M1 < M3 And M2 < (M_PI*2.0) Then
+468             M1=PosCq(ptemp1)
+469             M2=0
+470             While (M1=0) And (M2<100)
+471               Select M2
+472                 Case 0 'talán rossz az f2
+473                   jtemp1 = PtoJ(ptemp1)
+474                   ptemp1 = JtoP(jtemp1)
+475                   Dly 1.0 'a userdefined screenen lassam itt van
+476                 Break
+477                 Case 1 'kérjünk egy közbenso állapotot
+478                   ptemp1=PosMid(P_Curr,ptemp1,0,0)
+479                   Dly 1.0 'a userdefined screenen lassam itt van
+480                 Break
+481                 Case 2 'talán rossz a min.f2
+482                   jtemp1 = PtoJ(ptemp1)
+483                   ptemp1 = JtoP(jtemp1)
+484                   Dly 1.0 'a userdefined screenen lassam itt van
+485                 Break
+486                 Case 3 '
+487                   ptemp1=PosMid(P_Curr,ptemp1,0,0)
+488                   M2=99
+489                   Dly 4.0 'a userdefined screenen lassam itt van
+490                 Break
+491               End Select
+492               M1 = PosCq(ptemp1)
+493               M2=M2+1
+494               Dly 1.0 'a userdefined screenen lassam itt van
+495               ' valami nem tetszett
+496             WEnd
+497             M1 = PosCq(ptemp1)
+498             If M1=1 Then
+499               Mov ptemp1
+500             Else
+501               'küldjön akkor is hibát ha netán sikerül mozogni
+502               'ezeket fel akarom jegyezni
+503               MHibaszam=931
+504               Dly 10.0 'a userdefined screenen lassam itt van
+505               ' valami nem tetszett
+506               ' esetleg le löjem, vagy sem? 10 másodperc van rá
+507               Mov ptemp1
+508             EndIf
+509             '
+510             MFel=0 'Bármelyik parancs következhet
+511             '
+512           Else ' CAGE BOX
+513             MHibaszam=911
+514           EndIf ' CAGE BOX?
+515         EndIf ' MOVE? Dist?
+516       EndIf  'Zero detect?
+517       GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+518     Else 'MFel?
+519       MHibaszam=900
+520     EndIf 'MFel?
+521   Return '=======================
 522   '=================================================================
 523   '=================================================================
-524   *S111:
-525     MGY = Mgyors/4
-526     ML = Mlass/4
-527     GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-528     MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-529     MELOZOTERULET=MTERULET
-530     If (MFel<>0) Then 'MFel?
-531       MHibaszam=900
-532     Else  'MFel?
-533       Mz = Dist(P_Zero,ptemp2)
-534       If Mz < Mzero Then
-535         MHibaszam=910 'Zero detect!!!
-536       ElseIf Dist(ptemp1,ptemp2) > 0 Then
-537         MHibaszam=911 'HS1 detect!!!
-538       Else 'Zero detect!!!
-539         'ptemp1,ptemp2 azonos
-540         Md=Dist(P_Curr,ptemp2)
-541         Ma=FNMabc(P_Curr,ptemp2)
-542         If (Ma+Md)=0 Then  ' MOVE? TURN?
-543           MHibaszam=0
-544         Else ' MOVE? TURN?
-545           If M_Svo=0 Then
-546             If M_Run(3)=1 Then
-547               Servo On 'szervo
-548             EndIf ' R2D2.prg
-549           EndIf ' M_Servo?
-550           Fsc Off
-551           M_Tool=0
-552           ' speed
-553           MlstV=100
-554           If Md>0 And MPosS > 0 Then
-555             MlstV=FNMdOVRD(MPosS,Md,MmxSPD)
-556             MlstV=Max(1,MlstV)
-557             MlstV=Min(100,MlstV)
-558           EndIf
-559           Ovrd MlstV 'MSebesseg 'Sebesség
-560           Accel MGY,ML 'Gyorsulás
-561           Mcage=Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
-562           M2=Abs(ptemp2.A)
-563             If M2<Abs(ptemp2.B) Then M2=Abs(ptemp2.B)
-564             If M2<Abs(ptemp2.C) Then M2=Abs(ptemp2.C)
-565           If (Mz>Mcage) Or (M2>(M_PI*2.0)) Then ' CAGE BOX
-566             MHibaszam=912
-567           Else ' CAGE BOX
-568             ptemp0 = P_Curr 'a kiindulási pozició
-569             GoSub *MOVE
-570           EndIf ' CAGE BOX
-571         EndIf ' MOVE? TURN?
-572       EndIf 'Zero detect!!!
-573     EndIf 'MFel?
-574     GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-575   Return '=======================
-576   '
-577   '
-578   '
-579   *S110IRQ:
-580     Act 2=0
-581     'ioHS3=1
-582     Cnt 1
-583   *S110: '=======================
-584     MGY = Mgyors/4
-585     ML = Mlass/4
-586   *S110CNT:
-587     GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-588     If (MFel<>0) Then 'MFel?
-589       MHibaszam=900
-590     Else  'MFel?
-591       If Dist(P_Zero,ptemp2) < 300 Then
-592         MHibaszam=910 'Zero detect!!!
-593       ElseIf Dist(ptemp1,ptemp2) > 0 Then
-594         MHibaszam=911 'HS1 detect!!!
-595       Else 'Zero detect!!!
-596         'ABC Posture különbség
-597         M2=Abs(Cos(P_Curr.A)-Cos(ptemp2.A))
-598           If M2<Abs(Cos(P_Curr.B)-Cos(ptemp2.B)) Then M2=Abs(Cos(P_Curr.B)-Cos(ptemp2.B))
-599           If M2<Abs(Cos(P_Curr.C)-Cos(ptemp2.C)) Then M2=Abs(Cos(P_Curr.C)-Cos(ptemp2.C))
-600         'XYZ Távolság
-601         M1=Dist(P_Curr,ptemp2)
-602         MHibaszam=0
-603         If (M1+M2)=0 Then  ' MOVE? TURN?
-604           MHibaszam=0
-605         Else ' MOVE? TURN?
-606           If M_Svo=0 Then
-607             If M_Run(3)=1 Then
-608               Servo On 'szervo
-609             EndIf ' R2D2.prg
-610           EndIf ' M_Servo?
-611           Fsc Off
-612           M_Tool=0
-613           ' Tehát M1 mm-ben meg van a távolság
-614           Md = M1
-615           MlstV=MSebesseg
-616           'Me=(MPosS-MlstE) ' Mikorra kéne ott lenni
-617           If MPosS>0 Then
-618             ' megvan adva mennyi ido van rá
-619             MPosS100=MPosS/100.0
-620             MV=(MmxSPD*M_OPovrd)/100.0 'sebesség 150mm/sec * OP
-621             M6=(Md/MV)*1000.0 'd/Mv = sec lenne max sebességben, felszorozzuk menyivel több ebben a sebeségen ?
-622             MlstV2=M6/MPosS100
-623             MlstV=MlstV2
-624             If MlstV>MSebesseg Then
-625                 MlstV=MSebesseg
-626             ElseIf MlstV < 1 Then
-627                 MlstV = 1
-628             EndIf
-629           EndIf
-630           Ovrd MlstV 'MSebesseg 'Sebesség
-631           Accel MGY,ML 'Gyorsulás
-632           MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-633           MELOZOTERULET=MTERULET
-634           Cnt 0
-635           ' CAGE check -----------------------------------------------
-636             M2=Abs(ptemp2.A)
-637             If M2<Abs(ptemp2.B) Then M2=Abs(ptemp2.B)
-638             If M2<Abs(ptemp2.C) Then M2=Abs(ptemp2.C)
-639           M3 = Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
-640           If (M1 > M3) Or (M2 > (M_PI*2.0)) Then ' CAGE BOX
-641             MHibaszam=911
-642           Else ' CAGE BOX
-643             jtemp2 = PtoJ(ptemp2)
-644             'old If (Abs(jtemp2.J4)<Rad(90)) And Abs(jtemp2.J5)<Rad(75.0)  Then ' Soft J4
-645             M4 = Abs(Deg(jtemp2.J4)-MNMX(4,3)) 'resetnél ki van számolva a paraméterek közepe
-646             M5 = Abs(Deg(jtemp2.J5)-MNMX(5,3)) 'resetnél ki van számolva a paraméterek közepe
-647             'ezt azért mert TB-n ropant nehéz olvasni a kilométeres sorokat
-648             'egyszeru eltérést számol a középtol
-649             If (M4<MNMX(4,4)) And (M5<MNMX(5,4)) Then ' Soft J4
-650               Mvs ptemp2 'WthIf M_Ratio >= Mhs2rt, ioHS2 = 1
-651               Cnt 0
-652             Else ' Hard J4
-653               jtemp0=J_Curr
-654               ' FLIP? 4 ax
-655               If M4>MNMX(4,4) Then
-656                 If Deg(jtemp2.J4)>MNMX(4,3) Then
-657                   jtemp2.J4=jtemp2.J4-M_PI
-658                 Else
-659                   jtemp2.J4=jtemp2.J4+M_PI
-660                 EndIf
-661                 ' FLIP 5 ax
-662                 jtemp2.J5=jtemp2.J5*-1.0
-663                 M5 = Abs(Deg(jtemp2.J5)-MNMX(5,3)) 'lehet így mar jó?
-664                 ' FLIP 6 ax
-665                 jtemp2.J6=jtemp2.J6*-1.0
-666               EndIf
-667               If M5>MNMX(5,4) Then
-668                 MHibaszam=9115
-669                 If Deg(jtemp2.J5)>MNMX(5,3) Then
-670                   jtemp2.J5=M_PI*((MNMX(5,2)-Max5off)/180.0) 'maximum
-671                 Else
-672                   jtemp2.J5=M_PI*((MNMX(5,1)+Max5off)/180.0) 'minimum
-673                 EndIf
-674               EndIf
-675               ' MIDLE jtemp1
-676               jtemp1.J1 = (jtemp2.J1-J_Curr.J1)*Mmid + J_Curr.J1
-677               jtemp1.J2 = (jtemp2.J2-J_Curr.J2)*Mmid + J_Curr.J2
-678               jtemp1.J3 = (jtemp2.J3-J_Curr.J3)*Mmid + J_Curr.J3
-679               jtemp1.J4 = (jtemp2.J4-J_Curr.J4)*Mmid + J_Curr.J4
-680               jtemp1.J5 = (jtemp2.J5-J_Curr.J5)*Mmid + J_Curr.J5
-681               jtemp1.J6 = (jtemp2.J6-J_Curr.J6)*Mmid + J_Curr.J6
-682               Mov jtemp1 'WthIf M_Ratio >= Mhs2rt, ioHS2=1
-683             EndIf ' Soft J4
-684             'If ioHS3=1 Then
-685             '  Cnt 1
-686             '  GoSub *FEEDBACK
-687             '  Wait ioHS3=0
-688             '  GoSub *PXYZABCS
-689             '  If ioCOM=11 Then
-690             '    ioHS3=0
-691             '    GoTo *S110CNT
-692             '  EndIf
-693             'EndIf
-694           EndIf ' CAGE BOX?
-695         EndIf ' MOVE? TURN?
-696       EndIf  'Zero detect?
-697     EndIf 'MFel?
-698     GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-699 '    If (ioCOM=11) And ioHS1=1 And (M_Svo(1)=1) Then
-700 '        MGY = 100
-701 '        ML = 100
-702 '        Cnt 1
-703 '        GoTo *S110 'ha folytatásra érkezett parancs
-704 '    EndIf
-705    ioHS3=0
-706    Cnt 0
-707   Return '=======================
-708   *S11 '=======================
-709     '
-710     If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-711       'XYZ ABC joint
-712       GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-713       ptemp1=P_Curr
-714       ptemp1.X=(MPosX/100)
-715       ptemp1.Y=(MPosY/100)
-716       ptemp1.Z=(MPosZ/100)
-717       If Dist(P_Zero,ptemp1) < 300 Then
-718         MHibaszam=910 'Zero detect!!!
-719       Else 'Zero detect!!!
-720         ptemp1.A=Rad(MPosA/100)
-721         ptemp1.B=Rad(MPosB/100)
-722         ptemp1.C=Rad(MPosC/100)
-723         M1 = Abs(Cos(P_Curr.A)-Cos(ptemp1.A)) + Abs(Cos(P_Curr.B)-Cos(ptemp1.B)) + Abs(Cos(P_Curr.C)-Cos(ptemp1.C))
-724         '
-725         If Dist(P_Curr,ptemp1) > 0 Or M1 > 0 Then
-726           ' ha fut a R2D2.prg bekapcsolhatja tudtam hol a robot
-727           ' akkor nekem nem kell alahelyzet felvétel
-728           ' ha pedig S.A szolgáltatja az adatokatt akkor meg az ellenörzés sem kell
-729           If M_Svo=0 Then
-730             If M_Run(3)=1 Then
-731               Servo On 'szervo
-732             EndIf ' R2D2.prg
-733           EndIf ' M_Servo?
-734           Fsc Off
-735           M_Tool=0
-736           Ovrd MSebesseg 'Sebesség
-737           Accel Mgyors,Mlass 'Gyorsulás
-738           '
-739           Rem ezt kiszedtem mert amíg nincsenek felvéve területek
-740           Rem úgy gondolom bajos, lutri
-741           ' Cnt 1
-742           '
-743           'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-744           MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-745           'GoSub *TERULETVALTAS
-746           MELOZOTERULET=MTERULET
-747           MHibaszam=0
-748           '
-749           Cnt 0
-750           M1 = Dist(P_Zero,ptemp1) 'ha jol látom most jo ez is de egyébként lehet egy "doboz" közepe zero helyett
-751           '
-752           M2=Abs(ptemp1.A)
-753              If M2<Abs(ptemp1.B) Then M2=Abs(ptemp1.B)
-754              If M2<Abs(ptemp1.C) Then M2=Abs(ptemp1.C)
-755           '
-756           M3 = Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
-757           '
-758           If M1 < M3 And M2 < (M_PI*2.0) Then
-759             M1=PosCq(ptemp1)
-760             M2=0
-761             While (M1=0) And (M2<100)
-762               Select M2
-763                 Case 0 'talán rossz az f2
-764                   jtemp1 = PtoJ(ptemp1)
-765                   ptemp1 = JtoP(jtemp1)
-766                   Dly 1.0 'a userdefined screenen lassam itt van
-767                 Break
-768                 Case 1 'kérjünk egy közbenso állapotot
-769                   ptemp1=PosMid(P_Curr,ptemp1,1,0)
-770                   Dly 1.0 'a userdefined screenen lássam itt van
-771                 Break
-772                 Case 2 'talán rossz a min.f2
-773                   jtemp1 = PtoJ(ptemp1)
-774                   ptemp1 = JtoP(jtemp1)
-775                   Dly 1.0 'a userdefined screenen lássam itt van
-776                 Break
-777                 Case 3 '
-778                   ptemp1=PosMid(P_Curr,ptemp1,1,0)
-779                   M2=99
-780                   Dly 1.0 'a userdefined screenen lássam itt van
-781                 Break
-782               End Select
-783               M1=PosCq(ptemp1)
-784               M2=M2+1
-785               Dly 1.0 'a userdefined screenen lássam itt van
-786               ' valami nem tetszett
-787             WEnd
-788             '
-789             jtemp1 = PtoJ(ptemp1)
-790             If Abs(jtemp1.J4) > (M_PI*2.0/4.0) Then
-791               Mvs ptemp1 Type 1,0
-792               MHibaszam=931
-793             Else
-794               Mvs ptemp1
-795             EndIf
-796             '
-797             MFel=0 'Bármelyik parancs következhet
-798             '
-799           Else ' CAGE BOX
-800             MHibaszam=911
-801           EndIf ' CAGE BOX?
-802         EndIf ' MOVE? Dist?
-803       EndIf  'Zero detect?
-804       GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-805     Else 'MFel?
-806       MHibaszam=900
-807     EndIf 'MFel?
-808   Return '=======================
+524   '************************XYZ ABC lineáris**************************
+525   '=================================================================
+526   '=================================================================
+527   *S111:
+528     MGY = Mgyors/4
+529     ML = Mlass/4
+530     GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+531     MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+532     MELOZOTERULET=MTERULET
+533     If (MFel<>0) Then 'MFel?
+534       MHibaszam=900
+535     Else  'MFel?
+536       Mz = Dist(P_Zero,ptemp2)
+537       If Mz < Mzero Then
+538         MHibaszam=910 'Zero detect!!!
+539       ElseIf Dist(ptemp1,ptemp2) > 0 Then
+540         MHibaszam=911 'HS1 detect!!!
+541       Else 'Zero detect!!!
+542         'ptemp1,ptemp2 azonos
+543         Md=Dist(P_Curr,ptemp2)
+544         Ma=FNMabc(P_Curr,ptemp2)
+545         If (Ma+Md)=0 Then  ' MOVE? TURN?
+546           MHibaszam=0
+547         Else ' MOVE? TURN?
+548           If M_Svo=0 Then
+549             If M_Run(3)=1 Then
+550               Servo On 'szervo
+551             EndIf ' R2D2.prg
+552           EndIf ' M_Servo?
+553           Fsc Off
+554           M_Tool=0
+555           ' speed
+556           MlstV=100
+557           If Md>0 Then
+558             If MPosS > 0 Then
+559               MlstV=FNMdOVRD(MPosS,Md,MmxSPD)
+560               MlstV=Max(1,MlstV)
+561               MlstV=Min(100,MlstV)
+562             Else
+563               MPosS=FNMdMS(Md,MmxSPD)
+564             EndIf
+565           Else
+566             MPosS=FNMdMS(100.0,MmxSPD)
+567           EndIf
+568           Ovrd MlstV 'MSebesseg 'Sebesség
+569           Accel MGY,ML 'Gyorsulás
+570           Mcage=Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
+571           M2=Abs(ptemp2.A)
+572             If M2<Abs(ptemp2.B) Then M2=Abs(ptemp2.B)
+573             If M2<Abs(ptemp2.C) Then M2=Abs(ptemp2.C)
+574           If (Mz>Mcage) Or (M2>(M_PI*2.0)) Then ' CAGE BOX
+575             MHibaszam=912
+576           Else ' CAGE BOX
+577             MHibaszam=0
+578             ptemp0 = P_Curr 'a kiindulási pozició
+579             Mti = 0.0
+580             Mts = MPosS/4.0
+581             If Mts > 250.0 Then ' Mts
+582                 While (Mti<MPosS) And (ioHS1=0)
+583                     Cnt 1
+584                     Mti=Mti+Mts
+585                     jtemp0 = PtoJ(ptemp0)
+586                     jtemp1 = PtoJ(ptemp1)
+587                     jtemp2.J1 = (((jtemp1.J1-jtemp0.J1)*Mti)/MPosS)+jtemp0.J1
+588                     jtemp2.J2 = (((jtemp1.J2-jtemp0.J2)*Mti)/MPosS)+jtemp0.J2
+589                     jtemp2.J3 = (((jtemp1.J3-jtemp0.J3)*Mti)/MPosS)+jtemp0.J3
+590                     jtemp2.J4 = (((jtemp1.J4-jtemp0.J4)*Mti)/MPosS)+jtemp0.J4
+591                     jtemp2.J5 = (((jtemp1.J5-jtemp0.J5)*Mti)/MPosS)+jtemp0.J5
+592                     jtemp2.J6 = (((jtemp1.J6-jtemp0.J6)*Mti)/MPosS)+jtemp0.J6
+593                     ptemp2=JtoP(jtemp2)
+594                     GoSub *MOVEt2
+595                     GoSub *FEEDBACK
+596                     If ioHS1=1 Then
+597                       GoTo *S111
+598                     EndIf
+599                 WEnd
+600                 ptemp2 = ptemp1
+601             EndIf ' Mts > 250.0
+602             GoSub *MOVEt2
+603           EndIf ' CAGE BOX
+604         EndIf ' MOVE? TURN?
+605       EndIf 'Zero detect!!!
+606     EndIf 'MFel?
+607     Cnt 0
+608     GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+609   Return '=======================
+610   *S11:
+611     MGY = Mgyors/4
+612     ML = Mlass/4
+613     GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+614     MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+615     MELOZOTERULET=MTERULET
+616     If (MFel<>0) Then 'MFel?
+617       MHibaszam=900
+618     Else  'MFel?
+619       Mz = Dist(P_Zero,ptemp2)
+620       If Mz < Mzero Then
+621         MHibaszam=910 'Zero detect!!!
+622       ElseIf Dist(ptemp1,ptemp2) > 0 Then
+623         MHibaszam=911 'HS1 detect!!!
+624       Else 'Zero detect!!!
+625         'ptemp1,ptemp2 azonos
+626         Md=Dist(P_Curr,ptemp2)
+627         Ma=FNMabc(P_Curr,ptemp2)
+628         If (Ma+Md)=0 Then  ' MOVE? TURN?
+629           MHibaszam=0
+630         Else ' MOVE? TURN?
+631           If M_Svo=0 Then
+632             If M_Run(3)=1 Then
+633               Servo On 'szervo
+634             EndIf ' R2D2.prg
+635           EndIf ' M_Servo?
+636           Fsc Off
+637           M_Tool=0
+638           ' speed
+639           MlstV=100
+640           If Md>0 And MPosS > 0 Then
+641             MlstV=FNMdOVRD(MPosS,Md,MmxSPD)
+642             MlstV=Max(1,MlstV)
+643             MlstV=Min(100,MlstV)
+644           EndIf
+645           Ovrd MlstV 'MSebesseg 'Sebesség
+646           Accel MGY,ML 'Gyorsulás
+647           Mcage=Sqr(3.0*(800.0*800.0)) 'kb ~1385mm
+648           M2=Abs(ptemp2.A)
+649             If M2<Abs(ptemp2.B) Then M2=Abs(ptemp2.B)
+650             If M2<Abs(ptemp2.C) Then M2=Abs(ptemp2.C)
+651           If (Mz>Mcage) Or (M2>(M_PI*2.0)) Then ' CAGE BOX
+652             MHibaszam=912
+653           Else ' CAGE BOX
+654             ptemp0 = P_Curr 'a kiindulási pozició
+655             GoSub *MOVEt2
+656           EndIf ' CAGE BOX
+657         EndIf ' MOVE? TURN?
+658       EndIf 'Zero detect!!!
+659     EndIf 'MFel?
+660     GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+661   Return '=======================
+662   '=================================================================
+663   '=================================================================
+664   '*********************XYZ ABC lineáris erõre***********************
+665   '=================================================================
+666   '=================================================================
+667   *S12 '=======================
+668   '
+669   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
+670    'XYZ ABC lineáris erõre
+671    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+672   '
+673    Ovrd MSebesseg 'Sebesség
+674    Accel Mgyors,Mlass 'Gyorsulás
+675   '
+676   Cnt 1
+677   '
+678   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+679    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+680    GoSub *TERULETVALTAS
+681   MHibaszam=0
+682   '
+683   Cnt 0
+684   '
+685   ptemp1=P_Curr 'Pillanatnyi pozíció
+686   '
+687   If ((MPosX>100 And MPosX<300 And MPosY>100 And MPosY<300 And MPosZ>100 And MPosZ<300) And (MPosA>100 And MPosA<300 And MPosB>100 And MPosB<300 And MPosC>100 And MPosC<300)) Then
+688    ptemp1.X=(MPosX/100)
+689    ptemp1.Y=(MPosY/100)
+690    ptemp1.Z=(MPosZ/100)
+691    ptemp1.A=Rad(MPosA/100)
+692    ptemp1.B=Rad(MPosB/100)
+693    ptemp1.C=Rad(MPosC/100)
+694    Fsc On, 1,1,1
+695    FsCTrg 1,10,1
+696    Mvs ptemp1
+697    Dly 0.01
+698    Fsc Off
+699   '
+700   MFel=0 'Bármelyik parancs következhet
+701   '
+702   Else
+703   MHibaszam=910
+704   EndIf
+705   '
+706    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+707   '
+708   Else
+709   MHibaszam=900
+710   EndIf
+711   Return '=======================
+712   '=================================================================
+713   '=================================================================
+714   '********************XYZ ABC eltolás joint************************
+715   '=================================================================
+716   '=================================================================
+717   *S20 '=======================
+718   '
+719   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
+720    'XYZ ABC eltolás joint
+721    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+722   '
+723    Ovrd MSebesseg 'Sebesség
+724    Accel Mgyors,Mlass 'Gyorsulás
+725   '
+726   Cnt 1
+727   '
+728   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+729    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+730    GoSub *TERULETVALTAS
+731   MHibaszam=0
+732   '
+733   Cnt 0
+734   '
+735   ptemp1=P_Curr 'Pillanatnyi pozíció
+736   '
+737   If ((MPosXe>-1000 And MPosXe<1000 And MPosYe>100 And MPosYe<300 And MPosZe>100 And MPosZe<300) And (MPosAe>100 And MPosAe<300 And MPosBe>100 And MPosBe<300 And MPosCe>100 And MPosCe<300)) Then
+738    ptemp1.X=ptemp1.X+(MPosXe/100)
+739    ptemp1.Y=ptemp1.Y+(MPosYe/100)
+740    ptemp1.Z=ptemp1.Z+(MPosZe/100)
+741    ptemp1.A=ptemp1.A+Rad(MPosAe/100)
+742    ptemp1.B=ptemp1.B+Rad(MPosBe/100)
+743    ptemp1.C=ptemp1.C+Rad(MPosCe/100)
+744    Mov ptemp1
+745    Dly 0.01
+746   '
+747   MFel=0 'Bármelyik parancs következhet
+748   '
+749   Else
+750   MHibaszam=910
+751   EndIf
+752   '
+753    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+754   '
+755   Else
+756   MHibaszam=900
+757   EndIf
+758   Return '=======================
+759   '=================================================================
+760   '=================================================================
+761   '********************XYZ ABC eltolás lineáris*********************
+762   '=================================================================
+763   '=================================================================
+764   *S21 '=======================
+765   '
+766   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
+767    'XYZ ABC eltolás lineáris
+768    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+769   '
+770    Ovrd MSebesseg 'Sebesség
+771    Accel Mgyors,Mlass 'Gyorsulás
+772   '
+773   Cnt 1
+774   '
+775   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+776    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+777    GoSub *TERULETVALTAS
+778   MHibaszam=0
+779   '
+780   Cnt 0
+781   '
+782   ptemp1=P_Curr 'Pillanatnyi pozíció
+783   '
+784   If ((MPosXe>-1000 And MPosXe<1000 And MPosYe>100 And MPosYe<300 And MPosZe>100 And MPosZe<300) And (MPosAe>100 And MPosAe<300 And MPosBe>100 And MPosBe<300 And MPosCe>100 And MPosCe<300)) Then
+785    ptemp1.X=ptemp1.X+(MPosXe/100)
+786    ptemp1.Y=ptemp1.Y+(MPosYe/100)
+787    ptemp1.Z=ptemp1.Z+(MPosZe/100)
+788    ptemp1.A=ptemp1.A+Rad(MPosAe/100)
+789    ptemp1.B=ptemp1.B+Rad(MPosBe/100)
+790    ptemp1.C=ptemp1.C+Rad(MPosCe/100)
+791    Mvs ptemp1
+792    Dly 0.01
+793   '
+794   MFel=0 'Bármelyik parancs következhet
+795   '
+796   Else
+797   MHibaszam=910
+798   EndIf
+799   '
+800    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
+801   '
+802   Else
+803   MHibaszam=900
+804   EndIf
+805   Return '=======================
+806   '=================================================================
+807   '=================================================================
+808   '*****************XYZ ABC eltolás lineáris erõre******************
 809   '=================================================================
 810   '=================================================================
-811   '*********************XYZ ABC lineáris erõre***********************
-812   '=================================================================
-813   '=================================================================
-814   *S12 '=======================
-815   '
-816   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-817    'XYZ ABC lineáris erõre
-818    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+811   *S22 '=======================
+812   '
+813   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
+814    'XYZ ABC eltolás lineáris erõre
+815    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+816   '
+817    Ovrd MSebesseg 'Sebesség
+818    Accel Mgyors,Mlass 'Gyorsulás
 819   '
-820    Ovrd MSebesseg 'Sebesség
-821    Accel Mgyors,Mlass 'Gyorsulás
-822   '
-823   Cnt 1
-824   '
-825   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-826    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-827    GoSub *TERULETVALTAS
-828   MHibaszam=0
-829   '
-830   Cnt 0
-831   '
-832   ptemp1=P_Curr 'Pillanatnyi pozíció
-833   '
-834   If ((MPosX>100 And MPosX<300 And MPosY>100 And MPosY<300 And MPosZ>100 And MPosZ<300) And (MPosA>100 And MPosA<300 And MPosB>100 And MPosB<300 And MPosC>100 And MPosC<300)) Then
-835    ptemp1.X=(MPosX/100)
-836    ptemp1.Y=(MPosY/100)
-837    ptemp1.Z=(MPosZ/100)
-838    ptemp1.A=Rad(MPosA/100)
-839    ptemp1.B=Rad(MPosB/100)
-840    ptemp1.C=Rad(MPosC/100)
-841    Fsc On, 1,1,1
-842    FsCTrg 1,10,1
-843    Mvs ptemp1
-844    Dly 0.01
-845    Fsc Off
+820   Cnt 1
+821   '
+822   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+823    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+824    GoSub *TERULETVALTAS
+825   MHibaszam=0
+826   '
+827   Cnt 0
+828   '
+829   ptemp1=P_Curr 'Pillanatnyi pozíció
+830   '
+831   If ((MPosXe>-1000 And MPosXe<1000 And MPosYe>100 And MPosYe<300 And MPosZe>100 And MPosZe<300) And (MPosAe>100 And MPosAe<300 And MPosBe>100 And MPosBe<300 And MPosCe>100 And MPosCe<300)) Then
+832    ptemp1.X=ptemp1.X+(MPosXe/100)
+833    ptemp1.Y=ptemp1.Y+(MPosYe/100)
+834    ptemp1.Z=ptemp1.Z+(MPosZe/100)
+835    ptemp1.A=ptemp1.A+Rad(MPosAe/100)
+836    ptemp1.B=ptemp1.B+Rad(MPosBe/100)
+837    ptemp1.C=ptemp1.C+Rad(MPosCe/100)
+838    Mvs ptemp1
+839    Dly 0.01
+840   '
+841   MFel=0 'Bármelyik parancs következhet
+842   '
+843   Else
+844   MHibaszam=910
+845   EndIf
 846   '
-847   MFel=0 'Bármelyik parancs következhet
+847    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
 848   '
 849   Else
-850   MHibaszam=910
+850   MHibaszam=900
 851   EndIf
-852   '
-853    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-854   '
-855   Else
-856   MHibaszam=900
-857   EndIf
-858   Return '=======================
-859   '=================================================================
-860   '=================================================================
-861   '********************XYZ ABC eltolás joint************************
-862   '=================================================================
-863   '=================================================================
-864   *S20 '=======================
-865   '
-866   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-867    'XYZ ABC eltolás joint
-868    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-869   '
-870    Ovrd MSebesseg 'Sebesség
-871    Accel Mgyors,Mlass 'Gyorsulás
-872   '
-873   Cnt 1
-874   '
-875   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-876    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-877    GoSub *TERULETVALTAS
-878   MHibaszam=0
-879   '
-880   Cnt 0
-881   '
-882   ptemp1=P_Curr 'Pillanatnyi pozíció
-883   '
-884   If ((MPosXe>-1000 And MPosXe<1000 And MPosYe>100 And MPosYe<300 And MPosZe>100 And MPosZe<300) And (MPosAe>100 And MPosAe<300 And MPosBe>100 And MPosBe<300 And MPosCe>100 And MPosCe<300)) Then
-885    ptemp1.X=ptemp1.X+(MPosXe/100)
-886    ptemp1.Y=ptemp1.Y+(MPosYe/100)
-887    ptemp1.Z=ptemp1.Z+(MPosZe/100)
-888    ptemp1.A=ptemp1.A+Rad(MPosAe/100)
-889    ptemp1.B=ptemp1.B+Rad(MPosBe/100)
-890    ptemp1.C=ptemp1.C+Rad(MPosCe/100)
-891    Mov ptemp1
-892    Dly 0.01
+852   Return '=======================
+853   '=================================================================
+854   '=================================================================
+855   '*******************************J1-J6*****************************
+856   '=================================================================
+857   '=================================================================
+858   *S30 '=======================
+859   '
+860   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
+861    'J1-J6
+862    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+863   '
+864    Ovrd MSebesseg 'Sebesség
+865    Accel Mgyors,Mlass 'Gyorsulás
+866   '
+867   Cnt 1
+868   '
+869   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+870    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+871    GoSub *TERULETVALTAS
+872   MHibaszam=0
+873   '
+874   Cnt 0
+875   '
+876   jtemp1=J_Curr 'Pillanatnyi pozíció
+877   '
+878   If (MPosJ1>-36000& And MPosJ1<36000& And MPosJ2>-36000& And MPosJ2<36000& And MPosJ3>-36000& And MPosJ3<36000& And MPosJ4>-36000& And MPosJ4<36000& And MPosJ5>-36000& And MPosJ5<36000& And MPosJ6>-36000& And MPosJ6<36000&) Then
+879    jtemp1.J1=Rad(MPosJ1/100)
+880    jtemp1.J2=Rad(MPosJ2/100)
+881    jtemp1.J3=Rad(MPosJ3/100)
+882    jtemp1.J4=Rad(MPosJ4/100)
+883    jtemp1.J5=Rad(MPosJ5/100)
+884    jtemp1.J6=Rad(MPosJ6/100)
+885    Mov jtemp1
+886    Dly 0.01
+887    '
+888    MFel=0 'Bármelyik parancs következhet
+889    '
+890   Else
+891   MHibaszam=910
+892   EndIf
 893   '
-894   MFel=0 'Bármelyik parancs következhet
+894    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
 895   '
 896   Else
-897   MHibaszam=910
+897   MHibaszam=900
 898   EndIf
-899   '
-900    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-901   '
-902   Else
-903   MHibaszam=900
-904   EndIf
-905   Return '=======================
-906   '=================================================================
-907   '=================================================================
-908   '********************XYZ ABC eltolás lineáris*********************
-909   '=================================================================
-910   '=================================================================
-911   *S21 '=======================
-912   '
-913   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-914    'XYZ ABC eltolás lineáris
-915    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-916   '
-917    Ovrd MSebesseg 'Sebesség
-918    Accel Mgyors,Mlass 'Gyorsulás
-919   '
-920   Cnt 1
-921   '
-922   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-923    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-924    GoSub *TERULETVALTAS
-925   MHibaszam=0
-926   '
-927   Cnt 0
-928   '
-929   ptemp1=P_Curr 'Pillanatnyi pozíció
-930   '
-931   If ((MPosXe>-1000 And MPosXe<1000 And MPosYe>100 And MPosYe<300 And MPosZe>100 And MPosZe<300) And (MPosAe>100 And MPosAe<300 And MPosBe>100 And MPosBe<300 And MPosCe>100 And MPosCe<300)) Then
-932    ptemp1.X=ptemp1.X+(MPosXe/100)
-933    ptemp1.Y=ptemp1.Y+(MPosYe/100)
-934    ptemp1.Z=ptemp1.Z+(MPosZe/100)
-935    ptemp1.A=ptemp1.A+Rad(MPosAe/100)
-936    ptemp1.B=ptemp1.B+Rad(MPosBe/100)
-937    ptemp1.C=ptemp1.C+Rad(MPosCe/100)
-938    Mvs ptemp1
-939    Dly 0.01
+899   Return '=======================
+900   '=================================================================
+901   '=================================================================
+902   '**************************J1-J6 eltolás**************************
+903   '=================================================================
+904   '=================================================================
+905   *S40 '=======================
+906   '
+907   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
+908    'J1-J6 eltolás
+909    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
+910   '
+911    Ovrd MSebesseg 'Sebesség
+912    Accel Mgyors,Mlass 'Gyorsulás
+913   '
+914   Cnt 1
+915   '
+916   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
+917    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
+918    GoSub *TERULETVALTAS
+919   MHibaszam=0
+920   '
+921   Cnt 0
+922   '
+923   jtemp1=J_Curr 'Pillanatnyi pozíció
+924   '
+925   If (MPosJ1>-36000& And MPosJ1<36000& And MPosJ2>-36000& And MPosJ2<36000& And MPosJ3>-36000& And MPosJ3<36000& And MPosJ4>-36000& And MPosJ4<36000& And MPosJ5>-36000& And MPosJ5<36000& And MPosJ6>-36000& And MPosJ6<36000&) Then
+926    jtemp1.J1=jtemp1.J1+Rad(MPosJ1/100)
+927    jtemp1.J2=jtemp1.J2+Rad(MPosJ2/100)
+928    jtemp1.J3=jtemp1.J3+Rad(MPosJ3/100)
+929    jtemp1.J4=jtemp1.J4+Rad(MPosJ4/100)
+930    jtemp1.J5=jtemp1.J5+Rad(MPosJ5/100)
+931    jtemp1.J6=jtemp1.J6+Rad(MPosJ6/100)
+932    Mov jtemp1
+933    Dly 0.01
+934   '
+935   MFel=0 'Bármelyik parancs következhet
+936   '
+937   Else
+938   MHibaszam=910
+939   EndIf
 940   '
-941   MFel=0 'Bármelyik parancs következhet
+941    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
 942   '
 943   Else
-944   MHibaszam=910
+944   MHibaszam=900
 945   EndIf
-946   '
-947    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-948   '
-949   Else
-950   MHibaszam=900
-951   EndIf
-952   Return '=======================
-953   '=================================================================
-954   '=================================================================
-955   '*****************XYZ ABC eltolás lineáris erõre******************
-956   '=================================================================
-957   '=================================================================
-958   *S22 '=======================
-959   '
-960   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-961    'XYZ ABC eltolás lineáris erõre
-962    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-963   '
-964    Ovrd MSebesseg 'Sebesség
-965    Accel Mgyors,Mlass 'Gyorsulás
-966   '
-967   Cnt 1
-968   '
-969   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-970    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-971    GoSub *TERULETVALTAS
-972   MHibaszam=0
-973   '
-974   Cnt 0
-975   '
-976   ptemp1=P_Curr 'Pillanatnyi pozíció
-977   '
-978   If ((MPosXe>-1000 And MPosXe<1000 And MPosYe>100 And MPosYe<300 And MPosZe>100 And MPosZe<300) And (MPosAe>100 And MPosAe<300 And MPosBe>100 And MPosBe<300 And MPosCe>100 And MPosCe<300)) Then
-979    ptemp1.X=ptemp1.X+(MPosXe/100)
-980    ptemp1.Y=ptemp1.Y+(MPosYe/100)
-981    ptemp1.Z=ptemp1.Z+(MPosZe/100)
-982    ptemp1.A=ptemp1.A+Rad(MPosAe/100)
-983    ptemp1.B=ptemp1.B+Rad(MPosBe/100)
-984    ptemp1.C=ptemp1.C+Rad(MPosCe/100)
-985    Mvs ptemp1
-986    Dly 0.01
-987   '
-988   MFel=0 'Bármelyik parancs következhet
-989   '
-990   Else
-991   MHibaszam=910
-992   EndIf
-993   '
-994    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-995   '
-996   Else
-997   MHibaszam=900
-998   EndIf
-999   Return '=======================
-1000   '=================================================================
-1001   '=================================================================
-1002   '*******************************J1-J6*****************************
-1003   '=================================================================
-1004   '=================================================================
-1005   *S30 '=======================
-1006   '
-1007   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-1008    'J1-J6
-1009    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-1010   '
-1011    Ovrd MSebesseg 'Sebesség
-1012    Accel Mgyors,Mlass 'Gyorsulás
-1013   '
-1014   Cnt 1
-1015   '
-1016   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-1017    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-1018    GoSub *TERULETVALTAS
-1019   MHibaszam=0
-1020   '
-1021   Cnt 0
-1022   '
-1023   jtemp1=J_Curr 'Pillanatnyi pozíció
-1024   '
-1025   If (MPosJ1>-36000& And MPosJ1<36000& And MPosJ2>-36000& And MPosJ2<36000& And MPosJ3>-36000& And MPosJ3<36000& And MPosJ4>-36000& And MPosJ4<36000& And MPosJ5>-36000& And MPosJ5<36000& And MPosJ6>-36000& And MPosJ6<36000&) Then
-1026    jtemp1.J1=Rad(MPosJ1/100)
-1027    jtemp1.J2=Rad(MPosJ2/100)
-1028    jtemp1.J3=Rad(MPosJ3/100)
-1029    jtemp1.J4=Rad(MPosJ4/100)
-1030    jtemp1.J5=Rad(MPosJ5/100)
-1031    jtemp1.J6=Rad(MPosJ6/100)
-1032    Mov jtemp1
-1033    Dly 0.01
-1034    '
-1035    MFel=0 'Bármelyik parancs következhet
-1036    '
-1037   Else
-1038   MHibaszam=910
-1039   EndIf
-1040   '
-1041    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-1042   '
-1043   Else
-1044   MHibaszam=900
-1045   EndIf
-1046   Return '=======================
-1047   '=================================================================
-1048   '=================================================================
-1049   '**************************J1-J6 eltolás**************************
-1050   '=================================================================
-1051   '=================================================================
-1052   *S40 '=======================
-1053   '
-1054   If (MFel=0) Then 'Bármelyik mozgás után elvégezhetõ a parancs
-1055    'J1-J6 eltolás
-1056    GoSub *HS1 'üzenet megérkezett, parancs elkezdve nyugta
-1057   '
-1058    Ovrd MSebesseg 'Sebesség
-1059    Accel Mgyors,Mlass 'Gyorsulás
-1060   '
-1061   Cnt 1
-1062   '
-1063   'Robot elhelyezkedésének ellenõrzése, hogy a tengelyek megfelelõnek álljanak
-1064    MTERULET=40 'amelyik terulethez kell állítani a tengelyeket
-1065    GoSub *TERULETVALTAS
-1066   MHibaszam=0
-1067   '
-1068   Cnt 0
-1069   '
-1070   jtemp1=J_Curr 'Pillanatnyi pozíció
-1071   '
-1072   If (MPosJ1>-36000& And MPosJ1<36000& And MPosJ2>-36000& And MPosJ2<36000& And MPosJ3>-36000& And MPosJ3<36000& And MPosJ4>-36000& And MPosJ4<36000& And MPosJ5>-36000& And MPosJ5<36000& And MPosJ6>-36000& And MPosJ6<36000&) Then
-1073    jtemp1.J1=jtemp1.J1+Rad(MPosJ1/100)
-1074    jtemp1.J2=jtemp1.J2+Rad(MPosJ2/100)
-1075    jtemp1.J3=jtemp1.J3+Rad(MPosJ3/100)
-1076    jtemp1.J4=jtemp1.J4+Rad(MPosJ4/100)
-1077    jtemp1.J5=jtemp1.J5+Rad(MPosJ5/100)
-1078    jtemp1.J6=jtemp1.J6+Rad(MPosJ6/100)
-1079    Mov jtemp1
-1080    Dly 0.01
-1081   '
-1082   MFel=0 'Bármelyik parancs következhet
-1083   '
-1084   Else
-1085   MHibaszam=910
-1086   EndIf
-1087   '
-1088    GoSub *HS2 'vége a mûveletnek, várakozás a nyugtázásra
-1089   '
-1090   Else
-1091   MHibaszam=900
-1092   EndIf
-1093   Return '=======================
-1094   '=================================================================
-1095   '=================================================================
-1096   '*****************************************************************
-1097   '=================================================================
-1098   '=================================================================
-1099   '
-1100   *FEEDBACK '=======================
-1101     Mms = M_Timer(1)
-1102     Ms=Mms/1000.0
-1103     ioMsSLV = Mms
-1104     ioMx=P_Curr.X*100
-1105     ioMy=P_Curr.Y*100
-1106     ioMz=P_Curr.Z*100
-1107     ioMa=Deg(P_Curr.A)*100
-1108     ioMb=Deg(P_Curr.B)*100
-1109     ioMc=Deg(P_Curr.C)*100
-1110   Return '=======================
-1111   '
-1112   *PXYZABCS '=======================
-1113     ptemp2=P_Curr
-1114     MPosX=ioMx 'X pozíció átvétele
-1115     MPosY=ioMy 'Y pozíció átvétele
-1116     MPosZ=ioMz 'Z pozíció átvétele
-1117     MPosA=ioMa 'A pozíció fok átvétele
-1118     MPosB=ioMb 'B pozíció fok átvétele
-1119     MPosC=ioMc 'C pozíció fok átvétele
-1120     MPosS=ioMs 'pozíció utazási ido átvétele
-1121       ptemp2.X=(MPosX/100)
-1122       ptemp2.Y=(MPosY/100)
-1123       ptemp2.Z=(MPosZ/100)
-1124       ptemp2.A=Rad(MPosA/100)
-1125       ptemp2.B=Rad(MPosB/100)
-1126       ptemp2.C=Rad(MPosC/100)
-1127   Return '=======================
-1128   '
-1129   *HS1: '=======================
-1130     Wait ioHS1=1 'wait RobotStartIn=1
-1131     GoSub *PXYZABCS 'ptemp2 kitölti az io-ról
-1132     ptemp1 = ptemp2 'csinálunk egy másolatot
-1133     GoSub *FEEDBACK
-1134     ioHS1=1 'ConfirmOut=1
-1135     Wait ioHS1=0 'wait RobotStartIn=0
-1136     Wait ioCOM=0 'Mozgás parancs nullázására vár
-1137     GoSub *PXYZABCS 'ptemp2 hs1 után kitölti az io-t
-1138     'így össze lehet hasonlítani, hogy elrontotta e valaki
-1139     'ha nem stimmel hiba!!!
-1140     ioHS1=0 'ConfirmOut=0
-1141     M_00#=1 ' jelzes R2D2-nak hogy elkezdödött valami
-1142   Return '=======================
-1143   '
-1144   *HS2: '=======================
-1145     MPosS = 0
-1146     If M_Svo(1)=0 Then
-1147       ' Így nem nyírja ki miért lett leállítva
-1148       If MHibaszam<1 Then
-1149         MHibaszam=920
-1150       EndIf
-1151     EndIf
-1152     ' Így az R2D2-nál is frissebb adatok lesznek mire olvasnám
-1153     GoSub *FEEDBACK
-1154     '
-1155     ioCOM=MHibaszam 'Hiba státusz küldése
-1156     ioHS2=1 'ReadyOut=1
-1157     Wait ioHS2=1 'wait ConfirmIn=1
-1158     ioCOM=0 'Hibaküldés kinullázása
-1159     ioHS2=0 'ReadyOut=0
-1160     Wait ioHS2=0 'wait ConfirmIn=0
-1161     M_00#=0
-1162   Return '=======================
-1163   '
-1164   *MOVE: ' bemenet a ( ptemp2
-1165     jtemp2 = PtoJ(ptemp2)
-1166     'old If (Abs(jtemp2.J4)<Rad(90)) And Abs(jtemp2.J5)<Rad(75.0)  Then ' Soft J4
-1167     M4 = Abs(Deg(jtemp2.J4)-MNMX(4,3)) 'resetnél ki van számolva a paraméterek közepe
-1168     M5 = Abs(Deg(jtemp2.J5)-MNMX(5,3)) 'resetnél ki van számolva a paraméterek közepe
-1169     'ezt azért mert TB-n ropant nehéz olvasni a kilométeres sorokat
-1170     'egyszeru eltérést számol a középtol
-1171     If (M4<MNMX(4,4)) And (M5<MNMX(5,4)) Then ' Hard J4
-1172       ' nem ez Soft J4
-1173       Mvs ptemp2
-1174     Else ' Hard J4
-1175       jtemp0=J_Curr
-1176       ' FLIP? 4 ax
-1177       If M4>MNMX(4,4) Then
-1178         If Deg(jtemp2.J4)>MNMX(4,3) Then
-1179           jtemp2.J4=jtemp2.J4-M_PI
-1180         Else
-1181           jtemp2.J4=jtemp2.J4+M_PI
-1182         EndIf
-1183         ' FLIP 5 ax
-1184         jtemp2.J5=jtemp2.J5*-1.0
-1185         M5 = Abs(Deg(jtemp2.J5)-MNMX(5,3)) 'lehet így mar jó?
-1186         ' FLIP 6 ax
-1187         jtemp2.J6=jtemp2.J6*-1.0
-1188       EndIf
-1189       If M5>MNMX(5,4) Then
-1190         MHibaszam=9115
-1191         If Deg(jtemp2.J5)>MNMX(5,3) Then
-1192           jtemp2.J5=M_PI*((MNMX(5,2)-Max5off)/180.0) 'maximum
-1193         Else
-1194           jtemp2.J5=M_PI*((MNMX(5,1)+Max5off)/180.0) 'minimum
-1195         EndIf
-1196       EndIf
-1197       ' MIDLE jtemp1
-1198       jtemp1.J1 = (jtemp2.J1-J_Curr.J1)*Mmid + J_Curr.J1
-1199       jtemp1.J2 = (jtemp2.J2-J_Curr.J2)*Mmid + J_Curr.J2
-1200       jtemp1.J3 = (jtemp2.J3-J_Curr.J3)*Mmid + J_Curr.J3
-1201       jtemp1.J4 = (jtemp2.J4-J_Curr.J4)*Mmid + J_Curr.J4
-1202       jtemp1.J5 = (jtemp2.J5-J_Curr.J5)*Mmid + J_Curr.J5
-1203       jtemp1.J6 = (jtemp2.J6-J_Curr.J6)*Mmid + J_Curr.J6
-1204       Mov jtemp1 'WthIf M_Ratio >= Mhs2rt, ioHS2=1
-1205     EndIf ' Hard J4
-1206   Return '=======================
-1207   '
-1208  '=================================================================
-1209  '*************************************************************************
-1210  '*************************************************************************
-1211  '*************************************************************************
-1212  '*************************************************************************
-1213  '=================================================================
-1214  *TERULETVALTAS '=======================
-1215  If (MELOZOTERULET<>MTERULET) Then
-1216  '................................
-1217   If (MELOZOTERULET=10 And MTERULET=20) Then 'váltás alaphelyzetbõl szervizpozícióra
-1218    Mov jAlaph
-1219    Mov jSzerviz
-1220  '
-1221    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1222   EndIf
-1223  '................................
-1224   If (MELOZOTERULET=30 And MTERULET=20) Then 'váltás megfogó ürítésrõl szervizpozícióra
-1225    Mov jMurites
-1226    Mov jAlaph
-1227    Mov jSzerviz
-1228  '
-1229    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1230   EndIf
-1231  '................................
-1232   If (MELOZOTERULET=40 And MTERULET=20) Then 'váltás felvételrõl szervizpozícióra
-1233    Mov jFelvetel
-1234    Mov jSzerviz
-1235  '
-1236    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1237   EndIf
-1238  '................................
-1239   If (MELOZOTERULET=50 And MTERULET=20) Then 'váltás kamerásról szervizpozícióra
-1240    Mov jKamera
-1241    Mov jAlaph
-1242    Mov jSzerviz
-1243  '
-1244    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1245   EndIf
-1246  '................................
-1247   If (MELOZOTERULET=60 And MTERULET=20) Then 'váltás lerakásról szervizpozícióra
-1248    Mov jLerakas
-1249    Mov jAlaph
-1250    Mov jSzerviz
-1251  '
-1252    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1253   EndIf
-1254  '................................
-1255   If (MELOZOTERULET=20 And MTERULET=10) Then 'váltás szervizpozícióról alaphelyzetre
-1256    Mov jSzerviz
-1257    Mov jAlaph
-1258  '
-1259    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1260   EndIf
-1261  '................................
-1262   If (MELOZOTERULET=30 And MTERULET=10) Then 'váltás megfogó ürítésrõl alaphelyzetre
-1263    Mov jMurites
-1264    Mov jAlaph
-1265  '
-1266    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1267   EndIf
-1268  '................................
-1269   If (MELOZOTERULET=40 And MTERULET=10) Then 'váltás felvételrõl alaphelyzetre
-1270    Mov jFelvetel
-1271    Mov jAlaph
-1272  '
-1273    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1274   EndIf
-1275  '................................
-1276   If (MELOZOTERULET=50 And MTERULET=10) Then 'váltás kamerásról alaphelyzetre
-1277    Mov jKamera
-1278     Mov jAlaph
-1279   '
-1280     MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1281   EndIf
-1282  '................................
-1283   If (MELOZOTERULET=60 And MTERULET=10) Then 'váltás lerakásról alaphelyzetre
-1284    Mov jLerakas
-1285    Mov jAlaph
-1286  '
-1287    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1288   EndIf
-1289  '................................
-1290   If (MELOZOTERULET=10 And MTERULET=30) Then 'váltás alaphelyzetbõl megfogó ürítésre
-1291    Mov jAlaph
-1292    Mov jMurites
-1293  '
-1294    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1295   EndIf
-1296  '................................
-1297   If (MELOZOTERULET=20 And MTERULET=30) Then 'váltás szervizpozícióról megfogó ürítésre
-1298   Mov jSzerviz
-1299   Mov jAlaph
-1300   Mov jMurites
-1301  '
-1302    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1303   EndIf
-1304  '................................
-1305   If (MELOZOTERULET=40 And MTERULET=30) Then 'váltás felvételrõl megfogó ürítésre
-1306   Mov jFelvetel
-1307   Mov jAlaph
-1308   Mov jMurites
-1309  '
-1310    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1311   EndIf
-1312  '................................
-1313   If (MELOZOTERULET=50 And MTERULET=30) Then 'váltás kamerásról megfogó ürítésre
-1314    Mov jKamera
-1315    Mov jMurites
-1316  '
-1317    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1318   EndIf
-1319  '................................
-1320   If (MELOZOTERULET=60 And MTERULET=30) Then 'váltás lerakásról megfogó ürítésre
-1321    Mov jLerakas
-1322    Mov jMurites
-1323  '
-1324    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1325   EndIf
-1326  '................................
-1327   If (MELOZOTERULET=10 And MTERULET=40) Then 'váltás alaphelyzetbõl felvételre
-1328    Mov jAlaph
-1329    Mov jFelvetel
-1330  '
-1331    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1332   EndIf
-1333  '................................
-1334   If (MELOZOTERULET=20 And MTERULET=40) Then 'váltás szervizpozícióról felvételre
-1335    Mov jSzerviz
-1336    Mov jFelvetel
-1337  '
-1338    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1339   EndIf
-1340  '................................
-1341   If (MELOZOTERULET=30 And MTERULET=40) Then 'váltás megfogó ürítésrõl felvételre
-1342    Mov jMurites
-1343    Mov jAlaph
-1344    Mov jFelvetel
-1345  '
-1346    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1347   EndIf
-1348  '................................
-1349   If (MELOZOTERULET=50 And MTERULET=40) Then 'váltás kamerásról felvételre
-1350    Mov jKamera
-1351    Mov jFelvetel
-1352  '
-1353    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1354   EndIf
-1355  '................................
-1356   If (MELOZOTERULET=60 And MTERULET=40) Then 'váltás lerakásról felvételre
-1357    Mov jLerakas
-1358    Mov jAlaph
-1359    Mov jFelvetel
-1360  '
-1361    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1362   EndIf
-1363  '................................
-1364   If (MELOZOTERULET=10 And MTERULET=50) Then 'váltás alaphelyzetbõl kamerásra
-1365    Mov jAlaph
-1366    Mov jKamera
-1367  '
-1368    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1369   EndIf
-1370  '................................
-1371   If (MELOZOTERULET=20 And MTERULET=50) Then 'váltás szervizpozícióról kamerásra
-1372    Mov jSzerviz
-1373    Mov jAlaph
-1374    Mov jKamera
-1375  '
-1376    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1377   EndIf
-1378  '................................
-1379   If (MELOZOTERULET=30 And MTERULET=50) Then 'váltás megfogó ürítésrõl kamerásra
-1380    Mov jMurites
-1381     Mov jKamera
-1382   '
-1383     MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1384   EndIf
-1385  '................................
-1386   If (MELOZOTERULET=40 And MTERULET=50) Then 'váltás felvételrõl kamerásra
-1387    Mov jFelvetel
-1388    Mov jAlaph
-1389    Mov jKamera
-1390  '
-1391    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1392   EndIf
-1393  '................................
-1394   If (MELOZOTERULET=60 And MTERULET=50) Then 'váltás lerakásról kamerásra
-1395    Mov jLerakas
-1396    Mov jKamera
-1397  '
-1398    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1399   EndIf
-1400  '................................
-1401   If (MELOZOTERULET=10 And MTERULET=60) Then 'váltás alaphelyzetbõl lerakásra
-1402    Mov jAlaph
-1403    Mov jLerakas
-1404  '
-1405    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1406   EndIf
-1407 '................................
-1408   If (MELOZOTERULET=20 And MTERULET=60) Then 'váltás szervizpozícióról lerakásra
-1409    Mov jSzerviz
-1410    Mov jAlaph
-1411    Mov jLerakas
-1412  '
-1413    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1414   EndIf
-1415  '................................
-1416   If (MELOZOTERULET=30 And MTERULET=60) Then 'váltás megfogó ürítésrõl lerakásra
-1417    Mov jMurites
-1418    Mov jLerakas
-1419  '
-1420    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1421   EndIf
-1422  '................................
-1423   If (MELOZOTERULET=40 And MTERULET=60) Then 'váltás felvételrõl lerakásra
-1424    Mov jFelvetel
-1425    Mov jAlaph
-1426    Mov jLerakas
-1427  '
-1428    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1429   EndIf
-1430  '................................
-1431   If (MELOZOTERULET=50 And MTERULET=60) Then 'váltás kamerásról lerakásra
-1432    Mov jKamera
-1433    Mov jLerakas
-1434  '
-1435    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
-1436   EndIf
-1437  '................................
-1438  EndIf
-1439  Return '=======================
-1440 '
-1441 '
-1442 'Kártya Inputok:
-1443 '0 - Gyárilag Foglalt
-1444 '1 -
-1445 '2 -
-1446 '3 -
-1447 '4 -
-1448 '5 -
-1449 '6 -
-1450 '7 -
-1451 '8 -
-1452 '9 -
-1453 '10 -
-1454 '11 -
-1455 '12 -
-1456 '13 -
-1457 '14 -
-1458 '15 -
-1459 '
-1460 'Kártya Outputok:
-1461 '0 -
-1462 '1 -
-1463 '2 -
-1464 '3 -
-1465 '4 -
-1466 '5 -
-1467 '6 -
-1468 '7 -
-1469 '8 -
-1470 '9 -
-1471 '10 -
-1472 '11 -
-1473 '12 -
-1474 '13 -
-1475 '14 -
-1476 '15 -
-1477 '
-1478 '
-1479 'Tool-ok:
-1480 '0=semmilyen tool
+946   Return '=======================
+947   '=================================================================
+948   '=================================================================
+949   '*****************************************************************
+950   '=================================================================
+951   '=================================================================
+952   '
+953   *FEEDBACK '=======================
+954     Mms = M_Timer(1)
+955     Ms=Mms/1000.0
+956     ioMsSLV = Mms
+957     ioMx=P_Curr.X*100
+958     ioMy=P_Curr.Y*100
+959     ioMz=P_Curr.Z*100
+960     ioMa=Deg(P_Curr.A)*100
+961     ioMb=Deg(P_Curr.B)*100
+962     ioMc=Deg(P_Curr.C)*100
+963   Return '=======================
+964   '
+965   *PXYZABCS '=======================
+966     ptemp2=P_Curr
+967     MPosX=ioMx 'X pozíció átvétele
+968     MPosY=ioMy 'Y pozíció átvétele
+969     MPosZ=ioMz 'Z pozíció átvétele
+970     MPosA=ioMa 'A pozíció fok átvétele
+971     MPosB=ioMb 'B pozíció fok átvétele
+972     MPosC=ioMc 'C pozíció fok átvétele
+973     MPosS=ioMs 'pozíció utazási ido átvétele
+974       ptemp2.X=(MPosX/100)
+975       ptemp2.Y=(MPosY/100)
+976       ptemp2.Z=(MPosZ/100)
+977       ptemp2.A=Rad(MPosA/100)
+978       ptemp2.B=Rad(MPosB/100)
+979       ptemp2.C=Rad(MPosC/100)
+980   Return '=======================
+981   '
+982   *HS1: '=======================
+983     Wait ioHS1=1 'wait RobotStartIn=1
+984     GoSub *PXYZABCS 'ptemp2 kitölti az io-ról
+985     ptemp1 = ptemp2 'csinálunk egy másolatot
+986     GoSub *FEEDBACK
+987     ioHS1=1 'ConfirmOut=1
+988     Wait ioHS1=0 'wait RobotStartIn=0
+989     Wait ioCOM=0 'Mozgás parancs nullázására vár
+990     GoSub *PXYZABCS 'ptemp2 hs1 után kitölti az io-t
+991     'így össze lehet hasonlítani, hogy elrontotta e valaki
+992     'ha nem stimmel hiba!!!
+993     ioHS1=0 'ConfirmOut=0
+994     M_00#=1 ' jelzes R2D2-nak hogy elkezdödött valami
+995   Return '=======================
+996   '
+997   *HS2: '=======================
+998     MPosS = 0
+999     If M_Svo(1)=0 Then
+1000       ' Így nem nyírja ki miért lett leállítva
+1001       If MHibaszam<1 Then
+1002         MHibaszam=920
+1003       EndIf
+1004     EndIf
+1005     ' Így az R2D2-nál is frissebb adatok lesznek mire olvasnám
+1006     GoSub *FEEDBACK
+1007     '
+1008     ioCOM=MHibaszam 'Hiba státusz küldése
+1009     ioHS2=1 'ReadyOut=1
+1010     Wait ioHS2=1 'wait ConfirmIn=1
+1011     ioCOM=0 'Hibaküldés kinullázása
+1012     ioHS2=0 'ReadyOut=0
+1013     Wait ioHS2=0 'wait ConfirmIn=0
+1014     M_00#=0
+1015   Return '=======================
+1016   '
+1017   *MOVEt2: ' bemenet a ( ptemp2
+1018     jtemp2 = PtoJ(ptemp2)
+1019     'old If (Abs(jtemp2.J4)<Rad(90)) And Abs(jtemp2.J5)<Rad(75.0)  Then ' Soft J4
+1020     M4 = Abs(Deg(jtemp2.J4)-MNMX(4,3)) 'resetnél ki van számolva a paraméterek közepe
+1021     M5 = Abs(Deg(jtemp2.J5)-MNMX(5,3)) 'resetnél ki van számolva a paraméterek közepe
+1022     'ezt azért mert TB-n ropant nehéz olvasni a kilométeres sorokat
+1023     'egyszeru eltérést számol a középtol
+1024     If (M4<MNMX(4,4)) And (M5<MNMX(5,4)) Then ' Hard J4
+1025       ' nem ez Soft J4
+1026       Mvs ptemp2
+1027     Else ' Hard J4
+1028       GoSub *MOVEj2
+1029     EndIf ' Hard J4
+1030   Return '=======================
+1031   '
+1032   *MOVEj2: ' bemenet a ( jtemp2
+1033     jtemp0=J_Curr
+1034     ' FLIP? 4 ax
+1035     If M4>MNMX(4,4) Then
+1036       If Deg(jtemp2.J4)>MNMX(4,3) Then
+1037         jtemp2.J4=jtemp2.J4-M_PI
+1038       Else
+1039         jtemp2.J4=jtemp2.J4+M_PI
+1040       EndIf
+1041       ' FLIP 5 ax
+1042       jtemp2.J5=jtemp2.J5*-1.0
+1043       M5 = Abs(Deg(jtemp2.J5)-MNMX(5,3)) 'lehet így mar jó?
+1044       ' FLIP 6 ax
+1045       jtemp2.J6=jtemp2.J6*-1.0
+1046     EndIf
+1047     If M5>MNMX(5,4) Then
+1048       MHibaszam=9115
+1049       If Deg(jtemp2.J5)>MNMX(5,3) Then
+1050         jtemp2.J5=M_PI*((MNMX(5,2)-Max5off)/180.0) 'maximum
+1051       Else
+1052         jtemp2.J5=M_PI*((MNMX(5,1)+Max5off)/180.0) 'minimum
+1053       EndIf
+1054     EndIf
+1055     ' MIDLE jtemp1
+1056     jtemp1.J1 = (jtemp2.J1-J_Curr.J1)*Mmid + J_Curr.J1
+1057     jtemp1.J2 = (jtemp2.J2-J_Curr.J2)*Mmid + J_Curr.J2
+1058     jtemp1.J3 = (jtemp2.J3-J_Curr.J3)*Mmid + J_Curr.J3
+1059     jtemp1.J4 = (jtemp2.J4-J_Curr.J4)*Mmid + J_Curr.J4
+1060     jtemp1.J5 = (jtemp2.J5-J_Curr.J5)*Mmid + J_Curr.J5
+1061     jtemp1.J6 = (jtemp2.J6-J_Curr.J6)*Mmid + J_Curr.J6
+1062     Mov jtemp1 'WthIf M_Ratio >= Mhs2rt, ioHS2=1
+1063   Return '=======================
+1064   '
+1065  '=================================================================
+1066  '*************************************************************************
+1067  '*************************************************************************
+1068  '*************************************************************************
+1069  '*************************************************************************
+1070  '=================================================================
+1071  *TERULETVALTAS '=======================
+1072  If (MELOZOTERULET<>MTERULET) Then
+1073  '................................
+1074   If (MELOZOTERULET=10 And MTERULET=20) Then 'váltás alaphelyzetbõl szervizpozícióra
+1075    Mov jAlaph
+1076    Mov jSzerviz
+1077  '
+1078    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1079   EndIf
+1080  '................................
+1081   If (MELOZOTERULET=30 And MTERULET=20) Then 'váltás megfogó ürítésrõl szervizpozícióra
+1082    Mov jMurites
+1083    Mov jAlaph
+1084    Mov jSzerviz
+1085  '
+1086    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1087   EndIf
+1088  '................................
+1089   If (MELOZOTERULET=40 And MTERULET=20) Then 'váltás felvételrõl szervizpozícióra
+1090    Mov jFelvetel
+1091    Mov jSzerviz
+1092  '
+1093    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1094   EndIf
+1095  '................................
+1096   If (MELOZOTERULET=50 And MTERULET=20) Then 'váltás kamerásról szervizpozícióra
+1097    Mov jKamera
+1098    Mov jAlaph
+1099    Mov jSzerviz
+1100  '
+1101    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1102   EndIf
+1103  '................................
+1104   If (MELOZOTERULET=60 And MTERULET=20) Then 'váltás lerakásról szervizpozícióra
+1105    Mov jLerakas
+1106    Mov jAlaph
+1107    Mov jSzerviz
+1108  '
+1109    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1110   EndIf
+1111  '................................
+1112   If (MELOZOTERULET=20 And MTERULET=10) Then 'váltás szervizpozícióról alaphelyzetre
+1113    Mov jSzerviz
+1114    Mov jAlaph
+1115  '
+1116    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1117   EndIf
+1118  '................................
+1119   If (MELOZOTERULET=30 And MTERULET=10) Then 'váltás megfogó ürítésrõl alaphelyzetre
+1120    Mov jMurites
+1121    Mov jAlaph
+1122  '
+1123    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1124   EndIf
+1125  '................................
+1126   If (MELOZOTERULET=40 And MTERULET=10) Then 'váltás felvételrõl alaphelyzetre
+1127    Mov jFelvetel
+1128    Mov jAlaph
+1129  '
+1130    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1131   EndIf
+1132  '................................
+1133   If (MELOZOTERULET=50 And MTERULET=10) Then 'váltás kamerásról alaphelyzetre
+1134    Mov jKamera
+1135     Mov jAlaph
+1136   '
+1137     MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1138   EndIf
+1139  '................................
+1140   If (MELOZOTERULET=60 And MTERULET=10) Then 'váltás lerakásról alaphelyzetre
+1141    Mov jLerakas
+1142    Mov jAlaph
+1143  '
+1144    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1145   EndIf
+1146  '................................
+1147   If (MELOZOTERULET=10 And MTERULET=30) Then 'váltás alaphelyzetbõl megfogó ürítésre
+1148    Mov jAlaph
+1149    Mov jMurites
+1150  '
+1151    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1152   EndIf
+1153  '................................
+1154   If (MELOZOTERULET=20 And MTERULET=30) Then 'váltás szervizpozícióról megfogó ürítésre
+1155   Mov jSzerviz
+1156   Mov jAlaph
+1157   Mov jMurites
+1158  '
+1159    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1160   EndIf
+1161  '................................
+1162   If (MELOZOTERULET=40 And MTERULET=30) Then 'váltás felvételrõl megfogó ürítésre
+1163   Mov jFelvetel
+1164   Mov jAlaph
+1165   Mov jMurites
+1166  '
+1167    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1168   EndIf
+1169  '................................
+1170   If (MELOZOTERULET=50 And MTERULET=30) Then 'váltás kamerásról megfogó ürítésre
+1171    Mov jKamera
+1172    Mov jMurites
+1173  '
+1174    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1175   EndIf
+1176  '................................
+1177   If (MELOZOTERULET=60 And MTERULET=30) Then 'váltás lerakásról megfogó ürítésre
+1178    Mov jLerakas
+1179    Mov jMurites
+1180  '
+1181    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1182   EndIf
+1183  '................................
+1184   If (MELOZOTERULET=10 And MTERULET=40) Then 'váltás alaphelyzetbõl felvételre
+1185    Mov jAlaph
+1186    Mov jFelvetel
+1187  '
+1188    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1189   EndIf
+1190  '................................
+1191   If (MELOZOTERULET=20 And MTERULET=40) Then 'váltás szervizpozícióról felvételre
+1192    Mov jSzerviz
+1193    Mov jFelvetel
+1194  '
+1195    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1196   EndIf
+1197  '................................
+1198   If (MELOZOTERULET=30 And MTERULET=40) Then 'váltás megfogó ürítésrõl felvételre
+1199    Mov jMurites
+1200    Mov jAlaph
+1201    Mov jFelvetel
+1202  '
+1203    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1204   EndIf
+1205  '................................
+1206   If (MELOZOTERULET=50 And MTERULET=40) Then 'váltás kamerásról felvételre
+1207    Mov jKamera
+1208    Mov jFelvetel
+1209  '
+1210    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1211   EndIf
+1212  '................................
+1213   If (MELOZOTERULET=60 And MTERULET=40) Then 'váltás lerakásról felvételre
+1214    Mov jLerakas
+1215    Mov jAlaph
+1216    Mov jFelvetel
+1217  '
+1218    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1219   EndIf
+1220  '................................
+1221   If (MELOZOTERULET=10 And MTERULET=50) Then 'váltás alaphelyzetbõl kamerásra
+1222    Mov jAlaph
+1223    Mov jKamera
+1224  '
+1225    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1226   EndIf
+1227  '................................
+1228   If (MELOZOTERULET=20 And MTERULET=50) Then 'váltás szervizpozícióról kamerásra
+1229    Mov jSzerviz
+1230    Mov jAlaph
+1231    Mov jKamera
+1232  '
+1233    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1234   EndIf
+1235  '................................
+1236   If (MELOZOTERULET=30 And MTERULET=50) Then 'váltás megfogó ürítésrõl kamerásra
+1237    Mov jMurites
+1238     Mov jKamera
+1239   '
+1240     MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1241   EndIf
+1242  '................................
+1243   If (MELOZOTERULET=40 And MTERULET=50) Then 'váltás felvételrõl kamerásra
+1244    Mov jFelvetel
+1245    Mov jAlaph
+1246    Mov jKamera
+1247  '
+1248    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1249   EndIf
+1250  '................................
+1251   If (MELOZOTERULET=60 And MTERULET=50) Then 'váltás lerakásról kamerásra
+1252    Mov jLerakas
+1253    Mov jKamera
+1254  '
+1255    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1256   EndIf
+1257  '................................
+1258   If (MELOZOTERULET=10 And MTERULET=60) Then 'váltás alaphelyzetbõl lerakásra
+1259    Mov jAlaph
+1260    Mov jLerakas
+1261  '
+1262    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1263   EndIf
+1264 '................................
+1265   If (MELOZOTERULET=20 And MTERULET=60) Then 'váltás szervizpozícióról lerakásra
+1266    Mov jSzerviz
+1267    Mov jAlaph
+1268    Mov jLerakas
+1269  '
+1270    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1271   EndIf
+1272  '................................
+1273   If (MELOZOTERULET=30 And MTERULET=60) Then 'váltás megfogó ürítésrõl lerakásra
+1274    Mov jMurites
+1275    Mov jLerakas
+1276  '
+1277    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1278   EndIf
+1279  '................................
+1280   If (MELOZOTERULET=40 And MTERULET=60) Then 'váltás felvételrõl lerakásra
+1281    Mov jFelvetel
+1282    Mov jAlaph
+1283    Mov jLerakas
+1284  '
+1285    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1286   EndIf
+1287  '................................
+1288   If (MELOZOTERULET=50 And MTERULET=60) Then 'váltás kamerásról lerakásra
+1289    Mov jKamera
+1290    Mov jLerakas
+1291  '
+1292    MELOZOTERULET=MTERULET 'új tengely pozíciók felvétele megtörtént
+1293   EndIf
+1294  '................................
+1295  EndIf
+1296  Return '=======================
+1297 '
+1298 '
+1299 'Kártya Inputok:
+1300 '0 - Gyárilag Foglalt
+1301 '1 -
+1302 '2 -
+1303 '3 -
+1304 '4 -
+1305 '5 -
+1306 '6 -
+1307 '7 -
+1308 '8 -
+1309 '9 -
+1310 '10 -
+1311 '11 -
+1312 '12 -
+1313 '13 -
+1314 '14 -
+1315 '15 -
+1316 '
+1317 'Kártya Outputok:
+1318 '0 -
+1319 '1 -
+1320 '2 -
+1321 '3 -
+1322 '4 -
+1323 '5 -
+1324 '6 -
+1325 '7 -
+1326 '8 -
+1327 '9 -
+1328 '10 -
+1329 '11 -
+1330 '12 -
+1331 '13 -
+1332 '14 -
+1333 '15 -
+1334 '
+1335 '
+1336 'Tool-ok:
+1337 '0=semmilyen tool
 jAlaph=(2.600,-33.050,136.100,0.000,76.950,92.600)
 jFelvetel=(2.600,-33.050,136.100,0.000,76.950,92.600)
 jKamera=(2.600,-33.050,136.100,0.000,76.950,92.600)
 jLerakas=(2.600,-33.050,136.100,0.000,76.950,92.600)
 jMurites=(2.600,-33.050,136.100,0.000,76.950,92.600)
 jSzerviz=(2.600,-33.050,136.100,0.000,76.950,92.600)
-jtemp0=(59.560,30.300,135.010,67.300,-36.230,-42.660)
-jtemp1=(54.820,28.930,130.380,-23.070,0.570,45.870)
-jtemp2=(38.660,88.250,39.420,0.000,52.330,-179.930,0.000,0.000)
+jtemp0=(56.180,8.640,113.460,0.000,57.900,146.190)
+jtemp1=(90.000,13.160,142.710,0.000,24.130,-179.990)
+jtemp2=(90.000,13.160,142.710,0.000,24.130,-179.990,0.000,0.000)
 pMurites=(508.180,23.120,734.150,180.000,0.000,90.000)(7,0)
-ptemp0=(464.090,692.810,600.000,-180.000,0.000,38.590)(7,0)
-ptemp1=(1000.000,800.000,0.000,-180.000,0.000,38.590)(7,0)
-ptemp2=(1000.000,800.000,0.000,-180.000,0.000,38.590)(7,0)
+ptemp0=(464.100,692.820,600.000,-180.000,0.000,89.990)(7,0)
+ptemp1=(0.000,600.000,300.000,-180.000,0.000,89.990)(7,0)
+ptemp2=(0.000,600.000,300.000,-180.000,0.000,89.990)(7,0)
 pKamera(1)=(508.180,23.120,734.150,180.000,0.000,90.000)(7,0)
 pKamera(2)=(508.180,23.120,734.150,180.000,0.000,90.000)(7,0)
 pKamera(3)=(508.180,23.120,734.150,180.000,0.000,90.000)(7,0)

@@ -48,7 +48,10 @@ gpcLZY* gpcROBnD::pull( gpcLZY* pOUT, U4x4* pROBrw ) {
 }
 gpcDrc& gpcDrc::operator = ( const gpcROB& rob ) {
 	if( rob.name != NMnDIF.x )
+	{
+		std::cout << "\033[1;31mIlegal W rob!\033[0m" << std::endl;
 		return *this;
+	}
 
 	gpmMcpyOF( &iXYZ.x, &rob.aXYZ, 3 );
 	if( iXYZ.qlen_xyz() < mmX(300) )
@@ -365,21 +368,20 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
 					oHS2o();
 					JD.y = 4;
 					return *this;
-				}
-				/*else if( bHS1i() ? false : HS1ms ) {
+				} else if( bHS1i() ? false : HS1ms ) {
 					/// megnézzük holt tart a robot
-					U4 lag = (mSEC-msSMR2.w),
+					U4	lag = (mSEC-msSMR2.w),
 						lagX = msSRT3.x+lag;
 					std::cout << "HS1ms-msSRT3=" << HS1ms << "-" << lagX << "=" << (I8)HS1ms-(I8)lagX << std::endl;
 					if( HS1ms < lagX )
 					{
 						HS1ms = 0;
-						oCTRL.z = 0;
-						JD.y = 0;
-						std::cout << "EXTRA GO! lag:" << lag << "ms" << std::endl;
-						break;
+						//oCTRL.z = 0;
+						//JD.y = 0;
+						std::cout << "\033[1;32mEXTRA GO! lag:" << lag << "ms\033[0m" << std::endl;
+						//break;
 					}
-				}*/
+				}
 				/// PULLING most arra várunk megérkezzen a robot
 				xHS1o();
 				JD.y = 3;

@@ -193,7 +193,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 
 
 		jd1ABC.xyz_(tABC);
-		jd1xyz.xyz_(txyz);
+		jd1up.xyz_(tXYZ-txyz);
 	}
 	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
 	I4x2 xy = jdPRG.y;
@@ -209,7 +209,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				cr.gr2cr( xy, jdPRG.w );
 				d = cr.w/zl;
 				vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
-				tXYZ.xyz_( jd1xyz - vec );
+				tXYZ.xyz_( jd0xyz - vec );
 			} break;
 
 		case gpeALF_SNAIL: {
@@ -222,7 +222,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				cr.gr2cr( xy, jdPRG.w );
 				d = cr.w/zl;
 				vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
-				tXYZ.xyz_( jd1xyz - vec );
+				tXYZ.xyz_( jd0xyz - vec );
 			} break;
 
 		case gpeALF_DROP: {
@@ -237,8 +237,8 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				jdPRG.y = msSRT3.x + 5*ms2sec - jd0PRG.x;
 				I8 ti = jdPRG.y-jdPRG.w;
 
-				I4x4	up = (jd0XYZ-jd0xyz).xyz0(),
-						dti = jd0XYZ.drop( jd1XYZ, up, jd1XYZ.w, ti, tn );
+				I4x4	up0 = (jd0XYZ-jd0xyz).xyz0(),
+						dti = jd0XYZ.drop( jd1XYZ, up0, jd1XYZ.w, ti, tn );
 				if( preti<0 )
 					preti=0;
 				if( ti>tn )
@@ -246,18 +246,20 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 
 				if( (preti>=0) && (ti<=tn) )
 				{
-					double	radA = jd0XYZ.dropRAD( jd1XYZ, up, jd1XYZ.w, 0, tn ),
-							radB = jd0XYZ.dropRAD( jd1XYZ, up, jd1XYZ.w, tn, tn ),
+					double	radA = jd0XYZ.dropRAD( jd1XYZ, up0, jd1XYZ.w, 0, tn ),
+							radB = jd0XYZ.dropRAD( jd1XYZ, up0, jd1XYZ.w, tn, tn ),
 							piAB = radB-radA,
 							piA = radA > 0.0 ? PIp2-radA : PIp2,
 							th = double(tn)*piA/piAB;
-					if( ti > th )
-					if( preti < th )
-					{
-						ti = th;
-						jdPRG.y = ti+jdPRG.w;
-						dti = jd0XYZ.drop( jd1XYZ, up, jd1XYZ.w, ti, tn );
-						std::cout << "HI ";
+					if( ti > th ) {
+						if( preti < th ) {
+							ti = th;
+							jdPRG.y = ti+jdPRG.w;
+							dti = jd0XYZ.drop( jd1XYZ, up0, jd1XYZ.w, ti, tn );
+							std::cout << "HI ";
+						}
+						//I4x4 up1 = (jd1XYZ-jd1xyz).xyz0();
+						up0 += ((jd1up-up0)*(I8)(ti-th))/(I8)(tn-th);
 					}
 				}
 				MPosS = jdPRG.y-preY;
@@ -265,7 +267,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				if( HS1ms-msSRT3.x > ms2sec )
 					HS1ms -= ms2sec;
 				tXYZ.xyz_( dti );
-				txyz.xyz_( tXYZ-up );
+				txyz.xyz_( tXYZ-up0 );
 
 				std::cout << ti << "/" << tn << "\t" << tXYZ.pSTR( gpsJDprgPUB ) <<std::endl;
 			} break;
@@ -543,6 +545,12 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case gpeDRCos_posx:
 			case gpeDRCos_posy:
 			case gpeDRCos_posz:
+				if( pD->jdPRG.x )
+				{
+					U4 i = (iNUM-gpeDRCos_posx)%nNUM;
+					pD->jd1up.aXYZW[i] = pD->jd1XYZ.aXYZW[i] - ((d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1)));
+					break;
+				}
 				pD->txyz.aXYZW[(iNUM-gpeDRCos_posx)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 				break;
 
@@ -574,10 +582,12 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 				pD->jdPRGstp( mSEC );
 				alf = gpeALF_null;
 				break;
+			case gpeDRCos_drpUP:
+				pD->jd1up.xyz_( pD->tXYZ-pD->txyz );
 			case gpeDRCos_drpX:
 			case gpeDRCos_drpY:
 			case gpeDRCos_drpZ:
-			case gpeDRCos_drpUP:
+			///case gpeDRCos_drpUP: valójában a 4. para
 			case gpeDRCos_drpT:
 			case gpeDRCos_drpW:
 				if(iNUM<gpeDRCos_drpT)

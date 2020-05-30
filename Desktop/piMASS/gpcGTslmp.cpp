@@ -458,7 +458,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 ///              - REF -
 ///-------------------------------------
 
-gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR ) {
+/*gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR ) {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
 	if( this ? !n : true )
@@ -559,7 +559,7 @@ gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUS
 		}
 	}
     return pANS->lzyFRMT( s, "ok" );
-}
+}*/
 void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )

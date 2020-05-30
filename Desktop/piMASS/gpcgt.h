@@ -150,7 +150,7 @@ public:
 
 			jd0PRG, //jd0DRPtu,
 			jd0XYZ, jd0ABC, jd0xyz,
-			jd1XYZ, jd1ABC, jd1xyz;
+			jd1XYZ, jd1ABC, jd1up;
 	F4x4	jd0mx;
 	gpeALF	jdALF;
 	I4x4	msSMR2, msSRT3;
