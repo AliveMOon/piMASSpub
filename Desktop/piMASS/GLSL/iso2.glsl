@@ -34,10 +34,10 @@ vec4 cr_lut( vec4 rgba, vec3 crl, vec2 lwh ) 				// crl.xyz ColRowLut 	// lwh Lu
 }
 void main()																							
 {
-	const vec3 m0p = vec3(-1,0,1);
+	const vec4 m0p13 = vec3(-1,0,1, 1.0/3.0);
 	vec2	frm1 = fr_uv*FRMwh,																			
 			frm0 = frm1/aTX[2],								// atx[2] == TXwh							
-			t2x3 = vec2( 1.0/2.0, 1.0/3.0 )/gpdTXcrl.xy,	// aTX[0] == mn_iso_CR_32x32				
+			t2x3 = vec2( 1.0/2.0, m0p13.w )/gpdTXcrl.xy,	// aTX[0] == mn_iso_CR_32x32				
 			Ain = fract(frm1)*t2x3,							// atx[0] == mnCR							
 			off0 = vec2( 1.0/2.0, 1.0/4.0 ),															
 			off2x3 = 1.0/aTX[2];							// aTX[3] == mn_iso_CR	
@@ -53,7 +53,7 @@ void main()
 	vec4	O, A, B,
 			C, D,
 			E,F = texture2D( gpdTXutf, frm0 + off0+vec2(0.0,0.5) )*0x100,
-			cl, Ec;
+			cl;
 	if( F.r > 0 ) {																									
 		cl = cr_lut( F, gpdTXcrl*vec3(1,3,1), gpdTXwh );
 		F = texture2D( gpdTXmin, cl.xy+Ain+vec2(0,5.0/32.0) );
@@ -68,61 +68,64 @@ void main()
 	// |E|F|1	|02|12|		// +-+-+	// +-+-+																		
 	// +-+-+	+--+--+     // |F|E| 1	// |C|D| 2	
 	// MINI ----------------// +-+-+	// +-+-+	--------------------------------------
-	if( F.r < 0.25 ) {
+	if( F.a < 0.25 ) {
 		E = texture2D( gpdTXutf, frm0 + off0 )*0x100;
-		if( E.r > 0 ) {
 			cl = cr_lut( E, gpdTXcrl, gpdTXwh );
+		if( E.r > 0 ) {
 			E = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 2 )-gpdTXiz );
 		} else 
-			E = cl = m0p.yyyy;
+			E = m0p13.yyyy;
 		if( cl.w >= 1.0 ){
 			// ki van jelölve
-			if( (E.a*E.g)<0.5 )
-				O = texture2D( gpdTXmin, cl.zw );
+			if( (E.a*E.g)>0.5 )
+				F = texture2D( gpdTXmin, cl.zw );
 			else
-				O = m0p.yyyz;
+				F = m0p13.yyyz;
 		} else {
+			E *= texture2D( gpdTXmin, cl.zw );
+			
 			A = texture2D( gpdTXutf, frm0 + off0 + off2x3*vec2( 0, 2) )*0x100;	
 			B = texture2D( gpdTXutf, frm0 + off0 + off2x3*vec2(-1, 2) )*0x100;	
 			C = texture2D( gpdTXutf, frm0 + off0 + off2x3*vec2( 0, 1) )*0x100;	
 			D = texture2D( gpdTXutf, frm0 + off0 + off2x3*vec2(-1, 1) )*0x100;	
-			cl = cr_lut( E, gpdTXcrl, gpdTXwh );
-			Ec = texture2D( gpdTXmin, cl.zw );
 			F = texture2D( gpdTXutf, frm0 + off0 + off2x3*vec2(-1, 0) )*0x100;	
 			if( A.r > 0 ) {
 				cl = cr_lut( A, gpdTXcrl, gpdTXwh );
-				A = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 0 )-gpdTXiz )*Ec;
+				A = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 0 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
 			} else 
-				A = m0p.yyyy; 
+				A = m0p13.yyyy; 
 			if( B.r > 0 ) {
 				cl = cr_lut( B, gpdTXcrl, gpdTXwh );
-				B = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 0 )-gpdTXiz )*Ec;
+				B = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 0 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
 			} else 
-				B = m0p.yyyy; 
+				B = m0p13.yyyy; 
 			
 			if( C.r > 0 ) {
 				cl = cr_lut( C, gpdTXcrl, gpdTXwh );
-				C = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 1 )-gpdTXiz )*Ec;
+				C = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 1 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
 			} else
-				C = m0p.yyyy;
+				C = m0p13.yyyy;
 			
 			if( D.r > 0 ) {
 				cl = cr_lut( D, gpdTXcrl, gpdTXwh );
-				D = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 1 )-gpdTXiz )*Ec;
+				D = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 1 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
 			} else 
-				D = m0p.yyyy; 
+				D = m0p13.yyyy; 
 			
 			if( F.r > 0 ) {
 				cl = cr_lut( F, gpdTXcrl, gpdTXwh );
-				F = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 2 )-gpdTXiz )*Ec;
+				F = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 2 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
 			} else
-				F = m0p.yyyy; 
+				F = m0p13.yyyy; 
 			
-			O = max(max(max(A,B),C), max(max(D,E),F));
+			F = max(max(max(A,B),C), 
+					max(max(D,E),F));
+			
 		}
-		gl_FragColor = max( gl_FragColor*0.5, O );
 	} else 
-		gl_FragColor += F*texture2D( gpdTXmin, cl.zw );
- 	if( (gl_FragColor.a*gl_FragColor.g) < 0.25 ) 
+		F *= texture2D( gpdTXmin, cl.zw );
+	
+	F.a *= dot(F.rgb, m0p13.www );
+ 	if( F.a < 0.25 ) 
 		discard; 
 }

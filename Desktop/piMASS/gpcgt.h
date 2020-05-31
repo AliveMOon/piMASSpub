@@ -162,7 +162,6 @@ public:
 	~gpcDrc() {
 		if( n_join >= n_trd )
 			return;
-
 		trd.join();
 	}
 	gpcDrc& operator = ( const gpcDrc& d )
@@ -178,14 +177,18 @@ public:
 
 	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
 	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
+
+	gpcDrc( const gpcZS& zs, U4 nm = 0  );
+	gpcDrc& operator = ( const gpcZS& zs );
+	gpcDrc& judoZS( gpcZS& inp, U4 mSEC );
+
 	gpcDrc& operator &= ( gpcDrc& in );
-	gpcDrc( const gpcZS& zs, U4 nm = 0 )
+	gpcDrc( const gpcROB& rob, U4 nm = 0 )
 	{
 		if( nm != NMnDIF.au4x2[0].x )
 			format( nm );
-		*this = zs;
+		*this = rob;
 	}
-	gpcDrc& operator = ( const gpcZS& zs );
 	gpcDrc& operator = ( const gpcROB& rob );
 
 
@@ -291,7 +294,7 @@ public:
 	U4 xHS3o() { iCTRL.y|=ZShs3; return (oCTRL.y&=(~ZShs3)); }
 
 	bool jdPRGstp( U4 mSEC );
-	gpcDrc& judoZS( gpcZS& inp, U4 mSEC );
+
 	gpcDrc& judo( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)

@@ -8,6 +8,12 @@ U4x4 gpaZSwr[] = {
 	{ 	0xA,  	gpdZSnWu2,	10000, gpdZSnRu2	},
 	{ 	0x40A,  gpdZSnWu2,	20000, gpdZSnRu2	},
 };
+gpcDrc::gpcDrc( const gpcZS& zs, U4 nm )
+{
+	if( nm != NMnDIF.au4x2[0].x )
+		format( nm );
+	*this = zs;
+}
 gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	/// DEBUG célból készült nem igazán használható másra
 	gpmCLR;
