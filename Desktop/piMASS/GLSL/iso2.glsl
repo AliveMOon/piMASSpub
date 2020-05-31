@@ -15,7 +15,7 @@ uniform vec2 aTX[8];
 #define gpdTXutf	tex2
 #define gpdTXcrl	vec3( aTX[0], 4 )		// aTX[0] = vec2( 32, 32 )									
 #define gpdTXwh	vec2( 1024, 1536 )																	
-#define gpdTXiz	vec2( 0, 3.0/1536 )	
+#define gpdTXiz	vec2( 0, 3.5/1536.0 )	
 vec4 cr_lut( vec4 rgba, vec3 crl, vec2 lwh ) 				// crl.xyz ColRowLut 	// lwh LutWH		
 {
 	// MINI
@@ -34,7 +34,8 @@ vec4 cr_lut( vec4 rgba, vec3 crl, vec2 lwh ) 				// crl.xyz ColRowLut 	// lwh Lu
 }
 void main()																							
 {
-	const vec4 m0p13 = vec3(-1,0,1, 1.0/3.0);
+	const vec4 m0p13 = vec4(-1,0,1, 1.0/3.0);
+	const vec3 aa = vec3( 1.0/1024.0, 1.0/1536.0, 0 );
 	vec2	frm1 = fr_uv*FRMwh,																			
 			frm0 = frm1/aTX[2],								// atx[2] == TXwh							
 			t2x3 = vec2( 1.0/2.0, m0p13.w )/gpdTXcrl.xy,	// aTX[0] == mn_iso_CR_32x32				
@@ -42,7 +43,7 @@ void main()
 			off0 = vec2( 1.0/2.0, 1.0/4.0 ),															
 			off2x3 = 1.0/aTX[2];							// aTX[3] == mn_iso_CR	
 			
-	gl_FragColor = vec4( texture2D( gpdTXbg, fr_uv ).rgb, 0 );	// BG						
+	gl_FragColor = vec4( texture2D( gpdTXbg, fr_uv ).rgb, 0.25 );	// BG						
 	
 	if( DIVxy.x < 1 )																					
  		off0.x = 0.0;																					
@@ -53,7 +54,7 @@ void main()
 	vec4	O, A, B,
 			C, D,
 			E,F = texture2D( gpdTXutf, frm0 + off0+vec2(0.0,0.5) )*0x100,
-			cl;
+			cl, cl2;
 	if( F.r > 0 ) {																									
 		cl = cr_lut( F, gpdTXcrl*vec3(1,3,1), gpdTXwh );
 		F = texture2D( gpdTXmin, cl.xy+Ain+vec2(0,5.0/32.0) );
@@ -77,10 +78,10 @@ void main()
 			E = m0p13.yyyy;
 		if( cl.w >= 1.0 ){
 			// ki van jelölve
-			if( (E.a*E.g)>0.5 )
-				F = texture2D( gpdTXmin, cl.zw );
-			else
-				F = m0p13.yyyz;
+			//if( E.a>(1.0/255.0) )
+			//	F = texture2D( gpdTXmin, cl.zw );
+			//else
+				F = m0p13.zzzz*(1.0-E.a);
 		} else {
 			E *= texture2D( gpdTXmin, cl.zw );
 			
@@ -90,33 +91,33 @@ void main()
 			D = texture2D( gpdTXutf, frm0 + off0 + off2x3*vec2(-1, 1) )*0x100;	
 			F = texture2D( gpdTXutf, frm0 + off0 + off2x3*vec2(-1, 0) )*0x100;	
 			if( A.r > 0 ) {
-				cl = cr_lut( A, gpdTXcrl, gpdTXwh );
-				A = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 0 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
+				cl2 = cr_lut( A, gpdTXcrl, gpdTXwh );
+				A = texture2D( gpdTXmin, cl2.xy+Ain+t2x3*vec2( 0, 0 )-gpdTXiz )*texture2D( gpdTXmin, cl2.zw );
 			} else 
-				A = m0p13.yyyy; 
+				A = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 2 )-gpdTXiz+aa.xz ); 
 			if( B.r > 0 ) {
-				cl = cr_lut( B, gpdTXcrl, gpdTXwh );
-				B = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 0 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
+				cl2 = cr_lut( B, gpdTXcrl, gpdTXwh );
+				B = texture2D( gpdTXmin, cl2.xy+Ain+t2x3*vec2( 1, 0 )-gpdTXiz )*texture2D( gpdTXmin, cl2.zw );
 			} else 
-				B = m0p13.yyyy; 
+				B = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 2 )-gpdTXiz+aa.xy );
 			
 			if( C.r > 0 ) {
-				cl = cr_lut( C, gpdTXcrl, gpdTXwh );
-				C = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 1 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
+				cl2 = cr_lut( C, gpdTXcrl, gpdTXwh );
+				C = texture2D( gpdTXmin, cl2.xy+Ain+t2x3*vec2( 0, 1 )-gpdTXiz )*texture2D( gpdTXmin, cl2.zw );
 			} else
-				C = m0p13.yyyy;
+				C = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 2 )-gpdTXiz+aa.zy );
 			
 			if( D.r > 0 ) {
-				cl = cr_lut( D, gpdTXcrl, gpdTXwh );
-				D = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 1 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
+				cl2 = cr_lut( D, gpdTXcrl, gpdTXwh );
+				D = texture2D( gpdTXmin, cl2.xy+Ain+t2x3*vec2( 1, 1 )-gpdTXiz )*texture2D( gpdTXmin, cl2.zw );
 			} else 
-				D = m0p13.yyyy; 
+				D = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 2 )-gpdTXiz-aa.xz ); 
 			
 			if( F.r > 0 ) {
-				cl = cr_lut( F, gpdTXcrl, gpdTXwh );
-				F = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 1, 2 )-gpdTXiz )*texture2D( gpdTXmin, cl.zw );
+				cl2 = cr_lut( F, gpdTXcrl, gpdTXwh );
+				F = texture2D( gpdTXmin, cl2.xy+Ain+t2x3*vec2( 1, 2 )-gpdTXiz )*texture2D( gpdTXmin, cl2.zw );
 			} else
-				F = m0p13.yyyy; 
+				F = texture2D( gpdTXmin, cl.xy+Ain+t2x3*vec2( 0, 2 )-gpdTXiz-aa.xy ); 
 			
 			F = max(max(max(A,B),C), 
 					max(max(D,E),F));
@@ -125,7 +126,8 @@ void main()
 	} else 
 		F *= texture2D( gpdTXmin, cl.zw );
 	
-	F.a *= dot(F.rgb, m0p13.www );
- 	if( F.a < 0.25 ) 
+	//F.a *= dot(F.rgb, m0p13.www );
+ 	if( F.a < 1.0/255.0 ) 
 		discard; 
+	gl_FragColor = gl_FragColor*gl_FragColor.a + F*F.a;
 }

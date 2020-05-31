@@ -167,6 +167,8 @@ public:
 	gpcDrc& operator = ( const gpcDrc& d )
 	{
 		gpmMcpy( this, &d, gpmOFF(gpcDrc,n_trd) );
+		if( n_join < n_trd )
+			trd.join();
 		n_trd = n_join = 0;
 	}
 	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
@@ -243,11 +245,11 @@ public:
 
 		oCTRL.x = gpeZS_oCTR;
 		iCTRL.x = gpeZS_iCTR;
-
+		n_trd = n_join = 0;
 		return *this;
 	}
 	gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c );
-	gpcDrc() { format(); };
+	gpcDrc() { format(); n_trd = n_join = 0; };
 
 
 	U4 hs123() {
