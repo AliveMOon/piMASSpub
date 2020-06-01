@@ -607,7 +607,7 @@ void gpfMAINchk()
 					" \r\n1. A mini ha szerkesztve van _# ket is rajzolja"
 					" \r\nés ne használja az extra karaktereket!"
 					" \r\n2. F5 CPY F6 MOVE stb???"
-					" \r\n3. rosszul azonosítja hol van a pointer"
+					"\033[1;32m  \r\n3. rosszul azonosítja hol van a pointer"
 					"\033[0m" << std::endl;
 
 //	char* pSTR = NULL;

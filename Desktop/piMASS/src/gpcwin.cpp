@@ -105,11 +105,11 @@ void gpcWIN::WINreSZ( void )
 		throw InitError();
 	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
 
-	winSIZ.a4x2[1] = winSIZ.a4x2[0] / (gpdSIZ2CR*2);
+	//winSIZ.a4x2[1] = winSIZ.a4x2[0] / (gpdSIZ2CR*2);
+	//winDIVcr.a4x2[0] = winSIZ.a4x2[1];
 
-	winDIVcr.a4x2[0] = winSIZ.a4x2[1];
+	winDIVcr.a4x2[0] = winSIZ.a4x2[0] / (gpdSIZ2CR*2);
 	winDIVcr.a4x2[1] = winDIVcr.a4x2[0]*2;
-
 	winSIZ.a4x2[1] = winDIVcr.a4x2[1] & gpdSIZ2CR;
 
 	if( winSIZ.a4x2[0] != winSIZ.a4x2[1] )

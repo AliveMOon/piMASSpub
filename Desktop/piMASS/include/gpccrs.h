@@ -50,20 +50,9 @@ class gpcCRS
 		virtual ~gpcCRS();
 		U1*		gtUTF8( U1* pBUFF ), id;
 
-		bool CRSbEDget( void )
-		{
-			return bED;
-		}
-
-		bool CRSbEDset( bool b )
-		{
-			return bED = b;
-		}
-
-		bool CRSbEDswitch( void )
-		{
-			return bED = !bED;
-		}
+		bool CRSbEDget( void ) { return bED; }
+		bool CRSbEDset( bool b ) { return bED = b; }
+		bool CRSbEDswitch( void ) { return bED = !bED; }
 
 		I4* ZNpos( const I4x2& mZN, I4* pC, I4* pR ) {
 			if( (nCp <= mZN.x) || (nRp <= mZN.y) )
@@ -92,23 +81,14 @@ class gpcCRS
 			}
 			return pCp;
 		}
-		I4x2 gtFRMxy( ) //gpcWIN& win, U1 iDIV )
-		{
-
-			return CRSfrm.a4x2[0];
-		}
-		I4x2& gtFRMwh(  )  //gpcWIN& win ) //, U1 iDIV )
-		{
-			return CRSfrm.a4x2[1];
-		}
-		I4x2 stFRMxy( gpcWIN& win, U1 iDIV, I4 x, I4 y )
-		{
+		I4x2 gtFRMxy() { return CRSfrm.a4x2[0]; }
+		I4x2& gtFRMwh() { return CRSfrm.a4x2[1]; }
+		I4x2 stFRMxy( gpcWIN& win, U1 iDIV, I4 x, I4 y ) {
 			CRSfrm.x = x;
 			CRSfrm.y = y;
 			return CRSfrm.a4x2[0];
 		}
-		I4x2 addFRMxy( I4 x, I4 y = 0 )
-		{
+		I4x2 addFRMxy( I4 x, I4 y = 0 ) {
 			CRSfrm.x += x;
 			CRSfrm.y += y;
 			return CRSfrm.a4x2[0];
@@ -273,8 +253,7 @@ class gpcCRS
 		void CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
 
 		I4x4 scnZNCR( gpcWIN& win, gpcMASS& mass, const I4x2& _xy, U1 srcDIV );
-		I4x4& gtFRM()
-		{
+		I4x4& gtFRM() {
 			return CRSfrm;
 		}
 		void frmDRWtx( 	SDL_Rect dst, SDL_Rect src,

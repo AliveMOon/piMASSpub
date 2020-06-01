@@ -9,7 +9,7 @@ gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
 	gpmCLR;
 	id = _id;
 	win.apCRS[id] = this;
-	CRSfrm.a4x2[1] = win.wFRM( 0 )*6;
+	CRSfrm.a4x2[1] = win.wFRM()*6;
 	CRSfrm.a4x2[1].mn( win.wDIVcr(0).a4x2[1] );
 	//wDIVfrm = win.wDIV(0).xyWH;
 
@@ -26,21 +26,25 @@ gpcCRS::~gpcCRS()
 I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 						gpcMASS& mass, const I4x2& _xy, U1 srcDIV )
 {
+
 	// XY - pixel
 	// CR - Coll/Row
-	SDL_Rect div = win.wDIVpx( id ).xyWH; //iDIV );
-	if( div.w < 1 )
-	{
-		div = win.wDIVpx( id ).xyWH;  //iDIV );
+	I4x4	divSZ = win.wDIVsz( id );
+	if( !(divSZ.z*divSZ.w) )
 		return 0;
-	}
-	I4x2 cr( div.w/CRSfrm.z, div.h/CRSfrm.w );
-	I4x4 o = CRSfrm & cr;
 	if( !this )
-		return o;
+		return 0;
 
-	I4x2 xy = _xy - o.a4x2[0] - I4x2(div.x,div.y);
-	o = I4x4( xy, xy/cr );
+	I4x2 xyIN = _xy-divSZ.a4x2[0],
+		 crIN = (xyIN&CRSfrm.a4x2[1])/divSZ.a4x2[1],
+		 xy2CR = crIN - CRSfrm.a4x2[0],
+		 endCR = CRSfrm.a4x2[1] - CRSfrm.a4x2[0];
+	//I4x2 cr( dPX.z/CRSfrm.z, dPX.w/CRSfrm.w );
+	//I4x4 o = CRSfrm&dPX. & cr;
+
+
+	//I4x2 xy = _xy - o.a4x2[0] - I4x2(div.x,div.y);
+	//o = I4x4( xy, xy/cr );
 	if( srcDIV > 3 ? true : !win.apCRS[srcDIV] )
 		srcDIV = id;
 	if( gpcMAP* pMAP = &mass.mapCR )
@@ -57,35 +61,37 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 		scnZN.null();
 		scnIN.null();
 
-		for( scnZN.x = 0; o.z >= scnZN.z; scnZN.x++ )
+		for( scnZN.x = 0; endCR.x >= scnZN.z; scnZN.x++ )
 		{
 			scnZN.z += (scnZN.x < pMAP->mapZN44.z) ? pC[scnZN.x] : gpdSRC_COLw;
-			if( o.z >= scnZN.z )
+			if( xy2CR.x >= scnZN.z )
 			{
 				scnZN0.z = scnZN.z;
 				continue;
 			}
 
-			scnIN.z = ((scnZN.x < pMAP->mapZN44.z) ? pC[scnZN.x] : gpdSRC_COLw)*cr.x;
-			scnIN.x = xy.x - (scnZN.z*cr.x - scnIN.z);
+			scnIN.z = (((scnZN.x < pMAP->mapZN44.z) ? pC[scnZN.x] : gpdSRC_COLw)*divSZ.z) / CRSfrm.z;
+			scnIN.x = xyIN.x - ((scnZN0.z+CRSfrm.x)*divSZ.z)/CRSfrm.z;
 			break;
 		}
 
-		for( scnZN.y = 0; o.w >= scnZN.w; scnZN.y++ )
+		for( scnZN.y = 0; endCR.y >= scnZN.w; scnZN.y++ )
 		{
 			scnZN.w += (scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw;
-			if( o.w >= scnZN.w )
+			if( xy2CR.y >= scnZN.w )
 			{
 				scnZN0.w = scnZN.w;
 				continue;
 			}
 
-			scnIN.w = ((scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw)*cr.y;
-			scnIN.y = xy.y - (scnZN.w*cr.y - scnIN.w);
+			//scnIN.w = ((scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw)*cr.y;
+			//scnIN.y = o.y - scnZN0.w*cr.y; //(scnZN.w*cr.y - scnIN.w);
+			scnIN.w = (((scnZN.y < pMAP->mapZN44.w) ? pC[scnZN.y] : gpdSRC_ROWw)*divSZ.w) / CRSfrm.w;
+			scnIN.y = xyIN.y - ((scnZN0.w+CRSfrm.y)*divSZ.w)/CRSfrm.w;
 			break;
 		}
 	}
-	return o;
+	return I4x4( xyIN+(CRSfrm.a4x2[0]&divSZ.a4x2[1])/CRSfrm.a4x2[1], xy2CR );
 }
 
 

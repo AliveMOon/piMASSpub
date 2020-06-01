@@ -867,12 +867,11 @@ public:
 			}
 			return true;
 		}
-		I4x2 wFRM( U1 iDIV ) {
-			I4x2 whCR = winSIZ.a4x2[1]/chrTX.a4x2[1]; // I4x2( (int*)&chrPIC.w );
+		I4x2 wFRM(){ return winSIZ.a4x2[1]/chrTX.a4x2[1]; }// U1 iDIV ) {
+		/*	I4x2 whCR = winSIZ.a4x2[1]/chrTX.a4x2[1]; // I4x2( (int*)&chrPIC.w );
 			return whCR;
-		}
-		I4x4 wDIVcr( U1 iDIV )
-		{
+		}*/
+		I4x4 wDIVcr( U1 iDIV ) {
 			I4x4 div;
 
 			switch( iDIV%4)
@@ -918,28 +917,18 @@ public:
 			}
 			return div;
 		}
-
-
-		I4x4 wDIVpx( U1 iDIV )
-		{
-			//SDL_Rect
-			I4x4 div = wDIVcr(iDIV);
+		I4x4 wDIVpx( U1 iDIV ) { return wDIVcr(iDIV)&gpdSIZ2CR; }
+		I4x4 wDIVsz( U1 iDIV ) { return (winSIZ&wDIVcr(iDIV))/winDIVcr.a4x2[1]; }
+		/*	I4x4 div = wDIVcr(iDIV);
 			div &= gpdSIZ2CR;
 			return div;
-		}
-		I4x2 wDIVcrLAY()
-		{
-			return winDIVcr.a4x2[1];
-		}
-		I4x2 wDIVcrALLOCK()
-		{
-			return winDIVcr.a4x2[1]&gpdCRall;
-		}
+		}*/
+		I4x2 wDIVcrLAY() { return winDIVcr.a4x2[1]; }
+		I4x2 wDIVcrALLOCK() { return winDIVcr.a4x2[1]&gpdCRall; }
 		void WINreSZ( void );
 
 
-		U4 reSCAN( void )
-		{
+		U4 reSCAN( void ) {
 			bSHIFT = 1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]);
 			bCTRL = 1&(aKT[SDL_SCANCODE_LCTRL]|aKT[SDL_SCANCODE_RCTRL]);
 			abALT[0] = 1&aKT[SDL_SCANCODE_LALT];
@@ -948,7 +937,6 @@ public:
 
 			return (((U4)bSHIFT)<<9)|((U4)bALT<<10);
 		}
-
 		U4x2 chrWH( void ) {
 			return U4x2( chrPIC.w, chrPIC.h );
 		}
@@ -967,8 +955,7 @@ public:
 			}
 			return (mXY.x/winDIVpx.x) | ((mXY.y/winDIVpx.y)<<1);
 		}
-		I4x2& winWHpx()
-		{
+		I4x2& winWHpx() {
 			return winDIVpx.a4x2[1];
 		}
 		void	WINrun( const char* pWELLCOME );
