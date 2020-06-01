@@ -125,8 +125,8 @@ void gpcWIN::WINreSZ( void )
 		aAFT[id] = apCRS[id]->gtFRMwh();
 
 		std::cout 	<< 	"\033[1;31m WINreSZ"
-					<< "frmID" << id
-					<< " W:" << aBEF[id].x << "/" << aAFT[id].x
+					<< "frmID:" << id
+					<< " be/af W:" << aBEF[id].x << "/" << aAFT[id].x
 					<< " H:" << aBEF[id].y << "/" << aAFT[id].y
 					<< "\033[0m" << std::endl;
 	}
