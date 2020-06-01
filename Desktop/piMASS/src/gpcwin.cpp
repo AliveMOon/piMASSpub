@@ -4,8 +4,7 @@
 extern U1 gpsKEYMAP[];
 
 
-gpcWIN::~gpcWIN()
-{
+gpcWIN::~gpcWIN() {
 	for( U1 i = 0, e = gpmN(apTall); i < e; i++ )
 	{
 		if( apT[i] )
@@ -88,7 +87,7 @@ U1 gpsHUNtx[] =
 ":\"\"'  :   ' :   "
 // 0x80 -------------------
 "0123456789abcdef";
-void gpcWIN::gpeWINresize( void )
+void gpcWIN::WINreSZ( void )
 {
 	for( U1 i = 0; i < 4; i++ )
 	if( apT[i] )
@@ -96,7 +95,12 @@ void gpcWIN::gpeWINresize( void )
 		aT[i].join();
 		apT[i] = NULL;
 	}
-
+	I4x2 aBEF[4], aAFT[4];
+	for( U1 id = 0; id < 4; id++ ) {
+		if( !apCRS[id] )
+			continue;
+		aBEF[id] = apCRS[id]->gtFRMwh();
+	}
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
 		throw InitError();
 	SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
@@ -113,8 +117,19 @@ void gpcWIN::gpeWINresize( void )
 		winSIZ.a4x2[0] = winSIZ.a4x2[1];
 		SDL_SetWindowSize( pSDLwin, winSIZ.z, winSIZ.w );
 	}
-	winDIVpx = winSIZ / I4x4( 2,2,1,1 );
+	winDIVpx = winSIZ/I4x4( 2,2,1,1 );
+	for( int id = 0; id < 4; id++ ) {
+		if( !apCRS[id] )
+			continue;
+		apCRS[id]->stFRMwh( *this, aBEF[id].x, aBEF[id].y );
+		aAFT[id] = apCRS[id]->gtFRMwh();
 
+		std::cout 	<< 	"\033[1;31m WINreSZ"
+					<< "frmID" << id
+					<< " W:" << aBEF[id].x << "/" << aAFT[id].x
+					<< " H:" << aBEF[id].y << "/" << aAFT[id].y
+					<< "\033[0m" << std::endl;
+	}
 }
 gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	//ctor
@@ -593,12 +608,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								//
 								//---------------------
 								I4 mag = apCRS[onDIV.x]->gtFRMwh().x - ev.wheel.y*2;
-
-								apCRS[onDIV.x]->stFRMwh(
-															*this,
-															mag, 0,
-															mag
-														);
+								apCRS[onDIV.x]->stFRMwh( *this, mag, 0 );
 								nIRQ++;
 								break;
 							}
@@ -653,17 +663,20 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						aXY[0] = c = gpsKEYMAP[scan];
 						aXY[1] = gpsKEYMAP[scan+0x10];
 					} break;
-				case SDL_WINDOWEVENT:
-					if( ev.window.event != SDL_WINDOWEVENT_RESIZED )
-						break;
-					I4x2 xy = winSIZ.a4x2[0];
-					SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
-					if( !(abs( xy.x-winSIZ.x)+abs( xy.y-winSIZ.y))	)
-						break;
+				case SDL_WINDOWEVENT: {
+						if( ev.window.event != SDL_WINDOWEVENT_RESIZED )
+							break;
+						I4x2 xy = winSIZ.a4x2[0];
+						SDL_GetWindowSize( pSDLwin, &winSIZ.x, &winSIZ.y );
+						if( !(abs( xy.x-winSIZ.x)+abs( xy.y-winSIZ.y))	)
+							break;
 
-					gpeWINresize();
+						WINreSZ();
 
-					//winSIZ.a4x2[1] = winSIZ.a4x2[0];
+						//winSIZ.a4x2[1] = winSIZ.a4x2[0];
+					} break;
+				default:
+					break;
 
 			}
 			if( c == 'x' )

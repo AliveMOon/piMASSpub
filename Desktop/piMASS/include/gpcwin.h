@@ -935,7 +935,7 @@ public:
 		{
 			return winDIVcr.a4x2[1]&gpdCRall;
 		}
-		void		gpeWINresize( void );
+		void WINreSZ( void );
 
 
 		U4 reSCAN( void )

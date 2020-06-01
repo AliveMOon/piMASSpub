@@ -113,7 +113,7 @@ class gpcCRS
 			CRSfrm.y += y;
 			return CRSfrm.a4x2[0];
 		}
-		I4x2 stFRMwh(	gpcWIN& win, I4 c, I4 r, I4 mag = 0 ) {
+		I4x2 stFRMwh( gpcWIN& win, I4 c, I4 r ) { //, I4 mag = 0 ) {
 			I4x2 CR = win.wDIVcr(id).a4x2[1];
 			if( c > CR.x || r > CR.y )
 			{
