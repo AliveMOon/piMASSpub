@@ -765,9 +765,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						anRio.a8x2[1].x >>= 0x10;
 						} break;
 
-					case gpeALF_SLMPo: if(alu.bSTR())
-						break; // OFF
-						{
+					case gpeALF_SLMPo: if(alu.bSTR()) break; { // OFF -------------
 						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
 							break;
 						gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() );
