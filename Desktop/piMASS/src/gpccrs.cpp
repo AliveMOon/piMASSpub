@@ -12,17 +12,12 @@ gpcCRS::gpcCRS( gpcWIN& win, U1 _id )
 	CRSfrm.a4x2[1] = win.wFRM()*6;
 	CRSfrm.a4x2[1].mn( win.wDIVcr(0).a4x2[1] );
 	//wDIVfrm = win.wDIV(0).xyWH;
-
 }
 
-gpcCRS::~gpcCRS()
-{
+gpcCRS::~gpcCRS() {
 	//dtor
 	gpmDELary(pCp);
 }
-
-
-
 I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 						gpcMASS& mass, const I4x2& _xy, U1 srcDIV )
 {
@@ -39,20 +34,13 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 		 crIN = (xyIN&CRSfrm.a4x2[1])/divSZ.a4x2[1],
 		 xy2CR = crIN - CRSfrm.a4x2[0],
 		 endCR = CRSfrm.a4x2[1] - CRSfrm.a4x2[0];
-	//I4x2 cr( dPX.z/CRSfrm.z, dPX.w/CRSfrm.w );
-	//I4x4 o = CRSfrm&dPX. & cr;
 
-
-	//I4x2 xy = _xy - o.a4x2[0] - I4x2(div.x,div.y);
-	//o = I4x4( xy, xy/cr );
 	if( srcDIV > 3 ? true : !win.apCRS[srcDIV] )
 		srcDIV = id;
-	if( gpcMAP* pMAP = &mass.mapCR )
-	{
+	if( gpcMAP* pMAP = &mass.mapCR ) {
 		U4	*pC = pMAP->pCOL,
 			*pR = pMAP->pROW;
-		if( srcDIV )
-		{
+		if( srcDIV ) {
 			U4 nD = pMAP->mapZN44.a4x2[1].sum()*id;
 			pC += nD;
 			pR += nD;
@@ -61,32 +49,24 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 		scnZN.null();
 		scnIN.null();
 
-		for( scnZN.x = 0; endCR.x >= scnZN.z; scnZN.x++ )
-		{
+		for( scnZN.x = 0; endCR.x >= scnZN.z; scnZN.x++ ) {
 			scnZN.z += (scnZN.x < pMAP->mapZN44.z) ? pC[scnZN.x] : gpdSRC_COLw;
-			if( xy2CR.x >= scnZN.z )
-			{
+			if( xy2CR.x >= scnZN.z ) {
 				scnZN0.z = scnZN.z;
 				continue;
 			}
-
 			scnIN.z = (((scnZN.x < pMAP->mapZN44.z) ? pC[scnZN.x] : gpdSRC_COLw)*divSZ.z) / CRSfrm.z;
 			scnIN.x = xyIN.x - ((scnZN0.z+CRSfrm.x)*divSZ.z)/CRSfrm.z;
 			break;
 		}
 
-		for( scnZN.y = 0; endCR.y >= scnZN.w; scnZN.y++ )
-		{
+		for( scnZN.y = 0; endCR.y >= scnZN.w; scnZN.y++ ) {
 			scnZN.w += (scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw;
-			if( xy2CR.y >= scnZN.w )
-			{
+			if( xy2CR.y >= scnZN.w ) {
 				scnZN0.w = scnZN.w;
 				continue;
 			}
-
-			//scnIN.w = ((scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw)*cr.y;
-			//scnIN.y = o.y - scnZN0.w*cr.y; //(scnZN.w*cr.y - scnIN.w);
-			scnIN.w = (((scnZN.y < pMAP->mapZN44.w) ? pC[scnZN.y] : gpdSRC_ROWw)*divSZ.w) / CRSfrm.w;
+			scnIN.w = (((scnZN.y < pMAP->mapZN44.w) ? pR[scnZN.y] : gpdSRC_ROWw)*divSZ.w) / CRSfrm.w;
 			scnIN.y = xyIN.y - ((scnZN0.w+CRSfrm.y)*divSZ.w)/CRSfrm.w;
 			break;
 		}
