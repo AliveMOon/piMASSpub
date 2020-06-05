@@ -264,13 +264,8 @@ I4x2 gpcSRC::SRCmini(
 
 	I4x2 cxy = xy;
 	U1x4 c;
-	//c.u4 = pC64[15];
 	U1 nx, aC[] = " ";
 	I4 cr, n, rr;
-	//for( I4 r = max(xy.y,0); r < fy; r++ )
-	//for( I4 c = max(xy.x,0) + r*zz, ce = c+fx; c < ce; c++ )
-	//		pO[c] = 0;
-
 
 	bool bON = false, bSEL = false;
 	I4 nFILL;
@@ -346,6 +341,8 @@ I4x2 gpcSRC::SRCmini(
 				cxy.x++;
 				continue;
 			case '_':
+				if( bON )
+					break;
 				if( cr < 1 )
 					continue;
 				pO[cr-1].y = 1;
@@ -354,6 +351,8 @@ I4x2 gpcSRC::SRCmini(
 
 				continue;
 			case '#':
+				if( bON )
+					break;
 				if( cr < 1 )
 						continue;
 				pO[cr-1].y = 2;

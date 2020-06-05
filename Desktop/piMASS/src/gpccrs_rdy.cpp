@@ -29,11 +29,11 @@ bool gpcCRS::miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 allWH ) {
 }
 ///------------------------------
 ///
-/// 		miniRDYgl
+/// 		miniRDY
 ///
 ///------------------------------
 U1 gpsTITLE[0x100];
-void gpcCRS::miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT )
+void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT )
 {
 	if( miniLOCK( pPIC, pRNDR, win.wDIVcrALLOCK() ) )
 		return;

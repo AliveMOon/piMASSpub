@@ -179,7 +179,8 @@ magenta      35         45
 cyan         36         46
 white        37         47
 
-
+sudo /etc/init.d/dphys-swapfile stop
+sudo /etc/init.d/dphys-swapfile start
 
 
 

@@ -118,7 +118,7 @@ class gpcCRS
 		}
 
 		bool	miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 wh );
-		void	miniRDYgl( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT );
+		void	miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT );
 
 
 		bool	miniOFF( gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );

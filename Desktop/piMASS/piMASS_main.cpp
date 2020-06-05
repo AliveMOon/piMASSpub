@@ -604,10 +604,10 @@ void gpfMAINchk()
 		std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;
 	}
 	std::cout << 	"\033[1;31m Megvan már?"
-					" \r\n1. A mini ha szerkesztve van _# ket is rajzolja"
-					" \r\nés ne használja az extra karaktereket!"
-					" \r\n2. F5 CPY F6 MOVE stb???"
-					"\033[1;32m  \r\n3. rosszul azonosítja hol van a pointer"
+					"\033[1;34m \r\n1. A mini ha szerkesztve van _# ket is rajzolja"
+					"\033[1;31m \r\nés ne használja az extra karaktereket!"
+					"\033[1;31m \r\n2. F5 CPY F6 MOVE stb???"
+					"\033[1;32m \r\n3. rosszul azonosítja hol van a pointer"
 					"\033[0m" << std::endl;
 
 //	char* pSTR = NULL;

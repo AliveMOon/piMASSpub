@@ -423,7 +423,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				if( pS < gppKEYbuff )
 					crs.CRSins( *piMASS, gppKEYbuff, pS );
 
-				crs.miniRDYgl( *this, *piMASS, pPIC, pSDLrndr, bSHIFT );
+				crs.miniRDY( *this, *piMASS, pPIC, pSDLrndr, bSHIFT );
 
 				gppKEYbuff = gppMOUSEbuff;
 				*gppKEYbuff = 0;
@@ -433,7 +433,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					if( crs.id == i )
 						continue;
 					if( bSW&(1<<i) )
-						apCRS[i]->miniRDYgl( *this, *piMASS, pPIC, pSDLrndr, bSHIFT );
+						apCRS[i]->miniRDY( *this, *piMASS, pPIC, pSDLrndr, bSHIFT );
 				}
 			} else {
 				crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
