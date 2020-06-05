@@ -1213,7 +1213,7 @@ public:
 		an.x--;
 		return getXFNDzn(an);
 	}
-	U4 jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR );
+	U4 jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ = NULL );
 
 	U4 relLEV( void )
 	{

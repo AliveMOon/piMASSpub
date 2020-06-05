@@ -37,7 +37,8 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 {
 	if( miniLOCK( pPIC, pRNDR, win.wDIVcrALLOCK() ) )
 		return;
-	//U4 xFND;
+
+	/// ESCAPE? -------------------------------------------------------------------
 	bool bESC = false, bNoMini;
 	if( CRSfrm.x >= CRSfrm.z )
 	{
@@ -65,7 +66,8 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	}
 
 	if( bESC )
-		return;
+		return;	/// ----------------------------------------------------------- ESC!
+
 
 	gpcMAP* pMAP = &mass.mapCR;
 	if( !pMAP )
@@ -74,7 +76,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	U4 selID = id;
 	if( win.apCRS[win.srcDIV] )
 	if( bSHFT )
-		selID = win.srcDIV;
+		selID = win.srcDIV; /// Szomszédol!
 
 	I4x4	*p_selAI = (selID == id ? selANIN : win.apCRS[selID]->selANIN),
 
@@ -94,10 +96,12 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 
 	/// nagyon vigyázz itt nem BIZTOS, hogy a saját, PC és pR-rel dolgozik,
 	/// hanem ha le van nyomva a SHIFT akor e SRC_DIV-vel
-	I4	*pM = (I4*)pMAP->MAPalloc( spcZN, mZN, selID ),
-		*pC = (I4*)pMAP->pCOL,
-		*pR = (I4*)pMAP->pROW,
-		i, ie = pC-pM, c, r, z = mZN.z;
+	pMAP->MAPalloc( spcZN, mZN, selID );
+	U4	*pM, // = (I4*)pMAP->MAPalloc( spcZN, mZN, selID ),
+		*pC, // = (I4*)pMAP->pCOL,
+		*pR, // = (I4*)pMAP->pROW,
+		z, c, r,
+		ie, i = mass.jDOitREF( win, 0, ie, &pM, &pC, &pR, &z );
 
 	if( selID )
 	{
@@ -124,7 +128,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	}
 
 	/// pCp pRp ----------------------------------------
-	I4	*psCp = win.apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR ), // mapZN.ALLOC-al dolgozik
+	U4	*psCp = win.apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR ), // mapZN.ALLOC-al dolgozik
 		*psRp = win.apCRS[selID]->pRp;
 	/// end pCp pRp ----------------------------------------
 	I4x2 brdr = I4x2( psCp[mZN.x],psRp[mZN.y] );
@@ -165,11 +169,11 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 		else
 			xyCR.y = psRp[mZN.y]+((r-mZN.w)*gpdSRC_ROWw);
 
-		c16fr = (iON == I4x2(c,r)*I4x2(1,z)) ? gpeCLR_white
-											: (
+		c16fr = (iON == I4x2(c,r)*I4x2(1,z))	? gpeCLR_white
+												: (
 													(selID == win.srcDIV) ? gpeCLR_orange
 																		: gpeCLR_green
-											);
+												  );
 
 		xyCR.a4x2[0] += CRSfrm.a4x2[0]; //frm.xy
 		xyCR.a4x2[1] = I4x2( (c < mZN.x ? pC[c] : gpdSRC_COLw ), (r < mZN.y ? pR[r] : gpdSRC_ROWw ) );

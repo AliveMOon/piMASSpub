@@ -39,7 +39,7 @@ class gpcCRS
 		U4x2 iSTR;
 		U4 	nMINI, //aiSTR[2],
 			nCp, nRp;
-		I4	*pCp, *pRp;
+		U4	*pCp, *pRp;
 
 		U4x4 aCRS[2];
 		bool bESC, bED;
@@ -54,7 +54,7 @@ class gpcCRS
 		bool CRSbEDset( bool b ) { return bED = b; }
 		bool CRSbEDswitch( void ) { return bED = !bED; }
 
-		I4* ZNpos( const I4x2& mZN, I4* pC, I4* pR ) {
+		U4* ZNpos( const I4x2& mZN, U4* pC, U4* pR ) {
 			if( (nCp <= mZN.x) || (nRp <= mZN.y) )
 			{
 				nCp = gpmPAD( mZN.x+1, 0x10 );
@@ -63,7 +63,7 @@ class gpcCRS
 			}
 			if( !pCp )
 			{
-                pCp = new I4[nCp+nRp];
+                pCp = new U4[nCp+nRp];
                 pRp = pCp + nCp;
 			}
 
@@ -126,7 +126,7 @@ class gpcCRS
 		void 	miniINS( U1* pC, U1* pM, U1* pB );
 		bool	miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
 		bool	miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT );
-		void	miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
+		void	miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
 		///------------------------------
 		///
 		/// 		CRSins

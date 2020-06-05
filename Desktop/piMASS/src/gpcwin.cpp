@@ -344,7 +344,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					// mondjuk ZOOM, stb..?
 					iRDY = crs.id;
 					crs.CRSins( *piMASS, gppKEYbuff, pS );
-					//crs.miniRDY( *this, srcDIV, *piMASS, gppKEYbuff, pS, pPIC, pSDLrndr );
 					pS = gppKEYbuff;
 				} else {
 					iRDY = crs.id;
@@ -353,7 +352,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						{
 							case '\v': {
 								crs.CRSins( *piMASS, pE, pS );
-								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								pS = pE+1;
 								// tehát ha bent van ki kell lépni a szerkeszttett cellából
 								crs.CRSbEDswitch();
@@ -363,7 +361,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 									break;
 
 								crs.CRSins( *piMASS, pE, pS );
-								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
@@ -378,7 +375,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 
 								crs.CRSins( *piMASS, pE, pS );
-								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
@@ -394,7 +390,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							case 5:	{ 		// down
 
 								crs.CRSins( *piMASS, pE, pS );
-								//crs.miniRDY( *this, srcDIV, *piMASS, pE, pS, pPIC, pSDLrndr );
 								pS = pE+1;
 								if( !crs.CRSbEDget() )
 								{
@@ -439,19 +434,20 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 			}
 
+			pPIC->unLOCK();
 
-			if( !pPIC->unLOCK() )
+			/*if( !pPIC->unLOCK() )
 			for( U1 i = 0; i < 4; i++ )
 			{
 				if( crs.id != i )
-					apCRS[i]->miniRDY2( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
+					apCRS[i]->miniRDYsdl( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
 
 				if( pSDLrndr)
 					apCRS[i]->miniDRWtx( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 				else
 					apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
 				//std::cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
-			}
+			}*/
 			//if( pSDLrndr)
 			//	SDL_RenderPresent( pSDLrndr );
 

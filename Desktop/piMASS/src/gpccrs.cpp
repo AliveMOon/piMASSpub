@@ -897,7 +897,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 			}
 			if( !pCp )
 			{
-				pCp = new I4[nCp+nRp];
+				pCp = new U4[nCp+nRp];
 				pRp = pCp + nCp;
 			}
 
@@ -1450,7 +1450,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 			}
 			if( !pCp )
 			{
-				pCp = new I4[nCp+nRp];
+				pCp = new U4[nCp+nRp];
 				pRp = pCp + nCp;
 			}
 
@@ -1858,10 +1858,10 @@ U1* gpcCRS::gtUTF8( U1* pBUFF )
 
 ///------------------------------
 ///
-/// 		miniRDY2
+/// 		miniRDYsdl
 ///
 ///------------------------------
-void gpcCRS::miniRDY2( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC, SDL_Renderer* pRNDR ) {
+void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC, SDL_Renderer* pRNDR ) {
 	if( miniOFF( pPIC, pRNDR ) )
 		return;
 	U4 xFND;

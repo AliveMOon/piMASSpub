@@ -267,14 +267,15 @@ I4x2 gpcSRC::SRCmini(
 	U1 nx, aC[] = " ";
 	I4 cr, n, rr;
 
-	bool bON = false, bSEL = false;
+	bool	bON = false,
+			bONpre, bSEL = false;
 	I4 nFILL;
 
 	for( U1* pC = pSRCstart( bNoMini ), *pAL = pSRCalloc( bNoMini ) , *pCe = pC+dim.w; pC < pCe; pC++ )
 	{
 		if( cxy.y >= fy )
 			break;
-
+		bONpre = bON;
 		cr = cxy.x + cxy.y*zz;
 		if( this == crs.apSRC[0] )
 		if( crs.apSRC[0] == crs.apSRC[1] )
@@ -341,7 +342,7 @@ I4x2 gpcSRC::SRCmini(
 				cxy.x++;
 				continue;
 			case '_':
-				if( bON )
+				if( bON||bONpre )
 					break;
 				if( cr < 1 )
 					continue;
@@ -351,7 +352,7 @@ I4x2 gpcSRC::SRCmini(
 
 				continue;
 			case '#':
-				if( bON )
+				if( bON||bONpre )
 					break;
 				if( cr < 1 )
 						continue;
