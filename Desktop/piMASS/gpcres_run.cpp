@@ -415,11 +415,16 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			*aGLpBOB[0x10];
 	SDL_Texture* apTX[0x10];
 
-	if( U4 *pM = win.pM = mapCR.pMAP )
+	U4	*pM,*pC,*pR,
+		ie,z,i = jDOitREF( win, 0, ie, &pM, &pC, &pR, &z );
+
+
+	/*if( U4 *pM = win.pM = mapCR.pMAP )
 	if( U4 *pC = win.pC = mapCR.pCOL )
 	if( U4 *pR = win.pR = mapCR.pROW )
 	if( pM < pC )
-	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
+	for( U4 i = 0, ie = pC-pM; i < ie; i++ )*/
+	for( ; i < ie; i++ )
 	{
 		if( pSRC  ) {
 			if( aGLpic[0] )
