@@ -92,6 +92,7 @@
 			<Add library="libjpeg" />
 		</Linker>
 		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpcCRSbreak.cpp" />
 		<Unit filename="gpcDRCos.cpp" />
 		<Unit filename="gpcGL.cpp" />
 		<Unit filename="gpcGTslmp.cpp" />
@@ -103,6 +104,7 @@
 		<Unit filename="gpcSLMPdcr.cpp" />
 		<Unit filename="gpcSRC.cpp" />
 		<Unit filename="gpcSRC.h" />
+		<Unit filename="gpcSRCbreak.cpp" />
 		<Unit filename="gpcTOOL.cpp" />
 		<Unit filename="gpcU14.cpp" />
 		<Unit filename="gpcU44.cpp" />

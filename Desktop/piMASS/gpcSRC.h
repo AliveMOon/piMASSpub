@@ -37,7 +37,7 @@ class gpcWIN;
 #define gpdSRC_ROWw 1
 #define gpdPRGsep " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} "
 
-//extern U1 gpaALFadd[]; //0x100];
+//extern U1 gpaALFsub[]; //0x100];
 //extern U1 gpsSTRpub[]; //[0x10000];
 
 
@@ -470,8 +470,7 @@ I8 inline gpfSTR2I8( void* pV, void* ppV = NULL )
 	return i8;
 }
 
-class gpcLAY
-{
+class gpcLAY {
 public:
 	gpeALF	id;		// 0
 	gpeNET4	typ;	// 8
@@ -500,8 +499,7 @@ public:
 	}
 
 };
-class gpcMAP
-{
+class gpcMAP {
 public:
 	U4x4	mapZN44;	// xy load zw alloc
 	U4		*pMAP, *pCOL, *pROW, nLAY;
@@ -600,8 +598,86 @@ public:
 };
 
 
-class gpcSRC
-{
+class gpcSCOOP {
+public:
+	gpcLZYdct	dct;
+	gpcLZY		lnk,
+				mini;
+	U4	iDCT, nDCT,
+		nLNK, nMINI;
+	U1* pUTF;	/// ezt a gpcSRC::SRCmill adja
+	gpcSCOOP(){ gpmCLR; };
+	void rst( U1* pU )
+	{
+		dct.rst();
+		lnk.lzyRST();
+		mini.lzyRST();
+		iDCT = nDCT =
+		nLNK = nMINI = 0;
+		pUTF = pU;	// ezt a gpcSRC::SRCmill adja
+	}
+	U4 nMN() { return nMINI = gpmLZYload(&mini,U4x4); }
+
+	U4 DCTadd( U1* pUTF, U1* pUi, U8 nU, U4 typ = 0xff )
+	{
+		if( !this )
+			return 0;
+
+		if( !nU )
+			return nMINI;
+
+		iDCT = dct.dict_H_find( pUi, nU, nDCT );
+		if( iDCT >= nDCT )
+		{
+			// nem volt a listában
+			iDCT = nDCT; // a végére kerül ha hozzá adjuk
+			dct.dict_H_add( pUi, nU );
+			nDCT++;
+		}
+		// typ U4x4.w:
+		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
+		U4x4	lnk(nMINI,0,0,0),
+				mn( pUi-pUTF, nU, iDCT, typ );
+		// ha bent volt ha nem elteszük
+		mini.lzyADD( &lnk, sizeof(lnk), nU = -1, -1 );
+		mini.lzyADD( &mn, sizeof(mn), nU = -1, -1 );
+		return nMN();
+	}
+	U4 STRadd( U1* pUTF, U1* pUi, U8 nU )
+	{
+		if( !nU )
+			return 0;
+
+		if( !nU )
+			return nMINI;
+
+		// typ U4x4.w:
+		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
+		U1x4 typ(0x10,1,1,0);
+		U4x4 mn( pUi-pUTF, nU, -1, typ.typ().u4 );
+		mini.lzyADD( &mn, sizeof(mn), nU = -1, -1 );
+		return nMN();
+	}
+	U4 NOTEadd( U1* pUTF, U1* pUi, U8 nU )
+	{
+		if( !nU )
+			return 0;
+
+		if( !nU )
+			return nMINI;
+
+		// typ U4x4.w:
+		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
+		U4x4 mn( pUi-pUTF, nU, -1, 0 );
+		mini.lzyADD( &mn, sizeof(mn), nU = -1, -1 );
+		return nMN();
+	}
+};
+
+class gpcSRC {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
     U8		nL,
@@ -620,6 +696,8 @@ public:
 			*pBIG;
 
 	gpcMAP	*pMAP;
+
+	gpcSCOOP SCOOP;
 
 	U4 srcUPDT( SOCKET ig = INVALID_SOCKET )
 	{
@@ -658,19 +736,20 @@ public:
 	{
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
 		// és ráadásul a \a elöt6t van a cursor
-		bool bHD = false, bMINI = bHD ? false : ( bNoMini ? false : !!pMINI );
+		bool	bHD = false,
+				bMINI = bHD	? false
+							: ( bNoMini ? false : !!pMINI );
 
 		U1	*pC = bMINI ? pMINI->p_alloc : pA;
 		dim.w = bMINI ? pMINI->n_load : nL;
 		if( bMINI )
 			return pC;
 
-		if( !bHD )
-		{
-			pC += iPUB(); //iB()+1;
-			dim.w -= (pC-pA);
-		}
+		if( bHD )
+			return pC;
 
+		pC += iPUB(); //iB()+1;
+		dim.w -= (pC-pA);
 		return pC;
 	}
 
@@ -790,8 +869,7 @@ public:
 
 		return dim;
 	}
-
-
+	U4x4 SRCmill( bool bNoMini, const char* pVAN = NULL );
 
     bool bSUB( gpcMASS& mass ) {
 		if( !this )

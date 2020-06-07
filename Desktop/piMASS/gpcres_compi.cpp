@@ -1,5 +1,5 @@
 #include "gpcres.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 
 gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 {
@@ -65,7 +65,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 
 		}
 
-		if( gpmbABC( *pS, gpaALFadd ) ) { /// ALF NUM -------------------------------------------------
+		if( gpmbABC( *pS, gpaALFsub ) ) { /// ALF NUM -------------------------------------------------
 			if( str.n_load )
 				pI = resISA_str( str );
 
@@ -99,7 +99,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
 				iTRG = resISA_trg( iTRG, xyWH.a4x2[0] );
 
 			/// a stingől itt lesz ALF --------------
-			an.num = gpfABCnincs( pS, pE, nUTF8, gpaALFadd );
+			an.num = gpfABCnincs( pS, pE, nUTF8, gpaALFsub );
 			an = pS;
 			pS += an.num;	// majd átlépjük
 

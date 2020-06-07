@@ -1,6 +1,6 @@
 
 #include "gpcSRC.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 extern U1 gpsSTRpub[]; //[0x10000];
 extern char gpsHD[]; //[0x1000];
 extern char	gpsTAB[];
@@ -67,10 +67,10 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 			std::cout << "ASM:" << pCOUT << "\r\n";
 
 		c = *pS;
-		if( bABC = gpmbABC(c, gpaALFadd) )
+		if( bABC = gpmbABC(c, gpaALFsub) )
         {
 			// UTF8!
-			nALF = gpfABCnincs( pSTR = pS, pE, nLEN, gpaALFadd );
+			nALF = gpfABCnincs( pSTR = pS, pE, nLEN, gpaALFsub );
 			if( nALF )
 			{
 				nSTR = nALF + gpmVAN( pSTR+nALF, gpsPRG, nVAN );
@@ -209,10 +209,10 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 			std::cout << "ASM:" << pCOUT << "\r\n";
 
 		c = *pS;
-		if( bABC = gpmbABC(c, gpaALFadd) )
+		if( bABC = gpmbABC(c, gpaALFsub) )
         {
 			// UTF8!
-			nALF = gpfABCnincs( pSTR = pS, pE, nLEN, gpaALFadd );
+			nALF = gpfABCnincs( pSTR = pS, pE, nLEN, gpaALFsub );
 			if( nALF )
 			{
 				nSTR = nALF + gpmVAN( pSTR+nALF, gpsPRG, nVAN );

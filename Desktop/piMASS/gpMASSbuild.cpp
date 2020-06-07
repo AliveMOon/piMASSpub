@@ -1,5 +1,6 @@
 #include "gpcSRC.h"
-U1 gpaALFadd[0x100];
+U1 gpaALFsub[0x100];
+char gpaALF_H_sub[0x100];
 char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
 		gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 		*gppTAB = gpsTAB+strlen(gpsTAB),
@@ -12,17 +13,20 @@ U1* gpf_aALF_init( void )
 		if( i >= 'A' && i <= 'Z')
 		{
 			// egész biztos kisbetüt többet használnak
-			gpaALFadd[i] = 'A'-1;//GPD_UP;
+			gpaALFsub[i] = 'A'-1;//GPD_UP;
 			continue;
 		}
 		else if( i >= 'a' && i <= 'z' )
 		{
-			gpaALFadd[i] = 'a'-1;
+			gpaALFsub[i] = 'a'-1;
 			continue;
 		}
-		gpaALFadd[i] = 0;
+		gpaALFsub[i] = 0;
 	}
-	return gpaALFadd;
+	gpmMcpy( gpaALF_H_sub, gpaALFsub, sizeof(gpaALF_H_sub) );
+	gpaALF_H_sub['#'] = ('#'-'E')+('A'-1);
+	gpaALF_H_sub['_'] = ('_'-'E')+('A'-1);
+	return gpaALFsub;
 }
 
 
@@ -59,9 +63,9 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
 			//pS++;
 			c = 'e';
 		}
-		if( !gpaALFadd[c] )
+		if( !gpaALFsub[c] )
 			break;
-		c -= gpaALFadd[c];
+		c -= gpaALFsub[c];
 
 		alf *= (U8)gpdALF;
 		alf += (U8)c;

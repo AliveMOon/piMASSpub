@@ -1,5 +1,5 @@
 #include "gpcSRC.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 
 /*I4x2::I4x2( U8x2 b )
 {

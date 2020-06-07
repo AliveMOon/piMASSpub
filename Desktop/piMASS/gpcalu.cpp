@@ -1,6 +1,6 @@
 #include "gpcwin.h"
 //#include "gpcres.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 U1* gpcALU::ALUdatHARD( gpcRES* pM, U4x2 xy, U1x4 ty4, I1 mul )
 {
 	if( !pM )

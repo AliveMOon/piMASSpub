@@ -1,6 +1,6 @@
 #include "gpcgt.h"
 #include "gpcwin.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 extern char gpsTAB[], *gppTAB;
 
 gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
@@ -841,14 +841,15 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 			sGTent[0] = '\n';	// visza kapcsol ASCII-ba
 			return GTslmpDrcRob( mom, pWIN, pALL );
 		}
-		gpcSLMP* pD000 = (gpcSLMP*)(pSTR + gpfMEMMEM( pSTR, pINP->n_load, (U1*)&gpaSLMPbin[0].SER, sizeof(gpaSLMPbin[0].SER) ));
-		if( (U1*)pD000 < pSTR )
+		U4 nFND = gpfMM( pSTR, pINP->n_load, (U1*)&gpaSLMPbin[0].SER, sizeof(gpaSLMPbin[0].SER) );
+		if( nFND >= pINP->n_load )
 		{
 			// nincs D000
 			// valami zöldségnek kell lenie
 			gpmDEL(pINP);
 			return;
 		}
+		gpcSLMP* pD000 = (gpcSLMP*)(pSTR + nFND );
 		I4 nSUB = (U1*)pD000-pSTR;
 		//pSTR = pD000;
 

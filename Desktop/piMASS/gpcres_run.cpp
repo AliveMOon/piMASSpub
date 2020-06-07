@@ -2,7 +2,7 @@
 //#include "gpcres.h"
 
 bool bITT =  false; //true; // false; //
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 
 
 gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )

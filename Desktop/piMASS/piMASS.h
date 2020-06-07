@@ -330,7 +330,7 @@ double inline gpfRAMADZSAN( double a, double b )
 
 	return PI*(3.0*(a+b)-sqrt((3.0*a + b)*(a + 3.0*b)));
 }
-//#define gpmbABC( c ) (c < 0x80 ? gpaALFadd[c] : true)
+//#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 {
 	if( h == INVALID_SOCKET )
@@ -363,7 +363,7 @@ inline U1* gpfSTR( U1* pSTR, const U1* pU )
 	pSTR[nU] = 0;
 	return pSTR;
 }
-U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFadd )
+U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub )
 {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
@@ -380,7 +380,32 @@ U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaAL
 			pS++;
 			continue;
 		}
-		if( !gpaALFadd[*pS] )
+		if( !gpaALFsub[*pS] )
+			break;
+
+		nUTF8++;
+		pS++;
+	}
+	return pS-p_str;
+}
+U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* gpaALF_H_sub )
+{
+	/// a viszatérési érték nBYTE, nLEN az UTF(
+	nUTF8 = 0;
+	if( (p_str < pE) ? !*p_str : true )
+		return 0;
+
+	U1* pS = (U1*)p_str;
+	while( pS < pE )
+	{
+		if( (*pS)&0x80 )
+		{
+			if( (*pS)&0x40 )	// UTF8-nál az első kódnál van 0x110yYYYY a többi már 0x10xxXXXX
+				nUTF8++;
+			pS++;
+			continue;
+		}
+		if( !gpaALF_H_sub[*pS] )
 			break;
 
 		nUTF8++;
@@ -571,19 +596,14 @@ inline U8 gp_memcmp( const void* pA, const void* pB, size_t n )
 
 }
 
-inline size_t gpfMEMMEM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL )
+inline size_t gpfMM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL )
 {
-	size_t nT = nA, nFND;
-	U1* pT = pA;
+	/// ha talált kissebb lesz mint az nA
+	size_t nFND, nF = 0;
 	if( nB > nA )
-	{
-		nA = nB;
-		nA = nT;
-
-		pA = pB;
-		pB = pT;
-	}
-	nT = 0;
+		return nA;
+	// nem cserélgetünk megtévesztő
+	U1* pT = pA;
 
 	for( U1 *pE = pA+(nA-nB); pA <= pE; pA++ )
 	{
@@ -595,17 +615,17 @@ inline size_t gpfMEMMEM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL
 			if( !ppFND )
 				continue;
 
-			if( nT < nFND )
+			if( nF < nFND )
 			{
-				nT = nFND;
-				*ppFND = pA;
+				nF = nFND;
+				*ppFND = pA;	// azért meg tudja mondani hol talált hasonlót
 			}
 			continue;
 		}
 
 		return pA-pT;
 	}
-	return 0;
+	return nA;
 }
 
 class UTF8
@@ -1252,8 +1272,7 @@ public:
 	}
 };
 
-class I1x4
-{
+class I1x4 {
 public:
     union
     {
@@ -1331,8 +1350,7 @@ public:
 };
 
 
-class U2x2
-{
+class U2x2 {
 public:
 	union
 	{
@@ -1563,8 +1581,7 @@ public:
 
 };
 
-class U2x4
-{
+class U2x4 {
 public:
     union
     {
@@ -1695,12 +1712,10 @@ public:
 		return n_t;
 	}
 
-	/*U4	dict_add( U1* p_src, U4& m, U4x4& w );
-	U4  dict_find( U1* p_src, U4x4& w );*/
+
 };
 
-class U4x2
-{
+class U4x2 {
 public:
 	union
 	{
@@ -3042,8 +3057,7 @@ public:
 
 
 
-class I4x4
-{
+class I4x4 {
 public:
 	union
     {
@@ -4639,8 +4653,7 @@ public:
 	}
 };
 
-class F4
-{
+class F4 {
 public:
 	union
 	{
@@ -5033,8 +5046,7 @@ public:
 #define _43 t.z
 #define _44 t.w
 
-class F4x4
-{
+class F4x4 {
 public:
 	F4 x,y,z,t;
 
@@ -5492,8 +5504,7 @@ public:
 
 };
 
-class D4
-{
+class D4 {
 public:
     double x,y,z,w;
     D4(){};
@@ -5552,8 +5563,7 @@ public:
 	}
 };
 
-typedef enum gpeNET2:U4
-{
+typedef enum gpeNET2:U4 {
 	gpcNET2_NULL, // = 0,
 	gpeNET2_D8	= MAKE_ID( 'D', '8', 0, 0 ),
 	gpeNET2_F4	= MAKE_ID( 'F', '4', 0, 0 ),
@@ -5569,8 +5579,7 @@ typedef enum gpeNET2:U4
 	gpeNET2_U8	= MAKE_ID( 'U', '8', 0, 0 ),
 
 } gpeNET2;
-typedef enum gpeNET4:U4
-{
+typedef enum gpeNET4:U4 {
 	gpeNET4_null, // = 0,
 	gpeNET4_U11	= MAKE_ID( sizeof(U1)		, 'U', '1', '1' ),
 	gpeNET4_I11	= MAKE_ID( sizeof(I1)		, 'I', '1', '1' ),
@@ -5664,8 +5673,7 @@ typedef enum gpeNET4:U4
 class gpcCMPL;
 
 
-class gpcSYNC
-{
+class gpcSYNC {
 protected:
 	gpeNET4	typ4;
 	U4		nb;
@@ -5737,11 +5745,11 @@ public:
 
 #define gpdLZYallGT 4
 //#define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
-#define gpmLZYvaliPD( a, b, n ) ((a*)( (b) ? ((b)->p_alloc ? (b)->p_alloc+(n) : NULL ) : NULL ))
-#define gpmLZYvali( a, b ) gpmLZYvaliPD( a, (b), 0 )
+#define gpmLZYvaliPAD( a, b, n ) ((a*)( (b) ? ((b)->p_alloc ? (b)->p_alloc+(n) : NULL ) : NULL ))
+#define gpmLZYvali( a, b ) gpmLZYvaliPAD( a, (b), 0 )
 
-#define gpmLZYloadPD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
-#define gpmLZYload( p, t ) gpmLZYloadPD( p, t, (U8)0 )
+#define gpmLZYloadPAD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
+#define gpmLZYload( p, t ) gpmLZYloadPAD( (p), t, (U8)0 )
 
 class gpcROBnD;
 class gpcZSnD;
@@ -5766,8 +5774,7 @@ public:
 		};
 	};
 	U1x4& typ() { return *(U1x4*)&type; }
-	U4x4* pMAP( U4 nX, U4 nLIM, size_t nBYTE )
-	{
+	U4x4* pMAP( U4 nX, U4 nLIM, size_t nBYTE ) {
 		if( !this )
 			return NULL;
 
@@ -5780,8 +5787,7 @@ public:
 		n_load = iS;
 		return (U4x4*)p_alloc;
 	}
-	U4x4* xFND( U4 x, U4 nX, U4 nLIM, size_t nBYTE = sizeof(U1x4) )
-	{
+	U4x4* xFND( U4 x, U4 nX, U4 nLIM, size_t nBYTE = sizeof(U1x4) ) {
 		if( !this )
 			return NULL;
 
@@ -5848,8 +5854,7 @@ public:
 		return pM+iM;
 	}
 
-	U1x4* pU1x4( U4x4& m, U4 nX )
-	{
+	U1x4* pU1x4( U4x4& m, U4 nX ) {
 		if( !this )
 			return NULL;
 
@@ -5993,12 +5998,10 @@ public:
 
 
 	gpcLZY* qEVENT(void);
-	gpcLZY( void )
-	{
+	gpcLZY( void ) {
 		gpmCLR;
 	}
-	gpcLZY( U1 n )
-	{
+	gpcLZY( U1 n ) {
 		gpmCLR;
 
 		if( n < 1 )
@@ -6006,8 +6009,7 @@ public:
 		aWIP[gpeLZYwip] = gpeWIP_done,
 		aSET[gpeLZYxN] = n;
 	}
-	~gpcLZY()
-	{
+	~gpcLZY() {
 		gpmFREE( p_alloc );
 	}
 
@@ -6271,8 +6273,7 @@ public:
 		return this;
 	}
 
-	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub, U1 n = 0 )
-	{
+	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub, U1 n = 0 ) {
 		if( !this )
 		{
 			//start = n_u1;
@@ -6282,16 +6283,14 @@ public:
 		gpmMcpyOF( p_alloc+iSTRT, p_u1, n_u1 );
 		return this;
 	}
-	gpcLZY& operator = ( const gpcLZY& plus )
-	{
+	gpcLZY& operator = ( const gpcLZY& plus ){
 		U8 s = 0;
 		lzyINS( plus.p_alloc, plus.n_load, s, -1 );
 
 		return *this;
 	}
 
-	gpcLZY* operator += ( const gpcLZY& plus )
-	{
+	gpcLZY* operator += ( const gpcLZY& plus ){
 		U8 s = -1;
 		return lzyADD( plus.p_alloc, plus.n_load, s );
 	}
@@ -6441,9 +6440,17 @@ public:
 	U8			ver;
 
 	gpcLZYdct(){};
-	gpcLZYdct(U8 i)
+	gpcLZYdct(U8 v)
 	{
 		gpmCLR;
+	}
+	void rst()
+	{
+		if(!this)
+			return;
+		pIX = NULL;
+		str.lzyRST();
+		ix.lzyRST();
 	}
 	U4 dict_find( U1* pS, U8 nS, U4& nIX ) {
 		if( !this )
@@ -6454,6 +6461,9 @@ public:
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
+		// bemásolja a str szótárba
+		/// ebböl kéne akor csinálni egy olyat
+		/// ami ki szedi a '_#' jeleket
 		str.lzyADD( pS, nS+1, aSTRT[0] = -1 );
 		U1* pS0 = str.p_alloc;
 		pS = pS0+aSTRT[0];
@@ -6462,7 +6472,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -6515,6 +6525,112 @@ public:
 		pIX = p_ix0+nIX;
 		return this;
 	}
+
+	U4 dict_H_find( U1* pS, U8 nS, U4& nIX ) {
+		if( !this )
+		{
+			nIX = 0;
+			return 0;
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !str.p_alloc )
+			ver = 0;
+		// bemásolja a str szótárba
+		/// ebböl kéne akor csinálni egy olyat
+		/// ami ki szedi a '_#' jeleket
+		U1* pH = pS;
+		U8 nH = nS;
+		str.lzyADD( pH, nH+1, aSTRT[0] = -1 );
+		U1* pS0 = str.p_alloc;
+		pS = pS0+aSTRT[0];
+		nS = 0;
+		for( U8 h = 0; h < nH; h++ ) {
+			switch( pH[h] )
+			{
+				case '_':
+				case '#':
+					continue;
+				default:
+					break;
+			}
+			pS[nS]=pH[h];
+			nS++;
+		}
+		if( pS[nS] )
+			pS[nS] = 0;
+
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nS;
+
+		U4 iIX = p_ix0->dict_find( pS0, *pIX );
+
+		// UNDOza a bejegyzést
+		str.n_load = aSTRT[0];
+		ix.n_load = aSTRT[1];
+		pIX = p_ix0+iIX;
+		return iIX;
+	}
+	gpcLZYdct* dict_H_add( U1* pS, U8 nS ) {
+		if( !this )
+		{
+			gpcLZYdct* p_this = new gpcLZYdct(0);
+
+			return p_this->dict_add( pS, nS );
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !str.p_alloc )
+			ver = 0;
+
+		U1* pH = pS;
+		U8 nH = nS;
+		str.lzyADD( pH, nH+1, aSTRT[0] = -1 );
+		U1* pS0 = str.p_alloc;
+		pS = pS0+aSTRT[0];
+		nS = 0;
+		for( U8 h = 0; h < nH; h++ ) {
+			switch( pH[h] )
+			{
+				case '_':
+				case '#':
+					continue;
+				default:
+					break;
+			}
+			pS[nS]=pH[h];
+			nS++;
+		}
+		if( pS[nS] )
+			pS[nS] = 0;
+		str.n_load = aSTRT[0]+nS+1;
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		U4 nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nS;
+		U4 iIX, nADD = p_ix0->dict_add( pS0, iIX, *pIX );
+
+		if( nIX == nADD )
+		{
+			// UNDOza a bejegyzést
+			str.n_load = aSTRT[0];
+			ix.n_load = aSTRT[1];
+			pIX = p_ix0+iIX;
+			return this;
+		}
+		ver++;
+		pIX = p_ix0+nIX;
+		return this;
+	}
+
 	U4 x( void )
 	{
 		if( this ? !ix.n_load : true )

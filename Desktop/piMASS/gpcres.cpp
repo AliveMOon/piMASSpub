@@ -1,6 +1,6 @@
 #include "gpcwin.h"
 //#include "gpcres.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 
 
 

@@ -38,8 +38,8 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	if( miniLOCK( pPIC, pRNDR, win.wDIVcrALLOCK() ) )
 		return;
 
-	/// ESCAPE? -------------------------------------------------------------------
-	bool bESC = false, bNoMini;
+	/// ESCAPE? -----------------------------------------
+	bool bESC = false; //, bNoMini;
 	if( CRSfrm.x >= CRSfrm.z )
 	{
 		CRSfrm.x = CRSfrm.z;
@@ -66,7 +66,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	}
 
 	if( bESC )
-		return;	/// ----------------------------------------------------------- ESC!
+		return;	/// -------------------------------------- ESC!
 
 
 	gpcMAP* pMAP = &mass.mapCR;
@@ -97,12 +97,10 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	/// nagyon vigyázz itt nem BIZTOS, hogy a saját, PC és pR-rel dolgozik,
 	/// hanem ha le van nyomva a SHIFT akor e SRC_DIV-vel
 	pMAP->MAPalloc( spcZN, mZN, selID );
-	U4	*pM, // = (I4*)pMAP->MAPalloc( spcZN, mZN, selID ),
-		*pC, // = (I4*)pMAP->pCOL,
-		*pR, // = (I4*)pMAP->pROW,
+	U4	*pM, *pC, *pR,
 		z, c, r,
 		ie, i = mass.jDOitREF( win, 0, ie, &pM, &pC, &pR, &z );
-
+	bool bNoMini;
 	if( selID )
 	{
 		i = mZN.a4x2[1].sum()*(U4)selID;
@@ -119,8 +117,9 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 						   ( c+1 >= lurdAN.x	&& r >= lurdAN.y )
 						&& ( c+1 <= lurdAN.z	&& r <= lurdAN.w )
 					);
-
-		dim = mass.SRCfnd( pM[i] )->CRSdim( bNoMini );
+		/// TÁMADÁS HO RUKK!!
+		dim = mass.SRCfnd( pM[i] )->SRCmill( bNoMini, " \t\r\n" );
+		//dim = mass.SRCfnd( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )
 			pC[c] = dim.x;
 		if( pR[r] < dim.y )

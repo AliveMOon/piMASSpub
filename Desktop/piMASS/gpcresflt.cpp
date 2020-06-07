@@ -1,5 +1,5 @@
 #include "gpcwin.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 
 gpcALU& gpcALU::int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 ) {
 

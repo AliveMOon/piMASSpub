@@ -774,6 +774,67 @@ public:
 
 // FRM 1 up // 2 right // 4 down // 8 left
 
+void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )
+{
+	if( miniOFF() )
+		return;
+
+	U1x4 *pCRS = pMINI;
+
+	for( U1 i = 0; pB+i < pM; i++ )
+	{
+		pMINI[i].w = pB[i]-' ';
+	}
+	if( pC > pM )
+	for( U1 nx; pM < pC; pM++ )
+	{
+		if( *pM < ' ' )
+			continue;
+
+		if( *pM < 0x80 )
+		{
+			pCRS->w = *pM - ' ';
+			pCRS++;
+			continue;
+		}
+		nx = *pM;
+		pM++;
+		if( !*pM )
+			break;
+
+		pCRS->w = *pM - ' ';
+		pCRS->w += (nx&4)>>2;
+		pCRS++;
+	}
+
+}
+U1* gpcCRS::gtUTF8( U1* pBUFF )
+{
+	char* pS = NULL;
+	I4 nCPY = 0;
+	if( apSRC[1] )
+	if( apSRC[1] == apSRC[0] )
+	if( nCPY = iSTR.y - iSTR.x )
+	if( pS = nCPY > 0 ? (char*)apSRC[0]->pA : NULL )
+	{
+		pS += iSTR.x;
+	}
+	if( pS ? !nCPY : true )
+		return pBUFF;
+
+	gpmMcpyOF( pBUFF, pS, nCPY );
+	pBUFF[nCPY] = 0;
+
+	return pBUFF+nCPY;
+}
+
+
+
+///------------------------------
+///
+/// 		miniRDYsdl
+///
+///------------------------------
 bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool bSHFT ) {
 	if( !this )
 		return false;
@@ -1800,67 +1861,6 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	frmDRWtx( dstPX, src, CRSfrm.a4x2[1], win.pSDLrndr, win.pTXize, frmC, 0, (U1*)(id == sDIV ? "EDIT" : "TARGET") );
 	return false;
 }
-void gpcCRS::miniINS( U1* pC, U1* pM, U1* pB )
-{
-	if( miniOFF() )
-		return;
-
-	U1x4 *pCRS = pMINI;
-
-	for( U1 i = 0; pB+i < pM; i++ )
-	{
-		pMINI[i].w = pB[i]-' ';
-	}
-	if( pC > pM )
-	for( U1 nx; pM < pC; pM++ )
-	{
-		if( *pM < ' ' )
-			continue;
-
-		if( *pM < 0x80 )
-		{
-			pCRS->w = *pM - ' ';
-			pCRS++;
-			continue;
-		}
-		nx = *pM;
-		pM++;
-		if( !*pM )
-			break;
-
-		pCRS->w = *pM - ' ';
-		pCRS->w += (nx&4)>>2;
-		pCRS++;
-	}
-
-}
-U1* gpcCRS::gtUTF8( U1* pBUFF )
-{
-	char* pS = NULL;
-	I4 nCPY = 0;
-	if( apSRC[1] )
-	if( apSRC[1] == apSRC[0] )
-	if( nCPY = iSTR.y - iSTR.x )
-	if( pS = nCPY > 0 ? (char*)apSRC[0]->pA : NULL )
-	{
-		pS += iSTR.x;
-	}
-	if( pS ? !nCPY : true )
-		return pBUFF;
-
-	gpmMcpyOF( pBUFF, pS, nCPY );
-	pBUFF[nCPY] = 0;
-
-	return pBUFF+nCPY;
-}
-
-
-
-///------------------------------
-///
-/// 		miniRDYsdl
-///
-///------------------------------
 void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gpcPIC* pPIC, SDL_Renderer* pRNDR ) {
 	if( miniOFF( pPIC, pRNDR ) )
 		return;

@@ -1,6 +1,6 @@
 #include "gpcgt.h"
 #include "gpcwin.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 extern char gpsTAB[], *gppTAB;
 
 void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
@@ -18,8 +18,8 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			*pLZYout = mass.GTlzyALL.LZY( gpdGTlzyIDref(TnID) ),
 			*pLZYusr = NULL,
 			*pLZYdead = NULL;
-	U2		*pU2inp = gpmLZYvaliPD( U2, pLZYinp, 0 ),
-			*pU2out = gpmLZYvaliPD( U2, pLZYout, 0 ),
+	U2		*pU2inp = gpmLZYvaliPAD( U2, pLZYinp, 0 ),
+			*pU2out = gpmLZYvaliPAD( U2, pLZYout, 0 ),
 			*pU2dead = NULL;
 	SOCKET	*pSOCK;
 	U4		nSOCK, iLEN = 0;

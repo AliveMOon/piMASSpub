@@ -1,5 +1,5 @@
 #include "gpcSRC.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 
 U4x2& U4x2::operator = ( const I8x2& an )
 {

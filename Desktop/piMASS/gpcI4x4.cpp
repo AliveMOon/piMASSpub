@@ -1,5 +1,5 @@
 #include "gpcSRC.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 I8x4 gpaCAGEboxMSK[] = {
 	{0,1,1,0},
 	{1,0,1,0},

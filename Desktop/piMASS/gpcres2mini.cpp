@@ -1,5 +1,5 @@
 #include "gpcres.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 //extern U1 gpsTABrun[];
 U1	gpsTABrun[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 	*gppTABrun = gpsTABrun + sizeof(gpsTABrun)-1; //pmSTRLEN( (char*)gpsTABrun );

@@ -1,6 +1,6 @@
 #include "gpcgt.h"
 #include "gpcwin.h"
-extern U1 gpaALFadd[];
+extern U1 gpaALFsub[];
 extern char gpsTAB[], *gppTAB;
 ///------------------------
 ///
