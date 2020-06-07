@@ -233,6 +233,42 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
 
 	return pS-pU;
 }
+
+inline U4x2 lenMILL( U4x2 pos, U4x4&crn, U1* pUi, U1* pUie )
+{
+	for( ; pUi < pUie; pUi++ )
+	{
+		if( *pUi&0x80 )
+		{
+			if( !(*pUi&0x40) )
+				continue;
+			pos.x++;
+		}
+		else switch( *pUi )
+		{
+			case '\r':
+				pos.x = 0;
+				break;
+			case '\n':
+				pos.x = 0;
+				pos.y++;
+				break;
+			case '\a':
+				pos.x = 0;
+				pos.y++;
+				break;
+			case '\t':
+				pos.x = ((pos.x/4)+1)*4;
+				break;
+			default:
+				pos.x++;
+				break;
+		}
+		crn.a4x2[0].mx( pos );
+		crn.z++;
+	}
+	return pos;
+}
 inline U8 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
 {
 	U8 nLEN = 0, nBYTE, nUTF8 = 0;
@@ -603,6 +639,7 @@ public:
 	gpcLZYdct	dct;
 	gpcLZY		lnk,
 				mini;
+	U4x4 aMINI[2];
 	U4	iDCT, nDCT,
 		nLNK, nMINI;
 	U1* pUTF;	/// ezt a gpcSRC::SRCmill adja
@@ -616,9 +653,9 @@ public:
 		nLNK = nMINI = 0;
 		pUTF = pU;	// ezt a gpcSRC::SRCmill adja
 	}
-	U4 nMN() { return nMINI = gpmLZYload(&mini,U4x4); }
+	U4 nMN() { return nMINI = mini.nLD()/sizeof(aMINI); }
 
-	U4 DCTadd( U1* pUTF, U1* pUi, U8 nU, U4 typ = 0xff )
+	U4 DCTadd( U4x2 pos, U1* pUTF, U1* pUi, U8 nU, U4 typ = 0xff )
 	{
 		if( !this )
 			return 0;
@@ -637,14 +674,14 @@ public:
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		U4x4	lnk(nMINI,0,0,0),
-				mn( pUi-pUTF, nU, iDCT, typ );
-		// ha bent volt ha nem elteszük
-		mini.lzyADD( &lnk, sizeof(lnk), nU = -1, -1 );
-		mini.lzyADD( &mn, sizeof(mn), nU = -1, -1 );
+		U4x4	link(nMINI,0,0,0);
+		aMINI[0] = U4x4( pUi-pUTF, nU, iDCT, typ );
+		aMINI[1] = U4x4( pos, 0 );
+		mini.lzyADD( &aMINI, sizeof(aMINI), nU = -1, -1 );
+		lnk.lzyADD( &link, sizeof(link), nU = -1, -1 );
 		return nMN();
 	}
-	U4 STRadd( U1* pUTF, U1* pUi, U8 nU )
+	U4 STRadd( U4x2 pos, U1* pUTF, U1* pUi, U8 nU )
 	{
 		if( !nU )
 			return 0;
@@ -656,11 +693,13 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		U1x4 typ(0x10,1,1,0);
-		U4x4 mn( pUi-pUTF, nU, -1, typ.typ().u4 );
-		mini.lzyADD( &mn, sizeof(mn), nU = -1, -1 );
+		//U4x4 mn( pUi-pUTF, nU, -1, typ.typ().u4 );
+		aMINI[0] = U4x4( pUi-pUTF, nU, -1, typ.typ().u4 );
+		aMINI[1] = U4x4( pos, 0 );
+		mini.lzyADD( &aMINI, sizeof(aMINI), nU = -1, -1 );
 		return nMN();
 	}
-	U4 NOTEadd( U1* pUTF, U1* pUi, U8 nU )
+	U4 NOTEadd( U4x2 pos, U1* pUTF, U1* pUi, U8 nU )
 	{
 		if( !nU )
 			return 0;
@@ -671,8 +710,9 @@ public:
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		U4x4 mn( pUi-pUTF, nU, -1, 0 );
-		mini.lzyADD( &mn, sizeof(mn), nU = -1, -1 );
+		aMINI[0] = U4x4( pUi-pUTF, nU, -1, 0 );
+		aMINI[1] = U4x4( pos, 0 );
+		mini.lzyADD( &aMINI, sizeof(aMINI), nU = -1, -1 );
 		return nMN();
 	}
 };

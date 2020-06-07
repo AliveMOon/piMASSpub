@@ -4,6 +4,41 @@ extern char gpaALF_H_sub[];
 static char gpsNoWord[] = {
 							"\\ \t\a\r\n*&/%+-|~^!=$.,:;\'\"{}[]"
 						};
+/*inline U4x2 lenMILL( U4x2 pos, U4x2&cr, U1* pUi, U1* pUie )
+{
+	for( ; pUi < pUie; pUi++ )
+	{
+		if( *pUi&0x80 )
+		{
+			if( !(*pUi&0x40) )
+				continue;
+			pos.x++;
+		}
+		else switch( *pUi )
+		{
+			case '\r':
+				pos.x = 0;
+				break;
+			case '\n':
+				pos.x = 0;
+				pos.y++;
+				break;
+			case '\a':
+				pos.x = 0;
+				pos.y++;
+				break;
+			case '\t':
+				pos.x = ((pos.x/4)+1)*4;
+				break;
+			default:
+				pos.x++;
+				break;
+		}
+		cr.mx( pos );
+	}
+	return pos;
+}*/
+
 U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 {
 	if( !this )
@@ -24,13 +59,16 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 	double d8;
 	bool bABC;
 	SCOOP.rst( pUTF );
-
+	dim.xyz_( 0 );
+	U4x2 pos(0);
 	for( nS = gpmNINCS( pUi, pVAN ); pUi < pUe; nS = gpmNINCS( pUi, " \t\r\n" ) )
 	{
 		if( nS )
 		{
 			// elrakjuk kell
-			SCOOP.DCTadd( pUTF, pUi, nS );
+			SCOOP.DCTadd( pos, pUTF, pUi, nS );
+			// ebben van a " \t\r\n"
+			pos = lenMILL(pos,dim,pUi,pUi+nS);
 			pUi += nS;
 			if( pUi >= pUe )
 				break;
@@ -39,7 +77,10 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 		if( bABC = gpmbABC(*pUi, gpaALF_H_sub) )
 		{
 			nA = gpmVAN( pUi, gpsNoWord, nU );
-			SCOOP.DCTadd( pUTF, pUi, nA );
+			SCOOP.DCTadd( pos, pUTF, pUi, nA );
+			pos.x += nU;
+			dim.z += nU;
+			dim.a4x2[0].mx( pos );
 			pUi += nA;
 			continue;
 		}
@@ -54,7 +95,10 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 				d8 += gpmSTR2D( pUj );
 			}
 			nN = pUj-pUi;
-			SCOOP.DCTadd( pUTF, pUi, nN );
+			SCOOP.DCTadd( pos, pUTF, pUi, nN );
+			pos.x += nN;
+			dim.z += nN;
+			dim.a4x2[0].mx( pos );
 			pUi=pUj;
 			continue;
 		}
@@ -76,7 +120,8 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 					pUj += gpmVAN( pUj, sIZE, nU );
 				}
 				nSTR = pUj-pUi;
-				SCOOP.STRadd( pUTF, pUi, nO );
+				SCOOP.STRadd( pos, pUTF, pUi, nO );
+				pos = lenMILL(pos,dim,pUi,pUj);
 				pUi = pUj;
 				continue;
 			case '/':
@@ -110,7 +155,8 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 				nSTR = pUj-pUi;
 				if( !nSTR )
 					break;
-				SCOOP.NOTEadd( pUTF, pUi, nO );
+				SCOOP.NOTEadd( pos, pUTF, pUi, nO );
+				pos = lenMILL(pos,dim,pUi,pUj);
 				pUi = pUj;
 				continue;
 			default:
@@ -118,10 +164,13 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 		}
 
 		nO = gpmVAN( pUi, " \t\r\n", nU );
-		SCOOP.DCTadd( pUTF, pUi, nO );
+		SCOOP.DCTadd( pos, pUTF, pUi, nO );
+		pos.x += nO;
+		dim.a4x2[0].mx( pos );
+		dim.z += nU;
 		pUi += nO;
 	}
-
-	dim.z = gpfUTFlen( pUTF, pUe, dim.x, dim.y );
+	dim.a4x2[0]+=1;
+	//dim.z = gpfUTFlen( pUTF, pUe, dim.x, dim.y );
 	return dim;
 }

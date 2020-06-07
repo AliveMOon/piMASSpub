@@ -2095,6 +2095,11 @@ public:
         x = _x; y = _y; z = _z; w = _w;
     }
 	U4x4( const I4x2 _xy, I4x2* p_zw = NULL );
+    U4x4( const U4x2 _xy, int b )
+    {
+        a4x2[0] = _xy;
+        a4x2[1] = b;
+    }
     U4x4( U4x2& _xy, U4x2* p_zw = NULL )
     {
         a4x2[0] = _xy;
