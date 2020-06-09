@@ -3,14 +3,12 @@
 
 
 
-gpcSRC::gpcSRC()
-{
+gpcSRC::gpcSRC() {
     //ctor
     gpmCLR;
 }
 
-gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe )
-{
+gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
 	U1* pKL = nA ? pA : NULL;
 	if( pSe <= pS )
 	{
@@ -47,8 +45,7 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe )
 
 	return *this;
 }
-gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 nADD )
-{
+gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 nADD ) {
 	gpmCLR;
 	spcZN = _spcZN;
 	_spcZN.x += nADD;
@@ -91,8 +88,7 @@ gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 nADD )
 }
 static const U4 gpnZ = ((gpcSRC*)NULL)->nCLR();
 
-gpcSRC& gpcSRC::operator = ( gpcSRC& B )
-{
+gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 	if( this == &B )
 		return *this; // handle self assignment
 	//assignment operator
@@ -160,14 +156,12 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B )
 	return *this;
 }
 
-gpcSRC::gpcSRC( gpcSRC& B )
-{
+gpcSRC::gpcSRC( gpcSRC& B ) {
 	gpmCLR;
 	*this = B;
 }
 
-gpcSRC::~gpcSRC()
-{
+gpcSRC::~gpcSRC() {
 	if( nA )			// ha nA == 0 nm mi foglaltuk
 		gpmDELary(pA);
 	gpmDELary(pALFtg);
@@ -180,8 +174,7 @@ gpcSRC::~gpcSRC()
 	gpmDELary(pMAP);
 
 }
-gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) //, I4 fz )
-{
+gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) {
 	if( this ?
 				   ( fxyz.x <= 0 ||	fxyz.y <= 0 )
 				|| ( xy.x >= fxyz.x ||	xy.y >= fxyz.y )
@@ -266,24 +259,25 @@ I4x2 gpcSRC::SRCmini(
 	U1x4 c;
 	U1 nx, aC[] = " ";
 	I4 cr, n, rr;
+	U1	b01 =	 (((U1)(this==crs.apSRC[0]))<<1)
+				| ((U1)(this==crs.apSRC[1]));
 
 	bool	bON = false,
 			bONpre, bSEL = false;
 	I4 nFILL;
 
-	for( U1* pC = pSRCstart( bNoMini ), *pAL = pSRCalloc( bNoMini ) , *pCe = pC+dim.w; pC < pCe; pC++ )
-	{
+	for( U1* pC = pSRCstart( bNoMini ), *pAL = pSRCalloc( bNoMini ) , *pCe = pC+dim.w; pC < pCe; pC++ ) {
 		if( cxy.y >= fy )
 			break;
 		bONpre = bON;
 		cr = cxy.x + cxy.y*zz;
-		if( this == crs.apSRC[0] )
-		if( crs.apSRC[0] == crs.apSRC[1] )
+		//if( this == crs.apSRC[0] )
+		//if( crs.apSRC[0] == crs.apSRC[1] )
+		if( b01 == 3 )
 		if( pC-pAL == crs.iSTR.x )
 		{
 			if( cr > 0 )
 				pO[cr].z |= 0x10;
-			//pO[cr].y |= crs.iSTR.x==crs.iSTR.y ? 0x4 : 0x8;
 			bON = true;
 		}
 
@@ -291,8 +285,6 @@ I4x2 gpcSRC::SRCmini(
 		if( cxy.x >= 0 && cxy.x < fx )
 		if( cr >= 0 && cr < fy*zz )
 		{
-			//pO[cr].y |= 0x10;
-			//pO[cr].x = ch;
 			if( *pC == '\t' )
 			{
 				if( pO[cr].y&0x10 && pO[cr].x == ch )
@@ -306,12 +298,9 @@ I4x2 gpcSRC::SRCmini(
 		}
 
 		if( bON )
-		if( this == crs.apSRC[1] )
+		if( b01&1 ) //this == crs.apSRC[1] )
 		if( pC-pAL >= crs.iSTR.y )
 		{
-			//pO[cr].y &= 0xf;
-			//if( crs.iSTR.x != crs.iSTR.y )
-			//	pO[cr].y |= 8;
 			bON = false;
 		}
 

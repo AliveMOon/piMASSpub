@@ -2095,10 +2095,11 @@ public:
         x = _x; y = _y; z = _z; w = _w;
     }
 	U4x4( const I4x2 _xy, I4x2* p_zw = NULL );
-    U4x4( const U4x2 _xy, int b )
+    U4x4( const U4x2 _xy, U4 _z = 0, U4 _w = 0 )
     {
         a4x2[0] = _xy;
-        a4x2[1] = b;
+        z = _z;
+        w = _w;
     }
     U4x4( U4x2& _xy, U4x2* p_zw = NULL )
     {
@@ -4121,6 +4122,18 @@ public:
         {
             gpeALF labe;
             I8 mom, up, nx;
+        };
+        struct
+        {
+            I4x4 ai4x4[2];
+        };
+        struct
+        {
+            U4x4 au4x4[2];
+        };
+        struct
+        {
+            U4x4 af4x4[2];
         };
     };
     I8x4(){};
@@ -6531,7 +6544,7 @@ public:
 		return this;
 	}
 
-	U4 dict_H_find( U1* pS, U8 nS, U4& nIX ) {
+	U4 dictMILLfind( U1* pS, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;
@@ -6563,6 +6576,7 @@ public:
 		}
 		if( pS[nS] )
 			pS[nS] = 0;
+		str.n_load = aSTRT[0]+nS+1;
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
@@ -6581,7 +6595,7 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	gpcLZYdct* dict_H_add( U1* pS, U8 nS ) {
+	gpcLZYdct* dictMILLadd( U1* pS, U8 nS ) {
 		if( !this )
 		{
 			gpcLZYdct* p_this = new gpcLZYdct(0);
@@ -6591,7 +6605,9 @@ public:
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
-
+		// bemásolja a str szótárba
+		/// ebböl kéne akor csinálni egy olyat
+		/// ami ki szedi a '_#' jeleket
 		U1* pH = pS;
 		U8 nH = nS;
 		str.lzyADD( pH, nH+1, aSTRT[0] = -1 );
@@ -6613,6 +6629,8 @@ public:
 		if( pS[nS] )
 			pS[nS] = 0;
 		str.n_load = aSTRT[0]+nS+1;
+
+
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);

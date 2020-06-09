@@ -269,8 +269,7 @@ inline U4x2 lenMILL( U4x2 pos, U4x4&crn, U1* pUi, U1* pUie )
 	}
 	return pos;
 }
-inline U8 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
-{
+inline U8 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL ) {
 	U8 nLEN = 0, nBYTE, nUTF8 = 0;
 	if( !pVAN )
 		pVAN = (U1*)"\t\r\n\a";
@@ -328,8 +327,7 @@ inline U8 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL )
 	row++;
 	return nUTF8;
 }
-inline U8 gpfVANn( U1* pS, const U1* pVAN )
-{
+inline U8 gpfVANn( U1* pS, const U1* pVAN ) {
 	if( !pVAN )
 		return 0;
 	U2 nV = strlen( (char*)pVAN );
@@ -361,9 +359,7 @@ inline U8 gpfVANn( U1* pS, const U1* pVAN )
 	return n;
 }
 U8 inline gpfABC( U1* p_str, U1* pE, U8& nLEN );
-
-inline U1* gpfUTF8left( U1* pB, U1* pS, U1 n, U1 b )
-{
+inline U1* gpfUTF8left( U1* pB, U1* pS, U1 n, U1 b ) {
 	if( pB >= pS )
 		return pB;
 
@@ -388,8 +384,7 @@ inline U1* gpfUTF8left( U1* pB, U1* pS, U1 n, U1 b )
 
 	return pB;
 }
-inline U1* gpfUTF8stpX( U1* pB, U1* pE, U4 x, U4 nT = 4 )
-{
+inline U1* gpfUTF8stpX( U1* pB, U1* pE, U4 x, U4 nT = 4 ) {
 	if(!x)
 		return pB;
 
@@ -414,8 +409,7 @@ inline U1* gpfUTF8stpX( U1* pB, U1* pE, U4 x, U4 nT = 4 )
 	}
 	return pB;
 }
-inline U4 gpfUTF8rig( U1* pB, U1* pE, U4 nT = 4 )
-{
+inline U4 gpfUTF8rig( U1* pB, U1* pE, U4 nT = 4 ) {
 	U4 r = 0;
 	while( pB < pE )
 	{
@@ -435,13 +429,11 @@ inline U4 gpfUTF8rig( U1* pB, U1* pE, U4 nT = 4 )
 	}
 	return r;
 }
-
-U8 inline gpfSTR2U8( void* pV, void* ppV = NULL )
-{
+U8 inline gpfSTR2U8( void* pV, void* ppV = NULL ) {
 	if( !pV )
 		return 0;
-
 	char *p_str = (char*)pV;
+
 	U8 u8 = strtol( p_str, &p_str, 10 );
 	if( !u8 )
 	{
@@ -468,11 +460,7 @@ U8 inline gpfSTR2U8( void* pV, void* ppV = NULL )
 		*(char**)ppV = p_str;
 	return u8;
 }
-
-
-
-I8 inline gpfSTR2I8( void* pV, void* ppV = NULL )
-{
+I8 inline gpfSTR2I8( void* pV, void* ppV = NULL ) {
 	if( !pV )
 		return 0;
 
@@ -633,16 +621,18 @@ public:
 	}
 };
 
-
+#define rMNinxt au4x4[0]
+#define rMNpos ai4x4[1].a4x2[0]
+#define rMNclr au4x4[1].z
 class gpcSCOOP {
 public:
 	gpcLZYdct	dct;
 	gpcLZY		lnk,
 				mini;
-	U4x4 aMINI[2];
+	I8x4 rMN;
 	U4	iDCT, nDCT,
 		nLNK, nMINI;
-	U1* pUTF;	/// ezt a gpcSRC::SRCmill adja
+	U1* pALL;	/// ezt a gpcSRC::SRCmill adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )
 	{
@@ -651,11 +641,11 @@ public:
 		mini.lzyRST();
 		iDCT = nDCT =
 		nLNK = nMINI = 0;
-		pUTF = pU;	// ezt a gpcSRC::SRCmill adja
+		pALL = pU;	// ezt a gpcSRC::SRCmill adja
 	}
-	U4 nMN() { return nMINI = mini.nLD()/sizeof(aMINI); }
+	U4 nMN() { return nMINI = mini.nLD()/sizeof(rMN); }
 
-	U4 DCTadd( U4x2 pos, U1* pUTF, U1* pUi, U8 nU, U4 typ = 0xff )
+	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff )
 	{
 		if( !this )
 			return 0;
@@ -663,25 +653,27 @@ public:
 		if( !nU )
 			return nMINI;
 
-		iDCT = dct.dict_H_find( pUi, nU, nDCT );
+		iDCT = dct.dictMILLfind( pUi, nU, nDCT );
 		if( iDCT >= nDCT )
 		{
 			// nem volt a listában
 			iDCT = nDCT; // a végére kerül ha hozzá adjuk
-			dct.dict_H_add( pUi, nU );
+			dct.dictMILLadd( pUi, nU );
 			nDCT++;
 		}
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		U4x4	link(nMINI,0,0,0);
-		aMINI[0] = U4x4( pUi-pUTF, nU, iDCT, typ );
-		aMINI[1] = U4x4( pos, 0 );
-		mini.lzyADD( &aMINI, sizeof(aMINI), nU = -1, -1 );
+		rMN.rMNinxt = U4x4( pUi-pALL, nU, iDCT, typ );
+		rMN.rMNpos = pos;
+		rMN.rMNclr = color;
+		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+
 		lnk.lzyADD( &link, sizeof(link), nU = -1, -1 );
 		return nMN();
 	}
-	U4 STRadd( U4x2 pos, U1* pUTF, U1* pUi, U8 nU )
+	U4 STRadd( U4x2 pos, U1* pUi, U8 nU, U4 color )
 	{
 		if( !nU )
 			return 0;
@@ -693,13 +685,13 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		U1x4 typ(0x10,1,1,0);
-		//U4x4 mn( pUi-pUTF, nU, -1, typ.typ().u4 );
-		aMINI[0] = U4x4( pUi-pUTF, nU, -1, typ.typ().u4 );
-		aMINI[1] = U4x4( pos, 0 );
-		mini.lzyADD( &aMINI, sizeof(aMINI), nU = -1, -1 );
+		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, typ.typ().u4 );
+		rMN.rMNpos = pos;
+		rMN.rMNclr = color;
+		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 		return nMN();
 	}
-	U4 NOTEadd( U4x2 pos, U1* pUTF, U1* pUi, U8 nU )
+	U4 NOTEadd( U4x2 pos, U1* pUi, U8 nU, U4 color )
 	{
 		if( !nU )
 			return 0;
@@ -710,13 +702,14 @@ public:
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		aMINI[0] = U4x4( pUi-pUTF, nU, -1, 0 );
-		aMINI[1] = U4x4( pos, 0 );
-		mini.lzyADD( &aMINI, sizeof(aMINI), nU = -1, -1 );
+		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, 0 );
+		rMN.rMNpos = pos;
+		rMN.rMNclr = color;
+		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 		return nMN();
 	}
 };
-
+#define gpdMINI SRCminiMILL // SRCmini
 class gpcSRC {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
@@ -910,7 +903,18 @@ public:
 		return dim;
 	}
 	U4x4 SRCmill( bool bNoMini, const char* pVAN = NULL );
+	I4x2 SRCminiMILL(
+					U1x4* pO, I4x2 xy,
+					I4 fx,
+					I4 fy,
 
+					I4 fz, I4 zz,
+
+					gpcCRS& crs,
+					gpeCLR bg, //gpeCLR fr,
+					gpeCLR ch,
+					bool bNoMini
+				);
     bool bSUB( gpcMASS& mass ) {
 		if( !this )
 			return false;

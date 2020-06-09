@@ -275,7 +275,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 				pMINI[off+offFRM].pos( xyCR.a4x2[0], fxyz )
 							->frmBRDR( xyCR.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
 
-				pSRC->SRCmini(
+				pSRC->gpdMINI(
 									pMINI+off,
 
 									xyCR.a4x2[0],
@@ -329,7 +329,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			if( pTITLE > gpsTITLE )
 				pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( gpsTITLE, gpeCLR_white );
 
-			pSRC->SRCmini(
+			pSRC->gpdMINI(
 							pMINI + off,
 
 							xyCR.a4x2[0], //pMINI + off + offFRM,

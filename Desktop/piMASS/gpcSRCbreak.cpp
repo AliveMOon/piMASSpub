@@ -1,50 +1,22 @@
 #include "gpcSRC.h"
+#include "gpccrs.h"
+
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 static char gpsNoWord[] = {
-							"\\ \t\a\r\n*&/%+-|~^!=$.,:;\'\"{}[]"
+							"\\ \t\a\r\n*&/%+-|~^?!=$.,:;\'\"{}[]()"
 						};
-/*inline U4x2 lenMILL( U4x2 pos, U4x2&cr, U1* pUi, U1* pUie )
-{
-	for( ; pUi < pUie; pUi++ )
-	{
-		if( *pUi&0x80 )
-		{
-			if( !(*pUi&0x40) )
-				continue;
-			pos.x++;
-		}
-		else switch( *pUi )
-		{
-			case '\r':
-				pos.x = 0;
-				break;
-			case '\n':
-				pos.x = 0;
-				pos.y++;
-				break;
-			case '\a':
-				pos.x = 0;
-				pos.y++;
-				break;
-			case '\t':
-				pos.x = ((pos.x/4)+1)*4;
-				break;
-			default:
-				pos.x++;
-				break;
-		}
-		cr.mx( pos );
-	}
-	return pos;
-}*/
+static char gpsOPERA[] = {
+							"\\*&/%+-|~^?!=$.,:;{}[]()"
+						};
 
-U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
-{
+
+U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN ) {
 	if( !this )
 		return U4x4( gpdSRC_COLw, gpdSRC_ROWw );
 
-	U1	*pUTF = pSRCstart( bNoMini ),
+	U1	*pALL = pSRCalloc( bNoMini ),
+		*pUTF = pSRCstart( bNoMini ),
 		*pUi = pUTF, *pUj = pUTF, //*pUk = pUTF,
 		*pUe = pUi+dim.w,
 		sIZE[] = " \a";
@@ -58,15 +30,22 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 	I8 nSTR;
 	double d8;
 	bool bABC;
-	SCOOP.rst( pUTF );
+	SCOOP.rst( pALL );
 	dim.xyz_( 0 );
 	U4x2 pos(0);
+	U4	clrABC = U1x4(0,0,gpeCLR_blue2).u4,
+		clrSTR = U1x4(0,0,gpeCLR_red2).u4,
+		clrNUM = U1x4(0,0,gpeCLR_orange).u4,
+		clrOPERA = U1x4(0,0,gpeCLR_green2).u4,
+		clrNOTE = U1x4(0,0,gpeCLR_green).u4,
+		clrBREAK = U1x4(0,0,gpeCLR_red).u4;
+
 	for( nS = gpmNINCS( pUi, pVAN ); pUi < pUe; nS = gpmNINCS( pUi, " \t\r\n" ) )
 	{
 		if( nS )
 		{
 			// elrakjuk kell
-			SCOOP.DCTadd( pos, pUTF, pUi, nS );
+			SCOOP.DCTadd(pos,pUi,nS,clrBREAK);
 			// ebben van a " \t\r\n"
 			pos = lenMILL(pos,dim,pUi,pUi+nS);
 			pUi += nS;
@@ -77,7 +56,7 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 		if( bABC = gpmbABC(*pUi, gpaALF_H_sub) )
 		{
 			nA = gpmVAN( pUi, gpsNoWord, nU );
-			SCOOP.DCTadd( pos, pUTF, pUi, nA );
+			SCOOP.DCTadd(pos,pUi,nA,clrABC);
 			pos.x += nU;
 			dim.z += nU;
 			dim.a4x2[0].mx( pos );
@@ -95,7 +74,7 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 				d8 += gpmSTR2D( pUj );
 			}
 			nN = pUj-pUi;
-			SCOOP.DCTadd( pos, pUTF, pUi, nN );
+			SCOOP.DCTadd(pos,pUi,nN,clrNUM);
 			pos.x += nN;
 			dim.z += nN;
 			dim.a4x2[0].mx( pos );
@@ -120,7 +99,7 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 					pUj += gpmVAN( pUj, sIZE, nU );
 				}
 				nSTR = pUj-pUi;
-				SCOOP.STRadd( pos, pUTF, pUi, nO );
+				SCOOP.STRadd(pos,pUi,nSTR,clrSTR);
 				pos = lenMILL(pos,dim,pUi,pUj);
 				pUi = pUj;
 				continue;
@@ -155,7 +134,7 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 				nSTR = pUj-pUi;
 				if( !nSTR )
 					break;
-				SCOOP.NOTEadd( pos, pUTF, pUi, nO );
+				SCOOP.NOTEadd(pos,pUi,nSTR,clrNOTE);
 				pos = lenMILL(pos,dim,pUi,pUj);
 				pUi = pUj;
 				continue;
@@ -163,8 +142,9 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 				break;
 		}
 
-		nO = gpmVAN( pUi, " \t\r\n", nU );
-		SCOOP.DCTadd( pos, pUTF, pUi, nO );
+		//nO = gpmVAN( pUi, " \t\r\n", nU );
+		nO = gpmNINCS( pUi, gpsOPERA );
+		SCOOP.DCTadd(pos,pUi,nO,clrOPERA);
 		pos.x += nO;
 		dim.a4x2[0].mx( pos );
 		dim.z += nU;
@@ -173,4 +153,158 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN )
 	dim.a4x2[0]+=1;
 	//dim.z = gpfUTFlen( pUTF, pUe, dim.x, dim.y );
 	return dim;
+}
+
+I4x2 gpcSRC::SRCminiMILL(
+						U1x4* pO,  I4x2 xy,
+
+						I4 fW,
+						I4 fH,
+
+						I4 fz, I4 zz,
+
+						gpcCRS& crs,
+						gpeCLR bg, //gpeCLR fr,
+						gpeCLR ch,
+						bool bNoMini
+					) {
+	if( this ?
+				   ( fW <= 0 	||	fH <= 0 )
+				|| ( xy.x >= fW ||	xy.y >= fH )
+				: true )
+		return xy;
+
+	U1	*pALL	= pSRCalloc( bNoMini ),
+		*pSTRT	= pSRCstart( bNoMini ),
+		b01		=  (((U1)(this==crs.apSRC[0]))<<1)
+				  | ((U1)(this==crs.apSRC[1])),
+		cC, NX;
+
+	I8x4* pM0 = (I8x4*)SCOOP.mini.p_alloc;
+	bool	bON = false,
+			bONpre, bSEL = false;
+
+	I4x2	cxy = xy, Cxy,
+			trafo(1,zz);
+	I4 cr;
+	U4 clr, cn;
+	U1x4 c = 0;
+	for( U4 nM = SCOOP.nMN(), m = 0; m < nM; m++ )
+	{
+		cxy = xy+pM0[m].rMNpos;
+		if(cxy.y>=fH)
+			break;
+		clr = pM0[m].rMNclr;
+		for( U4	i = pM0[m].rMNinxt.x,
+				n = pM0[m].rMNinxt.y,
+				j = i+n;
+				i < j;
+				i++ )
+		{
+			c.u4 = clr;
+			c.w = 0;
+			bONpre = bON;
+			if(i==crs.iSTR.x)
+				bON = (b01==3);
+
+			if( bON )
+			{
+				if( crs.iSTR.y==crs.iSTR.x)
+					bON = !((b01&1)&&(i>crs.iSTR.y));
+				else
+					bON = !((b01&1)&&(i>=crs.iSTR.y));
+				if( bON )
+					c.z |= 0x10;
+			}
+
+			cC = pALL[i];
+
+			Cxy = cxy;
+			cn = 1;
+			NX = 0;
+			if( cC&0x80 )
+			{
+				if( cC&0x40 )
+					continue;
+				cxy.x++;
+				NX = pALL[i+1];
+			}
+			else switch( cC )
+			{
+				case '\r':
+					cxy.x = xy.x;
+					if(!bON)
+						continue;
+					cC = '.';
+					break;
+				case '\n':
+					cxy.x = xy.x;
+					cxy.y++;
+					if(!bON)
+						continue;
+					cC = '.';
+					break;
+				case '\a':
+					cxy.x = xy.x;
+					cxy.y++;
+					if(!bON)
+						continue;
+					cC = '.';
+					break;
+				case '\t':
+					cxy.x = xy.x + (((cxy.x-xy.x)/4)+1)*4;
+					if(!bON)
+						continue;
+					cn = cxy.x-Cxy.x;
+					cC = '.';
+					break;
+				default:
+					if(!bON)
+					if( cC == '_' || cC == '#' )
+					{
+						if(Cxy.x > 0)
+						{
+							cr = Cxy*trafo;
+							if( cC=='_' )
+							{
+								pO[cr-1].y = 1;
+								if( (pO[cr-1].w/0x20)%2 )
+									cxy.x++;
+							} else {
+								pO[cr-1].y = 2;
+							}
+						}
+						continue;
+					}
+					cxy.x++;
+					break;
+			}
+
+			if( Cxy.x >= fW || Cxy.x < 0 || Cxy.y < 0 )
+				continue;
+
+			cr = Cxy*trafo;
+			if( cC <= ' ' )
+			{
+				if(!bON)
+					continue;
+				cC = (cC!=' ') ? '.' : ' ';
+			}
+
+
+			pO[cr] = c;
+			pO[cr].w = cC-' ';
+			if(!NX)
+				continue;
+			pO[cr].w += (NX&4)>>2;
+		}
+
+
+
+
+
+
+
+	}
+	return xy;
 }
