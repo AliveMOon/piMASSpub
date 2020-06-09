@@ -141,8 +141,7 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS )
 	return utf8;
 }
 
-inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false )
-{
+inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false ) {
 	// return nBYTE
 	// nLEN = nCODE
 	nLEN = 0;
@@ -702,7 +701,8 @@ public:
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, 0 );
+		U1x4 typ(0x10,1,1,0);
+		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );

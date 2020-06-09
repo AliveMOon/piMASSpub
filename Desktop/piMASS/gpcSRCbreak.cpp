@@ -34,11 +34,11 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN ) {
 	dim.xyz_( 0 );
 	U4x2 pos(0);
 	U4	clrABC = U1x4(0,0,gpeCLR_blue2).u4,
-		clrSTR = U1x4(0,0,gpeCLR_red2).u4,
+		clrSTR = U1x4(0,0,gpeCLR_violet).u4,
 		clrNUM = U1x4(0,0,gpeCLR_orange).u4,
 		clrOPERA = U1x4(0,0,gpeCLR_green2).u4,
 		clrNOTE = U1x4(0,0,gpeCLR_green).u4,
-		clrBREAK = U1x4(0,0,gpeCLR_red).u4;
+		clrBREAK = U1x4(0,0,gpeCLR_red2).u4;
 
 	for( nS = gpmNINCS( pUi, pVAN ); pUi < pUe; nS = gpmNINCS( pUi, " \t\r\n" ) )
 	{
@@ -182,24 +182,24 @@ I4x2 gpcSRC::SRCminiMILL(
 
 	I8x4* pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	bool	bON = false,
-			bONpre, bSEL = false;
+			bONpre, bSEL = false, bSTR=false,
+			bONorSTR = false;
 
 	I4x2	cxy = xy, Cxy,
 			trafo(1,zz);
-	I4 cr;
-	U4 clr, cn;
+	I4 cr, i, j, n, sub = 0;
+	U4 clr, cn, tSTR = U1x4(0x10,1,1).typ().u4;
 	U1x4 c = 0;
 	for( U4 nM = SCOOP.nMN(), m = 0; m < nM; m++ )
 	{
 		cxy = xy+pM0[m].rMNpos;
 		if(cxy.y>=fH)
 			break;
+		i = pM0[m].rMNinxt.x;
+		n = pM0[m].rMNinxt.y;
+		bSTR = tSTR == pM0[m].rMNinxt.w;
 		clr = pM0[m].rMNclr;
-		for( U4	i = pM0[m].rMNinxt.x,
-				n = pM0[m].rMNinxt.y,
-				j = i+n;
-				i < j;
-				i++ )
+		for( j = i+n; i < j; i++ )
 		{
 			c.u4 = clr;
 			c.w = 0;
@@ -220,8 +220,10 @@ I4x2 gpcSRC::SRCminiMILL(
 			cC = pALL[i];
 
 			Cxy = cxy;
+			Cxy.x += sub;
 			cn = 1;
 			NX = 0;
+			bONorSTR = bON||bSTR;
 			if( cC&0x80 )
 			{
 				if( cC&0x40 )
@@ -232,22 +234,24 @@ I4x2 gpcSRC::SRCminiMILL(
 			else switch( cC )
 			{
 				case '\r':
+					sub = 0;
 					cxy.x = xy.x;
-					if(!bON)
+					if(!bONorSTR)
 						continue;
-					cC = '.';
+					cC = 'r';
 					break;
 				case '\n':
+					sub = 0;
 					cxy.x = xy.x;
 					cxy.y++;
-					if(!bON)
+					if(!bONorSTR)
 						continue;
-					cC = '.';
+					cC = 'n';
 					break;
 				case '\a':
 					cxy.x = xy.x;
 					cxy.y++;
-					if(!bON)
+					if(!bONorSTR)
 						continue;
 					cC = '.';
 					break;
@@ -259,7 +263,7 @@ I4x2 gpcSRC::SRCminiMILL(
 					cC = '.';
 					break;
 				default:
-					if(!bON)
+					if(!bONorSTR)
 					if( cC == '_' || cC == '#' )
 					{
 						if(Cxy.x > 0)
@@ -270,8 +274,11 @@ I4x2 gpcSRC::SRCminiMILL(
 								pO[cr-1].y = 1;
 								if( (pO[cr-1].w/0x20)%2 )
 									cxy.x++;
+								else
+									sub--;
 							} else {
 								pO[cr-1].y = 2;
+								sub--;
 							}
 						}
 						continue;
@@ -298,13 +305,6 @@ I4x2 gpcSRC::SRCminiMILL(
 				continue;
 			pO[cr].w += (NX&4)>>2;
 		}
-
-
-
-
-
-
-
 	}
 	return xy;
 }

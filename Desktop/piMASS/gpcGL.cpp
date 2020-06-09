@@ -377,7 +377,7 @@ char gpsGLSLfrgISO[] = {
 "	vec2 ac = (rgba.rg/crl.xz);																			\n"
 "	vec4 o = vec4( 																						\n"
 "					floor( vec2( fract(ac.x)*crl.x, ac.x )	),							// char			\n"
-"					floor( vec2( fract(ac.y)*crl.z, ac.y+(1.0/3.0) )	)  				// LUT			\n"
+"					floor( vec2( fract(ac.y)*crl.z, ac.y )	) +(1.0/3.0) 				// LUT			\n"
 "				) / vec4( crl.xy, lwh ) + vec2(0.0, rgba.b*0.25).xyxx;									\n"
 "	if( ac.y > crl.z )																					\n"
 "		o.w += 1.0;																						\n"
