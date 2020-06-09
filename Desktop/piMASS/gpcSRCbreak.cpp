@@ -287,7 +287,7 @@ I4x2 gpcSRC::SRCminiMILL(
 					break;
 			}
 
-			if( Cxy.x >= fW || Cxy.x < 0 || Cxy.y < 0 )
+			if( Cxy.x >= fW || Cxy.x < 0 || Cxy.y < 0 || Cxy.y>= fH )
 				continue;
 
 			cr = Cxy*trafo;
