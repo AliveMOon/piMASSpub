@@ -236,7 +236,7 @@ I4x2 gpcSRC::SRCminiMILL(
 				case '\r':
 					sub = 0;
 					cxy.x = xy.x;
-					if(!bONorSTR)
+					if(!bON)
 						continue;
 					cC = 'r';
 					break;
@@ -244,14 +244,14 @@ I4x2 gpcSRC::SRCminiMILL(
 					sub = 0;
 					cxy.x = xy.x;
 					cxy.y++;
-					if(!bONorSTR)
+					if(!bON)
 						continue;
 					cC = 'n';
 					break;
 				case '\a':
 					cxy.x = xy.x;
 					cxy.y++;
-					if(!bONorSTR)
+					if(!bON)
 						continue;
 					cC = '.';
 					break;
