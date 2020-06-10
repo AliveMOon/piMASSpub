@@ -1,23 +1,12 @@
 #include "gpcSRC.h"
 extern U1 gpaALFsub[];
 
-/*I4x2::I4x2( U8x2 b )
-{
-	x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
-	y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
-}*/
 I4x2::I4x2( I8x2 b )
 {
 	x = b.x;
 	y = b.y;
 }
 
-/*I4x2& I4x2::operator = ( const U8x2& b )
-{
-	x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
-	y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
-	return *this;
-}*/
 I4x2& I4x2::operator = ( const I8x2& b )
 {
 	x = b.x;
@@ -62,3 +51,5 @@ I8x2 I4x2::operator - (const I8x2& b) const
 }
 
 I4x4 I4x2::xxxy() const { return I4x4(x,x,x,y); }
+
+

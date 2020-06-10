@@ -170,7 +170,7 @@ gpcSRC::~gpcSRC() {
 		gpmDELary(apOUT[i]);
 
 	gpmDELary(pMINI);
-	gpmDELary(pBIG);
+	//gpmDELary(pBIG);
 	gpmDELary(pMAP);
 
 }

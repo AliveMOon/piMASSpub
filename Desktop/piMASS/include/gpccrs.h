@@ -31,7 +31,9 @@ class gpcCRS
 		I4x4	scnZN0, scnZN,
 				scnIN,
 				selANIN[2],
-				aXYuvPC[3]; //, edANIN[2];
+				aXYuvPC[3],
+
+				fxyz, crsOFF; //, edANIN[2];
 		gpcSRC	*apSRC[2];
 
 		U1x4	*pMINI, *pLOCK; //, *pCRS;
@@ -552,8 +554,8 @@ class gpcCRS
 
 		}
 	protected:
-
-	private:
+	public:
+	//private:
 		I4x4 		CRSfrm;
 		//SDL_Rect 	wDIVfrm;
 

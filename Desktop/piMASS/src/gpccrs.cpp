@@ -269,7 +269,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 
 	selANIN[1].a4x2[0] = sCRS.scnZN.a4x2[0]+U4x2(1,0);		//AN
 	selANIN[1].a4x2[1] = sCRS.scnIN.a4x2[0]/cr;				//IN
-	iSTR.y = (apSRC[1] = pSRC) ? pSRC->CRSminiCR( selANIN[1].a4x2[1], true ) : 0;
+	iSTR.y = (apSRC[1] = pSRC) ? pSRC->SRCmnCR( selANIN[1].a4x2[1], true ) : 0;
 
 	/// ha ezt igazra álítom akkor belemásolja a másik cursorba
 	bool bCPY = false; // OFF?

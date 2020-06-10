@@ -51,7 +51,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 		bESC = true;
 	}
 	I4x2 &div = win.wDIVcr( id ).a4x2[0];
-	I4x4 fxyz;
+	//I4x4 fxyz;
 	fxyz.z = pPIC->txWH.z;
 
 	U4	off = 	  (div.x ? fxyz.z/2: 0)
@@ -100,14 +100,14 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	U4	*pM, *pC, *pR,
 		z, c, r,
 		ie, i = mass.jDOitREF( win, 0, ie, &pM, &pC, &pR, &z );
-	bool bNoMini;
+	bool bNoMini, bTRIG = false;
 	if( selID )
 	{
 		i = mZN.a4x2[1].sum()*(U4)selID;
 		pC += i;
 		pR += i;
 	}
-
+	gpcSRC* pSrC = NULL;
 	for( i = 0; i < ie; i++ ) {
 		if( !pM[i] )
 			continue;
@@ -118,12 +118,21 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 						&& ( c+1 <= lurdAN.z	&& r <= lurdAN.w )
 					);
 		/// TÁMADÁS HO RUKK!!
-		dim = mass.SRCfnd( pM[i] )->SRCmill( bNoMini, " \t\r\n" );
+		dim = (pSrC = mass.SRCfnd( pM[i] ))->SRCmill( bNoMini, " \t\r\n" );
+
 		//dim = mass.SRCfnd( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )
 			pC[c] = dim.x;
 		if( pR[r] < dim.y )
 			pR[r] = dim.y;
+
+		if( pSrC )
+		if( bNoMini )
+		{
+			bTRIG = pSrC->SRCmnMILLscn(
+										xyCR.a4x2[0], fxyz.a4x2[0],
+										CRSfrm.z, fxyz.z, *this, bNoMini );
+		}
 	}
 
 	/// pCp pRp ----------------------------------------
@@ -133,8 +142,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	I4x2 brdr = I4x2( psCp[mZN.x],psRp[mZN.y] );
 
 
-	if( (CRSfrm.x+brdr.x < 1) || (CRSfrm.y+brdr.y < 1) )
-	{
+	if( (CRSfrm.x+brdr.x < 1) || (CRSfrm.y+brdr.y < 1) ) {
 		// ne lehessen messzebb tekerni
 		brdr *= -1;
 		CRSfrm.a4x2[0].mx( brdr );
@@ -156,8 +164,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 
 	if( lurdAN.x )
 	for( U4 r = lurdAN.y, c, ce; r <= lurdAN.w; r++ )
-	for( c = lurdAN.x-1; c < lurdAN.z; c++ )
-	{
+	for( c = lurdAN.x-1; c < lurdAN.z; c++ ) {
 		if( c < mZN.x )
 			xyCR.x = psCp[c];
 		else
@@ -220,8 +227,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			c16fr = bON&(iON == i+c) ? gpeCLR_white : gpeCLR_blue2;
 			c16ch = gpeCLR_blue2;
 
-			if( !pM[i+c] )
-			{
+			if( !pM[i+c] ) {
 				// nem lesz SRC
 				if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w || !((a >= lurdAN.x) && (a <= lurdAN.z )) )
 				{
@@ -238,8 +244,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			}
 
 			pTITLE = gpsTITLE;
-			if( pSRC = mass.SRCfnd(pM[i+c]) )
-			{
+			if( pSRC = mass.SRCfnd(pM[i+c]) ) {
 				gpcRES* pRES = pSRC->apOUT[3];
 				if( pRES )
 				{
@@ -269,25 +274,23 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 
 
 
-			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w )
-			{
+			if( !lurdAN.x || r < lurdAN.y || r > lurdAN.w ) {
 				// NINCSEN kijelölés az egész sorban
 				pMINI[off+offFRM].pos( xyCR.a4x2[0], fxyz )
 							->frmBRDR( xyCR.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
 
-				pSRC->gpdMINI(
+				pSRC->SRCmnMILL(
 									pMINI+off,
 
-									xyCR.a4x2[0],
+									xyCR.a4x2[0], fxyz.a4x2[0],
 
-									fxyz.x,fxyz.y,
+									CRSfrm.z, fxyz.z,
 
-									CRSfrm.z, fxyz.z,				// fz zz
 									*this,
-									c16bg, //gpeCLR_blue2,
-									gpeCLR_blue2,
+									//c16bg,
+									//gpeCLR_blue2,
 									false
-							);
+								);
 
 				if( bON ? iON == i+c : false )	// rajta a pointer
 					pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
@@ -329,20 +332,18 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			if( pTITLE > gpsTITLE )
 				pMINI[off+offFRM].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( gpsTITLE, gpeCLR_white );
 
-			pSRC->gpdMINI(
-							pMINI + off,
+			pSRC->SRCmnMILL(
+								pMINI + off,
 
-							xyCR.a4x2[0], //pMINI + off + offFRM,
+								xyCR.a4x2[0], fxyz.a4x2[0], //.x,fxyz.y,
 
-							fxyz.x,fxyz.y,
+								CRSfrm.z, fxyz.z,
 
-							CRSfrm.z, fxyz.z,				// fz zz
-
-							*this,
-							c16bg, //c16fr,
-							c16ch,
-							bNoMini
-						);
+								*this,
+								//c16bg,
+								//c16ch,
+								bNoMini
+							);
 		}
 	}
 }

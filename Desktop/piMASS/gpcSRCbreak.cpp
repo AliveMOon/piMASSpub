@@ -10,7 +10,7 @@ static char gpsOPERA[] = {
 							"\\*&/%+-|~^?!=$.,:;{}[]()"
 						};
 
-
+#define SCOOP aSCOOP[bMN]
 U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN ) {
 	if( !this )
 		return U4x4( gpdSRC_COLw, gpdSRC_ROWw );
@@ -29,8 +29,10 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN ) {
 	U4 nS, nA, nN, nO, nX, u8;
 	I8 nSTR;
 	double d8;
-	bool bABC;
-	SCOOP.rst( pALL );
+	bool bABC,
+		 bMN = pMINI ? pMINI->p_alloc == pALL : false;
+
+	aSCOOP[bMN].rst( pALL );
 	dim.xyz_( 0 );
 	U4x2 pos(0);
 	U4	clrABC = U1x4(0,0,gpeCLR_blue2).u4,
@@ -155,45 +157,166 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN ) {
 	return dim;
 }
 
-I4x2 gpcSRC::SRCminiMILL(
-						U1x4* pO,  I4x2 xy,
+bool gpcSRC::SRCmnMILLscn(
+							I4x2 xy, I4x2 fWH,
 
-						I4 fW,
-						I4 fH,
+							I4 fz, I4 zz,
 
-						I4 fz, I4 zz,
+							gpcCRS& crs,
+							bool bNoMini
+						) {
+	if( !this )
+		return false;
 
-						gpcCRS& crs,
-						gpeCLR bg, //gpeCLR fr,
-						gpeCLR ch,
-						bool bNoMini
-					) {
-	if( this ?
-				   ( fW <= 0 	||	fH <= 0 )
-				|| ( xy.x >= fW ||	xy.y >= fH )
-				: true )
-		return xy;
-
-	U1	*pALL	= pSRCalloc( bNoMini ),
+	I4 cr, i, j, n, sub = 0;
+	I4x2	cxy = xy, Cxy, trafo(1,zz);
+	U1	cC = 0, NX, preC,
+		*pALL	= pSRCalloc( bNoMini ),
 		*pSTRT	= pSRCstart( bNoMini ),
 		b01		=  (((U1)(this==crs.apSRC[0]))<<1)
-				  | ((U1)(this==crs.apSRC[1])),
-		cC, NX;
+				  | ((U1)(this==crs.apSRC[1]));
 
-	I8x4* pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	bool	bON = false,
 			bONpre, bSEL = false, bSTR=false,
-			bONorSTR = false;
+			bONorSTR = false,
+			bMN = pMINI ? pMINI->p_alloc == pALL : false;
+	I8x4	*pM0 = (I8x4*)SCOOP.mini.p_alloc;
 
-	I4x2	cxy = xy, Cxy,
-			trafo(1,zz);
-	I4 cr, i, j, n, sub = 0;
-	U4 clr, cn, tSTR = U1x4(0x10,1,1).typ().u4;
-	U1x4 c = 0;
 	for( U4 nM = SCOOP.nMN(), m = 0; m < nM; m++ )
 	{
 		cxy = xy+pM0[m].rMNpos;
-		if(cxy.y>=fH)
+		i = pM0[m].rMNinxt.x;
+		j = pM0[m].rMNinxt.y+i;
+
+		if( (crs.iSTR.y < i) && (crs.iSTR.y > j) )
+			continue;
+
+		for( ; i < j; i++ )
+		{
+			bONpre = bON;
+			if(i==crs.iSTR.x)
+				bON = (b01==3);
+			preC = cC-' ';
+			cC = pALL[i];
+			Cxy = cxy;
+			Cxy.x += sub;
+
+			if( bON )
+			{
+				if( crs.iSTR.y==crs.iSTR.x)
+					bON = !((b01&1)&&(i>crs.iSTR.y));
+				else
+					bON = !((b01&1)&&(i>=crs.iSTR.y));
+				if( !bON )
+				{
+					crs.crsOFF.a4x2[0] = Cxy;
+					return true;
+				}
+			}
+
+			if( cC&0x80 )
+			{
+				if( cC&0x40 )
+					continue;
+				cxy.x++;
+				NX = pALL[i+1];
+			}
+			else switch( cC )
+			{
+				case '\r':
+					sub = 0;
+					cxy.x = xy.x;
+					if(!bON)
+						continue;
+					cC = 'r';
+					break;
+				case '\n':
+					sub = 0;
+					cxy.x = xy.x;
+					cxy.y++;
+					if(!bON)
+						continue;
+					cC = 'n';
+					break;
+				case '\a':
+					cxy.x = xy.x;
+					cxy.y++;
+					if(!bON)
+						continue;
+					cC = '.';
+					break;
+				case '\t':
+					cxy.x = xy.x + (((cxy.x-xy.x)/4)+1)*4;
+					if(!bON)
+						continue;
+					cC = '.';
+					break;
+				default:
+					if(!bONorSTR)
+					if( cC == '_' || cC == '#' )
+					{
+						if(Cxy.x > 0)
+						{
+							cr = Cxy*trafo;
+							if( cC=='_' )
+							{
+								//pO[cr-1].y = 1;
+								if( (preC/0x20)%2 )
+									cxy.x++;
+								else
+									sub--;
+							} else {
+								//pO[cr-1].y = 2;
+								sub--;
+							}
+						}
+						continue;
+					}
+					cxy.x++;
+					break;
+			}
+
+
+		}
+	}
+	return false;
+}
+
+I4x2 gpcSRC::SRCmnMILL(
+							U1x4* pO,
+
+							I4x2 xy, I4x2 fWH,
+
+							I4 fz, I4 zz,
+
+							gpcCRS& crs,
+							bool bNoMini
+						) {
+	if( !this )
+		return xy;
+	if( (fWH.mn()<=0) || (xy.x>=fWH.x) || (xy.y>=fWH.y) )
+		return xy;
+	I4 cr, i, j, n, sub = 0;
+	I4x2	cxy = xy, Cxy, trafo(1,zz);
+	U1	cC, NX,
+		*pALL	= pSRCalloc( bNoMini ),
+		*pSTRT	= pSRCstart( bNoMini ),
+		b01		=  (((U1)(this==crs.apSRC[0]))<<1)
+				  | ((U1)(this==crs.apSRC[1]));
+
+	bool	bON = false,
+			bONpre, bSEL = false, bSTR=false,
+			bONorSTR = false,
+			bMN = pMINI ? pMINI->p_alloc == pALL : false;
+	I8x4	*pM0 = (I8x4*)SCOOP.mini.p_alloc;
+
+	U4 clr, tSTR = U1x4(0x10,1,1).typ().u4, cn;
+	U1x4 c = 0;
+
+	for( U4 nM = SCOOP.nMN(), m = 0; m < nM; m++ )
+	{
+		cxy = xy+pM0[m].rMNpos;
+		if(cxy.y>=fWH.y)
 			break;
 		i = pM0[m].rMNinxt.x;
 		n = pM0[m].rMNinxt.y;
@@ -207,6 +330,10 @@ I4x2 gpcSRC::SRCminiMILL(
 			if(i==crs.iSTR.x)
 				bON = (b01==3);
 
+			cC = pALL[i];
+			Cxy = cxy;
+			Cxy.x += sub;
+
 			if( bON )
 			{
 				if( crs.iSTR.y==crs.iSTR.x)
@@ -215,12 +342,10 @@ I4x2 gpcSRC::SRCminiMILL(
 					bON = !((b01&1)&&(i>=crs.iSTR.y));
 				if( bON )
 					c.z |= 0x10;
+				else
+					crs.crsOFF.a4x2[0] = Cxy;
 			}
 
-			cC = pALL[i];
-
-			Cxy = cxy;
-			Cxy.x += sub;
 			cn = 1;
 			NX = 0;
 			bONorSTR = bON||bSTR;
@@ -287,7 +412,7 @@ I4x2 gpcSRC::SRCminiMILL(
 					break;
 			}
 
-			if( Cxy.x >= fW || Cxy.x < 0 || Cxy.y < 0 || Cxy.y>= fH )
+			if( (Cxy.mn()<0) || (Cxy.x>=fWH.x) || (Cxy.y>=fWH.y) )
 				continue;
 
 			cr = Cxy*trafo;

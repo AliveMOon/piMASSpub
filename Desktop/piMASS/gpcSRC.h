@@ -631,7 +631,7 @@ public:
 	I8x4 rMN;
 	U4	iDCT, nDCT,
 		nLNK, nMINI;
-	U1* pALL;	/// ezt a gpcSRC::SRCmill adja
+	U1	*pALL, *pMN;	/// ezt a gpcSRC::SRCmill adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )
 	{
@@ -709,7 +709,6 @@ public:
 		return nMN();
 	}
 };
-#define gpdMINI SRCminiMILL // SRCmini
 class gpcSRC {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
@@ -725,12 +724,12 @@ public:
     gpeALF	*pALFtg;
     gpcRES	*pEXE,
 			*apOUT[4];
-	gpcLZY	*pMINI,
-			*pBIG;
+	gpcLZY	//*pBIG,
+			*pMINI;
 
 	gpcMAP	*pMAP;
 
-	gpcSCOOP SCOOP;
+	gpcSCOOP aSCOOP[2];
 
 	U4 srcUPDT( SOCKET ig = INVALID_SOCKET )
 	{
@@ -761,7 +760,8 @@ public:
 	}
 	U1* pSRCalloc( bool bNoMini )
 	{
-		bool bHD = false, bMINI = bHD ? false : ( bNoMini ? false : !!pMINI );
+		bool	bHD = false,
+				bMINI = bHD ? false : ( bNoMini ? false : !!pMINI );
 
 		return bMINI ? pMINI->p_alloc : pA;
 	}
@@ -770,8 +770,7 @@ public:
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
 		// és ráadásul a \a elöt6t van a cursor
 		bool	bHD = false,
-				bMINI = bHD	? false
-							: ( bNoMini ? false : !!pMINI );
+				bMINI = bHD	? false : ( bNoMini ? false : !!pMINI );
 
 		U1	*pC = bMINI ? pMINI->p_alloc : pA;
 		dim.w = bMINI ? pMINI->n_load : nL;
@@ -786,7 +785,7 @@ public:
 		return pC;
 	}
 
-	U8 CRSminiCR( I4x2& cr, bool bNoMini ) {
+	U8 SRCmnCR( I4x2& cr, bool bNoMini ) {
 		if( !this )
 		{
 			cr.null();
@@ -903,16 +902,17 @@ public:
 		return dim;
 	}
 	U4x4 SRCmill( bool bNoMini, const char* pVAN = NULL );
-	I4x2 SRCminiMILL(
-					U1x4* pO, I4x2 xy,
-					I4 fx,
-					I4 fy,
-
+	bool SRCmnMILLscn(
+					I4x2 xy, I4x2 fWH,
 					I4 fz, I4 zz,
-
 					gpcCRS& crs,
-					gpeCLR bg, //gpeCLR fr,
-					gpeCLR ch,
+					bool bNoMini
+				);
+	I4x2 SRCmnMILL(
+					U1x4* pO,
+					I4x2 xy, I4x2 fWH,
+					I4 fz, I4 zz,
+					gpcCRS& crs,
 					bool bNoMini
 				);
     bool bSUB( gpcMASS& mass ) {

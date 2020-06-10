@@ -227,6 +227,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 	gppKEYbuff = ( gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,pWELLCOME ) );
 	I8x2 GLSLline(0,2), GLSLpic(0,1), GLSLiso(0,0);
 	F4 tmpFx4;
+	bool bMOV = false;
 	while( gppKEYbuff ) {
 		usleep(33);
 		mSEC.y = mSEC.x;
@@ -347,6 +348,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					pS = gppKEYbuff;
 				} else {
 					iRDY = crs.id;
+					bMOV = true;
 					while( pE < gppKEYbuff ) {
 						switch( *pE )
 						{
@@ -388,13 +390,11 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							case 3:			// right
 							case 4:			// up
 							case 5:	{ 		// down
-
 								crs.CRSins( *piMASS, pE, pS );
 								pS = pE+1;
 								if( !crs.CRSbEDget() )
 								{
 									crs.CRSstpCL( *this, *piMASS, *pE, bSHIFT );
-
 									break;
 								}
 
@@ -419,6 +419,29 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					crs.CRSins( *piMASS, gppKEYbuff, pS );
 
 				crs.miniRDY( *this, *piMASS, pPIC, pSDLrndr, bSHIFT );
+				if( bMOV )
+				{
+					/*I4x4 &crsOFF = crs.crsOFF;
+					if( crsOFF.a4x2[1] != crsOFF.a4x2[0] )
+					{
+						crsOFF.a4x2[1] = crsOFF.a4x2[0];
+						I4x2 &xy = crs.CRSfrm.a4x2[0],
+							 &wh = crs.fxyz.a4x2[0];
+						if( crsOFF.a4x2[1].x < 0 )
+							xy.x = crsOFF.a4x2[1].x;
+						else if( crsOFF.a4x2[1].x >= wh.x )
+							xy.x = crsOFF.a4x2[1].x-wh.x + 1;
+
+						if( crsOFF.a4x2[1].y < 0 )
+							xy.y = crsOFF.a4x2[1].y;
+						else if( crsOFF.a4x2[1].y >= wh.y )
+							xy.y = crsOFF.a4x2[1].y-wh.y + 1;
+
+					}*/
+
+
+					bMOV = false;
+				}
 
 				gppKEYbuff = gppMOUSEbuff;
 				*gppKEYbuff = 0;
