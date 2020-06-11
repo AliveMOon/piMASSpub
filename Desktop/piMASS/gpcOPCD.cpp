@@ -373,8 +373,7 @@ I1 gpcCMPL::sOP( char* pS )
 	o++;
 	return o;
 }
-I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB, char* pSTR )
-{
+I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, const char* pTAB, const char* pSTR ) {
 	if( !this )
 		return 0;
 	if( !op )
@@ -390,7 +389,7 @@ I1 gpcCMPL::sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB, char* pSTR )
 						iLEV, iFND,
 						iPC, mPC,
 						n_dat,
-						pTAB, pS0 ? pS0+iPUB : "", pOP, pSTR
+						pTAB, pS0 ? pS0+iPUB : (char*)"", pOP, pSTR
 
 					);
 	return o;

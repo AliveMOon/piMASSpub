@@ -183,7 +183,7 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 	if( bTHRD )
 	{
 		pREF = NULL;
-		aiQC[0] = qc+gpdRPI_tOUT;
+		aiQC[0] = qc+ gpdTCP_tOUT;
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 

@@ -1,5 +1,6 @@
 #include "gpccrs.h"
-extern U1 gpsKEYMAP[];
+#include <gpsKEYMAP.h>
+//extern const U1 gpsKEYMAP[];
 
 bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
 {

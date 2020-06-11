@@ -203,10 +203,10 @@ double I4x4::dropRAD(const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
 			a = d+ah;
 	double	sa = double(ah)/double(a),
 			// ha h<0 lefelé dobjuk
-			rad0 = h < 0 ? asin(sa) : 0,
-			rad1 = h < 0 ? PI : PI-asin(sa);
+			rad00 = h < 0 ? asin(sa) : 0,
+			rad01 = h < 0 ? PI : PI-asin(sa);
 
-	return (rad1-rad0)*double(ti)/double(tn) + rad0;
+	return (rad01-rad00)*double(ti)/double(tn) + rad00;
 }
 I4x4 I4x4::drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
 {
@@ -241,9 +241,9 @@ I4x4 I4x4::drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const
 
 	double	sa = double(ah)/double(a),
 			// ha h<0 lefelé dobjuk
-			rad0 = h < 0 ? asin(sa) : 0,
-			rad1 = h < 0 ? PI : PI-asin(sa),
-			radA = (rad1-rad0)*double(ti)/double(tn) + rad0;
+			rad00 = h < 0 ? asin(sa) : 0,
+			rad01 = h < 0 ? PI : PI-asin(sa),
+			radA = (rad01-rad00)*double(ti)/double(tn) + rad00;
 
 	out += (u4*(I8)(double(a)*sin(radA)))/u;
 	if(!b)

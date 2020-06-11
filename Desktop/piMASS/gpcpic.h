@@ -797,7 +797,7 @@ public:
 						char* pNAME, char *pPATH, char *pFILE );
 
 	U1x4* food( U1x4* pPET, U4 i, U4 n,
-				char* pPATH, char* pDIR, char* pEXP = ".png" );
+				char* pPATH, char* pDIR, const char* pEXP = ".png" );
 
 };
 

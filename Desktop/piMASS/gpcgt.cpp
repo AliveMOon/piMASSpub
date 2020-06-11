@@ -794,11 +794,19 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			addr_in.sin_addr.s_addr = inet_addr( s_ip );
 			// LISTEN: addr_in.sin_addr.s_addr = INADDR_ANY;
 			memset(&(addr_in.sin_zero), '\0', 8);
-
+#ifdef _WIN64
+			//result = setsockopt(socket,		/* socket affected */
+			//	IPPROTO_TCP,	/* set option at TCP level */
+			//	TCP_NODELAY,	/* name of option */
+			//	(char*)& no_daley,	/* the cast is historical cruft */
+			//	sizeof(int));	/* length of option value */
+			
+#else
 			// set non blocking
 			U8 a = fcntl( socket, F_GETFL, NULL );
 			a |= O_NONBLOCK;
 			fcntl(socket, F_SETFL, a );
+#endif
 
 			error = connect(
 								socket,
@@ -1059,17 +1067,18 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 			}
 
 			if( p_host_ips && (gt_an_ip.alf == gpeALF_null) ) {
-				//if( !p_IPTable )
-				//{
-				//	DWORD dwSizeReq = 0;
-				//	DWORD dwRet = GetIpAddrTable( p_IPTable, &dwSizeReq, TRUE );
-				//	if( dwRet == ERROR_INSUFFICIENT_BUFFER )
-				//	{
-				//		p_IPTable = (PMIB_IPADDRTABLE)(new BYTE[dwSizeReq]);
-				//		dwRet = GetIpAddrTable( p_IPTable, &dwSizeReq, TRUE );
-				//	}
-				//}
-
+				#ifdef _WIN64
+				if( !p_IPTable )
+				{
+					DWORD dwSizeReq = 0;
+					DWORD dwRet = GetIpAddrTable( p_IPTable, &dwSizeReq, TRUE );
+					if( dwRet == ERROR_INSUFFICIENT_BUFFER )
+					{
+						p_IPTable = (PMIB_IPADDRTABLE)(new BYTE[dwSizeReq]);
+						dwRet = GetIpAddrTable( p_IPTable, &dwSizeReq, TRUE );
+					}
+				}
+				#endif
 				int i, j, idx;
 				gt_an_ip.alf = gpeALF_INTERNET;
 
@@ -1094,8 +1103,8 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				//	free( p_tmphstbuf );
 				//
 				//}
-
-				/*for( i = 0; p_host_ips->h_addr_list[i]; i++ )
+				#ifdef _WIN64
+				for( i = 0; p_host_ips->h_addr_list[i]; i++ )
 				{
 					idx = -1;
 					for( j = 0; j < p_IPTable->dwNumEntries; j++ )
@@ -1116,11 +1125,12 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 						if( dwinaddr == dwhostaddr )
 						{
-							gt_an_ip.a = gpeALF_LOCAL;
+							gt_an_ip.alf = gpeALF_LOCAL;
 							break;
 						}
 					}
-				}*/
+				}
+				#endif
 			}
 			else
 			if( !p_host_ips  ) //|| !p_IPTable )
@@ -1166,38 +1176,49 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				}
 
 				pACC->GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
+				
+				
+
+#ifdef _WIN64
+				char* s_buff = (char*)win.sGTpub;
+				gpmSTRCPY( s_buff, inet_ntoa(clientaddr.sin_addr) );
+				if (strstr(s_buff, pACC->s_ip))
+					gpmSTRCPY(pACC->s_ip, inet_ntoa(pACC->addr_in.sin_addr));
+				else
+					pACC->gt_ip.num++;
+#else
 				getifaddrs(&pIFadr);
-				char	*s_buff = (char*)win.sGTpub,
-						*pB = s_buff+gpdRECVn/2, *pBi = pB;
-				void	*pIFtmp = NULL;
-				for( pIFa = pIFadr; pIFa != NULL; pIFa = pIFa->ifa_next )
+				char* s_buff = (char*)win.sGTpub,
+					* pB = s_buff + gpdRECVn / 2, *pBi = pB;
+				void* pIFtmp = NULL;
+				for (pIFa = pIFadr; pIFa != NULL; pIFa = pIFa->ifa_next)
 				{
-					if( !pIFa->ifa_addr)
+					if (!pIFa->ifa_addr)
 						continue;
 
 					if (pIFa->ifa_addr->sa_family == AF_INET)
 					{ // check it is IP4
 						// is a valid IP4 Address
-						pIFtmp = &((struct sockaddr_in *)pIFa->ifa_addr)->sin_addr;
+						pIFtmp = &((struct sockaddr_in*)pIFa->ifa_addr)->sin_addr;
 						inet_ntop(AF_INET, pIFtmp, s_buff, INET_ADDRSTRLEN);
-						pBi += sprintf( pBi, "%s IPA: %s \n", pIFa->ifa_name, s_buff );
-						//printf("%s IP Address %s\n", pIFa->ifa_name, aADRbuf);
-					} else if (pIFa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
-						// is a valid IP6 Address
-						pIFtmp = &((struct sockaddr_in6 *)pIFa->ifa_addr)->sin6_addr;
-						inet_ntop(AF_INET6, pIFtmp, s_buff, INET6_ADDRSTRLEN);
-						pBi += sprintf( pBi, "%s IPA: %s \n", pIFa->ifa_name, s_buff );
+						pBi += sprintf(pBi, "%s IPA: %s \n", pIFa->ifa_name, s_buff);
 						//printf("%s IP Address %s\n", pIFa->ifa_name, aADRbuf);
 					}
-					gpmSTRCPY( s_buff, pIFa->ifa_name );
+					else if (pIFa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
+					 // is a valid IP6 Address
+						pIFtmp = &((struct sockaddr_in6*)pIFa->ifa_addr)->sin6_addr;
+						inet_ntop(AF_INET6, pIFtmp, s_buff, INET6_ADDRSTRLEN);
+						pBi += sprintf(pBi, "%s IPA: %s \n", pIFa->ifa_name, s_buff);
+						//printf("%s IP Address %s\n", pIFa->ifa_name, aADRbuf);
+					}
+					gpmSTRCPY(s_buff, pIFa->ifa_name);
 				}
-				//gpmSTRCPY( s_buff, inet_ntoa(clientaddr.sin_addr) );
-
 
 				if( strcasecmp( s_buff, pACC->s_ip ) )
 					gpmSTRCPY( pACC->s_ip, inet_ntoa(pACC->addr_in.sin_addr));
 				else
 					pACC->gt_ip.num++;
+#endif // _WIN64
 
 				//DZF_CON_FORMAT_Write( "\n%x accept IP: %s ", pACC->socket, pACC->s_ip );
 			}

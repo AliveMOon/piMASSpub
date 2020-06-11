@@ -1,6 +1,26 @@
 #ifndef GPCRES_H
 #define GPCRES_H
-
+//~ MIT License
+//
+//~ Copyright (c) 2019 AliveMOon
+//
+//~ Permission is hereby granted, free of charge, to any person obtaining a copy
+//~ of this software and associated documentation files (the "Software"), to deal
+//~ in the Software without restriction, including without limitation the rights
+//~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//~ copies of the Software, and to permit persons to whom the Software is
+//~ furnished to do so, subject to the following conditions:
+//
+//~ The above copyright notice and this permission notice shall be included in all
+//~ copies or substantial portions of the Software.
+//
+//~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//~ SOFTWARE.
 //#include "piMASS.h"
 
 class gpcALU;
@@ -56,7 +76,7 @@ public:
 		if( this )
 		{
 			if( *isa.aISA == gpeISA_str )
-				gpmDELary(an.aSTR[0]);
+				gpmDELary(an.apSTR[0]);
 			gpmDEL( pRES );
 			gpmCLR;
 		}
@@ -64,25 +84,25 @@ public:
 		return this;
 	}
 
-	gpcISA* str( gpcLAZY& str )
+	gpcISA* str( gpcLZY& str )
 	{
 		if( !this )
 			return NULL;
 		isa.null();
 
-		an.y = min( str.n_load, gpmSTRLEN( str.p_alloc ) );
-		if( an.y )
+		U4 nSTR = min( str.n_load, gpmSTRLEN( str.p_alloc ) );
+		if( nSTR )
 		{
-			an.aSTR[0] = new U1[an.y+1];
-			gpmMEMCPY( an.aSTR[0], str.p_alloc, an.y );
-			an.aSTR[0][an.y] = 0;
+			an.apSTR[0] = new U1[nSTR+1];
+			gpmMcpyOF( an.apSTR[0], str.p_alloc, nSTR );
+			an.apSTR[0][nSTR] = 0;
 		} else {
 			an = 0;
 		}
 
 		isa.aISA[0] = gpeISA_str;
 
-		str.lzy_reset();
+		str.lzyRST();
 		return this;
 	}
 
@@ -340,7 +360,7 @@ class gpcALU
 {
 	U1x4	type;	// typ:
 					/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-					// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
+					/// yz[ dimXY ] 	, nBYTE = 1<<(x&0xf)
 	U4x4	an;
 public:
 	I1x4	op, isa;
@@ -358,7 +378,7 @@ public:
 	gpcALU& TanDT( gpcALU& b )
 	{
 		// bizalmatlanok legyünk a b-vel?
-		//gpmMEMCPY( this, &b, 1 );
+		//gpmMcpyOF( this, &b, 1 );
 		type = b.type;
 		type.w = 0;
 		an = b.an;
@@ -366,24 +386,19 @@ public:
 		pDAT = b.pDAT;
 		return *this;
 	}
+	U1x4& typ() { return type.typ(); }
 
-	U1x4& typ()
-	{
-		return type.typ();
-	}
-	U1x4& typ( U4 b )
-	{
-		type.u4 = b;
-		type.w = 0;
-		return typ();
-	}
-	U1x4& TYPmx( U4 b )
-	{
-		type.typMX( b );
-		//type.u4 = b;
-		//type.w = 0;
-		return typ();
-	}
+	U1 typX() const { return ((gpcALU*)this)->typ().x; };
+	U1 typY() const { return ((gpcALU*)this)->typ().y; };
+	U1 typZ() const { return ((gpcALU*)this)->typ().z; };
+	U1 typW() const { return ((gpcALU*)this)->typ().w; };
+
+	// typ: 0x10
+	bool bSTR() const { return typX()&0x10; }
+	///   -  -  -  |    : - - - -
+	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+	U1x4& typ( U4 b ) { type.u4 = b; type.w = 0; return typ(); }
+	U1x4& TYPmx( U4 b ) { type.typMX( b ); return typ(); }
 
 	U4x2 tDIM()
 	{
@@ -468,7 +483,7 @@ public:
 	gpcALU& equ( gpcALU& b );
 
 	gpcALU& zero( void );
-	U8 ins( gpcRES* pM, gpcLAZY& str );
+	U8 ins( gpcRES* pM, gpcLZY& str );
 	gpcRES* ins( gpcRES* pM, gpcRES* pKID );
 	gpcALU& ins( gpcRES* pM, U4x2 xy, U1x4 ty4 );
 	gpcALU& int2flt( gpcRES* pM, U4x2 xy, U1x4 ty4 );
@@ -508,41 +523,41 @@ public:
 		return *this;
 	}
 
-	U8 u8() {
+	U8 u8() const {
 		if( this ? !pDAT : true )
 			return 0;
 		// typ:
-		// x[7s,6f,5r,4p? 	: 3-0 nBYTE = 1<<(x&0xf) ]
+		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		// yz[ dimXY ] 		,  nBYTE = 1<<(x&0xf)
-		if( typ().x&0x40 )
+		if( typX()&0x40 )
 		{
-			if( typ().w > 4 )
+			if( typW() > 4 )
 				return ((double*)pDAT)[0];
 
 			return ((float*)pDAT)[0];
 		}
-		if( typ().x&0x80 )
+		if( typX()&0x80 )
 		{
-			if( typ().w > 2 )
+			if( typW() > 2 )
 			{
-				if( typ().w > 4 )
+				if( typW() > 4 )
 					return ((I8*)pDAT)[0];
 
 				return ((I4*)pDAT)[0];
 			}
-			if( typ().w > 1 )
+			if( typW() > 1 )
 				return ((I2*)pDAT)[0];
 
 			return ((I1*)pDAT)[0];
 		}
-		if( typ().w > 2 )
+		if( typW() > 2 )
 		{
-			if( typ().w > 4 )
+			if( typW() > 4 )
 				return ((U8*)pDAT)[0];
 
 			return ((U4*)pDAT)[0];
 		}
-		if( typ().w > 1 )
+		if( typW() > 1 )
 			return ((U2*)pDAT)[0];
 		else
 			return ((U1*)pDAT)[0];
@@ -729,9 +744,9 @@ public:
 			nISA.y = nISA.x+0x10;
             pISA = new gpcISA[nISA.y];
             if( nISA.x )
-				gpmMEMCPY( pISA, pK, nISA.x );
-			gpmZn( pK, nISA.x ); // muszáj nehogy felszabaditsa az an.aSTR[0]-okat
-			gpmZn( pISA+nISA.x, nISA.y-nISA.x );
+				gpmMcpyOF( pISA, pK, nISA.x );
+			gpmZnOF( pK, nISA.x ); // muszáj nehogy felszabaditsa az an.aSTR[0]-okat
+			gpmZnOF( pISA+nISA.x, nISA.y-nISA.x );
 
 			gpmDELary(pK);
 		}
@@ -771,11 +786,16 @@ public:
 		switch( stp )
 		{
 			case '.':
-				pIS->i = pIS[-1].i+1;
+				/*pIS->i = pIS[-1].i+1;
 				pIS[-pIS->isa.z].n = pIS->i;
 				if( !pIS[-pIS->isa.z].i )
 					break;
-				pIS[-pIS->isa.z].n -= pIS[-pIS->isa.z].i;
+				pIS[-pIS->isa.z].n -= pIS[-pIS->isa.z].i;*/
+				pIS->i = pIS[-1].i+1;
+				pIS[-pIS->i].n = pIS->i;
+				if( !pIS[-pIS->i].i )
+					break;
+				pIS[-pIS->i].n -= pIS[-pIS->i].i;
 			case '(':
 				if( pIS[-1].isa.aISA[0] == gpeISA_var )
 					pIS[-1].isa.aISA[0] = gpeISA_FUN;
@@ -797,19 +817,13 @@ public:
 		return resISA()->var( a, gpeISA_tag );
 	}
 
-	gpcISA*	resISA_str( gpcLAZY& str )
+	gpcISA*	resISA_str( gpcLZY& str )
 	{
 		return resISA()->str( str );
 	}
 
-	U4 iL()
-	{
-		return iLEV;
-	}
-	gpcRES* pRM()
-	{
-		return pMOM;
-	}
+	U4 iL() { return iLEV; }
+	gpcRES* pRM() { return pMOM; }
 	gpcRES* null();
 
 	gpcRES( gpcRES* pM = NULL )
@@ -818,8 +832,8 @@ public:
         if( !pM )
 			return;
 
-		if( pMOM = pM )
-			iLEV = pMOM->iLEV+1;
+		pMOM = pM;
+		iLEV = pMOM->iLEV+1;
 	}
 
 	~gpcRES()
@@ -829,11 +843,10 @@ public:
 
 	gpcRES* 	compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
 	//gpcRES* 	compiHARD( U1* pS, U1* pE, U1** ppE, gpcRES* pMOM );
-	gpcLAZY* 	res2mini( gpcLAZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep );
-	gpcRES* 	RESrun( gpcRES* pOUT, gpcLAZY* pLZY, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
+	gpcLZY* 	res2mini( gpcLZY* pLZY, U1* pBUFF, gpcRES* pMOM, U4 deep );
+	gpcRES* 	RESrun( gpcRES* pOUT, gpcLZY* pLZY, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep = 0, gpcSTK* pSM = NULL  );
 
-	gpcALU& ALU( U4 iA )
-	{
+	gpcALU& ALU( U4 iA ) {
 		alu = this;
 
 		if( iA >= nA )
@@ -850,8 +863,7 @@ public:
 		alu.nALL	= pnALL ? pnALL[iA]	: 0;
 		return alu;
 	}
-	gpcRES* chg( gpcALU& ali )
-	{
+	gpcRES* chg( gpcALU& ali ) {
 		if( !this )
 			return NULL;
 
@@ -865,7 +877,7 @@ public:
 				if( ali.pDAT )
 				{
 					ppDAT = new void*[nA];
-					gpmZn( ppDAT, nA );
+					gpmZnOF( ppDAT, nA );
 				}
 			}
 			else if( ppDAT[ali.iA] != ali.pDAT )
@@ -880,7 +892,7 @@ public:
 				if( ali.pRES )
 				{
 					ppR = new gpcRES*[nA];
-					gpmZn( ppR, nA );
+					gpmZnOF( ppR, nA );
 				}
 			}
 			else if( ppR[ali.iA] != ali.pRES )
@@ -946,7 +958,7 @@ public:
 		{
 			pOP = new I1x4[nA];
 			pOP->u4 = 0;
-			gpfMEMSET( pOP+1, nCPY, pOP, sizeof(*pOP) );
+			gpfMset( pOP+1, nCPY, pOP, sizeof(*pOP) );
 			if( pKILL )
 			{
 				memcpy( pOP, pKILL, nCPY*sizeof(*pOP) );
@@ -977,12 +989,8 @@ public:
 		return ALU( nCPY );
 	}
 
-	U4 nFND()
-	{
-		return this ? nA : 0;
-	}
-    U4 iFND( gpeALF alf )
-    {
+	U4 nFND() { return this ? nA : 0; }
+    U4 iFND( gpeALF alf ) {
 		if( !this )
 			return 0;
 

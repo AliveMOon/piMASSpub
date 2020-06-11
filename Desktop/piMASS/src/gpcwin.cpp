@@ -1,7 +1,8 @@
 //#include "gpcwin.h"
 #include "gpccrs.h"
 //#include "gpcSRC.h"
-extern U1 gpsKEYMAP[];
+#include <gpsKEYMAP.h>
+//extern const U1 gpsKEYMAP[];
 
 
 gpcWIN::~gpcWIN() {
@@ -189,7 +190,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	chrPIC.y = 32; //*4;
 	chrPIC.w = pSRFchar->w/chrPIC.x;
 	chrPIC.h = pSRFchar->h/chrPIC.y;
-	U1x4* pC = (U1x4*)(pSRFchar->pixels + 4*pSRFchar->pitch);
+	U1x4* pC = (U1x4*)((char*)pSRFchar->pixels + 4*pSRFchar->pitch);
 	for( U4 i = 0; i < 0x80; i++ )
 		pC[(i>>4)*pSRFchar->w + (i&0xf)] = 0x01010101*(gpsHUNtx[i]-' ');
 
@@ -216,9 +217,10 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 
 }
 
+#include <gpsGLSL.h>
 
-extern char gpsGLSLfrgREF[];
-extern char gpsGLSLfrgLINE[];
+//extern const char gpsGLSLfrgREF[];
+//extern const char gpsGLSLfrgLINE[];
 void gpcWIN::WINrun( const char* pWELLCOME )
 {
 	U4 scan, bug = 0, nBUG;
@@ -821,75 +823,75 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					case '\'': {
 							switch( aXY[1] ) {
 								case 'A':
-									pUTF8 = "\xc3\x81";
+									pUTF8 = (char*)"\xc3\x81";
 									break;
 								case 'a':
-									pUTF8 = "\xc3\xa1";
+									pUTF8 = (char*)"\xc3\xa1";
 									break;
 								case 'E':
-									pUTF8 = "\xc3\x89";
+									pUTF8 = (char*)"\xc3\x89";
 									break;
 								case 'e':
-									pUTF8 = "\xc3\xa9";
+									pUTF8 = (char*)"\xc3\xa9";
 									break;
 								case 'I':
-									pUTF8 = "\xc3\x8d";
+									pUTF8 = (char*)"\xc3\x8d";
 									break;
 								case 'i':
-									pUTF8 = "\xc3\xad";
+									pUTF8 = (char*)"\xc3\xad";
 									break;
 								case 'O':
-									pUTF8 = "\xc3\x93";
+									pUTF8 = (char*)"\xc3\x93";
 									break;
 								case 'o':
-									pUTF8 = "\xc3\xb3";
+									pUTF8 = (char*)"\xc3\xb3";
 									break;
 								case 'U':
-									pUTF8 = "\xc3\x9a";
+									pUTF8 = (char*)"\xc3\x9a";
 									break;
 								case 'u':
-									pUTF8 = "\xc3\xba";
+									pUTF8 = (char*)"\xc3\xba";
 									break;
 								default:
-									pUTF8 = "?";
+									pUTF8 = (char*)"?";
 							}
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
 						} break;
 					case '\"': {
 							switch( aXY[1] ) {
 								case 'O':
-									pUTF8 = "\xc5\x90";
+									pUTF8 = (char*)"\xc5\x90";
 									break;
 								case 'o':
-									pUTF8 = "\xc5\x91";
+									pUTF8 = (char*)"\xc5\x91";
 									break;
 								case 'U':
-									pUTF8 = "\xc5\xb0";
+									pUTF8 = (char*)"\xc5\xb0";
 									break;
 								case 'u':
-									pUTF8 = "\xc5\xb1";
+									pUTF8 = (char*)"\xc5\xb1";
 									break;
 								default:
-									pUTF8 = "?";
+									pUTF8 = (char*)"?";
 							}
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
 						}break;
 					case ':': {
 							switch( aXY[1] ) {
 								case 'O':
-									pUTF8 = "\xc3\x96";
+									pUTF8 = (char*)"\xc3\x96";
 									break;
 								case 'o':
-									pUTF8 = "\xc3\xb6";
+									pUTF8 = (char*)"\xc3\xb6";
 									break;
 								case 'U':
-									pUTF8 = "\xc3\x90";
+									pUTF8 = (char*)"\xc3\x90";
 									break;
 								case 'u':
-									pUTF8 = "\xc3\xbc";
+									pUTF8 = (char*)"\xc3\xbc";
 									break;
 								default:
-									pUTF8 = "?";
+									pUTF8 = (char*)"?";
 							}
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
 						} break;
@@ -899,10 +901,10 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							{
 								case 'C':
 								case 'c':
-										pUTF8 = "\u20AC";
+										pUTF8 = (char*)"\u20AC";
 										break;
 								default:
-									pUTF8 = "?";
+									pUTF8 = (char*)"?";
 							}
 							gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", pUTF8 );
 						} break;

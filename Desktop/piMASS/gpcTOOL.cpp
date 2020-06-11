@@ -504,7 +504,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 }
 U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
-				char* pPATH, char* pDIR, char* pEXP ) {
+				char* pPATH, char* pDIR, const char* pEXP ) {
 	if( this ? !pPET : true )
 		return NULL;
 

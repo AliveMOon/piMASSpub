@@ -247,6 +247,7 @@ public:
 	{
 		pSTR = gpfSTR( pSTR, pU );
 		bD.u4 = gpeTYP_STR;
+		return *this;
 	}
 
 	gpcREG& operator = ( U4 u4 )

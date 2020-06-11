@@ -112,7 +112,7 @@ public:
 		return gpeKIDstuff;
 	}
 	I1 sOP( char* pPUB );
-	I1 sDST( U1* pPUB, U4 iFND, char* pS0, char* pTAB  = "", char* pSTR = "" );
+	I1 sDST( U1* pPUB, U4 iFND, char* pS0, const char* pTAB  = "", const char* pSTR = "" );
 	gpcLZY* reset( gpcLZY* pCMPL, U1* pPUB )
 	{
 		pCMPL = cmpl_add( pCMPL, pPUB, strlen((char*)pPUB) );

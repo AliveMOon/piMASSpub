@@ -26,7 +26,7 @@ void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
 	{
-		U1	*pD000 = (U1*)strcasestr( (char*)pSTR, "d000" );
+		U1	*pD000 = (U1*)gpmSTRiSTR( (char*)pSTR, "d000" );
 		if( pD000 < pSTR )
 		{
 			// nincs D000

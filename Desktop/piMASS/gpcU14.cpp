@@ -1,5 +1,5 @@
 #include "gpcSRC.h"
-char* gppsTYP[] = {
+const char* gppsTYP[] = {
 	"U",
 	"*U",
 	"rU",

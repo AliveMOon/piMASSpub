@@ -517,7 +517,8 @@ public:
 
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
-	SDL_Texture		*pTX, *pRTX;
+	SDL_Texture		*pTX,*pTXlock,
+                                *pRTX;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
@@ -598,12 +599,64 @@ public:
 	bool unLOCK( void ) {
 		if( this ? (!pLOCK||!pTX) : true )
 			return false;
+		if( !pLOCK )
+			pTXlock = NULL;
+
+		pLOCK = NULL;
+
+        if( pTXlock != pTX )
+            return true;
+
+        SDL_UnlockTexture(pTXlock);
+		pTXlock = NULL;
+        return true;
+	}
+	U1x4* u1x4LOCK( SDL_Renderer* pRNDR, U4x2 wh, int& ptch ) {
+		if( !this )
+			return NULL;
+		if( pLOCK )
+			return pLOCK;
+
+		ptch = 0;
+
+		if( pTX )
+		{
+			int w = 0, h = 0, acc = 0;
+			U4 frm;
+			SDL_QueryTexture( pTX, &frm, &acc, &w, &h );
+			if(    SDL_PIXELFORMAT_RGBA8888  != frm
+				|| wh.x != w || wh.y != h
+				|| acc != SDL_TEXTUREACCESS_STREAMING )
+				gpmSDL_FreeTX(pTX);
+		}
+		if( !pTX )
+		{
+			pTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_RGBA8888,
+											SDL_TEXTUREACCESS_STREAMING,
+											wh.x, wh.y );
+			txWH.a4x2[1] = wh;
+		}
+
+
+		if( pTX ? SDL_LockTexture( pTX, NULL, (void**)&pLOCK, &ptch ) : true )
+		{
+			pLOCK = NULL;
+			return NULL;
+		}
+		if( pLOCK )
+            pTXlock = pTX;
+		ptch /= sizeof(*pLOCK);
+		return pLOCK;
+	}
+	bool unLOCK_o( void ) {
+		if( this ? (!pLOCK||!pTX) : true )
+			return false;
 
 		SDL_UnlockTexture(pTX);
 		pLOCK = NULL;
 		return true;
 	}
-	U1x4* u1x4LOCK( SDL_Renderer* pRNDR, U4x2 wh, int& ptch ) {
+	U1x4* u1x4LOCK_o( SDL_Renderer* pRNDR, U4x2 wh, int& ptch ) {
 		if( !this )
 			return NULL;
 		if( pLOCK )
@@ -674,7 +727,6 @@ public:
         int pitch;
         if( SDL_LockTexture( pTX, NULL, (void**)&pLOCK, &pitch ) )
             return pTX;
-
         if( pitch == pREF->pitch )
             memcpy( pLOCK, pREF->pixels, pitch*pREF->h );
         else {

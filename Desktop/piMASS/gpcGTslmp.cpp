@@ -120,7 +120,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
 	{
-		U1	*pD0 = (U1*)strcasestr( (char*)pSTR, "d000" );
+		U1	*pD0 = (U1*)gpmSTRiSTR( (char*)pSTR, "d000" );
 		if( pD0 < pSTR )
 		{
 			// nincs D000
@@ -583,7 +583,7 @@ void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
 	{
-		U1	*pD000 = (U1*)strcasestr( (char*)pSTR, "d000" );
+		U1	*pD000 = (U1*)gpmSTRiSTR( (char*)pSTR, "d000" );
 		if( pD000 < pSTR )
 		{
 			// nincs D000
@@ -836,7 +836,7 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 			pOUT = pOUT->lzyADD( gpaSLMPbin[1].aU1, sizeof(gpaSLMPbin[1]), s = -1 );
 			//pOUT = pOUT->lzyFRMT( s = -1, gpdSLMP_recv_LN4SL6N4, 0x18, 0, gpdSLMPnDEV );
 		}*/
-		if( (U1*)strcasestr( (char*)pSTR, "d000" ) == pSTR )
+		if( (U1*)gpmSTRiSTR( (char*)pSTR, "d000" ) == pSTR )
 		{
 			sGTent[0] = '\n';	// visza kapcsol ASCII-ba
 			return GTslmpDrcRob( mom, pWIN, pALL );

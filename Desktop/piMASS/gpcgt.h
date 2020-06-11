@@ -561,6 +561,27 @@ public:
 		struct {
 			U1 aU1[21];
 		};
+#ifdef _WIN64
+		//PACK(
+		__pragma(pack(push, 1))
+			struct {
+				U2 	SER;		// 2
+				U1	nNET,		// 3
+					sRNG;		// 4
+				U2 	nUio;		// 6
+				U1 	MlDrp;		// 7
+				U2 	nLEN,		// 9
+
+					tMON,		// 11	//  2
+					com,		// 13	//  4
+					subC;		// 15	//  6
+				U1 	iDev[3],	// 18	//  9
+					d0;			// 19	// 10
+				U2 	nDev;		// 21	// 12
+								// 21
+			}
+		__pragma(pack(pop)); //);
+#else
 		struct {
 			U2 	SER			__attribute__((packed));	// 2
 			U1	nNET 		__attribute__((packed)),	// 3
@@ -577,6 +598,7 @@ public:
 			U2 	nDev		__attribute__((packed));	// 21	// 12
 														// 21
 		}__attribute__((packed));
+#endif
 	};
 	gpcSLMP(){};
 	gpcSLMP( 	U2 _SER,
@@ -626,7 +648,7 @@ public:
 		return (i&0xffffff);
 	}
 
-} __attribute__((packed));
+};
 class gpcWIN;
 class gpcGT;
 
@@ -779,7 +801,9 @@ class gpcGT
 	public:
 		gpcGT_DWNL	*pDWN;
 		gpcHUD		*pHUD, isEVNT;
-
+		#ifdef _WIN64
+		MIB_IPADDRTABLE* p_IPTable;
+		#endif
 		hostent			*p_host_ips;
 		struct ifaddrs 	*pIFadr,
 						*pIFa;

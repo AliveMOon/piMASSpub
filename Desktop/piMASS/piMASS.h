@@ -21,7 +21,27 @@
 //~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //~ SOFTWARE.
-#include "mysys.h"
+
+//#include "mysys.h"
+#include <exception>
+#include <mysys.h>
+#include <errno.h>
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+#include <inttypes.h>
+
+#include <stdarg.h>
+
+#include <setjmp.h>
+#include <math.h>
+#include <thread>
+
 #ifdef _WIN64
 
 	#pragma once
@@ -29,6 +49,11 @@
 	#pragma warning( push )
 	#pragma warning( disable : 4995 )
 
+	#include <stdint.h>
+	#include <assert.h>
+
+
+	#include <string>
 	#include <stdlib.h>
 	#include <io.h>
 	#include <direct.h>
@@ -36,6 +61,12 @@
 	#include <memory.h>
 	#include <WinSock2.h>
 	#include <ws2tcpip.h>
+	#include "camU.h"
+	//#include <ipmib.h>
+	#include <iphlpapi.h>
+	#include <fcntl.h>
+
+
 	#define bzero( a, n ) ( (void*)memset( a, 0, n ) )
 	#define gpdMAX_PATH _MAX_PATH
 	//#define close( h ){ if( h != INVALID_SOCKET ){ closesocket( h ); h = INVALID_SOCKET; } }
@@ -51,11 +82,26 @@
 	#pragma comment (lib, "iphlpapi.lib")
 	#pragma comment (lib, "ws2_32.lib")
 	#define gpdU4x2nSTR 1
-	#define gpdCAMu gpcCAMx64
+	#define gpdCAMu gpcCAMubi // gpcCAMx64
+
+	extern "C" {
+		#include <jpeglib.h>
+	}
+
+	#define GLEW_STATIC
+	#include <GL/glew.h>
+
+	//#define GL_GLES_PROTOTYPES 0
+	//#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop))
+	#define gpdGT_LIST_tOUT 7
+	#define gpdTCP_tOUT		1000/50
+	#define gpmSTRiSTR strstr
 #else
 
 	//#include <opencv2/core/core.hpp>
 	//#include <opencv2/highgui/highgui.hpp>
+	#include <jpeglib.h>
+
 	#define GLEW_STATIC
     #include <GL/glew.h>
 	#ifdef gpdSYSpi
@@ -112,21 +158,33 @@
 	#define gpmFREE( p ) free( p )
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
-	#define gpmSDL_FreeSRF( h ){ if( h ){ SDL_FreeSurface( h ); h = NULL; } }
-	#define gpmSDL_FreeTX( h ){ if( h ){ SDL_DestroyTexture( h ); h = NULL; } }
 
 	#define gpdMAX_PATH PATH_MAX
 
-	#define gpdRPI_WIDTH	640	//960 	//1280 	//640	//1280	//320	//	Allowable widths: 320, 640, 1280
-	#define gpdRPI_HEIGHT	320	//480 	//960 	//480 // 960	//240	//	Allowable heights: 240, 480, 960
 	#define gpdEV_tOUT		7
 	#define gpdSDL_tOUT		7
-	#define gpdRPI_tOUT		1000/20
-	#define gpdJDOIT_tOUT	3
-	#define gpdSYNmSEC		333
-	#define gpdRECVn 		(0x30000/0x4) 	//0x4000*4	//	(0x30000/0x10)
-	#define gpdHUDn			(gpdRECVn/0x4)
+	#define gpdTCP_tOUT		1000/20
+	/*SOCKET inline gpfSOC_CLOSE(SOCKET& h)
+	{
+		if (h == INVALID_SOCKET)
+			return INVALID_SOCKET;
+
+		close(h);
+		h = INVALID_SOCKET;
+		return h;
+	}*/
+	#define gpmSTRiSTR strstr
 #endif
+#define gpdSYNmSEC		333
+#define gpdRECVn 		(0x30000/0x4) 	//0x4000*4	//	(0x30000/0x10)
+#define gpdHUDn			(gpdRECVn/0x4)
+#define gpdRPI_WIDTH	640	//960 	//1280 	//640	//1280	//320	//	Allowable widths: 320, 640, 1280
+#define gpdRPI_HEIGHT	320	//480 	//960 	//480 // 960	//240	//	Allowable heights: 240, 480, 960
+#define gpdJDOIT_tOUT	3
+
+#define gpdSDL_tOUT		5
+#define gpmSDL_FreeSRF( h ){ if( h ){ SDL_FreeSurface( h ); h = NULL; } }
+#define gpmSDL_FreeTX( h ){ if( h ){ SDL_DestroyTexture( h ); h = NULL; } }
 
 #define gpdBLT 	SDL_BlitSurface //SDL_BlitSurface	//SDL_LowerBlit
 #define gpdBLTs	SDL_BlitScaled 	//SDL_SoftStretch //SDL_BlitScaled	//SDL_LowerBlitScaled
@@ -141,30 +199,13 @@
 #define gpsMINI_ISO "mini_ISO_32x32_1024x1536.png"
 
 
-#include <exception>
-#include <mysys.h>
-#include <errno.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <vector>
 
-#include <inttypes.h>
-
-#include <stdarg.h>
-
-#include "jpeglib.h"
-#include <setjmp.h>
 
 #include <SDL.h>			//-lSDL2
 #include <SDL_image.h>
 #include <SDL_opengl.h>
 #include <SDL_opengles2.h>
-#include <math.h>
-#include <thread>
+
 
 // Include GLFW
 //#include <glfw3.h>
@@ -175,22 +216,7 @@
 
 //using namespace std;
 
-#define NULL nullptr
-
-typedef unsigned char	U1;
-typedef volatile U1		vU1;
-typedef unsigned short	U2;
-typedef uint32_t		U4;	//unsigned int	U4;
-typedef uint64_t		U8;
-
-//typedef float		float;
-typedef double		F8;
-
-typedef signed char		I1;
-typedef signed short	I2;
-typedef int				I4;
-typedef int64_t			I8;
-typedef I8				LL;
+#include <UIF1248etc.h>
 
 enum gpeLX:U8
 {
@@ -1237,7 +1263,7 @@ public:
 		for( U4 d = 0, s = 0; d < dw; d += dsx, s += ssx )
 				p_d[d] = p_s[s];
 
-
+		return this;
 
 	}
 	U1x4 xyz0() const
@@ -2114,10 +2140,12 @@ public:
     U4x4& operator = ( U4 b )
     {
         x = y = z = w = b;
+		return *this;
     }
     U4x4& operator = ( I4 b )
     {
         x = y = z = w = abs(b);
+		return *this;
     }
     U4x4& operator = ( const U4x2& b )
     {
@@ -6313,7 +6341,7 @@ public:
 		return lzyADD( plus.p_alloc, plus.n_load, s );
 	}
 
-	gpcLZY* lzyRD( char* p_file, U8& iSTRT, U1 n = 0 ) {
+	gpcLZY* lzyRD( const char* p_file, U8& iSTRT, U1 n = 0 ) {
 		/// READ FILE
 		if( !p_file )
 			return this;

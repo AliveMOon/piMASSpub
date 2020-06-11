@@ -24,77 +24,7 @@
 #include "gpcSRC.h"
 #include "gpccrs.h"
 
-U1 gpsKEYMAP[] =
-/*
- 0123456789abcdef*/
-"0000            "		"0123abcdefghijkl"
-"                "		"mnopqrstuvwxzy12"
-"       ://// :'\""		"3456789onebt uoo"
-"'\"3''    3ffffff"		"uu2ea0,.-9123456"
-"ffffff444444/44_"		"789abc6789abdder"
-"___     /       "		"lduN/*-+n1234567"
-"    '66666666666"		"890.i56789abcdef"
-"7777777777777777"		"0123456789abcdef"
-"8888888888888888"		"0123456789abcdef"
-"9999999999999999"		"0123456789abcdef"
-"aaaaaaaaaaaaaaaa"		"0123456789abcdef"
-"bbbbbbbbbbbbbbbb"		"0123456789abcdef"
-"cccccccccccccccc"		"0123456789abcdef"
-"dddddddddddddddd"		"0123456789abcdef"
-"xxxxxxxxeeeeeeee"		"0123456789abcdef"
-"ffffffffffffffff"		"0123456789abcdef"
-// shift
-"0000            "		"0123ABCDEFGHIJKL"
-"                "		"MNOPQRSTUVWXZY'\""
-"       ://// :'\""		"+!%/=()ONEBT UOO" // \n
-"'\"3''    3FFFFFF"		"UU2EA0?:_9123456"
-"FFFFFF444444/44_"		"789abc6789ABDDER"
-"___     /       "		"LDUN/*-+n1234567"
-"    '66666666666"		"890,I56789abcdef"
-"7777777777777777"		"0123456789ABCDEF"
-"8888888888888888"		"0123456789ABCDEF"
-"9999999999999999"		"0123456789ABCDEF"
-"AAAAAAAAAAAAAAAA"		"0123456789ABCDEF"
-"BBBBBBBBBBBBBBBB"		"0123456789ABCDEF"
-"CCCCCCCCCCCCCCCC"		"0123456789ABCDEF"
-"DDDDDDDDDDDDDDDD"		"0123456789ABCDEF"
-"xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
-"FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
-// alt
-"0000            "		"0123A{&DE[]HIJKL"
-"        =       "		"M}OP\\RSTC@|# >~?"
-" 2222222/222 222"		"^1234567N9AB DEF"
-"333 33 3 3333333"		"012$45;7*9123456"
-"FFFFFF444444/44_"		"789abc6789ABDDER"
-"___5555555555555"		"LDU3456789ABCDEF"
-"6666 66666666666"		"0123<56789ABCDEF"
-"7777777777777777"		"0123456789ABCDEF"
-"8888888888888888"		"0123456789ABCDEF"
-"9999999999999999"		"0123456789ABCDEF"
-"AAAAAAAAAAAAAAAA"		"0123456789ABCDEF"
-"BBBBBBBBBBBBBBBB"		"0123456789ABCDEF"
-"CCCCCCCCCCCCCCCC"		"0123456789ABCDEF"
-"DDDDDDDDDDDDDDDD"		"0123456789ABCDEF"
-"xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
-"FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
-// shift+alt
-"0000            "		"0123ABCDEFGHIJKL"
-"              11"		"MNOPQRSTUVWXZYEF"
-"22222222 222 222"		"01234567\n9AB DEF"
-"3333333333333333"		"0123456789123456"
-"FFFFFF444444/44_"		"789abc6789ABDDER"
-"___5555555555555"		"LDU3456789ABCDEF"
-"6666666666666666"		"0123456789ABCDEF"
-"7777777777777777"		"0123456789ABCDEF"
-"8888888888888888"		"0123456789ABCDEF"
-"9999999999999999"		"0123456789ABCDEF"
-"AAAAAAAAAAAAAAAA"		"0123456789ABCDEF"
-"BBBBBBBBBBBBBBBB"		"0123456789ABCDEF"
-"CCCCCCCCCCCCCCCC"		"0123456789ABCDEF"
-"DDDDDDDDDDDDDDDD"		"0123456789ABCDEF"
-"xxxxxxxxEEEEEEEE"		"0123456789ABCDEF"
-"FFFFFFFFFFFFFFFF"		"0123456789ABCDEF"
-;
+#include <gpsKEYMAP.h>
 
 
 
@@ -227,7 +157,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		iB = pSRC->iB();
 		pLFT = pA;
 		pRIG = pA+pSRC->nL;
-        pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+        pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 
         if( bALT )
         {
@@ -247,7 +177,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 					pLFT = pANo + nADR;
 					pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
 
-					pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+					pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 					if( !pANo )
 						break;
 				}
@@ -351,7 +281,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		iB = pSRC->iB();
 		pLFT = pA;
 		pRIG = pA+pSRC->nL;
-        pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+        pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 
 		if( !pANo )
 		{
@@ -368,7 +298,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 			pLFT = pANo + nADR;
 			pLFT += gpmNINCS( pLFT, " \t" ); // ne gyarapodjon a cím utáni " \t"
 
-			pANo = (U1*)strcasestr( (char*)pLFT, (char*)gpsSVadr );
+			pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 			if( !pANo )
 				break;
         }
@@ -420,9 +350,7 @@ gpcMASS& gpcMASS::null()
 
 gpcMASS& gpcMASS::operator = ( const gpcMASS& b )
 {
-	null();
-
-
+	return null();
 }
 gpcMASS::gpcMASS( const U1* pU, U8 nU )
 {
@@ -636,9 +564,8 @@ void gpfMAINchk()
 
 }
 #ifdef _WIN64
-//int WINAPI WinMain( int nA, char *apA[] )
-//int Main(int nA, char **apA )
-int main(int nA, char** apA )
+INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR apA, INT nA)
+//int main(int nA, char** apA )
 #else
 int main( int nA, char *apA[] )
 #endif
@@ -648,7 +575,7 @@ int main( int nA, char *apA[] )
 
 	if( nA > 0 )
 	{
-		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, apA[0] );
+		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, (char*)apA[0] );
 
 		std::cout << "Start in:" << gpsEXEpath <<std::endl;;
 		std::cout << "Exe is:" << gpsEXEname <<std::endl;;
@@ -680,20 +607,25 @@ int main( int nA, char *apA[] )
 		for( int i = 1; i < nA; i++ )
 		{
 			std::cout << apA[i] <<std::endl;;
-			if( strcasestr( apA[i], ".mass" ) )
+			if( gpmSTRiSTR( (char*)apA[i], ".mass" ) )
 			{
-				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, apA[i] );
+				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, (char*)apA[i] );
 
 				std::cout << "MASS is:" << gpsMASSname <<std::endl;;
 				continue;
 			}
 		}
-		if( gppMASSfile == gpsMASSpath )
+		if (gppMASSfile == gpsMASSpath)
 		{
-			struct passwd *pw = getpwuid(getuid());
-			const char *pHOME = pw->pw_dir;
-			gppMASSfile = gpsMASSpath + sprintf( gpsMASSpath, "./" ); //, pHOME );
+			#ifdef _WIN64
+				std::cout << "\033[1;31m Meg kell szerezni a user HOME könjyvtárát?" << std::endl;
+			#else
+				
+						struct passwd *pw = getpwuid(getuid());
+						const char *pHOME = pw->pw_dir;
+						gppMASSfile = gpsMASSpath + sprintf( gpsMASSpath, "./" ); //, pHOME );
 
+			#endif
 		}
 		if( !*gpsMASSname )
 			strcpy( gpsMASSname, "pi.mass" );
@@ -708,7 +640,7 @@ int main( int nA, char *apA[] )
 
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 		if( piMASS )
-		if( char* pUND = strcasestr( gpsMASSname, ".undo0x" ) )
+		if( char* pUND = gpmSTRiSTR( gpsMASSname, ".undo0x" ) )
 		{
 			*pUND = 0;
 		}
@@ -738,39 +670,7 @@ int main( int nA, char *apA[] )
 						"                                        "
 						"READY                                   " );
 
-/*
-        //SDL_Event ev;
-        U1 c = 0;
-        U1* pKEY; // = (U1*)SDL_GetKeyboardState(NULL);
-        U4 aKT[0x200], scan, bug = 0, nBUG;
-        gpmZ(aKT);
-        U1 aXY[] = "00";
 
-        I4 nMOV, nMAG = 0, nMB = 0, nMBB = 0, nF = 0;
-        gppKEYbuff = (
-						gppMOUSEbuff +  sprintf( (char*)gppMOUSEbuff,
-																	"                                        "
-																	"     **** GRANDPACE piMASS V0.1 ****    "
-																	"                                        "
-																	" 1GB RAM SYSTEM  38911 piMASS BYTE FREE "
-																	"                                        "
-																	"READY                                   "
-																	//"_"
-												)
-					);
-		//----------------------------------------------------
-        //
-        //						MAIN WHILE
-        //
-        //		ha gppKEYbuff == NULL akkor zártuk be a programot
-        //
-        //----------------------------------------------------
-        bool bSHIFT, bCTRL, bALT, abALT[2];
-        U4x4 mSEC = 0;
-        */
-
-
-		/// END
         return 0;
     }
     catch ( const InitError & err )
