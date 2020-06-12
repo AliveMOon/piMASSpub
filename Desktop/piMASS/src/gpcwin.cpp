@@ -420,9 +420,10 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				if( pS < gppKEYbuff )
 					crs.CRSins( *piMASS, gppKEYbuff, pS );
 
-				crs.miniRDY( *this, *piMASS, pPIC, pSDLrndr, bSHIFT );
+				crs.miniRDY( *this, *piMASS, pPIC, pSDLrndr, bSHIFT, bMOV );
 				if( bMOV )
 				{
+
 					/*I4x4 &crsOFF = crs.crsOFF;
 					if( crsOFF.a4x2[1] != crsOFF.a4x2[0] )
 					{

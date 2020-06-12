@@ -36,7 +36,7 @@ class gpcCRS
 				fxyz, aCRSonPG[4]; //, edANIN[2];
 		gpcSRC	*apSRC[2];
 
-		U1x4	*pMINI, *pLOCK, *pMNoff; //, *pCRS;
+		U1x4	*pMINI, *pLOCK, *pMNoff, *pMNoffFRM; //, *pCRS;
 
 		U4x2 iSTR;
 		U4 	//divOFF,
@@ -129,7 +129,7 @@ class gpcCRS
 							U4* &psCp,	U4* &psRp,	U4& z,
 							U4x4& mZN, bool bSHFT
 						);
-		void	miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT );
+		void	miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT, bool bMOV = false );
 
 
 		bool	miniOFF( gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );

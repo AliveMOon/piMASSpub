@@ -188,7 +188,7 @@ U1 gpcSRC::SRCmnMILLscn(
 		if( (crs.iSTR.y < i) && (crs.iSTR.y > j) )
 			continue;
 		bSTR = (tSTR==pM0[m].rMNinxt.w);
-		for( ; i < j; i++ )
+		for( ; i <= j; i++ )
 		{
 			bONpre = bON;
 			if(i==crs.iSTR.x)
@@ -203,6 +203,7 @@ U1 gpcSRC::SRCmnMILLscn(
 			{
 				if( bONpre != bON )
 				{
+					// most lett BE kapcsolva
 					crs.aCRSonPG[0].a4x2[0] = Cxy;
 					oo |= 1;
 				}
@@ -212,11 +213,14 @@ U1 gpcSRC::SRCmnMILLscn(
 					bON = !((b01&1)&&(i>=crs.iSTR.y));
 				if( !bON )
 				{
+					// most lett KI kapcsolba
 					crs.aCRSonPG[1].a4x2[0] = Cxy;
 					oo |= 2;
 					return oo;
 				}
 			}
+			if( i >= j )
+				break;
 
 			bONorSTR = bON||bSTR;
 			if( cC&0x80 )
@@ -280,9 +284,8 @@ U1 gpcSRC::SRCmnMILLscn(
 					cxy.x++;
 					break;
 			}
-
-
 		}
+
 	}
 	return false;
 }
