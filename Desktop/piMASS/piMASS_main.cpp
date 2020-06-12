@@ -480,6 +480,7 @@ U4STR aSIZEOF[] = {
 	{ sizeof(gpcSLMP),  "gpcSLMP" },
 	{ sizeof(gpcDrc),  "gpcDrc" },
 	{ sizeof(gpcZS),  "gpcZS" },
+	{ sizeof(gpcROB),  "gpcROB" },
 	{ sizeof(gpcZSnD),  "gpcZSnD" },
 	{ sizeof(gpcLZY),  "gpcLZY" },
 };
@@ -533,9 +534,9 @@ void gpfMAINchk()
 	}
 	std::cout << 	"\033[1;31m Megvan már?"
 					"\033[1;34m \r\n1. A mini ha szerkesztve van _# ket is rajzolja"
-					"\033[1;31m \r\nés ne használja az extra karaktereket!"
+					"\033[1;34m \r\nés ne használja az extra karaktereket!"
+					"\033[1;34m \r\n3. rosszul azonosítja hol van a pointer"
 					"\033[1;31m \r\n2. F5 CPY F6 MOVE stb???"
-					"\033[1;32m \r\n3. rosszul azonosítja hol van a pointer"
 					"\033[0m" << std::endl;
 
 //	char* pSTR = NULL;
@@ -620,7 +621,7 @@ int main( int nA, char *apA[] )
 			#ifdef _WIN64
 				std::cout << "\033[1;31m Meg kell szerezni a user HOME könjyvtárát?" << std::endl;
 			#else
-				
+
 						struct passwd *pw = getpwuid(getuid());
 						const char *pHOME = pw->pw_dir;
 						gppMASSfile = gpsMASSpath + sprintf( gpsMASSpath, "./" ); //, pHOME );

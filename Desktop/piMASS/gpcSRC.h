@@ -2,7 +2,7 @@
 #define GPCSRC_H
 //~ MIT License
 //
-//~ Copyright (c) 2019 AliveMOon
+//~ Copyright (c) 2020 AliveMOon
 //
 //~ Permission is hereby granted, free of charge, to any person obtaining a copy
 //~ of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 //~ SOFTWARE.
 #include "gpcgt.h"
 #include "gpcOPCD.h"
+#include "gpeTYP.h"
 
 class gpcRES;
 class gpcCRS;
@@ -683,8 +684,8 @@ public:
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		U1x4 typ(0x10,1,1,0);
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, typ.typ().u4 );
+		//U1x4 typ(0x10,1,1,0);
+		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -701,8 +702,8 @@ public:
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		U1x4 typ(0x10,1,1,0);
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, typ.typ().u4 );
+		//U1x4 typ(0x10,1,1,0);
+		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -724,8 +725,7 @@ public:
     gpeALF	*pALFtg;
     gpcRES	*pEXE,
 			*apOUT[4];
-	gpcLZY	//*pBIG,
-			*pMINI;
+	gpcLZY	*pMINI;
 
 	gpcMAP	*pMAP;
 

@@ -35,33 +35,9 @@ class gpcWIN;
 #include "gpcSCHL.h"
 #include "gpcOPCD.h"
 
-enum gpeTYP:U4
-{
-	// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-	// yz dimxy
-	// w size
-	gpeTYP_STR 	= MAKE_ID( 0x10, 1, 1, 1 ),
-	gpeTYP_U1 	= MAKE_ID( 0x00, 1, 1, 1 ),
-	gpeTYP_U4 	= MAKE_ID( 0x02, 1, 1, 4 ),
-	gpeTYP_I4 	= MAKE_ID( 0x82, 1, 1, 4 ),
-	gpeTYP_F  	= MAKE_ID( 0xc2, 1, 1, 4 ),
-	gpeTYP_U8 	= MAKE_ID( 0x03, 1, 1, 8 ),
-	gpeTYP_I8 	= MAKE_ID( 0x83, 1, 1, 8 ),
-	gpeTYP_D  	= MAKE_ID( 0xc3, 1, 1, 8 ),
+#include "gpeTYP.h"
 
-	gpeTYP_A	= MAKE_ID( 0x93, 1, 1, 8 ),
-	gpeTYP_AN 	= MAKE_ID( 0x93, 2, 1, 16 ),
-
-
-	gpeTYP_U14 	= MAKE_ID( 0x00, 4, 1, 0 ),
-	gpeTYP_U44 	= MAKE_ID( 0x02, 4, 1, 0 ),
-	gpeTYP_I44 	= MAKE_ID( 0x82, 4, 1, 0 ),
-
-	gpeTYP_STRmsk = ~gpeTYP_STR, //MAKE_ID( 0xef, 0xff, 0xff, 0xff ),
-};
-
-class gpcISA
-{
+class gpcISA {
 public:
 	I1x4	isa;			// 0	4		// x:gpeISA y:step
 	U2		i, n, ix, iy;	// 4	2x4 8	//
@@ -167,8 +143,7 @@ public:
 	}
 };
 
-class gpcADR
-{
+class gpcADR {
 public:
 	gpcRES*	pRM;
 	I4		dp, iA, nA;
@@ -201,8 +176,7 @@ public:
 
 
 };
-class gpcREG
-{					// 	pi	x64
+class gpcREG {					// 	pi	x64
 	U8		u;		// 	8	8
 	I8		i;		// 	8	8
 	double	d;		// 	8	8
@@ -357,8 +331,7 @@ public:
 
 };
 
-class gpcALU
-{
+class gpcALU {
 	U1x4	type;	// typ:
 					/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 					/// yz[ dimXY ] 	, nBYTE = 1<<(x&0xf)
@@ -647,8 +620,7 @@ public:
 };
 
 
-class gpfFLG
-{
+class gpfFLG {
 public:
 	U4	iT = 0,	// trg	TRG
 		iA = 0,	// an	AN
@@ -661,8 +633,7 @@ public:
 
 
 };
-class gpcSTK
-{
+class gpcSTK {
 public:
 
 	gpcSTK* pMOM;
@@ -708,8 +679,7 @@ public:
 	}
 };
 
-class gpcRES
-{
+class gpcRES {
 	gpeALF	*pALF;
 	I1x4	*pOP;	// x add/sub // y mul/div // z[7rem:mod 6not:! 5or:| 4and:& ]  //w ?
 					// w size
@@ -720,8 +690,7 @@ class gpcRES
 	//U8x4	*pTREE;
 
 
-	U4		// *pTx,
-			*pnALL,
+	U4		*pnALL,
 			nA, t,
 			i, ig,
 			iLEV, nASG;
