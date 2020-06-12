@@ -153,7 +153,6 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN ) {
 		pUi += nO;
 	}
 	dim.a4x2[0]+=1;
-	//dim.z = gpfUTFlen( pUTF, pUe, dim.x, dim.y );
 	return dim;
 }
 

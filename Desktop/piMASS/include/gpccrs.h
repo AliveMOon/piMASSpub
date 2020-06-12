@@ -36,10 +36,12 @@ class gpcCRS
 				fxyz, crsOFF; //, edANIN[2];
 		gpcSRC	*apSRC[2];
 
-		U1x4	*pMINI, *pLOCK; //, *pCRS;
+		U1x4	*pMINI, *pLOCK, *pMNoff; //, *pCRS;
 
 		U4x2 iSTR;
-		U4 	nMINI, //aiSTR[2],
+		U4 	//divOFF,
+			divOFFfrm,
+			nMINI, //aiSTR[2],
 			nCp, nRp;
 		U4	*pCp, *pRp;
 
@@ -120,6 +122,13 @@ class gpcCRS
 		}
 
 		bool	miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 wh );
+		bool 	miniRDYesc( gpcWIN& win, gpcPIC* pPIC );
+		U4		miniRDYmap(
+							gpcWIN& win, I4x4& lurdAN,
+							U4* &pM,	U4* &pC,	U4* &pR,
+							U4* &psCp,	U4* &psRp,	U4& z,
+							U4x4& mZN, bool bSHFT
+						);
 		void	miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT );
 
 
