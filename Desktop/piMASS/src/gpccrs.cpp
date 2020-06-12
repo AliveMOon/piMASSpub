@@ -1883,8 +1883,7 @@ void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gp
 		return;
 	}
 	I4x4 miniALL = 0;
-	if( gpcMAP* pMAP = &mass.mapCR )
-	{
+	if( gpcMAP* pMAP = &mass.mapCR ) {
 		// nem a 0 cella a vezér hanem az 1-es
 		//if( lurd.a4x2[1].x > ie )
 
@@ -1964,116 +1963,6 @@ void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gp
 
 		if( pB < pE )
 			CRSins( mass, pE, pB );
-
-		/*if( lurdAN.x )
-		if( pB < pE )
-		if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
-		{
-			//gpmMcpyOF( edANIN, selANIN, 2 );
-			if( pSRC )
-			{
-				if( max( iSTR.y, iSTR.x ) > pSRC->nL )
-					iSTR.y = iSTR.x = pSRC->nL;
-
-				I4	nSTRT = pSRC->pSRCstart(true)-pSRC->pSRCalloc(true);
-
-				if( iSTR.x < nSTRT )
-					iSTR.x = nSTRT;
-				if( !bED )
-				{
-					iSTR.y = pSRC->nL;
-				}
-				else if( iSTR.y < iSTR.x )
-					iSTR.y = iSTR.x;
-
-				I4	nSUB = iSTR.y - iSTR.x,
-					nSTR = pE-pB,
-					nOL = pSRC->nL,
-					nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
-
-				// több karakter írunk át
-				U1	*pOA	= pSRC->nA ? pSRC->pA : NULL,
-					*pRIG	= pOA + iSTR.y,
-					*pRIGe	= pOA + nOL,
-					*pLFT	= (pSRC->pA = new U1[nNEW]) + iSTR.x;
-
-				gpmMcpyOF( pSRC->pA, pOA, iSTR.x );
-
-				for( ; pB < pE; pB++ )
-				{
-					switch( *pB )
-					{
-						case '\b':
-							if( pLFT > pSRC->pA )
-							{
-								pLFT--;
-								if( pLFT[0] == '\n' )
-								if( pLFT >= pSRC->pA )
-								if( pLFT[-1] == '\r' )
-								{
-									pLFT--;
-									continue;
-								}
-							}
-							continue;
-						case 0x7e:
-							continue;
-						case 0x7f:
-							pB++;
-							if( pB < pE )	// ha még van a bufferban abbol deletézünk
-								continue;
-
-							if( pRIG < pRIGe )
-								pRIG++;	// ha nincsen akkor a jobb oldalbol
-							continue;
-					}
-
-					*pLFT = *pB;
-					pLFT++;
-
-				}
-				iSTR.y = iSTR.x = pLFT-pSRC->pA;
-				if( pRIG < pRIGe )
-				{
-					gpmMcpyOF( pLFT, pRIG, pRIGe-pRIG );
-					pLFT += pRIGe-pRIG;
-				}
-				pSRC->nL = pLFT-pSRC->pA;
-				pSRC->nA = nNEW;
-				pSRC->srcUPDT();
-				*pLFT = 0;
-
-				gpmDELary(pOA);
-				pSRC->hd(mass);
-
-				for( I4x2 s = lurdAN.a4x2[0]; s.y <= lurdAN.w; s.y++ )
-				{
-					for( s.x = lurdAN.x; s.x <= lurdAN.z; s.x++ )
-					{
-						U4	i = (s * I4x2( 1, mass.mapCR.mapZN44.z ))-1,
-							x_fnd = mass.mapCR.pMAP[i];
-						pS2 = x_fnd ? mass.SRCfnd( x_fnd ) : NULL;
-						if( pS2 == pSRC )
-							continue;
-						if( !pS2 )
-						{
-							pS2 = mass.SRCnew( tmp, NULL, s, -1 );
-							if( !pS2 )
-								continue;
-						}
-
-						U1* pSS;
-						U4x4 mCR44 = s;
-
-
-						//pS2->reset( pSRC->pA, pSRC->pA+pSRC->nL, &pSS, mCR44, 0 );
-						pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->nL );
-						pS2->srcUPDT();
-					}
-				}
-
-			}
-		}*/
 
 		for( U4 r = 0; r < pMAP->mapZN44.y; miniALL.y += pR[r], r++ )
 		{

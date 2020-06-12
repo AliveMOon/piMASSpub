@@ -165,7 +165,7 @@ U1 gpcSRC::SRCmnMILLscn(
 		return 0;
 
 	I4	i, j, n, sub = 0;
-	I4x2	cxy = 0, Cxy; //trafo(1,zz);
+	I4x2	cxy = 0, Cxy;
 	U1	oo = 0, cC = 0, NX, preC,
 		*pALL	= pSRCalloc( bNoMini ),
 		*pSTRT	= pSRCstart( bNoMini ),
@@ -173,11 +173,12 @@ U1 gpcSRC::SRCmnMILLscn(
 				  | ((U1)(this==crs.apSRC[1]));
 
 	bool	bON = false,
-			bONpre, bSEL = false, bSTR=false,
+			bONpre, bSEL = false,
+			bSTR=false,
 			bONorSTR = false,
 			bMN = pMINI ? pMINI->p_alloc == pALL : false;
 	I8x4	*pM0 = (I8x4*)SCOOP.mini.p_alloc;
-
+	U4 tSTR = U1x4(0x10,1,1).typ().u4;
 	for( U4 nM = SCOOP.nMN(), m = 0; m < nM; m++ )
 	{
 		cxy = pM0[m].rMNpos;
@@ -186,7 +187,7 @@ U1 gpcSRC::SRCmnMILLscn(
 
 		if( (crs.iSTR.y < i) && (crs.iSTR.y > j) )
 			continue;
-
+		bSTR = (tSTR==pM0[m].rMNinxt.w);
 		for( ; i < j; i++ )
 		{
 			bONpre = bON;
@@ -217,6 +218,7 @@ U1 gpcSRC::SRCmnMILLscn(
 				}
 			}
 
+			bONorSTR = bON||bSTR;
 			if( cC&0x80 )
 			{
 				if( cC&0x40 )

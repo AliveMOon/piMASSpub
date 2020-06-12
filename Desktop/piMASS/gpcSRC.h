@@ -898,23 +898,17 @@ public:
 
 		U1* pC = pSRCstart( bNoMini );
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
-
 		return dim;
 	}
-	U4x4 SRCmill( bool bNoMini, const char* pVAN = NULL );
-	U1 SRCmnMILLscn(
-					//I4x2 xy, //I4x2 fWH,
-					//I4 fz, I4 zz,
-					gpcCRS& crs,
-					bool bNoMini
-				);
-	I4x2 SRCmnMILL(
-					U1x4* pO,
-					I4x2 xy, I4x2 fWH,
-					I4 fz, I4 zz,
-					gpcCRS& crs,
-					bool bNoMini
-				);
+	U4x4	SRCmill( bool bNoMini, const char* pVAN = NULL );
+	U1		SRCmnMILLscn( gpcCRS& crs, bool bNoMini );
+	I4x2	SRCmnMILL(
+						U1x4* pO,
+						I4x2 xy, I4x2 fWH,
+						I4 fz, I4 zz,
+						gpcCRS& crs,
+						bool bNoMini = false
+					);
     bool bSUB( gpcMASS& mass ) {
 		if( !this )
 			return false;
