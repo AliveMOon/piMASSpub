@@ -49,9 +49,9 @@ bool gpcCRS::miniRDYesc( gpcWIN& win, gpcPIC* pPIC )
 		return true;
 	}
 
-	divOFFfrm 	= pPIC->txWH.a4x2[1].area()/2;
-	U4 divOFF	= (div.x ? fxyz.z/2: 0)
-				+ (div.y ? divOFFfrm/2:0); //pPIC->txWH.a4x2[1].area()/4
+	U4	divOFFfrm	= pPIC->txWH.a4x2[1].area()/2,
+		divOFF	 	= (div.x ? fxyz.z/2: 0)
+					+ (div.y ? divOFFfrm/2:0); //pPIC->txWH.a4x2[1].area()/4
 	pMNoff = pMINI+divOFF;
 	pMNoffFRM = pMNoff+divOFFfrm;
 	for( U4 h = 0; h < CRSfrm.w; h++ )
@@ -174,7 +174,6 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	I4x2& CR = aCRSonPG[1].a4x2[1];
 	aCRSonPG[3].a4x2[0] = 	aCRSonPG[1].a4x2[0]
 							+I4x2(psCp[CR.x],psRp[CR.y]);
-	//aCRSonPG[0].a4x2[1] = I4x2(c,r);
 	if( bMOV )
 	if( aCRSonPG[3].a4x2[1] != aCRSonPG[3].a4x2[0] )
 	{
@@ -283,8 +282,10 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 						continue;
 
 					// de rajta a pointer
-					pMNoff[divOFFfrm].pos( xyCR.a4x2[0], fxyz )->frmBRDR( xyCR.a4x2[1], gpeCLR_white, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
-					pMNoff[divOFFfrm].pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
+					pMNoffFRM	->pos( xyCR.a4x2[0], fxyz )
+								->frmBRDR( xyCR.a4x2[1], gpeCLR_white, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
+					pMNoffFRM	->pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )
+								->print( onAN.pSTRalf4n(sSTR), gpeCLR_white );
 					continue;
 				}
 				continue;

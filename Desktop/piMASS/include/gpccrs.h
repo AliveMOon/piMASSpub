@@ -40,7 +40,7 @@ class gpcCRS
 
 		U4x2 iSTR;
 		U4 	//divOFF,
-			divOFFfrm,
+			//divOFFfrm,
 			nMINI, //aiSTR[2],
 			nCp, nRp;
 		U4	*pCp, *pRp;
