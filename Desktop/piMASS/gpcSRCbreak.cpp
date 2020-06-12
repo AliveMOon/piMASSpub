@@ -156,20 +156,17 @@ U4x4 gpcSRC::SRCmill( bool bNoMini, const char* pVAN ) {
 	return dim;
 }
 
-bool gpcSRC::SRCmnMILLscn(
-							I4x2 xy, I4x2 fWH,
-
-							I4 fz, I4 zz,
-
+U1 gpcSRC::SRCmnMILLscn(
+							//I4x2 xy,
 							gpcCRS& crs,
 							bool bNoMini
 						) {
 	if( !this )
-		return false;
+		return 0;
 
-	I4 cr, i, j, n, sub = 0;
-	I4x2	cxy = xy, Cxy, trafo(1,zz);
-	U1	cC = 0, NX, preC,
+	I4	i, j, n, sub = 0;
+	I4x2	cxy = 0, Cxy; //trafo(1,zz);
+	U1	oo = 0, cC = 0, NX, preC,
 		*pALL	= pSRCalloc( bNoMini ),
 		*pSTRT	= pSRCstart( bNoMini ),
 		b01		=  (((U1)(this==crs.apSRC[0]))<<1)
@@ -183,7 +180,7 @@ bool gpcSRC::SRCmnMILLscn(
 
 	for( U4 nM = SCOOP.nMN(), m = 0; m < nM; m++ )
 	{
-		cxy = xy+pM0[m].rMNpos;
+		cxy = pM0[m].rMNpos;
 		i = pM0[m].rMNinxt.x;
 		j = pM0[m].rMNinxt.y+i;
 
@@ -195,6 +192,7 @@ bool gpcSRC::SRCmnMILLscn(
 			bONpre = bON;
 			if(i==crs.iSTR.x)
 				bON = (b01==3);
+
 			preC = cC-' ';
 			cC = pALL[i];
 			Cxy = cxy;
@@ -202,14 +200,20 @@ bool gpcSRC::SRCmnMILLscn(
 
 			if( bON )
 			{
+				if( bONpre != bON )
+				{
+					crs.aCRSonPG[0].a4x2[0] = Cxy;
+					oo |= 1;
+				}
 				if( crs.iSTR.y==crs.iSTR.x)
 					bON = !((b01&1)&&(i>crs.iSTR.y));
 				else
 					bON = !((b01&1)&&(i>=crs.iSTR.y));
 				if( !bON )
 				{
-					crs.crsOFF.a4x2[0] = Cxy;
-					return true;
+					crs.aCRSonPG[1].a4x2[0] = Cxy;
+					oo |= 2;
+					return oo;
 				}
 			}
 
@@ -224,28 +228,28 @@ bool gpcSRC::SRCmnMILLscn(
 			{
 				case '\r':
 					sub = 0;
-					cxy.x = xy.x;
+					cxy.x = 0;
 					if(!bON)
 						continue;
 					cC = 'r';
 					break;
 				case '\n':
 					sub = 0;
-					cxy.x = xy.x;
+					cxy.x = 0;
 					cxy.y++;
 					if(!bON)
 						continue;
 					cC = 'n';
 					break;
 				case '\a':
-					cxy.x = xy.x;
+					cxy.x = 0;
 					cxy.y++;
 					if(!bON)
 						continue;
 					cC = '.';
 					break;
 				case '\t':
-					cxy.x = xy.x + (((cxy.x-xy.x)/4)+1)*4;
+					cxy.x = ((cxy.x/4)+1)*4;
 					if(!bON)
 						continue;
 					cC = '.';
@@ -256,7 +260,7 @@ bool gpcSRC::SRCmnMILLscn(
 					{
 						if(Cxy.x > 0)
 						{
-							cr = Cxy*trafo;
+							//cr = Cxy*trafo;
 							if( cC=='_' )
 							{
 								//pO[cr-1].y = 1;
@@ -341,8 +345,7 @@ I4x2 gpcSRC::SRCmnMILL(
 					bON = !((b01&1)&&(i>=crs.iSTR.y));
 				if( bON )
 					c.z |= 0x10;
-				else
-					crs.crsOFF.a4x2[0] = Cxy;
+
 			}
 
 			cn = 1;

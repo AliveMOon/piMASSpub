@@ -902,9 +902,9 @@ public:
 		return dim;
 	}
 	U4x4 SRCmill( bool bNoMini, const char* pVAN = NULL );
-	bool SRCmnMILLscn(
-					I4x2 xy, I4x2 fWH,
-					I4 fz, I4 zz,
+	U1 SRCmnMILLscn(
+					//I4x2 xy, //I4x2 fWH,
+					//I4 fz, I4 zz,
 					gpcCRS& crs,
 					bool bNoMini
 				);

@@ -102,6 +102,7 @@ U4 gpcCRS::miniRDYmap(
 
 
 	gpcSRC* pSrC = NULL;
+	U1 oo;
 	for( i = 0; i < ie; i++ ) {
 		if( !pM[i] )
 			continue;
@@ -124,10 +125,16 @@ U4 gpcCRS::miniRDYmap(
 			continue;
 
 		//bTRIG =
-		pSrC->SRCmnMILLscn(
-							aXYuvPC[0].a4x2[0], fxyz.a4x2[0],
-							CRSfrm.z, fxyz.z, *this, bNoMini
+		oo = pSrC->SRCmnMILLscn(
+							//aXYuvPC[0].a4x2[0],
+							//fxyz.a4x2[0],
+							//CRSfrm.z, fxyz.z,
+							*this, bNoMini
 						);
+		if( oo&1 )
+			aCRSonPG[0].a4x2[1] = I4x2(c,r);
+		if( oo&2 )
+			aCRSonPG[1].a4x2[1] = I4x2(c,r);
 
 	}
 

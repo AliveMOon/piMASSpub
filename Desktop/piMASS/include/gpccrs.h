@@ -33,7 +33,7 @@ class gpcCRS
 				selANIN[2],
 				aXYuvPC[3],
 
-				fxyz, crsOFF; //, edANIN[2];
+				fxyz, aCRSonPG[4]; //, edANIN[2];
 		gpcSRC	*apSRC[2];
 
 		U1x4	*pMINI, *pLOCK, *pMNoff; //, *pCRS;
