@@ -173,7 +173,7 @@
 		h = INVALID_SOCKET;
 		return h;
 	}*/
-	#define gpmSTRiSTR strstr
+	#define gpmSTRiSTR strcasestr
 #endif
 #define gpdSYNmSEC		333
 #define gpdRECVn 		(0x30000/0x4) 	//0x4000*4	//	(0x30000/0x10)

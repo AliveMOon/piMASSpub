@@ -122,6 +122,7 @@
 		<Unit filename="gpcres_run.cpp" />
 		<Unit filename="gpcresflt.cpp" />
 		<Unit filename="gpcwin_var.cpp" />
+		<Unit filename="gpeTYP.h" />
 		<Unit filename="include/camU.h" />
 		<Unit filename="include/gpcND.h" />
 		<Unit filename="include/gpcOPCD.h" />
