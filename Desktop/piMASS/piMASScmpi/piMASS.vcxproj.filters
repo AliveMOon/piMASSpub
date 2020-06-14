@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="gpcalu.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gpccrs.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcgt.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcgtos.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcLAZY.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gpcND.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcpic.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gpcPROTO.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcres.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcres_compi.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcres_run.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcres2mini.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcresflt.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcSRC.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcU14.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcU44.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gpcwin.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcwin_var.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpMASSbuild.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="piMASS_main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpc_mitsub.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcCRSbreak.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcGL.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcGTslmp.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcGTslmpZS.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcI4x2.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcDRCos.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcF4.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcI4x4.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcOPCD.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcSLMPdcr.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcSRCbreak.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcTOOL.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gpccrs_rdy.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\camU.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gpccrs.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="gpcgt.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gpcOPCD.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="gpcpic.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="gpcres.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="gpcSRC.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gpcwin.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gpeALF.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="piMASS.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="gpsGLSL.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="gpsKEYMAP.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="UIF1248etc.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Includes">
+      <UniqueIdentifier>{5453622d-d64f-4bc9-ae86-238d3ff5187f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{b88f164f-2d27-4d39-959d-a03d585f3730}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
