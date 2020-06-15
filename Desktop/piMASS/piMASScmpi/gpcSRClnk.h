@@ -2,7 +2,19 @@
 #define GPCSRCLNK_H
 #include "piMASS.h"
 
-class gpcAx{
+/*#define iAi ((U4x2*)Ai.Ux(iiiA,sizeof(U4x2)))
+#define iBi ((U4x2*)Bi.Ux(iiiB,sizeof(U4x2)))
+#define iCi ((U4x2*)Ci.Ux(iiiC,sizeof(U4x2)))
+
+#define iA iAi[0].y
+#define iB iBi[0].y
+#define iC iCi[0].y
+
+#define A ((gpcAx*)Ao.Ux(iAi[0].sum(),sizeof(gpcAx)))
+#define B ((gpcAx*)Bo.Ux(iBi[0].sum(),sizeof(gpcAx)))
+#define C ((gpcAx*)Co.Ux(iCi[0].sum(),sizeof(gpcAx)))*/
+
+/*class gpcAx{
 public:
 	I8x2 	AN;
 	U1		typ, op, x, y;
@@ -71,17 +83,53 @@ public:
 		return typ;
 	}
 
+};*/
+class gpcCDR {
+public:
+	I8x2 ea;
+	U1	pre, typ, post;
+
+	gpcCDR& null() { gpmCLR; return *this; }
 };
-#define iAi ((U4x2*)Ai.Ux(iiiA,sizeof(U4x2)))
-#define iBi ((U4x2*)Bi.Ux(iiiB,sizeof(U4x2)))
-#define iCi ((U4x2*)Ci.Ux(iiiC,sizeof(U4x2)))
+class gpcCDRsp {
+public:
+	U4		iSPr, iSP,
+			iCDr;
+	U2x2	*p_sp;
+	gpcCDR	*p_cd;
 
-#define iA iAi[0].y
-#define iB iBi[0].y
-#define iC iCi[0].y
+	gpcLZY	sp,
+			cd;
 
-#define A ((gpcAx*)Ao.Ux(iAi[0].sum(),sizeof(gpcAx)))
-#define B ((gpcAx*)Bo.Ux(iBi[0].sum(),sizeof(gpcAx)))
-#define C ((gpcAx*)Co.Ux(iCi[0].sum(),sizeof(gpcAx)))
+	gpcCDRsp(){ gpmCLR; };
+	gpcCDRsp& CDR()
+	{
+		if( !iSP )
+			iSP = 1;
+		U4 tmp;
+		if( iSPr != iSP )
+		{
+			if( iSPr < iSP )
+			{
+				// felfele lépett
+				tmp = iSPr;
+				p_sp = ((U2x2*)sp.Ux(iSPr=iSP,sizeof(U2x2)));
+				p_sp->x = 0;
+				p_sp->y = ((U2x2*)sp.Ux(tmp,sizeof(U2x2)))->sum()+1;
+			} else {
+				p_sp = ((U2x2*)sp.Ux(iSPr=iSP,sizeof(U2x2)));
+			}
+		}
+		if( iCDr == p_sp[0].sum() )
+			return *this;
+		tmp = iCDr;
+		p_cd = ((gpcCDR*)cd.Ux(iCDr=p_sp[0].sum(),sizeof(gpcCDR)));
+		if( tmp > iCDr )
+			return *this; // lefele lépett
+		p_cd->null();
+		return *this;
+	}
+};
+
 
 #endif // GPCSRCLNK_H

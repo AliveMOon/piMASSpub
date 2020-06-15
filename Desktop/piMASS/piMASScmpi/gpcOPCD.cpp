@@ -532,7 +532,7 @@ U4 gpcCMPL::cmpl_find( gpcLZY* pCMPL, U1* pS, U4 nS )
 
 	while( pC )
 	{
-		ifPC = pC->p_kid->dict_find( pS, nS, nPC );
+		ifPC = pC->p_kid->dctFND( pS, nS, nPC );
 
 		if( ifPC >= nPC )
 		{
@@ -572,7 +572,7 @@ U4 gpcCMPL::cmpl_best( gpcLZY* pCMPL, U1* pS, U4 nS )
 
 	while( pC )
 	{
-		ifPC = pC->p_kid->dict_find( pS, nS, nPC );
+		ifPC = pC->p_kid->dctFND( pS, nS, nPC );
 
 		if( ifPC >= nPC )
 		{
@@ -617,7 +617,7 @@ gpcLZY* gpcCMPL::cmpl_add( gpcLZY* pCMPL, U1* pS, U4 nS )
 		return pCMPL;
 
 	U4 w = p_kid->nIX();
-	p_kid = p_kid->dict_add( pS, nS );
+	p_kid = p_kid->dctADD( pS, nS );
 	if( w >= p_kid->nIX() )
 		return pCMPL;
 

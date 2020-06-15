@@ -738,12 +738,12 @@ public:
 		if( !nU )
 			return nMINI;
 
- 		iDCT = dct.dictMILLfind( pUi, nU, nDCT );
+ 		iDCT = dct.dctMILLfnd( pUi, nU, nDCT );
 		if( iDCT >= nDCT )
 		{
 			// nem volt a listában
 			iDCT = nDCT; // a végére kerül ha hozzá adjuk
-			dct.dictMILLadd( pUi, nU );
+			dct.dctMILLadd( pUi, nU );
 			nDCT++;
 		}
 		// typ U4x4.w:
@@ -1009,6 +1009,7 @@ public:
 						gpcCRS& crs,
 						bool bNoMini, U1 selID
 					);
+	void 	SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN );
 	void 	SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win );
 	gpcRES* SRCmnMILLrun( gpcMASS& mass, gpcWIN& win );
 

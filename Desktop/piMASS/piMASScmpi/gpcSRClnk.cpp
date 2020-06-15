@@ -3,62 +3,28 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+#define C Csp.CDR().p_cd[0]
+#define B Bsp.CDR().p_cd[0]
+#define A Asp.CDR().p_cd[0]
 
-void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
+#define iC Csp.CDR().p_sp[0].x
+#define iB Bsp.CDR().p_sp[0].x
+#define iA Asp.CDR().p_sp[0].x
+
+void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
 		return;
 
-	U1 iMN = 0;
-
-	if( !SCOOP.nLiNK() )
-		return;
-
-	char *pSi, *pSe;
-	U4 iOP, iOPe = mass.OPER.nIX();
-	if( !iOPe ) {
-		mass.mxOP = gpeALF_null;
-		/// ha nincsen még kitöltve az OPER lista feltöltjük
-		for( U4 i = 0, ie = gpmN(gpasOPER); i < ie; i++ )
-		{
-			pSe = strchr( (char*)gpasOPER[i], ' ' );
-			if( !pSe )
-				continue;
-
-			iOP = mass.OPER.dictMILLfind( (U1*)gpasOPER[i], pSe-gpasOPER[i], iOPe );
-			if( iOP >= iOPe )
-			{
-				iOP = iOPe;
-				mass.OPER.dictMILLadd( (U1*)gpasOPER[i], pSe-gpasOPER[i] );
-				mass.aOP[iOP].num = 14;
-				mass.aOP[iOP] = pSe+1;
-				iOPe++;
-				if( mass.mxOP < mass.aOP[iOP].alf )
-					mass.mxOP = mass.aOP[iOP].alf;
-			}
-
-		}
-		iOPe = mass.OPER.nIX();
-	}
-
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc, aLNK[0x10];
-	U4 nM = SCOOP.nMN();
+	U4 nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
 	pDBG->lzyRST();
 	const char *pS;
-	U8 nS, nIX = 0;
-	U4	nABC = 0, nNUM = 0, nOPER = 0, nBREAK = 0, sw,
-		nAN = 0, nADD, nSUB, n,
-		iiiA = 1, iiiB = 1, iiiC = 1,
-		*pAi, *pBi, *pCi;
-
-	gpcLZY Ao,Bo,Co, Ai,Bi,Ci;
-
-
-	I4x4 iZNmx = 0;
+	U8 nS;
 	gpeALF opALF;
-
-
+	I4x4 iZNmx = 0;
+	gpcCDRsp Asp, Bsp, Csp;
 
 	for( U4 le = SCOOP.nLiNK(), l = 0, m = 0; l < le; l++ )
 	{
@@ -70,30 +36,26 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 		nS = SCOOP.dct.nSTRix(M.rMNinxt.z);
 		if( !nS )
 			continue;
-
-		switch( sw = ((M.rMNclr>>0x10)&0xf) )
+		switch( (M.rMNclr>>0x10)&0xf )
 		{
 			case gpeCLR_blue2: 	///ABC
-				if( iCi ) { C[0].an(pS,nS); break; }
-				if( iBi ) { B[0].an(pS,nS); break; }
-				A[0].an(pS,nS);
+				if( iC ) { C.ea.cdrMILL( pS, nS ); break; }
+				if( iB ) { B.ea.cdrMILL( pS, nS ); break; }
+				A.ea.cdrMILL( pS, nS );
 				break;
 			case gpeCLR_orange:	///NUM
 
-				nNUM++;
 				break;
 			case gpeCLR_green2: {///OPER
-					iOP = mass.OPER.dictMILLfind( (U1*)pS, nS, iOPe );
-					opALF = mass.aOP[iOP].alf;
+					iOP = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
+					opALF = pOP[iOP].alf;
 					switch( opALF )
 					{
 						case gpeALF_dot:
-							if( iC ? !!C[0].typ : false )
-									++iC;
-							else if( iB ? !!B[0].typ : false )
-									++iB;
-							else if( !A[0].typ )
-									 ++iA;
+							if( iC ) { C.post = iOP; iC++; break; }
+							if( iB ) { B.post = iOP; iB++; break; }
+							A.post = iOP;
+							iA++;
 							break;
 						case gpeALF_andM:
 						case gpeALF_mulM:
@@ -109,69 +71,13 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 						case gpeALF_srM:
 						case gpeALF_mov:
 
-							if(iC) {
-								if( iC < 2 )
-								{
-									// Semmi! Csak egy op?
-									C[-1].OP(iOP);
-									break;
-								}
 
-								/// B-t stackelni majd C folytassa B-ként
-								++iC;
-								iiiB++;
-								iBi[0] = U4x2(iBi[-1].sum(),0);
-
-								gpmMcmpOF( B,C-iC, iC );
-								iB += iC;
-
-								iiiC++;
-								iCi[0] = U4x2(iCi[-1].sum(),0);
-								/// X= lehet C-t indítani
-								C[0].ZN(iZNmx.a4x2[0]).OP(iOP);
-								++iC;
-								C[0].null();
-								break;
-							}
-							else if(iB) {
-								if( iB < 2 )
-								{
-									// Semmi! Csak egy op?
-									B[-1].OP(iOP);
-									break;
-								}
-
-								/// A-t stackelni majd B folytassa A-ként
-								++iB;
-								iiiA++;
-								iAi[0] = U4x2(iAi[-1].sum(),0);
-
-								gpmMcmpOF( A,B-iB, iB );
-								iA += iB;
-
-								iiiB++;
-								iBi[0] = U4x2(iBi[-1].sum(),0);
-							} else {
-								if(!A[0].typ)
-									A[0].ZN( iZNmx.a4x2[0] );
-								++iA;
-							}
-							/// X= lehet B-t indítani
-							B[0].ZN(iZNmx.a4x2[0]).OP(iOP);
-							++iB;
-							B[0].null();
 							break;
 						case gpeALF_add:
 						case gpeALF_inc:
 						case gpeALF_sub:
 						case gpeALF_dec:
-							if( iC ) {
 
-							}
-							else if (iB) {
-
-
-							}
 							break;
 
 						/// valamineki vége le kell nulázni az iABC-ket
@@ -239,17 +145,56 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 						default:
 							break;
 					}
-					nOPER++;
-                } break;
+				} break;
 			case gpeCLR_red2:	///BREAK
-				nBREAK++;
-                break;
+				break;
 			case gpeCLR_violet:	///STR
 			case gpeCLR_green:	///NOTE
 			default:
 				continue;
 		}
 	}
+}
+void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
+{
+	if( !this )
+		return;
+
+	U1 iMN = 0;
+
+	if( !SCOOP.nLiNK() )
+		return;
+
+	char *pSi, *pSe;
+	U4 iOP, iOPe = mass.OPER.nIX();
+	if( !iOPe ) {
+		mass.mxOP = gpeALF_null;
+		/// ha nincsen még kitöltve az OPER lista feltöltjük
+		for( U4 i = 0, ie = gpmN(gpasOPER); i < ie; i++ )
+		{
+			pSe = strchr( (char*)gpasOPER[i], ' ' );
+			if( !pSe )
+				continue;
+
+			iOP = mass.OPER.dctMILLfnd( (U1*)gpasOPER[i], pSe-gpasOPER[i], iOPe );
+			if( iOP >= iOPe )
+			{
+				iOP = iOPe;
+				mass.OPER.dctMILLadd( (U1*)gpasOPER[i], pSe-gpasOPER[i] );
+				mass.aOP[iOP].num = 14;
+				mass.aOP[iOP] = pSe+1;
+				iOPe++;
+				if( mass.mxOP < mass.aOP[iOP].alf )
+					mass.mxOP = mass.aOP[iOP].alf;
+			}
+
+		}
+		iOPe = mass.OPER.nIX();
+	}
+
+	SRCmnMILLcdr( mass.aOP, mass.OPER, 0 );
+
+
 }
 gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS& mass, gpcWIN& win )
 {

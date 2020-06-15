@@ -1553,34 +1553,12 @@ public:
 	}
 
 
-	U4 sum( void ) const
-	{
-		return (U4)x+y;
-	}
-
-	U4 area( void )
-	{
-		return x*y;
-	}
-	U4 are_sum( void )
-	{
-		return area()+sum();
-	}
-
-	U4 qlen(void ) const
-	{
-		return x*x+y*y;
-	}
-
-	U2 mn( void ) const
-	{
-		return x < y ? x:y;
-	}
-
-	U2 mx( void ) const
-	{
-		return x > y ? x:y;
-	}
+	U4 sum() const 		{ return (!this?0:(U4)x+y); }
+	U4 area() const 	{ return (!this?0:(U4)x*y); }
+	U4 are_sum() const 	{ return area()+sum(); }
+	U4 qlen() const 	{ return (!this?0:((U4)x*x+(U4)y*y)); }
+	U2 mn() const 		{ return (!this?0:(x < y ? x:y)); }
+	U2 mx() const 		{ return (!this?0:(x > y ? x:y)); }
 
 	U2x2 abs( void ) const
 	{
@@ -2032,8 +2010,14 @@ public:
 		return *this;
 	}
 
+	U8 sum() const 		{ return (!this?0:(U8)x+y); }
+	U8 area() const 	{ return (!this?0:(U8)x*y); }
+	U8 are_sum() const 	{ return area()+sum(); }
+	U8 qlen() const 	{ return (!this?0:(U8)x*x+(U8)y*y); }
+	U4 mn() const 		{ return (!this?0:(x<y?x:y)); }
+	U4 mx() const 		{ return (!this?0:(x>y?x:y)); }
 
-	U8 sum( void ) const
+	/*U8 sum( void ) const
 	{
 		return (U8)x+y;
 	}
@@ -2060,7 +2044,7 @@ public:
 	U4 mx( void ) const
 	{
 		return x > y ? x:y;
-	}
+	}*/
 
 	U4x2 abs( void ) const
 	{
@@ -2321,8 +2305,13 @@ public:
 		return n_t;
 	}
 
-	U4	dict_add( U1* p_src, U4& m, U4x4& w );
-	U4  dict_find( U1* p_src, U4x4& w );
+	U4	dctADD( U1* p_src, U4& m, U4x4& w );
+	U4  dctFND( U1* p_src, U4x4& w );
+
+	U4	dctADDn( void* pBIN, U4& m, U4x4& w );
+	U4  dctFNDn( void* pBIN, U4x4& w );
+
+
 };
 
 class U8x4 {
@@ -4103,7 +4092,8 @@ public:
 	{
 		return I8x2( x<0?-x:x, y<0?-y:y );
 	}
-	I8x2& A( U1* pA, U1** ppA );
+	//I8x2& A( U1* pA, U1** ppA );
+	U1 cdrMILL( const char* pS, U4 nS );
 
 
 	U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false )
@@ -6168,7 +6158,7 @@ public:
 				n_load = 0;
 		}
 
-		if( !p_void )
+		if( p_void )
 			memcpy( p_alloc+n_load, p_void, n_byte );
 
 		n_load += n_byte;
@@ -6494,7 +6484,7 @@ szasz:
 
 class gpcLZYdct
 {
-	U4x4*		pIX;
+	U4x4*		pIX; /// BEST!!!
 public:
 	gpcLZY		str,
 				ix;
@@ -6513,7 +6503,7 @@ public:
 		str.lzyRST();
 		ix.lzyRST();
 	}
-	U4 dict_find( U1* pS, U8 nS, U4& nIX ) {
+	U4 dctFND( U1* pS, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;
@@ -6540,7 +6530,7 @@ public:
 		pIX->x = aSTRT[0];
 		pIX->y = nS;
 
-		U4 iIX = p_ix0->dict_find( pS0, *pIX );
+		U4 iIX = p_ix0->dctFND( pS0, *pIX );
 
 		// UNDOza a bejegyzést
 		str.n_load = aSTRT[0];
@@ -6548,12 +6538,12 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	gpcLZYdct* dict_add( U1* pS, U8 nS ) {
+	gpcLZYdct* dctADD( U1* pS, U8 nS ) {
 		if( !this )
 		{
 			gpcLZYdct* p_this = new gpcLZYdct(0);
 
-			return p_this->dict_add( pS, nS );
+			return p_this->dctADD( pS, nS );
 		}
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
@@ -6572,7 +6562,7 @@ public:
 		pIX->null();
 		pIX->x = aSTRT[0];
 		pIX->y = nS;
-		U4 iIX, nADD = p_ix0->dict_add( pS0, iIX, *pIX );
+		U4 iIX, nADD = p_ix0->dctADD( pS0, iIX, *pIX );
 
 		if( nIX == nADD )
 		{
@@ -6587,7 +6577,7 @@ public:
 		return this;
 	}
 
-	U4 dictMILLfind( U1* pS, U8 nS, U4& nIX ) {
+	U4 dctMILLfnd( U1* pS, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;
@@ -6630,7 +6620,7 @@ public:
 		pIX->x = aSTRT[0];
 		pIX->y = nS;
 
-		U4 iIX = p_ix0->dict_find( pS0, *pIX );
+		U4 iIX = p_ix0->dctFND( pS0, *pIX );
 
 		// UNDOza a bejegyzést
 		str.n_load = aSTRT[0];
@@ -6638,12 +6628,12 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	gpcLZYdct* dictMILLadd( U1* pS, U8 nS ) {
+	gpcLZYdct* dctMILLadd( U1* pS, U8 nS ) {
 		if( !this )
 		{
 			gpcLZYdct* p_this = new gpcLZYdct(0);
 
-			return p_this->dict_add( pS, nS );
+			return p_this->dctADD( pS, nS );
 		}
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
@@ -6682,7 +6672,7 @@ public:
 		pIX->null();
 		pIX->x = aSTRT[0];
 		pIX->y = nS;
-		U4 iIX, nADD = p_ix0->dict_add( pS0, iIX, *pIX );
+		U4 iIX, nADD = p_ix0->dctADD( pS0, iIX, *pIX );
 
 		if( nIX == nADD )
 		{
@@ -6734,6 +6724,137 @@ public:
 		return ((U4x4*)ix.p_alloc)[x].y;
 	}
 };
+#define UX U4
+class gpcLZYdctBIN
+{
+	U4x4*		pIX; /// BEST!!!
+public:
+	gpcLZY		bin,
+				ix;
+	U8			ver;
+
+	gpcLZYdctBIN(){};
+	gpcLZYdctBIN(U4 n)
+	{
+		gpmCLR;
+	}
+	void rst()
+	{
+		if(!this)
+			return;
+		pIX = NULL;
+		bin.lzyRST();
+		ix.lzyRST();
+	}
+	U4 dctFND( U1* pB, U4 nB, U4& nIX ) {
+		if( !this )
+		{
+			nIX = 0;
+			return 0;
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !bin.p_alloc )
+			ver = 0;
+		// bemásolja a bin-t szótárba
+		bin.lzyADD( pB, nB, aSTRT[0] = -1 );
+
+		U1	*pB0 = bin.p_alloc,
+			*pB1 = pB0+aSTRT[0];
+
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nB;
+
+		U4 iIX = p_ix0->dctFNDn( pB0, *pIX );
+
+		// UNDOza a bejegyzést
+		bin.n_load = aSTRT[0];
+		ix.n_load = aSTRT[1];
+		pIX = p_ix0+iIX;
+		return iIX;
+	}
+	gpcLZYdctBIN* dctADD( U1* pB, U8 nB ) {
+		if( !this )
+		{
+			gpcLZYdctBIN* p_this = new gpcLZYdctBIN(0);
+
+			return p_this->dctADD( pB, nB );
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !bin.p_alloc )
+			ver = 0;
+		// bemásolja a bin-t szótárba
+		bin.lzyADD( pB, nB, aSTRT[0] = -1 );
+
+		U1	*pB0 = bin.p_alloc,
+			*pB1 = pB0+aSTRT[0];
+
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		U4 nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nB;
+		U4 best, nADD = p_ix0->dctADDn( pB0, best, *pIX );
+
+		if( nIX == nADD )
+		{
+			// UNDOza a bejegyzést
+			bin.n_load = aSTRT[0];
+			ix.n_load = aSTRT[1];
+			pIX = p_ix0+best;
+			return this;
+		}
+		ver++;
+		pIX = p_ix0+nIX;
+		return this;
+	}
+
+	U4 x( void )
+	{
+		if( this ? !ix.n_load : true )
+			return 0;
+
+		return pIX-(U4x4*)ix.p_alloc;
+	}
+	U4 iBIN(void)
+	{
+		if( !pIX )
+			return bin.n_load;
+
+		return pIX->x;
+	}
+	void* pBINix( void )
+	{
+		return bin.p_alloc+pIX->x;
+	}
+	U8 nIX(void)
+	{
+		return this ? (ix.n_load / sizeof(U4x4)) : 0;
+	}
+	const void* pBINi( U8 i, const void* pER )
+	{
+		if( !this )
+			return pER;
+		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+		return bin.p_alloc + p_ix0[i].x;
+	}
+	U4 nBINix( U8 iX )
+	{
+		if( this ? iX >= nIX() : true )
+			return 0;
+
+		return ((U4x4*)ix.p_alloc)[iX].y;
+	}
+};
+
 
 class gpcLZYall
 {
