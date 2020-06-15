@@ -1,92 +1,8 @@
 #include "gpcSRC.h"
+#include "gpcSRClnk.h"
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-class gpcAx{
-public:
-	I8x2 	AN;
-	U1		typ, op, x;
-	gpcAx(){};
-	gpcAx& null() { gpmCLR; return *this; }
-	gpcAx& OP( U1 o ) { op=o; return *this; }
-	gpcAx& ZN( I8x2 zn ) { gpmCLR; AN=zn; typ=4; return *this; } // typ=4 ZN coordináta
-	U1 an( const char* pS, U4 nS )
-	{
-		AN.num = nS;
-		AN = pS;
-		char *pSi = (char*)pS+AN.num, *pSe;
-		typ = !!AN.x;
-		if( typ ? (AN.num >= nS) : true )
-			return typ;
-
-		AN.num = gpfSTR2I8( pSi, &pSe );
-		if(pSe > pSi)
-			typ |= 2;
-
-		if( pSe-pS < nS )
-		if( *pSe == 'x' || *pSe == 'X' )
-		{
-			// vector
-			switch( pSe[1] )
-			{
-				case '2':
-					x = 2;
-					break;
-
-				case '3':
-				case '4':
-					x = 4;
-					break;
-
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-					x = 8;
-					break;
-
-				case '9':
-				case 'a':
-				case 'b':
-				case 'c':
-				case 'd':
-				case 'e':
-				case 'f':
-				case 'A':
-				case 'B':
-				case 'C':
-				case 'D':
-				case 'E':
-				case 'F':
-					x = 0x10;
-					break;
-
-				default:
-					x = 1;
-					break;
-			}
-		}
-
-
-		return typ;
-	}
-
-};
-#define iA (((U4x2*)Ai.Ux(iiiA,sizeof(U4x2)))[0])
-#define iB (((U4x2*)Bi.Ux(iiiB,sizeof(U4x2)))[0])
-#define iC (((U4x2*)Ci.Ux(iiiC,sizeof(U4x2)))[0])
-
-#define iAi iA.y
-#define iBi iB.y
-#define iCi iC.y
-
-#define A0 ((gpcAx*)A.Ux(iA.x,sizeof(gpcAx)))[ 0]
-#define A1 ((gpcAx*)A.Ux(iA.x,sizeof(gpcAx)))[-1]
-#define B0 ((gpcAx*)B.Ux(iB.x,sizeof(gpcAx)))[ 0]
-#define B1 ((gpcAx*)B.Ux(iB.x,sizeof(gpcAx)))[-1]
-#define C0 ((gpcAx*)C.Ux(iC.x,sizeof(gpcAx)))[ 0]
-#define C1 ((gpcAx*)C.Ux(iC.x,sizeof(gpcAx)))[-1]
-
 
 void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 {
@@ -100,8 +16,7 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 
 	char *pSi, *pSe;
 	U4 iOP, iOPe = mass.OPER.nIX();
-	if( !iOPe )
-	{
+	if( !iOPe ) {
 		mass.mxOP = gpeALF_null;
 		/// ha nincsen még kitöltve az OPER lista feltöltjük
 		for( U4 i = 0, ie = gpmN(gpasOPER); i < ie; i++ )
@@ -137,7 +52,7 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 		iiiA = 1, iiiB = 1, iiiC = 1,
 		*pAi, *pBi, *pCi;
 
-	gpcLZY A,B,C, Ai,Bi,Ci;
+	gpcLZY Ao,Bo,Co, Ai,Bi,Ci;
 
 
 	I4x4 iZNmx = 0;
@@ -159,19 +74,9 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 		switch( sw = ((M.rMNclr>>0x10)&0xf) )
 		{
 			case gpeCLR_blue2: 	///ABC
-				if( iCi )
-				{
-					C0.an(pS,nS);
-					break;
-				}
-				if( iBi )
-				{
-					B0.an(pS,nS);
-					break;
-				}
-
-
-				A0.an(pS,nS);
+				if( iCi ) { C[0].an(pS,nS); break; }
+				if( iBi ) { B[0].an(pS,nS); break; }
+				A[0].an(pS,nS);
 				break;
 			case gpeCLR_orange:	///NUM
 
@@ -183,18 +88,12 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 					switch( opALF )
 					{
 						case gpeALF_dot:
-							if( iCi )
-							{
-								if( C0.typ )
+							if( iC ? !!C[0].typ : false )
 									++iC;
-							}
-							else if( iBi )
-							{
-								if( B0.typ )
+							else if( iB ? !!B[0].typ : false )
 									++iB;
-							} else
-								if( A0.typ )
-									++iA;
+							else if( !A[0].typ )
+									 ++iA;
 							break;
 						case gpeALF_andM:
 						case gpeALF_mulM:
@@ -210,27 +109,36 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 						case gpeALF_srM:
 						case gpeALF_mov:
 							/// X= lehet B-t indítani
-							if(iCi)
+							if(iC)
 							{
 
 							}
-							else if(iBi)
+							else if(iB)
 							{
-								if( iBi < 2 )
+								if( iB < 2 )
 								{
 									// Semmi! Csak egy op?
-									B1.OP(iOP);
+									B[-1].OP(iOP);
 									break;
 								}
 
-								// eltároljuk a 'A' cél és 'B' forrás
+								/// A-t stackelni majd B folytassa A-ként
+								++iA;
+								++iB;
+								iiiA++;
+								iAi[0] = U4x2(iAi[-1].sum(),0);
 
+								gpmMcmpOF( A,B-iB, iB );
+								iA += iB;
 
+								iiiB++;
+								iBi[0] = U4x2(iBi[-1].sum(),0);
 
+								break;
 							}
-							else if(!iAi)
+							else if(!iA)
 							{
-								A0.ZN( iZNmx.a4x2[0] );
+								A[0].ZN( iZNmx.a4x2[0] );
 								++iA;
 							}
 							B0.ZN(iZNmx.a4x2[0]).OP(iOP);

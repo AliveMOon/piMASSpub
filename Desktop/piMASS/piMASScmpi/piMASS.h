@@ -6480,14 +6480,14 @@ szasz:
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
 	U1* Ux( U4 i, U4 n )
 	{
-		U8 e = (i+1)*n, s = -1;
+		U8 e = (i+2)*n, s = -1;
 		if( e > n_load )
 		{
 			lzyADD( NULL, e-n_load, s, -1 );
 			gpmZn( p_alloc+s, e-s );
 		}
 
-        return p_alloc+e-n;
+        return p_alloc+e-n*2;
 	}
 };
 

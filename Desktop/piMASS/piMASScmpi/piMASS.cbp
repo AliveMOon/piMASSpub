@@ -107,6 +107,7 @@
 		<Unit filename="gpcSRC.h" />
 		<Unit filename="gpcSRCbreak.cpp" />
 		<Unit filename="gpcSRClnk.cpp" />
+		<Unit filename="gpcSRClnk.h" />
 		<Unit filename="gpcTOOL.cpp" />
 		<Unit filename="gpcU14.cpp" />
 		<Unit filename="gpcU44.cpp" />

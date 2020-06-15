@@ -199,33 +199,18 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 		p1[c].z = fr;
 		p1[c].w |= 0x1;
 	}
-	/*if( pS1 )
-	{
-		I4 yz = xy.y*fxyz.z, c = max(xy.x,0) + yz + 1, ce = yz + fxyz.x - 1, cs = c;
-		while( *pS1 )
-		{
-			p1[c].z = fr;
-			p1[c].w = *pS1;
-			c++;
-			if( c >= ce )
-				break;
-			pS1++;
-		}
-	}*/
 	//DWN
 	for( I4 yz = (fxyz.y-1)*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
 	{
 		p1[c].z = fr;
 		p1[c].w |= 0x4;
 	}
-
 	// LEFT
 	for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fxyz.z ; r < fxyz.y; r++, rr += fxyz.z )
 	{
 		p1[rr].z = fr;
 		p1[rr].w |= 0x8;
 	}
-
 	// RIGHT
 	for( I4 r = max(xy.y,0), rr = fxyz.x-1 + r*fxyz.z; r < fxyz.y; r++, rr += fxyz.z )
 	{
