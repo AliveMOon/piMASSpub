@@ -72,16 +72,16 @@ public:
 	}
 
 };
-#define iA ((U4x2*)Ai.Ux(iiiA,sizeof(U4x2)))
-#define iB ((U4x2*)Bi.Ux(iiiB,sizeof(U4x2)))
-#define iC ((U4x2*)Ci.Ux(iiiC,sizeof(U4x2)))
+#define iAi ((U4x2*)Ai.Ux(iiiA,sizeof(U4x2)))
+#define iBi ((U4x2*)Bi.Ux(iiiB,sizeof(U4x2)))
+#define iCi ((U4x2*)Ci.Ux(iiiC,sizeof(U4x2)))
 
-#define iAi iA[0].y
-#define iBi iB[0].y
-#define iCi iC[0].y
+#define iA iAi[0].y
+#define iB iBi[0].y
+#define iC iCi[0].y
 
-#define A ((gpcAx*)Ao.Ux(iA[0].sum(),sizeof(gpcAx)))
-#define B ((gpcAx*)Bo.Ux(iB[0].sum(),sizeof(gpcAx)))
-#define C ((gpcAx*)Co.Ux(iC[0].sum(),sizeof(gpcAx)))
+#define A ((gpcAx*)Ao.Ux(iAi[0].sum(),sizeof(gpcAx)))
+#define B ((gpcAx*)Bo.Ux(iBi[0].sum(),sizeof(gpcAx)))
+#define C ((gpcAx*)Co.Ux(iCi[0].sum(),sizeof(gpcAx)))
 
 #endif // GPCSRCLNK_H

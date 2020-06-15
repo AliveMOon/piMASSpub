@@ -108,13 +108,32 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 						case gpeALF_slM:
 						case gpeALF_srM:
 						case gpeALF_mov:
-							/// X= lehet B-t indítani
-							if(iC)
-							{
 
+							if(iC) {
+								if( iC < 2 )
+								{
+									// Semmi! Csak egy op?
+									C[-1].OP(iOP);
+									break;
+								}
+
+								/// B-t stackelni majd C folytassa B-ként
+								++iC;
+								iiiB++;
+								iBi[0] = U4x2(iBi[-1].sum(),0);
+
+								gpmMcmpOF( B,C-iC, iC );
+								iB += iC;
+
+								iiiC++;
+								iCi[0] = U4x2(iCi[-1].sum(),0);
+								/// X= lehet C-t indítani
+								C[0].ZN(iZNmx.a4x2[0]).OP(iOP);
+								++iC;
+								C[0].null();
+								break;
 							}
-							else if(iB)
-							{
+							else if(iB) {
 								if( iB < 2 )
 								{
 									// Semmi! Csak egy op?
@@ -123,7 +142,6 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 								}
 
 								/// A-t stackelni majd B folytassa A-ként
-								++iA;
 								++iB;
 								iiiA++;
 								iAi[0] = U4x2(iAi[-1].sum(),0);
@@ -133,17 +151,27 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 
 								iiiB++;
 								iBi[0] = U4x2(iBi[-1].sum(),0);
-
-								break;
-							}
-							else if(!iA)
-							{
-								A[0].ZN( iZNmx.a4x2[0] );
+							} else {
+								if(!A[0].typ)
+									A[0].ZN( iZNmx.a4x2[0] );
 								++iA;
 							}
-							B0.ZN(iZNmx.a4x2[0]).OP(iOP);
+							/// X= lehet B-t indítani
+							B[0].ZN(iZNmx.a4x2[0]).OP(iOP);
 							++iB;
-							B0.null();
+							B[0].null();
+							break;
+						case gpeALF_add:
+						case gpeALF_inc:
+						case gpeALF_sub:
+						case gpeALF_dec:
+							if( iC ) {
+
+							}
+							else if (iB) {
+
+
+							}
 							break;
 
 						/// valamineki vége le kell nulázni az iABC-ket
@@ -184,11 +212,7 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 						case gpeALF_or:
 						case gpeALF_orLG:
 
-						case gpeALF_add:
-						case gpeALF_inc:
 
-						case gpeALF_sub:
-						case gpeALF_dec:
 
 						case gpeALF_leLG:
 						case gpeALF_ltLG:
