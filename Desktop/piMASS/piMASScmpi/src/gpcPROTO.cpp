@@ -98,7 +98,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 			pS += pFND->n_str;
 			switch( pFND->typ )
 			{
-				case gpeALF_COMS: // "/*"
+				case gpeALF_comS: // "/*"
 					if( U1* pCOM = (U1*)strstr( (char*)pS, "*_/" ) )
 					{
 						pS = pCOM+2;
@@ -107,7 +107,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 					}
 					pFND = NULL;
 					continue;
-				case gpeALF_COM: // "//"
+				case gpeALF_com: // "//"
 					pS += gpmVAN( pS, "\r\n", nLEN );
 					pFND = NULL;
 					continue;
@@ -240,7 +240,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 			pS += pFND->n_str;
 			switch( pFND->typ )
 			{
-				case gpeALF_COMS: // "/*"
+				case gpeALF_comS: // "/*"
 					if( U1* pCOM = (U1*)strstr( (char*)pS, "*_/" ) )
 					{
 						pS = pCOM+2;
@@ -249,7 +249,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 					}
 					pFND = NULL;
 					continue;
-				case gpeALF_COM: // "//"
+				case gpeALF_com: // "//"
 					pS += gpmVAN( pS, "\r\n", nLEN );
 					pFND = NULL;
 					continue;

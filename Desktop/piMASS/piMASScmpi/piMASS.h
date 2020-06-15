@@ -1788,6 +1788,9 @@ public:
 		x = srf.w;
 		y = srf.h;
 	}
+	U4x2& operator ++() { ++x;++y; return *this; }
+	U4x2& operator --() { --x;--y; return *this; }
+
     U4x2& operator = ( const SDL_Surface& srf ) {
 		x = srf.w;
 		y = srf.h;
@@ -3810,7 +3813,8 @@ public:
     I8x2( I8 _x, I8 _y = 0 ) { x = _x; y = _y; }
     //I8x2( gpeALF a, I4 n = 0 ) { alf = a; num = n; }
     I8x2( gpeALF a, I8 n = 0 ) { alf = a; num = n; }
-    I8x2( U4x2 b ) { x = b.x; y = b.y; }
+    I8x2( const U4x2 b ) { x = b.x; y = b.y; }
+	I8x2( const I4x2 b ) { x = b.x; y = b.y; }
 	I8x2( U8* pB )
     {
 		gpmMcpyOF( this, pB, 1 );
@@ -3882,6 +3886,10 @@ public:
 	I8 operator * (const I8x2& b) const
 	{
 		return x*b.x + y * b.y;
+	}
+	I8x2 operator & (const I4x2& b) const
+	{
+		return I8x2( x*b.x,  y*b.y );
 	}
 	I8x2 operator & (const I8x2& b) const
 	{
@@ -5820,6 +5828,19 @@ public:
 			U8		n_l8, n_a8;
 		};
 	};
+
+	gpcLZY( void ) { gpmCLR; }
+	gpcLZY( U1 n ) {
+		gpmCLR;
+
+		if( n < 1 )
+			n = 4;
+		aWIP[gpeLZYwip] = gpeWIP_done,
+		aSET[gpeLZYxN] = n;
+	}
+	~gpcLZY() { gpmFREE( p_alloc ); }
+
+
 	U1x4& typ() { return *(U1x4*)&type; }
 	U4x4* pMAP( U4 nX, U4 nLIM, size_t nBYTE ) {
 		if( !this )
@@ -6045,20 +6066,7 @@ public:
 
 
 	gpcLZY* qEVENT(void);
-	gpcLZY( void ) {
-		gpmCLR;
-	}
-	gpcLZY( U1 n ) {
-		gpmCLR;
 
-		if( n < 1 )
-			n = 4;
-		aWIP[gpeLZYwip] = gpeWIP_done,
-		aSET[gpeLZYxN] = n;
-	}
-	~gpcLZY() {
-		gpmFREE( p_alloc );
-	}
 
 	gpcLZY* lzy_strict( void ) {
 		if( this ? !n_load : true )
@@ -6159,14 +6167,10 @@ public:
 			} else
 				n_load = 0;
 		}
-		if( !p_void )
-		{
-			n_load += n_byte;
-			p_alloc[n_load] = 0;
-			return this;
-		}
 
-		memcpy( p_alloc+n_load, p_void, n_byte );
+		if( !p_void )
+			memcpy( p_alloc+n_load, p_void, n_byte );
+
 		n_load += n_byte;
 		p_alloc[n_load] = 0;
 		return this;
@@ -6474,7 +6478,17 @@ szasz:
 	//U8 gpcLZY::tree_fnd( U8 id, U8& n )
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
+	U1* Ux( U4 i, U4 n )
+	{
+		U8 e = (i+1)*n, s = -1;
+		if( e > n_load )
+		{
+			lzyADD( NULL, e-n_load, s, -1 );
+			gpmZn( p_alloc+s, e-s );
+		}
 
+        return p_alloc+e-n;
+	}
 };
 
 

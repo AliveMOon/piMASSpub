@@ -194,7 +194,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			case gpeALF_null:
 				pS++;
 				continue;
-			case gpeALF_SUB:
+			case gpeALF_sub:
 				bSW |= gpeMASSsubMSK;
 				continue;
 			case gpeALF_RET:

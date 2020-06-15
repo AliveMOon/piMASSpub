@@ -104,7 +104,7 @@ static const gpcOPCD gpaOPCi[] = {
 	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_CLASS, gpeALF_DEF },
 
 	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
-	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_IF },
+	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_if },
 	{ gpaOPCi,	"for(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_FOR },
 	{ gpaOPCi,	"while(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_WHILE },
 	{ gpaOPCi,	"switch(",	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SWITCH },
@@ -129,11 +129,9 @@ static const gpcOPCD gpaOPCi[] = {
 static const char* gpasOPER[] = {
 
 
-	"! inv",	"!! LG",	"!= neqLG",
+	"! notLG",	"!! LG",	"~ inv",
 
-	//". pnt",
-				", stk",	"; newrow",
-	//"+ add", 	"++ inc",	"+= addM", ///--------------- DBG
+	", stk",	"; newrow",
 
 	"/* comS", 	"*/ comE",	"// com",
 
@@ -146,7 +144,7 @@ static const char* gpasOPER[] = {
 	"^ xor",	"^= xorM",
 
 
-	"= mov", 	"== eqLG",
+	"= mov", 	"== eqLG",  "!= neqLG",
 	"| or", 	"|| orLG",	"|= orM",
 	"+ add", 	"++ inc",	"+= addM",	/// -------------- GOOD
 	"- sub", 	"++ dec",	"-= subM",
@@ -740,7 +738,7 @@ public:
 		if( !nU )
 			return nMINI;
 
-		iDCT = dct.dictMILLfind( pUi, nU, nDCT );
+ 		iDCT = dct.dictMILLfind( pUi, nU, nDCT );
 		if( iDCT >= nDCT )
 		{
 			// nem volt a listában
@@ -1397,6 +1395,7 @@ public:
 	/// OPER --------
 	gpcLZYdct	OPER;
 	I8x2		aOP[0x100];
+	gpeALF		mxOP;
 	/// GATE --------
 	gpcLZYall	GTlzyALL;
 	gpcGTall	GTacpt, GTcnct;
