@@ -70,14 +70,55 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_slM:
 						case gpeALF_srM:
 						case gpeALF_mov:
+							///{  X=  }-----------------------------------------------
+							if( iC ) {
+								if( !C.ea.x ) {
+												C.pre = iOP; break; }
+								C.post = iOP;
+								iC++;
+								break;
+							}
+							if( iB ) {
+								if( !B.ea.x ) {
+												B.pre = iOP; break; }
+								B.post = iOP;
+								iB++;
+								break;
+							}
 
-
+							if( !A.ea.x ) {
+												A.pre = iOP; break; }
+							A.post = iOP;
+							iA++;
 							break;
+
 						case gpeALF_add:
 						case gpeALF_inc:
 						case gpeALF_sub:
 						case gpeALF_dec:
 
+						case gpeALF_or:
+						case gpeALF_xor:
+							///{ + ++ - -- | ^ }-----------------------------------------------
+							if( iC ) {
+								if( !C.ea.x ) {
+												C.pre = iOP; break; }
+								C.post = iOP;
+								iC++;
+								break;
+							}
+							if( iB ) {
+								if( !B.ea.x ) {
+												B.pre = iOP; break; }
+								B.post = iOP;
+								iB++;
+								break;
+							}
+
+							if( !A.ea.x ) {
+												A.pre = iOP; break; }
+							A.post = iOP;
+							iA++;
 							break;
 
 						/// valamineki vége le kell nulázni az iABC-ket
@@ -103,6 +144,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_comE:
 
 						case gpeALF_com:
+
 						case gpeALF_and:
 						case gpeALF_andLG:
 						case gpeALF_mul:
@@ -110,12 +152,11 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_div:
 						case gpeALF_rem:
 
-						case gpeALF_xor:
+
 
 						case gpeALF_eqLG:
 						case gpeALF_neqLG:
 
-						case gpeALF_or:
 						case gpeALF_orLG:
 
 

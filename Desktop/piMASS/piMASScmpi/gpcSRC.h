@@ -127,7 +127,7 @@ static const gpcOPCD gpaOPCi[] = {
 
 };
 static const char* gpasOPER[] = {
-
+	"_ nop",
 
 	"! notLG",	"!! LG",	"~ inv",
 
