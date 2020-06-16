@@ -72,22 +72,22 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_mov:
 							///{  X=  }-----------------------------------------------
 							if( iC ) {
-								if( !C.ea.x ) {
-												C.pre = iOP; break; }
+								if( !C.ea.x ) 	{
+													C.pre = iOP; break; }
 								C.post = iOP;
 								iC++;
 								break;
 							}
 							if( iB ) {
-								if( !B.ea.x ) {
-												B.pre = iOP; break; }
+								if( !B.ea.x ) 	{
+													B.pre = iOP; break; }
 								B.post = iOP;
 								iB++;
 								break;
 							}
 
-							if( !A.ea.x ) {
-												A.pre = iOP; break; }
+							if( !A.ea.x ) 		{
+													A.pre = iOP; break; }
 							A.post = iOP;
 							iA++;
 							break;
@@ -101,22 +101,22 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_xor:
 							///{ + ++ - -- | ^ }-----------------------------------------------
 							if( iC ) {
-								if( !C.ea.x ) {
-												C.pre = iOP; break; }
+								if( !C.ea.x ) 	{
+													C.pre = iOP; break; }
 								C.post = iOP;
 								iC++;
 								break;
 							}
 							if( iB ) {
-								if( !B.ea.x ) {
-												B.pre = iOP; break; }
+								if( !B.ea.x ) 	{
+													B.pre = iOP; break; }
 								B.post = iOP;
 								iB++;
 								break;
 							}
 
-							if( !A.ea.x ) {
-												A.pre = iOP; break; }
+							if( !A.ea.x ) 		{
+													A.pre = iOP; break; }
 							A.post = iOP;
 							iA++;
 							break;
