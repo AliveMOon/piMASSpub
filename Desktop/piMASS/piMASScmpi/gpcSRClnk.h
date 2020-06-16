@@ -87,7 +87,8 @@ public:
 class gpcCDR {
 public:
 	I8x2 ea;
-	U1	pre, typ, post;
+	U1	pre, typ, post, pad;
+	U4  deep;
 
 	gpcCDR& null() { gpmCLR; return *this; }
 };
@@ -127,6 +128,7 @@ public:
 		if( tmp > iCDr )
 			return *this; // lefele lépett
 		p_cd->null();
+		p_cd[0].deep = p_cd[1].deep;
 		return *this;
 	}
 };

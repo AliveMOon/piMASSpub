@@ -3,14 +3,17 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-#define C Csp.CDR().p_cd[0]
-#define B Bsp.CDR().p_cd[0]
+//#define C Csp.CDR().p_cd[0]
+//#define B Bsp.CDR().p_cd[0]
 #define A Asp.CDR().p_cd[0]
+//#define dC C.deep
+//#define dB B.deep
+#define dA A.deep
 
-#define iC Csp.CDR().p_sp[0].x
-#define iB Bsp.CDR().p_sp[0].x
+
+//#define iC Csp.CDR().p_sp[0].x
+//#define iB Bsp.CDR().p_sp[0].x
 #define iA Asp.CDR().p_sp[0].x
-
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
@@ -39,8 +42,8 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 		switch( (M.rMNclr>>0x10)&0xf )
 		{
 			case gpeCLR_blue2: 	///ABC
-				if( iC ) { C.ea.cdrMILL( pS, nS ); break; }
-				if( iB ) { B.ea.cdrMILL( pS, nS ); break; }
+				// if( iC ) { C.ea.cdrMILL( pS, nS ); break; }
+				// if( iB ) { B.ea.cdrMILL( pS, nS ); break; }
 				A.ea.cdrMILL( pS, nS );
 				break;
 			case gpeCLR_orange:	///NUM
@@ -49,14 +52,14 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 			case gpeCLR_green2: {///OPER
 					iOP = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
 					opALF = pOP[iOP].alf;
-					switch( opALF )
+					if( !A.ea.x )
 					{
-						case gpeALF_dot:
-							if( iC ) { C.post = iOP; iC++; break; }
-							if( iB ) { B.post = iOP; iB++; break; }
-							A.post = iOP;
-							iA++;
-							break;
+						A.pre = iOP;
+					}
+					else switch( opALF )
+					{
+
+					///{  &= *= **= /= //= %= ^= |= += -= <<= >>= =  }-----------------------------------------------
 						case gpeALF_andM:
 						case gpeALF_mulM:
 						case gpeALF_expM:
@@ -70,58 +73,67 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_slM:
 						case gpeALF_srM:
 						case gpeALF_mov:
-							///{  X=  }-----------------------------------------------
-							if( iC ) {
-								if( !C.ea.x ) 	{
-													C.pre = iOP; break; }
-								C.post = iOP;
-								iC++;
-								break;
-							}
-							if( iB ) {
-								if( !B.ea.x ) 	{
-													B.pre = iOP; break; }
-								B.post = iOP;
-								iB++;
-								break;
-							}
-
-							if( !A.ea.x ) 		{
-													A.pre = iOP; break; }
 							A.post = iOP;
-							iA++;
+							++iA;
 							break;
-
+					///{  + ++ - -- | ^  }-----------------------------------------------
 						case gpeALF_add:
 						case gpeALF_inc:
 						case gpeALF_sub:
 						case gpeALF_dec:
-
-						case gpeALF_or:
-						case gpeALF_xor:
-							///{ + ++ - -- | ^ }-----------------------------------------------
-							if( iC ) {
-								if( !C.ea.x ) 	{
-													C.pre = iOP; break; }
-								C.post = iOP;
-								iC++;
-								break;
-							}
-							if( iB ) {
-								if( !B.ea.x ) 	{
-													B.pre = iOP; break; }
-								B.post = iOP;
-								iB++;
-								break;
-							}
-
-							if( !A.ea.x ) 		{
-													A.pre = iOP; break; }
+						case gpeALF_or:		// a vagy a log. össze adás
+						case gpeALF_xor:	// a vagy a log. össze adás majd *-1
 							A.post = iOP;
-							iA++;
+							++iA;
 							break;
 
-						/// valamineki vége le kell nulázni az iABC-ket
+					///{  ~ * ** / % & ! !!  }-----------------------------------------------
+						case gpeALF_inv:	// végülis ez *-1-gel
+						case gpeALF_and:	// és log. szorzás
+						case gpeALF_mul:	// szorzás
+						case gpeALF_exp:	// sokszor szorzás
+						case gpeALF_div:	// reciprokkal szorzás
+						case gpeALF_rem:	// osztás maradéka
+						case gpeALF_sl:		// << *2^n
+						case gpeALF_sr:		// << /2^n
+						case gpeALF_notLG:
+						case gpeALF_LG:
+							A.post = iOP;
+							++dA;
+							++iA;
+							break;
+					///{  .  }-----------------------------------------------
+						case gpeALF_dot:
+							A.post = iOP;
+							++iA;
+							break;
+					///{  ~> :: ( [ { ?  }-----------------------------------------------
+						case gpeALF_entry:
+						case gpeALF_out:
+						case gpeALF_brakS:
+						case gpeALF_dimS:
+						case gpeALF_begin:
+						case gpeALF_if:
+							A.post = iOP;
+							++dA;
+							++iA;
+							break;
+
+					///{  && == != || <= < >= >  }-----------------------------------------------
+						case gpeALF_andLG:
+						case gpeALF_neqLG:
+						case gpeALF_orLG:
+						case gpeALF_eqLG:
+						case gpeALF_leLG:
+						case gpeALF_ltLG:
+						case gpeALF_beLG:
+						case gpeALF_bgLG:
+							A.post = iOP;
+							++dA;
+							++iA;
+							break;
+
+					/// valamineki vége le kell nulázni az iABC-ket
 						case gpeALF_stk:
 
 							iZNmx.x++;
@@ -135,54 +147,17 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 							iZNmx.y++;
 							break;
-						case gpeALF_notLG:
-						case gpeALF_LG:
-						case gpeALF_inv:
 
-
-						case gpeALF_comS:
-						case gpeALF_comE:
-
-						case gpeALF_com:
-
-						case gpeALF_and:
-						case gpeALF_andLG:
-						case gpeALF_mul:
-						case gpeALF_exp:
-						case gpeALF_div:
-						case gpeALF_rem:
-
-
-
-						case gpeALF_eqLG:
-						case gpeALF_neqLG:
-
-						case gpeALF_orLG:
-
-
-
-						case gpeALF_leLG:
-						case gpeALF_ltLG:
-						case gpeALF_sl:
-
-						case gpeALF_beLG:
-						case gpeALF_bgLG:
-						case gpeALF_sr:
-
-
-						case gpeALF_entry:
-						case gpeALF_out:
-
-						case gpeALF_brakS:
-						case gpeALF_brakE:
-						case gpeALF_dimS:
-						case gpeALF_dimE:
-						case gpeALF_begin:
-						case gpeALF_end:
-						case gpeALF_if:
 						case gpeALF_else:
+						case gpeALF_comE:
+						case gpeALF_brakE:
+						case gpeALF_dimE:
+						case gpeALF_end:
 						case gpeALF_mail:
+
 						case gpeALF_str:
+						case gpeALF_comS:
+						case gpeALF_com:
 						default:
 							break;
 					}
