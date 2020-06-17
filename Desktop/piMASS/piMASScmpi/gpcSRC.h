@@ -23,7 +23,7 @@
 //~ SOFTWARE.
 #include "gpcgt.h"
 #include "gpcOPCD.h"
-#include "gpeTYP.h"
+//#include "gpeTYP.h"
 
 class gpcRES;
 class gpcCRS;

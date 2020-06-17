@@ -43,7 +43,7 @@
 #define gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)		(U8)( gpdABCDEFGH(a,b,c,d,e,f,g,h)*gpdALF + gpdA(i) )
 #define gpdABCDEFGHIJ(a,b,c,d,e,f,g,h,i,j)	(U8)( gpdABCDEFGHI(a,b,c,d,e,f,g,h,i)*gpdALF + gpdA(j) )
 
-typedef enum gpeALFu4: U4
+typedef enum gpeALFu4:U4
 {
 	gpeALFu4_null = 0,
 	gpeALFu4_A,
@@ -503,7 +503,7 @@ typedef enum gpeALFu4: U4
 	gpeALFu4_MWLQKWU = (U4)gpdABCDEFG('M', 'W', 'L', 'Q', 'K', 'W', 'U'),
 	gpeALFu4_U4      = gpeALFu4_MWLQKWU,
 } gpeALFu4;
-typedef enum gpeALF: I8
+typedef enum gpeALF:I8
 {
 	gpeALF_null = 0,
 	gpeALF_A,

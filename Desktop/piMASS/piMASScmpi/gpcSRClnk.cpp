@@ -14,6 +14,9 @@ extern char gpaALF_H_sub[];
 //#define iC Csp.CDR().p_sp[0].x
 //#define iB Bsp.CDR().p_sp[0].x
 #define iA Asp.CDR().p_sp[0].x
+
+#define OBJadd ((gpcOBJlnk*)SCOOP.obj.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+#define OBJget ((gpcOBJlnk*)SCOOP.obj.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
@@ -21,10 +24,16 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc, aLNK[0x10];
-	U4 nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
+	U4 nS, nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
+
 	pDBG->lzyRST();
 	const char *pS;
 	U8 nS;
+
+	OBJ.lzyRST();
+	gpcOBJlnk* pOBJ;
+
+
 	gpeALF opALF;
 	I4x4 iZNmx = 0;
 	gpcCDRsp Asp, Bsp, Csp;
@@ -33,28 +42,58 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	{
 		U4x4& link = pL0[l];
 		M = pM0[link.x];
-		pS = SCOOP.dct.sSTRix(M.rMNinxt.z, NULL);
-		if( !pS )
-			continue;
-		nS = SCOOP.dct.nSTRix(M.rMNinxt.z);
-		if( !nS )
-			continue;
+
+
+		// még nem tud ja micsoda kicsoda
+		if( !M.w )
+		{
+			pS = SCOOP.dct.sSTRix(M.rMNinxt.z, NULL);
+			if( !pS )
+				continue;
+			nS = SCOOP.dct.nSTRix(M.rMNinxt.z);
+			if( !nS )
+				continue;
+		}
+
 		switch( (M.rMNclr>>0x10)&0xf )
 		{
 			case gpeCLR_blue2: 	///ABC
-				// if( iC ) { C.ea.cdrMILL( pS, nS ); break; }
-				// if( iB ) { B.ea.cdrMILL( pS, nS ); break; }
-				A.ea.cdrMILL( pS, nS );
+				if( M.w )
+				{
+					A.obj = M.w;
+					A.typ = OBJget.typ;
+					break;
+				}
+				// ez a mini még nincs feldolgozva
+				A.obj = M.w = (iOPe+SCOOP.nOBJ);
+				A.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
+				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_orange:	///NUM
-
+				if( M.w )
+				{
+					A.obj = M.w;
+					A.typ = OBJget.typ;
+					break;
+				}
+				// ez a mini még nincs feldolgozva
+				A.obj = M.w = (iOPe+SCOOP.nOBJ);
+				A.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
+				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_green2: {///OPER
-					iOP = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
-					opALF = pOP[iOP].alf;
-					if( !A.ea.x )
+					if( !M.w ) {
+						M.w = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
+						///!!! ez majd kell, ha mert több operátor is lesz egy pS-ben
+						U4 n = dOP.nSTRix(M.w);
+						if( !M.w )
+							break;
+					}
+
+					opALF = pOP[M.w].alf;
+					if( A.obj < iOPe )
 					{
-						A.pre = iOP;
+						A.pre = M.w;
 					}
 					else switch( opALF )
 					{
@@ -73,7 +112,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_slM:
 						case gpeALF_srM:
 						case gpeALF_mov:
-							A.post = iOP;
+							A.post = M.w;
 							++iA;
 							break;
 					///{  + ++ - -- | ^  }-----------------------------------------------
@@ -83,12 +122,12 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_dec:
 						case gpeALF_or:		// a vagy a log. össze adás
 						case gpeALF_xor:	// a vagy a log. össze adás majd *-1
-							A.post = iOP;
+							A.post = M.w;
 							++iA;
 							break;
 
 					///{  ~ * ** / % & ! !!  }-----------------------------------------------
-						case gpeALF_inv:	// végülis ez *-1-gel
+						case gpeALF_inv:	// végülis ez *-1-gyel
 						case gpeALF_and:	// és log. szorzás
 						case gpeALF_mul:	// szorzás
 						case gpeALF_exp:	// sokszor szorzás
@@ -98,13 +137,13 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_sr:		// << /2^n
 						case gpeALF_notLG:
 						case gpeALF_LG:
-							A.post = iOP;
+							A.post = M.w;
 							++dA;
 							++iA;
 							break;
 					///{  .  }-----------------------------------------------
 						case gpeALF_dot:
-							A.post = iOP;
+							A.post = M.w;
 							++iA;
 							break;
 					///{  ~> :: ( [ { ?  }-----------------------------------------------
@@ -114,7 +153,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_dimS:
 						case gpeALF_begin:
 						case gpeALF_if:
-							A.post = iOP;
+							A.post = M.w;
 							++dA;
 							++iA;
 							break;
@@ -128,7 +167,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_ltLG:
 						case gpeALF_beLG:
 						case gpeALF_bgLG:
-							A.post = iOP;
+							A.post = M.w;
 							++dA;
 							++iA;
 							break;

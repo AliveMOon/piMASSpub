@@ -1,4 +1,6 @@
-#include "gpcSRC.h"
+#include <gpcSRC.h>
+
+
 extern U1 gpaALFsub[];
 
 I8x2& I8x2::operator = ( const U1* pS )
@@ -12,64 +14,34 @@ I8x2& I8x2::operator = ( const U1* pS )
 	num = pE-pS;
 	return *this;
 }
-I8x2& I8x2::operator = ( const char* pS )
+I8x2& I8x2::operator = ( const char* pS ) { return *this = (U1*)pS; }
+gpeTYP I8x2::cdrMILLnum( const char* pS, U4 nS )
 {
-	return *this = (U1*)pS;
+	if( !this )
+		gpeTYP_null;
+	char* pSe = (char*)pS;
+	uy = gpfSTR2U8( pSe, &pSe );
+	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+	/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
+	/// see you examp. -> enum gpeTYP:U4
+	if( pS >= pSe )
+		return gpeTYP_U8;
+
+	dy = (double)uy + gpmSTR2D( pSe );
+	return gpeTYP_D;
 }
-U1 I8x2::cdrMILL( const char* pS, U4 nS )
-	{
-		num = nS;
-		*this = pS;
-		char *pSi = (char*)pS+num, *pSe;
-		U1 typ = alf ? 0x10:0;
-		if( typ ? (num >= nS) : true )
-			return typ;
+gpeTYP I8x2::cdrMILLalf( const char* pS, U4 nS )
+{
+	if( !this )
+		gpeTYP_null;
 
-		num = gpfSTR2I8( pSi, &pSe );
-		if(pSe > pSi)
-			typ |= 0x20;
-
-		if( pSe-pS < nS )
-		if( *pSe == 'x' || *pSe == 'X' )
-		{
-			// vector
-			switch( pSe[1] )
-			{
-				case '2':
-					typ |= 1;
-					break;
-
-				case '3':
-				case '4':
-					typ |= 2;
-					break;
-
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-					typ |= 3;
-					break;
-
-				case '9':
-				case 'a':
-				case 'b':
-				case 'c':
-				case 'd':
-				case 'e':
-				case 'f':
-				case 'A':
-				case 'B':
-				case 'C':
-				case 'D':
-				case 'E':
-				case 'F':
-					typ |= 4;
-					break;
-
-				default:
-					break;
-			}
-		}
+	num = nS;
+	*this = pS;
+	char *pSi = (char*)pS+num, *pSe;
+	gpeTYP typ = alf ? gpeTYP_A:gpeTYP_null;
+	if( typ ? (num >= nS) : true )
 		return typ;
-	}
+
+	num = gpfSTR2I8( pSi, &pSe );
+	return (pSe > pSi) ? typ : gpeTYP_AN;
+}

@@ -227,7 +227,7 @@ public:
 	gpcREG& operator = ( U4 u4 )
 	{
 		u = u4;
-		bD.u4 = 2;
+		bD.u4 = gpeTYP_U4;
 		return *this;
 	}
 	gpcREG& operator = ( I4 i4 )
@@ -236,33 +236,33 @@ public:
 		{
 			i = i4;
 			u = -i;
-			bD.u4 = 0x82;
+			bD.u4 = gpeTYP_I4;
 			return *this;
 		}
 		u = i4;
-		bD.u4 = 2;
+		bD.u4 = gpeTYP_U4;
 		return *this;
 	}
 	gpcREG& operator = ( float f4 )
 	{
 		i = (d = f4);
-		bD.u4 = ( f4 < 0.0 ) ? 0x82 : 0;
+		bD.u4 = ( f4 < 0.0 ) ? gpeTYP_I4 : 0;
 		if( bD.u4 || ((float)i != f4) ) // neg? || float?
 		{
 			u = bD.u4 ? -i : i;
-			bD.u4 = 0xc2;
+			bD.u4 = gpeTYP_F;
 			return *this;
 		}
 
 		u = i;
-		bD.u4 = 0x42;
+		bD.u4 = gpeTYP_UF;
 		return *this;
 	}
 
 	gpcREG& operator = ( U8 u8 )
 	{
 		u = u8;
-		bD.u4 = 3;
+		bD.u4 = gpeTYP_U8;
 		return *this;
 	}
 	gpcREG& operator = ( I8 i8 )
@@ -271,26 +271,26 @@ public:
 		{
 			i = i8;
 			u = -i;
-			bD.u4 = 0x83;
+			bD.u4 = gpeTYP_I8;
 			return *this;
 		}
 		u = i8;
-		bD.u4 = 3;
+		bD.u4 = gpeTYP_U8;
 		return *this;
 	}
 	gpcREG& operator = ( double d8 )
 	{
 		i = (d = d8);
-		bD.u4 = ( d < 0.0 ) ? 0x83 : 0;
+		bD.u4 = ( d < 0.0 ) ? gpeTYP_I8 : 0;
 		if( bD.u4 || ((double)i != d) ) // neg? || float?
 		{
 			u = bD.u4 ? -i : i;
-			bD.u4 = 0xc3;
+			bD.u4 = gpeTYP_D;
 			return *this;
 		}
 
 		u = i;
-		bD.u4 = 0x43;
+		bD.u4 = gpeTYP_UD;
 		return *this;
 	}
 
