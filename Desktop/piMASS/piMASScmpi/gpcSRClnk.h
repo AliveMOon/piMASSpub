@@ -84,11 +84,19 @@ public:
 	}
 
 };*/
+class gpcOBJlnk {
+public:
+	I8x2	obj;
+	gpeTYP	typ;
+	gpcOBJlnk(){};
+};
+
+
 class gpcCDR {
 public:
-	I8x2 ea;
 	U1	pre, typ, post, pad;
 	U4  deep;
+	U4	obj;
 
 	gpcCDR& null() { gpmCLR; return *this; }
 };

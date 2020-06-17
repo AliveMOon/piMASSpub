@@ -4005,7 +4005,7 @@ public:
 	I8x2 abs( void ) const { return I8x2( x<0?-x:x, y<0?-y:y ); }
 
 	gpeTYP cdrMILLnum( const char* pS, U4 nS );
-	gpeTYP cdrMILL( const char* pS, U4 nS );
+	gpeTYP cdrMILLalf( const char* pS, U4 nS );
 
 	U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
 		if( !p_buff )

@@ -697,6 +697,7 @@ public:
 #define rMNinxt au4x4[0]
 #define rMNpos ai4x4[1].a4x2[0]
 #define rMNclr au4x4[1].z
+#define rMNlnk au4x4[1].w
 static char gpsNoWord[] = {
 							"\\ \t\a\r\n*&/%+-|~^?!=$.,:;\'\"{}[]()"
 						};
@@ -710,12 +711,13 @@ class gpcSCOOP {
 public:
 	gpcLZYdct	dct;
 	gpcLZY		lnk,
-				mini,
+				mini, obj,
 				vASM;
 	I8x4 rMN;
 	U4x4 rLNK;
 	U4	iDCT, nDCT,
-		nLNK, nMINI;
+		nLNK, nOBJ,
+		nMINI;
 	U1	*pALL, *pMN;	/// ezt a gpcSRC::SRCmill adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )

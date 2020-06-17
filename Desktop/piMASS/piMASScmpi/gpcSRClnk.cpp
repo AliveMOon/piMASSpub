@@ -14,23 +14,23 @@ extern char gpaALF_H_sub[];
 //#define iC Csp.CDR().p_sp[0].x
 //#define iB Bsp.CDR().p_sp[0].x
 #define iA Asp.CDR().p_sp[0].x
-
-#define OBJadd ((gpcOBJlnk*)SCOOP.obj.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
-#define OBJget ((gpcOBJlnk*)SCOOP.obj.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+#define OBJ SCOOP.obj
+#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+#define OBJget ((gpcOBJlnk*)OBJ.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
 		return;
+	pDBG->lzyRST();
 
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M;
-	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc, aLNK[0x10];
-	U4 nS, nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
+	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc; //, aLNK[0x10];
+	U4 nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
 
-	pDBG->lzyRST();
+	OBJ.lzyRST();
 	const char *pS;
 	U8 nS;
 
-	OBJ.lzyRST();
 	gpcOBJlnk* pOBJ;
 
 
@@ -45,7 +45,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 
 		// még nem tud ja micsoda kicsoda
-		if( !M.w )
+		if( !M.rMNlnk )
 		{
 			pS = SCOOP.dct.sSTRix(M.rMNinxt.z, NULL);
 			if( !pS )
@@ -58,42 +58,42 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 		switch( (M.rMNclr>>0x10)&0xf )
 		{
 			case gpeCLR_blue2: 	///ABC
-				if( M.w )
+				if( M.rMNlnk )
 				{
-					A.obj = M.w;
+					A.obj = M.rMNlnk;
 					A.typ = OBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				A.obj = M.w = (iOPe+SCOOP.nOBJ);
+				A.obj = M.rMNlnk = (iOPe+SCOOP.nOBJ);
 				A.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_orange:	///NUM
-				if( M.w )
+				if( M.rMNlnk )
 				{
-					A.obj = M.w;
+					A.obj = M.rMNlnk;
 					A.typ = OBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				A.obj = M.w = (iOPe+SCOOP.nOBJ);
+				A.obj = M.rMNlnk = (iOPe+SCOOP.nOBJ);
 				A.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_green2: {///OPER
-					if( !M.w ) {
-						M.w = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
+					if( !M.rMNlnk ) {
+						M.rMNlnk = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
 						///!!! ez majd kell, ha mert több operátor is lesz egy pS-ben
-						U4 n = dOP.nSTRix(M.w);
-						if( !M.w )
+						U4 n = dOP.nSTRix(M.rMNlnk);
+						if( !M.rMNlnk )
 							break;
 					}
 
-					opALF = pOP[M.w].alf;
+					opALF = pOP[M.rMNlnk].alf;
 					if( A.obj < iOPe )
 					{
-						A.pre = M.w;
+						A.pre = M.rMNlnk;
 					}
 					else switch( opALF )
 					{
@@ -112,7 +112,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_slM:
 						case gpeALF_srM:
 						case gpeALF_mov:
-							A.post = M.w;
+							A.post = M.rMNlnk;
 							++iA;
 							break;
 					///{  + ++ - -- | ^  }-----------------------------------------------
@@ -122,7 +122,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_dec:
 						case gpeALF_or:		// a vagy a log. össze adás
 						case gpeALF_xor:	// a vagy a log. össze adás majd *-1
-							A.post = M.w;
+							A.post = M.rMNlnk;
 							++iA;
 							break;
 
@@ -137,13 +137,13 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_sr:		// << /2^n
 						case gpeALF_notLG:
 						case gpeALF_LG:
-							A.post = M.w;
+							A.post = M.rMNlnk;
 							++dA;
 							++iA;
 							break;
 					///{  .  }-----------------------------------------------
 						case gpeALF_dot:
-							A.post = M.w;
+							A.post = M.rMNlnk;
 							++iA;
 							break;
 					///{  ~> :: ( [ { ?  }-----------------------------------------------
@@ -153,7 +153,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_dimS:
 						case gpeALF_begin:
 						case gpeALF_if:
-							A.post = M.w;
+							A.post = M.rMNlnk;
 							++dA;
 							++iA;
 							break;
@@ -167,7 +167,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_ltLG:
 						case gpeALF_beLG:
 						case gpeALF_bgLG:
-							A.post = M.w;
+							A.post = M.rMNlnk;
 							++dA;
 							++iA;
 							break;

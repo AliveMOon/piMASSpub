@@ -61,6 +61,8 @@ typedef enum gpeTYP:U4
 	gpeTYP_I84 	= MAKE_ID( 0x83, 4, 1, 32 ),
 	gpeTYP_D4  	= MAKE_ID( 0xc3, 4, 1, 32 ),
 
+	gpeTYP_OP 	= MAKE_ID( 0xff, 0, 0, 0 ),
+
 	gpeTYP_STRmsk = ~gpeTYP_STR, //MAKE_ID( 0xef, 0xff, 0xff, 0xff ),
 } gpeTYPU4;
 
