@@ -24,11 +24,18 @@ gpeTYP I8x2::cdrMILLnum( const char* pS, U4 nS )
 	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 	/// see you examp. -> enum gpeTYP:U4
-	if( pS >= pSe )
-		return gpeTYP_U8;
+	if( *pSe != '.' )
+	if( uy > 0xFFff )
+		return uy > 0xFFFFffff ? gpeTYP_U8 : gpeTYP_U4;
+	else
+		return uy > 0xFf ? gpeTYP_U2 : gpeTYP_U1;
 
 	dy = (double)uy + gpmSTR2D( pSe );
-	return gpeTYP_D;
+	double ady = dy < 0.0 ? -dy : dy;
+	if( (ady>(1024.0*1024.0)) || (ady<(1.0/1024.0)) )  // 2^23
+		return gpeTYP_D;
+
+	return gpeTYP_F;
 }
 gpeTYP I8x2::cdrMILLalf( const char* pS, U4 nS )
 {

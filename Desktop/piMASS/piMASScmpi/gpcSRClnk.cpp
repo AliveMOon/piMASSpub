@@ -3,45 +3,58 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-//#define C Csp.CDR().p_cd[0]
-//#define B Bsp.CDR().p_cd[0]
-#define A Asp.CDR().p_cd[0]
-//#define dC C.deep
-//#define dB B.deep
-#define dA A.deep
-
-
-//#define iC Csp.CDR().p_sp[0].x
-//#define iB Bsp.CDR().p_sp[0].x
-#define iA Asp.CDR().p_sp[0].x
 #define OBJ SCOOP.obj
-#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
-#define OBJget ((gpcOBJlnk*)OBJ.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+
+#ifdef piMASS_DEBUG
+	#define dA (pDP=&A.deep)[0]
+	#define A (pA0=Asp.CDR().p_cd)[0]
+	#define iA (pSP=Asp.CDR().p_sp)[0].x
+	#define OBJadd (pOB0=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+	#define OBJget (pOB1=(gpcOBJlnk*)OBJ.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+#else
+	#define dA A.deep
+	#define A Asp.CDR().p_cd[0]
+	#define iA Asp.CDR().p_sp[0].x
+	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+#endif
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
 		return;
 	pDBG->lzyRST();
 
-	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M;
+	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M, Mnx;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc; //, aLNK[0x10];
 	U4 nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
 
 	OBJ.lzyRST();
 	const char *pS;
-	U8 nS;
-
+	const char *pSTR;
+	U8 nS, nSTR;
+#ifdef piMASS_DEBUG
 	gpcOBJlnk* pOBJ;
-
+	gpcCDR	*pA0;
+	gpcOBJlnk	*pOB0, *pOB1;
+	U2x2 *pSP;
+	U4* pDP;
+#endif
 
 	gpeALF opALF;
 	I4x4 iZNmx = 0;
-	gpcCDRsp Asp, Bsp, Csp;
+	gpcCDRsp Asp; //, Bsp, Csp;
 
-	for( U4 le = SCOOP.nLiNK(), l = 0, m = 0; l < le; l++ )
+	for( U4 le = SCOOP.nLiNK(), l = 0, mNX; l < le; l++ )
 	{
 		U4x4& link = pL0[l];
 		M = pM0[link.x];
+		pSTR = NULL;
+		if( (mNX=link.x+1) < nM )
+		if( pM0[mNX].rMNinxt.z == gpeTYP_STR )
+		if( (Mnx = pM0[mNX]).rMNinxt.z == gpeTYP_STR )
+		if( ((Mnx.rMNclr>>0x10)&0xf) == gpeCLR_violet )
+		if(	nSTR = SCOOP.dct.nSTRix(Mnx.rMNinxt.z) )
+			pSTR = SCOOP.dct.sSTRix(Mnx.rMNinxt.z, NULL);
 
 
 		// még nem tud ja micsoda kicsoda
@@ -127,7 +140,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 							break;
 
 					///{  ~ * ** / % & ! !!  }-----------------------------------------------
-						case gpeALF_inv:	// végülis ez *-1-gyel
+						case gpeALF_inv:	// végül is ez *-1-gyel
 						case gpeALF_and:	// és log. szorzás
 						case gpeALF_mul:	// szorzás
 						case gpeALF_exp:	// sokszor szorzás

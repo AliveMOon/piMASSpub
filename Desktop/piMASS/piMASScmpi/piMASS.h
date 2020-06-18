@@ -23,6 +23,7 @@
 //~ SOFTWARE.
 
 //#include "mysys.h"
+#define piMASS_DEBUG 1
 #include <exception>
 #include <mysys.h>
 #include <errno.h>

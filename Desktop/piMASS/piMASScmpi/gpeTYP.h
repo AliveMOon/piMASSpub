@@ -38,6 +38,8 @@ typedef enum gpeTYP:U4
 	gpeTYP_null,
 	gpeTYP_STR 	= MAKE_ID( 0x10, 1, 1, 1 ),
 	gpeTYP_U1 	= MAKE_ID( 0x00, 1, 1, 1 ),
+	gpeTYP_U2 	= MAKE_ID( 0x01, 1, 1, 1 ),
+	gpeTYP_I2 	= MAKE_ID( 0x81, 1, 1, 1 ),
 	gpeTYP_U4 	= MAKE_ID( 0x02, 1, 1, 4 ),
 	gpeTYP_I4 	= MAKE_ID( 0x82, 1, 1, 4 ),
 	gpeTYP_UF  	= MAKE_ID( 0x42, 1, 1, 4 ),
