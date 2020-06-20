@@ -45,10 +45,10 @@ gpeTYP I8x2::cdrMILLalf( const char* pS, U4 nS )
 	num = nS;
 	*this = pS;
 	char *pSi = (char*)pS+num, *pSe;
-	gpeTYP typ = alf ? gpeTYP_A:gpeTYP_null;
+	gpeTYP typ = alf ? gpeTYP_sA8:gpeTYP_null;
 	if( typ ? (num >= nS) : true )
 		return typ;
 
 	num = gpfSTR2I8( pSi, &pSe );
-	return (pSe > pSi) ? typ : gpeTYP_AN;
+	return (pSe > pSi) ? typ : gpeTYP_sA8N;
 }

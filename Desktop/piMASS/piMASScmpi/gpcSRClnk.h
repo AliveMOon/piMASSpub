@@ -21,20 +21,31 @@ public:
 
 class gpcCDsp {
 public:
-	U4		iCD, refCD;
+	I4		iCD, refCD;
 	gpcCD	*pCD;
 	gpcLZY	cd;
 
-	U4		*apSP[0x30], aiSP[0x30];
+	I4		*apSP[0x30], aiSP[0x30];
 	gpcLZY	aSP[0x30];
 
 	gpcCDsp(){ gpmCLR; refCD = -1; };
 	gpcCDsp& operator ++()
 	{
-		U1 p = CD()->pst;
+		U1 p = CD()[0].pst;
 		++aiSP[p];
-		(apSP[p] = ((U4*)aSP[p].Ux( aiSP[p], sizeof(U4))))[0] = iCD;
+		(apSP[p] = ((I4*)aSP[p].Ux( aiSP[p], sizeof(I4))))[0] = iCD;
 		++iCD;
+		CD()[0].null();
+		return *this;
+	}
+	gpcCDsp& operator --()
+	{
+		CD()[0].null();
+		--iCD;
+		U1 p = CD()[0].pst;
+		(apSP[p] = ((I4*)aSP[p].Ux( aiSP[p], sizeof(I4))))[0] = 0;
+		--aiSP[p];
+		CD();
 		return *this;
 	}
 	gpcCD* CD()
@@ -44,15 +55,24 @@ public:
 
 		return pCD;
 	}
-	U4 opi( U1 i )
+	I4 opi( U1 i )
 	{
-		return aiSP[i] ? (apSP[i]?*apSP[i]:(U4)-1) : (U4)-1;
+		return aiSP[i] ? (apSP[i]?*apSP[i]:-1) : -1;
 	}
-	U4* opi( U4* pO, U1* pL, U1 nL )
+	U1 opi( I4x2* pO, gpeOPid* pL, U1 nL )
 	{
-		for( U1 i = 0; i < nL; i++ )
-			pO[i] = opi(pL[i]);
-		return pO;
+		U1 i = 0, j = 0;
+		for( ; i < nL; i++ )
+		{
+			if( !pL[i] )
+				break;
+			if( opi(pL[i]) < 0 )
+				continue;
+			pO[j].null().pst = pL[i];
+			pO[j].iCD = opi(pL[i]);
+			++j;
+		}
+		return j;
 	}
 };
 

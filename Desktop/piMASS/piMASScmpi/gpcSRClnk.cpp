@@ -18,6 +18,7 @@ extern char gpaALF_H_sub[];
 	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
 	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #endif
+#define aaOPid gpaaOPid[lnk.y]
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
@@ -27,7 +28,6 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M, Mnx;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc; //, aLNK[0x10];
 	U4 nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
-
 	OBJ.lzyRST();
 	const char *pS;
 	const U1 *pSTR;
@@ -40,7 +40,8 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	gpcOBJlnk	*pOBn, *pOBi;
 
 #endif
-	U4 aFND[0x30];
+	I4x2 aFND[0x40];
+	U1 nFND;
 	gpeALF opALF;
 	I4x4 iZNmx = 0;
 	gpeCLR clr;
@@ -121,6 +122,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 					{
 
 					///{  &= *= **= /= //= %= ^= |= += -= <<= >>= =  }-----------------------------------------------
+						case gpeALF_mov:
 						case gpeALF_andM:
 						case gpeALF_mulM:
 						case gpeALF_expM:
@@ -133,7 +135,6 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_subM:
 						case gpeALF_slM:
 						case gpeALF_srM:
-						case gpeALF_mov:
 							cd.pst = lnk.y;
 							++CDsp;
 							break;
@@ -142,8 +143,8 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_inc:
 						case gpeALF_sub:
 						case gpeALF_dec:
-						case gpeALF_or:		// a vagy a log. össze adás
-						case gpeALF_xor:	// a vagy a log. össze adás majd *-1
+						case gpeALF_or:		// avagy a log. össze adás
+						case gpeALF_xor:	// avagy a log. össze adás majd *-1
 							cd.pst = lnk.y;
 							++CDsp;
 							break;
@@ -167,18 +168,12 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 							cd.pst = lnk.y;
 							++CDsp;
 							break;
-					///{  ~> :: ( [ { ?  }-----------------------------------------------
-						case gpeALF_entry:
-						case gpeALF_out:
-						case gpeALF_brakS:
-						case gpeALF_dimS:
-						case gpeALF_begin:
-						case gpeALF_if:
-							cd.pst = lnk.y;
-							++CDsp;
-							break;
+
+
 
 					///{  && == != || <= < >= >  }-----------------------------------------------
+					/// cmp utasítás lényegében kivonás,
+					/// csak nem a különbség van eltárólva hanem a különbség kondiciója
 						case gpeALF_andLG:
 						case gpeALF_neqLG:
 						case gpeALF_orLG:
@@ -191,43 +186,56 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 							++CDsp;
 							break;
 
-					/// valamineki vége le kell nulázni az iABC-ket
+					///{  ~> :: ( [ { ?  }-----------------------------------------------
+						case gpeALF_entry:
+						case gpeALF_out:
+						case gpeALF_brakS:
+						case gpeALF_dimS:
+						case gpeALF_begin:
+						case gpeALF_if:
+							cd.pst = lnk.y;
+							++CDsp;
+							break;
+
+					/// valamineki vége
+					/// szegyük vissza a PULCSIT!
+						case gpeALF_newrow:
 						case gpeALF_stk: {
-								static U1 lst[] = {gpeOPid_mov,gpeOPid_brakS};
-								CDsp.opi( aFND, lst, sizeof(lst) );
-								iZNmx.x++;
-								if( iZNmx.z < iZNmx.x )
+								//static gpeOPid lst[] = {gpeOPid_mov,gpeOPid_brakS};
+								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+								aFND->median( nFND, aFND+nFND+1 );
+								for( U4 up = CDsp.iCD, dwn = aFND[0].iCD; up > dwn; --up )
 								{
-									// bővíteni kell
-
+									U4x4& INS = ((U4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
+									INS = U4x4( pCD[-1].pst, pCD[0].obj, pCD[-1].obj );
+									--CDsp;
 								}
-
 							} break;
-						case gpeALF_newrow: {
-								static U1 lst[] = {gpeOPid_mov,gpeOPid_brakS};
-								CDsp.opi( aFND, lst, sizeof(lst) );
-
-								iZNmx.y++;
-							} break;
-
 
 						case gpeALF_brakE: {
-								static U1 lst[] = {gpeOPid_brakS};
-								CDsp.opi( aFND, lst, sizeof(lst) );
+								//static gpeOPid lst[] = {gpeOPid_brakS};
+								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+								aFND->median( nFND, aFND+nFND+1 );
+
 							} break;
 						case gpeALF_dimE:{
-								static U1 lst[] = {gpeOPid_dimS};
-								CDsp.opi( aFND, lst, sizeof(lst) );
+								//static gpeOPid lst[] = {gpeOPid_dimS};
+								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+								aFND->median( nFND, aFND+nFND+1 );
+
 							} break;
 
 						case gpeALF_else:{
-								static U1 lst[] = {gpeOPid_if};
-								CDsp.opi( aFND, lst, sizeof(lst) );
+								//static gpeOPid lst[] = {gpeOPid_if};
+								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+								aFND->median( nFND, aFND+nFND+1 );
 							} break;
 
 						case gpeALF_end:{
-								static U1 lst[] = {gpeOPid_begin};
-								CDsp.opi( aFND, lst, sizeof(lst) );
+								//static gpeOPid lst[] = {gpeOPid_begin};
+								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+								aFND->median( nFND, aFND+nFND+1 );
+
 							} break;
 
 						case gpeALF_str:

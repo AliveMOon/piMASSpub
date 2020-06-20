@@ -160,40 +160,7 @@ static const char* gpasOPER[] = {
 	"? if",		": else",
 	"@ mail",	"\" str",
 };
-typedef enum gpeOPid:U1{
-	gpeOPid_nop,
 
-	gpeOPid_notLG,	gpeOPid_LG,		gpeOPid_inv,
-
-	gpeOPid_stk,	gpeOPid_newrow,
-
-	gpeOPid_comS, 	gpeOPid_comE,	gpeOPid_com,
-
-
-	gpeOPid_and, 	gpeOPid_andLG, 	gpeOPid_andM,
-	gpeOPid_mul,	gpeOPid_exp, 	gpeOPid_mulM,
-									gpeOPid_expM,
-	gpeOPid_div, 	gpeOPid_divM, 	gpeOPid_rootM,
-	gpeOPid_rem, 	gpeOPid_remM,
-	gpeOPid_xor,	gpeOPid_xorM,
-
-
-	gpeOPid_mov, 	gpeOPid_eqLG,  	gpeOPid_neqLG,
-	gpeOPid_or, 	gpeOPid_orLG,	gpeOPid_orM,
-	gpeOPid_add, 	gpeOPid_inc,	gpeOPid_addM,	/// -------------- GOOD
-	gpeOPid_sub, 	gpeOPid_dec,	gpeOPid_subM,
-
-
-	gpeOPid_leLG,	gpeOPid_ltLG, 	gpeOPid_sl, 	gpeOPid_slM,
-	gpeOPid_beLG,	gpeOPid_bgLG, 	gpeOPid_sr, 	gpeOPid_srM,
-
-	gpeOPid_dot, 	gpeOPid_entry, 	gpeOPid_out,
-	gpeOPid_brakS,	gpeOPid_brakE,
-	gpeOPid_dimS, 	gpeOPid_dimE,
-	gpeOPid_begin, 	gpeOPid_end,
-	gpeOPid_if,		gpeOPid_else,
-	gpeOPid_mail,	gpeOPid_str,
-} gpeOPid_U1;
 
 inline U4 gpfUTF8( const U1* pS, U1** ppS ) {
 	U4 utf8 = *pS;
@@ -753,9 +720,9 @@ public:
 				mini, obj,
 				vASM;
 	I8x4 rMN;
-	U4x4 rLNK;
+	U4x4 rLNK, rINS;
 	U4	//iDCT,
-		nDCT, nLNK, nOBJ, nMINI;
+		nDCT, nLNK, nOBJ, nMINI, nvASM;
 	U1	*pALL, *pMN;	/// ezt a gpcSRC::SRCmill adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )
@@ -763,13 +730,15 @@ public:
 		dct.rst();
 		lnk.lzyRST();
 		mini.lzyRST();
+		vASM.lzyRST();
 		//iDCT =
 		nDCT =
-		nLNK = nMINI = 0;
+		nLNK = nMINI = nvASM = 0;
 		pALL = pU;	// ezt a gpcSRC::SRCmill adja
 	}
 	U4 nMN() { return nMINI = mini.nLD()/sizeof(rMN); }
 	U4 nLiNK() { return nLNK = lnk.nLD()/sizeof(rLNK); }
+	U4 nASM() { return nvASM = vASM.nLD()/sizeof(rINS); }
 
 	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff )
 	{

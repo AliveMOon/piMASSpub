@@ -2512,6 +2512,12 @@ public:
 		struct{
 			U8 u8;
 		};
+		struct{
+			gpeOPtyp	typ;
+			U1			wh;
+			gpeOPid		pst, pre;
+			I4 iCD;
+		};
 	};
 
     I4x2(){};
