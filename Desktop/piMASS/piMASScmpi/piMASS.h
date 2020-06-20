@@ -6394,9 +6394,12 @@ szasz:
 		{
 			lzyADD( NULL, e-n_load, s, -1 );
 			gpmZn( p_alloc+s, e-s );
+			if( n_load > (i+1)*n )
+				n_load = (i+1)*n;
 		}
 
-        return p_alloc+e-n*2;
+
+        return p_alloc + i*n;//+e-n*2;
 	}
 };
 

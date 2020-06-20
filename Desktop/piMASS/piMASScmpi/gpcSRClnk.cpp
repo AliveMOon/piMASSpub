@@ -248,7 +248,6 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 					/// szegyük vissza a PULCSIT!
 						case gpeALF_newrow:
 						case gpeALF_stk: {
-								//static gpeOPid lst[] = {gpeOPid_mov,gpeOPid_brakS};
 								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
 								aFND->median( nFND, aFND+nFND+1 );
 								for( U4 up = CDsp.iCD, dwn = aFND[0].iCD; up > dwn; --up )
