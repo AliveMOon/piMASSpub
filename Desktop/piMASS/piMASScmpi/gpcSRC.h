@@ -779,7 +779,12 @@ public:
 		if( !nU )
 			return nMINI;
 
- 		U4 iDCT = dct.dctMILLfnd( pUi, nU, nDCT );
+ 		U8 nS = nU, nI;
+ 		U4 iDCT = dct.dctMILLfndnS( pUi, nS, nDCT );
+ 		if( iDCT < nDCT )
+		if( (nI=dct.nSTRix(iDCT)) != nS )
+			iDCT = nDCT;
+
 		if( iDCT >= nDCT )
 		{
 			// nem volt a listában
