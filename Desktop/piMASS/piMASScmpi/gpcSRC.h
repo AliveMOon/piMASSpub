@@ -160,6 +160,40 @@ static const char* gpasOPER[] = {
 	"? if",		": else",
 	"@ mail",	"\" str",
 };
+typedef enum gpeOPid:U1{
+	gpeOPid_nop,
+
+	gpeOPid_notLG,	gpeOPid_LG,		gpeOPid_inv,
+
+	gpeOPid_stk,	gpeOPid_newrow,
+
+	gpeOPid_comS, 	gpeOPid_comE,	gpeOPid_com,
+
+
+	gpeOPid_and, 	gpeOPid_andLG, 	gpeOPid_andM,
+	gpeOPid_mul,	gpeOPid_exp, 	gpeOPid_mulM,
+									gpeOPid_expM,
+	gpeOPid_div, 	gpeOPid_divM, 	gpeOPid_rootM,
+	gpeOPid_rem, 	gpeOPid_remM,
+	gpeOPid_xor,	gpeOPid_xorM,
+
+
+	gpeOPid_mov, 	gpeOPid_eqLG,  	gpeOPid_neqLG,
+	gpeOPid_or, 	gpeOPid_orLG,	gpeOPid_orM,
+	gpeOPid_add, 	gpeOPid_inc,	gpeOPid_addM,	/// -------------- GOOD
+	gpeOPid_sub, 	gpeOPid_dec,	gpeOPid_subM,
+
+
+	gpeOPid_leLG,	gpeOPid_ltLG, 	gpeOPid_sl, 	gpeOPid_slM,
+	gpeOPid_beLG,	gpeOPid_bgLG, 	gpeOPid_sr, 	gpeOPid_srM,
+
+	gpeOPid_dot, 	gpeOPid_entry, 	gpeOPid_out,
+	gpeOPid_brakS,	gpeOPid_brakE,
+	gpeOPid_dimS, 	gpeOPid_dimE,
+	gpeOPid_begin, 	gpeOPid_end,
+	gpeOPid_if,		gpeOPid_else,
+	gpeOPid_mail,	gpeOPid_str,
+} gpeOPid_U1;
 
 inline U4 gpfUTF8( const U1* pS, U1** ppS ) {
 	U4 utf8 = *pS;
@@ -694,10 +728,15 @@ public:
 	}
 };
 
-#define rMNinxt au4x4[0]
+#define iMNinlt au4x4[0]
+#define iMNi au4x4[0].x
+#define iMNn au4x4[0].y
+#define iMNlnk au4x4[0].z
+#define iMNtyp au4x4[0].w
+
 #define rMNpos ai4x4[1].a4x2[0]
 #define rMNclr au4x4[1].z
-#define rMNlnk au4x4[1].w
+//#define rMNlnk au4x4[1].w
 static char gpsNoWord[] = {
 							"\\ \t\a\r\n*&/%+-|~^?!=$.,:;\'\"{}[]()"
 						};
@@ -715,9 +754,8 @@ public:
 				vASM;
 	I8x4 rMN;
 	U4x4 rLNK;
-	U4	iDCT, nDCT,
-		nLNK, nOBJ,
-		nMINI;
+	U4	//iDCT,
+		nDCT, nLNK, nOBJ, nMINI;
 	U1	*pALL, *pMN;	/// ezt a gpcSRC::SRCmill adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )
@@ -725,7 +763,8 @@ public:
 		dct.rst();
 		lnk.lzyRST();
 		mini.lzyRST();
-		iDCT = nDCT =
+		//iDCT =
+		nDCT =
 		nLNK = nMINI = 0;
 		pALL = pU;	// ezt a gpcSRC::SRCmill adja
 	}
@@ -740,7 +779,7 @@ public:
 		if( !nU )
 			return nMINI;
 
- 		iDCT = dct.dctMILLfnd( pUi, nU, nDCT );
+ 		U4 iDCT = dct.dctMILLfnd( pUi, nU, nDCT );
 		if( iDCT >= nDCT )
 		{
 			// nem volt a listában
@@ -751,8 +790,8 @@ public:
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		rLNK = nMINI;
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, iDCT, typ );
+		rLNK = U4x4(nMINI);
+		rMN.iMNinlt = U4x4( pUi-pALL, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -772,7 +811,7 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNinlt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -790,7 +829,7 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNinlt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );

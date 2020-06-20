@@ -185,12 +185,12 @@ U1 gpcSRC::SRCmnMILLscn( gpcCRS& crs, bool bNoMini, U1 selID ) {
 	for( U4 nM = SCOOP.nMN(), m = 0; m < nM; m++ )
 	{
 		cxy = pM0[m].rMNpos;
-		i = pM0[m].rMNinxt.x;
-		j = pM0[m].rMNinxt.y+i;
+		i = pM0[m].iMNinlt.x;
+		j = pM0[m].iMNinlt.y+i;
 
 		if( (crs.iSTR.y < i) && (crs.iSTR.y > j) )
 			continue;
-		bSTR = (tSTR==pM0[m].rMNinxt.w);
+		bSTR = (tSTR==pM0[m].iMNinlt.w);
 		for( ; i <= j; i++ )
 		{
 			bONpre = bON;
@@ -334,9 +334,9 @@ I4x2 gpcSRC::SRCmnMILL(
 		cxy = xy+pM0[m].rMNpos;
 		if(cxy.y>=fWH.y)
 			break;
-		i = pM0[m].rMNinxt.x;
-		n = pM0[m].rMNinxt.y;
-		bSTR = tSTR == pM0[m].rMNinxt.w;
+		i = pM0[m].iMNinlt.x;
+		n = pM0[m].iMNinlt.y;
+		bSTR = tSTR == pM0[m].iMNinlt.w;
 		clr = pM0[m].rMNclr;
 		for( j = i+n; i < j; i++ )
 		{

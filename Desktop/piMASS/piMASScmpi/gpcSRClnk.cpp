@@ -6,17 +6,17 @@ extern char gpaALF_H_sub[];
 #define OBJ SCOOP.obj
 
 #ifdef piMASS_DEBUG
-	#define dA (pDP=&A.deep)[0]
-	#define A (pA0=Asp.CDR().p_cd)[0]
-	#define iA (pSP=Asp.CDR().p_sp)[0].x
-	#define OBJadd (pOB0=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
-	#define OBJget (pOB1=(gpcOBJlnk*)OBJ.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+	/// gpcCDR
+	#define cd (pCD=CDsp.CD())[0]
+	/// gpcOBJlnk
+	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+	#define OBJadd (pOBn=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #else
-	#define dA A.deep
-	#define A Asp.CDR().p_cd[0]
-	#define iA Asp.CDR().p_sp[0].x
+	/// gpcCDR
+	#define cd CDsp.CDR().p_cd[0]
+	/// gpcOBJlnk
+	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
 	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
-	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (A.obj-iOPe), sizeof(gpcOBJlnk)))[0]
 #endif
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
@@ -30,83 +30,92 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 	OBJ.lzyRST();
 	const char *pS;
-	const char *pSTR;
+	const U1 *pSTR;
 	U8 nS, nSTR;
+	gpcCDsp CDsp; //, Bsp, Csp;
 #ifdef piMASS_DEBUG
-	gpcOBJlnk* pOBJ;
-	gpcCDR	*pA0;
-	gpcOBJlnk	*pOB0, *pOB1;
-	U2x2 *pSP;
-	U4* pDP;
-#endif
+	gpcCD	*pCD;
 
+	gpcOBJlnk* pOBJ;
+	gpcOBJlnk	*pOBn, *pOBi;
+
+#endif
+	U4 aFND[0x30];
 	gpeALF opALF;
 	I4x4 iZNmx = 0;
-	gpcCDRsp Asp; //, Bsp, Csp;
-
-	for( U4 le = SCOOP.nLiNK(), l = 0, mNX; l < le; l++ )
+	gpeCLR clr;
+	//for( U4 le = SCOOP.nLiNK(), l = 0, mNX; l < le; l++ )
+	for( U4 nM = SCOOP.nMN(), m = 0, l; m < nM; m++ )
 	{
-		U4x4& link = pL0[l];
-		M = pM0[link.x];
+		clr = (gpeCLR)((pM0[m].rMNclr>>0x10)&0xf);
+		if( clr == gpeCLR_red2 )
+				continue;
+
+		M = pM0[m]; //pM0[link.x];
 		pSTR = NULL;
-		if( (mNX=link.x+1) < nM )
-		if( pM0[mNX].rMNinxt.z == gpeTYP_STR )
-		if( (Mnx = pM0[mNX]).rMNinxt.z == gpeTYP_STR )
-		if( ((Mnx.rMNclr>>0x10)&0xf) == gpeCLR_violet )
-		if(	nSTR = SCOOP.dct.nSTRix(Mnx.rMNinxt.z) )
-			pSTR = SCOOP.dct.sSTRix(Mnx.rMNinxt.z, NULL);
-
-
-		// még nem tud ja micsoda kicsoda
-		if( !M.rMNlnk )
+		if( M.iMNtyp == gpeTYP_STR )
 		{
-			pS = SCOOP.dct.sSTRix(M.rMNinxt.z, NULL);
+			if( clr != gpeCLR_violet )
+				continue;
+
+			pSTR = (nSTR=M.iMNn) ? SCOOP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
+
+			cd.obj = m;
+			cd.typ = gpeTYP_STR;
+			continue;
+		}
+
+		U4x4& lnk = pL0[l=M.iMNlnk];
+		// még nem tud ja micsoda kicsoda
+		if( !lnk.y )
+		{
+			pS = SCOOP.dct.sSTRix(l, NULL);
 			if( !pS )
 				continue;
-			nS = SCOOP.dct.nSTRix(M.rMNinxt.z);
+			nS = SCOOP.dct.nSTRix(l);
 			if( !nS )
 				continue;
 		}
 
-		switch( (M.rMNclr>>0x10)&0xf )
+		switch( clr )
 		{
 			case gpeCLR_blue2: 	///ABC
-				if( M.rMNlnk )
+				if( lnk.y )
 				{
-					A.obj = M.rMNlnk;
-					A.typ = OBJget.typ;
+					cd.obj = lnk.y;
+					cd.typ = OBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				A.obj = M.rMNlnk = (iOPe+SCOOP.nOBJ);
-				A.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
+				cd.obj = lnk.y = (iOPe+SCOOP.nOBJ);
+				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_orange:	///NUM
-				if( M.rMNlnk )
+				if( lnk.y )
 				{
-					A.obj = M.rMNlnk;
-					A.typ = OBJget.typ;
+					cd.obj = lnk.y;
+					cd.typ = OBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				A.obj = M.rMNlnk = (iOPe+SCOOP.nOBJ);
-				A.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
+				cd.obj = lnk.y = (iOPe+SCOOP.nOBJ);
+				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_green2: {///OPER
-					if( !M.rMNlnk ) {
-						M.rMNlnk = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
+					if( !lnk.y ) {
+						lnk.y = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
 						///!!! ez majd kell, ha mert több operátor is lesz egy pS-ben
-						U4 n = dOP.nSTRix(M.rMNlnk);
-						if( !M.rMNlnk )
+						U4 n = dOP.nSTRix(lnk.y);
+						if( !lnk.y )
 							break;
 					}
 
-					opALF = pOP[M.rMNlnk].alf;
-					if( A.obj < iOPe )
+					opALF = pOP[lnk.y].alf;
+					if( cd.obj < iOPe )
 					{
-						A.pre = M.rMNlnk;
+						cd.pre = lnk.y;
 					}
 					else switch( opALF )
 					{
@@ -125,8 +134,8 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_slM:
 						case gpeALF_srM:
 						case gpeALF_mov:
-							A.post = M.rMNlnk;
-							++iA;
+							cd.pst = lnk.y;
+							++CDsp;
 							break;
 					///{  + ++ - -- | ^  }-----------------------------------------------
 						case gpeALF_add:
@@ -135,8 +144,8 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_dec:
 						case gpeALF_or:		// a vagy a log. össze adás
 						case gpeALF_xor:	// a vagy a log. össze adás majd *-1
-							A.post = M.rMNlnk;
-							++iA;
+							cd.pst = lnk.y;
+							++CDsp;
 							break;
 
 					///{  ~ * ** / % & ! !!  }-----------------------------------------------
@@ -150,14 +159,13 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_sr:		// << /2^n
 						case gpeALF_notLG:
 						case gpeALF_LG:
-							A.post = M.rMNlnk;
-							++dA;
-							++iA;
+							cd.pst = lnk.y;
+							++CDsp;
 							break;
 					///{  .  }-----------------------------------------------
 						case gpeALF_dot:
-							A.post = M.rMNlnk;
-							++iA;
+							cd.pst = lnk.y;
+							++CDsp;
 							break;
 					///{  ~> :: ( [ { ?  }-----------------------------------------------
 						case gpeALF_entry:
@@ -166,9 +174,8 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_dimS:
 						case gpeALF_begin:
 						case gpeALF_if:
-							A.post = M.rMNlnk;
-							++dA;
-							++iA;
+							cd.pst = lnk.y;
+							++CDsp;
 							break;
 
 					///{  && == != || <= < >= >  }-----------------------------------------------
@@ -180,36 +187,55 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_ltLG:
 						case gpeALF_beLG:
 						case gpeALF_bgLG:
-							A.post = M.rMNlnk;
-							++dA;
-							++iA;
+							cd.pst = lnk.y;
+							++CDsp;
 							break;
 
 					/// valamineki vége le kell nulázni az iABC-ket
-						case gpeALF_stk:
+						case gpeALF_stk: {
+								static U1 lst[] = {gpeOPid_mov,gpeOPid_brakS};
+								CDsp.opi( aFND, lst, sizeof(lst) );
+								iZNmx.x++;
+								if( iZNmx.z < iZNmx.x )
+								{
+									// bővíteni kell
 
-							iZNmx.x++;
-							if( iZNmx.z < iZNmx.x )
-							{
-								// bővíteni kell
+								}
 
-							}
-							break;
-						case gpeALF_newrow:
+							} break;
+						case gpeALF_newrow: {
+								static U1 lst[] = {gpeOPid_mov,gpeOPid_brakS};
+								CDsp.opi( aFND, lst, sizeof(lst) );
 
-							iZNmx.y++;
-							break;
+								iZNmx.y++;
+							} break;
 
-						case gpeALF_else:
-						case gpeALF_comE:
-						case gpeALF_brakE:
-						case gpeALF_dimE:
-						case gpeALF_end:
-						case gpeALF_mail:
+
+						case gpeALF_brakE: {
+								static U1 lst[] = {gpeOPid_brakS};
+								CDsp.opi( aFND, lst, sizeof(lst) );
+							} break;
+						case gpeALF_dimE:{
+								static U1 lst[] = {gpeOPid_dimS};
+								CDsp.opi( aFND, lst, sizeof(lst) );
+							} break;
+
+						case gpeALF_else:{
+								static U1 lst[] = {gpeOPid_if};
+								CDsp.opi( aFND, lst, sizeof(lst) );
+							} break;
+
+						case gpeALF_end:{
+								static U1 lst[] = {gpeOPid_begin};
+								CDsp.opi( aFND, lst, sizeof(lst) );
+							} break;
 
 						case gpeALF_str:
 						case gpeALF_comS:
 						case gpeALF_com:
+						case gpeALF_comE:
+						case gpeALF_mail:
+
 						default:
 							break;
 					}
@@ -243,8 +269,12 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 			pSe = strchr( (char*)gpasOPER[i], ' ' );
 			if( !pSe )
 				continue;
-
+			U4 n = pSe-gpasOPER[i];
 			iOP = mass.OPER.dctMILLfnd( (U1*)gpasOPER[i], pSe-gpasOPER[i], iOPe );
+			if( iOP < iOPe )
+			if( mass.OPER.nSTRix(iOP) != n )
+				iOP = iOPe;
+
 			if( iOP >= iOPe )
 			{
 				iOP = iOPe;

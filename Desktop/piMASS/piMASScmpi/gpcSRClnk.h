@@ -2,88 +2,6 @@
 #define GPCSRCLNK_H
 #include "piMASS.h"
 
-/*#define iAi ((U4x2*)Ai.Ux(iiiA,sizeof(U4x2)))
-#define iBi ((U4x2*)Bi.Ux(iiiB,sizeof(U4x2)))
-#define iCi ((U4x2*)Ci.Ux(iiiC,sizeof(U4x2)))
-
-#define iA iAi[0].y
-#define iB iBi[0].y
-#define iC iCi[0].y
-
-#define A ((gpcAx*)Ao.Ux(iAi[0].sum(),sizeof(gpcAx)))
-#define B ((gpcAx*)Bo.Ux(iBi[0].sum(),sizeof(gpcAx)))
-#define C ((gpcAx*)Co.Ux(iCi[0].sum(),sizeof(gpcAx)))*/
-
-/*class gpcAx{
-public:
-	I8x2 	AN;
-	U1		typ, op, x, y;
-	gpcAx(){};
-	gpcAx& null() { gpmCLR; return *this; }
-	gpcAx& OP( U1 o ) { op=o; return *this; }
-	gpcAx& ZN( I8x2 zn ) { gpmCLR; AN=zn; typ=4; return *this; } // typ=4 ZN coordináta
-	U1 an( const char* pS, U4 nS )
-	{
-		AN.num = nS;
-		AN = pS;
-		char *pSi = (char*)pS+AN.num, *pSe;
-		typ = !!AN.x;
-		if( typ ? (AN.num >= nS) : true )
-			return typ;
-
-		AN.num = gpfSTR2I8( pSi, &pSe );
-		if(pSe > pSi)
-			typ |= 2;
-
-		if( pSe-pS < nS )
-		if( *pSe == 'x' || *pSe == 'X' )
-		{
-			// vector
-			switch( pSe[1] )
-			{
-				case '2':
-					x = 2;
-					break;
-
-				case '3':
-				case '4':
-					x = 4;
-					break;
-
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-					x = 8;
-					break;
-
-				case '9':
-				case 'a':
-				case 'b':
-				case 'c':
-				case 'd':
-				case 'e':
-				case 'f':
-				case 'A':
-				case 'B':
-				case 'C':
-				case 'D':
-				case 'E':
-				case 'F':
-					x = 0x10;
-					break;
-
-				default:
-					x = 1;
-					break;
-			}
-		}
-
-
-		return typ;
-	}
-
-};*/
 class gpcOBJlnk {
 public:
 	I8x2	obj;
@@ -92,52 +10,49 @@ public:
 };
 
 
-class gpcCDR {
+class gpcCD {
 public:
-	U1	pre, typ, post, pad;
-	U4  deep;
-	U4	obj;
+	U1		pre, pst;
+	gpeTYP	typ;
+	U4		obj;
 
-	gpcCDR& null() { gpmCLR; return *this; }
+	gpcCD& null() { gpmCLR; return *this; }
 };
-class gpcCDRsp {
+
+class gpcCDsp {
 public:
-	U4		iSPr, iSP,
-			iCDr;
-	U2x2	*p_sp;
-	gpcCDR	*p_cd;
+	U4		iCD, refCD;
+	gpcCD	*pCD;
+	gpcLZY	cd;
 
-	gpcLZY	sp,
-			cd;
+	U4		*apSP[0x30], aiSP[0x30];
+	gpcLZY	aSP[0x30];
 
-	gpcCDRsp(){ gpmCLR; };
-	gpcCDRsp& CDR()
+	gpcCDsp(){ gpmCLR; refCD = -1; };
+	gpcCDsp& operator ++()
 	{
-		if( !iSP )
-			iSP = 1;
-		U4 tmp;
-		if( iSPr != iSP )
-		{
-			if( iSPr < iSP )
-			{
-				// felfele lépett
-				tmp = iSPr;
-				p_sp = ((U2x2*)sp.Ux(iSPr=iSP,sizeof(U2x2)));
-				p_sp->x = 0;
-				p_sp->y = ((U2x2*)sp.Ux(tmp,sizeof(U2x2)))->sum()+1;
-			} else {
-				p_sp = ((U2x2*)sp.Ux(iSPr=iSP,sizeof(U2x2)));
-			}
-		}
-		if( iCDr == p_sp[0].sum() )
-			return *this;
-		tmp = iCDr;
-		p_cd = ((gpcCDR*)cd.Ux(iCDr=p_sp[0].sum(),sizeof(gpcCDR)));
-		if( tmp > iCDr )
-			return *this; // lefele lépett
-		p_cd->null();
-		p_cd[0].deep = p_cd[1].deep;
+		U1 p = CD()->pst;
+		++aiSP[p];
+		(apSP[p] = ((U4*)aSP[p].Ux( aiSP[p], sizeof(U4))))[0] = iCD;
+		++iCD;
 		return *this;
+	}
+	gpcCD* CD()
+	{
+		if( refCD != iCD )
+			pCD = ((gpcCD*)cd.Ux( refCD=iCD, sizeof(gpcCD)));
+
+		return pCD;
+	}
+	U4 opi( U1 i )
+	{
+		return aiSP[i] ? (apSP[i]?*apSP[i]:(U4)-1) : (U4)-1;
+	}
+	U4* opi( U4* pO, U1* pL, U1 nL )
+	{
+		for( U1 i = 0; i < nL; i++ )
+			pO[i] = opi(pL[i]);
+		return pO;
 	}
 };
 
