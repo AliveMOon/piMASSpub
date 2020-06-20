@@ -4015,9 +4015,10 @@ public:
 	gpeTYP cdrMILLalf( const char* pS, U4 nS );
 
 	//U8
-	size_t an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
-		if( !p_buff )
+	size_t an2str( void* p_b, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
+		if( !p_b )
 			return 0;
+		U1* p_buff = (U1*)p_b;
 		if( !this )
 		{
 			*p_buff = 0;

@@ -24,34 +24,34 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 {
 	char sBstr[] = "FFFFffffFFFFffff",
 		*pBD, nB = sizeof(sBstr)-1;
-	size_t n, o;
+	size_t n;
 	switch( typ )
 	{
 		case gpeTYP_sA8:
-			return gpfALF2STR( pS, alf );
+			return gpfALF2STR( pS, obj.alf );
 		case gpeTYP_sA8N:
-			return an2str( pS );
+			return obj.an2str( pS );
 		case gpeTYP_U1:
-			return sprintf( pS, "0x%0.2x", uy );
+			return sprintf( pS, "0x%0.2x", obj.uy );
 		case gpeTYP_U2:
-			return sprintf( pS, "0x%0.4x", uy );
+			return sprintf( pS, "0x%0.4x", obj.uy );
 		case gpeTYP_U4:
-			return sprintf( pS, "0x%0.8x", uy );
-		case gpeTYP_U4:
-			return sprintf( pS, "0x%0.16llx", uy );
+			return sprintf( pS, "0x%0.8x", obj.uy );
+		case gpeTYP_U8:
+			return sprintf( pS, "0x%0.16llx", obj.uy );
 
 		case gpeTYP_I1:
-			return sprintf( pS, "0x%.3d", num );
+			return sprintf( pS, "0x%.3d", obj.num );
 		case gpeTYP_I2:
-			return sprintf( pS, "0x%.6d", num );
+			return sprintf( pS, "0x%.6d", obj.num );
 		case gpeTYP_I4:
-			return sprintf( pS, "0x%.9d", num );
-		case gpeTYP_I4:
-			return sprintf( pS, "0x%.12lld", num );
+			return sprintf( pS, "0x%.9d", obj.num );
+		case gpeTYP_I8:
+			return sprintf( pS, "0x%.12lld", obj.num );
 
 		case gpeTYP_D:
 		case gpeTYP_F:
-			return sprintf( pS, "%0.7f", dy );
+			return sprintf( pS, "%0.7f", obj.dy );
 		case gpeTYP_STR:
 			n = pM0[obj.uy].iMNn;
 			if( n > nB )
@@ -60,7 +60,7 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 			sBstr[n]=0;
 			return sprintf( pS, "\"%s...\"", sBstr );
 		default:
-			o = sprintf( "0x%0x4.0x%0x4", obj.x, obj.y );
+			n = sprintf( pS, "0x%0.8llx.0x%0.8llx", obj.x, obj.y );
 			break;
 	}
 	return n;
@@ -108,7 +108,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 			pSTR = (nSTR=M.iMNn) ? SCOOP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
 
-			cd.obj = I8x2( (I8)gpeALF_STR, m );
+			cd.obj = m ;
 			cd.typ = gpeTYP_STR;
 			continue;
 		}
