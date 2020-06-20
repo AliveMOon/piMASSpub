@@ -2,11 +2,31 @@
 #define GPCSRCLNK_H
 #include "piMASS.h"
 
+#define OBJ SCOOP.obj
+/*
+#ifdef piMASS_DEBUG
+	/// gpcCDR
+	#define cd (pCD=CDsp.CD())[0]
+	/// gpcOBJlnk
+	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+	#define OBJadd (pOBn=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+#else
+	/// gpcCDR
+	#define cd CDsp.CDR().p_cd[0]
+	/// gpcOBJlnk
+	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+#endif
+#define aaOPid gpaaOPid[lnk.y]*/
+
 class gpcOBJlnk {
 public:
 	I8x2	obj;
 	gpeTYP	typ;
 	gpcOBJlnk(){};
+
+	size_t strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   );
+
 };
 
 

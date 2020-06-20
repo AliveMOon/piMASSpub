@@ -233,6 +233,43 @@ static gpeOPid_U1 gpaaOPid[][0x20] = {
 	{gpeOPid_str,gpeOPid_nop,},
 };
 
+static const char* gpasINS[] = {
+	"\n %0.4x nop.%s\t%s,%s",
+
+	"\n %0.4x notLG.%s\t%s,%s",	"\n %0.4x LG.%s\t%s,%s",	"\n %0.4x inv.%s\t%s,%s",
+
+	"\n %0.4x stk.%s\t%s,%s",	"\n %0.4x nrow.%s\t%s,%s",
+
+	"\n %0.4x comS.%s\t%s,%s", 	"\n %0.4x comE.%s\t%s,%s",	"\n %0.4x com.%s\t%s,%s",
+
+
+	"\n %0.4x and.%s\t%s,%s", 	"\n %0.4x andLG.%s\t%s,%s",	"\n %0.4x andM.%s\t%s,%s",
+	"\n %0.4x mul.%s\t%s,%s", 	"\n %0.4x exp.%s\t%s,%s",	"\n %0.4x mulM.%s\t%s,%s",
+								"\n %0.4x expM.%s\t%s,%s",
+	"\n %0.4x div.%s\t%s,%s", 	"\n %0.4x divM.%s\t%s,%s",	"\n %0.4x rootM.%s\t%s,%s",
+	"\n %0.4x rem.%s\t%s,%s", 	"\n %0.4x remM.%s\t%s,%s",
+	"\n %0.4x xor.%s\t%s,%s",	"\n %0.4x xorM.%s\t%s,%s",
+
+
+	"\n %0.4x mov.%s\t%s,%s", 	"\n %0.4x eqLG.%s\t%s,%s",  "\n %0.4x neqLG.%s\t%s,%s",
+	"\n %0.4x or.%s\t%s,%s", 	"\n %0.4x orLG.%s\t%s,%s",	"\n %0.4x orM.%s\t%s,%s",
+	"\n %0.4x add.%s\t%s,%s", 	"\n %0.4x inc.%s\t%s,%s",	"\n %0.4x addM.%s\t%s,%s",	/// -------------- GOOD
+	"\n %0.4x sub.%s\t%s,%s", 	"\n %0.4x dec.%s\t%s,%s",	"\n %0.4x subM.%s\t%s,%s",
+
+
+	"\n %0.4x leLG.%s\t%s,%s",	"\n %0.4x ltLG.%s\t%s,%s", 	"\n %0.4x sl.%s\t%s,%s",
+	"\n %0.4x slM.%s\t%s,%s",
+	"\n %0.4x beLG.%s\t%s,%s",	"\n %0.4x bgLG.%s\t%s,%s", 	"\n %0.4x sr.%s\t%s,%s",
+	"\n %0.4x srM.%s\t%s,%s",
+
+	"\n %0.4x dot.%s\t%s,%s", 	"\n %0.4x entry.%s\t%s,%s", "\n %0.4x out.%s\t%s,%s",
+	"\n %0.4x brakS.%s\t%s,%s",	"\n %0.4x brakE.%s\t%s,%s",
+	"\n %0.4x dimS.%s\t%s,%s", 	"\n %0.4x dimE.%s\t%s,%s",
+	"\n %0.4x begin.%s\t%s,%s",	"\n %0.4x end.%s\t%s,%s",
+	"\n %0.4x if.%s\t%s,%s",	"\n %0.4x else.%s\t%s,%s",
+	"\n %0.4x mail.%s\t%s,%s",	"\n %0.4x str.%s\t%s,%s",
+};
+
 /// TYP
 typedef enum gpeTYP:U4
 {
@@ -253,7 +290,7 @@ typedef enum gpeTYP:U4
 	gpeTYP_D  	= MAKE_ID( 0xc3, 1, 1, 8 ),
 
 	gpeTYP_sA8	= MAKE_ID( 0x93, 1, 1, 8 ),
-	gpeTYP_sA8N 	= MAKE_ID( 0x93, 2, 1, 16 ),
+	gpeTYP_sA8N = MAKE_ID( 0x93, 2, 1, 16 ),
 
 
 	gpeTYP_U14 	= MAKE_ID( 0x00, 4, 1, 4 ),

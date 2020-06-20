@@ -4014,7 +4014,8 @@ public:
 	gpeTYP cdrMILLnum( const char* pS, U4 nS );
 	gpeTYP cdrMILLalf( const char* pS, U4 nS );
 
-	U8 an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
+	//U8
+	size_t an2str( U1* p_buff, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
 		if( !p_buff )
 			return 0;
 		if( !this )

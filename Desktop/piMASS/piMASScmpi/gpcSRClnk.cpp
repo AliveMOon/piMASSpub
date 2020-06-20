@@ -3,7 +3,8 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-#define OBJ SCOOP.obj
+
+
 
 #ifdef piMASS_DEBUG
 	/// gpcCDR
@@ -19,6 +20,52 @@ extern char gpaALF_H_sub[];
 	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #endif
 #define aaOPid gpaaOPid[lnk.y]
+size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
+{
+	char sBstr[] = "FFFFffffFFFFffff",
+		*pBD, nB = sizeof(sBstr)-1;
+	size_t n, o;
+	switch( typ )
+	{
+		case gpeTYP_sA8:
+			return gpfALF2STR( pS, alf );
+		case gpeTYP_sA8N:
+			return an2str( pS );
+		case gpeTYP_U1:
+			return sprintf( pS, "0x%0.2x", uy );
+		case gpeTYP_U2:
+			return sprintf( pS, "0x%0.4x", uy );
+		case gpeTYP_U4:
+			return sprintf( pS, "0x%0.8x", uy );
+		case gpeTYP_U4:
+			return sprintf( pS, "0x%0.16llx", uy );
+
+		case gpeTYP_I1:
+			return sprintf( pS, "0x%.3d", num );
+		case gpeTYP_I2:
+			return sprintf( pS, "0x%.6d", num );
+		case gpeTYP_I4:
+			return sprintf( pS, "0x%.9d", num );
+		case gpeTYP_I4:
+			return sprintf( pS, "0x%.12lld", num );
+
+		case gpeTYP_D:
+		case gpeTYP_F:
+			return sprintf( pS, "%0.7f", dy );
+		case gpeTYP_STR:
+			n = pM0[obj.uy].iMNn;
+			if( n > nB )
+				n = nB;
+			gpmMcpy( sBstr, pALL+(pM0[obj.uy]).iMNi, n );
+			sBstr[n]=0;
+			return sprintf( pS, "\"%s...\"", sBstr );
+		default:
+			o = sprintf( "0x%0x4.0x%0x4", obj.x, obj.y );
+			break;
+	}
+	return n;
+}
+
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
@@ -36,7 +83,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 #ifdef piMASS_DEBUG
 	gpcCD	*pCD;
 
-	gpcOBJlnk* pOBJ;
+	gpcOBJlnk	*pOBJ;
 	gpcOBJlnk	*pOBn, *pOBi;
 
 #endif
@@ -61,7 +108,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 			pSTR = (nSTR=M.iMNn) ? SCOOP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
 
-			cd.obj = m;
+			cd.obj = I8x2( (I8)gpeALF_STR, m );
 			cd.typ = gpeTYP_STR;
 			continue;
 		}
@@ -207,7 +254,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 								for( U4 up = CDsp.iCD, dwn = aFND[0].iCD; up > dwn; --up )
 								{
 									U4x4& INS = ((U4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
-									INS = U4x4( pCD[-1].pst, pCD[0].obj, pCD[-1].obj );
+									INS = U4x4( pCD[-1].pst, pCD[0].obj-iOPe, pCD[-1].obj-iOPe );
 									--CDsp;
 								}
 							} break;
@@ -307,5 +354,6 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS& mass, gpcWIN& win )
 	if( !this )
 		return NULL;
 
+	SRCmnMILLdbg( mass.aOP, mass.OPER, 0 );
 	return apOUT[3];
 }
