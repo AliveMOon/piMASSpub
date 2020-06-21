@@ -256,9 +256,11 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 										if( dp < 2 )
 										{
 											INS = U4x4( mom.pst, mom.lnk-iOPe, cd.lnk-iOPe );
+											--up;
 											break;
 										}
-										dp--;
+										--up;
+										--dp;
 										gpcCD &kid = pCD[-dp];
 										INS = U4x4( mom.pst, mom.lnk-iOPe, kid.lnk-iOPe );
 									}
@@ -330,15 +332,23 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 	if( !iOPe ) {
 		mass.mxOP = gpeALF_null;
 		/// ha nincsen még kitöltve az OPER lista feltöltjük
-		for( U4 i = 0, ie = gpmN(gpasOPER); i < ie; i++ )
+		pSe = strchr( (char*)gpasOPER[0], ' ' );
+		mass.OPER.dctMILLadd( (U1*)gpasOPER[0], pSe-gpasOPER[0] );
+		mass.aOP[0].num = 14;
+		mass.aOP[0] = pSe+1;
+		mass.mxOP = mass.aOP[0].alf;
+		iOPe++;
+
+		for( U4 i = 1, ie = gpmN(gpasOPER); i < ie; i++ )
 		{
 			pSe = strchr( (char*)gpasOPER[i], ' ' );
 			if( !pSe )
 				continue;
-			U4 n = pSe-gpasOPER[i];
+			U4 n = pSe-gpasOPER[i], nn = 0;
+			iOP = 0;
 			iOP = mass.OPER.dctMILLfnd( (U1*)gpasOPER[i], pSe-gpasOPER[i], iOPe );
 			if( iOP < iOPe )
-			if( mass.OPER.nSTRix(iOP) != n )
+			if( mass.OPER.nSTRix(iOP) < n )
 				iOP = iOPe;
 
 			if( iOP >= iOPe )

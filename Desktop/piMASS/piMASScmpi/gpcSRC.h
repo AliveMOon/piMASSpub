@@ -147,7 +147,7 @@ static const char* gpasOPER[] = {
 	"= mov", 	"== eqLG",  "!= neqLG",
 	"| or", 	"|| orLG",	"|= orM",
 	"+ add", 	"++ inc",	"+= addM",	/// -------------- GOOD
-	"- sub", 	"++ dec",	"-= subM",
+	"- sub", 	"-- dec",	"-= subM",
 
 
 	"<= leLG",	"< ltLG", 	"<< sl", 	"<<= slM",

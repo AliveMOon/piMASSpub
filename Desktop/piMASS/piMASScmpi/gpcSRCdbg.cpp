@@ -48,12 +48,12 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 		gpcOBJlnk& src = OBJsrc;
 		gpcOBJlnk& dst = OBJdst;
 		dx = dst.typ&0x3;
-		sx = dst.typ&0x3;
+		sx = src.typ&0x3;
 		pS = gpsDBGpub;
 		pD = pS + src.strASM( pS, pALL, pM0, pL0 ) + 1;
 		dst.strASM( pD, pALL, pM0, pL0 );
 
-		pDBG = pDBG->lzyFRMT( strt=-1, gpasINS[INS.x], i, gpsTYPsz[sx], pS, pD );
+		pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[INS.x], i, gpsTYPsz[sx], pS, pD );
 
 
 	}

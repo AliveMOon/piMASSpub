@@ -233,7 +233,7 @@ static gpeOPid_U1 gpaaOPid[][0x20] = {
 	{gpeOPid_str,gpeOPid_nop,},
 };
 
-static const char* gpasINS[] = {
+static const char* gpas68k[] = {
 	"\n %0.4x nop%s\t%s,%s",
 
 	"\n %0.4x notLG%s\t%s,%s",	"\n %0.4x LG%s\t%s,%s",	"\n %0.4x inv%s\t%s,%s",
@@ -251,7 +251,7 @@ static const char* gpasINS[] = {
 	"\n %0.4x xor%s\t%s,%s",	"\n %0.4x xorM%s\t%s,%s",
 
 
-	"\n %0.4x mov%s\t%s,%s", 	"\n %0.4x eqLG%s\t%s,%s",  "\n %0.4x neqLG%s\t%s,%s",
+	"\n %0.4x move%s\t%s,%s", 	"\n %0.4x eqLG%s\t%s,%s",  "\n %0.4x neqLG%s\t%s,%s",
 	"\n %0.4x or%s\t%s,%s", 	"\n %0.4x orLG%s\t%s,%s",	"\n %0.4x orM%s\t%s,%s",
 	"\n %0.4x add%s\t%s,%s", 	"\n %0.4x inc%s\t%s,%s",	"\n %0.4x addM%s\t%s,%s",	/// -------------- GOOD
 	"\n %0.4x sub%s\t%s,%s", 	"\n %0.4x dec%s\t%s,%s",	"\n %0.4x subM%s\t%s,%s",
@@ -262,7 +262,7 @@ static const char* gpasINS[] = {
 	"\n %0.4x beLG%s\t%s,%s",	"\n %0.4x bgLG%s\t%s,%s", 	"\n %0.4x sr%s\t%s,%s",
 	"\n %0.4x srM%s\t%s,%s",
 
-	"\n %0.4x dot%s\t%s,%s", 	"\n %0.4x entry%s\t%s,%s", "\n %0.4x out%s\t%s,%s",
+	"\n %0.4x lea%s\t%s,%s", 	"\n %0.4x entry%s\t%s,%s", "\n %0.4x out%s\t%s,%s",
 	"\n %0.4x brakS%s\t%s,%s",	"\n %0.4x brakE%s\t%s,%s",
 	"\n %0.4x dimS%s\t%s,%s", 	"\n %0.4x dimE%s\t%s,%s",
 	"\n %0.4x begin%s\t%s,%s",	"\n %0.4x end%s\t%s,%s",
