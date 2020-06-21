@@ -8,8 +8,8 @@
  rout = 0x10003;
  rinp = 0x10002;
  bill = d1.mini;
- slmp = "192.168.1.90 10000"
- cam = 1
+ slmp = "192.168.1.90 10000";
+ cam = 1;
  pic = "clip"; 
  
  bob = "exp";

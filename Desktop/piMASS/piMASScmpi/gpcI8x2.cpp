@@ -50,5 +50,5 @@ gpeTYP I8x2::cdrMILLalf( const char* pS, U4 nS )
 		return typ;
 
 	num = gpfSTR2I8( pSi, &pSe );
-	return (pSe > pSi) ? typ : gpeTYP_sA8N;
+	return (pSe > pSi) ? gpeTYP_sA8N : typ;
 }

@@ -54,7 +54,7 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 			sBstr[n]=0;
 			return sprintf( pS, "\"%s...\"", sBstr );
 		default:
-			n = sprintf( pS, "0x%0.8llx.0x%0.8llx", obj.x, obj.y );
+			n = sprintf( pS, "0x%0.8llx,0x%0.8llx", obj.x, obj.y );
 			break;
 	}
 	return n;
@@ -102,7 +102,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 			pSTR = (nSTR=M.iMNn) ? SCOOP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
 
-			cd.lnk = m ;
+			cd.lnk = -m;
 			cd.typ = gpeTYP_STR;
 			continue;
 		}
@@ -251,23 +251,23 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 									/// valseg itt kel majd egy JMP ha gyorsítani kell
 									while( dp )
 									{
-										U4x4 &INS = ((U4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
+										I4x4 &INS = ((I4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
 										gpcCD &mom = pCD[-dp];
 										if( dp < 2 )
 										{
-											INS = U4x4( mom.pst, mom.lnk-iOPe, cd.lnk-iOPe );
+											INS = I4x4( mom.pst, (mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk, cd.lnk-iOPe );
 											--up;
 											break;
 										}
 										--up;
 										--dp;
 										gpcCD &kid = pCD[-dp];
-										INS = U4x4( mom.pst, mom.lnk-iOPe, kid.lnk-iOPe );
+										INS = I4x4( mom.pst, (mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk, kid.lnk-iOPe );
 									}
-									U4x4 &INS = ((U4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
-									INS.y = cd.lnk-iOPe;
+									I4x4 &INS = ((I4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
+									INS.y = (cd.lnk > 0) ? cd.lnk-iOPe : cd.lnk;
 									CDsp -= cd.nD+1;
-									INS.z = cd.lnk-iOPe;
+									INS.z = (cd.lnk > 0) ? cd.lnk-iOPe : cd.lnk;
 									INS.x = cd.pst;
 								}
 							} break;

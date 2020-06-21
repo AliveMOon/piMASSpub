@@ -34,7 +34,7 @@ class gpcCD {
 public:
 	U1		pre, pst;
 	gpeTYP	typ;
-	U4		lnk, nD;
+	I4		lnk, nD;
 
 	gpcCD(){};
 

@@ -44,16 +44,31 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	char *pALL = (char*)SCOOP.pALL;
 	for( U4 i = 0, n = SCOOP.nASM(); i < n; i++ )
 	{
-		U4x4& INS = ((U4x4*)SCOOP.vASM.Ux( i, sizeof(INS) ))[0];
-		gpcOBJlnk& src = OBJsrc;
-		gpcOBJlnk& dst = OBJdst;
-		dx = dst.typ&0x3;
-		sx = src.typ&0x3;
-		pS = gpsDBGpub;
-		pD = pS + src.strASM( pS, pALL, pM0, pL0 ) + 1;
-		dst.strASM( pD, pALL, pM0, pL0 );
+		I4x4& INS = ((I4x4*)SCOOP.vASM.Ux( i, sizeof(INS) ))[0];
+		pD = pS = gpsDBGpub;
+		if( INS.y >= 0 )
+		{
+			gpcOBJlnk& src = OBJsrc;
+			sx = src.typ;
+			pD = pS + src.strASM( pS, pALL, pM0, pL0 ) + 1;
+		} else {
+			gpmMcpy( pS, pALL+pM0[-INS.y].iMNi, pM0[-INS.y].iMNn );
+			pS[pM0[-INS.y].iMNn]=0;
+			pD = pS + pM0[-INS.y].iMNn + 1;
+			sx = gpeTYP_STR;
+		}
+		if( INS.z >= 0 )
+		{
+			gpcOBJlnk& dst = OBJdst;
+			dx = dst.typ;
+			dst.strASM( pD, pALL, pM0, pL0 );
+		} else {
+			gpmMcpy( pD, pALL+pM0[-INS.z].iMNi, pM0[-INS.z].iMNn );
+			pD[pM0[-INS.z].iMNn]=0;
+			dx = gpeTYP_STR;
+		}
 
-		pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[INS.x], i, gpsTYPsz[sx], pS, pD );
+		pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[INS.x], i, gpsTYPsz[sx&0x3], pS, pD );
 
 
 	}
