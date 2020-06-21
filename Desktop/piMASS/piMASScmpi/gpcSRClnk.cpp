@@ -3,19 +3,13 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+#define cd (pCD=CDsp.CD())[0]
 
-
-
-#ifdef piMASS_DEBUG
-	/// gpcCDR
-	#define cd (pCD=CDsp.CD())[0]
 	/// gpcOBJlnk
-	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+#ifdef piMASS_DEBUG
+	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.lnk-iOPe), sizeof(gpcOBJlnk)))[0]
 	#define OBJadd (pOBn=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #else
-	/// gpcCDR
-	#define cd CDsp.CDR().p_cd[0]
-	/// gpcOBJlnk
 	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
 	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #endif
@@ -80,8 +74,8 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	const U1 *pSTR;
 	U8 nS, nSTR;
 	gpcCDsp CDsp; //, Bsp, Csp;
-#ifdef piMASS_DEBUG
 	gpcCD	*pCD;
+#ifdef piMASS_DEBUG
 
 	gpcOBJlnk	*pOBJ;
 	gpcOBJlnk	*pOBn, *pOBi;
@@ -108,7 +102,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 			pSTR = (nSTR=M.iMNn) ? SCOOP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
 
-			cd.obj = m ;
+			cd.lnk = m ;
 			cd.typ = gpeTYP_STR;
 			continue;
 		}
@@ -130,24 +124,24 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 			case gpeCLR_blue2: 	///ABC
 				if( lnk.y )
 				{
-					cd.obj = lnk.y;
+					cd.lnk = lnk.y;
 					cd.typ = OBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.obj = lnk.y = (iOPe+SCOOP.nOBJ);
+				cd.lnk = lnk.y = (iOPe+SCOOP.nOBJ);
 				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_orange:	///NUM
 				if( lnk.y )
 				{
-					cd.obj = lnk.y;
+					cd.lnk = lnk.y;
 					cd.typ = OBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.obj = lnk.y = (iOPe+SCOOP.nOBJ);
+				cd.lnk = lnk.y = (iOPe+SCOOP.nOBJ);
 				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
 				SCOOP.nOBJ++;
 				break;
@@ -161,7 +155,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 					}
 
 					opALF = pOP[lnk.y].alf;
-					if( cd.obj < iOPe )
+					if( cd.lnk < iOPe )
 					{
 						cd.pre = lnk.y;
 					}
@@ -210,11 +204,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 							cd.pst = lnk.y;
 							++CDsp;
 							break;
-					///{  .  }-----------------------------------------------
-						case gpeALF_dot:
-							cd.pst = lnk.y;
-							++CDsp;
-							break;
+
 
 
 
@@ -243,18 +233,40 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 							cd.pst = lnk.y;
 							++CDsp;
 							break;
-
+					///{  .  }-----------------------------------------------
+						case gpeALF_dot:
+							cd.pst = lnk.y;
+							++CDsp;
+							++cd;
+							break;
 					/// valamineki vége
 					/// szegyük vissza a PULCSIT!
 						case gpeALF_newrow:
 						case gpeALF_stk: {
 								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
 								aFND->median( nFND, aFND+nFND+1 );
-								for( U4 up = CDsp.iCD, dwn = aFND[0].iCD; up > dwn; --up )
+								for( U4 up = CDsp.iCD, dwn = aFND[0].iCD, dp; up > dwn; --up )
 								{
-									U4x4& INS = ((U4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
-									INS = U4x4( pCD[-1].pst, pCD[0].obj-iOPe, pCD[-1].obj-iOPe );
-									--CDsp;
+									dp = cd.nD;
+									/// valseg itt kel majd egy JMP ha gyorsítani kell
+									while( dp )
+									{
+										U4x4 &INS = ((U4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
+										gpcCD &mom = pCD[-dp];
+										if( dp < 2 )
+										{
+											INS = U4x4( mom.pst, mom.lnk-iOPe, cd.lnk-iOPe );
+											break;
+										}
+										dp--;
+										gpcCD &kid = pCD[-dp];
+										INS = U4x4( mom.pst, mom.lnk-iOPe, kid.lnk-iOPe );
+									}
+									U4x4 &INS = ((U4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
+									INS.y = cd.lnk-iOPe;
+									CDsp -= cd.nD+1;
+									INS.z = cd.lnk-iOPe;
+									INS.x = cd.pst;
 								}
 							} break;
 

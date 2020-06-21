@@ -34,9 +34,15 @@ class gpcCD {
 public:
 	U1		pre, pst;
 	gpeTYP	typ;
-	U4		obj;
+	U4		lnk, nD;
+
+	gpcCD(){};
 
 	gpcCD& null() { gpmCLR; return *this; }
+	gpcCD& operator ++()
+	{
+		++nD;
+	}
 };
 
 class gpcCDsp {
@@ -62,10 +68,25 @@ public:
 	{
 		CD()[0].null();
 		--iCD;
+		if( iCD < 0 )
+		{
+			iCD = 0;
+			refCD = -1;
+			return *this;
+		}
 		U1 p = CD()[0].pst;
 		(apSP[p] = ((I4*)aSP[p].Ux( aiSP[p], sizeof(I4))))[0] = 0;
 		--aiSP[p];
 		CD();
+		return *this;
+	}
+	gpcCDsp& operator -= ( U4 nd )
+	{
+		if( !nd )
+			return *this;
+		for( U4 i = 0; i < nd; i++ )
+			--(*this);
+
 		return *this;
 	}
 	gpcCD* CD()

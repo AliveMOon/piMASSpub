@@ -37,7 +37,7 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	gpcOBJlnk	*pOBs, *pOBd;
 #endif
 	U8 strt = -1;
-	char	*pSZ, *pS, *pD, x;
+	char	*pSZ, *pS, *pD, sx, dx;
 
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc;
@@ -47,12 +47,13 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 		U4x4& INS = ((U4x4*)SCOOP.vASM.Ux( i, sizeof(INS) ))[0];
 		gpcOBJlnk& src = OBJsrc;
 		gpcOBJlnk& dst = OBJdst;
-		x = dst.typ&0x3;
+		dx = dst.typ&0x3;
+		sx = dst.typ&0x3;
 		pS = gpsDBGpub;
 		pD = pS + src.strASM( pS, pALL, pM0, pL0 ) + 1;
 		dst.strASM( pD, pALL, pM0, pL0 );
 
-		pDBG = pDBG->lzyFRMT( strt=-1, gpasINS[INS.x], i, gpsTYPsz[x], pS, pD );
+		pDBG = pDBG->lzyFRMT( strt=-1, gpasINS[INS.x], i, gpsTYPsz[sx], pS, pD );
 
 
 	}
