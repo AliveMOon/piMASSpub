@@ -34,20 +34,21 @@ class gpcCD {
 public:
 	U1		pre, pst;
 	gpeTYP	typ;
-	I4		lnk, nD;
+	I4		lnk, deep;
 
 	gpcCD(){};
 
 	gpcCD& null() { gpmCLR; return *this; }
 	gpcCD& operator ++()
 	{
-		++nD;
+		++deep;
+		return *this;
 	}
 };
 
 class gpcCDsp {
 public:
-	I4		iCD, refCD;
+	I4		iCD, refCD, nR;
 	gpcCD	*pCD;
 	gpcLZY	cd;
 
@@ -55,6 +56,13 @@ public:
 	gpcLZY	aSP[0x30];
 
 	gpcCDsp(){ gpmCLR; refCD = -1; };
+	gpcCD* CD()
+	{
+		if( refCD == iCD )
+			return pCD;
+
+		return pCD = ((gpcCD*)cd.Ux( refCD=iCD, sizeof(gpcCD)));
+	}
 	gpcCDsp& operator ++()
 	{
 		U1 p = CD()[0].pst;
@@ -62,6 +70,7 @@ public:
 		(apSP[p] = ((I4*)aSP[p].Ux( aiSP[p], sizeof(I4))))[0] = iCD;
 		++iCD;
 		CD()[0].null();
+		pCD[0].deep = pCD[-1].deep+1;
 		return *this;
 	}
 	gpcCDsp& operator --()
@@ -89,13 +98,7 @@ public:
 
 		return *this;
 	}
-	gpcCD* CD()
-	{
-		if( refCD != iCD )
-			pCD = ((gpcCD*)cd.Ux( refCD=iCD, sizeof(gpcCD)));
 
-		return pCD;
-	}
 	I4 opi( U1 i )
 	{
 		return aiSP[i] ? (apSP[i]?*apSP[i]:-1) : -1;
@@ -114,6 +117,42 @@ public:
 			++j;
 		}
 		return j;
+	}
+
+	gpcLZY& ASMrdy( gpcSCOOP& scp, U4 iOPe, I4x2* aFND, gpeOPid* pL, U1 nL )
+	{
+		U4 nFND = opi( aFND, pL, nL );
+		aFND->median( nFND, aFND+nFND+1 );
+		for( I4 up = iCD, dwn = aFND[0].iCD, dp; dwn < up; up-- )
+		{
+			dp = CD()[0].deep;
+			/// valseg itt kel majd egy JMP ha gyorsítani kell
+			while( dp )
+			{
+				I4x4 &INS = ((I4x4*)scp.vASM.Ux( scp.nASM(), sizeof(INS) ))[0];
+				gpcCD &mom = pCD[-dp];
+				if( dp < 2 )
+				{
+					INS = I4x4( mom.pst, (mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk,
+										 (pCD[0].lnk > 0) ? pCD[0].lnk-iOPe : pCD[0].lnk );
+					--up;
+					break;
+				}
+				--up;
+				--dp;
+				gpcCD &kid = pCD[-dp];
+				INS = I4x4( mom.pst,	(mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk,
+										(kid.lnk > 0) ? kid.lnk-iOPe : kid.lnk );
+			}
+			I4x4 &INS = ((I4x4*)scp.vASM.Ux( scp.nASM(), sizeof(INS) ))[0];
+
+
+			INS.y = (CD()[0].lnk > 0) ? pCD[0].lnk-iOPe : pCD[0].lnk;
+			*this -= pCD[0].deep+1;
+
+			INS.z = (CD()[0].lnk > 0) ? pCD[0].lnk-iOPe : pCD[0].lnk;
+			INS.x = pCD[0].pst;
+		}
 	}
 };
 

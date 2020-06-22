@@ -98,7 +98,13 @@ typedef enum gpeOPid:U1{
 	gpeOPid_if,		gpeOPid_else,
 	gpeOPid_mail,	gpeOPid_str,
 } gpeOPid_U1;
-static gpeOPid_U1 gpaaOPid[][0x20] = {
+
+/*
+	Hello = ize + b - c * d * e / 100
+ 		+ ( 200 + f );
+	mini = print( "ize = %d\r\n", hello );
+*/
+static gpeOPid gpaaOPid[][0x20] = {
 	//gpeOPid_nop,
 	{gpeOPid_nop,},
 	//gpeOPid_notLG,
@@ -115,12 +121,7 @@ static gpeOPid_U1 gpaaOPid[][0x20] = {
 		gpeOPid_brakS,	gpeOPid_brakE,
 		gpeOPid_begin,	gpeOPid_stk,	gpeOPid_newrow, },
 	//gpeOPid_newrow,
-	{	gpeOPid_mov,	gpeOPid_andM,	gpeOPid_mulM,	gpeOPid_expM,
-		gpeOPid_divM,	gpeOPid_rootM,	gpeOPid_remM,	gpeOPid_xorM,
-		gpeOPid_addM,	gpeOPid_subM,	gpeOPid_slM,	gpeOPid_srM,
-
-		gpeOPid_brakS,	gpeOPid_brakE,
-		gpeOPid_begin,	gpeOPid_stk,	gpeOPid_newrow, },
+	{},
 	//gpeOPid_comS,
 	{},
 	//gpeOPid_comE,
@@ -135,7 +136,16 @@ static gpeOPid_U1 gpaaOPid[][0x20] = {
 	//gpeOPid_andM,
 	{},
 	//gpeOPid_mul,
-	{},
+	{	gpeOPid_mov,	gpeOPid_andM,	gpeOPid_mulM,	gpeOPid_expM,
+		gpeOPid_divM,	gpeOPid_rootM,	gpeOPid_remM,	gpeOPid_xorM,
+		gpeOPid_addM,	gpeOPid_subM,	gpeOPid_slM,	gpeOPid_srM,
+
+		gpeOPid_brakS,	gpeOPid_brakE,
+		gpeOPid_begin,	gpeOPid_stk,	gpeOPid_newrow,
+
+		gpeOPid_and,	gpeOPid_mul,	gpeOPid_exp,	gpeOPid_div,
+		gpeOPid_rem,	gpeOPid_sl,		gpeOPid_sr,
+	},
 	//gpeOPid_exp,
 	{},
 	//gpeOPid_mulM,
@@ -170,14 +180,32 @@ static gpeOPid_U1 gpaaOPid[][0x20] = {
 	{},
 
 	//gpeOPid_add,
-	{},
+	{	gpeOPid_mov,	gpeOPid_andM,	gpeOPid_mulM,	gpeOPid_expM,
+		gpeOPid_divM,	gpeOPid_rootM,	gpeOPid_remM,	gpeOPid_xorM,
+		gpeOPid_addM,	gpeOPid_subM,	gpeOPid_slM,	gpeOPid_srM,
+
+		gpeOPid_brakS,	gpeOPid_brakE,
+		gpeOPid_begin,	gpeOPid_stk,	gpeOPid_newrow,
+
+		gpeOPid_add,	gpeOPid_inc,	gpeOPid_sub,	gpeOPid_dec,
+		gpeOPid_or,		gpeOPid_xor,
+	},
 	//gpeOPid_inc,
 	{},
 	//gpeOPid_addM,	/// -------------- GOOD
 	{},
 
 	//gpeOPid_sub,
-	{},
+	{	gpeOPid_mov,	gpeOPid_andM,	gpeOPid_mulM,	gpeOPid_expM,
+		gpeOPid_divM,	gpeOPid_rootM,	gpeOPid_remM,	gpeOPid_xorM,
+		gpeOPid_addM,	gpeOPid_subM,	gpeOPid_slM,	gpeOPid_srM,
+
+		gpeOPid_brakS,	gpeOPid_brakE,
+		gpeOPid_begin,	gpeOPid_stk,	gpeOPid_newrow,
+
+		gpeOPid_add,	gpeOPid_inc,	gpeOPid_sub,	gpeOPid_dec,
+		gpeOPid_or,		gpeOPid_xor,
+	},
 	//gpeOPid_dec,
 	{},
 	//gpeOPid_subM,

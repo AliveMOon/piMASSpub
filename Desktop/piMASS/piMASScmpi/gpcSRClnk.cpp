@@ -13,7 +13,7 @@ extern char gpaALF_H_sub[];
 	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
 	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #endif
-#define aaOPid gpaaOPid[lnk.y]
+#define aaOPid gpaaOPid[OPgrp]
 size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 {
 	char sBstr[] = "FFFFffffFFFFffff",
@@ -60,6 +60,7 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 	return n;
 }
 
+
 void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
@@ -82,10 +83,11 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 #endif
 	I4x2 aFND[0x40];
-	U1 nFND;
+	U1 nFND, OPgrp;
 	gpeALF opALF;
 	I4x4 iZNmx = 0;
 	gpeCLR clr;
+
 	//for( U4 le = SCOOP.nLiNK(), l = 0, mNX; l < le; l++ )
 	for( U4 nM = SCOOP.nMN(), m = 0, l; m < nM; m++ )
 	{
@@ -176,8 +178,10 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_subM:
 						case gpeALF_slM:
 						case gpeALF_srM:
+							OPgrp = gpeOPid_mov;
 							cd.pst = lnk.y;
 							++CDsp;
+							cd.null();
 							break;
 					///{  + ++ - -- | ^  }-----------------------------------------------
 						case gpeALF_add:
@@ -186,12 +190,17 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_dec:
 						case gpeALF_or:		// avagy a log. össze adás
 						case gpeALF_xor:	// avagy a log. össze adás majd *-1
+							OPgrp = gpeOPid_add;
 							cd.pst = lnk.y;
 							++CDsp;
+							if( cd.deep > 1 )
+							{
+								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
+							}
+							cd.null();
 							break;
 
 					///{  ~ * ** / % & ! !!  }-----------------------------------------------
-						case gpeALF_inv:	// végül is ez *-1-gyel
 						case gpeALF_and:	// és log. szorzás
 						case gpeALF_mul:	// szorzás
 						case gpeALF_exp:	// sokszor szorzás
@@ -199,12 +208,15 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_rem:	// osztás maradéka
 						case gpeALF_sl:		// << *2^n
 						case gpeALF_sr:		// << /2^n
-						case gpeALF_notLG:
-						case gpeALF_LG:
+							OPgrp = gpeOPid_mul;
 							cd.pst = lnk.y;
 							++CDsp;
 							break;
-
+						case gpeALF_inv:	// végül is ez *-1-gyel
+						case gpeALF_notLG:
+						case gpeALF_LG:
+							cd.pre = lnk.y;
+							break;
 
 
 
@@ -219,8 +231,10 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_ltLG:
 						case gpeALF_beLG:
 						case gpeALF_bgLG:
+							OPgrp = gpeOPid_sub;
 							cd.pst = lnk.y;
 							++CDsp;
+							cd.null();
 							break;
 
 					///{  ~> :: ( [ { ?  }-----------------------------------------------
@@ -232,44 +246,19 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_if:
 							cd.pst = lnk.y;
 							++CDsp;
+							cd.null();
 							break;
 					///{  .  }-----------------------------------------------
 						case gpeALF_dot:
 							cd.pst = lnk.y;
 							++CDsp;
-							++cd;
 							break;
 					/// valamineki vége
 					/// szegyük vissza a PULCSIT!
 						case gpeALF_newrow:
 						case gpeALF_stk: {
-								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
-								aFND->median( nFND, aFND+nFND+1 );
-								for( U4 up = CDsp.iCD, dwn = aFND[0].iCD, dp; up > dwn; --up )
-								{
-									dp = cd.nD;
-									/// valseg itt kel majd egy JMP ha gyorsítani kell
-									while( dp )
-									{
-										I4x4 &INS = ((I4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
-										gpcCD &mom = pCD[-dp];
-										if( dp < 2 )
-										{
-											INS = I4x4( mom.pst, (mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk, cd.lnk-iOPe );
-											--up;
-											break;
-										}
-										--up;
-										--dp;
-										gpcCD &kid = pCD[-dp];
-										INS = I4x4( mom.pst, (mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk, kid.lnk-iOPe );
-									}
-									I4x4 &INS = ((I4x4*)SCOOP.vASM.Ux( SCOOP.nASM(), sizeof(INS) ))[0];
-									INS.y = (cd.lnk > 0) ? cd.lnk-iOPe : cd.lnk;
-									CDsp -= cd.nD+1;
-									INS.z = (cd.lnk > 0) ? cd.lnk-iOPe : cd.lnk;
-									INS.x = cd.pst;
-								}
+								OPgrp = gpeOPid_stk;
+								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
 							} break;
 
 						case gpeALF_brakE: {
