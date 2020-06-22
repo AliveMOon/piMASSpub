@@ -291,7 +291,7 @@ static const char* gpas68k[] = {
 	"\n %0.4x srM%s\t%s,%s",
 
 	"\n %0.4x lea%s\t%s,%s", 	"\n %0.4x entry%s\t%s,%s", "\n %0.4x out%s\t%s,%s",
-	"\n %0.4x brakS%s\t%s,%s",	"\n %0.4x brakE%s\t%s,%s",
+	"\n %0.4x jsr%s\t%s,%s",	"\n %0.4x brakE%s\t%s,%s",
 	"\n %0.4x dimS%s\t%s,%s", 	"\n %0.4x dimE%s\t%s,%s",
 	"\n %0.4x begin%s\t%s,%s",	"\n %0.4x end%s\t%s,%s",
 	"\n %0.4x if%s\t%s,%s",		"\n %0.4x else%s\t%s,%s",

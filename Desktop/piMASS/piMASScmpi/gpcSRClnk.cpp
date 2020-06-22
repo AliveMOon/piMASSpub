@@ -191,12 +191,10 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						case gpeALF_or:		// avagy a log. össze adás
 						case gpeALF_xor:	// avagy a log. össze adás majd *-1
 							OPgrp = gpeOPid_add;
+							if( cd.deep )
+								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
 							cd.pst = lnk.y;
 							++CDsp;
-							if( cd.deep > 1 )
-							{
-								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
-							}
 							cd.null();
 							break;
 

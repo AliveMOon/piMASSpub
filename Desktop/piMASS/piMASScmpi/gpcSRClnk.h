@@ -123,35 +123,70 @@ public:
 	{
 		U4 nFND = opi( aFND, pL, nL );
 		aFND->median( nFND, aFND+nFND+1 );
+		bool bFLIP = false;
 		for( I4 up = iCD, dwn = aFND[0].iCD, dp; dwn < up; up-- )
 		{
 			dp = CD()[0].deep;
 			/// valseg itt kel majd egy JMP ha gyorsítani kell
-			while( dp )
+			if( dp )
+			if( pCD[-dp].pst != gpeOPid_dot )
+			{
+				I4x4 &INS = ((I4x4*)scp.vASM.Ux( scp.nASM(), sizeof(INS) ))[0];
+				gpcCD &dst = pCD[-1];
+				INS =  I4x4( dst.pst,
+									(pCD[0].lnk > 0)	? pCD[0].lnk-iOPe	: pCD[0].lnk,
+									(dst.lnk > 0)		? dst.lnk-iOPe		: dst.lnk,
+									nR
+							);
+				--up;
+				for( U4 i = 2; i <= dp; i++ )
+				{
+					I4x4 &INS = ((I4x4*)scp.vASM.Ux( scp.nASM(), sizeof(INS) ))[0];
+					gpcCD &mom = pCD[-i], &kid = pCD[1-i];
+					INS = I4x4( mom.pst,
+										(kid.lnk > 0) ? kid.lnk-iOPe : kid.lnk,
+										(mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk,
+										nR
+								);
+					--up;
+				}
+			}
+			else while( dp )
 			{
 				I4x4 &INS = ((I4x4*)scp.vASM.Ux( scp.nASM(), sizeof(INS) ))[0];
 				gpcCD &mom = pCD[-dp];
 				if( dp < 2 )
 				{
-					INS = I4x4( mom.pst, (mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk,
-										 (pCD[0].lnk > 0) ? pCD[0].lnk-iOPe : pCD[0].lnk );
+					INS =  I4x4( mom.pst,
+										(pCD[0].lnk > 0) ? pCD[0].lnk-iOPe : pCD[0].lnk,
+										(mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk,
+										nR
+								);
+					INS.swpZY();
 					--up;
 					break;
 				}
 				--up;
 				--dp;
 				gpcCD &kid = pCD[-dp];
-				INS = I4x4( mom.pst,	(mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk,
-										(kid.lnk > 0) ? kid.lnk-iOPe : kid.lnk );
+				INS = I4x4( mom.pst,
+									(kid.lnk > 0) ? kid.lnk-iOPe : kid.lnk,
+									(mom.lnk > 0) ? mom.lnk-iOPe : mom.lnk,
+									nR
+							);
+				INS.swpZY();
 			}
+			bFLIP = false;
 			I4x4 &INS = ((I4x4*)scp.vASM.Ux( scp.nASM(), sizeof(INS) ))[0];
-
-
+			*this -= pCD[0].deep;
 			INS.y = (CD()[0].lnk > 0) ? pCD[0].lnk-iOPe : pCD[0].lnk;
-			*this -= pCD[0].deep+1;
-
+			--*this;
 			INS.z = (CD()[0].lnk > 0) ? pCD[0].lnk-iOPe : pCD[0].lnk;
 			INS.x = pCD[0].pst;
+			INS.w = nR;
+			//if( INS.x == gpeOPid_dot )
+			//	INS.swpZY();
+
 		}
 	}
 };

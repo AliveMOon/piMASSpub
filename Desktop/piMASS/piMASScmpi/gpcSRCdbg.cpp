@@ -25,6 +25,10 @@ static const char* gpsTYPsz[] = {
 	".q", //3 8
 	".x", //4 16
 };
+static const char* gps68kREG[] = {
+	"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
+	"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
+};
 void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
@@ -42,6 +46,8 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc;
 	char *pALL = (char*)SCOOP.pALL;
+	U4 iR = -1;
+
 	for( U4 i = 0, n = SCOOP.nASM(); i < n; i++ )
 	{
 		I4x4& INS = ((I4x4*)SCOOP.vASM.Ux( i, sizeof(INS) ))[0];
@@ -68,6 +74,14 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 			dx = gpeTYP_STR;
 		}
 
+		/*if( iR != INS.w )
+		{
+			iR = INS.w;
+			pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[gpeOPid_mov], i, gpsTYPsz[sx&0x3], pS, gps68kREG[iR&0xf] );
+			iR++;
+			pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[gpeOPid_mov], i, gpsTYPsz[dx&0x3], pD, gps68kREG[iR&0xf] );
+			iR--;
+		}*/
 		pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[INS.x], i, gpsTYPsz[sx&0x3], pS, pD );
 
 
