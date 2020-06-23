@@ -156,144 +156,144 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 							break;
 					}
 
-					opALF = pOP[lnk.y].alf;
-					if( cd.lnk < iOPe )
-					{
-						cd.pre = lnk.y;
+					if( (cd.lnk<0) ? false : (cd.lnk<iOPe) )
+						cd.pre = (gpeOPid)lnk.y;
+					else {
+						cd.pst = (gpeOPid)lnk.y;
+						CDsp.ASMdeep( SCOOP, iOPe );
 					}
-					else switch( opALF )
-					{
 
-					///{  &= *= **= /= //= %= ^= |= += -= <<= >>= =  }-----------------------------------------------
-						case gpeALF_mov:
-						case gpeALF_andM:
-						case gpeALF_mulM:
-						case gpeALF_expM:
-						case gpeALF_divM:
-						case gpeALF_rootM:
-						case gpeALF_remM:
-						case gpeALF_xorM:
-						case gpeALF_orM:
-						case gpeALF_addM:
-						case gpeALF_subM:
-						case gpeALF_slM:
-						case gpeALF_srM:
-							OPgrp = gpeOPid_mov;
-							cd.pst = lnk.y;
-							++CDsp;
-							cd.null();
-							break;
-					///{  + ++ - -- | ^  }-----------------------------------------------
-						case gpeALF_add:
-						case gpeALF_inc:
-						case gpeALF_sub:
-						case gpeALF_dec:
-						case gpeALF_or:		// avagy a log. össze adás
-						case gpeALF_xor:	// avagy a log. össze adás majd *-1
-							OPgrp = gpeOPid_add;
-							if( cd.deep )
-								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
-							cd.pst = lnk.y;
-							++CDsp;
-							cd.null();
-							break;
-
-					///{  ~ * ** / % & ! !!  }-----------------------------------------------
-						case gpeALF_and:	// és log. szorzás
-						case gpeALF_mul:	// szorzás
-						case gpeALF_exp:	// sokszor szorzás
-						case gpeALF_div:	// reciprokkal szorzás
-						case gpeALF_rem:	// osztás maradéka
-						case gpeALF_sl:		// << *2^n
-						case gpeALF_sr:		// << /2^n
-							OPgrp = gpeOPid_mul;
-							cd.pst = lnk.y;
-							++CDsp;
-							break;
-						case gpeALF_inv:	// végül is ez *-1-gyel
-						case gpeALF_notLG:
-						case gpeALF_LG:
-							cd.pre = lnk.y;
-							break;
-
-
-
-					///{  && == != || <= < >= >  }-----------------------------------------------
-					/// cmp utasítás lényegében kivonás,
-					/// csak nem a különbség van eltárólva hanem a különbség kondiciója
-						case gpeALF_andLG:
-						case gpeALF_neqLG:
-						case gpeALF_orLG:
-						case gpeALF_eqLG:
-						case gpeALF_leLG:
-						case gpeALF_ltLG:
-						case gpeALF_beLG:
-						case gpeALF_bgLG:
-							OPgrp = gpeOPid_sub;
-							cd.pst = lnk.y;
-							++CDsp;
-							cd.null();
-							break;
-
-					///{  ~> :: ( [ { ?  }-----------------------------------------------
-						case gpeALF_entry:
-						case gpeALF_out:
-						case gpeALF_brakS:
-						case gpeALF_dimS:
-						case gpeALF_begin:
-						case gpeALF_if:
-							cd.pst = lnk.y;
-							++CDsp;
-							cd.null();
-							break;
-					///{  .  }-----------------------------------------------
-						case gpeALF_dot:
-							cd.pst = lnk.y;
-							++CDsp;
-							break;
-					/// valamineki vége
-					/// szegyük vissza a PULCSIT!
-						case gpeALF_newrow:
-						case gpeALF_stk: {
-								OPgrp = gpeOPid_stk;
-								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
-							} break;
-
-						case gpeALF_brakE: {
-								//static gpeOPid lst[] = {gpeOPid_brakS};
-								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
-								aFND->median( nFND, aFND+nFND+1 );
-
-							} break;
-						case gpeALF_dimE:{
-								//static gpeOPid lst[] = {gpeOPid_dimS};
-								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
-								aFND->median( nFND, aFND+nFND+1 );
-
-							} break;
-
-						case gpeALF_else:{
-								//static gpeOPid lst[] = {gpeOPid_if};
-								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
-								aFND->median( nFND, aFND+nFND+1 );
-							} break;
-
-						case gpeALF_end:{
-								//static gpeOPid lst[] = {gpeOPid_begin};
-								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
-								aFND->median( nFND, aFND+nFND+1 );
-
-							} break;
-
-						case gpeALF_str:
-						case gpeALF_comS:
-						case gpeALF_com:
-						case gpeALF_comE:
-						case gpeALF_mail:
-
-						default:
-							break;
-					}
+//					if( false )
+//					switch( opALF = pOP[lnk.y].alf )
+//					{
+//
+//					///{  &= *= **= /= //= %= ^= |= += -= <<= >>= =  }-----------------------------------------------
+//						case gpeALF_mov:
+//						case gpeALF_andM:
+//						case gpeALF_mulM:
+//						case gpeALF_expM:
+//						case gpeALF_divM:
+//						case gpeALF_rootM:
+//						case gpeALF_remM:
+//						case gpeALF_xorM:
+//						case gpeALF_orM:
+//						case gpeALF_addM:
+//						case gpeALF_subM:
+//						case gpeALF_slM:
+//						case gpeALF_srM:
+//							cd.pst = lnk.y;
+//							++CDsp;
+//							cd.null();
+//							break;
+//					///{  + ++ - -- | || ^  }-----------------------------------------------
+//						case gpeALF_add:
+//						case gpeALF_orLG:
+//						case gpeALF_inc:
+//						case gpeALF_sub:
+//						case gpeALF_dec:
+//						case gpeALF_or:		// avagy a log. össze adás
+//						case gpeALF_xor:	// avagy a log. össze adás majd *-1
+//							OPgrp = gpeOPid_add;
+//							if( cd.deep )
+//								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
+//							cd.pst = lnk.y;
+//							++CDsp;
+//							cd.null();
+//							break;
+//
+//					///{  ~ * ** / % & && ! !!  }-----------------------------------------------
+//						case gpeALF_mul:	// szorzás
+//						case gpeALF_andLG:
+//						case gpeALF_and:	// és log. szorzás
+//						case gpeALF_exp:	// sokszor szorzás
+//						case gpeALF_div:	// reciprokkal szorzás
+//						case gpeALF_rem:	// osztás maradéka
+//						case gpeALF_sl:		// << *2^n
+//						case gpeALF_sr:		// << /2^n
+//							OPgrp = gpeOPid_mul;
+//							cd.pst = lnk.y;
+//							++CDsp;
+//							break;
+//						case gpeALF_inv:	// végül is ez *-1-gyel
+//						case gpeALF_notLG:
+//						case gpeALF_LG:
+//							cd.pre = lnk.y;
+//							break;
+//
+//
+//
+//					///{  == != <= < >= >  }-----------------------------------------------
+//					/// cmp utasítás lényegében kivonás,
+//					/// csak nem a különbség van eltárólva hanem a különbség kondiciója
+//						case gpeALF_eqLG:
+//						case gpeALF_neqLG:
+//						case gpeALF_leLG:
+//						case gpeALF_ltLG:
+//						case gpeALF_beLG:
+//						case gpeALF_bgLG:
+//							OPgrp = gpeOPid_sub;
+//							cd.pst = lnk.y;
+//							++CDsp;
+//							cd.null();
+//							break;
+//
+//					///{ . ~> :: ( [ { ? : }-----------------------------------------------
+//						case gpeALF_entry:
+//						case gpeALF_dot:
+//						case gpeALF_out:
+//						case gpeALF_brakS:
+//						case gpeALF_dimS:
+//						case gpeALF_begin:
+//						case gpeALF_if:
+//						case gpeALF_else:
+//							cd.pst = lnk.y;
+//							++CDsp;
+//							cd.null();
+//							break;
+//
+//					/// valamineki vége
+//					/// szegyük vissza a PULCSIT!
+//						case gpeALF_newrow:
+//						case gpeALF_stk: {
+//								OPgrp = gpeOPid_stk;
+//								CDsp.ASMrdy( SCOOP, iOPe, aFND, aaOPid, sizeof(aaOPid) );
+//							} break;
+//
+//						case gpeALF_brakE: {
+//								//static gpeOPid lst[] = {gpeOPid_brakS};
+//								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+//								aFND->median( nFND, aFND+nFND+1 );
+//
+//							} break;
+//						case gpeALF_dimE:{
+//								//static gpeOPid lst[] = {gpeOPid_dimS};
+//								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+//								aFND->median( nFND, aFND+nFND+1 );
+//
+//							} break;
+//
+//						{
+//								//static gpeOPid lst[] = {gpeOPid_if};
+//								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+//								aFND->median( nFND, aFND+nFND+1 );
+//							} break;
+//
+//						case gpeALF_end:{
+//								//static gpeOPid lst[] = {gpeOPid_begin};
+//								nFND = CDsp.opi( aFND, aaOPid, sizeof(aaOPid) );
+//								aFND->median( nFND, aFND+nFND+1 );
+//
+//							} break;
+//
+//						case gpeALF_str:
+//						case gpeALF_comS:
+//						case gpeALF_com:
+//						case gpeALF_comE:
+//						case gpeALF_mail:
+//
+//						default:
+//							break;
+//					}
 				} break;
 			case gpeCLR_red2:	///BREAK
 				break;

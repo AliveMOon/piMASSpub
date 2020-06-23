@@ -99,6 +99,41 @@ typedef enum gpeOPid:U1{
 	gpeOPid_mail,	gpeOPid_str,
 } gpeOPid_U1;
 
+static gpeOPid gpaOPgrp[] = {
+	gpeOPid_nop,
+
+	gpeOPid_mul,	gpeOPid_mul,	gpeOPid_mul,
+
+	gpeOPid_stk,	gpeOPid_stk,
+
+	gpeOPid_comS, 	gpeOPid_comE,	gpeOPid_com,
+
+
+	gpeOPid_mul, 	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_mul,	gpeOPid_mul, 	gpeOPid_mov,
+									gpeOPid_mov,
+	gpeOPid_mul, 	gpeOPid_mov, 	gpeOPid_mov,
+	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_add,	gpeOPid_mov,
+
+
+	gpeOPid_mov, 	gpeOPid_sub,  	gpeOPid_sub,
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,	/// -------------- GOOD
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
+
+
+	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
+
+	gpeOPid_entry, 	gpeOPid_entry, 	gpeOPid_out,
+	gpeOPid_entry,	gpeOPid_out,
+	gpeOPid_entry, 	gpeOPid_out,
+	gpeOPid_entry, 	gpeOPid_out,
+	gpeOPid_entry,	gpeOPid_entry,
+	gpeOPid_mail,	gpeOPid_str,
+};
+
 /*
 	Hello = ize + b - c * d * e / 100
  		+ ( 200 + f );
@@ -262,40 +297,45 @@ static gpeOPid gpaaOPid[][0x20] = {
 };
 
 static const char* gpas68k[] = {
-	"\n %0.4x nop%s\t%s,%s",
+	"\n 0x%0.4x nop%s\t%s,%s",
 
-	"\n %0.4x notLG%s\t%s,%s",	"\n %0.4x LG%s\t%s,%s",	"\n %0.4x inv%s\t%s,%s",
+	"\n 0x%0.4x notLG%s\t%s,%s",	"\n 0x%0.4x LG%s\t%s,%s",	"\n 0x%0.4x inv%s\t%s,%s",
 
-	"\n %0.4x stk%s\t%s,%s",	"\n %0.4x nrow%s\t%s,%s",
+	"\n 0x%0.4x stk%s\t%s,%s",	"\n 0x%0.4x nrow%s\t%s,%s",
 
-	"\n %0.4x comS%s\t%s,%s", 	"\n %0.4x comE%s\t%s,%s",	"\n %0.4x com%s\t%s,%s",
-
-
-	"\n %0.4x and%s\t%s,%s", 	"\n %0.4x andLG%s\t%s,%s",	"\n %0.4x andM%s\t%s,%s",
-	"\n %0.4x mul%s\t%s,%s", 	"\n %0.4x exp%s\t%s,%s",	"\n %0.4x mulM%s\t%s,%s",
-								"\n %0.4x expM%s\t%s,%s",
-	"\n %0.4x div%s\t%s,%s", 	"\n %0.4x divM%s\t%s,%s",	"\n %0.4x rootM%s\t%s,%s",
-	"\n %0.4x rem%s\t%s,%s", 	"\n %0.4x remM%s\t%s,%s",
-	"\n %0.4x xor%s\t%s,%s",	"\n %0.4x xorM%s\t%s,%s",
+	"\n 0x%0.4x comS%s\t%s,%s", 	"\n 0x%0.4x comE%s\t%s,%s",	"\n 0x%0.4x com%s\t%s,%s",
 
 
-	"\n %0.4x move%s\t%s,%s", 	"\n %0.4x eqLG%s\t%s,%s",  "\n %0.4x neqLG%s\t%s,%s",
-	"\n %0.4x or%s\t%s,%s", 	"\n %0.4x orLG%s\t%s,%s",	"\n %0.4x orM%s\t%s,%s",
-	"\n %0.4x add%s\t%s,%s", 	"\n %0.4x inc%s\t%s,%s",	"\n %0.4x addM%s\t%s,%s",	/// -------------- GOOD
-	"\n %0.4x sub%s\t%s,%s", 	"\n %0.4x dec%s\t%s,%s",	"\n %0.4x subM%s\t%s,%s",
+	"\n 0x%0.4x and%s\t%s,%s", 	"\n 0x%0.4x andLG%s\t%s,%s",	"\n 0x%0.4x andM%s\t%s,%s",
+	"\n 0x%0.4x mul%s\t%s,%s", 	"\n 0x%0.4x exp%s\t%s,%s",	"\n 0x%0.4x mulM%s\t%s,%s",
+								"\n 0x%0.4x expM%s\t%s,%s",
+	"\n 0x%0.4x div%s\t%s,%s", 	"\n 0x%0.4x divM%s\t%s,%s",	"\n 0x%0.4x rootM%s\t%s,%s",
+	"\n 0x%0.4x rem%s\t%s,%s", 	"\n 0x%0.4x remM%s\t%s,%s",
+	"\n 0x%0.4x xor%s\t%s,%s",	"\n 0x%0.4x xorM%s\t%s,%s",
 
 
-	"\n %0.4x leLG%s\t%s,%s",	"\n %0.4x ltLG%s\t%s,%s", 	"\n %0.4x sl%s\t%s,%s",
-	"\n %0.4x slM%s\t%s,%s",
-	"\n %0.4x beLG%s\t%s,%s",	"\n %0.4x bgLG%s\t%s,%s", 	"\n %0.4x sr%s\t%s,%s",
-	"\n %0.4x srM%s\t%s,%s",
+	"\n 0x%0.4x move%s\t%s,%s", 	"\n 0x%0.4x eqLG%s\t%s,%s",  "\n 0x%0.4x neqLG%s\t%s,%s",
+	"\n 0x%0.4x or%s\t%s,%s", 	"\n 0x%0.4x orLG%s\t%s,%s",	"\n 0x%0.4x orM%s\t%s,%s",
+	"\n 0x%0.4x add%s\t%s,%s", 	"\n 0x%0.4x inc%s\t%s,%s",	"\n 0x%0.4x addM%s\t%s,%s",	/// -------------- GOOD
+	"\n 0x%0.4x sub%s\t%s,%s", 	"\n 0x%0.4x dec%s\t%s,%s",	"\n 0x%0.4x subM%s\t%s,%s",
 
-	"\n %0.4x lea%s\t%s,%s", 	"\n %0.4x entry%s\t%s,%s", "\n %0.4x out%s\t%s,%s",
-	"\n %0.4x jsr%s\t%s,%s",	"\n %0.4x brakE%s\t%s,%s",
-	"\n %0.4x dimS%s\t%s,%s", 	"\n %0.4x dimE%s\t%s,%s",
-	"\n %0.4x begin%s\t%s,%s",	"\n %0.4x end%s\t%s,%s",
-	"\n %0.4x if%s\t%s,%s",		"\n %0.4x else%s\t%s,%s",
-	"\n %0.4x mail%s\t%s,%s",	"\n %0.4x str%s\t%s,%s",
+
+	"\n 0x%0.4x leLG%s\t%s,%s",	"\n 0x%0.4x ltLG%s\t%s,%s", 	"\n 0x%0.4x sl%s\t%s,%s",
+	"\n 0x%0.4x slM%s\t%s,%s",
+	"\n 0x%0.4x beLG%s\t%s,%s",	"\n 0x%0.4x bgLG%s\t%s,%s", 	"\n 0x%0.4x sr%s\t%s,%s",
+	"\n 0x%0.4x srM%s\t%s,%s",
+
+	// gpeOPid_dot
+	//"\n 0x%0.4x lea%s\t%s,%s",
+	"\n 0x%0.4x move%s 0x%0.4x,D0\t\t;%s"
+	"\n 0x%0.4x jsr FNDidD0eaA0" ,
+
+	"\n 0x%0.4x entry%s\t%s,%s", "\n 0x%0.4x out%s\t%s,%s",
+	"\n 0x%0.4x jsr%s\t%s,%s",	"\n 0x%0.4x brakE%s\t%s,%s",
+	"\n 0x%0.4x dimS%s\t%s,%s", 	"\n 0x%0.4x dimE%s\t%s,%s",
+	"\n 0x%0.4x begin%s\t%s,%s",	"\n 0x%0.4x end%s\t%s,%s",
+	"\n 0x%0.4x if%s\t%s,%s",		"\n 0x%0.4x else%s\t%s,%s",
+	"\n 0x%0.4x mail%s\t%s,%s",	"\n 0x%0.4x str%s\t%s,%s",
 };
 
 /// TYP

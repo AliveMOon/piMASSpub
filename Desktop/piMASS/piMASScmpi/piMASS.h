@@ -3073,10 +3073,18 @@ class I4x4 {
 public:
 	union
     {
-        struct
+		struct
         {
 			I4 x,y,z,w;
 		};
+
+		struct
+        {
+			gpeOPid pre, pst;	// 0, 1
+			U1		a0,d0;		// 2, 3
+			I4		msk,		// 4,   // 0x  oD oS rD rS
+					aOB[2];		// 8, 12; //0x10
+        };
 		struct
         {
 			I4 A,B,C,D;
@@ -3103,8 +3111,9 @@ public:
         {
 			U4x2 au4x2[2];
         };
+
 	};
-    I4x4(){};
+	I4x4(){};
     I4x4( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )
     {
         x = _x; y = _y; z = _z; w = _w;
@@ -6401,6 +6410,7 @@ szasz:
 
         return p_alloc + i*n;//+e-n*2;
 	}
+	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
 };
 
 
