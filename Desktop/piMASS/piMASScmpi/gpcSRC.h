@@ -716,8 +716,8 @@ static char gpsOPERA[] = {
 class gpcSCOOP {
 public:
 	gpcLZYdct	dct;
-	gpcLZY		lnk,
-				mini, obj,
+	gpcLZY		lnk, obj,
+				mini,
 				vASM;
 	I8x4 rMN;
 	U4x4 rLNK, rINS;
@@ -729,11 +729,12 @@ public:
 	{
 		dct.rst();
 		lnk.lzyRST();
+		obj.lzyRST();
 		mini.lzyRST();
 		vASM.lzyRST();
 		//iDCT =
 		nDCT =
-		nLNK = nMINI = nvASM = 0;
+		nLNK = nOBJ = nMINI = nvASM = 0;
 		pALL = pU;	// ezt a gpcSRC::SRCmill adja
 	}
 	U4 nMN() { return nMINI = mini.nLD()/sizeof(rMN); }
