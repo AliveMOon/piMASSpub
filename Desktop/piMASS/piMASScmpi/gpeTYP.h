@@ -339,12 +339,18 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x xor%s\t%s,%s",	"\n 0x%0.4x xorM%s\t%s,%s",
 
 	// gpeOPid_mov,
-	"\n 0x%0.4x move%s\t%s,%s\t%s",
+	"\n 0x%0.4x move%s\t%s,%s\t%s%s",
 
 	"\n 0x%0.4x eqLG%s\t%s,%s",  "\n 0x%0.4x neqLG%s\t%s,%s",
 	"\n 0x%0.4x or%s\t%s,%s", 	"\n 0x%0.4x orLG%s\t%s,%s",	"\n 0x%0.4x orM%s\t%s,%s",
-	"\n 0x%0.4x add%s\t%s,%s", 	"\n 0x%0.4x inc%s\t%s,%s",	"\n 0x%0.4x addM%s\t%s,%s",	/// -------------- GOOD
-	"\n 0x%0.4x sub%s\t%s,%s", 	"\n 0x%0.4x dec%s\t%s,%s",	"\n 0x%0.4x subM%s\t%s,%s",
+
+	"\n 0x%0.4x add%s\t%s,%s\t%s%s",
+	"\n 0x%0.4x inc%s\t%s,%s",
+	"\n 0x%0.4x addM%s\t%s,%s",	/// -------------- GOOD
+
+	"\n 0x%0.4x sub%s\t%s,%s\t%s%s",
+	"\n 0x%0.4x dec%s\t%s,%s",
+	"\n 0x%0.4x subM%s\t%s,%s",
 
 
 	"\n 0x%0.4x leLG%s\t%s,%s",	"\n 0x%0.4x ltLG%s\t%s,%s", 	"\n 0x%0.4x sl%s\t%s,%s",
@@ -353,7 +359,7 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x srM%s\t%s,%s",
 
 	// gpeOPid_dot,
-	"\n 0x%0.4x jsr fndOBJ2SP"
+	"\n 0x%0.4x jsr entryOBJ2A0",
 
 	//gpeOPid_entry,
 	"\n 0x%0.4x entry%s\t%s,%s",

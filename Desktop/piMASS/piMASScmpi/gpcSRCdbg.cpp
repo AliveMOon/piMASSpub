@@ -66,7 +66,6 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 					break;
 				case gpeEA_d16IAnI:
 					pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i], Xn&7 )+1;
-					bOB = true;
 					break;
 				case gpeEA_d16IAnDnI:
 					pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i], Xn&7, gps68kREG[Yn&0xf] )+1;
@@ -114,77 +113,11 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc );
 				pc++;
 				break;
-			/*case gpeOPid_mov:
-				for( U4 i = 0; i < 2; i++){ aPC[i] = pc++; }
-				pDBG = pDBG->lzyFRMT( strt=-1,
-											gpas68k[gpeOPid_dot],
-											aPC[0], gpsTYPsz[sx&0x3], si, pS,
-											aPC[1]
-									);
-				break;*/
+
 			default:
-				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, gpsTYPsz[sx&0x3], pS, pD, pC );
+				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, gpsTYPsz[sx&0x3], pS, pD, *pC?";":"", pC );
 				pc++;
 				break;
 		}
-
-
-
-//		I4	si = INS.aOB[0],
-//			di = INS.aOB[1];
-//		sx = dx = 0;
-//
-//		if( !(INS.msk&0x80) )
-//		{
-//		    pD = pS+sprintf( pS, gps68kR[(INS.msk&0x38)>>3], INS.msk&0x7, "D0" )+1;
-//			//pS = (char*)gps68kREG[INS.msk&0xf];
-//		}
-//		else if( si >= 0 )
-//		{
-//			gpcOBJlnk& src = OBJsrc;
-//			sx = src.typ;
-//			pD = pS + src.strASM( pS, pALL, pM0, pL0 ) + 1;
-//		} else {
-//			gpmMcpy( pS, pALL+pM0[-si].iMNi, pM0[-si].iMNn );
-//			pS[pM0[-si].iMNn]=0;
-//			pD = pS + pM0[-si].iMNn + 1;
-//			sx = gpeTYP_STR;
-//		}
-//		if( !(INS.msk&0x8000) )
-//		{
-//			sprintf( pD, gps68kR[(INS.msk&0x3800)>>11], (INS.msk&0x700)>>8, "D0" );
-//			//pD = (char*)gps68kREG[(INS.msk&0xf00)>>8];
-//		}
-//		else if( di >= 0 )
-//		{
-//			gpcOBJlnk& dst = OBJdst;
-//			dx = dst.typ;
-//			dst.strASM( pD, pALL, pM0, pL0 );
-//		} else {
-//			gpmMcpy( pD, pALL+pM0[-di].iMNi, pM0[-di].iMNn );
-//			pD[pM0[-di].iMNn]=0;
-//			dx = gpeTYP_STR;
-//		}
-//
-//		switch( INS.pst )
-//		{
-//			case gpeOPid_dot:
-//				for( U4 i = 0; i < 2; i++){ aPC[i] = pc++; }
-//				pDBG = pDBG->lzyFRMT( strt=-1,
-//											gpas68k[gpeOPid_dot],
-//											aPC[0], gpsTYPsz[sx&0x3], si, pS,
-//											aPC[1]
-//											//aPC[2], gpsTYPsz[dx&0x3], di, pD,
-//											//aPC[3]
-//									);
-//				break;
-//			default:
-//				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[INS.pst], pc, gpsTYPsz[sx&0x3], pS, pD );
-//				pc++;
-//				break;
-//		}
-
-
 	}
-
 }
