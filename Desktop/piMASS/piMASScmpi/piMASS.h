@@ -816,12 +816,12 @@ public:
             U4 u4;
         };
     };
+    U1x4(){};
     U1x4& null()
     {
 		u4 = 0;
 		return *this;
     }
-    U1x4(){};
     U1x4( U4 b )
     {
         u4 = b;
@@ -3082,8 +3082,8 @@ public:
         {
 			gpeOPid pre, pst;	// 0, 1
 			U1		a0,d0;		// 2, 3
-			I4		msk,		// 4,   // 0x  oD oS rD rS
-					aOB[2];		// 8, 12; //0x10
+			U4		op;		// 4,
+			I4		aOB[2];		// 8, 12; //0x10
         };
 		struct
         {
@@ -3113,6 +3113,10 @@ public:
         };
 
 	};
+	U1x4 opw()
+	{
+		return (U1x4)op;
+	}
 	I4x4(){};
     I4x4( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )
     {
@@ -6411,11 +6415,19 @@ szasz:
         return p_alloc + i*n;//+e-n*2;
 	}
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
+	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeEAsz sz = gpeEAsz0,
+						gpeEA s0 = gpeEA_OFF, 	U1 sn = 0,	U1 si = 0,
+						gpeEA d0 = gpeEA_OFF,	U1 dn = 0,	U1 di = 0 ) {
+		I4x4 &ins = *(I4x4*)Ux( pc, sizeof(I4x4) );
+		ins.null();
+		ins.op = U1x4( op, ((U1)s0<<3)|(sn&7), ((U1)d0<<3)|(dn&7), (di<<4)|(si&7) ).u4;
+		return ins;
+	}
+
 };
 
 
-class gpcLZYdct
-{
+class gpcLZYdct {
 	U4x4*		pIX; /// BEST!!!
 public:
 	gpcLZY		str,

@@ -19,6 +19,38 @@
 #endif
 #define aaOPid gpaaOPid[lnk.y]*/
 
+static const char* gpsTYPsz[] = {
+	".b", //0 1
+	".w", //1 2
+	".l", //2 4
+	".q", //3 8
+	".x", //4 16
+};
+static const char* gps68kREG[] = {
+	"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
+	"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
+};
+static const char* gps68kADRmod[] = {
+	"",
+	"D%x",
+	"A%x",
+
+	"(A%x)",
+	"(A%x)+",
+	"-(A%x)",
+
+	"0x%0.4d(A%x)",
+	"0x%0.2d(A%x,%s)",
+
+	"0x%0.4d(PC)",
+	"0x%0.2d(PC,%s)",
+
+	"0x%0.4x.w",
+	"0x%0.8x.l",
+	"0x%0.8x",				//direct data
+};
+
+
 class gpcOBJlnk {
 public:
 	I8x2	obj;
@@ -47,6 +79,7 @@ public:
 
 };
 
+#define PC scp.nASM()
 class gpcCDsp {
 public:
 	I4		iCD, refCD, nR;
@@ -92,11 +125,9 @@ public:
 			--(*this);
 		return *this;
 	}
-
 	I4 opi( U1 i ) {
 		return aiSP[i] ? (apSP[i]?*apSP[i]:-1) : -1;
 	}
-
 	U1 opi( I4x2* pO, gpeOPid* pL, U1 nL ) {
 		U1 i = 0, j = 0;
 		for( ; i < nL; i++ )
@@ -121,22 +152,30 @@ public:
 		switch( ins.pst )
 		{
 			case gpeOPid_dot: {
+					// move.q A7,D7
+					scp.vASM.INST( PC,	gpeOPid_mov, gpeEAszL,
+										gpeEA_An,7,0,
+										gpeEA_Dn,7,0  );
 					while( nDP > -1) {
 						gpcCD &i = pCD[0-nDP];
-						I4x4 &INS = scp.vASM.pINST(scp.nASM())[0];
-						INS.null();
-						INS.pst = gpeOPid_dot;
-						INS.aOB[0] = (i.lnk > 0) ? i.lnk-iOPe : i.lnk;
-						INS.msk = 0x0080;
-						INS.aOB[1] = 0;
+						I4 pc = PC;
+						// move.q 0xOBJid,-(A7) ;
+						I4x4 &opcd = scp.vASM.INST( PC,	gpeOPid_mov, gpeEAszL,
+														gpeEA_num,0,0,
+														gpeEA_sIAnI,7,0  );
+						opcd.aOB[0] = (i.lnk > 0) ? i.lnk-iOPe : i.lnk;
 						--nDP;
 					}
-					I4x4 &INS = scp.vASM.pINST(scp.nASM())[0];
-					INS.null();
-					INS.pst = gpeOPid_mov;
-					INS.msk = 0x2708;
-
-
+					// move.l A7,D0
+					scp.vASM.INST( PC,	gpeOPid_mov, gpeEAszL,
+										gpeEA_An,7,0,
+										gpeEA_Dn,0,0  );
+					// move.l D7,D0
+					scp.vASM.INST( PC,	gpeOPid_sub, gpeEAszL,
+										gpeEA_Dn,7,0,
+										gpeEA_Dn,0,0  );
+					// "\n 0x%0.4x jsr fndOBJ2SP"
+					scp.vASM.INST( PC,	gpeOPid_dot );
 				} break;
 			default:
 				break;

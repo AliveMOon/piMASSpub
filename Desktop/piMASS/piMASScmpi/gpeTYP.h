@@ -97,7 +97,38 @@ typedef enum gpeOPid:U1{
 	gpeOPid_begin, 	gpeOPid_end,
 	gpeOPid_if,		gpeOPid_else,
 	gpeOPid_mail,	gpeOPid_str,
+
+	gpeOPid_n,
 } gpeOPid_U1;
+typedef enum gpeEA:U1 {
+	gpeEA_OFF,
+	gpeEA_Dn,
+	gpeEA_An,
+
+	gpeEA_IAnI,
+	gpeEA_IAnIp,
+	gpeEA_sIAnI,
+
+	gpeEA_d16IAnI,
+	gpeEA_d16IAnDnI,
+
+	gpeEA_d16IPcI,
+	gpeEA_d16IPcDnI,
+
+	gpeEA_W,
+	gpeEA_L,
+
+	gpeEA_num,
+} gpeEA_U1;
+
+typedef enum gpeEAsz:U1 {
+	gpeEAsz0,
+	gpeEAszB,
+	gpeEAszW,
+	gpeEAszL,
+	gpeEAszQ,
+	gpeEAszX,
+} gpeEAsz_U1;
 
 static gpeOPid gpaOPgrp[] = {
 	gpeOPid_nop,
@@ -133,12 +164,6 @@ static gpeOPid gpaOPgrp[] = {
 	gpeOPid_entry,	gpeOPid_entry,
 	gpeOPid_mail,	gpeOPid_str,
 };
-
-/*
-	Hello = ize + b - c * d * e / 100
- 		+ ( 200 + f );
-	mini = print( "ize = %d\r\n", hello );
-*/
 static gpeOPid gpaaOPid[][0x20] = {
 	//gpeOPid_nop,
 	{gpeOPid_nop,},
@@ -313,8 +338,10 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x rem%s\t%s,%s", 	"\n 0x%0.4x remM%s\t%s,%s",
 	"\n 0x%0.4x xor%s\t%s,%s",	"\n 0x%0.4x xorM%s\t%s,%s",
 
+	// gpeOPid_mov,
+	"\n 0x%0.4x move%s\t%s,%s\t%s",
 
-	"\n 0x%0.4x move%s\t%s,%s", 	"\n 0x%0.4x eqLG%s\t%s,%s",  "\n 0x%0.4x neqLG%s\t%s,%s",
+	"\n 0x%0.4x eqLG%s\t%s,%s",  "\n 0x%0.4x neqLG%s\t%s,%s",
 	"\n 0x%0.4x or%s\t%s,%s", 	"\n 0x%0.4x orLG%s\t%s,%s",	"\n 0x%0.4x orM%s\t%s,%s",
 	"\n 0x%0.4x add%s\t%s,%s", 	"\n 0x%0.4x inc%s\t%s,%s",	"\n 0x%0.4x addM%s\t%s,%s",	/// -------------- GOOD
 	"\n 0x%0.4x sub%s\t%s,%s", 	"\n 0x%0.4x dec%s\t%s,%s",	"\n 0x%0.4x subM%s\t%s,%s",
@@ -325,17 +352,38 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x beLG%s\t%s,%s",	"\n 0x%0.4x bgLG%s\t%s,%s", 	"\n 0x%0.4x sr%s\t%s,%s",
 	"\n 0x%0.4x srM%s\t%s,%s",
 
-	// gpeOPid_dot
-	//"\n 0x%0.4x lea%s\t%s,%s",
-	"\n 0x%0.4x move%s 0x%0.4x,D0\t\t;%s"
-	"\n 0x%0.4x jsr FNDidD0eaA0" ,
+	// gpeOPid_dot,
+	"\n 0x%0.4x jsr fndOBJ2SP"
 
-	"\n 0x%0.4x entry%s\t%s,%s", "\n 0x%0.4x out%s\t%s,%s",
-	"\n 0x%0.4x jsr%s\t%s,%s",	"\n 0x%0.4x brakE%s\t%s,%s",
-	"\n 0x%0.4x dimS%s\t%s,%s", 	"\n 0x%0.4x dimE%s\t%s,%s",
-	"\n 0x%0.4x begin%s\t%s,%s",	"\n 0x%0.4x end%s\t%s,%s",
-	"\n 0x%0.4x if%s\t%s,%s",		"\n 0x%0.4x else%s\t%s,%s",
-	"\n 0x%0.4x mail%s\t%s,%s",	"\n 0x%0.4x str%s\t%s,%s",
+	//gpeOPid_entry,
+	"\n 0x%0.4x entry%s\t%s,%s",
+	//gpeOPid_out,
+	"\n 0x%0.4x out%s\t%s,%s",
+
+	//gpeOPid_brakS,
+	"\n 0x%0.4x jsr%s\t%s,%s",
+
+	//gpeOPid_brakE,
+
+	"\n 0x%0.4x brakE%s\t%s,%s",
+
+	//gpeOPid_dimS,
+	"\n 0x%0.4x dimS%s\t%s,%s",
+	// 	gpeOPid_dimE,
+	"\n 0x%0.4x dimE%s\t%s,%s",
+
+	// gpeOPid_begin,
+	"\n 0x%0.4x begin%s\t%s,%s",
+	// gpeOPid_end,
+	"\n 0x%0.4x end%s\t%s,%s",
+	// gpeOPid_if,
+	"\n 0x%0.4x if%s\t%s,%s",
+	// gpeOPid_else,
+	"\n 0x%0.4x else%s\t%s,%s",
+	// gpeOPid_mail,
+	"\n 0x%0.4x mail%s\t%s,%s",
+	//gpeOPid_str,
+	"\n 0x%0.4x str%s\t%s,%s",
 };
 
 /// TYP
