@@ -200,20 +200,37 @@ public:
 	}
 	gpcCDsp& ASMdeepADD( gpcSCOOP& scp, U4 iOPe )
 	{
-		I4x4 &ins = scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
+		I4x4 &load = scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
 											gpeEA_d16IAnI,Ai+1,0,
 											gpeEA_An,0,0  );
-		ins.aOB[0] = -1;
+		load.aOB[0] = -1;
 		scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
 										gpeEA_IAnI,0,0,
 										gpeEA_Dn,0,0  );
-		while( nADD )
+		while( nADD > 1 )
 		{
 			nADD--;
+			I4x4 &ins = scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
+											gpeEA_d16IAnI,Ai,0,
+											gpeEA_An,1,0  );
+			ins.aOB[0] = -nADD;
+			/*scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
+											gpeEA_IAnI,1,0,
+											gpeEA_Dn,1,0  );
+
 			scp.vASM.INST( PC,	aADD[nADD],	gpeEAszL,
 											gpeEA_Dn,1,0,
+											gpeEA_Dn,0,0  );*/
+			scp.vASM.INST( PC, aADD[nADD],	gpeEAszL,
+											gpeEA_IAnI,1,0,
 											gpeEA_Dn,0,0  );
 		}
+		scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
+										gpeEA_Dn,0,0,
+										gpeEA_IAnI,0,0
+						);
+
+		nADD = 0;
 		return *this;
 	}
 	gpcCDsp& ASMdeepMUL( gpcSCOOP& scp, U4 iOPe )
@@ -232,12 +249,15 @@ public:
 											gpeEA_d16IAnI,Ai,0,
 											gpeEA_An,0,0  );
 			ins.aOB[0] = i-nMUL;
-			scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
+			/*scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL,
 											gpeEA_IAnI,0,0,
 											gpeEA_Dn,1,0  );
 
 			scp.vASM.INST( PC,	aMUL[i],	gpeEAszL,
 											gpeEA_Dn,1,0,
+											gpeEA_Dn,0,0  );*/
+			scp.vASM.INST( PC, aMUL[i],		gpeEAszL,
+											gpeEA_IAnI,0,0,
 											gpeEA_Dn,0,0  );
 		}
 
@@ -277,9 +297,9 @@ public:
 					++(*this);
 					break;
 				case gpeOPid_mul:
-					ASMdeepDOT( scp, iOPe );
 					if( nADD )
 						ASMdeepADD( scp, iOPe );
+					ASMdeepDOT( scp, iOPe );
 					if( !nMUL )
 						*aMUL = prev;
 					++nMUL;
@@ -327,9 +347,9 @@ public:
 				++(*this);
 				break;
 			case gpeOPid_mul: /// *
-				ASMdeepDOT( scp, iOPe );
 				if( nADD )
-					ASMdeepMUL( scp, iOPe );
+					ASMdeepADD( scp, iOPe );
+				ASMdeepDOT( scp, iOPe );
 				if( !nMUL )
 					*aMUL = prev;
 				++nMUL;

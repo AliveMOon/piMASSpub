@@ -331,12 +331,12 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x comS%s\t%s,%s", 	"\n 0x%0.4x comE%s\t%s,%s",	"\n 0x%0.4x com%s\t%s,%s",
 
 
-	"\n 0x%0.4x and%s\t%s,%s", 	"\n 0x%0.4x andLG%s\t%s,%s",	"\n 0x%0.4x andM%s\t%s,%s",
-	"\n 0x%0.4x mul%s\t%s,%s", 	"\n 0x%0.4x exp%s\t%s,%s",	"\n 0x%0.4x mulM%s\t%s,%s",
-								"\n 0x%0.4x expM%s\t%s,%s",
-	"\n 0x%0.4x div%s\t%s,%s", 	"\n 0x%0.4x divM%s\t%s,%s",	"\n 0x%0.4x rootM%s\t%s,%s",
-	"\n 0x%0.4x rem%s\t%s,%s", 	"\n 0x%0.4x remM%s\t%s,%s",
-	"\n 0x%0.4x xor%s\t%s,%s",	"\n 0x%0.4x xorM%s\t%s,%s",
+	"\n 0x%0.4x AND%s\t%s,%s", 	"\n 0x%0.4x ANDlg%s\t%s,%s",	"\n 0x%0.4x ANDm%s\t%s,%s",
+	"\n 0x%0.4x MUL%s\t%s,%s", 	"\n 0x%0.4x EXP%s\t%s,%s",	"\n 0x%0.4x MULm%s\t%s,%s",
+								"\n 0x%0.4x EXPm%s\t%s,%s",
+	"\n 0x%0.4x DIV%s\t%s,%s", 	"\n 0x%0.4x DIVm%s\t%s,%s",	"\n 0x%0.4x ROOTm%s\t%s,%s",
+	"\n 0x%0.4x REM%s\t%s,%s", 	"\n 0x%0.4x REMm%s\t%s,%s",
+	"\n 0x%0.4x XOR%s\t%s,%s",	"\n 0x%0.4x XORm%s\t%s,%s",
 
 	// gpeOPid_mov,
 	"\n 0x%0.4x move%s\t%s,%s\t%s%s",
@@ -344,13 +344,13 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x eqLG%s\t%s,%s",  "\n 0x%0.4x neqLG%s\t%s,%s",
 	"\n 0x%0.4x or%s\t%s,%s", 	"\n 0x%0.4x orLG%s\t%s,%s",	"\n 0x%0.4x orM%s\t%s,%s",
 
-	"\n 0x%0.4x add%s\t%s,%s\t%s%s",
-	"\n 0x%0.4x inc%s\t%s,%s",
-	"\n 0x%0.4x addM%s\t%s,%s",	/// -------------- GOOD
+	"\n 0x%0.4x ADD%s\t%s,%s\t%s%s",
+	"\n 0x%0.4x INC%s\t%s,%s",
+	"\n 0x%0.4x ADDm%s\t%s,%s",	/// -------------- GOOD
 
-	"\n 0x%0.4x sub%s\t%s,%s\t%s%s",
-	"\n 0x%0.4x dec%s\t%s,%s",
-	"\n 0x%0.4x subM%s\t%s,%s",
+	"\n 0x%0.4x SUB%s\t%s,%s\t%s%s",
+	"\n 0x%0.4x DEC%s\t%s,%s",
+	"\n 0x%0.4x SUBm%s\t%s,%s",
 
 
 	"\n 0x%0.4x leLG%s\t%s,%s",	"\n 0x%0.4x ltLG%s\t%s,%s", 	"\n 0x%0.4x sl%s\t%s,%s",
