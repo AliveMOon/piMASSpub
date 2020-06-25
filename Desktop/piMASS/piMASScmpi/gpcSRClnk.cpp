@@ -124,6 +124,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 		switch( clr )
 		{
 			case gpeCLR_blue2: 	///ABC
+				//cd.pst = gpeOPid_mul;
 				if( lnk.y )
 				{
 					cd.lnk = lnk.y;
@@ -136,6 +137,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_orange:	///NUM
+				//cd.pst = gpeOPid_mul;
 				if( lnk.y )
 				{
 					cd.lnk = lnk.y;

@@ -334,9 +334,9 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x AND%s\t%s,%s", 	"\n 0x%0.4x ANDlg%s\t%s,%s",	"\n 0x%0.4x ANDm%s\t%s,%s",
 	"\n 0x%0.4x MUL%s\t%s,%s", 	"\n 0x%0.4x EXP%s\t%s,%s",	"\n 0x%0.4x MULm%s\t%s,%s",
 								"\n 0x%0.4x EXPm%s\t%s,%s",
-	"\n 0x%0.4x DIV%s\t%s,%s", 	"\n 0x%0.4x DIVm%s\t%s,%s",	"\n 0x%0.4x ROOTm%s\t%s,%s",
-	"\n 0x%0.4x REM%s\t%s,%s", 	"\n 0x%0.4x REMm%s\t%s,%s",
-	"\n 0x%0.4x XOR%s\t%s,%s",	"\n 0x%0.4x XORm%s\t%s,%s",
+	"\n 0x%0.4x DIV%s\t%s,%s\t%s%s", 	"\n 0x%0.4x DIVm%s\t%s,%s",	"\n 0x%0.4x ROOTm%s\t%s,%s",
+	"\n 0x%0.4x REM%%s\t%s,%s\t%s%s", 	"\n 0x%0.4x REMm%s\t%s,%s",
+	"\n 0x%0.4x XOR%s\t%s,%s\t%s%s",	"\n 0x%0.4x XORm%s\t%s,%s",
 
 	// gpeOPid_mov,
 	"\n 0x%0.4x move%s\t%s,%s\t%s%s",
