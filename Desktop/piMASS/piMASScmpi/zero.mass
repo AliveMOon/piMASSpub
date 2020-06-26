@@ -1,7 +1,9 @@
  a0	 
- Hello = a - ize * ezi + ba 
- 		- c * d * e / 100 
- 		* ( 200 + f * g + h ) ;
+ Hell.o = a - iz.e * ez.i 
+ 		+ b.a 
+ 		- c.d * e / 100 
+ 		*  (200 + f * g + h)  
+ 		+ i ;
  mini = print( "ize = %d\r\n",
  				 hello );
  

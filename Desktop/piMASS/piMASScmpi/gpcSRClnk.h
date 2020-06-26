@@ -158,7 +158,7 @@ public:
 		/// move.l -1(Ai), A1
 		I4x4 &load = isa( PC, gpeOPid_mov, gpeEAszL
 							,gpeEA_d16IAnI,Ai,0
-							,gpeEA_An,0,0  );
+							,gpeEA_An,1,0  );
 		load.aOB[0] = n;
 		return load;
 	}
@@ -180,14 +180,14 @@ public:
 	I4x4& move_l_IA1I_D0(gpcSCOOP& scp) { /// move.l (A1),D0
 		I4x4& inst = isa( PC, gpeOPid_mov, gpeEAszL
 							,gpeEA_IAnI,1,0
-							,gpeEA_IAnI,0,0
+							,gpeEA_Dn,0,0
 						);
 		return inst;
 	}
 	I4x4& move_l_IA1I_D1(gpcSCOOP& scp) { /// move.l (A1),D1
 		I4x4& inst = isa( PC, gpeOPid_mov, gpeEAszL
 							,gpeEA_IAnI,1,0
-							,gpeEA_IAnI,1,0
+							,gpeEA_Dn,1,0
 						);
 		return inst;
 	}
@@ -288,44 +288,45 @@ public:
 		}
 
 
-		U4 i = 1;
-		if(strt==gpeOPid_mov)
+		U4 s = ( gpaOPgrp[strt]==gpeOPid_mul ), a = 0, nA = nADD;
+		if( s )
 		{
-			// a =b+c +d*e  // nADD 2 // de nem adtam hozzá még a d-t
-			//   -2-1-^
-			LOAD_SRC_ADR_A1( scp,-nADD );	/// move.l n(Ai),A1
+			//  strt
+			//  |  0  1
+			//  V  v  v
+			// d*e +f -g*h		// nADD 2 // de nem adtam hozzá még a g-t
+			//     -1-^
+			//     0 1  2
+			//     v v  v
+			// d*e +f-g +h*i	// nADD 3 // de nem adtam hozzá még a h-t
+			//     -2-1-^
+			strt = aADD[a++];
+			LOAD_SRC_ADR_A1(scp,s-nADD);	/// move.l n(Ai),A1
 			move_l_IA1I_D0(scp);			/// move.l (A1),D0
+			--nA;
 		} else {
-			if( gpaOPgrp[strt]==gpeOPid_mul )
-			{
-				//  strt
-				//  V
-				// d*e +f -g*h		// nADD 2 // de nem adtam hozzá még a g-t
-				//     -1-^
-				// d*e +f-g +h*i	// nADD 3 // de nem adtam hozzá még a h-t
-				//     -2-1-^
-				LOAD_SRC_ADR_A1(scp,1-nADD);	/// move.l n(Ai),A1
-				move_l_IA1I_D0(scp);			/// move.l (A1),D0
-				i = 2;
-			} else {
-				//   strt
-				//   V
-				// a +=b +c*d 	// nADD 1 // de nem adtam hozzá még a c-t
-				//    -1-^
-				// a *=b+c +d*e  // nADD 2 // de nem adtam hozzá még a d-t
-				//    -2-1-^
-				LOAD_SRC_ADR_A1(scp,-nADD);	/// move.l n(Ai),A1
-				move_l_IA1I_D0(scp);			/// move.l (A1),D0
-			}
+			//   strt
+			//   |   0
+			//   V   v
+			// a +=b +c*d 	// nADD 1 // de nem adtam hozzá még a c-t
+			//    -1-^
+			//      0  1
+			//      v  v
+			// a *=b+c +d*e  // nADD 2 // de nem adtam hozzá még a d-t
+			//    -2-1-^
+			LOAD_SRC_ADR_A1(scp,s-nADD);	/// move.l n(Ai),A1
+			move_l_IA1I_D0(scp);			/// move.l (A1),D0
 		}
-		while( i < nADD )
+
+		while( a < nA )
 		{
-			LOAD_SRC_ADR_A1(scp,i-nADD);	/// move.l n(Ai),A1
-			isa( PC, aADD[i], gpeEAszL
+			LOAD_SRC_ADR_A1(scp,s-nADD);	/// move.l n(Ai),A1
+			isa( PC, aADD[a], gpeEAszL
 					,gpeEA_IAnI,1,0
 					,gpeEA_Dn,0,0
 			);
-			i++;
+			a++;
+			s++;
 		}
 
 		LOAD_DST_ADR_A0( scp,-1 );	/// move.l -1(Ai+1),A0
