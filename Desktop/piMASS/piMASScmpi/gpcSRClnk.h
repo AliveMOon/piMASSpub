@@ -87,10 +87,10 @@ public:
 	gpcLZY	cd;
 
 	gpeOPid aADD[0x40],aMUL[0x40], strt, now; //aSTRT[0x40];
-	I4		nADD, nMUL, //nSTRT,
+	I4		nADD, nMUL; //, //nSTRT,
 			//A[8], D[8],
-			*apSP[0x40], aiSP[0x40];
-	gpcLZY	aSP[0x40];
+	/*		*apSP[0x40], aiSP[0x40];
+	gpcLZY	aSP[0x40];*/
 
 	gpcCDsp(){ gpmCLR; refCD=-1; Ai=6; }; //A[7]=0x40; };
 	gpcCD* CD() {
@@ -100,13 +100,13 @@ public:
 	}
 	gpcCDsp& operator ++() {
 		U1 p = CD()[0].pst;
-		++aiSP[p];
-		(apSP[p] = ((I4*)aSP[p].Ux( aiSP[p], sizeof(I4))))[0] = iCD;
+		/*++aiSP[p];
+		(apSP[p] = ((I4*)aSP[p].Ux( aiSP[p], sizeof(I4))))[0] = iCD;*/
 		++iCD;
 		CD()[0].null();
 		return *this;
 	}
-	gpcCDsp& operator --() {
+	/*gpcCDsp& operator --() {
 		CD()[0].null();
 		--iCD;
 		if( iCD < 0 )
@@ -120,15 +120,15 @@ public:
 		--aiSP[p];
 		CD();
 		return *this;
-	}
-	gpcCDsp& operator -= ( U4 nd ) {
+	}*/
+	/*gpcCDsp& operator -= ( U4 nd ) {
 		if( !nd )
 			return *this;
 		for( U4 i = 0; i < nd; i++ )
 			--(*this);
 		return *this;
-	}
-	I4 opi( U1 i ) {
+	}*/
+	/*I4 opi( U1 i ) {
 		return aiSP[i] ? (apSP[i]?*apSP[i]:-1) : -1;
 	}
 	U1 opi( I4x2* pO, gpeOPid* pL, U1 nL ) {
@@ -144,8 +144,7 @@ public:
 			++j;
 		}
 		return j;
-	}
-
+	}*/
 	I4x4& LOAD_SRC_ADR_A0( gpcSCOOP& scp,I4 n=-1) { /// move.l n(Ai),A0
 		/// move.l -1(Ai), A0
 		I4x4 &load = isa( PC, gpeOPid_mov, gpeEAszL
@@ -191,7 +190,6 @@ public:
 						);
 		return inst;
 	}
-
 	gpcCDsp& kMOV( gpcSCOOP& scp, U4 iOPe ) {
 		isa( PC,	gpeOPid_mov, gpeEAszL,
 										gpeEA_An,Ai,0,
@@ -383,57 +381,7 @@ public:
 		nADD = nMUL = 0;
 		return *this;
 	}
-/*
 
-//	gpcCDsp& kMULo( gpcSCOOP& scp, U4 iOPe )
-//	{
-//		if(!nMUL)
-//			return *this;
-//		//nMUL++;
-//		/// LOAD SRC---------
-//		/// move.l -1(Ai), A0
-//		I4x4 &load = scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL
-//											,gpeEA_d16IAnI,Ai,0
-//											,gpeEA_An,0,0  );
-//		load.aOB[0] = -nMUL;
-//		/// move.l (A0),D0
-//		scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL
-//										,gpeEA_IAnI,0,0
-//										,gpeEA_Dn,0,0
-//					);
-//		for( U4 i = 1; i < nMUL; i++ )
-//		{
-//			/// move.l /i-nMUL/(Ai), A0
-//			I4x4 &ins = scp.vASM.INST( PC, gpeOPid_mov,	gpeEAszL
-//											,gpeEA_d16IAnI,Ai,0
-//											,gpeEA_An,0,0
-//									);
-//			ins.aOB[0] = i-nMUL;
-//			/// oper.l (A0),D0
-//			scp.vASM.INST( PC, strt, gpeEAszL
-//										,gpeEA_IAnI,0,0
-//										,gpeEA_Dn,0,0
-//						);
-//		}
-//
-//		/// LOAD DST ADR ------------------------------
-//		/// move.l -1(Ai+1), A0
-//		I4x4 &prev = scp.vASM.INST( PC, gpeOPid_mov, gpeEAszL
-//											,gpeEA_d16IAnI,Ai+1,0
-//											,gpeEA_An,0,0
-//									);
-//		prev.aOB[0] = -1;
-//
-//		scp.vASM.INST( PC, last, gpeEAszL
-//								,gpeEA_Dn,0,0
-//								,gpeEA_IAnI,0,0
-//						);
-//
-//		scp.vASM.INST( PC );
-//		nADD = nMUL = 0;
-//		return *this;
-//	}
-*/
 
 	gpcCDsp& knead( gpcSCOOP& scp, U4 iOPe ) {
 		gpcCDsp& SP = *this;
@@ -478,10 +426,19 @@ public:
             case gpeOPid_stk: /// ,
 
 				break;
-			case gpeOPid_entry: /// (
+			case gpeOPid_entry: { /// (
+					switch( now )
+					{
+						case gpeOPid_dot:
+							break;
+						case gpeOPid_brakS:
+						default:
+
+							break;
+					}
 				++SP;
 				++CDC;
-				break;
+				} break;
 			case gpeOPid_out: /// )
 				++SP;
 				++CDC;
@@ -489,7 +446,7 @@ public:
 		}
 		return SP;
 	}
-	gpcLZY& ASMrdy( gpcSCOOP& scp, U4 iOPe, I4x2* aFND, gpeOPid* pL, U1 nL ) {
+	/*gpcLZY& ASMrdy( gpcSCOOP& scp, U4 iOPe, I4x2* aFND, gpeOPid* pL, U1 nL ) {
 		U4 nFND = opi( aFND, pL, nL );
 		aFND->median( nFND, aFND+nFND+1 );
 		bool bFLIP = false;
@@ -558,7 +515,7 @@ public:
 
 		}
 		return scp.vASM;
-	}
+	}*/
 };
 
 
