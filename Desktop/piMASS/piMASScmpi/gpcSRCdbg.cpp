@@ -109,6 +109,7 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 
 		switch( U1 pst = ins.op&0xff )
 		{
+			case gpeOPid_nop:
 			case gpeOPid_dot:
 				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc );
 				pc++;

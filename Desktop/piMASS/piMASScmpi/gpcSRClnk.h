@@ -60,8 +60,6 @@ public:
 	size_t strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   );
 
 };
-
-
 class gpcCD {
 public:
 	gpeOPid	pre, pst;
@@ -80,13 +78,14 @@ public:
 };
 
 #define PC scp.nASM()
+#define CDC (CD()[0])
 class gpcCDsp {
 public:
 	I4		iCD, refCD, nR, Ai, Di;
 	gpcCD	*pCD;
 	gpcLZY	cd;
 
-	gpeOPid aADD[0x40],aMUL[0x40], now, prev;
+	gpeOPid aADD[0x40],aMUL[0x40], now, last;
 	I4		nADD, nMUL,
 			A[8], D[8],
 			*apSP[0x40], aiSP[0x40];
@@ -146,7 +145,7 @@ public:
 		return j;
 	}
 
-	gpcCDsp& ASMdeepMOV( gpcSCOOP& scp, U4 iOPe )
+	gpcCDsp& kMOV( gpcSCOOP& scp, U4 iOPe )
 	{
 		scp.vASM.INST( PC,	gpeOPid_mov, gpeEAszL,
 										gpeEA_An,Ai,0,
@@ -155,9 +154,10 @@ public:
 		scp.vASM.INST( PC,	gpeOPid_mov, gpeEAszL,
 							gpeEA_An,Ai,0,
 							gpeEA_Dn,Ai,0  );
+		scp.vASM.INST( PC );
 		return *this;
 	}
-	gpcCDsp& ASMdeepDOT( gpcSCOOP& scp, U4 iOPe )
+	gpcCDsp& kOBJ( gpcSCOOP& scp, U4 iOPe )
 	{
 		I4 dp = CD()[0].deep;
 		for( U4 d = 1; d < dp; d++ )
@@ -176,7 +176,7 @@ public:
 			gpcCD &i = pCD[0-dp];
 			I4 pc = PC;
 
-			/// move.l 0xOBJid,-(A7) ; PUSH
+		/// move.l 0xOBJid,-(A7) ; PUSH
 			I4x4 &opcd = scp.vASM.INST( PC,	gpeOPid_mov, gpeEAszL,
 											gpeEA_num,0,0,
 											gpeEA_sIAnI,7,0  );
@@ -194,15 +194,18 @@ public:
 		scp.vASM.INST( PC,	gpeOPid_mov, gpeEAszL,
 										gpeEA_An,0,0,
 										gpeEA_IAnIp,Ai,0  );
-		//aAm[Ai][A[Ai]] =
+
+		scp.vASM.INST( PC );
 		A[Ai]++;
 		return *this;
 	}
-	gpcCDsp& ASMdeepADD( gpcSCOOP& scp, U4 iOPe )
+	gpcCDsp& kADD( gpcSCOOP& scp, U4 iOPe )
 	{
+		if(!nADD)
+			return *this;
 		--nADD; // utolsot a szorzásnak kell
 		// 0.on meg tuti nem +- van
-		U4 i=1, j=(gpaOPgrp[*aADD]==gpeOPid_mul);
+		U4 i=1, j=(last==gpeOPid_mul);
 		nADD-=j;
 		/// LOAD SRC---------
 		/// move.l -1(Ai), A0
@@ -238,16 +241,19 @@ public:
 									);
 		prev.aOB[0] = -1;
 
-		scp.vASM.INST( PC, aADD[j], gpeEAszL
+		scp.vASM.INST( PC, last, gpeEAszL
 								,gpeEA_Dn,0,0
 								,gpeEA_IAnI,0,0
 						);
 
+		scp.vASM.INST( PC );
 		nADD = nMUL = 0;
 		return *this;
 	}
-	gpcCDsp& ASMdeepMUL( gpcSCOOP& scp, U4 iOPe )
+	gpcCDsp& kMUL( gpcSCOOP& scp, U4 iOPe )
 	{
+		if(!nMUL)
+			return *this;
 		//nMUL++;
 		/// LOAD SRC---------
 		/// move.l -1(Ai), A0
@@ -269,7 +275,7 @@ public:
 									);
 			ins.aOB[0] = i-nMUL;
 			/// oper.l (A0),D0
-			scp.vASM.INST( PC, aMUL[i], gpeEAszL
+			scp.vASM.INST( PC, last, gpeEAszL
 										,gpeEA_IAnI,0,0
 										,gpeEA_Dn,0,0
 						);
@@ -283,80 +289,60 @@ public:
 									);
 		prev.aOB[0] = -1;
 
-		scp.vASM.INST( PC, *aMUL, gpeEAszL
+		scp.vASM.INST( PC, last, gpeEAszL
 								,gpeEA_Dn,0,0
 								,gpeEA_IAnI,0,0
 						);
 
+		scp.vASM.INST( PC );
 		nADD = nMUL = 0;
 		return *this;
 	}
 
-	gpcCDsp& ASMdeep( gpcSCOOP& scp, U4 iOPe ) {
-		switch( gpaOPgrp[now=CD()[0].pst] )
+	gpcCDsp& knead( gpcSCOOP& scp, U4 iOPe ) {
+		gpcCDsp& SP = *this;
+		now=CDC.pst;
+		switch( gpaOPgrp[now] )
 		{
 			case gpeOPid_mov: /// =
-				ASMdeepDOT( scp, iOPe );
-				ASMdeepMOV( scp, iOPe ); //Ai--;
-				++(*this);
+				kOBJ( scp, iOPe );
+				kMOV( scp, iOPe ); //Ai--;
+				++SP;
+				last = now;
 				break;
 			case gpeOPid_add: /// +
 			case gpeOPid_sub: /// ==
-				ASMdeepDOT( scp, iOPe );
-				if( nMUL )
-				{
-					ASMdeepMUL( scp, iOPe );
-				}
-				if( !nADD )
-				{
-					*aADD = prev;
-					++nADD;
-				}
-				aADD[nADD] = now;
-				++nADD;
-				++(*this);
+				kOBJ( scp, iOPe );
+				kMUL( scp, iOPe );
+				aADD[nADD++] = last = now;
+				++SP;
+
 				break;
 			case gpeOPid_mul: /// *
-				if( nADD )
-					ASMdeepADD( scp, iOPe );
-				ASMdeepDOT( scp, iOPe );
-				if( !nMUL )
-				{
-					*aMUL = prev;
-					++nMUL;
-				}
-				aMUL[nMUL] = now;
-				++nMUL;
-				++(*this);
-				++(*pCD);
+				kADD( scp, iOPe );
+				// a =b +c*d +e +f*g
+				// a =b+c +d*e +f +g*h
+
+				kOBJ( scp, iOPe );
+				aMUL[nMUL++] = last = now;
+				++SP;
+				++CDC;
 				break;
             case gpeOPid_stk: /// ,
 
 				break;
 			case gpeOPid_entry: /// (
-				++(*this);
-				++(*pCD);
+				++SP;
+				++CDC;
 				break;
 			case gpeOPid_out: /// )
-				++(*this);
-				++(*pCD);
+				++SP;
+				++CDC;
 				break;
 		}
-		switch( gpaOPgrp[now] )
-		{
-			case gpeOPid_mul:
-			case gpeOPid_add:
-			case gpeOPid_sub:
-			case gpeOPid_mov:
-				prev = now;
-				break;
-			default:
-				break;
-		}
-		return *this;
+		return SP;
 	}
-	gpcLZY& ASMrdy( gpcSCOOP& scp, U4 iOPe, I4x2* aFND, gpeOPid* pL, U1 nL )
-	{
+	gpcLZY& ASMrdy( gpcSCOOP& scp, U4 iOPe, I4x2* aFND, gpeOPid* pL, U1 nL ) {
 		U4 nFND = opi( aFND, pL, nL );
 		aFND->median( nFND, aFND+nFND+1 );
 		bool bFLIP = false;

@@ -322,35 +322,35 @@ static gpeOPid gpaaOPid[][0x20] = {
 };
 
 static const char* gpas68k[] = {
-	"\n 0x%0.4x nop%s\t%s,%s",
+	"\n 0x%0.4x nop ;-------------------------",
 
-	"\n 0x%0.4x notLG%s\t%s,%s",	"\n 0x%0.4x LG%s\t%s,%s",	"\n 0x%0.4x inv%s\t%s,%s",
+	"\n 0x%0.4x notLG%s\t%s,%s",		"\n 0x%0.4x LG%s\t%s,%s",	"\n 0x%0.4x inv%s\t%s,%s",
 
-	"\n 0x%0.4x stk%s\t%s,%s",	"\n 0x%0.4x nrow%s\t%s,%s",
+	"\n 0x%0.4x stk%s\t%s,%s",			"\n 0x%0.4x nrow%s\t%s,%s",
 
-	"\n 0x%0.4x comS%s\t%s,%s", 	"\n 0x%0.4x comE%s\t%s,%s",	"\n 0x%0.4x com%s\t%s,%s",
+	"\n 0x%0.4x comS%s\t%s,%s", 		"\n 0x%0.4x comE%s\t%s,%s",	"\n 0x%0.4x com%s\t%s,%s",
 
 
-	"\n 0x%0.4x AND%s\t%s,%s", 	"\n 0x%0.4x ANDlg%s\t%s,%s",	"\n 0x%0.4x ANDm%s\t%s,%s",
-	"\n 0x%0.4x MUL%s\t%s,%s", 	"\n 0x%0.4x EXP%s\t%s,%s",	"\n 0x%0.4x MULm%s\t%s,%s",
-								"\n 0x%0.4x EXPm%s\t%s,%s",
-	"\n 0x%0.4x DIV%s\t%s,%s\t%s%s", 	"\n 0x%0.4x DIVm%s\t%s,%s",	"\n 0x%0.4x ROOTm%s\t%s,%s",
-	"\n 0x%0.4x REM%%s\t%s,%s\t%s%s", 	"\n 0x%0.4x REMm%s\t%s,%s",
-	"\n 0x%0.4x XOR%s\t%s,%s\t%s%s",	"\n 0x%0.4x XORm%s\t%s,%s",
+	"\n 0x%0.4x AND%s\t%s,%s\t\t; &", 	"\n 0x%0.4x ANDlg%s\t%s,%s\t\t; &&",	"\n 0x%0.4x ANDm%s\t%s,%s\t\t; &=",
+	"\n 0x%0.4x MUL%s\t%s,%s\t\t; *", 	"\n 0x%0.4x EXP%s\t%s,%s\t\t; **",	"\n 0x%0.4x MULm%s\t%s,%s\t\t; *=",
+										"\n 0x%0.4x EXPm%s\t%s,%s\t\t; **=",
+	"\n 0x%0.4x DIV%s\t%s,%s\t%s%s\t\t; /", 	"\n 0x%0.4x DIVm%s\t%s,%s\t\t; /=",	"\n 0x%0.4x ROOTm%s\t%s,%s\t\t; //=",
+	"\n 0x%0.4x REM%%s\t%s,%s\t%s%s\t\t; %", 	"\n 0x%0.4x REMm%s\t%s,%s\t\t; %=",
+	"\n 0x%0.4x XOR%s\t%s,%s\t%s%s\t\t; ^",		"\n 0x%0.4x XORm%s\t%s,%s\t\t; ^=",
 
 	// gpeOPid_mov,
 	"\n 0x%0.4x move%s\t%s,%s\t%s%s",
 
-	"\n 0x%0.4x eqLG%s\t%s,%s",  "\n 0x%0.4x neqLG%s\t%s,%s",
-	"\n 0x%0.4x or%s\t%s,%s", 	"\n 0x%0.4x orLG%s\t%s,%s",	"\n 0x%0.4x orM%s\t%s,%s",
+	"\n 0x%0.4x eqLG%s\t%s,%s",  		"\n 0x%0.4x neqLG%s\t%s,%s",
+	"\n 0x%0.4x or%s\t%s,%s", 			"\n 0x%0.4x orLG%s\t%s,%s",	"\n 0x%0.4x orM%s\t%s,%s",
 
-	"\n 0x%0.4x ADD%s\t%s,%s\t%s%s",
-	"\n 0x%0.4x INC%s\t%s,%s",
-	"\n 0x%0.4x ADDm%s\t%s,%s",	/// -------------- GOOD
+	"\n 0x%0.4x ADD%s\t%s,%s\t%s%s\t\t; + ",
+	"\n 0x%0.4x INC%s\t%s,%s\t\t; ++",
+	"\n 0x%0.4x ADDm%s\t%s,%s\t\t; += ",	/// -------------- GOOD
 
-	"\n 0x%0.4x SUB%s\t%s,%s\t%s%s",
-	"\n 0x%0.4x DEC%s\t%s,%s",
-	"\n 0x%0.4x SUBm%s\t%s,%s",
+	"\n 0x%0.4x SUB%s\t%s,%s\t%s%s\t\t; -",
+	"\n 0x%0.4x DEC%s\t%s,%s\t\t; --",
+	"\n 0x%0.4x SUBm%s\t%s,%s\t\t; -=",
 
 
 	"\n 0x%0.4x leLG%s\t%s,%s",	"\n 0x%0.4x ltLG%s\t%s,%s", 	"\n 0x%0.4x sl%s\t%s,%s",

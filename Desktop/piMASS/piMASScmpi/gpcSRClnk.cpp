@@ -162,7 +162,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 						cd.pre = (gpeOPid)lnk.y;
 					else {
 						cd.pst = (gpeOPid)lnk.y;
-						CDsp.ASMdeep( SCOOP, iOPe );
+						CDsp.knead( SCOOP, iOPe );
 					}
 				} break;
 			case gpeCLR_red2:	///BREAK
