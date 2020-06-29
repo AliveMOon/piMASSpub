@@ -2687,6 +2687,9 @@ public:
 	I8x2 operator + (const I8x2& b) const;
 	I8x2 operator - (const I8x2& b) const;
 
+    I4x2& operator ++() { ++x; ++y; return *this; }
+    I4x2& operator --() { --x; --y; return *this; }
+
 	I4x2 operator + ( int b ) const { return I4x2( x+b,  y+b ); }
 	I4x2 operator + (const I4x2& b) const { return I4x2( x+b.x,  y+b.y ); }
 	I4x2 operator + (const U4x2& b) const { return I4x2( x+b.x,  y+b.y ); }
@@ -3142,6 +3145,18 @@ public:
     I4x4& operator = ( I4x2 b )
     {
 		a4x2[1] = a4x2[0] = b;
+		return *this;
+    }
+    I4x4& operator ++()
+    {
+        ++a4x2[0];
+		++a4x2[1];
+		return *this;
+    }
+     I4x4& operator --()
+    {
+        --a4x2[0];
+		--a4x2[1];
 		return *this;
     }
     size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
@@ -6400,13 +6415,14 @@ szasz:
 	//U8 gpcLZY::tree_fnd( U8 id, U8& n )
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( U4 i, U4 n )
+	U1* Ux( U4 i, U4 n, bool bZ = true )
 	{
 		U8 e = (i+2)*n, s = -1;
 		if( e > n_load )
 		{
 			lzyADD( NULL, e-n_load, s, -1 );
-			gpmZn( p_alloc+s, e-s );
+			if( bZ )
+                gpmZn( p_alloc+s, e-s );
 			if( n_load > (i+1)*n )
 				n_load = (i+1)*n;
 		}

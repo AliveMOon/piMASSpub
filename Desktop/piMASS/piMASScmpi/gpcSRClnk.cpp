@@ -121,6 +121,7 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 				continue;
 		}
 
+
 		switch( clr )
 		{
 			case gpeCLR_blue2: 	///ABC
@@ -150,20 +151,52 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_green2: {///OPER
-					if( !lnk.y ) {
+                    if( !lnk.y ) {
 						lnk.y = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
 						///!!! ez majd kell, ha mert több operátor is lesz egy pS-ben
 						U4 n = dOP.nSTRix(lnk.y);
 						if( !lnk.y )
 							break;
 					}
-
-					if( (cd.lnk<0) ? false : (cd.lnk<iOPe) )
-						cd.pre = (gpeOPid)lnk.y;
-					else {
-						cd.pst = (gpeOPid)lnk.y;
-						CDsp.knead( SCOOP, iOPe );
-					}
+					//if( (cd.lnk<0) ? false : (cd.lnk<iOPe) ) {
+					switch( (gpeOPid)lnk.y )
+                    {
+                        case gpeOPid_brakS:
+                        case gpeOPid_dimS:
+                        case gpeOPid_begin:
+                            cd.lnk = lnk.y;
+                            /// LENT
+                            CDsp.LEVup( SCOOP );
+                            /// FENT
+                            break;
+                        case gpeOPid_end:
+                        case gpeOPid_dimE:
+                        case gpeOPid_brakE:
+                            /// FENT
+                            CDsp.LEVdwn( SCOOP, iOPe );
+                            /// LENT
+                            cd.lnk = lnk.y;
+                            break;
+                        default:
+                            switch( (gpeOPid)cd.lnk )
+                            {
+                                case gpeOPid_end:
+                                case gpeOPid_dimE:
+                                case gpeOPid_brakE:
+                                    cd.pst = (gpeOPid)lnk.y;
+                                    CDsp.knead( SCOOP, iOPe );
+                                    break;
+                                default:
+                                    if( (cd.lnk>-1) && (cd.lnk<iOPe) )
+                                        cd.pre = (gpeOPid)lnk.y;
+                                    else {
+                                        cd.pst = (gpeOPid)lnk.y;
+                                        CDsp.knead( SCOOP, iOPe );
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
 				} break;
 			case gpeCLR_red2:	///BREAK
 				break;
