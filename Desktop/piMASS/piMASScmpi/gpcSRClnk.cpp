@@ -164,8 +164,17 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
                         case gpeOPid_brakS:
                         case gpeOPid_dimS:
                         case gpeOPid_begin:
-                            cd.lnk = lnk.y;
+							if( cd.lnk >= gpeOPid_n )
+							{
+								/// FUNCTION
+								/// LENT
+								CDsp.LEVup( SCOOP );
+								/// FENT
+								break;
+							}
                             /// LENT
+							cd.lnk = lnk.y;
+
                             CDsp.LEVup( SCOOP );
                             /// FENT
                             break;
@@ -188,11 +197,12 @@ void gpcSRC::SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
                                     break;
                                 default:
                                     if( (cd.lnk>-1) && (cd.lnk<iOPe) )
+                                    {
                                         cd.pre = (gpeOPid)lnk.y;
-                                    else {
-                                        cd.pst = (gpeOPid)lnk.y;
-                                        CDsp.knead( SCOOP, iOPe );
+                                        break;
                                     }
+                                    cd.pst = (gpeOPid)lnk.y;
+                                    CDsp.knead( SCOOP, iOPe );
                                     break;
                             }
                             break;
@@ -219,6 +229,9 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 
 	char *pSi, *pSe;
 	U4 iOP, iOPe = mass.OPER.nIX();
+	/// -------------------------------------------------------
+	/// OPER
+	/// -------------------------------------------------------
 	if( !iOPe ) {
 		mass.mxOP = gpeALF_null;
 		/// ha nincsen még kitöltve az OPER lista feltöltjük
@@ -229,8 +242,7 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 		mass.mxOP = mass.aOP[0].alf;
 		iOPe++;
 
-		for( U4 i = 1, ie = gpmN(gpasOPER); i < ie; i++ )
-		{
+		for( U4 i = 1, ie = gpmN(gpasOPER); i < ie; i++ ) {
 			pSe = strchr( (char*)gpasOPER[i], ' ' );
 			if( !pSe )
 				continue;
@@ -241,8 +253,7 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 			if( mass.OPER.nSTRix(iOP) < n )
 				iOP = iOPe;
 
-			if( iOP >= iOPe )
-			{
+			if( iOP >= iOPe ) {
 				iOP = iOPe;
 				mass.OPER.dctMILLadd( (U1*)gpasOPER[i], pSe-gpasOPER[i] );
 				mass.aOP[iOP].num = 14;
@@ -255,6 +266,7 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 		}
 		iOPe = mass.OPER.nIX();
 	}
+	/// -------------------------------------------------------
 
 	SRCmnMILLcdr( mass.aOP, mass.OPER, 0 );
 

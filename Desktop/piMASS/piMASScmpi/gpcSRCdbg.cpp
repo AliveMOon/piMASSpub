@@ -48,8 +48,6 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 		U1 Xn, Yn;
 		U1x4 opw=ins.op;
 
-
-
 		for( U1 i = 0; i < 2; i++ )
 		{
 			bool bOB = false;
@@ -80,6 +78,9 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 					bOB = true;
 					break;
 				case gpeEA_num:
+					pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i] )+1;
+					bOB = true;
+					break;
 				default:
 					pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i] )+1;
 					bOB = true;
@@ -114,7 +115,10 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc );
 				pc++;
 				break;
-
+			case gpeOPid_n:
+				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, *pC?pC:"?" );
+				pc++;
+				break;
 			default:
 				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, gpsTYPsz[sx&0x3], pS, pD, *pC?";":"", pC );
 				pc++;

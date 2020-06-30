@@ -3085,13 +3085,17 @@ public:
         {
 			gpeOPid pre, pst;	// 0, 1
 			U1		a0,d0;		// 2, 3
-			U4		op;		// 4,
+			U4		op;			// 4,
 			I4		aOB[2];		// 8, 12; //0x10
         };
 		struct
         {
 			I4 A,B,C,D;
 		};
+		/*struct
+        {
+			I4 E,F,G,H;
+		};*/
 		struct
         {
 			I4 aXYZW[4];

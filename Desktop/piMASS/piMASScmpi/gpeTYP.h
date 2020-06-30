@@ -390,6 +390,9 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x mail%s\t%s,%s",
 	//gpeOPid_str,
 	"\n 0x%0.4x str%s\t%s,%s",
+
+	// gpeOPid_n
+	"\n 0x%0.4x jsr\t%s",
 };
 
 /// TYP

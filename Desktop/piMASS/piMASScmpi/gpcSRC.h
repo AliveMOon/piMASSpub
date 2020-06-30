@@ -739,7 +739,10 @@ public:
 	}
 	U4 nMN() { return nMINI = mini.nLD()/sizeof(rMN); }
 	U4 nLiNK() { return nLNK = lnk.nLD()/sizeof(rLNK); }
-	U4 nASM() { return nvASM = vASM.nLD()/sizeof(rINS); }
+	U4 nASM() {
+		nvASM = vASM.nLD()/sizeof(rINS);
+		return nvASM;
+	}
 
 	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff )
 	{
