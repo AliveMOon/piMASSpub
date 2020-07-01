@@ -285,20 +285,27 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS& mass, gpcWIN& win ) {
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	U1 Xn, Yn, bOB = false;
 	gpeEA m;
-	I8 aA[8], aD[8];
+	I8	aR[0x10],
+		*pA = aR, *pD = pA+0x8;
+	gpmZ(aR);
+	pA[7] = pA[6] = 0x400;
+	gpcLZY aMEM[0x8];
+
 	char *pALL = (char*)SCOOP.pALL, *apSTR[2];
 	I4	anSTR[2];
 	gpcOBJlnk* aOB[2];
+
 	for( I4x4* pPCs = SCOOP.vASM.pINST(0), *pPC = pPCs, *pPCe = pPC+SCOOP.nASM();
 			pPC < pPCe; pPC++ )
 	{
 		U1x4& op = *(U1x4*)pPC->op;
-		for( U1 i = 0; i < 2; i++, bOB = false )
-		{
+		if( !op.x ) // nop
+			continue;
+
+		for( U1 i = 0; i < 2; i++, bOB = false ) {
 			Xn = i ? op.z : op.y;
 			m = (gpeEA)(Xn>>3);
-			switch( m )
-			{
+			switch( m ) {
 				case gpeEA_OFF:
 					continue;
 				case gpeEA_Dn:
@@ -352,7 +359,37 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS& mass, gpcWIN& win ) {
 					//pCe += pM0[o].iMNn + 1;
 				}
 			}
+		}
 
+		if(op.x>=gpeOPid_n)
+		{
+			// jsr;
+			continue;
+		}
+
+		switch( gpaOPgrp[op.x] )
+		{
+			case gpeOPid_entry:{
+					switch( (gpeOPid)op.x )
+					{
+						case gpeOPid_dot:
+							// find OBJ
+							continue;
+						default:
+							continue;
+					}
+				} continue;
+			case gpeOPid_mul:{
+
+				} continue;
+			case gpeOPid_add:{
+
+
+				} continue;
+			case gpeOPid_sub:{
+
+
+				} continue;
 		}
 
 
