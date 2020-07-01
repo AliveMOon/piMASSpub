@@ -722,8 +722,7 @@ public:
 		}
 		return pISA ? pISA+nISA.x : NULL;
 	}
-	U4 resISA_trg( U4 iT, const U4x2& t )
-	{
+	U4 resISA_trg( U4 iT, const U4x2& t ) {
 		if( pISA )
 		if( pISA[iT].isa.aISA[0] == gpeISA_trg )
 		if( pISA[iT].an == t )
@@ -735,8 +734,7 @@ public:
 		resISA()->null();
 		return iT;
 	}
-	gpcISA*	resISA_stp( U1 stp )
-	{
+	gpcISA*	resISA_stp( U1 stp ) {
 		if( this ? !pISA : true )
 			return NULL;
 		gpcISA* pIS = resISA();

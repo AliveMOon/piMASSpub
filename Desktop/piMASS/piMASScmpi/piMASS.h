@@ -6275,14 +6275,14 @@ public:
 		gpmMcpyOF( p_alloc+iSTRT, p_u1, n_u1 );
 		return this;
 	}
-	gpcLZY& operator = ( const gpcLZY& plus ){
+	gpcLZY& operator = ( const gpcLZY& plus ) {
 		U8 s = 0;
 		lzyINS( plus.p_alloc, plus.n_load, s, -1 );
 
 		return *this;
 	}
 
-	gpcLZY* operator += ( const gpcLZY& plus ){
+	gpcLZY* operator += ( const gpcLZY& plus ) {
 		U8 s = -1;
 		return lzyADD( plus.p_alloc, plus.n_load, s );
 	}
@@ -6395,16 +6395,14 @@ szasz:
 	gpcLZY* lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i = 3 );
 	gpcLZY* lzyZSnDstat( U8& iSTRT, gpcZSnD& zs, U1 i = 3 );
-	gpcLZY* lzy_reqCLOSE( void )
-	{
+	gpcLZY* lzy_reqCLOSE( void ) {
 		if( !this )
 			return this;
 
 		aSET[gpeLZYoff] = 1;
 		return this;
 	}
-	bool qCLOSE( void )
-	{
+	bool qCLOSE( void ) {
 		if( !this )
 			return false;
 		return aSET[gpeLZYoff];
@@ -6416,11 +6414,9 @@ szasz:
 	I8 tree_fnd( I8 id, I8& n );
 	gpcLZY* tree_add( I8 id, I8& n );
 
-	//U8 gpcLZY::tree_fnd( U8 id, U8& n )
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( U4 i, U4 n, bool bZ = true )
-	{
+	U1* Ux( U4 i, U4 n, bool bZ = true ) {
 		U8 e = (i+2)*n, s = -1;
 		if( e > n_load )
 		{
@@ -6740,8 +6736,7 @@ public:
 	}
 };
 #define UX U4
-class gpcLZYdctBIN
-{
+class gpcLZYdctBIN {
 	U4x4*		pIX; /// BEST!!!
 public:
 	gpcLZY		bin,
@@ -6871,8 +6866,7 @@ public:
 };
 
 
-class gpcLZYall
-{
+class gpcLZYall {
 	gpcLZY	lzyID,
 			**ppLZY, *pLZY;
 	I8x2	iAN;
@@ -6895,8 +6889,7 @@ public:
 
 
 	//U4 alfFND( U1* pS );
-	gpcLZY*	LZYi( U4 i )
-	{
+	gpcLZY*	LZYi( U4 i ) {
 		if( pLZY ? iLZY == i : false )
 			return pLZY;
 
@@ -6912,8 +6905,7 @@ public:
 		return NULL;
 	}
 
-	gpcLZY*	LZY( I8x2 an )
-	{
+	gpcLZY*	LZY( I8x2 an ) {
 		if( pLZY ? (iAN==an) : false )
 			return pLZY;
 

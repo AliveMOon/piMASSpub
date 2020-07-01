@@ -272,11 +272,91 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 
 
 }
-gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS& mass, gpcWIN& win )
-{
+
+gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS& mass, gpcWIN& win ) {
 	if( !this )
 		return NULL;
 
 	SRCmnMILLdbg( mass.aOP, mass.OPER, 0 );
+	if( !pDBG->nLD() )
+		return NULL;
+
+	static const U1 iMN=0;
+	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
+	U1 Xn, Yn, bOB = false;
+	gpeEA m;
+	I8 aA[8], aD[8];
+	char *pALL = (char*)SCOOP.pALL, *apSTR[2];
+	I4	anSTR[2];
+	gpcOBJlnk* aOB[2];
+	for( I4x4* pPCs = SCOOP.vASM.pINST(0), *pPC = pPCs, *pPCe = pPC+SCOOP.nASM();
+			pPC < pPCe; pPC++ )
+	{
+		U1x4& op = *(U1x4*)pPC->op;
+		for( U1 i = 0; i < 2; i++, bOB = false )
+		{
+			Xn = i ? op.z : op.y;
+			m = (gpeEA)(Xn>>3);
+			switch( m )
+			{
+				case gpeEA_OFF:
+					continue;
+				case gpeEA_Dn:
+				case gpeEA_An:
+				case gpeEA_IAnI:
+				case gpeEA_IAnIp:
+				case gpeEA_sIAnI:
+					//pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], Xn&7 )+1;
+					break;
+				case gpeEA_d16IAnI:
+					//pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i], Xn&7 )+1;
+					break;
+				case gpeEA_d16IAnDnI:
+					//pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i], Xn&7, gps68kREG[Yn&0xf] )+1;
+					Yn = i ? op.w>>4 : op.w&0xf;
+					bOB = true;
+					break;
+				case gpeEA_d16IPcI:
+					//pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i] )+1;
+					bOB = true;
+					break;
+				case gpeEA_d16IPcDnI:
+					//pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i], gps68kREG[Yn&0xf] )+1;
+					Yn = i ? op.w>>4 : op.w&0xf;
+					bOB = true;
+					break;
+				case gpeEA_num:
+					//pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i] )+1;
+					bOB = true;
+					break;
+				default:
+					//pDe = pDe+sprintf( pDe, gps68kADRmod[ADRmod], ins.aOB[i] )+1;
+					bOB = true;
+					break;
+			}
+			aOB[i] = NULL;
+			apSTR[i] = NULL;
+			anSTR[i] = 0;
+			if( bOB ) {
+				I4 ob = pPC->aOB[i];
+				if( ob >= 0 )
+				{
+					aOB[i] = (gpcOBJlnk*)OBJ.Ux( ob, sizeof(gpcOBJlnk));
+					//pCe += obj.strASM( pCe, pALL, pM0, pL0 ) + 1;
+				} else {
+					ob *= -1;
+					apSTR[i] = pALL+pM0[ob].iMNi;
+					anSTR[i] = pM0[ob].iMNn;
+					//gpmMcpy( pCe, pALL+pM0[o].iMNi, pM0[o].iMNn );
+					//pS[pM0[o].iMNn]=0;
+					//pCe += pM0[o].iMNn + 1;
+				}
+			}
+
+		}
+
+
+	}
+
 	return apOUT[3];
 }
