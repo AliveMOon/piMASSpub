@@ -31,7 +31,8 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 	gpcOBJlnk	*pOBs, *pOBd;
 #endif
 	U8 strt = -1;
-	char	*pSZ, *pS, *pD, *pDe, sx, dx, *pC, *pCe;
+	char	*pSZ, *pS, *pD, *pDe, aSZ[2],
+			*pC, *pCe;
 
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc;
@@ -51,6 +52,7 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 		for( U1 i = 0; i < 2; i++ )
 		{
 			bool bOB = false;
+
 			Xn = i ? opw.z : opw.y;
 			Yn = i ? opw.w>>4 : opw.w;
 			switch( ADRmod=(gpeEA)(Xn>>3) )
@@ -86,21 +88,23 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 					bOB = true;
 					break;
 			}
-
 			if( bOB )
 			{
 				I4 o = ins.aOB[i];
 				if( o >= 0 )
 				{
+					aSZ[i] = 8;
 					gpcOBJlnk& obj = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
 					pCe += obj.strASM( pCe, pALL, pM0, pL0 ) + 1;
 				} else {
+					aSZ[i] = 8;
 					o *= -1;
 					gpmMcpy( pCe, pALL+pM0[o].iMNi, pM0[o].iMNn );
 					pS[pM0[o].iMNn]=0;
 					pCe += pM0[o].iMNn + 1;
 				}
-			}
+			} else
+				aSZ[i] = 1;
 
 			if(i)
 				continue;
@@ -119,8 +123,8 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, *pC?pC:"?" );
 				pc++;
 				break;
+				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, gpasTYPsz[aSZ[0]], pS, pD, *pC?";":"", pC );
 			default:
-				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, gpsTYPsz[sx&0x3], pS, pD, *pC?";":"", pC );
 				pc++;
 				break;
 		}

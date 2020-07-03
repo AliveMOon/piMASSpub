@@ -370,7 +370,7 @@ SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 
 inline U1* gpfSTR( U1* pSTR, const U1* pU )
 {
-	if(pSTR == pU )
+	if(pSTR == pU)
 		return pSTR;
 
 	U8 nSTR = gpmSTRLEN(pSTR), nU = gpmSTRLEN( pU );
@@ -381,12 +381,12 @@ inline U1* gpfSTR( U1* pSTR, const U1* pU )
 	}
 	if( nU < nSTR )
 	{
-		gpmMcpyOF( pSTR, pU, nU );
+		gpmMcpy( pSTR, pU, nU );
 		pSTR[nU] = 0;
 		return pSTR;
 	}
 	pSTR = new U1[nU+1];
-	gpmMcpyOF( pSTR, pU, nU );
+	gpmMcpy( pSTR, pU, nU );
 	pSTR[nU] = 0;
 	return pSTR;
 }
@@ -3144,7 +3144,11 @@ public:
     I4x4( const I8x4 b );
 	//I4x4( const I8x4& b );
 	I4x4( const F4 f4 );
-
+	I4x4& operator = ( const I4x4* pB )
+	{
+		gpmMcpy( this, pB, sizeof(*this) );
+		return *this;
+	}
     I4x4& operator = ( const F4 f4 );
     I4x4& operator = ( I4x2 b )
     {
@@ -3157,7 +3161,7 @@ public:
 		++a4x2[1];
 		return *this;
     }
-     I4x4& operator --()
+    I4x4& operator --()
     {
         --a4x2[0];
 		--a4x2[1];

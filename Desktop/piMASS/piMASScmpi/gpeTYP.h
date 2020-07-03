@@ -52,7 +52,7 @@ typedef enum gpeOPtyp:U1{
 	gpeOPtyp_sA4,
 	gpeOPtyp_sA8,
 
-	gpeOPtyp_HH = 0xC0,	// signed I1
+	gpeOPtyp_HH = 0xC0,	// float
 	gpeOPtyp_H,
 	gpeOPtyp_F,
 	gpeOPtyp_D,

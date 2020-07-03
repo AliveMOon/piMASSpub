@@ -19,16 +19,26 @@
 #endif
 #define aaOPid gpaaOPid[lnk.y]*/
 
-static const char* gpsTYPsz[] = {
-	".b", //0 1
-	".w", //1 2
-	".l", //2 4
-	".q", //3 8
-	".x", //4 16
+static const char* gpasTYPsz[] = {
+
+	".b",	///0 1	8	byte
+	".w",	// 1 2	16	word
+	".l",	// 2 4	32	long
+	".q",	// 3 8	64	quad
+
+	".o", 	// 4 16 128	4x4		// egy byte-os float nincs ezért ez jó lehet 128bit-esnek is
+
+	".h",	// 5 2	16	half
+	".f", 	// 6 4	32	float
+	".d", 	// 7 8	64	double
+	".fx", 	// 8 9	128 f4x4
 };
 static const char* gps68kREG[] = {
 	"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
 	"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
+
+	"F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7",
+	"O0", "O1", "O2", "O3", "O4", "O5", "O6", "O7",
 };
 static const char* gps68kADRmod[] = {
 	"",
@@ -615,6 +625,7 @@ public:
 	}
 
 };
+
 
 
 #endif // GPCSRCLNK_H

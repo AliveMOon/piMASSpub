@@ -744,8 +744,7 @@ public:
 		return nvASM;
 	}
 
-	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff )
-	{
+	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff ) {
 		if( !this )
 			return 0;
 
@@ -1031,7 +1030,7 @@ public:
 	void 	SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN );
 	void 	SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN );
 	void 	SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win );
-	gpcRES* SRCmnMILLrun( gpcMASS& mass, gpcWIN& win );
+	gpcRES* SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN );
 
 
 

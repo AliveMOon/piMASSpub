@@ -176,7 +176,7 @@ public:
 
 
 };
-class gpcREG {					// 	pi	x64
+class gpcREG {		// 	pi	x64
 	U8		u;		// 	8	8
 	I8		i;		// 	8	8
 	double	d;		// 	8	8
@@ -217,21 +217,18 @@ public:
 		return pS;
 	}
 
-	gpcREG& operator = ( U1* pU )
-	{
+
+	gpcREG& operator = ( U1* pU ) {
 		pSTR = gpfSTR( pSTR, pU );
 		bD.u4 = gpeTYP_STR;
 		return *this;
 	}
-
-	gpcREG& operator = ( U4 u4 )
-	{
+	gpcREG& operator = ( U4 u4 ) {
 		u = u4;
 		bD.u4 = gpeTYP_U4;
 		return *this;
 	}
-	gpcREG& operator = ( I4 i4 )
-	{
+	gpcREG& operator = ( I4 i4 ) {
 		if( i4 < 0 )
 		{
 			i = i4;
@@ -243,8 +240,7 @@ public:
 		bD.u4 = gpeTYP_U4;
 		return *this;
 	}
-	gpcREG& operator = ( float f4 )
-	{
+	gpcREG& operator = ( float f4 ){
 		i = (d = f4);
 		bD.u4 = ( f4 < 0.0 ) ? gpeTYP_I4 : 0;
 		if( bD.u4 || ((float)i != f4) ) // neg? || float?
@@ -259,14 +255,12 @@ public:
 		return *this;
 	}
 
-	gpcREG& operator = ( U8 u8 )
-	{
+	gpcREG& operator = ( U8 u8 ) {
 		u = u8;
 		bD.u4 = gpeTYP_U8;
 		return *this;
 	}
-	gpcREG& operator = ( I8 i8 )
-	{
+	gpcREG& operator = ( I8 i8 ) {
 		if( i8 < 0 )
 		{
 			i = i8;
@@ -278,8 +272,7 @@ public:
 		bD.u4 = gpeTYP_U8;
 		return *this;
 	}
-	gpcREG& operator = ( double d8 )
-	{
+	gpcREG& operator = ( double d8 ) {
 		i = (d = d8);
 		bD.u4 = ( d < 0.0 ) ? gpeTYP_I8 : 0;
 		if( bD.u4 || ((double)i != d) ) // neg? || float?
@@ -293,6 +286,59 @@ public:
 		bD.u4 = gpeTYP_UD;
 		return *this;
 	}
+	gpcREG( float f4 ) { *this = f4; }
+	gpcREG( double d8 ) { *this = d8; }
+	gpcREG( U4 u4 ) { *this = u4; }
+	gpcREG( I4 i4 ) { *this = i4; }
+	gpcREG( U8 u8 ) { *this = u8; }
+	gpcREG( I8 i8 ) { *this = i8; }
+
+	gpcREG operator --() { return *this = i8()-1; }
+	gpcREG operator ++() { return *this = i8()+1; }
+	gpcREG& operator = ( const gpcREG& b )
+	{
+		if( &b == this )
+			return *this;
+		gpmMcpy( this, &b, sizeof(*this) );
+		pSTR = gpfSTR( NULL, b.pSTR );
+		return *this;
+	}
+	gpcREG& operator += ( gpcREG& b )
+	{
+		if( bD.x&0x40 || b.bD.x&0x40 )
+			return *this = d8()+b.d8();
+
+		if( bD.x&0x80 || b.bD.x&0x80 )
+			return *this = i8()+b.i8();
+
+		return *this = u8()+b.u8();
+	}
+	gpcREG& operator -= ( gpcREG& b )
+	{
+		if( bD.x&0x40 || b.bD.x&0x40 )
+			return *this = d8()-b.d8();
+
+		if( bD.x&0x80 || b.bD.x&0x80 )
+			return *this = i8()-b.i8();
+
+		return *this = u8()-b.u8();
+	}
+	gpcREG& operator *= ( gpcREG& b )
+	{
+		if( bD.x&0x40 || b.bD.x&0x40 )
+			return *this = d8()*b.d8();
+
+		if( bD.x&0x80 || b.bD.x&0x80 )
+			return *this = i8()*b.i8();
+
+		return *this = u8()*b.u8();
+	}
+	gpcREG& operator /= ( gpcREG& b )
+	{
+		return *this = d8()/b.d8();
+	}
+
+
 
 	U8 u8()
 	{
@@ -484,15 +530,13 @@ public:
 
 	gpcALU& operator = ( U1* pSTR );
 
-	gpcALU& operator = ( gpeALF a )
-	{
+	gpcALU& operator = ( gpeALF a ) {
 		null();
 		alf = a;
 		return *this;
 	}
 
-	gpcALU& operator = ( U4x2& u42 )
-	{
+	gpcALU& operator = ( U4x2& u42 ) {
 		sub = u42;
 		return *this;
 	}

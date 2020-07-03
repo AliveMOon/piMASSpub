@@ -477,7 +477,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		}
 
 		if( !pSRC->apOUT[3] )
-		if( pSRC->SRCmnMILLrun(*this,win) )
+		if( pSRC->SRCmnMILLrun(this,&win) )
 		{
 			win.nJDOIT.x++;
 			pSRC->pMINI->lzyRST();
