@@ -3,36 +3,79 @@
 #include "piMASS.h"
 
 #define OBJ SCOOP.obj
-/*
-#ifdef piMASS_DEBUG
-	/// gpcCDR
-	#define cd (pCD=CDsp.CD())[0]
-	/// gpcOBJlnk
-	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
-	#define OBJadd (pOBn=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
-#else
-	/// gpcCDR
-	#define cd CDsp.CDR().p_cd[0]
-	/// gpcOBJlnk
-	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
-	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
-#endif
-#define aaOPid gpaaOPid[lnk.y]*/
 
-static const char* gpasTYPsz[] = {
+//typedef enum gpeTYPsz:U1{
+//	gpeTYPsz_b,		//	0	1		00:00	byte
+//	gpeTYPsz_w,		//	1	2		00:01	word
+//	gpeTYPsz_l,		//	2	4		00:10	long
+//	gpeTYPsz_q,		//	3	8		00:11	quad
+//	/// olyan nincsen hogy float és nincs előjel
+//	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+//	gpeTYPsz_rgba,	//  4   1x4		01:00	RGBA	pixel
+//	gpeTYPsz_utf8,	//  5   1->0	01:01	string
+//										//	12345678901234
+//	gpeTYPsz_alf,	//	6	8		01:10	ABCDEFGHIJKLMN
+//	gpeTYPsz_cell,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
+//	/// előjeles
+//	gpeTYPsz_sb,	//	8	1		10:00	signed byte
+//	gpeTYPsz_sw,	//	9	2		10:01	signed word
+//	gpeTYPsz_sl,	//	a	4		10:10	signed long
+//	gpeTYPsz_sq,	//	b	8		10:11	signed quad
+//	/// lebegőpontos
+//	gpeTYPsz_f,		//	c	4		11:00	float
+//	gpeTYPsz_d,		//  d	8		11:01	double
+//	gpeTYPsz_f4,	//	e	16		11:10	xyzw
+//	gpeTYPsz_d4,	//  f	32		11:11	double xyzw
+//} gpeTYPsz_U1;
+//static const char* gpasTYPsz[] = {
+//
+//	".b",		//	0	1		00:00	byte
+//	".w",		//	1	2		00:01	word
+//	".l",		//	2	4		00:10	long
+//	".q",		//	3	8		00:11	quad
+//	/// olyan nincsen hogy float és nincs előjel
+//	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+//	"rgba.l",	//  4   1x4		01:00	RGBA	pixel
+//	"utf8.b",	//  5   1->0	01:01	string
+//										//	12345678901234
+//	"alf.q",	//	6	8		01:10	ABCDEFGHIJKLMN
+//	"ce.q2",	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
+//	/// előjeles
+//	"s.b",		//	8	1		10:00	signed byte
+//	"s.w",		//	9	2		10:01	signed word
+//	"s.l",		//	a	4		10:10	signed long
+//	"s.q",		//	b	8		10:11	signed quad
+//	/// lebegőpontos
+//	".f",		//	c	4		11:00	float
+//	".d",		//  d	8		11:01	double
+//	".f4",		//	e	16		11:10	xyzw
+//	".d4",		//  f	32		11:11	double xyzw
+//};
+//static const U1 gpaTYPsz[] = {
+//
+//	1,	//".b",		//	0	00:00	byte
+//	2,	//".w",		//	1	00:01	word
+//	4,	//".l",		//	2	00:10	long
+//	8,	//".q",		//	3	00:11	quad
+//	/// olyan nincsen hogy float és nincs előjel
+//	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+//	4,	//"rgba.l",	//  4   01:00	RGBA	pixel
+//	1,	//"utf8.b",	//  5   01:01	string
+//										//	12345678901234
+//	8,	//"alf.q",	//	6	01:10	ABCDEFGHIJKLMN
+//	16,	//"ce.q2",	//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
+//	/// előjeles
+//	1,	//"s.b",	//	8	10:00	signed byte
+//	2,	//"s.w",	//	9	10:01	signed word
+//	4,	//"s.l",	//	a	10:10	signed long
+//	8,	//"s.q",	//	b	10:11	signed quad
+//	/// lebegőpontos
+//	4,	//".f",		//	c	11:00	float
+//	8,	//".d",		//  d	11:01	double
+//	16,	//".f4",	//	e	11:10	xyzw
+//	32,	//".d4",	//  f	11:11	double xyzw
+//};
 
-	".b",	///0 1	8	byte
-	".w",	// 1 2	16	word
-	".l",	// 2 4	32	long
-	".q",	// 3 8	64	quad
-
-	".o", 	// 4 16 128	4x4		// egy byte-os float nincs ezért ez jó lehet 128bit-esnek is
-
-	".h",	// 5 2	16	half
-	".f", 	// 6 4	32	float
-	".d", 	// 7 8	64	double
-	".fx", 	// 8 9	128 f4x4
-};
 static const char* gps68kREG[] = {
 	"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
 	"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7",
@@ -100,14 +143,14 @@ public:
 
 class gpcCDsp {
 public:
-	I4		iCD, refCD, nR, Ai, Di, nSTRT, iPC;
+	I4		iCD, refCD, nR, Ad, As, Di, nSTRT, iPC;
 	gpcCD	*pCD;
 	gpcLZY	cd, spA, spM, spSAM;
 
 	gpeOPid *pADD, *pMUL, *pSTRT, now; //aSTRT[0x40];
 	I4x4	iSAM, lSAM, nSAM, allSAM;
 
-	gpcCDsp(){ gpmCLR; refCD=-1; Ai=6; LEVrst(); }; //A[7]=0x40; };
+	gpcCDsp(){ gpmCLR; refCD=-1; Ad=6; LEVrst(); }; //A[7]=0x40; };
 	gpcCD* CD() {
 		if( refCD == iCD )
 			return pCD;
@@ -132,26 +175,26 @@ public:
 		return *this;
 	}
 
-	I4x4& LOAD_SRC_ADR_nA0( gpcSCOOP& scp,I4 n=-1) { /// move.l n(Ai),A0
+	I4x4& LOAD_SRC_ADR_nA0( gpcSCOOP& scp,I4 n=-1) { /// move.l n(iA),A0
 		/// move.l -1(Ai), A0
 		I4x4 &load = isa( PC, gpeOPid_mov, gpeEAszL
-							,gpeEA_d16IAnI,Ai,0
+							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,0,0  );
 		load.aOB[0] = n;
 		return load;
 	}
-	I4x4& LOAD_SRC_ADR_nA1( gpcSCOOP& scp,I4 n=-1) { /// move.l n(Ai),A1
+	I4x4& LOAD_SRC_ADR_nA1( gpcSCOOP& scp,I4 n=-1) { /// move.l n(iA),A1
 		/// move.l -1(Ai), A1
 		I4x4 &load = isa( PC, gpeOPid_mov, gpeEAszL
-							,gpeEA_d16IAnI,Ai,0
+							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,1,0  );
 		load.aOB[0] = n;
 		return load;
 	}
-	I4x4& LOAD_DST_ADR_A0( gpcSCOOP& scp ) { /// move.l (Ai+1),A0
+	I4x4& LOAD_DST_ADR_A0( gpcSCOOP& scp ) { /// move.l (iA+1),A0
 
 		I4x4 &prev = isa( PC, gpeOPid_mov, gpeEAszL
-							,gpeEA_IAnI,Ai+1,0
+							,gpeEA_IAnI,Ad,0
 							,gpeEA_An,0,0
 						);
 		return prev;
@@ -234,7 +277,7 @@ public:
 
 		isa( PC );
         isa( PC, gpeOPid_mov, gpeEAszL
-				,gpeEA_An,Ai,0
+				,gpeEA_An,As,0
 				,gpeEA_sIAnI,7,0
 			);
         isa( PC );
@@ -246,7 +289,7 @@ public:
         //I4x4& inst =
 		isa( PC, gpeOPid_mov, gpeEAszL
 				,gpeEA_Dn,0,0
-				,gpeEA_sIAnI,Ai+1,0
+				,gpeEA_sIAnI,Ad,0
 			).aOB[0] = 1;
         //inst.aOB[0] = 1;
         isa( PC );
@@ -277,12 +320,12 @@ public:
 
         isa( PC, gpeOPid_mov, gpeEAszL
 				,gpeEA_IAnIp,7,0
-				,gpeEA_An,Ai,0
+				,gpeEA_An,As,0
 			);
         isa( PC );
 		isa( PC, gpeOPid_mov, gpeEAszL
-				,gpeEA_IAnIp,Ai+1,0
-				,gpeEA_IAnIp,Ai
+				,gpeEA_IAnIp,Ad,0
+				,gpeEA_IAnIp,As
 			);
         isa( PC );
         return *this;
@@ -295,7 +338,13 @@ public:
                 ,gpeEA_An,Ai,0
                 ,gpeEA_Dn,Ai,0
             );*/
-		Ai--;
+		if( As >= Ad )
+		{
+			As = Ad-1;
+			isa( PC );
+			return *this;
+		}
+		As = Ad-1;
 		/*isa( PC, gpeOPid_mov, gpeEAszL
                 ,gpeEA_An,Ai,0
 				,gpeEA_Dn,Ai,0
@@ -354,13 +403,13 @@ public:
              /// move.l A0,(Ai)
             isa( PC, gpeOPid_mov, gpeEAszL
                     ,gpeEA_An,0,0
-                    ,gpeEA_IAnI,Ai,0
+                    ,gpeEA_IAnI,As,0
                 );
         } else
             /// move.l A0,(Ai)+
             isa( PC, gpeOPid_mov, gpeEAszL
                     ,gpeEA_An,0,0
-                    ,gpeEA_IAnIp,Ai,0
+                    ,gpeEA_IAnIp,As,0
                 );
 
 		isa( PC );
@@ -545,14 +594,15 @@ public:
 		//kOBJ( scp, iOPe );
 		//kMUL( scp, iOPe );
 
-		isa( PC, gpeOPid_sub, gpeEAszL
+		/*isa( PC, gpeOPid_sub, gpeEAszL
                             ,gpeEA_num,0,0
                             ,gpeEA_An,Ai+1,0
-                    ).aOB[0] = 1;
+                    ).aOB[0] = 1;*/
 		isa( PC );
         return *this;
     }
 
+	/// azaz gyúrjuk
 	gpcCDsp& knead( gpcSCOOP& scp, U4 iOPe ) {
 		gpcCDsp& SP = *this;
 		now=CDC.pst;
@@ -616,9 +666,9 @@ public:
 				break;
             case gpeOPid_stk: /// ,
 				kEND( scp, iOPe );
-				Ai++;
-                if( Ai > 6 )
-                    Ai = 6;
+				As++;
+                if( As > Ad )
+                    As = Ad;
 				break;
 		}
 		return SP;

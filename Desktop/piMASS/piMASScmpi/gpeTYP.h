@@ -100,6 +100,7 @@ typedef enum gpeOPid:U1{
 
 	gpeOPid_n,
 } gpeOPid_U1;
+
 typedef enum gpeEA:U1 {
 	gpeEA_OFF,
 	gpeEA_Dn,
@@ -122,14 +123,31 @@ typedef enum gpeEA:U1 {
 } gpeEA_U1;
 
 typedef enum gpeEAsz:U1 {
-	gpeEAsz0,
-	gpeEAszB,
-	gpeEAszW,
-	gpeEAszL,
-	gpeEAszQ,
-	gpeEAszX,
+	gpeEAsz0, // 0 EA
+	gpeEAszB, // 1 1
+	gpeEAszW, // 2 2
+	gpeEAszL, // 3 4
+	gpeEAszQ, // 4 8
+	gpeEAszX, // 5 16
 } gpeEAsz_U1;
 
+static const size_t gpaEAsz[] {
+	sizeof(U1*),		//gpeEAsz0, //
+	sizeof(U1), 		//gpeEAszB, // 1
+	sizeof(U2), 		//gpeEAszW, // 2
+	sizeof(float), 		//gpeEAszL, // 4
+	sizeof(double), 	//gpeEAszQ, // 8
+	sizeof(float)*4, 	//gpeEAszX, // 16
+};
+
+static const char* gpasEAsz[] = {
+	".e",		//	0	0		00:00	size_t
+	".b",		//	1	1		00:00	byte
+	".w",		//	2	2		00:01	word
+	".l",		//	3	4		00:10	long
+	".q",		//	4	8		00:11	quad
+	".v",		//	5	16		01:00	vec
+};
 static gpeOPid gpaOPgrp[] = {
 	gpeOPid_nop,
 
@@ -401,15 +419,17 @@ typedef enum gpeTYP:U4
 	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 	gpeTYP_null,
-	gpeTYP_STR 	= MAKE_ID( 0x10, 1, 1, 1 ),
-	gpeTYP_U1 	= MAKE_ID( 0x00, 1, 1, 1 ),
-	gpeTYP_I1 	= MAKE_ID( 0x80, 1, 1, 1 ),
-	gpeTYP_U2 	= MAKE_ID( 0x01, 1, 1, 1 ),
-	gpeTYP_I2 	= MAKE_ID( 0x81, 1, 1, 1 ),
-	gpeTYP_U4 	= MAKE_ID( 0x02, 1, 1, 4 ),
-	gpeTYP_I4 	= MAKE_ID( 0x82, 1, 1, 4 ),
-	gpeTYP_UF  	= MAKE_ID( 0x42, 1, 1, 4 ),
-	gpeTYP_F  	= MAKE_ID( 0xc2, 1, 1, 4 ),
+	gpeTYP_STR 	= MAKE_ID( 0x10, 1, 1, 1 ),	/// x[0001:0000]
+	gpeTYP_U1 	= MAKE_ID( 0x00, 1, 1, 1 ),	/// x[0000:0000]
+	gpeTYP_I1 	= MAKE_ID( 0x80, 1, 1, 1 ), /// x[1000:0000]
+	gpeTYP_U2 	= MAKE_ID( 0x01, 1, 1, 1 ), /// x[0000:0001]
+	gpeTYP_I2 	= MAKE_ID( 0x81, 1, 1, 1 ), /// x[1000:0001]
+	gpeTYP_U4 	= MAKE_ID( 0x02, 1, 1, 4 ),	/// x[0000:0010]
+	gpeTYP_I4 	= MAKE_ID( 0x82, 1, 1, 4 ), /// x[1000:0010]
+
+	gpeTYP_UF  	= MAKE_ID( 0x42, 1, 1, 4 ), /// x[0100:0010]
+
+	gpeTYP_F  	= MAKE_ID( 0xc2, 1, 1, 4 ), /// x[1100:0010]
 	gpeTYP_U8 	= MAKE_ID( 0x03, 1, 1, 8 ),
 	gpeTYP_I8 	= MAKE_ID( 0x83, 1, 1, 8 ),
 	gpeTYP_UD  	= MAKE_ID( 0x43, 1, 1, 8 ),	// azt jelenti, hogy pozitív

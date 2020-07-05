@@ -3,6 +3,7 @@
 extern U1 gpaALFsub[];
 extern char gpsTAB[], *gppTAB;
 
+
 void gpcGT::GTrealMITSUB( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )

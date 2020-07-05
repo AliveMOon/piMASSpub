@@ -1028,7 +1028,7 @@ public:
 						bool bNoMini, U1 selID
 					);
 	void 	SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN );
-	void 	SRCmnMILLcdr( I8x2* pOP, gpcLZYdct& dOP, U1 iMN );
+	void 	SRCmnMILLcoder( I8x2* pOP, gpcLZYdct& dOP, U1 iMN );
 	void 	SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win );
 	gpcRES* SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN );
 
