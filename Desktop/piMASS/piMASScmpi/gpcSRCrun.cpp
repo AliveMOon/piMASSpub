@@ -23,22 +23,49 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 		Ys, Xd, Yd, bOBs = false, bOBd = false;
 	gpeEA mS, mD;
 	char	*pALL = (char*)SCOOP.pALL,
-			*p_STR[2];
-	I4		anSTR[2];
+			*pSTR;
+	I4		nSTR;
 
 	gpcLZY	aMEM[0x10];
 	gpcREG	aA[8],
 			aD[8+2], *pSRC, *pDST;
 	aA[7] = aA[6] = 0x400;
 	I4	a;
-
+	U8 nL;
+	char* pDIS = (char*)pDBG->p_alloc;
 	for( I4x4* pPCs = (I4x4*)SCOOP.vASM.p_alloc, *pPC = pPCs, *pPCe = pPC+SCOOP.nASM();
 			pPC < pPCe; pPC++ )
 	{
+		pDIS += gpmVAN( pDIS, "\r\n", nL );
+		pDIS += gpmNINCS( pDIS, "\r\n" );
 		U1x4 op = //*(U1x4*)&
 					pPC->op;
 		if( !op.x ) // nop
 			continue;
+		else if( op.x == gpeOPid_dot )
+		{
+			// keressük meg az OBJ-t
+			for(U4	ie = aD->i8(), ii=aA[7].i8();
+					ii<ie;
+					ii++   )
+			{
+				pSRC = (gpcREG*)( aMEM[op.y&7].Ux(ii,sizeof(*aA)) );
+				I4 o = pSRC->i8();
+				if( o >= 0 )
+				{
+					gpcOBJlnk& obj = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
+					gpeTYP typ = obj.typ;
+				} else {
+					o *= -1;
+					pSTR = pALL+pM0[o].iMNi;
+					nSTR = pM0[o].iMNn;
+				}
+			}
+			// A7 vissza állít D0-ra
+			// obj *pointerét betesz az A0-ba
+
+			continue;
+		}
 
 		std::cout << pPC-pPCs << std::endl;
 		mS = (gpeEA)(op.y>>3);
