@@ -98,7 +98,7 @@ typedef enum gpeOPid:U1{
 	gpeOPid_if,		gpeOPid_else,
 	gpeOPid_mail,	gpeOPid_str,
 
-	gpeOPid_n,
+	gpeOPid_jsr,
 } gpeOPid_U1;
 
 typedef enum gpeEA:U1 {
@@ -409,7 +409,7 @@ static const char* gpas68k[] = {
 	//gpeOPid_str,
 	"\n 0x%0.4x str%s\t%s,%s",
 
-	// gpeOPid_n
+	// gpeOPid_jsr
 	"\n 0x%0.4x jsr\t%s",
 };
 

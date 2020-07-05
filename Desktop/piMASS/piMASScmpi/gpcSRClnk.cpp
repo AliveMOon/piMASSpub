@@ -7,10 +7,10 @@ extern char gpaALF_H_sub[];
 
 	/// gpcOBJlnk
 #ifdef piMASS_DEBUG
-	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.lnk-iOPe), sizeof(gpcOBJlnk)))[0]
+	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpcOBJlnk)))[0]
 	#define OBJadd (pOBn=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #else
-	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-iOPe), sizeof(gpcOBJlnk)))[0]
+	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpcOBJlnk)))[0]
 	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #endif
 #define aaOPid gpaaOPid[OPgrp]
@@ -61,14 +61,16 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 }
 
 
-void gpcSRC::SRCmnMILLcoder( I8x2* pOP, gpcLZYdct& dOP, U1 iMN ) {
+void gpcSRC::SRCmnMILLcoder(	//I8x2* pOP,
+								gpcLZYdct& dOP, U1 iMN ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
 
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M, Mnx;
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc; //, aLNK[0x10];
-	U4 nM = SCOOP.nMN(), iOP, iOPe = dOP.nIX();
+	U4 nM = SCOOP.nMN(), iOP; //, iOPe = dOP.nIX();
+
 	OBJ.lzyRST();
 	const char *pS;
 	const U1 *pSTR;
@@ -132,7 +134,7 @@ void gpcSRC::SRCmnMILLcoder( I8x2* pOP, gpcLZYdct& dOP, U1 iMN ) {
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (iOPe+SCOOP.nOBJ);
+				cd.lnk = lnk.y = (gpeOPid_jsr+SCOOP.nOBJ);
 				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
 				SCOOP.nOBJ++;
 				break;
@@ -145,12 +147,13 @@ void gpcSRC::SRCmnMILLcoder( I8x2* pOP, gpcLZYdct& dOP, U1 iMN ) {
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (iOPe+SCOOP.nOBJ);
+				cd.lnk = lnk.y = (gpeOPid_jsr+SCOOP.nOBJ);
 				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
 				SCOOP.nOBJ++;
 				break;
 			case gpeCLR_green2: {///OPER
                     if( !lnk.y ) {
+						U4 iOPe = gpeOPid_jsr;
 						lnk.y = dOP.dctMILLfnd( (U1*)pS, nS, iOPe );
 						///!!! ez majd kell, ha mert több operátor is lesz egy pS-ben
 						U4 n = dOP.nSTRix(lnk.y);
@@ -163,7 +166,7 @@ void gpcSRC::SRCmnMILLcoder( I8x2* pOP, gpcLZYdct& dOP, U1 iMN ) {
                         case gpeOPid_brakS:
                         case gpeOPid_dimS:
                         case gpeOPid_begin:
-							if( cd.lnk >= gpeOPid_n )
+							if( cd.lnk >= gpeOPid_jsr )
 							{
 								/// FUNCTION
 								/// LENT
@@ -180,7 +183,8 @@ void gpcSRC::SRCmnMILLcoder( I8x2* pOP, gpcLZYdct& dOP, U1 iMN ) {
                         case gpeOPid_dimE:
                         case gpeOPid_brakE:
                             /// FENT
-                            CDsp.LEVdwn( SCOOP, iOPe );
+                            CDsp.LEVdwn( SCOOP, //iOPe,
+											gpeOPid_mov ); // (gpeOPid)lnk.y );
                             /// LENT
                             cd.lnk = lnk.y;
                             break;
@@ -191,16 +195,16 @@ void gpcSRC::SRCmnMILLcoder( I8x2* pOP, gpcLZYdct& dOP, U1 iMN ) {
                                 case gpeOPid_dimE:
                                 case gpeOPid_brakE:
                                     cd.pst = (gpeOPid)lnk.y;
-                                    CDsp.knead( SCOOP, iOPe );
+                                    CDsp.knead( SCOOP ); //, iOPe );
                                     break;
                                 default:
-                                    if( (cd.lnk>-1) && (cd.lnk<iOPe) )
+                                    if( (cd.lnk>-1) && (cd.lnk<gpeOPid_jsr) )
                                     {
                                         cd.pre = (gpeOPid)lnk.y;
                                         break;
                                     }
                                     cd.pst = (gpeOPid)lnk.y;
-                                    CDsp.knead( SCOOP, iOPe );
+                                    CDsp.knead( SCOOP);//, iOPe );
                                     break;
                             }
                             break;
@@ -265,10 +269,10 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 		iOPe = mass.OPER.nIX();
 	}
 	/// -------------------------------------------------------
-
-	SRCmnMILLcoder( mass.aOP, mass.OPER, 0 );
-
-
+	if( iOPe == gpeOPid_jsr )
+		SRCmnMILLcoder( mass.OPER, 0 );
+	else
+		std::cout << "\033[1;31m iOPe != gpeOPid_jsr?" << std::endl;
 }
 
 

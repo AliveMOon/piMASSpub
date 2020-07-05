@@ -19,14 +19,15 @@
 
 static char gpsDBGpub[0x1000];
 
-void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
+void gpcSRC::SRCmnMILLdbg( //I8x2* pOP,
+							gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
 		return;
 	pDBG->lzyRST();
 	if( !SCOOP.nASM() )
 		return;
-	U4 iOPe = dOP.nIX();
+	//U4 iOPe = dOP.nIX();
 #ifdef piMASS_DEBUG
 	gpcOBJlnk	*pOBs, *pOBd;
 #endif
@@ -120,7 +121,7 @@ void gpcSRC::SRCmnMILLdbg( I8x2* pOP, gpcLZYdct& dOP, U1 iMN )
 				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc );
 				pc++;
 				break;
-			case gpeOPid_n:
+			case gpeOPid_jsr:
 				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, *pC?pC:"?" );
 				pc++;
 				break;

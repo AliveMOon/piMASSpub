@@ -8,12 +8,13 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 	if( !this )
 		return NULL;
 
-	SRCmnMILLdbg( pMASS->aOP, pMASS->OPER, 0 );
+	SRCmnMILLdbg( //pMASS->aOP,
+					pMASS->OPER, 0 );
 	if( !pDBG->nLD() )
 		return NULL;
 
 	/// -------------------------------------
-	return NULL;
+	//return NULL;
 
 
 	static const U1 iMN=0;
@@ -138,7 +139,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 			} break;
 		}
 
-		if(op.x>=gpeOPid_n)
+		if(op.x>=gpeOPid_jsr)
 		{
 			// jsr;
 			continue;

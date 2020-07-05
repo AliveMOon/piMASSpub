@@ -264,7 +264,7 @@ public:
 
         I4x4* pSPsam = (I4x4*)spSAM.Ux( ++nSTRT, sizeof(I4x4));
         pSPsam[0].a4x2[1] = (iSAM.a4x2[1]+=lSAM.a4x2[1]);
-        pSPsam[-1].op = CD()[0].lnk >= gpeOPid_n ? CD()[0].lnk : 0;
+        pSPsam[-1].op = CD()[0].lnk >= gpeOPid_jsr ? CD()[0].lnk : 0;
         lSAM.null();
 
         LEVaddEXP();
@@ -296,19 +296,23 @@ public:
         return *this;
 	}
 
-	gpcCDsp& LEVdwn( gpcSCOOP& scp, I4 iOPe ) {
+	gpcCDsp& LEVdwn( gpcSCOOP& scp, //I4 iOPe,
+						gpeOPid dwn ) {
         if( !pSTRT )
             return LEVrst();
 
         /// ITT MÉG FENT
-        kEND( scp,iOPe );
+        kEND( scp ); //,iOPe );
+        *pSTRT = dwn;
+
         I4x4 *pSPsam = (I4x4*)spSAM.Ux(--nSTRT, sizeof(I4x4));
+
 		/// ITT MÁR LENT
 		if( pSPsam[0].op )
 		{
-			isa( PC, gpeOPid_n, gpeEAszL
+			isa( PC, gpeOPid_jsr, gpeEAszL
 				,gpeEA_num
-			).aOB[0] = pSPsam[0].op-iOPe; //-gpeOPid_n;
+			).aOB[0] = pSPsam[0].op-gpeOPid_jsr; //-gpeOPid_jsr;
 		}
         lSAM.a4x2[1] = pSPsam[1].a4x2[1]-(iSAM.a4x2[1] = pSPsam[0].a4x2[1]);
         allSAM.a4x2[0] = allSAM.a4x2[1]-iSAM.a4x2[1];
@@ -332,29 +336,33 @@ public:
 	}
 
 
-	gpcCDsp& kMOV( gpcSCOOP& scp, U4 iOPe ) {
-
-		/*isa( PC,	gpeOPid_mov, gpeEAszL
-                ,gpeEA_An,Ai,0
-                ,gpeEA_Dn,Ai,0
-            );*/
-		if( As >= Ad )
-		{
-			As = Ad-1;
-			isa( PC );
-			return *this;
-		}
-		As = Ad-1;
-		/*isa( PC, gpeOPid_mov, gpeEAszL
-                ,gpeEA_An,Ai,0
-				,gpeEA_Dn,Ai,0
-            );*/
-		isa( PC );
+	gpcCDsp& kMOV( gpcSCOOP& scp
+					//, U4 iOPe
+					) {
+		As = Ad;
 		return *this;
+//		/*isa( PC,	gpeOPid_mov, gpeEAszL
+//                ,gpeEA_An,Ai,0
+//                ,gpeEA_Dn,Ai,0
+//            );*/
+//		if( As >= Ad )
+//		{
+//			As = Ad-1;
+//			isa( PC );
+//			return *this;
+//		}
+//		As = Ad-1;
+//		/*isa( PC, gpeOPid_mov, gpeEAszL
+//                ,gpeEA_An,Ai,0
+//				,gpeEA_Dn,Ai,0
+//            );*/
+//		isa( PC );
+//		return *this;
 	}
-	gpcCDsp& kOBJ( gpcSCOOP& scp, U4 iOPe ) {
-        switch( (gpeOPid)CD()[0].lnk )
-        {
+	gpcCDsp& kOBJ( gpcSCOOP& scp
+				//, U4 iOPe
+				) {
+        switch( (gpeOPid)CD()[0].lnk ) {
             case gpeOPid_end:
             case gpeOPid_dimE:
             case gpeOPid_brakE:
@@ -388,35 +396,29 @@ public:
 								,gpeEA_sIAnI,7,0
 							);
 			//--A[7];
-			opcd.aOB[0] = (i.lnk > 0) ? i.lnk-iOPe : i.lnk;
+			opcd.aOB[0] = (i.lnk > 0) ? i.lnk-gpeOPid_jsr : i.lnk;
 			--dp;
 		}
 		/// "\n 0x%0.4x jsr fndOBJ2A0"
 		isa( PC, gpeOPid_dot );
-		/*/// move.l D0,A7
-		isa( PC, gpeOPid_mov, gpeEAszL
-				,gpeEA_Dn,0,0
-				,gpeEA_An,7,0
-			);*/
-        if( gpaOPgrp[now] == gpeOPid_mov )
-        {
-             /// move.l A0,(Ai)
+        if( gpaOPgrp[now] == gpeOPid_mov )	/// move.l A0,-(Ai)
             isa( PC, gpeOPid_mov, gpeEAszL
                     ,gpeEA_An,0,0
-                    ,gpeEA_IAnI,As,0
+                    ,gpeEA_sIAnI,As,0
                 );
-        } else
-            /// move.l A0,(Ai)+
+		else 								/// move.l A0,(Ai)+
             isa( PC, gpeOPid_mov, gpeEAszL
                     ,gpeEA_An,0,0
                     ,gpeEA_IAnIp,As,0
                 );
 
 		isa( PC );
-		//A[Ai]++;
+		As = Ad-1;
 		return *this;
 	}
-	gpcCDsp& kADD( gpcSCOOP& scp, U4 iOPe ) {
+	gpcCDsp& kADD( gpcSCOOP& scp
+				//, U4 iOPe
+				) {
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^
 		// a =b+c +d*e  // iADD 2 // de nem adtam hozzá még a d-t
@@ -511,7 +513,8 @@ public:
 		lADD = lMUL = 0;
 		return *this;
 	}
-	gpcCDsp& kMUL( gpcSCOOP& scp, U4 iOPe, bool b_end ) {
+	gpcCDsp& kMUL( gpcSCOOP& scp, //U4 iOPe,
+					bool b_end ) {
 
 		if(!lMUL)
 		{
@@ -574,7 +577,7 @@ public:
 		lADD = lMUL = 0;
 		return *this;
 	}
-	gpcCDsp& kEND( gpcSCOOP& scp, I4 iOPe ) {
+	gpcCDsp& kEND( gpcSCOOP& scp ){
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^
 		// a =b+c +d*e  // iADD 2 // de nem adtam hozzá még a d-t
@@ -583,46 +586,40 @@ public:
 		//-2-1-^
 		// d*e +f -g*h	// iADD 2
 		//-3-2 -1-^
-		kADD( scp, iOPe );
-		kOBJ( scp, iOPe );
-		kMUL( scp, iOPe, true );
+		kADD(scp);
+		kOBJ(scp);
         // a =b*c +d		// iMUL 1
 		// a =b*c/d +e		// iMUL 2
 		// a +=b*c/d +e		// iMUL 3
 		// a +b*c +e		// iMUL 1
 		// a*b +b*c			// iMUL 1
-		//kOBJ( scp, iOPe );
-		//kMUL( scp, iOPe );
+		kMUL(scp,true);
 
-		/*isa( PC, gpeOPid_sub, gpeEAszL
-                            ,gpeEA_num,0,0
-                            ,gpeEA_An,Ai+1,0
-                    ).aOB[0] = 1;*/
 		isa( PC );
         return *this;
     }
 
 	/// azaz gyúrjuk
-	gpcCDsp& knead( gpcSCOOP& scp, U4 iOPe ) {
+	gpcCDsp& knead( gpcSCOOP& scp ){ //, U4 iOPe ) {
 		gpcCDsp& SP = *this;
 		now=CDC.pst;
 		switch( gpaOPgrp[now] )
 		{
 			case gpeOPid_mov: /// =
-				kOBJ( scp, iOPe );
-				kMOV( scp, iOPe ); // Ai--; // Ai--; //
+				kMOV(scp); //, iOPe ); // Ai--; // Ai--; //
+				kOBJ(scp); //, iOPe );
 				++SP;
 				*pSTRT = now;
 				break;
 			case gpeOPid_add: /// +
 			case gpeOPid_sub: /// ==
-				kOBJ( scp, iOPe );
+				kOBJ(scp); //, iOPe );
 				// a =b*c +d		// iMUL 1
 				// a =b*c/d +e		// iMUL 2
 				// a +=b*c/d +e		// iMUL 3
 				// a +b*c +e		// iMUL 1
 				// a*b +b*c			// iMUL 1
-				kMUL( scp, iOPe, false );
+				kMUL(scp,false);
 				LEVaddEXP()[lADD++] = now;
                 ++SP;
                 break;
@@ -635,8 +632,8 @@ public:
 				//-2-1-^
 				// d*e +f -g*h	// iADD 2
 				//-3-2 -1-^
-				kADD( scp, iOPe );
-				kOBJ( scp, iOPe );
+				kADD(scp); //, iOPe );
+				kOBJ(scp); //, iOPe );
 				LEVmulEXP()[lMUL++] = now;
 				++SP;
 				++CDC;
@@ -649,26 +646,21 @@ public:
 							break;
 						case gpeOPid_brakS:
 						default:
-							LEVup( scp );
+							LEVup(scp);
 							break;
 					}
-				++SP;
-				++CDC;
+					++SP;
+					++CDC;
 				} break;
 			case gpeOPid_out: /// )
                 /// ITT MÉG FENT
-                LEVdwn( scp, iOPe );
+                LEVdwn(scp,now);
                 /// ITT MÁR LENT
-
-
 				++SP;
 				++CDC;
 				break;
             case gpeOPid_stk: /// ,
-				kEND( scp, iOPe );
-				As++;
-                if( As > Ad )
-                    As = Ad;
+				kEND(scp);
 				break;
 		}
 		return SP;

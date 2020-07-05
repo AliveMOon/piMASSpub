@@ -118,6 +118,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 								"CELLPADDING=0 cellspacing=1 valign=top >\r\n",
 								pNAME
 					);
+
 	bool bTR = false, bTD = false;
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{
@@ -139,10 +140,20 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		if( !pSRC )
 			continue;
 
+
+
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
-		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
+		pNX = pNUM + sprintf( (char*)pNUM, "%d", i/z );
+		if( pSRC->pDBG->nLD() )
+		{
+			sprintf( (char*)gpsSAVEbf, "%s%s/%s.asm", pPATH, pNAME, gpsSVadr  );
+			pSRC->pDBG->lzyWR( (char*)gpsSAVEbf );
+		}
+		pNX += sprintf( (char*)pNX, "\t" );
+
 		if( bALT )
-		buff.lzyFRMT( nS = -1, " %s", gpsSVadr );
+			buff.lzyFRMT( nS = -1, " %s", gpsSVadr );
+
 
 		pA = pSRC->pA;
 		if( !pA )
