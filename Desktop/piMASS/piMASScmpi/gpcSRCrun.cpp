@@ -4,7 +4,7 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
-gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
+gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	if( !this )
 		return NULL;
 
@@ -28,10 +28,14 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 
 	gpcLZY	aMEM[0x10];
 	gpcREG	aA[8],
-			aD[8+2], *pSRC, *pDST;
+			aD[8+2], *pSRC, *pDST, *pTMP;
+	gpcRES	*pDOT,
+			*pOUT = apOUT[3];
 	aA[7] = aA[6] = 0x400;
 	I4	a;
 	U8 nL;
+	gpcADR	adr;
+	gpcSRC	*pANS = NULL;
 	char* pDIS = (char*)pDBG->p_alloc;
 	for( I4x4* pPCs = (I4x4*)SCOOP.vASM.p_alloc, *pPC = pPCs, *pPCe = pPC+SCOOP.nASM();
 			pPC < pPCe; pPC++ )
@@ -45,16 +49,61 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 		else if( op.x == gpeOPid_dot )
 		{
 			// keressük meg az OBJ-t
-			for(U4	ie = aD->i8(), ii=aA[7].i8();
-					ii<ie;
-					ii++   )
+			pDOT = NULL;
+			for(U4	ie = aD->i8(), ii=aA[7].i8(); ii<ie; ii++   )
 			{
-				pSRC = (gpcREG*)( aMEM[op.y&7].Ux(ii,sizeof(*aA)) );
-				I4 o = pSRC->i8();
+				pTMP = (gpcREG*)( aMEM[op.y&7].Ux(ii,sizeof(*aA)) );
+				I4 o = pTMP->i8();
 				if( o >= 0 )
 				{
 					gpcOBJlnk& obj = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
 					gpeTYP typ = obj.typ;
+					switch( obj.typ )
+					{
+						case gpeTYP_sA8:
+							adr = obj.obj.alf;
+							if( pDOT )
+							{
+								adr = pDOT; // most kezdi keresni
+								if( !adr.pRM ) {
+									// OOPS! nem találta?
+									// akkor az egész cucc egy nagy büdös 0;
+									aA[0] = 0;
+									ii = ie;
+									continue;
+								}
+								if( pANS ? pANS->bSW&gpeMASSloopMSK : false )
+									bSW |= gpeMASSloopMSK;
+								aA[0] = adr.pRM->ALU( adr.iA );
+								continue;
+							}
+							if( pOUT )
+							{
+								adr = pOUT;
+								if( adr.pRM )
+								{
+									aA[0] = adr.pRM->ALU( adr.iA );
+									continue;
+								}
+							}
+							if( win.WINvar( aA[0], adr.an.alf ) )
+							{
+								// valamit kapott
+								bSW |= gpeMASSloopMSK;
+								pSTR = aA[0].getSTR();
+								continue;
+							}
+							pOUT = new gpcRES( pMOM );
+							if( !pOUT )
+							{
+								aA[0].null();
+								ii = ie;
+								continue;
+							}
+
+							continue;
+
+					}
 				} else {
 					o *= -1;
 					pSTR = pALL+pM0[o].iMNi;

@@ -229,6 +229,9 @@ public:
 		return *this;
 	}
 	gpcREG& operator = ( I4 i4 ) {
+		if( !i4 )
+			return off();
+
 		if( i4 < 0 )
 		{
 			i = i4;
