@@ -14,7 +14,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 		return NULL;
 
 	/// -------------------------------------
-	//return NULL;
+	return NULL;
 
 
 	static const U1 iMN=0;
@@ -24,18 +24,15 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	gpeEA mS, mD;
 	char	*pALL = (char*)SCOOP.pALL,
 			*pSTR;
-	I4		nSTR;
+	I4		nSTR, a;
 
 	gpcLZY	aMEM[0x10];
 	gpcREG	aA[8],
 			aD[8+2], *pSRC, *pDST, *pTMP;
-	gpcRES	*pDOT,
-			*pOUT = apOUT[3];
-	aA[7] = aA[6] = 0x400;
-	I4	a;
-	U8 nL;
-	gpcADR	adr;
-	gpcSRC	*pANS = NULL;
+
+	gpcPIK	PIK;
+	gpcO	*pDOT, *pOUT, wipO;
+	gpcSRC	*pANs;
 	char* pDIS = (char*)pDBG->p_alloc;
 	for( I4x4* pPCs = (I4x4*)SCOOP.vASM.p_alloc, *pPC = pPCs, *pPCe = pPC+SCOOP.nASM();
 			pPC < pPCe; pPC++ )
@@ -52,51 +49,41 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 			pDOT = NULL;
 			for(U4	ie = aD->i8(), ii=aA[7].i8(); ii<ie; ii++   )
 			{
-				pTMP = (gpcREG*)( aMEM[op.y&7].Ux(ii,sizeof(*aA)) );
+				pTMP = (gpcREG*)( aMEM[op.y&7].Ux(ii,sizeof(gpcREG)) );
 				I4 o = pTMP->i8();
 				if( o >= 0 )
 				{
-					gpcOBJlnk& obj = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
-					gpeTYP typ = obj.typ;
-					switch( obj.typ )
+					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
+					gpeTYP typ = O.typ;
+					gpeALF alf = O.obj.alf;
+					switch( O.typ )
 					{
 						case gpeTYP_sA8:
-							adr = obj.obj.alf;
 							if( pDOT )
 							{
-								adr = pDOT; // most kezdi keresni
-								if( !adr.pRM ) {
-									// OOPS! nem találta?
-									// akkor az egész cucc egy nagy büdös 0;
-									aA[0] = 0;
-									ii = ie;
-									continue;
-								}
-								if( pANS ? pANS->bSW&gpeMASSloopMSK : false )
+								pDOT = pDOT->fnd( PIK, wipO, alf );
+								if( pANs ? pANs->bSW&gpeMASSloopMSK : false )
 									bSW |= gpeMASSloopMSK;
-								aA[0] = adr.pRM->ALU( adr.iA );
+								//aA[0] = adr.pRM->ALU( adr.iA ).i8();
 								continue;
 							}
 							if( pOUT )
 							{
-								adr = pOUT;
-								if( adr.pRM )
-								{
-									aA[0] = adr.pRM->ALU( adr.iA );
-									continue;
-								}
+								pOUT = pOUT->fnd( PIK, wipO, alf );
+								continue;
 							}
-							if( win.WINvar( aA[0], adr.an.alf ) )
+							if( pWIN->WINvar( aA[0], alf ) )
 							{
 								// valamit kapott
 								bSW |= gpeMASSloopMSK;
-								pSTR = aA[0].getSTR();
+								pSTR = (char*)aA[0].getSTR();
 								continue;
 							}
-							pOUT = new gpcRES( pMOM );
+							/// ITT kell létrehozni ha nincsen
+							pOUT = pOUT->add( PIK, wipO, alf );
 							if( !pOUT )
 							{
-								aA[0].null();
+								aA[0] = 0;
 								ii = ie;
 								continue;
 							}

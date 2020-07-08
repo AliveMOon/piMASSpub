@@ -4,29 +4,7 @@
 
 #define OBJ SCOOP.obj
 
-//typedef enum gpeTYPsz:U1{
-//	gpeTYPsz_b,		//	0	1		00:00	byte
-//	gpeTYPsz_w,		//	1	2		00:01	word
-//	gpeTYPsz_l,		//	2	4		00:10	long
-//	gpeTYPsz_q,		//	3	8		00:11	quad
-//	/// olyan nincsen hogy float és nincs előjel
-//	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
-//	gpeTYPsz_rgba,	//  4   1x4		01:00	RGBA	pixel
-//	gpeTYPsz_utf8,	//  5   1->0	01:01	string
-//										//	12345678901234
-//	gpeTYPsz_alf,	//	6	8		01:10	ABCDEFGHIJKLMN
-//	gpeTYPsz_cell,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
-//	/// előjeles
-//	gpeTYPsz_sb,	//	8	1		10:00	signed byte
-//	gpeTYPsz_sw,	//	9	2		10:01	signed word
-//	gpeTYPsz_sl,	//	a	4		10:10	signed long
-//	gpeTYPsz_sq,	//	b	8		10:11	signed quad
-//	/// lebegőpontos
-//	gpeTYPsz_f,		//	c	4		11:00	float
-//	gpeTYPsz_d,		//  d	8		11:01	double
-//	gpeTYPsz_f4,	//	e	16		11:10	xyzw
-//	gpeTYPsz_d4,	//  f	32		11:11	double xyzw
-//} gpeTYPsz_U1;
+
 //static const char* gpasTYPsz[] = {
 //
 //	".b",		//	0	1		00:00	byte
@@ -51,30 +29,7 @@
 //	".f4",		//	e	16		11:10	xyzw
 //	".d4",		//  f	32		11:11	double xyzw
 //};
-//static const U1 gpaTYPsz[] = {
-//
-//	1,	//".b",		//	0	00:00	byte
-//	2,	//".w",		//	1	00:01	word
-//	4,	//".l",		//	2	00:10	long
-//	8,	//".q",		//	3	00:11	quad
-//	/// olyan nincsen hogy float és nincs előjel
-//	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
-//	4,	//"rgba.l",	//  4   01:00	RGBA	pixel
-//	1,	//"utf8.b",	//  5   01:01	string
-//										//	12345678901234
-//	8,	//"alf.q",	//	6	01:10	ABCDEFGHIJKLMN
-//	16,	//"ce.q2",	//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
-//	/// előjeles
-//	1,	//"s.b",	//	8	10:00	signed byte
-//	2,	//"s.w",	//	9	10:01	signed word
-//	4,	//"s.l",	//	a	10:10	signed long
-//	8,	//"s.q",	//	b	10:11	signed quad
-//	/// lebegőpontos
-//	4,	//".f",		//	c	11:00	float
-//	8,	//".d",		//  d	11:01	double
-//	16,	//".f4",	//	e	11:10	xyzw
-//	32,	//".d4",	//  f	11:11	double xyzw
-//};
+
 
 static const char* gps68kREG[] = {
 	"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
@@ -128,6 +83,142 @@ public:
 		return *this;
 	}
 
+};
+static const char* gpasTYPsz[] = {
+
+	".b",	//	0	1		00:00	byte
+	".w",	//	1	2		00:01	word
+	".l",	//	2	4		00:10	long
+	".q",	//	3	8		00:11	quad
+	/// olyan nincsen hogy float és nincs előjel
+	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+	".4",	//  4   1x4		01:00	RGBA	pixel
+	".u",	//  5   1->0	01:01	string
+										//	12345678901234
+	".a",	//	6	8		01:10	ABCDEFGHIJKLMN
+	".c",	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
+	/// előjeles
+	".B",	//	8	1		10:00	signed byte
+	".W",	//	9	2		10:01	signed word
+	".L",	//	a	4		10:10	signed long
+	".Q",	//	b	8		10:11	signed quad
+	/// lebegőpontos
+	".f",	//	c	4		11:00	float
+	".d",	//  d	8		11:01	double
+	".F",	//	e	16		11:10	xyzw
+	".K",	//  f	16		11:11	KID
+};
+typedef enum gpeCsz:U1{
+	gpeCsz_b,	//	0	1		00:00	byte
+	gpeCsz_w,	//	1	2		00:01	word
+	gpeCsz_l,	//	2	4		00:10	long
+	gpeCsz_q,	//	3	8		00:11	quad
+	/// olyan nincsen hogy float és nincs előjel (lglbb is itt)
+	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+	gpeCsz_4,	//  4   1x4		01:00	RGBA	pixel
+	gpeCsz_u,	//  5   1->0	01:01	string
+										//	12345678901234
+	gpeCsz_a,	//	6	8		01:10	ABCDEFGHIJKLMN
+	gpeCsz_C,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
+	/// előjeles
+	gpeCsz_B,	//	8	1		10:00	signed byte
+	gpeCsz_W,	//	9	2		10:01	signed word
+	gpeCsz_L,	//	a	4		10:10	signed long
+	gpeCsz_Q,	//	b	8		10:11	signed quad
+	/// lebegőpontos
+	gpeCsz_f,	//	c	4		11:00	float
+	gpeCsz_d,	//  d	8		11:01	double
+	gpeCsz_F,	//	e	16		11:10	xyzw
+	gpeCsz_K,	//  f	16		11:11	KID
+} gpeCsz_U1;
+static const U4 gpaCsz[] = {
+
+	1,	//".b",	//	0	00:00	byte
+	2,	//".w",	//	1	00:01	word
+	4,	//".l",	//	2	00:10	long
+	8,	//".q",	//	3	00:11	quad
+	/// olyan nincsen hogy float és nincs előjel
+	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+	4,	//".4",	//  4   01:00	RGBA	pixel
+	1,	//".u",	//  5   01:01	string
+										//	12345678901234
+	8,	//".a",	//	6	01:10	ABCDEFGHIJKLMN
+	16,	//".c",	//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
+	/// előjeles
+	1,	//".B",	//	8	10:00	signed byte
+	2,	//".W",	//	9	10:01	signed word
+	4,	//".L",	//	a	10:10	signed long
+	8,	//".Q",	//	b	10:11	signed quad
+	/// lebegőpontos
+	4,	//".f",	//	c	11:00	float
+	8,	//".d",	//  d	11:01	double
+	16,	//".F",	//	e	11:10	xyzw
+	16,	//".K",	//  f	11:11	KID
+};
+class gpcC /// CLASS
+{
+	/// ebben lehet bővebben
+	/// mert ez a CLASS a "leírás"
+public:
+	gpeALF	cNM;
+	gpeCsz	*pLST;
+	U1		 nLST;
+	U4		*pKiD, szOF;	// 16
+	gpcC(){}
+};
+
+
+
+
+class gpcPIK
+{
+public:
+	gpcLZY	cLST,	// CLASS LIST
+			oLST,	// OBJ LIST
+			oNMlst, // OBJ nm LIST
+			mem;	// foglalt memória
+	gpcPIK(){ gpmCLR; }
+};
+
+class gpcO /// OBJ
+{
+	/// ez a példány az osztályból
+	/// cID azonosítja mi van ebben
+public:
+	U1	*pTS;	/// a pointer a memóriára
+	U4	cID, dx, szOF;	// dy = szOF/([cID].szOF*dx)
+	gpcO(){}
+
+	gpcO* fnd( gpcPIK& pik, gpcO& wip, gpeALF a )
+	{
+		gpcO* pO = this;
+		if( !pO )
+		{
+			pO = gpmLZYvali( gpcO, &pik.oLST );
+			if( !pO )
+				return NULL;
+
+			gpeALF* pNM = gpmLZYvali( gpeALF, &pik.oNMlst );
+			for( U4 i = 0, n = pik.oLST.nLD(sizeof(*pO)); i < n; i++ ) {
+				if( a != pNM[i] )
+					continue;
+				return pO;
+			}
+			return NULL; // NINCS
+		}
+
+		gpcC* pC = gpmLZYvali( gpcC, &pik.cLST );
+		if( !pC )
+			return NULL;
+		pC += cID;
+
+
+		return NULL;
+	}
+	gpcO* add( gpcPIK& pik, gpcO& wip, gpeALF a )
+	{
+		return NULL;
+	}
 };
 
 #define PC (iPC=scp.nASM())

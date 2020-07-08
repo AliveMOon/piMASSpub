@@ -445,10 +445,6 @@ public:
 	{
 		if( an.w )
 			return an;
-		/*if( !pDAT )
-		{
-			return an.null();
-		}*/
 		if( !an.x )
 			an.x = 1;
 		if( !an.y )
@@ -490,10 +486,6 @@ public:
 	{
 		return typ().area_yz();
 	}
-	/*U4 nT1()
-	{
-		return 1<<(typ.x&0xf);
-	}*/
 	U4 nLOAD()
 	{
 		return AN().w;
@@ -517,6 +509,7 @@ public:
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 
+	gpcALU& operator = ( I4 a );
 	gpcALU& operator = ( gpcREG& a );
 	gpcALU& operator += ( gpcREG& a );
 	gpcALU& operator -= ( gpcREG& a );
@@ -530,19 +523,9 @@ public:
 	gpcALU& operator /= ( gpcALU& b );
 	gpcALU& operator %= ( gpcALU& b );
 
-
 	gpcALU& operator = ( U1* pSTR );
-
-	gpcALU& operator = ( gpeALF a ) {
-		null();
-		alf = a;
-		return *this;
-	}
-
-	gpcALU& operator = ( U4x2& u42 ) {
-		sub = u42;
-		return *this;
-	}
+	gpcALU& operator = ( gpeALF a ) { null(); alf = a; return *this; }
+	gpcALU& operator = ( U4x2& u42 ) { sub = u42; return *this; }
 
 	U8 u8() const {
 		if( this ? !pDAT : true )
@@ -750,8 +733,7 @@ class gpcRES {
 	U4x2	nISA;
 
 public:
-	gpcISA*	resISA( void )
-	{
+	gpcISA*	resISA( void ) {
 		if( !pISA )
 			nISA = 0;
 
@@ -819,30 +801,16 @@ public:
 		return pIS; //resISA();
 	}
 
-	gpcISA*	resISA_an( I8x2& an )
-	{
-		return resISA()->AN( an );
-	}
-	gpcISA*	resISA_var( gpeALF a )
-	{
-		return resISA()->var( a );
-	}
-	gpcISA*	resISA_tag( gpeALF a )
-	{
-		return resISA()->var( a, gpeISA_tag );
-	}
-
-	gpcISA*	resISA_str( gpcLZY& str )
-	{
-		return resISA()->str( str );
-	}
+	gpcISA*	resISA_an( I8x2& an ) { return resISA()->AN( an ); }
+	gpcISA*	resISA_var( gpeALF a ) { return resISA()->var( a ); }
+	gpcISA*	resISA_tag( gpeALF a ) { return resISA()->var( a, gpeISA_tag ); }
+	gpcISA*	resISA_str( gpcLZY& str ) { return resISA()->str( str ); }
 
 	U4 iL() { return iLEV; }
 	gpcRES* pRM() { return pMOM; }
 	gpcRES* null();
 
-	gpcRES( gpcRES* pM = NULL )
-	{
+	gpcRES( gpcRES* pM = NULL ){
         gpmCLR;
         if( !pM )
 			return;
@@ -851,8 +819,7 @@ public:
 		iLEV = pMOM->iLEV+1;
 	}
 
-	~gpcRES()
-	{
+	~gpcRES() {
 		null();
 	}
 

@@ -5878,7 +5878,7 @@ public:
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
 
-	size_t nLD() { return this ? n_load : 0; }
+	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
 	U4 nPC( void );
 	void wait( void ) {
 		if( !this )
@@ -6703,37 +6703,22 @@ public:
 		return this;
 	}
 
-	U4 x( void )
-	{
+	U4 x( void ) {
 		if( this ? !ix.n_load : true )
 			return 0;
 
 		return pIX-(U4x4*)ix.p_alloc;
 	}
-	U4 i_str(void)
-	{
-		if( !pIX )
-			return str.n_load;
-
-		return pIX->x;
-	}
-	char* p_str( void )
-	{
-		return (char*)str.p_alloc+pIX->x;
-	}
-	U8 nIX(void)
-	{
-		return this ? (ix.n_load / sizeof(U4x4)) : 0;
-	}
-	const char* sSTRix( U8 iX, const char* pER )
-	{
+	U4 i_str(void) { return pIX ? pIX->x : str.n_load; }
+	char* p_str( void ) { return (char*)str.p_alloc+pIX->x; }
+	U8 nIX(void) { return this ? (ix.n_load / sizeof(U4x4)) : 0; }
+	const char* sSTRix( U8 iX, const char* pER ) {
 		if( !this )
 			return pER;
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 		return (char*)(str.p_alloc + p_ix0[iX].x);
 	}
-	U4 nSTRix( U8 x )
-	{
+	U4 nSTRix( U8 x ) {
 		if( this ? x >= nIX() : true )
 			return 0;
 
