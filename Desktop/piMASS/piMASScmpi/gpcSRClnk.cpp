@@ -60,7 +60,61 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 	return n;
 }
 
+gpcO* gpcPIK::O( gpcO* pO, gpcO& dot, U4 nmID )
+{
+	if( !pO )
+	{
+		pO = gpmLZYvali( gpcO, &oLST );
+		for( U4 i = 0, n = oLST.nLD(sizeof(*pO)); i < n; i++ )
+		{
+			if( pO[i].nmID != nmID )
+				continue;
+			return pO+i;
+		}
+		return NULL;
+	}
 
+	if( &dot != pO )
+	{
+		dot = pO;
+		pO = &dot;
+	}
+
+	gpcC	*pC = gpmLZYvali( gpcC, &cLST )+dot.cID;
+	U4x4	*pCL = pC->pLST;
+	U4		*pKD = pC->pKID, szNM,
+			ary;
+	for( U4 i = 0, n = pC->nLST, iK = 0, off = 0; i < n; i++ )
+	{
+		szNM = pCL[i].x;
+		ary = pCL[i].y;
+		if( !ary )
+		{
+			ary = pCL[i].y = pCL[i].a4x2[1].area();
+			if( !ary )
+				ary = pCL[i].y = (pCL[i].a4x2[1] = 1).x;
+		}
+		if( (szNM>>4) != nmID )
+		{
+			// nem ez!
+			szNM &= 0xf;
+			if( szNM < gpeCsz_K )
+			{
+				off += ary*gpaCsz[szNM];
+				continue;
+			}
+
+			off += ary*gpmLZYvali( gpcC, &cLST )[pKD[iK]].szOF;
+			++iK;
+			continue;
+		}
+		dot.nmID = szNM;
+		dot.pALL += off;
+		dot.an = pCL[i].a4x2[1];
+		return &dot;
+	}
+	return NULL;
+}
 void gpcSRC::SRCmnMILLcoder(	//I8x2* pOP,
 								gpcLZYdct& dOP, U1 iMN ) {
 	if( !this )

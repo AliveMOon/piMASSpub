@@ -155,71 +155,69 @@ static const U4 gpaCsz[] = {
 	16,	//".F",	//	e	11:10	xyzw
 	16,	//".K",	//  f	11:11	KID
 };
-class gpcC /// CLASS
-{
+class gpcC {	/// CLASS
 	/// ebben lehet bővebben
 	/// mert ez a CLASS a "leírás"
 public:
-	gpeALF	cNM;
-	gpeCsz	*pLST;
-	U1		 nLST;
-	U4		*pKiD, szOF;	// 16
+	U4x4	*pLST; // pLST[i].x&0xf gpeCsz // pLST[i].x>>4 iOBJnm
+					// y = z*w = a4x2[1].area()
+	U4		*pKID, szOF, nLST;
+
 	gpcC(){}
 };
-
-
-
-
-class gpcPIK
-{
-public:
-	gpcLZY	cLST,	// CLASS LIST
-			oLST,	// OBJ LIST
-			oNMlst, // OBJ nm LIST
-			mem;	// foglalt memória
-	gpcPIK(){ gpmCLR; }
-};
-
 class gpcO /// OBJ
 {
 	/// ez a példány az osztályból
 	/// cID azonosítja mi van ebben
 public:
-	U1	*pTS;	/// a pointer a memóriára
-	U4	cID, dx, szOF;	// dy = szOF/([cID].szOF*dx)
+	U1		*pALL;	/// a pointer a memóriára
+	U4		nmID, cID, szOF, nA;	// dy = szOF/([cID].szOF*dx)
+									// ha nA == 0 nem saját mem a pALL-ben
+	U4x2	an;
 	gpcO(){}
-
-	gpcO* fnd( gpcPIK& pik, gpcO& wip, gpeALF a )
-	{
-		gpcO* pO = this;
-		if( !pO )
-		{
-			pO = gpmLZYvali( gpcO, &pik.oLST );
-			if( !pO )
-				return NULL;
-
-			gpeALF* pNM = gpmLZYvali( gpeALF, &pik.oNMlst );
-			for( U4 i = 0, n = pik.oLST.nLD(sizeof(*pO)); i < n; i++ ) {
-				if( a != pNM[i] )
-					continue;
-				return pO;
-			}
-			return NULL; // NINCS
-		}
-
-		gpcC* pC = gpmLZYvali( gpcC, &pik.cLST );
-		if( !pC )
-			return NULL;
-		pC += cID;
-
-
-		return NULL;
+	~gpcO(){
+		if(!nA)
+			return;
+		gpmDELary(pALL);
 	}
-	gpcO* add( gpcPIK& pik, gpcO& wip, gpeALF a )
+
+	gpcO& operator = ( const gpcO& a )
+	{
+		/// EZ komplet másolat
+		gpmMcpyOF( this, &a, 1 );
+		nA = gpmPAD( szOF+1, 0x10 );
+		pALL = new U1[nA+1];
+		gpmMcpy( pALL, a.pALL, szOF )[szOF]=0;
+		return *this;
+	}
+
+	gpcO& operator = ( const gpcO* pA )
+	{
+		/// EZ referencia átadással müxik
+		/// nem szabad törölni a pALL-t mert másé
+		gpmMcpyOF( this, pA, 1 );
+		nA = 0;
+		return *this;
+	}
+
+};
+
+class gpcPIK {
+public:
+	gpcLZY	cLST,	// CLASS LIST
+			oLST,	// OBJ LIST
+			//oNMlst, // OBJ nm LIST
+			mem;	// foglalt memória
+
+	gpcPIK(){ gpmCLR; }
+	gpcO* O( gpcO* pO, gpcO& dot, U4 nID );
+	gpcO* add( gpcO* pO, gpcO& dot, U4 nID )
 	{
 		return NULL;
 	}
 };
+
+
 
 #define PC (iPC=scp.nASM())
 #define CDC (CD()[0])

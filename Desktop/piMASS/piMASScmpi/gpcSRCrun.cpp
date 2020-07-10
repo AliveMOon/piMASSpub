@@ -14,24 +14,33 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 		return NULL;
 
 	/// -------------------------------------
-	return NULL;
+	 ///return NULL;
 
 
 	static const U1 iMN=0;
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	U1	//Xs,
-		Ys, Xd, Yd, bOBs = false, bOBd = false;
+		Ys, Xd, Yd, bOBs = false, bOBd = false, iS, iD, sz;
 	gpeEA mS, mD;
 	char	*pALL = (char*)SCOOP.pALL,
 			*pSTR;
 	I4		nSTR, a;
 
 	gpcLZY	aMEM[0x10];
-	gpcREG	aA[8],
-			aD[8+2], *pSRC, *pDST, *pTMP;
+	I8		*pSRC, *pDST, sNUM, dNUM,
+			aA[8*4],
+			*pD = aA+8,
+			*pC = pD+8;
+	double	*pF = (double*)(pC+8);
+	gpmZ(aA);
+
+	aA[6] = 0x3ff;
+	aA[7] = 0x400;
+
+	gpcREG wVAR;
 
 	gpcPIK	PIK;
-	gpcO	*pDOT, *pOUT, wipO;
+	gpcO	*pDOT = NULL, wip0; //, *pOUT = NULL, wipO;
 	gpcSRC	*pANs;
 	char* pDIS = (char*)pDBG->p_alloc;
 	for( I4x4* pPCs = (I4x4*)SCOOP.vASM.p_alloc, *pPC = pPCs, *pPCe = pPC+SCOOP.nASM();
@@ -39,18 +48,19 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	{
 		pDIS += gpmVAN( pDIS, "\r\n", nL );
 		pDIS += gpmNINCS( pDIS, "\r\n" );
-		U1x4 op = //*(U1x4*)&
-					pPC->op;
-		if( !op.x ) // nop
+		U1x4 op = pPC->op;
+		gpeOPid oID = (gpeOPid)op.x;
+		if( !oID ) // nop
 			continue;
-		else if( op.x == gpeOPid_dot )
-		{
+		iS = op.y&7;
+		sz = pPC->sz;
+		if( oID == gpeOPid_dot ) {
+			/// jsr entryOBJ2A0
 			// keressük meg az OBJ-t
 			pDOT = NULL;
-			for(U4	ie = aD->i8(), ii=aA[7].i8(); ii<ie; ii++   )
+			for( U4 ie = pD[0], ii=aA[7]; ii<ie; ii++ )
 			{
-				pTMP = (gpcREG*)( aMEM[op.y&7].Ux(ii,sizeof(gpcREG)) );
-				I4 o = pTMP->i8();
+				I4 o = *(I8*)( aMEM[iS].Ux(ii,sizeof(I8)) );
 				if( o >= 0 )
 				{
 					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
@@ -61,35 +71,29 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 						case gpeTYP_sA8:
 							if( pDOT )
 							{
-								pDOT = pDOT->fnd( PIK, wipO, alf );
+								pDOT = PIK.O( pDOT, wip0, o );
 								if( pANs ? pANs->bSW&gpeMASSloopMSK : false )
 									bSW |= gpeMASSloopMSK;
-								//aA[0] = adr.pRM->ALU( adr.iA ).i8();
 								continue;
 							}
-							if( pOUT )
-							{
-								pOUT = pOUT->fnd( PIK, wipO, alf );
-								continue;
-							}
-							if( pWIN->WINvar( aA[0], alf ) )
+
+							if( pWIN->WINvar( wVAR, alf ) )
 							{
 								// valamit kapott
 								bSW |= gpeMASSloopMSK;
-								pSTR = (char*)aA[0].getSTR();
+								pSTR = (char*)wVAR.getSTR();
 								continue;
 							}
 							/// ITT kell létrehozni ha nincsen
-							pOUT = pOUT->add( PIK, wipO, alf );
-							if( !pOUT )
+							pDOT = PIK.add( pDOT, wip0, o );
+							if( !pDOT )
 							{
 								aA[0] = 0;
 								ii = ie;
 								continue;
 							}
-
+							aA[0] = (I8)pDOT;
 							continue;
-
 					}
 				} else {
 					o *= -1;
@@ -110,43 +114,43 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 				pSRC = NULL;
 				continue;
 			case gpeEA_Dn:
-				pSRC = aD+(op.y&7);
+				pSRC = pD+iS;
 				break;
 			case gpeEA_An:
-				pSRC = aA+(op.y&7);
+				pSRC = aA+iS;
 				break;
 			case gpeEA_IAnI:
-				pSRC = (gpcREG*)( aMEM[op.y&7].Ux( aA[op.y&7].i8(),sizeof(*aA)) );
+				pSRC = (I8*)( aMEM[iS].Ux( aA[iS],sizeof(*aA)) );
 				break;
 			case gpeEA_IAnIp:
-				pSRC = (gpcREG*)( aMEM[op.y&7].Ux( aA[op.y&7].i8(),sizeof(*aA)) );
-				++aA[op.y&7];
+				pSRC = (I8*)( aMEM[iS].Ux( aA[iS],sizeof(*aA)) );
+				++aA[iS];
 				break;
 			case gpeEA_sIAnI:
-				--aA[op.y&7];
-				pSRC = (gpcREG*)( aMEM[op.y&7].Ux( aA[op.y&7].i8(),sizeof(*aA)) );
+				--aA[iS];
+				pSRC = (I8*)( aMEM[iS].Ux( aA[iS],sizeof(*aA)) );
 				break;
 			case gpeEA_d16IAnI:
-				a = aA[op.y&7].i8() + pPC->aOB[0];
-				pSRC = (gpcREG*)( aMEM[op.y&7].Ux( a,sizeof(*aA)) );
+				a = aA[iS] + pPC->aOB[0];
+				pSRC = (I8*)( aMEM[iS].Ux( a,sizeof(*aA)) );
 				break;
 			case gpeEA_d16IAnDnI:
-				a = aA[op.y&7].i8() + pPC->aOB[0] + aD[op.w&7].i8();
-				pSRC = (gpcREG*)( aMEM[op.y&7].Ux( a,sizeof(*aA)) );
+				a = aA[iS] + pPC->aOB[0] + pD[op.w&7];
+				pSRC = (I8*)( aMEM[iS].Ux( a,sizeof(*aA)) );
 				break;
 			case gpeEA_d16IPcI:
 				/*a = (pPC-pPCs)+pPC->aOB[0];
-				pSRC = &(aRES[op.y&7].ALU(a));
+				pSRC = &(aRES[iS].ALU(a));
 				break;*/
 			case gpeEA_d16IPcDnI:
 				pSRC = NULL;
 				break;
 				/*a = (pPC-pPCs)+pPC->aOB[0]+aD[op.w&7].i8();
-				pSRC = &(aRES[op.y&7].ALU(a));
+				pSRC = &(aRES[iS].ALU(a));
 				break;*/
 			case gpeEA_num:
 			default:{
-				pSRC = &(aD[8]=*pPC->aOB);
+				pSRC = &(sNUM=*pPC->aOB);
 				/*if( ob >= 0 )
 					NUM = (gpcOBJlnk*)OBJ.Ux( ob, sizeof(gpcOBJlnk));
 				else {
@@ -163,34 +167,35 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 		}
 
 		mD = (gpeEA)(op.z>>3);
+		iD = op.z&7;
 		switch( mD ) {
 			case gpeEA_OFF:
 				pDST = NULL;
 				continue;
 			case gpeEA_Dn:
-				pDST = aD+(op.z&7);
+				pDST = pD+iD;
 				break;
 			case gpeEA_An:
-				pDST = aA+(op.z&7);
+				pDST = aA+iD;
 				break;
 			case gpeEA_IAnI:
-				pDST = (gpcREG*)( aMEM[op.z&7].Ux( aA[op.z&7].i8(),sizeof(*aA)) );
+				pDST = (I8*)( aMEM[iD].Ux( aA[iD],sizeof(*aA)) );
 				break;
 			case gpeEA_IAnIp:
-				pDST = (gpcREG*)( aMEM[op.z&7].Ux( aA[op.z&7].i8(),sizeof(*aA)) );
-				++aA[op.z&7];
+				pDST = (I8*)( aMEM[iD].Ux( aA[iD],sizeof(*aA)) );
+				++aA[iD];
 				break;
 			case gpeEA_sIAnI:
-				--aA[op.z&7];
-				pDST = (gpcREG*)( aMEM[op.z&7].Ux( aA[op.z&7].i8(),sizeof(*aA)) );
+				--aA[iD];
+				pDST = (I8*)( aMEM[iD].Ux( aA[iD],sizeof(*aA)) );
 				break;
 			case gpeEA_d16IAnI:
-				a = aA[op.z&7].i8() + pPC->aOB[0];
-				pDST = (gpcREG*)( aMEM[op.z&7].Ux( a,sizeof(*aA)) );
+				a = aA[iD] + pPC->aOB[0];
+				pDST = (I8*)( aMEM[iD].Ux( a,sizeof(*aA)) );
 				break;
 			case gpeEA_d16IAnDnI:
-				a = aA[op.z&7].i8() + pPC->aOB[0] + aD[op.w>>4].i8();
-				pDST = (gpcREG*)( aMEM[op.z&7].Ux( a,sizeof(*aA)) );
+				a = aA[iD] + pPC->aOB[0] + pD[op.w>>4];
+				pDST = (I8*)( aMEM[iD].Ux( a,sizeof(*aA)) );
 				break;
 			case gpeEA_d16IPcI:
 			case gpeEA_d16IPcDnI:
@@ -198,7 +203,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 				break;
 			case gpeEA_num:
 			default:{
-				pDST = &(aD[9]=*pPC->aOB);
+				pDST = &(dNUM=*pPC->aOB);
 			} break;
 		}
 
@@ -208,10 +213,10 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 			continue;
 		}
 
-		switch( gpaOPgrp[op.x] )
+		switch(gpaOPgrp[oID])
 		{
 			case gpeOPid_entry:{
-					switch( (gpeOPid)op.x )
+					switch(oID)
 					{
 						case gpeOPid_dot:
 							// find OBJ
@@ -223,32 +228,74 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 			case gpeOPid_mov:{
 					if( !pDST || !pSRC )
 						continue;
-
-					*pDST = *pSRC;
+					switch(oID)
+					{
+						case gpeOPid_mov:
+							*pDST = *pSRC;
+							continue;
+						default:
+							*pDST = *pSRC;
+							continue;
+					}
 				} continue;
 			case gpeOPid_mul:{
 					if( !pDST || !pSRC )
 						continue;
-
-					*pDST *= *pSRC;
+					switch(oID)
+					{
+						case gpeOPid_and:
+							*pDST &= *pSRC;
+							continue;
+						case gpeOPid_rem:
+							*pDST %= *pSRC;
+							continue;
+						case gpeOPid_div:
+							*pDST /= *pSRC;
+							continue;
+						case gpeOPid_mul:
+							*pDST *= *pSRC;
+							continue;
+						default:
+							*pDST *= *pSRC;
+							continue;
+					}
 				} continue;
 			case gpeOPid_add:{
 					if( !pDST || !pSRC )
 						continue;
 
-					*pDST += *pSRC;
+					switch(oID)
+					{
+						case gpeOPid_or:
+							*pDST |= *pSRC;
+							continue;
+						case gpeOPid_sub:
+							*pDST -= *pSRC;
+							continue;
+						case gpeOPid_add:
+							*pDST += *pSRC;
+							continue;
+						default:
+							*pDST += *pSRC;
+							continue;
+					}
 				} continue;
 			case gpeOPid_sub:{
 					if( !pDST || !pSRC )
 						continue;
+					switch(oID)
+					{
 
-					*pDST -= *pSRC;
+						default:
+							pD[9] = *pDST == *pSRC;
+							continue;
+					}
 				} continue;
 		}
 
 
 	}
-	U4 i = 0x400, ie = aA[6].i8();
+	U4 i = 0x400, ie = aA[6];
 	while( i >= ie )
 	{
 		i--;

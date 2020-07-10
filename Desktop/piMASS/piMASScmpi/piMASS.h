@@ -370,7 +370,7 @@ SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 
 inline U1* gpfSTR( U1* pSTR, const U1* pU )
 {
-	if(pSTR == pU)
+	if(pSTR == pU)	/// ha mindkető NULL akkor is kész
 		return pSTR;
 
 	U8 nSTR = gpmSTRLEN(pSTR), nU = gpmSTRLEN( pU );
@@ -1385,7 +1385,7 @@ public:
 	{
 		struct
 		{
-			U4 x,y;
+			U2 x,y;
 		};
 		struct
 		{
@@ -1402,35 +1402,6 @@ public:
     {
         x = _x; y = _y;
     }
-	// cnt = fract * U4x2(1, w);
-	/*U4x2& cnt2fract(U4 w, U8 cnt)
-	{
-		U1 lg = log2(w * w);
-		w = 1<<(lg/2);
-		U8 X = w * w;
-		cnt %= X;
-		null();
-
-		while( cnt )
-		{
-			w >>= 1;
-			switch(cnt&3)
-			{
-				case 1:
-					x += w;
-					y += w;
-					break;
-				case 2:
-					x += w;
-					break;
-				case 3:
-					y += w;
-					break;
-			}
-			cnt >>= 2;
-		}
-		return *this;
-	}*/
 
 	U2x2& null( void )
 	{

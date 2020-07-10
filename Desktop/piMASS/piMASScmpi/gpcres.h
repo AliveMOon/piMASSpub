@@ -188,28 +188,24 @@ public:
 	U4x2	xy;		//	8	8
 
 	gpcREG(){ bD = 0; };
-	~gpcREG()
-	{
+	~gpcREG() {
 		if( bD.u4 == gpeTYP_STR )
 			gpmDELary( pSTR );
 	}
-	gpcREG& bad()
-	{
+	gpcREG& bad() {
 		u = 1;
 		i = -1;
 		d = 0.1;
 		bD.u4 = 0;
 		return *this;
 	}
-	gpcREG& off()
-	{
+	gpcREG& off() {
 		if( bD.u4 == gpeTYP_STR )
 				gpmDELary( pSTR );
 		gpmCLR;
 		return *this;
 	}
-	U1* getSTR()
-	{
+	U1* getSTR() {
 		if( this ? !pSTR : true )
 			return NULL;
 		U1* pS = pSTR;
@@ -243,7 +239,7 @@ public:
 		bD.u4 = gpeTYP_U4;
 		return *this;
 	}
-	gpcREG& operator = ( float f4 ){
+	gpcREG& operator = ( float f4 ) {
 		i = (d = f4);
 		bD.u4 = ( f4 < 0.0 ) ? gpeTYP_I4 : 0;
 		if( bD.u4 || ((float)i != f4) ) // neg? || float?
@@ -298,16 +294,14 @@ public:
 
 	gpcREG operator --() { return *this = i8()-1; }
 	gpcREG operator ++() { return *this = i8()+1; }
-	gpcREG& operator = ( const gpcREG& b )
-	{
+	gpcREG& operator = ( const gpcREG& b ) {
 		if( &b == this )
 			return *this;
 		gpmMcpy( this, &b, sizeof(*this) );
 		pSTR = gpfSTR( NULL, b.pSTR );
 		return *this;
 	}
-	gpcREG& operator += ( gpcREG& b )
-	{
+	gpcREG& operator += ( gpcREG& b ) {
 		if( bD.x&0x40 || b.bD.x&0x40 )
 			return *this = d8()+b.d8();
 
@@ -316,8 +310,7 @@ public:
 
 		return *this = u8()+b.u8();
 	}
-	gpcREG& operator -= ( gpcREG& b )
-	{
+	gpcREG& operator -= ( gpcREG& b ) {
 		if( bD.x&0x40 || b.bD.x&0x40 )
 			return *this = d8()-b.d8();
 
@@ -326,8 +319,7 @@ public:
 
 		return *this = u8()-b.u8();
 	}
-	gpcREG& operator *= ( gpcREG& b )
-	{
+	gpcREG& operator *= ( gpcREG& b ) {
 		if( bD.x&0x40 || b.bD.x&0x40 )
 			return *this = d8()*b.d8();
 
@@ -336,21 +328,19 @@ public:
 
 		return *this = u8()*b.u8();
 	}
-	gpcREG& operator /= ( gpcREG& b )
-	{
-		return *this = d8()/b.d8();
-	}
+	gpcREG& operator /= ( gpcREG& b ) { return *this = d8()/b.d8(); }
+	gpcREG& operator %= ( gpcREG& b ) { return *this = i8()%b.i8(); }
+	gpcREG& operator |= ( gpcREG& b ) { return *this = u8()|b.u8(); }
+	gpcREG& operator &= ( gpcREG& b ) { return *this = u8()&b.u8(); }
 
-
-
-	U8 u8()
-	{
+	bool	operator == ( gpcREG& b ) { return (d8()-b.d8()) == 0.0;  }
+	bool	operator != ( gpcREG& b ) { return !(*this==b);  }
+	U8 u8() {
 		if( this ? !bD.x : true )
 			return 0;
 		return u;
 	}
-	I8 i8()
-	{
+	I8 i8() {
 		if( this ? !bD.x : true )
 			return 0;
 
@@ -360,8 +350,7 @@ public:
 		return u;
 
 	}
-	double d8()
-	{
+	double d8() {
 		if( this ? !bD.x : true )
 			return 0.0;
 		if( bD.u4&0xf0)
@@ -369,14 +358,8 @@ public:
 
 		return u;
 	}
-	bool bGD()
-	{
-		return bD.x; //.u4&0x1f;
-	}
-	I1 t()
-	{
-		return bD.x;
-	}
+	bool bGD() { return bD.x; }
+	I1 t() { return bD.x; }
 
 };
 
