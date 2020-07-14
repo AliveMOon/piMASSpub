@@ -71,7 +71,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 						case gpeTYP_sA8:
 							if( pDOT )
 							{
-								pDOT = PIK.O( pDOT, wip0, o );
+								pDOT = PIK.fnd( pDOT, wip0, o );
 								if( pANs ? pANs->bSW&gpeMASSloopMSK : false )
 									bSW |= gpeMASSloopMSK;
 								continue;

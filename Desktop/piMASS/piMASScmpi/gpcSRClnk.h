@@ -161,7 +161,7 @@ class gpcC {	/// CLASS
 public:
 	U4x4	*pLST; // pLST[i].x&0xf gpeCsz // pLST[i].x>>4 iOBJnm
 					// y = z*w = a4x2[1].area()
-	U4		*pKID, szOF, nLST;
+	U4		*pKID, szOF, nLST, mom;
 
 	gpcC(){}
 };
@@ -184,20 +184,33 @@ public:
 	gpcO& operator = ( const gpcO& a )
 	{
 		/// EZ komplet másolat
+		U1* pD = pALL;
+		U4 	nD = nA;
+
 		gpmMcpyOF( this, &a, 1 );
+
 		nA = gpmPAD( szOF+1, 0x10 );
-		pALL = new U1[nA+1];
+		if( nD < nA )
+		{
+			gpmDELary(pD);
+			pALL = new U1[nA+1];
+		} else {
+			pALL = pD;
+			nA = nD;
+		}
 		gpmMcpy( pALL, a.pALL, szOF )[szOF]=0;
 		return *this;
 	}
 
-	gpcO& operator = ( const gpcO* pA )
+	gpcO* operator = ( const gpcO* pA )
 	{
+		if( this == pA )
+			return this;
 		/// EZ referencia átadással müxik
 		/// nem szabad törölni a pALL-t mert másé
 		gpmMcpyOF( this, pA, 1 );
 		nA = 0;
-		return *this;
+		return this;
 	}
 
 };
@@ -208,12 +221,34 @@ public:
 			oLST,	// OBJ LIST
 			//oNMlst, // OBJ nm LIST
 			mem;	// foglalt memória
+	U4 dcmID, dckID;
 
-	gpcPIK(){ gpmCLR; }
-	gpcO* O( gpcO* pO, gpcO& dot, U4 nID );
-	gpcO* add( gpcO* pO, gpcO& dot, U4 nID )
+	gpcPIK(){ gpmCLR; dcmID = dckID = gpeCsz_L; } // gpeCsz_L kb. int
+	gpcO* fnd( gpcO* pM, gpcO& dot, U4 nmID );
+	gpcO* add( gpcO* pM, gpcO& dot, U4 nmID )
 	{
-		return NULL;
+		if( !pM )
+		{
+			U4 i = oLST.nLD(sizeof(*pM));
+			pM = (gpcO*)oLST.Ux( i, sizeof(*pM) );
+			// deklarácio most csak a nevének az ID-jét tudjunk
+			gpmZ(*pM);
+			pM->nmID = nmID;
+			pM->cID = dcmID;
+			return pM;
+		}
+		gpcO* pO = NULL;
+
+		if( &dot != pO ) {
+			dot = pO;
+			pO = &dot;
+		}
+
+
+
+
+
+		return pO;
 	}
 };
 

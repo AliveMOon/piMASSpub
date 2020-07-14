@@ -60,9 +60,10 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
 	return n;
 }
 
-gpcO* gpcPIK::O( gpcO* pO, gpcO& dot, U4 nmID )
+gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID )
 {
-	if( !pO )
+	gpcO* pO = NULL;
+	if( !pM )
 	{
 		pO = gpmLZYvali( gpcO, &oLST );
 		for( U4 i = 0, n = oLST.nLD(sizeof(*pO)); i < n; i++ )
@@ -74,11 +75,7 @@ gpcO* gpcPIK::O( gpcO* pO, gpcO& dot, U4 nmID )
 		return NULL;
 	}
 
-	if( &dot != pO )
-	{
-		dot = pO;
-		pO = &dot;
-	}
+	pO = (dot=pM);
 
 	gpcC	*pC = gpmLZYvali( gpcC, &cLST )+dot.cID;
 	U4x4	*pCL = pC->pLST;
@@ -115,8 +112,7 @@ gpcO* gpcPIK::O( gpcO* pO, gpcO& dot, U4 nmID )
 	}
 	return NULL;
 }
-void gpcSRC::SRCmnMILLcoder(	//I8x2* pOP,
-								gpcLZYdct& dOP, U1 iMN ) {
+void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
