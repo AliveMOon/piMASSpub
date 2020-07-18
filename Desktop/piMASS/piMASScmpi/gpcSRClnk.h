@@ -159,14 +159,13 @@ class gpcC {	/// CLASS
 	/// ebben lehet bővebben
 	/// mert ez a CLASS a "leírás"
 public:
-	U4x4	*pLST; // pLST[i].x&0xf gpeCsz // pLST[i].x>>4 iOBJnm
-					// y = z*w = a4x2[1].area()
-	U4		*pKID, szOF, nLST, mom;
+	U4x4	*pLST;	/// pLST[i].x&0xf gpeCsz // pLST[i].x>>4 iCnm 28bit 64millio
+					/// y = z*w = a4x2[1].area()
+	U4		*pKID, szOF, nLST;
 
 	gpcC(){}
 };
-class gpcO /// OBJ
-{
+class gpcO { /// OBJ
 	/// ez a példány az osztályból
 	/// cID azonosítja mi van ebben
 public:
@@ -174,15 +173,14 @@ public:
 	U4		nmID, cID, szOF, nA;	// dy = szOF/([cID].szOF*dx)
 									// ha nA == 0 nem saját mem a pALL-ben
 	U4x2	an;
-	gpcO(){}
+	gpcO(){ gpmCLR; }
 	~gpcO(){
 		if(!nA)
 			return;
 		gpmDELary(pALL);
 	}
 
-	gpcO& operator = ( const gpcO& a )
-	{
+	gpcO& operator = ( const gpcO& a ) {
 		/// EZ komplet másolat
 		U1* pD = pALL;
 		U4 	nD = nA;
@@ -219,18 +217,30 @@ class gpcPIK {
 public:
 	gpcLZY	cLST,	// CLASS LIST
 			oLST,	// OBJ LIST
-			//oNMlst, // OBJ nm LIST
 			mem;	// foglalt memória
 	U4 dcmID, dckID;
 
 	gpcPIK(){ gpmCLR; dcmID = dckID = gpeCsz_L; } // gpeCsz_L kb. int
+	U4 szOF( U4 sz )
+	{
+		if(sz<gpeCsz_K)
+			return gpaCsz[sz];
+		gpcC *pC = gpmLZYvali( gpcC, &cLST );
+		if( !pC )
+			return 0;
+		sz-=gpeCsz_K;
+		if( sz >= cLST.nLD(sizeof(*pC)) )
+			return 0;
+
+		return pC[sz].szOF;
+	}
 	gpcO* fnd( gpcO* pM, gpcO& dot, U4 nmID );
 	gpcO* add( gpcO* pM, gpcO& dot, U4 nmID )
 	{
 		if( !pM )
 		{
-			U4 i = oLST.nLD(sizeof(*pM));
-			pM = (gpcO*)oLST.Ux( i, sizeof(*pM) );
+			U4 iO = oLST.nLD(sizeof(*pM));
+			pM = (gpcO*)oLST.Ux( iO, sizeof(*pM) );
 			// deklarácio most csak a nevének az ID-jét tudjunk
 			gpmZ(*pM);
 			pM->nmID = nmID;
@@ -244,15 +254,117 @@ public:
 			pO = &dot;
 		}
 
+		gpcC *pCm = gpmLZYvali( gpcC, &cLST );
+		if( !pCm )
+			return NULL;
+		pCm += pM->cID;
+		if( pM->cID == dckID  )
+		{
+			/// nem lehet c ben c
+		}
+		/*pC->nmID = nmID;
+		pC->cID = dckID;*/
 
 
 
 
 		return pO;
 	}
+
 };
 
+class gpC {
+public:
+	U4x4	*pLST;	/// pLST[i].x&0xf gpeCsz // pLST[i].x>>4 iCnm 28bit 64millio
+					/// y = z*w = a4x2[1].area()
+	U2		*pKID, nLST;
+	U4		sOF;
 
+	gpC(){}
+};
+
+class gpO {
+public:
+
+	U2	iNM,	// 0	// name id
+		iC,		// 2	// class id
+		iD,		// 4	// dim id	// 0 1x1
+		iM;		// 6	// mom id	// szülő kapcsota
+
+	U4	iX;		// 8	// index
+				// 12	szOF
+
+
+
+	gpO(){}
+	gpO& operator = ( const gpO& b )
+	{
+		gpmMcpyOF( this, b, 1 );
+		return *this;
+	}
+};
+
+class gpCORE {
+public:
+	gpcLZY	amLST[0x11],	// mem data
+			cLST,			// OBJ LIST
+			dLST,
+			oLST;			// CLASS LIST
+	U4		pc, nPC;
+	I4x4	*pALL, *pPC;
+	I4x2	aR[8*4];
+
+
+	gpCORE(){ gpmCLR; }
+	I4x4* ini( I4x4* pA, U4 n, I4x2** ppA, I4x2** ppD ) {
+		nPC = n;
+		if( pALL != pA )
+		{
+			gpmZ(apR);
+			pc = 0;
+		}
+		if( !pA )
+			pc = nPC;
+		if( ppA )
+			*ppA = aR;
+		if( ppD )
+			*ppD = aR+8;
+		pALL = pA;
+		return pALL+pc;
+	}
+	I4x4* iPC( 	U1x4& op, gpeOPid& oID,
+				U1& iS, gpeEA& mS,
+				U1& iD, gpeEA& mD,
+				U4& szOF
+			) {
+		if( pPC == pALL+pc )
+			pc<nPC ? pALL+pc : NULL;
+
+		pPC = pALL+pc;
+
+		op = pPC->op;
+		oID = (gpeOPid)op.x;
+		if( !oID ) // nop
+			return NULL;
+
+		iS = op.y&7;
+		mS = (gpeEA)(op.y>>3);
+
+		iD = op.z&7;
+		mD = (gpeEA)(op.z>>3);
+		szOF = gpaEAsz[pPC->sz];
+
+		return pPC;
+	}
+	gpO* adr( const I4x2& ix )
+	{
+		if( ix.x < 0x10 )
+			return gpmLZYvali( gpO, amLST[ix.x] );
+
+		return  (gpO*)oLST.Ux( ix.y,sizeof(gpO*));
+	}
+
+};
 
 #define PC (iPC=scp.nASM())
 #define CDC (CD()[0])

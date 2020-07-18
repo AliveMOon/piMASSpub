@@ -77,7 +77,11 @@ gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID )
 
 	pO = (dot=pM);
 
-	gpcC	*pC = gpmLZYvali( gpcC, &cLST )+dot.cID;
+	gpcC* pC = gpmLZYvali( gpcC, &cLST );
+	if( !pC )
+		return NULL;
+
+	pC += dot.cID;
 	U4x4	*pCL = pC->pLST;
 	U4		*pKD = pC->pKID, szNM,
 			ary;

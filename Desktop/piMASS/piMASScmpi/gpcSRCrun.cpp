@@ -13,14 +13,116 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	if( !pDBG->nLD() )
 		return NULL;
 
+	static const U1 iMN=0;
+	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
+	char* pDIS = (char*)pDBG->p_alloc;
+	gpCORE core;
+	I4x4	*pPC;
+	U8		*pA, *pD;
+	I8		sNUM, dNUM,
+	U1		*pS, *pD;
+	U1x4 op;
+	gpeOPid oID;
+	U1 iS, iD;
+	gpeEA mS, mD;
+	U4 szOF;
+
+	for(	core.ini(
+						(I4x4*)SCOOP.vASM.p_alloc,SCOOP.nASM(),
+						&pA, &pD
+					);
+			core.pc < core.nPC;
+			core.pc++ )
+	{
+		pDIS += gpmVAN( pDIS, "\r\n", nL );
+		pDIS += gpmNINCS( pDIS, "\r\n" );
+		pPC = core.iPC( op, oID, iS, mS, iD, mD, szOF );
+		if( !pPC )
+			continue; // NOP?
+
+		if( oID == gpeOPid_dot ) {
+
+			continue;
+		}
+
+		switch( mS ) {
+			case gpeEA_OFF:
+				pS = NULL;
+				continue;
+			case gpeEA_Dn:
+				pS = pD+iS; // pD[iS];
+				break;
+			case gpeEA_An:
+				pS = pA+iS;
+				break;
+			case gpeEA_IAnI:
+				pS = core.ea( pA[iS] );
+				break;
+			case gpeEA_IAnIp:
+				pS = core.ea( 0, pA[iS] );
+				pA[iS] += szOF;
+				break;
+			case gpeEA_sIAnI:
+				pA[iS] += szOF;
+				pS = core.ea( 0, pA[iS] );
+				break;
+			case gpeEA_d16IAnI:
+				pS = core.ea( pPC->aOB[0], pA[iS] );
+				break;
+			case gpeEA_d16IAnDnI:
+				pS = core.ea( pPC->aOB[0] + pD[op.w&7], pA[iS] );
+				break;
+			case gpeEA_d16IPcI:
+				pS = pPC->aOB[0]+(I8)pPC;
+				break;
+
+			case gpeEA_d16IPcDnI:
+				pS = pPC->aOB[0]+pD[op.w&7]+(I8)pPC;
+				break;
+
+			case gpeEA_num:
+			default:{
+				pS = (U1*)&(sNUM=*pPC->aOB);
+				/*if( ob >= 0 )
+					NUM = (gpcOBJlnk*)OBJ.Ux( ob, sizeof(gpcOBJlnk));
+				else {
+					ob *= -1;
+					if(pM0[ob].iMNn)
+					{
+						NUM = ? pALL+pM0[ob].iMNi
+					} else
+						NUM.zero();
+
+				}*/
+
+			} break;
+		}
+
+	}
+
+
+	return NULL;
+
+}
+
+gpcRES* gpcSRC::SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
+	if( !this )
+		return NULL;
+
+	SRCmnMILLdbg( //pMASS->aOP,
+					pMASS->OPER, 0 );
+	if( !pDBG->nLD() )
+		return NULL;
+
 	/// -------------------------------------
-	 ///return NULL;
+	 /// return NULL;
 
 
 	static const U1 iMN=0;
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
 	U1	//Xs,
-		Ys, Xd, Yd, bOBs = false, bOBd = false, iS, iD, sz;
+		Ys, Xd, Yd, bOBs = false, bOBd = false, iS, iD, //sz,
+		szOF;
 	gpeEA mS, mD;
 	char	*pALL = (char*)SCOOP.pALL,
 			*pSTR;
@@ -34,14 +136,15 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	double	*pF = (double*)(pC+8);
 	gpmZ(aA);
 
-	aA[6] = 0x3ff;
-	aA[7] = 0x400;
+	aA[6] = (I8)aMEM[6].Ux( 0x400, sizeof(I8) );
+	aA[7] = (I8)aMEM[7].Ux( 0x400, sizeof(I8) );
 
 	gpcREG wVAR;
 
 	gpcPIK	PIK;
 	gpcO	*pDOT = NULL, wip0; //, *pOUT = NULL, wipO;
 	gpcSRC	*pANs;
+
 	char* pDIS = (char*)pDBG->p_alloc;
 	for( I4x4* pPCs = (I4x4*)SCOOP.vASM.p_alloc, *pPC = pPCs, *pPCe = pPC+SCOOP.nASM();
 			pPC < pPCe; pPC++ )
@@ -53,16 +156,15 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 		if( !oID ) // nop
 			continue;
 		iS = op.y&7;
-		sz = pPC->sz;
+		szOF = gpaEAsz[pPC->sz];
+
 		if( oID == gpeOPid_dot ) {
 			/// jsr entryOBJ2A0
 			// keressük meg az OBJ-t
 			pDOT = NULL;
-			for( U4 ie = pD[0], ii=aA[7]; ii<ie; ii++ )
-			{
+			for( U4 ie = pD[0], ii=aA[7]; ii<ie; ii++ ) {
 				I4 o = *(I8*)( aMEM[iS].Ux(ii,sizeof(I8)) );
-				if( o >= 0 )
-				{
+				if( o >= 0 ) {
 					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
 					gpeTYP typ = O.typ;
 					gpeALF alf = O.obj.alf;
