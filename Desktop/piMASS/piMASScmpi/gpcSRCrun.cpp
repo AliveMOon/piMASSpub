@@ -18,85 +18,301 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	char* pDIS = (char*)pDBG->p_alloc;
 	gpCORE core;
 	I4x4	*pPC;
-	U8		*pA, *pD;
-	I8		sNUM, dNUM,
-	U1		*pS, *pD;
+	I8		*pA, *pO, *pC,
+			*pD,
+			sNUM, dNUM;
+	U1		*p_src, *p_dst;
 	U1x4 op;
-	gpeOPid oID;
-	U1 iS, iD;
+	gpeOPid iOP;
+	U1 iS, iD, xS, xD;
 	gpeEA mS, mD;
 	U4 szOF;
 
 	for(	core.ini(
 						(I4x4*)SCOOP.vASM.p_alloc,SCOOP.nASM(),
-						&pA, &pD
+						&pA, &pD, &pC, &pO
 					);
 			core.pc < core.nPC;
 			core.pc++ )
 	{
 		pDIS += gpmVAN( pDIS, "\r\n", nL );
 		pDIS += gpmNINCS( pDIS, "\r\n" );
-		pPC = core.iPC( op, oID, iS, mS, iD, mD, szOF );
+		pPC = core.iPC( op, iOP, iS, xS, mS, iD, xD, mD, szOF );
 		if( !pPC )
 			continue; // NOP?
 
-		if( oID == gpeOPid_dot ) {
+		if( iOP == gpeOPid_dot ) {
 
 			continue;
 		}
 
 		switch( mS ) {
 			case gpeEA_OFF:
-				pS = NULL;
+				p_src = NULL;
 				continue;
 			case gpeEA_Dn:
-				pS = pD+iS; // pD[iS];
+				p_src = (U1*)(pD+iS); // pD[iS];
 				break;
 			case gpeEA_An:
-				pS = pA+iS;
+				p_src = (U1*)(pA+iS);
 				break;
 			case gpeEA_IAnI:
-				pS = core.ea( pA[iS] );
+				p_src = core.ea( pA[iS], pO+iS, pC+iS );
 				break;
 			case gpeEA_IAnIp:
-				pS = core.ea( 0, pA[iS] );
+				p_src = core.ea( pA[iS], pO+iS, pC+iS );
 				pA[iS] += szOF;
 				break;
 			case gpeEA_sIAnI:
 				pA[iS] += szOF;
-				pS = core.ea( 0, pA[iS] );
+				p_src = core.ea( pA[iS], pO+iS, pC+iS );
 				break;
 			case gpeEA_d16IAnI:
-				pS = core.ea( pPC->aOB[0], pA[iS] );
+				p_src = core.ea( pA[iS], pO+iS, pC+iS );
+				if( !p_src )
+					break;
+				p_src += pPC->aOB[0];
 				break;
 			case gpeEA_d16IAnDnI:
-				pS = core.ea( pPC->aOB[0] + pD[op.w&7], pA[iS] );
+				p_src = core.ea( pA[iS], pO+iS, pC+iS );
+				if( !p_src )
+					break;
+				p_src += pPC->aOB[0] + pD[xS];
 				break;
 			case gpeEA_d16IPcI:
-				pS = pPC->aOB[0]+(I8)pPC;
+				p_src = (U1*)(pPC->aOB[0] + (I8)pPC );
 				break;
 
 			case gpeEA_d16IPcDnI:
-				pS = pPC->aOB[0]+pD[op.w&7]+(I8)pPC;
+				p_src = (U1*)(pPC->aOB[0] + pD[xS] + (I8)pPC );
 				break;
 
 			case gpeEA_num:
 			default:{
-				pS = (U1*)&(sNUM=*pPC->aOB);
-				/*if( ob >= 0 )
-					NUM = (gpcOBJlnk*)OBJ.Ux( ob, sizeof(gpcOBJlnk));
-				else {
-					ob *= -1;
-					if(pM0[ob].iMNn)
-					{
-						NUM = ? pALL+pM0[ob].iMNi
-					} else
-						NUM.zero();
-
-				}*/
-
+				p_src = (U1*)&(sNUM=pPC->aOB[0]);
 			} break;
 		}
+
+		if(iOP>=gpeOPid_jsr)
+		{
+			// jsr;
+			// elvileg nem kell foglalkozni a céllal
+			continue;
+		}
+
+		switch( mD ) {
+			case gpeEA_OFF:
+				p_dst = NULL;
+				continue;
+			case gpeEA_Dn:
+				p_dst = (U1*)(pD+iD); // pD[iS];
+				break;
+			case gpeEA_An:
+				p_dst = (U1*)(pA+iD);
+				break;
+			case gpeEA_IAnI:
+				p_dst = core.ea( pA[iD], pO+iD, pC+iD );
+				break;
+			case gpeEA_IAnIp:
+				p_dst = core.ea( pA[iD], pO+iD, pC+iD );
+				pA[iD] += szOF;
+				break;
+			case gpeEA_sIAnI:
+				pA[iD] += szOF;
+				p_dst = core.ea( pA[iD], pO+iD, pC+iD );
+				break;
+			case gpeEA_d16IAnI:
+				p_dst = core.ea( pA[iD], pO+iD, pC+iD );
+				if( !p_dst )
+					break;
+				p_dst += pPC->aOB[1];
+				break;
+			case gpeEA_d16IAnDnI:
+				p_dst = core.ea( pA[iD], pO+iD, pC+iD );
+				if( !p_dst )
+					break;
+				p_dst += pPC->aOB[1] + pD[xD];
+				break;
+			case gpeEA_d16IPcI:
+				p_dst = (U1*)(pPC->aOB[1] + (I8)pPC );
+				break;
+
+			case gpeEA_d16IPcDnI:
+				p_dst = (U1*)(pPC->aOB[1] + pD[xD] + (I8)pPC );
+				break;
+
+			case gpeEA_num:
+			default:{
+				p_dst = (U1*)&(dNUM=pPC->aOB[1]);
+			} break;
+		}
+		if( !p_dst )
+			continue;
+
+		switch(gpaOPgrp[iOP])
+		{
+			case gpeOPid_entry:{
+					switch(iOP)
+					{
+						case gpeOPid_dot:
+							// find OBJ
+							continue;
+						default:
+							continue;
+					}
+				} continue;
+			case gpeOPid_mov:{
+					if( !p_dst || !p_src )
+						continue;
+					switch(iOP)
+					{
+						case gpeOPid_mov:
+						default:
+							gpmMcpy( p_dst, p_src, szOF );
+							continue;
+					}
+				} continue;
+			case gpeOPid_mul:{
+					if( !p_dst || !p_src )
+						continue;
+					switch( szOF )
+					{
+						case 0x10:
+							switch(iOP)
+							{
+								case gpeOPid_and:
+									*(F4*)p_dst &= *(F4*)p_src;
+									continue;
+								case gpeOPid_rem:
+									*(F4*)p_dst %= *(F4*)p_src;
+									continue;
+								case gpeOPid_div:
+									*(F4*)p_dst /= *(F4*)p_src;
+									continue;
+								case gpeOPid_mul:
+									*(F4*)p_dst *= *(F4*)p_src;
+									continue;
+								default:
+									*(F4*)p_dst *= *(F4*)p_src;
+									continue;
+							}
+							continue;
+						case 8:
+							switch(iOP)
+							{
+								case gpeOPid_and:
+									*(I8*)p_dst &= *(I8*)p_src;
+									continue;
+								case gpeOPid_rem:
+									*(I8*)p_dst %= *(I8*)p_src;
+									continue;
+								case gpeOPid_div:
+									*(I8*)p_dst /= *(I8*)p_src;
+									continue;
+								case gpeOPid_mul:
+									*(I8*)p_dst *= *(I8*)p_src;
+									continue;
+								default:
+									*(I8*)p_dst *= *(I8*)p_src;
+									continue;
+							}
+							continue;
+						case 4:
+							switch(iOP)
+							{
+								case gpeOPid_and:
+									*(I4*)p_dst &= *(I4*)p_src;
+									continue;
+								case gpeOPid_rem:
+									*(I4*)p_dst %= *(I4*)p_src;
+									continue;
+								case gpeOPid_div:
+									*(I4*)p_dst /= *(I4*)p_src;
+									continue;
+								case gpeOPid_mul:
+									*(I4*)p_dst *= *(I4*)p_src;
+									continue;
+								default:
+									*(I4*)p_dst *= *(I4*)p_src;
+									continue;
+							}
+							continue;
+						case 2:
+							switch(iOP)
+							{
+								case gpeOPid_and:
+									*(U2*)p_dst &= *(U2*)p_src;
+									continue;
+								case gpeOPid_rem:
+									*(U2*)p_dst %= *(U2*)p_src;
+									continue;
+								case gpeOPid_div:
+									*(U2*)p_dst /= *(U2*)p_src;
+									continue;
+								case gpeOPid_mul:
+									*(U2*)p_dst *= *(U2*)p_src;
+									continue;
+								default:
+									*(U2*)p_dst *= *(U2*)p_src;
+									continue;
+							}
+							continue;
+						case 1:
+						default:
+							switch(iOP)
+							{
+								case gpeOPid_and:
+									*p_dst &= *p_src;
+									continue;
+								case gpeOPid_rem:
+									*p_dst %= *p_src;
+									continue;
+								case gpeOPid_div:
+									*p_dst /= *p_src;
+									continue;
+								case gpeOPid_mul:
+									*p_dst *= *p_src;
+									continue;
+								default:
+									*p_dst *= *p_src;
+									continue;
+							}
+							continue;
+					}
+				} continue;
+			case gpeOPid_add:{
+					if( !p_dst || !p_src )
+						continue;
+
+					switch(iOP)
+					{
+						case gpeOPid_or:
+							*p_dst |= *p_src;
+							continue;
+						case gpeOPid_sub:
+							*p_dst -= *p_src;
+							continue;
+						case gpeOPid_add:
+							*p_dst += *p_src;
+							continue;
+						default:
+							*p_dst += *p_src;
+							continue;
+					}
+				} continue;
+			case gpeOPid_sub:{
+					if( !p_dst || !p_src )
+						continue;
+					switch(iOP)
+					{
+
+						default:
+							pD[9] = (*p_dst == *p_src);
+							continue;
+					}
+				} continue;
+		}
+
 
 	}
 

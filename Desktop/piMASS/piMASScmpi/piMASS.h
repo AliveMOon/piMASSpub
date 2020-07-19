@@ -4810,6 +4810,13 @@ public:
 		aF2[1] -= b.aF2[1];
 		return *this;
     }
+    F4& operator *= ( const F4& b ) {
+		double a = aF2[0] * b.aF2[0];
+		a += aF2[1] * b.aF2[1];
+
+		x = y = z = w = a;
+		return *this;
+    }
     F4& operator &= ( const F4& b ) {
 		aF2[0] &= b.aF2[0];
 		aF2[1] &= b.aF2[1];
@@ -6391,15 +6398,17 @@ szasz:
 
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( U4 i, U4 n, bool bZ = true ) {
-		U8 e = (i+2)*n, s = -1;
+	U1* Ux( U4 i, U4 n, bool bZ = true, U4 stp = 0 ) {
+		if( !stp )
+			stp = n;
+		U8 e = i*stp + 2*n, s = -1;
 		if( e > n_load )
 		{
 			lzyADD( NULL, e-n_load, s, -1 );
 			if( bZ )
                 gpmZn( p_alloc+s, e-s );
-			if( n_load > (i+1)*n )
-				n_load = (i+1)*n;
+			if( n_load > (i*stp+n) )
+				n_load = (i*stp+n);
 		}
 
 
