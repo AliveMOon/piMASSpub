@@ -169,20 +169,46 @@ static const U4 gpaCsz[] = {
 	/// lebegőpontos
 	4,	//".f",	//	c	11:00	float
 	8,	//".d",	//  d	11:01	double
-	16,	//".K",	//  f	11:11	KID
-	0,	//".F",	//	e	11:10	OFF
+	4,	//".K",	//  e	11:10	KID
+	0,	//".F",	//	f	11:11	OFF
 };
-#define gpmMUL( a, b ) 						\
+static const U8 gpaCszMX[] = {
+
+	0xff,				//".b",	//	0	00:00	byte
+	0xffFF,				//".w",	//	1	00:01	word
+	0xffffFFFF,			//".l",	//	2	00:10	long
+	0xffffFFFFffffFFFF,	//".q",	//	3	00:11	quad
+	/// olyan nincsen hogy float és nincs előjel
+	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+	0xffffFFFF,			//".4",	//  4   01:00	RGBA	pixel
+	0xff,				//".u",	//  5   01:01	string
+										//	12345678901234
+	0x7fffFFFFffffFFFF,	//".a",	//	6	01:10	ABCDEFGHIJKLMN
+	0x7fffFFFFffffFFFF,	//".c",	//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
+	/// előjeles
+	0x7f,				//".B",	//	8	10:00	signed byte
+	0x7fff,				//".W",	//	9	10:01	signed word
+	0x7fffFFFF,			//".L",	//	a	10:10	signed long
+	0x7fffFFFFffffFFFF,	//".Q",	//	b	10:11	signed quad
+	/// lebegőpontos
+	0x7fffFFFF,			//".f",	//	c	11:00	float
+	0x7fffFFFFffffFFFF,	//".d",	//  d	11:01	double
+	0x7fffFFFF,			//".K",	//  f	11:11	KID
+	0,					//".F",	//	e	11:10	OFF
+};
+
+
+#define gpmMUL( a, b, mx ) 						\
 		switch(b) 							\
 		{									\
 			case gpeOPid_and:				\
 				*(a*)p_dst &= *(a*)p_src;	\
 				continue;					\
 			case gpeOPid_rem:				\
-				*(a*)p_dst %= *(a*)p_src;	\
+				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)%(*(a*)p_src) : (a)0;	\
 				continue;					\
 			case gpeOPid_div:				\
-				*(a*)p_dst /= *(a*)p_src;	\
+				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)/(*(a*)p_src) : (a)mx;	\
 				continue;					\
 			default:						\
 				*(a*)p_dst *= *(a*)p_src;	\

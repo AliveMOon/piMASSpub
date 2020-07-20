@@ -15,7 +15,10 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 
 	static const U1 iMN=0;
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
-	char* pDIS = (char*)pDBG->p_alloc;
+	char	*pALL = (char*)SCOOP.pALL,
+			*pSTR;
+	I4		nSTR, a, n;
+	char* pDIS = (char*)pDBG->p_alloc, sBUFF[0x100];
 	gpCORE core;
 	I4x4	*pPC;
 	I8		*pA, *pO, *pC,
@@ -28,6 +31,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	gpeEA mS, mD;
 	gpeCsz iC;	// class id
 	U4 szOF;
+	U8 mx;
 	for(	core.ini(
 						(I4x4*)SCOOP.vASM.p_alloc,SCOOP.nASM(),
 						&pA, &pD, &pC, &pO
@@ -43,13 +47,71 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 
 		if( iOP == gpeOPid_dot ) {
 
-			for( U4 eI = pD[0], iI=pA[7]; iI<eI; iI+=4 ) {
+			for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4 ) {
 				p_src = core.ea( iI, pO+7, pC+7 );
+				gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( *(int*)p_src, sizeof(gpcOBJlnk)))[0];
+				gpeTYP typ = O.typ;
+				gpeALF alf = O.obj.alf;
+				*sBUFF = ' ';
+				switch( O.typ )
+				{
+					case gpeTYP_sA8:
+						gpfALF2STR( sBUFF+1, alf );
+						break;
+					case gpeTYP_sA8N:
+						O.obj.an2str( sBUFF+1 );
+						break;
+					case gpeTYP_U1:
+						sprintf( sBUFF+1, "0x%0.2x", O.obj.uy );
+						break;
+					case gpeTYP_U2:
+						sprintf( sBUFF+1, "0x%0.4x", O.obj.uy );
+						break;
+					case gpeTYP_U4:
+						sprintf( sBUFF+1, "0x%0.8x", O.obj.uy );
+						break;
+					case gpeTYP_U8:
+						sprintf( sBUFF+1, "0x%0.16llx", O.obj.uy );
+						break;
+
+					case gpeTYP_I1:
+						sprintf( sBUFF+1, "0x%.3d", O.obj.num );
+						break;
+					case gpeTYP_I2:
+						sprintf( sBUFF+1, "0x%.6d", O.obj.num );
+						break;
+					case gpeTYP_I4:
+						sprintf( sBUFF+1, "0x%.9d", O.obj.num );
+						break;
+					case gpeTYP_I8:
+						sprintf( sBUFF+1, "0x%.12lld", O.obj.num );
+						break;
+
+					case gpeTYP_D:
+					case gpeTYP_F:
+						sprintf( sBUFF+1, "%0.7f", O.obj.dy );
+						break;
+
+					case gpeTYP_STR:
+						n = pM0[O.obj.uy].iMNn;
+						if( n > 0x7e )
+							n = 0x7e;
+						gpmMcpy( sBUFF+0x80, pALL+(pM0[O.obj.uy]).iMNi, n );
+						sBUFF[0x80+n]=0;
+						sprintf( sBUFF+1, "\"%s...\"", sBUFF+0x80 );
+						break;
+					default:
+						sprintf( sBUFF+1, "%x", O.typ );
+						break;
+				}
+				std::cout << *(U4*)p_src << " " << sBUFF << std::endl;
 
 			}
+			pA[7] = pD[0];
 			continue;
 		}
 		szOF = gpaCsz[iC];
+		mx = gpaCszMX[iC];
 		switch( mS ) {
 			case gpeEA_OFF:
 				p_src = NULL;
@@ -180,14 +242,17 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 						continue;
 					switch( iC )
 					{
-						case gpeCsz_Q: gpmMUL( I8, iOP ); continue;
-						case gpeCsz_q: gpmMUL( U8, iOP ); continue;
-						case gpeCsz_L: gpmMUL( I4, iOP ); continue;
-						case gpeCsz_l: gpmMUL( U4, iOP ); continue;
-						case gpeCsz_W: gpmMUL( I2, iOP ); continue;
-						case gpeCsz_w: gpmMUL( U2, iOP ); continue;
-						case gpeCsz_B: gpmMUL( I1, iOP ); continue;
-						case gpeCsz_b: gpmMUL( U1, iOP ); continue;
+						case gpeCsz_Q: gpmMUL( I8, iOP, mx ); continue;
+						case gpeCsz_q: gpmMUL( U8, iOP, mx ); continue;
+						case gpeCsz_L: gpmMUL( I4, iOP, mx ); continue;
+						case gpeCsz_l: gpmMUL( U4, iOP, mx ); continue;
+						case gpeCsz_W: gpmMUL( I2, iOP, mx ); continue;
+						case gpeCsz_w: gpmMUL( U2, iOP, mx ); continue;
+						case gpeCsz_B: gpmMUL( I1, iOP, mx ); continue;
+						case gpeCsz_b: gpmMUL( U1, iOP, mx ); continue;
+						case gpeCsz_f: gpmMUL( F, iOP, mx ); continue;
+						case gpeCsz_d: gpmMUL( D, iOP, mx ); continue;
+						case gpeCsz_4: gpmMUL( U1x4, iOP, mx ); continue;
 					}
 				} continue;
 			case gpeOPid_add:{
@@ -204,6 +269,9 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 						case gpeCsz_w: gpmADD( U2, iOP ); continue;
 						case gpeCsz_B: gpmADD( I1, iOP ); continue;
 						case gpeCsz_b: gpmADD( U1, iOP ); continue;
+						case gpeCsz_f: gpmADD( F, iOP ); continue;
+						case gpeCsz_d: gpmADD( D, iOP ); continue;
+						case gpeCsz_4: gpmADD( U1x4, iOP ); continue;
 					}
 				} continue;
 			case gpeOPid_sub:{

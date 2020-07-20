@@ -258,6 +258,55 @@ class gpcALU;
 
 #define frac( a ) ( (a)-floor((a)) )
 
+class F {
+public:
+	float f;
+	F() {}
+	F( float i ) { f = i; }
+	F( double i ) { f = i; }
+	F( U8 i ) { f = i; }
+	F( I8 i ) { f = i; }
+	F( int i ) { f = i; }
+	bool operator != ( F b ) { return f != b.f; }
+	bool operator == ( F b ) { return f == b.f; }
+
+	F& operator *= ( const F& b ) { f*=b.f; return *this; }
+	F& operator &= ( const F& b ) { f =frac(f*b.f); return *this; }
+	F& operator /= ( const F& b ) { f/=b.f; return *this; }
+	F& operator %= ( const F& b ) { f =frac(f/b.f); return *this; }
+	float operator % ( const F& b ) { return frac(f/b.f); }
+	float operator / ( const F& b ) { return f/b.f; }
+
+
+	F& operator += ( const F& b ) { f+=b.f; return *this; }
+	F& operator |= ( const F& b ) { f =frac(f+b.f); return *this; }
+	F& operator -= ( const F& b ) { f-=b.f; return *this; }
+};
+class D {
+public:
+	double d;
+	D() {};
+	D( float i ) { d = i; }
+	D( double i ) { d = i; }
+	D( U8 i ) { d = i; }
+	D( I8 i ) { d = i; }
+	D( int i ) { d = i; }
+	bool operator != ( D b ) { return d != b.d; }
+	bool operator == ( D b ) { return d == b.d; }
+
+	D& operator *= ( const D& b ) { d*=b.d; return *this; }
+	D& operator &= ( const D& b ) { d =frac(d*b.d); return *this; }
+	D& operator /= ( const D& b ) { d/=b.d; return *this; }
+	D& operator %= ( const D& b ) { d =frac(d/b.d); return *this; }
+	double operator % ( const D& b ) { return frac(d/b.d); }
+	double operator / ( const D& b ) { return d/b.d; }
+
+	D& operator += ( const D& b ) { d+=b.d; return *this; }
+	D& operator |= ( const D& b ) { d =frac(d+b.d); return *this; }
+	D& operator -= ( const D& b ) { d-=b.d; return *this; }
+};
+
+
 
 #define max( a, b ) ( a > b ? a : b )
 #define min( a, b ) ( a < b ? a : b )
@@ -625,8 +674,7 @@ inline U8 gp_memcmp( const void* pA, const void* pB, size_t n )
 
 }
 
-inline size_t gpfMM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL )
-{
+inline size_t gpfMM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL ) {
 	/// ha talált kissebb lesz mint az nA
 	size_t nFND, nF = 0;
 	if( nB > nA )
@@ -657,8 +705,7 @@ inline size_t gpfMM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL )
 	return nA;
 }
 
-class UTF8
-{
+class UTF8 {
 	U1* pU;
 public:
 	UTF8( void* pVOID ){
@@ -752,8 +799,7 @@ public:
 	}
 
 };
-enum gpeISA : I1
-{
+enum gpeISA : I1 {
 	gpeISA_nop,
 	gpeISA_u8,
 	gpeISA_i8,
@@ -794,8 +840,7 @@ enum gpeISA : I1
 
 };
 
-class U1x4
-{
+class U1x4 {
 public:
     union
     {
@@ -817,6 +862,30 @@ public:
         };
     };
     U1x4(){};
+    bool operator != ( U1x4 b ) { return u4 != b.u4; }
+	bool operator == ( U1x4 b ) { return u4 == b.u4; }
+
+    U1x4& operator *= ( const U1x4& b ) { x*=b.x; y*=b.y; z*=b.z; w*=b.w; return *this; }
+	U1x4& operator &= ( const U1x4& b ) { u4 &= b.u4; return *this; }
+	U1x4& operator /= ( const U1x4& b ) {
+		x = b.x ? x/b.x : 0xff;
+		y = b.y ? y/b.y : 0xff;
+		z = b.z ? y/b.z : 0xff;
+		w = b.w ? y/b.w : 0xff;
+		return *this;
+	}
+	U1x4& operator %= ( const U1x4& b ) {
+		x = b.x ? x%b.x : 0x0;
+		y = b.y ? y%b.y : 0x0;
+		z = b.z ? y%b.z : 0x0;
+		w = b.w ? y%b.w : 0x0;
+		return *this;
+	}
+
+	U1x4& operator += ( const U1x4& b ) { x+=b.x; y+=b.y; z+=b.z; w+=b.w; return *this; }
+	U1x4& operator |= ( const U1x4& b ) { u4 |= b.u4; return *this; }
+	U1x4& operator -= ( const U1x4& b ) { x-=b.x; y-=b.y; z-=b.z; w-=b.w; return *this; }
+
     U1x4& null()
     {
 		u4 = 0;
@@ -1183,7 +1252,8 @@ public:
 	U1x4 operator & ( U4 b ) const { return u4&b; }
 	U1x4 operator | ( U4 b ) const { return u4|b; }
 	U1x4 operator ^ ( U4 b ) const { return u4^b; }
-
+	U1x4 operator % ( const U1x4& b ) { return U1x4( x?frac(x%b.x):0, y?frac(y%b.y):0, z?frac(z%b.z):0, w?frac(w%b.w):0 ); }
+	U1x4 operator / ( const U1x4& b ) { return U1x4( x?x/b.x:0xff, y?y/b.y:0xff, z?z/b.z:0xff, w?w/b.w:0xff ); }
 
 
 	U1x4 operator & ( U1 b ) const {

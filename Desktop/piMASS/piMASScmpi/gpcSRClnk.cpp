@@ -14,8 +14,7 @@ extern char gpaALF_H_sub[];
 	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
 #endif
 #define aaOPid gpaaOPid[OPgrp]
-size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   )
-{
+size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
 	char sBstr[] = "FFFFffffFFFFffff",
 		*pBD, nB = sizeof(sBstr)-1;
 	size_t n;

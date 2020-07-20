@@ -460,7 +460,7 @@ public:
 		I4x4 &load = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,0,0  );
-		load.aOB[0] = n;
+		load.aOB[0] = n*gpaCsz[gpeCsz_l];
 		return load;
 	}
 	I4x4& LOAD_SRC_ADR_nA1( gpcSCOOP& scp,I4 n=-1) { /// move.l n(iA),A1
@@ -468,7 +468,7 @@ public:
 		I4x4 &load = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,1,0  );
-		load.aOB[0] = n;
+		load.aOB[0] = n*gpaCsz[gpeCsz_l];
 		return load;
 	}
 	I4x4& LOAD_DST_ADR_A0( gpcSCOOP& scp ) { /// move.l (iA+1),A0
@@ -616,32 +616,8 @@ public:
 	}
 
 
-	gpcCDsp& kMOV( gpcSCOOP& scp
-					//, U4 iOPe
-					) {
-		As = Ad;
-		return *this;
-//		/*isa( PC,	gpeOPid_mov, gpeCsz_l
-//                ,gpeEA_An,Ai,0
-//                ,gpeEA_Dn,Ai,0
-//            );*/
-//		if( As >= Ad )
-//		{
-//			As = Ad-1;
-//			isa( PC );
-//			return *this;
-//		}
-//		As = Ad-1;
-//		/*isa( PC, gpeOPid_mov, gpeCsz_l
-//                ,gpeEA_An,Ai,0
-//				,gpeEA_Dn,Ai,0
-//            );*/
-//		isa( PC );
-//		return *this;
-	}
-	gpcCDsp& kOBJ( gpcSCOOP& scp
-				//, U4 iOPe
-				) {
+	gpcCDsp& kMOV( gpcSCOOP& scp ) { As = Ad; return *this; }
+	gpcCDsp& kOBJ( gpcSCOOP& scp ) {
         switch( (gpeOPid)CD()[0].lnk ) {
             case gpeOPid_end:
             case gpeOPid_dimE:
@@ -696,9 +672,7 @@ public:
 		As = Ad-1;
 		return *this;
 	}
-	gpcCDsp& kADD( gpcSCOOP& scp
-				//, U4 iOPe
-				) {
+	gpcCDsp& kADD( gpcSCOOP& scp ) {
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^
 		// a =b+c +d*e  // iADD 2 // de nem adtam hozzá még a d-t
@@ -793,8 +767,7 @@ public:
 		lADD = lMUL = 0;
 		return *this;
 	}
-	gpcCDsp& kMUL( gpcSCOOP& scp, //U4 iOPe,
-					bool b_end ) {
+	gpcCDsp& kMUL( gpcSCOOP& scp, bool b_end ) {
 
 		if(!lMUL)
 		{
@@ -857,7 +830,7 @@ public:
 		lADD = lMUL = 0;
 		return *this;
 	}
-	gpcCDsp& kEND( gpcSCOOP& scp ){
+	gpcCDsp& kEND( gpcSCOOP& scp ) {
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^
 		// a =b+c +d*e  // iADD 2 // de nem adtam hozzá még a d-t
@@ -880,7 +853,7 @@ public:
     }
 
 	/// azaz gyúrjuk
-	gpcCDsp& knead( gpcSCOOP& scp ){ //, U4 iOPe ) {
+	gpcCDsp& knead( gpcSCOOP& scp ) { //, U4 iOPe ) {
 		gpcCDsp& SP = *this;
 		now=CDC.pst;
 		switch( gpaOPgrp[now] )
