@@ -3055,7 +3055,8 @@ public:
 		struct
         {
 			gpeOPid pre, pst;	// 0, 1
-			U1		sz,d0;		// 2, 3
+			gpeCsz	iC;
+			U1		d0;		// 2, 3
 			U4		op;			// 4,
 			I4		aOB[2];		// 8, 12; //0x10
         };
@@ -5866,9 +5867,7 @@ public:
 			usleep(100);
 
 	}
-	void DO(void) {
-		aWIP[gpeLZYwip] = aWIP[gpeLZYwipSTK];
-	}
+	void DO(void) { aWIP[gpeLZYwip] = aWIP[gpeLZYwipSTK]; }
 
 
 	gpcLZY* syncADD( gpcSYNC s, U4& ms ) {
@@ -5986,10 +5985,7 @@ public:
 		return pOUT->SYNrdy(b);
 	}
 
-
-
 	gpcLZY* qEVENT(void);
-
 
 	gpcLZY* lzy_strict( void ) {
 		if( this ? !n_load : true )
@@ -6015,8 +6011,6 @@ public:
 		p_alloc[ n_load ] = 0;
 		return this;
 	}
-
-
 	gpcLZY* lzyRST( void ) {
 		if( this ? !n_load : true )
 			return this;
@@ -6415,12 +6409,12 @@ szasz:
         return p_alloc + i*n;//+e-n*2;
 	}
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
-	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeEAsz sz = gpeEAsz0,
+	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_OFF,
 						gpeEA s0 = gpeEA_OFF, 	U1 sn = 0,	U1 si = 0,
 						gpeEA d0 = gpeEA_OFF,	U1 dn = 0,	U1 di = 0 ) {
 		I4x4 &ins = *(I4x4*)Ux( pc, sizeof(I4x4) );
 		ins.null();
-		ins.sz = sz;
+		ins.iC = iC;
 		ins.op = U1x4( op, ((U1)s0<<3)|(sn&7), ((U1)d0<<3)|(dn&7), (di<<4)|(si&7) ).u4;
 		return ins;
 	}

@@ -101,6 +101,108 @@ typedef enum gpeOPid:U1{
 	gpeOPid_jsr,
 } gpeOPid_U1;
 
+static const char* gpasCsz[] = {
+
+	".b",	//	0	1		00:00	byte
+	".w",	//	1	2		00:01	word
+	".l",	//	2	4		00:10	long
+	".q",	//	3	8		00:11	quad
+	/// olyan nincsen hogy float és nincs előjel
+	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+	".4",	//  4   1x4		01:00	RGBA	pixel
+	".u",	//  5   1->0	01:01	string
+										//	12345678901234
+	".a",	//	6	8		01:10	ABCDEFGHIJKLMN
+	".c",	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
+	/// előjeles
+	".B",	//	8	1		10:00	signed byte
+	".W",	//	9	2		10:01	signed word
+	".L",	//	a	4		10:10	signed long
+	".Q",	//	b	8		10:11	signed quad
+	/// lebegőpontos
+	".f",	//	c	4		11:00	float
+	".d",	//  d	8		11:01	double
+	".K",	//  e	16		11:11	KID
+	"",		//	e	16		11:10	OFF
+};
+typedef enum gpeCsz:U1{
+	gpeCsz_b,	//	0	1		00:00	byte
+	gpeCsz_w,	//	1	2		00:01	word
+	gpeCsz_l,	//	2	4		00:10	long
+	gpeCsz_q,	//	3	8		00:11	quad
+	/// olyan nincsen hogy float és nincs előjel (lglbb is itt)
+	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+	gpeCsz_4,	//  4   1x4		01:00	RGBA	pixel
+	gpeCsz_u,	//  5   1->0	01:01	string
+										//	12345678901234
+	gpeCsz_a,	//	6	8		01:10	ABCDEFGHIJKLMN
+	gpeCsz_C,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
+	/// előjeles
+	gpeCsz_B,	//	8	1		10:00	signed byte
+	gpeCsz_W,	//	9	2		10:01	signed word
+	gpeCsz_L,	//	a	4		10:10	signed long
+	gpeCsz_Q,	//	b	8		10:11	signed quad
+	/// lebegőpontos
+	gpeCsz_f,	//	c	4		11:00	float
+	gpeCsz_d,	//  d	8		11:01	double
+	gpeCsz_K,	//  f	16		11:10	KID
+	gpeCsz_OFF,	//	e	16		11:11	OFF
+} gpeCsz_U1;
+static const U4 gpaCsz[] = {
+
+	1,	//".b",	//	0	00:00	byte
+	2,	//".w",	//	1	00:01	word
+	4,	//".l",	//	2	00:10	long
+	8,	//".q",	//	3	00:11	quad
+	/// olyan nincsen hogy float és nincs előjel
+	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
+	4,	//".4",	//  4   01:00	RGBA	pixel
+	1,	//".u",	//  5   01:01	string
+										//	12345678901234
+	8,	//".a",	//	6	01:10	ABCDEFGHIJKLMN
+	16,	//".c",	//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
+	/// előjeles
+	1,	//".B",	//	8	10:00	signed byte
+	2,	//".W",	//	9	10:01	signed word
+	4,	//".L",	//	a	10:10	signed long
+	8,	//".Q",	//	b	10:11	signed quad
+	/// lebegőpontos
+	4,	//".f",	//	c	11:00	float
+	8,	//".d",	//  d	11:01	double
+	16,	//".K",	//  f	11:11	KID
+	0,	//".F",	//	e	11:10	OFF
+};
+#define gpmMUL( a, b ) 						\
+		switch(b) 							\
+		{									\
+			case gpeOPid_and:				\
+				*(a*)p_dst &= *(a*)p_src;	\
+				continue;					\
+			case gpeOPid_rem:				\
+				*(a*)p_dst %= *(a*)p_src;	\
+				continue;					\
+			case gpeOPid_div:				\
+				*(a*)p_dst /= *(a*)p_src;	\
+				continue;					\
+			default:						\
+				*(a*)p_dst *= *(a*)p_src;	\
+				continue;					\
+		} 							\
+
+#define gpmADD( a, b ) 						\
+		switch(b) 							\
+		{									\
+			case gpeOPid_or:				\
+				*(a*)p_dst |= *(a*)p_src;	\
+				continue;					\
+			case gpeOPid_sub:				\
+				*(a*)p_dst -= *(a*)p_src;	\
+				continue;					\
+			default:						\
+				*(a*)p_dst += *(a*)p_src;	\
+				continue;					\
+		} 							\
+
 typedef enum gpeEA:U1 {
 	gpeEA_OFF,
 	gpeEA_Dn,
@@ -122,7 +224,9 @@ typedef enum gpeEA:U1 {
 	gpeEA_num,
 } gpeEA_U1;
 
-typedef enum gpeEAsz:U1 {
+
+
+/*typedef enum gpeEAsz:U1 {
 	gpeEAsz0, // 0 EA
 	gpeEAszB, // 1 1
 	gpeEAszW, // 2 2
@@ -147,7 +251,8 @@ static const char* gpasEAsz[] = {
 	".l",		//	3	4		00:10	long
 	".q",		//	4	8		00:11	quad
 	".v",		//	5	16		01:00	vec
-};
+};*/
+
 static gpeOPid gpaOPgrp[] = {
 	gpeOPid_nop,
 

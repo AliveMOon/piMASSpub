@@ -84,77 +84,7 @@ public:
 	}
 
 };
-static const char* gpasTYPsz[] = {
 
-	".b",	//	0	1		00:00	byte
-	".w",	//	1	2		00:01	word
-	".l",	//	2	4		00:10	long
-	".q",	//	3	8		00:11	quad
-	/// olyan nincsen hogy float és nincs előjel
-	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
-	".4",	//  4   1x4		01:00	RGBA	pixel
-	".u",	//  5   1->0	01:01	string
-										//	12345678901234
-	".a",	//	6	8		01:10	ABCDEFGHIJKLMN
-	".c",	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
-	/// előjeles
-	".B",	//	8	1		10:00	signed byte
-	".W",	//	9	2		10:01	signed word
-	".L",	//	a	4		10:10	signed long
-	".Q",	//	b	8		10:11	signed quad
-	/// lebegőpontos
-	".f",	//	c	4		11:00	float
-	".d",	//  d	8		11:01	double
-	".F",	//	e	16		11:10	xyzw
-	".K",	//  f	16		11:11	KID
-};
-typedef enum gpeCsz:U1{
-	gpeCsz_b,	//	0	1		00:00	byte
-	gpeCsz_w,	//	1	2		00:01	word
-	gpeCsz_l,	//	2	4		00:10	long
-	gpeCsz_q,	//	3	8		00:11	quad
-	/// olyan nincsen hogy float és nincs előjel (lglbb is itt)
-	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
-	gpeCsz_4,	//  4   1x4		01:00	RGBA	pixel
-	gpeCsz_u,	//  5   1->0	01:01	string
-										//	12345678901234
-	gpeCsz_a,	//	6	8		01:10	ABCDEFGHIJKLMN
-	gpeCsz_C,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
-	/// előjeles
-	gpeCsz_B,	//	8	1		10:00	signed byte
-	gpeCsz_W,	//	9	2		10:01	signed word
-	gpeCsz_L,	//	a	4		10:10	signed long
-	gpeCsz_Q,	//	b	8		10:11	signed quad
-	/// lebegőpontos
-	gpeCsz_f,	//	c	4		11:00	float
-	gpeCsz_d,	//  d	8		11:01	double
-	gpeCsz_F,	//	e	16		11:10	xyzw
-	gpeCsz_K,	//  f	16		11:11	KID
-} gpeCsz_U1;
-static const U4 gpaCsz[] = {
-
-	1,	//".b",	//	0	00:00	byte
-	2,	//".w",	//	1	00:01	word
-	4,	//".l",	//	2	00:10	long
-	8,	//".q",	//	3	00:11	quad
-	/// olyan nincsen hogy float és nincs előjel
-	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
-	4,	//".4",	//  4   01:00	RGBA	pixel
-	1,	//".u",	//  5   01:01	string
-										//	12345678901234
-	8,	//".a",	//	6	01:10	ABCDEFGHIJKLMN
-	16,	//".c",	//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
-	/// előjeles
-	1,	//".B",	//	8	10:00	signed byte
-	2,	//".W",	//	9	10:01	signed word
-	4,	//".L",	//	a	10:10	signed long
-	8,	//".Q",	//	b	10:11	signed quad
-	/// lebegőpontos
-	4,	//".f",	//	c	11:00	float
-	8,	//".d",	//  d	11:01	double
-	16,	//".F",	//	e	11:10	xyzw
-	16,	//".K",	//  f	11:11	KID
-};
 class gpcC {	/// CLASS
 	/// ebben lehet bővebben
 	/// mert ez a CLASS a "leírás"
@@ -310,8 +240,8 @@ public:
 	gpcLZY	mLST,	// mem data
 			cLST,	// CLASS LIST
 			dLST,	// dim LIST
-			pOlst;	// OBJ LIST
-	U4		pc, nPC;
+			oLST;	// OBJ LIST
+	U4		pc, nPC, stk;
 	I4x4	*pALL, *pPC;
 	I8		aR[8*4];
 	gpcO	aO[8];
@@ -322,10 +252,11 @@ public:
 		nPC = n;
 		if( pALL != pA )
 		{
+			stk = 0x2000;
 			gpmZ(aR);
 			pc = 0;
-			aR[6] = 0x1000;
-			aR[7] = 0x2000;
+			aR[6] = stk>>1;
+			aR[7] = stk;
 		}
 		if( !pA )
 			pc = nPC;
@@ -343,7 +274,7 @@ public:
 	I4x4* iPC( 	U1x4& op, gpeOPid& oID,
 				U1& iS, U1& xS, gpeEA& mS,
 				U1& iD, U1& xD, gpeEA& mD,
-				U4& szOF
+				gpeCsz& iC
 			) {
 		if( pPC == pALL+pc )
 			pc<nPC ? pALL+pc : NULL;
@@ -362,12 +293,11 @@ public:
 		iD = op.z&7;
 		xS = (op.w>>4)&7;
 		mD = (gpeEA)(op.z>>3);
-		szOF = gpaEAsz[pPC->sz];
+		iC = pPC->iC; //gpaCsz[pPC->iC];
 
 		return pPC;
 	}
-	gpeCsz C( U4& ix, U4 iC, U4 ixO )
-	{
+	gpeCsz C( U4& ix, U4 iC, U4 ixO ) {
 		U4 off = ix-ixO;
 		if( !off )
 			return (gpeCsz)iC;
@@ -430,11 +360,11 @@ public:
 	}
 	U1* ea( U4 ix, I8* pO = NULL, I8* pC = NULL )
 	{
-		if( pO )
-		if(	gpO* pO0 = gpmLZYvali( gpO, &mLST ) )
+		if( pO ? ix >= stk : false )
+		if(	gpO* pO0 = gpmLZYvali( gpO, &oLST ) )
 		{
 			U4	L = 0,
-				H = mLST.nLD(sizeof(*pO0)),
+				H = oLST.nLD(sizeof(*pO0)),
 				i = H/2;
 			pO[0] = 0;
 			while( i>L ? i < H : false )
@@ -527,7 +457,7 @@ public:
 
 	I4x4& LOAD_SRC_ADR_nA0( gpcSCOOP& scp,I4 n=-1) { /// move.l n(iA),A0
 		/// move.l -1(Ai), A0
-		I4x4 &load = isa( PC, gpeOPid_mov, gpeEAszL
+		I4x4 &load = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,0,0  );
 		load.aOB[0] = n;
@@ -535,7 +465,7 @@ public:
 	}
 	I4x4& LOAD_SRC_ADR_nA1( gpcSCOOP& scp,I4 n=-1) { /// move.l n(iA),A1
 		/// move.l -1(Ai), A1
-		I4x4 &load = isa( PC, gpeOPid_mov, gpeEAszL
+		I4x4 &load = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,1,0  );
 		load.aOB[0] = n;
@@ -543,7 +473,7 @@ public:
 	}
 	I4x4& LOAD_DST_ADR_A0( gpcSCOOP& scp ) { /// move.l (iA+1),A0
 
-		I4x4 &prev = isa( PC, gpeOPid_mov, gpeEAszL
+		I4x4 &prev = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,Ad,0
 							,gpeEA_An,0,0
 						);
@@ -551,7 +481,7 @@ public:
 	}
 
 	I4x4& move_l_IA1I_IA0I(gpcSCOOP& scp) { /// move.l (A1),(A0)
-		I4x4& inst = isa( PC, gpeOPid_mov, gpeEAszL
+		I4x4& inst = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,1,0
 							,gpeEA_IAnI,0,0
 						);
@@ -559,7 +489,7 @@ public:
 	}
 	I4x4& move_l_IA1I_D0(gpcSCOOP& scp) { /// move.l (A1),D0
 
-		I4x4& inst = isa( PC, gpeOPid_mov, gpeEAszL
+		I4x4& inst = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,1,0
 							,gpeEA_Dn,0,0
 						);
@@ -567,7 +497,7 @@ public:
 	}
 	I4x4& move_l_IA1I_D1(gpcSCOOP& scp) { /// move.l (A1),D1
 
-		I4x4& inst = isa( PC, gpeOPid_mov, gpeEAszL
+		I4x4& inst = isa( PC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,1,0
 							,gpeEA_Dn,1,0
 						);
@@ -626,18 +556,18 @@ public:
 
 
 		isa( PC );
-        isa( PC, gpeOPid_mov, gpeEAszL
+        isa( PC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_An,As,0
 				,gpeEA_sIAnI,7,0
 			);
         isa( PC );
         isa( PC );
-        isa( PC, gpeOPid_xor, gpeEAszL
+        isa( PC, gpeOPid_xor, gpeCsz_l
 				,gpeEA_Dn,0,0
 				,gpeEA_Dn
 			);
         //I4x4& inst =
-		isa( PC, gpeOPid_mov, gpeEAszL
+		isa( PC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_Dn,0,0
 				,gpeEA_sIAnI,Ad,0
 			).aOB[0] = 1;
@@ -660,7 +590,7 @@ public:
 		/// ITT MÁR LENT
 		if( pSPsam[0].op )
 		{
-			isa( PC, gpeOPid_jsr, gpeEAszL
+			isa( PC, gpeOPid_jsr, gpeCsz_l
 				,gpeEA_num
 			).aOB[0] = pSPsam[0].op-gpeOPid_jsr; //-gpeOPid_jsr;
 		}
@@ -672,12 +602,12 @@ public:
         pMUL    = (gpeOPid*)spM.Ux( pSPsam[0].w, sizeof(gpeOPid));
 
 
-        isa( PC, gpeOPid_mov, gpeEAszL
+        isa( PC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_IAnIp,7,0
 				,gpeEA_An,As,0
 			);
         isa( PC );
-		isa( PC, gpeOPid_mov, gpeEAszL
+		isa( PC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_IAnIp,Ad,0
 				,gpeEA_IAnIp,As
 			);
@@ -691,7 +621,7 @@ public:
 					) {
 		As = Ad;
 		return *this;
-//		/*isa( PC,	gpeOPid_mov, gpeEAszL
+//		/*isa( PC,	gpeOPid_mov, gpeCsz_l
 //                ,gpeEA_An,Ai,0
 //                ,gpeEA_Dn,Ai,0
 //            );*/
@@ -702,7 +632,7 @@ public:
 //			return *this;
 //		}
 //		As = Ad-1;
-//		/*isa( PC, gpeOPid_mov, gpeEAszL
+//		/*isa( PC, gpeOPid_mov, gpeCsz_l
 //                ,gpeEA_An,Ai,0
 //				,gpeEA_Dn,Ai,0
 //            );*/
@@ -733,7 +663,7 @@ public:
 		gpcCD	&ins = dp ? pCD[0-dp] : pCD[0];
 		/// move.l A7,D0
 		//A[7] = D[0];
-		isa( PC, gpeOPid_mov, gpeEAszL
+		isa( PC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_An,7,0
 				,gpeEA_Dn,0,0
 			);
@@ -741,7 +671,7 @@ public:
 			gpcCD &i = pCD[0-dp];
 
 		/// move.l 0xOBJid,-(A7) ; PUSH
-			I4x4 &opcd = isa( PC, gpeOPid_mov, gpeEAszL
+			I4x4 &opcd = isa( PC, gpeOPid_mov, gpeCsz_l
 								,gpeEA_num,0,0
 								,gpeEA_sIAnI,7,0
 							);
@@ -752,12 +682,12 @@ public:
 		/// "\n 0x%0.4x jsr fndOBJ2A0"
 		isa( PC, gpeOPid_dot );
         if( gpaOPgrp[now] == gpeOPid_mov )	/// move.l A0,-(Ai)
-            isa( PC, gpeOPid_mov, gpeEAszL
+            isa( PC, gpeOPid_mov, gpeCsz_l
                     ,gpeEA_An,0,0
                     ,gpeEA_sIAnI,As,0
                 );
 		else 								/// move.l A0,(Ai)+
-            isa( PC, gpeOPid_mov, gpeEAszL
+            isa( PC, gpeOPid_mov, gpeCsz_l
                     ,gpeEA_An,0,0
                     ,gpeEA_IAnIp,As,0
                 );
@@ -844,7 +774,7 @@ public:
 		while( a < nA )
 		{
 			LOAD_SRC_ADR_nA1(scp,s-lADD);	/// move.l n(Ai),A1
-			isa( PC, pADD[a], gpeEAszL
+			isa( PC, pADD[a], gpeCsz_l
 					,gpeEA_IAnI,1,0
 					,gpeEA_Dn,0,0
 			);
@@ -853,7 +783,7 @@ public:
 		}
 
 		LOAD_DST_ADR_A0( scp );	/// move.l (Ai+1),A0
-		isa( PC, *pSTRT, gpeEAszL
+		isa( PC, *pSTRT, gpeCsz_l
                 ,gpeEA_Dn,0,0
 				,gpeEA_IAnI,0,0
 			);
@@ -879,7 +809,7 @@ public:
                 LOAD_SRC_ADR_nA1(scp,-1);	/// move.l n(Ai),A1
                 move_l_IA1I_D0(scp);		/// move.l (A1),D0
                 LOAD_DST_ADR_A0( scp );		/// move.l -(Ai+1),A0
-                isa( PC, *pSTRT, gpeEAszL
+                isa( PC, *pSTRT, gpeCsz_l
                             ,gpeEA_Dn,0,0
                             ,gpeEA_IAnI,0,0
                     );
@@ -910,14 +840,14 @@ public:
 		for( I4 i = 0; i < lMUL; i++ )
 		{
 			LOAD_SRC_ADR_nA1(scp,i-lMUL);	/// move.l n(Ai),A1
-			isa( PC, pMUL[i], gpeEAszL
+			isa( PC, pMUL[i], gpeCsz_l
 					,gpeEA_IAnI,1,0
 					,gpeEA_Dn,0,0
 			);
 		}
 
 		LOAD_DST_ADR_A0( scp );	/// move.l (Ai+1),A0
-		isa( PC, *pSTRT, gpeEAszL
+		isa( PC, *pSTRT, gpeCsz_l
 					,gpeEA_Dn,0,0
 					,gpeEA_IAnI,0,0
 			);

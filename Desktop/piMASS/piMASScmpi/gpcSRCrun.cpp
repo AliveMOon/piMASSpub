@@ -26,8 +26,8 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	gpeOPid iOP;
 	U1 iS, iD, xS, xD;
 	gpeEA mS, mD;
+	gpeCsz iC;	// class id
 	U4 szOF;
-
 	for(	core.ini(
 						(I4x4*)SCOOP.vASM.p_alloc,SCOOP.nASM(),
 						&pA, &pD, &pC, &pO
@@ -37,15 +37,19 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	{
 		pDIS += gpmVAN( pDIS, "\r\n", nL );
 		pDIS += gpmNINCS( pDIS, "\r\n" );
-		pPC = core.iPC( op, iOP, iS, xS, mS, iD, xD, mD, szOF );
+		pPC = core.iPC( op, iOP, iS, xS, mS, iD, xD, mD, iC );
 		if( !pPC )
 			continue; // NOP?
 
 		if( iOP == gpeOPid_dot ) {
 
+			for( U4 eI = pD[0], iI=pA[7]; iI<eI; iI+=4 ) {
+				p_src = core.ea( iI, pO+7, pC+7 );
+
+			}
 			continue;
 		}
-
+		szOF = gpaCsz[iC];
 		switch( mS ) {
 			case gpeEA_OFF:
 				p_src = NULL;
@@ -64,7 +68,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 				pA[iS] += szOF;
 				break;
 			case gpeEA_sIAnI:
-				pA[iS] += szOF;
+				pA[iS] -= szOF;
 				p_src = core.ea( pA[iS], pO+iS, pC+iS );
 				break;
 			case gpeEA_d16IAnI:
@@ -118,7 +122,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 				pA[iD] += szOF;
 				break;
 			case gpeEA_sIAnI:
-				pA[iD] += szOF;
+				pA[iD] -= szOF;
 				p_dst = core.ea( pA[iD], pO+iD, pC+iD );
 				break;
 			case gpeEA_d16IAnI:
@@ -149,8 +153,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 		if( !p_dst )
 			continue;
 
-		switch(gpaOPgrp[iOP])
-		{
+		switch(gpaOPgrp[iOP]) {
 			case gpeOPid_entry:{
 					switch(iOP)
 					{
@@ -175,129 +178,32 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 			case gpeOPid_mul:{
 					if( !p_dst || !p_src )
 						continue;
-					switch( szOF )
+					switch( iC )
 					{
-						case 0x10:
-							switch(iOP)
-							{
-								case gpeOPid_and:
-									*(F4*)p_dst &= *(F4*)p_src;
-									continue;
-								case gpeOPid_rem:
-									*(F4*)p_dst %= *(F4*)p_src;
-									continue;
-								case gpeOPid_div:
-									*(F4*)p_dst /= *(F4*)p_src;
-									continue;
-								case gpeOPid_mul:
-									*(F4*)p_dst *= *(F4*)p_src;
-									continue;
-								default:
-									*(F4*)p_dst *= *(F4*)p_src;
-									continue;
-							}
-							continue;
-						case 8:
-							switch(iOP)
-							{
-								case gpeOPid_and:
-									*(I8*)p_dst &= *(I8*)p_src;
-									continue;
-								case gpeOPid_rem:
-									*(I8*)p_dst %= *(I8*)p_src;
-									continue;
-								case gpeOPid_div:
-									*(I8*)p_dst /= *(I8*)p_src;
-									continue;
-								case gpeOPid_mul:
-									*(I8*)p_dst *= *(I8*)p_src;
-									continue;
-								default:
-									*(I8*)p_dst *= *(I8*)p_src;
-									continue;
-							}
-							continue;
-						case 4:
-							switch(iOP)
-							{
-								case gpeOPid_and:
-									*(I4*)p_dst &= *(I4*)p_src;
-									continue;
-								case gpeOPid_rem:
-									*(I4*)p_dst %= *(I4*)p_src;
-									continue;
-								case gpeOPid_div:
-									*(I4*)p_dst /= *(I4*)p_src;
-									continue;
-								case gpeOPid_mul:
-									*(I4*)p_dst *= *(I4*)p_src;
-									continue;
-								default:
-									*(I4*)p_dst *= *(I4*)p_src;
-									continue;
-							}
-							continue;
-						case 2:
-							switch(iOP)
-							{
-								case gpeOPid_and:
-									*(U2*)p_dst &= *(U2*)p_src;
-									continue;
-								case gpeOPid_rem:
-									*(U2*)p_dst %= *(U2*)p_src;
-									continue;
-								case gpeOPid_div:
-									*(U2*)p_dst /= *(U2*)p_src;
-									continue;
-								case gpeOPid_mul:
-									*(U2*)p_dst *= *(U2*)p_src;
-									continue;
-								default:
-									*(U2*)p_dst *= *(U2*)p_src;
-									continue;
-							}
-							continue;
-						case 1:
-						default:
-							switch(iOP)
-							{
-								case gpeOPid_and:
-									*p_dst &= *p_src;
-									continue;
-								case gpeOPid_rem:
-									*p_dst %= *p_src;
-									continue;
-								case gpeOPid_div:
-									*p_dst /= *p_src;
-									continue;
-								case gpeOPid_mul:
-									*p_dst *= *p_src;
-									continue;
-								default:
-									*p_dst *= *p_src;
-									continue;
-							}
-							continue;
+						case gpeCsz_Q: gpmMUL( I8, iOP ); continue;
+						case gpeCsz_q: gpmMUL( U8, iOP ); continue;
+						case gpeCsz_L: gpmMUL( I4, iOP ); continue;
+						case gpeCsz_l: gpmMUL( U4, iOP ); continue;
+						case gpeCsz_W: gpmMUL( I2, iOP ); continue;
+						case gpeCsz_w: gpmMUL( U2, iOP ); continue;
+						case gpeCsz_B: gpmMUL( I1, iOP ); continue;
+						case gpeCsz_b: gpmMUL( U1, iOP ); continue;
 					}
 				} continue;
 			case gpeOPid_add:{
 					if( !p_dst || !p_src )
 						continue;
 
-					switch(iOP)
+					switch( iC )
 					{
-						case gpeOPid_or:
-							*p_dst |= *p_src;
-							continue;
-						case gpeOPid_sub:
-							*p_dst -= *p_src;
-							continue;
-						case gpeOPid_add:
-							*p_dst += *p_src;
-							continue;
-						default:
-							*p_dst += *p_src;
-							continue;
+						case gpeCsz_Q: gpmADD( I8, iOP ); continue;
+						case gpeCsz_q: gpmADD( U8, iOP ); continue;
+						case gpeCsz_L: gpmADD( I4, iOP ); continue;
+						case gpeCsz_l: gpmADD( U4, iOP ); continue;
+						case gpeCsz_W: gpmADD( I2, iOP ); continue;
+						case gpeCsz_w: gpmADD( U2, iOP ); continue;
+						case gpeCsz_B: gpmADD( I1, iOP ); continue;
+						case gpeCsz_b: gpmADD( U1, iOP ); continue;
 					}
 				} continue;
 			case gpeOPid_sub:{
@@ -372,7 +278,7 @@ gpcRES* gpcSRC::SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) 
 		if( !oID ) // nop
 			continue;
 		iS = op.y&7;
-		szOF = gpaEAsz[pPC->sz];
+		szOF = gpaCsz[pPC->iC];
 
 		if( oID == gpeOPid_dot ) {
 			/// jsr entryOBJ2A0

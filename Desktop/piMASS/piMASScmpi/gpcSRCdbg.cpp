@@ -126,7 +126,7 @@ void gpcSRC::SRCmnMILLdbg( //I8x2* pOP,
 				pc++;
 				break;
 			default:
-				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, gpasEAsz[ins.sz], pS, pD, *pC?";":"", pC );
+				pDBG = pDBG->lzyFRMT( strt=-1, gpas68k[pst], pc, gpasCsz[ins.iC], pS, pD, *pC?";":"", pC );
 				pc++;
 				break;
 		}
