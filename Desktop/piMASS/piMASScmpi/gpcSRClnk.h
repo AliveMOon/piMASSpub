@@ -216,14 +216,14 @@ public:
 class gpO {
 public:
 
-	U2	iNM,	// 0	// name id
-		iC,		// 2	// class id
-		iD,		// 4	// dim id	// 0 1x1
-		iM;		// 6	// mom id	// szülő kapcsota
+	U2	iNM,	// 	0	// name id
+		iC,		/// 2	// class id // gpeCsz_ptr *pntr
+		iD,		// 	4	// dim id	// 0 1x1
+		iM;		// 	6	// mom id	// szülő kapcsota
 
-	U4	iX,		// 8	// index
-		szOF;	// 12	szOF
-				// 16
+	U4	iX,		// 	8	// index
+		szOF;	// 	12	szOF
+				// 	16
 
 
 
@@ -246,6 +246,25 @@ public:
 	I8		aR[8*4];
 	gpcO	aO[8];
 
+	~gpCORE(){
+		if(	gpO* pO0 = gpmLZYvali( gpO, &oLST ) )
+		{
+			U4 n = oLST.nLD(sizeof(*pO0));
+			for( U4 i = 0; i < n; i++ )
+			{
+				switch( pO0[i].iC )
+				{
+					case gpeCsz_ptr: {
+							U4* pU4 = (U4*)mLST.Ux( pO0[i].iX, gpaCsz[gpeCsz_ptr], true, sizeof(U1) );
+							char** ppSTR = (char**)(pU4+1);
+							gpmDELary( *ppSTR );
+						} continue;
+					default:
+						continue;
+				}
+			}
+		}
+	}
 
 	gpCORE(){ gpmCLR; }
 	I4x4* ini( I4x4* pA, U4 n, I8** ppA, I8** ppD, I8** ppC, I8** ppO ) {
@@ -357,6 +376,41 @@ public:
 
 		ix = ixO;
 		return gpeCsz_K;
+	}
+
+	U4 ix_str( char* pSTR, U4 nSTR, U4 oID )
+	{
+		U4 n = oLST.nLD(sizeof(gpO));
+		if(	gpO* pO0 = gpmLZYvali( gpO, &oLST ) )
+		{
+			for( U4 i = 0; i < n; i++ )
+			{
+				switch( pO0[i].iC )
+				{
+					case gpeCsz_ptr: {
+							U4* pU4 = (U4*)mLST.Ux( pO0[i].iX, gpaCsz[gpeCsz_ptr], true, sizeof(U1) );
+							if( *pU4 != oID )
+								continue;
+							return pO0[i].iX;
+						} continue;
+					default:
+						continue;
+				}
+			}
+		}
+
+		gpO* pO = (gpO*)oLST.Ux( n, sizeof(gpO) );
+		pO[0].iNM = 0;
+		pO[0].iC = gpeCsz_ptr;
+		pO[0].iD = 0;
+		pO[0].iX = mLST.nLD();
+		pO[0].szOF = gpaCsz[pO[0].iC];
+
+		U4* pU4 = (U4*)mLST.Ux( pO[0].iX, pO[0].szOF, true, sizeof(U1) );
+		char** ppSTR = (char**)(pU4+1);
+		pU4[0] = oID;
+		gpmMcpy( ppSTR[0] = new char[nSTR+1], pSTR, nSTR )[nSTR] = 0;
+		return pO[0].iX;
 	}
 	U1* ea( U4 ix, I8* pO = NULL, I8* pC = NULL )
 	{

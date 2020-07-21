@@ -9,7 +9,7 @@
  0x0007 jsr entryOBJ2A0
  0x0008 move.l	A0,(A5)+	
  0x0009 nop ;-------------------------
- 0x000a move.l	-1(A5),A1	
+ 0x000a move.l	-4(A5),A1	
  0x000b move.l	(A1),D0	
  0x000c move.l	(A6),A0	
  0x000d move.l	D0,(A0)	
@@ -26,7 +26,7 @@
  0x0018 jsr entryOBJ2A0
  0x0019 move.l	A0,(A5)+	
  0x001a nop ;-------------------------
- 0x001b move.l	-1(A5),A1	
+ 0x001b move.l	-4(A5),A1	
  0x001c move.l	(A6),A0	
  0x001d move.l	(A1),(A0)	
  0x001e nop ;-------------------------
@@ -42,9 +42,9 @@
  0x0028 jsr entryOBJ2A0
  0x0029 move.l	A0,(A5)+	
  0x002a nop ;-------------------------
- 0x002b move.l	-2(A5),A1	
+ 0x002b move.l	-8(A5),A1	
  0x002c move.l	(A1),D0	
- 0x002d move.l	-1(A5),A1	
+ 0x002d move.l	-4(A5),A1	
  0x002e MUL.l	(A1),D0		; *
  0x002f move.l	(A6),A0	
  0x0030 SUB.l	D0,(A0)			; -
@@ -55,7 +55,7 @@
  0x0035 jsr entryOBJ2A0
  0x0036 move.l	A0,(A5)+	
  0x0037 nop ;-------------------------
- 0x0038 move.l	-1(A5),A1	
+ 0x0038 move.l	-4(A5),A1	
  0x0039 move.l	(A1),D0	
  0x003a move.l	(A6),A0	
  0x003b ADD.l	D0,(A0)			; + 
@@ -88,7 +88,7 @@
  0x0056 jsr entryOBJ2A0
  0x0057 move.l	A0,(A5)+	
  0x0058 nop ;-------------------------
- 0x0059 move.l	-1(A5),A1	
+ 0x0059 move.l	-4(A5),A1	
  0x005a move.l	(A6),A0	
  0x005b move.l	(A1),(A0)	
  0x005c nop ;-------------------------
@@ -102,9 +102,9 @@
  0x0064 jsr entryOBJ2A0
  0x0065 move.l	A0,(A5)+	
  0x0066 nop ;-------------------------
- 0x0067 move.l	-2(A5),A1	
+ 0x0067 move.l	-8(A5),A1	
  0x0068 move.l	(A1),D0	
- 0x0069 move.l	-1(A5),A1	
+ 0x0069 move.l	-4(A5),A1	
  0x006a MUL.l	(A1),D0		; *
  0x006b move.l	(A6),A0	
  0x006c ADD.l	D0,(A0)			; + 
@@ -114,7 +114,7 @@
  0x0070 jsr entryOBJ2A0
  0x0071 move.l	A0,(A5)+	
  0x0072 nop ;-------------------------
- 0x0073 move.l	-1(A5),A1	
+ 0x0073 move.l	-4(A5),A1	
  0x0074 move.l	(A1),D0	
  0x0075 move.l	(A6),A0	
  0x0076 ADD.l	D0,(A0)			; + 
@@ -124,13 +124,13 @@
  0x007a nop ;-------------------------
  0x007b move.l	(A6)+,(A5)+	
  0x007c nop ;-------------------------
- 0x007d move.l	-4(A5),A1	
+ 0x007d move.l	-16(A5),A1	
  0x007e move.l	(A1),D0	
- 0x007f move.l	-3(A5),A1	
+ 0x007f move.l	-12(A5),A1	
  0x0080 MUL.l	(A1),D0		; *
- 0x0081 move.l	-2(A5),A1	
+ 0x0081 move.l	-8(A5),A1	
  0x0082 DIV.l	(A1),D0			; /
- 0x0083 move.l	-1(A5),A1	
+ 0x0083 move.l	-4(A5),A1	
  0x0084 MUL.l	(A1),D0		; *
  0x0085 move.l	(A6),A0	
  0x0086 SUB.l	D0,(A0)			; -
@@ -140,7 +140,7 @@
  0x008a jsr entryOBJ2A0
  0x008b move.l	A0,(A5)+	
  0x008c nop ;-------------------------
- 0x008d move.l	-1(A5),A1	
+ 0x008d move.l	-4(A5),A1	
  0x008e move.l	(A1),D0	
  0x008f move.l	(A6),A0	
  0x0090 ADD.l	D0,(A0)			; + 
@@ -163,7 +163,7 @@
  0x00a1 jsr entryOBJ2A0
  0x00a2 move.l	A0,(A5)+	
  0x00a3 nop ;-------------------------
- 0x00a4 move.l	-1(A5),A1	
+ 0x00a4 move.l	-4(A5),A1	
  0x00a5 move.l	(A1),D0	
  0x00a6 move.l	(A6),A0	
  0x00a7 move.l	D0,(A0)	
@@ -174,7 +174,7 @@
  0x00ac jsr entryOBJ2A0
  0x00ad move.l	A0,(A5)+	
  0x00ae nop ;-------------------------
- 0x00af move.l	-1(A5),A1	
+ 0x00af move.l	-4(A5),A1	
  0x00b0 move.l	(A1),D0	
  0x00b1 move.l	(A6),A0	
  0x00b2 move.l	D0,(A0)	

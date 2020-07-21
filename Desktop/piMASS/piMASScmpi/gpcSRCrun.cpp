@@ -49,60 +49,77 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 
 			for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4 ) {
 				p_src = core.ea( iI, pO+7, pC+7 );
-				gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( *(int*)p_src, sizeof(gpcOBJlnk)))[0];
-				gpeTYP typ = O.typ;
-				gpeALF alf = O.obj.alf;
 				*sBUFF = ' ';
-				switch( O.typ )
+				if( *(int*)p_src < 0 )
 				{
-					case gpeTYP_sA8:
-						gpfALF2STR( sBUFF+1, alf );
-						break;
-					case gpeTYP_sA8N:
-						O.obj.an2str( sBUFF+1 );
-						break;
-					case gpeTYP_U1:
-						sprintf( sBUFF+1, "0x%0.2x", O.obj.uy );
-						break;
-					case gpeTYP_U2:
-						sprintf( sBUFF+1, "0x%0.4x", O.obj.uy );
-						break;
-					case gpeTYP_U4:
-						sprintf( sBUFF+1, "0x%0.8x", O.obj.uy );
-						break;
-					case gpeTYP_U8:
-						sprintf( sBUFF+1, "0x%0.16llx", O.obj.uy );
-						break;
+					int i = -*(int*)p_src;
+					char* pSTR = pALL+pM0[i].iMNi+1;
+					n = pM0[i].iMNn-2;
 
-					case gpeTYP_I1:
-						sprintf( sBUFF+1, "0x%.3d", O.obj.num );
-						break;
-					case gpeTYP_I2:
-						sprintf( sBUFF+1, "0x%.6d", O.obj.num );
-						break;
-					case gpeTYP_I4:
-						sprintf( sBUFF+1, "0x%.9d", O.obj.num );
-						break;
-					case gpeTYP_I8:
-						sprintf( sBUFF+1, "0x%.12lld", O.obj.num );
-						break;
+					pA[0] = core.ix_str( pSTR, n, i );
 
-					case gpeTYP_D:
-					case gpeTYP_F:
-						sprintf( sBUFF+1, "%0.7f", O.obj.dy );
-						break;
+					if( n > 0x7e )
+						n = 0x7e;
+					gpmMcpy( sBUFF+0x80, pSTR, n );
+					sBUFF[0x80+n]=0;
+					sprintf( sBUFF+1, "\"%s...\"", sBUFF+0x80 );
 
-					case gpeTYP_STR:
-						n = pM0[O.obj.uy].iMNn;
-						if( n > 0x7e )
-							n = 0x7e;
-						gpmMcpy( sBUFF+0x80, pALL+(pM0[O.obj.uy]).iMNi, n );
-						sBUFF[0x80+n]=0;
-						sprintf( sBUFF+1, "\"%s...\"", sBUFF+0x80 );
-						break;
-					default:
-						sprintf( sBUFF+1, "%x", O.typ );
-						break;
+
+				} else {
+					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( *(int*)p_src, sizeof(gpcOBJlnk)))[0];
+					gpeTYP typ = O.typ;
+					gpeALF alf = O.obj.alf;
+					switch( O.typ )
+					{
+						case gpeTYP_sA8:
+							gpfALF2STR( sBUFF+1, alf );
+							break;
+						case gpeTYP_sA8N:
+							O.obj.an2str( sBUFF+1 );
+							break;
+						case gpeTYP_U1:
+							sprintf( sBUFF+1, "0x%0.2x", O.obj.uy );
+							break;
+						case gpeTYP_U2:
+							sprintf( sBUFF+1, "0x%0.4x", O.obj.uy );
+							break;
+						case gpeTYP_U4:
+							sprintf( sBUFF+1, "0x%0.8x", O.obj.uy );
+							break;
+						case gpeTYP_U8:
+							sprintf( sBUFF+1, "0x%0.16llx", O.obj.uy );
+							break;
+
+						case gpeTYP_I1:
+							sprintf( sBUFF+1, "0x%.3d", O.obj.num );
+							break;
+						case gpeTYP_I2:
+							sprintf( sBUFF+1, "0x%.6d", O.obj.num );
+							break;
+						case gpeTYP_I4:
+							sprintf( sBUFF+1, "0x%.9d", O.obj.num );
+							break;
+						case gpeTYP_I8:
+							sprintf( sBUFF+1, "0x%.12lld", O.obj.num );
+							break;
+
+						case gpeTYP_D:
+						case gpeTYP_F:
+							sprintf( sBUFF+1, "%0.7f", O.obj.dy );
+							break;
+
+						case gpeTYP_STR:
+							n = pM0[O.obj.uy].iMNn;
+							if( n > 0x7e )
+								n = 0x7e;
+							gpmMcpy( sBUFF+0x80, pALL+(pM0[O.obj.uy].iMNi), n );
+							sBUFF[0x80+n]=0;
+							sprintf( sBUFF+1, "\"%s...\"", sBUFF+0x80 );
+							break;
+						default:
+							sprintf( sBUFF+1, "%x", O.typ );
+							break;
+					}
 				}
 				std::cout << *(U4*)p_src << " " << sBUFF << std::endl;
 

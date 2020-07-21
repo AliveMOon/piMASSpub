@@ -6327,7 +6327,6 @@ public:
 
 		return *this;
 	}
-
 	gpcLZY* operator += ( const gpcLZY& plus ) {
 		U8 s = -1;
 		return lzyADD( plus.p_alloc, plus.n_load, s );
@@ -6462,7 +6461,9 @@ szasz:
 
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( U4 i, U4 n, bool bZ = true, U4 stp = 0 ) {
+	U1* Ux( I8 i, U4 n, bool bZ = true, U4 stp = 0 ) {
+		if( i < 0 )
+			i *= -1;
 		if( !stp )
 			stp = n;
 		U8 e = i*stp + 2*n, s = -1;

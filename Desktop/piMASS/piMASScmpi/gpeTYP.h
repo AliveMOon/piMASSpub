@@ -110,8 +110,8 @@ static const char* gpasCsz[] = {
 	/// olyan nincsen hogy float és nincs előjel
 	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
 	".4",	//  4   1x4		01:00	RGBA	pixel
-	".u",	//  5   1->0	01:01	string
-										//	12345678901234
+	".p",	//  5   1->0	01:01	// gpeCsz_ptr pointer
+								//	12345678901234
 	".a",	//	6	8		01:10	ABCDEFGHIJKLMN
 	".c",	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
 	/// előjeles
@@ -133,7 +133,9 @@ typedef enum gpeCsz:U1{
 	/// olyan nincsen hogy float és nincs előjel (lglbb is itt)
 	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
 	gpeCsz_4,	//  4   1x4		01:00	RGBA	pixel
-	gpeCsz_u,	//  5   1->0	01:01	string
+
+	/// gpeCsz_ptr pointer
+	gpeCsz_ptr,	//  5   1->0	01:01	string
 										//	12345678901234
 	gpeCsz_a,	//	6	8		01:10	ABCDEFGHIJKLMN
 	gpeCsz_C,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
@@ -150,27 +152,27 @@ typedef enum gpeCsz:U1{
 } gpeCsz_U1;
 static const U4 gpaCsz[] = {
 
-	1,	//".b",	//	0	00:00	byte
-	2,	//".w",	//	1	00:01	word
-	4,	//".l",	//	2	00:10	long
-	8,	//".q",	//	3	00:11	quad
+	1,	//".b",		//	0	00:00	byte
+	2,	//".w",		//	1	00:01	word
+	4,	//".l",		//	2	00:10	long
+	8,	//".q",		//	3	00:11	quad
 	/// olyan nincsen hogy float és nincs előjel
 	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
-	4,	//".4",	//  4   01:00	RGBA	pixel
-	1,	//".u",	//  5   01:01	string
+	4,	//".4",		//  4   01:00	RGBA	pixel
+	4+sizeof(U1*),	//".u",	//  5   01:01	string
 										//	12345678901234
-	8,	//".a",	//	6	01:10	ABCDEFGHIJKLMN
-	16,	//".c",	//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
+	8,	//".a",		//	6	01:10	ABCDEFGHIJKLMN
+	16,	//".c",		//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?
 	/// előjeles
-	1,	//".B",	//	8	10:00	signed byte
-	2,	//".W",	//	9	10:01	signed word
-	4,	//".L",	//	a	10:10	signed long
-	8,	//".Q",	//	b	10:11	signed quad
+	1,	//".B",		//	8	10:00	signed byte
+	2,	//".W",		//	9	10:01	signed word
+	4,	//".L",		//	a	10:10	signed long
+	8,	//".Q",		//	b	10:11	signed quad
 	/// lebegőpontos
-	4,	//".f",	//	c	11:00	float
-	8,	//".d",	//  d	11:01	double
-	4,	//".K",	//  e	11:10	KID
-	0,	//".F",	//	f	11:11	OFF
+	4,	//".f",		//	c	11:00	float
+	8,	//".d",		//  d	11:01	double
+	4,	//".K",		//  e	11:10	KID
+	0,	//".F",		//	f	11:11	OFF
 };
 static const U8 gpaCszMX[] = {
 
