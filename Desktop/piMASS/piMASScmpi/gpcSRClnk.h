@@ -216,7 +216,7 @@ public:
 class gpO {
 public:
 
-	U2	iNM,	// 	0	// name id
+	U2	iO,		// 	0	// obj id
 		iC,		/// 2	// class id // gpeCsz_ptr *pntr
 		iD,		// 	4	// dim id	// 0 1x1
 		iM;		// 	6	// mom id	// szülő kapcsota
@@ -378,6 +378,58 @@ public:
 		return gpeCsz_K;
 	}
 
+	U4 ix( U4 ix, I8& d1, I4 oID )
+	{
+        if( !ix )
+        {
+			U4 n = oLST.nLD(sizeof(gpO));
+			gpO* pO = gpmLZYvali( gpO, &oLST );
+			if( pO )
+			for( U4 i = 0; i < n; i++ )
+			{
+				if( pO[i].iO != oID )
+					continue;
+				d1 = pO[i].iC;
+				return pO[i].iX;
+			}
+
+			gpO* pO = (gpO*)oLST.Ux( oID, sizeof(gpO) );
+			pO[0].iO = oID;
+			pO[0].iC = d1 = gpeCsz_OFF;	// még nem adtuk meg
+			pO[0].iD = 0;
+			pO[0].iX = mLST.nLD();
+			pO[0].szOF = 0;			// még nem tudjuk
+			return pO[0].iX;
+		}
+
+		gpC		*pC = gpmLZYvali( gpC, &cLST )+d1;
+		U4x4	*pCL = pC->pLST, *pCK;
+		gpeCsz	Csz;
+		U4		ary, add;
+		for( U4 i = 0, n = pC->nLST; i < n; i++ )
+		{
+			Csz = (gpeCsz)(pCL[i].x&0xf);
+			ary = pCL[i].y;
+			if( !ary )
+			{
+				ary = pCL[i].y = pCL[i].a4x2[1].area();
+				if( !ary )
+					ary = pCL[i].y = (pCL[i].a4x2[1] = 1).x;
+			}
+
+			if( Csz < gpeCsz_K )
+			{
+				add = ary*gpaCsz[Csz];
+				ixi += add;
+				if( ixi-ixo < off )
+					continue;
+				ix = ixi-add;
+				return Csz;
+			}
+		}
+
+	}
+
 	U4 ix_str( char* pSTR, U4 nSTR, U4 oID )
 	{
 		U4 n = oLST.nLD(sizeof(gpO));
@@ -400,15 +452,13 @@ public:
 		}
 
 		gpO* pO = (gpO*)oLST.Ux( n, sizeof(gpO) );
-		pO[0].iNM = 0;
+		pO[0].iO = oID;
 		pO[0].iC = gpeCsz_ptr;
 		pO[0].iD = 0;
 		pO[0].iX = mLST.nLD();
 		pO[0].szOF = gpaCsz[pO[0].iC];
 
-		U4* pU4 = (U4*)mLST.Ux( pO[0].iX, pO[0].szOF, true, sizeof(U1) );
-		char** ppSTR = (char**)(pU4+1);
-		pU4[0] = oID;
+		char** ppSTR = (char**)mLST.Ux( pO[0].iX, pO[0].szOF, true, sizeof(U1) );
 		gpmMcpy( ppSTR[0] = new char[nSTR+1], pSTR, nSTR )[nSTR] = 0;
 		return pO[0].iX;
 	}

@@ -8,8 +8,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	if( !this )
 		return NULL;
 
-	SRCmnMILLdbg( //pMASS->aOP,
-					pMASS->OPER, 0 );
+	SRCmnMILLdbg( pMASS->OPER, 0 );
 	if( !pDBG->nLD() )
 		return NULL;
 
@@ -18,7 +17,10 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	char	*pALL = (char*)SCOOP.pALL,
 			*pSTR;
 	I4		nSTR, a, n;
-	char* pDIS = (char*)pDBG->p_alloc, sBUFF[0x100];
+	char sBF[0x100],
+		 *pDIS = (char*)pDBG->p_alloc, *pBF = NULL;
+	pBF = sBF+1;
+	if( pBF ) *sBF = ' ';
 	gpCORE core;
 	I4x4	*pPC;
 	I8		*pA, *pO, *pC,
@@ -32,24 +34,31 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	gpeCsz iC;	// class id
 	U4 szOF;
 	U8 mx;
-	for(	core.ini(
+	gpcREG wVAR;
+
+	for(
+			/// loop INIT --------------
+			core.ini(
 						(I4x4*)SCOOP.vASM.p_alloc,SCOOP.nASM(),
 						&pA, &pD, &pC, &pO
 					);
+			/// loop CMP --------------
 			core.pc < core.nPC;
-			core.pc++ )
+			/// loop INCRMNT --------------
+			core.pc++
+		)
 	{
 		pDIS += gpmVAN( pDIS, "\r\n", nL );
 		pDIS += gpmNINCS( pDIS, "\r\n" );
 		pPC = core.iPC( op, iOP, iS, xS, mS, iD, xD, mD, iC );
 		if( !pPC )
-			continue; // NOP?
+			continue; /// - NOP! --------------
 
 		if( iOP == gpeOPid_dot ) {
 
 			for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4 ) {
 				p_src = core.ea( iI, pO+7, pC+7 );
-				*sBUFF = ' ';
+
 				if( *(int*)p_src < 0 )
 				{
 					int i = -*(int*)p_src;
@@ -57,14 +66,13 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 					n = pM0[i].iMNn-2;
 
 					pA[0] = core.ix_str( pSTR, n, i );
-
-					if( n > 0x7e )
-						n = 0x7e;
-					gpmMcpy( sBUFF+0x80, pSTR, n );
-					sBUFF[0x80+n]=0;
-					sprintf( sBUFF+1, "\"%s...\"", sBUFF+0x80 );
-
-
+					if( pBF ) {
+						if( n > 0x7e )
+							n = 0x7e;
+						gpmMcpy( sBF+0x80, pSTR, n );
+						sBF[0x80+n]=0;
+						sprintf( pBF, "\"%s...\"", sBF+0x80 );
+					}
 				} else {
 					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( *(int*)p_src, sizeof(gpcOBJlnk)))[0];
 					gpeTYP typ = O.typ;
@@ -72,42 +80,53 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 					switch( O.typ )
 					{
 						case gpeTYP_sA8:
-							gpfALF2STR( sBUFF+1, alf );
+							/// ha win variable akkor is csinál ide egy változatot belölle
+							/// hogy felül lehessen írni
+							if( pBF ) gpfALF2STR( pBF, alf );
+
+							if( pWIN->WINvar( wVAR, alf ) )
+							{
+								// valamit kapott
+								bSW |= gpeMASSloopMSK;
+								pSTR = (char*)wVAR.getSTR();
+								continue;
+							}
+
 							break;
 						case gpeTYP_sA8N:
-							O.obj.an2str( sBUFF+1 );
+							if( pBF ) O.obj.an2str( pBF );
 							break;
 						case gpeTYP_U1:
-							sprintf( sBUFF+1, "0x%0.2x", O.obj.uy );
+							if( pBF ) sprintf( pBF, "0x%0.2x", O.obj.uy );
 							break;
 						case gpeTYP_U2:
-							sprintf( sBUFF+1, "0x%0.4x", O.obj.uy );
+							if( pBF ) sprintf( pBF, "0x%0.4x", O.obj.uy );
 							break;
 						case gpeTYP_U4:
-							sprintf( sBUFF+1, "0x%0.8x", O.obj.uy );
+							if( pBF ) sprintf( pBF, "0x%0.8x", O.obj.uy );
 							break;
 						case gpeTYP_U8:
-							sprintf( sBUFF+1, "0x%0.16llx", O.obj.uy );
+							if( pBF ) sprintf( pBF, "0x%0.16llx", O.obj.uy );
 							break;
 
 						case gpeTYP_I1:
-							sprintf( sBUFF+1, "0x%.3d", O.obj.num );
+							if( pBF ) sprintf( pBF, "0x%.3d", O.obj.num );
 							break;
 						case gpeTYP_I2:
-							sprintf( sBUFF+1, "0x%.6d", O.obj.num );
+							if( pBF ) sprintf( pBF, "0x%.6d", O.obj.num );
 							break;
 						case gpeTYP_I4:
-							sprintf( sBUFF+1, "0x%.9d", O.obj.num );
+							if( pBF ) sprintf( pBF, "0x%.9d", O.obj.num );
 							break;
 						case gpeTYP_I8:
-							sprintf( sBUFF+1, "0x%.12lld", O.obj.num );
+							if( pBF ) sprintf( pBF, "0x%.12lld", O.obj.num );
 							break;
 
 						case gpeTYP_D:
 						case gpeTYP_F:
-							sprintf( sBUFF+1, "%0.7f", O.obj.dy );
+							if( pBF ) sprintf( pBF, "%0.7f", O.obj.dy );
 							break;
-
+						/* ez már felül fel kell dolgozni
 						case gpeTYP_STR:
 							n = pM0[O.obj.uy].iMNn;
 							if( n > 0x7e )
@@ -115,14 +134,14 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 							gpmMcpy( sBUFF+0x80, pALL+(pM0[O.obj.uy].iMNi), n );
 							sBUFF[0x80+n]=0;
 							sprintf( sBUFF+1, "\"%s...\"", sBUFF+0x80 );
-							break;
+							break;*/
 						default:
-							sprintf( sBUFF+1, "%x", O.typ );
+							if( pBF ) sprintf( pBF, "%x", O.typ );
 							break;
 					}
 				}
-				std::cout << *(U4*)p_src << " " << sBUFF << std::endl;
-
+				if( pBF )
+					std::cout << *(U4*)p_src << sBF << std::endl;
 			}
 			pA[7] = pD[0];
 			continue;
