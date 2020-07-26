@@ -147,8 +147,8 @@ typedef enum gpeCsz:U1{
 	/// lebegőpontos
 	gpeCsz_f,	//	c	4		11:00	float
 	gpeCsz_d,	//  d	8		11:01	double
-	gpeCsz_K,	//  f	16		11:10	KID
-	gpeCsz_OFF,	//	e	16		11:11	OFF
+	gpeCsz_0,	//	e	16		11:10	ZRO
+	gpeCsz_K,	//  f	16		11:11	KID
 } gpeCsz_U1;
 static const U4 gpaCsz[] = {
 
@@ -171,8 +171,8 @@ static const U4 gpaCsz[] = {
 	/// lebegőpontos
 	4,	//".f",		//	c	11:00	float
 	8,	//".d",		//  d	11:01	double
-	4,	//".K",		//  e	11:10	KID
-	0,	//".F",		//	f	11:11	OFF
+	0,	//".Z",		//  e	11:10	KID
+	4,	//".K",		//	f	11:11	OFF
 };
 static const U8 gpaCszMX[] = {
 

@@ -3,6 +3,139 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN, U8& bSW, U4 newC )
+	{
+
+		aSTK[nSTK = 0].null();
+		gpcREG wVAR;
+		gpO* pOo;
+
+		for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4, nSTK++ ) {
+			//p_src = ea( iI, pO+7, pC+7 );
+			int oID = *(int*)ea( iI, pO+7, pC+7 ); // p_src;
+			if( oID < 0 )
+			{
+				oID *= -1;
+				//int i = -*(int*)p_src;
+				char* pSTR = pSCPall + pM0[oID].iMNi+1;
+				//n = ;
+
+				return ix_str( pSTR, pM0[oID].iMNn-2, oID );
+			}
+
+			gpcOBJlnk& O = ((gpcOBJlnk*)pSCPobj->Ux( oID, sizeof(gpcOBJlnk)))[0];
+			gpeTYP typ = O.typ;
+
+			switch( O.typ )
+			{
+				case gpeTYP_sA8:
+					/// ha win variable akkor is csinál ide egy változatot belölle
+					/// hogy felül lehessen írni
+					if( !nSTK )
+					{
+						/// most kezdődik
+						//U4 nO = oLST.nLD(sizeof(gpO));
+						U4 iO;
+						pOo = oIDfnd( oID, iO );
+						if( pOo )
+						{
+							aSTK[nSTK].iX = pOo->iX;
+							aSTK[nSTK].pC =
+								(aSTK[nSTK].iC = pOo->iC) < gpeCsz_K
+								? NULL
+								: gpmLZYvali( gpC, &cLST ) + pOo->iC-gpeCsz_K;
+							continue;
+						}
+						/*if( pO )
+						{
+							bool bGD = false;
+
+							for( U4 i = 0; i < nO; i++ )
+							{
+								if( pO[i].iO != oID )
+									continue;
+								aSTK[nSTK].iX = pO[i].iX;
+								aSTK[nSTK].pC =
+									(aSTK[nSTK].iC = pO[i].iC) < gpeCsz_K
+									? NULL
+									: gpmLZYvali( gpC, &cLST ) + pO[i].iC-gpeCsz_K;
+								bGD = true;
+								break;
+							}
+							if( bGD )
+								continue;
+						}*/
+
+						gpeALF alf = O.obj.alf;
+						if( pWIN->WINvar( wVAR, alf ) )
+						{
+							// valamit kapott
+							bSW |= gpeMASSloopMSK;
+							return ix_reg( wVAR, oID );
+						}
+
+						pOo = (gpO*)oLST.Ux( iO, sizeof(gpO) );
+						pOo->iO = oID;
+						pOo->iC = newC;
+						pOo->iD = 0;
+						pOo->iX = mLST.nLD();
+						pOo->szOF = sOF(newC);
+						mLST.Ux( pOo->iX, pOo->szOF );
+
+						aSTK[nSTK].iX = pOo->iX;
+						aSTK[nSTK].pC =
+							(aSTK[nSTK].iC = pOo->iC) < gpeCsz_K
+							? NULL
+							: gpmLZYvali( gpC, &cLST ) + pOo->iC-gpeCsz_K;
+						continue;
+
+
+					}
+
+					break;
+				case gpeTYP_sA8N:
+					//if( pBF ) O.obj.an2str( pBF );
+					break;
+				case gpeTYP_U1:
+					//if( pBF ) sprintf( pBF, "0x%0.2x", O.obj.uy );
+					break;
+				case gpeTYP_U2:
+					//if( pBF ) sprintf( pBF, "0x%0.4x", O.obj.uy );
+					break;
+				case gpeTYP_U4:
+					//if( pBF ) sprintf( pBF, "0x%0.8x", O.obj.uy );
+					break;
+				case gpeTYP_U8:
+					//if( pBF ) sprintf( pBF, "0x%0.16llx", O.obj.uy );
+					break;
+
+				case gpeTYP_I1:
+					//if( pBF ) sprintf( pBF, "0x%.3d", O.obj.num );
+					break;
+				case gpeTYP_I2:
+					//if( pBF ) sprintf( pBF, "0x%.6d", O.obj.num );
+					break;
+				case gpeTYP_I4:
+					//if( pBF ) sprintf( pBF, "0x%.9d", O.obj.num );
+					break;
+				case gpeTYP_I8:
+					//if( pBF ) sprintf( pBF, "0x%.12lld", O.obj.num );
+					break;
+
+				case gpeTYP_D:
+				case gpeTYP_F:
+					//if( pBF ) sprintf( pBF, "%0.7f", O.obj.dy );
+					break;
+				default:
+					//if( pBF ) sprintf( pBF, "%x", O.typ );
+					break;
+			}
+		}
+		if( nSTK>1 )
+			return aSTK[nSTK-1].iX;
+
+		return 0;
+	}
 
 gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	if( !this )
@@ -11,6 +144,8 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	SRCmnMILLdbg( pMASS->OPER, 0 );
 	if( !pDBG->nLD() )
 		return NULL;
+
+	return NULL;
 
 	static const U1 iMN=0;
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
@@ -40,7 +175,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 			/// loop INIT --------------
 			core.ini(
 						(I4x4*)SCOOP.vASM.p_alloc,SCOOP.nASM(),
-						&pA, &pD, &pC, &pO
+						&pA, &pD, &pO, &pC
 					);
 			/// loop CMP --------------
 			core.pc < core.nPC;
@@ -55,17 +190,22 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 			continue; /// - NOP! --------------
 
 		if( iOP == gpeOPid_dot ) {
-
+			pA[0] = core.entryOBJ2A0( pM0, pALL, &OBJ, pWIN, bSW, pD[1] );
+			pA[7] = pD[0];
+			continue;
+			//pD[1] = gpeCsz_0;
 			for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4 ) {
 				p_src = core.ea( iI, pO+7, pC+7 );
+				int oID = *(int*)p_src;
 
-				if( *(int*)p_src < 0 )
+				if( oID < 0 )
 				{
-					int i = -*(int*)p_src;
-					char* pSTR = pALL+pM0[i].iMNi+1;
-					n = pM0[i].iMNn-2;
+					oID *= -1;
+					//int i = -*(int*)p_src;
+					char* pSTR = pALL+pM0[oID].iMNi+1;
+					n = pM0[oID].iMNn-2;
 
-					pA[0] = core.ix_str( pSTR, n, i );
+					pA[0] = core.ix_str( pSTR, n, oID );
 					if( pBF ) {
 						if( n > 0x7e )
 							n = 0x7e;
@@ -74,7 +214,8 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 						sprintf( pBF, "\"%s...\"", sBF+0x80 );
 					}
 				} else {
-					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( *(int*)p_src, sizeof(gpcOBJlnk)))[0];
+
+					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( oID, sizeof(gpcOBJlnk)))[0];
 					gpeTYP typ = O.typ;
 					gpeALF alf = O.obj.alf;
 					switch( O.typ )
@@ -83,6 +224,8 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 							/// ha win variable akkor is csinál ide egy változatot belölle
 							/// hogy felül lehessen írni
 							if( pBF ) gpfALF2STR( pBF, alf );
+
+							pA[0] = core.ix( pA[0], oID );
 
 							if( pWIN->WINvar( wVAR, alf ) )
 							{

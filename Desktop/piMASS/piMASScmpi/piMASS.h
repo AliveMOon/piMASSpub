@@ -2164,83 +2164,70 @@ public:
 
 
     U4x4& str2date( U1* p_str, U1* p_end, U1** pp_str = NULL );
-    char* pSTR( char* pBUFF, const char* pSP = ", "  )
-    {
+    char* pSTR( char* pBUFF, const char* pSP = ", "  ) {
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
     }
 
-    bool operator != ( const U4x4& b ) const
-	{
+    bool operator != ( const U4x4& b ) const {
 		if( a4x2[0] != b.a4x2[0] )
 			return true;
 		return a4x2[1] != b.a4x2[1];
 	}
-	bool operator == ( const U4x4& b ) const
-	{
+	bool operator == ( const U4x4& b ) const {
 		return !(*this!=b);
 	}
 
 
-	U4x4& operator += ( const U4x4& b )
-	{
+	U4x4& operator += ( const U4x4& b ) {
 		a4x2[0] += b.a4x2[0];
 		a4x2[1] += b.a4x2[1];
 		return *this;
 	}
-	U4x4& operator -= ( const U4x4& b )
-	{
+	U4x4& operator -= ( const U4x4& b ) {
 		a4x2[0] -= b.a4x2[0];
 		a4x2[1] -= b.a4x2[1];
 		return *this;
 	}
 
-	U4x4& operator += ( const U4x2& b )
-	{
+	U4x4& operator += ( const U4x2& b ) {
 		a4x2[0] += b;
 		a4x2[1] += b;
 		return *this;
 	}
-	U4x4& operator -= ( const U4x2& b )
-	{
+	U4x4& operator -= ( const U4x2& b ) {
 		a4x2[0] -= b;
 		a4x2[1] -= b;
 		return *this;
 	}
 
-	U4x4& operator += ( U4 u )
-	{
+	U4x4& operator += ( U4 u ) {
 		a4x2[0] += u;
 		a4x2[1] += u;
 		return *this;
 	}
-	U4x4& operator += ( I4 i )
-	{
+	U4x4& operator += ( I4 i ) {
 		a4x2[0] += i;
 		a4x2[1] += i;
 		return *this;
 	}
-	U4x4& operator += ( float f )
-	{
+	U4x4& operator += ( float f ) {
 		a4x2[0] += f;
 		a4x2[1] += f;
 		return *this;
 	}
 
-	U4x4& operator -= ( U4 u )
-	{
+	U4x4& operator -= ( U4 u ) {
 		a4x2[0] -= u;
 		a4x2[1] -= u;
 		return *this;
 	}
-	U4x4& operator -= ( I4 i )
-	{
+	U4x4& operator -= ( I4 i ) {
 		a4x2[0] -= i;
 		a4x2[1] -= i;
 		return *this;
 	}
-	U4x4& operator -= ( float f )
-	{
+	U4x4& operator -= ( float f ) {
 		a4x2[0] -= f;
 		a4x2[1] -= f;
 		return *this;
@@ -2332,7 +2319,13 @@ public:
 	U4	dctADDn( void* pBIN, U4& m, U4x4& w );
 	U4  dctFNDn( void* pBIN, U4x4& w );
 
-
+	U4 coreC() const { return x>>4; }
+	gpeCsz coreCsz() const { return (gpeCsz)(x&0xf); }
+	U4 coreARY( U4 sz=1 ) {
+		if( y )
+			return sz*y;
+		return sz*(y = a4x2[1].area());
+	}
 };
 
 class U8x4 {
@@ -3186,35 +3179,18 @@ public:
     I4x4( const I8x4 b );
 	//I4x4( const I8x4& b );
 	I4x4( const F4 f4 );
-	I4x4& operator = ( const I4x4* pB )
-	{
+	I4x4& operator = ( const I4x4* pB ) {
 		gpmMcpy( this, pB, sizeof(*this) );
 		return *this;
 	}
     I4x4& operator = ( const F4 f4 );
-    I4x4& operator = ( I4x2 b )
-    {
-		a4x2[1] = a4x2[0] = b;
-		return *this;
-    }
-    I4x4& operator ++()
-    {
-        ++a4x2[0];
-		++a4x2[1];
-		return *this;
-    }
-    I4x4& operator --()
-    {
-        --a4x2[0];
-		--a4x2[1];
-		return *this;
-    }
-    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
-    {
+    I4x4& operator = ( I4x2 b ) { a4x2[1] = a4x2[0] = b; return *this; }
+    I4x4& operator ++() { ++a4x2[0]; ++a4x2[1]; return *this; }
+	I4x4& operator --() { --a4x2[0]; --a4x2[1]; return *this; }
+    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   ) {
 		return sprintf( pBUFF, "%d%s%d%s%d%s%d%s%s", x,pSeP,y,pSeP,z,pSeP,w,pSeP, pENT );
     }
-	char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   )
-    {
+	char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""   ) {
 		str( pBUFF, pSeP, pENT );
 		//sprintf( pBUFF, "%d%s%d%s%d%s%d%s%s", x,pSeP,y,pSeP,z,pSeP,w,pSeP, pENT );
 		return pBUFF;
@@ -3484,12 +3460,10 @@ public:
 	I8x4 operator * ( float b ) const;
 	I8x4 operator * ( double b ) const;
 
-	I4x4 operator / ( int b ) const
-	{
+	I4x4 operator / ( int b ) const {
 		return I4x4( a4x2[0]/b, a4x2[1]/b );
 	}
-	I4x4 operator % ( int b ) const
-	{
+	I4x4 operator % ( int b ) const {
 		return I4x4( a4x2[0]%b, a4x2[1]%b );
 	}
 
@@ -3837,6 +3811,8 @@ public:
 
 	double dropRAD(const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
 	I4x4 drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
+
+
 };
 
 
@@ -5833,6 +5809,7 @@ public:
 		aSET[gpeLZYxN] = n;
 	}
 	~gpcLZY() { gpmFREE( p_alloc ); }
+	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
 
 
 	U1x4& typ() { return *(U1x4*)&type; }
@@ -5927,7 +5904,6 @@ public:
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
 
-	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
 	U4 nPC( void );
 	void wait( void ) {
 		if( !this )
@@ -6480,7 +6456,7 @@ szasz:
         return p_alloc + i*n;//+e-n*2;
 	}
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
-	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_OFF,
+	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_0,
 						gpeEA s0 = gpeEA_OFF, 	U1 sn = 0,	U1 si = 0,
 						gpeEA d0 = gpeEA_OFF,	U1 dn = 0,	U1 di = 0 ) {
 		I4x4 &ins = *(I4x4*)Ux( pc, sizeof(I4x4) );
