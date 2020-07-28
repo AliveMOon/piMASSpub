@@ -23,11 +23,13 @@
 //~ SOFTWARE.
 #include "gpcgt.h"
 #include "gpcOPCD.h"
+
 //#include "gpeTYP.h"
 
 class gpcRES;
 class gpcCRS;
 class gpcWIN;
+class gpCORE;
 //#include "gpcres.h"
 
 //#include "gpccrs.h"
@@ -834,10 +836,9 @@ public:
 	gpcMAP	*pMAP;
 
 	gpcSCOOP aSCOOP[3];
+	gpCORE 	*pCORE;
 
-
-	U4 srcUPDT( SOCKET ig = INVALID_SOCKET )
-	{
+	U4 srcUPDT( SOCKET ig = INVALID_SOCKET ) {
 		U8 nLEN = 0;
 		pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 		nVERr = nHD+1;
@@ -845,16 +846,14 @@ public:
 
 		return nVERr;
 	}
-	bool qBLD( void )
-    {
+	bool qBLD( void ) {
 		if( nVERr > nBLD )
 			return true;	// már kérte valaki
 
 		//nVERr = max( nHD, nBLD ); //+1;
 		return false; // mi kérjük elösször
     }
-    U4 rdyBLD( void )
-    {
+    U4 rdyBLD( void ) {
 		nBLD = nVERr;
 		return nVERr;
     }
@@ -1032,7 +1031,7 @@ public:
 	void 	SRCmnMILLcoder( //I8x2* pOP,
 							gpcLZYdct& dOP, U1 iMN );
 	void 	SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win );
-	gpcRES* SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM = NULL );
+	gpCORE* SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 	gpcRES* SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM = NULL );
 
 

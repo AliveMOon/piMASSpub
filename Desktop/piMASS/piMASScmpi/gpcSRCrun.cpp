@@ -126,7 +126,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 	return 0;
 }
 
-gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
+gpCORE* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	if( !this )
 		return NULL;
 
@@ -134,7 +134,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	if( !pDBG->nLD() )
 		return NULL;
 
-	return NULL;
+	//return NULL;
 
 	static const U1 iMN=0;
 	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc;
@@ -145,7 +145,12 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 		 *pDIS = (char*)pDBG->p_alloc, *pBF = NULL;
 	pBF = sBF+1;
 	if( pBF ) *sBF = ' ';
-	gpCORE core;
+
+	if( !pCORE )
+		pCORE = new gpCORE;
+
+	gpCORE& core = *pCORE;
+
 	I4x4	*pPC;
 	I8		*pA, *pO, *pC,
 			*pD,
@@ -364,7 +369,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	}
 
 
-	return NULL;
+	return pCORE;
 
 }
 

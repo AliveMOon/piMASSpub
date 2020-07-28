@@ -173,7 +173,7 @@ gpcSRC::~gpcSRC() {
 	gpmDELary(pMINI);
 	//gpmDELary(pBIG);
 	gpmDELary(pMAP);
-
+	gpmDEL(pCORE);
 }
 gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) {
 	if( this ?
