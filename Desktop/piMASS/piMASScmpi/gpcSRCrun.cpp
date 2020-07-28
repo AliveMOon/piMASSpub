@@ -4,31 +4,32 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN, U8& bSW, U4 newC )
-	{
+{
+	nSTK = 0;
+	gpcREG wVAR;
+	gpO* pOo;
 
-		aSTK[nSTK = 0].null();
-		gpcREG wVAR;
-		gpO* pOo;
+	for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4, nSTK++ ) {
+		//p_src = ea( iI, pO+7, pC+7 );
+		aSTK[nSTK].null();
 
-		for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4, nSTK++ ) {
-			//p_src = ea( iI, pO+7, pC+7 );
-			int oID = *(int*)ea( iI, pO+7, pC+7 ); // p_src;
-			if( oID < 0 )
-			{
-				oID *= -1;
-				//int i = -*(int*)p_src;
-				char* pSTR = pSCPall + pM0[oID].iMNi+1;
-				//n = ;
+		int oID = *(int*)ea( iI, pO+7, pC+7 ); // p_src;
+		if( oID < 0 )
+		{
+			oID *= -1;
+			//int i = -*(int*)p_src;
+			char* pSTR = pSCPall + pM0[oID].iMNi+1;
+			//n = ;
 
-				return ix_str( pSTR, pM0[oID].iMNn-2, oID );
-			}
+			return ix_str( pSTR, pM0[oID].iMNn-2, oID );
+		}
 
-			gpcOBJlnk& O = ((gpcOBJlnk*)pSCPobj->Ux( oID, sizeof(gpcOBJlnk)))[0];
-			gpeTYP typ = O.typ;
+		gpcOBJlnk& O = ((gpcOBJlnk*)pSCPobj->Ux( oID, sizeof(gpcOBJlnk)))[0];
+		gpeTYP typ = O.typ;
 
-			switch( O.typ )
-			{
-				case gpeTYP_sA8:
+		switch( O.typ )
+		{
+			case gpeTYP_sA8: {
 					/// ha win variable akkor is csinál ide egy változatot belölle
 					/// hogy felül lehessen írni
 					if( !nSTK )
@@ -46,25 +47,6 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 								: gpmLZYvali( gpC, &cLST ) + pOo->iC-gpeCsz_K;
 							continue;
 						}
-						/*if( pO )
-						{
-							bool bGD = false;
-
-							for( U4 i = 0; i < nO; i++ )
-							{
-								if( pO[i].iO != oID )
-									continue;
-								aSTK[nSTK].iX = pO[i].iX;
-								aSTK[nSTK].pC =
-									(aSTK[nSTK].iC = pO[i].iC) < gpeCsz_K
-									? NULL
-									: gpmLZYvali( gpC, &cLST ) + pO[i].iC-gpeCsz_K;
-								bGD = true;
-								break;
-							}
-							if( bGD )
-								continue;
-						}*/
 
 						gpeALF alf = O.obj.alf;
 						if( pWIN->WINvar( wVAR, alf ) )
@@ -80,7 +62,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 						pOo->iD = 0;
 						pOo->iX = mLST.nLD();
 						pOo->szOF = sOF(newC);
-						mLST.Ux( pOo->iX, pOo->szOF );
+						mLST.Ux( pOo->iX, pOo->szOF, true, sizeof(U1) );
 
 						aSTK[nSTK].iX = pOo->iX;
 						aSTK[nSTK].pC =
@@ -88,54 +70,61 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 							? NULL
 							: gpmLZYvali( gpC, &cLST ) + pOo->iC-gpeCsz_K;
 						continue;
-
-
 					}
+					aSTK[nSTK].iX = aSTK[nSTK-1].iX;
+					aSTK[nSTK].x = aSTK[nSTK-1].pC->cIDfnd( cLST, oID, aSTK[nSTK].iC );
+					if( aSTK[nSTK].x > -1 )
+					{
+						aSTK[nSTK].iX += aSTK[nSTK].x;
+						continue;
+					}
+					aSTK[nSTK].aO = oID;
+					aSTK[nSTK].aC = newC;
 
-					break;
-				case gpeTYP_sA8N:
-					//if( pBF ) O.obj.an2str( pBF );
-					break;
-				case gpeTYP_U1:
-					//if( pBF ) sprintf( pBF, "0x%0.2x", O.obj.uy );
-					break;
-				case gpeTYP_U2:
-					//if( pBF ) sprintf( pBF, "0x%0.4x", O.obj.uy );
-					break;
-				case gpeTYP_U4:
-					//if( pBF ) sprintf( pBF, "0x%0.8x", O.obj.uy );
-					break;
-				case gpeTYP_U8:
-					//if( pBF ) sprintf( pBF, "0x%0.16llx", O.obj.uy );
-					break;
+				} break;
+			case gpeTYP_sA8N:
+				//if( pBF ) O.obj.an2str( pBF );
+				break;
+			case gpeTYP_U1:
+				//if( pBF ) sprintf( pBF, "0x%0.2x", O.obj.uy );
+				break;
+			case gpeTYP_U2:
+				//if( pBF ) sprintf( pBF, "0x%0.4x", O.obj.uy );
+				break;
+			case gpeTYP_U4:
+				//if( pBF ) sprintf( pBF, "0x%0.8x", O.obj.uy );
+				break;
+			case gpeTYP_U8:
+				//if( pBF ) sprintf( pBF, "0x%0.16llx", O.obj.uy );
+				break;
 
-				case gpeTYP_I1:
-					//if( pBF ) sprintf( pBF, "0x%.3d", O.obj.num );
-					break;
-				case gpeTYP_I2:
-					//if( pBF ) sprintf( pBF, "0x%.6d", O.obj.num );
-					break;
-				case gpeTYP_I4:
-					//if( pBF ) sprintf( pBF, "0x%.9d", O.obj.num );
-					break;
-				case gpeTYP_I8:
-					//if( pBF ) sprintf( pBF, "0x%.12lld", O.obj.num );
-					break;
+			case gpeTYP_I1:
+				//if( pBF ) sprintf( pBF, "0x%.3d", O.obj.num );
+				break;
+			case gpeTYP_I2:
+				//if( pBF ) sprintf( pBF, "0x%.6d", O.obj.num );
+				break;
+			case gpeTYP_I4:
+				//if( pBF ) sprintf( pBF, "0x%.9d", O.obj.num );
+				break;
+			case gpeTYP_I8:
+				//if( pBF ) sprintf( pBF, "0x%.12lld", O.obj.num );
+				break;
 
-				case gpeTYP_D:
-				case gpeTYP_F:
-					//if( pBF ) sprintf( pBF, "%0.7f", O.obj.dy );
-					break;
-				default:
-					//if( pBF ) sprintf( pBF, "%x", O.typ );
-					break;
-			}
+			case gpeTYP_D:
+			case gpeTYP_F:
+				//if( pBF ) sprintf( pBF, "%0.7f", O.obj.dy );
+				break;
+			default:
+				//if( pBF ) sprintf( pBF, "%x", O.typ );
+				break;
 		}
-		if( nSTK>1 )
-			return aSTK[nSTK-1].iX;
-
-		return 0;
 	}
+	if( nSTK>1 )
+		return aSTK[nSTK-1].iX;
+
+	return 0;
+}
 
 gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 	if( !this )
@@ -190,102 +179,7 @@ gpcRES* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) {
 			continue; /// - NOP! --------------
 
 		if( iOP == gpeOPid_dot ) {
-			pA[0] = core.entryOBJ2A0( pM0, pALL, &OBJ, pWIN, bSW, pD[1] );
-			pA[7] = pD[0];
-			continue;
-			//pD[1] = gpeCsz_0;
-			for( U4 iI = pD[0]-4, eI=pA[7]; iI>=eI; iI-=4 ) {
-				p_src = core.ea( iI, pO+7, pC+7 );
-				int oID = *(int*)p_src;
-
-				if( oID < 0 )
-				{
-					oID *= -1;
-					//int i = -*(int*)p_src;
-					char* pSTR = pALL+pM0[oID].iMNi+1;
-					n = pM0[oID].iMNn-2;
-
-					pA[0] = core.ix_str( pSTR, n, oID );
-					if( pBF ) {
-						if( n > 0x7e )
-							n = 0x7e;
-						gpmMcpy( sBF+0x80, pSTR, n );
-						sBF[0x80+n]=0;
-						sprintf( pBF, "\"%s...\"", sBF+0x80 );
-					}
-				} else {
-
-					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( oID, sizeof(gpcOBJlnk)))[0];
-					gpeTYP typ = O.typ;
-					gpeALF alf = O.obj.alf;
-					switch( O.typ )
-					{
-						case gpeTYP_sA8:
-							/// ha win variable akkor is csinál ide egy változatot belölle
-							/// hogy felül lehessen írni
-							if( pBF ) gpfALF2STR( pBF, alf );
-
-							pA[0] = core.ix( pA[0], oID );
-
-							if( pWIN->WINvar( wVAR, alf ) )
-							{
-								// valamit kapott
-								bSW |= gpeMASSloopMSK;
-								pSTR = (char*)wVAR.getSTR();
-								continue;
-							}
-
-							break;
-						case gpeTYP_sA8N:
-							if( pBF ) O.obj.an2str( pBF );
-							break;
-						case gpeTYP_U1:
-							if( pBF ) sprintf( pBF, "0x%0.2x", O.obj.uy );
-							break;
-						case gpeTYP_U2:
-							if( pBF ) sprintf( pBF, "0x%0.4x", O.obj.uy );
-							break;
-						case gpeTYP_U4:
-							if( pBF ) sprintf( pBF, "0x%0.8x", O.obj.uy );
-							break;
-						case gpeTYP_U8:
-							if( pBF ) sprintf( pBF, "0x%0.16llx", O.obj.uy );
-							break;
-
-						case gpeTYP_I1:
-							if( pBF ) sprintf( pBF, "0x%.3d", O.obj.num );
-							break;
-						case gpeTYP_I2:
-							if( pBF ) sprintf( pBF, "0x%.6d", O.obj.num );
-							break;
-						case gpeTYP_I4:
-							if( pBF ) sprintf( pBF, "0x%.9d", O.obj.num );
-							break;
-						case gpeTYP_I8:
-							if( pBF ) sprintf( pBF, "0x%.12lld", O.obj.num );
-							break;
-
-						case gpeTYP_D:
-						case gpeTYP_F:
-							if( pBF ) sprintf( pBF, "%0.7f", O.obj.dy );
-							break;
-						/* ez már felül fel kell dolgozni
-						case gpeTYP_STR:
-							n = pM0[O.obj.uy].iMNn;
-							if( n > 0x7e )
-								n = 0x7e;
-							gpmMcpy( sBUFF+0x80, pALL+(pM0[O.obj.uy].iMNi), n );
-							sBUFF[0x80+n]=0;
-							sprintf( sBUFF+1, "\"%s...\"", sBUFF+0x80 );
-							break;*/
-						default:
-							if( pBF ) sprintf( pBF, "%x", O.typ );
-							break;
-					}
-				}
-				if( pBF )
-					std::cout << *(U4*)p_src << sBF << std::endl;
-			}
+			pA[0] = core.entryOBJ2A0( pM0, pALL, &OBJ, pWIN, bSW ); //, pD[1] );
 			pA[7] = pD[0];
 			continue;
 		}

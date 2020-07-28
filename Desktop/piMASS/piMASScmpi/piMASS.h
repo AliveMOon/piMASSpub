@@ -6442,18 +6442,19 @@ szasz:
 			i *= -1;
 		if( !stp )
 			stp = n;
-		U8 e = i*stp + 2*n, s = -1;
-		if( e > n_load )
-		{
-			lzyADD( NULL, e-n_load, s, -1 );
-			if( bZ )
-                gpmZn( p_alloc+s, e-s );
-			if( n_load > (i*stp+n) )
-				n_load = (i*stp+n);
-		}
+		U8	e = i*stp + n;
+		if( e <= n_load )
+			 return p_alloc + i*stp; //n;
 
+		U8 s = -1, ee = e+n*3;
 
-        return p_alloc + i*n;//+e-n*2;
+		lzyADD( NULL, ee-n_load, s, -1 );
+		if( bZ )
+			gpmZn( p_alloc+s, n_load-s );
+		if( n_load > e )
+			n_load = e;
+
+        return p_alloc + i*stp; //*n;//+e-n*2;
 	}
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
 	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_0,
