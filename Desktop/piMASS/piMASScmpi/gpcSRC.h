@@ -1032,6 +1032,8 @@ public:
 							gpcLZYdct& dOP, U1 iMN );
 	void 	SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win );
 	gpCORE* SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+	gpcLZY* SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+
 	gpcRES* SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM = NULL );
 
 

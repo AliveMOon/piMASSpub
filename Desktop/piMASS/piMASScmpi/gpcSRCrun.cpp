@@ -3,8 +3,9 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN, U8& bSW, U4 newC )
-{
+
+
+U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN, U8& bSW, U4 newC ) {
 	nSTK = 0;
 	gpcREG wVAR;
 	gpO* pOo;
@@ -125,6 +126,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 
 	return 0;
 }
+
 
 gpCORE* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	if( !this )

@@ -231,6 +231,7 @@ static const U8 gpaCszMX[] = {
 				continue;					\
 		} 							\
 
+
 typedef enum gpeEA:U1 {
 	gpeEA_OFF,
 	gpeEA_Dn,
