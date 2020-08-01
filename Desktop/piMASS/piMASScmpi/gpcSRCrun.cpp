@@ -25,9 +25,9 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 			return ix_str( pSTR, pM0[oID].iMNn-2, oID );
 		}
 
-		gpcOBJlnk& O = ((gpcOBJlnk*)pSCPobj->Ux( oID, sizeof(gpcOBJlnk)))[0];
+		gpcOBJlnk& O = *((gpcOBJlnk*)pSCPobj->Ux( oID, sizeof(gpcOBJlnk)));
 		gpeTYP typ = O.typ;
-
+		U4 iO;
 		switch( O.typ )
 		{
 			case gpeTYP_sA8: {
@@ -37,7 +37,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 					{
 						/// most kezdődik
 						//U4 nO = oLST.nLD(sizeof(gpO));
-						U4 iO;
+
 						pOo = oIDfnd( oID, iO );
 						if( pOo )
 						{
@@ -88,6 +88,27 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 				break;
 			case gpeTYP_U1:
 				//if( pBF ) sprintf( pBF, "0x%0.2x", O.obj.uy );
+				switch( newC )
+				{
+					case gpeCsz_L:
+						pOo = oIDfnd( oID, iO );
+						if( pOo ? pOo->iX : false )
+							return pOo->iX;
+
+						pOo = (gpO*)oLST.Ux( iO, sizeof(gpO) );
+						pOo->iO = oID;
+						pOo->iC = newC;
+						pOo->iD = 0;
+						pOo->iX = mLST.nLD();
+						pOo->szOF = sOF(newC);
+						mLST.Ux( pOo->iX, pOo->szOF, true, sizeof(U1) );
+
+						int* p_dst = (int*)mLST.Ux( pOo->iX, sizeof(int), false, 1 );
+						*p_dst = O.obj.uy;
+
+						return pOo->iX;
+
+				}
 				break;
 			case gpeTYP_U2:
 				//if( pBF ) sprintf( pBF, "0x%0.4x", O.obj.uy );

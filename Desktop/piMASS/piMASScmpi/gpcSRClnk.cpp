@@ -59,8 +59,7 @@ size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
 	return n;
 }
 
-gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID )
-{
+gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID ) {
 	gpcO* pO = NULL;
 	if( !pM )
 	{

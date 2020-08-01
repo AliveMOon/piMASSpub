@@ -7,6 +7,8 @@ gpcLZY* gpcSRC::SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCOR
 	pLZY->lzyRST();
 	if( !pCORE )
 		return pLZY;
+
+	static const U1 iMN=0;
 	gpCORE& core = *pCORE;
 	gpO* pO0 = gpmLZYvali( gpO, &core.oLST );
 	if( !pO0 )
@@ -14,10 +16,13 @@ gpcLZY* gpcSRC::SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCOR
 	char sBUFF[0x100];
 	gpmMcpy( sBUFF, "A:", 3 );
 	U8 s;
-	gpcLZY& mLST = core.mLST;
+	gpcLZY	&mLST = core.mLST;
+	gpcOBJlnk* pOlnk = (gpcOBJlnk*)SCOOP.obj.p_alloc;
 	for( U4 o = 0, n = core.oLST.nLD(sizeof(gpO)); o < n; o++ )
 	{
 		gpO& obj = pO0[o];
+		gpcOBJlnk& O = pOlnk[obj.iO];
+		gpfALF2STR( sBUFF, O.obj.alf );
 
 		pLZY = pLZY->lzyFRMT( s = -1, "\n %s", sBUFF );
 
