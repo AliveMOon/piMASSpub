@@ -17,11 +17,11 @@ gpcLZY* gpcSRC::SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCOR
 	gpmMcpy( sBUFF, "A:", 3 );
 	U8 s;
 	gpcLZY	&mLST = core.mLST;
-	gpcOBJlnk* pOlnk = (gpcOBJlnk*)SCOOP.obj.p_alloc;
+	gpcLNK* pOlnk = (gpcLNK*)SCOOP.obj.p_alloc;
 	for( U4 o = 0, n = core.oLST.nLD(sizeof(gpO)); o < n; o++ )
 	{
 		gpO& obj = pO0[o];
-		gpcOBJlnk& O = pOlnk[obj.iO];
+		gpcLNK& O = pOlnk[obj.iO];
 		gpfALF2STR( sBUFF, O.obj.alf );
 
 		pLZY = pLZY->lzyFRMT( s = -1, "\n %s", sBUFF );

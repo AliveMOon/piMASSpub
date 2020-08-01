@@ -395,33 +395,33 @@ U4 gpcMASS::jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U
 	return in*win.mZ+iz;
 }
 char gpsPUB[0x1000];
-U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
+U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 {
-	win.nJDOIT.w++;
-	win.nJDOIT.y = win.nJDOIT.x;
-	U1* pKEYbuff = win.gpsKEYbuff;
+	pWIN->nJDOIT.w++;
+	pWIN->nJDOIT.y = pWIN->nJDOIT.x;
+	U1* pKEYbuff = pWIN->gpsKEYbuff;
 	gpcSRC	tmp, *pSRC, *pS2;
 	U4 xFND, x_fnd;
 	//int aGLpic[0] = 0;
 	I4x4 sprt[2] = {0}, trgWH = 0;
-	win.mZ = mapCR.mapZN44.z;
-	win.mN = mapCR.mapZN44.w;
-	win.mZN = mapCR.mapZN44.a4x2[1].area();
+	pWIN->mZ = mapCR.mapZN44.z;
+	pWIN->mN = mapCR.mapZN44.w;
+	pWIN->mZN = mapCR.mapZN44.a4x2[1].area();
 	I8x4 anRio;
 	gpcLZY hex; U8 s;
-	gpcGL *pGL = win.pGL;
+	gpcGL *pGL = pWIN->pGL;
 	char* pVTX = NULL;
 	gpcPIC	*aGLpPIC[0x10],
 			*aGLpBOB[0x10];
 	SDL_Texture* apTX[0x10];
 
 	U4	*pM,*pC,*pR,
-		ie,z,i = jDOitREF( win, 0, ie, &pM, &pC, &pR, &z );
+		ie,z,i = jDOitREF( *pWIN, 0, ie, &pM, &pC, &pR, &z );
 
 
-	/*if( U4 *pM = win.pM = mapCR.pMAP )
-	if( U4 *pC = win.pC = mapCR.pCOL )
-	if( U4 *pR = win.pR = mapCR.pROW )
+	/*if( U4 *pM = pWIN->pM = mapCR.pMAP )
+	if( U4 *pC = pWIN->pC = mapCR.pCOL )
+	if( U4 *pR = pWIN->pR = mapCR.pROW )
 	if( pM < pC )
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )*/
 	for( ; i < ie; i++ )
@@ -446,13 +446,13 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		aGLpic[0] = pSRC->picID = 0;
 		gpmDEL( pSRC->apOUT[0] );
 		if( pSRC->qBLD() ) {
-			pSRC->msBLD = win.mSEC.x + pSRC->msBLTdly;
+			pSRC->msBLD = pWIN->mSEC.x + pSRC->msBLTdly;
 			pSRC->rdyBLD();
 		}
 
-		if( pSRC->msBLD ? pSRC->msBLD <= win.mSEC.x : false ) {
+		if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
 
-			pSRC->SRCmnMILLlnk( *this, win );
+			pSRC->SRCmnMILLlnk( *this, *pWIN );
 
 			gpmDEL( pSRC->pEXE0 );
 			pSRC->pEXE0 = pSRC->pEXE0->compiEASY( pSRC->pSRCstart( true, 4 ), NULL, NULL, NULL );
@@ -460,7 +460,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 			if( !pSRC->msBLTdly )
 				pSRC->msBLTdly = gpdSYNmSEC;
 			else
-				win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%win.mZ)+((i/win.mZ)<<16) , win.mSEC.y, pSRC->iGT, 0 ), win.msSYN );
+				pWIN->pSYNwin = pWIN->pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%pWIN->mZ)+((i/pWIN->mZ)<<16) , pWIN->mSEC.y, pSRC->iGT, 0 ), pWIN->msSYN );
 			pSRC->msBLD = 0;
 
 			pSRC->apOUT[0] = pSRC->apOUT[1];
@@ -477,20 +477,21 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 		}
 
 		if( !pSRC->apOUT[3] )
-		if( pSRC->SRCmnMILLrun(this,&win) )
+		if( pSRC->SRCmnMILLrun(this,pWIN) )
 		{
-			win.nJDOIT.x++;
+			pWIN->nJDOIT.x++;
 
-			pSRC->pMINI = pSRC->SRCmnMILLprnt(pSRC->pMINI,this,&win);
+			pSRC->pMINI = pSRC->SRCmnMILLprnt(pSRC->pMINI,this,pWIN);
+			continue;
 		} else {
 			if( !pSRC->pEXE0 )
 			{
 				pSRC->pMINI->lzyRST();
 				continue;
 			}
-			win.nJDOIT.x++;
+			pWIN->nJDOIT.x++;
 			pSRC->pMINI->lzyRST();
-			pSRC->apOUT[3] = pSRC->pEXE0->RESrun( pSRC->apOUT[3], NULL, win, pSRC, NULL );
+			pSRC->apOUT[3] = pSRC->pEXE0->RESrun( pSRC->apOUT[3], NULL, *pWIN, pSRC, NULL );
 			if( !pSRC->apOUT[3] )
 				continue;
 		}
@@ -523,22 +524,22 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								if( aGLpPIC[0] = PIC.PIC( I8x2(alu.alf,iCAM) ) ) {
 									if( !pCAM )
 										pCAM = new gpcPICAM;
-									U1* pRGB = aGLpPIC[0]->getPIX( pCAM, win.mSEC.y ); //50 );
+									U1* pRGB = aGLpPIC[0]->getPIX( pCAM, pWIN->mSEC.y ); //50 );
 									if( pRGB )
 									{
 										if( pCAM->bGD() )
 										{
 											gpmDEL( aGLpPIC[0]->pPACK );
-											win.pSYNwin = win.pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, aGLpPIC[0]->id+1, win.mSEC.y, INVALID_SOCKET, 0 ), win.msSYN );
+											pWIN->pSYNwin = pWIN->pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, aGLpPIC[0]->id+1, pWIN->mSEC.y, INVALID_SOCKET, 0 ), pWIN->msSYN );
 										}
 
-										if( !win.pPICbg )
+										if( !pWIN->pPICbg )
 										{
-											win.pPICbg = aGLpPIC[0];
+											pWIN->pPICbg = aGLpPIC[0];
 										}
 									}
 									else if( aGLpPIC[0]->pSHR )
-											win.pPICbg = aGLpPIC[0];
+											pWIN->pPICbg = aGLpPIC[0];
 								}
 							} break;
 						case gpeALF_BOB: {
@@ -654,7 +655,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 									{
 										SDL_SetSurfaceBlendMode( pTRG->pSRF, SDL_BLENDMODE_BLEND );
 										SDL_SetSurfaceAlphaMod( pTRG->pSRF, 128 );
-										SDL_SetRenderDrawBlendMode( win.pSDLrndr, SDL_BLENDMODE_BLEND);
+										SDL_SetRenderDrawBlendMode( pWIN->pSDLrndr, SDL_BLENDMODE_BLEND);
 										trgWH.a4x2[0] = 0;
 										SDL_FillRect( pTRG->pSRF, &trgWH.xyWH, 0 ); //amask );
 										trgWH.a4x2[0] = trgWH.a4x2[1];
@@ -662,15 +663,15 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								}
 								if( !pSPR->surDRW() )
 								{
-									pSPR->TnID.an2str( (U1*)win.gppMASSfile, (U1*)".png" );
-									pSPR->pSRF = IMG_Load( win.gpsMASSpath );
+									pSPR->TnID.an2str( (U1*)pWIN->gppMASSfile, (U1*)".png" );
+									pSPR->pSRF = IMG_Load( pWIN->gpsMASSpath );
 									if( !pSPR->pSRF )
 										break;
 								}
 
 								gpdBLTs( pSPR->surDRW(), &sprt[0].xyWH, pTRG->pSRF, &sprt[1].xyWH );
 								pTRG->pREF = NULL;
-								//SDL_UpdateWindowSurface( win.pSDLwin );
+								//SDL_UpdateWindowSurface( pWIN->pSDLwin );
 							} break;
 						case gpeALF_SSX: sprt[0].x = alu.i8(); break;
 						case gpeALF_SSY: sprt[0].y = alu.i8(); break;
@@ -688,7 +689,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 
 					case gpeALF_SYNC: if(alu.bSTR()) {
 						if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
-							pGT->GTcnct( win );
+							pGT->GTcnct( *pWIN );
 					} break;
 
 					case gpeALF_PICo:{
@@ -810,22 +811,22 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							break;
 
 							I4 cnt = pGT->iCNT;
-							pGT->GTcnct( win );
+							pGT->GTcnct( *pWIN );
 							if( cnt == pGT->iCNT )
 								anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
 
 							if( anRio.a8x2[0].x )
-							if( gpcLZY *pLZYinp = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( gpcLZY *pLZYinp = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
 							if( gpcZSnD	*pZSnD = gpmLZYvali( gpcZSnD, pLZYinp ) )
 							for( U1 i = 0; i < 2; i++ )
 							{
-								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
-								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
+								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{
-									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
+									pS2 = pWIN->piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
 									if( !pS2 )
 										continue;
 								}
@@ -846,16 +847,16 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								break;
 
 							// INP
-							if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( gpcLZY *pLZYin = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
 							if( pLZYin->n_load )
 							{
-								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
-								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[1] );
+								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{
-									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
+									pS2 = pWIN->piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
 									if( !pS2 )
 										continue;
 								}
@@ -878,22 +879,22 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							break;
 
 							I4 cnt = pGT->iCNT;
-							pGT->GTcnct( win );
+							pGT->GTcnct( *pWIN );
 							if( cnt == pGT->iCNT )
 								anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
 
 							if( anRio.a8x2[0].x )
-							if( gpcLZY *pLZYinp = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( gpcLZY *pLZYinp = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
 							if( gpcROBnD *pROBnD = gpmLZYvali( gpcROBnD, pLZYinp ) )
 							for( U1 i = 0; i < 2; i++ )
 							{
-								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
-								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
+								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{
-									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
+									pS2 = pWIN->piMASS->SRCnew( tmp, NULL, anRio.a8x2[0], -1 );
 									if( !pS2 )
 										continue;
 								}
@@ -914,16 +915,16 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 								break;
 
 							// INP
-							if( gpcLZY *pLZYin = win.piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
+							if( gpcLZY *pLZYin = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID)) )
 							if( pLZYin->n_load )
 							{
-								x_fnd = win.piMASS->getXFNDan( anRio.a8x2[1] );
-								pS2 = x_fnd ? win.piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( win, i, ie, &pM, &pC, &pR );
+								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[1] );
+								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{
-									pS2 = win.piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
+									pS2 = pWIN->piMASS->SRCnew( tmp, NULL, anRio.a8x2[1], -1 );
 									if( !pS2 )
 										continue;
 								}
@@ -958,16 +959,16 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						{
 						case 1: { /// SPACE TOOL ----------------------------
 							pTRG->TOOLspace(
-								win.piMASS->PIClzyALL, aGLpPIC,
-								win.gpsMASSname,
-								win.gpsMASSpath ,win.gppMASSfile );
+								pWIN->piMASS->PIClzyALL, aGLpPIC,
+								pWIN->gpsMASSname,
+								pWIN->gpsMASSpath ,pWIN->gppMASSfile );
 
 							} break;
 						case 2: { /// EXPLODE TOOL ----------------------------
 							pTRG->TOOLexplode(
-								win.piMASS->PIClzyALL, aGLpPIC,
-								win.gpsMASSname,
-								win.gpsMASSpath ,win.gppMASSfile );
+								pWIN->piMASS->PIClzyALL, aGLpPIC,
+								pWIN->gpsMASSname,
+								pWIN->gpsMASSpath ,pWIN->gppMASSfile );
 
 							} break;
 						default:{
@@ -1078,7 +1079,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 							}
 							if( !aGLpPIC[i]->pSRF )
 								break;
-							SDL_RenderReadPixels(	win.pSDLrndr, NULL, 0,
+							SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
 													aGLpPIC[i]->pSRF->pixels,
 													aGLpPIC[i]->pSRF->pitch 	);
 							aGLpPIC[i]->pREF = NULL;
@@ -1112,7 +1113,7 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 						{
 							gpcGT& gt = *pGT;
 
-							gt.GTlst( win, GTcnct );
+							gt.GTlst( *pWIN, GTcnct );
 							if( gpcLZY* pEVNT = gt.pEVENT->qEVENT() )
 							{
 								U1x4* pBGRA;
@@ -1137,28 +1138,28 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 												  bmask = 0x00ff0000;
 												  amask = 0; //(req_format == STBI_rgb) ? 0 : 0xff000000;
 												#endif
-												I4x4	src( 0,0, win.pSRFwin->w, win.pSRFwin->h ),
-														dst( 0,0, win.pSRFwin->w/2, win.pSRFwin->h/2 );
+												I4x4	src( 0,0, pWIN->pSRFwin->w, pWIN->pSRFwin->h ),
+														dst( 0,0, pWIN->pSRFwin->w/2, pWIN->pSRFwin->h/2 );
 
-												if( win.pSRFwin )
+												if( pWIN->pSRFwin )
 												{
-													if( win.pSRFwin->w != src.z || win.pSRFwin->h != src.w )
+													if( pWIN->pSRFwin->w != src.z || pWIN->pSRFwin->h != src.w )
 													{
-														gpmSDL_FreeSRF(win.pSRFwin);
-														win.pSRFwin = SDL_CreateRGBSurface( 0, src.z, src.w, 24, rmask, gmask, bmask, amask );
+														gpmSDL_FreeSRF(pWIN->pSRFwin);
+														pWIN->pSRFwin = SDL_CreateRGBSurface( 0, src.z, src.w, 24, rmask, gmask, bmask, amask );
 													}
 
-													SDL_RenderReadPixels( win.pSDLrndr,  &src.xyWH, win.pSRFwin->format->format, win.pSRFwin->pixels, win.pSRFwin->pitch );
+													SDL_RenderReadPixels( pWIN->pSDLrndr,  &src.xyWH, pWIN->pSRFwin->format->format, pWIN->pSRFwin->pixels, pWIN->pSRFwin->pitch );
 
 												}
 
-												if( !win.pSRFsnd )
-													win.pSRFsnd = SDL_CreateRGBSurface(	0, dst.z, dst.w, 24, rmask, gmask, bmask, amask  );
+												if( !pWIN->pSRFsnd )
+													pWIN->pSRFsnd = SDL_CreateRGBSurface(	0, dst.z, dst.w, 24, rmask, gmask, bmask, amask  );
 
-												if( SDL_Surface* pSURF = win.pSRFsnd )
+												if( SDL_Surface* pSURF = pWIN->pSRFsnd )
 												{
 													src.a4x2[0] = 0;
-													gpdBLTs( win.pSRFwin, &src.xyWH, pSURF, &dst.xyWH );
+													gpdBLTs( pWIN->pSRFwin, &src.xyWH, pSURF, &dst.xyWH );
 
 													pJPGsnd = NULL; //gpfSRF2JPG( pJPGsnd, pSURF, 57 );
 													if( pJPGsnd )
@@ -1195,14 +1196,14 @@ U1* gpcMASS::justDOit( gpcWIN& win ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4
 												}
 											} break;
 										case gpeNET4_0HUD:
-											if( win.pPICbg )
+											if( pWIN->pPICbg )
 											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) ) {
 												nGD++;
-												pGT->pHUD = pGT->pHUD->put( win.pPICbg->getPIX(), win.pPICbg->nPIX/6 );
+												pGT->pHUD = pGT->pHUD->put( pWIN->pPICbg->getPIX(), pWIN->pPICbg->nPIX/6 );
 												pGT->pHUD->id = pEV[i].id;
 											} break;
 										case gpeNET4_PREV:
-											if( win.pPICbg )
+											if( pWIN->pPICbg )
 											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) ) {
 												nGD++;
 												pGT->pHUD = pGT->pHUD->put( "\u001B[2J\r", strlen("\u001B[2J\r") );

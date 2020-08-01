@@ -25,7 +25,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 			return ix_str( pSTR, pM0[oID].iMNn-2, oID );
 		}
 
-		gpcOBJlnk& O = *((gpcOBJlnk*)pSCPobj->Ux( oID, sizeof(gpcOBJlnk)));
+		gpcLNK& O = *((gpcLNK*)pSCPobj->Ux( oID, sizeof(gpcLNK)));
 		gpeTYP typ = O.typ;
 		U4 iO;
 		switch( O.typ )
@@ -207,7 +207,7 @@ gpCORE* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 			continue; /// - NOP! --------------
 
 		if( iOP == gpeOPid_dot ) {
-			pA[0] = core.entryOBJ2A0( pM0, pALL, &OBJ, pWIN, bSW ); //, pD[1] );
+			pA[0] = core.entryOBJ2A0( pM0, pALL, &LNK, pWIN, bSW ); //, pD[1] );
 			pA[7] = pD[0];
 			continue;
 		}
@@ -456,7 +456,7 @@ gpcRES* gpcSRC::SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) 
 			for( U4 ie = pD[0], ii=aA[7]; ii<ie; ii++ ) {
 				I4 o = *(I8*)( aMEM[iS].Ux(ii,sizeof(I8)) );
 				if( o >= 0 ) {
-					gpcOBJlnk& O = ((gpcOBJlnk*)OBJ.Ux( o, sizeof(gpcOBJlnk)))[0];
+					gpcLNK& O = ((gpcLNK*)LNK.Ux( o, sizeof(gpcLNK)))[0];
 					gpeTYP typ = O.typ;
 					gpeALF alf = O.obj.alf;
 					switch( O.typ )
@@ -545,7 +545,7 @@ gpcRES* gpcSRC::SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM ) 
 			default:{
 				pSRC = &(sNUM=*pPC->aOB);
 				/*if( ob >= 0 )
-					NUM = (gpcOBJlnk*)OBJ.Ux( ob, sizeof(gpcOBJlnk));
+					NUM = (gpcLNK*)OBJ.Ux( ob, sizeof(gpcLNK));
 				else {
 					ob *= -1;
 					if(pM0[ob].iMNn)

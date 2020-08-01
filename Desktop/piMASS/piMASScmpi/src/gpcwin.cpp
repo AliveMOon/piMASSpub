@@ -484,7 +484,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 
 		//nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 
-		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( *this );
+		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( this );
 		*gpsTITLEpub = 0;
 		if(
 			(

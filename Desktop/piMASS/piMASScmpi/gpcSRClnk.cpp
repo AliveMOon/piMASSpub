@@ -5,16 +5,16 @@ extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 #define cd (pCD=CDsp.CD())[0]
 
-	/// gpcOBJlnk
+	/// gpcLNK
 #ifdef piMASS_DEBUG
-	#define OBJget (pOBi=(gpcOBJlnk*)OBJ.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpcOBJlnk)))[0]
-	#define OBJadd (pOBn=(gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+	#define OBJget (pOBi=(gpcLNK*)LNK.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpcLNK)))[0]
+	#define OBJadd (pOBn=(gpcLNK*)LNK.Ux( SCOOP.nOBJ, sizeof(gpcLNK)))[0]
 #else
-	#define OBJget ((gpcOBJlnk*)OBJ.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpcOBJlnk)))[0]
-	#define OBJadd ((gpcOBJlnk*)OBJ.Ux( SCOOP.nOBJ, sizeof(gpcOBJlnk)))[0]
+	#define OBJget ((gpcLNK*)LNK.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpcLNK)))[0]
+	#define OBJadd ((gpcLNK*)LNK.Ux( SCOOP.nOBJ, sizeof(gpcLNK)))[0]
 #endif
 #define aaOPid gpaaOPid[OPgrp]
-size_t gpcOBJlnk::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
+size_t gpcLNK::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
 	char sBstr[] = "FFFFffffFFFFffff",
 		*pBD, nB = sizeof(sBstr)-1;
 	size_t n;
@@ -123,7 +123,7 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc; //, aLNK[0x10];
 	U4 nM = SCOOP.nMN(), iOP; //, iOPe = dOP.nIX();
 
-	OBJ.lzyRST();
+	LNK.lzyRST();
 	const char *pS;
 	const U1 *pSTR;
 	U8 nS, nSTR;
@@ -131,8 +131,8 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 	gpcCD	*pCD;
 #ifdef piMASS_DEBUG
 
-	gpcOBJlnk	*pOBJ;
-	gpcOBJlnk	*pOBn, *pOBi;
+	gpcLNK	*pOBJ;
+	gpcLNK	*pOBn, *pOBi;
 
 #endif
 	I4x2 aFND[0x40];

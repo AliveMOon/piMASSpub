@@ -2,7 +2,7 @@
 #define GPCSRCLNK_H
 #include "piMASS.h"
 
-#define OBJ SCOOP.obj
+#define LNK SCOOP.obj
 
 
 //static const char* gpasTYPsz[] = {
@@ -59,11 +59,11 @@ static const char* gps68kADRmod[] = {
 };
 
 
-class gpcOBJlnk {
+class gpcLNK {
 public:
 	I8x2	obj;
 	gpeTYP	typ;
-	gpcOBJlnk(){};
+	gpcLNK(){};
 
 	size_t strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   );
 
@@ -259,35 +259,7 @@ public:
 		return 0;
 	}
 
-//	gpC* KIDadd( const gpC& B, U4 iKID, U4 szKID, U4 oKID  ) {
-//
-//		gpmMcpyOF( this, &B, 1 );
-//
-//		szOF += szKID;
-//		nLST++;
-//		pLST = new U4x4[nLST];
-//
-//		if( iKID < gpeCsz_K )
-//		{
-//			pLST[B.nLST] = iKID;
-//			if( nKID )
-//				pKID=new U2[nKID];
-//		} else {
-//			pLST[B.nLST] = gpeCsz_K;
-//			nKID++;
-//			pKID=new U2[nKID];
-//			pKID[B.nKID] = iKID-gpeCsz_K;
-//		}
-//		pLST[B.nLST].x |= oKID<<4;
-//		if( !B.nLST )
-//			return this;
-//		gpmMcpyOF( pLST, B.pLST, B.nLST );
-//		if( !B.nKID )
-//			return this;
-//
-//		gpmMcpyOF( pKID, B.pKID, B.nKID );
-//		return this;
-//	}
+
 
 };
 
