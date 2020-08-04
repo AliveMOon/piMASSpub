@@ -75,7 +75,8 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 }
 
 
-void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
+void gpcCRS::CRSstpCL( //gpcWIN& win,
+						gpcMASS* pMASS, U1 stp, bool bSH, bool bCT )
 {
 	// ha van shift akkor a 2. cursort mozgatja
 	if( !this )
@@ -110,18 +111,19 @@ void gpcCRS::CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 		selANIN[0] = selANIN[1];
 
 	gpmZ(apSRC);
-	U4 xFND = mass.getXFNDan( selANIN[1].au4x2[0] );
+	U4 xFND = pMASS->getXFNDan( selANIN[1].au4x2[0] );
     if( !xFND )
 		return;
-	apSRC[1] = mass.SRCfnd(xFND);
+	apSRC[1] = pMASS->SRCfnd(xFND);
 	if( selANIN[0].au4x2[0] == selANIN[1].au4x2[0] )
 		apSRC[0] = apSRC[1];
 	if( !apSRC[1] )
 		return;
 	iSTR.x = apSRC[1]->iPUB();
-	iSTR.y = apSRC[1]->nL;
+	iSTR.y = apSRC[1]->n_ld_add();
 }
-void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
+void gpcCRS::CRSstpED( //gpcWIN* pWIN, gpcMASS* pMASS,
+						U1 stp, bool bSH, bool bCT )
 {
 	// ha van shift akkor a 2. cursort mozgatja
 	if( !this )
@@ -168,7 +170,7 @@ void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 						pRIG--;
 				break;
 			case 3:
-				if( pRIG-pOA < pSRC->nL )
+				if( pRIG-pOA < pSRC->n_ld_add() )
 				{
 					if( pRIG[0] != '\r' )
 					{
@@ -227,14 +229,14 @@ void gpcCRS::CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH, bool bCT )
 					if( *pRIG == '\n')
 						pRIG++;
 
-					pRIG = gpfUTF8stpX( pRIG, pOA+pSRC->nL, x );
+					pRIG = gpfUTF8stpX( pRIG, pOA+pSRC->n_ld_add(), x );
 				}
 				break;
 		}
 		if( pRIG < pSRC->pA )
 			pRIG = pSRC->pA;
-		if( pRIG >= pSRC->pA+pSRC->nL )
-			pRIG = pSRC->pA+pSRC->nL;
+		if( pRIG >= pSRC->pA+pSRC->n_ld_add() )
+			pRIG = pSRC->pA+pSRC->n_ld_add();
 
 		iSTR.y = pRIG-pSRC->pA;
 		if( !bSH )
@@ -1962,7 +1964,7 @@ void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gp
 				c16ch = gpeCLR_blue2;
 
 		if( pB < pE )
-			CRSins( mass, pE, pB );
+			CRSins( &mass, pE, pB );
 
 		for( U4 r = 0; r < pMAP->mapZN44.y; miniALL.y += pR[r], r++ )
 		{

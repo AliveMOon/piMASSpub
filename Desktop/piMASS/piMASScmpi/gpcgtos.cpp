@@ -624,7 +624,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 								if( gpcSRC* pSRC = pWIN->piMASS->SRCfnd( xFND ) )
 								{
 									pA = pSRC->pA;
-									nA = pSRC->nL;
+									nA = pSRC->n_ld_add();
 								}
 							}
 

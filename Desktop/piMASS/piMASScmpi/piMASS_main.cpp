@@ -167,7 +167,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		}
 		iB = pSRC->iB();
 		pLFT = pA;
-		pRIG = pA+pSRC->nL;
+		pRIG = pA+pSRC->n_ld_add();
         pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 
         if( bALT )
@@ -291,7 +291,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		}
 		iB = pSRC->iB();
 		pLFT = pA;
-		pRIG = pA+pSRC->nL;
+		pRIG = pA+pSRC->n_ld_add();
         pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 
 		if( !pANo )
@@ -382,7 +382,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 	while( pS < pSe ? *pS : false )
 	{
 		tmp.reset( pS, pSe, &pS, aSP44[nSP] );
-		if(!tmp.nL)
+		if(!tmp.n_ld_add())
 			continue;
 		tmp.IX = nLST;
 		if( tmp.bSUB( *this ) )

@@ -8,10 +8,10 @@ extern char gpaALF_H_sub[];
 	/// gpcLNK
 #ifdef piMASS_DEBUG
 	#define OBJget (pOBi=(gpcLNK*)LNK.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpcLNK)))[0]
-	#define OBJadd (pOBn=(gpcLNK*)LNK.Ux( SCOOP.nOBJ, sizeof(gpcLNK)))[0]
+	#define OBJadd (pOBn=(gpcLNK*)LNK.Ux( gpmSCP.nOBJ, sizeof(gpcLNK)))[0]
 #else
 	#define OBJget ((gpcLNK*)LNK.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpcLNK)))[0]
-	#define OBJadd ((gpcLNK*)LNK.Ux( SCOOP.nOBJ, sizeof(gpcLNK)))[0]
+	#define OBJadd ((gpcLNK*)LNK.Ux( gpmSCP.nOBJ, sizeof(gpcLNK)))[0]
 #endif
 #define aaOPid gpaaOPid[OPgrp]
 size_t gpcLNK::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
@@ -119,9 +119,9 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 		return;
 	pDBG->lzyRST();
 
-	I8x4 *pM0 = (I8x4*)SCOOP.mini.p_alloc, M, Mnx;
-	U4x4 *pL0 = (U4x4*)SCOOP.lnk.p_alloc; //, aLNK[0x10];
-	U4 nM = SCOOP.nMN(), iOP; //, iOPe = dOP.nIX();
+	I8x4 *pM0 = gpmSCP.pMN(), M, Mnx;
+	U4x4 *pL0 = (U4x4*)gpmSCP.lnk.p_alloc; //, aLNK[0x10];
+	U4 nM = gpmSCP.nMN(), iOP; //, iOPe = dOP.nIX();
 
 	LNK.lzyRST();
 	const char *pS;
@@ -141,8 +141,8 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 	I4x4 iZNmx = 0;
 	gpeCLR clr;
 
-	//for( U4 le = SCOOP.nLiNK(), l = 0, mNX; l < le; l++ )
-	for( U4 nM = SCOOP.nMN(), m = 0, l; m < nM; m++ )
+	//for( U4 le = gpmSCP.nLiNK(), l = 0, mNX; l < le; l++ )
+	for( U4 nM = gpmSCP.nMN(), m = 0, l; m < nM; m++ )
 	{
 		clr = (gpeCLR)((pM0[m].rMNclr>>0x10)&0xf);
 		if( clr == gpeCLR_red2 )
@@ -155,7 +155,7 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 			if( clr != gpeCLR_violet )
 				continue;
 
-			pSTR = (nSTR=M.iMNn) ? SCOOP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
+			pSTR = (nSTR=M.iMNn) ? gpmSCP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
 
 			cd.lnk = -m;
 			cd.typ = gpeTYP_STR;
@@ -166,10 +166,10 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 		// még nem tud ja micsoda kicsoda
 		if( !lnk.y )
 		{
-			pS = SCOOP.dct.sSTRix(l, NULL);
+			pS = gpmSCP.dct.sSTRix(l, NULL);
 			if( !pS )
 				continue;
-			nS = SCOOP.dct.nSTRix(l);
+			nS = gpmSCP.dct.nSTRix(l);
 			if( !nS )
 				continue;
 		}
@@ -186,9 +186,9 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (gpeOPid_jsr+SCOOP.nOBJ);
+				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nOBJ);
 				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
-				SCOOP.nOBJ++;
+				gpmSCP.nOBJ++;
 				break;
 			case gpeCLR_orange:	///NUM
 				//cd.pst = gpeOPid_mul;
@@ -199,9 +199,9 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (gpeOPid_jsr+SCOOP.nOBJ);
+				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nOBJ);
 				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
-				SCOOP.nOBJ++;
+				gpmSCP.nOBJ++;
 				break;
 			case gpeCLR_green2: {///OPER
                     if( !lnk.y ) {
@@ -222,20 +222,20 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 							{
 								/// FUNCTION
 								/// LENT
-								CDsp.LEVup( SCOOP );
+								CDsp.LEVup( gpmSCP );
 								/// FENT
 								break;
 							}
                             /// LENT
 							cd.lnk = lnk.y;
-                            CDsp.LEVup( SCOOP );
+                            CDsp.LEVup( gpmSCP );
                             /// FENT
                             break;
                         case gpeOPid_end:
                         case gpeOPid_dimE:
                         case gpeOPid_brakE:
                             /// FENT
-                            CDsp.LEVdwn( SCOOP, //iOPe,
+                            CDsp.LEVdwn( gpmSCP, //iOPe,
 											gpeOPid_mov ); // (gpeOPid)lnk.y );
                             /// LENT
                             cd.lnk = lnk.y;
@@ -247,7 +247,7 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
                                 case gpeOPid_dimE:
                                 case gpeOPid_brakE:
                                     cd.pst = (gpeOPid)lnk.y;
-                                    CDsp.knead( SCOOP ); //, iOPe );
+                                    CDsp.knead( gpmSCP ); //, iOPe );
                                     break;
                                 default:
                                     if( (cd.lnk>-1) && (cd.lnk<gpeOPid_jsr) )
@@ -256,7 +256,7 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
                                         break;
                                     }
                                     cd.pst = (gpeOPid)lnk.y;
-                                    CDsp.knead( SCOOP);//, iOPe );
+                                    CDsp.knead( gpmSCP);//, iOPe );
                                     break;
                             }
                             break;
@@ -278,7 +278,7 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 
 	U1 iMN = 0;
 
-	if( !SCOOP.nLiNK() )
+	if( !gpmSCP.nLiNK() )
 		return;
 
 	char *pSi, *pSe;

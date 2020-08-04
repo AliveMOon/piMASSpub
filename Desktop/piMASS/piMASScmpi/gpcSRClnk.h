@@ -2,7 +2,7 @@
 #define GPCSRCLNK_H
 #include "piMASS.h"
 
-#define LNK SCOOP.obj
+#define LNK gpmSCP.obj
 
 
 //static const char* gpasTYPsz[] = {

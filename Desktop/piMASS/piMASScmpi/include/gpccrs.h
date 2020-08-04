@@ -122,14 +122,15 @@ class gpcCRS
 		}
 
 		bool	miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 wh );
-		bool 	miniRDYesc( gpcWIN& win, gpcPIC* pPIC );
+		bool 	miniRDYesc( gpcWIN* pWIN, gpcPIC* pPIC );
 		U4		miniRDYmap(
-							gpcWIN& win, I4x4& lurdAN,
+							gpcWIN* pWIN, I4x4& lurdAN,
 							U4* &pM,	U4* &pC,	U4* &pR,
 							U4* &psCp,	U4* &psRp,	U4& z,
 							U4x4& mZN, bool bSHFT
 						);
-		void	miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT, bool bMOV = false );
+		void	miniRDY(	gpcWIN* pWIN, //gpcMASS* pMASS,
+							gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT, bool bMOV = false );
 
 
 		bool	miniOFF( gpcPIC* pPIC = NULL, SDL_Renderer* pRNDR = NULL );
@@ -143,7 +144,7 @@ class gpcCRS
 		/// 		CRSins
 		///
 		///------------------------------
-		void CRSins( gpcMASS& mass, U1* pE, U1* pB ) {
+		void CRSins( gpcMASS *pMASS, U1* pE, U1* pB ) {
 			if( pB >= pE )
 				return;
 
@@ -154,10 +155,10 @@ class gpcCRS
 
 			gpcSRC	tmp, *pSRC, *pS2;
 
-			if( pSRC = mass.SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
+			if( pSRC = pMASS->SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
 			{
-				if( max( iSTR.y, iSTR.x ) > pSRC->nL )
-					iSTR.y = iSTR.x = pSRC->nL;
+				if( max( iSTR.y, iSTR.x ) > pSRC->n_ld_add() )
+					iSTR.y = iSTR.x = pSRC->n_ld_add();
 
 				I4	nSTRT = pSRC->pSRCstart(true,4)-pSRC->pSRCalloc(true,4);
 
@@ -165,14 +166,14 @@ class gpcCRS
 					iSTR.x = nSTRT;
 				if( !bED )
 				{
-					iSTR.y = pSRC->nL;
+					iSTR.y = pSRC->n_ld_add();
 				}
 				else if( iSTR.y < iSTR.x )
 					iSTR.y = iSTR.x;
 
 				I4	nSUB = iSTR.y - iSTR.x,
 					nSTR = pE-pB,
-					nOL = pSRC->nL,
+					nOL = pSRC->n_ld_add(),
 					nNEW = gpmPAD( nOL+nSTR + 1, 0x10 );
 
 				// több karakter írunk át
@@ -222,13 +223,13 @@ class gpcCRS
 					gpmMcpyOF( pLFT, pRIG, pRIGe-pRIG );
 					pLFT += pRIGe-pRIG;
 				}
-				pSRC->nL = pLFT-pSRC->pA;
+				pSRC->n_ld( pLFT-pSRC->pA );
 				pSRC->nA = nNEW;
 				pSRC->srcUPDT();
 				*pLFT = 0;
 
 				gpmDELary(pOA);
-				pSRC->hd(mass);
+				pSRC->hd(pMASS);
 
 
 				/*for( I4x2 s = lurdAN.a4x2[0]; s.y <= lurdAN.w; s.y++ )
@@ -240,11 +241,11 @@ class gpcCRS
 				for( s.x = lurdAN.a4x2[1].x; s.x >= lurdAN.x; s.x-- )
 				{
 
-					U4 x_fnd = mass.getXFNDan( s );
-					pS2 = x_fnd ? mass.SRCfnd( x_fnd ) : NULL;
+					U4 x_fnd = pMASS->getXFNDan( s );
+					pS2 = x_fnd ? pMASS->SRCfnd( x_fnd ) : NULL;
 					if( !pS2 )
 					{
-						pS2 = mass.SRCnew( tmp, NULL, s, -1 );
+						pS2 = pMASS->SRCnew( tmp, NULL, s, -1 );
 						if( !pS2 )
 							continue;
 					}
@@ -252,15 +253,17 @@ class gpcCRS
 						continue;
 
 
-					pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->nL );
+					pS2->SRCcpy( pSRC->pA, pSRC->pA+pSRC->n_ld_add() );
 					pS2->srcUPDT();
 				}
 			}
 		}
 
 		void CRSsel( gpcWIN& win, gpcCRS& crs, gpcMASS& mass, bool bSH, U1 src = 4 );
-		void CRSstpCL( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
-		void CRSstpED( gpcWIN& win, gpcMASS& mass, U1 stp, bool bSH = false, bool bCT = false );
+		void CRSstpCL( //gpcWIN& win,
+						gpcMASS* pMASS, U1 stp, bool bSH = false, bool bCT = false );
+		void CRSstpED( //gpcWIN* pWIN, gpcMASS* pMASS,
+						U1 stp, bool bSH = false, bool bCT = false );
 
 		I4x4 scnZNCR( gpcWIN& win, gpcMASS& mass, const I4x2& _xy, U1 srcDIV );
 		I4x4& gtFRM() {

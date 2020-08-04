@@ -15,19 +15,19 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
         // kill
         gpmDELary(pKL);
         pB = pA = NULL;
-        nA = nL = 0;
+        nA = n_ld(0);
 		return *this;
 	}
-	nL = pSe-pS;
-	if( nA < nL+2 )
+	n_ld(pSe-pS);
+	if( nA < n_ld_add()+2 )
 	{
 		gpmDELary(pKL);
-		nA = gpmPAD( nL+2, 0x10 );
+		nA = gpmPAD( n_ld_add()+2, 0x10 );
 		pA = new U1[nA];
 	}
 	U8 nLEN;
 	U4 iA = gpfVAN( pS, (U1*)"\a", nLEN );
-	if( iA >= nL )
+	if( iA >= n_ld_add() )
 	{
 		iA = sizeof(" \a");
 		gpmMcpyOF( pA, " \a", iA );
@@ -35,9 +35,9 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
 	} else
 		iA = 0;
 
-	gpmMcpyOF( pA+iA, pS, nL );
-	nL += iA;
-	pA[nL] = 0;
+	gpmMcpyOF( pA+iA, pS, n_ld_add() );
+	//n_ld += iA;
+	pA[n_ld_add(iA)] = 0;
 
 	pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 	if( *pB == '\a' )
@@ -66,20 +66,20 @@ gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 iADD ) {
 	pS = (pB = pA + gpfVAN( pA, (U1*)"\a", anLEN[0] ));	//...\aA..B
 	if( *pB == '\a' )
 		pS++;											//...\aA..B\aS
-	nL = gpfVAN( pS, (U1*)"\a", anLEN[1] );
-	if( pS+nL >= pSe )
+	n_ld(gpfVAN( pS, (U1*)"\a", anLEN[1] ));
+	if( pS+n_ld_add() >= pSe )
 	{
-		nL = pSe-pS;
+		n_ld(pSe-pS);
 		pS = pSe;
-	} else if( !pS[nL] )
-		pS+=nL;											//...\aA..B\a... . .   . . ...S0
-	else if( pS[nL] != '\a' )
+	} else if( !pS[n_ld_add()] )
+		pS+=n_ld_add();											//...\aA..B\a... . .   . . ...S0
+	else if( pS[n_ld_add()] != '\a' )
 		pS += gpfVAN( pS, (U1*)"\a", anLEN[1], true );	//...\aA..B\a... . .   . . ...S?
 	else
-		pS+=nL;											//...\aA..B\a... . .   . . ...S\a
+		pS+=n_ld_add();											//...\aA..B\a... . .   . . ...S\a
 
 
-	nL = pS-pA;
+	n_ld(pS-pA);
 	if( !ppS )
 		return *this;
 
@@ -99,8 +99,8 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 
 	qBLD();
 
-	nL = &B ? B.nL : 0;
-	if( !nL )	// B kampec;
+	n_ld( &B ? B.n_ld_add() : 0 );
+	if( !n_ld_add() )	// B kampec;
 	{
 		// hagyjuk a pA-t hátha hamarosan mással töltjük meg
 		return *this;
@@ -109,13 +109,13 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 	U8 i = B.iB();
 	// fontos, hogy itt legyenek, mielött a pA-val kezdünk valamit
 
-	if( nA < (nL+2) )
+	if( nA < (n_ld_add()+2) )
 	{
 		// ha nA == 0 volt azt jelenti nem foglalva volt, ha nem valahonnan kölcsönözve
 		if( nA )	// csak akkor felszabadítható ha van mérete, egyébként simán elfelejthető
 			gpmDELary(pA);
 
-		nA = gpmPAD( nL+2, 0x10 );
+		nA = gpmPAD( n_ld_add()+2, 0x10 );
 		pA = new U1[nA];
 	}
 	if( !pA )
@@ -127,13 +127,13 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 
 	// nL = B.nL; ema vót
 	// nL = B.nL; e má vót
-	if( i < nL )
+	if( i < n_ld_add() )
 	{
 		// nL van
 		// i kissebb ez egyértelmű
 		pB = pA+i;
-		gpmMcpyOF( pA, BpA, nL );
-		pA[nL] = 0;
+		gpmMcpyOF( pA, BpA, n_ld_add() );
+		pA[n_ld_add()] = 0;
 		return *this;
 	}
 
@@ -141,11 +141,11 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 	// potoljuk // az elejére rakunk egyet mert kell
 	pB = pA;
 	*pB = '\a';
-	gpmMcpyOF( pB+1, BpA, nL );
-	nL++;
-	pA[nL] = 0;
+	gpmMcpyOF( pB+1, BpA, n_ld_add() );
+	//n_ld++;
+	pA[n_ld_add(1)] = 0;
 
-	for( U8 i = 1; i < nL; i++ )
+	for( U8 i = 1; i < n_ld_add(); i++ )
 	{
 		if( pB[i] != '\a' )
 			continue;

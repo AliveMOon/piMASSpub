@@ -28,7 +28,7 @@ bool gpcCRS::miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 allWH ) {
 
 	return true;
 }
-bool gpcCRS::miniRDYesc( gpcWIN& win, gpcPIC* pPIC )
+bool gpcCRS::miniRDYesc( gpcWIN* pWIN, gpcPIC* pPIC )
 {
 	bool bESC = false; //, bNoMini;
 	if( CRSfrm.x >= CRSfrm.z )
@@ -41,7 +41,7 @@ bool gpcCRS::miniRDYesc( gpcWIN& win, gpcPIC* pPIC )
 		CRSfrm.y = CRSfrm.w;
 		bESC = true;
 	}
-	I4x2 &div = win.wDIVcr( id ).a4x2[0];
+	I4x2 &div = pWIN->wDIVcr( id ).a4x2[0];
 	fxyz.z = pPIC->txWH.z;
 	if( bESC )
 	{
@@ -64,23 +64,23 @@ bool gpcCRS::miniRDYesc( gpcWIN& win, gpcPIC* pPIC )
 	return false;
 }
 U4 gpcCRS::miniRDYmap(
-						gpcWIN& win, I4x4& lurdAN,
+						gpcWIN* pWIN, I4x4& lurdAN,
 						U4* &pM,	U4* &pC,	U4* &pR,
 						U4* &psCp,	U4* &psRp,	U4& z,
 						U4x4& mZN, bool bSHFT
 					)
 {
-	gpcMAP* pMAP = win.piMASS ? &(win.piMASS->mapCR) : NULL;
+	gpcMAP* pMAP = pWIN->piMASS ? &(pWIN->piMASS->mapCR) : NULL;
 	if( !pMAP )
 		return -1;
 
-	gpcMASS& mass = *win.piMASS;
+	gpcMASS& mass = *pWIN->piMASS;
 	U4 selID = id;
 	if( bSHFT )
-	if( win.apCRS[win.srcDIV] )
-		selID = win.srcDIV; /// Szomszédol!
+	if( pWIN->apCRS[pWIN->srcDIV] )
+		selID = pWIN->srcDIV; /// Szomszédol!
 
-	I4x4	*p_selAI = (selID == id ? selANIN : win.apCRS[selID]->selANIN),
+	I4x4	*p_selAI = (selID == id ? selANIN : pWIN->apCRS[selID]->selANIN),
 			&xyCR = aXYuvPC[0];
 
 	lurdAN = I4x4( p_selAI[0].a4x2[0], p_selAI[1].a4x2[0] ).lurd();
@@ -91,7 +91,7 @@ U4 gpcCRS::miniRDYmap(
 	/// hanem ha le van nyomva a SHIFT akor e SRC_DIV-vel
 	pMAP->MAPalloc( rdZN, mZN, selID );
 	U4	c, r, ie,
-		i = mass.jDOitREF( win, 0, ie, &pM, &pC, &pR, &z );
+		i = mass.jDOitREF( *pWIN, 0, ie, &pM, &pC, &pR, &z );
 
 	bool bNoMini; //, bTRIG = false;
 	if( selID ) {
@@ -132,8 +132,8 @@ U4 gpcCRS::miniRDYmap(
 	}
 
 	/// pCp pRp ----------------------------------------
-	psCp = win.apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR );
-	psRp = win.apCRS[selID]->pRp;
+	psCp = pWIN->apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR );
+	psRp = pWIN->apCRS[selID]->pRp;
 	/// end pCp pRp ----------------------------------------
 	I4x2 brdr = I4x2( psCp[mZN.x],psRp[mZN.y] );
 	if( (CRSfrm.x+brdr.x < 1) || (CRSfrm.y+brdr.y < 1) ) {
@@ -151,14 +151,15 @@ U4 gpcCRS::miniRDYmap(
 ///
 ///------------------------------
 static U1 gpsTITLE[0x100];
-void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT, bool bMOV )
+void gpcCRS::miniRDY( gpcWIN* pWIN, //gpcMASS* pMASS,
+						gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT, bool bMOV )
 {
 	picBG.lzyRST(); bobBG.lzyRST();
 
-	if( !miniLOCK( pPIC, pRNDR, win.wDIVcrALLOCK() ) )
+	if( !miniLOCK( pPIC, pRNDR, pWIN->wDIVcrALLOCK() ) )
 		return;
 
-	if( miniRDYesc(win,pPIC) )
+	if( miniRDYesc(pWIN,pPIC) )
 		return;
 
 	I4x4 lurdAN;
@@ -166,7 +167,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	U4	*pM, *pC, *pR, *psCp, *psRp,
 		z, c, r, i;
 
-	U4 selID = miniRDYmap( win, lurdAN, pM, pC, pR, psCp, psRp, z, mZN, bSHFT );
+	U4 selID = miniRDYmap( pWIN, lurdAN, pM, pC, pR, psCp, psRp, z, mZN, bSHFT );
 	if( selID > 3 )
 		return;
 
@@ -192,7 +193,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 
 		aCRSonPG[3].a4x2[1] = aCRSonPG[3].a4x2[0];
 	}
-	bool bON=(id==win.onDIV.x), bNoMini;
+	bool bON=(id==pWIN->onDIV.x), bNoMini;
 
 	I4x4 &xyCR = aXYuvPC[0];
 	gpeCLR	c16bg = gpeCLR_blue,
@@ -220,7 +221,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 				xyCR.x = psCp[mZN.x]+((c-mZN.z)*gpdSRC_COLw);
 			c16fr = (iON == I4x2(c,r)*I4x2(1,z))	? gpeCLR_white
 													: (
-														(selID == win.srcDIV) 	? gpeCLR_orange
+														(selID == pWIN->srcDIV) 	? gpeCLR_orange
 																				: gpeCLR_green
 													  );
 
@@ -292,7 +293,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			}
 
 			pTITLE = gpsTITLE;
-			if( pSRC = mass.SRCfnd(pM[i+c]) ) {
+			if( pSRC = pWIN->piMASS->SRCfnd(pM[i+c]) ) {
 				gpcRES* pRES = pSRC->apOUT[3];
 				if( pRES )
 				{

@@ -80,7 +80,7 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
 }
 U1		gpsSTRpub[0x10000];
 char 	gpsHD[0x1000], *psHD;
-void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
+void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub )
 {
 	if( !this )
 		return;
@@ -134,7 +134,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				continue;
 
 			if( !pTGpub )
-				pTGpub = mass.aTGwip;
+				pTGpub = pMASS->aTGwip;
 
 			for( U4 i = 0; i < nALFtg; i++ )
 			{
@@ -234,7 +234,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			if( pTGdie[i] < gpeALF_A )
 				continue;
 			// kiszedni a teg listából az SRC-t
-			mass.tag_sub( pTGdie[i], IX );
+			pMASS->tag_sub( pTGdie[i], IX );
 		}
 		gpmDELary(pTGdie);
 	}
@@ -268,7 +268,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 					break;
 			}
 			// betenni a teg listába az SRC-t
-			mass.tag_add( pALFtg[nALFtg], IX );			///
+			pMASS->tag_add( pALFtg[nALFtg], IX );			///
 			nALFtg++;
 		}
 

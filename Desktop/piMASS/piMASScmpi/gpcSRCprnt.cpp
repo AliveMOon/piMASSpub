@@ -15,13 +15,13 @@ gpcLZY* gpcSRC::SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCOR
 		return pLZY;
 	char sBUFF[0x100];
 	gpmMcpy( sBUFF, "A:", 3 );
-	U8 s;
+	U8 s = gpmSCP.nMN();
 	gpcLZY	&mLST = core.mLST;
-	gpcLNK* pOlnk = (gpcLNK*)SCOOP.obj.p_alloc;
+	gpcLNK* pLNK = (gpcLNK*)gpmSCP.obj.p_alloc;
 	for( U4 o = 0, n = core.oLST.nLD(sizeof(gpO)); o < n; o++ )
 	{
 		gpO& obj = pO0[o];
-		gpcLNK& O = pOlnk[obj.iO];
+		gpcLNK& O = pLNK[obj.iO];
 		gpfALF2STR( sBUFF, O.obj.alf );
 
 		pLZY = pLZY->lzyFRMT( s = -1, "\n %s", sBUFF );

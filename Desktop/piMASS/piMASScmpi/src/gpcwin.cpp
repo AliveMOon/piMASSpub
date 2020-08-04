@@ -221,8 +221,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 
 //extern const char gpsGLSLfrgREF[];
 //extern const char gpsGLSLfrgLINE[];
-void gpcWIN::WINrun( const char* pWELLCOME )
-{
+void gpcWIN::WINrun( const char* pWELLCOME ) {
 	U4 scan, bug = 0, nBUG;
 	U1 aXY[] = "00", c = 0;
 
@@ -346,7 +345,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					// nincsen begépelve semmi
 					// mondjuk ZOOM, stb..?
 					iRDY = crs.id;
-					crs.CRSins( *piMASS, gppKEYbuff, pS );
+					crs.CRSins( piMASS, gppKEYbuff, pS );
 					pS = gppKEYbuff;
 				} else {
 					iRDY = crs.id;
@@ -355,7 +354,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 						switch( *pE )
 						{
 							case '\v': {
-								crs.CRSins( *piMASS, pE, pS );
+								crs.CRSins( piMASS, pE, pS );
 								pS = pE+1;
 								// tehát ha bent van ki kell lépni a szerkeszttett cellából
 								crs.CRSbEDswitch();
@@ -364,13 +363,13 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								if( crs.CRSbEDget() )
 									break;
 
-								crs.CRSins( *piMASS, pE, pS );
+								crs.CRSins( piMASS, pE, pS );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
 
 								pS = pE+1;
-								crs.CRSstpCL( *this, *piMASS, 3, bSHIFT );
+								crs.CRSstpCL( piMASS, 3, bSHIFT );
 							} break;
 							case '\r':
 							case '\n': {
@@ -378,13 +377,13 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 									break;
 
 
-								crs.CRSins( *piMASS, pE, pS );
+								crs.CRSins( piMASS, pE, pS );
 								if( *pE == '\r' )
 								if( pE[1] == '\n' )
 									pE++;
 
 								pS = pE+1;
-								crs.CRSstpCL( *this, *piMASS, 5, bSHIFT );
+								crs.CRSstpCL( piMASS, 5, bSHIFT );
 							} break;
 
 
@@ -392,11 +391,11 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							case 3:			// right
 							case 4:			// up
 							case 5:	{ 		// down
-								crs.CRSins( *piMASS, pE, pS );
+								crs.CRSins( piMASS, pE, pS );
 								pS = pE+1;
 								if( !crs.CRSbEDget() )
 								{
-									crs.CRSstpCL( *this, *piMASS, *pE, bSHIFT );
+									crs.CRSstpCL( piMASS, *pE, bSHIFT );
 									break;
 								}
 
@@ -406,7 +405,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 								//
 								//------------------------------------
 								crs.CRSstpED(
-												*this, *piMASS,
+												//this, piMASS,
 												*pE, bSHIFT // (1&(aKT[SDL_SCANCODE_LSHIFT]|aKT[SDL_SCANCODE_RSHIFT]))
 											);
 
@@ -418,33 +417,12 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 				}
 
 				if( pS < gppKEYbuff )
-					crs.CRSins( *piMASS, gppKEYbuff, pS );
+					crs.CRSins( piMASS, gppKEYbuff, pS );
 
-				crs.miniRDY( *this, *piMASS, pPIC, pSDLrndr, bSHIFT, bMOV );
+				crs.miniRDY(	this, //piMASS,
+								pPIC, pSDLrndr, bSHIFT, bMOV );
 				if( bMOV )
-				{
-
-					/*I4x4 &crsOFF = crs.crsOFF;
-					if( crsOFF.a4x2[1] != crsOFF.a4x2[0] )
-					{
-						crsOFF.a4x2[1] = crsOFF.a4x2[0];
-						I4x2 &xy = crs.CRSfrm.a4x2[0],
-							 &wh = crs.fxyz.a4x2[0];
-						if( crsOFF.a4x2[1].x < 0 )
-							xy.x = crsOFF.a4x2[1].x;
-						else if( crsOFF.a4x2[1].x >= wh.x )
-							xy.x = crsOFF.a4x2[1].x-wh.x + 1;
-
-						if( crsOFF.a4x2[1].y < 0 )
-							xy.y = crsOFF.a4x2[1].y;
-						else if( crsOFF.a4x2[1].y >= wh.y )
-							xy.y = crsOFF.a4x2[1].y-wh.y + 1;
-
-					}*/
-
-
 					bMOV = false;
-				}
 
 				gppKEYbuff = gppMOUSEbuff;
 				*gppKEYbuff = 0;
@@ -454,35 +432,15 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 					if( crs.id == i )
 						continue;
 					if( bSW&(1<<i) )
-						apCRS[i]->miniRDY( *this, *piMASS, pPIC, pSDLrndr, bSHIFT );
+						apCRS[i]->miniRDY(	this, //piMASS,
+											pPIC, pSDLrndr, bSHIFT );
 				}
 			} else {
 				crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 			}
 
 			pPIC->unLOCK();
-
-			/*if( !pPIC->unLOCK() )
-			for( U1 i = 0; i < 4; i++ )
-			{
-				if( crs.id != i )
-					apCRS[i]->miniRDYsdl( *this, srcDIV, *piMASS, gppKEYbuff, gppKEYbuff );
-
-				if( pSDLrndr)
-					apCRS[i]->miniDRWtx( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
-				else
-					apCRS[i]->miniDRW( *this, srcDIV, onDIV.x, dstDIV, SRCxycr, bSHIFT );
-				//std::cout <<  (int)i << ":" << (SDL_GetTicks()-mSEC.x) << " " ;
-			}*/
-			//if( pSDLrndr)
-			//	SDL_RenderPresent( pSDLrndr );
-
-			//SDL_UpdateWindowSurface( pSDLwin );
-			//std::cout << "s" << SDL_GetTicks() <<std::endl;
 		}
-
-
-		//nMB = SDL_GetMouseState( &mouseXY.x, &mouseXY.y );
 
 		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( this );
 		*gpsTITLEpub = 0;
@@ -543,11 +501,7 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							dstDIV = tmp;
 						}
 
-                        /*if(( srcDIV != onDIV.x ) && ( dstDIV != onDIV.x ) )
-                        {
-							dstDIV = onDIV.x;
-                        }*/
-						apCRS[srcDIV]->CRSsel(
+                        apCRS[srcDIV]->CRSsel(
 												*this, *apCRS[srcDIV], *piMASS,
 												bSHIFT //, bSHIFT ? 4 : srcDIV
 											);
@@ -694,8 +648,6 @@ void gpcWIN::WINrun( const char* pWELLCOME )
 							break;
 
 						WINreSZ();
-
-						//winSIZ.a4x2[1] = winSIZ.a4x2[0];
 					} break;
 				default:
 					break;
