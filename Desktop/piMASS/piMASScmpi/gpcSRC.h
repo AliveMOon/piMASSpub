@@ -724,7 +724,7 @@ public:
 	U4x4 rLNK, rINS;
 	U4	//iDCT,
 		nDCT, nLNK, nOBJ, nMIN, nvASM;
-	U1	*pALL; //, *pMN;	/// ezt a gpcSRC::SRCmill adja
+	U1	*pALL; //, *pMN;	/// ezt a gpcSRC::SRCmnMILLbrk adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )
 	{
@@ -736,7 +736,7 @@ public:
 		//iDCT =
 		nDCT =
 		nLNK = nOBJ = nMIN = nvASM = 0;
-		pALL = pU;	// ezt a gpcSRC::SRCmill adja
+		pALL = pU;	// ezt a gpcSRC::SRCmnMILLbrk adja
 	}
 	//I8x4* pMN();
 	I8x4* pMN() {
@@ -1046,7 +1046,7 @@ public:
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 		return dim;
 	}
-	U4x4	SRCmill( bool bNoMini, U1 selID, const char* pVAN = NULL );
+	U4x4	SRCmnMILLbrk( bool bNoMini, U1 selID, const char* pVAN = NULL );
 	U1		SRCmnMILLscn( gpcCRS& crs, bool bNoMini, U1 selID );
 	I4x2	SRCmnMILL(
 						U1x4* pO,
@@ -1487,7 +1487,7 @@ public:
 		an.x--;
 		return getXFNDzn(an);
 	}
-	U4 jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ = NULL );
+	U4 jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ = NULL );
 
 	U4 relLEV( void )
 	{

@@ -360,39 +360,39 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 	return pOUT;
 }
 
-U4 gpcMASS::jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ )
+U4 gpcMASS::jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ )
 {
-	if( win.mZN == mapCR.mapZN44.a4x2[1].area() ) {
+	if( pWIN->mZN == mapCR.mapZN44.a4x2[1].area() ) {
 		if(ppM)
-			*ppM = win.pM;
+			*ppM = pWIN->pM;
 		if(ppC)
-			*ppC = win.pC;
+			*ppC = pWIN->pC;
 		if(ppR)
-			*ppR = win.pR;
+			*ppR = pWIN->pR;
 		if(pZ)
 			*pZ = mapCR.mapZN44.z;
-		ie = win.pC-win.pM;
+		ie = pWIN->pC-pWIN->pM;
 		return i;
 	}
 
-	win.mZ = mapCR.mapZN44.z;
-	win.mN = mapCR.mapZN44.w;
-	win.mZN = mapCR.mapZN44.a4x2[1].area();
-	U4 iz = i%win.mZ, in = i/win.mZ;
+	pWIN->mZ = mapCR.mapZN44.z;
+	pWIN->mN = mapCR.mapZN44.w;
+	pWIN->mZN = mapCR.mapZN44.a4x2[1].area();
+	U4 iz = i%pWIN->mZ, in = i/pWIN->mZ;
 
-	win.pM = mapCR.pMAP;
+	pWIN->pM = mapCR.pMAP;
 	if(ppM)
-		*ppM = win.pM;
-	win.pC = mapCR.pCOL;
+		*ppM = pWIN->pM;
+	pWIN->pC = mapCR.pCOL;
 	if(ppC)
-		*ppC = win.pC;
-	win.pR = mapCR.pROW;
+		*ppC = pWIN->pC;
+	pWIN->pR = mapCR.pROW;
 	if(ppR)
-		*ppR = win.pR;
+		*ppR = pWIN->pR;
 	if(pZ)
-		*pZ = win.mZ;
-	ie = win.pC-win.pM;
-	return in*win.mZ+iz;
+		*pZ = pWIN->mZ;
+	ie = pWIN->pC-pWIN->pM;
+	return in*pWIN->mZ+iz;
 }
 char gpsPUB[0x1000];
 U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
@@ -416,7 +416,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 	SDL_Texture* apTX[0x10];
 
 	U4	*pM,*pC,*pR,
-		ie,z,i = jDOitREF( *pWIN, 0, ie, &pM, &pC, &pR, &z );
+		ie,z,i = jDOitREF( pWIN, 0, ie, &pM, &pC, &pR, &z );
 
 
 	/*if( U4 *pM = pWIN->pM = mapCR.pMAP )
@@ -822,7 +822,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
 								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
+								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{
@@ -852,7 +852,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[1] );
 								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
+								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{
@@ -890,7 +890,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
 								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
+								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{
@@ -920,7 +920,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[1] );
 								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
-								i = jDOitREF( *pWIN, i, ie, &pM, &pC, &pR );
+								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
 								{

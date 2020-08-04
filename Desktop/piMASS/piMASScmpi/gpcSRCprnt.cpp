@@ -18,6 +18,14 @@ gpcLZY* gpcSRC::SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCOR
 	U8 s = gpmSCP.nMN();
 	gpcLZY	&mLST = core.mLST;
 	gpcLNK* pLNK = (gpcLNK*)gpmSCP.obj.p_alloc;
+	I8	*pO, *pC;
+	for( I8 a6 = core.aR[6], a6e = core.stk>>1; a6 < a6e; a6+=4 )
+	{
+		gpO& O = *(gpO*)core.ea( a6, pO, pC );
+		U1* p_src = mLST.Ux( O.iX, sizeof(U1) );
+		gpcLNK& L = pLNK[O.iO];
+	}
+	if(false)
 	for( U4 o = 0, n = core.oLST.nLD(sizeof(gpO)); o < n; o++ )
 	{
 		gpO& obj = pO0[o];

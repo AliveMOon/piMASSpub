@@ -156,8 +156,9 @@ gpCORE* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	SRCmnMILLdbg( pMASS->OPER, 0 );
 	if( !pDBG->nLD() )
 		return NULL;
-
-	//return NULL;
+	//#ifndef newCMPI
+	//	return NULL;
+	//#endif // newCMPI
 
 	static const U1 iMN=0;
 	I8x4 *pM0 = (I8x4*)gpmSCP.pMN();

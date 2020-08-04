@@ -74,7 +74,7 @@ U4 gpcCRS::miniRDYmap(
 	if( !pMAP )
 		return -1;
 
-	gpcMASS& mass = *pWIN->piMASS;
+	//gpcMASS* pMASS = pWIN->piMASS;
 	U4 selID = id;
 	if( bSHFT )
 	if( pWIN->apCRS[pWIN->srcDIV] )
@@ -91,7 +91,7 @@ U4 gpcCRS::miniRDYmap(
 	/// hanem ha le van nyomva a SHIFT akor e SRC_DIV-vel
 	pMAP->MAPalloc( rdZN, mZN, selID );
 	U4	c, r, ie,
-		i = mass.jDOitREF( *pWIN, 0, ie, &pM, &pC, &pR, &z );
+		i = pWIN->piMASS->jDOitREF( pWIN, 0, ie, &pM, &pC, &pR, &z );
 
 	bool bNoMini; //, bTRIG = false;
 	if( selID ) {
@@ -112,7 +112,7 @@ U4 gpcCRS::miniRDYmap(
 						&& ( c+1 <= lurdAN.z && r <= lurdAN.w )
 					);
 		/// TÁMADÁS HO RUKK!!
-		dim = (pSrC = mass.SRCfnd( pM[i] ))->SRCmill( bNoMini, selID, " \t\r\n" );
+		dim = (pSrC = pWIN->piMASS->SRCfnd( pM[i] ))->SRCmnMILLbrk( bNoMini, selID, " \t\r\n" );
 
 		//dim = mass.SRCfnd( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )
