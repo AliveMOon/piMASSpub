@@ -114,7 +114,7 @@ gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID ) {
 	}
 	return NULL;
 }
-void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
+void gpcSRC::srcCDR( gpcLZYdct& dOP, U1 iMN ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
@@ -271,7 +271,7 @@ void gpcSRC::SRCmnMILLcoder( gpcLZYdct& dOP, U1 iMN ) {
 		}
 	}
 }
-void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
+void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 {
 	if( !this )
 		return;
@@ -282,18 +282,18 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 		return;
 
 	char *pSi, *pSe;
-	U4 iOP, iOPe = mass.OPER.nIX();
+	U4 iOP, iOPe = pMASS->OPER.nIX();
 	/// -------------------------------------------------------
 	/// OPER
 	/// -------------------------------------------------------
 	if( !iOPe ) {
-		mass.mxOP = gpeALF_null;
+		pMASS->mxOP = gpeALF_null;
 		/// ha nincsen még kitöltve az OPER lista feltöltjük
 		pSe = strchr( (char*)gpasOPER[0], ' ' );
-		mass.OPER.dctMILLadd( (U1*)gpasOPER[0], pSe-gpasOPER[0] );
-		mass.aOP[0].num = 14;
-		mass.aOP[0] = pSe+1;
-		mass.mxOP = mass.aOP[0].alf;
+		pMASS->OPER.dctMILLadd( (U1*)gpasOPER[0], pSe-gpasOPER[0] );
+		pMASS->aOP[0].num = 14;
+		pMASS->aOP[0] = pSe+1;
+		pMASS->mxOP = pMASS->aOP[0].alf;
 		iOPe++;
 
 		for( U4 i = 1, ie = gpmN(gpasOPER); i < ie; i++ ) {
@@ -302,29 +302,31 @@ void gpcSRC::SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win )
 				continue;
 			U4 n = pSe-gpasOPER[i], nn = 0;
 			iOP = 0;
-			iOP = mass.OPER.dctMILLfnd( (U1*)gpasOPER[i], pSe-gpasOPER[i], iOPe );
+			iOP = pMASS->OPER.dctMILLfnd( (U1*)gpasOPER[i], pSe-gpasOPER[i], iOPe );
 			if( iOP < iOPe )
-			if( mass.OPER.nSTRix(iOP) < n )
+			if( pMASS->OPER.nSTRix(iOP) < n )
 				iOP = iOPe;
 
 			if( iOP >= iOPe ) {
 				iOP = iOPe;
-				mass.OPER.dctMILLadd( (U1*)gpasOPER[i], pSe-gpasOPER[i] );
-				mass.aOP[iOP].num = 14;
-				mass.aOP[iOP] = pSe+1;
+				pMASS->OPER.dctMILLadd( (U1*)gpasOPER[i], pSe-gpasOPER[i] );
+				pMASS->aOP[iOP].num = 14;
+				pMASS->aOP[iOP] = pSe+1;
 				iOPe++;
-				if( mass.mxOP < mass.aOP[iOP].alf )
-					mass.mxOP = mass.aOP[iOP].alf;
+				if( pMASS->mxOP < pMASS->aOP[iOP].alf )
+					pMASS->mxOP = pMASS->aOP[iOP].alf;
 			}
 
 		}
-		iOPe = mass.OPER.nIX();
+		iOPe = pMASS->OPER.nIX();
 	}
 	/// -------------------------------------------------------
 	if( iOPe == gpeOPid_jsr )
-		SRCmnMILLcoder( mass.OPER, 0 );
+		srcCDR( pMASS->OPER, 0 );
 	else
 		std::cout << "\033[1;31m iOPe != gpeOPid_jsr?" << std::endl;
+
+
 }
 
 

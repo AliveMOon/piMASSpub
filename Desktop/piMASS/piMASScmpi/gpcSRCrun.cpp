@@ -149,18 +149,20 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN,
 }
 
 
-gpCORE* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
+gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	if( !this )
 		return NULL;
 
-	SRCmnMILLdbg( pMASS->OPER, 0 );
+	srcDBG( pMASS->OPER, 0 );
 	if( !pDBG->nLD() )
 		return NULL;
+
+	static const U1 iMN=0;
+	static const bool b_dbg = true;
 	//#ifndef newCMPI
 	//	return NULL;
 	//#endif // newCMPI
 
-	static const U1 iMN=0;
 	I8x4 *pM0 = (I8x4*)gpmSCP.pMN();
 	char	*pALL = (char*)gpmSCP.pALL,
 			*pSTR;
@@ -201,10 +203,13 @@ gpCORE* gpcSRC::SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 			core.pc++
 		)
 	{
-		U8 nLEN;
-		pDIS += gpmVAN( pDIS, "\r\n", nLEN );
-		//n_ld( nLEN );
-		pDIS += gpmNINCS( pDIS, "\r\n" );
+		if( b_dbg )
+		{
+			U8 nLEN;
+			pDIS += gpmVAN( pDIS, "\r\n", nLEN );
+			pDIS += gpmNINCS( pDIS, "\r\n" );
+		}
+
 		pPC = core.iPC( op, iOP, iS, xS, mS, iD, xD, mD, iC );
 		if( !pPC )
 			continue; /// - NOP! --------------

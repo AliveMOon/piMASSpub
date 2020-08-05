@@ -112,7 +112,7 @@ U4 gpcCRS::miniRDYmap(
 						&& ( c+1 <= lurdAN.z && r <= lurdAN.w )
 					);
 		/// TÁMADÁS HO RUKK!!
-		dim = (pSrC = pWIN->piMASS->SRCfnd( pM[i] ))->SRCmnMILLbrk( bNoMini, selID, " \t\r\n" );
+		dim = (pSrC = pWIN->piMASS->SRCfnd( pM[i] ))->srcBRK( bNoMini, selID, " \t\r\n" );
 
 		//dim = mass.SRCfnd( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )
@@ -123,7 +123,7 @@ U4 gpcCRS::miniRDYmap(
 		if( pSrC ? !bNoMini : true )
 			continue;
 
-		oo = pSrC->SRCmnMILLscn( *this, bNoMini, selID );
+		oo = pSrC->srcSCN( *this, bNoMini, selID );
 		if( oo&1 )
 			aCRSonPG[0].a4x2[1] = I4x2(c,r);
 		if( oo&2 )
@@ -328,7 +328,7 @@ void gpcCRS::miniRDY( gpcWIN* pWIN, //gpcMASS* pMASS,
 				pMNoffFRM	->pos( xyCR.a4x2[0], fxyz )
 							->frmBRDR( xyCR.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
 
-				pSRC->SRCmnMILL(
+				pSRC->srcMILL(
 									pMNoff,
 									xyCR.a4x2[0], fxyz.a4x2[0],
 									CRSfrm.z, fxyz.z,
@@ -378,7 +378,7 @@ void gpcCRS::miniRDY( gpcWIN* pWIN, //gpcMASS* pMASS,
 				pMNoffFRM	->pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )
 							->print( gpsTITLE, gpeCLR_white );
 
-			pSRC->SRCmnMILL(
+			pSRC->srcMILL(
 								pMNoff,
 								xyCR.a4x2[0], fxyz.a4x2[0],
 								CRSfrm.z, fxyz.z,

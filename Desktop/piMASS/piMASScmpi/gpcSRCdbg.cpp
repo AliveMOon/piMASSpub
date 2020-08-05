@@ -19,8 +19,7 @@
 
 static char gpsDBGpub[0x1000];
 
-void gpcSRC::SRCmnMILLdbg( //I8x2* pOP,
-							gpcLZYdct& dOP, U1 iMN )
+void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iMN )
 {
 	if( !this )
 		return;

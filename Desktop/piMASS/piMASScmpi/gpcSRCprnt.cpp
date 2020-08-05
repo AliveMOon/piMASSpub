@@ -3,7 +3,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-gpcLZY* gpcSRC::SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
+gpcLZY* gpcSRC::srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	pLZY->lzyRST();
 	if( !pCORE )
 		return pLZY;

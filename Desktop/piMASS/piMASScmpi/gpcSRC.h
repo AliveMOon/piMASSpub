@@ -724,7 +724,7 @@ public:
 	U4x4 rLNK, rINS;
 	U4	//iDCT,
 		nDCT, nLNK, nOBJ, nMIN, nvASM;
-	U1	*pALL; //, *pMN;	/// ezt a gpcSRC::SRCmnMILLbrk adja
+	U1	*pALL; //, *pMN;	/// ezt a gpcSRC::srcBRK adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )
 	{
@@ -736,7 +736,7 @@ public:
 		//iDCT =
 		nDCT =
 		nLNK = nOBJ = nMIN = nvASM = 0;
-		pALL = pU;	// ezt a gpcSRC::SRCmnMILLbrk adja
+		pALL = pU;	// ezt a gpcSRC::srcBRK adja
 	}
 	//I8x4* pMN();
 	I8x4* pMN() {
@@ -1046,22 +1046,20 @@ public:
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 		return dim;
 	}
-	U4x4	SRCmnMILLbrk( bool bNoMini, U1 selID, const char* pVAN = NULL );
-	U1		SRCmnMILLscn( gpcCRS& crs, bool bNoMini, U1 selID );
-	I4x2	SRCmnMILL(
+	U4x4	srcBRK( bool bNoMini, U1 selID, const char* pVAN = NULL );
+	U1		srcSCN( gpcCRS& crs, bool bNoMini, U1 selID );
+	I4x2	srcMILL(
 						U1x4* pO,
 						I4x2 xy, I4x2 fWH,
 						I4 fz, I4 zz,
 						gpcCRS& crs,
 						bool bNoMini, U1 selID
 					);
-	void 	SRCmnMILLdbg( //I8x2* pOP,
-							gpcLZYdct& dOP, U1 iMN );
-	void 	SRCmnMILLcoder( //I8x2* pOP,
-							gpcLZYdct& dOP, U1 iMN );
-	void 	SRCmnMILLlnk( gpcMASS& mass, gpcWIN& win );
-	gpCORE* SRCmnMILLrun( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
-	gpcLZY* SRCmnMILLprnt( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+	void 	srcDBG( gpcLZYdct& dOP, U1 iMN );
+	void 	srcCDR( gpcLZYdct& dOP, U1 iMN );
+	void 	srcBLD( gpcMASS* pMASS ); //, gpcWIN& win );
+	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 
 	//gpcRES* SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM = NULL );
     bool bSUB( gpcMASS& mass ) {

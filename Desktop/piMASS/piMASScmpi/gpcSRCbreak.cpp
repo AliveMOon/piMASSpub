@@ -19,7 +19,7 @@ extern char gpaALF_H_sub[];
 //						};
 //
 //#define gpmSCP aSCOOP[iMN]
-U4x4 gpcSRC::SRCmnMILLbrk( bool bNoMini, U1 selID, const char* pVAN ) {
+U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 	if( !this )
 		return U4x4( gpdSRC_COLw, gpdSRC_ROWw );
 
@@ -166,7 +166,7 @@ U4x4 gpcSRC::SRCmnMILLbrk( bool bNoMini, U1 selID, const char* pVAN ) {
 	return dim;
 }
 
-U1 gpcSRC::SRCmnMILLscn( gpcCRS& crs, bool bNoMini, U1 selID ) {
+U1 gpcSRC::srcSCN( gpcCRS& crs, bool bNoMini, U1 selID ) {
 	if( !this )
 		return 0;
 
@@ -300,7 +300,7 @@ U1 gpcSRC::SRCmnMILLscn( gpcCRS& crs, bool bNoMini, U1 selID ) {
 	return false;
 }
 
-I4x2 gpcSRC::SRCmnMILL(
+I4x2 gpcSRC::srcMILL(
 							U1x4* pO,
 
 							I4x2 xy, I4x2 fWH,

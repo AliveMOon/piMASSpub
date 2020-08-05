@@ -362,6 +362,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 
 U4 gpcMASS::jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ )
 {
+	/// U4 i éppen hol tartott, ha át kell méretezni a pSRC mapot majd relocalja az it
 	if( pWIN->mZN == mapCR.mapZN44.a4x2[1].area() ) {
 		if(ppM)
 			*ppM = pWIN->pM;
@@ -416,16 +417,10 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 	SDL_Texture* apTX[0x10];
 
 	U4	*pM,*pC,*pR,
-		ie,z,i = jDOitREF( pWIN, 0, ie, &pM, &pC, &pR, &z );
+		ie,z;
+	jDOitREF( pWIN, 0, ie, &pM, &pC, &pR, &z );
 
-
-	/*if( U4 *pM = pWIN->pM = mapCR.pMAP )
-	if( U4 *pC = pWIN->pC = mapCR.pCOL )
-	if( U4 *pR = pWIN->pR = mapCR.pROW )
-	if( pM < pC )
-	for( U4 i = 0, ie = pC-pM; i < ie; i++ )*/
-	for( ; i < ie; i++ )
-	{
+	for( U4 i = 0; i < ie; i++ ) {
 		if( pSRC  ) {
 			if( aGLpic[0] )
 				pSRC->picID = aGLpic[0];
@@ -452,7 +447,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 
 		if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
 
-			pSRC->SRCmnMILLlnk( *this, *pWIN );
+			pSRC->srcBLD( this );
 
 			gpmDEL( pSRC->pEXE0 );
 			pSRC->pEXE0 = pSRC->pEXE0->compiEASY( pSRC->pSRCstart( true, 4 ), NULL, NULL, NULL );
@@ -477,11 +472,11 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 		}
 
 		if( !pSRC->apOUT[3] )
-		if( pSRC->SRCmnMILLrun(this,pWIN) )
+		if( pSRC->srcRUN(this,pWIN) )
 		{
 			pWIN->nJDOIT.x++;
 
-			pSRC->pMINI = pSRC->SRCmnMILLprnt(pSRC->pMINI,this,pWIN);
+			pSRC->pMINI = pSRC->srcMINI(pSRC->pMINI,this,pWIN);
 			continue;
 		} else {
 			if( !pSRC->pEXE0 )
