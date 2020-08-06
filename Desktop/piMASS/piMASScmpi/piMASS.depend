@@ -1015,7 +1015,7 @@
 1593166346 /home/pi/Desktop/piMASS/piMASScmpi/gpcpic.h
 	"piMASS.h"
 
-1595897623 /home/pi/Desktop/piMASS/piMASScmpi/piMASS.h
+1596685923 /home/pi/Desktop/piMASS/piMASScmpi/piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -1087,7 +1087,7 @@
 	"gpcSRC.h"
 	"gpcres.h"
 
-1596589714 /home/pi/Desktop/piMASS/piMASScmpi//gpcSRC.h
+1596602484 /home/pi/Desktop/piMASS/piMASScmpi//gpcSRC.h
 	"gpcgt.h"
 	"gpcOPCD.h"
 
@@ -1097,7 +1097,7 @@
 1593166346 /home/pi/Desktop/piMASS/piMASScmpi//gpcpic.h
 	"piMASS.h"
 
-1595897623 /home/pi/Desktop/piMASS/piMASScmpi//piMASS.h
+1596685923 /home/pi/Desktop/piMASS/piMASScmpi//piMASS.h
 	<exception>
 	<mysys.h>
 	<errno.h>
@@ -1207,7 +1207,7 @@
 	"gpcSRC.h"
 	"gpcwin.h"
 
-1596589714 /home/pi/Desktop/piMASS/piMASScmpi/gpcSRC.h
+1596602484 /home/pi/Desktop/piMASS/piMASScmpi/gpcSRC.h
 	"gpcgt.h"
 	"gpcOPCD.h"
 
@@ -1260,7 +1260,7 @@
 1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcres_compi.cpp
 	"gpcres.h"
 
-1596589714 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcres_run.cpp
+1596592718 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcres_run.cpp
 	"gpcwin.h"
 
 1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcresflt.cpp
@@ -1278,7 +1278,7 @@
 	"gpcSRC.h"
 	"gpccrs.h"
 
-1596591175 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRClnk.cpp
+1596672710 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRClnk.cpp
 	"gpcSRC.h"
 	"gpcSRClnk.h"
 	"gpccrs.h"
@@ -1331,7 +1331,7 @@
 
 1593166346 /home/pi/Desktop/piMASS/piMASScmpi//gpsGLSL.h
 
-1596418538 /home/pi/Desktop/piMASS/piMASScmpi/gpcSRClnk.h
+1596690043 /home/pi/Desktop/piMASS/piMASScmpi/gpcSRClnk.h
 	"piMASS.h"
 
 1596587934 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCdbg.cpp
@@ -2016,7 +2016,7 @@
 
 1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpsGLSL.h
 
-1596591277 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCrun.cpp
+1596672816 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCrun.cpp
 	"gpcSRC.h"
 	"gpcSRClnk.h"
 	"gpccrs.h"
@@ -2024,7 +2024,12 @@
 1595890682 /home/pi/Desktop/piMASS/piMASScmpi//gpcSRClnk.h
 	"piMASS.h"
 
-1596587934 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCprnt.cpp
+1596595583 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1596672710 source:/home/pi/Desktop/piMASS/piMASScmpi/gpCORE.cpp
 	"gpcSRC.h"
 	"gpcSRClnk.h"
 	"gpccrs.h"

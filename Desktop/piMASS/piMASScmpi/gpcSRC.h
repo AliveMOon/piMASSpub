@@ -842,8 +842,7 @@ public:
 	gpcSCOOP aSCOOP[3];
 	gpCORE 	*pCORE;
 
-	U8 n_ld( U8 in )
-	{
+	U8 n_ld( U8 in ) {
 		if( !this )
 			return 0;
 
@@ -857,8 +856,7 @@ public:
 		nLD = in;
 		return nLD;
 	}
-	U8 n_ld_add( I8 add = 0 )
-	{
+	U8 n_ld_add( I8 add = 0 ) {
 		if( !this )
 			return 0;
 
@@ -1056,9 +1054,10 @@ public:
 						bool bNoMini, U1 selID
 					);
 	void 	srcDBG( gpcLZYdct& dOP, U1 iMN );
-	void 	srcCDR( gpcLZYdct& dOP, U1 iMN );
+	void 	srcCMPLR( gpcLZYdct& dOP, U1 iMN );
 	void 	srcBLD( gpcMASS* pMASS ); //, gpcWIN& win );
 	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+
 	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 
 	//gpcRES* SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM = NULL );

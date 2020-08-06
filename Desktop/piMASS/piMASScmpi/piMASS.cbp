@@ -104,6 +104,7 @@
 			<Add library="SDL2" />
 			<Add library="libjpeg" />
 		</Linker>
+		<Unit filename="gpCORE.cpp" />
 		<Unit filename="gpMASSbuild.cpp" />
 		<Unit filename="gpcCRSbreak.cpp" />
 		<Unit filename="gpcDRCos.cpp" />

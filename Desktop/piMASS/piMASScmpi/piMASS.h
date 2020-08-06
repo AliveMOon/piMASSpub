@@ -3110,16 +3110,15 @@ class I4x4 {
 public:
 	union
     {
-		struct
-        {
+		struct {
 			I4 x,y,z,w;
 		};
 
 		struct
         {
 			gpeOPid pre, pst;	// 0, 1
-			gpeCsz	iC;
-			U1		d0;		// 2, 3
+			gpeCsz	iC;			// 2,
+			U1		d0;			// 3,
 			U4		op;			// 4,
 			I4		aOB[2];		// 8, 12; //0x10
         };
@@ -3127,10 +3126,6 @@ public:
         {
 			I4 A,B,C,D;
 		};
-		/*struct
-        {
-			I4 E,F,G,H;
-		};*/
 		struct
         {
 			I4 aXYZW[4];
@@ -6466,6 +6461,7 @@ szasz:
 		ins.op = U1x4( op, ((U1)s0<<3)|(sn&7), ((U1)d0<<3)|(dn&7), (di<<4)|(si&7) ).u4;
 		return ins;
 	}
+
 
 };
 

@@ -114,7 +114,7 @@ gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID ) {
 	}
 	return NULL;
 }
-void gpcSRC::srcCDR( gpcLZYdct& dOP, U1 iMN ) {
+void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
@@ -271,6 +271,7 @@ void gpcSRC::srcCDR( gpcLZYdct& dOP, U1 iMN ) {
 		}
 	}
 }
+
 void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 {
 	if( !this )
@@ -322,11 +323,16 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 	}
 	/// -------------------------------------------------------
 	if( iOPe == gpeOPid_jsr )
-		srcCDR( pMASS->OPER, 0 );
+		srcCMPLR( pMASS->OPER, 0 );
 	else
 		std::cout << "\033[1;31m iOPe != gpeOPid_jsr?" << std::endl;
 
-
+	if( !pCORE )
+	{
+		pCORE = new gpCORE;
+		pCORE->lnk( gpmLZYvali( I4x4, &gpmSCP.vASM ),  gpmSCP.nASM(),
+					gpmSCP.pMN(), (char*)gpmSCP.pALL, &LNK );
+	}
 }
 
 

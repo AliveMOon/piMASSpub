@@ -289,13 +289,72 @@ public:
 	I4	iX, x, iC, aO, aC;
 	gpC* pC;
 
-
 	gpSTK(){}
-	gpSTK& null()
-	{
+	gpSTK& null() {
 		gpmCLR;
 		return *this;
 	}
+};
+class gpINST {
+public:
+	U1x4 op;
+	gpeOPid oID;
+	gpeCsz iC;
+
+	U1	iS, xS;
+	gpeEA mS;
+
+	U1	iD, xD;
+	gpeEA mD;
+
+	I4	aOB[2];
+
+	gpINST& operator = ( const U4 u4 ) {
+		gpmCLR;
+		op = u4;
+		oID = (gpeOPid)op.x;
+		if( !oID ) // nop
+			return *this;
+
+		iS = op.y&7;
+		xS = op.w&7;
+		mS = (gpeEA)(op.y>>3);
+
+		iD = op.z&7;
+		xS = (op.w>>4)&7;
+		mD = (gpeEA)(op.z>>3);
+		return *this;
+	}
+	gpINST& operator = ( const I4x4 x4 ) {
+		*this = x4.op;
+		aOB[0] = x4.z;
+		aOB[1] = x4.w;
+		iC = x4.iC;
+		return *this;
+	}
+
+	/*gpINST& operator = ( const I4x4 x4 ) {
+		gpmCLR;
+
+		op = x4.op;
+		oID = (gpeOPid)op.x;
+		if( !oID ) // nop
+			return NULL;
+
+		iS = op.y&7;
+		xS = op.w&7;
+		mS = (gpeEA)(op.y>>3);
+
+		iD = op.z&7;
+		xS = (op.w>>4)&7;
+		mD = (gpeEA)(op.z>>3);
+
+		iC = x4.iC;
+
+		return *this;
+	}*/
+	gpINST(){};
+	gpINST( const I4x4 x4 ) { *this = x4; }
 };
 class gpCORE {
 public:
@@ -384,6 +443,7 @@ public:
 
 		return pPC;
 	}
+	U4 lnk( I4x4* pPC, U4 n, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk );
 	gpeCsz C( U4& ix, U4 iC, U4 ixO ) {
 		U4 off = ix-ixO;
 		if( !off )
@@ -588,91 +648,27 @@ public:
 		return mLST.Ux( ix, sizeof(I4x4), true, sizeof(U1) );
 	}
 
-//	U4 ix( U4 ix, I4 oID, I8 cID = gpeCsz_Q ) {
-//		if( !ix ) {
-//			/// most kezdődik
-//			oDPi = 0;
-//			U4 nO = oLST.nLD(sizeof(gpO));
-//			gpO* pO = gpmLZYvali( gpO, &oLST );
-//			if( pO )
-//			for( U4 i = 0; i < nO; i++ )
-//			{
-//				if( pO[i].iO != oID )
-//					continue;
-//
-//				return pO[i].iX;
-//			}
-//
-//			pO = (gpO*)oLST.Ux( nO, sizeof(gpO) );
-//			pO[0].iO = oID;
-//			pO[0].iC = cID;
-//			pO[0].iD = 0;
-//			pO[0].iX = mLST.nLD();
-//			if( cID < gpeCsz_K )
-//				pO[0].szOF = gpaCsz[cID];
-//			else {
-//				gpC *pC = gpmLZYvali(gpC,&cLST)+(cID-gpeCsz_K);
-//				pO[0].szOF = pC[0].szOF;
-//			}
-//			mLST.Ux( pO[0].iX, pO[0].szOF );
-//			return pO[0].iX;
-//		}
-//
-//
-//		I8	O0, // mom obj
-//			cBRO; // testvér
-//		U1* pS = ea( ix, &O0, &cBRO );
-//		if( cBRO < gpeCsz_K )
-//			return ix;
-//
-//		gpC		*pC0 = gpmLZYvali( gpC, &cLST ),
-//				*pCB = pC0+(cBRO-gpeCsz_K);
-//
-//		U4x4	*pCBL = pCB->pLST;
-//		gpeCsz	Csz;
-//		U4		ixADD = 0, nK = pCB->nLST;
-//		for( U4 i = 0, iK = 0; i < nK; i++ )
-//		{
-//			if( pCBL[i].coreC() == oID )
-//				return ix+ixADD;
-//
-//			Csz = pCBL[i].coreCsz();
-//			if( Csz < gpeCsz_K )
-//			{
-//				ixADD += pCBL[i].coreARY(gpaCsz[Csz]);
-//				continue;
-//			}
-//			ixADD += pC0[pCB->pKID[iK]].szOF;
-//		}
-//
-//
-//		/// nincs
-//
-//		/// az új CLASS amivel szeretnénk bővíteni
-//
-//		U4	iNEW = cLST.nLD(sizeof(gpC)),
-//			ADDsz = cID < gpeCsz_K ? gpaCsz[cID] : ((gpC*)cLST.Ux( cID-gpeCsz_K, sizeof(gpC) ))->szOF;
-//
-//
-//		gpC	*pNEW = ((gpC*)cLST.Ux( iNEW, sizeof(gpC) ))->KIDadd( 	*pCB,	// ennek a másolata
-//																	cID,
-//																	ADDsz,
-//																	oID  );
-//		/*U4	ix0 = pO[O0].iX,
-//			ix0sz = pO[O0].szOF,
-//			ix1 = ix0+ix0sz,
-//			szC0 = pCB->szOF/,
-//			nALL = mLST.n_load;
-//
-//		U1**/
-//
-//		//pC0[O0].iC = iNEW;
-//
-//		return 0;
-//	}
 
-	U4 entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPobj, gpcWIN* pWIN, U8& bSW, U4 newC = gpeCsz_L );
 
+	U4 entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN, U8& bSW, U4 newC = gpeCsz_L );
+
+	gpO* pOBJlnk( U4 i, U4 oID, U4 cID, bool bALLOC )
+	{
+		U4 iO;
+		gpO* p_o = oIDfnd( oID, iO );
+		if( p_o )
+			return p_o;
+		p_o = (gpO*)oLST.Ux( i, sizeof(gpO) );
+		p_o->iO = oID;
+		p_o->iC = cID;
+		p_o->iD = 0;
+		p_o->iX = 0;
+		p_o->szOF = sOF(cID);
+		if( !bALLOC )
+			return p_o;
+		mLST.Ux( p_o->iX = mLST.nLD(), p_o->szOF, true, sizeof(U1) );
+		return p_o;
+	}
 };
 
 #define PC (iPC=scp.nASM())
