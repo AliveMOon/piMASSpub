@@ -214,5 +214,15 @@ U4 gpCORE::lnk( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
 		aoID[d0] = inst.aOB[0];
 		d0++;
 	}
+	for( U4 o = 0, nO = oLST.nLD(sizeof(*pO)); o<nO; o++ ) {
+		pOlnk = (gpO*)oLST.Ux( o, sizeof(*pOlnk), true );
+		if( pOlnk->cID < gpeCsz_K ) {
+			pOlnk->szOF = gpaCsz[pOlnk->cID];
+			continue;
+		}
+
+
+
+	}
 	return nO;
 }
