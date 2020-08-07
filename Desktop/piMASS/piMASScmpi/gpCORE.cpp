@@ -24,7 +24,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 		gpcLNK& lnk = *((gpcLNK*)pSCPlnk->Ux( oID, sizeof(gpcLNK)));
 		//gpeTYP typ = O.typ;
 		U4 iO;
-		gpeALF alf = lnk.obj.alf;
+
 
 		switch( lnk.typ )
 		{
@@ -38,13 +38,13 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 						{
 							aSTK[nSTK].iX = pOlnk->iX;
 							aSTK[nSTK].pC =
-								(aSTK[nSTK].iC = pOlnk->iC) < gpeCsz_K
+								(aSTK[nSTK].cID = pOlnk->cID) < gpeCsz_K
 								? NULL
-								: gpmLZYvali( gpC, &cLST ) + pOlnk->iC-gpeCsz_K;
+								: gpmLZYvali( gpC, &cLST ) + pOlnk->cID-gpeCsz_K;
 							continue;
 						}
 
-
+						gpeALF alf = lnk.obj.alf;
 						if( pWIN->WINvar( wVAR, alf ) )
 						{
 							// valamit kapott
@@ -56,20 +56,20 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 
 						aSTK[nSTK].iX = pOlnk->iX;
 						aSTK[nSTK].pC =
-							(aSTK[nSTK].iC = pOlnk->iC) < gpeCsz_K
+							(aSTK[nSTK].cID = pOlnk->cID) < gpeCsz_K
 							? NULL
-							: gpmLZYvali( gpC, &cLST ) + pOlnk->iC-gpeCsz_K;
+							: gpmLZYvali( gpC, &cLST ) + pOlnk->cID-gpeCsz_K;
 						continue;
 					}
 					aSTK[nSTK].iX = aSTK[nSTK-1].iX;
-					aSTK[nSTK].x = aSTK[nSTK-1].pC->cIDfnd( cLST, oID, aSTK[nSTK].iC );
+					aSTK[nSTK].x = aSTK[nSTK-1].pC->cIDfnd( cLST, oID, aSTK[nSTK].cID );
 					if( aSTK[nSTK].x > -1 )
 					{
 						aSTK[nSTK].iX += aSTK[nSTK].x;
 						continue;
 					}
-					aSTK[nSTK].aO = oID;
-					aSTK[nSTK].aC = newC;
+					aSTK[nSTK].oID = oID;
+					aSTK[nSTK].cID = newC;
 
 				} break;
 			case gpeTYP_sA8N:
@@ -85,8 +85,8 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 							return pOlnk->iX;
 
 						pOlnk = (gpO*)oLST.Ux( iO, sizeof(gpO) );
-						pOlnk->iO = oID;
-						pOlnk->iC = newC;
+						pOlnk->oID = oID;
+						pOlnk->cID = newC;
 						pOlnk->iD = 0;
 						pOlnk->iX = mLST.nLD();
 						pOlnk->szOF = sOF(newC);
@@ -142,10 +142,12 @@ U4 gpCORE::lnk( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
 	I4	aoID[0x10];
 	U4 nO = 0, iO;
 	gpO* pOlnk;
-	U4 newC = gpeCsz_L;
+	I4 newC = gpeCsz_L;
 	for( U4 i = 0, d0 = 0; i<nPC; i++ )
 	{
 		inst = pPC[i];
+		if( !inst.oID ) // nop
+			continue;
 		if( inst.oID == gpeOPid_dot )
 		{
 			if( !d0 )
@@ -154,43 +156,47 @@ U4 gpCORE::lnk( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
 			{
 				aSTK[nSTK].null();
 				if( aoID[nSTK]<0)
-				{
 					aoID[nSTK] *= -1;
 
-				}
-
 				gpcLNK& lnk = *((gpcLNK*)pSCPlnk->Ux( aoID[nSTK], sizeof(gpcLNK)));
-				gpeTYP typ = lnk.typ;
-				gpeALF alf = lnk.obj.alf;
-				if( !nSTK ) {
-					pOlnk = oIDfnd( aoID[d0], iO );
-					if( pOlnk ) {
-						aSTK[nSTK].iX = pOlnk->iX;
-						aSTK[nSTK].pC =
-							(aSTK[nSTK].iC = pOlnk->iC) < gpeCsz_K
-							? NULL
-							: gpmLZYvali( gpC, &cLST ) + pOlnk->iC-gpeCsz_K;
-						continue;
-					}
-
-					pOlnk = pOBJlnk( iO, aoID[d0], newC, false );
-					aSTK[nSTK].iX = pOlnk->iX;
-					aSTK[nSTK].pC =
-						(aSTK[nSTK].iC = pOlnk->iC) < gpeCsz_K
-						? NULL
-						: gpmLZYvali( gpC, &cLST ) + pOlnk->iC-gpeCsz_K;
-					continue;
-				}
-
-				aSTK[nSTK].iX = aSTK[nSTK-1].iX;
-				aSTK[nSTK].x = aSTK[nSTK-1].pC->cIDfnd( cLST, aoID[d0], aSTK[nSTK].iC );
-				if( aSTK[nSTK].x > -1 )
+				//gpeTYP typ = lnk.typ;
+				//gpeALF alf = lnk.obj.alf;
+				switch( lnk.typ )
 				{
-					aSTK[nSTK].iX += aSTK[nSTK].x;
-					continue;
+					case gpeTYP_sA8: {
+							if( !nSTK ) {
+								pOlnk = oIDfnd( aoID[nSTK], iO );
+								if( pOlnk ) {
+									aSTK[nSTK].iX = pOlnk->iX;
+									aSTK[nSTK].pC =
+										(aSTK[nSTK].cID = pOlnk->cID) < gpeCsz_K
+										? NULL
+										: gpmLZYvali( gpC, &cLST ) + pOlnk->cID-gpeCsz_K;
+									continue;
+								}
+
+								pOlnk = pOBJlnk( iO, aoID[nSTK], newC, false );
+								aSTK[nSTK].iX = pOlnk->iX;
+								aSTK[nSTK].pC =
+								(aSTK[nSTK].cID = pOlnk->cID) < gpeCsz_K
+										? NULL
+										: gpmLZYvali( gpC, &cLST ) + pOlnk->cID-gpeCsz_K;
+								continue;
+							}
+
+							aSTK[nSTK].oID = aoID[nSTK];
+							aSTK[nSTK].cID = newC;
+							aSTK[nSTK-1].pC = pCLASSlnk( nSTK );
+
+
+							aSTK[nSTK].iX = aSTK[nSTK-1].iX;
+							aSTK[nSTK].x = aSTK[nSTK-1].pC->cIDfnd( cLST, aoID[nSTK], aSTK[nSTK].cID );
+							if( aSTK[nSTK].x > -1 )
+								continue;
+
+
+						} continue;
 				}
-				aSTK[nSTK].aO = aoID[d0];
-				aSTK[nSTK].aC = newC;
 			}
 
 			d0 = 0;

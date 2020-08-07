@@ -22,14 +22,14 @@ gpcLZY* gpcSRC::srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMO
 	for( U4 o = 0, n = core.oLST.nLD(sizeof(gpO)); o < n; o++ )
 	{
 		gpO& obj = pO0[o];
-		gpcLNK& O = pLNK[obj.iO];
+		gpcLNK& O = pLNK[obj.oID];
 		gpfALF2STR( sBUFF, O.obj.alf );
 
 		pLZY = pLZY->lzyFRMT( s = -1, "\n %s", sBUFF );
 
         U1* p_src = mLST.Ux( obj.iX, sizeof(U1) );
         s = -1;
-		switch( obj.iC )
+		switch( obj.cID )
 		{
 			case gpeCsz_Q: pLZY->lzyFRMT( s, " %lld,", *(I8*)p_src ); break;
 			case gpeCsz_q: pLZY->lzyFRMT( s, " %lld,", *(U8*)p_src ); break;
