@@ -5,8 +5,7 @@ bool bITT =  false; //true; // false; //
 extern U1 gpaALFsub[];
 
 
-gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK )
-{
+gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK ) {
 	if( win.pM ? !this : true )
 		return pOUT;
 
@@ -74,7 +73,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 							break;
 						if( IS.an.y < mN )
 						if(	anFND = win.pM[IS.an.y*mZ + IS.an.x-1] )
-						if( pANS = mass.SRCfnd( anFND ) )
+						if( pANS = mass.srcFND( anFND ) )
 							pSTR = pANS->pB+1;
 					} break;
 
@@ -243,7 +242,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 			case gpeISA_dot:{
 					pANcall = NULL;
 					if( anFND )
-						pDOT = ( pANS = mass.SRCfnd( anFND ) ) ? pANS->apOUT[3] : NULL;
+						pDOT = ( pANS = mass.srcFND( anFND ) ) ? pANS->apOUT[3] : NULL;
 					else
 						pDOT = NULL;
 				} break;
@@ -310,7 +309,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 			case gpeISA_dot:{
 					pANcall = NULL;
 					if( anFND )
-						pDOT = ( pANS = mass.SRCfnd( anFND ) ) ? pANS->apOUT[3] : NULL;
+						pDOT = ( pANS = mass.srcFND( anFND ) ) ? pANS->apOUT[3] : NULL;
 					else
 						pDOT = NULL;
 				} break;
@@ -360,8 +359,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 	return pOUT;
 }
 
-U4 gpcMASS::jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ )
-{
+U4 gpcMASS::jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ ) {
 	/// U4 i éppen hol tartott, ha át kell méretezni a pSRC mapot majd relocalja az it
 	if( pWIN->mZN == mapCR.mapZN44.a4x2[1].area() ) {
 		if(ppM)
@@ -396,8 +394,8 @@ U4 gpcMASS::jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, 
 	return in*pWIN->mZ+iz;
 }
 char gpsPUB[0x1000];
-U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
-{
+U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
+
 	pWIN->nJDOIT.w++;
 	pWIN->nJDOIT.y = pWIN->nJDOIT.x;
 	U1* pKEYbuff = pWIN->gpsKEYbuff;
@@ -434,7 +432,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 			continue;
 
 		xFND = pM[i];
-		pSRC = SRCfnd( xFND );
+		pSRC = srcFND( xFND );
 		if( !pSRC )
 			continue;
 
@@ -816,7 +814,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							for( U1 i = 0; i < 2; i++ )
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
-								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								pS2 = x_fnd ? pWIN->piMASS->srcFND( x_fnd ) : NULL;
 								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
@@ -846,7 +844,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							if( pLZYin->n_load )
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[1] );
-								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								pS2 = x_fnd ? pWIN->piMASS->srcFND( x_fnd ) : NULL;
 								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
@@ -884,7 +882,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							for( U1 i = 0; i < 2; i++ )
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
-								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								pS2 = x_fnd ? pWIN->piMASS->srcFND( x_fnd ) : NULL;
 								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )
@@ -914,7 +912,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I
 							if( pLZYin->n_load )
 							{
 								x_fnd = pWIN->piMASS->getXFNDan( anRio.a8x2[1] );
-								pS2 = x_fnd ? pWIN->piMASS->SRCfnd( x_fnd ) : NULL;
+								pS2 = x_fnd ? pWIN->piMASS->srcFND( x_fnd ) : NULL;
 								i = jDOitREF( pWIN, i, ie, &pM, &pC, &pR );
 
 								if( !pS2 )

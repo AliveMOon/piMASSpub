@@ -1591,7 +1591,7 @@ public:
 		gpcSRC** ppS = ppSRC();
 		return ppS ? ppS[i] : NULL;
 	}
-	gpcSRC* SRCfnd( U4 xfnd )
+	gpcSRC* srcFND( U4 xfnd )
 	{
 		if(!this)
 			return NULL;

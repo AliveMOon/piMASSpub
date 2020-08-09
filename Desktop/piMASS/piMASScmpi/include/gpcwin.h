@@ -719,7 +719,7 @@ public:
             {
 				if( !( xFND = pM[i] ) )
 					continue;
-				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
 				if( !pSRC )
 					continue;
 				pNUM = sBUFF+gpfALF2STR( sBUFF, (i%z)+1 );
@@ -772,7 +772,7 @@ public:
 				if( !( xFND = pM[i] ) )
 					continue;
 
-				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
 				if( !pSRC )
 					continue;
 				pNUM = sBUFF+gpfALF2STR( sBUFF, an.x+1 );
@@ -825,7 +825,7 @@ public:
 				if( !( xFND = pM[i] ) )
 					continue;
 
-				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
 				if( !pSRC )
 					continue;
 				pNUM = sBUFF+gpfALF2STR( sBUFF, an.x+1 );
@@ -879,7 +879,7 @@ public:
 				if( !( xFND = pM[i] ) )
 					continue;
 
-				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
 				if( !pSRC )
 					continue;
 				pNUM = sBUFF+gpfALF2STR( sBUFF, an.x+1 );

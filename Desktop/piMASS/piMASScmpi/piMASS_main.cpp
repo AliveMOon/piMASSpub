@@ -50,7 +50,7 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, I4 ig, U4 nS )
 	U4	iZN = (an * U4x2( 1, mCR.z ))-1,
 		xFND = pM[iZN];
 
-	gpcSRC* p_fnd = xFND ? SRCfnd( xFND ) : NULL;
+	gpcSRC* p_fnd = xFND ? srcFND( xFND ) : NULL;
 	if( p_fnd )
 	{
 
@@ -136,7 +136,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		}
 		buff.lzyFRMT( nS = -1, "%s<TD BGCOLOR=%s BORDER=1> ", bTD ? "</TD>" : "", ((i%z)+(i/z))%2 ? "#bfbfbf":"#afafaf"  );
 
-		pSRC = SRCfnd( pM[i] );
+		pSRC = srcFND( pM[i] );
 		if( !pSRC )
 			continue;
 
@@ -275,7 +275,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		if( !pM[i] )
 			continue;
 
-		pSRC = SRCfnd( pM[i] );
+		pSRC = srcFND( pM[i] );
 		if( !pSRC )
 			continue;
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );

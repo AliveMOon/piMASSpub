@@ -361,7 +361,8 @@ public:
 			cLST,	// CLASS LIST
 			dLST,	// dim LIST
 			oLST;	// OBJ LIST
-	U4		pc, nPC, stk, oDPi, nSTK;
+	U4		pc, nPC, mSTK, oDPi,
+			nSTK;
 	I4x4	*pALL, *pPC;
 	I8		aR[8*4], *pA, *pD, *pO, *pC;
 	gpcO	aO[8];
@@ -392,11 +393,11 @@ public:
 		nPC = n;
 		if( pALL != pAx4 )
 		{
-			stk = 0x2000;
+			mSTK = 0x2000;
 			gpmZ(aR);
 			pc = 0;
-			aR[6] = stk>>1;
-			aR[7] = stk;
+			aR[6] = mSTK>>1;
+			aR[7] = mSTK;
 		}
 		if( !pAx4 )
 			pc = nPC;
@@ -442,7 +443,7 @@ public:
 
 		return pPC;
 	}
-	U4 lnk( I4x4* pPC, U4 n, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk );
+	U4 coreLNK( I4x4* pPC, U4 n, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk );
 	gpeCsz C( U4& ix, U4 iC, U4 ixO ) {
 		U4 off = ix-ixO;
 		if( !off )
@@ -512,18 +513,18 @@ public:
 		}
 		return NULL;
 	}
-	U4 sOF( U4 iC ) {
-		if( iC < gpeCsz_K )
-			return gpaCsz[iC];
+	U4 sOF( U4 cID ) {
+		if( cID < gpeCsz_K )
+			return gpaCsz[cID];
 
 		gpC* pC = gpmLZYvali(gpC,&cLST);
 		if( !pC )
 			return 0;
-		iC -= gpeCsz_K;
-		if( iC >= cLST.nLD(sizeof(gpcC)) )
+		cID -= gpeCsz_K;
+		if( cID >= cLST.nLD(sizeof(gpcC)) )
 			return 0;
 
-		return pC[iC].sOF(cLST);
+		return pC[cID].sOF(cLST);
 	}
 	U4 ix_str( char* pSTR, U4 nSTR, U4 oID ) {
 
@@ -600,7 +601,7 @@ public:
 		return pOi->iX;
 	}
 	U1* ea( U4 ix, I8* pO = NULL, I8* pC = NULL ) {
-		if( pO ? ix >= stk : false )
+		if( pO ? ix >= mSTK : false )
 		if(	gpO* pO0 = gpmLZYvali( gpO, &oLST ) ) {
 			U4	L = 0,
 				H = oLST.nLD(sizeof(*pO0)),
@@ -656,8 +657,7 @@ public:
 			return NULL;
 		return gpmLZYvali( gpC, &cLST ) + iC-gpeCsz_K;
 	}
-	gpO* pOBJlnk( U4 i, U4 oID, U4 cID, bool bALLOC )
-	{
+	gpO* pOBJlnk( U4 i, U4 oID, U4 cID, bool bALLOC ) {
 		U4 iO;
 		gpO* p_o = oIDfnd( oID, iO );
 		if( !p_o )
@@ -678,8 +678,7 @@ public:
 		mLST.Ux( p_o->iX = mLST.nLD(), p_o->szOF, true, sizeof(U1) );
 		return p_o;
 	}
-	gpC* pCLASSlnk( U4 nSTK )
-	{
+	gpC* pCLASSlnk( U4 nSTK ) {
 		if( !nSTK )
 			return NULL;
 

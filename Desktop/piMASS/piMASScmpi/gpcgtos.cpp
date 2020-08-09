@@ -621,7 +621,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							{
 								U4 iM = zn*U4x2(1,pWIN->mZ);
 								if( U4 xFND = pWIN->pM[iM] )
-								if( gpcSRC* pSRC = pWIN->piMASS->SRCfnd( xFND ) )
+								if( gpcSRC* pSRC = pWIN->piMASS->srcFND( xFND ) )
 								{
 									pA = pSRC->pA;
 									nA = pSRC->n_ld_add();

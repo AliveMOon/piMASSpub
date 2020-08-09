@@ -112,9 +112,9 @@ U4 gpcCRS::miniRDYmap(
 						&& ( c+1 <= lurdAN.z && r <= lurdAN.w )
 					);
 		/// TÁMADÁS HO RUKK!!
-		dim = (pSrC = pWIN->piMASS->SRCfnd( pM[i] ))->srcBRK( bNoMini, selID, " \t\r\n" );
+		dim = (pSrC = pWIN->piMASS->srcFND( pM[i] ))->srcBRK( bNoMini, selID, " \t\r\n" );
 
-		//dim = mass.SRCfnd( pM[i] )->CRSdim( bNoMini );
+		//dim = mass.srcFND( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )
 			pC[c] = dim.x;
 		if( pR[r] < dim.y )
@@ -293,7 +293,7 @@ void gpcCRS::miniRDY( gpcWIN* pWIN, //gpcMASS* pMASS,
 			}
 
 			pTITLE = gpsTITLE;
-			if( pSRC = pWIN->piMASS->SRCfnd(pM[i+c]) ) {
+			if( pSRC = pWIN->piMASS->srcFND(pM[i+c]) ) {
 				gpcRES* pRES = pSRC->apOUT[3];
 				if( pRES )
 				{

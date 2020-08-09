@@ -114,7 +114,7 @@ void gpcCRS::CRSstpCL( //gpcWIN& win,
 	U4 xFND = pMASS->getXFNDan( selANIN[1].au4x2[0] );
     if( !xFND )
 		return;
-	apSRC[1] = pMASS->SRCfnd(xFND);
+	apSRC[1] = pMASS->srcFND(xFND);
 	if( selANIN[0].au4x2[0] == selANIN[1].au4x2[0] )
 		apSRC[0] = apSRC[1];
 	if( !apSRC[1] )
@@ -264,7 +264,7 @@ void gpcCRS::CRSsel( gpcWIN& win, gpcCRS& sCRS, gpcMASS& mass, bool bSH, U1 src 
 	U4	i = sCRS.scnZN.a4x2[0]*I4x2( 1, mpZN.z );
 
 	U4 xFND = pM[i];
-	gpcSRC* pSRC = mass.SRCfnd( xFND );
+	gpcSRC* pSRC = mass.srcFND( xFND );
 	if( pSRC )
 	if( pSRC->bSW&gpeMASSunselMSK )
 		return; //pSRC = NULL;
@@ -990,7 +990,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 					if( pM[i] )
 					if( U4 xFND = pM[i] )
-					if(	gpcSRC* pSRC = win.piMASS->SRCfnd( xFND ) )
+					if(	gpcSRC* pSRC = win.piMASS->srcFND( xFND ) )
 					if( pSRC->picID )
 					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
 					if( SDL_Surface* pSRF = pPIC->pSRF )
@@ -1111,7 +1111,7 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 					if( pM[i] )
 					if( U4 xFND = pM[i] )
-					if(	gpcSRC* pSRC = win.piMASS->SRCfnd( xFND ) )
+					if(	gpcSRC* pSRC = win.piMASS->srcFND( xFND ) )
 					if( pSRC->picID )
 					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
 					if( SDL_Surface* pSRF = pPIC->surDRW() )
@@ -1542,7 +1542,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 					if( pM[i] )
 					if( U4 xFND = pM[i] )
-					if(	gpcSRC* pSRC = win.piMASS->SRCfnd( xFND ) )
+					if(	gpcSRC* pSRC = win.piMASS->srcFND( xFND ) )
 					if( pSRC->picID )
 					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
 					if( SDL_Texture* pTX = pPIC->surDRWtx(win.pSDLrndr) )
@@ -1663,7 +1663,7 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 					if( pM[i] )
 					if( U4 xFND = pM[i] )
-					if(	gpcSRC* pSRC = win.piMASS->SRCfnd( xFND ) )
+					if(	gpcSRC* pSRC = win.piMASS->srcFND( xFND ) )
 					if( pSRC->picID )
 					if( gpcPIC* pPIC = win.piMASS->PIC.PIC(pSRC->picID-1) )
 					if( SDL_Texture* pTX = pPIC->surDRWtx(win.pSDLrndr) )
@@ -1925,7 +1925,7 @@ void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gp
 				bNoMini = false;
 
 			xFND = pM[i];
-			pSRC = mass.SRCfnd( xFND );
+			pSRC = mass.srcFND( xFND );
 			dim = pSRC->CRSdim( bNoMini, id );
             if( pC[c] < dim.x )
 				pC[c] = dim.x;
@@ -1991,7 +1991,7 @@ void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gp
 					continue;
 
 				xFND = pM[i];
-				pSRC = mass.SRCfnd( xFND );
+				pSRC = mass.srcFND( xFND );
 
 				bNoMini = false;
 				if( !lurdAN.x )

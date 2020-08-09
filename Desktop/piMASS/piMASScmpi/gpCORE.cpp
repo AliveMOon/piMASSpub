@@ -136,7 +136,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 
 	return 0;
 }
-U4 gpCORE::lnk( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
+U4 gpCORE::coreLNK( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
 {
 	gpINST inst;
 	I4	aoID[0x10];
@@ -187,14 +187,6 @@ U4 gpCORE::lnk( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
 							aSTK[nSTK].oID = aoID[nSTK];
 							aSTK[nSTK].cID = newC;
 							aSTK[nSTK-1].pC = pCLASSlnk( nSTK );
-
-
-							aSTK[nSTK].iX = aSTK[nSTK-1].iX;
-							aSTK[nSTK].x = aSTK[nSTK-1].pC->cIDfnd( cLST, aoID[nSTK], aSTK[nSTK].cID );
-							if( aSTK[nSTK].x > -1 )
-								continue;
-
-
 						} continue;
 				}
 			}
@@ -216,13 +208,7 @@ U4 gpCORE::lnk( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
 	}
 	for( U4 o = 0, nO = oLST.nLD(sizeof(*pO)); o<nO; o++ ) {
 		pOlnk = (gpO*)oLST.Ux( o, sizeof(*pOlnk), true );
-		if( pOlnk->cID < gpeCsz_K ) {
-			pOlnk->szOF = gpaCsz[pOlnk->cID];
-			continue;
-		}
-
-
-
+		pOlnk->szOF = sOF(pOlnk->cID);
 	}
 	return nO;
 }

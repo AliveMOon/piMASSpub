@@ -322,17 +322,22 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 		iOPe = pMASS->OPER.nIX();
 	}
 	/// -------------------------------------------------------
-	if( iOPe == gpeOPid_jsr )
-		srcCMPLR( pMASS->OPER, 0 );
-	else
+	if( iOPe != gpeOPid_jsr ) {
 		std::cout << "\033[1;31m iOPe != gpeOPid_jsr?" << std::endl;
-
-	if( !pCORE )
-	{
-		pCORE = new gpCORE;
-		pCORE->lnk( gpmLZYvali( I4x4, &gpmSCP.vASM ),  gpmSCP.nASM(),
-					gpmSCP.pMN(), (char*)gpmSCP.pALL, &LNK );
+		return;
 	}
+
+	if( pCORE )
+		return;
+
+	srcCMPLR( pMASS->OPER, 0 );
+	(pCORE=new gpCORE)->coreLNK(
+									gpmLZYvali( I4x4, &gpmSCP.vASM ),
+									gpmSCP.nASM(),
+									gpmSCP.pMN(),
+									(char*)gpmSCP.pALL, &LNK
+								);
+
 }
 
 

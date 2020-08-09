@@ -242,7 +242,7 @@ class gpcCRS
 				{
 
 					U4 x_fnd = pMASS->getXFNDan( s );
-					pS2 = x_fnd ? pMASS->SRCfnd( x_fnd ) : NULL;
+					pS2 = x_fnd ? pMASS->srcFND( x_fnd ) : NULL;
 					if( !pS2 )
 					{
 						pS2 = pMASS->SRCnew( tmp, NULL, s, -1 );
