@@ -67,7 +67,7 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 			continue; /// - NOP! --------------
 
 		if( iOP == gpeOPid_dot ) {
-			pA[0] = core.entryOBJ2A0( pM0, pALL, &LNK, pWIN, bSW ); //, pD[1] );
+			pA[0] = core.entryOBJ2A0( pM0, pALL, &scpCNST, pWIN, bSW ); //, pD[1] );
 			pA[7] = pD[0];
 			continue;
 		}

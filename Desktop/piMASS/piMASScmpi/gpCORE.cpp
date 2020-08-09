@@ -21,7 +21,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 			return ix_str( pSTR, pM0[oID].iMNn-2, oID );
 		}
 
-		gpcLNK& lnk = *((gpcLNK*)pSCPlnk->Ux( oID, sizeof(gpcLNK)));
+		gpCNST& lnk = *((gpCNST*)pSCPlnk->Ux( oID, sizeof(gpCNST)));
 		//gpeTYP typ = O.typ;
 		U4 iO;
 
@@ -158,7 +158,7 @@ U4 gpCORE::coreLNK( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk
 				if( aoID[nSTK]<0)
 					aoID[nSTK] *= -1;
 
-				gpcLNK& lnk = *((gpcLNK*)pSCPlnk->Ux( aoID[nSTK], sizeof(gpcLNK)));
+				gpCNST& lnk = *((gpCNST*)pSCPlnk->Ux( aoID[nSTK], sizeof(gpCNST)));
 				//gpeTYP typ = lnk.typ;
 				//gpeALF alf = lnk.obj.alf;
 				switch( lnk.typ )

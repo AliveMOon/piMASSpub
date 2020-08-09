@@ -5,15 +5,15 @@
 #ifdef piMASS_DEBUG
 	/// gpcCDR
 	// #define cd (pCD=CDsp.CD())[0]
-	/// gpcLNK
-	#define OBJsrc (pOBs=(gpcLNK*)OBJ.Ux( si, sizeof(gpcLNK)))[0]
-	#define OBJdst (pOBd=(gpcLNK*)OBJ.Ux( di, sizeof(gpcLNK)))[0]
+	/// gpCNST
+	#define OBJsrc (pOBs=(gpCNST*)OBJ.Ux( si, sizeof(gpCNST)))[0]
+	#define OBJdst (pOBd=(gpCNST*)OBJ.Ux( di, sizeof(gpCNST)))[0]
 #else
 	/// gpcCDR
 	// #define cd CDsp.CDR().p_cd[0]
-	/// gpcLNK
-	#define OBJsrc ((gpcLNK*)OBJ.Ux( si, sizeof(gpcLNK)))[0]
-	#define OBJdst ((gpcLNK*)OBJ.Ux( di, sizeof(gpcLNK)))[0]
+	/// gpCNST
+	#define OBJsrc ((gpCNST*)OBJ.Ux( si, sizeof(gpCNST)))[0]
+	#define OBJdst ((gpCNST*)OBJ.Ux( di, sizeof(gpCNST)))[0]
 #endif
 #define aaOPid gpaaOPid[lnk.y]
 
@@ -28,7 +28,7 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iMN )
 		return;
 	//U4 iOPe = dOP.nIX();
 #ifdef piMASS_DEBUG
-	gpcLNK	*pOBs, *pOBd;
+	gpCNST	*pOBs, *pOBd;
 #endif
 	U8 strt = -1;
 	char	*pSZ, *pS, *pD, *pDe,
@@ -94,7 +94,7 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iMN )
 				I4 o = ins.aOB[i];
 				if( o >= 0 )
 				{
-					gpcLNK& obj = ((gpcLNK*)LNK.Ux( o, sizeof(gpcLNK)))[0];
+					gpCNST& obj = ((gpCNST*)scpCNST.Ux( o, sizeof(gpCNST)))[0];
 					pCe += obj.strASM( pCe, pALL, pM0, pL0 ) + 1;
 				} else {
 					o *= -1;

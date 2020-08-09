@@ -5,16 +5,9 @@ extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 #define cd (pCD=CDsp.CD())[0]
 
-	/// gpcLNK
-#ifdef piMASS_DEBUG
-	#define OBJget (pOBi=(gpcLNK*)LNK.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpcLNK)))[0]
-	#define OBJadd (pOBn=(gpcLNK*)LNK.Ux( gpmSCP.nOBJ, sizeof(gpcLNK)))[0]
-#else
-	#define OBJget ((gpcLNK*)LNK.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpcLNK)))[0]
-	#define OBJadd ((gpcLNK*)LNK.Ux( gpmSCP.nOBJ, sizeof(gpcLNK)))[0]
-#endif
+
 #define aaOPid gpaaOPid[OPgrp]
-size_t gpcLNK::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
+size_t gpCNST::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
 	char sBstr[] = "FFFFffffFFFFffff",
 		*pBD, nB = sizeof(sBstr)-1;
 	size_t n;
@@ -123,7 +116,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 	U4x4 *pL0 = (U4x4*)gpmSCP.lnk.p_alloc; //, aLNK[0x10];
 	U4 nM = gpmSCP.nMN(), iOP; //, iOPe = dOP.nIX();
 
-	LNK.lzyRST();
+	scpCNST.lzyRST();
 	const char *pS;
 	const U1 *pSTR;
 	U8 nS, nSTR;
@@ -131,8 +124,8 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 	gpcCD	*pCD;
 #ifdef piMASS_DEBUG
 
-	gpcLNK	*pOBJ;
-	gpcLNK	*pOBn, *pOBi;
+	//gpCNST	*pOBJ;
+	gpCNST	*pCNSTn, *pCNSTi;
 
 #endif
 	I4x2 aFND[0x40];
@@ -182,12 +175,12 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 				if( lnk.y )
 				{
 					cd.lnk = lnk.y;
-					cd.typ = OBJget.typ;
+					cd.typ = scpOBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
 				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nOBJ);
-				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLalf( pS, nS );
+				cd.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLalf( pS, nS );
 				gpmSCP.nOBJ++;
 				break;
 			case gpeCLR_orange:	///NUM
@@ -195,12 +188,12 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 				if( lnk.y )
 				{
 					cd.lnk = lnk.y;
-					cd.typ = OBJget.typ;
+					cd.typ = scpOBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
 				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nOBJ);
-				cd.typ = OBJadd.typ = OBJadd.obj.cdrMILLnum( pS, nS );
+				cd.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLnum( pS, nS );
 				gpmSCP.nOBJ++;
 				break;
 			case gpeCLR_green2: {///OPER
@@ -335,7 +328,7 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 									gpmLZYvali( I4x4, &gpmSCP.vASM ),
 									gpmSCP.nASM(),
 									gpmSCP.pMN(),
-									(char*)gpmSCP.pALL, &LNK
+									(char*)gpmSCP.pALL, &scpCNST
 								);
 
 }

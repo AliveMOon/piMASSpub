@@ -2,8 +2,18 @@
 #define GPCSRCLNK_H
 #include "piMASS.h"
 
-#define LNK gpmSCP.obj
 
+/// gpCNST
+#define scpCNST gpmSCP.cnst
+/// gpCNST
+#ifdef piMASS_DEBUG
+	#define scpOBJget (pCNSTi=(gpCNST*)scpCNST.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpCNST)))[0]
+	#define scpOBJadd (pCNSTn=(gpCNST*)scpCNST.Ux( gpmSCP.nOBJ, sizeof(gpCNST)))[0]
+#else
+	#define scpOBJget ((gpCNST*)scpCNST.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpCNST)))[0]
+	#define scpOBJadd ((gpCNST*)scpCNST.Ux( gpmSCP.nOBJ, sizeof(gpCNST)))[0]
+#endif
+//#define scpLNK gpmSCP.lnk
 
 //static const char* gpasTYPsz[] = {
 //
@@ -59,11 +69,11 @@ static const char* gps68kADRmod[] = {
 };
 
 
-class gpcLNK {
+class gpCNST {
 public:
 	I8x2	obj;
 	gpeTYP	typ;
-	gpcLNK(){};
+	gpCNST(){};
 
 	size_t strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   );
 

@@ -19,6 +19,8 @@ extern char gpaALF_H_sub[];
 //						};
 //
 //#define gpmSCP aSCOOP[iMN]
+
+/// 1. srcBREAK scp.MN scp.DCT scp.LNK
 U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 	if( !this )
 		return U4x4( gpdSRC_COLw, gpdSRC_ROWw );

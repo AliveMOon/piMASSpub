@@ -17,12 +17,12 @@ gpcLZY* gpcSRC::srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMO
 	gpmMcpy( sBUFF, "A:", 3 );
 	U8 s = gpmSCP.nMN();
 	gpcLZY	&mLST = core.mLST;
-	gpcLNK* pLNK = (gpcLNK*)gpmSCP.obj.p_alloc;
+	gpCNST* pLNK = gpmLZYvali( gpCNST, &scpCNST ); // (gpCNST*)gpmSCP.obj.p_alloc;
 	I8	*pO, *pC;
 	for( U4 o = 0, n = core.oLST.nLD(sizeof(gpO)); o < n; o++ )
 	{
 		gpO& obj = pO0[o];
-		gpcLNK& O = pLNK[obj.oID];
+		gpCNST& O = pLNK[obj.oID];
 		gpfALF2STR( sBUFF, O.obj.alf );
 
 		pLZY = pLZY->lzyFRMT( s = -1, "\n %s", sBUFF );

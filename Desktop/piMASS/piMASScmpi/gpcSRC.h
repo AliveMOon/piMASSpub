@@ -715,27 +715,28 @@ static char gpsOPERA[] = {
 #define gpmSCP aSCOOP[iMN]
 
 class gpcSCOOP {
-	gpcLZY MN;
+	gpcLZY 		MN;		I8x4 rMN;	U4 nMIN;
 public:
-	gpcLZYdct	dct;
-	gpcLZY		lnk, obj,
-				vASM;
-	I8x4 rMN;
-	U4x4 rLNK, rINS;
-	U4	//iDCT,
-		nDCT, nLNK, nOBJ, nMIN, nvASM;
+	gpcLZYdct	dct;				U4 nDCT;
+	gpcLZY		lnk; 	U4x4 rLNK;	U4 nLNK;
+	gpcLZY		cnst;				U4 nOBJ;
+	gpcLZY		vASM;	U4x4 rINS;	U4 nINS;
+
+
+	/*U4	//iDCT,
+		nDCT, nLNK, nOBJ, //nMIN,
+		nvASM;*/
 	U1	*pALL; //, *pMN;	/// ezt a gpcSRC::srcBRK adja
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pU )
 	{
 		dct.rst();
 		lnk.lzyRST();
-		obj.lzyRST();
+		cnst.lzyRST();
 		MN.lzyRST();
 		vASM.lzyRST();
 		//iDCT =
-		nDCT =
-		nLNK = nOBJ = nMIN = nvASM = 0;
+		nDCT = nLNK = nOBJ = nMIN = nINS = 0;
 		pALL = pU;	// ezt a gpcSRC::srcBRK adja
 	}
 	//I8x4* pMN();
@@ -748,8 +749,8 @@ public:
 	U4 nMN() { return nMIN = MN.nLD(sizeof(rMN)); }
 	U4 nLiNK() { return nLNK = lnk.nLD(sizeof(rLNK)); }
 	U4 nASM() {
-		nvASM = vASM.nLD(sizeof(rINS));
-		return nvASM;
+		nINS = vASM.nLD(sizeof(rINS));
+		return nINS;
 	}
 
 	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff ) {
@@ -776,6 +777,7 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		rLNK = U4x4(nMN());
+
 		rMN.iMNinlt = U4x4( pUi-pALL, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
