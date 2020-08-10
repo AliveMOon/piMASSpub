@@ -148,7 +148,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 			if( clr != gpeCLR_violet )
 				continue;
 
-			pSTR = (nSTR=M.iMNn) ? gpmSCP.pALL+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
+			pSTR = (nSTR=M.iMNn) ? gpmSCP.p_str+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
 
 			cd.lnk = -m;
 			cd.typ = gpeTYP_STR;
@@ -328,7 +328,7 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 									gpmLZYvali( I4x4, &gpmSCP.vASM ),
 									gpmSCP.nASM(),
 									gpmSCP.pMN(),
-									(char*)gpmSCP.pALL, &scpCNST
+									(char*)gpmSCP.p_str, &scpCNST
 								);
 
 }

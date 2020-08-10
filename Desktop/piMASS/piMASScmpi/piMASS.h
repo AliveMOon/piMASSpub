@@ -3117,7 +3117,7 @@ public:
 		struct
         {
 			gpeOPid pre, pst;	// 0, 1
-			gpeCsz	iC;			// 2,
+			gpeCsz	cID;		// 2,
 			U1		d0;			// 3,
 			U4		op;			// 4,
 			I4		aOB[2];		// 8, 12; //0x10
@@ -6457,7 +6457,7 @@ szasz:
 						gpeEA d0 = gpeEA_OFF,	U1 dn = 0,	U1 di = 0 ) {
 		I4x4 &ins = *(I4x4*)Ux( pc, sizeof(I4x4) );
 		ins.null();
-		ins.iC = iC;
+		ins.cID = iC;
 		ins.op = U1x4( op, ((U1)s0<<3)|(sn&7), ((U1)d0<<3)|(dn&7), (di<<4)|(si&7) ).u4;
 		return ins;
 	}

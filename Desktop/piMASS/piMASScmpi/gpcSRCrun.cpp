@@ -20,7 +20,7 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 
 	I8x4 *pM0 = (I8x4*)gpmSCP.pMN();
 	I4		nSTR, a, n = gpmSCP.nMN();
-	char	*pALL = (char*)gpmSCP.pALL,
+	char	*pALL = (char*)gpmSCP.p_str,
 			*pSTR,
 			sBF[0x100],
 			*pDIS = (char*)pDBG->p_alloc, *pBF = NULL;

@@ -308,7 +308,7 @@ class gpINST {
 public:
 	U1x4 op;
 	gpeOPid oID;
-	gpeCsz iC;
+	gpeCsz cID;
 
 	U1	iS, xS;
 	gpeEA mS;
@@ -338,7 +338,7 @@ public:
 		*this = x4.op;
 		aOB[0] = x4.z;
 		aOB[1] = x4.w;
-		iC = x4.iC;
+		cID = x4.cID;
 		return *this;
 	}
 
@@ -430,7 +430,7 @@ public:
 	I4x4* iPC( 	U1x4& op, gpeOPid& oID,
 				U1& iS, U1& xS, gpeEA& mS,
 				U1& iD, U1& xD, gpeEA& mD,
-				gpeCsz& iC
+				gpeCsz& cID
 			) {
 		if( pPC == pALL+pc )
 			pc<nPC ? pALL+pc : NULL;
@@ -447,9 +447,9 @@ public:
 		mS = (gpeEA)(op.y>>3);
 
 		iD = op.z&7;
-		xS = (op.w>>4)&7;
+		xD = (op.w>>4)&7;
 		mD = (gpeEA)(op.z>>3);
-		iC = pPC->iC; //gpaCsz[pPC->iC];
+		cID = pPC->cID; //gpaCsz[pPC->iC];
 
 		return pPC;
 	}

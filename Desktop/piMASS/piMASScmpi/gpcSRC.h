@@ -720,15 +720,11 @@ public:
 	gpcLZYdct	dct;				U4 nDCT;
 	gpcLZY		lnk; 	U4x4 rLNK;	U4 nLNK;
 	gpcLZY		cnst;				U4 nCNST;
-	gpcLZY		vASM;	U4x4 rINS;	U4 nINS;
+	gpcLZY		vASM;	I4x4 rINS;	U4 nINS;
 
-
-	/*U4	//iDCT,
-		nDCT, nLNK, nOBJ, //nMIN,
-		nvASM;*/
-	U1	*pALL; //, *pMN;	/// ezt a gpcSRC::srcBRK adja
+	U1	*p_str;
 	gpcSCOOP(){ gpmCLR; };
-	void rst( U1* pU )
+	void rst( U1* pUTF )
 	{
 		dct.rst();
 		lnk.lzyRST();
@@ -737,7 +733,7 @@ public:
 		vASM.lzyRST();
 		//iDCT =
 		nDCT = nLNK = nCNST = nMIN = nINS = 0;
-		pALL = pU;	// ezt a gpcSRC::srcBRK adja
+		p_str = pUTF;	// ezt a gpcSRC::srcBRK adja
 	}
 	//I8x4* pMN();
 	I8x4* pMN() {
@@ -778,7 +774,7 @@ public:
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		rLNK = U4x4(nMN());
 
-		rMN.iMNinlt = U4x4( pUi-pALL, nU, iDCT, typ );
+		rMN.iMNinlt = U4x4( pUi-p_str, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -797,7 +793,7 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.iMNinlt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNinlt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -814,7 +810,7 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.iMNinlt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNinlt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
