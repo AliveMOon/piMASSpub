@@ -179,9 +179,9 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nOBJ);
+				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nCNST);
 				cd.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLalf( pS, nS );
-				gpmSCP.nOBJ++;
+				gpmSCP.nCNST++;
 				break;
 			case gpeCLR_orange:	///NUM
 				//cd.pst = gpeOPid_mul;
@@ -192,9 +192,9 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nOBJ);
+				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nCNST);
 				cd.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLnum( pS, nS );
-				gpmSCP.nOBJ++;
+				gpmSCP.nCNST++;
 				break;
 			case gpeCLR_green2: {///OPER
                     if( !lnk.y ) {

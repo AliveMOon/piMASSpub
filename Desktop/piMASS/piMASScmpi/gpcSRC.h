@@ -719,7 +719,7 @@ class gpcSCOOP {
 public:
 	gpcLZYdct	dct;				U4 nDCT;
 	gpcLZY		lnk; 	U4x4 rLNK;	U4 nLNK;
-	gpcLZY		cnst;				U4 nOBJ;
+	gpcLZY		cnst;				U4 nCNST;
 	gpcLZY		vASM;	U4x4 rINS;	U4 nINS;
 
 
@@ -736,7 +736,7 @@ public:
 		MN.lzyRST();
 		vASM.lzyRST();
 		//iDCT =
-		nDCT = nLNK = nOBJ = nMIN = nINS = 0;
+		nDCT = nLNK = nCNST = nMIN = nINS = 0;
 		pALL = pU;	// ezt a gpcSRC::srcBRK adja
 	}
 	//I8x4* pMN();

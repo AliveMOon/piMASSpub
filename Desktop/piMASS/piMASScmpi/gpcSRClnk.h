@@ -8,10 +8,10 @@
 /// gpCNST
 #ifdef piMASS_DEBUG
 	#define scpOBJget (pCNSTi=(gpCNST*)scpCNST.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpCNST)))[0]
-	#define scpOBJadd (pCNSTn=(gpCNST*)scpCNST.Ux( gpmSCP.nOBJ, sizeof(gpCNST)))[0]
+	#define scpOBJadd (pCNSTn=(gpCNST*)scpCNST.Ux( gpmSCP.nCNST, sizeof(gpCNST)))[0]
 #else
 	#define scpOBJget ((gpCNST*)scpCNST.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpCNST)))[0]
-	#define scpOBJadd ((gpCNST*)scpCNST.Ux( gpmSCP.nOBJ, sizeof(gpCNST)))[0]
+	#define scpOBJadd ((gpCNST*)scpCNST.Ux( gpmSCP.nCNST, sizeof(gpCNST)))[0]
 #endif
 //#define scpLNK gpmSCP.lnk
 
