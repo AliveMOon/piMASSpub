@@ -194,12 +194,12 @@ U1 gpcSRC::srcSCN( gpcCRS& crs, bool bNoMini, U1 selID ) {
 	for( U4 nM = gpmSCP.nMN(), m = 0; m < nM; m++ )
 	{
 		cxy = pM0[m].rMNpos;
-		i = pM0[m].iMNinlt.x;
-		j = pM0[m].iMNinlt.y+i;
+		i = pM0[m].iMNindt.x;
+		j = pM0[m].iMNindt.y+i;
 
 		if( (crs.iSTR.y < i) && (crs.iSTR.y > j) )
 			continue;
-		bSTR = (tSTR==pM0[m].iMNinlt.w);
+		bSTR = (tSTR==pM0[m].iMNindt.w);
 		for( ; i <= j; i++ )
 		{
 			bONpre = bON;
@@ -302,7 +302,7 @@ U1 gpcSRC::srcSCN( gpcCRS& crs, bool bNoMini, U1 selID ) {
 	return false;
 }
 
-I4x2 gpcSRC::srcMILL(
+I4x2 gpcSRC::srcRDY(
 							U1x4* pO,
 
 							I4x2 xy, I4x2 fWH,
@@ -343,9 +343,9 @@ I4x2 gpcSRC::srcMILL(
 		cxy = xy+pM0[m].rMNpos;
 		if(cxy.y>=fWH.y)
 			break;
-		i = pM0[m].iMNinlt.x;
-		n = pM0[m].iMNinlt.y;
-		bSTR = tSTR == pM0[m].iMNinlt.w;
+		i = pM0[m].iMNindt.x;
+		n = pM0[m].iMNindt.y;
+		bSTR = tSTR == pM0[m].iMNindt.w;
 		clr = pM0[m].rMNclr;
 		for( j = i+n; i < j; i++ )
 		{

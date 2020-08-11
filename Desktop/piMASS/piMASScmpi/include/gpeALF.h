@@ -942,6 +942,7 @@ typedef enum gpeALF:I8
 	gpeALF_BREAK = gpdABCDE('B', 'R', 'E', 'A', 'K'),
 	gpeALF_BUBLE = gpdABCDE('B', 'U', 'B', 'L', 'E'),
 	gpeALF_CACHE = gpdABCDE('C', 'A', 'C', 'H', 'E'),
+	gpeALF_CALIB = gpdABCDE('C', 'A', 'L', 'I', 'B'),
 	gpeALF_CLASS = gpdABCDE('C', 'L', 'A', 'S', 'S'),
 
 	/// CNL -----------------------------------------------

@@ -137,6 +137,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 			{
 				case gpeALF_null:
 				case gpeALF_DROP:
+				case gpeALF_CALIB:
 					break;
 				default:
 					tXYZ.xyz_(jd0XYZ);
@@ -170,10 +171,11 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 			case gpeALF_DROP:if( jd1XYZ.qlen_xyz() * max( 0, jd0PRG.y-jd0PRG.x) ) {
 					//I4 lag = mSEC < msSMR2.w ? 0 : mSEC-msSMR2.w;
 					//std::cout << "lag: " << lag << std::endl;
-					jdPRG.y = jdPRG.w = msSRT3.x;	// w-ben örizzük az indulási időt y aktuális idő
+					jdPRG.y = jdPRG.w = msSRT3.x;				// w-ben örizzük az indulási időt y aktuális idő
 					jdPRG.z = jdPRG.w+jd0PRG.a4x2[0].sum();		// z-ben pedig a kívánt megérkezési időt
 					break;
 				}
+			case gpeALF_CALIB:
 			default:
 				jdPRG.null();
 				return true;
@@ -224,7 +226,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
 				tXYZ.xyz_( jd0xyz - vec );
 			} break;
-
+		case gpeALF_CALIB:
 		case gpeALF_DROP: {
 				// I4 lag = mSEC < msSMR2.w ? 0 : mSEC-msSMR2.w;
 				// std::cout << "lag: " << lag << std::endl;

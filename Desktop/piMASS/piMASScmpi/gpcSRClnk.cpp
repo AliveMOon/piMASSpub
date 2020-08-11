@@ -148,14 +148,14 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
 			if( clr != gpeCLR_violet )
 				continue;
 
-			pSTR = (nSTR=M.iMNn) ? gpmSCP.p_str+M.iMNi : NULL; //M.iMNinlt.a4x2[0];
+			pSTR = (nSTR=M.iMNn) ? gpmSCP.p_str+M.iMNi : NULL; //M.iMNindt.a4x2[0];
 
 			cd.lnk = -m;
 			cd.typ = gpeTYP_STR;
 			continue;
 		}
 
-		U4x4& lnk = pL0[l=M.iMNlnk];
+		U4x4& lnk = pL0[l=M.iMNdct];
 		// még nem tud ja micsoda kicsoda
 		if( !lnk.y )
 		{

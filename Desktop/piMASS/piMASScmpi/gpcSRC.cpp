@@ -232,9 +232,8 @@ I4x2 gpcSRC::SRCmini(
 						gpcCRS& crs,
 						gpeCLR bg, //gpeCLR fr,
 						gpeCLR ch,
-						bool bNoMini, U1 selID
-					)
-{
+						bool bNoMini, U1 selID	) {
+
 	if( this ?
 				   ( fx <= 0 	||	fy <= 0 )
 				|| ( xy.x >= fx ||	xy.y >= fy )
@@ -252,13 +251,19 @@ I4x2 gpcSRC::SRCmini(
 			bONpre, bSEL = false;
 	I4 nFILL;
 
-	for( U1* pC = pSRCstart( bNoMini, selID ), *pAL = pSRCalloc( bNoMini, selID ) , *pCe = pC+dim.w; pC < pCe; pC++ ) {
+	for( U1	*pC = pSRCstart( bNoMini, selID ),
+			*pAL = pSRCalloc( bNoMini, selID ),
+			*pCe = pC+dim.w;
+
+			pC < pCe;
+
+			pC++	) {
+
 		if( cxy.y >= fy )
 			break;
 		bONpre = bON;
 		cr = cxy.x + cxy.y*zz;
-		//if( this == crs.apSRC[0] )
-		//if( crs.apSRC[0] == crs.apSRC[1] )
+
 		if( b01 == 3 )
 		if( pC-pAL == crs.iSTR.x )
 		{

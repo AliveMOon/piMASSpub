@@ -696,10 +696,10 @@ public:
 	}
 };
 
-#define iMNinlt au4x4[0]
+#define iMNindt au4x4[0]
 #define iMNi au4x4[0].x
 #define iMNn au4x4[0].y
-#define iMNlnk au4x4[0].z
+#define iMNdct au4x4[0].z
 #define iMNtyp au4x4[0].w
 
 #define rMNpos ai4x4[1].a4x2[0]
@@ -774,7 +774,7 @@ public:
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		rLNK = U4x4(nMN());
 
-		rMN.iMNinlt = U4x4( pUi-p_str, nU, iDCT, typ );
+		rMN.iMNindt = U4x4( pUi-p_str, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -793,7 +793,7 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.iMNinlt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -810,7 +810,7 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.iMNinlt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
@@ -1044,7 +1044,7 @@ public:
 	}
 	U4x4	srcBRK( bool bNoMini, U1 selID, const char* pVAN = NULL );
 	U1		srcSCN( gpcCRS& crs, bool bNoMini, U1 selID );
-	I4x2	srcMILL(
+	I4x2	srcRDY(
 						U1x4* pO,
 						I4x2 xy, I4x2 fWH,
 						I4 fz, I4 zz,
