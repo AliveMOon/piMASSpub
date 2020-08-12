@@ -906,7 +906,11 @@ public:
 			}
 			if( pUSER <= sUSER )
 			{
+#ifdef _WIN64
+				char* pU = getenv("USER");
+#else
 				char* pU = getlogin();
+
 				if( !pU )
 				{
 					struct passwd *pw = getpwuid(getuid());
@@ -914,6 +918,7 @@ public:
 					if( pU ? *pU == '/' : false )
 						pU++;
 				}
+#endif
 
 				//__uid_t id = getuid();
 				//pCOMP +=
