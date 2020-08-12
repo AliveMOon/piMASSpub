@@ -107,7 +107,7 @@ gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID ) {
 	}
 	return NULL;
 }
-void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iMN ) {
+void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
@@ -270,7 +270,7 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 	if( !this )
 		return;
 
-	U1 iMN = 0;
+	U1 iSCP = 0;
 
 	if( !gpmSCP.nLiNK() )
 		return;
@@ -283,27 +283,27 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 	if( !iOPe ) {
 		pMASS->mxOP = gpeALF_null;
 		/// ha nincsen még kitöltve az OPER lista feltöltjük
-		pSe = strchr( (char*)gpasOPER[0], ' ' );
-		pMASS->OPER.dctMILLadd( (U1*)gpasOPER[0], pSe-gpasOPER[0] );
+		pSe = strchr( (char*)gpasOP[0], ' ' );
+		pMASS->OPER.dctMILLadd( (U1*)gpasOP[0], pSe-gpasOP[0] );
 		pMASS->aOP[0].num = 14;
 		pMASS->aOP[0] = pSe+1;
 		pMASS->mxOP = pMASS->aOP[0].alf;
 		iOPe++;
 
-		for( U4 i = 1, ie = gpmN(gpasOPER); i < ie; i++ ) {
-			pSe = strchr( (char*)gpasOPER[i], ' ' );
+		for( U4 i = 1, ie = gpmN(gpasOP); i < ie; i++ ) {
+			pSe = strchr( (char*)gpasOP[i], ' ' );
 			if( !pSe )
 				continue;
-			U4 n = pSe-gpasOPER[i], nn = 0;
+			U4 n = pSe-gpasOP[i], nn = 0;
 			iOP = 0;
-			iOP = pMASS->OPER.dctMILLfnd( (U1*)gpasOPER[i], pSe-gpasOPER[i], iOPe );
+			iOP = pMASS->OPER.dctMILLfnd( (U1*)gpasOP[i], pSe-gpasOP[i], iOPe );
 			if( iOP < iOPe )
 			if( pMASS->OPER.nSTRix(iOP) < n )
 				iOP = iOPe;
 
 			if( iOP >= iOPe ) {
 				iOP = iOPe;
-				pMASS->OPER.dctMILLadd( (U1*)gpasOPER[i], pSe-gpasOPER[i] );
+				pMASS->OPER.dctMILLadd( (U1*)gpasOP[i], pSe-gpasOP[i] );
 				pMASS->aOP[iOP].num = 14;
 				pMASS->aOP[iOP] = pSe+1;
 				iOPe++;

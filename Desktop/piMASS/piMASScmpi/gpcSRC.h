@@ -127,7 +127,7 @@ static const gpcOPCD gpaOPCi[] = {
 
 
 };
-static const char* gpasOPER[] = {
+static const char* gpasOP[] = {
 	"0 nop",
 
 	"! notLG",	"!! LG",	"~ inv",
@@ -712,7 +712,7 @@ static char gpsOPERA[] = {
 							"\\*&/%+-|~^?!=$.,:;{}[]()"
 						};
 
-#define gpmSCP aSCOOP[iMN]
+#define gpmSCP aSCOOP[iSCP]
 
 class gpcSCOOP {
 	gpcLZY 		MN;		I8x4 rMN;	U4 nMIN;
@@ -1051,8 +1051,8 @@ public:
 						gpcCRS& crs,
 						bool bNoMini, U1 selID
 					);
-	void 	srcDBG( gpcLZYdct& dOP, U1 iMN );
-	void 	srcCMPLR( gpcLZYdct& dOP, U1 iMN );
+	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
+	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP );
 	void 	srcBLD( gpcMASS* pMASS ); //, gpcWIN& win );
 	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 
