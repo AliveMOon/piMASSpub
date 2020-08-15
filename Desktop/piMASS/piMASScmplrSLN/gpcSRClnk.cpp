@@ -171,7 +171,6 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 		switch( clr )
 		{
 			case gpeCLR_blue2: 	///ABC
-				//cd.pst = gpeOPid_mul;
 				if( lnk.y )
 				{
 					cd.lnk = lnk.y;
@@ -184,7 +183,6 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 				gpmSCP.nCNST++;
 				break;
 			case gpeCLR_orange:	///NUM
-				//cd.pst = gpeOPid_mul;
 				if( lnk.y )
 				{
 					cd.lnk = lnk.y;

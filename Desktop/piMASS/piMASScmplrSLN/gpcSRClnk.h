@@ -347,10 +347,12 @@ public:
 };
 class gpCORE {
 public:
-	gpcLZY	mLST,	// mem data
-			cLST,	// CLASS LIST
+	gpcLZY
 			dLST,	// dim LIST
-			oLST;	// OBJ LIST
+			cLST,	// CLASS LIST
+			oLST,	// OBJ LIST
+			mLST;	// mem data
+
 	U4		pc, nPC, mSTK, oDPi,
 			nSTK;
 	I4x4	*pALL, *pPC;
@@ -703,9 +705,9 @@ public:
 	}
 };
 
-#define PC (iPC=scp.nASM())
+#define scpPC (iPC=scp.nASM())
 #define CDC (CD()[0])
-#define isa scp.vASM.INST
+#define scpINST scp.vASM.INST
 #define lADD lSAM.z
 #define nADD allSAM.x
 #define alADD allSAM.z
@@ -750,7 +752,7 @@ public:
 
 	I4x4& LOAD_SRC_ADR_nA0( gpcSCOOP& scp,I4 n=-1) { /// move.l n(iA),A0
 		/// move.l -1(Ai), A0
-		I4x4 &load = isa( PC, gpeOPid_mov, gpeCsz_l
+		I4x4 &load = scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,0,0  );
 		load.aOB[0] = n*gpaCsz[gpeCsz_l];
@@ -758,7 +760,7 @@ public:
 	}
 	I4x4& LOAD_SRC_ADR_nA1( gpcSCOOP& scp,I4 n=-1) { /// move.l n(iA),A1
 		/// move.l -1(Ai), A1
-		I4x4 &load = isa( PC, gpeOPid_mov, gpeCsz_l
+		I4x4 &load = scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_d16IAnI,As,0
 							,gpeEA_An,1,0  );
 		load.aOB[0] = n*gpaCsz[gpeCsz_l];
@@ -766,7 +768,7 @@ public:
 	}
 	I4x4& LOAD_DST_ADR_A0( gpcSCOOP& scp ) { /// move.l (iA+1),A0
 
-		I4x4 &prev = isa( PC, gpeOPid_mov, gpeCsz_l
+		I4x4 &prev = scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,Ad,0
 							,gpeEA_An,0,0
 						);
@@ -774,7 +776,7 @@ public:
 	}
 
 	I4x4& move_l_IA1I_IA0I(gpcSCOOP& scp) { /// move.l (A1),(A0)
-		I4x4& inst = isa( PC, gpeOPid_mov, gpeCsz_l
+		I4x4& inst = scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,1,0
 							,gpeEA_IAnI,0,0
 						);
@@ -782,7 +784,7 @@ public:
 	}
 	I4x4& move_l_IA1I_D0(gpcSCOOP& scp) { /// move.l (A1),D0
 
-		I4x4& inst = isa( PC, gpeOPid_mov, gpeCsz_l
+		I4x4& inst = scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,1,0
 							,gpeEA_Dn,0,0
 						);
@@ -790,7 +792,7 @@ public:
 	}
 	I4x4& move_l_IA1I_D1(gpcSCOOP& scp) { /// move.l (A1),D1
 
-		I4x4& inst = isa( PC, gpeOPid_mov, gpeCsz_l
+		I4x4& inst = scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 							,gpeEA_IAnI,1,0
 							,gpeEA_Dn,1,0
 						);
@@ -848,24 +850,24 @@ public:
         pMUL    = (gpeOPid*)spM.Ux( iSAM.w, sizeof(gpeOPid), false );
 
 
-		isa( PC );
-        isa( PC, gpeOPid_mov, gpeCsz_l
+		scpINST( scpPC );
+        scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_An,As,0
 				,gpeEA_sIAnI,7,0
 			);
-        isa( PC );
-        isa( PC );
-        isa( PC, gpeOPid_xor, gpeCsz_l
+        scpINST( scpPC );
+        scpINST( scpPC );
+        scpINST( scpPC, gpeOPid_xor, gpeCsz_l
 				,gpeEA_Dn,0,0
 				,gpeEA_Dn
 			);
         //I4x4& inst =
-		isa( PC, gpeOPid_mov, gpeCsz_l
+		scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_Dn,0,0
 				,gpeEA_sIAnI,Ad,0
 			).aOB[0] = 1;
         //inst.aOB[0] = 1;
-        isa( PC );
+        scpINST( scpPC );
         return *this;
 	}
 
@@ -883,7 +885,7 @@ public:
 		/// ITT MÁR LENT
 		if( pSPsam[0].op )
 		{
-			isa( PC, gpeOPid_jsr, gpeCsz_l
+			scpINST( scpPC, gpeOPid_jsr, gpeCsz_l
 				,gpeEA_num
 			).aOB[0] = pSPsam[0].op-gpeOPid_jsr; //-gpeOPid_jsr;
 		}
@@ -895,16 +897,16 @@ public:
         pMUL    = (gpeOPid*)spM.Ux( pSPsam[0].w, sizeof(gpeOPid));
 
 
-        isa( PC, gpeOPid_mov, gpeCsz_l
+        scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_IAnIp,7,0
 				,gpeEA_An,As,0
 			);
-        isa( PC );
-		isa( PC, gpeOPid_mov, gpeCsz_l
+        scpINST( scpPC );
+		scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_IAnIp,Ad,0
 				,gpeEA_IAnIp,As
 			);
-        isa( PC );
+        scpINST( scpPC );
         return *this;
 	}
 
@@ -932,7 +934,7 @@ public:
 		gpcCD	&ins = dp ? pCD[0-dp] : pCD[0];
 		/// move.l A7,D0
 		//A[7] = D[0];
-		isa( PC, gpeOPid_mov, gpeCsz_l
+		scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 				,gpeEA_An,7,0
 				,gpeEA_Dn,0,0
 			);
@@ -940,7 +942,7 @@ public:
 			gpcCD &i = pCD[0-dp];
 
 		/// move.l 0xOBJid,-(A7) ; PUSH
-			I4x4 &opcd = isa( PC, gpeOPid_mov, gpeCsz_l
+			I4x4 &opcd = scpINST( scpPC, gpeOPid_mov, gpeCsz_l
 								,gpeEA_num,0,0
 								,gpeEA_sIAnI,7,0
 							);
@@ -949,19 +951,19 @@ public:
 			--dp;
 		}
 		/// "\n 0x%0.4x jsr fndOBJ2A0"
-		isa( PC, gpeOPid_dot );
+		scpINST( scpPC, gpeOPid_dot );
         if( gpaOPgrp[now] == gpeOPid_mov )	/// move.l A0,-(Ai)
-            isa( PC, gpeOPid_mov, gpeCsz_l
+            scpINST( scpPC, gpeOPid_mov, gpeCsz_l
                     ,gpeEA_An,0,0
                     ,gpeEA_sIAnI,As,0
                 );
 		else 								/// move.l A0,(Ai)+
-            isa( PC, gpeOPid_mov, gpeCsz_l
+            scpINST( scpPC, gpeOPid_mov, gpeCsz_l
                     ,gpeEA_An,0,0
                     ,gpeEA_IAnIp,As,0
                 );
 
-		isa( PC );
+		scpINST( scpPC );
 		As = Ad-1;
 		return *this;
 	}
@@ -1000,7 +1002,7 @@ public:
 
                     lADD = lMUL = 0;
                     *pSTRT = pADD[lADD];
-                    scp.vASM.INST( PC );
+                    scp.vASM.INST( scpPC );
                 }
                 return *this;
             default:
@@ -1041,7 +1043,7 @@ public:
 		while( a < nA )
 		{
 			LOAD_SRC_ADR_nA1(scp,s-lADD);	/// move.l n(Ai),A1
-			isa( PC, pADD[a], gpeCsz_l
+			scpINST( scpPC, pADD[a], gpeCsz_l
 					,gpeEA_IAnI,1,0
 					,gpeEA_Dn,0,0
 			);
@@ -1050,13 +1052,13 @@ public:
 		}
 
 		LOAD_DST_ADR_A0( scp );	/// move.l (Ai+1),A0
-		isa( PC, *pSTRT, gpeCsz_l
+		scpINST( scpPC, *pSTRT, gpeCsz_l
                 ,gpeEA_Dn,0,0
 				,gpeEA_IAnI,0,0
 			);
 
 		*pSTRT = pADD[lADD-1];
-		isa( PC );
+		scpINST( scpPC );
 		lADD = lMUL = 0;
 		return *this;
 	}
@@ -1075,11 +1077,11 @@ public:
                 LOAD_SRC_ADR_nA1(scp,-1);	/// move.l n(Ai),A1
                 move_l_IA1I_D0(scp);		/// move.l (A1),D0
                 LOAD_DST_ADR_A0( scp );		/// move.l -(Ai+1),A0
-                isa( PC, *pSTRT, gpeCsz_l
+                scpINST( scpPC, *pSTRT, gpeCsz_l
                             ,gpeEA_Dn,0,0
                             ,gpeEA_IAnI,0,0
                     );
-				isa( PC );
+				scpINST( scpPC );
 
             }
 			return *this;
@@ -1106,20 +1108,20 @@ public:
 		for( I4 i = 0; i < lMUL; i++ )
 		{
 			LOAD_SRC_ADR_nA1(scp,i-lMUL);	/// move.l n(Ai),A1
-			isa( PC, pMUL[i], gpeCsz_l
+			scpINST( scpPC, pMUL[i], gpeCsz_l
 					,gpeEA_IAnI,1,0
 					,gpeEA_Dn,0,0
 			);
 		}
 
 		LOAD_DST_ADR_A0( scp );	/// move.l (Ai+1),A0
-		isa( PC, *pSTRT, gpeCsz_l
+		scpINST( scpPC, *pSTRT, gpeCsz_l
 					,gpeEA_Dn,0,0
 					,gpeEA_IAnI,0,0
 			);
 
 		*pSTRT = pMUL[lMUL-1];
-		isa( PC );
+		scpINST( scpPC );
 		lADD = lMUL = 0;
 		return *this;
 	}
@@ -1141,7 +1143,7 @@ public:
 		// a*b +b*c			// iMUL 1
 		kMUL(scp,true);
 
-		isa( PC );
+		scpINST( scpPC );
         return *this;
     }
 

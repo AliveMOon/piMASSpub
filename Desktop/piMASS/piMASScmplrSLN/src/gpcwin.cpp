@@ -221,7 +221,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 
 //extern const char gpsGLSLfrgREF[];
 //extern const char gpsGLSLfrgLINE[];
-void gpcWIN::WINrun( const char* pWELLCOME ) {
+void gpcWIN::winRUN( const char* pWELLCOME ) {
 	U4 scan, bug = 0, nBUG = 0;
 	U1 aXY[] = "00", c = 0;
 

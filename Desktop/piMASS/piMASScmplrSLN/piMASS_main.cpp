@@ -591,7 +591,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR apA, INT nA)
 int main( int nA, char *apA[] )
 
 {
-	
+
 	if(	apA[0] ? nA > 0 : false )
 	{
 		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, (char*)(apA[0]) );
@@ -689,7 +689,7 @@ int main( int nA, char *apA[] )
         //apCRS[srcDIV] = &main_crs;
         //sdl.draw();
 
-		win.WINrun( 	"                                        "
+		win.winRUN( 	"                                        "
 						"     **** GRANDPACE piMASS V0.1 ****    "
 						"                                        "
 						" 1GB RAM SYSTEM  38911 piMASS BYTE FREE "

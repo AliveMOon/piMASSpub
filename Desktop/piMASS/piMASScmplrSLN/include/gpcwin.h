@@ -1018,7 +1018,7 @@ public:
 		I4x2& winWHpx() {
 			return winDIVpx.a4x2[1];
 		}
-		void	WINrun( const char* pWELLCOME );
+		void	winRUN( const char* pWELLCOME );
 		bool	WINvar( gpcREG& out, gpeALF alf );
 
 };
