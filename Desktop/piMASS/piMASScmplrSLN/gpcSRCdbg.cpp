@@ -36,14 +36,14 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP )
 	//gpeEAsz aSZ[2];
 
 	I8x4 *pM0 = gpmSCP.pMN();
-	U4x4 *pL0 = (U4x4*)gpmSCP.lnk.p_alloc;
+	U4x4 *pL0 = gpmSCP.pLNK(); //lzyLNK.p_alloc;
 	char *pALL = (char*)gpmSCP.p_str;
 	U4 iR = -1;
 	I4 pc = 0, aPC[0x10];
 	//I8 i8 = 0;
 	for( U4 i = 0, n = gpmSCP.nASM(); i < n; i++ )
 	{
-		I4x4& ins = gpmSCP.vASM.pINST(i)[0];
+		I4x4& ins = gpmSCP.lzyASM.pINST(i)[0];
 		pDe = pS = (pD = (pCe=pC=gpsDBGpub)+0x400)+0x400;
 		*pDe = *pD = *pC = 0;
 		gpeEA ADRmod;

@@ -4,7 +4,7 @@
 
 
 /// gpCNST
-#define scpCNST gpmSCP.cnst
+#define scpCNST gpmSCP.lzyCNST
 /// gpCNST
 #ifdef piMASS_DEBUG
 	#define scpOBJget (pCNSTi=(gpCNST*)scpCNST.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpCNST)))[0]
@@ -267,9 +267,6 @@ public:
 		}
 		return 0;
 	}
-
-
-
 };
 
 class gpO {
@@ -706,8 +703,8 @@ public:
 };
 
 #define scpPC (iPC=scp.nASM())
-#define CDC (CD()[0])
-#define scpINST scp.vASM.INST
+#define stkCD (CD()[0])
+#define scpINST scp.lzyASM.INST
 #define lADD lSAM.z
 #define nADD allSAM.x
 #define alADD allSAM.z
@@ -1002,7 +999,7 @@ public:
 
                     lADD = lMUL = 0;
                     *pSTRT = pADD[lADD];
-                    scp.vASM.INST( scpPC );
+                    scpINST( scpPC ); // scp.vASM.INST( scpPC );
                 }
                 return *this;
             default:
@@ -1103,7 +1100,7 @@ public:
 		// a +b*c/d +e		// iMUL 2
 		//   -3-2-1_^ 		// (Ai)+
 		LOAD_SRC_ADR_nA1(scp,-(lMUL+1));	/// move.l n(Ai),A1
-		move_l_IA1I_D0(scp);			/// move.l (A1),D0
+		move_l_IA1I_D0(scp);				/// move.l (A1),D0
 
 		for( I4 i = 0; i < lMUL; i++ )
 		{
@@ -1114,7 +1111,7 @@ public:
 			);
 		}
 
-		LOAD_DST_ADR_A0( scp );	/// move.l (Ai+1),A0
+		LOAD_DST_ADR_A0( scp );				/// move.l (Ai+1),A0
 		scpINST( scpPC, *pSTRT, gpeCsz_l
 					,gpeEA_Dn,0,0
 					,gpeEA_IAnI,0,0
@@ -1150,7 +1147,7 @@ public:
 	/// azaz gyúrjuk
 	gpcCDsp& knead( gpcSCOOP& scp ) { //, U4 iOPe ) {
 		gpcCDsp& SP = *this;
-		now=CDC.pst;
+		now=stkCD.pst;
 		switch( gpaOPgrp[now] )
 		{
 			case gpeOPid_mov: /// =
@@ -1184,7 +1181,7 @@ public:
 				kOBJ(scp); //, iOPe );
 				LEVmulEXP()[lMUL++] = now;
 				++SP;
-				++CDC;
+				++stkCD;
 				break;
 
 			case gpeOPid_entry: { /// (
@@ -1198,14 +1195,14 @@ public:
 							break;
 					}
 					++SP;
-					++CDC;
+					++stkCD;
 				} break;
 			case gpeOPid_out: /// )
                 /// ITT MÉG FENT
                 LEVdwn(scp,now);
                 /// ITT MÁR LENT
 				++SP;
-				++CDC;
+				++stkCD;
 				break;
             case gpeOPid_stk: /// ,
 				kEND(scp);

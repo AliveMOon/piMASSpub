@@ -715,38 +715,61 @@ static char gpsOPERA[] = {
 #define gpmSCP aSCOOP[iSCP]
 
 class gpcSCOOP {
-	gpcLZY 		MN;		I8x4 rMN;	U4 nMIN;
+	gpcLZY 		lzyMiN;		I8x4 rMN;	U4 nMiN;
 public:
-	gpcLZYdct	dct;				U4 nDCT;
-	gpcLZY		lnk; 	U4x4 rLNK;	U4 nLNK;
-	gpcLZY		cnst;				U4 nCNST;
-	gpcLZY		vASM;	I4x4 rINS;	U4 nINS;
+	gpcLZYdct	lzyDCT;					U4 nDCT;
+	gpcLZY		lzyLiNK; 	U4x4 rLNK;	U4 nLiNK;
+	gpcLZY		lzyCNST;				U4 nCNST;
+	gpcLZY		lzyASM;		I4x4 rINS;	U4 nINS;
 
 	U1	*p_str;
 	gpcSCOOP(){ gpmCLR; };
 	void rst( U1* pUTF )
 	{
-		dct.rst();
-		lnk.lzyRST();
-		cnst.lzyRST();
-		MN.lzyRST();
-		vASM.lzyRST();
+		lzyMiN.lzyRST();
+
+		lzyDCT.rst();
+		lzyLiNK.lzyRST();
+		lzyCNST.lzyRST();
+		lzyASM.lzyRST();
 		//iDCT =
-		nDCT = nLNK = nCNST = nMIN = nINS = 0;
+		nDCT = nLiNK = nCNST = nMiN = nINS = 0;
 		p_str = pUTF;	// ezt a gpcSRC::srcBRK adja
 	}
 	//I8x4* pMN();
-	I8x4* pMN() {
-		if( nMIN )
-			return (I8x4*)MN.p_alloc;
 
-		return nMN() ? (I8x4*)MN.p_alloc : NULL;
+	U4 nMN() {
+		/*if(nMiN)
+			return nMiN;*/
+
+		return nMiN = lzyMiN.nLD(sizeof(rMN));
 	}
-	U4 nMN() { return nMIN = MN.nLD(sizeof(rMN)); }
-	U4 nLiNK() { return nLNK = lnk.nLD(sizeof(rLNK)); }
+	I8x4* pMN() {
+		if( nMiN )
+			return (I8x4*)lzyMiN.p_alloc;
+
+		return nMN() ? (I8x4*)lzyMiN.p_alloc : NULL;
+	}
+
+
+	U4 nLNK() {
+		if( nLiNK )
+			return nLiNK;
+
+		return nLiNK = lzyLiNK.nLD(sizeof(rLNK));
+	}
+	U4x4* pLNK() {
+		if( nLiNK )
+			return (U4x4*)lzyLiNK.p_alloc;
+
+		return nLNK() ? (U4x4*)lzyLiNK.p_alloc : NULL;
+	}
+
 	U4 nASM() {
-		nINS = vASM.nLD(sizeof(rINS));
-		return nINS;
+		/*if( nINS )
+			return nINS;*/
+
+		return 	nINS = lzyASM.nLD(sizeof(rINS));
 	}
 
 	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff ) {
@@ -757,16 +780,16 @@ public:
 			return nMN();
 
  		U8 nS = nU, nI;
- 		U4 iDCT = dct.dctMILLfndnS( pUi, nS, nDCT );
+ 		U4 iDCT = lzyDCT.dctMILLfndnS( pUi, nS, nDCT );
  		if( iDCT < nDCT )
-		if( (nI=dct.nSTRix(iDCT)) != nS )
+		if( (nI=lzyDCT.nSTRix(iDCT)) != nS )
 			iDCT = nDCT;
 
 		if( iDCT >= nDCT )
 		{
-			// nem volt a listában
+			// nem volt a SZóTáRBAN
 			iDCT = nDCT; // a végére kerül ha hozzá adjuk
-			dct.dctMILLadd( pUi, nU );
+			lzyDCT.dctMILLadd( pUi, nU );
 			nDCT++;
 		}
 		// typ U4x4.w:
@@ -777,9 +800,9 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 
-		lnk.lzyADD( &rLNK, sizeof(rLNK), nU = -1, -1 );
+		lzyLiNK.lzyADD( &rLNK, sizeof(rLNK), nU = -1, -1 );
 		return nMN();
 	}
 	U4 STRadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
@@ -796,7 +819,7 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 		return nMN();
 	}
 	U4 NOTEadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
@@ -813,7 +836,7 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		MN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 		return nMN();
 	}
 };

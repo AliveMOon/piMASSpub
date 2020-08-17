@@ -46,7 +46,7 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	for(
 			/// loop INIT --------------
 			core.ini(
-						gpmLZYvali( I4x4, &gpmSCP.vASM ),  gpmSCP.nASM(),
+						gpmLZYvali( I4x4, &gpmSCP.lzyASM ),  gpmSCP.nASM(),
 						&pA, &pD, &pO, &pC
 					);
 			/// loop CMP --------------

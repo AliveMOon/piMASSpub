@@ -28,8 +28,7 @@ bool gpcCRS::miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 allWH ) {
 
 	return true;
 }
-bool gpcCRS::miniRDYesc( gpcWIN* pWIN, gpcPIC* pPIC )
-{
+bool gpcCRS::miniRDYesc( gpcWIN* pWIN, gpcPIC* pPIC ) {
 	bool bESC = false; //, bNoMini;
 	if( CRSfrm.x >= CRSfrm.z )
 	{
@@ -68,8 +67,7 @@ U4 gpcCRS::miniRDYmap(
 						U4* &pM,	U4* &pC,	U4* &pR,
 						U4* &psCp,	U4* &psRp,	U4& z,
 						U4x4& mZN, bool bSHFT
-					)
-{
+					) {
 	gpcMAP* pMAP = pWIN->piMASS ? &(pWIN->piMASS->mapCR) : NULL;
 	if( !pMAP )
 		return -1;
@@ -151,9 +149,9 @@ U4 gpcCRS::miniRDYmap(
 ///
 ///------------------------------
 static U1 gpsTITLE[0x100];
-void gpcCRS::miniRDY( gpcWIN* pWIN, //gpcMASS* pMASS,
-						gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT, bool bMOV )
-{
+void gpcCRS::miniRDY(	gpcWIN* pWIN,
+						gpcPIC* pPIC, SDL_Renderer* pRNDR,
+						bool bSHFT, bool bMOV ) {
 	picBG.lzyRST(); bobBG.lzyRST();
 
 	if( !miniLOCK( pPIC, pRNDR, pWIN->wDIVcrALLOCK() ) )

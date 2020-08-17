@@ -849,6 +849,10 @@ public:
         {
             U1 x,y,z,w;
         };
+         struct
+        {
+            U1 R,G,B,A;
+        };
         struct
         {
             U1 aXYZW[4];
@@ -1052,8 +1056,8 @@ public:
 		while( *p_str )
 		{
 			p4->u4 = 0;
-			p4->z = clr;
-			p4->w = *p_str;
+			p4->B = clr;
+			p4->A = *p_str;
 			p4++;
 			p_str++;
 		}
@@ -1846,29 +1850,10 @@ public:
 		}
 		return *this;
 	}
-	U4x2& null( void )
-	{
-		gpmCLR;
-		return *this;
-	}
-	U4x2& operator += ( const U4x2& b )
-	{
-		x += b.x;
-		y += b.y;
-		return *this;
-	}
-	U4x2& operator -= ( const U4x2& b )
-	{
-		x -= b.x;
-		y -= b.y;
-		return *this;
-	}
-	U4x2& operator &= ( const U4x2& u )
-	{
-		x *= u.x;
-		y *= u.y;
-		return *this;
-	}
+	U4x2& null( void ) { gpmCLR; return *this; }
+	U4x2& operator += ( const U4x2& b ) { x += b.x; y += b.y; return *this; }
+	U4x2& operator -= ( const U4x2& b ) { x -= b.x; y -= b.y; return *this; }
+	U4x2& operator &= ( const U4x2& u ) { x *= u.x; y *= u.y; return *this; }
 	U4x2& operator /= ( const U4x2& u )
 	{
 		if( u.x )
@@ -1901,37 +1886,11 @@ public:
 		y += u;
 		return *this;
 	}
-	U4x2& operator += ( I4 i )
-	{
-		x += i;
-		y += i;
-		return *this;
-	}
-	U4x2& operator += ( float f )
-	{
-		x += f;
-		y += f;
-		return *this;
-	}
-
-	U4x2& operator -= ( U4 u )
-	{
-		x -= u;
-		y -= u;
-		return *this;
-	}
-	U4x2& operator -= ( I4 i )
-	{
-		x -= i;
-		y -= i;
-		return *this;
-	}
-	U4x2& operator -= ( float f )
-	{
-		x -= f;
-		y -= f;
-		return *this;
-	}
+	U4x2& operator += ( I4 i )		{ x += i; y += i; return *this; }
+	U4x2& operator += ( float f )	{ x += f; y += f; return *this; }
+	U4x2& operator -= ( U4 u ) 		{ x -= u; y -= u; return *this; }
+	U4x2& operator -= ( I4 i ) 		{ x -= i; y -= i; return *this; }
+	U4x2& operator -= ( float f ) 	{ x -= f; y -= f; return *this; }
 	U4x2& operator = ( int i )
 	{
 		if( !i )
@@ -1944,23 +1903,11 @@ public:
 	U4x2& operator = ( const I4x2& b );
 
 
-	U4x2 operator + (const U4 b) const
-	{
-		return U4x2( x+b, y+b );
-	}
-	U4x2 operator + (const U4x2 b) const
-	{
-		return U4x2( x+b.x, y+b.y );
-	}
+	U4x2 operator + (const U4 b) const		{ return U4x2( x+b, y+b );		}
+	U4x2 operator + (const U4x2 b) const	{ return U4x2( x+b.x, y+b.y );	}
 
-	U4x2 operator - (const U4 b) const
-	{
-		return U4x2( x-b, y-b );
-	}
-	U4x2 operator - (const U4x2 b) const
-	{
-		return U4x2( x-b.x, y-b.y );
-	}
+	U4x2 operator - (const U4 b) const 		{ return U4x2( x-b, y-b );		}
+	U4x2 operator - (const U4x2 b) const	{ return U4x2( x-b.x, y-b.y );	}
 
 	bool operator != ( const U4x2& b ) const
 	{
@@ -1973,14 +1920,8 @@ public:
 		return !(*this!=b);
 	}
 
-	U8 operator * (const U4x2& b) const
-	{
-		return (U8)x*b.x + (U8)y*b.y;
-	}
-	U4x2 operator & (const U4x2& b) const
-	{
-		return U4x2( x*b.x, y*b.y );
-	}
+	U8 operator * (const U4x2& b) const		{ return (U8)x*b.x + (U8)y*b.y;	}
+	U4x2 operator & (const U4x2& b) const	{ return U4x2( x*b.x, y*b.y );	}
 	U4x2 operator / (const U4x2& b) const
 	{
 		return U4x2( b.x ? x/b.x : 0xffffffff, b.y ? y/b.y : 0xffffffff );
@@ -2039,35 +1980,6 @@ public:
 	U4 mn() const 		{ return (!this?0:(x<y?x:y)); }
 	U4 mx() const 		{ return (!this?0:(x>y?x:y)); }
 
-	/*U8 sum( void ) const
-	{
-		return (U8)x+y;
-	}
-
-	U8 area( void )
-	{
-		return x*y;
-	}
-	U8 are_sum( void )
-	{
-		return area()+sum();
-	}
-
-	U8 qlen(void ) const
-	{
-		return x*x+y*y;
-	}
-
-	U4 mn( void ) const
-	{
-		return x < y ? x:y;
-	}
-
-	U4 mx( void ) const
-	{
-		return x > y ? x:y;
-	}*/
-
 	U4x2 abs( void ) const
 	{
 		return U4x2( x<0?-x:x, y<0?-y:y );
@@ -2115,6 +2027,10 @@ public:
         struct
         {
             U2 aU2[8];
+        };
+        struct
+        {
+            U1x4 aRGBAx4[4];
         };
 
     };
@@ -4131,6 +4047,10 @@ public:
         {
             U4x4 af4x4[2];
         };
+        /*struct
+        {
+			U1x4 au1x4x4[8];
+        };*/
     };
     I8x4(){};
     I8x4( I8 _x, I8 _y = 0, I8 _z = 0, I8 _w = 0 )

@@ -239,7 +239,14 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 
 		gpcCRS& crs = *apCRS[srcDIV]; // ? *apCRS[srcDIV] : main_crs;
 		reSCAN();
-
+		/// ----------------------------------------------
+		///
+		///		0 pTRD->RNDR
+		/// 	1 pPIC->LOCK
+		///		2 crs.miniRDY( pPIC ) x nDIV
+		///		3 pPIC->unLOCK
+		///
+		/// ----------------------------------------------
 		if(
 			  (gppKEYbuff != gpsKEYbuff)
 			|| nIRQ
@@ -442,6 +449,11 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 			pPIC->unLOCK();
 		}
 
+		/// ----------------------------------------------
+		///
+		///		justDOit
+		///
+		/// ----------------------------------------------
 		gppMOUSEbuff = gppKEYbuff = piMASS->justDOit( this );
 		*gpsTITLEpub = 0;
 		if(

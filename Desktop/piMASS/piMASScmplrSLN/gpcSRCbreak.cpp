@@ -331,8 +331,6 @@ I4x2 gpcSRC::srcRDY(
 	if( pDBG ? pDBG->p_alloc == pALL : false )
 		iSCP = 2;
 
-			//bMN = pMINI ? pMINI->p_alloc == pALL : false,
-			//bDBG = pDBG  ? pDBG->p_alloc == pALL : false;
 	I8x4	*pM0 = gpmSCP.pMN();
 
 	U4 clr, tSTR = U1x4(0x10,1,1).typ().u4, cn;

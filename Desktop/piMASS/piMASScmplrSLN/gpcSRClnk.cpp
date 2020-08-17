@@ -113,7 +113,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	pDBG->lzyRST();
 
 	I8x4 *pM0 = gpmSCP.pMN(), M, Mnx;
-	U4x4 *pL0 = (U4x4*)gpmSCP.lnk.p_alloc; //, aLNK[0x10];
+	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];
 	U4 nM = gpmSCP.nMN(), iOP; //, iOPe = dOP.nIX();
 
 	scpCNST.lzyRST();
@@ -137,7 +137,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	//for( U4 le = gpmSCP.nLiNK(), l = 0, mNX; l < le; l++ )
 	for( U4 nM = gpmSCP.nMN(), m = 0, l; m < nM; m++ )
 	{
-		clr = (gpeCLR)((pM0[m].rMNclr>>0x10)&0xf);
+		clr = (gpeCLR)pM0[m].au4x4[1].aRGBAx4[2].B; // ((pM0[m].rMNclr>>0x10)&0xf);
 		if( clr == gpeCLR_red2 )
 				continue;
 
@@ -159,10 +159,10 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 		// még nem tud ja micsoda kicsoda
 		if( !lnk.y )
 		{
-			pS = gpmSCP.dct.sSTRix(l, NULL);
+			pS = gpmSCP.lzyDCT.sSTRix(l, NULL);
 			if( !pS )
 				continue;
-			nS = gpmSCP.dct.nSTRix(l);
+			nS = gpmSCP.lzyDCT.nSTRix(l);
 			if( !nS )
 				continue;
 		}
@@ -270,15 +270,15 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 
 	U1 iSCP = 0;
 
-	if( !gpmSCP.nLiNK() )
+	if( !gpmSCP.nLNK() )
 		return;
 
 	if( pCORE )
 		return;
 
-	srcCMPLR( *pMASS->pOPER(), 0 );
+	srcCMPLR( *pMASS->pOPER(), iSCP );
 	(pCORE=new gpCORE)->coreLNK(
-									gpmLZYvali( I4x4, &gpmSCP.vASM ),
+									gpmLZYvali( I4x4, &gpmSCP.lzyASM ),
 									gpmSCP.nASM(),
 									gpmSCP.pMN(),
 									(char*)gpmSCP.p_str, &scpCNST
