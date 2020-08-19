@@ -138,7 +138,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 }
 U4 gpCORE::coreLNK( I4x4* pPC, U4 nPC, I8x4 *pM0, char *pSCPall, gpcLZY* pSCPlnk )
 {
-	gpINST inst;
+	gpcINST inst;
 	I4	aoID[0x10];
 	U4 nO = 0, iO;
 	gpO* pOlnk;

@@ -7,10 +7,10 @@
 #define scpCNST gpmSCP.lzyCNST
 /// gpCNST
 #ifdef piMASS_DEBUG
-	#define scpOBJget (pCNSTi=(gpCNST*)scpCNST.Ux( (cd.lnk-gpeOPid_jsr), sizeof(gpCNST)))[0]
+	#define scpOBJget (pCNSTi=(gpCNST*)scpCNST.Ux( (mCD0.lnk-gpeOPid_jsr), sizeof(gpCNST)))[0]
 	#define scpOBJadd (pCNSTn=(gpCNST*)scpCNST.Ux( gpmSCP.nCNST, sizeof(gpCNST)))[0]
 #else
-	#define scpOBJget ((gpCNST*)scpCNST.Ux( (cd.obj-gpeOPid_jsr), sizeof(gpCNST)))[0]
+	#define scpOBJget ((gpCNST*)scpCNST.Ux( (mCD0.obj-gpeOPid_jsr), sizeof(gpCNST)))[0]
 	#define scpOBJadd ((gpCNST*)scpCNST.Ux( gpmSCP.nCNST, sizeof(gpCNST)))[0]
 #endif
 //#define scpLNK gpmSCP.lnk
@@ -301,7 +301,7 @@ public:
 		return *this;
 	}
 };
-class gpINST {
+class gpcINST {
 public:
 	U1x4 op;
 	gpeOPid oID;
@@ -315,7 +315,7 @@ public:
 
 	I4	aOB[2];
 
-	gpINST& operator = ( const U4 u4 ) {
+	gpcINST& operator = ( const U4 u4 ) {
 		gpmCLR;
 		op = u4;
 		oID = (gpeOPid)op.x;
@@ -331,7 +331,7 @@ public:
 		mD = (gpeEA)(op.z>>3);
 		return *this;
 	}
-	gpINST& operator = ( const I4x4 x4 ) {
+	gpcINST& operator = ( const I4x4 x4 ) {
 		*this = x4.op;
 		aOB[0] = x4.z;
 		aOB[1] = x4.w;
@@ -339,8 +339,8 @@ public:
 		return *this;
 	}
 
-	gpINST(){};
-	gpINST( const I4x4 x4 ) { *this = x4; }
+	gpcINST(){};
+	gpcINST( const I4x4 x4 ) { *this = x4; }
 };
 class gpCORE {
 public:
@@ -703,7 +703,7 @@ public:
 };
 
 #define scpPC (iPC=scp.nASM())
-#define stkCD (CD()[0])
+#define stkCD (piCD()[0])
 #define scpINST scp.lzyASM.INST
 #define lADD lSAM.z
 #define nADD allSAM.x
@@ -723,27 +723,27 @@ public:
 	I4x4	iSAM, lSAM, nSAM, allSAM;
 
 	gpcCDsp(){ gpmCLR; refCD=-1; Ad=6; LEVrst(); }; //A[7]=0x40; };
-	gpcCD* CD() {
+	gpcCD* piCD() {
 		if( refCD == iCD )
 			return pCD;
 		return pCD = ((gpcCD*)cd.Ux( refCD=iCD, sizeof(gpcCD)));
 	}
 
 	gpcCDsp& operator ++() {
-		U1 p = CD()[0].pst;
+		U1 p = piCD()[0].pst;
 		++iCD;
-		CD()[0].null();
+		piCD()[0].null();
 		return *this;
 	}
 	gpcCDsp& operator --() {
-		CD()[0].null();
+		piCD()[0].null();
 		--iCD;
 		if( iCD < 0 )
 		{
 			iCD = 0;
 			refCD = -1;
 		}
-		CD();
+		piCD();
 		return *this;
 	}
 
@@ -836,7 +836,7 @@ public:
 
         I4x4* pSPsam = (I4x4*)spSAM.Ux( ++nSTRT, sizeof(I4x4));
         pSPsam[0].a4x2[1] = (iSAM.a4x2[1]+=lSAM.a4x2[1]);
-        pSPsam[-1].op = CD()[0].lnk >= gpeOPid_jsr ? CD()[0].lnk : 0;
+        pSPsam[-1].op = piCD()[0].lnk >= gpeOPid_jsr ? piCD()[0].lnk : 0;
         lSAM.null();
 
         LEVaddEXP();
@@ -910,7 +910,7 @@ public:
 
 	gpcCDsp& kMOV( gpcSCOOP& scp ) { As = Ad; return *this; }
 	gpcCDsp& kOBJ( gpcSCOOP& scp ) {
-        switch( (gpeOPid)CD()[0].lnk ) {
+        switch( (gpeOPid)piCD()[0].lnk ) {
             case gpeOPid_end:
             case gpeOPid_dimE:
             case gpeOPid_brakE:

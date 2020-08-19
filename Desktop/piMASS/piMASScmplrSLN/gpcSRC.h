@@ -732,7 +732,7 @@ public:
 		lzyLiNK.lzyRST();
 		lzyCNST.lzyRST();
 		lzyASM.lzyRST();
-		//iDCT =
+
 		nDCT = nLiNK = nCNST = nMiN = nINS = 0;
 		p_str = pUTF;	// ezt a gpcSRC::srcBRK adja
 	}

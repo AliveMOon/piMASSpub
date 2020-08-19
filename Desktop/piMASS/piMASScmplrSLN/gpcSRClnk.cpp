@@ -3,7 +3,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-#define cd (pCD=CDsp.CD())[0]
+#define mCD0 (pCD=CDsp.piCD())[0]
 
 
 #define aaOPid gpaaOPid[OPgrp]
@@ -150,13 +150,13 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 
 			pSTR = (nSTR=M.iMNn) ? gpmSCP.p_str+M.iMNi : NULL; //M.iMNindt.a4x2[0];
 
-			cd.lnk = -m;
-			cd.typ = gpeTYP_STR;
+			mCD0.lnk = -m;
+			mCD0.typ = gpeTYP_STR;
 			continue;
 		}
 
 		U4x4& lnk = pL0[l=M.iMNdct];
-		// még nem tud ja micsoda kicsoda
+		// még nem tudja micsoda kicsoda
 		if( !lnk.y )
 		{
 			pS = gpmSCP.lzyDCT.sSTRix(l, NULL);
@@ -173,25 +173,25 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 			case gpeCLR_blue2: 	///ABC
 				if( lnk.y )
 				{
-					cd.lnk = lnk.y;
-					cd.typ = scpOBJget.typ;
+					mCD0.lnk = lnk.y;
+					mCD0.typ = scpOBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nCNST);
-				cd.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLalf( pS, nS );
+				mCD0.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nCNST);
+				mCD0.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLalf( pS, nS );
 				gpmSCP.nCNST++;
 				break;
 			case gpeCLR_orange:	///NUM
 				if( lnk.y )
 				{
-					cd.lnk = lnk.y;
-					cd.typ = scpOBJget.typ;
+					mCD0.lnk = lnk.y;
+					mCD0.typ = scpOBJget.typ;
 					break;
 				}
 				// ez a mini még nincs feldolgozva
-				cd.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nCNST);
-				cd.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLnum( pS, nS );
+				mCD0.lnk = lnk.y = (gpeOPid_jsr+gpmSCP.nCNST);
+				mCD0.typ = scpOBJadd.typ = scpOBJadd.obj.cdrMILLnum( pS, nS );
 				gpmSCP.nCNST++;
 				break;
 			case gpeCLR_green2: {///OPER
@@ -209,7 +209,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
                         case gpeOPid_brakS:
                         case gpeOPid_dimS:
                         case gpeOPid_begin:
-							if( cd.lnk >= gpeOPid_jsr )
+							if( mCD0.lnk >= gpeOPid_jsr )
 							{
 								/// FUNCTION
 								/// LENT
@@ -218,7 +218,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 								break;
 							}
                             /// LENT
-							cd.lnk = lnk.y;
+							mCD0.lnk = lnk.y;
                             CDsp.LEVup( gpmSCP );
                             /// FENT
                             break;
@@ -229,24 +229,24 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
                             CDsp.LEVdwn( gpmSCP, //iOPe,
 											gpeOPid_mov ); // (gpeOPid)lnk.y );
                             /// LENT
-                            cd.lnk = lnk.y;
+                            mCD0.lnk = lnk.y;
                             break;
                         default:
-                            switch( (gpeOPid)cd.lnk )
+                            switch( (gpeOPid)mCD0.lnk )
                             {
                                 case gpeOPid_end:
                                 case gpeOPid_dimE:
                                 case gpeOPid_brakE:
-                                    cd.pst = (gpeOPid)lnk.y;
+                                    mCD0.pst = (gpeOPid)lnk.y;
                                     CDsp.knead( gpmSCP ); //, iOPe );
                                     break;
                                 default:
-                                    if( (cd.lnk>-1) && (cd.lnk<gpeOPid_jsr) )
+                                    if( (mCD0.lnk>-1) && (mCD0.lnk<gpeOPid_jsr) )
                                     {
-                                        cd.pre = (gpeOPid)lnk.y;
+                                        mCD0.pre = (gpeOPid)lnk.y;
                                         break;
                                     }
-                                    cd.pst = (gpeOPid)lnk.y;
+                                    mCD0.pst = (gpeOPid)lnk.y;
                                     CDsp.knead( gpmSCP);//, iOPe );
                                     break;
                             }

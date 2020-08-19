@@ -122,8 +122,8 @@ static const char* gpasCsz[] = {
 	/// lebegőpontos
 	".f",	//	c	4		11:00	float
 	".d",	//  d	8		11:01	double
-	".K",	//  e	16		11:11	KID
-	"",		//	e	16		11:10	OFF
+	".K",	//  e	16		11:10	KID
+	"",		//	e	16		11:11	OFF
 };
 typedef enum gpeCsz:U1{
 	gpeCsz_b,	//	0	1		00:00	byte
@@ -253,34 +253,6 @@ typedef enum gpeEA:U1 {
 	gpeEA_num,
 } gpeEA_U1;
 
-
-
-/*typedef enum gpeEAsz:U1 {
-	gpeEAsz0, // 0 EA
-	gpeEAszB, // 1 1
-	gpeEAszW, // 2 2
-	gpeEAszL, // 3 4
-	gpeEAszQ, // 4 8
-	gpeEAszX, // 5 16
-} gpeEAsz_U1;
-
-static const size_t gpaEAsz[] {
-	sizeof(U1*),		//gpeEAsz0, //
-	sizeof(U1), 		//gpeEAszB, // 1
-	sizeof(U2), 		//gpeEAszW, // 2
-	sizeof(float), 		//gpeEAszL, // 4
-	sizeof(double), 	//gpeEAszQ, // 8
-	sizeof(float)*4, 	//gpeEAszX, // 16
-};
-
-static const char* gpasEAsz[] = {
-	".e",		//	0	0		00:00	size_t
-	".b",		//	1	1		00:00	byte
-	".w",		//	2	2		00:01	word
-	".l",		//	3	4		00:10	long
-	".q",		//	4	8		00:11	quad
-	".v",		//	5	16		01:00	vec
-};*/
 
 static gpeOPid gpaOPgrp[] = {
 	gpeOPid_nop,
@@ -548,8 +520,7 @@ static const char* gpas68k[] = {
 };
 
 /// TYP
-typedef enum gpeTYP:U4
-{
+typedef enum gpeTYP:U4 {
 	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 	/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 	gpeTYP_null,
