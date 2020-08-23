@@ -840,6 +840,102 @@ public:
 		return nMN();
 	}
 };
+
+class gpCLASS {
+public:
+	gpcLZY lzyOBJ;
+	gpCLASS(){ gpmCLR; };
+};
+
+class gpOBJ {
+public:
+	I4x2 d2D;
+	I4	oID, cID, sOF, iPC;
+	gpOBJ(){ gpmCLR; };
+};
+
+class gpROW{
+public:
+	I4	iBLK,	oID,
+		iMN,	cID,
+		iPC,	sOF;
+
+	gpeOPid opID;
+	gpROW(){};
+
+};
+
+class gpBLOCK {
+	I4 nR;
+public:
+	gpcLZY	lzyROW;
+	gpeOPid opID;
+
+	I4 nROW()
+	{
+		if( nR )
+			return nR;
+
+		return nR = lzyROW.nLD(sizeof(gpROW));
+	}
+	gpROW* pROWin( I4 r ) { return pROW( r < 1 ? 1:r ) }
+	gpROW* pROW( I4 r ) {
+		if( r < 0 )
+			return NULL;
+
+		if( nROW() <= r )
+			return NULL;
+
+		return ((gpROW*)gpmLZYvali( gpROW, &lzyROW )) + r;
+	}
+
+	gpROW* pROWadd( I4 iR, I4 oID ) {
+		gpROW* pR = (gpROW*)lzyBLK.Ux( iR, sizeof(*pR) );
+		if( !pR )
+			return NULL;
+		nR = 0;
+		return pR;
+	}
+	gpBLOCK(){ gpmCLR; };
+};
+class gpcLZYblk {
+public:
+	gpcLZY	lzyBLK;
+	I4		iB;
+
+	gpcLZYblk(){ gpmCLR; iB = 0; }
+	~gpcLZYblk()
+	{
+		gpBLOCK** ppB0 = gpmLZYvali( gpBLOCK*, &lzyBLK );
+		if( ppB0 )
+		for( I4 nBLK = lzyBLK.nLD(sizeof(*ppB0)), b = 0; b < nBLK; b++ )
+			gpmDEL( ppB0[b] );
+	}
+	gpBLOCK* pBLOCK(){
+		gpBLOCK** ppB = (gpBLOCK**)lzyBLOCK.lzyBLK.Ux( iB, sizeof(*ppB) );
+		if( !(*ppB) )
+		{
+			return (*ppB) = new gpBLOCK;
+		}
+		return (*ppB);
+	}
+};
+
+class gpMEM {
+public:
+	gpcLZY	lzyMEM,
+			lzyOBJ,
+			lzyCLASS;
+	I4		iSTK,nDAT,nINST;
+	gpMEM( I4 i = 0x2000 ){ gpmCLR; iSTK = nDAT = i; }
+	U1* iPC( U4 iPC, U4 n )
+	{
+		if( !this )
+			return NULL;
+		return Ux( iPC, n, true, 1 );
+	}
+};
+
 class gpcSRC {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
@@ -860,8 +956,97 @@ public:
 
 	gpcMAP	*pMAP;
 
-	gpcSCOOP aSCOOP[3];
-	gpCORE 	*pCORE;
+	gpcSCOOP 	aSCOOP[3];
+	gpCORE		*pCORE;
+
+	gpcLZYblk	lzyBLOCK;
+	gpMEM		*pMEM;
+
+	gpOBJ* srcOBJfnd( I4 id )
+	{
+		if( !pMEM )
+			return NULL;
+		gpOBJ* pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ );
+		if( !pO0 )
+			return NULL;
+        for( U4 nO = pMEM->lzyOBJ.nLD(sizeof(gpOBJ)), o = 0; o < nO; o++ )
+        {
+			if( pO0[o].oID != id )
+				continue;
+			return pO0+o;
+        }
+        return NULL;
+	}
+	gpOBJ* srcOBJadd( I4 id )
+	{
+		if( !pMEM )
+			pMEM = new gpMEM;
+		U4 nO = pMEM->lzyOBJ.nLD(sizeof(gpOBJ));
+		gpOBJ* pO = (gpOBJ*)pMEM->lzyOBJ.Ux( nO, sizeof(*pO) );
+		pO->oID = id;
+		return pO;
+	}
+	U1* srcMEMiPC( I4 iPC, U4 nU1 )
+	{
+		if( !pMEM )
+			pMEM = new gpMEM;
+		return pMEM->iPC( iPC, nU1 );
+	}
+
+	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 id, char* pSTR, U4 nSTR )
+	{
+		if( id > 0 )
+			id *= -1;
+
+		gpOBJ *pO = srcOBJfnd(id);
+		if( !pO )
+		{
+			pO = srcOBJadd(id);
+			if( !pO )
+				return NULL;
+
+			pO->cID = gpeCsz_b;
+			pO->d2D = I4x2( nSTR+1, 1 );
+			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
+			U1* pU1 = srcMEMiPC( pO->iPC = pMEM->nDAT, pO->sOF );
+			pMEM->nDAT += pO->sOF;
+			gpmMcpy( pU1, pSTR, nSTR )[nSTR] = 0;
+		}
+
+		if( pBLK )
+		switch( pBLK->opID )
+		{
+			case gpeOPid_stk:
+			case gpeOPid_newrow:{
+					I4 nR = pBLK->nROW();
+					gpROW* pROW = pBLK->pROWin( nR );
+					if( pROW )
+					{
+						pROW->oID = id;
+
+						pROW->opID =
+						pBLK->opID = gpeOPid_stk;
+					}
+					return pBLK;
+				} break;
+			default:{
+
+
+			} break;
+		}
+
+		pBLK = lzyBLOCK.pBLOCK();
+		gpROW* pROW = pBLK->pROW(1);
+		if( pROW )
+		{
+			pROW->oID = id;
+
+			pROW->opID =
+			pBLK->opID = gpeOPid_stk;
+		}
+		return pBLK;
+	}
+
 
 	U8 n_ld( U8 in ) {
 		if( !this )
@@ -1080,6 +1265,8 @@ public:
 	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 
 	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+
+	void 	srcCMPLR_tresh( gpcLZYdct& dOP, U1 iSCP );
 
 	//gpcRES* SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM = NULL );
     bool bSUB( gpcMASS& mass ) {

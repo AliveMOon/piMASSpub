@@ -541,8 +541,7 @@ enum gpeFD {
 
 #include "gpeALF.h"
 
-inline void* gpfMset( void* pD, size_t n, void* pS, size_t nS )
-{
+inline void* gpfMset( void* pD, size_t n, void* pS, size_t nS ) {
 	if( !n || !nS )
 		return pD;
 
@@ -572,8 +571,7 @@ inline void* gpfMset( void* pD, size_t n, void* pS, size_t nS )
 	return pD;
 }
 #define gpmMsetOF( d, n, s ) gpfMset((d), (n), (s), sizeof(*(s))  )
-int inline gpfACE( const char* p_file, I4 mode )
-{
+int inline gpfACE( const char* p_file, I4 mode ) {
 	//	00	Existence only
 	//	02	Write-only
 	//	04	Read-only
@@ -585,8 +583,7 @@ int inline gpfACE( const char* p_file, I4 mode )
 	return io;
 }
 #define gpmACE( p, m ) gpfACE( (char*)(p), (m) )
-bool inline gpfMKDR( char* p_buff, const char* p_new )
-{
+bool inline gpfMKDR( char* p_buff, const char* p_new ) {
 	if( p_new ? !*p_new : true )
 		return false;
 	int mi;
@@ -620,8 +617,7 @@ bool inline gpfMKDR( char* p_buff, const char* p_new )
 	}
 	return p_last == p_first;
 }
-inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
-{
+inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' ) {
 	char* pC = strrchr( (char*)pS, c );
 
 	if( !pC )
@@ -636,8 +632,7 @@ inline char* gpfP2F( char* p2P, char* p2F, const char* pS, char c = '/' )
 	return p2P;
 }
 
-inline U8 gp_memcmp( const void* pA, const void* pB, size_t n )
-{
+inline U8 gp_memcmp( const void* pA, const void* pB, size_t n ) {
 	if( !pA || !pB )
 		return 0;
 
@@ -4047,11 +4042,24 @@ public:
         {
             U4x4 af4x4[2];
         };
+        struct
+        {
+			I4 i,n,dct,typ,px,py,clr,res;
+        };
         /*struct
         {
 			U1x4 au1x4x4[8];
         };*/
     };
+	///-----------------------------------------
+	///
+	///				-= piMASS =-
+	///
+	///-----------------------------------------
+    gpeCLR MNclt() { return (gpeCLR)clr; }
+	gpeTYP MNtyp() { return (gpeTYP)typ; }
+
+
     I8x4(){};
     I8x4( I8 _x, I8 _y = 0, I8 _z = 0, I8 _w = 0 )
     {

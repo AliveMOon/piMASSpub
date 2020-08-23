@@ -107,7 +107,7 @@ gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID ) {
 	}
 	return NULL;
 }
-void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
+void gpcSRC::srcCMPLR_tresh( gpcLZYdct& dOP, U1 iSCP ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
