@@ -3975,6 +3975,8 @@ public:
 	gpeTYP cdrMILLnum( const char* pS, U4 nS );
 	gpeTYP cdrMILLalf( const char* pS, U4 nS );
 
+	gpeCsz gpCszNUM( const char* pS, U4 nS );
+	gpeCsz gpCszALF( const char* pS, U4 nS );
 	//U8
 	size_t an2str( void* p_b, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
 		if( !p_b )
@@ -4042,21 +4044,22 @@ public:
         {
             U4x4 af4x4[2];
         };
+        ///-----------------------------------------
+		///
+		///				-= piMASS cmplr =-
+		///
+		///-----------------------------------------
         struct
         {
-			I4 i,n,dct,typ,px,py,clr,res;
+			I4 i,n,dct,typ,px,py, clr,res;
         };
-        /*struct
-        {
-			U1x4 au1x4x4[8];
-        };*/
     };
 	///-----------------------------------------
 	///
-	///				-= piMASS =-
+	///				-= piMASS cmplr =-
 	///
 	///-----------------------------------------
-    gpeCLR MNclr() { return (gpeCLR)clr; }
+    gpeCLR MNclr() { return (gpeCLR)((U1x4)clr).B; }
 	gpeTYP MNtyp() { return (gpeTYP)typ; }
 
 
@@ -6381,7 +6384,7 @@ szasz:
         return p_alloc + i*stp; //*n;//+e-n*2;
 	}
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
-	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_0,
+	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_OFF,
 						gpeEA s0 = gpeEA_OFF, 	U1 sn = 0,	U1 si = 0,
 						gpeEA d0 = gpeEA_OFF,	U1 dn = 0,	U1 di = 0 ) {
 		I4x4 &ins = *(I4x4*)Ux( pc, sizeof(I4x4) );

@@ -52,3 +52,38 @@ gpeTYP I8x2::cdrMILLalf( const char* pS, U4 nS )
 	num = gpfSTR2I8( pSi, &pSe );
 	return (pSe > pSi) ? gpeTYP_sA8N : typ;
 }
+
+gpeCsz I8x2::gpCszNUM( const char* pS, U4 nS )
+{
+	if( !this )
+		return gpeCsz_OFF;
+	char* pSe = (char*)pS;
+	ux = gpfSTR2U8( pSe, &pSe );
+	if( *pSe != '.' )
+	if( ux > 0xFFff )
+		return ux > 0xFFFFffff ? gpeCsz_q : gpeCsz_l;
+	else
+		return ux > 0xFf ? gpeCsz_w : gpeCsz_b;
+
+	dx = (double)ux + gpmSTR2D( pSe );
+	double adx = dx < 0.0 ? -dx : dx;
+	if( (adx>(1024.0*1024.0)) || (adx<(1.0/1024.0)) )  // 2^23
+		return gpeCsz_d;
+
+	return gpeCsz_f;
+}
+gpeCsz I8x2::gpCszALF( const char* pS, U4 nS )
+{
+	if( !this )
+		return gpeCsz_OFF;
+
+	num = nS;
+	*this = pS;
+	char *pSi = (char*)pS+num, *pSe;
+	gpeCsz typ = alf ? gpeCsz_a:gpeCsz_OFF;
+	if( typ ? (num >= nS) : true )
+		return typ;
+
+	num = gpfSTR2I8( pSi, &pSe );
+	return (pSe > pSi) ? gpeCsz_c : typ;
+}

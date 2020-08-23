@@ -123,7 +123,7 @@ static const char* gpasCsz[] = {
 	".f",	//	c	4		11:00	float
 	".d",	//  d	8		11:01	double
 	".K",	//  e	16		11:10	KID
-	"",		//	e	16		11:11	OFF
+	".0",	//	f	0		11:11	OFF
 };
 typedef enum gpeCsz:U1{
 	gpeCsz_b,	//	0	1		00:00	byte
@@ -138,7 +138,7 @@ typedef enum gpeCsz:U1{
 	gpeCsz_ptr,	//  5   1->0	01:01	string
 										//	12345678901234
 	gpeCsz_a,	//	6	8		01:10	ABCDEFGHIJKLMN
-	gpeCsz_C,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
+	gpeCsz_c,	//  7	16		01:11   ABCDEF 0x00000000 // 2D koordináta?
 	/// előjeles
 	gpeCsz_B,	//	8	1		10:00	signed byte
 	gpeCsz_W,	//	9	2		10:01	signed word
@@ -147,8 +147,8 @@ typedef enum gpeCsz:U1{
 	/// lebegőpontos
 	gpeCsz_f,	//	c	4		11:00	float
 	gpeCsz_d,	//  d	8		11:01	double
-	gpeCsz_0,	//	e	16		11:10	ZRO
-	gpeCsz_K,	//  f	16		11:11	KID
+	gpeCsz_K,	//  e	16		11:10	KID
+	gpeCsz_OFF,	//	f	16		11:11	ZRO
 } gpeCsz_U1;
 static const U4 gpaCsz[] = {
 
@@ -171,8 +171,8 @@ static const U4 gpaCsz[] = {
 	/// lebegőpontos
 	4,	//".f",		//	c	11:00	float
 	8,	//".d",		//  d	11:01	double
-	0,	//".Z",		//  e	11:10	KID
-	4,	//".K",		//	f	11:11	OFF
+	4,	//".K",		//  e	11:10	KID
+	0,	//".0",		//	f	11:11	OFF
 };
 static const U8 gpaCszMX[] = {
 
@@ -196,7 +196,7 @@ static const U8 gpaCszMX[] = {
 	0x7fffFFFF,			//".f",	//	c	11:00	float
 	0x7fffFFFFffffFFFF,	//".d",	//  d	11:01	double
 	0x7fffFFFF,			//".K",	//  f	11:11	KID
-	0,					//".F",	//	e	11:10	OFF
+	0,					//".0",	//	e	11:10	OFF
 };
 
 

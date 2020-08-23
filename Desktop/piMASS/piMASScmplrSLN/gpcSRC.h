@@ -1050,6 +1050,120 @@ public:
 		return pBLK;
 	}
 
+	gpBLOCK* srcBLKaryAN( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN )
+	{
+		if( id > 0 )
+			id *= -1;
+
+		gpOBJ *pO = srcOBJfnd(id);
+		if( !pO )
+		{
+			pO = srcOBJadd(id);
+			if( !pO )
+				return NULL;
+
+			pO->cID = pcVAR[1];
+			pO->d2D = I4x2(1,1);
+			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
+			U1* pU1 = srcMEMiPC(
+									pO->iPC = pMEM->nDAT,
+									pO->sOF
+								);
+			pMEM->nDAT += pO->sOF;
+			gpmMcpy( pU1, &AN, pO->sOF );
+		}
+
+		if( pBLK )
+		switch( pBLK->opID )
+		{
+			case gpeOPid_stk:
+			case gpeOPid_newrow:{
+					I4 nR = pBLK->nROW();
+					gpROW* pROW = pBLK->pROWin( nR );
+					if( pROW )
+					{
+						pROW->oID = id;
+
+						pROW->opID =
+						pBLK->opID = gpeOPid_stk;
+					}
+					return pBLK;
+				} break;
+			default:{
+
+
+			} break;
+		}
+
+		pBLK = lzyBLOCK.pBLOCK();
+		gpROW* pROW = pBLK->pROW(1);
+		if( pROW )
+		{
+			pROW->oID = id;
+
+			pROW->opID =
+			pBLK->opID = gpeOPid_stk;
+		}
+		return pBLK;
+	}
+
+	gpBLOCK* srcBLKaryNUM( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN )
+	{
+		if( id > 0 )
+			id *= -1;
+
+		gpOBJ *pO = srcOBJfnd(id);
+		if( !pO )
+		{
+			pO = srcOBJadd(id);
+			if( !pO )
+				return NULL;
+
+			pO->cID = pcVAR[1];
+			pO->d2D = I4x2(1,1);
+			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
+			U1* pU1 = srcMEMiPC(
+									pO->iPC = pMEM->nDAT,
+									pO->sOF
+								);
+			pMEM->nDAT += pO->sOF;
+			gpmMcpy( pU1, &AN, pO->sOF );
+		}
+
+		if( pBLK )
+		switch( pBLK->opID )
+		{
+			case gpeOPid_stk:
+			case gpeOPid_newrow:{
+					I4 nR = pBLK->nROW();
+					gpROW* pROW = pBLK->pROWin( nR );
+					if( pROW )
+					{
+						pROW->oID = id;
+
+						pROW->opID =
+						pBLK->opID = gpeOPid_stk;
+					}
+					return pBLK;
+				} break;
+			default:{
+
+
+			} break;
+		}
+
+		pBLK = lzyBLOCK.pBLOCK();
+		gpROW* pROW = pBLK->pROW(1);
+		if( pROW )
+		{
+			pROW->oID = id;
+
+			pROW->opID =
+			pBLK->opID = gpeOPid_stk;
+		}
+		return pBLK;
+	}
+
 
 	U8 n_ld( U8 in ) {
 		if( !this )

@@ -537,7 +537,7 @@ public:
 			{
 				// felszabadítjuk az object hejét is
 				pOi->oID = -1;
-				pOi->cID = gpeCsz_0;
+				pOi->cID = gpeCsz_OFF;
 
 				// végére teszem
 				pOi = (gpO*)oLST.Ux( iO, sizeof(gpO) );
@@ -575,7 +575,7 @@ public:
 				// felszabadítjuk az object hejét is
 				/// ide kell majd egy realloc
 				pOi->oID = -1;
-				pOi->cID = gpeCsz_0;
+				pOi->cID = gpeCsz_OFF;
 
 				// végére teszem
 				pOi = (gpO*)oLST.Ux( iO, sizeof(gpO) );
