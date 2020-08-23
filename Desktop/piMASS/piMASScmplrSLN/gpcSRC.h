@@ -992,9 +992,17 @@ public:
 			pMEM = new gpMEM;
 		return pMEM->iPC( iPC, nU1 );
 	}
-
-	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 id, U1* pSTR, U4 nSTR )
+	gpBLOCK* srcBLKstk( gpBLOCK* pBLK, gpeOPid opID )
 	{
+		///kEND(scp);
+		if( pBLK )
+		{
+
+		}
+
+		return pBLK;
+	}
+	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 id, U1* pSTR, U4 nSTR ) {
 		if( id > 0 )
 			id *= -1;
 
@@ -1049,12 +1057,7 @@ public:
 		}
 		return pBLK;
 	}
-
-	gpBLOCK* srcBLKaryAN( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN )
-	{
-		if( id > 0 )
-			id *= -1;
-
+	gpBLOCK* srcBLKaryAN( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN ) {
 		gpOBJ *pO = srcOBJfnd(id);
 		if( !pO )
 		{
@@ -1106,12 +1109,7 @@ public:
 		}
 		return pBLK;
 	}
-
-	gpBLOCK* srcBLKaryNUM( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN )
-	{
-		if( id > 0 )
-			id *= -1;
-
+	gpBLOCK* srcBLKaryNUM( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN ) {
 		gpOBJ *pO = srcOBJfnd(id);
 		if( !pO )
 		{
@@ -1163,7 +1161,88 @@ public:
 		}
 		return pBLK;
 	}
+	gpBLOCK* srcBLKmov( gpBLOCK* pBLK, gpeOPid opID ) {
+		///kMOV(scp); //, iOPe ); // Ai--; // Ai--; //
+		///kOBJ(scp); //, iOPe );
+		///++SP;
+		///*pSTRT = now;
+		if( pBLK )
+		{
 
+		}
+
+		return pBLK;
+	}
+	gpBLOCK* srcBLKadd( gpBLOCK* pBLK, gpeOPid opID ) {
+		///kOBJ(scp); //, iOPe );
+		// a =b*c +d		// iMUL 1
+		// a =b*c/d +e		// iMUL 2
+		// a +=b*c/d +e		// iMUL 3
+		// a +b*c +e		// iMUL 1
+		// a*b +b*c			// iMUL 1
+		///kMUL(scp,false);
+		///LEVaddEXP()[lADD++] = now;
+		///++SP;
+		if( pBLK )
+		{
+
+		}
+
+		return pBLK;
+	}
+	gpBLOCK* srcBLKmul( gpBLOCK* pBLK, gpeOPid opID ) {
+		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
+		//   -1-^
+		// a =b+c +d*e  // iADD 2 // de nem adtam hozzá még a d-t
+		//   -2-1-^
+		// d*e +f*g		// iADD 1
+		//-2-1-^
+		// d*e +f -g*h	// iADD 2
+		//-3-2 -1-^
+		///kADD(scp); //, iOPe );
+		///kOBJ(scp); //, iOPe );
+		///LEVmulEXP()[lMUL++] = now;
+		///++SP;
+		///++stkCD;
+		if( pBLK )
+		{
+
+		}
+
+		return pBLK;
+	}
+	gpBLOCK* srcBLKentry( gpBLOCK* pBLK, gpeOPid opID ) {
+		///switch( now )
+		///{
+		///	case gpeOPid_dot:
+		///		break;
+		///	case gpeOPid_brakS:
+		///	default:
+		///		LEVup(scp);
+		///		break;
+		///}
+		///++SP;
+		///++stkCD;
+		if( pBLK )
+		{
+
+		}
+
+		return pBLK;
+	}
+	gpBLOCK* srcBLKout( gpBLOCK* pBLK, gpeOPid opID ) {
+		/// ITT MÉG FENT
+		///LEVdwn(scp,now);
+		/// ITT MÁR LENT
+		///++SP;
+		///++stkCD;
+		if( pBLK )
+		{
+
+		}
+
+		return pBLK;
+	}
 
 	U8 n_ld( U8 in ) {
 		if( !this )

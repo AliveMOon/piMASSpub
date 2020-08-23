@@ -6492,7 +6492,7 @@ public:
 		return this;
 	}
 
-	U4 dctMILLfnd( U1* pS, U8 nS, U4& nIX ) {
+	U4 dctMILLfnd( const void* pS, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;
@@ -6504,11 +6504,11 @@ public:
 		// bemásolja a str szótárba
 		/// ebböl kéne akor csinálni egy olyat
 		/// ami ki szedi a '_#' jeleket
-		U1* pH = pS;
+		U1* pH = (U1*)pS, *pSS = pH;
 		U8 nH = nS;
 		str.lzyADD( pH, nH+1, aSTRT[0] = -1 );
 		U1* pS0 = str.p_alloc;
-		pS = pS0+aSTRT[0];
+		pSS = pS0+aSTRT[0];
 		nS = 0;
 		for( U8 h = 0; h < nH; h++ ) {
 			switch( pH[h] )
@@ -6519,11 +6519,11 @@ public:
 				default:
 					break;
 			}
-			pS[nS]=pH[h];
+			pSS[nS]=pH[h];
 			nS++;
 		}
-		if( pS[nS] )
-			pS[nS] = 0;
+		if( pSS[nS] )
+			pSS[nS] = 0;
 		str.n_load = aSTRT[0]+nS+1;
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );

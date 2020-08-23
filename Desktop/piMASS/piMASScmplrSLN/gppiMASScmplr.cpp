@@ -15,6 +15,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	I4 nSTR, nS, iDCT;
 	gpBLOCK* pBLOCK = NULL;
 	I8x2 AN; gpeCsz acID[2] = {gpeCsz_OFF};
+	gpeOPid opID;
 	for( U4 nM = gpmSCP.nMN(), mID = 0, l; mID < nM; mID++ )
 	{
 		if( pM0[mID].MNclr() == gpeCLR_red2 )
@@ -58,9 +59,64 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 					continue;
 				pBLOCK = srcBLKaryNUM( pBLOCK, iDCT, acID, AN );
 				break;
-			case gpeCLR_green2: ///OPER
+			case gpeCLR_green2: { ///OPER
+					U1* pSs = (U1*)pS, *pSe = pSs+nS;
+					U4 nOx;
+					while( pSs < pSe )
+					{
+						opID = (gpeOPid)dOP.dctMILLfnd( pSs, pSe-pSs, nOx = (U4)gpeOPid_jsr );
+						pSs += dOP.nSTRix(opID);
+						switch( opID )
+						{
+							case gpeOPid_brakS:
+							case gpeOPid_dimS:
+							case gpeOPid_begin:
+								/// LENT
 
-				break;
+								/// FENT
+								break;
+							case gpeOPid_end:
+							case gpeOPid_dimE:
+							case gpeOPid_brakE:
+								/// FENT
+
+								/// LENT
+								break;
+
+                            default:
+								switch( gpaOPgrp[opID] )
+								{
+									case gpeOPid_mov: /// =
+										pBLOCK = srcBLKmov( pBLOCK, opID );
+										break;
+									case gpeOPid_add: /// +
+									case gpeOPid_sub: /// ==
+										pBLOCK = srcBLKadd( pBLOCK, opID );
+										break;
+									case gpeOPid_mul: /// *
+										pBLOCK = srcBLKmul( pBLOCK, opID );
+
+
+										break;
+
+									case gpeOPid_entry: { /// (
+										pBLOCK = srcBLKentry( pBLOCK, opID );
+
+										} break;
+									case gpeOPid_out: /// )
+										pBLOCK = srcBLKout( pBLOCK, opID );
+
+										break;
+									case gpeOPid_stk: /// ,
+										pBLOCK = srcBLKstk( pBLOCK, opID );
+										break;
+								}
+						}
+
+						break;
+					}
+
+				} break;
 			case gpeCLR_red2:	///BREAK
 				break;
 
