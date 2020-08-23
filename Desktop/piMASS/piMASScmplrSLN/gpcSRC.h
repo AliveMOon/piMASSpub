@@ -878,7 +878,7 @@ public:
 
 		return nR = lzyROW.nLD(sizeof(gpROW));
 	}
-	gpROW* pROWin( I4 r ) { return pROW( r < 1 ? 1:r ) }
+	gpROW* pROWin( I4 r ) { return pROW( r < 1 ? 1:r ); }
 	gpROW* pROW( I4 r ) {
 		if( r < 0 )
 			return NULL;
@@ -890,7 +890,7 @@ public:
 	}
 
 	gpROW* pROWadd( I4 iR, I4 oID ) {
-		gpROW* pR = (gpROW*)lzyBLK.Ux( iR, sizeof(*pR) );
+		gpROW* pR = (gpROW*)lzyROW.Ux( iR, sizeof(*pR) );
 		if( !pR )
 			return NULL;
 		nR = 0;
@@ -912,7 +912,7 @@ public:
 			gpmDEL( ppB0[b] );
 	}
 	gpBLOCK* pBLOCK(){
-		gpBLOCK** ppB = (gpBLOCK**)lzyBLOCK.lzyBLK.Ux( iB, sizeof(*ppB) );
+		gpBLOCK** ppB = (gpBLOCK**)lzyBLK.Ux( iB, sizeof(*ppB) );
 		if( !(*ppB) )
 		{
 			return (*ppB) = new gpBLOCK;
@@ -932,7 +932,7 @@ public:
 	{
 		if( !this )
 			return NULL;
-		return Ux( iPC, n, true, 1 );
+		return lzyMEM.Ux( iPC, n, true, 1 );
 	}
 };
 
@@ -993,7 +993,7 @@ public:
 		return pMEM->iPC( iPC, nU1 );
 	}
 
-	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 id, char* pSTR, U4 nSTR )
+	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 id, U1* pSTR, U4 nSTR )
 	{
 		if( id > 0 )
 			id *= -1;
@@ -1008,7 +1008,10 @@ public:
 			pO->cID = gpeCsz_b;
 			pO->d2D = I4x2( nSTR+1, 1 );
 			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
-			U1* pU1 = srcMEMiPC( pO->iPC = pMEM->nDAT, pO->sOF );
+			U1* pU1 = srcMEMiPC(
+									pO->iPC = pMEM->nDAT,
+									pO->sOF
+								);
 			pMEM->nDAT += pO->sOF;
 			gpmMcpy( pU1, pSTR, nSTR )[nSTR] = 0;
 		}

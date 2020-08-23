@@ -4056,7 +4056,7 @@ public:
 	///				-= piMASS =-
 	///
 	///-----------------------------------------
-    gpeCLR MNclt() { return (gpeCLR)clr; }
+    gpeCLR MNclr() { return (gpeCLR)clr; }
 	gpeTYP MNtyp() { return (gpeTYP)typ; }
 
 
