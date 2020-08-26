@@ -107,7 +107,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 										pBLOCK = srcBLKout( pBLOCK, opID );
 
 										break;
-									case gpeOPid_stk: /// ,
+									case gpeOPid_stk: /// , ;
 										pBLOCK = srcBLKstk( pBLOCK, opID );
 										break;
 								}

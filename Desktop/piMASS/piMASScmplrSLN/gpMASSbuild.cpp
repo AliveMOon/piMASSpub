@@ -80,8 +80,7 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
 }
 U1		gpsSTRpub[0x10000];
 char 	gpsHD[0x1000], *psHD;
-void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub )
-{
+void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub ) {
 	if( !this )
 		return;
 
@@ -291,9 +290,7 @@ void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub )
 		std::cout << gpsHD;
 	std::cout << "." ;
 }
-
-gpcLZYdct* gpcMASS::pOPER()
-{
+gpcLZYdct* gpcMASS::pOPER() {
 	if(!this)
 		return NULL;
 	if( OPER.nIX() )
