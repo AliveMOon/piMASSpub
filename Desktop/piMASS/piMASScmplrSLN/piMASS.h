@@ -4049,9 +4049,9 @@ public:
 		///				-= piMASS cmplr =-
 		///
 		///-----------------------------------------
-        struct
+        struct /// src/mn/dct
         {
-			I4 i,n,dct,typ,px,py, clr,res;
+			I4 iS,nS,dctID,typ,px,py, clr,res;
         };
     };
 	///-----------------------------------------

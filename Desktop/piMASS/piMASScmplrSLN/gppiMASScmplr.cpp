@@ -10,36 +10,36 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	I8x4 *pM0 = gpmSCP.pMN(), M, Mnx;
 	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];
 	gpeCLR clr;
-	char		*pSTR;
+	char		*pS;
 	const char	*psDCT;
-	I4 nSTR, nsDCT, iDCT;
+	I4 nS, nsDCT; //, dctID;
 	gpBLOCK* pBLOCK = NULL;
 	I8x2 AN; gpeCsz acID[2] = {gpeCsz_OFF};
 	gpeOPid opID;
-	for( U4 nM = gpmSCP.nMN(), mID = 0, l; mID < nM; mID++ )
+	for( U4 nM = gpmSCP.nMN(), mnID = 0, l; mnID < nM; mnID++ )
 	{
-		if( pM0[mID].MNclr() == gpeCLR_red2 )
+		if( pM0[mnID].MNclr() == gpeCLR_red2 )
 			continue;
 
-		M = pM0[mID];
-		pSTR = (nSTR=M.n) ? (char*)gpmSCP.p_str+M.i : NULL;
+		M = pM0[mnID];
+		pS = (nS=M.nS) ? (char*)gpmSCP.p_str+M.iS : NULL;
 		if( M.MNtyp() == gpeTYP_STR )
 		{
 			if( M.MNclr() != gpeCLR_violet )
 				continue;
 			///STR
-			pBLOCK = srcBLKarySTR( pBLOCK, mID, pSTR, nSTR );
+			pBLOCK = srcBLKarySTR( pBLOCK, mnID, pS, nS );
 			continue;
 		}
 
 
-		U4x4& lnk = pL0[iDCT=M.dct];
+		U4x4& lnk = pL0[M.dctID];
 		if( !lnk.y )
 		{
-			psDCT = gpmSCP.lzyDCT.sSTRix(iDCT, NULL);
+			psDCT = gpmSCP.lzyDCT.sSTRix(M.dctID, NULL);
 			if( !psDCT )
 				continue;
-			nsDCT = gpmSCP.lzyDCT.nSTRix(iDCT);
+			nsDCT = gpmSCP.lzyDCT.nSTRix(M.dctID);
 			if( !nsDCT )
 				continue;
 		}
@@ -50,13 +50,13 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 				acID[1] = AN.gpCszALF(psDCT,nsDCT);
 				if( acID[1] == gpeCsz_OFF )
 					continue;
-				pBLOCK = srcBLKaryAN( pSTR, pBLOCK, iDCT, acID, AN );
+				pBLOCK = srcBLKaryAN( pS, pBLOCK, M.dctID, lnk.x, acID, AN );
 				break;
 			case gpeCLR_orange:	///NUM
 				acID[1] = AN.gpCszNUM(psDCT,nsDCT);
 				if( acID[1] == gpeCsz_OFF )
 					continue;
-				pBLOCK = srcBLKaryNUM( pSTR, pBLOCK, iDCT, acID, AN );
+				pBLOCK = srcBLKaryNUM( pS, pBLOCK, M.dctID, lnk.x, acID, AN );
 				break;
 			case gpeCLR_green2: { ///OPER
 					U1* pSs = (U1*)psDCT, *pSe = pSs+nsDCT;
@@ -86,26 +86,26 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 								switch( gpaOPgrp[opID] )
 								{
 									case gpeOPid_mov: /// =
-										pBLOCK = srcBLKmov( pSTR, pBLOCK, opID );
+										pBLOCK = srcBLKmov( pS, pBLOCK, opID );
 										break;
 									case gpeOPid_add: /// +
 									case gpeOPid_sub: /// ==
-										pBLOCK = srcBLKadd( pSTR, pBLOCK, opID );
+										pBLOCK = srcBLKadd( pS, pBLOCK, opID );
 										break;
 									case gpeOPid_mul: /// *
-										pBLOCK = srcBLKmul( pSTR, pBLOCK, opID );
+										pBLOCK = srcBLKmul( pS, pBLOCK, opID );
 										break;
 
 									case gpeOPid_entry: { /// (
-										pBLOCK = srcBLKentry( pSTR, pBLOCK, opID );
+										pBLOCK = srcBLKent( pS, pBLOCK, opID );
 
 										} break;
 									case gpeOPid_out: /// )
-										pBLOCK = srcBLKout( pSTR, pBLOCK, opID );
+										pBLOCK = srcBLKout( pS, pBLOCK, opID );
 
 										break;
 									case gpeOPid_stk: /// , ;
-										pBLOCK = srcBLKstk( pSTR, pBLOCK, opID );
+										pBLOCK = srcBLKstk( pS, pBLOCK, opID );
 										break;
 								}
 						}
