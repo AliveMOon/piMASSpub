@@ -1036,8 +1036,20 @@ public:
 			pMEM = new gpMEM;
 		return pMEM->iPC( iPC, nU1 );
 	}
+	gpBLOCK* srcBLKup( char* pS, gpBLOCK* pBMom )
+	{
+		gpROW	*apRL[2];
+		apRL[0] = pBMom->pLAST();
 
-	gpBLOCK* srcBLKnew( I4 oID, I4 bIDmom, I4 iL  ) {
+		gpBLOCK* pBkid = srcBLKnew( pS, apRL[0]->oID, pBMom->bID, pBMom->iLAST() );
+		apRL[1] = pBkid->pLAST();
+
+		apRL[0]->oID = gpeOPid_stk;
+		apRL[0]->bID = pBMom->bID;
+		apRL[0]->bIDr = pBMom->iLAST();
+		return pBkid;
+	}
+	gpBLOCK* srcBLKnew( char* pS, I4 oID, I4 bIDmom, I4 iL  ) {
 		gpBLOCK	*pBLK = lzyBLOCK.pSTPup( -2, bIDmom, iL );
 		gpROW	*pROW = pBLK->pROW(0,true);
 		if( pROW )
@@ -1049,7 +1061,7 @@ public:
 		}
 		return pBLK;
 	}
-	gpBLOCK* srcBLKstk( gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKstk( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kEND(scp);
 
 		gpROW	*pRm = pBLK->pROW();
@@ -1097,7 +1109,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 id, U1* pSTR, U4 nSTR ) {
+	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 id, char* pS, U4 nSTR ) {
 		if( id > 0 )
 			id *= -1;
 
@@ -1113,15 +1125,15 @@ public:
 			pO->d2D = I4x2( nSTR+1, 1 );
 			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
 			pU1 = srcMEMiPC(
-									pO->iPC = pMEM->nDAT,
-									pO->sOF
-								);
+								pO->iPC = pMEM->nDAT,
+								pO->sOF
+							);
 			pMEM->nDAT += pO->sOF;
-			gpmMcpy( pU1, pSTR, nSTR )[nSTR] = 0;
+			gpmMcpy( pU1, pS, nSTR )[nSTR] = 0;
 		}
 
 		if( !pBLK )
-			return srcBLKnew( id, -1, -1 );
+			return srcBLKnew( pS, id, -1, -1 );
 
 		switch( pBLK->opID )
 		{
@@ -1145,7 +1157,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKaryAN( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN ) {
+	gpBLOCK* srcBLKaryAN( char* pS, gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN ) {
 		gpOBJ *pO = srcOBJfnd(id);
 		U1* pU1 = NULL;
 		if( !pO )
@@ -1166,7 +1178,7 @@ public:
 		}
 
 		if( !pBLK )
-			return srcBLKnew( id, -1, -1 );
+			return srcBLKnew( pS, id, -1, -1 );
 
 		switch( gpaOPgrp[pBLK->opID] )
 		{
@@ -1187,7 +1199,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKaryNUM( gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN ) {
+	gpBLOCK* srcBLKaryNUM( char* pS, gpBLOCK* pBLK, I4 id, gpeCsz* pcVAR, const I8x2& AN ) {
 		gpOBJ *pO = srcOBJfnd(id);
 		U1* pU1 = NULL;
 		if( !pO )
@@ -1208,7 +1220,7 @@ public:
 		}
 
 		if( !pBLK )
-			return srcBLKnew( id, -1, -1 );
+			return srcBLKnew( pS, id, -1, -1 );
 
 		switch( gpaOPgrp[pBLK->opID] )
 		{
@@ -1229,20 +1241,8 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKup( gpBLOCK* pBMom )
-	{
-		gpROW	*apRL[2];
-		apRL[0] = pBMom->pLAST();
 
-		gpBLOCK* pBkid = srcBLKnew( apRL[0]->oID, pBMom->bID, pBMom->iLAST() );
-		apRL[1] = pBkid->pLAST();
-
-		apRL[0]->oID = gpeOPid_stk;
-		apRL[0]->bID = pBMom->bID;
-		apRL[0]->bIDr = pBMom->iLAST();
-		return pBkid;
-	}
-	gpBLOCK* srcBLKmov( gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKmov( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kMOV(scp); //, iOPe ); // Ai--; // Ai--; //
 		///kOBJ(scp); //, iOPe );
 		///++SP;
@@ -1265,14 +1265,14 @@ public:
 			// azaz ki kell emelni a b=-t új block-ba
 			/// UP b =
 			gpBLOCK* pBMom = pBLK;
-			pBLK = srcBLKup( pBMom );
+			pBLK = srcBLKup( pS, pBMom );
 
 		}
 
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKadd( gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKadd( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kOBJ(scp); //, iOPe );
 		// a =b*c +d		// iMUL 1
 		// a =b*c/d +e		// iMUL 2
@@ -1289,7 +1289,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKmul( gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKmul( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^
 		// a =b+c +d*e  // iADD 2 // de nem adtam hozzá még a d-t
@@ -1310,7 +1310,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKentry( gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKentry( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
 		///switch( now )
 		///{
 		///	case gpeOPid_dot:
@@ -1329,7 +1329,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKout( gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKout( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
 		/// ITT MÉG FENT
 		///LEVdwn(scp,now);
 		/// ITT MÁR LENT
