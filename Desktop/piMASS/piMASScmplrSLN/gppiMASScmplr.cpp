@@ -11,8 +11,8 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];
 	gpeCLR clr;
 	char		*pSTR;
-	const char	*pS;
-	I4 nSTR, nS, iDCT;
+	const char	*psDCT;
+	I4 nSTR, nsDCT, iDCT;
 	gpBLOCK* pBLOCK = NULL;
 	I8x2 AN; gpeCsz acID[2] = {gpeCsz_OFF};
 	gpeOPid opID;
@@ -36,30 +36,30 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 		U4x4& lnk = pL0[iDCT=M.dct];
 		if( !lnk.y )
 		{
-			pS = gpmSCP.lzyDCT.sSTRix(iDCT, NULL);
-			if( !pS )
+			psDCT = gpmSCP.lzyDCT.sSTRix(iDCT, NULL);
+			if( !psDCT )
 				continue;
-			nS = gpmSCP.lzyDCT.nSTRix(iDCT);
-			if( !nS )
+			nsDCT = gpmSCP.lzyDCT.nSTRix(iDCT);
+			if( !nsDCT )
 				continue;
 		}
 
 		switch( M.MNclr() )
 		{
 			case gpeCLR_blue2: 	///ABC
-				acID[1] = AN.gpCszALF(pS,nS);
+				acID[1] = AN.gpCszALF(psDCT,nsDCT);
 				if( acID[1] == gpeCsz_OFF )
 					continue;
 				pBLOCK = srcBLKaryAN( pSTR, pBLOCK, iDCT, acID, AN );
 				break;
 			case gpeCLR_orange:	///NUM
-				acID[1] = AN.gpCszNUM(pS,nS);
+				acID[1] = AN.gpCszNUM(psDCT,nsDCT);
 				if( acID[1] == gpeCsz_OFF )
 					continue;
 				pBLOCK = srcBLKaryNUM( pSTR, pBLOCK, iDCT, acID, AN );
 				break;
 			case gpeCLR_green2: { ///OPER
-					U1* pSs = (U1*)pS, *pSe = pSs+nS;
+					U1* pSs = (U1*)psDCT, *pSe = pSs+nsDCT;
 					U4 nOx;
 					while( pSs < pSe )
 					{
@@ -94,8 +94,6 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 										break;
 									case gpeOPid_mul: /// *
 										pBLOCK = srcBLKmul( pSTR, pBLOCK, opID );
-
-
 										break;
 
 									case gpeOPid_entry: { /// (
