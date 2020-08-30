@@ -1071,7 +1071,7 @@ public:
 		}
 		return pBLK;
 	}
-	gpBLOCK* srcBLKstk( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kEND(scp);
 
 		gpROW	*pRm = pBLK->pROW();
@@ -1119,32 +1119,43 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 mnID, char* pS, U4 nSTR ) {
+	gpOBJ* srcOBJmn( char* pS, I4 mnID, gpeCsz cID, I4x2 d2D )
+	{
 		I4 dctID = mnID;
 		if( dctID > 0 )
 			dctID *= -1;
 
-		gpOBJ *pO = srcOBJfnd(dctID);
-		U1* pU1 = NULL;
-		if( !pO )
-		{
-			pO = srcOBJadd(dctID);
-			if( !pO )
-				return NULL;
+		gpOBJ* pO = srcOBJfnd(dctID);
+		if( pO )
+			return pO;
 
-			pO->cID = gpeCsz_b;
-			pO->d2D.x = nSTR+1;
-			//pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
-			pU1 = srcMEMiPC(
-								pO->iPC = pMEM->nDAT,
-								pO->sOF()
-							);
-			pMEM->nDAT += pO->sOF();
-			gpmMcpy( pU1, pS, nSTR )[nSTR] = 0;
-		}
+		U1* pU1 = NULL;
+		pO = srcOBJadd(dctID);
+		if( !pO )
+			return NULL;
+
+		pO->cID = cID;
+		pO->d2D = d2D;
+		pU1 = srcMEMiPC(
+							pO->iPC = pMEM->nDAT,
+							pO->sOF()
+						);
+		pMEM->nDAT += pO->sOF();
+		gpmZn( pU1, pO->sOF() );
+
+		return pO;
+	}
+	gpBLOCK* srcBLKarySTR( gpBLOCK* pBLK, I4 mnID, char* pS, U4 nS ) {
+
+		gpOBJ* pO = srcOBJmn( pS, mnID, gpeCsz_b, I4x2(nS+1,1) );
+		if( !pO )
+			return NULL;
+
+		U1* pU1 = srcMEMiPC( pO->iPC, pO->sOF() );
+		gpmMcpy( pU1, pS, nS )[nS] = 0;
 
 		if( !pBLK )
-			return srcBLKnew( pS, dctID, mnID, -1, -1 );
+			return srcBLKnew( pS, pO->dctID, mnID, -1, -1 );
 
 		switch( pBLK->opID )
 		{
@@ -1153,7 +1164,7 @@ public:
 					gpROW* pROW = pBLK->pROW( pBLK->nROW(), true );
 					if( pROW )
 					{
-						pROW->mNdID = dctID;
+						pROW->mNdID = pO->dctID;
 						pROW->mnID = mnID;
 
 						pROW->pstOP =
@@ -1255,37 +1266,42 @@ public:
 		return pBLK;
 	}
 
-	gpBLOCK* srcBLKmov( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKmov( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kMOV(scp); //, iOPe ); // Ai--; // Ai--; //
 		///kOBJ(scp); //, iOPe );
 		///++SP;
 		///*pSTRT = now;
-		U4 nR = pBLK->nROW(), iI = pBLK->iIN();
-		if( nR && !iI )
+		U4	nR = pBLK->nROW();
+		if( !nR )
 		{
-			//már van benne valami cucc, de nem volt OUT
-			gpROW	*pR0 = pBLK->pROW( 0 ),
-					*pRL = pBLK->pLAST();
-			pRL->pstOP = opID;
-			if( nR == 1 )
-			{
-				/// a =
-				pBLK->setIN( 1 );
-				return pBLK;
-			}
+			///  = ..... azaz nincsen semmi az = elött
+			gpOBJ* pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
+			if( !pBLK )
+				pBLK = srcBLKnew( pS, pO->dctID, mnID,-1,-1 );
 
-			/// a, b =
-			// azaz ki kell emelni a b=-t új block-ba
-			/// UP b =
-			gpBLOCK* pBMom = pBLK;
-			pBLK = srcBLKup( pS, pBMom );
+			gpROW* pR0 = pBLK->pROW( 0, true );
+			if( pR0 )
+			{
+				pR0->mNdID = pO->dctID;
+				pR0->mnID = mnID;
+				pR0->pstOP = gpeOPid_stk;
+			}
 
 		}
 
+		gpROW	*pR0 = pBLK->pROW( 0 ),
+				*pRL = pBLK->pLAST();
+		pRL->pstOP = opID;
+
+		/// a, b =
+		// azaz ki kell emelni a b=-t új block-ba
+		/// UP b =
+		gpBLOCK* pBMom = pBLK;
+		pBLK = srcBLKup( pS, pBMom );
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKadd( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKadd( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kOBJ(scp); //, iOPe );
 		// a =b*c +d		// iMUL 1
 		// a =b*c/d +e		// iMUL 2
@@ -1302,7 +1318,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKmul( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKmul( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^
 		// a =b+c +d*e  // iADD 2 // de nem adtam hozzá még a d-t
@@ -1323,7 +1339,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKent( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///switch( now )
 		///{
 		///	case gpeOPid_dot:
@@ -1342,7 +1358,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKout( char* pS, gpBLOCK* pBLK, gpeOPid opID ) {
+	gpBLOCK* srcBLKout( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		/// ITT MÉG FENT
 		///LEVdwn(scp,now);
 		/// ITT MÁR LENT

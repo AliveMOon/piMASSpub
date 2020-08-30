@@ -86,26 +86,26 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 								switch( gpaOPgrp[opID] )
 								{
 									case gpeOPid_mov: /// =
-										pBLOCK = srcBLKmov( pS, pBLOCK, opID );
+										pBLOCK = srcBLKmov( pS, mnID, pBLOCK, opID );
 										break;
 									case gpeOPid_add: /// +
 									case gpeOPid_sub: /// ==
-										pBLOCK = srcBLKadd( pS, pBLOCK, opID );
+										pBLOCK = srcBLKadd( pS, mnID, pBLOCK, opID );
 										break;
 									case gpeOPid_mul: /// *
-										pBLOCK = srcBLKmul( pS, pBLOCK, opID );
+										pBLOCK = srcBLKmul( pS, mnID, pBLOCK, opID );
 										break;
 
 									case gpeOPid_entry: { /// (
-										pBLOCK = srcBLKent( pS, pBLOCK, opID );
+										pBLOCK = srcBLKent( pS, mnID, pBLOCK, opID );
 
 										} break;
 									case gpeOPid_out: /// )
-										pBLOCK = srcBLKout( pS, pBLOCK, opID );
+										pBLOCK = srcBLKout( pS, mnID, pBLOCK, opID );
 
 										break;
 									case gpeOPid_stk: /// , ;
-										pBLOCK = srcBLKstk( pS, pBLOCK, opID );
+										pBLOCK = srcBLKstk( pS, mnID, pBLOCK, opID );
 										break;
 								}
 						}
