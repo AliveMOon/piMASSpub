@@ -848,10 +848,18 @@ public:
 };
 
 class gpOBJ {
+	I4	sof;
 public:
 	I4x2 d2D;
-	I4	dctID, cID, sOF, iPC;
+	I4	dctID, cID, iPC;
 	gpOBJ(){ gpmCLR; };
+	U4 sOF()
+	{
+		if( sof )
+			return sof;
+		sof = d2D.area();
+		return sof *= gpaCsz[cID];
+	}
 };
 
 class gpROW{
@@ -1028,6 +1036,7 @@ public:
 		U4 nO = pMEM->lzyOBJ.nLD(sizeof(gpOBJ));
 		gpOBJ* pO = (gpOBJ*)pMEM->lzyOBJ.Ux( nO, sizeof(*pO) );
 		pO->dctID = dctID;
+		pO->d2D = I4x2(1,1);
 		return pO;
 	}
 	U1* srcMEMiPC( I4 iPC, U4 nU1 )
@@ -1124,13 +1133,13 @@ public:
 				return NULL;
 
 			pO->cID = gpeCsz_b;
-			pO->d2D = I4x2( nSTR+1, 1 );
-			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
+			pO->d2D.x = nSTR+1;
+			//pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
 			pU1 = srcMEMiPC(
 								pO->iPC = pMEM->nDAT,
-								pO->sOF
+								pO->sOF()
 							);
-			pMEM->nDAT += pO->sOF;
+			pMEM->nDAT += pO->sOF();
 			gpmMcpy( pU1, pS, nSTR )[nSTR] = 0;
 		}
 
@@ -1170,14 +1179,14 @@ public:
 				return NULL;
 
 			pO->cID = pcVAR[1];
-			pO->d2D = I4x2(1,1);
-			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
+			//pO->d2D = I4x2(1,1);
+			//pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
 			pU1 = srcMEMiPC(
 								pO->iPC = pMEM->nDAT,
-								pO->sOF
+								pO->sOF()
 							);
-			pMEM->nDAT += pO->sOF;
-			gpmMcpy( pU1, &AN, pO->sOF );
+			pMEM->nDAT += pO->sOF();
+			gpmMcpy( pU1, &AN, pO->sOF() );
 		}
 
 		if( !pBLK )
@@ -1213,14 +1222,14 @@ public:
 				return NULL;
 
 			pO->cID = pcVAR[1];
-			pO->d2D = I4x2(1,1);
-			pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
+			//pO->d2D = I4x2(1,1);
+			//pO->sOF = pO->d2D.area()*gpaCsz[pO->cID];
 			pU1 = srcMEMiPC(
 								pO->iPC = pMEM->nDAT,
-								pO->sOF
+								pO->sOF()
 							);
-			pMEM->nDAT += pO->sOF;
-			gpmMcpy( pU1, &AN, pO->sOF );
+			pMEM->nDAT += pO->sOF();
+			gpmMcpy( pU1, &AN, pO->sOF() );
 		}
 
 		if( !pBLK )
