@@ -13,7 +13,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	char		*pS;
 	const char	*psDCT;
 	I4 nS, nsDCT; //, dctID;
-	gpBLOCK* pBLOCK = NULL;
+	gpBLOCK* pBLK = NULL;
 	I8x2 AN; gpeCsz acID[2] = {gpeCsz_OFF};
 	gpeOPid opID;
 	for( U4 nM = gpmSCP.nMN(), mnID = 0, l; mnID < nM; mnID++ )
@@ -28,7 +28,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 			if( M.MNclr() != gpeCLR_violet )
 				continue;
 			///STR
-			pBLOCK = srcBLKarySTR( pBLOCK, mnID, pS, nS );
+			pBLK = srcBLKarySTR( pBLK, mnID, pS, nS );
 			continue;
 		}
 
@@ -50,13 +50,13 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 				acID[1] = AN.gpCszALF(psDCT,nsDCT);
 				if( acID[1] == gpeCsz_OFF )
 					continue;
-				pBLOCK = srcBLKaryAN( pS, pBLOCK, M.dctID, lnk.x, acID, AN );
+				pBLK = srcBLKaryAN( pS, pBLK, M.dctID, lnk.x, acID, AN );
 				break;
 			case gpeCLR_orange:	///NUM
 				acID[1] = AN.gpCszNUM(psDCT,nsDCT);
 				if( acID[1] == gpeCsz_OFF )
 					continue;
-				pBLOCK = srcBLKaryNUM( pS, pBLOCK, M.dctID, lnk.x, acID, AN );
+				pBLK = srcBLKaryNUM( pS, pBLK, M.dctID, lnk.x, acID, AN );
 				break;
 			case gpeCLR_green2: { ///OPER
 					U1* pSs = (U1*)psDCT, *pSe = pSs+nsDCT;
@@ -86,26 +86,26 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 								switch( gpaOPgrp[opID] )
 								{
 									case gpeOPid_mov: /// =
-										pBLOCK = srcBLKmov( pS, mnID, pBLOCK, opID );
+										pBLK = srcBLKmov( pS, mnID, pBLK, opID );
 										break;
 									case gpeOPid_add: /// +
 									case gpeOPid_sub: /// ==
-										pBLOCK = srcBLKadd( pS, mnID, pBLOCK, opID );
+										pBLK = srcBLKadd( pS, mnID, pBLK, opID );
 										break;
 									case gpeOPid_mul: /// *
-										pBLOCK = srcBLKmul( pS, mnID, pBLOCK, opID );
+										pBLK = srcBLKmul( pS, mnID, pBLK, opID );
 										break;
 
 									case gpeOPid_entry: { /// (
-										pBLOCK = srcBLKent( pS, mnID, pBLOCK, opID );
+										pBLK = srcBLKent( pS, mnID, pBLK, opID );
 
 										} break;
 									case gpeOPid_out: /// )
-										pBLOCK = srcBLKout( pS, mnID, pBLOCK, opID );
+										pBLK = srcBLKout( pS, mnID, pBLK, opID );
 
 										break;
 									case gpeOPid_stk: /// , ;
-										pBLOCK = srcBLKstk( pS, mnID, pBLOCK, opID );
+										pBLK = srcBLKstk( pS, mnID, pBLK, opID );
 										break;
 								}
 						}

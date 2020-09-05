@@ -438,7 +438,7 @@ inline U1* gpfUTF8left( U1* pB, U1* pS, U1 n, U1 b ) {
 	if( pB >= pS )
 		return pB;
 
-	if( b )
+	if(b)
 	{
 		while( pS > pB )
 		{
@@ -864,22 +864,42 @@ public:
 
 class gpROW{
 public:
-	I4	bID,	bIDr,
-		mNdID,	mnID,
+	I4	mNdID,	mnID,
 		cID,
 		iPC,	sOF;
 
 	gpeOPid preOP, pstOP;
 	gpROW(){};
+	gpROW* operator = ( gpOBJ& O )
+	{
+		if( !this || !&O )
+			return this;
+
+		mNdID	= O.dctID;
+		cID 	= O.cID;
+		iPC 	= O.iPC;
+		sOF 	= O.sOF();
+
+		mnID = mNdID;
+		if( mnID < 0 )
+			mnID*=-1;
+		pstOP = gpeOPid_stk;
+		return this;
+	}
+	gpROW* operator = ( gpOBJ* pO )
+	{
+		return (*this = *pO);
+	}
 
 };
 
 class gpBLOCK {
 	I4 nR, iI;
 public:
-	I4 bID;
+	I4 bIDm, bIDmR, bID;
+
 	gpcLZY	lzyROW;
-	gpeOPid opID;
+	gpeOPid opIDgrp;
 
 	I4 iIN() { return iI; }
 	I4 setIN( I4 i )
@@ -902,20 +922,24 @@ public:
 		return nR = lzyROW.nLD(sizeof(gpROW));
 	}
 	I4 iLAST() { return nROW()-1; }
-	gpROW* pLAST() { return pROW(iLAST()); }
-	gpROW* pROW( I4 r = 0, bool bADD = false ) {
-		if( r < 0 )
+	gpROW* pROW( I4 iR = 0, bool bADD = false ) {
+		if( !this )
 			return NULL;
 
-		if( nROW() <= r )
+		if( iR < 0 )
+			return NULL;
+
+		if( nROW() <= iR )
 		{
 			if( bADD )
-				return pROWadd( r );
+				return pROWadd( iR );
 			return NULL;
 		}
 
-		return ((gpROW*)gpmLZYvali( gpROW, &lzyROW )) + r;
+		return ((gpROW*)gpmLZYvali( gpROW, &lzyROW )) + iR;
 	}
+	gpROW* pLAST() { return pROW(iLAST()); }
+	gpROW* pNEW() { return pROW(nROW(), true); }
 
 	gpROW* pROWadd( I4 iR ) {
 		gpROW* pR = (gpROW*)lzyROW.Ux( iR, sizeof(*pR) );
@@ -924,13 +948,13 @@ public:
 		nR = 0;
 		return pR;
 	}
-	gpBLOCK( I4 bid, I4 iBLK, I4 iBR ){
+	gpBLOCK( I4 bid, I4 bIDmom, I4 bIDmR ){
 		gpmCLR;
-		bID = bid;
-		gpROW* pR0	= pROW( 0, true );
+		bID 	= bid;
+		bIDm	= bIDmom;
+		bIDmR	= bIDmR;
 
-		pR0[0].bID	= iBLK;
-		pR0[0].bIDr	= iBR;
+		gpROW* pR0	= pROW( 0, true );
 	};
 };
 class gpcLZYblk {
@@ -956,20 +980,28 @@ public:
 	gpBLOCK* pSTPdwn( I4 bID ) {
 		return pSTPup( bID, -1, -1 );
 	}
-	gpBLOCK* pSTPup( I4 bID, I4 iBMom, I4 iBMomiR ){
+	gpBLOCK* pSTPup( I4 bID, I4 bIDmom, I4 bIDr ){
 		if( bID == -1 )	// pont -1 volt azaz nincs
 			return NULL;
-		// bID negatív akor új blokot kérünk
+
 		if( bID < 0 )
-			bID = nBLK();
+			bID = nBLK(); // bID -2 vagy kissebb akkor új blokot kérünk
 		else if( bID >= nBLK() )
-			bID >= nBLK();
+			bID = nBLK();
 
 		gpBLOCK** ppB = (gpBLOCK**)lzyBLK.Ux( bID, sizeof(*ppB) );
 		if( *ppB )
 			return (*ppB);
 
-		return (*ppB) = new gpBLOCK( bID, iBMom, iBMomiR );
+		return (*ppB) = new gpBLOCK( bID, bIDmom, bIDr );
+	}
+	gpBLOCK* pNEW( gpeOPid opID, I4 bIDmom, I4 bIDr )
+	{
+		gpBLOCK	*pBLK = pSTPup( -2, bIDmom, bIDr );
+		if( !pBLK )
+			return NULL;
+		pBLK->opIDgrp = gpaOPgrp[opID];
+		return pBLK;
 	}
 };
 
@@ -1039,49 +1071,44 @@ public:
 		pO->d2D = I4x2(1,1);
 		return pO;
 	}
-	U1* srcMEMiPC( I4 iPC, U4 nU1 )
-	{
+	U1* srcMEMiPC( I4 iPC, U4 nU1 ) {
 		if( !pMEM )
 			pMEM = new gpMEM;
 		return pMEM->iPC( iPC, nU1 );
 	}
-	gpBLOCK* srcBLKup( char* pS, gpBLOCK* pBMom )
-	{
-		gpROW	*apRL[2];
-		apRL[0] = pBMom->pLAST();
+	gpBLOCK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDmom, I4 bIDmR  ) {
+		gpBLOCK	*pBLK = lzyBLOCK.pNEW( opID, bIDmom, bIDmR );
+		gpROW	*pRf = pBLK->pROW(0,true);
+		if( !pRf )
+			return pBLK;
+		pRf->pstOP	= opID;
 
-		gpBLOCK* pBkid = srcBLKnew( pS, apRL[0]->mNdID, apRL[0]->mnID, pBMom->bID, pBMom->iLAST() );
-		apRL[1] = pBkid->pLAST();
+		if( !pRml )
+			return pBLK;
 
-		apRL[0]->pstOP = gpeOPid_stk;
-		apRL[0]->bID = pBMom->bID;
-		apRL[0]->bIDr = pBMom->iLAST();
-		return pBkid;
-	}
-	gpBLOCK* srcBLKnew( char* pS, I4 dctID, I4 mnID, I4 bIDmom, I4 iL  ) {
-		gpBLOCK	*pBLK = lzyBLOCK.pSTPup( -2, bIDmom, iL );
-		gpROW	*pROW = pBLK->pROW(0,true);
-		if( pROW )
-		{
-			pROW->mNdID = dctID;
-			pROW->mnID = mnID;
-
-			pROW->pstOP =
-			pBLK->opID = gpeOPid_stk;
-		}
+		pRf->mNdID	= pRml->mNdID;
+		pRf->mnID	= pRml->mnID;
 		return pBLK;
 	}
+	gpBLOCK* srcBLKup( char* pS, gpBLOCK* pBMom, gpeOPid opID )
+	{
+//		gpROW	*pRl = pBMom->pLAST();
+
+		return srcBLKnew( pS, opID, pBMom->pLAST(), pBMom->bID, pBMom->iLAST() );
+
+//		return pBkid;
+	}
+
 	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kEND(scp);
-
 		gpROW	*pRm = pBLK->pROW();
-		if( pRm->bID > -1 ) {
+		if( pBLK->bIDm > -1 ) {
 			/// itt kell végig csinálni ezt a blockot
-			gpBLOCK* pBdwn = lzyBLOCK.pSTPdwn( pRm->bID );
-            while( pBdwn ? pRm->bID : false )
+			gpBLOCK* pBdwn = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+            while( pBdwn ? pBLK->bIDm : false )
             {
 				/// INST a pBLK-ból
-				switch( gpaOPgrp[pRm->pstOP] )
+				switch( gpaOPgrp[pBLK->opIDgrp] )
 				{
 					case gpeOPid_mov:
 
@@ -1119,8 +1146,7 @@ public:
 
 		return pBLK;
 	}
-	gpOBJ* srcOBJmn( char* pS, I4 mnID, gpeCsz cID, I4x2 d2D )
-	{
+	gpOBJ* srcOBJmn( char* pS, I4 mnID, gpeCsz cID, I4x2 d2D ) {
 		I4 dctID = mnID;
 		if( dctID > 0 )
 			dctID *= -1;
@@ -1154,30 +1180,19 @@ public:
 		U1* pU1 = srcMEMiPC( pO->iPC, pO->sOF() );
 		gpmMcpy( pU1, pS, nS )[nS] = 0;
 
+		gpROW* pROW = NULL;
 		if( !pBLK )
-			return srcBLKnew( pS, pO->dctID, mnID, -1, -1 );
-
-		switch( pBLK->opID )
 		{
-			case gpeOPid_stk:
-			case gpeOPid_newrow:{
-					gpROW* pROW = pBLK->pROW( pBLK->nROW(), true );
-					if( pROW )
-					{
-						pROW->mNdID = pO->dctID;
-						pROW->mnID = mnID;
+			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
+			pROW = pBLK->pLAST();
+		} else
+			pROW = pBLK->pNEW();
 
-						pROW->pstOP =
-						pBLK->opID = gpeOPid_stk;
-					}
-					return pBLK;
-				} break;
-			default:{
+		if( !pROW )
+			return pBLK;
 
-
-			} break;
-		}
-
+		pROW->mNdID = pO->dctID;
+		pROW->mnID = mnID;
 		return pBLK;
 	}
 	gpBLOCK* srcBLKaryAN( char* pS, gpBLOCK* pBLK, I4 dctID, I4 mnID, gpeCsz* pcVAR, const I8x2& AN ) {
@@ -1200,29 +1215,22 @@ public:
 			gpmMcpy( pU1, &AN, pO->sOF() );
 		}
 
+		gpROW* pROW = NULL;
 		if( !pBLK )
-			return srcBLKnew( pS, dctID, mnID, -1, -1 );
-
-		switch( gpaOPgrp[pBLK->opID] )
 		{
-			case gpeOPid_stk: {
-					gpROW* pROW = pBLK->pROW( pBLK->nROW(), true );
-					if( pROW )
-					{
-						pROW->mNdID = dctID;
-						pROW->mnID = mnID;
-						pROW->pstOP = gpeOPid_stk;
-					}
-					return pBLK;
-				} break;
-			default:{
+			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
+			pROW = pBLK->pLAST();
+		} else
+			pROW = pBLK->pNEW();
 
+		if( !pROW )
+			return pBLK;
 
-			} break;
-		}
-
+		pROW->mNdID = pO->dctID;
+		pROW->mnID = mnID;
 		return pBLK;
 	}
+
 	gpBLOCK* srcBLKaryNUM( char* pS, gpBLOCK* pBLK, I4 dctID, I4 mnID, gpeCsz* pcVAR, const I8x2& AN ) {
 		gpOBJ *pO = srcOBJfnd(dctID);
 		U1* pU1 = NULL;
@@ -1243,26 +1251,53 @@ public:
 			gpmMcpy( pU1, &AN, pO->sOF() );
 		}
 
+		gpROW* pROW = NULL;
 		if( !pBLK )
-			return srcBLKnew( pS, dctID, mnID,-1,-1 );
-
-		switch( gpaOPgrp[pBLK->opID] )
 		{
-			case gpeOPid_stk: {
-					gpROW* pROW = pBLK->pROW( pBLK->nROW(), true );
-					if( pROW )
-					{
-						pROW->mNdID = dctID;
-						pROW->pstOP = gpeOPid_stk;
-					}
-					return pBLK;
-				} break;
-			default:{
+			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
+			pROW = pBLK->pLAST();
+		} else
+			pROW = pBLK->pNEW();
 
+		if( !pROW )
+			return pBLK;
 
-			} break;
+		pROW->mNdID = pO->dctID;
+		pROW->mnID = mnID;
+		return pBLK;
+	}
+
+	gpBLOCK* srcBLKnull( char* pS, gpBLOCK* pBLK, I4 dctID, I4 mnID ) {
+		gpOBJ *pO = srcOBJfnd(dctID);
+		U1* pU1 = NULL;
+		if( !pO )
+		{
+			pO = srcOBJadd(dctID);
+			if( !pO )
+				return NULL;
+
+			pO->cID = gpeCsz_L;
+			pU1 = srcMEMiPC(
+								pO->iPC = pMEM->nDAT,
+								pO->sOF()
+							);
+			pMEM->nDAT += pO->sOF();
+			gpmZn( pU1, pO->sOF() );
 		}
 
+		gpROW* pROW = NULL;
+		if( !pBLK )
+		{
+			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
+			pROW = pBLK->pLAST();
+		} else
+			pROW = pBLK->pNEW();
+
+		if( !pROW )
+			return pBLK;
+
+		pROW->mNdID = pO->dctID;
+		pROW->mnID = mnID;
 		return pBLK;
 	}
 
@@ -1271,35 +1306,30 @@ public:
 		///kOBJ(scp); //, iOPe );
 		///++SP;
 		///*pSTRT = now;
-		U4	nR = pBLK->nROW();
-		if( !nR )
+		gpROW* pRL = pBLK->pLAST();
+
+		//U4	nR = pBLK->nROW();
+		if( !pRL )
 		{
-			///  = ..... azaz nincsen semmi az = elött
+			///  = ..... azaz nincsen semmi az "=" elött
+			/// a rendszer kitalál valamit
+			/// srcOBJmn( a mnID-t mint negatív szám használja azonosító számnak
 			gpOBJ* pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
-			if( !pBLK )
-				pBLK = srcBLKnew( pS, pO->dctID, mnID,-1,-1 );
+			pBLK = srcBLKnull( pS, pBLK, pO->dctID, mnID );
 
-			gpROW* pR0 = pBLK->pROW( 0, true );
-			if( pR0 )
-			{
-				pR0->mNdID = pO->dctID;
-				pR0->mnID = mnID;
-				pR0->pstOP = gpeOPid_stk;
-			}
-
+			pRL = pBLK->pLAST();
+			if( *pRL = pO )
+				pRL->mnID = mnID;
+			else
+				return pBLK;
 		}
 
-		gpROW	*pR0 = pBLK->pROW( 0 ),
-				*pRL = pBLK->pLAST();
 		pRL->pstOP = opID;
 
 		/// a, b =
 		// azaz ki kell emelni a b=-t új block-ba
 		/// UP b =
-		gpBLOCK* pBMom = pBLK;
-		pBLK = srcBLKup( pS, pBMom );
-
-		return pBLK;
+		return srcBLKup( pS, pBLK, opID );
 	}
 	gpBLOCK* srcBLKadd( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kOBJ(scp); //, iOPe );
