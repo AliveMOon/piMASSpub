@@ -1101,48 +1101,72 @@ public:
 
 	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kEND(scp);
-		gpROW	*pRm = pBLK->pROW();
-		if( pBLK->bIDm > -1 ) {
-			/// itt kell végig csinálni ezt a blockot
-			gpBLOCK* pBdwn = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-            while( pBdwn ? pBLK->bIDm : false )
-            {
-				/// INST a pBLK-ból
-				switch( gpaOPgrp[pBLK->opIDgrp] )
-				{
-					case gpeOPid_mov:
+		U1* pM;
+		while( pBLK ? (pBLK->opIDgrp != gpeOPid_str) : false )
+		{
+			/// FENT
+			gpBLOCK	*pBup = pBLK,
+					*pBdwn = lzyBLOCK.pSTPdwn( pBup->bIDm );
+			gpROW	*pR0 = pBup->pROW(),
+					*pRd = pBdwn->pROW(pBup->bIDmR);
+			I4 nR = pBup->nROW();
+			switch( pBup->opIDgrp )
+			{
+				case gpeOPid_brakS:
+				case gpeOPid_dimS:
+				case gpeOPid_begin:
 
-						break;
-					case gpeOPid_add:
-					case gpeOPid_sub:
+					break;
+				case gpeOPid_mov:
+					for( I4 i = nR-1; i >= 0; i-- )
+					{
+						if( pR0[ir]->iPC < 4 )
+						{
+							gpOBJ* pO = srcOBJfnd( pR0[ir]->mNdID );
+							if( pO->iPC < 4 )
+								pO->iPC = srcMEMiPC( pR0[ir]->iPC, pO->sOF() );
+							pR0[ir]->iPC = pO->iPC;
 
-						break;
-					case gpeOPid_mul:
+							if( pR0[ir]->iPC < 4 )
+								continue;
+						}
+						pM = srcMEMiPC( pR0[ir]->iPC, 16 );
 
-						break;
-				}
+					}
+					break;
+				case gpeOPid_add:
+				case gpeOPid_sub:
+					for( I4 ir = nR-1; ir >= 0; ir-- )
+					{
 
-				pBLK = pBdwn;
-				pRm = pBLK->pROW();
-            }
+					}
+					break;
+				case gpeOPid_mul:
+					for( I4 ir = nR-1; ir >= 0; ir-- )
+					{
 
+					}
+					break;
+			}
+
+
+			if( !pBdwn )
+				break;
+			/// LENT
+			pBLK = pBdwn;
 
 		}
 
 		gpROW	*pRl = pBLK->pLAST();
 		if( pRl )
-		switch( gpaOPgrp[pRl->pstOP] )
-		{
+		switch( gpaOPgrp[pRl->pstOP] ) {
 			case gpeOPid_stk: /// , ;
 				pRl->pstOP = opID;
 				return pBLK;
 		}
 
 
-		if( pBLK )
-		{
 
-		}
 
 		return pBLK;
 	}
@@ -1181,8 +1205,7 @@ public:
 		gpmMcpy( pU1, pS, nS )[nS] = 0;
 
 		gpROW* pROW = NULL;
-		if( !pBLK )
-		{
+		if( !pBLK ) {
 			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 			pROW = pBLK->pLAST();
 		} else
