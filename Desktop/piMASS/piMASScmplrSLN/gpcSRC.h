@@ -1098,7 +1098,34 @@ public:
 
 //		return pBkid;
 	}
+	I4 iPCrow( gpROW* pRd, gpROW* pRu ) {
+		if( pRd ? pRu->iPC < pRd->iPC : false )
+		{
+			pRu->iPC = pRd->iPC;
+		}
 
+		if( pRu->iPC >= 4 )
+			return pRu->iPC;
+
+		gpOBJ* pO = srcOBJfnd( pRu->mNdID );
+		if( !pO )
+			return pRu->iPC;
+
+		if( !pO )
+			return pRu->iPC;
+
+		if( pRu->iPC < pO->iPC )
+		{
+			pRd->iPC = pRu->iPC = pO->iPC;
+			pRd->sOF = pRu->sOF = pO->sOF();
+		}
+		else if( pRu->iPC > pO->iPC )
+		{
+			pO->iPC = pRu->iPC;
+		}
+
+		return pRu->iPC;
+	}
 	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kEND(scp);
 		U1* pM;
@@ -1109,7 +1136,7 @@ public:
 					*pBdwn = lzyBLOCK.pSTPdwn( pBup->bIDm );
 			gpROW	*pR0 = pBup->pROW(),
 					*pRd = pBdwn->pROW(pBup->bIDmR);
-			I4 nR = pBup->nROW();
+			I4 nR = pBup->nROW(), iPC, sOF;
 			switch( pBup->opIDgrp )
 			{
 				case gpeOPid_brakS:
@@ -1120,30 +1147,28 @@ public:
 				case gpeOPid_mov:
 					for( I4 i = nR-1; i >= 0; i-- )
 					{
-						if( pR0[ir]->iPC < 4 )
-						{
-							gpOBJ* pO = srcOBJfnd( pR0[ir]->mNdID );
-							if( pO->iPC < 4 )
-								pO->iPC = srcMEMiPC( pR0[ir]->iPC, pO->sOF() );
-							pR0[ir]->iPC = pO->iPC;
-
-							if( pR0[ir]->iPC < 4 )
-								continue;
-						}
-						pM = srcMEMiPC( pR0[ir]->iPC, 16 );
+						iPC = iPCrow( pRd, pR0+i );
+						sOF = pR0[i].sOF;
+						pM = srcMEMiPC( pR0[i].iPC, sOF );
 
 					}
 					break;
 				case gpeOPid_add:
 				case gpeOPid_sub:
-					for( I4 ir = nR-1; ir >= 0; ir-- )
+					for( I4 i = nR-1; i >= 0; i-- )
 					{
+						iPC = iPCrow( pRd, pR0+i );
+						sOF = pR0[i].sOF;
+						pM = srcMEMiPC( pR0[i].iPC, sOF );
 
 					}
 					break;
 				case gpeOPid_mul:
-					for( I4 ir = nR-1; ir >= 0; ir-- )
+					for( I4 i = nR-1; i >= 0; i-- )
 					{
+						iPC = iPCrow( pRd, pR0+i );
+						sOF = pR0[i].sOF;
+						pM = srcMEMiPC( pR0[i].iPC, sOF );
 
 					}
 					break;
@@ -1204,18 +1229,17 @@ public:
 		U1* pU1 = srcMEMiPC( pO->iPC, pO->sOF() );
 		gpmMcpy( pU1, pS, nS )[nS] = 0;
 
-		gpROW* pROW = NULL;
-		if( !pBLK ) {
+		if( !pBLK )
 			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-			pROW = pBLK->pLAST();
-		} else
-			pROW = pBLK->pNEW();
 
-		if( !pROW )
+		gpROW* pRl = pBLK->pLAST();
+		if( !pRl )
 			return pBLK;
 
-		pROW->mNdID = pO->dctID;
-		pROW->mnID = mnID;
+		pRl->mNdID = pO->dctID;
+		pRl->mnID = mnID;
+		pRl->iPC = pO->iPC;
+		pRl->sOF = pO->sOF();
 		return pBLK;
 	}
 	gpBLOCK* srcBLKaryAN( char* pS, gpBLOCK* pBLK, I4 dctID, I4 mnID, gpeCsz* pcVAR, const I8x2& AN ) {
@@ -1238,19 +1262,17 @@ public:
 			gpmMcpy( pU1, &AN, pO->sOF() );
 		}
 
-		gpROW* pROW = NULL;
 		if( !pBLK )
-		{
 			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-			pROW = pBLK->pLAST();
-		} else
-			pROW = pBLK->pNEW();
 
-		if( !pROW )
+		gpROW* pRl = pBLK->pLAST();
+		if( !pRl )
 			return pBLK;
 
-		pROW->mNdID = pO->dctID;
-		pROW->mnID = mnID;
+		pRl->mNdID = pO->dctID;
+		pRl->mnID = mnID;
+		pRl->iPC = pO->iPC;
+		pRl->sOF = pO->sOF();
 		return pBLK;
 	}
 
@@ -1274,19 +1296,17 @@ public:
 			gpmMcpy( pU1, &AN, pO->sOF() );
 		}
 
-		gpROW* pROW = NULL;
 		if( !pBLK )
-		{
 			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-			pROW = pBLK->pLAST();
-		} else
-			pROW = pBLK->pNEW();
 
-		if( !pROW )
+		gpROW* pRl = pBLK->pLAST();
+		if( !pRl )
 			return pBLK;
 
-		pROW->mNdID = pO->dctID;
-		pROW->mnID = mnID;
+		pRl->mNdID = pO->dctID;
+		pRl->mnID = mnID;
+		pRl->iPC = pO->iPC;
+		pRl->sOF = pO->sOF();
 		return pBLK;
 	}
 
@@ -1308,19 +1328,15 @@ public:
 			gpmZn( pU1, pO->sOF() );
 		}
 
-		gpROW* pROW = NULL;
 		if( !pBLK )
-		{
 			pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-			pROW = pBLK->pLAST();
-		} else
-			pROW = pBLK->pNEW();
 
-		if( !pROW )
+		gpROW* pRl = pBLK->pLAST();
+		if( !pRl )
 			return pBLK;
 
-		pROW->mNdID = pO->dctID;
-		pROW->mnID = mnID;
+		pRl->mNdID = pO->dctID;
+		pRl->mnID = mnID;
 		return pBLK;
 	}
 
