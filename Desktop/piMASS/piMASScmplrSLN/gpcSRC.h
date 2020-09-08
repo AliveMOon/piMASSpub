@@ -873,7 +873,7 @@ public:
 class gpROW{
 public:
 	I4	mNdID,	mnID,
-		cID,
+		cID,	bIDup,
 		iPC,	sOF;
 
 	gpeOPid preOP, pstOP;
@@ -1092,8 +1092,8 @@ public:
 			pMEM = new gpMEM;
 		return pMEM->iPC( iPC, nU1 );
 	}
-	gpBLOCK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDmom, I4 bIDmR  ) {
-		gpBLOCK	*pBLK = lzyBLOCK.pNEWblk( opID, bIDmom, bIDmR );
+	gpBLOCK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR  ) {
+		gpBLOCK	*pBLK = lzyBLOCK.pNEWblk( opID, bIDm, bIDmR );
 		gpROW	*pRf = pBLK->pROW(0,true);
 		if( !pRf )
 			return pBLK;
@@ -1101,18 +1101,37 @@ public:
 
 		if( !pRml )
 			return pBLK;
+		*pRf = *pRml;
 
-		pRf->mNdID	= pRml->mNdID;
-		pRf->mnID	= pRml->mnID;
+		pRml->pstOP = gpeOPid_nop;
+		pRml->bIDup = pBLK->bID;
+
 		return pBLK;
 	}
 	gpBLOCK* srcBLKup( char* pS, gpBLOCK* pBMom, gpeOPid opID )
 	{
-//		gpROW	*pRl = pBMom->pLSTrow();
-
 		return srcBLKnew( pS, opID, pBMom->pLSTrow(), pBMom->bID, pBMom->iLAST() );
+	}
+	gpBLOCK* srcBLKinsrt( char* pS, gpBLOCK* pBLKup, gpeOPid opID )
+	{
+		if( pBLKup )
+			return srcBLKnew( pS, opID, NULL, -1, -1 );
 
-//		return pBkid;
+		gpBLOCK	*pBLKm = lzyBLOCK.pSTPdwn( pBLKup->bIDm ),
+				*pBLKi = lzyBLOCK.pNEWblk( opID, pBLKup->bIDm, pBLKup->bIDmR );
+
+		gpROW	*pRuf = pBLKup->pROW(0,true),
+				*pRif = pBLKi->pROW(0,true),
+				*pRml = pBLKm->pLSTrow();
+
+		pRml->bIDup = 	pBLKup->bIDm = pBLKi->bID;
+						pBLKup->bIDmR = 0; // pBLKi->iLAST();
+
+		*pRif = *pRml;
+		pRif->pstOP = opID;
+
+		pBLKi->pNEWrow();
+		return pBLKi;
 	}
 	I4 iPCrow( gpROW* pR ) {
 		if( pR->iPC >= 4 )
@@ -1134,6 +1153,32 @@ public:
 		}
 
 		return pR->iPC;
+	}
+	gpBLOCK* srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  )
+	{
+		if( !pBLKm )
+			pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+
+		gpROW	*pR = pBLK->pROW();
+		I4 iPC, sOF;
+		U1* pU1 = NULL;
+		for( I4 i = 0, nR = pBLK->nROW(); i < nR; i++ )
+		{
+			iPC = iPCrow( pR+i );
+			pU1 = srcMEMiPC( iPC, sOF );
+			sOF = pR[i].sOF;
+			if( !i ){
+				// move.l (iPC),d0
+				continue;
+			}
+			// add.l (iPC),d0
+		}
+
+		pR = pBLKm->pROW(pBLK->bIDmR);
+		iPC = iPCrow( pR );
+		pU1 = srcMEMiPC( iPC, pR->sOF );
+		// move.l d0, -(A6)
+		return pBLKm;
 	}
 	gpBLOCK* srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  )
 	{
@@ -1162,75 +1207,7 @@ public:
 		return pBLKm;
 	}
 
-	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
-		///kEND(scp);
-		U1* pU1 = NULL;
-		while( pBLK ? (pBLK->opIDgrp != gpeOPid_stk) : false )
-		{
-			/// FENT
-			gpBLOCK	*pBLKdwn = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-			gpROW	*pR0 = pBLK->pROW(),
-					*pRd = pBLKdwn->pROW(pBLK->bIDmR);
-			I4 nR = pBLK->nROW(), iPC, sOF;
-			switch( pBLK->opIDgrp )
-			{
-				case gpeOPid_brakS:
-				case gpeOPid_dimS:
-				case gpeOPid_begin:
 
-					break;
-				case gpeOPid_mov:
-					for( I4 i = nR-1; i >= 0; i-- )
-					{
-						iPC = iPCrow( pR0+i );
-						sOF = pR0[i].sOF;
-						pU1 = srcMEMiPC( iPC, sOF );
-
-					}
-					break;
-				case gpeOPid_add:
-				case gpeOPid_sub:
-					for( I4 i = nR-1; i >= 0; i-- )
-					{
-						iPC = iPCrow( pR0+i );
-						sOF = pR0[i].sOF;
-						pU1 = srcMEMiPC( iPC, sOF );
-						if( !i ){
-							// move.l (iPC),d0
-							continue;
-						}
-						// add.l (iPC),d0
-					}
-
-					// move.l d0, -(A6)
-					break;
-				case gpeOPid_mul:{
-						///			pRl
-						/// a, 		_ +
-						/// a, 		b +
-						/// a = 	b +
-						/// a * 	b +
-						pBLKdwn = srcINSTmul( pS, pBLKdwn, pBLK );
-					} break;
-			}
-
-
-			if( !pBLKdwn )
-				break;
-			/// LENT
-			pBLK = pBLKdwn;
-
-		}
-
-		gpROW	*pRl = pBLK->pLSTrow();
-		if( !pRl )
-			return pBLK;
-
-		pRl->pstOP = opID;
-		/// a veszö egyenlőre csinál helyet
-		pBLK->pNEWrow();
-		return pBLK;
-	}
 	gpOBJ* srcOBJmn( char* pS, I4 mnID, gpeCsz cID, I4x2 d2D ) {
 		I4 dctID = mnID;
 		if( dctID > 0 )
@@ -1388,47 +1365,92 @@ public:
 		pRl->mnID = mnID;
 		return pBLK;
 	}
+	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
+		///kEND(scp);
+		U1* pU1 = NULL;
+		while( pBLK ? (pBLK->opIDgrp != gpeOPid_stk) : false )
+		{
+			/// FENT
+			gpBLOCK	*pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+			gpROW	*pR0 = pBLK->pROW(),
+					*pRd = pBLKm->pROW(pBLK->bIDmR);
+			I4 nR = pBLK->nROW(), iPC, sOF;
+			switch( pBLK->opIDgrp )
+			{
+				case gpeOPid_brakS:
+				case gpeOPid_dimS:
+				case gpeOPid_begin:
+
+					break;
+				case gpeOPid_mov:
+					for( I4 i = nR-1; i >= 0; i-- )
+					{
+						iPC = iPCrow( pR0+i );
+						sOF = pR0[i].sOF;
+						pU1 = srcMEMiPC( iPC, sOF );
+
+					}
+					break;
+				case gpeOPid_add:
+				case gpeOPid_sub:
+						pBLKm = srcINSTadd( pS, pBLKm, pBLK );
+					// move.l d0, -(A6)
+					break;
+				case gpeOPid_mul:{
+						///			pRl
+						/// a, 		_ +
+						/// a, 		b +
+						/// a = 	b +
+						/// a * 	b +
+						pBLKm = srcINSTmul( pS, pBLKm, pBLK );
+					} break;
+			}
+
+
+			if( !pBLKm )
+				break;
+			/// LENT
+			pBLK = pBLKm;
+
+		}
+
+		gpROW	*pRl = pBLK->pLSTrow();
+		if( !pRl )
+			return pBLK;
+
+		pRl->pstOP = opID;
+		/// a veszö egyenlőre csinál helyet
+		pBLK->pNEWrow();
+		return pBLK;
+	}
 	gpBLOCK* srcBLKmov( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 		///kMOV(scp); //, iOPe ); // Ai--; // Ai--; //
 		///kOBJ(scp); //, iOPe );
 		///++SP;
 		///*pSTRT = now;
-		gpROW* pRl = pBLK->pLSTrow();
-		if( pRl )
+		if( !pBLK )
 		{
-			/// a, b =
-			// azaz ki kell emelni a b=-t új block-ba
-			/// UP b =
-			pRl->pstOP = opID;
-			if( pBLK )
-			if( pBLK->opIDgrp == gpaOPgrp[opID] )
-			{
-				/// pl. a = b += c -= d *=
-				pBLK->pNEWrow();
-				return pBLK;
-			}
-			/// 		pRl
-			/// , 		_ =
-			/// a +		b =
-			/// b *		c =
-
-			return srcBLKup( pS, pBLK, opID );
+			gpOBJ* pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
+			pBLK = srcBLKnull( pS, pBLK, pO->dctID, mnID );
 		}
 
-		///  = ..... azaz nincsen semmi az "=" elött
-		/// a rendszer kitalál valamit
-		/// srcOBJmn( a mnID-t mint negatív szám használja ID-nek
-		gpOBJ* pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
-		pBLK = srcBLKnull( pS, pBLK, pO->dctID, mnID );
-
-		pRl = pBLK->pLSTrow( pS, pO, mnID );
-		if( !pRl )
+		gpROW* pRl = pBLK->pLSTrow();
+		if( !pRl)
 			return pBLK;
 
-		pRl->pstOP = opID;
-		/// a, b =
-		// azaz ki kell emelni a b=-t új block-ba
-		/// UP b =
+		switch( pBLK->opIDgrp )
+		{
+			case gpeOPid_mov:
+				///							pRl
+				/// a = b += c *= d %= 		e =
+				pRl->pstOP = opID;
+				pBLK->pNEWrow();
+				return pBLK;
+			default:
+				break;
+		}
+		///							 		pRl	//up
+		/// a, 10, b; c, d;  e = f + 		g =
 		return srcBLKup( pS, pBLK, opID );
 	}
 	gpBLOCK* srcBLKmul( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
@@ -1455,8 +1477,20 @@ public:
 		if( !pRl )
 			return pBLK;
 
-		pRl->pstOP = opID;
-		/// add NEM csinált egy buffert a következőnek
+		switch( pBLK->opIDgrp )
+		{
+			case gpeOPid_mul:
+				///					pRl
+				/// a = b + c *		d /
+				pRl->pstOP = opID;
+				pBLK->pNEWrow();
+				return pBLK;
+			default:
+				break;
+		}
+
+		///				pRl	// up
+		/// a = b +		c *
 		return srcBLKup( pS, pBLK, opID );
 	}
 
@@ -1481,32 +1515,37 @@ public:
 			return pBLK;
 
 		U1* pU1 = NULL;
-
 		switch( pBLK->opIDgrp )
 		{
 			case gpeOPid_add:
-				/// a + b - c == d - e + f -
+				///							pRl
+				/// a + b - c == d - e + 	f -
 				pRl->pstOP = opID;
 				pBLK->pNEWrow();
 				return pBLK;
 			case gpeOPid_mul: {
-					///			pRl
-					/// a ,		_ +
-					/// a ,		b +
-					/// a = 	b +
-					/// a * 	b +
 					gpBLOCK	*pBLKm = srcINSTmul( pS, NULL, pBLK );
 					if( pBLKm ? pBLKm->opIDgrp == gpeOPid_add : false )
 					{
+						/// IGEN volt alatta ADD
+						///				pRl
+						/// a -	b *		c +
 						pRl = pBLKm->pLSTrow();
 						pRl->pstOP = opID;
 						pBLKm->pNEWrow();
 						return pBLKm;
 					}
+					/// NEM volt alatta ADD
+					///				pRl
+					/// a *	b *		c +
+					return srcBLKinsrt( pS, NULL, opID );
 				} break;
 			default:
 				break;
 		}
+
+
+
 		pRl->pstOP = opID;
 		pBLK->pNEWrow();
 		return srcBLKup( pS, pBLK, opID );
