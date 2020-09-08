@@ -71,7 +71,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 							case gpeOPid_dimS:
 							case gpeOPid_begin:
 								/// LENT
-
+								pBLK = srcBLKblkS( pS, mnID, pBLK, opID );
 								/// FENT
 								break;
 							case gpeOPid_end:
