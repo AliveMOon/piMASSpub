@@ -1648,7 +1648,7 @@ public:
 					/// NEM volt alatta ADD
 					///				pRl
 					/// a *	b *		c +
-					return srcBLKinsrt( pS, NULL, opID );
+					return srcBLKinsrt( pS, pBLK, opID );
 				} break;
 			default:
 				break;
