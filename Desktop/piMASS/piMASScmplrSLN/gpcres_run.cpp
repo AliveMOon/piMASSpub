@@ -470,7 +470,14 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 		}
 
 		if( !pSRC->apOUT[3] )
-		if( pSRC->srcRUN(this,pWIN) )
+		if( pSRC->srcINSTrun(this,pWIN) )
+		{
+			pWIN->nJDOIT.x++;
+
+			pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI,this,pWIN);
+			continue;
+		}
+		else if( pSRC->srcRUN(this,pWIN) )
 		{
 			pWIN->nJDOIT.x++;
 

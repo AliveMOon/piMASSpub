@@ -905,7 +905,8 @@ public:
 class gpBLOCK {
 	I4 nR, iI;
 public:
-	I4 bIDm, bIDmR, bID;
+	I4	bIDm, bIDmR, bID,
+		iPC, sOF;
 
 	gpcLZY	lzyROW;
 	gpeOPid opIDgrp;
@@ -1284,11 +1285,20 @@ public:
 		sOF = pO->sOF();
 		return pR->iPC;
 	}
-	gpBLOCK* srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
-	gpBLOCK* srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
-	gpBLOCK* srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
-
-
+	///--------------------------
+	///			INST
+	///--------------------------
+	gpBLOCK*	srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
+	gpBLOCK*	srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
+	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
+	bool 		srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN );
+	gpcLZY*		srcINSTmini( gpcLZY* pLZY,gpcMASS* pMASS, gpcWIN* pWIN );
+	///--------------------------
+	///			BLOCK
+	///--------------------------
+	///--------------------------
+	///			OPERA
+	///--------------------------
 	gpOBJ* srcOBJmn( char* pS, I4 mnID, gpeCsz cID, I4x2 d2D ) {
 		I4 dctID = mnID;
 		if( dctID > 0 )
@@ -1446,6 +1456,9 @@ public:
 		pRl->mnID = mnID;
 		return pBLK;
 	}
+	///--------------------------
+	///			OPERA
+	///--------------------------
 	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		///kEND(scp);
 		U1* pU1 = NULL;
@@ -1599,7 +1612,6 @@ public:
 		/// a = b +		c *
 		return srcBLKup( pS, pBLK, opID );
 	}
-
 	gpBLOCK* srcBLKadd( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		///kOBJ(scp); //, iOPe );
 		// a =b*c +d		// iMUL 1
@@ -1660,7 +1672,6 @@ public:
 		pBLK->pNEWrow();
 		return srcBLKup( pS, pBLK, opID );
 	}
-
 	gpBLOCK* srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		///switch( now )
 		///{
