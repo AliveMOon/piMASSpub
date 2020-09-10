@@ -128,4 +128,5 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 
 	}
 
+	pMEM->instRDY();
 }

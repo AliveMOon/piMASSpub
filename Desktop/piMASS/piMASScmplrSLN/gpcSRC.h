@@ -1145,12 +1145,15 @@ public:
 };
 class gpMEM {
 public:
+	I8x2 	aA[0x10];
 	gpcLZY	lzyMEM,
 			lzyOBJ,
 			lzyCLASS,
 			lzyCODE;
 	I4		nCD,
-			iSTK,nDAT,nINST;
+			iSTK,nDAT,nINST, pc, pcCPY;
+	gpINST* pINST;
+
 	gpMEM( I4 i = 0x2000 ){ gpmCLR; iSTK = nDAT = i; }
 	U1* iPC( U4 iPC, U4 n )
 	{
@@ -1164,6 +1167,21 @@ public:
 		nCD++;
 		return *pI;
 	};
+	gpINST* instRDY()
+	{
+		if( this ? !nCD : true )
+			return this ? pINST : NULL;
+
+		if( !pcCPY )
+		{
+			pcCPY = gpmPAD(nDAT,0x10);
+		}
+		U8 s = -1;
+		pINST = (gpINST*)lzyMEM.Ux( pcCPY, lzyCODE.n_load, true, 1 );
+		gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
+		nDAT = lzyMEM.n_load;
+		return pINST;
+	}
 
 };
 
