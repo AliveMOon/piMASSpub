@@ -16,7 +16,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 	char		*pS;
 	const char	*psDCT;
 	I4 nS, nsDCT; //, dctID;
-	gpBLOCK* pBLK = NULL;
+	gpBLOCK* pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 	I8x2 AN; gpeCsz acID[2] = {gpeCsz_OFF};
 	gpeOPid opID;
 	for( U4 nM = gpmSCP.nMN(), mnID = 0, l; mnID < nM; mnID++ )
