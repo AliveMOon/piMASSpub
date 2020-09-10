@@ -1208,7 +1208,7 @@ public:
         }
         return NULL;
 	}
-	gpOBJ* srcOBJadd( I4 dctID )
+	gpOBJ* srcOBJadd( char* pS, I4 dctID )
 	{
 		if( !pMEM )
 			pMEM = new gpMEM;
@@ -1309,7 +1309,7 @@ public:
 			return pO;
 
 		U1* pU1 = NULL;
-		pO = srcOBJadd(dctID);
+		pO = srcOBJadd( pS, dctID);
 		if( !pO )
 			return NULL;
 
@@ -1359,7 +1359,7 @@ public:
 		U1* pU1 = NULL;
 		if( !pO )
 		{
-			pO = srcOBJadd(dctID);
+			pO = srcOBJadd( pS, dctID);
 			if( !pO )
 				return NULL;
 			pO->AN = AN;
@@ -1395,7 +1395,7 @@ public:
 		U1* pU1 = NULL;
 		if( !pO )
 		{
-			pO = srcOBJadd(dctID);
+			pO = srcOBJadd( pS, dctID);
 			if( !pO )
 				return NULL;
 

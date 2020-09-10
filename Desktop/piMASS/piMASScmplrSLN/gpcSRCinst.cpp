@@ -170,8 +170,9 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 	gpOBJ* pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
 	U4x4* pL0 = aSCOOP[0].pLNK();
 	I8x4* pMN0 = aSCOOP[0].pMN();
-	U1* pU1, *pSRC = pA;
-	U8 s = -1;
+	U1* pU1, *pSRC = aSCOOP[0].p_str;
+	const char *pS;
+	U8 s = -1, nS;
 	for( U4 i = 0, iMN; i < nO; i++ )
 	{
 		gpOBJ& obj = pO0[i];
@@ -189,8 +190,12 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 			continue;
 		}
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n " );
-		iMN = pL0[obj.dctID].x;
-		pLZY = pLZY->lzyADD( pA+pMN0[iMN].iS, pMN0[iMN].nS, (s=-1), -1 );
+		//iMN = pL0[obj.dctID].x;
+		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
+		nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
+		pLZY = pLZY->lzyADD( //pSRC+pMN0[iMN].iS, pMN0[iMN].nS,
+								pS, nS,
+								(s=-1), -1 );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );
 		(s=-1);
 
