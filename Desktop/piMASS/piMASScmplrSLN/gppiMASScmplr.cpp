@@ -2,13 +2,15 @@
 #include "gpcSRClnk.h"
 #include "gpccrs.h"
 
-void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
+void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
 	if( !this )
 		return;
 	if( !pDBG )
 		pDBG = new gpcLZY;
 	else
 		pDBG->lzyRST();
+	if( !pMEM )
+		pMEM = new gpMEM( this, pMS );
 
 	I8x4 *pM0 = gpmSCP.pMN(), M, Mnx;
 	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];
@@ -128,5 +130,5 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP ) {
 
 	}
 
-	pMEM->instRDY();
+	pMEM->instRDY( pDBG );
 }

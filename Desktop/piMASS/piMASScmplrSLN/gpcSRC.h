@@ -1134,14 +1134,7 @@ public:
 		a8x2.y = i;
 		return *this;
 	};
-	gpINST& dbg( gpcLZY* pDBG ) {
-		if(!pDBG)
-			return *this;
-		U8 s = -1;
-		pDBG->lzyFRMT( s, "\r\n%0x8x", (I4)this );
-
-		return *this;
-	}
+	gpINST& dbg( gpcLZY* pDBG, gpcMASS* pMS, U1* pU1 = NULL );
 };
 class gpMEM {
 public:
@@ -1152,9 +1145,16 @@ public:
 			lzyCODE;
 	I4		nCD,
 			iSTK,nDAT,nINST, pc, pcCPY;
-	gpINST* pINST;
+	gpINST	*pINST;
+	gpcMASS	*pMASS;
+	gpcSRC	*pSRC;
 
-	gpMEM( I4 i = 0x2000 ){ gpmCLR; iSTK = nDAT = i; }
+	gpMEM( gpcSRC* pS, gpcMASS* pMS, I4 i = 0x2000 ){
+		gpmCLR;
+		pSRC = pS;
+		pMASS = pMS;
+		iSTK = nDAT = i;
+	}
 	U1* iPC( U4 iPC, U4 n )
 	{
 		if( !this )
@@ -1167,7 +1167,7 @@ public:
 		nCD++;
 		return *pI;
 	};
-	gpINST* instRDY()
+	gpINST* instRDY( gpcLZY* pDBG )
 	{
 		if( this ? !nCD : true )
 			return this ? pINST : NULL;
@@ -1178,8 +1178,12 @@ public:
 		}
 		U8 s = -1;
 		pINST = (gpINST*)lzyMEM.Ux( pcCPY, lzyCODE.n_load, true, 1 );
+
 		gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
 		nDAT = lzyMEM.n_load;
+		for( I4 i = 0; i < nCD; i++ )
+			pINST[i].dbg(pDBG,pMASS,lzyMEM.p_alloc);
+
 		return pINST;
 	}
 
@@ -1211,8 +1215,7 @@ public:
 	gpcLZYblk	lzyBLOCK;
 	gpMEM		*pMEM;
 
-	gpOBJ* srcOBJfnd( I4 dctID )
-	{
+	gpOBJ* srcOBJfnd( I4 dctID ) {
 		if( !pMEM )
 			return NULL;
 		gpOBJ* pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ );
@@ -1226,10 +1229,7 @@ public:
         }
         return NULL;
 	}
-	gpOBJ* srcOBJadd( char* pS, I4 dctID )
-	{
-		if( !pMEM )
-			pMEM = new gpMEM;
+	gpOBJ* srcOBJadd( char* pS, I4 dctID ) {
 		U4 nO = pMEM->lzyOBJ.nLD(sizeof(gpOBJ));
 		gpOBJ* pO = (gpOBJ*)pMEM->lzyOBJ.Ux( nO, sizeof(*pO) );
 		pO->dctID = dctID;
@@ -1237,8 +1237,6 @@ public:
 		return pO;
 	}
 	U1* srcMEMiPC( I4 iPC, U4 nU1 ) {
-		if( !pMEM )
-			pMEM = new gpMEM;
 		return pMEM->iPC( iPC, nU1 );
 	}
 	gpBLOCK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR  ) {
@@ -1257,8 +1255,7 @@ public:
 
 		return pBLK;
 	}
-	gpBLOCK* srcBLKup( char* pS, gpBLOCK* pBMom, gpeOPid opID )
-	{
+	gpBLOCK* srcBLKup( char* pS, gpBLOCK* pBMom, gpeOPid opID ) {
 		return srcBLKnew( pS, opID, pBMom->pLSTrow(), pBMom->bID, pBMom->iLAST() );
 	}
 	gpBLOCK* srcBLKinsrt( char* pS, gpBLOCK* pBLKup, gpeOPid opID ) {
@@ -1306,9 +1303,9 @@ public:
 	///--------------------------
 	///			INST
 	///--------------------------
-	gpBLOCK*	srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
-	gpBLOCK*	srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
-	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  );
+	gpBLOCK*	srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	gpBLOCK*	srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	bool 		srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN );
 	gpcLZY*		srcINSTmini( gpcLZY* pLZY,gpcMASS* pMASS, gpcWIN* pWIN );
 	///--------------------------
@@ -1466,11 +1463,11 @@ public:
 
 					break;
 				case gpeOPid_mov:
-					pBLKm = srcINSTmov( pS, pBLKm, pBLK, pDBG );
+					pBLKm = srcINSTmov( pS, pBLKm, pBLK );
 					break;
 				case gpeOPid_add:
 				case gpeOPid_sub:
-					pBLKm = srcINSTadd( pS, pBLKm, pBLK, pDBG );
+					pBLKm = srcINSTadd( pS, pBLKm, pBLK );
 					// move.l d0, -(A6)
 					break;
 				case gpeOPid_mul:{
@@ -1479,7 +1476,7 @@ public:
 						/// a, 		b +
 						/// a = 	b +
 						/// a * 	b +
-					pBLKm = srcINSTmul( pS, pBLKm, pBLK, pDBG );
+					pBLKm = srcINSTmul( pS, pBLKm, pBLK );
 					} break;
 			}
 
@@ -1629,7 +1626,7 @@ public:
 				pBLK->pNEWrow();
 				return pBLK;
 			case gpeOPid_mul: {
-					gpBLOCK	*pBLKm = srcINSTmul( pS, NULL, pBLK, pDBG );
+					gpBLOCK	*pBLKm = srcINSTmul( pS, NULL, pBLK );
 					if( pBLKm ? pBLKm->opIDgrp == gpeOPid_add : false )
 					{
 						/// IGEN volt alatta ADD
@@ -1900,7 +1897,7 @@ public:
 						bool bNoMini, U1 selID
 					);
 	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
-	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP );
+	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS );
 	void 	srcBLD( gpcMASS* pMASS ); //, gpcWIN& win );
 	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 

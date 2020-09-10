@@ -62,8 +62,102 @@ extern char gpaALF_H_sub[];
 #define D6 Dn(6)
 #define D7 Dn(7)
 
+gpINST& gpINST::dbg( gpcLZY* pDBG, gpcMASS* pMS, U1* pU1 ) {
+	if( pMS ? !pDBG : true )
+		return *this;
 
-gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG )
+	U8 s = -1;
+	char sBUFF[0x100], *pB = sBUFF;
+	pB += gpfALF2STR( pB, pMS->aOP[op].alf );
+
+	pDBG = pDBG->lzyFRMT( (s=-1), "\r\n0x%0.8x %s%s", (U4)((U1*)this-pU1), sBUFF, gpasCsz[cID] );
+
+	switch( mS )
+	{
+		case gpeEA_OFF:
+			return *this;
+		case gpeEA_Dn:
+			pDBG = pDBG->lzyFRMT( (s=-1), " D%x", iS );
+			break;
+		case gpeEA_An:
+			pDBG = pDBG->lzyFRMT( (s=-1), " A%x", iS );
+			break;
+		case gpeEA_IAnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), " (A%x)", iS );
+			break;
+		case gpeEA_IAnIp:
+			pDBG = pDBG->lzyFRMT( (s=-1), " (A%x)+", iS );
+			break;
+		case gpeEA_sIAnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), " -(A%x)", iS );
+			break;
+		case gpeEA_d16IAnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), " %d(A%x)", a8x2.x, iS );
+			break;
+		case gpeEA_d16IAnDnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), " %d(A%x,D%x)", a8x2.x, iS, xS );
+			break;
+		case gpeEA_d16IPcI:
+			pDBG = pDBG->lzyFRMT( (s=-1), " %d(PC)", a8x2.x );
+			break;
+
+		case gpeEA_d16IPcDnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), " %d(PC,D%x)", a8x2.x, iS );
+			break;
+		case gpeEA_W:
+		case gpeEA_L:
+			pDBG = pDBG->lzyFRMT( (s=-1), " %d", a8x2.x );
+			break;
+
+		default:
+			return *this;
+	}
+
+	switch( mD )
+	{
+		case gpeEA_OFF:
+			return *this;
+		case gpeEA_Dn:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",D%x", iD );
+			break;
+		case gpeEA_An:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",A%x", iD );
+			break;
+		case gpeEA_IAnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",(A%x)", iD );
+			break;
+		case gpeEA_IAnIp:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",(A%x)+", iD );
+			break;
+		case gpeEA_sIAnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",-(A%x)", iD );
+			break;
+		case gpeEA_d16IAnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(A%x)", a8x2.y, iD );
+			break;
+		case gpeEA_d16IAnDnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(A%x,D%x)", a8x2.y, iD, xD );
+			break;
+		case gpeEA_d16IPcI:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(PC)", a8x2.y );
+			break;
+
+		case gpeEA_d16IPcDnI:
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(PC,D%x)", a8x2.y, iD );
+			break;
+		case gpeEA_W:
+		case gpeEA_L:
+			pDBG = pDBG->lzyFRMT( (s=-1), " %d", a8x2.y );
+			break;
+		default:
+			return *this;
+	}
+
+
+
+	return *this;
+}
+gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK )
 {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
@@ -76,25 +170,25 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pD
 		iPC = iPCrow( pR0+i, sOF );
 		pU1 = srcMEMiPC( iPC, sOF );
 		//_move.l #iPC.Aa;
-		_move._L.EAl( iPC ).An(0)								.dbg(pDBG);
+		_move._L.EAl( iPC ).A0;
 		if( !i ){
 			// move.l (A0),d0
-			_move._L.IAnI(0).Dn(0)								.dbg(pDBG);
+			_move._L.IA0I.D0;
 			continue;
 		}
 		// move.l d0,(A0)
-		pMEM->inst( (gpeOPid)pR0[i].pstOP )._L.Dn(0).IAnI(0)	.dbg(pDBG);
+		pMEM->inst( (gpeOPid)pR0[i].pstOP )._L.D0.IA0I;
 	}
 
 	gpROW *pRm = pBLKm->pROW(pBLK->bIDmR);
 	iPC = iPCrow( pRm, sOF );
 	pU1 = srcMEMiPC( iPC, sOF );
-	_move._L.EAl( iPC ).An(0)									.dbg(pDBG);
-	_move._L.Dn(0).IAnI(0)										.dbg(pDBG);
+	_move._L.EAl(iPC).A0;
+	_move._L.D0.IA0I;
 	return pBLKm;
 }
 
-gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG )
+gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK )
 {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
@@ -107,25 +201,25 @@ gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pD
 		iPC = iPCrow( pR+i, sOF );
 		pU1 = srcMEMiPC( iPC, sOF );
 		//_move.l #iPC.Aa;
-		_move._L.EAl(iPC).A0							.dbg(pDBG);
+		_move._L.EAl(iPC).A0;
 		if( !i ){
 			// move.l (A0),d0
-			_move._L.IA0I.D0							.dbg(pDBG);
+			_move._L.IA0I.D0;
 			continue;
 		}
 		// add.l (A0),d0
-		pMEM->inst( (gpeOPid)pR[i].pstOP )._L.IA0I.D0	.dbg(pDBG);
+		pMEM->inst( (gpeOPid)pR[i].pstOP )._L.IA0I.D0;
 	}
 
 	pR = pBLKm->pROW(pBLK->bIDmR);
 	iPC = iPCrow( pR, sOF );
 	pU1 = srcMEMiPC( iPC, sOF );
-	_move._L.EAl( iPC ).An(0)							.dbg(pDBG);
-	_move._L.Dn(0).IAnI(0)								.dbg(pDBG);
+	_move._L.EAl( iPC ).A0;
+	_move._L.D0.IA0I;
 	// move.l d0, -(A6)
 	return pBLKm;
 }
-gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pDBG  )
+gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  )
 {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
@@ -138,21 +232,21 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpcLZY* pD
 		iPC = iPCrow( pR+i, sOF );
 		pU1 = srcMEMiPC( iPC, sOF );
 		//_move.l #iPC.Aa;
-		_move._L.EAl(iPC).A0							.dbg(pDBG);
+		_move._L.EAl(iPC).A0;
 		if( !i ){
 			// move.l (A0),d0
-			_move._L.IA0I.D0							.dbg(pDBG);
+			_move._L.IA0I.D0;
 			continue;
 		}
 		// add.l (A0),d0
-		pMEM->inst( (gpeOPid)pR[i].pstOP )._L.IA0I.D0	.dbg(pDBG);
+		pMEM->inst( (gpeOPid)pR[i].pstOP )._L.IA0I.D0;
 	}
 
 	pR = pBLKm->pROW(pBLK->bIDmR);
 	iPC = iPCrow( pR, sOF );
 	pU1 = srcMEMiPC( iPC, sOF );
-	_move._L.EAl( iPC ).A0							.dbg(pDBG);
-	_move._L.D0.IA0I								.dbg(pDBG);
+	_move._L.EAl( iPC ).A0;
+	_move._L.D0.IA0I;
 	return pBLKm;
 }
 bool gpcSRC::srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN ) {

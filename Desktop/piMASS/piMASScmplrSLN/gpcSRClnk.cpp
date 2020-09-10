@@ -276,7 +276,7 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 	if( pCORE )
 		return;
 
-	srcCMPLR( *pMASS->pOPER(), iSCP );
+	srcCMPLR( *pMASS->pOPER(), iSCP, pMASS );
 	(pCORE=new gpCORE)->coreLNK(
 									gpmLZYvali( I4x4, &gpmSCP.lzyASM ),
 									gpmSCP.nASM(),
