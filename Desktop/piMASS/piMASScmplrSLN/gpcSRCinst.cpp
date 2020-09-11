@@ -191,21 +191,83 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 
 	gpROW *pR0 = pBLK->pROW();
-	I4 iPC, sOF = 0;
+	I4 iPC, sOF = 0, cID = -1;
 	U1* pU1 = NULL;
-	for( I4 i = pBLK->nROW()-1, nR = pBLK->nROW(); i >= 0; i-- )
+	for( I4 i = pBLK->nROW()-1, j = 0, nR = pBLK->nROW(); i >= 0; i--, j++ )
 	{
 		iPC = iPCrow( pR0+i, sOF );
 		pU1 = srcMEMiPC( iPC, sOF );
 		//_move.l #iPC.Aa;
-		_move._L.EAl( iPC ).A0;
-		if( !i ){
-			// move.l (A0),d0
-			_move._L.IA0I.D0;
-			continue;
+		if( !j )
+		{
+			_move._L.EAl( iPC ).A0;
+			_move.c( (gpeCsz)(cID=pR0[i].cID) ).IA0I.D0;
+		} else {
+			if( cID != pR0[i].cID )
+			{
+				/// convert D0 -> pR0[i].cID
+				cID = pR0[i].cID;
+			}
+			if( (gpeOPid)pR0[i].pstOP == gpeOPid_mov )
+			{
+				if( cID<gpeCsz_K )
+					_move.c((gpeCsz)cID).D0.IA0I;
+				else
+					_move._L.D0.IA0I;
+				continue;
+			}
+
+			_move._q.D0.D1;
+
+			if( cID<gpeCsz_K )
+				_move.c((gpeCsz)cID).IA0I.D0;
+			else
+				_move._L.IA0I.D0;
+
+			if( cID<gpeCsz_K )
+			{
+				switch( pR0[i].pstOP )
+				{
+					case gpeOPid_addM: _add.c((gpeCsz)cID).D1.D0; break;
+					case gpeOPid_subM: _sub.c((gpeCsz)cID).D1.D0; break;
+					case gpeOPid_mulM: _mul.c((gpeCsz)cID).D1.D0; break;
+					case gpeOPid_divM: _div.c((gpeCsz)cID).D1.D0; break;
+					case gpeOPid_remM: _rem.c((gpeCsz)cID).D1.D0; break;
+					default: break;
+				}
+			}
+
+			if( cID<gpeCsz_K )
+			{
+				_move.c((gpeCsz)cID).D0.IA0I;
+				continue;
+			}
+
+			_move._L.D0.IA0I;
 		}
-		// move.l d0,(A0)
-		pMEM->inst( (gpeOPid)pR0[i].pstOP )._L.D0.IA0I;
+
+//		return;
+
+//		if( cID != pR0[i].cID )
+//		{
+//			if( !cID )
+//
+//			_move.c(pR0[i].cID).IA0I.D0;
+//
+//		}
+//		if( !i ){
+//			// move.l (A0),d0
+//			if( pR0[i].cID<gpeCsz_K )
+//				_move.c(pR0[i].cID).IA0I.D0;
+//			else
+//				_move._L.IA0I.D0;
+//			continue;
+//		}
+//		// move.l d0,(A0)
+//		if( pR0[i].cID<gpeCsz_K )
+//			pMEM->inst( (gpeOPid)pR0[i].pstOP ).c(pR0[i].cID).IA0I.D0;
+//		else
+//			pMEM->inst( (gpeOPid)pR0[i].pstOP )._L.IA0I.D0;
 	}
 
 	gpROW *pRm = pBLKm->pROW(pBLK->bIDmR);
@@ -231,11 +293,11 @@ gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		_move._L.EAl(iPC).A0;
 		if( !i ){
 			// move.l (A0),d0
-			_move._L.IA0I.D0;
+			_move.c((gpeCsz)pR[i].cID).IA0I.D0;
 			continue;
 		}
 		// add.l (A0),d0
-		pMEM->inst( (gpeOPid)pR[i].pstOP )._L.IA0I.D0;
+		pMEM->inst( (gpeOPid)pR[i].pstOP ).c((gpeCsz)pR[i].cID).IA0I.D0;
 	}
 
 	pR = pBLKm->pROW(pBLK->bIDmR);
@@ -261,11 +323,11 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
 		_move._L.EAl(iPC).A0;
 		if( !i ){
 			// move.l (A0),d0
-			_move._L.IA0I.D0;
+			_move.c((gpeCsz)pR[i].cID).IA0I.D0;
 			continue;
 		}
 		// add.l (A0),d0
-		pMEM->inst( (gpeOPid)pR[i].pstOP )._L.IA0I.D0;
+		pMEM->inst( (gpeOPid)pR[i].pstOP ).c((gpeCsz)pR[i].cID).IA0I.D0;
 	}
 
 	pR = pBLKm->pROW(pBLK->bIDmR);

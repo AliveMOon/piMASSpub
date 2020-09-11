@@ -1289,7 +1289,10 @@ public:
 	I4 iPCrow( gpROW* pR, I4& sOF ) {
 		sOF = 0;
 		if( pR->iPC >= 4 )
+		{
+			sOF = pR->sOF;
 			return pR->iPC;
+		}
 
 		gpOBJ* pO = srcOBJfnd( pR->mNdID );
 		if( !pO )
