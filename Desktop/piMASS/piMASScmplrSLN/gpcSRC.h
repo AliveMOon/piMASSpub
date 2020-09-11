@@ -907,7 +907,7 @@ class gpBLOCK {
 	I4 nR, iI;
 public:
 	I4	bIDm, bIDmR, bID,
-		iPC, sOF;
+		iPC, sOF, cID;
 
 	gpcLZY	lzyROW;
 	gpeOPid opIDgrp;
@@ -1003,8 +1003,10 @@ public:
 			return NULL;
 
 		if( bID < 0 )
+		{
 			bID = nBLK(); // bID -2 vagy kissebb akkor új blokot kérünk
-		else if( bID >= nBLK() )
+			nB = 0;
+		} else if( bID >= nBLK() )
 			bID = nBLK();
 
 		gpBLOCK** ppB = (gpBLOCK**)lzyBLK.Ux( bID, sizeof(*ppB) );
@@ -1252,15 +1254,35 @@ public:
 		gpROW	*pRf = pBLK->pROW(0,true);
 		if( !pRf )
 			return pBLK;
-		pRf->pstOP	= opID;
 
 		if( !pRml )
 			return pBLK;
 		*pRf = *pRml;
+		pRf->pstOP = opID;
 
 		pRml->pstOP = gpeOPid_nop;
 		pRml->bIDup = pBLK->bID;
+		if( pBLK->iPC >= 4 )
+			return pBLK;
+		U1* pU1 = NULL;
+		switch( pBLK->opIDgrp )
+		{
+			case gpeOPid_add:
+			case gpeOPid_mul:
+					pBLK->sOF = pRml->sOF;
+					pBLK->cID = pRml->cID;
+					pBLK->iPC = pMEM->nDAT;
+					pU1 = srcMEMiPC( pBLK->iPC, pBLK->sOF );
+					pMEM->nDAT += gpmPAD( pBLK->sOF, 0x10 );
+					break;
+			default:
+					pBLK->sOF = pRml->sOF;
+					pBLK->cID = pRml->cID;
+					pBLK->iPC = pRml->iPC;
+					break;
 
+
+		}
 		return pBLK;
 	}
 	gpBLOCK* srcBLKup( char* pS, gpBLOCK* pBMom, gpeOPid opID ) {
@@ -1286,8 +1308,18 @@ public:
 		pBLKi->pNEWrow();
 		return pBLKi;
 	}
-	I4 iPCrow( gpROW* pR, I4& sOF ) {
+	I4 iPCrow( gpROW* pR, I4& sOF, bool b_in ) {
 		sOF = 0;
+		if( b_in )
+		{
+			if( pR->bIDup )
+			if( gpBLOCK* pBup = lzyBLOCK.pSTPup( pR->bIDup, -1, -1 ) )
+			if( pBup->iPC >= 4 )
+			{
+				sOF = pBup->sOF;
+				return pBup->iPC;
+			}
+		}
 		if( pR->iPC >= 4 )
 		{
 			sOF = pR->sOF;
@@ -1658,6 +1690,10 @@ public:
 		}
 
 
+		pBLK = srcBLKup( pS, pBLK, opID );
+		pRl = pBLK->pLSTrow();
+		pBLK->pNEWrow();
+		return pBLK;
 
 		pRl->pstOP = opID;
 		pBLK->pNEWrow();
