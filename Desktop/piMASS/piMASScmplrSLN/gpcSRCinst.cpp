@@ -106,7 +106,7 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 			break;
 		case gpeEA_W:
 		case gpeEA_L:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %lld", a8x2.x );
+			pDBG = pDBG->lzyFRMT( (s=-1), " 0x%llx", a8x2.x );
 			break;
 
 		default:
@@ -175,7 +175,7 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 			break;
 		case gpeEA_W:
 		case gpeEA_L:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %lld", a8x2.y );
+			pDBG = pDBG->lzyFRMT( (s=-1), ",0x%llx", a8x2.y );
 			break;
 		default:
 			return *this;
@@ -394,28 +394,28 @@ gpINST* gpMEM::instALU()
 
 	switch( ins.mD )
 	{
-		case gpeEA_Dn: p_dst = (U1*)&(pD[ins.iS]); break;
-		case gpeEA_An: p_dst = (U1*)&(pA[ins.iS]); break;
-		case gpeEA_IAnI: p_dst = pALL + pA[ins.iS]; break;
+		case gpeEA_Dn: p_dst = (U1*)&(pD[ins.iD]); break;
+		case gpeEA_An: p_dst = (U1*)&(pA[ins.iD]); break;
+		case gpeEA_IAnI: p_dst = pALL + pA[ins.iD]; break;
 		case gpeEA_IAnIp:
-			p_dst = pALL + pA[ins.iS];
+			p_dst = pALL + pA[ins.iD];
 			pA[ins.iS]+=sOF;
 			break;
 		case gpeEA_sIAnI:
 			pA[ins.iS]-=sOF;
-			p_dst = pALL + pA[ins.iS];
+			p_dst = pALL + pA[ins.iD];
 			break;
 		case gpeEA_d16IAnI:
-			p_dst = pALL + pA[ins.iS] + ins.a8x2.y;
+			p_dst = pALL + pA[ins.iD] + ins.a8x2.y;
 			break;
 		case gpeEA_d16IAnDnI:
-			p_dst = pALL + pA[ins.iS] + pD[ins.xS] + ins.a8x2.y;
+			p_dst = pALL + pA[ins.iD] + pD[ins.xD] + ins.a8x2.y;
 			break;
 		case gpeEA_d16IPcI:
 			p_dst = pPC + ins.a8x2.y;
 			break;
 		case gpeEA_d16IPcDnI:
-			p_dst = pPC + pD[ins.iS] + ins.a8x2.y;
+			p_dst = pPC + pD[ins.iD] + ins.a8x2.y;
 			break;
 		case gpeEA_W:
 		case gpeEA_L:
