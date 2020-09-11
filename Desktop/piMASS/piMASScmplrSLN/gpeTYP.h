@@ -205,16 +205,16 @@ static const U8 gpaCszMX[] = {
 		{									\
 			case gpeOPid_and:				\
 				*(a*)p_dst &= *(a*)p_src;	\
-				continue;					\
+				break;					\
 			case gpeOPid_rem:				\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)%(*(a*)p_src) : (a)0;	\
-				continue;					\
+				break;					\
 			case gpeOPid_div:				\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)/(*(a*)p_src) : (a)mx;	\
-				continue;					\
+				break;					\
 			default:						\
 				*(a*)p_dst *= *(a*)p_src;	\
-				continue;					\
+				break;					\
 		} 							\
 
 #define gpmADD( a, b ) 						\
@@ -222,13 +222,13 @@ static const U8 gpaCszMX[] = {
 		{									\
 			case gpeOPid_or:				\
 				*(a*)p_dst |= *(a*)p_src;	\
-				continue;					\
+				break;					\
 			case gpeOPid_sub:				\
 				*(a*)p_dst -= *(a*)p_src;	\
-				continue;					\
+				break;					\
 			default:						\
 				*(a*)p_dst += *(a*)p_src;	\
-				continue;					\
+				break;					\
 		} 							\
 
 

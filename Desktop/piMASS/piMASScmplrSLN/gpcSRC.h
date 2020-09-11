@@ -30,6 +30,7 @@ class gpcRES;
 class gpcCRS;
 class gpcWIN;
 class gpCORE;
+class gpMEM;
 //#include "gpcres.h"
 
 //#include "gpccrs.h"
@@ -1134,11 +1135,13 @@ public:
 		a8x2.y = i;
 		return *this;
 	};
-	gpINST& dbg( gpcLZY* pDBG, gpcMASS* pMS, U1* pU1 = NULL );
+	gpINST& dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 = NULL );
 };
 class gpMEM {
 public:
 	I8x2 	aA[0x10];
+	I8		*pA, *pD;
+	double	aF[0x10];
 	gpcLZY	lzyMEM,
 			lzyOBJ,
 			lzyCLASS,
@@ -1154,6 +1157,9 @@ public:
 		pSRC = pS;
 		pMASS = pMS;
 		iSTK = nDAT = i;
+		nDAT += 0x100;
+		pA = (I8*)aA;
+		pD = (I8*)(aA+8);
 	}
 	U1* iPC( U4 iPC, U4 n )
 	{
@@ -1182,11 +1188,13 @@ public:
 		gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
 		nDAT = lzyMEM.n_load;
 		for( I4 i = 0; i < nCD; i++ )
-			pINST[i].dbg(pDBG,pMASS,lzyMEM.p_alloc);
+			pINST[i].dbg(pDBG,this,lzyMEM.p_alloc);
 
+		pc = 0;
+		aA[7] = iSTK;
 		return pINST;
 	}
-
+	gpINST* instALU();
 };
 
 class gpcSRC {

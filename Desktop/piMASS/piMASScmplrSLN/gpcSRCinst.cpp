@@ -62,16 +62,16 @@ extern char gpaALF_H_sub[];
 #define D6 Dn(6)
 #define D7 Dn(7)
 
-gpINST& gpINST::dbg( gpcLZY* pDBG, gpcMASS* pMS, U1* pU1 ) {
-	if( pMS ? !pDBG : true )
+gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
+	if( pMEM ? !pDBG : true )
 		return *this;
 
 	U8 s = -1;
 	char sBUFF[0x100], *pB = sBUFF;
-	pB += gpfALF2STR( pB, pMS->aOP[op].alf );
+	pB += gpfALF2STR( pB, pMEM->pMASS->aOP[op].alf );
 
 	pDBG = pDBG->lzyFRMT( (s=-1), "\r\n0x%0.8x %s%s", (U4)((U1*)this-pU1), sBUFF, gpasCsz[cID] );
-
+	U1	*pUs = NULL;
 	switch( mS )
 	{
 		case gpeEA_OFF:
@@ -92,21 +92,21 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpcMASS* pMS, U1* pU1 ) {
 			pDBG = pDBG->lzyFRMT( (s=-1), " -(A%x)", iS );
 			break;
 		case gpeEA_d16IAnI:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %d(A%x)", a8x2.x, iS );
+			pDBG = pDBG->lzyFRMT( (s=-1), " %lld(A%x)", a8x2.x, iS );
 			break;
 		case gpeEA_d16IAnDnI:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %d(A%x,D%x)", a8x2.x, iS, xS );
+			pDBG = pDBG->lzyFRMT( (s=-1), " %lld(A%x,D%x)", a8x2.x, iS, xS );
 			break;
 		case gpeEA_d16IPcI:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %d(PC)", a8x2.x );
+			pDBG = pDBG->lzyFRMT( (s=-1), " %lld(PC)", a8x2.x );
 			break;
 
 		case gpeEA_d16IPcDnI:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %d(PC,D%x)", a8x2.x, iS );
+			pDBG = pDBG->lzyFRMT( (s=-1), " %lld(PC,D%x)", a8x2.x, iS );
 			break;
 		case gpeEA_W:
 		case gpeEA_L:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %d", a8x2.x );
+			pDBG = pDBG->lzyFRMT( (s=-1), " %lld", a8x2.x );
 			break;
 
 		default:
@@ -120,9 +120,37 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpcMASS* pMS, U1* pU1 ) {
 		case gpeEA_Dn:
 			pDBG = pDBG->lzyFRMT( (s=-1), ",D%x", iD );
 			break;
-		case gpeEA_An:
-			pDBG = pDBG->lzyFRMT( (s=-1), ",A%x", iD );
-			break;
+		case gpeEA_An: {
+				pDBG = pDBG->lzyFRMT( (s=-1), ",A%x", iD );
+				switch( mS )
+				{
+					case gpeEA_W:
+					case gpeEA_L:
+						pUs = pMEM->pSRC->srcMEMiPC( a8x2.x, gpaCsz[cID] );
+						break;
+					default:
+						break;
+				}
+				if( !pUs )
+					break;
+				s = -1;
+				switch( cID )
+				{
+					case gpeCsz_Q: pDBG = pDBG->lzyFRMT( s, "\t\t; //%lld,", *(I8*)pUs ); break;
+					case gpeCsz_q: pDBG = pDBG->lzyFRMT( s, "\t\t; //%lld,", *(U8*)pUs ); break;
+					case gpeCsz_L: pDBG = pDBG->lzyFRMT( s, "\t\t; //%d,", *(int*)pUs ); break;
+					case gpeCsz_l: pDBG = pDBG->lzyFRMT( s, "\t\t; //%d,", *(U4*)pUs ); break;
+					case gpeCsz_W: pDBG = pDBG->lzyFRMT( s, "\t\t; //%d,", *(I2*)pUs ); break;
+					case gpeCsz_w: pDBG = pDBG->lzyFRMT( s, "\t\t; //%d,", *(U2*)pUs ); break;
+					case gpeCsz_B: pDBG = pDBG->lzyFRMT( s, "\t\t; //%d,", *(I1*)pUs ); break;
+					case gpeCsz_b: pDBG = pDBG->lzyFRMT( s, "\t\t; //%d,", *(U1*)pUs ); break;
+					case gpeCsz_f: pDBG = pDBG->lzyFRMT( s, "\t\t; //%f,", *(float*)pUs ); break;
+					case gpeCsz_d: pDBG = pDBG->lzyFRMT( s, "\t\t; //%f,", *(double*)pUs ); break;
+					case gpeCsz_4: pDBG = pDBG->lzyFRMT( s, "\t\t; //%d,", *(I1*)pUs ); break;
+					default: break;
+
+				}
+			} break;
 		case gpeEA_IAnI:
 			pDBG = pDBG->lzyFRMT( (s=-1), ",(A%x)", iD );
 			break;
@@ -133,21 +161,21 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpcMASS* pMS, U1* pU1 ) {
 			pDBG = pDBG->lzyFRMT( (s=-1), ",-(A%x)", iD );
 			break;
 		case gpeEA_d16IAnI:
-			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(A%x)", a8x2.y, iD );
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%lld(A%x)", a8x2.y, iD );
 			break;
 		case gpeEA_d16IAnDnI:
-			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(A%x,D%x)", a8x2.y, iD, xD );
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%lld(A%x,D%x)", a8x2.y, iD, xD );
 			break;
 		case gpeEA_d16IPcI:
-			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(PC)", a8x2.y );
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%lld(PC)", a8x2.y );
 			break;
 
 		case gpeEA_d16IPcDnI:
-			pDBG = pDBG->lzyFRMT( (s=-1), ",%d(PC,D%x)", a8x2.y, iD );
+			pDBG = pDBG->lzyFRMT( (s=-1), ",%lld(PC,D%x)", a8x2.y, iD );
 			break;
 		case gpeEA_W:
 		case gpeEA_L:
-			pDBG = pDBG->lzyFRMT( (s=-1), " %d", a8x2.y );
+			pDBG = pDBG->lzyFRMT( (s=-1), " %lld", a8x2.y );
 			break;
 		default:
 			return *this;
@@ -188,8 +216,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK )
 	return pBLKm;
 }
 
-gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK )
-{
+gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 
@@ -219,8 +246,7 @@ gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK )
 	// move.l d0, -(A6)
 	return pBLKm;
 }
-gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  )
-{
+gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 
@@ -252,6 +278,14 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  )
 bool gpcSRC::srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 	if( pMEM ? !pMEM->nCD : true )
 		return false;
+
+	I4 nPC = pMEM->nCD;
+	gpINST*pI;
+	while( pMEM->pc < nPC )
+	{
+		pI = pMEM->instALU();
+	}
+
 
 	return true;
 }
@@ -314,4 +348,158 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 
 
 	return pLZY;
+}
+gpINST* gpMEM::instALU()
+{
+	gpINST& ins = pINST[pc];
+	pc++;
+
+	U4 sOF = gpaCsz[ins.cID];
+	U1* p_src, *p_dst, *pALL = lzyMEM.p_alloc, *pPC = ((U1*)&ins);
+	switch( ins.mS )
+	{
+		case gpeEA_Dn: p_src = (U1*)&(pD[ins.iS]); break;
+		case gpeEA_An: p_src = (U1*)&(pA[ins.iS]); break;
+		case gpeEA_IAnI: p_src = pALL + pA[ins.iS]; break;
+		case gpeEA_IAnIp:
+			p_src = pALL + pA[ins.iS];
+			pA[ins.iS]+=sOF;
+			break;
+		case gpeEA_sIAnI:
+			pA[ins.iS]-=sOF;
+			p_src = pALL + pA[ins.iS];
+			break;
+		case gpeEA_d16IAnI:
+			p_src = pALL + pA[ins.iS] + ins.a8x2.x;
+			break;
+		case gpeEA_d16IAnDnI:
+			p_src = pALL + pA[ins.iS] + pD[ins.xS] + ins.a8x2.x;
+			break;
+		case gpeEA_d16IPcI:
+			p_src = pPC + ins.a8x2.x;
+			break;
+		case gpeEA_d16IPcDnI:
+			p_src = pPC + pD[ins.iS] + ins.a8x2.x;
+			break;
+		case gpeEA_W:
+		case gpeEA_L:
+			p_src = (U1*)&ins.a8x2.x;
+			break;
+
+		case gpeEA_OFF:
+		default:
+			p_src = NULL;
+			break;
+	}
+
+	switch( ins.mD )
+	{
+		case gpeEA_Dn: p_dst = (U1*)&(pD[ins.iS]); break;
+		case gpeEA_An: p_dst = (U1*)&(pA[ins.iS]); break;
+		case gpeEA_IAnI: p_dst = pALL + pA[ins.iS]; break;
+		case gpeEA_IAnIp:
+			p_dst = pALL + pA[ins.iS];
+			pA[ins.iS]+=sOF;
+			break;
+		case gpeEA_sIAnI:
+			pA[ins.iS]-=sOF;
+			p_dst = pALL + pA[ins.iS];
+			break;
+		case gpeEA_d16IAnI:
+			p_dst = pALL + pA[ins.iS] + ins.a8x2.y;
+			break;
+		case gpeEA_d16IAnDnI:
+			p_dst = pALL + pA[ins.iS] + pD[ins.xS] + ins.a8x2.y;
+			break;
+		case gpeEA_d16IPcI:
+			p_dst = pPC + ins.a8x2.y;
+			break;
+		case gpeEA_d16IPcDnI:
+			p_dst = pPC + pD[ins.iS] + ins.a8x2.y;
+			break;
+		case gpeEA_W:
+		case gpeEA_L:
+			p_dst = (U1*)&ins.a8x2.y;
+			break;
+
+		case gpeEA_OFF:
+		default:
+			p_dst = NULL;
+			break;
+	}
+
+	switch(gpaOPgrp[ins.op]) {
+			case gpeOPid_entry:{
+					switch(ins.op)
+					{
+						case gpeOPid_dot:
+							// find OBJ
+							break;
+						default: break;
+					}
+				} break;
+			case gpeOPid_mov:{
+					if( !p_dst || !p_src )
+						break;
+					switch(ins.op)
+					{
+						case gpeOPid_mov:
+						default:
+							gpmMcpy( p_dst, p_src, sOF );
+							break;
+					}
+				} break;
+			case gpeOPid_mul:{
+					if( !p_dst || !p_src )
+						break;
+					U8 mx = gpaCszMX[ins.cID];
+					switch( ins.cID )
+					{
+						case gpeCsz_Q: gpmMUL( I8, ins.op, mx ); break;
+						case gpeCsz_q: gpmMUL( U8, ins.op, mx ); break;
+						case gpeCsz_L: gpmMUL( I4, ins.op, mx ); break;
+						case gpeCsz_l: gpmMUL( U4, ins.op, mx ); break;
+						case gpeCsz_W: gpmMUL( I2, ins.op, mx ); break;
+						case gpeCsz_w: gpmMUL( U2, ins.op, mx ); break;
+						case gpeCsz_B: gpmMUL( I1, ins.op, mx ); break;
+						case gpeCsz_b: gpmMUL( U1, ins.op, mx ); break;
+						case gpeCsz_f: gpmMUL( F, ins.op, mx ); break;
+						case gpeCsz_d: gpmMUL( D, ins.op, mx ); break;
+						case gpeCsz_4: gpmMUL( U1x4, ins.op, mx ); break;
+						default: break;
+					}
+				} break;
+			case gpeOPid_add:{
+					if( !p_dst || !p_src )
+						break;
+
+					switch( ins.cID )
+					{
+						case gpeCsz_Q: gpmADD( I8, ins.op ); break;
+						case gpeCsz_q: gpmADD( U8, ins.op ); break;
+						case gpeCsz_L: gpmADD( I4, ins.op ); break;
+						case gpeCsz_l: gpmADD( U4, ins.op ); break;
+						case gpeCsz_W: gpmADD( I2, ins.op ); break;
+						case gpeCsz_w: gpmADD( U2, ins.op ); break;
+						case gpeCsz_B: gpmADD( I1, ins.op ); break;
+						case gpeCsz_b: gpmADD( U1, ins.op ); break;
+						case gpeCsz_f: gpmADD( F, ins.op ); break;
+						case gpeCsz_d: gpmADD( D, ins.op ); break;
+						case gpeCsz_4: gpmADD( U1x4, ins.op ); break;
+						default: break;
+					}
+				} break;
+			case gpeOPid_sub:{
+					if( !p_dst || !p_src )
+						break;
+					switch(ins.op)
+					{
+						default:
+							pD[9] = (*p_dst == *p_src);
+							break;
+					}
+				} break;
+		}
+
+	return &ins;
 }
