@@ -22,6 +22,10 @@
 //~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //~ SOFTWARE.
 
+#define gpdDEBUG
+//#define gpdNEW_CMPLR
+
+
 #include "mysys.h"
 #define piMASS_DEBUG 1
 #include <exception>

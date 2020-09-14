@@ -489,6 +489,15 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 
 					pANS = RnD.aDrc[iD].answSTAT( pANS, iD );
 					continue;
+				case gpeALF_INFO:
+					if(iD >= nD )
+					{
+						iNUM = gpeDRCos_NONS;
+						break;
+					}
+
+					pANS = RnD.aDrc[iD].answINFO( pANS, iD );
+					continue;
 				case gpeALF_STOP:
 				default:
 					break;

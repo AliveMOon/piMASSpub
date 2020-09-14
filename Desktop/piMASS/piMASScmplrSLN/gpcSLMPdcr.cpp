@@ -81,7 +81,27 @@ gpcDrc& gpcDrc::operator = ( const gpcROB& rob ) {
 	}
 	return *this;
 }
+gpcLZY* gpcDrc::answINFO( gpcLZY* pANS, U1 id ) {
+	if( !this )
+		return pANS;
 
+	I4x4 cXYZ = cageXYZ( mmX(gpdROBlim), id );
+	U1 	sCOM[] = "ABCD";
+		U4 &comA = *(U4*)sCOM;
+	U8 s;
+	pANS = pANS->lzyFRMT( s = -1, 	"\r\nPOS %0.2f %0.2f %0.2f "
+									"ABC %0.2f %0.2f %0.2f "
+									"pos %0.2f %0.2f %0.2f ",
+									//*sCOM ? (char*)sCOM : "?",
+									double(iXYZ.x)/mmX(1), double(iXYZ.y)/mmX(1), double(iXYZ.z)/mmX(1),
+
+									double(iABC.x)/degX(1), double(iABC.y)/degX(1), double(iABC.z)/degX(1),
+
+									double(txyz.x)/mmX(1), double(txyz.y)/mmX(1), double(txyz.z)/mmX(1)
+							);
+
+	return pANS;
+}
 gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
 		if( !this )
 			return pANS;

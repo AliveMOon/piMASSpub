@@ -817,6 +817,7 @@ typedef enum gpeALF:I8
 	gpeALF_HTTP = gpdABCD('H', 'T', 'T', 'P'),
 
 	gpeALF_IDLE = gpdABCD('I', 'D', 'L', 'E'),
+	gpeALF_INFO = gpdABCD('I', 'N', 'F', 'O'),
 	gpeALF_INIT = gpdABCD('I', 'N', 'I', 'T'),
 
 	gpeALF_ITEM = gpdABCD('I', 'T', 'E', 'M'),

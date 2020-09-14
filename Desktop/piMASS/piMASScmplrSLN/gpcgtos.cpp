@@ -11,15 +11,15 @@ gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pT
 	U8 s;
 	p_out = p_out->lzyFRMT(
 									s = -1,
-									"%s%0.8x %s %s"
+									"%s%s 0x%0.8x %s"
 									" %d %s"
 									" %s %s %s"
 									" %d %d %s"
 									" %d/%d%s",
-									pTAB, socket, s_type, s_ip,
+									pTAB, s_type, socket,  s_ip,
 									port, bGTdie() ? "die" : "live", //(socket < 0) ? "die" : "live"),
                                     sHOST, sUSER, pFILE > sFILE ? (char*)sFILE : "",
-                                    mSEC.x, mSEC.y, bLOOP() ? "LP" : "<>",
+                                    mSEC.x, mSEC.y, bLOOP() ? "LP" : "-",
                                     nSYNdo, nSYNsum,
 									p_enter
 								);

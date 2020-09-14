@@ -260,6 +260,7 @@ public:
 				|(bHS2i()<<0x0c)|(bHS2o()<<0x08)
 				|(bHS3i()<<0x04)|(bHS3o());
 	}
+	gpcLZY* answINFO( gpcLZY* pANS, U1 id );
 	gpcLZY* answSTAT( gpcLZY* pANS, U1 id );
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}

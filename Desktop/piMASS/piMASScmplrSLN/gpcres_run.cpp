@@ -470,6 +470,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 		}
 
 		if( !pSRC->apOUT[3] )
+		#ifdef gpdNEW_CMPLR
 		if( pSRC->srcINSTrun(this,pWIN) )
 		{
 			pWIN->nJDOIT.x++;
@@ -483,7 +484,10 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 
 			pSRC->pMINI = pSRC->srcMINI(pSRC->pMINI,this,pWIN);
 			continue;
-		} else {
+		}
+		else
+		#endif
+		{
 			if( !pSRC->pEXE0 )
 			{
 				pSRC->pMINI->lzyRST();
