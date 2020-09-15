@@ -498,6 +498,15 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 
 					pANS = RnD.aDrc[iD].answINFO( pANS, iD );
 					continue;
+				case gpeALF_INFOX:
+					if(iD >= nD )
+					{
+						iNUM = gpeDRCos_NONS;
+						break;
+					}
+
+					pANS = RnD.aDrc[iD].answINFOX( pANS, iD, 100 );
+					continue;
 				case gpeALF_STOP:
 				default:
 					break;
@@ -506,7 +515,6 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			if( oD != iD )
 			if( pD )
 			{
-				//pD->cageXYZ( mmX(gpdROBlim), iD );
 				pANS = pD->answSTAT( pANS, iD );
 			}
 			pD = NULL;

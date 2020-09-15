@@ -81,28 +81,81 @@ gpcDrc& gpcDrc::operator = ( const gpcROB& rob ) {
 	}
 	return *this;
 }
-gpcLZY* gpcDrc::answINFO( gpcLZY* pANS, U1 id ) {
+
+int gpcDrc::answINFOX( char* pANS, U4 id, I4 x ) {
 	if( !this )
-		return pANS;
+		return 0;
 
 	I4x4 cXYZ = cageXYZ( mmX(gpdROBlim), id );
 	U1 	sCOM[] = "ABCD";
-		U4 &comA = *(U4*)sCOM;
-	U8 s;
-	pANS = pANS->lzyFRMT( s = -1, 	"\r\nPOS %0.2f %0.2f %0.2f "
-									"ABC %0.2f %0.2f %0.2f "
-									"pos %0.2f %0.2f %0.2f ",
-									//*sCOM ? (char*)sCOM : "?",
-									double(iXYZ.x)/mmX(1), double(iXYZ.y)/mmX(1), double(iXYZ.z)/mmX(1),
+	U4 &comA = *(U4*)sCOM;
+	comA = NMnDIF.au4x2[0].x;
+	return sprintf( pANS,
 
-									double(iABC.x)/degX(1), double(iABC.y)/degX(1), double(iABC.z)/degX(1),
+							"\r\n "
+							"NM %s ERR 0x%0.4x ms 0x%0.8x xX %d "
+							"POSX %d %d %d "
+							"ABCX %d %d %d "
+							"posx %d %d %d "
+							"HS 0x%0.4x ",
+							(char*)sCOM, JD.z, msSRT3.x, x,
 
-									double(txyz.x)/mmX(1), double(txyz.y)/mmX(1), double(txyz.z)/mmX(1)
-							);
+							(iXYZ.x*x)/mmX(1), (iXYZ.y*x)/mmX(1), (iXYZ.z*x)/mmX(1),
+							(iABC.x*x)/degX(1), (iABC.y*x)/degX(1), (iABC.z*x)/degX(1),
+							(txyz.x*x)/mmX(1), (txyz.y*x)/mmX(1), (txyz.z*x)/mmX(1),
 
-	return pANS;
+							hs123()
+					);
+
+	//return nS;
 }
-gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U1 id ) {
+gpcLZY* gpcDrc::answINFOX( gpcLZY* pANS, U4 id, I4 x ) {
+	if( !this )
+		return pANS;
+	char sBUFF[0x100];
+	if( !answINFOX( sBUFF, id, x ) )
+		return pANS;
+	U8 s = -1;
+	return pANS->lzyFRMT( s, "%s", sBUFF );
+}
+int gpcDrc::answINFO( char* pANS, U4 id ) {
+	if( !this )
+		return 0;
+
+	I4x4 cXYZ = cageXYZ( mmX(gpdROBlim), id );
+	U1 	sCOM[] = "ABCD";
+	U4 &comA = *(U4*)sCOM;
+	comA = NMnDIF.au4x2[0].x;
+	return sprintf( pANS,
+
+							"\r\n "
+							"NM %s ERR 0x%0.4x ms 0x%0.8 xX %7.2f "
+							"POSX %7.2f %7.2f %7.2f "
+							"ABCX %7.2f %7.2f %7.2f "
+							"posx %7.2f %7.2f %7.2f "
+							"HS 0x%0.4x ",
+							sCOM, JD.z, msSRT3.x, 1.0,
+
+							double(iXYZ.x)/mmX(1),	double(iXYZ.y)/mmX(1),	double(iXYZ.z)/mmX(1),
+							double(iABC.x)/degX(1),	double(iABC.y)/degX(1),	double(iABC.z)/degX(1),
+							double(txyz.x)/mmX(1),	double(txyz.y)/mmX(1),	double(txyz.z)/mmX(1),
+
+							hs123()
+					);
+
+	//return nS;
+}
+gpcLZY* gpcDrc::answINFO( gpcLZY* pANS, U4 id ) {
+	if( !this )
+		return pANS;
+	char sBUFF[0x100];
+	if( !answINFO( sBUFF, id ) )
+		return pANS;
+	U8 s = -1;
+	return pANS->lzyFRMT( s, "%s", sBUFF );
+}
+
+gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id ) {
 		if( !this )
 			return pANS;
 		I4x4 cXYZ = cageXYZ( mmX(gpdROBlim), id );
@@ -453,8 +506,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
 		return *this;		// nem fut a R2D task
 
 
-	if( !JD.x )
-	{
+	if( !JD.x ) {
 		oCTRL.w = 0;
 		oCTRL.z = 1;
 		JD.y = 0;
@@ -465,7 +517,10 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
 		JD.x = 1;
 		return *this;
 	}
+
+	/// --------------------
 	/// CTRL.z = 0;
+	/// --------------------
 	oCTRL.z = 0;
 	if( sqrt(okXYZ.qlen_xyz()) > mmX(200) ){
 		// ezt kaptuk a robitol

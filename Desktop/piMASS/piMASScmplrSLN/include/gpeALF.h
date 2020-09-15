@@ -994,6 +994,9 @@ typedef enum gpeALF:I8
 	gpeALF_HISTI = gpdABCDE('H', 'I', 'S', 'T', 'I'),
 	gpeALF_HUMAN = gpdABCDE('H', 'U', 'M', 'A', 'N'),
 	gpeALF_INDEX = gpdABCDE('I', 'N', 'D', 'E', 'X'),
+
+	gpeALF_INFOX = gpdABCDE('I', 'N', 'F', 'O', 'X'),
+
 	gpeALF_KCTRL = gpdABCDE('K', 'C', 'T', 'R', 'L'),
 	gpeALF_LABEL = gpdABCDE('L', 'A', 'B', 'E', 'L'),
 	gpeALF_LATHE = gpdABCDE('L', 'A', 'T', 'H', 'E'),

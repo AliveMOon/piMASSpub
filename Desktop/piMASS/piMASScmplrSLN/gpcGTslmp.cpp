@@ -104,10 +104,9 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		return GTslmpBINref( mom, pWIN, pALL );*/
 
 	//, nPAD = gpdZSpad, nPADu2 = nPAD/sizeof(U2);
-	gpcMASS& mass = *(pWIN->piMASS);
-	gpcGT* pGTusr = NULL;
-	gpcLZY	*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
-			//*pLZYout = mass.GTlzyALL.LZY( gpdGTlzyIDref(TnID) ),
+	gpcMASS	*pMASS = pWIN->piMASS;
+	gpcGT	*pGTusr = NULL;
+	gpcLZY	*pLZYinp = pMASS->GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
 			*pLZYusr = NULL,
 			*pLZYdead = NULL;
 	gpcROBnD *pROBnD = gpmLZYvali( gpcROBnD, pLZYinp );
@@ -116,6 +115,8 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			*pU2inp = pROBnD->pU2inp();
 
 	SOCKET	*pSOCK;
+	char sANSW[0x100], *pANSW = sANSW, sCOM[] = "ABCD";
+
 	U4 nSOCK, nD0 = 0, iD0 = 0, eD0, iDRC;
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
@@ -192,22 +193,55 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			if( iD0 > 4 )
 			{
 				iDRC = pROBnD->iDrc();
+				I4x4	befPOS = pROBnD->aDrc[iDRC].iXYZ,
+						befABC = pROBnD->aDrc[iDRC].iABC;
+
 				// nem fecsegés, hanem adat
 				pROBnD->aDrc[iDRC] = pROBnD->ioROB();
 				pROBnD->aDrc[iDRC].msSMR2.w = pWIN->mSEC.x;
+
+
+				I4	dPOS = (pROBnD->aDrc[iDRC].iXYZ-befPOS).qlen_xyz(),
+					dABC = (pROBnD->aDrc[iDRC].iABC-befABC).qlen_xyz();
+				if( dPOS+dABC ) {
+					pANSW += pROBnD->aDrc[iDRC].answINFOX( pANSW, iDRC, 100 );
+					if( sANSW < pANSW ) {
+						pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+						if( !pSOCK ) {
+							pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+							pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+							nSOCK = gpmLZYload( pLZYusr, SOCKET );
+						}
+
+						for( U4 iS = 0; iS < nSOCK; iS++ ) {
+							pGTusr = pALL->GT( pSOCK[iS] );
+							if( pGTusr->bGTdie() )
+								continue;
+							pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1,	//"\r\n %d."
+																			"%s",
+																			//pGTusr->iCNT,
+																			sANSW );
+							pGTusr->GTback();
+						}
+					}
+				}
+
+
+
 				pROBnD->stpPULL();
 				if( pROBnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pROBnD->pull( pOUT, gpaROBwr );
 			}
 
-		} else {
+		}
+		else {
 			/// error
 			if( pALL ) {
 				/// üzenet a felhasználóknak
 				pSOCK = gpmLZYvali( SOCKET, pLZYusr );
 				if( !pSOCK )
 				{
-					pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+					pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 					pSOCK = gpmLZYvali( SOCKET, pLZYusr );
 					nSOCK = gpmLZYload( pLZYusr, SOCKET );
 				}
@@ -274,6 +308,9 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// Drc judo filter
 	/// ---------------------------------
 	iD0 = pROBnD->stpPUSH( true );
+	I4x4	befPOS = pROBnD->aDrc[iD0].iXYZ,
+			befABC = pROBnD->aDrc[iD0].iABC;
+
 
 	U4x4& JD = pROBnD->aDrc[iD0].JD;
 	U4 JDy = JD.y;
@@ -285,64 +322,85 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						pROBnD->aROBio[iD0*2]
 						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x )
 					); // pA-ban azaz új out lesz
+
 	if( JDy == JD.y )
 	{
+
 		pOUT = pROBnD->pull( pOUT, gpaROBwr );
 		return;
 	}
-	char sANSW[0x100], *pANSW = sANSW, sCOM[] = "ABCD";
+
+
 	U4& comA = *(U4*)sCOM, msg = JDy+JD.y*0x10;
 	comA = pROBnD->aDrc[iD0].NMnDIF.au4x2[0].x;
-	I4x4 iXYZ = pROBnD->aDrc[iD0].iXYZ;
 	switch( msg )
 	{
 		case 0x04:
-			pANSW += sprintf( pANSW, "%s %0.2x END HS2i off! HS2o off!", sCOM, msg  );
-			break;
 		case 0x10:
-			pANSW += sprintf( pANSW, "%s %0.2x START HS1o on!", sCOM, msg  );
-			break;
 		case 0x11:
-			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS1i on??", sCOM, msg  );
-			break;
 		case 0x21:
-			pANSW += sprintf( pANSW, "%s %0.2x HS1i on! HS1o off!", sCOM, msg  );
-			break;
 		case 0x33:
-			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i on?", sCOM, msg  );
-			break;
 		case 0x40:
 		case 0x41:
-			pANSW += sprintf( pANSW, "%s %0.2x ON maradt a HS2!", sCOM, msg  );
-			break;
 		case 0x43:
-			pANSW += sprintf( pANSW, 	"%s %0.2x HS2i on!  HS2o on!"
-										" Error:%d"
-										" POS: %0.2fmm %0.2fmm %0.2fmm ",
-										sCOM, msg, //JD.x,
-										JD.z,
-										double(iXYZ.x)/mmX(1),
-										double(iXYZ.y)/mmX(1),
-										double(iXYZ.z)/mmX(1)
-										 );
-			break;
 		case 0x44:
-			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i off?", sCOM, msg  );
+			pANSW += pROBnD->aDrc[iD0].answINFOX( pANSW, iD0, 100 );
 			break;
+		default:
 
+			break;
 	}
-	if( sANSW < pANSW )
-	{
-		pSOCK = gpmLZYvali( SOCKET, pLZYusr );
-		if( !pSOCK )
+	if( sANSW == pANSW ) {
+
+		I4x4 iXYZ = pROBnD->aDrc[iD0].iXYZ;
+		switch( msg )
 		{
-			pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+			case 0x04:
+				pANSW += sprintf( pANSW, "%s %0.2x END HS2i off! HS2o off!", sCOM, msg  );
+				break;
+			case 0x10:
+				pANSW += sprintf( pANSW, "%s %0.2x START HS1o on!", sCOM, msg  );
+				break;
+			case 0x11:
+				pANSW += sprintf( pANSW, "%s %0.2x Wait! HS1i on??", sCOM, msg  );
+				break;
+			case 0x21:
+				pANSW += sprintf( pANSW, "%s %0.2x HS1i on! HS1o off!", sCOM, msg  );
+				break;
+			case 0x33:
+				pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i on?", sCOM, msg  );
+				break;
+			case 0x40:
+			case 0x41:
+				pANSW += sprintf( pANSW, "%s %0.2x ON maradt a HS2!", sCOM, msg  );
+				break;
+			case 0x43:
+				pANSW += sprintf( pANSW, 	"%s %0.2x HS2i on!  HS2o on!"
+											" Error:%d"
+											" POS: %0.2fmm %0.2fmm %0.2fmm ",
+											sCOM, msg, //JD.x,
+											JD.z,
+											double(iXYZ.x)/mmX(1),
+											double(iXYZ.y)/mmX(1),
+											double(iXYZ.z)/mmX(1)
+											 );
+				break;
+			case 0x44:
+				pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i off?", sCOM, msg  );
+				break;
+
+		}
+	}
+
+	if( sANSW < pANSW ) {
+		pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+		if( !pSOCK ) {
+			pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 			pSOCK = gpmLZYvali( SOCKET, pLZYusr );
 			nSOCK = gpmLZYload( pLZYusr, SOCKET );
 		}
 
-		for( U4 iS = 0; iS < nSOCK; iS++ )
-		{
+		for( U4 iS = 0; iS < nSOCK; iS++ ) {
 			pGTusr = pALL->GT( pSOCK[iS] );
 			if( pGTusr->bGTdie() )
 				continue;

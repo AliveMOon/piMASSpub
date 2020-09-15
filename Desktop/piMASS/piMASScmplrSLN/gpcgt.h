@@ -260,8 +260,12 @@ public:
 				|(bHS2i()<<0x0c)|(bHS2o()<<0x08)
 				|(bHS3i()<<0x04)|(bHS3o());
 	}
-	gpcLZY* answINFO( gpcLZY* pANS, U1 id );
-	gpcLZY* answSTAT( gpcLZY* pANS, U1 id );
+	int		answINFO( char*		pANS, U4 id );
+	gpcLZY* answINFO( gpcLZY* 	pANS, U4 id );
+	gpcLZY* answSTAT( gpcLZY* 	pANS, U4 id );
+
+	int		answINFOX( char*	pANS, U4 id, I4 x );
+	gpcLZY* answINFOX( gpcLZY*	pANS, U4 id, I4 x );
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
 	bool bHS1o() const { return !!(oCTRL.y&ZShs1);	}
