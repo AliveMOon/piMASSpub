@@ -102,7 +102,7 @@ int gpcDrc::answINFOX( char* pANS, U4 id, I4 x ) {
 
 							(iXYZ.x*x)/mmX(1), (iXYZ.y*x)/mmX(1), (iXYZ.z*x)/mmX(1),
 							(iABC.x*x)/degX(1), (iABC.y*x)/degX(1), (iABC.z*x)/degX(1),
-							(txyz.x*x)/mmX(1), (txyz.y*x)/mmX(1), (txyz.z*x)/mmX(1),
+							(ixyz.x*x)/mmX(1), (ixyz.y*x)/mmX(1), (ixyz.z*x)/mmX(1),
 
 							hs123()
 					);

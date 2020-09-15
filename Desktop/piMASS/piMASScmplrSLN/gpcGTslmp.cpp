@@ -202,8 +202,8 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 
 				I4	dPOS = (pROBnD->aDrc[iDRC].iXYZ-befPOS).qlen_xyz(),
-					dABC = (pROBnD->aDrc[iDRC].iABC-befABC).qlen_xyz();
-				if( dPOS+dABC ) {
+					dABC = befABC.mmABC( pROBnD->aDrc[iDRC].iABC, degX(180.0/PI), degX(180.0/PI) ).w;
+				if( dPOS+(dABC>=(degX(1)/2)) ) {
 					pANSW += pROBnD->aDrc[iDRC].answINFOX( pANSW, iDRC, 100 );
 					if( sANSW < pANSW ) {
 						pSOCK = gpmLZYvali( SOCKET, pLZYusr );
