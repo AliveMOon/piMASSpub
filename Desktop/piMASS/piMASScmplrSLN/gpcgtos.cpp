@@ -13,7 +13,7 @@ gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pT
 									s = -1,
 									"%s%s 0x%0.8x %s"
 									" %d %s"
-									" %s %s %s"
+									" HST:%s USR:%s FIL:%s"
 									" %d %d %s"
 									" %d/%d%s",
 									pTAB, s_type, socket,  s_ip,
@@ -76,13 +76,17 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 	if( gpmLZYload(pOUT, U1) )
 		return pOUT ? pOUT->n_load : 0;
 
-	if( !gpmLZYload(pPUB, U1) )
+	if( !gpmLZYload(pPUBgt, U1) )
 		return 0;
 
 	gpmDEL( pOUT );
-	pOUT = pPUB;
-	pPUB = NULL;
-
+	if( pOUT = pPUBgt )
+	{
+		pPUBgt = NULL;
+		GTprmpt();
+		if( pINP )
+			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
+	}
 	return pOUT ? pOUT->n_load : 0;
 }
 void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
@@ -475,7 +479,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						}
 						break;
 					case gpeALF_MSG:{
-							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "msg%0.8x: %s%s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
+							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "msg 0x%0.8x: %s%s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
 						} break;
 					case gpeALF_HELP:
 						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", gpmGTent );

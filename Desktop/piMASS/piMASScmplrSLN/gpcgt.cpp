@@ -597,11 +597,11 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	U8 s;
 	if( !pOUT )
 	{
-		if( !pPUB )
+		if( !pPUBgt )
 			return p_err;
 
-		pOUT = pPUB;
-		pPUB = NULL;
+		pOUT = pPUBgt;
+		pPUBgt = NULL;
 		if( !sGTent[2] )
 		if( sGTent[0] )
 		{
@@ -800,7 +800,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			//	TCP_NODELAY,	/* name of option */
 			//	(char*)& no_daley,	/* the cast is historical cruft */
 			//	sizeof(int));	/* length of option value */
-			
+
 #else
 			// set non blocking
 			U8 a = fcntl( socket, F_GETFL, NULL );
@@ -1176,8 +1176,8 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				}
 
 				pACC->GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
-				
-				
+
+
 
 #ifdef _WIN64
 				char* s_buff = (char*)win.sGTpub;
@@ -1251,7 +1251,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
-				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
+				p_gt->pPUBgt = p_gt->pPUBgt->lzyPLUS( pOUT, s );
 			}
 			gpmDEL(pOUT);
 		}
@@ -1271,7 +1271,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
-				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
+				p_gt->pPUBgt = p_gt->pPUBgt->lzyPLUS( pOUT, s );
 			}
 			gpmDEL(pOUT);
 		}

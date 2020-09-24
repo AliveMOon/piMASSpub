@@ -703,30 +703,6 @@ public:
 		return *this;
 	}
 	gpcHUD* put( const void* p_void, I8 n_byte);
-	/*{
-		if( p_void ? !n_byte : true )
-			return this;
-		if(!this)
-		{
-			gpcHUD* p_this = new gpcHUD;
-			if(!p_this)
-				return NULL;
-			return p_this->put(p_void, n_byte);
-		}
-		if( p_alloc )
-		{
-			U1	*p_kill = p_alloc;
-			p_alloc = new U1[n+n_byte];
-			memcpy( p_alloc, p_kill, n );
-			memcpy( p_alloc+n, p_void, n_byte );
-			n += n_byte;
-			gpmDELary(p_kill);
-			return this;
-		}
-		n = n_byte;
-		p_alloc = (U1*)memcpy( new U1[n+(0x10-(n%0x10))], p_void, n );
-		return this;
-	}*/
 
 };
 
@@ -795,7 +771,7 @@ class gpcGT
 		SOCKADDR_IN	*p_ai, addr_in;
 		gpcGTall	GTacc;
 
-		gpcLZY		*pPUB,
+		gpcLZY		*pPUBgt,
 					*pINP, *pMISi,
 					*pEVENT,
 					*pSYNgt;
@@ -862,6 +838,7 @@ class gpcGT
 			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
 			return true;
 		}
+
 		gpcLZY* GTback()
 		{
 			if( !this )
@@ -891,7 +868,7 @@ class gpcGT
 			if( this )
 			{
 				GTacc.clr();
-				gpmDEL( pPUB );
+				gpmDEL( pPUBgt );
 				gpmDEL( pOUT ); gpmDEL( pMISo );
 				gpmDEL( pINP ); gpmDEL( pMISi );
 				gpmDEL( pDWN );

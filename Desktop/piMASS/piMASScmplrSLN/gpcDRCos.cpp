@@ -11,7 +11,7 @@ extern char gpsTAB[], *gppTAB;
 // BALL
 //------------------------
 I4x4 gpaCAGEbillBALL[] = {
-	{ mmX(1500), 0, mmX(320), mmX(700) },
+	{ mmX(1500), 0, mmX(320), mmX(350) },						// jOHN
 	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
@@ -35,7 +35,7 @@ U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 // BALL
 //------------------------
 I4x4 gpaCAGEjohnBALL[] = {
-	{ mmX(1500), 0, mmX(320), mmX(700) },
+	{ mmX(1500), 0, mmX(320), mmX(350) },						// bILL
 	{ 0, 0, mmX(320), mmX(300) }, { 0, 0, mmX(-300), mmX(350) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
