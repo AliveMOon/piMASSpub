@@ -70,6 +70,88 @@ U4x4 gpaROBwr[] = {
 	{ 	0x40A,  refROB.nWu2,	20000, refROB.nRu2	},
 };
 
+/*gpcDrc::gpcDrc( const gpcZS& zs, U4 nm )
+{
+	if( nm != NMnDIF.au4x2[0].x )
+		format( nm );
+	*this = zs;
+}*/
+gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
+	/// DEBUG célból készült nem igazán használható másra
+	gpmCLR;
+	iXYZ.xyz_(a);
+	tXYZ.xyz_(b);
+
+	oXYZ.xyz_( (tXYZ+iXYZ)/2 );
+
+	txyz.xyz_(c);
+
+	I4x4	iR = (iXYZ-txyz).xyz0(),
+			tR = (tXYZ-txyz).xyz0(),
+			oR = (oXYZ-txyz).xyz0();
+
+	I4	iRr = sqrt(iR.qlen_xyz())/0x100,
+		oRr = sqrt(oR.qlen_xyz())/0x100,
+		tRr = sqrt(tR.qlen_xyz())/0x100;
+
+	oXYZ.xyz_( (oR*tRr)/oRr + txyz );
+
+	std::cout << "iR   " << iR.pSTR( pbuff ) << "iRr " << iRr << std::endl;
+	std::cout << "tR   " << tR.pSTR( pbuff ) << "tRr " << tRr << std::endl;
+	std::cout << "oR   " << oR.pSTR( pbuff ) << "oRr " << oRr << std::endl;
+	std::cout << "a    " << a.pSTR( pbuff ) << std::endl;
+	std::cout << "oXYZ " << oXYZ.pSTR( pbuff ) << std::endl;
+	std::cout << "tXYZ " << tXYZ.pSTR( pbuff ) << std::endl;
+	std::cout << std::endl;
+
+
+	iABC.ABC_( F4(  0, 30, 45 )*degX(1) );
+	tABC.ABC_( F4( 90, 90, 90 )*degX(1) );
+
+	oABC.ABC_( iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) )/2 + iABC );
+
+	F4x4	iMX, tMX, oMX;
+	float ab = 0.5;
+	iMX.mxABC(iABC, degX(180.0/PI) );
+	oMX.mxABC(oABC, degX(180.0/PI) );
+	tMX.mxABC(tABC, degX(180.0/PI) );
+	//oMX = iMX.lerp_zyx( tMX, ab );
+
+	std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "iX   " << iMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "iY   " << iMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "iZ   " << iMX.z.pSTR( pbuff ) << std::endl << std::endl;
+
+	std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;
+
+	std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl << std::endl;
+
+    iABC.ABC_( iMX.eulABC()*degX(180.0/PI) );
+    tABC.ABC_( oMX.eulABC()*degX(180.0/PI) );
+	//tABC.ABC_( tMX.eABC()*degX(180.0/PI) );
+
+	std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;
+	std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl << std::endl;
+
+	tMX.mxABC(tABC, degX(180.0/PI) );
+	std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;
+
+	std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;
+	std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;
+	std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl;
+	std::cout << std::endl;
+}
 
 gpcROB& gpcROB::operator &= ( const gpcDrc& D )
 {
@@ -81,7 +163,7 @@ gpcROB& gpcROB::operator = ( const gpcDrc& D )
 {
 	null();
 	gpmMcpyOF( aXYZ,	&D.oXYZ.x, 3 );
-	gpmMcpyOF( aABC,	&D.oABC.x, 3 );
+	gpmMcpyOF( aABC,	&D.oABC.A, 3 );
 	HS = D.oCTRL.y;
 	if( D.bHS1o() )
 		COM = D.oCTRL.z;
@@ -94,8 +176,7 @@ gpcROB::gpcROB( const gpcDrc& D ) {
 	gpmCLR;
 	*this = D;
 }
-void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
-{
+void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )
 		return;

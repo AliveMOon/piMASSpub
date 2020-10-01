@@ -110,7 +110,6 @@
 		<Unit filename="gpcDRCos.cpp" />
 		<Unit filename="gpcGL.cpp" />
 		<Unit filename="gpcGTslmp.cpp" />
-		<Unit filename="gpcGTslmpZS.cpp" />
 		<Unit filename="gpcI4x2.cpp" />
 		<Unit filename="gpcI4x4.cpp" />
 		<Unit filename="gpcI8x2.cpp" />

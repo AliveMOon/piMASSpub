@@ -909,7 +909,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			GTslmpDrcRob( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
 			break;
 		case gpeALF_SLMPo:
-			GTslmpDrcZS( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			//GTslmpDrcZS( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
 			break;
 		default:
 			break;
