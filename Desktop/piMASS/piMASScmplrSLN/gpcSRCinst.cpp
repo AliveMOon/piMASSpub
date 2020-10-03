@@ -314,8 +314,12 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
 bool gpcSRC::srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 	if( pMEM ? !pMEM->nCD : true )
 		return false;
-
 	I4 nPC = pMEM->nCD;
+	if( pMEM->pc >= nPC )
+		return false;
+
+	std::cout << stdRUN " RUN" stdRESET; // << std::endl;
+
 	gpINST*pI;
 	while( pMEM->pc < nPC )
 	{
@@ -327,9 +331,12 @@ bool gpcSRC::srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
 }
 gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 	pLZY->lzyRST();
+	std::cout << stdMINI " MIN" stdRESET << std::endl;
+
 	I4 nO = 0, sOF = 0;
 	if( pMEM ? !(nO=pMEM->lzyOBJ.nLD(sizeof(gpOBJ))) : true )
 		return pLZY;
+
 	char sBUFF[0x100];
 	gpOBJ* pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
 	U4x4* pL0 = aSCOOP[0].pLNK();
@@ -390,6 +397,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 }
 gpINST* gpMEM::instALU()
 {
+	std::cout << stdALU "+";
 	gpINST& ins = pINST[pc];
 	pc++;
 

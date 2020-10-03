@@ -100,6 +100,7 @@ U4 gpcCRS::miniRDYmap(
 
 	gpcSRC* pSrC = NULL;
 	U1 oo;
+	std::cout << stdALU "+";
 	for( i = 0; i < ie; i++ ) {
 		if( !pM[i] )
 			continue;
@@ -110,7 +111,8 @@ U4 gpcCRS::miniRDYmap(
 						&& ( c+1 <= lurdAN.z && r <= lurdAN.w )
 					);
 		/// TÁMADÁS HO RUKK!!
-		dim = (pSrC = pWIN->piMASS->srcFND( pM[i] ))->srcBRK( bNoMini, selID, " \t\r\n" );
+		dim =	(pSrC = pWIN->piMASS->srcFND( pM[i] ))
+				->srcBRK( bNoMini, selID, " \t\r\n" );
 
 		//dim = mass.srcFND( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )

@@ -1,5 +1,6 @@
+#define gpdNEW_CMPLR
+
 #include "gpcwin.h"
-//#include "gpcres.h"
 
 bool bITT =  false; //true; // false; //
 extern U1 gpaALFsub[];
@@ -470,35 +471,14 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 		}
 
 		if( !pSRC->apOUT[3] )
-		#ifdef gpdNEW_CMPLR
-		if( pSRC->srcINSTrun(this,pWIN) )
 		{
-			pWIN->nJDOIT.x++;
+			if( !pSRC->srcINSTrun(this,pWIN) )
+				continue;
 
+			pWIN->nJDOIT.x++;
 			pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI,this,pWIN);
-			continue;
 		}
-		else if( pSRC->srcRUN(this,pWIN) )
-		{
-			pWIN->nJDOIT.x++;
-
-			pSRC->pMINI = pSRC->srcMINI(pSRC->pMINI,this,pWIN);
-			continue;
-		}
-		else
-		#endif
-		{
-			if( !pSRC->pEXE0 )
-			{
-				pSRC->pMINI->lzyRST();
-				continue;
-			}
-			pWIN->nJDOIT.x++;
-			pSRC->pMINI->lzyRST();
-			pSRC->apOUT[3] = pSRC->pEXE0->RESrun( pSRC->apOUT[3], NULL, *pWIN, pSRC, NULL );
-			if( !pSRC->apOUT[3] )
-				continue;
-		}
+		continue;
 
 
 		/// READY

@@ -35,6 +35,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 		dim.z = gpfUTFlen( pUTF, pUe, dim.x, dim.y );
 		return dim;
 	}
+
 	U8 nU;
 	U4 nS, nA, nN, nO, nX, u8;
 	I8 nSTR;
@@ -44,6 +45,10 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 	if( pDBG ? pDBG->p_alloc == pALL : false )
 		iSCP = 2;
 
+	if( gpmSCP.bGD( pALL, &pUe ) )
+		return dim;
+
+	std::cout << stdBREAK "BRK" << (int)iSCP << stdRESET << std::endl;
 	gpmSCP.rst( pALL );
 	dim.xyz_( 0 );
 	U4x2 pos(0);
@@ -56,6 +61,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 
 	for( nS = gpmNINCS( pUi, pVAN ); pUi < pUe; nS = gpmNINCS( pUi, " \t\r\n" ) )
 	{
+		//std::cout << stdBREAK "." << (int)(pUi-pALL) << stdRESET << std::endl;
 		if( nS )
 		{
 			// elrakjuk kell
@@ -158,6 +164,11 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 
 		//nO = gpmVAN( pUi, " \t\r\n", nU );
 		nO = gpmNINCS( pUi, gpsOPERA );
+		if( !nO )
+		{
+			pUi++; // gpmVAN( pUi, pVAN, nU );
+			continue;
+		}
 		gpmSCP.DCTadd(pos,pUi,nO,clrOPERA);
 		pos.x += nO;
 		dim.a4x2[0].mx( pos );
@@ -165,6 +176,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 		pUi += nO;
 	}
 	dim.a4x2[0]+=1;
+	std::cout << stdBREAK "oBRK" << (int)iSCP << stdRESET << std::endl;
 	return dim;
 }
 
@@ -184,7 +196,7 @@ U1 gpcSRC::srcSCN( gpcCRS& crs, bool bNoMini, U1 selID ) {
 			bONpre, bSEL = false,
 			bSTR=false,
 			bONorSTR = false;
-			//bMN = pMINI ? pMINI->p_alloc == pALL : false;
+
 	U1 iSCP = pMINI ? pMINI->p_alloc == pALL : false;
 	if( pDBG ? pDBG->p_alloc == pALL : false )
 		iSCP = 2;

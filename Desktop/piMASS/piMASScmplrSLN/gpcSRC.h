@@ -724,7 +724,27 @@ public:
 	gpcLZY		lzyASM;		I4x4 rINS;	U4 nINS;
 
 	U1	*p_str;
+	U8	hsSTR;
 	gpcSCOOP(){ gpmCLR; };
+
+	bool bGD( U1* pUTF, U1** ppUe )
+	{
+		U8	hs2 = 0;
+		U4	i = 0;
+		while( pUTF[i] )
+		{
+			hs2 += i + (U8)pUTF[i];
+			i++;
+		}
+		if( ppUe )
+			*ppUe = pUTF+i;
+		if( hsSTR == hs2 )
+			return true;
+
+		hsSTR = hs2;
+		return false;
+	}
+
 	void rst( U1* pUTF )
 	{
 		lzyMiN.lzyRST();
@@ -1154,6 +1174,10 @@ public:
 	gpcMASS	*pMASS;
 	gpcSRC	*pSRC;
 
+	/*~gpMEM()
+	{
+		gpmDEL(pINST);
+	}*/
 	gpMEM( gpcSRC* pS, gpcMASS* pMS, I4 i = 0x2000 ){
 		gpmCLR;
 		pSRC = pS;
@@ -1223,7 +1247,8 @@ public:
 	gpCORE		*pCORE;
 
 	gpcLZYblk	lzyBLOCK;
-	gpMEM		*pMEM;
+	gpMEM		*pMEM,
+				*pOLD;
 
 	gpOBJ* srcOBJfnd( I4 dctID ) {
 		if( !pMEM )

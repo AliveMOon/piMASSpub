@@ -11,7 +11,7 @@
  //john 
  	= d1.mini;
  slmp = "192.168.1.90 10000";
- cam = 331 * 10;
+ cam = 1;
  pic = "clip"; 
  
  bob = "exp";
@@ -48,7 +48,7 @@
   d1	 
   mini = "wget -O ./calib_rics/calib%s http://192.168.1.160:5000/api/camera/take_picture";
  
- a2	 
+ a2	
 // BILL HS123:000000 E:88ms AVG:444ms
 // POS:  n:0
 //	iXYZ  599.99mm,  600.00mm,  399.99mm 
@@ -69,7 +69,7 @@
 //	okXYZ  599.99mm,  600.00mm,  399.99mm 
 //	okabc -180.00dg,    0.00dg, -134.94dg 
 //	okxyz    0.00mm,    0.00mm,    0.00mm;"
- b2	 
+ b2	
 // JOHN HS123:010000 E:88ms AVG:446ms
 // POS:  n:159
 //	iXYZ  832.78mm,   87.50mm,  199.98mm 
@@ -90,7 +90,7 @@
 //	okXYZ  832.78mm,   87.50mm,  199.98mm 
 //	okabc  179.99dg,   -0.01dg, -133.50dg 
 //	okxyz    0.00mm,    0.00mm,    0.00mm;"
- c2	    d2	    aa2	   mini = "wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture" a3	 
+ c2	    d2	    aa2	   mini = "wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture" a3	
 //0000|00000004 00000000 00000000 00000000 |................
 //0010|00000000 000065bb 000065bc 000065bc |.....e...e...e..
 //0020|00000000 00000000 00000000 00000000 |................

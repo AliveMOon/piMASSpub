@@ -22,8 +22,8 @@
 //~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //~ SOFTWARE.
 
-#define gpdDEBUG
-//#define gpdNEW_CMPLR
+//#define gpdDEBUG
+//? #define gpdNEW_CMPLR
 
 
 #include "mysys.h"
@@ -506,6 +506,26 @@ U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* 
 			| ((U4)a)						\
 		)
 #endif
+
+#define stdRESET	"\033[0m"
+
+#define stdBLACK	"\033[1;30m"
+#define stdRED		"\033[1;31m"
+#define stdGREEN	"\033[1;32m"
+#define stdYELLOW	"\033[1;33m"
+#define stdBLUE		"\033[1;34m"
+#define stdPURPLE	"\033[1;35m"
+#define stdCYAN		"\033[1;36m"
+#define stdWHITE	"\033[1;36m"
+
+#define stdALU		stdYELLOW
+#define stdMINI		stdBLUE
+#define stdRUN		stdPURPLE
+#define stdCMPLR	stdRED
+#define stdDBG		stdCYAN
+#define stdBREAK	stdGREEN
+#define stdRDY		stdCYAN
+
 enum gpeCLR: U1
 {
 	gpeCLR_black,	gpeCLR_red, 	gpeCLR_green,	gpeCLR_blue,
