@@ -944,7 +944,13 @@ public:
 		iI = i;
 		return iI;
 	}
-
+	gpROW* pROWadd( I4 iR ) {
+		gpROW* pR = (gpROW*)lzyROW.Ux( iR, sizeof(*pR) );
+		if( !pR )
+			return NULL;
+		nR = 0;
+		return pR;
+	}
 	I4 nROW() {
 		if( !this )
 			return 0;
@@ -962,9 +968,13 @@ public:
 
 		if( nROW() <= iR )
 		{
-			if( bADD )
-				return pROWadd( iR );
-			return NULL;
+			if( !bADD )
+				return NULL;
+			gpROW* pRl = pLSTrow();
+			if( pRl )
+			if( pRl->pstOP == gpeOPid_nop )
+				return pRl;
+			return pROWadd( iR );
 		}
 
 		return ((gpROW*)gpmLZYvali( gpROW, &lzyROW )) + iR;
@@ -977,15 +987,11 @@ public:
 		(*pRl = pO)->mnID = mnID;
 		return pRl;
 	}
-	gpROW* pNEWrow() { return pROW(nROW(), true); }
-
-	gpROW* pROWadd( I4 iR ) {
-		gpROW* pR = (gpROW*)lzyROW.Ux( iR, sizeof(*pR) );
-		if( !pR )
-			return NULL;
-		nR = 0;
-		return pR;
+	gpROW* pNEWrow() {
+		return pROW(nROW(), true);
 	}
+
+
 	gpBLOCK( I4 bid, I4 bIDmom, I4 bIDmomR ){
 		gpmCLR;
 		bID 	= bid;
@@ -1284,25 +1290,25 @@ public:
 			return pBLK;
 		*pRf = *pRml;
 		pRf->pstOP = opID;
+		pBLK->pNEWrow();
 
 		pRml->pstOP = gpeOPid_nop;
 		pRml->bIDup = pBLK->bID;
 		if( pBLK->iPC >= 4 )
 			return pBLK;
 		U1* pU1 = NULL;
+
+		pBLK->sOF = pRml->sOF;
+		pBLK->cID = pRml->cID;
 		switch( pBLK->opIDgrp )
 		{
 			case gpeOPid_add:
 			case gpeOPid_mul:
-					pBLK->sOF = pRml->sOF;
-					pBLK->cID = pRml->cID;
 					pBLK->iPC = pMEM->nDAT;
 					pU1 = srcMEMiPC( pBLK->iPC, pBLK->sOF );
 					pMEM->nDAT += gpmPAD( pBLK->sOF, 0x10 );
 					break;
 			default:
-					pBLK->sOF = pRml->sOF;
-					pBLK->cID = pRml->cID;
 					pBLK->iPC = pRml->iPC;
 					break;
 
@@ -1402,8 +1408,9 @@ public:
 							pO->iPC = pMEM->nDAT,
 							pO->sOF()
 						);
-		pMEM->nDAT += pO->sOF();
-		gpmZn( pU1, pO->sOF() );
+		U4 n = gpmPAD( pO->sOF(), 0x10 );
+		pMEM->nDAT += n;
+		gpmZn( pU1, n );
 
 		return pO;
 	}
@@ -1714,15 +1721,12 @@ public:
 				break;
 		}
 
+		return srcBLKup( pS, pBLK, opID );
 
 		pBLK = srcBLKup( pS, pBLK, opID );
 		pRl = pBLK->pLSTrow();
 		pBLK->pNEWrow();
 		return pBLK;
-
-		pRl->pstOP = opID;
-		pBLK->pNEWrow();
-		return srcBLKup( pS, pBLK, opID );
 	}
 	gpBLOCK* srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		///switch( now )

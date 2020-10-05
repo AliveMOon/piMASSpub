@@ -266,14 +266,11 @@ gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	{
 		iPC = iPCrow( pR+i, sOF, true );
 		pU1 = srcMEMiPC( iPC, sOF );
-		//_move.l #iPC.Aa;
 		_move._L.EAl(iPC).A0;
 		if( !i ){
-			// move.l (A0),d0
 			_move.c((gpeCsz)pR[i].cID).IA0I.D0;
 			continue;
 		}
-		// add.l (A0),d0
 		pMEM->inst( (gpeOPid)pR[i-1].pstOP ).c((gpeCsz)pR[i].cID).IA0I.D0;
 	}
 
