@@ -100,7 +100,7 @@ U4 gpcCRS::miniRDYmap(
 
 	gpcSRC* pSrC = NULL;
 	U1 oo;
-	std::cout << stdALU "+";
+	std::cout << stdRDY " RDY";
 	for( i = 0; i < ie; i++ ) {
 		if( !pM[i] )
 			continue;

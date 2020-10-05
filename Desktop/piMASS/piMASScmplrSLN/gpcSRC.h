@@ -725,6 +725,8 @@ public:
 
 	U1	*p_str;
 	U8	hsSTR;
+	U4x4 dim;
+
 	gpcSCOOP(){ gpmCLR; };
 
 	bool bGD( U1* pUTF, U1** ppUe )
