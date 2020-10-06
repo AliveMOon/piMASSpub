@@ -74,6 +74,7 @@ gpBLOCK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gp
 		pBLK = pBLKm;
 
 	}
+	return pBLK;
 
 	gpROW	*pRl = pBLK->pLSTrow();
 	if( !pRl )

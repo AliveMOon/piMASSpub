@@ -376,7 +376,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 			//pLZY = pLZY->lzyADD( pU1, obj.sOF(), (s=-1), -1 );
 			continue;
 		}
-		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n " );
+		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n0x%x ", obj.iPC );
 		//iMN = pL0[obj.dctID].x;
 		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
 		nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
@@ -403,8 +403,8 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 			default: break;
 
 		}
-		(s=-1);
-		pLZY = pLZY->lzyFRMT( s, "\t\t// 0x%x", obj.iPC );
+		/*(s=-1);
+		pLZY = pLZY->lzyFRMT( s, "\t\t// 0x%x", obj.iPC );*/
 
 	}
 
