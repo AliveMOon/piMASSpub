@@ -1,7 +1,89 @@
 #include "gpcSRC.h"
 #include "gpcSRClnk.h"
 #include "gpccrs.h"
+gpBLOCK* gpcSRC::srcBLKblkS( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 
+		///					pRl
+		/// a + 			{		//block level up
+		/// a + 			b{		//block rutine
+		/// a + 			(		//brake block
+		/// a + 			b(		//function
+		/// a + 			b[		//index b
+		//if( !pBLK )
+		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
+
+		gpROW* pRl = pBLK->pLSTrow();
+		if( !pRl )
+			return pBLK;
+		if( pBLK->opIDgrp == opID )
+		{
+			/// a + 			{{{{		//block level up
+			/// a + 			b{c(d((		//block rutinepRl->pstOP = opID;
+			pRl->pstOP = opID;
+			pBLK->pNEWrow();
+			return pBLK;
+		}
+		if( pRl->iPC < 4 )
+		{
+			gpOBJ* pO = srcOBJfnd( pRl->mNdID );
+			if( !pO )
+				pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
+			*pRl = *pO;
+		}
+		return srcBLKup( pS, pBLK, opID );
+}
+gpBLOCK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
+	///kEND(scp);
+	U1* pU1 = NULL;
+	gpBLOCK* pBLKup = NULL;
+	while( pBLKup ? (pBLKup->opIDgrp != gpeOPid_entry) : !!pBLK )
+	{
+		/// FENT
+		gpBLOCK	*pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+		gpROW	*pR0 = pBLK->pROW(),
+				*pRd = pBLKm->pROW(pBLK->bIDmR);
+		I4 nR = pBLK->nROW(), iPC, sOF;
+		switch( pBLK->opIDgrp )
+		{
+			case gpeOPid_entry: {
+					pBLKm = srcINSTdwn( pS, pBLKm, pBLK, pBLKup );
+				} break;
+			case gpeOPid_mov:
+				pBLKm = srcINSTmov( pS, pBLKm, pBLK );
+				break;
+			case gpeOPid_add:
+			case gpeOPid_sub:
+				pBLKm = srcINSTadd( pS, pBLKm, pBLK );
+				// move.l d0, -(A6)
+				break;
+			case gpeOPid_mul:{
+					///			pRl
+					/// a, 		_ +
+					/// a, 		b +
+					/// a = 	b +
+					/// a * 	b +
+				pBLKm = srcINSTmul( pS, pBLKm, pBLK );
+				} break;
+		}
+
+
+		if( !pBLKm )
+			break;
+		/// LENT
+		pBLKup = pBLK;
+		pBLK = pBLKm;
+
+	}
+
+	gpROW	*pRl = pBLK->pLSTrow();
+	if( !pRl )
+		return pBLK;
+
+	pRl->pstOP = opID;
+	/// a veszö egyenlőre csinál helyet
+	pBLK->pNEWrow();
+	return pBLK;
+}
 void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
 	if( !this )
 		return;
@@ -88,7 +170,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
 							case gpeOPid_dimE:
 							case gpeOPid_brakE:
 								/// FENT
-
+								pBLK = srcBLKbrakE( pS, mnID, pBLK, opID, pDBG );
 								/// LENT
 								break;
 

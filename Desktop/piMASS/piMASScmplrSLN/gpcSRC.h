@@ -904,13 +904,15 @@ public:
 	gpROW(){};
 	gpROW* operator = ( gpOBJ& O )
 	{
-		if( !this || !&O )
+		if( !this )
 			return this;
-
-		mNdID	= O.dctID;
-		cID 	= O.cID();
-		iPC 	= O.iPC;
-		sOF 	= O.sOF();
+		if( &O )
+		{
+			mNdID	= O.dctID;
+			cID 	= O.cID();
+			iPC 	= O.iPC;
+			sOF 	= O.sOF();
+		}
 
 		mnID = mNdID;
 		if( mnID < 0 )
@@ -1379,6 +1381,7 @@ public:
 	///--------------------------
 	///			INST
 	///--------------------------
+	gpBLOCK*	srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* pBLKup );
 	gpBLOCK*	srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
@@ -1522,6 +1525,7 @@ public:
 	///--------------------------
 	///			OPERA
 	///--------------------------
+	gpBLOCK* srcBLKbrakE( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG );
 	gpBLOCK* srcBLKstk( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		///kEND(scp);
 		U1* pU1 = NULL;
@@ -1607,30 +1611,7 @@ public:
 		//gpBLOCK* pBup =
 		return srcBLKup( pS, pBLK, opID );
 	}
-	gpBLOCK* srcBLKblkS( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
-
-		///					pRl
-		/// a + 			{		//block level up
-		/// a + 			b{		//block rutine
-		/// a + 			(		//brake block
-		/// a + 			b(		//function
-		/// a + 			b[		//index b
-		//if( !pBLK )
-		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-
-		gpROW* pRl = pBLK->pLSTrow();
-		if( !pRl )
-			return pBLK;
-		if( pBLK->opIDgrp == opID )
-		{
-			/// a + 			{{{{		//block level up
-			/// a + 			b{c(d((		//block rutinepRl->pstOP = opID;
-			pRl->pstOP = opID;
-			pBLK->pNEWrow();
-			return pBLK;
-		}
-		return srcBLKup( pS, pBLK, opID );
-	}
+	gpBLOCK* srcBLKblkS( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID );
 	gpBLOCK* srcBLKmul( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^

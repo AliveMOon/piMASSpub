@@ -185,6 +185,25 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 
 	return *this;
 }
+gpBLOCK* gpcSRC::srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* pBLKup ) {
+	if( !pBLKm )
+		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+	if( pBLKup )
+		pBLK = pBLKup;
+	I4 aiPC[2], sOF = 0, cID = -1;
+	U1* pU1 = NULL;
+
+	//gpROW *pR0 = pBLK->pROW();
+	//aiPC[0] = iPCrow( pR0, sOF, true );
+	_move._L.EAl(pBLK->iPC).A0;
+
+	gpROW *pRm = pBLKm->pROW(pBLK->bIDmR);
+	aiPC[1] = iPCrow( pRm, sOF, false );
+	//pU1 = srcMEMiPC( iPC, sOF );
+	_move._L.EAl(aiPC[1]).A1;
+	_move._L.IA0I.IA1I;
+	return pBLKm;
+}
 gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
