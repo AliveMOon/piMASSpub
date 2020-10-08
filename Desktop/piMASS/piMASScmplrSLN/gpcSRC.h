@@ -2473,6 +2473,7 @@ public:
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
 	U1* justDOit( gpcWIN* pWIN ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
+	U1* justDOitOLD( gpcWIN* pWIN ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
 
 
 	gpcMASS&	null();

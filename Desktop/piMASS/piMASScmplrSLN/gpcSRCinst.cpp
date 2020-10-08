@@ -26,6 +26,7 @@ extern char gpaALF_H_sub[];
 #define _K c(gpeCsz_K)
 #define _OFF c(gpeCsz_OFF)
 
+#define _nop	pMEM->inst( gpeOPid_nop )
 #define _move	pMEM->inst( gpeOPid_mov )
 #define _add	pMEM->inst( gpeOPid_add )
 #define _sub	pMEM->inst( gpeOPid_sub )
@@ -67,6 +68,15 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 		return *this;
 
 	U8 s = -1;
+	if( op == gpeOPid_nop )
+	{
+		pDBG = pDBG->lzyFRMT(
+								(s=-1),
+								"\r\n0x%0.8x nop; //----------------",
+								(U4)((U1*)this-pU1)
+							);
+		return *this;
+	}
 	char sBUFF[0x100], *pB = sBUFF;
 	pB += gpfALF2STR( pB, pMEM->pMASS->aOP[op].alf );
 
@@ -202,6 +212,7 @@ gpBLOCK* gpcSRC::srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* p
 	//pU1 = srcMEMiPC( iPC, sOF );
 	_move._L.EAl(aiPC[1]).A1;
 	_move._L.IA0I.IA1I;
+	_nop;
 	return pBLKm;
 }
 gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
@@ -211,58 +222,60 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	gpROW *pR0 = pBLK->pROW();
 	I4 iPC, sOF = 0, cID = -1;
 	U1* pU1 = NULL;
-	for( I4 i = pBLK->nROW()-1, j = 0, nR = pBLK->nROW(); i >= 0; i--, j++ )
+	for( I4 i = pBLK->nROW()-1, j = 0, nR = pBLK->nROW(); i >= 0; i-- )
 	{
 		iPC = iPCrow( pR0+i, sOF, true );
 		pU1 = srcMEMiPC( iPC, sOF );
-		//_move.l #iPC.Aa;
 		if( !j )
 		{
+			j = 1;
 			_move._L.EAl( iPC ).A0;
 			_move.c( (gpeCsz)(cID=pR0[i].cID) ).IA0I.D0;
-		} else {
-			if( cID != pR0[i].cID )
-			{
-				/// convert D0 -> pR0[i].cID
-				cID = pR0[i].cID;
-			}
-			if( (gpeOPid)pR0[i].pstOP == gpeOPid_mov )
-			{
-				if( cID<gpeCsz_K )
-					_move.c((gpeCsz)cID).D0.IA0I;
-				else
-					_move._L.D0.IA0I;
-				continue;
-			}
-
-			_move._q.D0.D1;
-
-			if( cID<gpeCsz_K )
-				_move.c((gpeCsz)cID).IA0I.D0;
-			else
-				_move._L.IA0I.D0;
-
-			if( cID<gpeCsz_K )
-			{
-				switch( pR0[i].pstOP )
-				{
-					case gpeOPid_addM: _add.c((gpeCsz)cID).D1.D0; break;
-					case gpeOPid_subM: _sub.c((gpeCsz)cID).D1.D0; break;
-					case gpeOPid_mulM: _mul.c((gpeCsz)cID).D1.D0; break;
-					case gpeOPid_divM: _div.c((gpeCsz)cID).D1.D0; break;
-					case gpeOPid_remM: _rem.c((gpeCsz)cID).D1.D0; break;
-					default: break;
-				}
-			}
-
-			if( cID<gpeCsz_K )
-			{
-				_move.c((gpeCsz)cID).D0.IA0I;
-				continue;
-			}
-
-			_move._L.D0.IA0I;
+			continue;
 		}
+
+		if( cID != pR0[i].cID )
+		{
+			/// convert D0 -> pR0[i].cID
+			cID = pR0[i].cID;
+		}
+		if( (gpeOPid)pR0[i].pstOP == gpeOPid_mov )
+		{
+			if( cID<gpeCsz_K )
+				_move.c((gpeCsz)cID).D0.IA0I;
+			else
+				_move._L.D0.IA0I;
+			continue;
+		}
+
+		_move._q.D0.D1;
+
+		if( cID<gpeCsz_K )
+			_move.c((gpeCsz)cID).IA0I.D0;
+		else
+			_move._L.IA0I.D0;
+
+		if( cID<gpeCsz_K )
+		{
+			switch( pR0[i].pstOP )
+			{
+				case gpeOPid_addM: _add.c((gpeCsz)cID).D1.D0; break;
+				case gpeOPid_subM: _sub.c((gpeCsz)cID).D1.D0; break;
+				case gpeOPid_mulM: _mul.c((gpeCsz)cID).D1.D0; break;
+				case gpeOPid_divM: _div.c((gpeCsz)cID).D1.D0; break;
+				case gpeOPid_remM: _rem.c((gpeCsz)cID).D1.D0; break;
+				default: break;
+			}
+		}
+
+		if( cID<gpeCsz_K )
+		{
+			_move.c((gpeCsz)cID).D0.IA0I;
+			continue;
+		}
+
+		_move._L.D0.IA0I;
+
 
 	}
 
@@ -271,6 +284,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	pU1 = srcMEMiPC( iPC, sOF );
 	_move._L.EAl(iPC).A0;
 	_move._L.D0.IA0I;
+	_nop;
 	return pBLKm;
 }
 
@@ -296,6 +310,7 @@ gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	pU1 = srcMEMiPC( pBLK->iPC, sOF );
 	_move._L.EAl( pBLK->iPC ).A0;
 	_move.c((gpeCsz)pBLK->cID).D0.IA0I;
+	_nop;
 	return pBLKm;
 }
 gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
@@ -325,6 +340,7 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
 	pU1 = srcMEMiPC( pBLK->iPC, sOF );
 	_move._L.EAl( pBLK->iPC ).A0;
 	_move.c((gpeCsz)pBLK->cID).D0.IA0I;
+	_nop;
 	return pBLKm;
 }
 bool gpcSRC::srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN ) {
@@ -372,8 +388,6 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 			pLZY = pLZY->lzyFRMT( (s=-1), "\r\n " );
 			pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
 			pLZY = pLZY->lzyFRMT( (s=-1), "%s,", pU1 );
-
-			//pLZY = pLZY->lzyADD( pU1, obj.sOF(), (s=-1), -1 );
 			continue;
 		}
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n0x%x ", obj.iPC );

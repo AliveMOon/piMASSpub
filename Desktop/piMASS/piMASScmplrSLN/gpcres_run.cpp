@@ -445,6 +445,97 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 		}
 
 		if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
+			pSRC->srcBLD( this );
+
+			gpmDEL( pSRC->pEXE0 );
+			//pSRC->pEXE0 = pSRC->pEXE0->compiEASY( pSRC->pSRCstart( true, 4 ), NULL, NULL, NULL );
+
+			if( !pSRC->msBLTdly )
+				pSRC->msBLTdly = gpdSYNmSEC;
+			else
+				pWIN->pSYNwin =
+				pWIN->pSYNwin->syncADD(
+											gpcSYNC(
+														gpeNET4_0SRC,
+														(i%pWIN->mZ)+((i/pWIN->mZ)<<16),
+														pWIN->mSEC.y, pSRC->iGT, 0
+													),
+											pWIN->msSYN
+										);
+			pSRC->msBLD = 0;
+
+			pSRC->apOUT[0] = pSRC->apOUT[1];
+			pSRC->apOUT[1] = pSRC->apOUT[2];
+			pSRC->apOUT[2] = pSRC->apOUT[3];
+			pSRC->apOUT[3] = NULL;
+		}
+		else if( pSRC->bSW&gpeMASSloopMSK )
+		{
+			pSRC->apOUT[0] = pSRC->apOUT[1];
+			pSRC->apOUT[1] = pSRC->apOUT[2];
+			pSRC->apOUT[2] = pSRC->apOUT[3];
+			pSRC->apOUT[3] = NULL;
+		}
+
+		if( !pSRC->srcINSTrun(this,pWIN) )
+			continue;
+
+		pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI,this,pWIN);
+		pWIN->nJDOIT.x++;
+	}
+
+	return pKEYbuff;
+}
+U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
+
+	pWIN->nJDOIT.w++;
+	pWIN->nJDOIT.y = pWIN->nJDOIT.x;
+	U1* pKEYbuff = pWIN->gpsKEYbuff;
+	gpcSRC	tmp, *pSRC = NULL, *pS2;
+	U4 xFND, x_fnd;
+	//int aGLpic[0] = 0;
+	I4x4 sprt[2] = {0}, trgWH = 0;
+	pWIN->mZ = mapCR.mapZN44.z;
+	pWIN->mN = mapCR.mapZN44.w;
+	pWIN->mZN = mapCR.mapZN44.a4x2[1].area();
+	I8x4 anRio;
+	gpcLZY hex; U8 s;
+	gpcGL *pGL = pWIN->pGL;
+	char* pVTX = NULL;
+	gpcPIC	*aGLpPIC[0x10],
+			*aGLpBOB[0x10];
+	SDL_Texture* apTX[0x10];
+
+	U4	*pM,*pC,*pR,
+		ie,z;
+	jDOitREF( pWIN, 0, ie, &pM, &pC, &pR, &z );
+
+	for( U4 i = 0; i < ie; i++ ) {
+		if( pSRC  ) {
+			if( aGLpic[0] )
+				pSRC->picID = aGLpic[0];
+			if( aGLpic[0xf] )
+				pSRC->bobID = aGLpic[0xf];
+
+			aGLpic[0xf] = 0;
+		}
+
+		if( !pM[i] )
+			continue;
+
+		xFND = pM[i];
+		pSRC = srcFND( xFND );
+		if( !pSRC )
+			continue;
+
+		aGLpic[0] = pSRC->picID = 0;
+		gpmDEL( pSRC->apOUT[0] );
+		if( pSRC->qBLD() ) {
+			pSRC->msBLD = pWIN->mSEC.x + pSRC->msBLTdly;
+			pSRC->rdyBLD();
+		}
+
+		if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
 
 			pSRC->srcBLD( this );
 
@@ -478,6 +569,9 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 			pWIN->nJDOIT.x++;
 			pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI,this,pWIN);
 		}
+
+
+
 		continue;
 
 
@@ -668,8 +762,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 							break;
 					}
 				}
-				else switch( alu.alf )
-				{ //	gpeALF_ZZZZZ // 5 char
+				else switch( alu.alf ) { //	gpeALF_ZZZZZ // 5 char
 
 					case gpeALF_SYNC: if(alu.bSTR()) {
 						if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
