@@ -121,6 +121,7 @@
 		<Unit filename="gpcSRCbreak.cpp" />
 		<Unit filename="gpcSRCdbg.cpp" />
 		<Unit filename="gpcSRCinst.cpp" />
+		<Unit filename="gpcSRCinst.h" />
 		<Unit filename="gpcSRClnk.cpp" />
 		<Unit filename="gpcSRClnk.h" />
 		<Unit filename="gpcSRCprnt.cpp" />

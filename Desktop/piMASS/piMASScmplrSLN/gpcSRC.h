@@ -936,18 +936,15 @@ public:
 	gpcLZY	lzyROW;
 	gpeOPid opIDgrp;
 
-	I4 iIN() { return iI; }
-	I4 setIN( I4 i )
-	{
-		if( iI >= i )
-			return iI;
+    I4 cCMNr( gpcSRC* pSRC )
+    {
+		I4 cO;
+		for( I4 i = 0; i < nR; i++ )
+		{
 
-		if( i > nR )
-			i = nR;
-
-		iI = i;
-		return iI;
-	}
+		}
+		return cO;
+    }
 	gpROW* pROWadd( I4 iR ) {
 		gpROW* pR = (gpROW*)lzyROW.Ux( iR, sizeof(*pR) );
 		if( !pR )
@@ -1004,6 +1001,7 @@ public:
 
 		gpROW* pR0	= pROW( 0, true );
 	};
+
 };
 class gpcLZYblk {
 	I4		nB;
@@ -1343,46 +1341,50 @@ public:
 		pBLKi->pNEWrow();
 		return pBLKi;
 	}
-	I4 iPCrow( gpROW* pR, I4& sOF, bool b_in ) {
+	I4 iPCrow( gpROW& R, I4& sOF, bool b_in ) {
 		sOF = 0;
 		if( b_in )
 		{
-			if( pR->bIDup )
-			if( gpBLOCK* pBup = lzyBLOCK.pSTPup( pR->bIDup, -1, -1 ) )
+			if( R.bIDup )
+			if( gpBLOCK* pBup
+				= lzyBLOCK.pSTPup(	R.bIDup,
+									-1, -1 )
+			)
 			if( pBup->iPC >= 4 )
 			{
 				sOF = pBup->sOF;
 				return pBup->iPC;
 			}
 		}
-		if( pR->iPC >= 4 )
+		if( R.iPC >= 4 )
 		{
-			sOF = pR->sOF;
-			return pR->iPC;
+			sOF = R.sOF;
+			return R.iPC;
 		}
 
-		gpOBJ* pO = srcOBJfnd( pR->mNdID );
+		gpOBJ* pO = srcOBJfnd( R.mNdID );
 		if( !pO )
-			return pR->iPC;
+			return R.iPC;
 
-		if( pR->iPC < pO->iPC )
+		if( R.iPC < pO->iPC )
 		{
-			pR->iPC = pO->iPC;
-			pR->sOF = pO->sOF();
+			R.iPC = pO->iPC;
+			R.sOF = pO->sOF();
 		}
-		else if( pR->iPC > pO->iPC )
+		else if( R.iPC > pO->iPC )
 		{
-			pO->iPC = pR->iPC;
-			pO->REcID( pR->cID );
+			pO->iPC = R.iPC;
+			pO->REcID( R.cID );
 		}
 		sOF = pO->sOF();
-		return pR->iPC;
+		return R.iPC;
 	}
 	///--------------------------
 	///			INST
 	///--------------------------
 	gpBLOCK*	srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* pBLKup );
 	gpBLOCK*	srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	gpBLOCK*	srcINSTmov2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	bool 		srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN );
