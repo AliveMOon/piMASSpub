@@ -891,6 +891,20 @@ public:
 		sof = 0;
 		return cid;
 	}
+	gpOBJ* movREF( gpOBJ* pB )
+	{
+		if( this ? !pB : true )
+			return this;
+		if( dctID == pB->dctID )
+			return this;
+
+		cid = pB->cID();
+		sof = pB->sOF();
+
+		d2D = pB->d2D;
+		iPC = pB->iPC;
+		return this;
+	}
 };
 
 class gpROW{

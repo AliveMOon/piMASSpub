@@ -243,7 +243,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 	gpROW	*pR0 = pBLK->pROW(),
 
-			*pRa = NULL,
+			// *pRa = NULL,
 			*pRb = NULL,
 			*pRm = NULL;
 
@@ -272,7 +272,6 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		iPCa 	= iPCrow( *pRa, sOFa, true );
 		pOa 	= srcOBJfnd( pRa->mNdID );
 		nA 		= pOa ? pOa->d2D.area() : 1;
-		//cIDa	= pRa->cID;
 
 		pUa = srcMEMiPC( iPCa, sOFa );
 
@@ -352,7 +351,10 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		{
 			/// Síma egyenlő művelet többel
             // ezt valami REFERENCE átadásal próbáljuk
-
+			pOa->movREF( pOb );
+			*pRa = *pOa;
+			iPCa 	= iPCrow( *pRa, sOFa, true );
+			nA 		= pOa ? pOa->d2D.area() : 1;
 			continue;
 		}
 
@@ -361,7 +363,13 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	}
 
 	if( nB > 1 )
+	{
+		if( pOm )
+		{
+			pOm->movREF( pOa );
+		}
 		return pBLKm;
+	}
 
 	_move._L.EAl(iPCm).A0;
 	_move._L.D0.IA0I;
