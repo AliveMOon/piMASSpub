@@ -367,6 +367,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		if( pOm )
 		{
 			pOm->movREF( pOa );
+			*pRm = *pOm;
 		}
 		return pBLKm;
 	}

@@ -931,7 +931,7 @@ public:
 		mnID = mNdID;
 		if( mnID < 0 )
 			mnID*=-1;
-		pstOP = gpeOPid_stk;
+		//pstOP = gpeOPid_stk;
 		return this;
 	}
 	gpROW* operator = ( gpOBJ* pO )
@@ -950,15 +950,15 @@ public:
 	gpcLZY	lzyROW;
 	gpeOPid opIDgrp;
 
-    I4 cCMNr( gpcSRC* pSRC )
-    {
-		I4 cO;
-		for( I4 i = 0; i < nR; i++ )
-		{
-
-		}
-		return cO;
-    }
+//    I4 cCMNr( gpcSRC* pSRC )
+//    {
+//		I4 cO;
+//		for( I4 i = 0; i < nR; i++ )
+//		{
+//
+//		}
+//		return cO;
+//    }
 	gpROW* pROWadd( I4 iR ) {
 		gpROW* pR = (gpROW*)lzyROW.Ux( iR, sizeof(*pR) );
 		if( !pR )
