@@ -30,6 +30,7 @@
 #define _mul	pMEM->inst( gpeOPid_mul )
 #define _div	pMEM->inst( gpeOPid_div )
 #define _rem	pMEM->inst( gpeOPid_rem )
+#define _swep	pMEM->inst( gpeOPid_SWAP )
 
 #define A0 An(0)
 #define A1 An(1)

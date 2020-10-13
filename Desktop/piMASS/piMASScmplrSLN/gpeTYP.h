@@ -98,7 +98,7 @@ typedef enum gpeOPid:U1{
 	gpeOPid_if,		gpeOPid_else,
 	gpeOPid_mail,	gpeOPid_str,
 
-	gpeOPid_jsr,
+	gpeOPid_jsr,	gpeOPid_SWAP,	gpeOPid_EXT,
 } gpeOPid_U1;
 
 static const char* gpasCsz[] = {

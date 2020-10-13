@@ -38,7 +38,9 @@ gpcLZY* gpcSRC::srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMO
 			case gpeCsz_W: pLZY->lzyFRMT( s, " %d,", *(I2*)p_src ); break;
 			case gpeCsz_w: pLZY->lzyFRMT( s, " %d,", *(U2*)p_src ); break;
 			case gpeCsz_B: pLZY->lzyFRMT( s, " %d,", *(I1*)p_src ); break;
-			case gpeCsz_b: pLZY->lzyFRMT( s, " %d,", *(U1*)p_src ); break;
+			case gpeCsz_b:
+						pLZY->lzyFRMT( s, " %d,", *(U1*)p_src );
+						break;
 			case gpeCsz_f: pLZY->lzyFRMT( s, " %f,", *(float*)p_src ); break;
 			case gpeCsz_d: pLZY->lzyFRMT( s, " %f,", *(double*)p_src ); break;
 			case gpeCsz_4: pLZY->lzyFRMT( s, " %d,", *(I1*)p_src ); break;

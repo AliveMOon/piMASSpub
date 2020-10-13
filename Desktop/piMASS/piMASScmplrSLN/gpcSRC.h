@@ -1401,6 +1401,7 @@ public:
 	gpBLOCK*	srcINSTmov2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	gpBLOCK*	srcINSTmul2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	bool 		srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN );
 	gpcLZY*		srcINSTmini( gpcLZY* pLZY,gpcMASS* pMASS, gpcWIN* pWIN );
 	///--------------------------
