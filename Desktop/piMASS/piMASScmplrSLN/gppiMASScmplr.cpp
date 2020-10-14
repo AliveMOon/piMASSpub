@@ -103,7 +103,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
 	I8x4 *pM0 = gpmSCP.pMN(), M, Mnx;
 	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];
 	gpeCLR clr;
-	char		*pS;
+	char		*pS = (char*)gpmSCP.p_str;
 	const char	*psDCT;
 	I4 nS, nsDCT; //, dctID;
 	gpBLOCK* pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );

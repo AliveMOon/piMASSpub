@@ -5,7 +5,7 @@
  mini = "wget -O /robo2/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture"
   e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
- rr = 0x10000,
+ rr = 0x10000;
  rout = 0 + rr - 3;
  rinp = 0 + rr + 2;
  bill 

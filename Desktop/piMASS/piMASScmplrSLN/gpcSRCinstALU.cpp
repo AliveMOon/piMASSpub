@@ -79,6 +79,8 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 				cIDa = pRa->cID;
 			}
 
+			/// TRG iPCa ---------------------
+			_move._L.EAl( iPCa ).A0;
 			if( (gpeOPid)pRa->pstOP == gpeOPid_mov ) {
 				/// Síma egyenlő
 				if( cIDa<gpeCsz_K )
@@ -92,7 +94,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			/// SRC ig mst B ---------------------
 			_move._q.D0.D1;	// elöző kör lesz a forás
 
-			/// TRG A ---------------------
+
 			if( cIDa<gpeCsz_K )
 				_move.c((gpeCsz)cIDa).IA0I.D0;
 			else
@@ -152,7 +154,11 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		}
 		return pBLKm;
 	}
-
+	if( iPCa == iPCm )
+	{
+		_nop;
+		return pBLKm;
+	}
 	_move._L.EAl(iPCm).A0;
 	_move._L.D0.IA0I;
 	_nop;

@@ -1723,11 +1723,6 @@ public:
 		}
 
 		return srcBLKup( pS, pBLK, opID );
-
-		pBLK = srcBLKup( pS, pBLK, opID );
-		pRl = pBLK->pLSTrow();
-		pBLK->pNEWrow();
-		return pBLK;
 	}
 	gpBLOCK* srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		///switch( now )
