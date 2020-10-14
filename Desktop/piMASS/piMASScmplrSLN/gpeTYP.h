@@ -30,39 +30,7 @@
 	| (((U4)b)<< 8)				\
 	| ((U4)a)					\
 )
-/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-typedef enum gpeOPtyp:U1{
-	gpeOPtyp_U1,	// 0x00 unsigned
-	gpeOPtyp_U2,	// 0x01
-	gpeOPtyp_U4,	// 0x02
-	gpeOPtyp_U8,	// 0x03
 
-	gpeOPtyp_sU1 = 0x10, 	// strU1
-	gpeOPtyp_sU2, 		 	// strU2
-	gpeOPtyp_sU4, 		 	// strU4
-	gpeOPtyp_sU8, 			// strU8
-
-	gpeOPtyp_I1 = 0x80,	// signed I1
-	gpeOPtyp_I2,
-	gpeOPtyp_I4,
-	gpeOPtyp_I8,
-
-	gpeOPtyp_sA1 = 0x90,	// signed ALF
-	gpeOPtyp_sA2,
-	gpeOPtyp_sA4,
-	gpeOPtyp_sA8,
-
-	gpeOPtyp_HH = 0xC0,	// float
-	gpeOPtyp_H,
-	gpeOPtyp_F,
-	gpeOPtyp_D,
-
-	gpeOPtyp_sHH = 0xD0,	// signed I1
-	gpeOPtyp_sH,
-	gpeOPtyp_sF,
-	gpeOPtyp_sD,
-
-} gpeOPtyp;
 
 typedef enum gpeOPid:U1{
 	gpeOPid_nop,
@@ -98,7 +66,9 @@ typedef enum gpeOPid:U1{
 	gpeOPid_if,		gpeOPid_else,
 	gpeOPid_mail,	gpeOPid_str,
 
-	gpeOPid_jsr,	gpeOPid_SWAP,	gpeOPid_EXT,
+	gpeOPid_jsr,
+
+	gpeOPid_SWAP,	gpeOPid_EXTB,	gpeOPid_EXT,	gpeOPid_EXTL,
 } gpeOPid_U1;
 
 static const char* gpasCsz[] = {
@@ -519,6 +489,39 @@ static const char* gpas68k[] = {
 	"\n 0x%0.4x jsr\t%s",
 };
 
+/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
+typedef enum gpeOPtyp:U1{
+	gpeOPtyp_U1,	// 0x00 unsigned
+	gpeOPtyp_U2,	// 0x01
+	gpeOPtyp_U4,	// 0x02
+	gpeOPtyp_U8,	// 0x03
+
+	gpeOPtyp_sU1 = 0x10, 	// strU1
+	gpeOPtyp_sU2, 		 	// strU2
+	gpeOPtyp_sU4, 		 	// strU4
+	gpeOPtyp_sU8, 			// strU8
+
+	gpeOPtyp_I1 = 0x80,	// signed I1
+	gpeOPtyp_I2,
+	gpeOPtyp_I4,
+	gpeOPtyp_I8,
+
+	gpeOPtyp_sA1 = 0x90,	// signed ALF
+	gpeOPtyp_sA2,
+	gpeOPtyp_sA4,
+	gpeOPtyp_sA8,
+
+	gpeOPtyp_HH = 0xC0,	// float
+	gpeOPtyp_H,
+	gpeOPtyp_F,
+	gpeOPtyp_D,
+
+	gpeOPtyp_sHH = 0xD0,	// signed I1
+	gpeOPtyp_sH,
+	gpeOPtyp_sF,
+	gpeOPtyp_sD,
+
+} gpeOPtyp;
 /// TYP
 typedef enum gpeTYP:U4 {
 	/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]

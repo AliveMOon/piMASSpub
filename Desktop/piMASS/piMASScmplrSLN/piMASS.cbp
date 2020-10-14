@@ -122,6 +122,7 @@
 		<Unit filename="gpcSRCdbg.cpp" />
 		<Unit filename="gpcSRCinst.cpp" />
 		<Unit filename="gpcSRCinst.h" />
+		<Unit filename="gpcSRCinstALU.cpp" />
 		<Unit filename="gpcSRCinstRUN.cpp" />
 		<Unit filename="gpcSRClnk.cpp" />
 		<Unit filename="gpcSRClnk.h" />

@@ -11,8 +11,8 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 		return *this;
 
 	U8 s = -1;
-	if( op == gpeOPid_nop )
-	{
+	char sBUFF[0x100], *pB = sBUFF;
+	if( op == gpeOPid_nop ) {
 		pDBG = pDBG->lzyFRMT(
 								(s=-1),
 								"\r\n0x%0.8x nop; //----------------",
@@ -20,8 +20,24 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 							);
 		return *this;
 	}
-	char sBUFF[0x100], *pB = sBUFF;
-	pB += gpfALF2STR( pB, pMEM->pMASS->aOP[op].alf );
+
+	switch( op )
+	{
+		case gpeOPid_SWAP:
+			pB += sprintf( pB, "swap" );
+			break;
+		case gpeOPid_EXTB:
+			pB += sprintf( pB, "extB" );
+			break;
+		case gpeOPid_EXT:
+			pB += sprintf( pB, "ext" );
+			break;
+		case gpeOPid_EXTL:
+			pB += sprintf( pB, "extL" );
+			break;
+		default:
+			pB += gpfALF2STR( pB, pMEM->pMASS->aOP[op].alf );
+	}
 
 	pDBG = pDBG->lzyFRMT( (s=-1), "\r\n0x%0.8x %s%s", (U4)((U1*)this-pU1), sBUFF, gpasCsz[cID] );
 	U1	*pUs = NULL;

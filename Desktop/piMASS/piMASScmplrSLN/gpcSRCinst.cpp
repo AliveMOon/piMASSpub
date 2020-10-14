@@ -126,79 +126,95 @@ gpINST* gpMEM::instALU()
 			p_dst = NULL;
 			break;
 	}
+	switch( ins.op ) {
+		case gpeOPid_EXTB:
+			if( p_src ) {
+				*(I8*)p_src = *(I1*)p_src;
+			} break;
+		case gpeOPid_EXT:
+			if( p_src ) {
+				*(I8*)p_src = *(I2*)p_src;
+			} break;
+		case gpeOPid_EXTL:
+			if( p_src ) {
+				*(I8*)p_src = *(I4*)p_src;
+			} break;
+		default: {
+			switch(gpaOPgrp[ins.op]) {
+					case gpeOPid_entry:{
+							switch(ins.op)
+							{
+								case gpeOPid_dot:
+									// find OBJ
+									break;
+								default: break;
+							}
+						} break;
+					case gpeOPid_mov:{
+							if( !p_dst || !p_src )
+								break;
+							switch(ins.op)
+							{
+								case gpeOPid_mov:
+								default:
+									gpmMcpy( p_dst, p_src, sOF );
+									break;
+							}
+						} break;
+					case gpeOPid_mul:{
+							if( !p_dst || !p_src )
+								break;
+							U8 mx = gpaCszMX[ins.cID];
+							switch( ins.cID )
+							{
+								case gpeCsz_Q: gpmMUL( I8, ins.op, mx ); break;
+								case gpeCsz_q: gpmMUL( U8, ins.op, mx ); break;
+								case gpeCsz_L: gpmMUL( I4, ins.op, mx ); break;
+								case gpeCsz_l: gpmMUL( U4, ins.op, mx ); break;
+								case gpeCsz_W: gpmMUL( I2, ins.op, mx ); break;
+								case gpeCsz_w: gpmMUL( U2, ins.op, mx ); break;
+								case gpeCsz_B: gpmMUL( I1, ins.op, mx ); break;
+								case gpeCsz_b: gpmMUL( U1, ins.op, mx ); break;
+								case gpeCsz_f: gpmMUL( F, ins.op, mx ); break;
+								case gpeCsz_d: gpmMUL( D, ins.op, mx ); break;
+								case gpeCsz_4: gpmMUL( U1x4, ins.op, mx ); break;
+								default: break;
+							}
+						} break;
+					case gpeOPid_add:{
+							if( !p_dst || !p_src )
+								break;
 
-	switch(gpaOPgrp[ins.op]) {
-			case gpeOPid_entry:{
-					switch(ins.op)
-					{
-						case gpeOPid_dot:
-							// find OBJ
-							break;
-						default: break;
-					}
-				} break;
-			case gpeOPid_mov:{
-					if( !p_dst || !p_src )
-						break;
-					switch(ins.op)
-					{
-						case gpeOPid_mov:
-						default:
-							gpmMcpy( p_dst, p_src, sOF );
-							break;
-					}
-				} break;
-			case gpeOPid_mul:{
-					if( !p_dst || !p_src )
-						break;
-					U8 mx = gpaCszMX[ins.cID];
-					switch( ins.cID )
-					{
-						case gpeCsz_Q: gpmMUL( I8, ins.op, mx ); break;
-						case gpeCsz_q: gpmMUL( U8, ins.op, mx ); break;
-						case gpeCsz_L: gpmMUL( I4, ins.op, mx ); break;
-						case gpeCsz_l: gpmMUL( U4, ins.op, mx ); break;
-						case gpeCsz_W: gpmMUL( I2, ins.op, mx ); break;
-						case gpeCsz_w: gpmMUL( U2, ins.op, mx ); break;
-						case gpeCsz_B: gpmMUL( I1, ins.op, mx ); break;
-						case gpeCsz_b: gpmMUL( U1, ins.op, mx ); break;
-						case gpeCsz_f: gpmMUL( F, ins.op, mx ); break;
-						case gpeCsz_d: gpmMUL( D, ins.op, mx ); break;
-						case gpeCsz_4: gpmMUL( U1x4, ins.op, mx ); break;
-						default: break;
-					}
-				} break;
-			case gpeOPid_add:{
-					if( !p_dst || !p_src )
-						break;
+							switch( ins.cID )
+							{
+								case gpeCsz_Q: gpmADD( I8, ins.op ); break;
+								case gpeCsz_q: gpmADD( U8, ins.op ); break;
+								case gpeCsz_L: gpmADD( I4, ins.op ); break;
+								case gpeCsz_l: gpmADD( U4, ins.op ); break;
+								case gpeCsz_W: gpmADD( I2, ins.op ); break;
+								case gpeCsz_w: gpmADD( U2, ins.op ); break;
+								case gpeCsz_B: gpmADD( I1, ins.op ); break;
+								case gpeCsz_b: gpmADD( U1, ins.op ); break;
+								case gpeCsz_f: gpmADD( F, ins.op ); break;
+								case gpeCsz_d: gpmADD( D, ins.op ); break;
+								case gpeCsz_4: gpmADD( U1x4, ins.op ); break;
+								default: break;
+							}
+						} break;
+					case gpeOPid_sub:{
+							if( !p_dst || !p_src )
+								break;
+							switch(ins.op)
+							{
+								default:
+									pD[9] = (*p_dst == *p_src);
+									break;
+							}
+						} break;
+				}
+		} break; // deafault:
+	}
 
-					switch( ins.cID )
-					{
-						case gpeCsz_Q: gpmADD( I8, ins.op ); break;
-						case gpeCsz_q: gpmADD( U8, ins.op ); break;
-						case gpeCsz_L: gpmADD( I4, ins.op ); break;
-						case gpeCsz_l: gpmADD( U4, ins.op ); break;
-						case gpeCsz_W: gpmADD( I2, ins.op ); break;
-						case gpeCsz_w: gpmADD( U2, ins.op ); break;
-						case gpeCsz_B: gpmADD( I1, ins.op ); break;
-						case gpeCsz_b: gpmADD( U1, ins.op ); break;
-						case gpeCsz_f: gpmADD( F, ins.op ); break;
-						case gpeCsz_d: gpmADD( D, ins.op ); break;
-						case gpeCsz_4: gpmADD( U1x4, ins.op ); break;
-						default: break;
-					}
-				} break;
-			case gpeOPid_sub:{
-					if( !p_dst || !p_src )
-						break;
-					switch(ins.op)
-					{
-						default:
-							pD[9] = (*p_dst == *p_src);
-							break;
-					}
-				} break;
-		}
 
 	return &ins;
 }
