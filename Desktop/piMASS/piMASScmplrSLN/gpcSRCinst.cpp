@@ -175,9 +175,9 @@ gpINST* gpMEM::instALU()
 								case gpeCsz_w: gpmMUL( U2, ins.op, mx ); break;
 								case gpeCsz_B: gpmMUL( I1, ins.op, mx ); break;
 								case gpeCsz_b: gpmMUL( U1, ins.op, mx ); break;
-								case gpeCsz_f: gpmMUL( F, ins.op, mx ); break;
-								case gpeCsz_d: gpmMUL( D, ins.op, mx ); break;
-								case gpeCsz_4: gpmMUL( U1x4, ins.op, mx ); break;
+								case gpeCsz_f: gpmFMUL( F, ins.op, mx ); break;
+								case gpeCsz_d: gpmFMUL( D, ins.op, mx ); break;
+								case gpeCsz_4: gpmFMUL( U1x4, ins.op, mx ); break;
 								default: break;
 							}
 						} break;

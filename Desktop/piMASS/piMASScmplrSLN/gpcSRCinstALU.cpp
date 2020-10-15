@@ -69,6 +69,9 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			if( bD0 ) {
 				/// SRC
 				// B ------------
+				if( gpaCsz[cIDb] < 4 )
+					_xor._q.D0.D0;
+
 				_move._L.EAl( iPCb ).A0;
 				_move.c((gpeCsz)cIDb).IA0I.D0;
 				bD0 = false;
@@ -83,9 +86,9 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			_move._L.EAl( iPCa ).A0;
 			if( (gpeOPid)pRa->pstOP == gpeOPid_mov ) {
 				/// Síma egyenlő
-				if( cIDa<gpeCsz_K )
+				if( cIDa<gpeCsz_K ) {
 					_move.c((gpeCsz)cIDa).D0.IA0I;
-				else
+				} else
 					_move._L.D0.IA0I;
 				continue;
 			}
@@ -93,6 +96,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			/// müvelet+egyenlő
 			/// SRC ig mst B ---------------------
 			_move._q.D0.D1;	// elöző kör lesz a forás
+
 
 
 			if( cIDa<gpeCsz_K )
@@ -228,6 +232,8 @@ gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			if( bD0 ) {
 			/// DST B 	D0 ----------------
 				// B ------------
+				if( gpaCsz[cIDb] < 4 )
+					_xor._q.D0.D0;
 				cID0 = cIDb;
 				_move._L.EAl( iPCb ).A0;
 				_move.c((gpeCsz)cID0).IA0I.D0;
@@ -237,47 +243,74 @@ gpBLOCK* gpcSRC::srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 				nU0 = gpaCsz[cID0];
 			}
 
-			/// SRC A 	D2 ---------------------
+			/// SRC A 	D1 ---------------------
 			_move._L.EAl( iPCa ).A0;
 			if( cIDa < gpeCsz_K )
 			{
+				if( gpaCsz[cIDa] < 4 )
+					_xor._q.D1.D1;
 				// A   0    0
-				// b x b -> w
-				// w x w -> l
-				// l x l -> q
-				// q x q -> q
+				// b + b -> w
+				// w + w -> l
+				// l + l -> q
+				// q + q -> q
+
 				_move.c((gpeCsz)cIDa).IA0I.D1;
 
-				bSa = cIDa & ((I4)gpeCsz_B);
-				bFa = bSa & (cIDa&((I4)gpeCsz_4));
+				bSa = cIDa&((I4)gpeCsz_B);
+				bFa = bSa&(cIDa&((I4)gpeCsz_4));
 				nUa = gpaCsz[cIDa];
 				bS0 |= bSa;
-
-
 				if( bSa )
 				{
-					if( nUa == nU0) {
-
-					}
-					else if( nUa < nU0) {
-						switch( nUa )
-						{
-							case 1: _extB._Q.D1; break;
-							case 2: _ext._Q.D1; break;
-							case 4: _extL._Q.D1; break;
-							default:
-								break;
+					if( nUa != nU0 ) {
+						if( nUa < nU0) {
+							switch( nUa )
+							{
+								case 1: _extB._Q.D1; break;
+								case 2: _ext._Q.D1; break;
+								case 4: _extL._Q.D1; break;
+								default:
+									break;
+							}
+							nUa = nU0;
 						}
-						nUa = nU0;
+						else if( nUa > nU0 ) {
+							nU0 = nUa;
+							switch( nUa )
+							{
+								case 0:
+								case 1: cID0 = gpeCsz_B; break;
+								case 2: cID0 = gpeCsz_W; break;
+								case 4: cID0 = gpeCsz_L; break;
+								case 8: cID0 = gpeCsz_Q; break;
+								default:
+									break;
+							}
+						}
 					}
-					else {
 
-					}
 					bS0 = true;
-				} else {
+				}
+				else if( nUa != nU0 )
+				{
 					if( nUa < nU0) {
 						nUa = nU0;
 					}
+					else if( nUa > nU0 ) {
+						nU0 = nUa;
+						switch( nUa )
+						{
+							case 0:
+							case 1: cID0 = gpeCsz_b; break;
+							case 2: cID0 = gpeCsz_w; break;
+							case 4: cID0 = gpeCsz_l; break;
+							case 8: cID0 = gpeCsz_q; break;
+							default:
+								break;
+						}
+					}
+
 				}
 				if( bFa )
 				{
@@ -413,6 +446,8 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			/// DST B 	D0 ----------------
 				// B ------------
 				cID0 = cIDb;
+				if( gpaCsz[cID0] < 4 )
+					_xor._q.D0.D0;
 				_move._L.EAl( iPCb ).A0;
 				_move.c((gpeCsz)cID0).IA0I.D0;
 				bD0 = false;
@@ -421,47 +456,73 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 				nU0 = gpaCsz[cID0];
 			}
 
-			/// SRC A 	D2 ---------------------
+			/// SRC A 	D1 ---------------------
 			_move._L.EAl( iPCa ).A0;
 			if( cIDa < gpeCsz_K )
 			{
+				if( gpaCsz[cIDa] < 4 )
+					_xor._q.D1.D1;
 				// A   0    0
-				// b x b -> w
-				// w x w -> l
-				// l x l -> q
-				// q x q -> q
+				// b + b -> w
+				// w + w -> l
+				// l + l -> q
+				// q + q -> q
 				_move.c((gpeCsz)cIDa).IA0I.D1;
 
-				bSa = cIDa & ((I4)gpeCsz_B);
-				bFa = bSa & (cIDa&((I4)gpeCsz_4));
+				bSa = cIDa&((I4)gpeCsz_B);
+				bFa = bSa&(cIDa&((I4)gpeCsz_4));
 				nUa = gpaCsz[cIDa];
 				bS0 |= bSa;
-
-
 				if( bSa )
 				{
-					if( nUa == nU0) {
-
-					}
-					else if( nUa < nU0) {
-						switch( nUa )
-						{
-							case 1: _extB._Q.D1; break;
-							case 2: _ext._Q.D1; break;
-							case 4: _extL._Q.D1; break;
-							default:
-								break;
+					if( nUa != nU0 ) {
+						if( nUa < nU0) {
+							switch( nUa )
+							{
+								case 1: _extB._Q.D1; break;
+								case 2: _ext._Q.D1; break;
+								case 4: _extL._Q.D1; break;
+								default:
+									break;
+							}
+							nUa = nU0;
 						}
-						nUa = nU0;
+						else if( nUa > nU0 ) {
+							nU0 = nUa;
+							switch( nUa )
+							{
+								case 0:
+								case 1: cID0 = gpeCsz_B; break;
+								case 2: cID0 = gpeCsz_W; break;
+								case 4: cID0 = gpeCsz_L; break;
+								case 8: cID0 = gpeCsz_Q; break;
+								default:
+									break;
+							}
+						}
 					}
-					else {
 
-					}
 					bS0 = true;
-				} else {
+				}
+				else if( nUa != nU0 )
+				{
 					if( nUa < nU0) {
 						nUa = nU0;
 					}
+					else if( nUa > nU0 ) {
+						nU0 = nUa;
+						switch( nUa )
+						{
+							case 0:
+							case 1: cID0 = gpeCsz_b; break;
+							case 2: cID0 = gpeCsz_w; break;
+							case 4: cID0 = gpeCsz_l; break;
+							case 8: cID0 = gpeCsz_q; break;
+							default:
+								break;
+						}
+					}
+
 				}
 				if( bFa )
 				{

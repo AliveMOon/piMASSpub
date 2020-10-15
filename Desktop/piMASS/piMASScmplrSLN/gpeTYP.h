@@ -170,22 +170,42 @@ static const U8 gpaCszMX[] = {
 };
 
 
-#define gpmMUL( a, b, mx ) 						\
+#define gpmFMUL( a, b, mx ) 					\
 		switch(b) 							\
 		{									\
 			case gpeOPid_and:				\
 				*(a*)p_dst &= *(a*)p_src;	\
-				break;					\
+				break;						\
 			case gpeOPid_rem:				\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)%(*(a*)p_src) : (a)0;	\
-				break;					\
+				break;						\
 			case gpeOPid_div:				\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)/(*(a*)p_src) : (a)mx;	\
-				break;					\
+				break;						\
 			default:						\
 				*(a*)p_dst *= *(a*)p_src;	\
-				break;					\
-		} 							\
+				break;						\
+		} 									\
+
+#define gpmMUL( a, b, mx ) 					\
+		switch(b) 							\
+		{									\
+			case gpeOPid_xor:				\
+				*(a*)p_dst ^= *(a*)p_src;	\
+				break;						\
+			case gpeOPid_and:				\
+				*(a*)p_dst &= *(a*)p_src;	\
+				break;						\
+			case gpeOPid_rem:				\
+				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)%(*(a*)p_src) : (a)0;	\
+				break;						\
+			case gpeOPid_div:				\
+				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)/(*(a*)p_src) : (a)mx;	\
+				break;						\
+			default:						\
+				*(a*)p_dst *= *(a*)p_src;	\
+				break;						\
+		} 									\
 
 #define gpmADD( a, b ) 						\
 		switch(b) 							\
@@ -239,7 +259,7 @@ static gpeOPid gpaOPgrp[] = {
 									gpeOPid_mov,
 	gpeOPid_mul, 	gpeOPid_mov, 	gpeOPid_mov,
 	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_add,	gpeOPid_mov,
+	gpeOPid_mul,	gpeOPid_mul,
 
 
 	gpeOPid_mov, 	gpeOPid_sub,  	gpeOPid_sub,

@@ -203,7 +203,8 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 						continue;
 					switch( iC )
 					{
-						case gpeCsz_Q: gpmMUL( I8, iOP, mx ); continue;
+						case gpeCsz_Q:
+										gpmMUL( I8, iOP, mx ); continue;
 						case gpeCsz_q: gpmMUL( U8, iOP, mx ); continue;
 						case gpeCsz_L: gpmMUL( I4, iOP, mx ); continue;
 						case gpeCsz_l: gpmMUL( U4, iOP, mx ); continue;
@@ -211,9 +212,9 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 						case gpeCsz_w: gpmMUL( U2, iOP, mx ); continue;
 						case gpeCsz_B: gpmMUL( I1, iOP, mx ); continue;
 						case gpeCsz_b: gpmMUL( U1, iOP, mx ); continue;
-						case gpeCsz_f: gpmMUL( F, iOP, mx ); continue;
-						case gpeCsz_d: gpmMUL( D, iOP, mx ); continue;
-						case gpeCsz_4: gpmMUL( U1x4, iOP, mx ); continue;
+						case gpeCsz_f: gpmFMUL( F, iOP, mx ); continue;
+						case gpeCsz_d: gpmFMUL( D, iOP, mx ); continue;
+						case gpeCsz_4: gpmFMUL( U1x4, iOP, mx ); continue;
 					}
 				} continue;
 			case gpeOPid_add:{

@@ -24,9 +24,12 @@
 
 #define _nop	pMEM->inst( gpeOPid_nop )
 #define _move	pMEM->inst( gpeOPid_mov )
+#define _or		pMEM->inst( gpeOPid_or )
 #define _add	pMEM->inst( gpeOPid_add )
 #define _sub	pMEM->inst( gpeOPid_sub )
 
+#define _xor	pMEM->inst( gpeOPid_xor )
+#define _and	pMEM->inst( gpeOPid_and )
 #define _mul	pMEM->inst( gpeOPid_mul )
 #define _div	pMEM->inst( gpeOPid_div )
 #define _rem	pMEM->inst( gpeOPid_rem )
