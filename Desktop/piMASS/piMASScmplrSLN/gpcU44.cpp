@@ -112,12 +112,7 @@ U4  U4x4::dctADD( U1* p_src, U4& m, U4x4& w )
 			e = w.y;
 
 		i = gpmMcmp( p_d, pS, e );
-		/*for( i = 0; i < e; i++ )
-		{
-			if( pS[i] == p_d[i] )
-				continue;
-			break;
-		}*/
+
 		if( e == i )
 		if( w.y == p_w[cd].y )
 			return n_w;
@@ -141,7 +136,6 @@ U4  U4x4::dctADD( U1* p_src, U4& m, U4x4& w )
 			// feltolja ezt a szót mert w.n az elején van
 			//w.m = p_w[code].m;
 			w.z = cd;
-			//p_w[code].m = n_w;
 
 			if( p_w[m].z == cd )
 				p_w[m].z = n_w;

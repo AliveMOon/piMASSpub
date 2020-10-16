@@ -259,7 +259,7 @@ static gpeOPid gpaOPgrp[] = {
 									gpeOPid_mov,
 	gpeOPid_mul, 	gpeOPid_mov, 	gpeOPid_mov,
 	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_mul,	gpeOPid_mul,
+	gpeOPid_mul,	gpeOPid_mov,
 
 
 	gpeOPid_mov, 	gpeOPid_sub,  	gpeOPid_sub,

@@ -27,8 +27,8 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 
 	U1	*pALL = pSRCalloc( bNoMini, selID ),
 		*pUTF = pSRCstart( bNoMini, selID ),
-		*pUi = pUTF, *pUj = pUTF, //*pUk = pUTF,
-		*pUe = pUi+dim.w,
+		*pS = pUTF, *pUj = pUTF, //*pUk = pUTF,
+		*pUe = pS+dim.w,
 		sIZE[] = " \a";
 	if( !pVAN )
 	{
@@ -58,54 +58,56 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 		clrOPERA = U1x4(0,0,gpeCLR_green2).u4,
 		clrNOTE = U1x4(0,0,gpeCLR_green).u4,
 		clrBREAK = U1x4(0,0,gpeCLR_red2).u4;
+	/// berakjuk a 0-t gyökérnek
+	gpmSCP.DCTadd(pos,pUe,1,clrABC);
 
-	for( nS = gpmNINCS( pUi, pVAN ); pUi < pUe; nS = gpmNINCS( pUi, " \t\r\n" ) )
+	for( nS = gpmNINCS( pS, pVAN ); pS < pUe; nS = gpmNINCS( pS, " \t\r\n" ) )
 	{
-		//std::cout << stdBREAK "." << (int)(pUi-pALL) << stdRESET << std::endl;
+		//std::cout << stdBREAK "." << (int)(pS-pALL) << stdRESET << std::endl;
 		if( nS )
 		{
 			// elrakjuk kell
-			gpmSCP.DCTadd(pos,pUi,nS,clrBREAK);
+			gpmSCP.DCTadd(pos,pS,nS,clrBREAK);
 			// ebben van a " \t\r\n"
-			pos = lenMILL(pos,dim,pUi,pUi+nS);
-			pUi += nS;
-			if( pUi >= pUe )
+			pos = lenMILL(pos,dim,pS,pS+nS);
+			pS += nS;
+			if( pS >= pUe )
 				break;
 		}
 
-		if( bABC = gpmbABC(*pUi, gpaALF_H_sub) )
+		if( bABC = gpmbABC(*pS, gpaALF_H_sub) )
 		{
-			nA = gpmVAN( pUi, gpsNoWord, nU );
-			gpmSCP.DCTadd(pos,pUi,nA,clrABC);
+			nA = gpmVAN( pS, gpsNoWord, nU );
+			gpmSCP.DCTadd(pos,pS,nA,clrABC);
 			pos.x += nU;
 			dim.z += nU;
 			dim.a4x2[0].mx( pos );
-			pUi += nA;
+			pS += nA;
 			continue;
 		}
 
-		if( gpmbNUM( *pUi ) )
+		if( gpmbNUM( *pS ) )
 		{
-			pUj = pUi;
+			pUj = pS;
 			u8 = gpfSTR2U8( pUj, &pUj );
 			if( pUj < pUe ? *pUj == '.' : false )
 			{
 				d8 = u8;
 				d8 += gpmSTR2D( pUj );
 			}
-			nN = pUj-pUi;
-			gpmSCP.DCTadd(pos,pUi,nN,clrNUM);
+			nN = pUj-pS;
+			gpmSCP.DCTadd(pos,pS,nN,clrNUM);
 			pos.x += nN;
 			dim.z += nN;
 			dim.a4x2[0].mx( pos );
-			pUi=pUj;
+			pS=pUj;
 			continue;
 		}
-		switch( sIZE[0] = *pUi )
+		switch( sIZE[0] = *pS )
 		{
 			case '\"':
 			case '\'':
-				pUj = pUi+1;
+				pUj = pS+1;
 				while( pUj < pUe )
 				{
 					pUj += gpmVAN( pUj, sIZE, nU );
@@ -118,13 +120,13 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 
 					pUj += gpmVAN( pUj, sIZE, nU );
 				}
-				nSTR = pUj-pUi;
-				gpmSCP.STRadd(pos,pUi,nSTR,clrSTR);
-				pos = lenMILL(pos,dim,pUi,pUj);
-				pUi = pUj;
+				nSTR = pUj-pS;
+				gpmSCP.STRadd(pos,pS,nSTR,clrSTR);
+				pos = lenMILL(pos,dim,pS,pUj);
+				pS = pUj;
 				continue;
 			case '/':
-				pUj = pUi+1;
+				pUj = pS+1;
 				if( pUj < pUe )
 				{
 					switch(*pUj)
@@ -144,36 +146,36 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 								pUj += nSTR+2;
 							break;
 						case '/':
-							pUj += gpmVAN( pUi, "\a\r\n", nU );
+							pUj += gpmVAN( pS, "\a\r\n", nU );
 							break;
 						default:
-							pUj = pUi;
+							pUj = pS;
 							break;
 					}
 				}
-				nSTR = pUj-pUi;
+				nSTR = pUj-pS;
 				if( !nSTR )
 					break;
-				gpmSCP.NOTEadd(pos,pUi,nSTR,clrNOTE);
-				pos = lenMILL(pos,dim,pUi,pUj);
-				pUi = pUj;
+				gpmSCP.NOTEadd(pos,pS,nSTR,clrNOTE);
+				pos = lenMILL(pos,dim,pS,pUj);
+				pS = pUj;
 				continue;
 			default:
 				break;
 		}
 
-		//nO = gpmVAN( pUi, " \t\r\n", nU );
-		nO = gpmNINCS( pUi, gpsOPERA );
+		//nO = gpmVAN( pS, " \t\r\n", nU );
+		nO = gpmNINCS( pS, gpsOPERA );
 		if( !nO )
 		{
-			pUi++; // gpmVAN( pUi, pVAN, nU );
+			pS++; // gpmVAN( pS, pVAN, nU );
 			continue;
 		}
-		gpmSCP.DCTadd(pos,pUi,nO,clrOPERA);
+		gpmSCP.DCTadd(pos,pS,nO,clrOPERA);
 		pos.x += nO;
 		dim.a4x2[0].mx( pos );
 		dim.z += nU;
-		pUi += nO;
+		pS += nO;
 	}
 	dim.a4x2[0]+=1;
 	gpmSCP.dim = dim;

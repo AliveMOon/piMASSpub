@@ -812,7 +812,7 @@ public:
 		{
 			// nem volt a SZóTáRBAN
 			iDCT = nDCT; // a végére kerül ha hozzá adjuk
-			lzyDCT.dctMILLadd( pUi, nU );
+			lzyDCT.dctMILLaddS( pUi, nU );
 			nDCT++;
 		}
 		// typ U4x4.w:

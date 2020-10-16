@@ -6420,57 +6420,7 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	U4 dctMILLfndnS( U1* pS, U8& nS, U4& nIX ) {
-		if( !this )
-		{
-			nIX = 0;
-			return 0;
-		}
-		U8 aSTRT[2]; // = -1;
-		if( !str.p_alloc )
-			ver = 0;
-		// bemásolja a str szótárba
-		/// ebböl kéne akor csinálni egy olyat
-		/// ami ki szedi a '_#' jeleket
-		U1* pH = pS;
-		U8 nH = nS;
-		str.lzyADD( pH, nH+1, aSTRT[0] = -1 );
-		U1* pS0 = str.p_alloc;
-		pS = pS0+aSTRT[0];
-		nS = 0;
-		for( U8 h = 0; h < nH; h++ ) {
-			switch( pH[h] )
-			{
-				case '_':
-				case '#':
-					continue;
-				default:
-					break;
-			}
-			pS[nS]=pH[h];
-			nS++;
-		}
-		if( pS[nS] )
-			pS[nS] = 0;
-		str.n_load = aSTRT[0]+nS+1;
 
-		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
-		nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
-
-		pIX = p_ix0 + nIX;
-		pIX->null();
-		pIX->x = aSTRT[0];
-		pIX->y = nS;
-
-		U4 iIX = p_ix0->dctFND( pS0, *pIX );
-
-		// UNDOza a bejegyzést
-		str.n_load = aSTRT[0];
-		ix.n_load = aSTRT[1];
-		pIX = p_ix0+iIX;
-		return iIX;
-	}
 	gpcLZYdct* dctMILLadd( U1* pS, U8 nS ) {
 		if( !this )
 		{
@@ -6530,6 +6480,112 @@ public:
 		return this;
 	}
 
+	U4 dctMILLfndnS( U1* pS, U8& nS, U4& nIX ) {
+		if( !this )
+		{
+			nIX = 0;
+			return 0;
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !str.p_alloc )
+			ver = 0;
+		// bemásolja a str szótárba
+		/// ebböl kéne akor csinálni egy olyat
+		/// ami ki szedi a '_#' jeleket
+		U1* pH = pS;
+		U8 nH = nS;
+		str.lzyADD( pH, nH+1, aSTRT[0] = -1 );
+		U1* pS0 = str.p_alloc;
+		pS = pS0+aSTRT[0];
+		nS = 0;
+		for( U8 h = 0; h < nH; h++ ) {
+			switch( pH[h] )
+			{
+				case '_':
+				case '#':
+					continue;
+				default:
+					break;
+			}
+			pS[nS]=pH[h];
+			nS++;
+		}
+		if( pS[nS] )
+			pS[nS] = 0;
+		str.n_load = aSTRT[0]+nS+1;
+
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nS;
+
+		U4 iIX	= p_ix0->dctFND( pS0, *pIX );
+		// UNDOza a bejegyzést
+		str.n_load = aSTRT[0];
+		ix.n_load = aSTRT[1];
+		pIX = p_ix0+iIX;
+		return iIX;
+	}
+	gpcLZYdct* dctMILLaddS( U1* pS, U8 nS ) {
+		if( !this ) {
+			gpcLZYdct* p_this = new gpcLZYdct(0);
+			return p_this->dctADD( pS, nS );
+		}
+		U8 aSTRT[2]; // = -1;
+		if( !str.p_alloc )
+			ver = 0;
+		// bemásolja a str szótárba
+		/// ebböl kéne akor csinálni egy olyat
+		/// ami ki szedi a '_#' jeleket
+		U1* pH = pS;
+		U8 nH = nS;
+		str.lzyADD( pH, nH+1, aSTRT[0] = -1 );
+		U1* pS0 = str.p_alloc;
+		pS = pS0+aSTRT[0];
+		nS = 0;
+		for( U8 h = 0; h < nH; h++ ) {
+			switch( pH[h] )
+			{
+				case '_':
+				case '#':
+					continue;
+				default:
+					break;
+			}
+			pS[nS]=pH[h];
+			nS++;
+		}
+		if( pS[nS] )
+			pS[nS] = 0;
+		str.n_load = aSTRT[0]+nS+1;
+
+
+		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
+		U4 nIX = (aSTRT[1]/sizeof(U4x4));
+		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+
+		pIX = p_ix0 + nIX;
+		pIX->null();
+		pIX->x = aSTRT[0];
+		pIX->y = nS;
+		U4 iIX, nADD = p_ix0->dctADD( pS0, iIX, *pIX );
+
+		if( nIX == nADD )
+		{
+			// UNDOza a bejegyzést
+			str.n_load = aSTRT[0];
+			ix.n_load = aSTRT[1];
+			pIX = p_ix0+iIX;
+			return this;
+		}
+		ver++;
+		pIX = p_ix0+nIX;
+		return this;
+	}
 	U4 x( void ) {
 		if( this ? !ix.n_load : true )
 			return 0;
