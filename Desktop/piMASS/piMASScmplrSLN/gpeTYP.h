@@ -171,55 +171,55 @@ static const U8 gpaCszMX[] = {
 
 
 #define gpmFMUL( a, b, mx ) 					\
-		switch(b) 							\
-		{									\
-			case gpeOPid_and:				\
-				*(a*)p_dst &= *(a*)p_src;	\
-				break;						\
-			case gpeOPid_rem:				\
+		switch(b) 								\
+		{										\
+			case gpeOPid_and:					\
+				*((a*)p_dst) &= *((a*)p_src);	\
+				break;							\
+			case gpeOPid_rem:					\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)%(*(a*)p_src) : (a)0;	\
-				break;						\
-			case gpeOPid_div:				\
+				break;							\
+			case gpeOPid_div:					\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)/(*(a*)p_src) : (a)mx;	\
-				break;						\
-			default:						\
-				*(a*)p_dst *= *(a*)p_src;	\
-				break;						\
-		} 									\
+				break;							\
+			default:							\
+				*((a*)p_dst) *= *((a*)p_src);	\
+				break;							\
+		} 										\
 
-#define gpmMUL( a, b, mx ) 					\
-		switch(b) 							\
-		{									\
-			case gpeOPid_xor:				\
-				*(a*)p_dst ^= *(a*)p_src;	\
-				break;						\
-			case gpeOPid_and:				\
-				*(a*)p_dst &= *(a*)p_src;	\
-				break;						\
-			case gpeOPid_rem:				\
+#define gpmMUL( a, b, mx ) 						\
+		switch(b) 								\
+		{										\
+			case gpeOPid_xor:					\
+				*((a*)p_dst) ^= *((a*)p_src);	\
+				break;							\
+			case gpeOPid_and:					\
+				*((a*)p_dst) &= *((a*)p_src);	\
+				break;							\
+			case gpeOPid_rem:					\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)%(*(a*)p_src) : (a)0;	\
-				break;						\
-			case gpeOPid_div:				\
+				break;							\
+			case gpeOPid_div:					\
 				*(a*)p_dst = ((*(a*)p_src)!=(a)0) ? (*(a*)p_dst)/(*(a*)p_src) : (a)mx;	\
-				break;						\
-			default:						\
-				*(a*)p_dst *= *(a*)p_src;	\
-				break;						\
-		} 									\
+				break;							\
+			default:							\
+				*((a*)p_dst) *= *((a*)p_src);	\
+				break;							\
+		} 										\
 
-#define gpmADD( a, b ) 						\
-		switch(b) 							\
-		{									\
-			case gpeOPid_or:				\
-				*(a*)p_dst |= *(a*)p_src;	\
-				break;					\
-			case gpeOPid_sub:				\
-				*(a*)p_dst -= *(a*)p_src;	\
-				break;					\
-			default:						\
-				*(a*)p_dst += *(a*)p_src;	\
-				break;					\
-		} 							\
+#define gpmADD( a, b ) 							\
+		switch(b) 								\
+		{										\
+			case gpeOPid_or:					\
+				*((a*)p_dst) |= *((a*)p_src);	\
+				break;							\
+			case gpeOPid_sub:					\
+				*((a*)p_dst) -= *((a*)p_src);	\
+				break;							\
+			default:							\
+				*((a*)p_dst) += *((a*)p_src);	\
+				break;							\
+		} 										\
 
 
 typedef enum gpeEA:U1 {

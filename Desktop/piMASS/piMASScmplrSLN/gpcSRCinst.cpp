@@ -15,12 +15,12 @@ gpBLOCK* gpcSRC::srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* p
 
 	//gpROW *pR0 = pBLK->pROW();
 	//aiPC[0] = iPCrow( pR0, sOF, true );
-	_move._L.EAl(pBLK->iPC).A0;
+	_move._l.EAl(pBLK->iPC).A0;
 
 	gpROW *pRm = pBLKm->pROW(pBLK->bIDmR);
 	aiPC[1] = pRm ? iPCrow( *pRm, sOF, false ) : gpeCsz_L;
 	//pU1 = srcMEMiPC( iPC, sOF );
-	_move._L.EAl(aiPC[1]).A1;
+	_move._l.EAl(aiPC[1]).A1;
 	_move._L.IA0I.IA1I;
 	_nop;
 	return pBLKm;
@@ -168,8 +168,12 @@ gpINST* gpMEM::instALU()
 							switch( ins.cID )
 							{
 								case gpeCsz_Q: gpmMUL( I8, ins.op, mx ); break;
-								case gpeCsz_q: gpmMUL( U8, ins.op, mx ); break;
-								case gpeCsz_L: gpmMUL( I4, ins.op, mx ); break;
+								case gpeCsz_q:
+									gpmMUL( U8, ins.op, mx );
+									break;
+								case gpeCsz_L:
+									gpmMUL( int, ins.op, mx );
+									break;
 								case gpeCsz_l: gpmMUL( U4, ins.op, mx ); break;
 								case gpeCsz_W: gpmMUL( I2, ins.op, mx ); break;
 								case gpeCsz_w: gpmMUL( U2, ins.op, mx ); break;
@@ -189,8 +193,34 @@ gpINST* gpMEM::instALU()
 							{
 								case gpeCsz_Q: gpmADD( I8, ins.op ); break;
 								case gpeCsz_q: gpmADD( U8, ins.op ); break;
-								case gpeCsz_L: gpmADD( I4, ins.op ); break;
-								case gpeCsz_l: gpmADD( U4, ins.op ); break;
+								case gpeCsz_L:{
+										switch(ins.op)
+										{
+											case gpeOPid_or:
+												*((I4*)p_dst) |= *((I4*)p_src);
+												break;
+											case gpeOPid_sub:
+												*((I4*)p_dst) -= *((I4*)p_src);
+												break;
+											default:
+												*((I4*)p_dst) += *((I4*)p_src);
+												break;
+										}
+									} break;
+								case gpeCsz_l:{
+										switch(ins.op)
+										{
+											case gpeOPid_or:
+												*((U4*)p_dst) |= *((U4*)p_src);
+												break;
+											case gpeOPid_sub:
+												*((U4*)p_dst) -= *((U4*)p_src);
+												break;
+											default:
+												*((U4*)p_dst) += *((U4*)p_src);
+												break;
+										}
+									} break;
 								case gpeCsz_W: gpmADD( I2, ins.op ); break;
 								case gpeCsz_w: gpmADD( U2, ins.op ); break;
 								case gpeCsz_B: gpmADD( I1, ins.op ); break;
@@ -231,7 +261,7 @@ gpBLOCK* gpcSRC::srcINSTadd2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		gpROW& Ri = pR0[i];
 		iPC = iPCrow( Ri, sOF, true );
 		pU1 = srcMEMiPC( iPC, sOF );
-		_move._L.EAl(iPC).A0;
+		_move._l.EAl(iPC).A0;
 		if( !i ){
 			_move.c((gpeCsz)Ri.cID).IA0I.D0;
 			continue;
@@ -240,7 +270,7 @@ gpBLOCK* gpcSRC::srcINSTadd2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	}
 
 	pU1 = srcMEMiPC( pBLK->iPC, sOF );
-	_move._L.EAl( pBLK->iPC ).A0;
+	_move._l.EAl( pBLK->iPC ).A0;
 	_move.c((gpeCsz)pBLK->cID).D0.IA0I;
 	_nop;
 	return pBLKm;
@@ -258,7 +288,7 @@ gpBLOCK* gpcSRC::srcINSTmul2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
 		iPC = iPCrow( Ri, sOF, true );
 		pU1 = srcMEMiPC( iPC, sOF );
 		//_move.l #iPC.Aa;
-		_move._L.EAl(iPC).A0;
+		_move._l.EAl(iPC).A0;
 		if( !i ){
 			// move.l (A0),d0
 			_move.c((gpeCsz)Ri.cID).IA0I.D0;
@@ -269,7 +299,7 @@ gpBLOCK* gpcSRC::srcINSTmul2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
 	}
 
 	pU1 = srcMEMiPC( pBLK->iPC, sOF );
-	_move._L.EAl( pBLK->iPC ).A0;
+	_move._l.EAl( pBLK->iPC ).A0;
 	_move.c((gpeCsz)pBLK->cID).D0.IA0I;
 	_nop;
 	return pBLKm;

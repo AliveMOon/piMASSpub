@@ -6,13 +6,13 @@
   e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rr = 0x10000;
- rout = 0 + rr - 3;
+ rout =  rr + 3;
  rinp = 0 + rr + 2;
  bill 
  //john 
  	= d1.mini;
  slmp = "192.168.1.90 10000";
- cam = 331 * 10;
+ cam = 0x100 - 331 * 10;
  pic = "clip"; 
  
  bob = "exp";
