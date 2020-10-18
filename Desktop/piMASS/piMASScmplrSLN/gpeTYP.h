@@ -277,6 +277,10 @@ static gpeOPid gpaOPgrp[] = {
 	gpeOPid_entry, 	gpeOPid_out,
 	gpeOPid_entry,	gpeOPid_entry,
 	gpeOPid_mail,	gpeOPid_str,
+
+	gpeOPid_entry,
+
+	gpeOPid_entry,	gpeOPid_entry,	gpeOPid_entry,	gpeOPid_entry,
 };
 static gpeOPid gpaaOPid[][0x20] = {
 	//gpeOPid_nop,

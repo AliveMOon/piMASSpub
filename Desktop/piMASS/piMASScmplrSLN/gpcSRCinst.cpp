@@ -147,6 +147,15 @@ gpINST* gpMEM::instALU()
 								case gpeOPid_dot:
 									// find OBJ
 									break;
+								case gpeOPid_jsr: {
+										p_dst = pALL + pA[0];
+										switch( ins.a8x2.alf )
+										{
+											case gpeALF_FPS:
+												*p_dst = ins.a8x2.x;
+												break;
+										}
+									} break;
 								default: break;
 							}
 						} break;

@@ -274,7 +274,9 @@ void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
 		return;
 
 	srcCMPLR( *pMASS->pOPER(), iSCP, pMASS );
+	return;
 
+	/// OFF OLD ---------
 	if( pCORE )
 		return;
 

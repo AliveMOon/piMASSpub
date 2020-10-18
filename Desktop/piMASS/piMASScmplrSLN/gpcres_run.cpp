@@ -448,7 +448,6 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 			pSRC->srcBLD( this );
 
 			gpmDEL( pSRC->pEXE0 );
-			//pSRC->pEXE0 = pSRC->pEXE0->compiEASY( pSRC->pSRCstart( true, 4 ), NULL, NULL, NULL );
 
 			if( !pSRC->msBLTdly )
 				pSRC->msBLTdly = gpdSYNmSEC;

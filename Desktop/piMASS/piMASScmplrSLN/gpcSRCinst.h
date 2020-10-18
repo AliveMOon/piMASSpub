@@ -22,6 +22,7 @@
 #define _K c(gpeCsz_K)
 #define _OFF c(gpeCsz_OFF)
 
+#define _jsr	pMEM->inst( gpeOPid_jsr )
 #define _nop	pMEM->inst( gpeOPid_nop )
 #define _move	pMEM->inst( gpeOPid_mov )
 #define _or		pMEM->inst( gpeOPid_or )

@@ -35,14 +35,17 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 		case gpeOPid_EXTL:
 			pB += sprintf( pB, "extL" );
 			break;
+		case gpeOPid_jsr:
+			pB += gpfALF2STR( pB, a8x2.alf );
+			pDBG = pDBG->lzyFRMT( (s=-1), "\r\n0x%0.8x jsr %s", (U4)((U1*)this-pU1), sBUFF );
+			return *this;
 		default:
 			pB += gpfALF2STR( pB, pMEM->pMASS->aOP[op].alf );
 	}
 
 	pDBG = pDBG->lzyFRMT( (s=-1), "\r\n0x%0.8x %s%s", (U4)((U1*)this-pU1), sBUFF, gpasCsz[cID] );
 	U1	*pUs = NULL;
-	switch( mS )
-	{
+	switch( mS ) {
 		case gpeEA_OFF:
 			return *this;
 		case gpeEA_Dn:
@@ -82,8 +85,7 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 			return *this;
 	}
 
-	switch( mD )
-	{
+	switch( mD ) {
 		case gpeEA_OFF:
 			return *this;
 		case gpeEA_Dn:

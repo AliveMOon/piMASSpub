@@ -16,7 +16,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		cID0 = -1,
 		cIDm = -1,	cIDa = -1,	cIDb = -1,
 		nM = 0,		nA = 0, 	nB = 1;
-
+	I8x2	anA = 0, anB;
 
 	gpROW	*pR0 = pBLK->pROW(),
 
@@ -41,6 +41,8 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	{
 		iPCb = iPCa; sOFb = sOFa;
 		pOb = pOa;
+		anB = anA;
+
 		if( nA < 2 )
 			nB = 1;
 		else
@@ -53,7 +55,9 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		iPCa 	= iPCrow( *pRa, sOFa, true );
 		cIDa	= pRa ? pRa->cID : gpeCsz_L;
 		bSa 	= cIDa&((I4)gpeCsz_B);
-		pOa 	= srcOBJfnd( pRa->mNdID );
+		if( pOa = srcOBJfnd( pRa->mNdID ) ) {
+			anA = pOa->AN;
+		}
 		nA 		= pOa ? pOa->d2D.area() : 1;
 		nUa		= sOFa/nA;
 
@@ -84,6 +88,14 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 				if( nUb < 8 )
 					_xor._q.D0.D0;
 				_move._l.EAl( iPCb ).A0;
+				switch( anB.alf )
+				{
+					case gpeALF_FPS:
+						_jsr.EAl( anB.alf );
+						break;
+					default:
+						break;
+				}
 				_move.c((gpeCsz)cIDb).IA0I.D0;
 				bD0 = false;
 			}
