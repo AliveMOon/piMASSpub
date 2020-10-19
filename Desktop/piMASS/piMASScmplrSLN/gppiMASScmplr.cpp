@@ -85,7 +85,7 @@ gpBLOCK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gp
 	pBLK->pNEWrow();
 	return pBLK;
 }
-void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
+void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW ) {
 	if( !this )
 		return;
 
@@ -96,7 +96,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
 		gpmDEL(pOLD);
 		pOLD = pMEM;
 	}
-	pMEM = new gpMEM( this, pMS );
+	pMEM = new gpMEM( this, pW );
 
 	std::cout << stdCMPLR " CMP" stdRESET << std::endl;
 
@@ -109,8 +109,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
 	gpBLOCK* pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 	I8x2 AN; gpeCsz acID[2] = {gpeCsz_OFF};
 	gpeOPid opID;
-	for( U4 nM = gpmSCP.nMN(), mnID = 0, l; mnID < nM; mnID++ )
-	{
+	for( U4 nM = gpmSCP.nMN(), mnID = 0, l; mnID < nM; mnID++ ) {
 		if( pM0[mnID].MNclr() == gpeCLR_red2 )
 			continue;
 
@@ -220,3 +219,16 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS ) {
 
 	pMEM->instRDY( pDBG );
 }
+void gpcSRC::srcBLD( gpcWIN* pW ) //, gpcWIN& win )
+{
+	if( !this )
+		return;
+
+	U1 iSCP = 0;
+
+	if( !gpmSCP.nLNK() )
+		return;
+
+	srcCMPLR( *pW->piMASS->pOPER(), iSCP, pW );
+}
+

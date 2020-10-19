@@ -445,7 +445,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 		}
 
 		if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
-			pSRC->srcBLD( this );
+			pSRC->srcBLD( pWIN );
 
 			gpmDEL( pSRC->pEXE0 );
 
@@ -476,10 +476,10 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 			pSRC->apOUT[3] = NULL;
 		}
 
-		if( !pSRC->srcINSTrun(this,pWIN) )
+		if( !pSRC->srcINSTrun() )
 			continue;
 
-		pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI,this,pWIN);
+		pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI); //,this,pWIN);
 		pWIN->nJDOIT.x++;
 	}
 
@@ -536,7 +536,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 		if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
 
-			pSRC->srcBLD( this );
+			pSRC->srcBLD( pWIN );
 
 			gpmDEL( pSRC->pEXE0 );
 			pSRC->pEXE0 = pSRC->pEXE0->compiEASY( pSRC->pSRCstart( true, 4 ), NULL, NULL, NULL );
@@ -562,11 +562,11 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 		if( !pSRC->apOUT[3] )
 		{
-			if( !pSRC->srcINSTrun(this,pWIN) )
+			if( !pSRC->srcINSTrun() ) //this,pWIN) )
 				continue;
 
 			pWIN->nJDOIT.x++;
-			pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI,this,pWIN);
+			pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI); //,this,pWIN);
 		}
 
 

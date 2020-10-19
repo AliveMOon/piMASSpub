@@ -51,7 +51,6 @@ size_t gpCNST::strASM( char* pS, char* pALL, I8x4 *pM0, U4x4 *pL0   ) {
 	}
 	return n;
 }
-
 gpcO* gpcPIK::fnd( gpcO* pM, gpcO& dot, U4 nmID ) {
 	gpcO* pO = NULL;
 	if( !pM )
@@ -263,30 +262,6 @@ void gpcSRC::srcCMPLR_tresh( gpcLZYdct& dOP, U1 iSCP ) {
 	}
 }
 
-void gpcSRC::srcBLD( gpcMASS* pMASS ) //, gpcWIN& win )
-{
-	if( !this )
-		return;
 
-	U1 iSCP = 0;
-
-	if( !gpmSCP.nLNK() )
-		return;
-
-	srcCMPLR( *pMASS->pOPER(), iSCP, pMASS );
-	return;
-
-	/// OFF OLD ---------
-	if( pCORE )
-		return;
-
-	(pCORE=new gpCORE)->coreLNK(
-									gpmLZYvali( I4x4, &gpmSCP.lzyASM ),
-									gpmSCP.nASM(),
-									gpmSCP.pMN(),
-									(char*)gpmSCP.p_str, &scpCNST
-								);
-
-}
 
 

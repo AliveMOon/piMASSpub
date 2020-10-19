@@ -157,7 +157,7 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 	return *this;
 }
 
-gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
+gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN ) {
 	pLZY->lzyRST();
 	std::cout << stdMINI " MIN" stdRESET << std::endl;
 
@@ -172,14 +172,16 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 	U1* pU1, *pSRC = aSCOOP[0].p_str;
 	const char *pS;
 	U8 s = -1, nS;
+	bool bTMP;
 	for( U4 i = 0, iMN; i < nO; i++ )
 	{
 		gpOBJ& obj = pO0[i];
 		if( !(sOF=obj.sOF()) )
 			continue;
-		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n0x%x ", obj.iPC );
+		bTMP = obj.dctID < 0;
+		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPC );
 
-		if( obj.dctID < 0 )
+		if( bTMP )
 		{
 			if( obj.iPC < 4)
 				continue;
@@ -191,13 +193,36 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 		//iMN = pL0[obj.dctID].x;
 		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
 		nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
+
+		if( !nS )
+			continue;
+		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
+
+		switch( obj.AN.alf )
+		{
+			case gpeALF_TELNET:
+
+				break;
+			case gpeALF_SLMP:
+
+				break;
+			case gpeALF_AGAIN:
+				pMEM->msRUN = *(U4*)pU1;
+				if( !pMEM->msRUN )
+					break;
+				pMEM->msRUN += pMEM->pWIN->mSEC.x;
+				break;
+			default:
+				break;
+		}
+
+
 		pLZY = pLZY->lzyADD( //pSRC+pMN0[iMN].iS, pMN0[iMN].nS,
 								pS, nS,
 								(s=-1), -1 );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );
 		(s=-1);
 
-		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
 		if( obj.d2D.area() > 1 ) {
 			switch( obj.cID() )
 			{
@@ -209,15 +234,17 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 
 		}
 
+
+
 		switch( obj.cID() ) {
 			case gpeCsz_Q: pLZY = pLZY->lzyFRMT( s, " %lld,", *(I8*)pU1 ); break;
-			case gpeCsz_q: pLZY = pLZY->lzyFRMT( s, " %lld,", *(U8*)pU1 ); break;
+			case gpeCsz_q: pLZY = pLZY->lzyFRMT( s, " 0x%0.16llx,", *(U8*)pU1 ); break;
 			case gpeCsz_L: pLZY = pLZY->lzyFRMT( s, " %d,", *(int*)pU1 ); break;
-			case gpeCsz_l: pLZY = pLZY->lzyFRMT( s, " %d,", *(U4*)pU1 ); break;
+			case gpeCsz_l: pLZY = pLZY->lzyFRMT( s, " 0x%0.8x,", *(U4*)pU1 ); break;
 			case gpeCsz_W: pLZY = pLZY->lzyFRMT( s, " %d,", *(I2*)pU1 ); break;
-			case gpeCsz_w: pLZY = pLZY->lzyFRMT( s, " %d,", *(U2*)pU1 ); break;
+			case gpeCsz_w: pLZY = pLZY->lzyFRMT( s, " 0x%0.4x,", *(U2*)pU1 ); break;
 			case gpeCsz_B: pLZY = pLZY->lzyFRMT( s, " %d,", *(I1*)pU1 ); break;
-			case gpeCsz_b: pLZY = pLZY->lzyFRMT( s, " %d,", *(U1*)pU1 ); break;
+			case gpeCsz_b: pLZY = pLZY->lzyFRMT( s, " 0x%0.2x,", *(U1*)pU1 ); break;
 			case gpeCsz_f: pLZY = pLZY->lzyFRMT( s, " %f,", *(float*)pU1 ); break;
 			case gpeCsz_d: pLZY = pLZY->lzyFRMT( s, " %f,", *(double*)pU1 ); break;
 			case gpeCsz_4: pLZY = pLZY->lzyFRMT( s, " %d,", *(I1*)pU1 ); break;
@@ -231,4 +258,27 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN ) {
 
 
 	return pLZY;
+}
+
+bool gpcSRC::srcINSTrun() {
+	if( pMEM ? !pMEM->nCD : true )
+		return false;
+	I4 nPC = pMEM->nCD;
+	if( pMEM->pc >= nPC )
+	{
+		if( pMEM->msRUN ? pMEM->msRUN >= pMEM->pWIN->mSEC.x : true )
+			return false;
+		pMEM->pc = 0;
+	}
+
+	std::cout << stdRUN " RUN" stdRESET; // << std::endl;
+
+	gpINST*pI;
+	while( pMEM->pc < nPC )
+	{
+		pI = pMEM->instALU();
+	}
+
+
+	return true;
 }

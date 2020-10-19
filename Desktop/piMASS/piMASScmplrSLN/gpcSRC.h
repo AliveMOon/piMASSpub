@@ -1192,7 +1192,9 @@ public:
 			lzyCODE;
 	I4		nCD,
 			iSTK,nDAT,nINST, pc, pcCPY;
+	U4		msRUN;
 	gpINST	*pINST;
+	gpcWIN	*pWIN;
 	gpcMASS	*pMASS;
 	gpcSRC	*pSRC;
 
@@ -1200,15 +1202,7 @@ public:
 	{
 		gpmDEL(pINST);
 	}*/
-	gpMEM( gpcSRC* pS, gpcMASS* pMS, I4 i = 0x2000 ){
-		gpmCLR;
-		pSRC = pS;
-		pMASS = pMS;
-		iSTK = nDAT = i;
-		nDAT += 0x100;
-		pA = (I8*)aA;
-		pD = (I8*)(aA+8);
-	}
+	gpMEM( gpcSRC* pS, gpcWIN* pW, I4 i = 0x2000 );
 	U1* iPC( U4 iPC, U4 n )
 	{
 		if( !this )
@@ -1243,6 +1237,7 @@ public:
 		return pINST;
 	}
 	gpINST* instALU();
+	U1*		instVAR( U1* p_dst, gpINST& inst );
 };
 
 class gpcSRC {
@@ -1403,8 +1398,8 @@ public:
 	gpBLOCK*	srcINSTadd2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTmul2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
-	bool 		srcINSTrun( gpcMASS* pMASS, gpcWIN* pWIN );
-	gpcLZY*		srcINSTmini( gpcLZY* pLZY,gpcMASS* pMASS, gpcWIN* pWIN );
+	bool 		srcINSTrun(); //gpcMASS* pMASS, gpcWIN* pWIN );
+	gpcLZY*		srcINSTmini( gpcLZY* pLZY ); //,gpcMASS* pMASS, gpcWIN* pWIN );
 	///--------------------------
 	///			BLOCK
 	///--------------------------
@@ -1969,8 +1964,8 @@ public:
 						bool bNoMini, U1 selID
 					);
 	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
-	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcMASS* pMS );
-	void 	srcBLD( gpcMASS* pMASS ); //, gpcWIN& win );
+	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW ); //gpcMASS* pMS );
+	void 	srcBLD( gpcWIN* pW ); //
 	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 
 	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
@@ -2331,9 +2326,6 @@ public:
 	gpcMAP		mapCR;
 
 	gpeALF		aTGwip[0x100];
-	//gpcOPCD		aPRG[0x1000];
-	//U1			asPRG[0x1000],
-	//			*pPUB; //, nDICT;
 
 	// CMPL ----------------------------
 	gpcLZY		CMPL;
@@ -2342,13 +2334,7 @@ public:
 				aiDAT[0x100], alDAT;
 
 	// CPLD ----------------------------
-
-
-
-	//gpcLZY		*apDICTopcd[0x1000];
-	//gpcLZYdct	*apDICTix[0x1000];
 	U4	anDICTix[0x1000],
-		//aLEVsp[0x100],
 		rstLEV, iLEV, nLEV, topLEV;
 
 	/// aGLcnl --------
@@ -2373,8 +2359,7 @@ public:
 	char* pTXT, *pT;
 
 	gpcLZYdct* pOPER();
-	U4* pM( U4x2& zn, U1 id = 4 )
-	{
+	U4* pM( U4x2& zn, U1 id = 4 ) {
 		zn = 0;
 		if( !this )
 			return NULL;
@@ -2383,8 +2368,7 @@ public:
 		zn = mpZN.a4x2[1];
 		return p_map;
 	}
-	U4 getXFNDzn( const U4x2& zn )
-	{
+	U4 getXFNDzn( const U4x2& zn ) {
 		if( !this )
 			return 0;
 
@@ -2396,8 +2380,7 @@ public:
 		U4	i = zn*U4x2( 1, mpZN.z );
 		return pM[i];
 	}
-	U4 getXFNDan( I4x2 an )
-	{
+	U4 getXFNDan( I4x2 an ) {
 		if( this ? !an.x : true )
 			return 0;
 		an.x--;
@@ -2405,21 +2388,13 @@ public:
 	}
 	U4 jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ = NULL );
 
-	U4 relLEV( void )
-	{
+	U4 relLEV( void ) {
 		return iLEV-rstLEV;
 	}
 
-	gpcCMPL* piLEVmom( void )
-	{
-		return CMPL.pPC( aPC[iLEV-1] );
-	}
-	gpcCMPL* piLEViPC( void )
-	{
-		return CMPL.pPC( aPC[iLEV] );
-	}
-	U4 incLEV( void )
-	{
+	gpcCMPL* piLEVmom( void ) { return CMPL.pPC( aPC[iLEV-1] ); }
+	gpcCMPL* piLEViPC( void ) { return CMPL.pPC( aPC[iLEV] ); }
+	U4 incLEV( void ) {
 
 		aPC[iLEV] = iPC;
 		U4 iDT = aiDAT[iLEV];
@@ -2435,8 +2410,7 @@ public:
 
 	//void reset_o( void );
 	U1* msRST( U1* pPUB );
-	void tag_add( gpeALF tg, U4 iKID )
-	{
+	void tag_add( gpeALF tg, U4 iKID ) {
 		I8 ix, n;
 		U8 s = -1;
 
@@ -2449,8 +2423,7 @@ public:
 		}
 		pLZY->lzyADD( (U4*)&iKID, sizeof(U4), s, 8 );
 	}
-	void tag_sub( gpeALF tg, U4 iKID )
-	{
+	void tag_sub( gpeALF tg, U4 iKID ) {
 		if( !pTG )
 			return;
 		I8 ix;
@@ -2493,26 +2466,18 @@ public:
 	gpcMASS&	operator = ( const gpcMASS& b );
 	/// -------------------
 
-
-
 	gpcMASS(){ gpmCLR; }
 	gpcMASS( const U1* pU, U8 nU );
-	gpcMASS( const gpcMASS& b )
-	{
-		*this = b;
-	}
-
+	gpcMASS( const gpcMASS& b ) { *this = b; }
 
 	virtual ~gpcMASS();
-	gpcSRC* get( U4 i )
-	{
+	gpcSRC* get( U4 i ) {
 		if( i >= nLST )
 			return NULL;
 		gpcSRC** ppS = ppSRC();
 		return ppS ? ppS[i] : NULL;
 	}
-	gpcSRC* srcFND( U4 xfnd )
-	{
+	gpcSRC* srcFND( U4 xfnd ) {
 		if(!this)
 			return NULL;
 
@@ -2533,7 +2498,6 @@ public:
 
 		return pFND;
 	}
-
 	gpcSRC* SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
 
 
