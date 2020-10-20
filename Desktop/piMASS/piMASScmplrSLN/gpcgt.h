@@ -262,7 +262,7 @@ public:
 	}
 	int		answINFO( char*		pANS, U4 id );
 	gpcLZY* answINFO( gpcLZY* 	pANS, U4 id );
-	gpcLZY* answSTAT( gpcLZY* 	pANS, U4 id );
+	gpcLZY* answSTAT( gpcLZY* 	pANS, U4 id, char* pPP = "//" );
 
 	int		answINFOX( char*	pANS, U4 id, I4 x );
 	gpcLZY* answINFOX( gpcLZY*	pANS, U4 id, I4 x );

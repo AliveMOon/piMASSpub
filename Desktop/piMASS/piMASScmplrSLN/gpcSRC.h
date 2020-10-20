@@ -1236,9 +1236,30 @@ public:
 		aA[7] = iSTK;
 		return pINST;
 	}
+	gpOBJ* pOBJ( gpeALF alf ) {
+		if(!alf)
+			return NULL;
+		U4 nO = lzyOBJ.nLD(sizeof(gpOBJ)), sOF;
+		if( !nO )
+			return NULL;
+		gpOBJ* pO0 = gpmLZYvali( gpOBJ, &lzyOBJ );
+		for( U4 i = 0; i < nO; i++ )
+		{
+			gpOBJ& obj = pO0[i];
+			if( !(sOF=obj.sOF()) )
+				continue;
+			if( obj.AN.alf != alf )
+				continue;
+			return pO0+i;
+		}
+		return NULL;
+	}
+
 	gpINST* instALU();
 	U1*		instVAR( U1* p_dst, gpINST& inst );
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
+	I4		instDOitSLMP( gpcGT* pGT );
+
 };
 
 class gpcSRC {
@@ -2116,9 +2137,7 @@ public:
 		pB = pA+i;
 		return i;
 	}
-	U8 iPUB() {
-		return iB()+1;
-	}
+	U8 iPUB() { return iB()+1; }
 	U1* pPUB() {
 		if( this ? pA : NULL )
 		{

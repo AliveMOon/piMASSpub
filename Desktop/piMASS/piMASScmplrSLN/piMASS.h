@@ -6218,7 +6218,7 @@ szasz:
 	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN );
-	gpcLZY* lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i = 3 );
+	gpcLZY* lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i = 3, char* pPP = "//" );
 	gpcLZY* lzyZSnDstat( U8& iSTRT, gpcZSnD& zs, U1 i = 3 );
 	gpcLZY* lzy_reqCLOSE( void ) {
 		if( !this )

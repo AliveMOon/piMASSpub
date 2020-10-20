@@ -13,7 +13,7 @@ extern U4	gpnCAGEjohnBALL,
 
 static char gpsJDpub[0x100];
 
-gpcLZY* gpcLZY::lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i ) {
+gpcLZY* gpcLZY::lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i, char* pPP ) {
 	if( !&RnD ) {
 		iSTRT = nLD();
 		return this;
@@ -22,12 +22,12 @@ gpcLZY* gpcLZY::lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i ) {
 	U1 n = gpmN(RnD.aDrc);
 	if( i < n )
 	{
-		pANS = RnD.aDrc[i].answSTAT( pANS, i );
+		pANS = RnD.aDrc[i].answSTAT( pANS, i, pPP );
 		return this;
 	}
 
 	for( U1 i = 0, n = gpmN(RnD.aDrc); i < n; i++ )
-		pANS = RnD.aDrc[i].answSTAT( pANS, i );
+		pANS = RnD.aDrc[i].answSTAT( pANS, i, pPP );
 	return this;
 }
 U1 gpcROBnD::iDrc( bool bPULL ) {
@@ -155,7 +155,7 @@ gpcLZY* gpcDrc::answINFO( gpcLZY* pANS, U4 id ) {
 	U8 s = -1;
 	return pANS->lzyFRMT( s, "%s", sBUFF );
 }
-gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id ) {
+gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id, char* pPP ) {
 		if( !this )
 			return pANS;
 		I4x4 cXYZ = cageXYZ( mmX(gpdROBlim), id );
@@ -165,112 +165,112 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id ) {
 
 		comA = NMnDIF.x;
 		U8 s;
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// %s HS123:%0.6X E:%dms AVG:%dms", *sCOM ? (char*)sCOM : "?", hs123(), Ems, AVGms );
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// POS:  n:%d"
-										"\r\n//\tiXYZ %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\tcXYZ %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\toXYZ %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\tSMR2 %9.2fs,  %9.2fs, %9.2fs, %9.2fs;"
-										"\r\n//\tDIFF %9.2fs,  %9.2fs, %9.2fs, %9.2fs;"
-										,
-										(U4)(sqrt((tXYZ-iXYZ).qlen_xyz())/mmX(1)),
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n%s %s HS123:%0.6X E:%dms AVG:%dms", pPP, *sCOM ? (char*)sCOM : "?", hs123(), Ems, AVGms );
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n%s POS:  n:%d"
+										"\r\n%s\tiXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n%s\tcXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n%s\toXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n%s\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n%s\tSMR2 %9.2fs,  %9.2fs, %9.2fs, %9.2fs;"
+										"\r\n%s\tDIFF %9.2fs,  %9.2fs, %9.2fs, %9.2fs;",
+										pPP, (U4)(sqrt((tXYZ-iXYZ).qlen_xyz())/mmX(1)),
+
+										pPP,
 										double(iXYZ.x)/mmX(1),
 										double(iXYZ.y)/mmX(1),
 										double(iXYZ.z)/mmX(1),
 
+										pPP,
 										double(cXYZ.x)/mmX(1),
 										double(cXYZ.y)/mmX(1),
 										double(cXYZ.z)/mmX(1),
 
+										pPP,
 										double(oXYZ.x)/mmX(1),
 										double(oXYZ.y)/mmX(1),
 										double(oXYZ.z)/mmX(1),
 
+										pPP,
 										double(tXYZ.x)/mmX(1),
 										double(tXYZ.y)/mmX(1),
 										double(tXYZ.z)/mmX(1),
 
+										pPP,
 										double( msSMR2.x )/ms2sec,
 										double( msSMR2.y )/ms2sec,
 										double( msSMR2.z )/ms2sec,
 										double( msSMR2.w )/ms2sec,
 
+										pPP,
 										double( msSRT3.x-msSMR2.x )/ms2sec,
 										double( msSRT3.x-msSMR2.y )/ms2sec,
 										double( msSRT3.x-msSMR2.z )/ms2sec,
 										double( msSRT3.x-msSMR2.w )/ms2sec
 
 							);
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// DIR:  n:%d"
-										"\r\n//\tiABC %7.2fdg, %7.2fdg, %7.2fdg "
-										"\r\n//\toABC %7.2fdg, %7.2fdg, %7.2fdg "
-										"\r\n//\ttABC %7.2fdg, %7.2fdg, %7.2fdg;"
-										,
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n%s DIR:  n:%d"
+										"\r\n%s\tiABC %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n%s\toABC %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n%s\ttABC %7.2fdg, %7.2fdg, %7.2fdg;",
+										pPP,
 										(U4)(sqrt((tABC-iABC).qlen_xyz())/degX(1)),
 										double(iABC.A)/degX(1),
 										double(iABC.B)/degX(1),
 										double(iABC.C)/degX(1),
 
+										pPP,
 										double(oABC.A)/degX(1),
 										double(oABC.B)/degX(1),
 										double(oABC.C)/degX(1),
 
+										pPP,
 										double(tABC.A)/degX(1),
 										double(tABC.B)/degX(1),
 										double(tABC.C)/degX(1)
 							);
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// pos:"
-										"\r\n//\tixyz %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\toxyz %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\ttxyz %7.2fmm, %7.2fmm, %7.2fmm;"
-										,
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n%s pos:"
+										"\r\n%s\tixyz %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n%s\toxyz %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n%s\ttxyz %7.2fmm, %7.2fmm, %7.2fmm;",
+										pPP,
+
+										pPP,
 										double(ixyz.x)/mmX(1),
 										double(ixyz.y)/mmX(1),
 										double(ixyz.z)/mmX(1),
 
+										pPP,
 										double(oxyz.x)/mmX(1),
 										double(oxyz.y)/mmX(1),
 										double(oxyz.z)/mmX(1),
 
+										pPP,
 										double(txyz.x)/mmX(1),
 										double(txyz.y)/mmX(1),
 										double(txyz.z)/mmX(1)
 							);
-		pANS = pANS->lzyFRMT( s = -1,	"\r\n// ok:"
-										"\r\n//\tokXYZ %7.2fmm, %7.2fmm, %7.2fmm "
-										"\r\n//\tokabc %7.2fdg, %7.2fdg, %7.2fdg "
-										"\r\n//\tokxyz %7.2fmm, %7.2fmm, %7.2fmm;"
-										,
+		pANS = pANS->lzyFRMT( s = -1,	"\r\n%s ok:"
+										"\r\n%s\tokXYZ %7.2fmm, %7.2fmm, %7.2fmm "
+										"\r\n%s\tokabc %7.2fdg, %7.2fdg, %7.2fdg "
+										"\r\n%s\tokxyz %7.2fmm, %7.2fmm, %7.2fmm;",
+										pPP,
+
+										pPP,
 										double(okXYZ.x)/mmX(1),
 										double(okXYZ.y)/mmX(1),
 										double(okXYZ.z)/mmX(1),
 
+										pPP,
 										double(okABC.A)/degX(1),
 										double(okABC.B)/degX(1),
 										double(okABC.C)/degX(1),
 
+										pPP,
 										double(okxyz.x)/mmX(1),
 										double(okxyz.y)/mmX(1),
 										double(okxyz.z)/mmX(1)
 							);
-		/*pANS = pANS->lzyFRMT( s = -1,	"\r\n// dir:"
-										"\r\n//\tiabc %7.2fdg, %7.2fdg, %7.2fdg "
-										"\r\n//\toabc %7.2fdg, %7.2fdg, %7.2fdg "
-										"\r\n//\ttabc %7.2fdg, %7.2fdg, %7.2fdg;"
-										,
-										double(iabc.x)/degX(1),
-										double(iabc.y)/degX(1),
-										double(iabc.z)/degX(1),
 
-										double(oabc.x)/degX(1),
-										double(oabc.y)/degX(1),
-										double(oabc.z)/degX(1),
-
-										double(tabc.x)/degX(1),
-										double(tabc.y)/degX(1),
-										double(tabc.z)/degX(1)
-							);*/
 		return pANS;
 	}
 
