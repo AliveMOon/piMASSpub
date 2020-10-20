@@ -692,7 +692,7 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 }
 
 gpINST* gpMEM::instALU() {
-	std::cout << stdALU "+";
+	//std::cout << stdALU "+";
 	gpINST& ins = pINST[pc];
 	pc++;
 

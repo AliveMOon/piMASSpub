@@ -765,7 +765,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 					case gpeALF_SYNC: if(alu.bSTR()) {
 						if( gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() ) )
-							pGT->GTcnct( *pWIN );
+							pGT->GTcnct( pWIN );
 					} break;
 
 					case gpeALF_PICo:{
@@ -879,7 +879,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 						anRio.a8x2[1].x >>= 0x10;
 						} break;
 
-					case gpeALF_SLMPo: if(alu.bSTR()) break; { // OFF -------------
+					/*case gpeALF_SLMPo: if(alu.bSTR()) break; { // OFF -------------
 						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
 							break;
 						gpcGT* pGT = GTcnct.GT( alu.alf, (U1*)alu.pDAT, alu.nLOAD() );
@@ -887,7 +887,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 							break;
 
 							I4 cnt = pGT->iCNT;
-							pGT->GTcnct( *pWIN );
+							pGT->GTcnct( pWIN );
 							if( cnt == pGT->iCNT )
 								anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
 
@@ -946,7 +946,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 							}
 							anRio.a8x2[0].x = 0;
-						} break;
+						} break;*/
 					case gpeALF_SLMP: if(alu.bSTR()) {
 						if( anRio.a8x2[0].x*anRio.a8x2[1].x < 1 )
 							break;
@@ -955,7 +955,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 							break;
 
 							I4 cnt = pGT->iCNT;
-							pGT->GTcnct( *pWIN );
+							pGT->GTcnct( pWIN );
 							if( cnt == pGT->iCNT )
 								anRio.a8x2[1].x = anRio.a8x2[0].x = 0;
 
@@ -1185,20 +1185,15 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 					} break;
 				case gpeALF_TELNET: {
 						I4 port = alu.u8();
-						if( gpcGT* pGT = GTacpt.GT( alu.alf, port ) )
-						{
+						if( gpcGT* pGT = GTacpt.GT( alu.alf, port ) ) {
 							gpcGT& gt = *pGT;
-
-							gt.GTlst( *pWIN, GTcnct );
-							if( gpcLZY* pEVNT = gt.pEVENT->qEVENT() )
-							{
+							gt.GTlst( pWIN, GTcnct );
+							if( gpcLZY* pEVNT = gt.pEVENT->qEVENT() ) {
 								U1x4* pBGRA;
 								U4 nGD = 0; U8 s;
 								gpcHUD* pEV = (gpcHUD*)pEVNT->p_alloc;
-								for(U4 i = 0, n = pEVNT->n_load / sizeof(gpcHUD); i < n; i++)
-								{
-									switch(pEV[i].id)
-									{
+								for(U4 i = 0, n = pEVNT->n_load / sizeof(gpcHUD); i < n; i++) {
+									switch(pEV[i].id) {
 										case gpeNET4_0EYE:
 											if( gpcGT* pGT = gt.GTacc.iGT(pEV[i].n) ) {
 												U4	rmask, gmask, bmask, amask;
