@@ -2466,7 +2466,7 @@
 	"gpcSRC.h"
 	"gpcres.h"
 
-1603138710 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpcSRC.h
+1603192774 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpcSRC.h
 	"gpcgt.h"
 	<gpcOPCD.h>
 
@@ -2587,7 +2587,7 @@
 	"gpcSRC.h"
 	"gpcwin.h"
 
-1603138710 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRC.h
+1603192774 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRC.h
 	"gpcgt.h"
 	<gpcOPCD.h>
 
@@ -2747,13 +2747,19 @@
 
 1603033182 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinst.h
 
-1603139427 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinstRUN.cpp
+1603184721 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinstRUN.cpp
 	"gpcSRC.h"
 	"gpcSRCinst.h"
 	"gpcSRClnk.h"
 	"gpccrs.h"
 
 1603105342 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinstALU.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603192774 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpMEMinstDOit.cpp
 	"gpcSRC.h"
 	"gpcSRCinst.h"
 	"gpcSRClnk.h"

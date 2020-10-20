@@ -106,6 +106,7 @@
 		</Linker>
 		<Unit filename="gpCORE.cpp" />
 		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpMEMinstDOit.cpp" />
 		<Unit filename="gpcCRSbreak.cpp" />
 		<Unit filename="gpcDRCos.cpp" />
 		<Unit filename="gpcGL.cpp" />

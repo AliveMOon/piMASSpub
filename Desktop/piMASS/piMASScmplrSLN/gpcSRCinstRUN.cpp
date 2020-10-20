@@ -198,28 +198,10 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 			continue;
 		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
 
-		switch( obj.AN.alf )
-		{
-			case gpeALF_TELNET:
-
-				break;
-			case gpeALF_SLMP:
-
-				break;
-			case gpeALF_AGAIN:
-				pMEM->msRUN = *(U4*)pU1;
-				if( !pMEM->msRUN )
-					break;
-				pMEM->msRUN += pMEM->pWIN->mSEC.x;
-				break;
-			default:
-				break;
-		}
+		int iDi = pMEM->instDOit( obj, pU1 );
 
 
-		pLZY = pLZY->lzyADD( //pSRC+pMN0[iMN].iS, pMN0[iMN].nS,
-								pS, nS,
-								(s=-1), -1 );
+		pLZY = pLZY->lzyADD( pS, nS, (s=-1), -1 );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );
 		(s=-1);
 
@@ -282,3 +264,6 @@ bool gpcSRC::srcINSTrun() {
 
 	return true;
 }
+
+
+

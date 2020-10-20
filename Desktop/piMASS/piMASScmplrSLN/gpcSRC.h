@@ -1238,6 +1238,7 @@ public:
 	}
 	gpINST* instALU();
 	U1*		instVAR( U1* p_dst, gpINST& inst );
+	I4		instDOit( gpOBJ& obj, U1* pU1 );
 };
 
 class gpcSRC {

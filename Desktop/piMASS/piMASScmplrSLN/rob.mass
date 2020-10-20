@@ -17,7 +17,7 @@
  
  bob = "exp";
  f = fps;
- again = 0x10; 
+ again = 0x400; 
   b1	 
  pic = 	"cam1";
  unsel = 1;

@@ -51,7 +51,7 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 	return p_dst;
 }
 
-
+/*
 gpBLOCK* gpcSRC::srcINSTadd2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
@@ -107,3 +107,7 @@ gpBLOCK* gpcSRC::srcINSTmul2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK  ) {
 	_nop;
 	return pBLKm;
 }
+
+
+*/
+*/
