@@ -20,9 +20,12 @@ static const char* gpasADDR[] = {
 	"//%0.4x|",
 	"//%0.8x|",
 	"//%0.16llx|",
+	"%S%0.2x|",
+	"%S%0.4x|",
+	"%S%0.8x|",
+	"%S%0.16llx|",
 };
-gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN )
-{
+gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN ) {
 	if( nBIN ? !pBIN : true )
 		return this;
 
@@ -69,9 +72,7 @@ gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
-
-gpcLZY* gpcLZY::lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN )
-{
+gpcLZY* gpcLZY::lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN ) {
 	if( nBIN ? !pBIN : true )
 		return this;
 
@@ -118,8 +119,7 @@ gpcLZY* gpcLZY::lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
-gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN )
-{
+gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN, bool bCOM ) {
 	if( nBIN ? !pBIN : true )
 		return this;
 
@@ -129,13 +129,14 @@ gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN )
 		if( !pTHIS )
 			return NULL;
 
-		return pTHIS->lzyHEXw( iSTRT, pBIN, nBIN );
+		return pTHIS->lzyHEXl( iSTRT, pBIN, nBIN, bCOM );
 	}
 
 	iSTRT = n_load;
 	U8 s;
 
-	U1 nLOG = log2( nBIN )/8+4;
+	U1 nLOG = log2( nBIN )/8+(bCOM?4:0);
+
 	char sLINE[0x400], *pLINE = sLINE, *pADDR;
 	//pLINE += sprintf( pLINE, "\"\r\n");
 	for( U4 i = 0, j, je; i < nBIN; i += 16 )

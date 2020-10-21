@@ -18,7 +18,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT )
 
 	gpOBJ	*pOi = pOBJ(gpeALF_RINP),
 			*pOo = pOBJ(gpeALF_ROUT);
-	I8x4 anRio;
+	I8x2 an;
 	U1* pU1;
 	gpcSRC* pS2;
 	U4 xfnd;
@@ -37,12 +37,13 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT )
 		pU1 = pSRC->srcMEMiPC( pOi->iPC, gpeCsz_l );
 		if( pU1 )
 		{
-			anRio.a8x2[0].x = *(U4*)pU1;
-			anRio.a8x2[0].y = anRio.a8x2[0].x&0xff;
-			anRio.a8x2[0].x >>= 0x10;
+			an.x = *(U4*)pU1;
+			an.y = an.x&0xff;
+			an.x >>= 0x10;
+
 			for( U1 i = 0; i < 2; i++ )
 			{
-				xfnd = pMASS->getXFNDan( anRio.a8x2[0]+I8x2( i, 0 ) );
+				xfnd = pMASS->getXFNDan( an+I8x2( i, 0 ) );
 				pS2 = xfnd ? pMASS->srcFND( xfnd ) : NULL;
 				if( pS2 )
 				{
@@ -59,6 +60,21 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT )
 
 	std::cout << stdALU "rOUT" << std::endl;
 	pU1 = pSRC->srcMEMiPC( pOo->iPC, gpeCsz_l );
+	if( !pU1 )
+		return pGT->iCNT;
+	an.x = *(U4*)pU1;
+	an.y = an.x&0xff;
+	an.x >>= 0x10;
+
+	xfnd = pMASS->getXFNDan( an );
+	pS2 = xfnd ? pMASS->srcFND( xfnd ) : NULL;
+	if( !pS2 )
+		return pGT->iCNT;
+	gpcLZY *pLZYhex = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(pGT->TnID));
+	if( !pLZYhex->nLD() )
+		return pGT->iCNT;
+	pS2->pMINI = pS2->pMINI->lzyFRMT( s=0, "\r\n" ); //\r\n" );
+	pS2->pMINI = pS2->pMINI->lzyHEXl( s = 0, pLZYhex->p_alloc, pLZYhex->n_load, false );
 
 	return pGT->iCNT;
 }
