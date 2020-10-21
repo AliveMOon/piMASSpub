@@ -12,18 +12,18 @@ gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 	return lzyADD( (U1*)gps_lzy_pub1, n, iSTRT );
 }
 static const char* gpasADDR[] = {
-	"%0.2x|",
-	"%0.4x|",
-	"%0.8x|",
-	"%0.16llx|",
+	"0x%0.2x|",
+	"0x%0.4x|",
+	"0x%0.8x|",
+	"0x%0.16llx|",
 	"//%0.2x|",
 	"//%0.4x|",
 	"//%0.8x|",
 	"//%0.16llx|",
-	"%S%0.2x|",
-	"%S%0.4x|",
-	"%S%0.8x|",
-	"%S%0.16llx|",
+	"%S0x%0.2x|",
+	"%S0x%0.4x|",
+	"%S0x%0.8x|",
+	"%S0x%0.16llx|",
 };
 gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN ) {
 	if( nBIN ? !pBIN : true )
@@ -149,9 +149,9 @@ gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN, bool bCOM ) {
 				pLINE += sprintf( pLINE, "         " );
 				continue;
 			}
-			pLINE += sprintf( pLINE, "%0.8x ", *(U4*)(pBIN+j) );
+			pLINE += sprintf( pLINE, "0x%0.8x ", *(U4*)(pBIN+j) );
 		}
-		pLINE += sprintf( pLINE, "|" );
+		pLINE += sprintf( pLINE, "//" );
 		for( j = i, je = j+16; j < je; j++ )
 		{
 			if( j >= nBIN )

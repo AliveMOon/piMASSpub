@@ -2,7 +2,7 @@
  
  R# o# b# i#                                            	
   R# o# b# i#                                            	 b0	 b0  d0	  																							
- mini = "wget -O /robo2/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture"
+ mini = "wget -O /robo2/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture", 
   e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rr = 0x10000;

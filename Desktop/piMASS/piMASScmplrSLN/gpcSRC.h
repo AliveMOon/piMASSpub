@@ -1181,6 +1181,16 @@ public:
 	};
 	gpINST& dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 = NULL );
 };
+class gpGL{
+public:
+	gpcPIC		*apPIC[0x10],
+				*apBOB[0x10];
+	gpcPICAM	*pCAM;
+	SDL_Texture* apTX[0x10];
+	gpGL(){
+		gpmCLR;
+	};
+};
 class gpMEM {
 public:
 	I8x2 	aA[0x10];
@@ -1197,7 +1207,7 @@ public:
 	gpcWIN	*pWIN;
 	gpcMASS	*pMASS;
 	gpcSRC	*pSRC;
-
+	gpGL	*pGL;
 	/*~gpMEM()
 	{
 		gpmDEL(pINST);

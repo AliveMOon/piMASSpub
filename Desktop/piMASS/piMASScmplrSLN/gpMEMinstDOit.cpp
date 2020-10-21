@@ -49,7 +49,6 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT )
 				{
 					pS2->pMINI = pS2->pMINI->lzyFRMT( s=0, "\r\n" ); //\r\n" );
 					pS2->pMINI = pS2->pMINI->lzyROBnDstat( s=0, *pROBnD, i, "" );
-					//pS2->pMINI = pS2->pMINI->lzyRST()->lzyHEXl( s = 0, pLZYin->p_alloc, pLZYin->n_load );
 				}
 			}
 		}
@@ -78,48 +77,77 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT )
 
 	return pGT->iCNT;
 }
+#define gpdGL (pGL?pGL:(pGL = new gpGL))
+#define gpdGLapPIC gpdGL->apPIC
+#define gpdGLpCAM (gpdGL->pCAM?gpdGL->pCAM:(gpdGL->pCAM = new gpcPICAM))
 I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 {
 	bool bCID = this ? !pU1 : true;
+	gpcGT* pGT;
 	I4 cID = -1;
 	switch( obj.AN.alf )
 	{
-		case gpeALF_TELNET: {
-				cID = gpeCsz_L;
-				if( bCID ) break;
-				I4 port = *(U4*)pU1;
-				if( port < 0 )
-					break;
-				gpcGT* pGT = pMASS->GTacpt.GT( obj.AN.alf, port );
-				if( !pGT )
-					break;
-				std::cout << stdALU " TNET" << std::endl;
-				pGT->GTlst( pWIN, pMASS->GTcnct );
-			} break;
-		case gpeALF_SLMP: {
-				cID = gpeCsz_L;
-				if( bCID ) break;
-				gpcGT* pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
+		/// LISTENER
+		case gpeALF_TELNET: {								cID = gpeCsz_L; if( bCID ) break;
+			I4 port = *(U4*)pU1;
+			if( port < 1 ) break;
+			pGT = pMASS->GTacpt.GT( obj.AN.alf, port );
+			if( !pGT ) break;
+			std::cout << stdALU " TNET" << std::endl;
+			pGT->GTlst( pWIN, pMASS->GTcnct );
+		} break;
+
+		/// CONNECT
+		case gpeALF_SLMP: {									cID = gpeCsz_L; if( bCID ) break;
+				pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
 				instDOitSLMP( pGT );
-				break;
-				/*if( !pGT )
-					break;
-
-				I4 cnt = pGT->iCNT;
-				pGT->GTcnct( pWIN );
-				if( cnt == pGT->iCNT )
-					break;
-				std::cout << stdALU " SLMP" << std::endl;*/
-
 			} break;
-		case gpeALF_AGAIN:	cID = gpeCsz_l;
-			if( bCID ) break;
+		case gpeALF_SYNC: {									cID = gpeCsz_L; if( bCID ) break;
+			pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
+			if( !pGT ) break;
+			pGT->GTcnct( pWIN );
+		} break;
 
+		/// SRC CTRL
+		case gpeALF_UNSEL: {								cID = gpeCsz_L; if( bCID ) break;
+			if( (*pU1)&1 )
+				pSRC->bSW |= gpeMASSunselMSK;
+			else
+				pSRC->bSW &= ~gpeMASSunselMSK;
+		} break;
+		case gpeALF_AGAIN: {								cID = gpeCsz_l; if( bCID ) break;
 			msRUN = *(U4*)pU1;
-			if( !msRUN )
-				break;
+			if( !msRUN ) break;
 			msRUN += pWIN->mSEC.x;
-			break;
+		} break;
+		/// periFERI
+		case gpeALF_CAM:{									cID = gpeCsz_l; if( bCID ) break;
+			U4 iCAM = *(U4*)pU1;
+			if( !iCAM )
+				break;
+			if( gpdGLapPIC[0] = pMASS->PIC.PIC( I8x2(obj.AN.alf,iCAM) ) ) {
+				/*if( !gpdGP->pCAM )
+					gpdGP->pCAM = new gpcPICAM;*/
+				U1* pRGB = gpdGLapPIC[0]->getPIX( gpdGLpCAM, pWIN->mSEC.y ); //50 );
+				if( pRGB )
+				{
+					if( gpdGLpCAM->bGD() )
+					{
+						gpmDEL( gpdGLapPIC[0]->pPACK );
+						pWIN->pSYNwin = pWIN->pSYNwin->syncADD( gpcSYNC( gpeNET4_0PIC, gpdGLapPIC[0]->id+1, pWIN->mSEC.y, INVALID_SOCKET, 0 ), pWIN->msSYN );
+					}
+
+					if( !pWIN->pPICbg )
+					{
+						pWIN->pPICbg = gpdGLapPIC[0];
+					}
+				}
+				else if( gpdGLapPIC[0]->pSHR )
+						pWIN->pPICbg = gpdGLapPIC[0];
+			}
+		} break;
+		/// GFX
+
 		default:
 			break;
 	}
