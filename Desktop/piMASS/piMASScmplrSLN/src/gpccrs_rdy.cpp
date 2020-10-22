@@ -294,8 +294,31 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 
 			pTITLE = gpsTITLE;
 			if( pSRC = pWIN->piMASS->srcFND(pM[i+c]) ) {
-				gpcRES* pRES = pSRC->apOUT[3];
-				if( pRES )
+				//gpcRES* pRES = pSRC->apOUT[3];
+				if( pSRC->pMEM  )
+				{
+					if( pSRC->pMEM->pCTRL )
+					{
+						if( *(pSRC->pMEM->pCTRL->sNAME) )
+							pTITLE += sprintf( (char*)pTITLE, "%s", (pSRC->pMEM->pCTRL->sNAME) );
+					}
+					if( pSRC->pMEM->pGL )
+					{
+						if( pSRC->pMEM->pGL->aPICid[0] )
+						{
+							/// CELL PICTURES BACK GROUND -------------------
+							//xyWH azonos a xyPIC[0]-val!
+							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pGL->aPICid[0]-1;
+							picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+						}
+						if( pSRC->pMEM->pGL->aBOBid[0] )
+						{
+							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pGL->aBOBid[0]-1;
+							bobBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+						}
+					}
+				}
+				/*else if( pRES )
 				{
 					U4	n = pRES->nFND(),
 						i = pRES->iFND( gpeALF_NAME );
@@ -306,19 +329,15 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 							pTITLE += sprintf( (char*)pTITLE, "%s", (char*)alu.pDAT );
 
 					}
-				}
-				if( pSRC->picID )
+				}*/
+				/*if( pSRC->picID )
 				{
 					/// CELL PICTURES BACK GROUND -------------------
 					//xyWH azonos a xyPIC[0]-val!
 					aXYuvPC[2].a4x2[1].x = pSRC->picID-1;
 					picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
-				}
-				if( pSRC->bobID )
-				{
-					aXYuvPC[2].a4x2[1].x = pSRC->bobID-1;
-					bobBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
-				}
+				}*/
+
 			}
 
 

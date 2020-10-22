@@ -905,6 +905,13 @@ public:
 		iPC = pB->iPC;
 		return this;
 	}
+	bool bARY(){ return d2D.area() > 1; }
+	bool bSTR()
+	{
+		if( cID() != gpeCsz_b )
+			return false;
+		return bARY();
+	}
 };
 
 class gpROW{
@@ -1183,13 +1190,24 @@ public:
 };
 class gpGL{
 public:
+	I4			aPICid[0x10],
+				aBOBid[0x10];
 	gpcPIC		*apPIC[0x10],
 				*apBOB[0x10];
 	gpcPICAM	*pCAM;
 	SDL_Texture* apTX[0x10];
-	gpGL(){
-		gpmCLR;
+	gpGL(){ gpmCLR; };
+	~gpGL(){
+		gpmDEL(pCAM);
 	};
+};
+class gpCTRL{
+public:
+	char	sNAME[0x100];
+	gpCTRL(){ gpmCLR; };
+	/*~gpCTRL(){
+
+	};*/
 };
 class gpMEM {
 public:
@@ -1208,6 +1226,7 @@ public:
 	gpcMASS	*pMASS;
 	gpcSRC	*pSRC;
 	gpGL	*pGL;
+	gpCTRL	*pCTRL;
 	/*~gpMEM()
 	{
 		gpmDEL(pINST);
