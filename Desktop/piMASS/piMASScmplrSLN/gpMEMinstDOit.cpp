@@ -4,8 +4,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-I4 gpMEM::instDOitSLMP( gpcGT* pGT )
-{
+I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
 
@@ -88,6 +87,10 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 	bool bCID = this ? !pU1 : true;
 	gpcGT* pGT;
 	I4 cID = -1;
+	if( obj.cAN != gpeCsz_a )
+	{
+		return cID;
+	}
 	switch( obj.AN.alf )
 	{
 		/// --------------------------------------------------------------------------

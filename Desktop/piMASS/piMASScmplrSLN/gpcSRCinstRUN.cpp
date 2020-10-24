@@ -6,7 +6,7 @@ extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
 
-gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
+gpINST& gpINST::instDBG( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 	if( pMEM ? !pDBG : true )
 		return *this;
 
@@ -39,6 +39,9 @@ gpINST& gpINST::dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 			pB += gpfALF2STR( pB, a8x2.alf );
 			pDBG = pDBG->lzyFRMT( (s=-1), "\r\n0x%0.8x jsr %s", (U4)((U1*)this-pU1), sBUFF );
 			return *this;
+		case gpeOPid_mov:
+			pB += sprintf( pB, "move" );
+			break;
 		default:
 			pB += gpfALF2STR( pB, pMEM->pMASS->aOP[op].alf );
 	}
@@ -178,10 +181,10 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 		gpOBJ& obj = pO0[i];
 		if( !(sOF=obj.sOF()) )
 			continue;
-		bTMP = obj.dctID < 0;
+		bTMP = obj.dctID < 0 || (obj.cAN != gpeCsz_a);
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPC );
 
-		if( bTMP )
+		if( obj.dctID < 0  )
 		{
 			if( obj.iPC < 4)
 				continue;
@@ -191,13 +194,12 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 			continue;
 		}
 		//iMN = pL0[obj.dctID].x;
-		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
 		nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
-
 		if( !nS )
 			continue;
-		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
 
+		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
+		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
 		int iDi = pMEM->instDOit( obj, pU1 );
 
 

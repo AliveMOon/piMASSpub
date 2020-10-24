@@ -1186,7 +1186,7 @@ public:
 		a8x2.y = i;
 		return *this;
 	};
-	gpINST& dbg( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 = NULL );
+	gpINST& instDBG( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 = NULL );
 };
 class gpGL{
 public:
@@ -1259,7 +1259,7 @@ public:
 		gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
 		nDAT = lzyMEM.n_load;
 		for( I4 i = 0; i < nCD; i++ )
-			pINST[i].dbg(pDBG,this,lzyMEM.p_alloc);
+			pINST[i].instDBG(pDBG,this,lzyMEM.p_alloc);
 
 		pc = 0;
 		aA[7] = iSTK;
