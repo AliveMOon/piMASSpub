@@ -27,7 +27,7 @@ gpBLOCK* gpcSRC::srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* p
 }
 
 
-gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, I4 i ) {
+gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i ) {
 	gpmCLR;
 	pSRC = pS;
 	pWIN = pW;
@@ -36,6 +36,11 @@ gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, I4 i ) {
 	nDAT += 0x100;
 	pA = (I8*)aA;
 	pD = (I8*)(aA+8);
+	pLZYsrcXFND = pSRCstk;
+	if( !pLZYsrcXFND )
+		return;
+
+	nXFND = pLZYsrcXFND->nLD(sizeof(U4));
 }
 
 U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )

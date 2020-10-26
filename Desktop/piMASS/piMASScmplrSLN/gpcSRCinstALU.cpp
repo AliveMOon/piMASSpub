@@ -4,7 +4,142 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+gpBLOCK* gpcSRC::srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
+	/// + a0.b
+	/// * a0.b
 
+	gpROW* pRl = pBLK->pLSTrow();
+	if( !pRl )
+		return pBLK;
+
+	gpOBJ* pO = srcOBJfnd(pRl->mNdID);
+	switch( pO ? pO->cAN : gpeCsz_OFF )
+	{
+		case gpeCsz_a:
+		case gpeCsz_c:
+			/// a0.b
+			/// b.a0
+			return srcBLKup( pS, pBLK, opID );
+		case gpeCsz_b:
+			if( pO->bSTR() )
+			{
+				// itt lehetne egy név alapján keresni
+
+			}
+		default: break;
+	}
+	return pBLK;
+}
+
+gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
+	if( !pBLKm )
+		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+
+	I4	nR = pBLK->nROW(),
+		iPCm = pBLK->iPC, 	iPCa = 0, 	iPCb = 0,	iPCin = 0,
+		sOFm = 0,			sOFa = 0,	sOFb = 0,	sOFin = 0,
+		cIDm = -1,			cIDa = -1,	cIDb = -1, cID0 = gpeCsz_L,
+		nM = 0,				nA = 0, 	nB = 1;
+
+
+	gpROW	*pRa = pBLK->pROW(),
+
+			// *pRa = NULL,
+			*pRb = NULL,
+			*pRm = NULL;
+
+	gpOBJ	*pOa = NULL,
+			*pOb = NULL,
+			*pOm = NULL;
+
+	U1		*pUm = srcMEMiPC( iPCm, sOFm ), nUm,
+			*pUa = NULL, nUa,
+			*pUb = NULL, nUb, nU0, *pUin;
+	gpcSRC	*pSRCa = NULL,
+			*pSRCb = NULL;
+
+	bool	bD0 = true,
+			bS0, bF0,
+			bSa, bFa;
+
+	for( gpROW* pRe = pRa+nR; pRa < pRe; pRb = pRa, pRa++ ) {
+		iPCb = iPCa; sOFb = sOFa;
+		pOb = pOa;
+		pSRCb = pSRCa;
+
+		if( nA < 2 )
+			nB = 1;
+		else
+			nB = pOb ? pOb->d2D.area() : 1;
+		cIDb = cIDa;
+		pUb = pUa;
+
+		iPCa 	= iPCrow( *pRa, sOFa, true );
+		pOa 	= srcOBJfnd( pRa->mNdID );
+		nA 		= pOa ? pOa->d2D.area() : 1;
+		cIDa 	= pRa ? pRa->cID : gpeCsz_L;
+		pUa		= srcMEMiPC( iPCa, sOFa );
+		if( pOa->bAN() )
+		{
+			U4 xfnd = pMEM->pMASS->getXFNDan( pOa->AN );
+			pSRCa = pMEM->pMASS->srcFND( xfnd );
+			if( pSRCa )
+			{
+				if( !pMEM->pLZYsrcXFND )
+				{
+					if( pMEM->pLZYsrcXFNDall )
+					{
+						pMEM->pLZYsrcXFNDall->lzyRST();
+					} else {
+						pMEM->pLZYsrcXFNDall = new gpcLZY;
+					}
+					pMEM->nXFND = 0;
+					pMEM->pLZYsrcXFND = pMEM->pLZYsrcXFNDall;
+				}
+                U4* pXFND = (U4*)(pMEM->pLZYsrcXFND->Ux( pMEM->nXFND, sizeof(*pXFND) ));
+                (*pXFND) = xfnd;
+
+			} else {
+				// nincsen PÁPÁ
+				return pBLKm;
+			}
+		} else {
+			pSRCa = NULL;
+			if(pOa->bALF())
+			if( pSRCb ){
+				if( !pSRCb->pMEM )
+				{
+					pSRCb->msBLD = pMEM->pWIN->mSEC.x + pSRCb->msBLTdly;
+				}
+				if( !pSRCb->srcBLD( pMEM->pWIN, pMEM->pLZYsrcXFND ) )
+					return pBLKm;
+
+				if( gpOBJ* pOin = pSRCb->pMEM->pOBJ(pOa->AN.alf) )
+				{
+					std::cout << stdALU "pSRCb" << std::endl;
+					pUin = pSRCb->srcMEMiPC( iPCin = pOin->iPC, sOFin );
+					if( pOin->bSTR() )
+					{
+						std::cout << stdMINI << (char*)pUin << std::endl;
+					}
+					return pBLKm;
+				}
+			}
+		}
+		if( !pRb )
+		{
+			pRm 	= pBLKm->pROW(pBLK->bIDmR);
+			//iPCm 	= pRm ? iPCrow( *pRm, sOFm, false ) : 0;
+			pOm 	= pRm ? srcOBJfnd( pRm->mNdID ) : NULL;
+			cIDm	= pRm ? pRm->cID : gpeCsz_L;
+			nM		= pOm ? pOm->d2D.area() : 0;
+			continue;
+		}
+
+	}
+
+	return pBLKm;
+}
 gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );

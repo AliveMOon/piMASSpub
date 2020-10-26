@@ -912,6 +912,8 @@ public:
 			return false;
 		return bARY();
 	}
+	bool bAN() { return this? cAN == gpeCsz_c:false; }
+	bool bALF() { return this? cAN == gpeCsz_a:false; }
 };
 
 class gpROW{
@@ -1217,8 +1219,11 @@ public:
 	gpcLZY	lzyMEM,
 			lzyOBJ,
 			lzyCLASS,
-			lzyCODE;
-	I4		nCD,
+			lzyCODE,
+			*pLZYsrcXFND,
+			*pLZYsrcXFNDall;
+
+	I4		nCD, nXFND,
 			iSTK,nDAT,nINST, pc, pcCPY;
 	U4		msRUN;
 	gpINST	*pINST;
@@ -1227,11 +1232,11 @@ public:
 	gpcSRC	*pSRC;
 	gpGL	*pGL;
 	gpCTRL	*pCTRL;
-	/*~gpMEM()
+	~gpMEM()
 	{
-		gpmDEL(pINST);
-	}*/
-	gpMEM( gpcSRC* pS, gpcWIN* pW, I4 i = 0x2000 );
+		gpmDEL(pLZYsrcXFNDall);
+	}
+	gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i = 0x2000 );
 	U1* iPC( U4 iPC, U4 n )
 	{
 		if( !this )
@@ -1266,7 +1271,7 @@ public:
 		return pINST;
 	}
 	gpOBJ* pOBJ( gpeALF alf ) {
-		if(!alf)
+		if( this ? !alf : true )
 			return NULL;
 		U4 nO = lzyOBJ.nLD(sizeof(gpOBJ)), sOF;
 		if( !nO )
@@ -1443,12 +1448,15 @@ public:
 	///			INST
 	///--------------------------
 	gpBLOCK*	srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* pBLKup );
+
 	gpBLOCK*	srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
-	gpBLOCK*	srcINSTmov2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	//gpBLOCK*	srcINSTmov2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTadd( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
-	gpBLOCK*	srcINSTadd2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	//gpBLOCK*	srcINSTadd2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
 	gpBLOCK*	srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
-	gpBLOCK*	srcINSTmul2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	//gpBLOCK*	srcINSTmul2( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+	gpBLOCK*	srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK );
+
 	bool 		srcINSTrun(); //gpcMASS* pMASS, gpcWIN* pWIN );
 	gpcLZY*		srcINSTmini( gpcLZY* pLZY ); //,gpcMASS* pMASS, gpcWIN* pWIN );
 	///--------------------------
@@ -1623,6 +1631,9 @@ public:
 						/// a * 	b +
 					pBLKm = srcINSTmul( pS, pBLKm, pBLK );
 					} break;
+				case gpeOPid_entry:{
+					pBLKm = srcINSTent( pS, pBLKm, pBLK );
+					} break;
 			}
 
 
@@ -1676,6 +1687,8 @@ public:
 		return srcBLKup( pS, pBLK, opID );
 	}
 	gpBLOCK* srcBLKblkS( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID );
+	gpBLOCK* srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+
 	gpBLOCK* srcBLKmul( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		// a =b +c*d 	// iADD 1 // de nem adtam hozzá még a c-t
 		//   -1-^
@@ -1709,6 +1722,17 @@ public:
 				pRl->pstOP = opID;
 				pBLK->pNEWrow();
 				return pBLK;
+			case gpeOPid_entry:{
+					gpBLOCK	*pBLKm = srcINSTent( pS, NULL, pBLK );
+					if( pBLKm ? pBLKm->opIDgrp == gpeOPid_mul : false )
+					{
+						pRl = pBLKm->pLSTrow();
+						pRl->pstOP = opID;
+						pBLKm->pNEWrow();
+						return pBLKm;
+					}
+					return srcBLKinsrt( pS, pBLK, opID );
+				} break;
 			default:
 				break;
 		}
@@ -1747,6 +1771,17 @@ public:
 				pRl->pstOP = opID;
 				pBLK->pNEWrow();
 				return pBLK;
+			case gpeOPid_entry: {
+					gpBLOCK	*pBLKm = srcINSTent( pS, NULL, pBLK );
+					if( pBLKm ? pBLKm->opIDgrp == gpeOPid_add : false )
+					{
+						pRl = pBLKm->pLSTrow();
+						pRl->pstOP = opID;
+						pBLKm->pNEWrow();
+						return pBLKm;
+					}
+					return srcBLKinsrt( pS, pBLK, opID );
+				} break;
 			case gpeOPid_mul: {
 					gpBLOCK	*pBLKm = srcINSTmul( pS, NULL, pBLK );
 					if( pBLKm ? pBLKm->opIDgrp == gpeOPid_add : false )
@@ -1770,25 +1805,7 @@ public:
 
 		return srcBLKup( pS, pBLK, opID );
 	}
-	gpBLOCK* srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
-		///switch( now )
-		///{
-		///	case gpeOPid_dot:
-		///		break;
-		///	case gpeOPid_brakS:
-		///	default:
-		///		LEVup(scp);
-		///		break;
-		///}
-		///++SP;
-		///++stkCD;
-		if( pBLK )
-		{
 
-		}
-
-		return pBLK;
-	}
 	gpBLOCK* srcBLKout( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		/// ITT MÉG FENT
 		///LEVdwn(scp,now);
@@ -2015,16 +2032,12 @@ public:
 						bool bNoMini, U1 selID
 					);
 	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
-	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW ); //gpcMASS* pMS );
-	void 	srcBLD( gpcWIN* pW ); //
+	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ); //gpcMASS* pMS );
+	bool 	srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ); //
 	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
-
 	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 
-	void 	srcCMPLR_tresh( gpcLZYdct& dOP, U1 iSCP );
-
-	//gpcRES* SRCmnMILLrunTRESH( gpcMASS* pMASS, gpcWIN* pWIN, gpcRES* pMOM = NULL );
-    bool bSUB( gpcMASS& mass ) {
+	bool bSUB( gpcMASS& mass ) {
 		if( !this )
 			return false;
 

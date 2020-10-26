@@ -144,6 +144,12 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
 		pNX = pNUM + sprintf( (char*)pNUM, "%d", i/z );
+
+		if( pSRC->pMINI->nLD() )
+		{
+			sprintf( (char*)gpsSAVEbf, "%s%s/%s.mini", pPATH, pNAME, gpsSVadr  );
+			pSRC->pMINI->lzyWR( (char*)gpsSAVEbf );
+		}
 		if( pSRC->pDBG->nLD() )
 		{
 			sprintf( (char*)gpsSAVEbf, "%s%s/%s.asm", pPATH, pNAME, gpsSVadr  );

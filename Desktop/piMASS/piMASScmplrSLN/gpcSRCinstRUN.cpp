@@ -200,6 +200,11 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 
 		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
 		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
+		/// ---------------------------------
+		///
+		/// 			instDOit
+		///
+		/// ---------------------------------
 		int iDi = pMEM->instDOit( obj, pU1 );
 
 
