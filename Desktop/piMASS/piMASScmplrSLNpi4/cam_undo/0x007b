@@ -1,0 +1,76 @@
+ a0	 cam = 1; // * 0; c0	 192.168.1.99 6001 d0	 =ia e0	  =in a1	  telnet = 6001;
+ sync = c0;
+f = fps; c1	 c = nbld;
+="blabla
+blablaaaa
+na csak őssze szedte
+de szar lassú
+blabla
+pi" d1	 = ix;
+na = a + 1 * 10 + a;
+ba = a + a // % 2 e1	  = iy f1	 = iw g1	  =ih a2	 = 10+20 a3	  b3	 =fps  c3	 abcdef
+  a4	   = print( "%c", rnd%2 ? '/':'\' ) 
+ c4	 A nyám tyú�kja{_|_}_()/\ 
+
+ 
+ B_o_d_r_i_ kutyám hegyezd füled
+  
+  H_a_d_ beszéljek mostan veled
+  
+ R_égi cseléd vagy a háznál
+  
+  M_i_n_d_i_g_
+ A_
+     B_é_É_í_Í_ óÓ öÖ őŐ üÐ űŰ iíi;.iIjJ_
+
+ abcdefghijklmnopqrstuvwxyz
+ ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ a     S#
+  P# I# S# H_e_l_l_ó_
+ A# C# A# H_e_l_l_ó_
+  i# ##M#
+   i#
+  p# 
+ �   a5	 pic ="cam1" c5	   d5	 pic = "sprite0" e5	 = c1.c ; f5	 trg ="draw1";
+trgw = 640;
+trgh = 512 * 3;
+sprite = "sprite";
+ssx = 16;
+ssy = 16;
+ssw = 32;
+ssh = ssw; // + 100;
+sdx = trgw*ix/iw - 16;
+sdy = trgh*iy/ih - 16;
+sdw = ssw;
+sdh = sdw*mlb; a6	 						
+nonsens = msec;
+d = nonsens;
+ c6	   d6	 93734 osram
+  e6	 Hello!a a7	 Na mégegyszer na most átmrent!
+Ja hát még nem tökéletes!
+Na mi lesz már! c7	 ashs d7	 save = 0 e7	 Hello!0123 c8	  asjaj e8	  Hello!0123  c9	 = e5.a / 3600 ; e9	  Hello!01 a10	 pic ="cam1"  c10	 pic ="cam1" d10	 pic = "draw2"
+unsel = 1  e10	 trg ="draw2";
+trgw = 640;
+trgh = 512 * 3;
+sprite = "cam1";
+ssx = 490;
+ssy = 160;
+ssw = 320;
+ssh = ssw; // + 100;
+sdx = trgw*ix/iw - 16;
+sdy = trgh*iy/ih - 16;
+sdw = ssw;
+sdh = sdw*mlb;
+
+
+
+
+
+
+
+
+
+
+
+
+ 

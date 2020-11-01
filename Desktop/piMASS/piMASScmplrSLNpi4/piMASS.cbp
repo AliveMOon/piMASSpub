@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="piMASS" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="cam.mass" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option parameters="cam.mass" />
+				<Compiler>
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+				</Compiler>
+				<Linker>
+					<Add option="-O3" />
+				</Linker>
+			</Target>
+			<Target title="Robi_Debug">
+				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="robi.mass" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+				</Compiler>
+			</Target>
+			<Target title="Rob_Debug">
+				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="rob.mass" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+				</Compiler>
+			</Target>
+			<Target title="OX_Rob_Debug">
+				<Option output="bin/OX/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="rob.mass" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+				</Compiler>
+				<Linker>
+					<Add option="-O3" />
+				</Linker>
+			</Target>
+			<Target title="zero_Debug">
+				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="zero.mass" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wzero-as-null-pointer-constant" />
+			<Add option="-Wfatal-errors" />
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
+			<Add option="`sdl2-config --cflags`" />
+			<Add directory="/home/alivemoon/Asztal/userland" />
+			<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+			<Add directory="/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys" />
+		</Compiler>
+		<Linker>
+			<Add option="`sdl2-config --libs`" />
+			<Add option="-pthread" />
+			<Add option="-lSDL2 -lSDL2_mixer" />
+			<Add option="-lSDL2_image -lSDL2_ttf" />
+			<Add library="GL" />
+			<Add library="GLEW" />
+			<Add library="SDL2" />
+			<Add library="libjpeg" />
+		</Linker>
+		<Unit filename="gpCORE.cpp" />
+		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpMEMinstDOit.cpp" />
+		<Unit filename="gpcCRSbreak.cpp" />
+		<Unit filename="gpcDRCos.cpp" />
+		<Unit filename="gpcGL.cpp" />
+		<Unit filename="gpcGTslmp.cpp" />
+		<Unit filename="gpcI4x2.cpp" />
+		<Unit filename="gpcI4x4.cpp" />
+		<Unit filename="gpcI8x2.cpp" />
+		<Unit filename="gpcLAZY.cpp" />
+		<Unit filename="gpcOPCD.cpp" />
+		<Unit filename="gpcSLMPdcr.cpp" />
+		<Unit filename="gpcSRC.cpp" />
+		<Unit filename="gpcSRC.h" />
+		<Unit filename="gpcSRCbreak.cpp" />
+		<Unit filename="gpcSRCdbg.cpp" />
+		<Unit filename="gpcSRCinst.cpp" />
+		<Unit filename="gpcSRCinst.h" />
+		<Unit filename="gpcSRCinstALU.cpp" />
+		<Unit filename="gpcSRCinstRUN.cpp" />
+		<Unit filename="gpcSRClnk.cpp" />
+		<Unit filename="gpcSRClnk.h" />
+		<Unit filename="gpcSRCprnt.cpp" />
+		<Unit filename="gpcSRCrun.cpp" />
+		<Unit filename="gpcTOOL.cpp" />
+		<Unit filename="gpcU14.cpp" />
+		<Unit filename="gpcU44.cpp" />
+		<Unit filename="gpc_mitsub.cpp" />
+		<Unit filename="gpcalu.cpp" />
+		<Unit filename="gpcgt.cpp" />
+		<Unit filename="gpcgt.h" />
+		<Unit filename="gpcgtos.cpp" />
+		<Unit filename="gpcpic.cpp" />
+		<Unit filename="gpcpic.h" />
+		<Unit filename="gpcres.cpp" />
+		<Unit filename="gpcres.h" />
+		<Unit filename="gpcres2mini.cpp" />
+		<Unit filename="gpcres_compi.cpp" />
+		<Unit filename="gpcres_run.cpp" />
+		<Unit filename="gpcresflt.cpp" />
+		<Unit filename="gpcwin_var.cpp" />
+		<Unit filename="gpeTYP.h" />
+		<Unit filename="gppiMASScmplr.cpp" />
+		<Unit filename="include/camU.h" />
+		<Unit filename="include/gpcND.h" />
+		<Unit filename="include/gpcOPCD.h" />
+		<Unit filename="include/gpcSCHL.h" />
+		<Unit filename="include/gpccrs.h" />
+		<Unit filename="include/gpcwin.h" />
+		<Unit filename="include/gpeALF.h" />
+		<Unit filename="piMASS.h" />
+		<Unit filename="piMASS_main.cpp" />
+		<Unit filename="src/gpcND.cpp" />
+		<Unit filename="src/gpcPROTO.cpp" />
+		<Unit filename="src/gpccrs.cpp" />
+		<Unit filename="src/gpccrs_rdy.cpp" />
+		<Unit filename="src/gpcwin.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
