@@ -48,7 +48,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 	if( gpmSCP.bGD( pALL, &pUe ) )
 		return dim = gpmSCP.dim;
 #ifdef stdOFF
-	std::cout << stdBREAK "BRK" << (int)iSCP << stdRESET << std::endl;
+	if(bSTDcout){std::cout << stdBREAK "BRK" << (int)iSCP << stdRESET << std::endl;}
 #endif
 	gpmSCP.rst( pALL );
 	dim.xyz_( 0 );
@@ -64,7 +64,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 
 	for( nS = gpmNINCS( pS, pVAN ); pS < pUe; nS = gpmNINCS( pS, " \t\r\n" ) )
 	{
-		//std::cout << stdBREAK "." << (int)(pS-pALL) << stdRESET << std::endl;
+		//if(bSTDcout){std::cout << stdBREAK "." << (int)(pS-pALL) << stdRESET << std::endl;}
 		if( nS )
 		{
 			// elrakjuk kell
@@ -181,7 +181,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 	dim.a4x2[0]+=1;
 	gpmSCP.dim = dim;
 #ifdef stdOFF
-	std::cout << stdBREAK "oBRK" << (int)iSCP << stdRESET << std::endl;
+	if(bSTDcout){std::cout << stdBREAK "oBRK" << (int)iSCP << stdRESET << std::endl;}
 #endif
 	return dim;
 }

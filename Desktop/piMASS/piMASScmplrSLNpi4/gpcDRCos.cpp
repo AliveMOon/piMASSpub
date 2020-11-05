@@ -170,7 +170,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 
 			case gpeALF_DROP:if( jd1XYZ.qlen_xyz() * gpmMAX( 0, jd0PRG.y-jd0PRG.x) ) {
 					//I4 lag = mSEC < msSMR2.w ? 0 : mSEC-msSMR2.w;
-					//std::cout << "lag: " << lag << std::endl;
+					//if(bSTDcout){std::cout << "lag: " << lag << std::endl;}
 					jdPRG.y = jdPRG.w = msSRT3.x;				// w-ben örizzük az indulási időt y aktuális idő
 					jdPRG.z = jdPRG.w+jd0PRG.a4x2[0].sum();		// z-ben pedig a kívánt megérkezési időt
 					break;
@@ -229,7 +229,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 		case gpeALF_CALIB:
 		case gpeALF_DROP: {
 				// I4 lag = mSEC < msSMR2.w ? 0 : mSEC-msSMR2.w;
-				// std::cout << "lag: " << lag << std::endl;
+				// if(bSTDcout){std::cout << "lag: " << lag << std::endl;}
 				/// msSRT3.x robot ms // AVGms átlagos válasz idő
 				/// jd0PRG.x késleltetés
 				I8	tn = jdPRG.z-jdPRG.w,
@@ -258,7 +258,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 							ti = th;
 							jdPRG.y = ti+jdPRG.w;
 							dti = jd0XYZ.drop( jd1XYZ, up0, jd1XYZ.w, ti, tn );
-							std::cout << "HI ";
+							if(bSTDcout){std::cout << "HI ";}
 						}
 						//I4x4 up1 = (jd1XYZ-jd1xyz).xyz0();
 						up0 += ((jd1up-up0)*(I8)(ti-th))/(I8)(tn-th);
@@ -271,7 +271,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				tXYZ.xyz_( dti );
 				txyz.xyz_( tXYZ-up0 );
 
-				std::cout << ti << "/" << tn << "\t" << tXYZ.pSTR( gpsJDprgPUB ) <<std::endl;
+				if(bSTDcout){std::cout << ti << "/" << tn << "\t" << tXYZ.pSTR( gpsJDprgPUB ) <<std::endl;}
 			} break;
 		default:
 			jdPRG.null();

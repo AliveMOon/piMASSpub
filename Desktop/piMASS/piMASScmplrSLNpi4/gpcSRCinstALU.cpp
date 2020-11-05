@@ -117,12 +117,12 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 				if( gpOBJ* pOin = pSRCb->pMEM->pOBJ(pOa->AN.alf) )
 				{
 				#ifdef stdOFF
-					std::cout << stdALU "pSRCb" << std::endl;
+					if(bSTDcout){std::cout << stdALU "pSRCb" << std::endl;}
                 #endif // stdOFF
 					pUin = pSRCb->srcMEMiPC( iPCin = pOin->iPC, sOFin );
 					if( pOin->bSTR() )
 					{
-						std::cout << stdMINI << (char*)pUin << std::endl;
+						if(bSTDcout){std::cout << stdMINI << (char*)pUin << std::endl;}
 					}
 					return pBLKm;
 				}
@@ -829,7 +829,7 @@ gpBLOCK* gpcSRC::srcINSTmul( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 }
 
 gpINST* gpMEM::instALU() {
-	//std::cout << stdALU "+";
+	//if(bSTDcout){std::cout << stdALU "+";
 	gpINST& ins = pINST[pc];
 	pc++;
 

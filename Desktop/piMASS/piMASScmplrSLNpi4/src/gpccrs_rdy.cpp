@@ -101,7 +101,7 @@ U4 gpcCRS::miniRDYmap(
 	gpcSRC* pSrC = NULL;
 	U1 oo;
 #ifdef stdOFF
-	std::cout << stdRDY " RDY";
+	if(bSTDcout){std::cout << stdRDY " RDY";
 #endif // stdOFF
 
 	for( i = 0; i < ie; i++ ) {

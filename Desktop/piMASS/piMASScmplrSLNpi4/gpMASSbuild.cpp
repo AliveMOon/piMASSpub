@@ -287,8 +287,8 @@ void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub ) {
 	psHD += sprintf( 	psHD, "\r\nbSW:0x%0.8x",
 						bSW );
 	if( psHD > gpsHD )
-		std::cout << gpsHD;
-	std::cout << "." ;
+		if(bSTDcout){std::cout << gpsHD;}
+	if(bSTDcout){std::cout << ".";}
 }
 gpcLZYdct* gpcMASS::pOPER() {
 	if(!this)

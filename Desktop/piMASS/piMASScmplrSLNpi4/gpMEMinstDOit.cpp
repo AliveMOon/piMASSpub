@@ -14,7 +14,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 		return cnt;
 
 #ifdef stdOFF
-	std::cout << stdALU "SLMP" << pGT->iCNT;
+	if(bSTDcout){std::cout << stdALU "SLMP" << pGT->iCNT;}
 #endif
 	gpOBJ	*pOi = pOBJ(gpeALF_RINP),
 			*pOo = pOBJ(gpeALF_ROUT);
@@ -34,7 +34,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( pOi )
 	{
 	#ifdef stdOFF
-		std::cout << stdALU "rINP" << std::endl;
+		if(bSTDcout){std::cout << stdALU "rINP" << std::endl;}
     #endif
 		pU1 = pSRC->srcMEMiPC( pOi->iPC, gpeCsz_l );
 		if( pU1 )
@@ -59,7 +59,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( !pOo )
 		return pGT->iCNT;
 #ifdef stdOFF
-	std::cout << stdALU "rOUT" << std::endl;
+	if(bSTDcout){std::cout << stdALU "rOUT" << std::endl;}
 #endif
 	pU1 = pSRC->srcMEMiPC( pOo->iPC, gpeCsz_l );
 	if( !pU1 )
@@ -105,7 +105,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 			pGT = pMASS->GTacpt.GT( obj.AN.alf, port );
 			if( !pGT ) break;
 			#ifdef stdOFF
-			std::cout << stdALU " TNET" << std::endl;
+			if(bSTDcout){std::cout << stdALU " TNET" << std::endl;}
 			#endif
 			pGT->GTlst( pWIN, pMASS->GTcnct );
 		} break;
@@ -142,10 +142,10 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 			U4 iCAM = *(U4*)pU1;
 			if( !iCAM )
 				break;
-			if( gpdGLapPIC[0] = pMASS->PIC.PIC( I8x2(obj.AN.alf,iCAM) ) ) {
-				/*if( !gpdGP->pCAM )
-					gpdGP->pCAM = new gpcPICAM;*/
-				U1* pRGB = gpdGLapPIC[0]->getPIX( gpdGLpCAM, pWIN->mSEC.y ); //50 );
+			if(gpdGLapPIC[0] = pMASS->PIC.PIC(I8x2(obj.AN.alf,iCAM))) {
+				gpcPICAM* pCAM = gpdGLpCAM;
+				if(bSTDcout){std::cout << "gpdGLapPIC[0] = " << (U8)gpdGLapPIC[0]  << std::endl;}
+				U1* pRGB = gpdGLapPIC[0]->getPIX( pCAM, pWIN->mSEC.y );
 				if( pRGB )
 				{
 					if( gpdGLpCAM->bGD() )

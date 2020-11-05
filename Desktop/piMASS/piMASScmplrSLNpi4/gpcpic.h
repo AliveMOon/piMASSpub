@@ -40,7 +40,12 @@ class gpcCAMubi
     U4x2 wh;
     U4 nGRB;
 
-
+//-lraspicam
+//-lvcos
+//-lbcm_host
+//-lmmal -lmmal_core
+//-lmmal_util
+//-lmmal_vc_client
     /// openCAM ----------------------------------------------------------------
     int fd;                             ///  1. Open the device ---------------
     v4l2_capability     capability;     ///  2. Ask the device if it can capture frames
@@ -61,17 +66,17 @@ class gpcCAMubi
 
 
     bool bOPEN;
+    U1      wip;
 public:
     char* pBUFF;                        /// mmap << queryBuffer.length
     U4x2 wh0;
 
-    bool bLIVE(){ return this ? fd > -1 : false; }
+
     void setFormat( RASPICAM_FORMAT f )
     {
         frm = f;
     }
     int setCaptureSize( U4 w, U4 h, U4 picFRM = V4L2_PIX_FMT_RGB24 );
-
 
     U4 getImageTypeSize( RASPICAM_FORMAT f );
     bool    openCAM();
@@ -80,17 +85,34 @@ public:
     U4 getWidth() { return wh.x; }
     U4 getHeight() { return wh.y; }
 
-
     void* retrieve( void *pPIX, RASPICAM_FORMAT f );
 
     gpcCAMubi(){ gpmCLR; fd = -1; };
-    ~gpcCAMubi()
+    void closeCAM()
     {
+        int res;
         if( fd > -1 )
+        {
+            /// 10. VIDIOC_DQBUF --------------------
+            if(bSTDcout){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
+            res = ioctl(fd, VIDIOC_DQBUF, &bufferinfo);
+            if( res >= 0)
+            if(bSTDcout){std::cout << "10.2 VIDIOC_DQBUF --------------------" << std::endl;}
+
+            res = ioctl(fd, VIDIOC_STREAMOFF, &type);
+
             close(fd);
+            fd = -1;
+        }
         if( !pBUFF )
             return;
         munmap(pBUFF, queryBuffer.length);
+        pBUFF = NULL;
+    }
+    ~gpcCAMubi()
+    {
+        if(bSTDcout){std::cout << "~gpcCAMubi() ---------------" << std::endl;}
+        closeCAM();
     }
 };
 #endif

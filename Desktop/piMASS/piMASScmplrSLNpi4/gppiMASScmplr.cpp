@@ -94,12 +94,15 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 
 	if( pMEM )
 	{
-		gpmDEL(pOLD);
-		pOLD = pMEM;
+		gpmDEL(pMEMo);
+        if( pMEM ? pMEM->pGL : NULL )
+            gpmDEL( pMEM->pGL->pCAM );
+
+		pMEMo = pMEM;
 	}
 	pMEM = new gpMEM( this, pW, pSRCstk );
 #ifdef stdOFF
-	std::cout << stdCMPLR " CMP" stdRESET << std::endl;
+	if(bSTDcout){std::cout << stdCMPLR " CMP" stdRESET << std::endl;}
 #endif
 	I8x4 *pM0 = gpmSCP.pMN(), M, Mnx;
 	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];

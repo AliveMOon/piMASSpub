@@ -320,7 +320,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 
 	gpdEXPdbgCOUT
-	std::cout << "Explode: " << any <<std::endl;
+	if(bSTDcout){std::cout << "Explode: " << any <<std::endl;}
 
 
 	U4 mom = 0, nBtrd = 0;
@@ -351,18 +351,18 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			trd = i;
 			break;
 		}
-		gpdEXPdbgCOUT std::cout << "Explode: nTRD " << i <<std::endl;
+		gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: nTRD " << i <<std::endl;}
 		aBUG[i].trd = std::thread( TRDexp, aBUG+i );
 		aBUG[i].n_run++;
 		trd++;
 	}
 
 	gpdEXPdbgCOUT
-	std::cout << "Explode: nTRD " << trd <<std::endl;
+	if(bSTDcout){std::cout << "Explode: nTRD " << trd <<std::endl;}
 
 	aBUG[trd].loop();
 
-	gpdEXPdbgCOUT std::cout << "Explode: mainLOOP " << trd <<std::endl;
+	gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: mainLOOP " << trd <<std::endl;}
 	for( U4 i = 0; i <= trd; i++ ) {
 		if( aBUG[i].n_join < aBUG[i].n_run )
 		{
@@ -481,10 +481,10 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			gpdEXPdbgCOUT
 			if( nBOB )
 			{
-				std::cout << "Explode: " << nB << "/" << nA <<std::endl;
+				if(bSTDcout){std::cout << "Explode: " << nB << "/" << nA <<std::endl;}
 				for( U4 i = 0; i < k2; i++)
 				if( pBB = ppBOB[i] )
-					std::cout << i << "BOB:"
+					if(bSTDcout){std::cout << i << "BOB:"
 								<< pBB->wCNTR.x
 								<< "x"
 								<< pBB->wCNTR.y
@@ -493,13 +493,13 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 								<< "rnd"
 								<< pBB->nRND
 								<< "A"
-								<< pBB->nAREA <<std::endl;
+								<< pBB->nAREA <<std::endl;}
 			}
 			delete[] pF;
 		} else
 			delete[] pF;
 	}
-	//gpdEXPdbgCOUT std::cout << "Explode: " << nB << "/" << nA <<std::endl;
+	//gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: " << nB << "/" << nA <<std::endl;}
 	return (U1x4*)gpapP[0]->pixels;
 
 }
@@ -517,7 +517,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 
 	(TnID+I8x2(0,i)).
 	an2str( (U1*)pDIR, (U1*)pEXP, true, true );
-	std::cout << "FOOD:" << pPATH <<std::endl;
+	if(bSTDcout){std::cout << "FOOD:" << pPATH <<std::endl;}
 
 	SDL_Surface* pTMP = NULL;
 	if( gpfACE( pPATH, 4) > -1 )
@@ -527,7 +527,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 		{
 			pPET->w = 0;
 			gpmSDL_FreeSRF(pTMP);
-			std::cout << " ERR! NoGood FILE" <<std::endl;
+			if(bSTDcout){std::cout << " ERR! NoGood FILE" <<std::endl;}
 			return pPET;
 		}
 
@@ -539,18 +539,18 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 			pPET->z = 0x1;	// z alive!
 			pPET->w = 2;	// w load.
 			gpmSDL_FreeSRF(pTMP);
-			std::cout << " OK" <<std::endl;
+			if(bSTDcout){std::cout << " OK" <<std::endl;}
 			return pPET;
 		}
 
 		pPET->w = 0;
 		gpmSDL_FreeSRF(pTMP);
-		std::cout << " ERR! NoGood SIZE" <<std::endl;
+		if(bSTDcout){std::cout << " ERR! NoGood SIZE" <<std::endl;}
 		return pPET;
 
 	}
 
-	std::cout << " NoFnd!" <<std::endl;
+	if(bSTDcout){std::cout << " NoFnd!" <<std::endl;}
 	pPET->w = 0;
 	return pPET;
 }
@@ -627,8 +627,8 @@ public:
 			U4 p = pSRF->pitch/sizeof(*p_s);
 			if( p_u )
 			{
-				std::cout	<< " food.w:"	<< ptch
-							<< " pitch:"	<< p <<std::endl;
+				if(bSTDcout){std::cout	<< " food.w:"	<< ptch
+							<< " pitch:"	<< p <<std::endl;}
 
 				p_u[0].cpyX( p_s, gpmMIN(ptch,p), ptch*gpmMIN(0x80,pSRF->h), 1, gpmMIN(ptch,p) );
 				p_s = p_u->zyxw( p_s, ptch*0x80 );
@@ -667,8 +667,8 @@ public:
 		if( ptch != pSRF->pitch/sizeof(*p_d) )
 		{
 			ptch = pSRF->pitch/sizeof(*p_d);
-			std::cout	<< " save.w:"	<< pSRF->w
-						<< " pitch:"	<< ptch <<std::endl;
+			if(bSTDcout){std::cout	<< " save.w:"	<< pSRF->w
+						<< " pitch:"	<< ptch <<std::endl;}
 		}
 		// SPaCe
 		p_d[0x00]
@@ -712,13 +712,13 @@ public:
 		gpmSTRCPY(pRAM,pDIR);
 		if( int err = rename( (char*)sRAM, (char*)sPATH ) )
 		{
-			std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;
+			if(bSTDcout){std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;}
 			gpcLZY load; U8 s = 0;
 			load.lzyRD( (char*)sRAM, s, 1 );
 			load.lzyWR( (char*)sPATH, true );
-			std::cout << " LZYcpy: " << sRAM << " to " << sPATH <<std::endl;
+			if(bSTDcout){std::cout << " LZYcpy: " << sRAM << " to " << sPATH <<std::endl;}
 			remove((char*)sRAM);
-			std::cout << " KILL:" << sRAM <<std::endl;
+			if(bSTDcout){std::cout << " KILL:" << sRAM <<std::endl;}
 		}
 
 		(ALFid+I8x2(0,pMAP->x))
@@ -726,7 +726,7 @@ public:
 		if( gpmACE(sRAM, 4) > -1 )
 		{
 			remove((char*)sRAM);
-			std::cout << " KILL:" << sRAM <<std::endl;
+			if(bSTDcout){std::cout << " KILL:" << sRAM <<std::endl;}
 		}
 
 		return pSRF;
@@ -800,7 +800,7 @@ public:
 				pMAP->y++;
 
 		} else {
-			gpdSPCdbgCOUT std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;
+			gpdSPCdbgCOUT if(bSTDcout){std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;}
 
             // csere nem stimmel
             /// az a lényeg, ha le van nyomva az egér gomb a RNDR képet átmásolja a maskii-be
@@ -827,7 +827,7 @@ public:
 		if( !pFcpy )
 			return;
 
-		std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;
+		if(bSTDcout){std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;}
 
 
 		U1x4	fC, GD,// fP,
@@ -908,7 +908,7 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	else
 		pDIR = pFILE+gpmSTRLEN(pFILE);
 	if( gpfACE(pPATH, 4) < 0 ) {
-		std::cout << "mkdir:"<< pPATH <<std::endl;
+		if(bSTDcout){std::cout << "mkdir:"<< pPATH <<std::endl;}
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
@@ -923,8 +923,8 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	aSPC[0].spcWH = *gpapP[0];
 	if( aSPC[0].spcWH.x != gpapP[0]->pitch/sizeof(*aSPC[0].pSPC) )
 	{
-		std::cout	<< " spcWH.x:"	<< aSPC[0].spcWH.x
-					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*aSPC[0].pSPC)) <<std::endl;
+		if(bSTDcout){std::cout	<< " spcWH.x:"	<< aSPC[0].spcWH.x
+					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*aSPC[0].pSPC)) <<std::endl;}
 		aSPC[0].spcWH.x = gpapP[0]->pitch/sizeof(*aSPC[0].pSPC);
 	}
 
@@ -1066,7 +1066,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	else
 		pDIR = pFILE+gpmSTRLEN(pFILE);
 	if( gpfACE(pPATH, 4) < 0 ) {
-		std::cout << "mkdir:"<< pPATH <<std::endl;
+		if(bSTDcout){std::cout << "mkdir:"<< pPATH <<std::endl;}
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
@@ -1081,8 +1081,8 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	SPC.spcWH = *gpapP[0];
 	if( SPC.spcWH.x != gpapP[0]->pitch/sizeof(*SPC.pSPC) )
 	{
-		std::cout	<< " spcWH.x:"	<< SPC.spcWH.x
-					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*SPC.pSPC)) <<std::endl;
+		if(bSTDcout){std::cout	<< " spcWH.x:"	<< SPC.spcWH.x
+					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*SPC.pSPC)) <<std::endl;}
 		SPC.spcWH.x = gpapP[0]->pitch/sizeof(*SPC.pSPC);
 	}
 

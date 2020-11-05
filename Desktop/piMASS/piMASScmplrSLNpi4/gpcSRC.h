@@ -1235,6 +1235,7 @@ public:
 	~gpMEM()
 	{
 		gpmDEL(pLZYsrcXFNDall);
+		gpmDEL(pGL);
 	}
 	gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i = 0x2000 );
 	U1* iPC( U4 iPC, U4 n )
@@ -1321,7 +1322,7 @@ public:
 
 	gpcLZYblk	lzyBLOCK;
 	gpMEM		*pMEM,
-				*pOLD;
+				*pMEMo;
 
 	gpOBJ* srcOBJfnd( I4 dctID ) {
 		if( !pMEM )

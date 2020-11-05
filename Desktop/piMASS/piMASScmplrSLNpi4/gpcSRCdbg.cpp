@@ -28,7 +28,7 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP )
 		return;
 	//U4 iOPe = dOP.nIX();
 #ifdef stdOFF
-	std::cout << stdDBG " DBG" stdRESET << std::endl;
+	if(bSTDcout){std::cout << stdDBG " DBG" stdRESET << std::endl;}
 #endif // stdOFF
 
 #ifdef piMASS_DEBUG

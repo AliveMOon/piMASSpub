@@ -327,7 +327,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 		if( pS < pB )
 		{
 			*pB = 0;
-			std::cout << (char*)pS <<std::endl;; // ; //
+			if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
 			pB = pS;
 		}
 	}
@@ -336,7 +336,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 	if( bITT )
 	if( pS < pB )
 	{
-		std::cout << (char*)pS <<std::endl;; // ; //
+		if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
 		pB = pS;
 	}
 
