@@ -116,14 +116,21 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 				if( gpOBJ* pOin = pSRCb->pMEM->pOBJ(pOa->AN.alf) )
 				{
-				#ifdef stdOFF
+				#ifdef stdON
 					if(bSTDcout){std::cout << stdALU "pSRCb" << std::endl;}
-                #endif // stdOFF
-					pUin = pSRCb->srcMEMiPC( iPCin = pOin->iPC, sOFin );
+                #endif
+					/// tervek szerint a isza térési cim A0-ban lesz
+                    pUin = pSRCb->srcMEMiPC( iPCin = pOin->iPC, sOFin );
 					if( pOin->bSTR() )
 					{
 						if(bSTDcout){std::cout << stdMINI << (char*)pUin << std::endl;}
 					}
+
+                    _move._L.A7.D7;
+					_move._l.EAl( pRb->mNdID ).sIA7I;
+					_move._l.EAl( pRa->mNdID ).sIA7I ;
+					_jsr.EAl( gpeALF_entry );
+					_move._L.D7.A7;
 					return pBLKm;
 				}
 			}
@@ -876,10 +883,10 @@ gpINST* gpMEM::instALU() {
 		case gpeEA_IAnI: p_dst = pALL + pA[ins.iD]; break;
 		case gpeEA_IAnIp:
 			p_dst = pALL + pA[ins.iD];
-			pA[ins.iS]+=sOF;
+			pA[ins.iD]+=sOF;
 			break;
 		case gpeEA_sIAnI:
-			pA[ins.iS]-=sOF;
+			pA[ins.iD]-=sOF;
 			p_dst = pALL + pA[ins.iD];
 			break;
 		case gpeEA_d16IAnI:

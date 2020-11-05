@@ -32,10 +32,10 @@ gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i ) {
 	pSRC = pS;
 	pWIN = pW;
 	pMASS = pWIN ? pWIN->piMASS : NULL;
-	iSTK = nDAT = i;
-	nDAT += 0x100;
 	pA = (I8*)aA;
 	pD = (I8*)(aA+8);
+	pA[7] = iSTK = nDAT = i;
+	nDAT += 0x100;
 	pLZYsrcXFND = pSRCstk;
 	if( !pLZYsrcXFND )
 		return;
@@ -50,6 +50,21 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 		case gpeALF_FPS:
 			*(U4*)p_dst = pWIN->mSEC.w;
 			break;
+        case gpeALF_entry: if(pSRC) {
+                U4      *pU4    = (U4*)pSRC->srcMEMiPC( pA[7], 4 );
+                gpOBJ   *pOa    = pSRC->srcOBJfnd( pU4[1] );
+                U4      xfnd    = pMASS->getXFNDan( pOa->AN );
+
+                if( gpcSRC  *pSRCb  = pMASS->srcFND( xfnd ))
+                if( gpOBJ   *pOb    = pSRC->srcOBJfnd( pU4[0] ))
+                if( gpOBJ* pOin = pSRCb->pMEM->pOBJ(pOb->AN.alf) )
+				{
+                	/// tervek szerint a isza térési cim A0-ban lesz
+                    U1* pUin = pSRCb->srcMEMiPC( pOin->iPC, pOin->sOF() );
+                    //if(bSTDcout)
+                        {std::cout << stdALU "pSRCb" << std::endl;}
+                }
+            } break;
 		default:
 			break;
 	}

@@ -210,6 +210,7 @@ bool gpcCAMubi::openCAM()
                         iWH0 = 1;
                         break;
                     case V4L2_PIX_FMT_YUYV:
+                        //bBREAK = true;
                         pixFMT = V4L2_PIX_FMT_YUYV;
                         iWH0 = 0;
                         break;

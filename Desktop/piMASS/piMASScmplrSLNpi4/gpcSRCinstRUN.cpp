@@ -162,7 +162,7 @@ gpINST& gpINST::instDBG( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 
 gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN ) {
 	pLZY->lzyRST();
-#ifdef stdOFF
+#ifdef stdON
 	if(bSTDcout){std::cout << stdMINI " MIN" stdRESET << std::endl;}
 #endif // stdOFF
 
@@ -261,7 +261,7 @@ bool gpcSRC::srcINSTrun() {
 			return false;
 		pMEM->pc = 0;
 	}
-#ifdef stdOFF
+#ifdef stdON
 	if(bSTDcout){std::cout << stdRUN " RUN" stdRESET; // << std::endl;}
 #endif // stdOFF
 

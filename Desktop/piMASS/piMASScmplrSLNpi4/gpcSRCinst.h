@@ -57,6 +57,24 @@
 #define IA6I IAnI(6)
 #define IA7I IAnI(7)
 
+#define sIA0I sIAnI(0)
+#define sIA1I sIAnI(1)
+#define sIA2I sIAnI(2)
+#define sIA3I sIAnI(3)
+#define sIA4I sIAnI(4)
+#define sIA5I sIAnI(5)
+#define sIA6I sIAnI(6)
+#define sIA7I sIAnI(7)
+
+#define IA0Ip IAnIp(0)
+#define IA1Ip IAnIp(1)
+#define IA2Ip IAnIp(2)
+#define IA3Ip IAnIp(3)
+#define IA4Ip IAnIp(4)
+#define IA5Ip IAnIp(5)
+#define IA6Ip IAnIp(6)
+#define IA7Ip IAnIp(7)
+
 
 #define D0 Dn(0)
 #define D1 Dn(1)

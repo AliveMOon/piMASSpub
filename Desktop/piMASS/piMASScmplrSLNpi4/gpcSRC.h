@@ -1325,7 +1325,7 @@ public:
 				*pMEMo;
 
 	gpOBJ* srcOBJfnd( I4 dctID ) {
-		if( !pMEM )
+		if( this ? !pMEM : true )
 			return NULL;
 		gpOBJ* pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ );
 		if( !pO0 )

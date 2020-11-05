@@ -24,7 +24,10 @@
 
 //#define gpdDEBUG
 //? #define gpdNEW_CMPLR
-#define bSTDcout false //true //false //true
+
+#define bSTDcout true //false //true
+//#define stdON
+
 #include "mysys.h"
 #define piMASS_DEBUG 1
 #include <exception>

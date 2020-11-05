@@ -140,8 +140,7 @@ public:
 
 		// Open camera
 		//cout<<"Opening Camera..."<<endl;
-		if( !cam.openCAM() )
-		{
+		if( !cam.openCAM() ) {
 			//cerr<<"Error opening camera"<<endl;return -1;
 			return;
 		}

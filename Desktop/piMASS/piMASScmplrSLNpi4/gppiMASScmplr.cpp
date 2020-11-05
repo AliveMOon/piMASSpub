@@ -101,7 +101,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 		pMEMo = pMEM;
 	}
 	pMEM = new gpMEM( this, pW, pSRCstk );
-#ifdef stdOFF
+#ifdef stdON
 	if(bSTDcout){std::cout << stdCMPLR " CMP" stdRESET << std::endl;}
 #endif
 	I8x4 *pM0 = gpmSCP.pMN(), M, Mnx;

@@ -47,7 +47,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 
 	if( gpmSCP.bGD( pALL, &pUe ) )
 		return dim = gpmSCP.dim;
-#ifdef stdOFF
+#ifdef stdON
 	if(bSTDcout){std::cout << stdBREAK "BRK" << (int)iSCP << stdRESET << std::endl;}
 #endif
 	gpmSCP.rst( pALL );
@@ -180,7 +180,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 	}
 	dim.a4x2[0]+=1;
 	gpmSCP.dim = dim;
-#ifdef stdOFF
+#ifdef stdON
 	if(bSTDcout){std::cout << stdBREAK "oBRK" << (int)iSCP << stdRESET << std::endl;}
 #endif
 	return dim;

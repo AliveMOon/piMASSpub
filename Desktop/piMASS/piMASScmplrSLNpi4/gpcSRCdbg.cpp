@@ -27,7 +27,7 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP )
 	if( !gpmSCP.nASM() )
 		return;
 	//U4 iOPe = dOP.nIX();
-#ifdef stdOFF
+#ifdef stdON
 	if(bSTDcout){std::cout << stdDBG " DBG" stdRESET << std::endl;}
 #endif // stdOFF
 
