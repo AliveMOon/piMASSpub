@@ -120,6 +120,19 @@ typedef enum gpeCsz:U1{
 	gpeCsz_K,	//  e	16		11:10	KID
 	gpeCsz_OFF,	//	f	16		11:11	ZRO
 } gpeCsz_U1;
+class U4x2;
+class I4x2;
+class gpPTR{
+public:
+    gpPTR(){};
+    gpPTR* pNULL(); //{ gpmCLR; return this; }
+    U4  oID, cID, sof, iPC,
+        x,y,z,w;
+    U4x2* pd2D();
+    gpPTR* d2D( I4x2& d2 );
+    U4 area();
+    U4 sOF();
+};
 static const U4 gpaCsz[] = {
 
 	1,	//".b",		//	0	00:00	byte
@@ -129,7 +142,7 @@ static const U4 gpaCsz[] = {
 	/// olyan nincsen hogy float és nincs előjel
 	/// azaz ha nincs bepipálva az előjel bit akkor mást jelent
 	4,	//".4",		//  4   01:00	RGBA	pixel
-	4+sizeof(U1*),	//".u",	//  5   01:01	string
+	sizeof(gpPTR),	//".u",	//  5   01:01	string
 										//	12345678901234
 	8,	//".a",		//	6	01:10	ABCDEFGHIJKLMN
 	16,	//".c",		//  7	01:11   ABCDEF 0x00000000 // 2D koordináta?

@@ -85,6 +85,7 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			pSRCa = pMEM->pMASS->srcFND( xfnd );
 			if( pSRCa )
 			{
+                /// STACK ki lehessen szürni a AN loop-okat
 				if( !pMEM->pLZYsrcXFND )
 				{
 					if( pMEM->pLZYsrcXFNDall )
@@ -107,19 +108,19 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			pSRCa = NULL;
 			if(pOa->bALF())
 			if( pSRCb ){
+                /// pSRCb BUILD? ----------------------------
 				if( !pSRCb->pMEM )
-				{
-					pSRCb->msBLD = pMEM->pWIN->mSEC.x + pSRCb->msBLTdly;
-				}
+                    pSRCb->msBLD = pMEM->pWIN->mSEC.x + pSRCb->msBLTdly;
 				if( !pSRCb->srcBLD( pMEM->pWIN, pMEM->pLZYsrcXFND ) )
 					return pBLKm;
+                /// ------------------------------------------
 
 				if( gpOBJ* pOin = pSRCb->pMEM->pOBJ(pOa->AN.alf) )
 				{
 				#ifdef stdON
 					if(bSTDcout){std::cout << stdALU "pSRCb" << std::endl;}
                 #endif
-					/// tervek szerint a isza térési cim A0-ban lesz
+
                     pUin = pSRCb->srcMEMiPC( iPCin = pOin->iPC, sOFin );
 					if( pOin->bSTR() )
 					{
@@ -128,9 +129,20 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
                     _move._L.A7.D7;
 					_move._l.EAl( pRb->mNdID ).sIA7I;
-					_move._l.EAl( pRa->mNdID ).sIA7I ;
+					_move._l.EAl( pRa->mNdID ).sIA7I;
 					_jsr.EAl( gpeALF_entry );
 					_move._L.D7.A7;
+					/// tervek szerint a visza térési cim A0-ban lesz
+                    pRm 	= pBLKm->pROW(pBLK->bIDmR);
+                    iPCm 	= pRm ? iPCrow( *pRm, sOFm, false ) : 0;
+                    pOm 	= pRm ? srcOBJfnd( pRm->mNdID ) : NULL;
+                    cIDm	= pRm ? pRm->cID : gpeCsz_L;
+                    nM		= pOm ? pOm->d2D.area() : 0;
+                    //bSm		= cIDm&((I4)gpeCsz_B),
+                    pUm		= srcMEMiPC( iPCm, sOFm );
+                    _move._l.EAl( iPCm ).A1;
+                    _move._l.A0.IA1I;
+
 					return pBLKm;
 				}
 			}

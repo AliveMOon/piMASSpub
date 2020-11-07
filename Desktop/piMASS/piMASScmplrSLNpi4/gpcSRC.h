@@ -870,6 +870,8 @@ public:
 	gpCLASS(){ gpmCLR; };
 };
 
+
+
 class gpOBJ {
 	I4	cid, sof;
 public:
@@ -1220,12 +1222,14 @@ public:
 			lzyOBJ,
 			lzyCLASS,
 			lzyCODE,
+			lzyBINlnk,
 			*pLZYsrcXFND,
 			*pLZYsrcXFNDall;
+    gpcLZYdctBIN    lzyDCTbin;
 
 	I4		nCD, nXFND,
 			iSTK,nDAT,nINST, pc, pcCPY;
-	U4		msRUN;
+	U4		msRUN, nDCTscp, nDCTbin;
 	gpINST	*pINST;
 	gpcWIN	*pWIN;
 	gpcMASS	*pMASS;
@@ -1234,8 +1238,8 @@ public:
 	gpCTRL	*pCTRL;
 	~gpMEM()
 	{
-		gpmDEL(pLZYsrcXFNDall);
-		gpmDEL(pGL);
+		gpmDEL( pLZYsrcXFNDall);
+		gpmDEL( pGL );
 	}
 	gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i = 0x2000 );
 	U1* iPC( U4 iPC, U4 n )
@@ -1244,14 +1248,15 @@ public:
 			return NULL;
 		return lzyMEM.Ux( iPC, n, true, 1 );
 	}
+	gpOBJ* getOBJ( U1* pU1, U4 nBYTE );
+
 	gpINST& inst( gpeOPid op ) {
 		gpINST* pI = (gpINST*)lzyCODE.Ux( nCD, sizeof(*pI) );
 		pI->op = op;
 		nCD++;
 		return *pI;
 	};
-	gpINST* instRDY( gpcLZY* pDBG )
-	{
+	gpINST* instRDY( gpcLZY* pDBG ) {
 		if( this ? !nCD : true )
 			return this ? pINST : NULL;
 
@@ -2195,8 +2200,7 @@ public:
 	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spcZN, U4 nADD = 1 );
 
     gpcSRC& SRCcpy( U1* pC, U1* pE );
-	bool SRCcmp( U1* pS, U4 nS )
-	{
+	bool SRCcmp( U1* pS, U4 nS ) {
         if( nS != n_ld_add() )
 			return false;
 		return gpmMcmp( pA, pS, n_ld_add() ) == n_ld_add();
