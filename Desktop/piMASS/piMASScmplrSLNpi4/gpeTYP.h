@@ -126,7 +126,7 @@ class gpPTR{
 public:
     gpPTR(){};
     gpPTR* pNULL(); //{ gpmCLR; return this; }
-    U4  oID, cID, sof, iPC,
+    U4  iPC, cID, oID, sof,
         x,y,z,w;
     U4x2* pd2D();
     gpPTR* d2D( I4x2& d2 );

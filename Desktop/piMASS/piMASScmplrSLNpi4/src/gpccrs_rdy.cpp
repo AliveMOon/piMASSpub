@@ -100,7 +100,7 @@ U4 gpcCRS::miniRDYmap(
 
 	gpcSRC* pSrC = NULL;
 	U1 oo;
-#ifdef stdOFF
+#ifdef stdON
 	if(bSTDcout){std::cout << stdRDY " RDY";
 #endif // stdOFF
 

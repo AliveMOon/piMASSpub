@@ -5,7 +5,7 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
-gpBLOCK* gpcSRC::srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* pBLKup ) {
+gpBLOCK* gpcSRC::srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* pBLKup, I4 mnID ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 	if( pBLKup )
@@ -88,7 +88,7 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
                         U1  *pUin = pSRCb->srcMEMiPC( pOin->iPC, nCPY ),
                             *pDST = NULL;
 
-                        pOc = getOBJ( (U1*)pU4, (pD[7]-pA[7]) );
+                        pOc = getOBJptr( (U1*)pU4, (pD[7]-pA[7]), 0 );
                         if( gpPTR* pPTR = (gpPTR*)pSRC->srcMEMiPC( pOc->iPC, pOc->sOF() ) )
                         {
                             U4  asOF[2];
@@ -127,10 +127,13 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 }
 
 
-gpOBJ* gpMEM::getOBJ( U1* pU1, U4 nBYTE )
+gpOBJ* gpMEM::getOBJptr( U1* pU1, U4 nBYTE, I4 nmID )
 {
     if( this ? (nBYTE?!pU1:true) : true )
         return NULL;
+
+    if( nmID > 0 )
+        nmID *= -1;
 
     U4 iDb = lzyDCTbin.dctFND( pU1, nBYTE, nDCTbin ), iDbN, iOb;
     if( iDb < nDCTbin )
@@ -142,8 +145,9 @@ gpOBJ* gpMEM::getOBJ( U1* pU1, U4 nBYTE )
 
     if( iDb < nDCTbin )
     {
-        iOb = *(U4*)lzyBINlnk.Ux( iDb, sizeof(iDb) );
-        pO = pSRC->srcOBJfnd(nDCTscp+iOb);
+        iOb = *(U4*)lzyBINlnk.Ux( iDb, sizeof(iOb) );
+        gpOBJ* pO0 = gpmLZYvali( gpOBJ, &lzyOBJ );
+        pO = pO0+iOb;
         pPTR = (gpPTR*)pSRC->srcMEMiPC( pO->iPC, pO->sOF() );
         return pO;
     }
@@ -155,12 +159,12 @@ gpOBJ* gpMEM::getOBJ( U1* pU1, U4 nBYTE )
     iOb = lzyOBJ.nLD(sizeof(gpOBJ));
     *(U4*)lzyBINlnk.Ux( iDb, sizeof(iOb) ) = iOb;
 
-    pO = pSRC->srcOBJadd( NULL, nDCTscp+iOb);
+    pO = pSRC->srcOBJadd( NULL, nmID);
     pO->REcID(gpeCsz_ptr);
     pPTR = (gpPTR*)pSRC->srcMEMiPC( pO->iPC = nDAT, pO->sOF() );
     U4 n = gpmPAD( pO->sOF(), 0x10 );
     nDAT += n;
-    pPTR->pNULL()->oID = nDCTscp+iOb;
+    pPTR->pNULL()->oID = iOb;
     return pO;
 }
 

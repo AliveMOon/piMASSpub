@@ -178,6 +178,8 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	const char *pS;
 	U8 s = -1, nS;
 	bool bTMP;
+	U4 cID, area = 1;
+	gpPTR* pPTR = NULL;
 	for( U4 i = 0, iMN; i < nO; i++ )
 	{
 		gpOBJ& obj = pO0[i];
@@ -185,23 +187,50 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 			continue;
 		bTMP = obj.dctID < 0 || (obj.cAN != gpeCsz_a);
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPC );
-
-		if( obj.dctID < 0  )
-		{
-			if( obj.iPC < 4)
+		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
+		area = obj.d2D.area();
+        if( obj.iPC < 4)
 				continue;
-			//pLZY = pLZY->lzyFRMT( (s=-1), "\r\n " );
-			pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
-			pLZY = pLZY->lzyFRMT( (s=-1), "%s,", pU1 );
-			continue;
+        nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
+
+        switch(cID=obj.cID()) {
+            case gpeCsz_ptr:
+            case gpeCsz_a:
+            case gpeCsz_c: {
+                if( nS ){
+                    pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
+                    pLZY = pLZY->lzyADD( pS, nS, (s=-1), -1 );
+                    pLZY = pLZY->lzyFRMT( (s=-1), "=" );
+                }
+
+                pPTR = (gpPTR*)pU1;
+                pU1 = srcMEMiPC( pPTR->iPC, pPTR->sOF() );
+                cID = pPTR->cID;
+                area = pPTR->area();
+                if( area > 1 ) {
+                    switch( cID )
+                    {
+                        case gpeCsz_B:
+                        case gpeCsz_b:
+                            pLZY = pLZY->lzyFRMT( (s=-1), " %s,", pU1 );
+                            continue;
+                    }
+                }
+            } continue;
+            default:
+                if( obj.dctID < 0  )
+                {
+                    pLZY = pLZY->lzyFRMT( (s=-1), "%s,", pU1 );
+                    continue;
+                }
+                break;
 		}
 		//iMN = pL0[obj.dctID].x;
-		nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
+
 		if( !nS )
 			continue;
-
 		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
-		pU1 = srcMEMiPC( obj.iPC, obj.sOF() );
+
 		/// ---------------------------------
 		///
 		/// 			instDOit
@@ -213,9 +242,28 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 		pLZY = pLZY->lzyADD( pS, nS, (s=-1), -1 );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );
 		(s=-1);
+        switch( cID ) {
+            case gpeCsz_ptr:
+            case gpeCsz_c:
+            case gpeCsz_a:
+                pPTR = (gpPTR*)pU1;
+                pU1 = srcMEMiPC( pPTR->iPC, pPTR->sOF() );
+                cID = pPTR->cID;
+                area = pPTR->area();
+                if( area > 1 ) {
+                    switch( cID )
+                    {
+                        case gpeCsz_B:
+                        case gpeCsz_b:
+                            pLZY = pLZY->lzyFRMT( s, " %s,", pU1 );
+                            break;;
+                    }
+                }
+                break;
+        }
 
-		if( obj.d2D.area() > 1 ) {
-			switch( obj.cID() )
+		if( area > 1 ) {
+			switch( cID )
 			{
 				case gpeCsz_B:
 				case gpeCsz_b:
@@ -227,7 +275,24 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 
 
 
-		switch( obj.cID() ) {
+		switch( cID ) {
+            case gpeCsz_ptr:
+            case gpeCsz_c:
+            case gpeCsz_a:
+                pPTR = (gpPTR*)pU1;
+                pU1 = srcMEMiPC( pPTR->iPC, pPTR->sOF() );
+                cID = pPTR->cID;
+                area = pPTR->area();
+                if( area > 1 ) {
+                    switch( cID )
+                    {
+                        case gpeCsz_B:
+                        case gpeCsz_b:
+                            pLZY = pLZY->lzyFRMT( s, " %s,", pU1 );
+                            break;;
+                    }
+                }
+                break;
 			case gpeCsz_Q: pLZY = pLZY->lzyFRMT( s, " %lld,", *(I8*)pU1 ); break;
 			case gpeCsz_q: pLZY = pLZY->lzyFRMT( s, " 0x%0.16llx,", *(U8*)pU1 ); break;
 			case gpeCsz_L: pLZY = pLZY->lzyFRMT( s, " %d,", *(int*)pU1 ); break;

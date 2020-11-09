@@ -1,37 +1,7 @@
 #include "gpcSRC.h"
 #include "gpcSRClnk.h"
 #include "gpccrs.h"
-gpBLOCK* gpcSRC::srcBLKblkS( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
 
-		///					pRl
-		/// a + 			{		//block level up
-		/// a + 			b{		//block rutine
-		/// a + 			(		//brake block
-		/// a + 			b(		//function
-		/// a + 			b[		//index b
-		//if( !pBLK )
-		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-
-		gpROW* pRl = pBLK->pLSTrow();
-		if( !pRl )
-			return pBLK;
-		if( pBLK->opIDgrp == opID )
-		{
-			/// a + 			{{{{		//block level up
-			/// a + 			b{c(d((		//block rutinepRl->pstOP = opID;
-			pRl->pstOP = opID;
-			pBLK->pNEWrow();
-			return pBLK;
-		}
-		if( pRl->iPC < 4 )
-		{
-			gpOBJ* pO = srcOBJfnd( pRl->mNdID );
-			if( !pO )
-				pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
-			*pRl = *pO;
-		}
-		return srcBLKup( pS, pBLK, opID );
-}
 
 gpBLOCK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 	///kEND(scp);
@@ -47,7 +17,7 @@ gpBLOCK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gp
 		switch( pBLK->opIDgrp )
 		{
 			case gpeOPid_entry: {
-					pBLKm = srcINSTdwn( pS, pBLKm, pBLK, pBLKup );
+					pBLKm = srcINSTdwn( pS, pBLKm, pBLK, pBLKup, mnID );
 				} break;
 			case gpeOPid_mov:
 				pBLKm = srcINSTmov( pS, pBLKm, pBLK );
@@ -109,8 +79,8 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 	gpeCLR clr;
 	char		*pS = (char*)gpmSCP.p_str;
 	const char	*psDCT;
-	I4 nS, nsDCT; //, dctID;
-	gpBLOCK* pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
+	I4 nS, nsDCT;
+	gpBLOCK* pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1, 0 );
 	I8x2 AN; gpeCsz acID[2] = {gpeCsz_OFF};
 	gpeOPid opID;
 	for( U4 nM = gpmSCP.nMN(), mnID = 0, l; mnID < nM; mnID++ ) {

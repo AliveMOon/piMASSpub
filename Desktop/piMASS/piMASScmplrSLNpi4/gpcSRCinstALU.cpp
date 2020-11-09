@@ -4,6 +4,37 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+gpBLOCK* gpcSRC::srcBLKblkS( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID ) {
+
+		///					pRl
+		/// a + 			{		//block level up
+		/// a + 			b{		//block rutine
+		/// a + 			(		//brake block
+		/// a + 			b(		//function
+		/// a + 			b[		//index b
+		//if( !pBLK )
+		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
+
+		gpROW* pRl = pBLK->pLSTrow();
+		if( !pRl )
+			return pBLK;
+		if( pBLK->opIDgrp == opID )
+		{
+			/// a + 			{{{{		//block level up
+			/// a + 			b{c(d((		//block rutinepRl->pstOP = opID;
+			pRl->pstOP = opID;
+			pBLK->pNEWrow();
+			return pBLK;
+		}
+		if( pRl->iPC < 4 )
+		{
+			gpOBJ* pO = srcOBJfnd( pRl->mNdID );
+			if( !pO )
+				pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
+			*pRl = *pO;
+		}
+		return srcBLKup( pS, pBLK, opID, mnID );
+}
 gpBLOCK* gpcSRC::srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 	/// + a0.b
 	/// * a0.b
@@ -19,7 +50,7 @@ gpBLOCK* gpcSRC::srcBLKent( char* pS, I4 mnID, gpBLOCK* pBLK, gpeOPid opID, gpcL
 		case gpeCsz_c:
 			/// a0.b
 			/// b.a0
-			return srcBLKup( pS, pBLK, opID );
+			return srcBLKup( pS, pBLK, opID, mnID );
 		case gpeCsz_b:
 			if( pO->bSTR() )
 			{
@@ -48,8 +79,7 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			*pRb = NULL,
 			*pRm = NULL;
 
-	gpOBJ	*pOa = NULL,
-			*pOb = NULL,
+	gpOBJ	*pOa = NULL, *pOb = NULL, *pOc = NULL,
 			*pOm = NULL;
 
 	U1		*pUm = srcMEMiPC( iPCm, sOFm ), nUm,
@@ -115,8 +145,7 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 					return pBLKm;
                 /// ------------------------------------------
 
-				if( gpOBJ* pOin = pSRCb->pMEM->pOBJ(pOa->AN.alf) )
-				{
+				if( gpOBJ* pOin = pSRCb->pMEM->pOBJ(pOa->AN.alf) ) {
 				#ifdef stdON
 					if(bSTDcout){std::cout << stdALU "pSRCb" << std::endl;}
                 #endif
@@ -126,22 +155,27 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 					{
 						if(bSTDcout){std::cout << stdMINI << (char*)pUin << std::endl;}
 					}
+                    U4  aU4[2];
 
                     _move._L.A7.D7;
-					_move._l.EAl( pRb->mNdID ).sIA7I;
-					_move._l.EAl( pRa->mNdID ).sIA7I;
+					_move._l.EAl( aU4[1] = pRb->mNdID ).sIA7I;
+					_move._l.EAl( aU4[0] = pRa->mNdID ).sIA7I;
 					_jsr.EAl( gpeALF_entry );
 					_move._L.D7.A7;
 					/// tervek szerint a visza térési cim A0-ban lesz
-                    pRm 	= pBLKm->pROW(pBLK->bIDmR);
-                    iPCm 	= pRm ? iPCrow( *pRm, sOFm, false ) : 0;
+                    pRm = pBLKm->pROW(pBLK->bIDmR);
+                    pOc = pMEM->getOBJptr( (U1*)aU4, sizeof(aU4), pBLK->mnID );
+
+                    *pRm = *pOc;
+
+                    iPCm    = pRm ? iPCrow( *pRm, sOFm, false ) : 0;
                     pOm 	= pRm ? srcOBJfnd( pRm->mNdID ) : NULL;
                     cIDm	= pRm ? pRm->cID : gpeCsz_L;
                     nM		= pOm ? pOm->d2D.area() : 0;
                     //bSm		= cIDm&((I4)gpeCsz_B),
                     pUm		= srcMEMiPC( iPCm, sOFm );
-                    _move._l.EAl( iPCm ).A1;
-                    _move._l.A0.IA1I;
+                    //_move._l.EAl( iPCm ).A1;
+                    //_move._l.A0.IA1I;
 
 					return pBLKm;
 				}
@@ -191,7 +225,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 	bool	bD0 = true,
 			bS0, bSa, bSb, bSm;
-
+    gpPTR* pPTR = NULL;
 	//for( I4 i = nR-1; i >= 0; i-- )
 	for( gpROW* pRa = pR0+nR-1; pRa >= pR0; pRb = pRa, pRa-- )
 	{
@@ -210,14 +244,22 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 		iPCa 	= iPCrow( *pRa, sOFa, true );
 		cIDa	= pRa ? pRa->cID : gpeCsz_L;
+		pUa     = srcMEMiPC( iPCa, sOFa );
+
 		bSa 	= cIDa&((I4)gpeCsz_B);
 		if( pOa = srcOBJfnd( pRa->mNdID ) ) {
 			anA = pOa->AN;
 		}
 		nA 		= pOa ? pOa->d2D.area() : 1;
 		nUa		= sOFa/nA;
+        /*if( cIDa == gpeCsz_ptr )
+        {
+            pPTR = (gpPTR*)pUa;
+            pUa = srcMEMiPC( pPTR->iPC, pPTR->sOF() );
+            cIDa = pPTR->cID;
+            nA = pPTR->area();
+        }*/
 
-		pUa = srcMEMiPC( iPCa, sOFa );
 
 		if( cID0<0 )
 		{
@@ -235,12 +277,23 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			bS0 	= bSa;
 			continue;
 		}
+        if( cIDb == gpeCsz_ptr )
+        if( (gpeOPid)pRa->pstOP == gpeOPid_mov ) {
+			/// Síma egyenlő művelet
+            // ezt valami REFERENCE átadásal próbáljuk
+            pOa->movREF( pOb );
+			*pRa = *pOa;
+			iPCa 	= iPCrow( *pRa, sOFa, true );
+			nA 		= pOa ? pOa->d2D.area() : 1;
+			continue;
+		}
 
 		if( nB < 2 ) {
 			/// SINGLE VARI
 			if( bD0 ) {
 				/// SRC
 				// B ------------
+
 				if( nUb < 8 )
 					_xor._q.D0.D0;
 				_move._l.EAl( iPCb ).A0;
@@ -293,11 +346,16 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 			}
 
 			/// TRG iPCa ---------------------
-			_move._l.EAl( iPCa ).A0;
+			if( cID0 == gpeCsz_ptr ){
+                _move._l.EAl( iPCa ).A1;            // gpPTR címe
+                _move._l.IA1I.A0;                   // gpPTR.ipc
+            } else
+                _move._l.EAl( iPCa ).A0;
+
 			if( (gpeOPid)pRa->pstOP == gpeOPid_mov ) {
 				/// Síma egyenlő
 				if( cID0<gpeCsz_K ) {
-					_move.c((gpeCsz)cID0).D0.IA0I;
+                    _move.c((gpeCsz)cID0).D0.IA0I;
 				} else
 					_move._L.D0.IA0I;
 				continue;
@@ -309,9 +367,9 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 
 
-			if( cID0<gpeCsz_K )
+			if( cID0<gpeCsz_K ){
 				_move.c((gpeCsz)cID0).IA0I.D0;
-			else
+			} else
 				_move._L.IA0I.D0;
 
 			/// doITop ---------------------
@@ -333,7 +391,7 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 			if( cID0<gpeCsz_K )
 			{
-				_move.c((gpeCsz)cID0).D0.IA0I;
+                _move.c((gpeCsz)cID0).D0.IA0I;
 				continue;
 			}
 
@@ -344,11 +402,10 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 		if( !pRa )
 			continue;
 		/// ARRAY VARI
-		if( (gpeOPid)pRa->pstOP == gpeOPid_mov )
-		{
+		if( (gpeOPid)pRa->pstOP == gpeOPid_mov ) {
 			/// Síma egyenlő művelet
             // ezt valami REFERENCE átadásal próbáljuk
-			pOa->movREF( pOb );
+            pOa->movREF( pOb );
 			*pRa = *pOa;
 			iPCa 	= iPCrow( *pRa, sOFa, true );
 			nA 		= pOa ? pOa->d2D.area() : 1;
@@ -357,6 +414,15 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 		/// itt LOOP-olni kell majd
 
+	}
+    if( cIDb == gpeCsz_ptr ) {
+		_nop;_nop;
+		if( pOm )
+		{
+			pOm->movREF( pOa );
+			*pRm = *pOm;
+		}
+		return pBLKm;
 	}
 
 	if( nB > 1 ) {
@@ -371,7 +437,6 @@ gpBLOCK* gpcSRC::srcINSTmov( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
 
 	if( iPCa == iPCm )
 	{
-
 		_nop;
 		return pBLKm;
 	}
