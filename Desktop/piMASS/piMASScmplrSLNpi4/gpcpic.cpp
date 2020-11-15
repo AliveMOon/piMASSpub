@@ -135,7 +135,7 @@ bool gpcCAMubi::openCAM()
         return bOPEN;
 
     ///  1. Open the device ---------------
-    if(bSTDcout){std::cout << "1. Open the device ---------------" << std::endl;}
+    if(bSTDcout_V4l2){std::cout << "1. Open the device ---------------" << std::endl;}
     if( fd < 0 )
         fd = open("/dev/video0",O_RDWR);
 
@@ -148,13 +148,13 @@ bool gpcCAMubi::openCAM()
     ///  2. Ask the device if it can capture frames
     if( wip == 1 )
     {
-        if(bSTDcout){std::cout << "2. Ask the device if it can capture frames" << std::endl;}
+        if(bSTDcout_V4l2){std::cout << "2. Ask the device if it can capture frames" << std::endl;}
         if(ioctl(fd, VIDIOC_QUERYCAP, &capability) < 0){
             // something went wrong... exit
             perror("Failed to get device capabilities, VIDIOC_QUERYCAP");
             //return bOPEN;
         } else {
-             if(bSTDcout){std::cout << "driver:" << (char*)capability.driver << std::endl;}
+             if(bSTDcout_V4l2){std::cout << "driver:" << (char*)capability.driver << std::endl;}
         }
         wip = 2;
     }
@@ -170,7 +170,7 @@ bool gpcCAMubi::openCAM()
     U4x2 aWH[8];
     gpfMset( aWH, gpmN(aWH), &wh0, sizeof(*aWH) );
     while( r > -1 ) {
-        if(bSTDcout){std::cout << fmtdesc.description << std::endl;}
+        if(bSTDcout_V4l2){std::cout << fmtdesc.description << std::endl;}
         frmsize.type = fmtdesc.type;
         frmsize.pixel_format = fmtdesc.pixelformat;
         frmsize.index = 0;
@@ -179,7 +179,7 @@ bool gpcCAMubi::openCAM()
 
         while( r > -1 ) {
             if(frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
-                if(bSTDcout){std::cout  << "discrete w:" << frmsize.discrete.width << " h:" << frmsize.discrete.height << std::endl;}
+                if(bSTDcout_V4l2){std::cout  << "discrete w:" << frmsize.discrete.width << " h:" << frmsize.discrete.height << std::endl;}
                 switch( frmsize.pixel_format ) {
                     case V4L2_PIX_FMT_YUYV:
                         pixFMT = V4L2_PIX_FMT_YUYV;
@@ -201,7 +201,7 @@ bool gpcCAMubi::openCAM()
                     aWH[iWH].y = frmsize.discrete.height;
                 }
             } else {
-                if(bSTDcout){std::cout  << "-------- w:" << frmsize.stepwise.min_width << " h:" << frmsize.stepwise.min_height << std::endl
+                if(bSTDcout_V4l2){std::cout  << "-------- w:" << frmsize.stepwise.min_width << " h:" << frmsize.stepwise.min_height << std::endl
                                         << "-------- w:" << frmsize.stepwise.max_width << " h:" << frmsize.stepwise.max_height << std::endl;}
                 switch( frmsize.pixel_format ) {
                     case V4L2_PIX_FMT_RGB24:
@@ -254,7 +254,7 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
         return 0;
 
     /// 5. Set Image format
-    if(bSTDcout){std::cout << "5. Set Image format ----------" << std::endl;}
+    if(bSTDcout_V4l2){std::cout << "5. Set Image format ----------" << std::endl;}
     gpmZ(format);
     format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     format.fmt.pix.width = w;
@@ -272,7 +272,7 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
     }
 
     /// 6. VIDIOC_REQBUFS ----------
-    if(bSTDcout){std::cout << "6. VIDIOC_REQBUFS ----------" << std::endl;}
+    if(bSTDcout_V4l2){std::cout << "6. VIDIOC_REQBUFS ----------" << std::endl;}
     requestBuffer.count = 1;                    // one request buffer
     requestBuffer.type = format.type ;          // request a buffer wich we an use for capturing frames
     requestBuffer.memory = V4L2_MEMORY_MMAP;
@@ -281,7 +281,7 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
         return res;
     }
 
-    if(bSTDcout){std::cout << "7. VIDIOC_QUERYBUF ----------------" << std::endl;}
+    if(bSTDcout_V4l2){std::cout << "7. VIDIOC_QUERYBUF ----------------" << std::endl;}
     /// 7. VIDIOC_QUERYBUF ----------
     queryBuffer.type = format.type ;
     queryBuffer.memory = V4L2_MEMORY_MMAP;
@@ -297,7 +297,7 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
                             fd, queryBuffer.m.offset    );
 
     /// 8. VIDIOC_STREAMON ----------------
-    if(bSTDcout){std::cout << " 8. VIDIOC_STREAMON ----------------" << std::endl;}
+    if(bSTDcout_V4l2){std::cout << " 8. VIDIOC_STREAMON ----------------" << std::endl;}
     type = format.type;
     res = ioctl(fd, VIDIOC_STREAMON, &type);
     if( res < 0 ){
@@ -308,7 +308,6 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
         bufferinfo.type = type;
         bufferinfo.memory = V4L2_MEMORY_MMAP;
         bufferinfo.index = 0;
-        //if(bSTDcout){std::cout << " 9. VIDIOC_QBUF ----------------" << std::endl;}
         res = ioctl(fd, VIDIOC_QBUF, &bufferinfo);
         if( res < 0){
             return res;
@@ -325,23 +324,21 @@ U4 gpcCAMubi::grab()
     int res;
     if( wip == 9 ) {
         /// 10. VIDIOC_DQBUF --------------------
-        if(bSTDcout){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
+        if(bSTDcout_V4l2){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
         res = ioctl(fd, VIDIOC_DQBUF, &bufferinfo);
         if( res < 0){
             return nGRB++;
         }
-        if(bSTDcout){std::cout << "10.2 VIDIOC_DQBUF --------------------" << std::endl;}
+        if(bSTDcout_V4l2){std::cout << "10.2 VIDIOC_DQBUF --------------------" << std::endl;}
         wip = 10;
     }
-    //if(bSTDcout){std::cout  << "Buffer has: " << (double)bufferinfo.bytesused / 1024
-    //                        << " KBytes of data" << std::endl;}
 
     return nGRB++;
 }
 void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f )
 {
     U1* pRGB = (U1*)pPIX;
-    if(bSTDcout){std::cout << "CPY" << std::endl;}
+    if(bSTDcout_V4l2){std::cout << "CPY" << std::endl;}
     int res ;
     switch( format.fmt.pix.pixelformat ){ //frmsize.pixel_format ) {
         case V4L2_PIX_FMT_YUYV: {
@@ -378,11 +375,11 @@ void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f )
         bufferinfo.type = type;
         bufferinfo.memory = V4L2_MEMORY_MMAP;
         bufferinfo.index = 0;
-        if(bSTDcout){std::cout << " 9.1 VIDIOC_QBUF ----------------" << std::endl;}
+        if(bSTDcout_V4l2){std::cout << " 9.1 VIDIOC_QBUF ----------------" << std::endl;}
         res = ioctl(fd, VIDIOC_QBUF, &bufferinfo);
         if(res < 0)
             return NULL;
-        if(bSTDcout){std::cout << " 9.2 VIDIOC_QBUF ----------------" << std::endl;}
+        if(bSTDcout_V4l2){std::cout << " 9.2 VIDIOC_QBUF ----------------" << std::endl;}
     }
     return pPIX;
 }

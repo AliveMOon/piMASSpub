@@ -325,11 +325,12 @@ void drc_trd( char* pBUFF ) {
 	if( pBUFF ? !pBUFF : true )
 		return;
 	char	sBUFF[0x100];
-	strcpy( sBUFF, pBUFF );
+	strcpy( sBUFF, pBUFF+gpmNINCS(pBUFF, "\" \a\t") );
 	int o = system( sBUFF );
-	if(bSTDcout){std::cout << o << ":" << sBUFF <<std::endl;};
+	if(bSTDcout_slmp){std::cout << o << ":" << sBUFF <<std::endl;};
 }
-bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
+
+bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 	if( this ? !pBUFF : true )
 		return false;
 
@@ -347,7 +348,7 @@ bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
 	{
 		case 4:{
 			// 5->6 jelzünk hogy olvastuk a HS2i-t
-			nm = NMnDIF.x;
+			/*nm = NMnDIF.x;
 			gpcADR A0 = gpfSTR2ALF( sNM, sNM+4 );	/// gpcADR
 			A0 = pRES;
 			if( !A0.pRM )
@@ -357,16 +358,17 @@ bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
 			if(!aB.bSTR())
 				return false;
 			if(!alu.pDAT)
-				return false;
+				return false;*/
 
-			char	//*p_pat = (char*)alu.pDAT,
-					*pP = pBUFF;
+			char	*pP = pBUFF;
 
 			pP += okXYZ.str( pP, "_" );
 			pP += okABC.str( pP, "_" );
 			pP += sprintf( pP, ".png" );
 			pP++;
-			sprintf( pP, (char*)alu.pDAT, pBUFF );
+			U4 n = sprintf( pP, (char*)pCLI, pBUFF );
+			if( n )
+                pP[n-1] = 0;
 			if( n_join < n_trd )
 			{
 				trd.join();
@@ -374,7 +376,7 @@ bool gpcDrc::async( char* pBUFF, gpcALU& alu, gpcRES* pRES ) {
 			}
 			trd = std::thread( drc_trd, pP );
 			n_trd++;
-
+            if(bSTDcout_slmp){std::cout << pP+1 <<std::endl;};
 			//int o = system( pP+1 );
 			//if(bSTDcout){std::cout << o << ":" << pP+1 <<std::endl;};
 		} return true;

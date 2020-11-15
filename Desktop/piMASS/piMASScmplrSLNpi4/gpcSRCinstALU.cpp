@@ -174,8 +174,8 @@ gpBLOCK* gpcSRC::srcINSTent( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK ) {
                     nM		= pOm ? pOm->d2D.area() : 0;
                     //bSm		= cIDm&((I4)gpeCsz_B),
                     pUm		= srcMEMiPC( iPCm, sOFm );
-                    //_move._l.EAl( iPCm ).A1;
-                    //_move._l.A0.IA1I;
+                    _move._l.EAl( iPCm ).A1;
+                    _move._l.A0.IA1I;
 
 					return pBLKm;
 				}

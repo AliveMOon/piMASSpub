@@ -26,6 +26,9 @@
 //? #define gpdNEW_CMPLR
 
 #define bSTDcout true //false //true
+#define bSTDcout_V4l2 (bSTDcout&false)
+#define bSTDcout_ent (bSTDcout&false)
+#define bSTDcout_slmp (bSTDcout&true)
 //#define stdON
 
 #include "mysys.h"

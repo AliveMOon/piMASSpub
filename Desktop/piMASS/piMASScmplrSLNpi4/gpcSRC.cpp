@@ -155,7 +155,11 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 
 	return *this;
 }
-
+///-------------------------------------------------------------
+///
+///                         gpcSRC
+///
+///-------------------------------------------------------------
 gpcSRC::gpcSRC( gpcSRC& B ) {
 	gpmCLR;
 	*this = B;
@@ -174,6 +178,17 @@ gpcSRC::~gpcSRC() {
 	//gpmDELary(pBIG);
 	gpmDELary(pMAP);
 	gpmDEL(pCORE);
+}
+U1* gpcSRC::srcMEMiPC( gpOBJ* pOBJ ) {
+    if( this ? !pOBJ : true )
+        return NULL;
+
+    U1* pU1 = srcMEMiPC( pOBJ->iPC, pOBJ->sOF() );
+    if( pU1 ? (pOBJ->cID() != gpeCsz_ptr) : true )
+        return pU1;
+
+    gpPTR* pPTR = (gpPTR*)pU1;
+    return pMEM->iPC( pPTR->iPC, pPTR->sOF() );
 }
 gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) {
 	if( this ?
@@ -374,6 +389,11 @@ I4x2 gpcSRC::SRCmini(
 	return cxy;
 }
 
+///-------------------------------------------------------------
+///
+///                         gpcMASS
+///
+///-------------------------------------------------------------
 gpcMASS::~gpcMASS()
 {
 	gpcSRC** ppS = ppSRC();

@@ -886,9 +886,11 @@ public:
 		sof = d2D.area();
 		return sof *= gpaCsz[cid];
 	}
-	I4 cID() { return cid; }
+	I4 cID() { return this ? cid : gpeCsz_OFF; }
 	I4 REcID( I4 c )
 	{
+        if( !this )
+            return gpeCsz_OFF;
 		cid = c;
 		sof = 0;
 		return cid;
@@ -1305,8 +1307,10 @@ public:
     SOCKET	iGT;
 
     gpeALF	*pALFtg;
+
     gpcRES	*pEXE0,
 			*apOUT[4];
+
 	gpcLZY	*pMINI, *pDBG,
 			*pABI;
 
@@ -1342,6 +1346,7 @@ public:
 	U1* srcMEMiPC( I4 iPC, U4 nU1 ) {
 		return pMEM->iPC( iPC, nU1 );
 	}
+	U1* srcMEMiPC( gpOBJ* pOBJ );
 	gpBLOCK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  ) {
 		gpBLOCK	*pBLK = lzyBLOCK.pNEWblk( opID, bIDm, bIDmR, mnID );
 		gpROW	*pRf = pBLK->pROW(0,true);
@@ -2029,7 +2034,7 @@ public:
 					);
 	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
 	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ); //gpcMASS* pMS );
-	bool 	srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ); //
+	U1 	srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ); //
 	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 

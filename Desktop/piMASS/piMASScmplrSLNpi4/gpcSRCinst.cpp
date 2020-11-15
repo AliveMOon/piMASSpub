@@ -75,7 +75,7 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
                 U4      *pU4    = (U4*)pSRC->srcMEMiPC( pA[7], 4 );
                 gpOBJ   *pOa    = pSRC->srcOBJfnd( pU4[1] ),
                         *pOb = NULL, *pOc = NULL;
-
+                gpPTR* pPTR = NULL;
 
                 U4      xfnd    = pMASS->getXFNDan( pOa->AN );
                 if( gpcSRC  *pSRCb  = pMASS->srcFND( xfnd ))
@@ -87,9 +87,10 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
                         U4 nCPY = pOin->sOF();
                         U1  *pUin = pSRCb->srcMEMiPC( pOin->iPC, nCPY ),
                             *pDST = NULL;
-
+                        if(bSTDcout_ent)
+                            {std::cout << stdALU << pUin << std::endl;}
                         pOc = getOBJptr( (U1*)pU4, (pD[7]-pA[7]), 0 );
-                        if( gpPTR* pPTR = (gpPTR*)pSRC->srcMEMiPC( pOc->iPC, pOc->sOF() ) )
+                        if( pPTR = (gpPTR*)pSRC->srcMEMiPC( pOc->iPC, pOc->sOF() ) )
                         {
                             U4  asOF[2];
                             asOF[0] = pPTR->iPC ? pPTR->sOF() : 0;
@@ -104,21 +105,21 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
                                 asOF[1] = gpmPAD( pPTR->sOF(), 0x10 );
                                 if( !pPTR->iPC )
                                 {
-                                    pDST = pSRC->srcMEMiPC( pPTR->iPC = nDAT, asOF[1] );
+                                    pPTR->iPC = nDAT;
                                     nDAT += asOF[1];
                                 }
+                                pDST = pSRC->srcMEMiPC( pPTR->iPC, asOF[1] );
                             } else
                                 pDST = pSRC->srcMEMiPC( pPTR->iPC, pPTR->sOF() );
 
                             gpmMcpy( pDST, pUin, asOF[1] );
                         }
 
-                        //if(bSTDcout)
+                        if(bSTDcout_ent)
                             {std::cout << stdALU "pSRCb" << std::endl;}
                     }
-
                 }
-                pA[0] = pOc ? pOc->iPC : 0;
+                pA[0] = pPTR ? pPTR->iPC : 0;
             } break;
 		default:
 			break;

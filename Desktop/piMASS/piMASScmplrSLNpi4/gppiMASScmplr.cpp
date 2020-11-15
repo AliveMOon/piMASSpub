@@ -193,19 +193,19 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 
 	pMEM->instRDY( pDBG );
 }
-bool gpcSRC::srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ) //, gpcWIN& win )
+U1 gpcSRC::srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ) //, gpcWIN& win )
 {
 	if( !this )
-		return false;
+		return 0;
 	if( msBLD ? msBLD > pW->mSEC.x : true )
-		return false;
+		return 2;
 
 	msBLD = 0;
 	U1 iSCP = 0;
 	if( !gpmSCP.nLNK() )
-		return false;
+		return 0;
 
 	srcCMPLR( *pW->piMASS->pOPER(), iSCP, pW, pSRCstk );
-	return true;
+	return 1;
 }
 

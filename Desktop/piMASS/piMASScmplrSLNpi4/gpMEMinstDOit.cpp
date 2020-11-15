@@ -4,6 +4,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+extern char gpsPUB[0x1000];
 I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
@@ -17,7 +18,11 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if(bSTDcout){std::cout << stdALU "SLMP" << pGT->iCNT;}
 #endif
 	gpOBJ	*pOi = pOBJ(gpeALF_RINP),
-			*pOo = pOBJ(gpeALF_ROUT);
+			*pOo = pOBJ(gpeALF_ROUT),
+			*apO[2];
+    apO[0] = pOBJ(gpeALF_BILL),
+    apO[1] = pOBJ(gpeALF_JOHN);
+
 	I8x2 an;
 	U1* pU1;
 	gpcSRC* pS2;
@@ -47,11 +52,12 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 			{
 				xfnd = pMASS->getXFNDan( an+I8x2( i, 0 ) );
 				pS2 = xfnd ? pMASS->srcFND( xfnd ) : NULL;
-				if( pS2 )
-				{
-					pS2->pMINI = pS2->pMINI->lzyFRMT( s=0, "\r\n" ); //\r\n" );
-					pS2->pMINI = pS2->pMINI->lzyROBnDstat( s=0, *pROBnD, i, "" );
-				}
+				if( !pS2 )
+                    continue;
+                pS2->pMINI = pS2->pMINI->lzyFRMT( s=0, "\r\n" ); //\r\n" );
+                pS2->pMINI = pS2->pMINI->lzyROBnDstat( s=0, *pROBnD, i, "" );
+
+                pROBnD->aDrc[i].asyncSYS( gpsPUB, pSRC->srcMEMiPC(apO[i]) );
 			}
 		}
 	}

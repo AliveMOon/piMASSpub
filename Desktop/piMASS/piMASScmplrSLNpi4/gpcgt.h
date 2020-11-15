@@ -205,7 +205,8 @@ public:
 	{
 		return !(*this == b);
 	}
-	bool async( char* pBUFF, gpcALU& alu, gpcRES* pRES );
+	//bool async( char* pBUFF, gpcALU& alu, gpcRES* pRES );
+	bool asyncSYS( char* pBUFF, U1* pCLI );
 
 	gpcDrc& format( U4 nm = 0 ) {
 		U4 nn = gpmOFF(gpcDrc,n_trd);
