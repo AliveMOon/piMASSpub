@@ -125,11 +125,11 @@ void gpcWIN::WINreSZ( void )
 		apCRS[id]->stFRMwh( *this, aBEF[id].x, aBEF[id].y );
 		aAFT[id] = apCRS[id]->gtFRMwh();
 
-		std::cout 	<< 	"\033[1;31m WINreSZ"
+		if(bSTDcout){std::cout 	<< 	"\033[1;31m WINreSZ"
 					<< "frmID:" << id
 					<< " be/af W:" << aBEF[id].x << "/" << aAFT[id].x
 					<< " H:" << aBEF[id].y << "/" << aAFT[id].y
-					<< "\033[0m" << std::endl;
+					<< "\033[0m" << std::endl;}
 	}
 }
 gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
@@ -234,7 +234,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 		mSEC.y = mSEC.x;
 		mSEC.x = SDL_GetTicks();
 		mSEC.z = mSEC.x-mSEC.y;
-		mSEC.w = 1000/max( 1, mSEC.z);
+		mSEC.w = 1000/gpmMAX( 1, mSEC.z);
 
 
 		gpcCRS& crs = *apCRS[srcDIV]; // ? *apCRS[srcDIV] : main_crs;

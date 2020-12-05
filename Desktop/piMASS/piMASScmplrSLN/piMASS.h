@@ -25,6 +25,11 @@
 //#define gpdDEBUG
 //? #define gpdNEW_CMPLR
 
+#define bSTDcout true //false //true
+#define bSTDcout_V4l2 (bSTDcout&false)
+#define bSTDcout_ent (bSTDcout&false)
+#define bSTDcout_slmp (bSTDcout&true)
+//#define stdON
 
 #include "mysys.h"
 #define piMASS_DEBUG 1
@@ -113,16 +118,19 @@
 	#ifdef gpdSYSpi
 		#include <raspicam/raspicam.h>
 		//#include <raspicam/raspicam_cv.h>
-		#include <wiringPi.h>
+		//#include <wiringPi.h>
 		#define gpdU4x2nSTR 2
 		#define gpdCAMu raspicam::RaspiCam
         #define gpdGT_LIST_tOUT 3
+        #define GL_GLES_PROTOTYPES 0
 	#else
-        #include <GLFW/glfw3.h>
+        //#include <GLFW/glfw3.h>
 	    #define GL_GLES_PROTOTYPES 0
 		#define gpdU4x2nSTR 1
-	#define gpdCAMu gpcCAMubi
+
         #include <camU.h>
+        #define gpdCAMu gpcCAMubi
+
         #define gpdGT_LIST_tOUT 7
 	#endif // gpdSYSpi
 
@@ -314,8 +322,8 @@ public:
 
 
 
-#define max( a, b ) ( a > b ? a : b )
-#define min( a, b ) ( a < b ? a : b )
+#define gpmMAX( a, b ) ( a > b ? a : b )
+#define gpmMIN( a, b ) ( a < b ? a : b )
 #define PI acos(-1.0)
 #define PIp2 (PI/2.0)
 #define PI2 (PI*2.0)
@@ -507,6 +515,7 @@ U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* 
 		)
 #endif
 
+//#define stdOFF      0
 #define stdRESET	"\033[0m"
 
 #define stdBLACK	"\033[1;30m"
@@ -1052,7 +1061,7 @@ public:
 				sh1 = 2;	// ha float most 4b kisebb nem lehet
 		}
 
-		x = tp.x|min(3,sh1);
+		x = tp.x|gpmMIN(3,sh1);
 		w = 1<<(x&0xf);
 
 		// legalább 1x1 es valamikből áll
@@ -2858,8 +2867,8 @@ public:
 	I4 mx() { return x > y ? x:y; }
 
 
-	I4x2 MX( const I4x2 b ) const { return  I4x2( x>b.x?x:b.x, y>b.y?y:b.y ); }
-	I4x2 MN( const I4x2 b ) const { return  I4x2( x<b.x?x:b.x, y<b.y?y:b.y ); }
+	I4x2 MX( const I4x2 b ) const { return  this ? I4x2( x>b.x?x:b.x, y>b.y?y:b.y ) : I4x2(0); }
+	I4x2 MN( const I4x2 b ) const { return  this ? I4x2( x<b.x?x:b.x, y<b.y?y:b.y ) : I4x2(0); }
 	I4x2& mx( const I4x2 b ) {
 		if( x < b.x )
 			x = b.x;
@@ -3050,7 +3059,9 @@ public:
 		struct {
 			I4 x,y,z,w;
 		};
-
+		struct {
+			I4 i,n,zz,ww;
+		};
 		struct
         {
 			gpeOPid pre, pst;	// 0, 1
@@ -4147,7 +4158,7 @@ public:
     I8x4& operator = ( U8 b )
     {
 		gpmCLR;
-        x = min( b, 0x7FFFffffFFFFffff );
+        x = gpmMIN( b, 0x7FFFffffFFFFffff );
 		return *this;
     }
     I8x4& operator = ( I8 b )
@@ -4876,25 +4887,26 @@ public:
 
 
 };
-#define _11 x.x
-#define _12 x.y
-#define _13 x.z
-#define _14 x.w
 
-#define _21 y.x
-#define _22 y.y
-#define _23 y.z
-#define _24 y.w
-
-#define _31 z.x
-#define _32 z.y
-#define _33 z.z
-#define _34 z.w
-
-#define _41 t.x
-#define _42 t.y
-#define _43 t.z
-#define _44 t.w
+//#define _11 x.x
+//#define _12 x.y
+//#define _13 x.z
+//#define _14 x.w
+//
+//#define _21 y.x
+//#define _22 y.y
+//#define _23 y.z
+//#define _24 y.w
+//
+//#define _31 z.x
+//#define _32 z.y
+//#define _33 z.z
+//#define _34 z.w
+//
+//#define _41 t.x
+//#define _42 t.y
+//#define _43 t.z
+//#define _44 t.w
 
 class F4x4 {
 public:
@@ -5173,17 +5185,47 @@ public:
 
 
 
+//	F4x4& ypr( F4 ypr, float toR = 1.0 ) {
+//		ypr /= toR;
+//		float	cy = cosf(ypr.x), sy = sinf(ypr.x),
+//				cp = cosf(ypr.y), sp = sinf(ypr.y),
+//				cr = cosf(ypr.z), sr = sinf(ypr.z);
+//
+//		_11 =  cr*cy + sr*sp*sy;	_12 = sr*cp;	_13 = -cr*sy + sr*sp*cy;	_14 = 0.0f;
+//		_21 = -sr*cy + cr*sp*sy;	_22 = cr*cp;	_23 = sr*sy + cr*sp*cy;		_24 = 0.0f;
+//		_31 =  cp*sy;				_32 = -sp;		_33 = cp*cy;				_34 = 0.0f;
+//
+//		_41 = _42 = _43 = 0.0f;				_44 = 1.0f;
+//
+//		return *this;
+//	}
+//	F4x4& AXr( F4 vec, float rad ) {
+//		double	l = sqrt(vec.qlen());
+//		float	CR = cosf(rad), SR = sinf(rad), T = 1-CR,
+//				X = vec.x/l, Y = vec.y/l, Z = vec.z/l,
+//				X2 = X*X, Y2 = Y*Y, Z2 = Z*Z;
+//
+//		_11 = T*X2+CR;		_12 = T*X*Y+SR*Z; 	_13 = T*X*Z-SR*Y;
+//		_21 = T*X*Y-SR*Z;	_22 = T*Y2+CR;		_23 = T*Y*Z+SR*X;
+//		_31 = T*X*Z+SR*Y; 	_32 = T*Y*Z-SR*X;	_33 = T*Z2+CR;
+//
+//		_14 = _24 = _34 = _41 = _42 = _43 = 0.0f;
+//		_44 = 1.0f;
+//
+//		return *this;
+//	}
+
 	F4x4& ypr( F4 ypr, float toR = 1.0 ) {
 		ypr /= toR;
 		float	cy = cosf(ypr.x), sy = sinf(ypr.x),
 				cp = cosf(ypr.y), sp = sinf(ypr.y),
 				cr = cosf(ypr.z), sr = sinf(ypr.z);
 
-		_11 =  cr*cy + sr*sp*sy;	_12 = sr*cp;	_13 = -cr*sy + sr*sp*cy;	_14 = 0.0f;
-		_21 = -sr*cy + cr*sp*sy;	_22 = cr*cp;	_23 = sr*sy + cr*sp*cy;		_24 = 0.0f;
-		_31 =  cp*sy;				_32 = -sp;		_33 = cp*cy;				_34 = 0.0f;
+		x.x =  cr*cy + sr*sp*sy;	x.y = sr*cp;	x.z = -cr*sy + sr*sp*cy;	x.w = 0.0f;
+		y.x = -sr*cy + cr*sp*sy;	y.y = cr*cp;	y.z = sr*sy + cr*sp*cy;		y.w = 0.0f;
+		z.x =  cp*sy;				z.y = -sp;		z.z = cp*cy;				z.w = 0.0f;
 
-		_41 = _42 = _43 = 0.0f;				_44 = 1.0f;
+		t.x = t.y = t.z = 0.0f;				t.w = 1.0f;
 
 		return *this;
 	}
@@ -5193,15 +5235,16 @@ public:
 				X = vec.x/l, Y = vec.y/l, Z = vec.z/l,
 				X2 = X*X, Y2 = Y*Y, Z2 = Z*Z;
 
-		_11 = T*X2+CR;		_12 = T*X*Y+SR*Z; 	_13 = T*X*Z-SR*Y;
-		_21 = T*X*Y-SR*Z;	_22 = T*Y2+CR;		_23 = T*Y*Z+SR*X;
-		_31 = T*X*Z+SR*Y; 	_32 = T*Y*Z-SR*X;	_33 = T*Z2+CR;
+		x.x = T*X2+CR;		x.y = T*X*Y+SR*Z; 	x.z = T*X*Z-SR*Y;
+		y.x = T*X*Y-SR*Z;	y.y = T*Y2+CR;		y.z = T*Y*Z+SR*X;
+		z.x = T*X*Z+SR*Y; 	z.y = T*Y*Z-SR*X;	z.z = T*Z2+CR;
 
-		_14 = _24 = _34 = _41 = _42 = _43 = 0.0f;
-		_44 = 1.0f;
+		x.w = y.w = z.w = t.x = t.y = t.z = 0.0f;
+		t.w = 1.0f;
 
 		return *this;
 	}
+
 	F4 eulABC() {
 
 		F4 abc(0.0, acos(x.z)-(PI/2.0) ), N;	// B
@@ -5672,7 +5715,7 @@ public:
 		if( nM >= nX )
 			return NULL; // nincsen több hely
 
-		pM[iM=nM] = U4x4( x, 0, 0, min(iM,nLIM) );
+		pM[iM=nM] = U4x4( x, 0, 0, gpmMIN(iM,nLIM) );
 		nM++;
 		n_load = sizeof(*pM)*nM;
 
@@ -6241,14 +6284,14 @@ szasz:
 
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( I8 i, U4 n, bool bZ = true, U4 stp = 0 ) {
-		if( i < 0 )
-			i *= -1;
+	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 ) {
+		if( iPC < 0 )
+			iPC *= -1;
 		if( !stp )
 			stp = n;
-		U8	e = i*stp + n;
+		U8	e = iPC*stp + n;
 		if( e <= n_load )
-			 return p_alloc + i*stp; //n;
+			 return p_alloc + iPC*stp; //n;
 
 		U8 s = -1, ee = e+n*3;
 
@@ -6258,7 +6301,7 @@ szasz:
 		if( n_load > e )
 			n_load = e;
 
-        return p_alloc + i*stp; //*n;//+e-n*2;
+        return p_alloc + iPC*stp; //*n;//+e-n*2;
 	}
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
 	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_OFF,

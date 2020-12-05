@@ -155,7 +155,11 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 
 	return *this;
 }
-
+///-------------------------------------------------------------
+///
+///                         gpcSRC
+///
+///-------------------------------------------------------------
 gpcSRC::gpcSRC( gpcSRC& B ) {
 	gpmCLR;
 	*this = B;
@@ -175,6 +179,17 @@ gpcSRC::~gpcSRC() {
 	gpmDELary(pMAP);
 	gpmDEL(pCORE);
 }
+/*U1* gpcSRC::srcMEMiPC( gpOBJ* pOBJ ) {
+    if( this ? !pOBJ : true )
+        return NULL;
+
+    U1* pU1 = srcMEMiPC( pOBJ->iPC, pOBJ->sOF() );
+    if( pU1 ? (pOBJ->cID() != gpeCsz_ptr) : true )
+        return pU1;
+
+    gpPTR* pPTR = (gpPTR*)pU1;
+    return pMEM->iPC( pPTR->iPC, pPTR->sOF() );
+}*/
 gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) {
 	if( this ?
 				   ( fxyz.x <= 0 ||	fxyz.y <= 0 )
@@ -185,8 +200,8 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 	if( !p1 ) // ki lehet vele kapcsolni a keret rajzolást ha nem kap pointert
 		return this;
 
-	for( I4 r = max(xy.y,0); r < fxyz.y; r++ )
-	for( I4 c = max(xy.x,0) + r*fxyz.z, s = c-xy.x, ce = c+fxyz.x-s; c < ce; c++ )
+	for( I4 r = gpmMAX(xy.y,0); r < fxyz.y; r++ )
+	for( I4 c = gpmMAX(xy.x,0) + r*fxyz.z, s = c-xy.x, ce = c+fxyz.x-s; c < ce; c++ )
 			p1[c] = 0;
 
 	if( bSW&gpeMASSoffMSK )
@@ -194,25 +209,25 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 
 	// UP
 	if( xy.y >= 0 )
-	for( I4 yz = xy.y*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
+	for( I4 yz = xy.y*fxyz.z, c = gpmMAX(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
 	{
 		p1[c].z = fr;
 		p1[c].w |= 0x1;
 	}
 	//DWN
-	for( I4 yz = (fxyz.y-1)*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
+	for( I4 yz = (fxyz.y-1)*fxyz.z, c = gpmMAX(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
 	{
 		p1[c].z = fr;
 		p1[c].w |= 0x4;
 	}
 	// LEFT
-	for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fxyz.z ; r < fxyz.y; r++, rr += fxyz.z )
+	for( I4 r = gpmMAX(xy.y,0), rr = gpmMAX(xy.x,0) + r*fxyz.z ; r < fxyz.y; r++, rr += fxyz.z )
 	{
 		p1[rr].z = fr;
 		p1[rr].w |= 0x8;
 	}
 	// RIGHT
-	for( I4 r = max(xy.y,0), rr = fxyz.x-1 + r*fxyz.z; r < fxyz.y; r++, rr += fxyz.z )
+	for( I4 r = gpmMAX(xy.y,0), rr = fxyz.x-1 + r*fxyz.z; r < fxyz.y; r++, rr += fxyz.z )
 	{
 		p1[rr].z = fr;
 		p1[rr].w |= 0x2;
@@ -374,6 +389,11 @@ I4x2 gpcSRC::SRCmini(
 	return cxy;
 }
 
+///-------------------------------------------------------------
+///
+///                         gpcMASS
+///
+///-------------------------------------------------------------
 gpcMASS::~gpcMASS()
 {
 	gpcSRC** ppS = ppSRC();

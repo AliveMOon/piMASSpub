@@ -1,4 +1,5 @@
 #include "gpcSRC.h"
+#include "gpccrs.h"
 U1 gpaALFsub[0x100];
 char gpaALF_H_sub[0x100];
 char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
@@ -6,8 +7,7 @@ char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{}
 		*gppTAB = gpsTAB+strlen(gpsTAB),
 		gpsNDAT[] = "-bwllqqqqxxxxxxxx";
 
-U1* gpf_aALF_init( void )
-{
+U1* gpf_aALF_init( void ) {
 	for( int i = 0; i < 0x100; i++ )
 	{
 		if( i >= 'A' && i <= 'Z')
@@ -28,10 +28,7 @@ U1* gpf_aALF_init( void )
 	gpaALF_H_sub['_'] = ('_'-'E')+('A'-1);
 	return gpaALFsub;
 }
-
-
-gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
-{
+gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
 	if( p_end < pS )
 	{
 		if( ppS )
@@ -287,8 +284,8 @@ void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub ) {
 	psHD += sprintf( 	psHD, "\r\nbSW:0x%0.8x",
 						bSW );
 	if( psHD > gpsHD )
-		std::cout << gpsHD;
-	std::cout << "." ;
+		if(bSTDcout){std::cout << gpsHD;}
+	if(bSTDcout){std::cout << ".";}
 }
 gpcLZYdct* gpcMASS::pOPER() {
 	if(!this)
@@ -339,6 +336,20 @@ gpcLZYdct* gpcMASS::pOPER() {
 	return &OPER;
 }
 
+U1 gpcSRC::srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ) {
+	if( !this )
+		return 0;
+	if( msBLD ? msBLD > pW->mSEC.x : true )
+		return 2;
+
+	msBLD = 0;
+	U1 iSCP = 0;
+	if( !gpmSCP.nLNK() )
+		return 0;
+
+	srcCMPLR( *pW->piMASS->pOPER(), iSCP, pW, pSRCstk );
+	return 1;
+}
 
 
 

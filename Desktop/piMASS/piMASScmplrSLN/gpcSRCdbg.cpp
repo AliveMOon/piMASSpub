@@ -19,15 +19,16 @@
 
 static char gpsDBGpub[0x1000];
 
-void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP )
-{
+void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
 	if( !gpmSCP.nASM() )
 		return;
 	//U4 iOPe = dOP.nIX();
-	std::cout << stdDBG " DBG" stdRESET << std::endl;
+#ifdef stdON
+	if(bSTDcout){std::cout << stdDBG " DBG" stdRESET << std::endl;}
+#endif // stdOFF
 
 #ifdef piMASS_DEBUG
 	gpCNST	*pOBs, *pOBd;

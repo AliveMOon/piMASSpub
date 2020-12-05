@@ -92,13 +92,20 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wzero-as-null-pointer-constant" />
 			<Add option="-Wfatal-errors" />
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add option="`sdl2-config --cflags`" />
+			<Add directory="/home/alivemoon/Asztal/userland" />
+			<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+			<Add directory="/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys" />
 		</Compiler>
 		<Linker>
-			<Add option="`sdl2-config --libs` -pthread -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf" />
+			<Add option="`sdl2-config --libs`" />
+			<Add option="-pthread" />
+			<Add option="-lSDL2 -lSDL2_mixer" />
+			<Add option="-lSDL2_image -lSDL2_ttf" />
 			<Add library="GL" />
 			<Add library="GLEW" />
 			<Add library="SDL2" />
@@ -123,7 +130,11 @@
 		<Unit filename="gpcSRCdbg.cpp" />
 		<Unit filename="gpcSRCinst.cpp" />
 		<Unit filename="gpcSRCinst.h" />
+		<Unit filename="gpcSRCinstADD.cpp" />
 		<Unit filename="gpcSRCinstALU.cpp" />
+		<Unit filename="gpcSRCinstENTRY.cpp" />
+		<Unit filename="gpcSRCinstMOVE.cpp" />
+		<Unit filename="gpcSRCinstMUL.cpp" />
 		<Unit filename="gpcSRCinstRUN.cpp" />
 		<Unit filename="gpcSRClnk.cpp" />
 		<Unit filename="gpcSRClnk.h" />

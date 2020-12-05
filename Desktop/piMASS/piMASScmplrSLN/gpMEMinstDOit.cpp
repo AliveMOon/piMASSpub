@@ -4,6 +4,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+extern char gpsPUB[0x1000];
 I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
@@ -13,10 +14,15 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( cnt == pGT->iCNT )
 		return cnt;
 
-	std::cout << stdALU "SLMP" << pGT->iCNT;
-
+#ifdef stdON
+	if(bSTDcout){std::cout << stdALU "SLMP" << pGT->iCNT;}
+#endif
 	gpOBJ	*pOi = pOBJ(gpeALF_RINP),
-			*pOo = pOBJ(gpeALF_ROUT);
+			*pOo = pOBJ(gpeALF_ROUT),
+			*apO[2];
+    apO[0] = pOBJ(gpeALF_BILL),
+    apO[1] = pOBJ(gpeALF_JOHN);
+
 	I8x2 an;
 	U1* pU1;
 	gpcSRC* pS2;
@@ -32,8 +38,10 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 
 	if( pOi )
 	{
-		std::cout << stdALU "rINP" << std::endl;
-		pU1 = pSRC->srcMEMiPC( pOi->iPC, gpeCsz_l );
+	#ifdef stdON
+		if(bSTDcout){std::cout << stdALU "rINP" << std::endl;}
+    #endif
+		pU1 = pOi->pU1(); // pSRC->srcMEMiPC( pOi->iPC, gpeCsz_l );
 		if( pU1 )
 		{
 			an.x = *(U4*)pU1;
@@ -44,20 +52,22 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 			{
 				xfnd = pMASS->getXFNDan( an+I8x2( i, 0 ) );
 				pS2 = xfnd ? pMASS->srcFND( xfnd ) : NULL;
-				if( pS2 )
-				{
-					pS2->pMINI = pS2->pMINI->lzyFRMT( s=0, "\r\n" ); //\r\n" );
-					pS2->pMINI = pS2->pMINI->lzyROBnDstat( s=0, *pROBnD, i, "" );
-				}
+				if( !pS2 )
+                    continue;
+                pS2->pMINI = pS2->pMINI->lzyFRMT( s=0, "\r\n" ); //\r\n" );
+                pS2->pMINI = pS2->pMINI->lzyROBnDstat( s=0, *pROBnD, i, "" );
+
+                pROBnD->aDrc[i].asyncSYS( gpsPUB, apO[i]->pU1() );
 			}
 		}
 	}
 
 	if( !pOo )
 		return pGT->iCNT;
-
-	std::cout << stdALU "rOUT" << std::endl;
-	pU1 = pSRC->srcMEMiPC( pOo->iPC, gpeCsz_l );
+#ifdef stdON
+	if(bSTDcout){std::cout << stdALU "rOUT" << std::endl;}
+#endif
+	pU1 = pOo->pU1(); // pSRC->srcMEMiPC( pOo->iPC, gpeCsz_l );
 	if( !pU1 )
 		return pGT->iCNT;
 	an.x = *(U4*)pU1;
@@ -82,15 +92,13 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 #define gpdGLapPIC gpdGL->apPIC
 #define gpdGLaPICid gpdGL->aPICid
 #define gpdGLpCAM (gpdGL->pCAM?gpdGL->pCAM:(gpdGL->pCAM = new gpcPICAM))
-I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
-{
+I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 	bool bCID = this ? !pU1 : true;
 	gpcGT* pGT;
-	I4 cID = -1;
 	if( obj.cAN != gpeCsz_a )
-	{
-		return cID;
-	}
+        return gpeCsz_OFF;
+
+	I4 cID = gpeCsz_OFF;
 	switch( obj.AN.alf )
 	{
 		/// --------------------------------------------------------------------------
@@ -100,15 +108,17 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 			if( port < 1 ) break;
 			pGT = pMASS->GTacpt.GT( obj.AN.alf, port );
 			if( !pGT ) break;
-			std::cout << stdALU " TNET" << std::endl;
+			#ifdef stdON
+			if(bSTDcout){std::cout << stdALU " TNET" << std::endl;}
+			#endif
 			pGT->GTlst( pWIN, pMASS->GTcnct );
 		} break;
 		/// --------------------------------------------------------------------------
 		/// CONNECT
 		case gpeALF_SLMP: {									cID = gpeCsz_b; if( bCID ) break;
-				pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
-				instDOitSLMP( pGT );
-			} break;
+            pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
+            instDOitSLMP( pGT );
+        } break;
 		case gpeALF_SYNC: {									cID = gpeCsz_b; if( bCID ) break;
 			pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
 			if( !pGT ) break;
@@ -136,10 +146,10 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 			U4 iCAM = *(U4*)pU1;
 			if( !iCAM )
 				break;
-			if( gpdGLapPIC[0] = pMASS->PIC.PIC( I8x2(obj.AN.alf,iCAM) ) ) {
-				/*if( !gpdGP->pCAM )
-					gpdGP->pCAM = new gpcPICAM;*/
-				U1* pRGB = gpdGLapPIC[0]->getPIX( gpdGLpCAM, pWIN->mSEC.y ); //50 );
+			if(gpdGLapPIC[0] = pMASS->PIC.PIC(I8x2(obj.AN.alf,iCAM))) {
+				//gpcPICAM* pCAM = gpdGLpCAM;
+				//if(bSTDcout){std::cout << "gpdGLapPIC[0] = " << (U8)gpdGLapPIC[0]  << std::endl;}
+				U1* pRGB = gpdGLapPIC[0]->getPIX( gpdGLpCAM, pWIN->mSEC.y ); // pCAM, pWIN->mSEC.y );
 				if( pRGB )
 				{
 					if( gpdGLpCAM->bGD() )
@@ -169,7 +179,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 		/// GFX
 		case gpeALF_PIC: {								cID = gpeCsz_b; if( bCID ) break;
 			U1* pS = pU1;
-			I4 picID 	= obj.bSTR()
+			I4 picID 	= obj.bUTF8()
 						? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
 						: *(I4*)pU1;
 			gpcPIC* pPIC = pMASS->PIC.PIC( picID );
@@ -195,3 +205,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 )
 	}
 	return cID;
 }
+
+
+
+

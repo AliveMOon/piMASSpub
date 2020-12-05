@@ -987,7 +987,9 @@ typedef enum gpeALF:I8
 	gpeALF_DEBUG = gpdABCDE('D', 'E', 'B', 'U', 'G'),
 	gpeALF_DEBUS = gpdABCDE('D', 'E', 'B', 'U', 'S'),
 	gpeALF_ENTER = gpdABCDE('E', 'N', 'T', 'E', 'R'),
+
 	gpeALF_entry = gpdABCDE('E', 'N', 'T', 'R', 'Y'),
+
 	gpeALF_ERECT = gpdABCDE('E', 'R', 'E', 'C', 'T'),
 	gpeALF_HELLO = gpdABCDE('H', 'E', 'L', 'L', 'O'),
 	gpeALF_GETMX = gpdABCDE('G', 'E', 'T', 'M', 'X'),

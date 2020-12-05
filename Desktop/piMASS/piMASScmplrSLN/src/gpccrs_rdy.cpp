@@ -40,7 +40,7 @@ bool gpcCRS::miniRDYesc( gpcWIN* pWIN, gpcPIC* pPIC ) {
 		CRSfrm.y = CRSfrm.w;
 		bESC = true;
 	}
-	I4x2 &div = pWIN->wDIVcr( id ).a4x2[0];
+	I4x2 div = pWIN->wDIVcr( id ).a4x2[0];
 	fxyz.z = pPIC->txWH.z;
 	if( bESC )
 	{
@@ -100,7 +100,10 @@ U4 gpcCRS::miniRDYmap(
 
 	gpcSRC* pSrC = NULL;
 	U1 oo;
-	std::cout << stdRDY " RDY";
+#ifdef stdON
+	if(bSTDcout){std::cout << stdRDY " RDY";
+#endif // stdOFF
+
 	for( i = 0; i < ie; i++ ) {
 		if( !pM[i] )
 			continue;
@@ -256,7 +259,7 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 			continue;
 
 		i = r*z;
-		fxyz.y = min( CRSfrm.w, (xyCR.y + xyCR.w) );
+		fxyz.y = gpmMIN( CRSfrm.w, (xyCR.y + xyCR.w) );
 		for( U4 c = 0; c < mZN.x; c++ )
 		{
 			xyCR.x = psCp[c]+CRSfrm.x;
@@ -269,7 +272,7 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 			if( (xyCR.x + xyCR.z) < 0 )
 				continue;
 
-			fxyz.x = min( CRSfrm.z, (xyCR.x + xyCR.z) );
+			fxyz.x = gpmMIN( CRSfrm.z, (xyCR.x + xyCR.z) );
 			a = c+1;
 			c16fr = bON&(iON == i+c) ? gpeCLR_white : gpeCLR_blue2;
 			c16ch = gpeCLR_blue2;

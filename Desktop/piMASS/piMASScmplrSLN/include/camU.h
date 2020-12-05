@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef _RASPICAM_TYPES_H
 #define _RASPICAM_TYPES_H
-
 //namespace raspicam {
 
     /**Image formats
@@ -133,6 +132,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //};
 #endif
 
-
+//#define gpdCAMu gpcCAMubi
 
 #endif // CAMU_H_INCLUDED

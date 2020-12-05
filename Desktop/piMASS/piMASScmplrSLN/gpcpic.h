@@ -27,59 +27,97 @@
 //GLOVAL(void)
 bool gpfSRFjpgSAVE( U1* pFILE, SDL_Surface* pSRF, I4 q );
 gpcLZY* gpfSRF2JPG( gpcLZY* pBUFF, SDL_Surface* pSRF, I4 q );
-#ifndef gpdSYSpi
+#ifdef gpdSYSubi
 
+#include <linux/v4l2-common.h>
+#include <linux/v4l2-controls.h>
+#include <linux/videodev2.h>
+#include <sys/mman.h>
 
 class gpcCAMubi
 {
     U1 frm;
     U4x2 wh;
     U4 nGRB;
+
+//-lraspicam
+//-lvcos
+//-lbcm_host
+//-lmmal -lmmal_core
+//-lmmal_util
+//-lmmal_vc_client
+    /// openCAM ----------------------------------------------------------------
+    int fd;                             ///  1. Open the device ---------------
+    v4l2_capability     capability;     ///  2. Ask the device if it can capture frames
+    v4l2_fmtdesc        fmtdesc;        ///  3. VIDIOC_ENUM_FMT-----------------
+    v4l2_frmsizeenum    frmsize;        ///  4. VIDIOC_ENUM_FRAMESIZES ---------
+    /// setCaptureSize ---------------------------------------------------------
+    v4l2_format         format;         ///  5. VIDIOC_S_FMT -------------------
+    v4l2_requestbuffers requestBuffer;  ///  6. VIDIOC_REQBUFS -----------------
+    v4l2_buffer         queryBuffer;    ///  7. VIDIOC_QUERYBUF ----------------
+    int type;                           ///  8. VIDIOC_STREAMON ----------------
+    /// greb -------------------------------------------------------------------
+    v4l2_buffer         bufferinfo;     ///  9. VIDIOC_QBUF --------------------
+                                        /// 10. VIDIOC_DQBUF -------------------
+    /// retrieve ---------------------------------------------------------------
+                                        /// 11. VIDIOC_STREAMOFF ---------------
+
+    //v4l2_frmivalenum frmival;
+
+
     bool bOPEN;
+    U1      wip;
 public:
+    char* pBUFF;                        /// mmap << queryBuffer.length
+    U4x2 wh0;
+
+
     void setFormat( RASPICAM_FORMAT f )
     {
         frm = f;
     }
-    void setCaptureSize( U4 w, U4 h )
-    {
-        wh.x = w;
-        wh.y = h;
-    }
-    bool open()
-    {
-        if( bOPEN )
-            return bOPEN;
+    int setCaptureSize( U4 w, U4 h, U4 picFRM = V4L2_PIX_FMT_RGB24 );
 
-        return bOPEN = true;
-    }
-    U4 getImageTypeSize( RASPICAM_FORMAT f )
+    U4 getImageTypeSize( RASPICAM_FORMAT f );
+    bool    openCAM();
+    U4      grab();
+    U1*     getImageBufferData() { return (U1*)pBUFF; }
+    U4 getWidth() { return wh.x; }
+    U4 getHeight() { return wh.y; }
+
+    void* retrieve( void *pPIX, RASPICAM_FORMAT f );
+
+    gpcCAMubi(){ gpmCLR; fd = -1; };
+    void closeCAM()
     {
-        return 0;
+        int res;
+        if( fd > -1 )
+        {
+            /// 10. VIDIOC_DQBUF --------------------
+            if(bSTDcout){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
+            res = ioctl(fd, VIDIOC_DQBUF, &bufferinfo);
+            if( res >= 0)
+            if(bSTDcout){std::cout << "10.2 VIDIOC_DQBUF --------------------" << std::endl;}
+
+            res = ioctl(fd, VIDIOC_STREAMOFF, &type);
+
+            close(fd);
+            fd = -1;
+        }
+        if( !pBUFF )
+            return;
+        munmap(pBUFF, queryBuffer.length);
+        pBUFF = NULL;
     }
-    U4 getWidth()
+    ~gpcCAMubi()
     {
-        return wh.x;
+        if(bSTDcout){std::cout << "~gpcCAMubi() ---------------" << std::endl;}
+        closeCAM();
     }
-    U4 getHeight()
-    {
-        return wh.y;
-    }
-    U4 grab()
-    {
-       return nGRB++;
-    }
-		// Extract the image
-    void* retrieve( void *pPIX, RASPICAM_FORMAT f )
-    {
-        return pPIX;
-    }
-    gpcCAMubi(){ gpmCLR; };
 };
 #endif
 
-class gpcPICAM
-{
+class gpcPICAM {
 	bool bCAMU;
 public:
 	gpdCAMu	cam;
@@ -97,14 +135,12 @@ public:
 
 		// Allowable widths: 320, 640, 1280
 		// Allowable heights: 240, 480, 960
-		// setCaptureSize(width,height)
-		wh = I4x2( gpdRPI_WIDTH,gpdRPI_HEIGHT );
-		cam.setCaptureSize( wh.x, wh.y );
+		cam.wh0 = wh = I4x2( gpdRPI_WIDTH,gpdRPI_HEIGHT );
+		//cam.setCaptureSize( wh.x, wh.y );
 
 		// Open camera
 		//cout<<"Opening Camera..."<<endl;
-		if( !cam.open() )
-		{
+		if( !cam.openCAM() ) {
 			//cerr<<"Error opening camera"<<endl;return -1;
 			return;
 		}
@@ -187,14 +223,12 @@ public:
 		U8 wA = 0, wB = 0, nW = 0;
 		lurd.a4x2[0] = picWH = I4x2(rg,Mwh.y);
 		lurd.a4x2[1].null();
-		if( !nA )
-		{
+		if( !nA ) {
 			nA = rg*Mwh.y;
 		}
 		I4 i = 0,a,b,ab;
 
-		for( nRD = 0; nRD < nR; nRD++ )
-		{
+		for( nRD = 0; nRD < nR; nRD++ ) {
 			a = pFILL[nRD].x;
 
 			nRD++;
@@ -730,7 +764,7 @@ public:
         if( pitch == pREF->pitch )
             memcpy( pLOCK, pREF->pixels, pitch*pREF->h );
         else {
-            U4 p = min(pitch,pREF->pitch );
+            U4 p = gpmMIN(pitch,pREF->pitch );
             for( U4 i = 0, ip = pREF->pitch, ie = pREF->h*ip,
                     j = 0, jp = pitch;
 

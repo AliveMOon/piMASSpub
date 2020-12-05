@@ -94,7 +94,6 @@ public:
 	}
 
 };
-
 class gpcC {	/// CLASS
 	/// ebben lehet bővebben
 	/// mert ez a CLASS a "leírás"
@@ -153,7 +152,6 @@ public:
 	}
 
 };
-
 class gpcPIK {
 public:
 	gpcLZY	cLST,	// CLASS LIST
@@ -214,6 +212,9 @@ public:
 
 };
 
+
+
+
 class gpC {
 public:
 	U4x4	*pLST;	/// pLST[i].x&0xf gpeCsz // pLST[i].x>>4 iCnm 28bit 64millio
@@ -272,8 +273,8 @@ public:
 class gpO {
 public:
 
-	U2	oID,		// 	0	// obj id
-		cID,		/// 2	// class id // gpeCsz_ptr *pntr
+	U2	oID,	// 	0	// obj id
+		cID,	/// 2	// class id // gpeCsz_ptr *pntr
 		iD,		// 	4	// dim id	// 0 1x1
 		iM;		// 	6	// mom id	// szülő kapcsota
 

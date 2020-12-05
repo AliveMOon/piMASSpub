@@ -591,8 +591,8 @@ public:
 		/// ON -----------------------------------------------------
 		if( crs.id ==win.onDIV.x )
 		{
-			dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
-			dstPX.y = max( 0, scnZN0.w+CRSfrm.y );
+			dstPX.x = gpmMAX( 0, scnZN0.z+CRSfrm.x );
+			dstPX.y = gpmMAX( 0, scnZN0.w+CRSfrm.y );
 
 			wh = crs.scnZN.a4x2[1]; //+CRSfrm.a4x2[0];
 			wh += CRSfrm.a4x2[0];
@@ -732,8 +732,8 @@ public:
 		/// ON -----------------------------------------------------
 		if( crs.id == win.onDIV.x )
 		{
-			dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
-			dstPX.y = max( 0, scnZN0.w+CRSfrm.y );
+			dstPX.x = gpmMAX( 0, scnZN0.z+CRSfrm.x );
+			dstPX.y = gpmMAX( 0, scnZN0.w+CRSfrm.y );
 
 			wh = crs.scnZN.a4x2[1]; //+CRSfrm.a4x2[0];
 			wh += CRSfrm.a4x2[0];
@@ -1048,8 +1048,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 				U4x2 iSKIP = c+r*mZN.z;
 
-				dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-				dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+				dstPX.x = gpmMAX( 0, pCp[c]+CRSfrm.x );
+				dstPX.y = gpmMAX( 0, pRp[r]+CRSfrm.y );
 				wh.x =	( c < mZN.a4x2[1].x )
 						? pC[c]+pCp[c]
 						: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
@@ -1084,8 +1084,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 
 				iSKIP.y = c+r*mZN.z;
 
-				dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-				dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+				dstPX.x = gpmMAX( 0, pCp[c]+CRSfrm.x );
+				dstPX.y = gpmMAX( 0, pRp[r]+CRSfrm.y );
 
 
 				if( wh.mn() ) {
@@ -1179,8 +1179,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 						   ( (c+1 >= lurdAN.x)	&& (r >= lurdAN.y) )
 						&& ( (c+1 <= lurdAN.z)	&& (r <= lurdAN.w) )
 					) {
-						dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-						dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+						dstPX.x = gpmMAX( 0, pCp[c]+CRSfrm.x );
+						dstPX.y = gpmMAX( 0, pRp[r]+CRSfrm.y );
 
 						wh.x =	( c < mZN.a4x2[1].x )
 								? pC[c]+pCp[c]
@@ -1344,8 +1344,8 @@ bool gpcCRS::miniDRW( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bool
 	/// ON -----------------------------------------------------
 	if( id == oDIV  )
 	{
-		dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
-		dstPX.y = max( 0, scnZN0.w+CRSfrm.y );
+		dstPX.x = gpmMAX( 0, scnZN0.z+CRSfrm.x );
+		dstPX.y = gpmMAX( 0, scnZN0.w+CRSfrm.y );
 
 		wh = scnZN.a4x2[1]; //+CRSfrm.a4x2[0];
 		wh += CRSfrm.a4x2[0];
@@ -1600,8 +1600,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 				U4x2 iSKIP = c+r*mZN.z;
 
-				dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-				dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+				dstPX.x = gpmMAX( 0, pCp[c]+CRSfrm.x );
+				dstPX.y = gpmMAX( 0, pRp[r]+CRSfrm.y );
 				wh.x =	( c < mZN.a4x2[1].x )
 						? pC[c]+pCp[c]
 						: (pC[mZN.a4x2[1].x]+pCp[mZN.a4x2[1].x] + (c-mZN.a4x2[1].x));
@@ -1636,8 +1636,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 
 				iSKIP.y = c+r*mZN.z;
 
-				dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-				dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+				dstPX.x = gpmMAX( 0, pCp[c]+CRSfrm.x );
+				dstPX.y = gpmMAX( 0, pRp[r]+CRSfrm.y );
 
 
 				if( wh.mn() ) {
@@ -1722,8 +1722,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 						   ( (c+1 >= lurdAN.x)	&& (r >= lurdAN.y) )
 						&& ( (c+1 <= lurdAN.z)	&& (r <= lurdAN.w) )
 					) {
-						dstPX.x = max( 0, pCp[c]+CRSfrm.x );
-						dstPX.y = max( 0, pRp[r]+CRSfrm.y );
+						dstPX.x = gpmMAX( 0, pCp[c]+CRSfrm.x );
+						dstPX.y = gpmMAX( 0, pRp[r]+CRSfrm.y );
 
 						wh.x =	( c < mZN.a4x2[1].x )
 								? pC[c]+pCp[c]
@@ -1824,8 +1824,8 @@ bool gpcCRS::miniDRWtx( gpcWIN& win, U1 sDIV, U1 oDIV, U1 dDIV, I4x4 scnXYCR, bo
 	/// ON ----------------------------------------------pTX-------
 	if( id == oDIV  )
 	{
-		dstPX.x = max( 0, scnZN0.z+CRSfrm.x );
-		dstPX.y = max( 0, scnZN0.w+CRSfrm.y );
+		dstPX.x = gpmMAX( 0, scnZN0.z+CRSfrm.x );
+		dstPX.y = gpmMAX( 0, scnZN0.w+CRSfrm.y );
 
 		wh = scnZN.a4x2[1]; //+CRSfrm.a4x2[0];
 		wh += CRSfrm.a4x2[0];
@@ -2016,7 +2016,7 @@ void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gp
 				pSRC->SRCmini(
 									pMINI, //NULL, //aCRS,
 									miniALL.a4x2[0],
-									min(CRSfrm.z, miniALL.x+(int)pC[c]), min(CRSfrm.w, miniALL.y+(int)pR[r]),
+									gpmMIN(CRSfrm.z, miniALL.x+(int)pC[c]), gpmMIN(CRSfrm.w, miniALL.y+(int)pR[r]),
 									CRSfrm.z, CRSfrm.z,
 									//gpaC64,
 									*this,

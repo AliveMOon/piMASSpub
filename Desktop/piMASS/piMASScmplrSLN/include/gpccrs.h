@@ -157,7 +157,7 @@ class gpcCRS
 
 			if( pSRC = pMASS->SRCnew( tmp, NULL, lurdAN.a4x2[0], -1 ) )
 			{
-				if( max( iSTR.y, iSTR.x ) > pSRC->n_ld_add() )
+				if( gpmMAX( iSTR.y, iSTR.x ) > pSRC->n_ld_add() )
 					iSTR.y = iSTR.x = pSRC->n_ld_add();
 
 				I4	nSTRT = pSRC->pSRCstart(true,4)-pSRC->pSRCalloc(true,4);

@@ -327,7 +327,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 		if( pS < pB )
 		{
 			*pB = 0;
-			std::cout << (char*)pS <<std::endl;; // ; //
+			if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
 			pB = pS;
 		}
 	}
@@ -336,7 +336,7 @@ gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gp
 	if( bITT )
 	if( pS < pB )
 	{
-		std::cout << (char*)pS <<std::endl;; // ; //
+		if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
 		pB = pS;
 	}
 
@@ -444,9 +444,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 			pSRC->rdyBLD();
 		}
 
-		if( pSRC->srcBLD( pWIN, NULL ) ) {
-		//if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
-		// pSRC->srcBLD( pWIN )
+		if( pSRC->srcBLD( pWIN, NULL ) == 1 ) {
 
 			gpmDEL( pSRC->pEXE0 );
 
@@ -984,7 +982,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 								hex.lzyFRMT( s=-1, "\"\r\n" );
 								pS2->SRCcpy( hex.p_alloc, hex.p_alloc+hex.n_load );
 								pS2->srcUPDT();
-								pROBnD->aDrc[i].async( gpsPUB, alu, &res );
+								//pROBnD->aDrc[i].async( gpsPUB, alu, &res );
 
 							}
 

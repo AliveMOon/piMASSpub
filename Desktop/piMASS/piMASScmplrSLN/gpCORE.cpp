@@ -40,7 +40,7 @@ U4 gpCORE::entryOBJ2A0( I8x4 *pM0, char	*pSCPall, gpcLZY* pSCPlnk, gpcWIN* pWIN,
 							aSTK[nSTK].pC =
 								(aSTK[nSTK].cID = pOlnk->cID) < gpeCsz_K
 								? NULL
-								: gpmLZYvali( gpC, &cLST ) + pOlnk->cID-gpeCsz_K;
+ 								: gpmLZYvali( gpC, &cLST ) + pOlnk->cID-gpeCsz_K;
 							continue;
 						}
 
