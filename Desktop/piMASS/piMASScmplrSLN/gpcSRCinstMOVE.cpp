@@ -5,70 +5,8 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
-{
-	switch( inst.a8x2.alf )
-	{
-		case gpeALF_FPS:
-			*(U4*)p_dst = pWIN->mSEC.w;
-			break;
-        case gpeALF_entry: if(pSRC) {
-                U4      *pU4    = (U4*)pUn(pA[7], 4); // pSRC->srcMEMiPC( pA[7], 4 );
-                gpOBJ   *pOa    = pSRC->srcOBJfnd( pU4[1] ),
-                        *pOb = NULL, *pOc = NULL;
-                gpPTR	*pPTR = NULL;
 
-                U4      xfnd    = pMASS->getXFNDan( pOa->AN );
-                if( gpcSRC  *pSRCb  = pMASS->srcFND( xfnd ))
-                {
-                    if( pOb    = pSRC->srcOBJfnd( pU4[0] ))
-                    if( gpOBJ   *pOin   = pSRCb->pMEM->pOBJ(pOb->AN.alf) )
-                    {
-                        /// tervek szerint a isza térési cim A0-ban lesz
-                        U4 nCPY = pOin->sOF();
-                        /*U1  *pUin = pSRCb->srcMEMiPC( pOin->iPC, nCPY ),
-                            *pDST = NULL;
-                        if(bSTDcout_ent)
-                            {std::cout << stdALU << pUin << std::endl;}
-                        pOc = getOBJptr( (U1*)pU4, (pD[7]-pA[7]), 0 );
-                        if( pPTR = (gpPTR*)pSRC->srcMEMiPC( pOc->iPC, pOc->sOF() ) )
-                        {
-                            U4  asOF[2];
-                            asOF[0] = pPTR->iPC ? pPTR->sOF() : 0;
-                            asOF[1] = 0;
-                            if( asOF[0] < nCPY )
-                            {
-                                if( pPTR->cID != pOin->cID() )
-                                {
-                                    pPTR->cID = pOin->cID();
-                                }
-                                pPTR->d2D( pOin->d2D );
-                                asOF[1] = gpmPAD( pPTR->sOF(), 0x10 );
-                                if( !pPTR->iPC )
-                                {
-                                    pPTR->iPC = nDAT;
-                                    nDAT += asOF[1];
-                                }
-                                pDST = pSRC->srcMEMiPC( pPTR->iPC, asOF[1] );
-                            } else
-                                pDST = pSRC->srcMEMiPC( pPTR->iPC, pPTR->sOF() );
-
-                            gpmMcpy( pDST, pUin, asOF[1] );
-                        }*/
-
-                        if(bSTDcout_ent)
-                            {std::cout << stdALU "pSRCb" << std::endl;}
-                    }
-                }
-                pA[0] = pPTR ? pPTR->iPC : 0;
-            } break;
-		default:
-			break;
-	}
-	return p_dst;
-}
-
-gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR  )
+gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR, gpcSRC** ppSRC, gpOBJ** ppOin )
 {
 	if( i >= nROW() )
 		return NULL;
@@ -104,9 +42,47 @@ gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR  )
 
 	I4 cID = gpeCsz_L;
 	if(pO->bAN()) {
-
+		if(ppSRC) {
+			U4 xfnd = pMEM->pMASS->getXFNDan( pO->AN );
+			if( (*ppSRC) = pMEM->pMASS->srcFND( xfnd ) ) {
+				/// STACK ki lehessen szürni a AN loop-okat
+				if( !pMEM->pLZYsrcXFND ) {
+					if( pMEM->pLZYsrcXFNDall ) {
+						pMEM->pLZYsrcXFNDall->lzyRST();
+					} else {
+						pMEM->pLZYsrcXFNDall = new gpcLZY;
+					}
+					pMEM->nXFND = 0;
+					pMEM->pLZYsrcXFND = pMEM->pLZYsrcXFNDall;
+				}
+				U4* pXFND = (U4*)(pMEM->pLZYsrcXFND->Ux( pMEM->nXFND, sizeof(*pXFND) ));
+				(*pXFND) = xfnd;
+			}
+		}
+		return pPTR;
 	}
 	else if( pO->bALF() ) {
+		if( gpcSRC* pSRC = (ppSRC ? *ppSRC : NULL) )
+		{
+			/// pSRC BUILD? ----------------------------
+			if( !pSRC->pMEM )
+				pSRC->msBLD = pMEM->pWIN->mSEC.x + pSRC->msBLTdly;
+			if( !pSRC->srcBLD( pMEM->pWIN, pMEM->pLZYsrcXFND ) )
+				return pPTR;
+			/// ------------------------------------------
+			if( ppOin )
+				*ppOin = pSRC->pMEM->pOBJ(pO->AN.alf);
+			gpPTR* pPin = (*ppOin)->pPTR();
+			pPTR->cpyREF(pPin);
+			pPTR->iPC = -1;
+			return pPTR;
+		}
+
+		if( ppOin )
+			*ppOin = NULL;
+		if( ppSRC )
+			*ppSRC = NULL;
+
 		AN = pO->AN;
 		switch( AN.alf ) {
 			case gpeALF_FPS:			/// beépített FPS
@@ -115,6 +91,7 @@ gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR  )
 			default:
 				AN.alf = gpeALF_null;
 		}
+
 	}
 	else if( pPTR ) {
 		if( pPTR->mNdID < 0 ){
@@ -131,9 +108,11 @@ gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR  )
 		}
 	}
 
+	if( AN.alf == gpeALF_null )
+		return pPTR;
+
 	U4	nA = pMEM->nALL(pPTR->iPC),
 		nC = gpaCsz[cID]*DM.area();
-
 	if( nA < nC ) {
 		/// nem lett még lefoglalva
 		if( nA )
@@ -152,8 +131,7 @@ gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR  )
     return pPTR;
 }
 
-gpPTR* gpBLK::moveAB( gpROW* pRdst, gpPTR* pPsrc )
-{
+gpPTR* gpBLK::moveAB( gpROW* pRdst, gpPTR* pPsrc ) {
 	I4		cIDc,
 			oIDs = (pPsrc ? pPsrc->mNdID : 0),
 			iPCs = -1,
@@ -252,7 +230,7 @@ gpPTR* gpBLK::moveAB( gpROW* pRdst, gpPTR* pPsrc )
 	return pPdst;
 }
 
-gpBLK* gpcSRC::srcINSTmov( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
+gpBLK* gpcSRC::srcINSTmov3( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
     I4  nR = pBLK->nROW(), cID0 = gpeCsz_L;
@@ -285,5 +263,40 @@ gpBLK* gpcSRC::srcINSTmov( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	}
 
 
+	return pBLKm;
+}
+
+gpBLK* gpcSRC::srcINSTmov( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
+	if( !pBLKm )
+		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+    I4  nR = pBLK->nROW();
+    if(!nR)
+        return pBLKm;
+	gpcSRC	*pSRC = NULL;
+	gpROW	*pRa;
+	gpOBJ	*pOa, *pOs = NULL;
+	gpPTR	*pPb = NULL, *pPa;
+	gpeOPid opB, opA;
+	for( I4 iR = nR-1; iR > -1 ; opB=opA, iR-- )
+	{
+		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOs );
+		opA = pRa->pstOP;
+		if( !pPa )
+			continue;
+		if( !pPb )
+		{
+			pPb = pPa; // pBLK->BLKpPTR( pS )->cpy( pMEM, pPa );
+			continue;
+		}
+
+		switch( pRa->pstOP ) {
+			case gpeOPid_mov:
+			default:
+				_nop;
+				pPa->cpyREF(pPb);
+				pPb = pPa;
+				continue;
+		}
+	}
 	return pBLKm;
 }

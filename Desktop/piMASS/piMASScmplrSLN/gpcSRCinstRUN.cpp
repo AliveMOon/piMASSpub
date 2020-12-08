@@ -174,7 +174,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	gpOBJ* pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
 	U4x4* pL0 = aSCOOP[0].pLNK();
 	I8x4* pMN0 = aSCOOP[0].pMN();
-	U1* pU1, *pSRC = aSCOOP[0].p_str;
+	U1* pU1, *pSRC = aSCOOP[0].p_str, *pUdbg = NULL;
 	const char *pS;
 	U8 s = -1, nS;
 	bool bTMP;
@@ -190,7 +190,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 				continue;
 		bTMP = obj.dctID < 0 || (obj.cAN != gpeCsz_a);
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPTR );
-
+		pUdbg = pLZY ? pLZY->p_alloc : NULL;
 		gpPTR* pP = obj.pPTRu1();
 		area = pP->pd2D()->area();
 		pU1 = pP->pU1(obj.pMEM);
@@ -213,7 +213,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 					{
 						case gpeCsz_B:
 						case gpeCsz_b:
-								pLZY = pLZY->lzyFRMT( (s=-1), " %s,", pU1 );
+								pLZY = pLZY->lzyFRMT( (s=-1), " %s,", *pU1?(char*)pU1:"?" );
 						default:
 							continue;
 					}
@@ -222,7 +222,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
                 if( obj.dctID > -1  )
 					break;
 
-				pLZY = pLZY->lzyFRMT( (s=-1), "%s,", pU1 );
+				pLZY = pLZY->lzyFRMT( (s=-1), "%s,", pU1?(char*)pU1:"?" );
 				continue;
 		}
 
@@ -253,7 +253,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 					{
 						case gpeCsz_B:
 						case gpeCsz_b:
-								pLZY = pLZY->lzyFRMT( s, " %s,", pU1 );
+								pLZY = pLZY->lzyFRMT( s, " %s,", pU1?(char*)pU1:"?" );
 						default:
 							break;
 					}
@@ -266,7 +266,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 			case gpeCsz_w: pLZY = pLZY->lzyFRMT( s, " 0x%0.4x,", *(U2*)pU1 ); break;
 			case gpeCsz_B: pLZY = pLZY->lzyFRMT( s, " %d,", *(I1*)pU1 ); break;
 			case gpeCsz_b:	if( area > 1 ) {
-								pLZY = pLZY->lzyFRMT( s, " %s,", pU1 );
+								pLZY = pLZY->lzyFRMT( s, " %s,", pU1?(char*)pU1:"?" );
 								break;
 							}
 							pLZY = pLZY->lzyFRMT( s, " 0x%0.2x,", *(U1*)pU1 );
@@ -278,6 +278,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 
 		}
 	}
+	pUdbg = pLZY ? pLZY->p_alloc : NULL;
 	return pLZY;
 }
 

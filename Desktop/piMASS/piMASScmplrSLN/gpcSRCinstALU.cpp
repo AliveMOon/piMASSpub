@@ -1001,8 +1001,7 @@ gpINST* gpMEM::instALU() {
 		default: {
 			switch(gpaOPgrp[ins.op]) {
 					case gpeOPid_entry:{
-							switch(ins.op)
-							{
+							switch(ins.op) {
 								case gpeOPid_dot:
 									// find OBJ
 									break;
@@ -1015,8 +1014,7 @@ gpINST* gpMEM::instALU() {
 					case gpeOPid_mov:{
 							if( !p_dst || !p_src )
 								break;
-							switch(ins.op)
-							{
+							switch(ins.op) {
 								case gpeOPid_mov:
 								default:
 									gpmMcpy( p_dst, p_src, sOF );
@@ -1027,8 +1025,7 @@ gpINST* gpMEM::instALU() {
 							if( !p_dst || !p_src )
 								break;
 							U8 mx = gpaCszMX[ins.cID];
-							switch( ins.cID )
-							{
+							switch( ins.cID ) {
 								case gpeCsz_Q: gpmMUL( I8, ins.op, mx ); break;
 								case gpeCsz_q:
 									gpmMUL( U8, ins.op, mx );
@@ -1056,8 +1053,7 @@ gpINST* gpMEM::instALU() {
 								case gpeCsz_Q: gpmADD( I8, ins.op ); break;
 								case gpeCsz_q: gpmADD( U8, ins.op ); break;
 								case gpeCsz_L:{
-										switch(ins.op)
-										{
+										switch(ins.op) {
 											case gpeOPid_or:
 												*((I4*)p_dst) |= *((I4*)p_src);
 												break;
@@ -1070,8 +1066,7 @@ gpINST* gpMEM::instALU() {
 										}
 									} break;
 								case gpeCsz_l:{
-										switch(ins.op)
-										{
+										switch(ins.op) {
 											case gpeOPid_or:
 												*((U4*)p_dst) |= *((U4*)p_src);
 												break;
@@ -1096,8 +1091,7 @@ gpINST* gpMEM::instALU() {
 					case gpeOPid_sub:{
 							if( !p_dst || !p_src )
 								break;
-							switch(ins.op)
-							{
+							switch(ins.op) {
 								default:
 									pD[9] = (*p_dst == *p_src);
 									break;

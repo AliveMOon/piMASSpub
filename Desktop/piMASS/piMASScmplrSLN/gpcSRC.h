@@ -1038,7 +1038,7 @@ public:
 	};
 	gpBLK* pRST( gpMEM* pMEM );
 
-	gpPTR* iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR );
+	gpPTR* iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR, gpcSRC** ppSRC = NULL, gpOBJ** ppOin = NULL );
 
 	gpPTR* moveAB( gpROW* pRdst, gpPTR* pPsrc );
 	gpPTR* subAB( char* pS, gpPTR* pPa, gpROW* pRb, bool bADD );
@@ -1268,135 +1268,11 @@ public:
 			return NULL;
 		return lzyMEM.Ux( iPC, nU1, true, sizeof(U1) );
 	}
-	U4 nALL( I4 iPC ) {
-		if( this ? (iPC<0) : true )
-			return 0;
-		I4x4* pA = pALL(iPC);
-		return pA ? pA->y : 0;
-	}
-	I4x4* pALL( I4 iPC ) {
-		if( iPC < 0 )
-			return NULL;
 
-		for( U4 i = 0; i < nALLOC; i++ ) {
-			if( !pALLOC[i].y )
-				continue;
-
-			if( pALLOC[i].x > iPC )
-				continue;
-			if( (iPC-pALLOC[i].x) < pALLOC[i].y )
-				continue;
-
-			return pALLOC+i;
-		}
-		return NULL;
-	}
-	I4 iFREE( I4 iPC ) {
-		if( this ? iPC < 0 : true )
-			return -1;
-
-		I4x4* pA = pALL(iPC);
-		if(!pA)
-			return -1;
-		iPC = pA->i;
-		U4 iF = nFREE;
-		for( U4 i = 0; i < nFREE; i++ )
-		{
-			if( !pFREE[i].n )
-			{
-				if( iF < i )
-					continue;
-
-				iF = i;
-				continue;
-			}
-
-			if( pFREE[i].n+pFREE[i].i != iPC )
-			{
-				if( pFREE[i].i != iPC+pA->n )
-					continue;
-
-				pFREE[i].i = iPC;
-				pFREE[i].n += pA->n;
-				pA->n = 0;
-				return pA->i = -1;
-			}
-
-			pFREE[i].n += pA->n;
-			pA->n = 0;
-			return pA->i = -1;
-		}
-
-		if( iF < nFREE )
-		{
-			pFREE[iF] = *pA;
-			pA->n = 0;
-			return pA->i = -1;
-		}
-
-		I4x4* pKILL = pFREE;
-		nFREE++;
-		pFREE = new I4x4[nFREE];
-		if( pKILL ) {
-			gpmMcpyOF( pFREE, pKILL, iF );
-			delete[] pKILL;
-		}
-		pFREE[iF] = *pA;
-		pA->n = 0;
-		return -1;
-	}
-	I4 iALL( U4 nA ) {
-		if( this ? nA < 1 : true )
-			return -1;
-		I4	nA0x10 = gpmPAD( nA+1, 0x10 ),
-			iA = -1;
-		for( U4 i = 0; i < nFREE; i++ )
-		{
-			if( pFREE[i].n < nA0x10 )
-				continue;
-
-			iA = pFREE[i].i;
-
-			if( (pFREE[i].n-nA0x10) > 0x10 ) {
-				// lecíp
-				pFREE[i].n -= nA0x10;
-				pFREE[i].i += nA0x10;
-			} else {
-				// egészet
-				nA0x10 = pFREE[i].n;
-				pFREE[i].n = 0;
-			}
-			break;
-		}
-		if( iA < 0 ) {
-			iA = nDAT;
-			nDAT += nA0x10;
-		}
-		U4 a = 0;
-		for( ; a < nALLOC; a++ )
-		{
-			if( pALLOC[a].n )
-				continue;
-
-			pALLOC[a].i = iA;
-			pALLOC[a].n = nA0x10;
-			U1* pA = pUn( iA, nA0x10 );
-			pA[nA] = 0;
-			return iA;
-		}
-
-		I4x4* pKILL = pALLOC;
-		nALLOC++;
-		pALLOC = new I4x4[nALLOC];
-		if( pKILL ) {
-			gpmMcpyOF( pALLOC, pKILL, a );
-			delete[] pKILL;
-		}
-
-		U1* pA = pUn( iA, nA0x10 );
-		pA[nA] = 0;
-		return iA;
-	}
+	U4 nALL( I4 iPC );
+	I4x4* pALL( I4 iPC );
+	I4 iFREE( I4 iPC );
+	I4 iALL( U4 nA );
 
 	gpPTR* pPTR( I4 iPC ) { return (gpPTR*)pUn( iPC, sizeof(gpPTR)); }
 
@@ -1485,8 +1361,6 @@ public:
 
 	gpOBJ* srcOBJfnd( I4 dctID );
 	gpOBJ* srcOBJadd( char* pS, I4 dctID );
-//	U1* srcMEMiPC( I4 iPC, U4 nU1 ) { return pMEM->iPC( iPC, nU1 ); }
-//	U1* srcMEMiPC( gpOBJ* pOBJ );
 	gpBLK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  ) {
 		gpBLK	*pBLK = lzyBLOCK.pNEWblk( opID, bIDm, bIDmR, mnID )->pRST( pMEM );
 		gpROW	*pRf = pBLK->pROW(0,true);
@@ -1540,6 +1414,8 @@ public:
 	gpBLK*	srcINSTent( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTmul( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+
+	gpBLK*	srcINSTmov3( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 
 	gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTent2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );

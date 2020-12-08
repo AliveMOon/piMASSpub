@@ -103,6 +103,8 @@ gpPTR* gpcSRC::SRCpPTR( char* pS, gpROW& R ) {
 gpPTR* gpPTR::cpyREF( gpPTR* pRF )
 {
 	gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
+	/*if(iPC<0)
+		return this;*/
 	bckID = pRF->mNdID;
 	return this;
 }

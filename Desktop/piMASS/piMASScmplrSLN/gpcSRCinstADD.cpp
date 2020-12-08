@@ -11,21 +11,21 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
     I4  nR = pBLK->nROW();
     if(!nR)
         return pBLKm;
+	gpcSRC	*pSRC = NULL;
 	gpROW	*pRa;
-	gpOBJ	*pOa;
+	gpOBJ	*pOa, *pOin = NULL;
 	gpPTR	*pPb = NULL, *pPa;
 	gpeOPid opB, opA;
-	for( U4 iR = 0; iR < nR; opB=opA, iR++ )
+	for( I4 iR = 0; iR < nR; opB=opA, iR++ )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa );
+		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOin );
 		opA = pRa->pstOP;
-		if( !pPb )
-		{
+		if( !pPa )
+			continue;
+		if( !pPb ) {
 			pPb = pBLK->BLKpPTR( pS )->cpy( pMEM, pPa );
 			continue;
 		}
-		if( !pPa )
-			continue;
 
 		bool 	bSIGa = pPa->cID&((I4)gpeCsz_B),
 				bSIGb = pPb->cID&((I4)gpeCsz_B),

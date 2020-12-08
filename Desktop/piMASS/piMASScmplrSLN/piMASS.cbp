@@ -106,6 +106,12 @@
 			<Add option="-pthread" />
 			<Add option="-lSDL2 -lSDL2_mixer" />
 			<Add option="-lSDL2_image -lSDL2_ttf" />
+			<Add option="-lraspicam" />
+			<Add option="-lvcos" />
+			<Add option="-lbcm_host" />
+			<Add option="-lmmal -lmmal_core" />
+			<Add option="-lmmal_util" />
+			<Add option="-lmmal_vc_client" />
 			<Add library="GL" />
 			<Add library="GLEW" />
 			<Add library="SDL2" />
@@ -173,9 +179,6 @@
 		<Unit filename="src/gpccrs.cpp" />
 		<Unit filename="src/gpccrs_rdy.cpp" />
 		<Unit filename="src/gpcwin.cpp" />
-		<Extensions>
-			<code_completion />
-			<debugger />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
