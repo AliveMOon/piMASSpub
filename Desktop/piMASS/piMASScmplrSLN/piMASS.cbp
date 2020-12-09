@@ -139,6 +139,7 @@
 		<Unit filename="gpcSRCinstADD.cpp" />
 		<Unit filename="gpcSRCinstALU.cpp" />
 		<Unit filename="gpcSRCinstENTRY.cpp" />
+		<Unit filename="gpcSRCinstFUN.cpp" />
 		<Unit filename="gpcSRCinstMOVE.cpp" />
 		<Unit filename="gpcSRCinstMUL.cpp" />
 		<Unit filename="gpcSRCinstRUN.cpp" />

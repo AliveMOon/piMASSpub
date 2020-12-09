@@ -5,29 +5,7 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
-gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID ) {
-	if( !pBLKm )
-		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-	if( pBLKup )
-		pBLK = pBLKup;
-	I4 aiPC[2], sOF = 0, cID = -1;
-	U1* pU1 = NULL;
 
-	gpPTR	*pUPptr = pBLK->BLKpPTR( pS ),
-			*pDWptr;
-	_move._l.EAl(pUPptr->iPC).A0;
-
-	gpROW *pRm = pBLKm->pROW(pBLK->bIDmR);
-	gpOBJ* pO = srcOBJfnd( pRm->mNdID );
-	pDWptr = pO->pPTRu1();
-
-	//aiPC[1] = pRm ? iPCrow( *pRm, sOF, false ) : gpeCsz_L;
-	//pU1 = srcMEMiPC( iPC, sOF );
-	_move._l.EAl(pDWptr->iPC).A1;
-	_move._L.IA0I.IA1I;
-	_nop;
-	return pBLKm;
-}
 
 gpPTR* gpPTR::pNULL(){ gpmCLR; return this; }
 gpPTR* gpPTR::d2D( I4x2& d2 ){

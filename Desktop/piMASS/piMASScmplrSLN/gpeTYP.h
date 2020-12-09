@@ -70,7 +70,44 @@ typedef enum gpeOPid:U1{
 
 	gpeOPid_SWAP,	gpeOPid_EXTB,	gpeOPid_EXT,	gpeOPid_EXTL,
 } gpeOPid_U1;
+static gpeOPid gpaOPgrp[] = {
+	gpeOPid_nop,
 
+	gpeOPid_mul,	gpeOPid_mul,	gpeOPid_mul,
+
+	gpeOPid_stk,	gpeOPid_stk,
+
+	gpeOPid_comS, 	gpeOPid_comE,	gpeOPid_com,
+
+
+	gpeOPid_mul, 	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_mul,	gpeOPid_mul, 	gpeOPid_mov,
+									gpeOPid_mov,
+	gpeOPid_mul, 	gpeOPid_mov, 	gpeOPid_mov,
+	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_mul,	gpeOPid_mov,
+
+
+	gpeOPid_mov, 	gpeOPid_sub,  	gpeOPid_sub,
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,	/// -------------- GOOD
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
+
+
+	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
+
+	gpeOPid_entry, 	gpeOPid_entry, 	gpeOPid_out,
+	gpeOPid_begin,	gpeOPid_out,
+	gpeOPid_begin, 	gpeOPid_out,
+	gpeOPid_begin, 	gpeOPid_out,
+	gpeOPid_entry,	gpeOPid_entry,
+	gpeOPid_mail,	gpeOPid_str,
+
+	gpeOPid_entry,
+
+	gpeOPid_entry,	gpeOPid_EXT,	gpeOPid_EXT,	gpeOPid_EXT,
+};
 static const char* gpasCsz[] = {
 
 	".b",	//	0	1		00:00	byte
@@ -275,44 +312,7 @@ typedef enum gpeEA:U1 {
 } gpeEA_U1;
 
 
-static gpeOPid gpaOPgrp[] = {
-	gpeOPid_nop,
 
-	gpeOPid_mul,	gpeOPid_mul,	gpeOPid_mul,
-
-	gpeOPid_stk,	gpeOPid_stk,
-
-	gpeOPid_comS, 	gpeOPid_comE,	gpeOPid_com,
-
-
-	gpeOPid_mul, 	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_mul,	gpeOPid_mul, 	gpeOPid_mov,
-									gpeOPid_mov,
-	gpeOPid_mul, 	gpeOPid_mov, 	gpeOPid_mov,
-	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_mul,	gpeOPid_mov,
-
-
-	gpeOPid_mov, 	gpeOPid_sub,  	gpeOPid_sub,
-	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
-	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,	/// -------------- GOOD
-	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
-
-
-	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
-
-	gpeOPid_entry, 	gpeOPid_entry, 	gpeOPid_out,
-	gpeOPid_entry,	gpeOPid_out,
-	gpeOPid_entry, 	gpeOPid_out,
-	gpeOPid_entry, 	gpeOPid_out,
-	gpeOPid_entry,	gpeOPid_entry,
-	gpeOPid_mail,	gpeOPid_str,
-
-	gpeOPid_entry,
-
-	gpeOPid_entry,	gpeOPid_entry,	gpeOPid_entry,	gpeOPid_entry,
-};
 static gpeOPid gpaaOPid[][0x20] = {
 	//gpeOPid_nop,
 	{gpeOPid_nop,},

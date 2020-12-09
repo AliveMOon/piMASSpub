@@ -4,7 +4,70 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
+		///kOBJ(scp); //, iOPe );
+		// a =b*c +d		// iMUL 1
+		// a =b*c/d +e		// iMUL 2
+		// a +=b*c/d +e		// iMUL 3
+		// a +b*c +e		// iMUL 1
+		// a*b +b*c			// iMUL 1
+		///kMUL(scp,false);
+		///LEVaddEXP()[lADD++] = now;
+		///++SP;
+		//if( !pBLK )
+		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 
+		gpROW* pRl = pBLK->pLSTrow();
+		if( !pRl )
+			return pBLK;
+
+		U1* pU1 = NULL;
+		switch( pBLK->opIDgrp() )
+		{
+			case gpeOPid_brakS:
+			case gpeOPid_dimS:
+			case gpeOPid_begin:
+				return srcBLKup( pS, pBLK, opID, mnID );
+			case gpeOPid_add:
+				///							pRl
+				/// a + b - c == d - e + 	f -
+				pRl->pstOP = opID;
+				pBLK->pNEWrow();
+				return pBLK;
+			case gpeOPid_entry: {
+					gpBLK	*pBLKm = srcINSTanDalf( pS, NULL, pBLK );
+					if( pBLKm->opIDgrp() == gpeOPid_add )
+					{
+						pRl = pBLKm->pLSTrow();
+						pRl->pstOP = opID;
+						pBLKm->pNEWrow();
+						return pBLKm;
+					}
+					return srcBLKinsrt( pS, pBLK, opID, mnID );
+				} break;
+			case gpeOPid_mul: {
+					gpBLK	*pBLKm = srcINSTmul( pS, NULL, pBLK );
+					if( pBLKm->opIDgrp() == gpeOPid_add )
+					{
+						/// IGEN volt alatta ADD
+						///				pRl
+						/// a -	b *		c +
+						pRl = pBLKm->pLSTrow();
+						pRl->pstOP = opID;
+						pBLKm->pNEWrow();
+						return pBLKm;
+					}
+					/// NEM volt alatta ADD
+					///				pRl
+					/// a *	b *		c +
+					return srcBLKinsrt( pS, pBLK, opID, mnID );
+				} break;
+			default:
+				break;
+		}
+
+		return srcBLKup( pS, pBLK, opID, mnID );
+	}
 gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );

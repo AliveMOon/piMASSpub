@@ -59,8 +59,33 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 	}
 	return p_dst;
 }
+gpBLK* gpcSRC::srcBLKanDalf( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
+	/// + a0.b
+	/// * a0.b
 
-gpBLK* gpcSRC::srcINSTent( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
+	gpROW* pRl = pBLK->pLSTrow();
+	if( !pRl )
+		return pBLK;
+
+	gpOBJ* pO = srcOBJfnd(pRl->mNdID);
+	switch( pO ? pO->cAN : gpeCsz_OFF )
+	{
+		case gpeCsz_a:
+		case gpeCsz_c:
+			/// a0.b
+			/// b.a0
+			return srcBLKup( pS, pBLK, opID, mnID );
+		case gpeCsz_b:
+			if( pO->bUTF8() )
+			{
+				// itt lehetne egy név alapján keresni
+
+			}
+		default: break;
+	}
+	return pBLK;
+}
+gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
     I4  nR = pBLK->nROW();
@@ -100,8 +125,6 @@ gpBLK* gpcSRC::srcINSTent( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 			pPb->cpyREF(pPa);
 			pPb->iPC = -1;
 			_move._l.EAl( pBLK->iPTR ).A0;
-			/*pPb->cID = pOin->cID();
-			pPb->d2D( *pOin->pd2D() );*/
 			_jsr.EAl( gpeALF_entry );
 
 		_move._q.D7.A7;

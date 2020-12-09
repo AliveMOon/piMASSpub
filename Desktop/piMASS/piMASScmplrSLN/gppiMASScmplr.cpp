@@ -242,58 +242,26 @@ gpBLK* gpcSRC::srcBLKaryAN( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID, gpeCsz cAN
 }
 
 
-gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
-	///kEND(scp);
-	U1* pU1 = NULL;
-	gpBLK* pBLKup = NULL;
-	while( pBLKup ? (pBLKup->opIDgrp != gpeOPid_entry) : !!pBLK )
+
+gpINST* gpMEM::instRDY( gpcLZY* pDBG ) {
+	if( this ? !nCD : true )
+		return this ? pINST : NULL;
+
+	if( !pcCPY )
 	{
-		/// FENT
-		gpBLK	*pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-		gpROW	*pR0 = pBLK->pROW(),
-				*pRd = pBLKm->pROW(pBLK->bIDmR);
-		I4 nR = pBLK->nROW(), iPC, sOF;
-		switch( pBLK->opIDgrp )
-		{
-			case gpeOPid_entry: {
-					pBLKm = srcINSTdwn( pS, pBLKm, pBLK, pBLKup, mnID );
-				} break;
-			case gpeOPid_mov:
-				pBLKm = srcINSTmov( pS, pBLKm, pBLK );
-				break;
-			case gpeOPid_add:
-			case gpeOPid_sub:
-				pBLKm = srcINSTadd( pS, pBLKm, pBLK );
-				// move.l d0, -(A6)
-				break;
-			case gpeOPid_mul:{
-					///			pRl
-					/// a, 		_ +
-					/// a, 		b +
-					/// a = 	b +
-					/// a * 	b +
-				pBLKm = srcINSTmul( pS, pBLKm, pBLK );
-				} break;
-		}
-
-
-		if( !pBLKm )
-			break;
-		/// LENT
-		pBLKup = pBLK;
-		pBLK = pBLKm;
-
+		pcCPY = gpmPAD(nDAT,0x10);
 	}
-	return pBLK;
+	U8 s = -1;
+	pINST = (gpINST*)lzyMEM.Ux( pcCPY, lzyCODE.n_load, true, 1 );
 
-	gpROW	*pRl = pBLK->pLSTrow();
-	if( !pRl )
-		return pBLK;
+	gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
+	nDAT = lzyMEM.n_load;
+	for( I4 i = 0; i < nCD; i++ )
+		pINST[i].instDBG(pDBG,this,lzyMEM.p_alloc);
 
-	pRl->pstOP = opID;
-	/// a veszö egyenlőre csinál helyet
-	pBLK->pNEWrow();
-	return pBLK;
+	pc = 0;
+	aA[7] = iSTK;
+	return pINST;
 }
 void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 	if( !this )
@@ -301,8 +269,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 
 	pDBG = pDBG ? pDBG->lzyRST() : new gpcLZY;
 
-	if( pMEM )
-	{
+	if( pMEM ) {
 		gpmDEL(pMEMo);
         if( pMEM ? pMEM->pGL : NULL )
             gpmDEL( pMEM->pGL->pCAM );
@@ -376,7 +343,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 							case gpeOPid_dimS:
 							case gpeOPid_begin:
 								/// LENT
-								pBLK = srcBLKblkS( pS, mnID, pBLK, opID );
+								pBLK = srcBLKbrakS( pS, mnID, pBLK, opID );
 								/// FENT
 								break;
 							case gpeOPid_end:
@@ -386,7 +353,6 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 								pBLK = srcBLKbrakE( pS, mnID, pBLK, opID, pDBG );
 								/// LENT
 								break;
-
                             default:
 								switch( gpaOPgrp[opID] )
 								{
@@ -402,12 +368,10 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 										break;
 
 									case gpeOPid_entry: { /// (
-										pBLK = srcBLKent( pS, mnID, pBLK, opID, pDBG );
-
+										pBLK = srcBLKanDalf( pS, mnID, pBLK, opID, pDBG );
 										} break;
 									case gpeOPid_out: /// )
 										pBLK = srcBLKout( pS, mnID, pBLK, opID, pDBG );
-
 										break;
 									case gpeOPid_stk: /// , ;
 										pBLK = srcBLKstk( pS, mnID, pBLK, opID, pDBG );

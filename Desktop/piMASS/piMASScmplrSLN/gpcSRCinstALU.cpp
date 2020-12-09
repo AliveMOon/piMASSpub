@@ -5,64 +5,6 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
-gpBLK* gpcSRC::srcBLKblkS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
-
-		///					pRl
-		/// a + 			{		//block level up
-		/// a + 			b{		//block rutine
-		/// a + 			(		//brake block
-		/// a + 			b(		//function
-		/// a + 			b[		//index b
-		//if( !pBLK )
-		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-
-		gpROW* pRl = pBLK->pLSTrow();
-		if( !pRl )
-			return pBLK;
-		if( pBLK->opIDgrp == opID )
-		{
-			/// a + 			{{{{		//block level up
-			/// a + 			b{c(d((		//block rutinepRl->pstOP = opID;
-			pRl->pstOP = opID;
-			pBLK->pNEWrow();
-			return pBLK;
-		}
-		/*if( pRl->iPC < 4 )
-		{
-			gpOBJ* pO = srcOBJfnd( pRl->mNdID );
-			if( !pO )
-				pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
-			*pRl = *pO;
-		}*/
-		return srcBLKup( pS, pBLK, opID, mnID );
-}
-gpBLK* gpcSRC::srcBLKent( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
-	/// + a0.b
-	/// * a0.b
-
-	gpROW* pRl = pBLK->pLSTrow();
-	if( !pRl )
-		return pBLK;
-
-	gpOBJ* pO = srcOBJfnd(pRl->mNdID);
-	switch( pO ? pO->cAN : gpeCsz_OFF )
-	{
-		case gpeCsz_a:
-		case gpeCsz_c:
-			/// a0.b
-			/// b.a0
-			return srcBLKup( pS, pBLK, opID, mnID );
-		case gpeCsz_b:
-			if( pO->bUTF8() )
-			{
-				// itt lehetne egy név alapján keresni
-
-			}
-		default: break;
-	}
-	return pBLK;
-}
-
 gpBLK* gpcSRC::srcINSTent2( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
@@ -985,6 +927,124 @@ gpINST* gpMEM::instALU() {
 			p_dst = NULL;
 			break;
 	}
+	switch(gpaOPgrp[ins.op]) {
+		case gpeOPid_EXT:{
+				switch(ins.op) {
+					case gpeOPid_EXTB:
+						if( p_src ) {
+							*(I8*)p_src = *(I1*)p_src;
+						} break;
+					case gpeOPid_EXT:
+						if( p_src ) {
+							*(I8*)p_src = *(I2*)p_src;
+						} break;
+					case gpeOPid_EXTL:
+						if( p_src ) {
+							*(I8*)p_src = *(I4*)p_src;
+						} break;
+				}
+
+			} break;
+		case gpeOPid_entry:{
+				switch(ins.op) {
+					case gpeOPid_dot:
+						// find OBJ
+						break;
+					case gpeOPid_jsr: {
+							instVAR( pALL + pA[0], ins );
+						} break;
+					default: break;
+				}
+			} break;
+		case gpeOPid_mov:{
+				if( !p_dst || !p_src )
+					break;
+				switch(ins.op) {
+					case gpeOPid_mov:
+					default:
+						gpmMcpy( p_dst, p_src, sOF );
+						break;
+				}
+			} break;
+		case gpeOPid_mul:{
+				if( !p_dst || !p_src )
+					break;
+				U8 mx = gpaCszMX[ins.cID];
+				switch( ins.cID ) {
+					case gpeCsz_Q: gpmMUL( I8, ins.op, mx ); break;
+					case gpeCsz_q:
+						gpmMUL( U8, ins.op, mx );
+						break;
+					case gpeCsz_L:
+						gpmMUL( int, ins.op, mx );
+						break;
+					case gpeCsz_l: gpmMUL( U4, ins.op, mx ); break;
+					case gpeCsz_W: gpmMUL( I2, ins.op, mx ); break;
+					case gpeCsz_w: gpmMUL( U2, ins.op, mx ); break;
+					case gpeCsz_B: gpmMUL( I1, ins.op, mx ); break;
+					case gpeCsz_b: gpmMUL( U1, ins.op, mx ); break;
+					case gpeCsz_f: gpmFMUL( F, ins.op, mx ); break;
+					case gpeCsz_d: gpmFMUL( D, ins.op, mx ); break;
+					case gpeCsz_4: gpmFMUL( U1x4, ins.op, mx ); break;
+					default: break;
+				}
+			} break;
+		case gpeOPid_add:{
+				if( !p_dst || !p_src )
+					break;
+
+				switch( ins.cID )
+				{
+					case gpeCsz_Q: gpmADD( I8, ins.op ); break;
+					case gpeCsz_q: gpmADD( U8, ins.op ); break;
+					case gpeCsz_L:{
+							switch(ins.op) {
+								case gpeOPid_or:
+									*((I4*)p_dst) |= *((I4*)p_src);
+									break;
+								case gpeOPid_sub:
+									*((I4*)p_dst) -= *((I4*)p_src);
+									break;
+								default:
+									*((I4*)p_dst) += *((I4*)p_src);
+									break;
+							}
+						} break;
+					case gpeCsz_l:{
+							switch(ins.op) {
+								case gpeOPid_or:
+									*((U4*)p_dst) |= *((U4*)p_src);
+									break;
+								case gpeOPid_sub:
+									*((U4*)p_dst) -= *((U4*)p_src);
+									break;
+								default:
+									*((U4*)p_dst) += *((U4*)p_src);
+									break;
+							}
+						} break;
+					case gpeCsz_W: gpmADD( I2, ins.op ); break;
+					case gpeCsz_w: gpmADD( U2, ins.op ); break;
+					case gpeCsz_B: gpmADD( I1, ins.op ); break;
+					case gpeCsz_b: gpmADD( U1, ins.op ); break;
+					case gpeCsz_f: gpmADD( F, ins.op ); break;
+					case gpeCsz_d: gpmADD( D, ins.op ); break;
+					case gpeCsz_4: gpmADD( U1x4, ins.op ); break;
+					default: break;
+				}
+			} break;
+		case gpeOPid_sub:{
+				if( !p_dst || !p_src )
+					break;
+				switch(ins.op) {
+					default:
+						pD[9] = (*p_dst == *p_src);
+						break;
+				}
+			} break;
+	}
+	return &ins;
+
 	switch( ins.op ) {
 		case gpeOPid_EXTB:
 			if( p_src ) {
