@@ -69,7 +69,7 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 		{
 			// elrakjuk kell
 			gpmSCP.DCTadd(pos,pS,nS,clrBREAK);
-			// ebben van a " \t\r\n"
+			/// ebben van a " \t\r\n"
 			pos = lenMILL(pos,dim,pS,pS+nS);
 			pS += nS;
 			if( pS >= pUe )

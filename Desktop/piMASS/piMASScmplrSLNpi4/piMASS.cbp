@@ -136,7 +136,12 @@
 		<Unit filename="gpcSRCdbg.cpp" />
 		<Unit filename="gpcSRCinst.cpp" />
 		<Unit filename="gpcSRCinst.h" />
+		<Unit filename="gpcSRCinstADD.cpp" />
 		<Unit filename="gpcSRCinstALU.cpp" />
+		<Unit filename="gpcSRCinstENTRY.cpp" />
+		<Unit filename="gpcSRCinstFUN.cpp" />
+		<Unit filename="gpcSRCinstMOVE.cpp" />
+		<Unit filename="gpcSRCinstMUL.cpp" />
 		<Unit filename="gpcSRCinstRUN.cpp" />
 		<Unit filename="gpcSRClnk.cpp" />
 		<Unit filename="gpcSRClnk.h" />

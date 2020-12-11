@@ -5,27 +5,119 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
-gpBLOCK* gpcSRC::srcINSTdwn( char* pS, gpBLOCK *pBLKm, gpBLOCK* pBLK, gpBLOCK* pBLKup, I4 mnID ) {
-	if( !pBLKm )
-		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-	if( pBLKup )
-		pBLK = pBLKup;
-	I4 aiPC[2], sOF = 0, cID = -1;
-	U1* pU1 = NULL;
 
-	//gpROW *pR0 = pBLK->pROW();
-	//aiPC[0] = iPCrow( pR0, sOF, true );
-	_move._l.EAl(pBLK->iPC).A0;
 
-	gpROW *pRm = pBLKm->pROW(pBLK->bIDmR);
-	aiPC[1] = pRm ? iPCrow( *pRm, sOF, false ) : gpeCsz_L;
-	//pU1 = srcMEMiPC( iPC, sOF );
-	_move._l.EAl(aiPC[1]).A1;
-	_move._L.IA0I.IA1I;
-	_nop;
-	return pBLKm;
+gpPTR* gpPTR::pNULL(){ gpmCLR; return this; }
+gpPTR* gpPTR::d2D( I4x2& d2 ){
+    x = d2.x;
+    y = d2.y;
+    z = 0;
+    return this;
+}
+U4 gpPTR::area(){
+    if( z )
+        return z;
+    return z = x*y;
+}
+U4 gpPTR::sOF(){
+	if( w )
+        return w;
+    if(!cSZ)
+        cSZ = gpaCsz[cID];
+
+    return w = area()*cSZ;
+}
+gpPTR& gpPTR::operator = ( gpBLK* pBLK ) {
+    /// ennek csak az a célja pBLK targetból kimásolja ami van
+    gpmCLR;
+    gpPTR* pBp = pBLK->BLKpPTR( NULL );
+    if( !pBp ) {
+        iPC = -1;
+        cID = gpeCsz_OFF;
+        return *this;
+    }
+	mNdID = pBp->mNdID;
+    iPC = pBp->iPC;
+    cID = pBp->cID;
+    cSZ = gpaCsz[cID];
+    d2D( *pBp->pd2D() );
+    return *this;
+}
+gpPTR& gpPTR::operator = ( gpOBJ* pO ) {
+    /// ennek csak az a célja pBLK targetból kimásolja ami van
+    gpmCLR;
+	gpPTR* pPo = pO->pPTR();
+    if( !pO ) {
+        iPC = -1;
+        cID = gpeCsz_OFF;
+        return *this;
+    }
+    mNdID = pPo->mNdID;
+    iPC = pPo->iPC;
+    cID = pPo->cID;
+    cSZ = gpaCsz[cID];
+    d2D( *pPo->pd2D() );
+    return *this;
 }
 
+gpPTR* gpcSRC::SRCpPTR( char* pS, gpROW& R ) {
+	gpPTR* pPTR = NULL;
+    if( gpBLK* pBup	= 	R.bIDup
+						? lzyBLOCK.pSTPup( R.bIDup, -1, -1, R.mnID )
+						: NULL )
+    if( pBup->iPTR > 0 ) {
+		pPTR = pBup->BLKpPTR( pS );
+        while( pPTR->cID == gpeCsz_ptr ) {
+			pPTR = pMEM->pPTR( pPTR->iPC );
+        }
+        return pPTR;
+    }
+	gpOBJ* pO = srcOBJfnd( R.mNdID );
+	if( !pO )
+		return pPTR;
+    pPTR = pO->pPTR();
+    return pPTR;
+}
+gpPTR* gpPTR::cpyREF( gpPTR* pRF )
+{
+	gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
+	/*if(iPC<0)
+		return this;*/
+	bckID = pRF->mNdID;
+	return this;
+}
+gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pB )
+{
+	if( !this )
+		return NULL;
+
+	I4 iPPC = iPC;
+	cpyREF(pB);
+	iPC = iPPC;
+
+	U4	nA = pMEM->nALL(iPC),
+		nB = sOF();	/// ez azért jó mert átmásolta a REF az adatokat
+
+	if( nA < nB ) {
+		/// nem lett még lefoglalva
+		if( nA )
+			pMEM->iFREE( iPC );
+		iPC = pMEM->iALL( nB );
+	}
+
+	_move._l.EAl( pB->iPC ).A0;
+	_move._l.EAl( iPC ).A1;
+	_move.c((gpeCsz)cID).IA0I.IA1I;
+	return this;
+}
+gpBLK* gpBLK::pRST( gpMEM* pM )
+{
+	if( this ? !!pMEM : true )
+		return this;
+
+	pMEM = pM;
+	return this;
+}
 gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i ) {
 	gpmCLR;
 	pSRC = pS;
@@ -43,89 +135,10 @@ gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i ) {
 
 	nXFND = pLZYsrcXFND->nLD(sizeof(U4));
 }
-gpPTR* gpPTR::pNULL(){ gpmCLR; return this; }
-U4x2* gpPTR::pd2D(){ return (U4x2*)&x; };
-gpPTR* gpPTR::d2D( I4x2& d2 ){
-    x = d2.x;
-    y = d2.y;
-    z = 0;
-    return this;
-}
-U4 gpPTR::area(){
-    if( z )
-        return z;
-    return z = x*y;
-}
-U4 gpPTR::sOF(){
-    if( w )
-        return w;
-    if(!sof)
-        sof = gpaCsz[cID];
 
-    return w = area()*sof;
-}
-U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
-{
-	switch( inst.a8x2.alf )
-	{
-		case gpeALF_FPS:
-			*(U4*)p_dst = pWIN->mSEC.w;
-			break;
-        case gpeALF_entry: if(pSRC) {
-                U4      *pU4    = (U4*)pSRC->srcMEMiPC( pA[7], 4 );
-                gpOBJ   *pOa    = pSRC->srcOBJfnd( pU4[1] ),
-                        *pOb = NULL, *pOc = NULL;
-                gpPTR* pPTR = NULL;
 
-                U4      xfnd    = pMASS->getXFNDan( pOa->AN );
-                if( gpcSRC  *pSRCb  = pMASS->srcFND( xfnd ))
-                {
-                    if( pOb    = pSRC->srcOBJfnd( pU4[0] ))
-                    if( gpOBJ   *pOin   = pSRCb->pMEM->pOBJ(pOb->AN.alf) )
-                    {
-                        /// tervek szerint a isza térési cim A0-ban lesz
-                        U4 nCPY = pOin->sOF();
-                        U1  *pUin = pSRCb->srcMEMiPC( pOin->iPC, nCPY ),
-                            *pDST = NULL;
-                        if(bSTDcout_ent)
-                            {std::cout << stdALU << pUin << std::endl;}
-                        pOc = getOBJptr( (U1*)pU4, (pD[7]-pA[7]), 0 );
-                        if( pPTR = (gpPTR*)pSRC->srcMEMiPC( pOc->iPC, pOc->sOF() ) )
-                        {
-                            U4  asOF[2];
-                            asOF[0] = pPTR->iPC ? pPTR->sOF() : 0;
-                            asOF[1] = 0;
-                            if( asOF[0] < nCPY )
-                            {
-                                if( pPTR->cID != pOin->cID() )
-                                {
-                                    pPTR->cID = pOin->cID();
-                                }
-                                pPTR->d2D( pOin->d2D );
-                                asOF[1] = gpmPAD( pPTR->sOF(), 0x10 );
-                                if( !pPTR->iPC )
-                                {
-                                    pPTR->iPC = nDAT;
-                                    nDAT += asOF[1];
-                                }
-                                pDST = pSRC->srcMEMiPC( pPTR->iPC, asOF[1] );
-                            } else
-                                pDST = pSRC->srcMEMiPC( pPTR->iPC, pPTR->sOF() );
 
-                            gpmMcpy( pDST, pUin, asOF[1] );
-                        }
 
-                        if(bSTDcout_ent)
-                            {std::cout << stdALU "pSRCb" << std::endl;}
-                    }
-                }
-                pA[0] = pPTR ? pPTR->iPC : 0;
-            } break;
-		default:
-			break;
-	}
-	return p_dst;
-}
 
 
 gpOBJ* gpMEM::getOBJptr( U1* pU1, U4 nBYTE, I4 nmID )
@@ -149,7 +162,7 @@ gpOBJ* gpMEM::getOBJptr( U1* pU1, U4 nBYTE, I4 nmID )
         iOb = *(U4*)lzyBINlnk.Ux( iDb, sizeof(iOb) );
         gpOBJ* pO0 = gpmLZYvali( gpOBJ, &lzyOBJ );
         pO = pO0+iOb;
-        pPTR = (gpPTR*)pSRC->srcMEMiPC( pO->iPC, pO->sOF() );
+        pPTR = pO->pPTR();
         return pO;
     }
     // nem volt a SZóTáRBAN
@@ -161,11 +174,11 @@ gpOBJ* gpMEM::getOBJptr( U1* pU1, U4 nBYTE, I4 nmID )
     *(U4*)lzyBINlnk.Ux( iDb, sizeof(iOb) ) = iOb;
 
     pO = pSRC->srcOBJadd( NULL, nmID);
-    pO->REcID(gpeCsz_ptr);
-    pPTR = (gpPTR*)pSRC->srcMEMiPC( pO->iPC = nDAT, pO->sOF() );
-    U4 n = gpmPAD( pO->sOF(), 0x10 );
+    //pO->REcID(gpeCsz_ptr);
+    pPTR = pO->pPTR(); //(gpPTR*)pSRC->srcMEMiPC( pO->iPC = nDAT, pO->sOF() );
+    /*U4 n = gpmPAD( pO->sOF(), 0x10 );
     nDAT += n;
-    pPTR->pNULL()->oID = iOb;
+    pPTR->pNULL()->oID = iOb;*/
     return pO;
 }
 

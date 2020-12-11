@@ -70,7 +70,44 @@ typedef enum gpeOPid:U1{
 
 	gpeOPid_SWAP,	gpeOPid_EXTB,	gpeOPid_EXT,	gpeOPid_EXTL,
 } gpeOPid_U1;
+static gpeOPid gpaOPgrp[] = {
+	gpeOPid_nop,
 
+	gpeOPid_mul,	gpeOPid_mul,	gpeOPid_mul,
+
+	gpeOPid_stk,	gpeOPid_stk,
+
+	gpeOPid_comS, 	gpeOPid_comE,	gpeOPid_com,
+
+
+	gpeOPid_mul, 	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_mul,	gpeOPid_mul, 	gpeOPid_mov,
+									gpeOPid_mov,
+	gpeOPid_mul, 	gpeOPid_mov, 	gpeOPid_mov,
+	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_mul,	gpeOPid_mov,
+
+
+	gpeOPid_mov, 	gpeOPid_sub,  	gpeOPid_sub,
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,	/// -------------- GOOD
+	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
+
+
+	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
+	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
+
+	gpeOPid_entry, 	gpeOPid_entry, 	gpeOPid_out,
+	gpeOPid_begin,	gpeOPid_out,
+	gpeOPid_begin, 	gpeOPid_out,
+	gpeOPid_begin, 	gpeOPid_out,
+	gpeOPid_entry,	gpeOPid_entry,
+	gpeOPid_mail,	gpeOPid_str,
+
+	gpeOPid_entry,
+
+	gpeOPid_entry,	gpeOPid_EXT,	gpeOPid_EXT,	gpeOPid_EXT,
+};
 static const char* gpasCsz[] = {
 
 	".b",	//	0	1		00:00	byte
@@ -120,18 +157,36 @@ typedef enum gpeCsz:U1{
 	gpeCsz_K,	//  e	16		11:10	KID
 	gpeCsz_OFF,	//	f	16		11:11	ZRO
 } gpeCsz_U1;
+
 class U4x2;
 class I4x2;
+class gpBLK;
+class gpOBJ;
+class gpMEM;
+
 class gpPTR{
 public:
+    I4  iPC, bckID,	// 0
+        cID, cSZ,	// 8
+
+        x,y,		// 16
+        z,  w,		// 24
+
+		mNdID;		// 32
+					// 36
     gpPTR(){};
+    gpPTR& operator = ( gpBLK* pBLK );
+	gpPTR& operator = ( gpOBJ* pO );
     gpPTR* pNULL(); //{ gpmCLR; return this; }
-    U4  iPC, cID, oID, sof,
-        x,y,z,w;
-    U4x2* pd2D();
-    gpPTR* d2D( I4x2& d2 );
-    U4 area();
-    U4 sOF();
+
+	U1* pU1( gpMEM* pMEM );
+	I4x2* pd2D(){ return this ? (I4x2*)&x : NULL; };
+
+	gpPTR* 	d2D( I4x2& d2 );
+    U4 		area();
+    U4 		sOF();
+    gpPTR* 	cpyREF( gpPTR* pRF );
+    gpPTR*	cpy( gpMEM* pMEM, gpPTR* pB );
 };
 static const U4 gpaCsz[] = {
 
@@ -257,44 +312,7 @@ typedef enum gpeEA:U1 {
 } gpeEA_U1;
 
 
-static gpeOPid gpaOPgrp[] = {
-	gpeOPid_nop,
 
-	gpeOPid_mul,	gpeOPid_mul,	gpeOPid_mul,
-
-	gpeOPid_stk,	gpeOPid_stk,
-
-	gpeOPid_comS, 	gpeOPid_comE,	gpeOPid_com,
-
-
-	gpeOPid_mul, 	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_mul,	gpeOPid_mul, 	gpeOPid_mov,
-									gpeOPid_mov,
-	gpeOPid_mul, 	gpeOPid_mov, 	gpeOPid_mov,
-	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_mul,	gpeOPid_mov,
-
-
-	gpeOPid_mov, 	gpeOPid_sub,  	gpeOPid_sub,
-	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
-	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,	/// -------------- GOOD
-	gpeOPid_add, 	gpeOPid_add,	gpeOPid_mov,
-
-
-	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
-	gpeOPid_sub,	gpeOPid_sub, 	gpeOPid_mul, 	gpeOPid_mov,
-
-	gpeOPid_entry, 	gpeOPid_entry, 	gpeOPid_out,
-	gpeOPid_entry,	gpeOPid_out,
-	gpeOPid_entry, 	gpeOPid_out,
-	gpeOPid_entry, 	gpeOPid_out,
-	gpeOPid_entry,	gpeOPid_entry,
-	gpeOPid_mail,	gpeOPid_str,
-
-	gpeOPid_entry,
-
-	gpeOPid_entry,	gpeOPid_entry,	gpeOPid_entry,	gpeOPid_entry,
-};
 static gpeOPid gpaaOPid[][0x20] = {
 	//gpeOPid_nop,
 	{gpeOPid_nop,},

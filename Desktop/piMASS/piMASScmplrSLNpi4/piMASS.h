@@ -27,7 +27,7 @@
 
 #define bSTDcout true //false //true
 #define bSTDcout_V4l2 (bSTDcout&false)
-#define bSTDcout_ent (bSTDcout&false)
+#define bSTDcout_ent (bSTDcout&true)
 #define bSTDcout_slmp (bSTDcout&true)
 //#define stdON
 
@@ -2867,8 +2867,8 @@ public:
 	I4 mx() { return x > y ? x:y; }
 
 
-	I4x2 MX( const I4x2 b ) const { return  I4x2( x>b.x?x:b.x, y>b.y?y:b.y ); }
-	I4x2 MN( const I4x2 b ) const { return  I4x2( x<b.x?x:b.x, y<b.y?y:b.y ); }
+	I4x2 MX( const I4x2 b ) const { return  this ? I4x2( x>b.x?x:b.x, y>b.y?y:b.y ) : I4x2(0); }
+	I4x2 MN( const I4x2 b ) const { return  this ? I4x2( x<b.x?x:b.x, y<b.y?y:b.y ) : I4x2(0); }
 	I4x2& mx( const I4x2 b ) {
 		if( x < b.x )
 			x = b.x;
@@ -3059,7 +3059,9 @@ public:
 		struct {
 			I4 x,y,z,w;
 		};
-
+		struct {
+			I4 i,n,zz,ww;
+		};
 		struct
         {
 			gpeOPid pre, pst;	// 0, 1
@@ -6282,14 +6284,14 @@ szasz:
 
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( I8 i, U4 n, bool bZ = true, U4 stp = 0 ) {
-		if( i < 0 )
-			i *= -1;
+	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 ) {
+		if( iPC < 0 )
+			iPC *= -1;
 		if( !stp )
 			stp = n;
-		U8	e = i*stp + n;
+		U8	e = iPC*stp + n;
 		if( e <= n_load )
-			 return p_alloc + i*stp; //n;
+			 return p_alloc + iPC*stp; //n;
 
 		U8 s = -1, ee = e+n*3;
 
@@ -6299,7 +6301,7 @@ szasz:
 		if( n_load > e )
 			n_load = e;
 
-        return p_alloc + i*stp; //*n;//+e-n*2;
+        return p_alloc + iPC*stp; //*n;//+e-n*2;
 	}
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
 	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_OFF,
