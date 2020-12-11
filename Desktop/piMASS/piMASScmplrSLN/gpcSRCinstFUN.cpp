@@ -19,7 +19,7 @@ gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 		gpROW* pRl = pBLK->pLSTrow();
 		if( !pRl )
 			return pBLK;
-		if( pBLK->opIDgrp() == opID )
+		if( pBLK->opIDgrp() == gpaOPgrp[opID] )
 		{
 			/// a + 			{{{{		//block level up
 			/// a + 			b{c(d((		//block rutinepRl->pstOP = opID;
@@ -44,7 +44,7 @@ gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY
 	///kEND(scp);
 	U1* pU1 = NULL;
 	gpBLK* pBLKup = NULL;
-	while( pBLKup ? (pBLKup->opIDgrp() != gpeOPid_entry) : !!pBLK )
+	while( pBLKup ? (pBLKup->opIDgrp() != gpeOPid_begin) : !!pBLK )
 	{
 		/// FENT
 		gpBLK	*pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
@@ -80,7 +80,7 @@ gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY
 		pBLK = pBLKm;
 
 	}
-	return pBLK;
+	//return pBLK;
 
 	gpROW	*pRl = pBLK->pLSTrow();
 	if( !pRl )

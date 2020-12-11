@@ -1344,23 +1344,7 @@ public:
 
 	gpOBJ* srcOBJfnd( I4 dctID );
 	gpOBJ* srcOBJadd( char* pS, I4 dctID );
-	gpBLK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  ) {
-		gpBLK	*pBLK = lzyBLOCK.pNEWblk( opID, bIDm, bIDmR, mnID )->pRST( pMEM );
-		gpROW	*pRf = pBLK->pROW(0,true);
-		if( !pRf )
-			return pBLK;
-
-		if( !pRml )
-			return pBLK;
-		*pRf = *pRml;
-		if( opID != pRml->pstOP )
-			pRf->pstOP = opID;
-		pBLK->pNEWrow();
-
-		pRml->pstOP = gpeOPid_nop;
-		pRml->bIDup = pBLK->bID;
-		return pBLK;
-	}
+	gpBLK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  );
 	gpBLK* srcBLKup( char* pS, gpBLK* pBMom, gpeOPid opID, I4 mnID ) {
 		return srcBLKnew( pS, opID, pBMom->pLSTrow(), pBMom->bID, pBMom->iLAST(), mnID );
 	}
