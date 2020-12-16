@@ -54,6 +54,8 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 				}
 
             } break;
+		case gpeALF_PRINT: funPRINT(); break;
+
 		default:
 			break;
 	}

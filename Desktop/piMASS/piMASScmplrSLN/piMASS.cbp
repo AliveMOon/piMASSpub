@@ -119,6 +119,7 @@
 		</Linker>
 		<Unit filename="gpCORE.cpp" />
 		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpMEMfunPRINT.cpp" />
 		<Unit filename="gpMEMinstDOit.cpp" />
 		<Unit filename="gpcCRSbreak.cpp" />
 		<Unit filename="gpcDRCos.cpp" />
@@ -143,6 +144,7 @@
 		<Unit filename="gpcSRCinstMOVE.cpp" />
 		<Unit filename="gpcSRCinstMUL.cpp" />
 		<Unit filename="gpcSRCinstRUN.cpp" />
+		<Unit filename="gpcSRCinstSTK.cpp" />
 		<Unit filename="gpcSRClnk.cpp" />
 		<Unit filename="gpcSRClnk.h" />
 		<Unit filename="gpcSRCprnt.cpp" />

@@ -32,13 +32,105 @@ gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 		if( pO )
 		{
 			/// FUN(
-
 		} else {
 			/// (
 			pO = srcOBJadd( pS, mnID<0 ? mnID :-mnID );
-			*pRl = *pO;
 		}
+		*pRl = *pO;
 		return srcBLKup( pS, pBLK, opID, mnID );
+}
+gpBLK* gpBLK::instFUN( char* pS, I8x2& AN, gpBLK *pARG )
+{
+	gpeALF alf = AN.alf;
+	if( !alf )
+		return this;
+
+	switch( alf ) {
+		case gpeALF_SIN:
+		case gpeALF_COS:
+		case gpeALF_PRINT:
+			break;
+		default:
+			return this;
+	}
+	I4 nR = pARG->nROW();
+	_move._q.A7.D7;
+	if( nR ) {
+		gpOBJ	*pOa;
+		gpROW	*pRa;
+		gpPTR	*pPa;
+		for( I4 iR = 0; iR < pARG->nROW(); iR++ ) {
+			pPa = pARG->iROWptr( pS, iR, &pOa, &pRa );
+			if( !pPa )
+				continue;
+			_move._l.EAl( pOa->iPTR ).sIA7I;
+		}
+	}
+		gpPTR* pP = BLKpPTR( pS );
+		switch( alf ) {
+			case gpeALF_SIN:
+			case gpeALF_COS:
+				pP->cID = gpeCsz_L;
+				break;
+			case gpeALF_PRINT:
+				pP->cID = gpeCsz_b;
+				break;
+			default:
+				break;
+		}
+
+		_move._l.EAl( iPTR ).A0;
+		_jsr.EAl( AN.alf );
+
+	if( nR ) _move._q.D7.A7;
+	return this;
+}
+gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID ) {
+	if( !pBLKm )
+		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+
+	I4  nR = pBLK->nROW();
+    if(!nR)
+        return pBLKm;
+
+	//I4 aiPC[2], sOF = 0, cID = -1;
+	//U1* pU1 = NULL;
+	gpcSRC	*pSin;
+	gpROW	*pRm, *pRa;
+	gpOBJ	*pO, *pOa, *pOin = NULL;
+	gpPTR	*pPu = pBLKup->BLKpPTR( pS ),
+			*pPd = pBLKm->iROWptr(	pS, pBLKup->bIDmR, &pO, &pRm ),
+			*pPb = NULL, *pPa;
+	gpeOPid opB, opA;
+
+	for( I4 iR = 0; iR < nR; opB=opA, iR++ ) {
+		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSin, &pOin );
+		opA = pRa->pstOP;
+		if( !pPa )
+			continue;
+
+		if( !pPb )
+			pPb = pPd;
+
+		switch( opA ) {
+			case gpeOPid_brakS:
+				pBLK->instFUN( pS, pOa->AN, pBLKup );
+				break;
+			default:
+				break;
+		}
+	}
+
+	if( pPd->iPC < 0 ) {
+		pPd->cpyREF(pPu);
+		_nop;
+		return pBLKm;
+	}
+	_move._l.EAl(pPu->iPC).A0;
+	_move._l.EAl(pPd->iPC).A1;
+	_move._L.IA0I.IA1I;
+	_nop;
+	return pBLKm;
 }
 gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 	///kEND(scp);
@@ -68,8 +160,11 @@ gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY
 					/// a, 		b +
 					/// a = 	b +
 					/// a * 	b +
-				pBLKm = srcINSTmul( pS, pBLKm, pBLK );
+					pBLKm = srcINSTmul( pS, pBLKm, pBLK );
 				} break;
+			case gpeOPid_stk:
+					pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+				break;
 		}
 
 
@@ -91,31 +186,4 @@ gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY
 	pBLK->pNEWrow();
 	return pBLK;
 }
-gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID ) {
-	if( !pBLKm )
-		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-	if( pBLKup )
-		pBLK = pBLKup;
-	I4 aiPC[2], sOF = 0, cID = -1;
-	U1* pU1 = NULL;
 
-	gpROW *pRm; // = pBLKm->pROW(pBLK->bIDmR);
-	gpOBJ* pO; // = srcOBJfnd( pRm->mNdID );
-	gpPTR	*pPu = pBLK->BLKpPTR( pS ),
-			*pPd = pBLKm->iROWptr(	pS, pBLK->bIDmR,
-									&pO, &pRm ); //, &pSRC, &pOs );
-	//pDWptr = pO->pPTRu1();
-
-	//aiPC[1] = pRm ? iPCrow( *pRm, sOF, false ) : gpeCsz_L;
-	//pU1 = srcMEMiPC( iPC, sOF );
-	if( pPd->iPC < 0 ) {
-		pPd->cpyREF(pPu);
-		_nop;
-		return pBLKm;
-	}
-	_move._l.EAl(pPu->iPC).A0;
-	_move._l.EAl(pPd->iPC).A1;
-	_move._L.IA0I.IA1I;
-	_nop;
-	return pBLKm;
-}

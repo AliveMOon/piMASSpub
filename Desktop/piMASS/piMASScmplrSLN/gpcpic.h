@@ -47,28 +47,25 @@ class gpcCAMubi
 //-lmmal_util
 //-lmmal_vc_client
     /// openCAM ----------------------------------------------------------------
-    int fd;                             ///  1. Open the device ---------------
-    v4l2_capability     capability;     ///  2. Ask the device if it can capture frames
-    v4l2_fmtdesc        fmtdesc;        ///  3. VIDIOC_ENUM_FMT-----------------
-    v4l2_frmsizeenum    frmsize;        ///  4. VIDIOC_ENUM_FRAMESIZES ---------
+    int fd;							///  1. Open the device ---------------
+    v4l2_capability     capBLTY;	///  2. Ask the device if it can capture frames
+    v4l2_fmtdesc        frmDeSC;	///  3. VIDIOC_ENUM_FMT-----------------
+    v4l2_frmsizeenum    frmSZ;		///  4. VIDIOC_ENUM_FRAMESIZES ---------
     /// setCaptureSize ---------------------------------------------------------
-    v4l2_format         format;         ///  5. VIDIOC_S_FMT -------------------
-    v4l2_requestbuffers requestBuffer;  ///  6. VIDIOC_REQBUFS -----------------
-    v4l2_buffer         queryBuffer;    ///  7. VIDIOC_QUERYBUF ----------------
-    int type;                           ///  8. VIDIOC_STREAMON ----------------
+    v4l2_format         format;		///  5. VIDIOC_S_FMT -------------------
+    v4l2_requestbuffers reqBUF;		///  6. VIDIOC_REQBUFS -----------------
+    v4l2_buffer         qryBUF;		///  7. VIDIOC_QUERYBUF ----------------
+    int type;						///  8. VIDIOC_STREAMON ----------------
     /// greb -------------------------------------------------------------------
-    v4l2_buffer         bufferinfo;     ///  9. VIDIOC_QBUF --------------------
-                                        /// 10. VIDIOC_DQBUF -------------------
+    v4l2_buffer         infBUF;     ///  9. VIDIOC_QBUF --------------------
+									/// 10. VIDIOC_DQBUF -------------------
     /// retrieve ---------------------------------------------------------------
-                                        /// 11. VIDIOC_STREAMOFF ---------------
-
-    //v4l2_frmivalenum frmival;
-
+									/// 11. VIDIOC_STREAMOFF ---------------
 
     bool bOPEN;
     U1      wip;
 public:
-    char* pBUFF;                        /// mmap << queryBuffer.length
+    char* pBUFF;                        /// mmap << qryBUF.length
     U4x2 wh0;
 
 
@@ -95,7 +92,7 @@ public:
         {
             /// 10. VIDIOC_DQBUF --------------------
             if(bSTDcout){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
-            res = ioctl(fd, VIDIOC_DQBUF, &bufferinfo);
+            res = ioctl(fd, VIDIOC_DQBUF, &infBUF);
             if( res >= 0)
             if(bSTDcout){std::cout << "10.2 VIDIOC_DQBUF --------------------" << std::endl;}
 
@@ -106,7 +103,7 @@ public:
         }
         if( !pBUFF )
             return;
-        munmap(pBUFF, queryBuffer.length);
+        munmap(pBUFF, qryBUF.length);
         pBUFF = NULL;
     }
     ~gpcCAMubi()

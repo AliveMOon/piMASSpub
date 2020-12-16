@@ -150,8 +150,7 @@ gpBLK* gpcSRC::srcINSTmul( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 			}
 		}
 
-		switch( opB )
-		{
+		switch( opB ) {
 			case gpeOPid_mul:
 			case gpeOPid_div:
 			case gpeOPid_and:

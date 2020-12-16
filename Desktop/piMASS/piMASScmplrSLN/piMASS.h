@@ -3753,14 +3753,12 @@ public:
     I8x2( I4 _x, I4 _y = 0 ) { x = _x; y = _y; }
     I8x2( U8 _x, U8 _y = 0 ) { x = _x; y = _y; }
     I8x2( I8 _x, I8 _y = 0 ) { x = _x; y = _y; }
-    //I8x2( gpeALF a, I4 n = 0 ) { alf = a; num = n; }
     I8x2( gpeALF a, I8 n = 0 ) { alf = a; num = n; }
     I8x2( const U4x2 b ) { x = b.x; y = b.y; }
 	I8x2( const I4x2 b ) { x = b.x; y = b.y; }
-	I8x2( U8* pB )
-    {
+	I8x2( U8* pB ) {
 		gpmMcpyOF( this, pB, 1 );
-    }
+	}
     I8x2& operator = ( const U1* pS );
     I8x2& operator = ( const char* pS );
 
@@ -3807,72 +3805,38 @@ public:
 	I8x2 operator & (const U8* pB ) const { return I8x2( x*pB[0],  y*pB[1] ); }
 
 
-	I8x2 operator % (const U4x2& b) const
-	{
+	I8x2 operator % (const U4x2& b) const {
 		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
 	}
-	I8x2 operator % (const I4x2& b) const
-	{
+	I8x2 operator % (const I4x2& b) const {
 		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
 	}
-	I8x2 operator % (const I8x2& b) const
-	{
+	I8x2 operator % (const I8x2& b) const {
 		return I8x2( b.x ? x%b.x : 0x7FFFffffFFFFffff ,  b.y ? y%b.y : 0x7FFFffffFFFFffff );
 	}
 
-	I8x2 operator / (const U4x2& b) const
-	{
+	I8x2 operator / (const U4x2& b) const {
 		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
 	}
-	I8x2 operator / (const I4x2& b) const
-	{
+	I8x2 operator / (const I4x2& b) const {
 		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff ,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
 	}
-	I8x2 operator / (const I8x2& b) const
-	{
+	I8x2 operator / (const I8x2& b) const {
 		return I8x2( b.x ? x/b.x : 0x7FFFffffFFFFffff ,  b.y ? y/b.y : 0x7FFFffffFFFFffff );
 	}
 
-	I8x2 operator & (const U4x2& b) const
-	{
-		return I8x2( x*b.x,  y*b.y );
-	}
+	I8x2 operator & (const U4x2& b) const { return I8x2( x*b.x,  y*b.y ); }
+	I8x2 operator + (const I4x2& b) const { return I8x2( x+b.x,  y+b.y ); }
+	I8x2 operator + (const I8x2& b) const { return I8x2( x+b.x,  y+b.y ); }
 
-	I8x2 operator + (const I4x2& b) const
-	{
-		return I8x2( x+b.x,  y+b.y );
-	}
-	I8x2 operator + (const I8x2& b) const
-	{
-		return I8x2( x+b.x,  y+b.y );
-	}
+	I8x2 operator + (const U4x2& b) const { return I8x2( x+b.x,  y+b.y ); }
+	I8x2 operator + (const U8* pB ) const { return I8x2( x+pB[0], y+pB[1] ); }
 
-	I8x2 operator + (const U4x2& b) const
-	{
-		return I8x2( x+b.x,  y+b.y );
-	}
-	I8x2 operator + ( const U8* pB ) const
-	{
-		return I8x2( x+pB[0],  y+pB[1] );
-	}
+	I8x2 operator - (const I4x2& b) const { return I8x2( x-b.x,  y-b.y ); }
+	I8x2 operator - (const I8x2& b) const { return I8x2( x-b.x,  y-b.y ); }
 
-	I8x2 operator - (const I4x2& b) const
-	{
-		return I8x2( x-b.x,  y-b.y );
-	}
-	I8x2 operator - (const I8x2& b) const
-	{
-		return I8x2( x-b.x,  y-b.y );
-	}
-
-	I8x2 operator - (const U4x2& b) const
-	{
-		return I8x2( x-b.x,  y-b.y );
-	}
-	I8x2 operator - ( const U8* pB ) const
-	{
-		return I8x2( x-pB[0], y-pB[1] );
-	}
+	I8x2 operator - (const U4x2& b) const { return I8x2( x-b.x,  y-b.y ); }
+	I8x2 operator - (const U8* pB ) const { return I8x2( x-pB[0], y-pB[1]); }
 
 	I8x2 operator * ( const U4 b ) const { return *this&U4x2(b,b); }
 	I8x2 operator & ( const U4 b ) const { return I8x2( x&b, y&b ); }
@@ -4016,37 +3980,29 @@ class I8x4 {
 public:
     union
     {
-        struct
-        {
+        struct {
             I8 x,y,z,w;
         };
-        struct
-        {
+        struct {
             I8 A,B,C,D;
         };
-        struct
-        {
+        struct {
             I8 aXYZW[4];
         };
-        struct
-        {
+        struct {
             I8x2 a8x2[2];
         };
-        struct
-        {
+        struct {
             gpeALF labe;
             I8 mom, up, nx;
         };
-        struct
-        {
+        struct {
             I4x4 ai4x4[2];
         };
-        struct
-        {
+        struct {
             U4x4 au4x4[2];
         };
-        struct
-        {
+        struct {
             U4x4 af4x4[2];
         };
         ///-----------------------------------------

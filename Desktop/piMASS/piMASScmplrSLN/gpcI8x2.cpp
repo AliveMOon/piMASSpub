@@ -15,8 +15,7 @@ I8x2& I8x2::operator = ( const U1* pS )
 	return *this;
 }
 I8x2& I8x2::operator = ( const char* pS ) { return *this = (U1*)pS; }
-gpeTYP I8x2::cdrMILLnum( const char* pS, U4 nS )
-{
+gpeTYP I8x2::cdrMILLnum( const char* pS, U4 nS ) {
 	if( !this )
 		gpeTYP_null;
 	char* pSe = (char*)pS;

@@ -1041,6 +1041,8 @@ public:
 	gpBLK* pRST( gpMEM* pMEM );
 
 	gpPTR* iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR, gpcSRC** ppSRC = NULL, gpOBJ** ppOin = NULL );
+	gpBLK* instFUN( char* pS, I8x2& AN, gpBLK *pARG );
+
 
 	// gpPTR* moveAB( gpROW* pRdst, gpPTR* pPsrc );
 	// gpPTR* subAB( char* pS, gpPTR* pPa, gpROW* pRb, bool bADD );
@@ -1311,6 +1313,7 @@ public:
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
 	I4		instDOitSLMP( gpcGT* pGT );
 
+	void	funPRINT();
 };
 
 class gpcSRC {
@@ -1398,33 +1401,6 @@ public:
 	///--------------------------
 	///			CONST & VAR
 	///--------------------------
-	/*gpOBJ* srcOBJmn( char* pS, I4 mnID, gpeCsz cID, I4x2 d2D ) {
-		I4 dctID = mnID;
-		if( dctID > 0 )
-			dctID *= -1;
-
-		gpOBJ* pO = srcOBJfnd(dctID);
-		if( pO )
-			return pO;
-
-		U1* pU1 = NULL;
-		pO = srcOBJadd( pS, dctID);
-		if( !pO )
-			return NULL;
-
-		pO->REcID(cID);
-		pO->d2D = d2D;
-		pU1 = srcMEMiPC(
-							pO->iPC = pMEM->nDAT,
-							pO->sOF()
-						);
-		U4 n = gpmPAD( pO->sOF(), 0x10 );
-		pMEM->nDAT += n;
-		gpmZn( pU1, n );
-
-		return pO;
-	}*/
-
 	gpBLK* srcBLKmNdID( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID );
 	gpBLK* srcBLKaryUTF8( gpBLK* pBLK, I4 mnID, char* pS, U4 nS );
 	gpBLK* srcBLKaryAN( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID, gpeCsz cAN, const I8x2& AN );
@@ -1433,97 +1409,10 @@ public:
 	///--------------------------
 	///			OPERA
 	///--------------------------
-	gpBLK* srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
-	gpBLK* srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
-		///kEND(scp);
-		U1* pU1 = NULL;
-		while( pBLK ? (pBLK->opIDgrp() != gpeOPid_stk) : false )
-		{
-			/// FENT
-			gpBLK	*pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-			gpROW	*pR0 = pBLK->pROW(),
-					*pRd = pBLKm->pROW(pBLK->bIDmR);
-			I4 nR = pBLK->nROW(), iPC, sOF;
-			switch( pBLK->opIDgrp() )
-			{
-				case gpeOPid_brakS:
-				case gpeOPid_dimS:
-				case gpeOPid_begin:
-
-					break;
-				case gpeOPid_mov:
-					pBLKm = srcINSTmov( pS, pBLKm, pBLK );
-					break;
-				case gpeOPid_add:
-				case gpeOPid_sub:
-					pBLKm = srcINSTadd( pS, pBLKm, pBLK );
-					// move.l d0, -(A6)
-					break;
-				case gpeOPid_mul:{
-						///			pRl
-						/// a, 		_ +
-						/// a, 		b +
-						/// a = 	b +
-						/// a * 	b +
-					pBLKm = srcINSTmul( pS, pBLKm, pBLK );
-					} break;
-				case gpeOPid_entry:{
-					pBLKm = srcINSTanDalf( pS, pBLKm, pBLK );
-					} break;
-				default: break;
-			}
-
-
-			if( !pBLKm )
-				break;
-			/// LENT
-			pBLK = pBLKm;
-
-		}
-
-		gpROW	*pRl = pBLK->pLSTrow();
-		if( !pRl )
-			return pBLK;
-
-		pRl->pstOP = opID;
-		/// a veszö egyenlőre csinál helyet
-		pBLK->pNEWrow();
-		return pBLK;
-	}
-	gpBLK* srcBLKmov( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
-		///kMOV(scp); //, iOPe ); // Ai--; // Ai--; //
-		///kOBJ(scp); //, iOPe );
-		///++SP;
-		///*pSTRT = now;
-		//if( !pBLK )
-		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-		//if( !pBLK )
-		//{
-		//	gpOBJ* pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
-		//	pBLK = srcBLKnull( pS, pBLK, pO->dctID, mnID );
-		//}
-
-		gpROW* pRl = pBLK->pLSTrow();
-		if( !pRl)
-			return pBLK;
-
-		switch( pBLK->opIDgrp() )
-		{
-			case gpeOPid_mov:
-				///							pRl
-				/// a = b += c *= d %= 		e =
-				pRl->pstOP = opID;
-				pBLK->pNEWrow();
-				return pBLK;
-			default:
-				break;
-		}
-		///							 		pRl	//up
-		/// a, 10, b; c, d;  e = f + 		g =
-		//gpBLK* pBup =
-		return srcBLKup( pS, pBLK, opID, mnID );
-	}
 	gpBLK* srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID );
+	gpBLK* srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+	gpBLK* srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+	gpBLK* srcBLKmov( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
 	gpBLK* srcBLKanDalf( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
 
 	gpBLK* srcBLKmul( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
