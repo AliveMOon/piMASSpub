@@ -28,6 +28,8 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 			case gpeOPid_dimS:
 			case gpeOPid_begin:
 				return srcBLKup( pS, pBLK, opID, mnID );
+			case gpeOPid_nop:
+				pBLK->opID = opID;
 			case gpeOPid_add:
 				///							pRl
 				/// a + b - c == d - e + 	f -
@@ -75,14 +77,14 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
     if(!nR)
         return pBLKm;
 	gpcSRC	*pSRC = NULL;
-	gpROW	*pRa;
+	gpROW	*pRi;
 	gpOBJ	*pOa, *pOin = NULL;
 	gpPTR	*pPb = NULL, *pPa;
 	gpeOPid opB, opA;
 	for( I4 iR = 0; iR < nR; opB=opA, iR++ )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOin );
-		opA = pRa->pstOP;
+		pPa = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSRC, &pOin );
+		opA = pRi->pstOP;
 		if( !pPa )
 			continue;
 		if( !pPb ) {

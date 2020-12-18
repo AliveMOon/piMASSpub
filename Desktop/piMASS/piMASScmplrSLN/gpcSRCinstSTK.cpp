@@ -8,8 +8,14 @@ extern char gpaALF_H_sub[];
 gpBLK* gpcSRC::srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 		///kEND(scp);
 		U1* pU1 = NULL;
+
 		while( pBLK ? (pBLK->opIDgrp() != gpeOPid_stk) : false )
 		{
+			if( pBLK->opID == gpeOPid_nop )
+			{
+				pBLK->opID = opID;
+				break;
+			}
 			/// FENT
 			gpBLK	*pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 			gpROW	*pR0 = pBLK->pROW(),

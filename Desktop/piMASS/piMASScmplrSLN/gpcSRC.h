@@ -1040,8 +1040,9 @@ public:
 	};
 	gpBLK* pRST( gpMEM* pMEM );
 
-	gpPTR* iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR, gpcSRC** ppSRC = NULL, gpOBJ** ppOin = NULL );
-	gpBLK* instFUN( char* pS, I8x2& AN, gpBLK *pARG );
+	gpBLK* iROWblk( char* pS, I4 i, gpROW** ppR );
+	gpPTR* iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC = NULL, gpOBJ** ppOin = NULL );
+	gpPTR* instFUN( char* pS, I8x2& AN, gpBLK *pARG );
 
 
 	// gpPTR* moveAB( gpROW* pRdst, gpPTR* pPsrc );
@@ -1379,6 +1380,7 @@ public:
 	///			INST
 	///--------------------------
 	gpBLK*	srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID );
+	gpBLK*	srcINSTdwnO( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID );
 
 	gpBLK*	srcINSTmov( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
@@ -1634,7 +1636,8 @@ public:
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 		return dim;
 	}
-	U4x4	srcBRK( bool bNoMini, U1 selID, const char* pVAN = NULL );
+	U4x4	srcBRK( gpcLZYdct& dOP, //U1 iSCP,
+					bool bNoMini, U1 selID, const char* pVAN = NULL );
 	U1		srcSCN( gpcCRS& crs, bool bNoMini, U1 selID );
 	I4x2	srcRDY(
 						U1x4* pO,

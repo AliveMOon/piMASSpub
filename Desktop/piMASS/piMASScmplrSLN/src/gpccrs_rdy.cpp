@@ -115,7 +115,7 @@ U4 gpcCRS::miniRDYmap(
 					);
 		/// TÁMADÁS HO RUKK!!
 		dim =	(pSrC = pWIN->piMASS->srcFND( pM[i] ))
-				->srcBRK( bNoMini, selID, " \t\r\n" );
+				->srcBRK( *pWIN->piMASS->pOPER(), bNoMini, selID, " \t\r\n" );
 
 		//dim = mass.srcFND( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )

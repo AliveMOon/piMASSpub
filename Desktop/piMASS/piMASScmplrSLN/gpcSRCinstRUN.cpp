@@ -180,8 +180,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	bool bTMP;
 	U4 cID, area = 1;
 	gpPTR* pPTR = NULL;
-	for( U4 i = 0; i < nO; i++ )
-	{
+	for( U4 i = 0; i < nO; i++ ) {
 		gpOBJ& obj = pO0[i];
 		if( !(sOF=obj.sOF()) )
 			continue;

@@ -101,7 +101,9 @@ void gpMEM::funPRINT()
 	if( pDST )
 		gpmMcpy( pDST, pS, nCPY )[nCPY] = 0;
 
-
+	if(bSTDcout_jsr)
+	{std::cout	<< stdCYAN << "funPRINT:"
+				<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
 
 
 }

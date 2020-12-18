@@ -27,7 +27,7 @@
 
 #define bSTDcout true //false //true
 #define bSTDcout_V4l2 (bSTDcout&false)
-#define bSTDcout_ent (bSTDcout&true)
+#define bSTDcout_jsr (bSTDcout&true)
 #define bSTDcout_slmp (bSTDcout&true)
 //#define stdON
 

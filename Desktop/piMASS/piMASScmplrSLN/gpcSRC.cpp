@@ -191,7 +191,8 @@ gpBLK* gpcSRC::srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR
 	*pRf = *pRml;
 	if( opID != pRml->pstOP )
 		pRf->pstOP = opID;
-	pBLK->pNEWrow();
+	if( gpaOPgrp[opID] != gpeOPid_begin )
+		pBLK->pNEWrow();
 
 	pRml->pstOP = gpeOPid_nop;
 	pRml->bIDup = pBLK->bID;
@@ -209,6 +210,12 @@ gpBLK* gpcSRC::srcBLKmNdID( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID ) {
 	gpROW* pRl = pBLK->pLSTrow();
 	if( !pRl )
 		return pBLK;
+	if( pBLK->opIDgrp() == gpeOPid_begin )
+	{
+		pBLK = srcBLKup( pS, pBLK, gpeOPid_nop, mnID );
+		//srcBLKnew( pS, gpeOPid_nop, pRl, pBLK->bID, pBLK->iLAST(), mnID );
+		pRl = pBLK->pLSTrow();
+	}
 
 	*pRl = pO;
 	if( pRl->mnID == mnID )

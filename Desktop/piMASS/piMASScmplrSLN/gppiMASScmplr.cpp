@@ -193,21 +193,22 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 				cID = AN.gpCszALF(psDCT,nsDCT);
 				if( cID == gpeCsz_OFF )
 					continue;
-				pBLK = srcBLKaryAN( pS, pBLK, MiN.dctID, lnk.x, cID, AN );
+				pBLK = srcBLKaryAN( pS, pBLK, MiN.dctID, mnID, cID, AN );
 				break;
 			case gpeCLR_orange:	///NUM
 				cID = AN.gpCszNUM(psDCT,nsDCT);
 				if( cID == gpeCsz_OFF )
 					continue;
-				pBLK = srcBLKaryNUM( pS, pBLK, MiN.dctID, lnk.x, cID, AN );
+				pBLK = srcBLKaryNUM( pS, pBLK, MiN.dctID, mnID, cID, AN );
 				break;
 			case gpeCLR_green2: { ///OPER
 					U1* pSs = (U1*)psDCT, *pSe = pSs+nsDCT;
-					U4 nOx;
+					U4 nOx, nSTP;
 					while( pSs < pSe )
 					{
 						opID = (gpeOPid)dOP.dctMILLfnd( pSs, pSe-pSs, nOx = (U4)gpeOPid_jsr );
-						pSs += dOP.nSTRix(opID);
+						nSTP = dOP.nSTRix(opID);
+						pSs += nSTP;
 						switch( opID )
 						{
 							case gpeOPid_brakS:
@@ -249,8 +250,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 										break;
 								}
 						}
-
-						break;
+						//break;
 					}
 
 				} break;

@@ -5,30 +5,49 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-
-gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR, gpcSRC** ppSRC, gpOBJ** ppOin )
+gpBLK* gpBLK::iROWblk( char* pS, I4 i, gpROW** ppR )
 {
-	if( i >= nROW() )
+	if( ppR ) *ppR = NULL;
+	I4 nR = nROW();
+	if( !nR )
 		return NULL;
-	gpPTR* pPTR = NULL;
-	gpROW* pRW = pROW(i);
-	if( ppR )
-		*ppR = pRW;
+	if( i >= nR )
+		return NULL;
 
+	gpROW* pRi = pROW(i);
+	if( ppR )
+		*ppR = pRi;
+
+	if( pRi ? !pRi->bIDup : true )
+		return NULL;
+
+	return pMEM->pSRC->lzyBLOCK.pSTPup( pRi->bIDup, -1, -1, pRi->mnID );
+}
+gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC, gpOBJ** ppOin )
+{
 	gpOBJ* pO = NULL;
-	if( gpBLK* pBup	= 	pRW->bIDup
-						? pMEM->pSRC->lzyBLOCK.pSTPup( pRW->bIDup, -1, -1, pRW->mnID )
-						: NULL )
-    if( pBup->iPTR > 0 ) {
+	gpROW* pRi = NULL;
+	gpPTR* pPTR = NULL;
+	gpBLK* pBup = iROWblk( pS, i, &pRi );
+
+    if( ppR )
+		*ppR = pRi;
+
+	if( pBup )
+	if( pBup->iPTR > 0 ) {
 		pPTR = pBup->BLKpPTR( pS );
         while( pPTR->cID == gpeCsz_ptr ) {
 			pPTR = pMEM->pPTR( pPTR->iPC );
         }
         pO = pMEM->OBJfnd( pPTR->mNdID );
+        if( ppO )
+			*ppO = pO;
     }
+    if( !pRi )
+		return NULL;
 
     if(!pPTR) {
-		pO = pMEM->OBJfnd( pRW->mNdID );
+		pO = pMEM->OBJfnd( pRi->mNdID );
 		if( !pO )
 			return NULL;
 		pPTR = pO->pPTR();
@@ -92,7 +111,6 @@ gpPTR* gpBLK::iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR, gpcSRC** ppSRC,
 			default:
 				AN.alf = gpeALF_null;
 		}
-
 	}
 	else if( pPTR ) {
 		if( pPTR->mNdID < 0 ){
@@ -149,6 +167,8 @@ gpBLK* gpcSRC::srcBLKmov( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 
 		switch( pBLK->opIDgrp() )
 		{
+			case gpeOPid_nop:
+				pBLK->opID = opID;
 			case gpeOPid_mov:
 				///							pRl
 				/// a = b += c *= d %= 		e =
@@ -171,28 +191,28 @@ gpBLK* gpcSRC::srcINSTmov( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
     if(!nR)
         return pBLKm;
 	gpcSRC	*pSRC = NULL;
-	gpROW	*pRa;
-	gpOBJ	*pOa, *pOs = NULL;
-	gpPTR	*pPb = NULL, *pPa;
+	gpROW	*pRi;
+	gpOBJ	*pOa, *pOs = NULL, *pOb;
+	gpPTR	*pPb = NULL, *pPi;
 	gpeOPid opB, opA;
-	for( I4 iR = nR-1; iR > -1 ; opB=opA, iR-- )
+	for( I4 iR = nR-1; iR > -1 ; pOb = pOa, opB=opA, iR-- )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOs );
-		opA = pRa->pstOP;
-		if( !pPa )
+		pPi = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSRC, &pOs );
+		opA = pRi->pstOP;
+		if( !pPi )
 			continue;
 		if( !pPb )
 		{
-			pPb = pPa; // pBLK->BLKpPTR( pS )->cpy( pMEM, pPa );
+			pPb = pPi; // pBLK->BLKpPTR( pS )->cpy( pMEM, pPi );
 			continue;
 		}
 
-		switch( pRa->pstOP ) {
+		switch( pRi->pstOP ) {
 			case gpeOPid_mov:
 			default:
 				_nop;
-				pPa->cpyREF(pPb);
-				pPb = pPa;
+				pPi->cpyREF(pPb);
+				pPb = pPi;
 				continue;
 		}
 	}

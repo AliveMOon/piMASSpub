@@ -16,7 +16,8 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
                 gpOBJ   *pOan = pSRC->srcOBJfnd( pI4[1] ),
 						*pOa = NULL,
 						*pOfrm = NULL;
-                gpPTR	*pPhr = NULL,	*pPfrm = NULL;
+                gpPTR	*pPhr = NULL,
+						*pPfrm = NULL;
 
                 U4      xfnd = pMASS->getXFNDan( pOan->AN ),
 						nA, 	nCPY;
@@ -26,8 +27,8 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 				if( pOa = pSRC->srcOBJfnd(pI4[0]) )
                 if( pOfrm = pSfrm->pMEM->pOBJ(pOa->AN.alf) )
 				{
-					I4 iPhr = pA[0];
-					pPhr = pPTR(iPhr);
+					//I4 iPhr = pA[0];
+					pPhr = pPTR(pA[0]);
 
 					/// tervek szerint a isza térési cim A0-ban lesz
 					pPfrm = pOfrm->pPTR();
@@ -48,9 +49,9 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 					if( pDST )
 						gpmMcpy( pDST, pCPY, nCPY )[nCPY] = 0;
 
-					if(bSTDcout_ent)
-						{std::cout	<< stdCYAN << "gpeALF_entry:"
-									<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
+					if(bSTDcout_jsr)
+					{std::cout	<< stdCYAN << "gpeALF_entry:"
+								<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
 				}
 
             } break;
@@ -94,14 +95,14 @@ gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
     if(!nR)
         return pBLKm;
 	gpcSRC	*pSRC = NULL;
-	gpROW	*pRa;
+	gpROW	*pRi;
 	gpOBJ	*pOblk,*pOa, *pOin = NULL;
 	gpPTR	*pPb = NULL, *pPa;
 	gpeOPid opB, opA;
 	for( I4 iR = 0; iR < nR; opB=opA, iR++ )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOin );
-		opA = pRa->pstOP;
+		pPa = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSRC, &pOin );
+		opA = pRi->pstOP;
 		if( !pPa )
 			continue;
 		if( !pPb ) {

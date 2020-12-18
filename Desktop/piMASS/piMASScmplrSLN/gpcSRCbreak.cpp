@@ -21,7 +21,8 @@ extern char gpaALF_H_sub[];
 //#define gpmSCP aSCOOP[iMN]
 
 /// 1. srcBREAK scp.MN scp.DCT scp.LNK
-U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
+U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
+						bool bNoMini, U1 selID, const char* pVAN ) {
 	if( !this )
 		return U4x4( gpdSRC_COLw, gpdSRC_ROWw );
 
@@ -35,9 +36,9 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 		dim.z = gpfUTFlen( pUTF, pUe, dim.x, dim.y );
 		return dim;
 	}
-
+	gpeOPid opID;
 	U8 nU;
-	U4 nS, nA, nN, nO, nX, u8;
+	U4 nS, nA, nN, nO, nX, u8, nSTP, nOx;
 	I8 nSTR;
 	double d8;
 	bool bABC;
@@ -172,6 +173,12 @@ U4x4 gpcSRC::srcBRK( bool bNoMini, U1 selID, const char* pVAN ) {
 			pS++; // gpmVAN( pS, pVAN, nU );
 			continue;
 		}
+
+		opID = (gpeOPid)dOP.dctMILLfnd( pS, nO, nOx = (U4)gpeOPid_jsr );
+		nSTP = dOP.nSTRix(opID);
+		if( nO > nSTP )
+			nO = nSTP;
+
 		gpmSCP.DCTadd(pos,pS,nO,clrOPERA);
 		pos.x += nO;
 		dim.a4x2[0].mx( pos );

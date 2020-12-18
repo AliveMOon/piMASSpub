@@ -31,6 +31,8 @@ gpBLK* gpcSRC::srcBLKmul( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 			case gpeOPid_dimS:
 			case gpeOPid_begin:
 				return srcBLKup( pS, pBLK, opID, mnID );
+			case gpeOPid_nop:
+				pBLK->opID = opID;
 			case gpeOPid_mul:
 				///					pRl
 				/// a = b + c *		d /
@@ -63,26 +65,26 @@ gpBLK* gpcSRC::srcINSTmul( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
     if(!nR)
         return pBLKm;
 	gpcSRC	*pSRC = NULL;
-	gpROW	*pRa;
+	gpROW	*pRi;
 	gpOBJ	*pOa, *pOin = NULL;
-	gpPTR	*pPb = NULL, *pPa;
+	gpPTR	*pPb = NULL, *pPi;
 	gpeOPid opB, opA;
 	for( I4 iR = 0; iR < nR; opB=opA, iR++ )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOin );
-		opA = pRa->pstOP;
-		if( !pPa )
+		pPi = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSRC, &pOin );
+		opA = pRi->pstOP;
+		if( !pPi )
 			continue;
 		if( !pPb ) {
-			pPb = pBLK->BLKpPTR( pS )->cpy( pMEM, pPa );
+			pPb = pBLK->BLKpPTR( pS )->cpy( pMEM, pPi );
 			continue;
 		}
 
-		bool 	bSIGa = pPa->cID&((I4)gpeCsz_B),
+		bool 	bSIGa = pPi->cID&((I4)gpeCsz_B),
 				bSIGb = pPb->cID&((I4)gpeCsz_B),
 				bSIGc = bSIGb|bSIGa;
 
-		U4	nA = gpaCsz[pPa->cID], //pPa->sOF(),
+		U4	nA = gpaCsz[pPi->cID], //pPi->sOF(),
 			nB = gpaCsz[pPb->cID], //pPb->sOF(),
 			nMN = gpmMIN(nA,nB),
 			nMX = gpmMIN(gpmMAX(nA,nB)*2, 8 );
@@ -91,8 +93,8 @@ gpBLK* gpcSRC::srcINSTmul( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 		if(!bSIGa)
 		if(nA<nMX)
 			_xor._q.D0.D0;
-		_move._l.EAl( pPa->iPC ).A0;
-		_move.c((gpeCsz)pPa->cID).IA0I.D0;
+		_move._l.EAl( pPi->iPC ).A0;
+		_move.c((gpeCsz)pPi->cID).IA0I.D0;
 		if(bSIGa)
 		if(nA<nMX)
 		switch(nA) {
@@ -161,7 +163,7 @@ gpBLK* gpcSRC::srcINSTmul( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 		}
 
 		pPb->cID = cIDc;
-		I4x2 DMb = pPb->pd2D()->MX( *pPa->pd2D() );
+		I4x2 DMb = pPb->pd2D()->MX( *pPi->pd2D() );
 
 		U4 nC = pMEM->nALL(pPb->iPC);
 		if( nC < nMX ) {
