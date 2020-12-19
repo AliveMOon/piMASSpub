@@ -166,7 +166,7 @@ class gpMEM;
 
 class gpPTR{
 public:
-    I4  iPC, bckID,	// 0
+    I4  iPC, // bckID,	// 0
         cID, cSZ,	// 8
 
         x,y,		// 16
@@ -177,15 +177,17 @@ public:
     gpPTR(){};
     gpPTR& operator = ( gpBLK* pBLK );
 	gpPTR& operator = ( gpOBJ* pO );
-    gpPTR* pNULL(); //{ gpmCLR; return this; }
-
+    gpPTR* pNULL( I4 i = -1 );
+	bool bPTR(){ return this ? (cID == gpeCsz_ptr) : false; }
+	gpPTR* pPTR( gpMEM* pMEM );
+	gpPTR* pPTRu1( gpMEM* pMEM );
 	U1* pU1( gpMEM* pMEM );
 	I4x2* pd2D(){ return this ? (I4x2*)&x : NULL; };
 
 	gpPTR* 	d2D( I4x2& d2 );
     U4 		area();
     U4 		sOF();
-    gpPTR* 	cpyREF( gpPTR* pRF );
+    gpPTR* 	cpyREF( U1* pALL, gpPTR* pRF );
     gpPTR*	cpy( gpMEM* pMEM, gpPTR* pB );
 };
 static const U4 gpaCsz[] = {

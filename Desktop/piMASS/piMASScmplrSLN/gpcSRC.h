@@ -897,7 +897,7 @@ public:
 
 		return *this;
 	}
-	U4 sOF() { return this ? pPTR()->sOF() : NULL; }
+	U4 sOF();
 	I4 cID() { return pPTR() ? pPTR()->cID : gpeCsz_OFF; }
 	I4x2* pd2D() {
 		if( !this )
@@ -1268,7 +1268,7 @@ public:
 	gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i = 0x2000 );
 	gpOBJ* OBJfnd( I4 dctID );
 	gpOBJ* OBJadd( char* pS, I4 dctID );
-	U1*	pUn( I4 iPC, U4 nU1 = 0x100 ) {
+	U1*	pUn( I4 iPC = 0, U4 nU1 = 0x100 ) {
 		if( this ? iPC < 0 : true )
 			return NULL;
 		return lzyMEM.Ux( iPC, nU1, true, sizeof(U1) );
@@ -1279,7 +1279,8 @@ public:
 	I4 iFREE( I4 iPC );
 	I4 iALL( U4 nA );
 
-	gpPTR* pPTR( I4 iPC ) { return (gpPTR*)pUn( iPC, sizeof(gpPTR)); }
+	gpPTR* pPTR( I4 i ) { return (gpPTR*)pUn( i, sizeof(gpPTR)); }
+	gpPTR* pPTRu1( I4 i ) { return pPTR( i )->pPTRu1( this ); }
 
 	gpOBJ* getOBJptr( U1* pU1, U4 nBYTE, I4 nmID );
 

@@ -10,15 +10,14 @@ void gpMEM::funPRINT()
 		*pI4 = (I4*)pUn(pA[7], nI4 ), nCPY;
 	nI4 /= gpaCsz[gpeCsz_l];
 
-
 	U8 nLEN, s;
 	I4x2 AB;
 	gpeCsz cAB;
 	I4 i = nI4-1;
-	gpPTR *pP = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
+	gpPTR *pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
 
 	char	sFRMT[0x100], *pNUM,
-			*pS = pP ? (char*)pUn(pP->iPC, pP->sOF() ) : NULL,
+			*pS = pPi ? (char*)pUn(pPi->iPC, pPi->sOF() ) : NULL,
 			*pSe = pS;
 
 	gpcLZY* pPRNT = NULL;
@@ -59,12 +58,12 @@ void gpMEM::funPRINT()
 		else
 			sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );
 
-		pP = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
-		U1* pU1 = pP->pU1(this);
+		pPi = pPTRu1(pI4[i]);
+		U1* pU1 = pPi->pU1(this);
 		if( !pU1)
 			continue;
 
-		switch( pP->cID ) {
+		switch( pPi->cID ) {
 			case gpeCsz_Q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I8*)pU1 ); break;
 			case gpeCsz_q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U8*)pU1 ); break;
 			case gpeCsz_L: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I4*)pU1 ); break;

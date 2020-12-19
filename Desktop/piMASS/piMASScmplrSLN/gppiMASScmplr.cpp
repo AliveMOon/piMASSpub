@@ -11,6 +11,13 @@ U1* gpPTR::pU1( gpMEM* pMEM )
 {
 	if( !this )
 		return NULL;
+
+	if( !bPTR() )
+		return pMEM->pUn( iPC, gpaCsz[cID] );
+
+	return pPTRu1(pMEM)->pU1(pMEM);
+	/*if( !this )
+		return NULL;
 	if( pMEM ? (iPC<0) : true )
 	{
 		if( !bckID )
@@ -19,7 +26,7 @@ U1* gpPTR::pU1( gpMEM* pMEM )
 		return pO->pU1();
 	}
 
-	return pMEM->pUn( iPC, gpaCsz[cID] );
+	return pMEM->pUn( iPC, gpaCsz[cID] );*/
 }
 ///--------------------------
 ///			gpOBJ
@@ -43,7 +50,8 @@ gpPTR* gpOBJ::pPTR(){
 	return pMEM->pPTR( iPTR );
 }
 gpPTR* gpOBJ::pPTRu1(){
-	gpPTR* pP = pPTR(), *pPu;
+	return pPTR()->pPTRu1( pMEM );
+	/*gpPTR* pP = pPTR(), *pPu;
 	if( !pP )
 		return NULL;
 	while( pP->cID == gpeCsz_ptr )
@@ -53,14 +61,14 @@ gpPTR* gpOBJ::pPTRu1(){
 			break;
 		pP = pPu;
 	}
-	return pP;
+	return pP;*/
 }
 gpPTR* gpOBJ::pPTRd2D(){
 	gpPTR* pPt = pPTR(), *pPu;
 	if( !pPt )
 		return NULL;
 
-	while( pPt->cID == gpeCsz_ptr )
+	while( pPt->bPTR() )
 	{
 		pPu = pMEM->pPTR( pPt->iPC );
 		if( !pPu )
@@ -72,6 +80,18 @@ gpPTR* gpOBJ::pPTRd2D(){
 		pPt = pPu;
 	}
 	return pPt;
+}
+U4 gpOBJ::sOF() {
+	return pPTRu1()->sOF();
+	/*gpPTR* pP = pPTR();
+	if( !pP )
+		return 0;
+	U4 n = pP->sOF();
+	if( n )
+		return n;
+
+	gpOBJ* pO = pMEM->OBJfnd( pP->bckID );
+	return pO ? pO->sOF() : 0;*/
 }
 U1* gpOBJ::pU1(){
 	gpPTR* pP = pPTRu1();
@@ -132,6 +152,8 @@ gpINST* gpMEM::instRDY( gpcLZY* pDBG ) {
 
 	pc = 0;
 	aA[7] = iSTK;
+	if(bSTDcoutCMP){std::cout << stdCMPLR " CMP" stdRESET << (char*)pDBG->p_alloc  << std::endl;}
+
 	return pINST;
 }
 void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {

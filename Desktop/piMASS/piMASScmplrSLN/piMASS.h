@@ -29,6 +29,7 @@
 #define bSTDcout_V4l2 (bSTDcout&false)
 #define bSTDcout_jsr (bSTDcout&true)
 #define bSTDcout_slmp (bSTDcout&true)
+#define bSTDcoutCMP true //false //true
 //#define stdON
 
 #include "mysys.h"

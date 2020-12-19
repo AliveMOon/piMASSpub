@@ -7,7 +7,7 @@ extern char gpaALF_H_sub[];
 
 
 
-gpPTR* gpPTR::pNULL(){ gpmCLR; return this; }
+gpPTR* gpPTR::pNULL( I4 i ){ gpmCLR; iPC = i; return this; }
 gpPTR* gpPTR::d2D( I4x2& d2 ){
     x = d2.x;
     y = d2.y;
@@ -78,21 +78,40 @@ gpPTR* gpcSRC::SRCpPTR( char* pS, gpROW& R ) {
     pPTR = pO->pPTR();
     return pPTR;
 }
-gpPTR* gpPTR::cpyREF( gpPTR* pRF )
+gpPTR* gpPTR::pPTR( gpMEM* pMEM ){
+	return this ? (gpPTR*)pMEM->pUn( iPC ) : NULL;
+}
+gpPTR* gpPTR::pPTRu1( gpMEM* pMEM ) {
+	gpPTR* pPu = this;
+	while(pPu->bPTR()){
+		pPu = pPu->pPTR( pMEM );
+	}
+	return pPu;
+}
+gpPTR* gpPTR::cpyREF( U1* pALL, gpPTR* pRF )
 {
-	gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
-	/*if(iPC<0)
-		return this;*/
-	bckID = pRF->mNdID;
+	if( !pRF )
+		return pNULL();
+
+	pRF->sOF();
+	if( pRF->bPTR() )
+	{
+		gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
+		return this;
+	}
+	iPC = (U1*)pRF - pALL;
+	x = y = 1;
+	cID = gpeCsz_ptr;
 	return this;
 }
-gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pB )
+gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb )
 {
 	if( !this )
 		return NULL;
 
 	I4 iPPC = iPC;
-	cpyREF(pB);
+	pPb = pPb->pPTRu1(pMEM);
+	*this = *pPb;
 	iPC = iPPC;
 
 	U4	nA = pMEM->nALL(iPC),
@@ -105,7 +124,7 @@ gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pB )
 		iPC = pMEM->iALL( nB );
 	}
 
-	_move._l.EAl( pB->iPC ).A0;
+	_move._l.EAl( pPb->iPC ).A0;
 	_move._l.EAl( iPC ).A1;
 	_move.c((gpeCsz)cID).IA0I.IA1I;
 	return this;

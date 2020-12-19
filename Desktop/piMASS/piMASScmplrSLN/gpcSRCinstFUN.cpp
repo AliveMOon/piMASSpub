@@ -110,12 +110,12 @@ gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I
 			/// IGEN ugyan az mint az pBu NEM történt fun
 			// akkor a pBLK->iPRT <--= pBu->iPRT
 			_nop;
-			pPd->cpyREF(pPb);
+			pPd->cpyREF( pMEM->pUn(), pPb);
 		} else {
 			/// NEM ugyan az mint az pBu IGEN történt FUN
 			// akkor a pBLK->iPRT marad
 			_nop;
-			pPd->cpyREF(pPb);
+			pPd->cpyREF(pMEM->pUn(), pPb);
 		}
 
 		break;
@@ -131,7 +131,7 @@ gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I
 	_nop;
 	return pBLKm;*/
 }
-gpBLK* gpcSRC::srcINSTdwnO( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID ) {
+/*gpBLK* gpcSRC::srcINSTdwnO( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 
@@ -177,7 +177,7 @@ gpBLK* gpcSRC::srcINSTdwnO( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, 
 	_move._L.IA0I.IA1I;
 	_nop;
 	return pBLKm;
-}
+}*/
 gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 	///kEND(scp);
 	U1* pU1 = NULL;

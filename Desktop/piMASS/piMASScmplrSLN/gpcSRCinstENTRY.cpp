@@ -125,7 +125,7 @@ gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 			_move._l.EAl( pPb->mNdID ).sIA7I;
 			_move._l.EAl( pPa->mNdID ).sIA7I;
 			pPb = pBLK->BLKpPTR( pS );
-			pPb->cpyREF(pPa);
+			pPb->cpyREF( pMEM->pUn(), pPa);
 			pPb->iPC = -1;
 			_move._l.EAl( pBLK->iPTR ).A0;
 			_jsr.EAl( gpeALF_entry );

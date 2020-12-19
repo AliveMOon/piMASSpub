@@ -182,9 +182,10 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	gpPTR* pPTR = NULL;
 	for( U4 i = 0; i < nO; i++ ) {
 		gpOBJ& obj = pO0[i];
+		if( !obj.AN.alf )
+			continue;
 		if( !(sOF=obj.sOF()) )
 			continue;
-
         if( obj.iPTR < 0)
 				continue;
 		bTMP = obj.dctID < 0 || (obj.cAN != gpeCsz_a);
