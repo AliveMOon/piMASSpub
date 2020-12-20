@@ -53,30 +53,49 @@ void gpMEM::funPRINT()
 		if( i < 0 )
 			continue;
 
-		if( AB.area() )
+		/*if( AB.area() )
 			sFRMT[0] = sprintf( sFRMT+1, "%%%d.%d%c", (int)AB.x, (int)AB.y, pSe[-1] );
 		else
-			sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );
+			sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );*/
 
 		pPi = pPTRu1(pI4[i]);
 		U1* pU1 = pPi->pU1(this);
 		if( !pU1)
 			continue;
+		switch( pSe[-1] )
+		{
+			case 's':
+			case 'S':{
+					U4 l = gpmSTRLEN(pU1+1);
+					if( l > 0 )
+						l--;
 
-		switch( pPi->cID() ) {
-			case gpeCsz_Q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I8*)pU1 ); break;
-			case gpeCsz_q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U8*)pU1 ); break;
-			case gpeCsz_L: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I4*)pU1 ); break;
-			case gpeCsz_l: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U4*)pU1 ); break;
-			case gpeCsz_W: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I2*)pU1 ); break;
-			case gpeCsz_w: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U2*)pU1 ); break;
-			case gpeCsz_B: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I1*)pU1 ); break;
-			case gpeCsz_b: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U1*)pU1 ); break;
-			case gpeCsz_f: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(float*)pU1 ); break;
-			case gpeCsz_d: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(double*)pU1 ); break;
-			case gpeCsz_4: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U4*)pU1 ); break;
-			default: break;
+					//sFRMT[0] = sprintf( sFRMT+1, "%%%ds", l );
+					pPRNT = pPRNT->lzyADD( pU1+1, l, (s=-1) );
+				} break;
+			default: {
+				if( AB.area() )
+					sFRMT[0] = sprintf( sFRMT+1, "%%%d.%d%c", (int)AB.x, (int)AB.y, pSe[-1] );
+				else
+					sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );
+				switch( pPi->cID() ) {
+					case gpeCsz_Q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I8*)pU1 ); break;
+					case gpeCsz_q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U8*)pU1 ); break;
+					case gpeCsz_L: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I4*)pU1 ); break;
+					case gpeCsz_l: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U4*)pU1 ); break;
+					case gpeCsz_W: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I2*)pU1 ); break;
+					case gpeCsz_w: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U2*)pU1 ); break;
+					case gpeCsz_B: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I1*)pU1 ); break;
+					case gpeCsz_b: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U1*)pU1 ); break;
+					case gpeCsz_f: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(float*)pU1 ); break;
+					case gpeCsz_d: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(double*)pU1 ); break;
+					case gpeCsz_4: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U4*)pU1 ); break;
+					default: break;
+				}
+			} break;
+
 		}
+
 	}
 
 	pS = pPRNT ? (char*)pPRNT->p_alloc : NULL;

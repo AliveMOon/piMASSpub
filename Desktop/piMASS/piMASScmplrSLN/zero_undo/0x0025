@@ -7,6 +7,4 @@
  ,
  d = c%4;
  mini = print( "hello %d",c );
- agein = 10;
- mimi = print( "%s %d",mini,c );
-  a1	   
+ agein = 10; a1	   

@@ -57,17 +57,6 @@ gpPTR* gpOBJ::pPTRu1(){
 	if( !this )
 		return NULL;
 	return pPTR()->pPTRu1( pMEM );
-	/*gpPTR* pP = pPTR(), *pPu;
-	if( !pP )
-		return NULL;
-	while( pP->cID == gpeCsz_ptr )
-	{
-		pPu = pMEM->pPTR( pP->iPC );
-		if( !pPu )
-			break;
-		pP = pPu;
-	}
-	return pP;*/
 }
 gpPTR* gpOBJ::pPTRd2D(){
 	gpPTR* pPt = pPTR(), *pPu;

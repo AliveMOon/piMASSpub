@@ -127,6 +127,8 @@ gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb )
 			pMEM->iFREE( iPC );
 		iPC = pMEM->iALL( nB );
 	}
+	if( (pPb->iPC < 0) || (iPC < 0) )
+		return this;
 
 	_move._l.EAl( pPb->iPC ).A0;
 	_move._l.EAl( iPC ).A1;
