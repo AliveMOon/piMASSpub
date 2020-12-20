@@ -27,21 +27,29 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 {
 	gpOBJ* pOi = NULL;
 	gpROW* pRi = NULL;
-	gpPTR* pPi = NULL;
+	gpPTR* pPi = NULL, *pPu;
 	gpBLK* pBup = iROWblk( pS, i, &pRi );
 
     if( ppR )
 		*ppR = pRi;
 
 	if( pBup )
-	if( pBup->iPTR > 0 ) {
-		pPi = pBup->BLKpPTR( pS );
-        while( pPi->cID == gpeCsz_ptr ) {
-			pPi = pMEM->pPTR( pPi->iPC );
+	if( pBup->iPTR > 0 )
+	if(	pPi = pBup->BLKpPTR( pS ) ) {
+        while( pPi->cID() == gpeCsz_ptr ) {
+			pPu = pMEM->pPTR( pPi->iPC );
+			if( pPu ) {
+				pPi = pPu;
+				continue;
+			}
+			pPu = pMEM->pPTR( pPi->iPC );;
+			break;
         }
         pOi = pMEM->OBJfnd( pPi->mNdID );
         if( ppO )
 			*ppO = pOi;
+    } else {
+    	pPi = pBup->BLKpPTR( pS );
     }
     if( !pRi )
 		return NULL;
@@ -59,7 +67,7 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 	I4x2	DM(1,1);
 	I8x2 	AN(0);
 
-	I4 cID = gpeCsz_L;
+	I4 cIDblk = gpeCsz_L;
 	if(pOi->bAN()) {
 		if(ppSRC) {
 			U4 xfnd = pMEM->pMASS->getXFNDan( pOi->AN );
@@ -92,9 +100,12 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 			if( ppOin )
 				*ppOin = pSRC->pMEM->pOBJ(pOi->AN.alf);
 
-			gpPTR* pPin = (*ppOin)->pPTR();
-			pPi->cpyREF( pMEM->pUn(), pPin );
+			I4 imNdID = pPi->mNdID; // (*ppOin) ? (*ppOin)->oID : 0;
+			gpPTR* pPin = (*ppOin)->pPTRu1();
+			//pPi->cpyREF( pMEM->pUn(), pPin );
+			*pPi = *pPin;
 			pPi->iPC = -1;
+			pPi->mNdID = imNdID;
 			return pPi;
 		}
 
@@ -106,7 +117,7 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 		AN = pOi->AN;
 		switch( AN.alf ) {
 			case gpeALF_FPS:			/// beépített FPS
-				cID = gpeCsz_L;
+				cIDblk = gpeCsz_L;
 				break;
 			default:
 				AN.alf = gpeALF_null;
@@ -114,16 +125,16 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 	}
 	else if( pPi ) {
 		if( pPi->mNdID < 0 ){
-			cID = pPi->cID;
+			cIDblk = pPi->cID();
 			DM = *pPi->pd2D();
 		}
 		else {
 			/// beépített CÉL változó?
-			cID = pMEM->instDOit( *pOi, NULL );
-			if( cID != gpeCsz_OFF )
-				pPi->cID = cID;		/// igen ha kapunk typust akkor találat
+			cIDblk = pMEM->instDOit( *pOi, NULL );
+			if( cIDblk != gpeCsz_OFF )
+				pPi->cID( cIDblk );		/// igen ha kapunk typust akkor találat
 			else
-				cID = pPi->cID;		/// nem
+				cIDblk = pPi->cID();		/// nem
 		}
 	}
 
@@ -131,12 +142,12 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 		return pPi;
 
 	U4	nA = pMEM->nALL(pPi->iPC),
-		nC = gpaCsz[cID]*DM.area();
+		nC = gpaCsz[cIDblk]*DM.area();
 	if( nA < nC ) {
 		/// nem lett még lefoglalva
 		if( nA )
 			pMEM->iFREE( pPi->iPC );
-		pPi->cID = cID;
+		pPi->cID( cIDblk );
 		pPi->d2D( DM );
 		pPi->iPC = pMEM->iALL( pPi->sOF() );
 	}

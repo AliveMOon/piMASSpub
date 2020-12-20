@@ -63,7 +63,7 @@ void gpMEM::funPRINT()
 		if( !pU1)
 			continue;
 
-		switch( pPi->cID ) {
+		switch( pPi->cID() ) {
 			case gpeCsz_Q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I8*)pU1 ); break;
 			case gpeCsz_q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U8*)pU1 ); break;
 			case gpeCsz_L: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I4*)pU1 ); break;
@@ -92,7 +92,7 @@ void gpMEM::funPRINT()
 		pPhr->iPC = iALL( nCPY );
 	}
 	nA = nALL(pPhr->iPC);
-	pPhr->cID = gpeCsz_b;
+	pPhr->cID(gpeCsz_b);
 	I4x2 dm(nCPY,1);
 	pPhr->d2D( dm );
 

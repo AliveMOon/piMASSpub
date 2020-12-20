@@ -13,9 +13,13 @@ U1* gpPTR::pU1( gpMEM* pMEM )
 		return NULL;
 
 	if( !bPTR() )
-		return pMEM->pUn( iPC, gpaCsz[cID] );
+		return pMEM->pUn( iPC, gpaCsz[cID()] );
 
-	return pPTRu1(pMEM)->pU1(pMEM);
+	gpPTR* pPi = pPTRu1(pMEM);
+	if( !pPi->bPTR() )
+		return NULL;
+
+	return pMEM->pUn( pPi->iPC, gpaCsz[pPi->cID()] );
 	/*if( !this )
 		return NULL;
 	if( pMEM ? (iPC<0) : true )
@@ -43,13 +47,15 @@ gpPTR* gpOBJ::pPTR(){
 		if( !pPTR )
 			return NULL;
 		pPTR->mNdID = dctID;
-		pPTR->cID = gpeCsz_OFF;
+		pPTR->cID(gpeCsz_OFF);
 		pPTR->iPC = -1;
 		return pPTR;
 	}
 	return pMEM->pPTR( iPTR );
 }
 gpPTR* gpOBJ::pPTRu1(){
+	if( !this )
+		return NULL;
 	return pPTR()->pPTRu1( pMEM );
 	/*gpPTR* pP = pPTR(), *pPu;
 	if( !pP )
@@ -83,15 +89,9 @@ gpPTR* gpOBJ::pPTRd2D(){
 }
 U4 gpOBJ::sOF() {
 	return pPTRu1()->sOF();
-	/*gpPTR* pP = pPTR();
-	if( !pP )
-		return 0;
-	U4 n = pP->sOF();
-	if( n )
-		return n;
-
-	gpOBJ* pO = pMEM->OBJfnd( pP->bckID );
-	return pO ? pO->sOF() : 0;*/
+}
+I4 gpOBJ::cID() {
+	return pPTRu1()->cID();
 }
 U1* gpOBJ::pU1(){
 	gpPTR* pP = pPTRu1();
@@ -126,7 +126,7 @@ gpPTR* gpBLK::BLKpPTR( char* pS ) {
 			if( pPTR->mNdID > 0 )
 				pPTR->mNdID *= -1;
 
-			pPTR->cID = gpeCsz_OFF;
+			pPTR->cID( gpeCsz_OFF );
 			pPTR->iPC = -1;
 		}
 		return pPTR;

@@ -239,7 +239,7 @@ gpBLK* gpcSRC::srcBLKaryNUM( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID, gpeCsz cA
 	gpPTR* pP = pO->pPTRu1();
 	pP->x = pP->y = 1;
 	pP->z = 0;
-	pP->cID = cAN;
+	pP->cID( cAN );
 	U4 nS = sizeof(AN);
 
 	I4x4* pALL = pMEM->pALL( pP->iPC );
@@ -276,7 +276,7 @@ gpBLK* gpcSRC::srcBLKaryUTF8( gpBLK* pBLK, I4 mnID, char* pS, U4 nS ) {
 	pP->x = nS;
 	pP->y = 1;
 	pP->z = 0;
-	pP->cID = gpeCsz_b;
+	pP->cID( gpeCsz_b );
 
 	return pBLK;
 }

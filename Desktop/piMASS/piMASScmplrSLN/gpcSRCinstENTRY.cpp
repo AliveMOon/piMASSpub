@@ -28,10 +28,10 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
                 if( pOfrm = pSfrm->pMEM->pOBJ(pOa->AN.alf) )
 				{
 					//I4 iPhr = pA[0];
-					pPhr = pPTR(pA[0]);
+					pPhr = pPTRu1(pA[0]);
 
 					/// tervek szerint a isza térési cim A0-ban lesz
-					pPfrm = pOfrm->pPTR();
+					pPfrm = pOfrm->pPTRu1();
 					nCPY = pOfrm->sOF();
 					pCPY = pOfrm->pU1();
 
@@ -42,7 +42,7 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 						pPhr->iPC = iALL( nCPY );
 					}
 					nA = nALL(pPhr->iPC);
-					pPhr->cID = pPfrm->cID;
+					pPhr->cID(pPfrm->cID());
 					pPhr->d2D( *pPfrm->pd2D() );
 
 					pDST = pPhr->pU1( this );
@@ -97,16 +97,16 @@ gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	gpcSRC	*pSRC = NULL;
 	gpROW	*pRi;
 	gpOBJ	*pOblk,*pOa, *pOin = NULL;
-	gpPTR	*pPb = NULL, *pPa;
+	gpPTR	*pPb = NULL, *pPi;
 	gpeOPid opB, opA;
 	for( I4 iR = 0; iR < nR; opB=opA, iR++ )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSRC, &pOin );
+		pPi = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSRC, &pOin );
 		opA = pRi->pstOP;
-		if( !pPa )
+		if( !pPi )
 			continue;
 		if( !pPb ) {
-			pPb = pPa; // pBLK->BLKpPTR( pS )->cpy( pMEM, pPa );
+			pPb = pPi; // pBLK->BLKpPTR( pS )->cpy( pMEM, pPi );
 			continue;
 		}
 
@@ -123,10 +123,12 @@ gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 		_move._q.A7.D7;
 
 			_move._l.EAl( pPb->mNdID ).sIA7I;
-			_move._l.EAl( pPa->mNdID ).sIA7I;
+			_move._l.EAl( pPi->mNdID ).sIA7I;
+
 			pPb = pBLK->BLKpPTR( pS );
-			pPb->cpyREF( pMEM->pUn(), pPa);
-			pPb->iPC = -1;
+			//pPb->cpyREF( pMEM->pUn(), pPi);
+			//pPb->iPC = -1;
+
 			_move._l.EAl( pBLK->iPTR ).A0;
 			_jsr.EAl( gpeALF_entry );
 

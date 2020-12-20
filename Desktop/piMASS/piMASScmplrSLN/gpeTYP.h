@@ -167,7 +167,7 @@ class gpMEM;
 class gpPTR{
 public:
     I4  iPC, // bckID,	// 0
-        cID, cSZ,	// 8
+        cid, cSZ,	// 8
 
         x,y,		// 16
         z,  w,		// 24
@@ -178,7 +178,6 @@ public:
     gpPTR& operator = ( gpBLK* pBLK );
 	gpPTR& operator = ( gpOBJ* pO );
     gpPTR* pNULL( I4 i = -1 );
-	bool bPTR(){ return this ? (cID == gpeCsz_ptr) : false; }
 	gpPTR* pPTR( gpMEM* pMEM );
 	gpPTR* pPTRu1( gpMEM* pMEM );
 	U1* pU1( gpMEM* pMEM );
@@ -187,6 +186,9 @@ public:
 	gpPTR* 	d2D( I4x2& d2 );
     U4 		area();
     U4 		sOF();
+    I4		cID(){ return this ? cid : gpeCsz_OFF; }
+	I4		cID( I4 c ) { return this ? cid=c : gpeCsz_OFF; }
+	bool bPTR(){ return this ? (cid == gpeCsz_ptr) : false; }
     gpPTR* 	cpyREF( U1* pALL, gpPTR* pRF );
     gpPTR*	cpy( gpMEM* pMEM, gpPTR* pB );
 };

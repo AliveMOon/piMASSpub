@@ -23,7 +23,7 @@ U4 gpPTR::sOF(){
 	if( w )
         return w;
     if(!cSZ)
-        cSZ = gpaCsz[cID];
+        cSZ = gpaCsz[cID()];
 
     return w = area()*cSZ;
 }
@@ -33,13 +33,13 @@ gpPTR& gpPTR::operator = ( gpBLK* pBLK ) {
     gpPTR* pBp = pBLK->BLKpPTR( NULL );
     if( !pBp ) {
         iPC = -1;
-        cID = gpeCsz_OFF;
+        cID( gpeCsz_OFF );
         return *this;
     }
 	mNdID = pBp->mNdID;
     iPC = pBp->iPC;
-    cID = pBp->cID;
-    cSZ = gpaCsz[cID];
+    cID(pBp->cID());
+    cSZ = gpaCsz[cID()];
     d2D( *pBp->pd2D() );
     return *this;
 }
@@ -49,13 +49,13 @@ gpPTR& gpPTR::operator = ( gpOBJ* pO ) {
 	gpPTR* pPo = pO->pPTR();
     if( !pO ) {
         iPC = -1;
-        cID = gpeCsz_OFF;
+		cID( gpeCsz_OFF );
         return *this;
     }
     mNdID = pPo->mNdID;
     iPC = pPo->iPC;
-    cID = pPo->cID;
-    cSZ = gpaCsz[cID];
+    cID(pPo->cID());
+    cSZ = gpaCsz[cID()];
     d2D( *pPo->pd2D() );
     return *this;
 }
@@ -67,7 +67,7 @@ gpPTR* gpcSRC::SRCpPTR( char* pS, gpROW& R ) {
 						: NULL )
     if( pBup->iPTR > 0 ) {
 		pPTR = pBup->BLKpPTR( pS );
-        while( pPTR->cID == gpeCsz_ptr ) {
+        while( pPTR->cID() == gpeCsz_ptr ) {
 			pPTR = pMEM->pPTR( pPTR->iPC );
         }
         return pPTR;
@@ -82,11 +82,16 @@ gpPTR* gpPTR::pPTR( gpMEM* pMEM ){
 	return this ? (gpPTR*)pMEM->pUn( iPC ) : NULL;
 }
 gpPTR* gpPTR::pPTRu1( gpMEM* pMEM ) {
-	gpPTR* pPu = this;
-	while(pPu->bPTR()){
-		pPu = pPu->pPTR( pMEM );
+	gpPTR* pPi = this, *pPu;
+	while(pPi->bPTR()){
+		pPu = pPi->pPTR( pMEM );
+		if( pPu ) {
+			pPi = pPu;
+			continue;
+		}
+		break;
 	}
-	return pPu;
+	return pPi;
 }
 gpPTR* gpPTR::cpyREF( U1* pALL, gpPTR* pRF )
 {
@@ -94,14 +99,13 @@ gpPTR* gpPTR::cpyREF( U1* pALL, gpPTR* pRF )
 		return pNULL();
 
 	pRF->sOF();
-	if( pRF->bPTR() )
-	{
+	if(pRF->bPTR()) {
 		gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
 		return this;
 	}
 	iPC = (U1*)pRF - pALL;
 	x = y = 1;
-	cID = gpeCsz_ptr;
+	cID( gpeCsz_ptr );
 	return this;
 }
 gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb )
@@ -126,7 +130,7 @@ gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb )
 
 	_move._l.EAl( pPb->iPC ).A0;
 	_move._l.EAl( iPC ).A1;
-	_move.c((gpeCsz)cID).IA0I.IA1I;
+	_move.c((gpeCsz)cID()).IA0I.IA1I;
 	return this;
 }
 gpBLK* gpBLK::pRST( gpMEM* pM )

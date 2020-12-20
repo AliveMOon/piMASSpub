@@ -188,47 +188,21 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 			continue;
         if( obj.iPTR < 0)
 				continue;
+		gpPTR* pP = obj.pPTRu1();
+		if( pP->iPC < 0 )
+			continue;
+
 		bTMP = obj.dctID < 0 || (obj.cAN != gpeCsz_a);
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPTR );
 		pUdbg = pLZY ? pLZY->p_alloc : NULL;
-		gpPTR* pP = obj.pPTRu1();
 		area = pP->pd2D()->area();
 		pU1 = pP->pU1(obj.pMEM);
 
         nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
-
-        switch(cID = pP->cID) {
-            case gpeCsz_ptr:
-            case gpeCsz_a:
-            case gpeCsz_c: {
-					if( nS ){
-						pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
-						pLZY = pLZY->lzyADD( pS, nS, (s=-1), -1 );
-						pLZY = pLZY->lzyFRMT( (s=-1), "=" );
-					}
-					if( area < 2 )
-						continue;
-
-					switch( cID )
-					{
-						case gpeCsz_B:
-						case gpeCsz_b:
-								pLZY = pLZY->lzyFRMT( (s=-1), " %s,", *pU1?(char*)pU1:"?" );
-						default:
-							continue;
-					}
-				} continue;
-            default:
-                if( obj.dctID > -1  )
-					break;
-
-				pLZY = pLZY->lzyFRMT( (s=-1), "%s,", pU1?(char*)pU1:"?" );
-				continue;
-		}
-
-		if( !nS )
+        if( !nS )
 			continue;
 
+		cID = pP->cID();
 		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
 		pLZY = pLZY->lzyADD( pS, nS, (s=-1), -1 );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );

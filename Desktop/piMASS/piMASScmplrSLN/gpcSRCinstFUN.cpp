@@ -65,13 +65,14 @@ gpPTR* gpBLK::instFUN( char* pS, I8x2& AN, gpBLK *pARG )
 		}
 	}
 		gpPTR* pP = BLKpPTR( pS );
+
 		switch( AN.alf ) {
 			case gpeALF_SIN:
 			case gpeALF_COS:
-				pP->cID = gpeCsz_L;
+				pP->cID(gpeCsz_L);
 				break;
 			case gpeALF_PRINT:
-				pP->cID = gpeCsz_b;
+				pP->cID(gpeCsz_b);
 				break;
 			default:
 				break;
@@ -131,53 +132,7 @@ gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I
 	_nop;
 	return pBLKm;*/
 }
-/*gpBLK* gpcSRC::srcINSTdwnO( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID ) {
-	if( !pBLKm )
-		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 
-	I4  nR = pBLK->nROW();
-    if(!nR)
-        return pBLKm;
-
-	//I4 aiPC[2], sOF = 0, cID = -1;
-	//U1* pU1 = NULL;
-	gpcSRC	*pSin;
-	gpROW	*pRm, *pRi;
-	gpOBJ	*pO, *pOa, *pOin = NULL;
-	gpPTR	*pPu = pBLKup->BLKpPTR( pS ),
-			*pPd = pBLKm->iROWptr(	pS, pBLKup->bIDmR, &pRm, &pO ),
-			*pPb = NULL, *pPa;
-	gpeOPid opB, opA;
-
-	for( I4 iR = 0; iR < nR; opB=opA, iR++ ) {
-		pPa = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSin, &pOin );
-		opA = pRi->pstOP;
-		if( !pPa )
-			continue;
-
-		if( !pPb )
-			pPb = pPd;
-
-		switch( opA ) {
-			case gpeOPid_brakS:
-				pBLK->instFUN( pS, pOa->AN, pBLKup );
-				break;
-			default:
-				break;
-		}
-	}
-
-	if( pPd->iPC < 0 ) {
-		pPd->cpyREF(pPu);
-		_nop;
-		return pBLKm;
-	}
-	_move._l.EAl(pPu->iPC).A0;
-	_move._l.EAl(pPd->iPC).A1;
-	_move._L.IA0I.IA1I;
-	_nop;
-	return pBLKm;
-}*/
 gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 	///kEND(scp);
 	U1* pU1 = NULL;

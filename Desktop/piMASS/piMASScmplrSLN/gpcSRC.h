@@ -898,7 +898,7 @@ public:
 		return *this;
 	}
 	U4 sOF();
-	I4 cID() { return pPTR() ? pPTR()->cID : gpeCsz_OFF; }
+	I4 cID(); // { return pPTR() ? pPTR()->cID : gpeCsz_OFF; }
 	I4x2* pd2D() {
 		if( !this )
 			return 0;
