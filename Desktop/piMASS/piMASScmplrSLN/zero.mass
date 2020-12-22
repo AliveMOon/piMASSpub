@@ -7,6 +7,6 @@
  ,
  d = c%4;
  mini = print( "hello %d",c );
- agein = 10;
- mimi = print( "%s %d",mini,c );
+ again = 10;
+ mimi = print( "%s %d",mini,fps );
   a1	   

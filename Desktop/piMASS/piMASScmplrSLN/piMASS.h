@@ -210,7 +210,7 @@
 //#define gpdGT_LIST_tOUT 3
 #define gpdPICbg "/mnt/ram/bg.png"
 #define gpsMINI_CHAR "mini_char_16x32_8x32.png" //"mini_char_64x512.png"	// "mini_char_16x32.png" //
-#define gpsMINI_ISO "mini_ISO_32x32_1024x1536.png"
+#define gpsMINI_ISO "mini_ISO_32x32_1024x1536_3.png"
 
 
 
