@@ -1,0 +1,18 @@
+ a0	 
+ a = 10;
+ b = 20;
+ c = a+b
+  *(a + b)
+  *b/a
+ ,
+ d = c%4;
+ mini = print( "hello %d",c );
+ again = 10;
+ mimi = print( "%s %d",mini,fps );
+  b0	 
+ gsm = "hello";
+ again = 10;
+ 
+ 
+ 
+  a1	   

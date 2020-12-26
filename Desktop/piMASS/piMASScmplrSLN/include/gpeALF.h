@@ -649,6 +649,7 @@ typedef enum gpeALF:I8
 	gpeALF_GIT = gpdABC('G', 'I', 'T'),
 	gpeALF_GIV = gpdABC('G', 'I', 'V'),
 	gpeALF_GPU = gpdABC('G', 'P', 'U'),
+	gpeALF_GSM = gpdABC('G', 'S', 'M'),
 	gpeALF_GXT = gpdABC('G', 'X', 'T'),
 	gpeALF_HUD = gpdABC('H', 'U', 'D'),
 	gpeALF_inc = gpdABC('I', 'N', 'C'),

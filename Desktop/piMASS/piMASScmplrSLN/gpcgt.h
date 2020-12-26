@@ -23,6 +23,7 @@
 //~ SOFTWARE.
 
 #include "gpcpic.h"
+#include "sim7x00.h"
 
 #define gpmGTent (sGTent[0]?(char*)sGTent:"\r\n")
 
@@ -307,8 +308,7 @@ public:
 	gpcDrc& JUDO( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)
-class gpcROBnD
-{
+class gpcROBnD {
 	public:
 		U4x4	pc,
 				ioSW;
@@ -893,6 +893,7 @@ class gpcGT
 			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
+		I8		GTgsm( gpcWIN* pWIN );
 		I8		GTcnct( gpcWIN* pWIN ); //, gpcGTall& acpt );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );

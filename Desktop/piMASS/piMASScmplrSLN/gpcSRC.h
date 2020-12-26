@@ -1314,7 +1314,7 @@ public:
 	U1*		instVAR( U1* p_dst, gpINST& inst );
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
 	I4		instDOitSLMP( gpcGT* pGT );
-
+	I4		instDOitGSM( gpcGT* pGT );
 	void	funPRINT();
 };
 

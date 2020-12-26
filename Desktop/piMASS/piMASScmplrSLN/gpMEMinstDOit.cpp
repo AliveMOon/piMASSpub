@@ -113,8 +113,13 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 			#endif
 			pGT->GTlst( pWIN, pMASS->GTcnct );
 		} break;
+		case gpeALF_GSM: {									cID = gpeCsz_b; if( bCID ) break;
+            pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
+            instDOitGSM( pGT );
+        } break;
 		/// --------------------------------------------------------------------------
 		/// CONNECT
+
 		case gpeALF_SLMP: {									cID = gpeCsz_b; if( bCID ) break;
             pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
             instDOitSLMP( pGT );

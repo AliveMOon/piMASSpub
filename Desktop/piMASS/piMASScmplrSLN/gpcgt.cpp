@@ -233,9 +233,18 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	if( iGTfr < nGTld )
 	{
 		pGT = new gpcGT( an, port );
-		gpmMcpyOF( pGT->s_ip, pS, nCMP );
-		pGT->s_ip[nCMP] = 0;
+		switch( alf ) {
+			case gpeALF_GSM:{
+					U8 s = 0;
+					gpmSTRCPY(pGT->s_ip,pIPA);
+					//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s, -1 );
+				} break;
+			default:
+				gpmMcpyOF( pGT->s_ip, pS, nCMP );
+				pGT->s_ip[nCMP] = 0;
+				break;
 
+		}
 		return ppGTalloc[iGTfr] = pGT;
 	}
 
@@ -250,9 +259,18 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	}
 
 	pGT = new gpcGT( an, port );
-	gpmMcpyOF( pGT->s_ip, pS, nCMP );
-	pGT->s_ip[nCMP] = 0;
+	switch( alf ) {
+		case gpeALF_GSM:{
+				U8 s = 0;
+				gpmSTRCPY(pGT->s_ip,pIPA);
+				//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s, -1 );
+			} break;
+		default:
+			gpmMcpyOF( pGT->s_ip, pS, nCMP );
+			pGT->s_ip[nCMP] = 0;
+			break;
 
+	}
 	return ppGTalloc[iGTfr] = pGT;
 }
 gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
@@ -731,7 +749,7 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 	tv.tv_sec = 0;
 	tv.tv_usec = gpdGT_LIST_tOUT;
 
-	bool bNEWip = *s_ip == '!';
+	bool bNEWip = (*s_ip == '!');
 	U8 s;
 	if( bNEWip || bGTdie() ) //socket == INVALID_SOCKET )
 	{
