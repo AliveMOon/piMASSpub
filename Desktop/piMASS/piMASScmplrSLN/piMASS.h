@@ -192,8 +192,13 @@
 #define gpdSYNmSEC		333
 #define gpdRECVn 		(0x30000/0x4) 	//0x4000*4	//	(0x30000/0x10)
 #define gpdHUDn			(gpdRECVn/0x4)
+
+#define gpdWIN_WIDTH	480	//(sdlDM.w*4)/8			//480	//(sdlDM.w*4)/8			//
+#define gpdWIN_HEIGHT	800	//(winSIZ.x*6)/8			//800	//(winSIZ.x*6)/8		//
+
 #define gpdRPI_WIDTH	640	//960 	//1280 	//640	//1280	//320	//	Allowable widths: 320, 640, 1280
 #define gpdRPI_HEIGHT	320	//480 	//960 	//480 // 960	//240	//	Allowable heights: 240, 480, 960
+
 #define gpdJDOIT_tOUT	3
 
 #define gpdSDL_tOUT		5
@@ -2531,8 +2536,7 @@ public:
 		return pBUFF;
     }
 	// cnt = fract * U42(1, w);
-	I4x2& snail( I4 i )
-	{
+	I4x2& snail( I4 i ) {
 		if( !i )
 			return null();
 
@@ -2615,8 +2619,7 @@ public:
 	I8x2 operator * ( int b ) const; ///? { return *this * (I8)b };
 	I8x2 operator * ( float b ) const; // { return *this * (I8)b };
 	I8x2 operator * ( double b ) const; // { return *this * (I8)b };
-	I4x2 operator / ( int b ) const
-	{
+	I4x2 operator / ( int b ) const {
 		if( !b )
 			return I4x2( 0x7fffffff, 0x7fffffff );
 		if( b == 1 )
@@ -2626,8 +2629,7 @@ public:
 
 		return I4x2( x/b, y/b );
 	}
-	I4x2 operator % ( int b ) const
-	{
+	I4x2 operator % ( int b ) const {
 		if( ( b > 0 ? b : -b ) < 2 )
 			return 0;
 
@@ -2635,14 +2637,12 @@ public:
 	}
 
 
-	I8 operator * (const I4x2& b) const
-	{
+	I8 operator * (const I4x2& b) const {
 		return (I8)x*b.x + (I8)y * b.y;
 	}
 
 
-	I4x2 operator & (U8 b) const
-	{
+	I4x2 operator & (U8 b) const {
 		if( !b )
 			return 0;
 
@@ -2651,8 +2651,7 @@ public:
 		return a;
 	}
 
-	I4x2 operator >> (int b) const
-	{
+	I4x2 operator >> (int b) const {
 		if(!b)
 			return *this;
 
@@ -2734,8 +2733,7 @@ public:
 	}
 	I4x2& null( void ) { gpmCLR; return *this; }
 
-	I4x2& operator += ( const U4x2& u )
-	{
+	I4x2& operator += ( const U4x2& u ) {
 		I4x2 b = u;
 		x += b.x;
 		y += b.y;

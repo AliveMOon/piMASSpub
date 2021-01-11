@@ -78,8 +78,9 @@ gpPTR* gpcSRC::SRCpPTR( char* pS, gpROW& R ) {
     pPTR = pO->pPTR();
     return pPTR;
 }
-gpPTR* gpPTR::cpyREF( gpPTR* pRF )
-{
+gpPTR* gpPTR::cpyREF( gpPTR* pRF ) {
+	if( !pRF )
+		return pNULL();
 	gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
 	/*if(iPC<0)
 		return this;*/

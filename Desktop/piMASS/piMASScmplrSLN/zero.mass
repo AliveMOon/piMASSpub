@@ -10,7 +10,7 @@
  again = 10;
  mimi = print( "%s %d",mini,fps );
   b0	  
- gsm = "Bodor Dezso";
+ gsm = "ttyS0";
  again = 10;
  
  

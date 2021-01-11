@@ -575,7 +575,7 @@ typedef enum gpeALF:I8
 	gpeALF_NA = gpdAB('N', 'A'),
 	gpeALF_NO = gpdAB('N', 'O'),
 
-	gpeALF_OK = gpdAB('O', 'K'),
+	gpeALF_OK = gpdAB('O', 'K'),		// SIM7600 - AT+CRESET
 
 	gpeALF_ON = gpdAB('O', 'N'),
 	gpeALF_or = gpdAB('O', 'R'),
@@ -686,6 +686,8 @@ typedef enum gpeALF:I8
 	/// PIC 0 -----------------------------------------------
 	gpeALF_PIC = gpdABC('P', 'I', 'C'),
 	/// PIX dx PixelShader gl FragmentShader
+	gpeALF_PIN = gpdABC('P', 'I', 'N'),		// SIM7600 - AT+CRESET
+
 	gpeALF_PIX = gpdABC('P', 'I', 'X'),
 	gpeALF_PMX = gpdABC('P', 'M', 'X'),
 	gpeALF_PMY = gpdABC('P', 'M', 'Y'),
@@ -695,6 +697,9 @@ typedef enum gpeALF:I8
 	gpeALF_POS = gpdABC('P', 'O', 'S'),
 
 	gpeALF_PRG = gpdABC('P', 'R', 'G'),
+
+	gpeALF_RDY = gpdABC('R', 'D', 'Y'),		// SIM7600 - AT+CRESET
+
 	gpeALF_REF = gpdABC('R', 'E', 'F'),
 	gpeALF_REG = gpdABC('R', 'E', 'G'),
 	gpeALF_rem = gpdABC('R', 'E', 'M'),
@@ -708,6 +713,7 @@ typedef enum gpeALF:I8
 	gpeALF_SDY = gpdABC('S', 'D', 'Y'),
 
 	gpeALF_SEC = gpdABC('S', 'E', 'C'),
+	gpeALF_SIM = gpdABC('S', 'I', 'M'),		// SIM7600 - AT+CRESET
 	gpeALF_SIN = gpdABC('S', 'I', 'N'),
 	gpeALF_SIT = gpdABC('S', 'I', 'T'),
 	gpeALF_slM = gpdABC('S', 'L', 'M'),
@@ -760,7 +766,16 @@ typedef enum gpeALF:I8
 	gpeALF_BONE = gpdABCD('B', 'O', 'N', 'E'),
 	gpeALF_BUMM = gpdABCD('B', 'U', 'M', 'M'),
 	gpeALF_BUMP = gpdABCD('B', 'U', 'M', 'P'),
+
+	gpeALF_CGMI = gpdABCD('C', 'G', 'M', 'I'),		// SIM7600 - Module Manufacture
+	gpeALF_CGMM = gpdABCD('C', 'G', 'M', 'M'),		// SIM7600 - Module MODEL
+	gpeALF_CGMR = gpdABCD('C', 'G', 'M', 'R'),		// SIM7600 - Module MODEL
+	gpeALF_CGSN = gpdABCD('C', 'G', 'S', 'N'),		// SIM7600 - Serial Num
+
 	gpeALF_CNLC = gpdABCD('C', 'N', 'L', 'C'),
+	gpeALF_COPS = gpdABCD('C', 'O', 'P', 'S'),		/// SIM7600 - PROVIDER?
+
+	gpeALF_CPIN = gpdABCD('C', 'P', 'I', 'N'),		// SIM7600 - AT+CRESET
 
 	gpeALF_comE = gpdABCD('C', 'O', 'M', 'E'),
 	gpeALF_comS = gpdABCD('C', 'O', 'M', 'S'),
@@ -992,6 +1007,7 @@ typedef enum gpeALF:I8
 	gpeALF_entry = gpdABCDE('E', 'N', 'T', 'R', 'Y'),
 
 	gpeALF_ERECT = gpdABCDE('E', 'R', 'E', 'C', 'T'),
+	gpeALF_ERROR = gpdABCDE('E', 'R', 'R', 'O', 'R'), // SIM7600 - AT+CRESET
 	gpeALF_HELLO = gpdABCDE('H', 'E', 'L', 'L', 'O'),
 	gpeALF_GETMX = gpdABCDE('G', 'E', 'T', 'M', 'X'),
 	gpeALF_GLOBA = gpdABCDE('G', 'L', 'O', 'B', 'A'),
@@ -1028,6 +1044,7 @@ typedef enum gpeALF:I8
 	gpeALF_PICix = gpdABCDE('P', 'I', 'C', 'I', 'X'),	// 9
 	gpeALF_PICxi = gpdABCDE('P', 'I', 'C', 'X', 'I'),	// 11
 
+	gpeALF_READY = gpdABCDE('R', 'E', 'A', 'D', 'Y'),
 	gpeALF_REPIC = gpdABCDE('R', 'E', 'P', 'I', 'C'),
 
 
@@ -1117,6 +1134,8 @@ typedef enum gpeALF:I8
 	gpeALF_CNLxiY = gpdABCDEF('C', 'N', 'L', 'X', 'I', 'Y'),
 	gpeALF_CNLxiZ = gpdABCDEF('C', 'N', 'L', 'X', 'I', 'Z'),
 	gpeALF_CNLxiW = gpdABCDEF('C', 'N', 'L', 'X', 'I', 'W'),
+
+	gpeALF_CRESET = gpdABCDEF('C', 'R', 'E', 'S', 'E', 'T'),	// SIM7600 - AT
 
 
 	gpeALF_ELAPSE = gpdABCDEF('E', 'L', 'A', 'P', 'S', 'E'),

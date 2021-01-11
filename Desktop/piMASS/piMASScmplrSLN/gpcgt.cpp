@@ -233,7 +233,9 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	if( iGTfr < nGTld )
 	{
 		pGT = new gpcGT( an, port );
-		switch( alf ) {
+		gpmMcpyOF( pGT->s_ip, pS, nCMP );
+		pGT->s_ip[nCMP] = 0;
+		/*switch( alf ) {
 			case gpeALF_GSM:{
 					U8 s = 0;
 					gpmSTRCPY(pGT->s_ip,pIPA);
@@ -244,7 +246,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 				pGT->s_ip[nCMP] = 0;
 				break;
 
-		}
+		}*/
 		return ppGTalloc[iGTfr] = pGT;
 	}
 
@@ -259,7 +261,9 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	}
 
 	pGT = new gpcGT( an, port );
-	switch( alf ) {
+	gpmMcpyOF( pGT->s_ip, pS, nCMP );
+	pGT->s_ip[nCMP] = 0;
+	/*switch( alf ) {
 		case gpeALF_GSM:{
 				U8 s = 0;
 				gpmSTRCPY(pGT->s_ip,pIPA);
@@ -270,7 +274,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 			pGT->s_ip[nCMP] = 0;
 			break;
 
-	}
+	}*/
 	return ppGTalloc[iGTfr] = pGT;
 }
 gpcGT* gpcGTall::GT( gpeALF alf, I4 port )

@@ -138,8 +138,12 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	piMASS = piM;
 	SDL_DisplayMode sdlDM;
 	SDL_GetCurrentDisplayMode( 0, &sdlDM );
-	winSIZ.x = (sdlDM.w*4)/8;
-	winSIZ.y = (winSIZ.x*6)/8 ; //(sdlDM.h*4)/8; //-64;
+
+	winSIZ.x = gpdWIN_WIDTH;
+	winSIZ.y = gpdWIN_HEIGHT;
+
+	//winSIZ.x = (sdlDM.w*4)/8;
+	//winSIZ.y = (winSIZ.x*6)/8;
 
 	winSIZ.a4x2[1] = winSIZ.a4x2[0] / (gpdSIZ2CR*2);
 
