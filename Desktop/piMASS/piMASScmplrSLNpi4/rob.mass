@@ -1,5 +1,5 @@
  a0	 
- 
+ T
  R# o# b# i#                                            	
   R# o# b# i#                                            	 b0	 b0  d0	  																							
  mini = "wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture", 
@@ -8,7 +8,7 @@
  rr = 0x10000;
  rout = rr + 3;
  rinp = rr + 2;
- bill = d0.mini;
+ john = d1.mini;
  //john 
  	
  slmp = "192.168.1.90 10000";
