@@ -27,7 +27,7 @@ char sGSMreset[] =	{
 		"AT+CNMP=2\r\n"		// Preferred mode selection
 
 		"AT+CGPS=1\r\n"
-		"AT+CGPSCOLD\r\n"
+		"AT+CNMI=2,1\r\n"		// new SMS?
 		"1\r\n"
 
 		"AT+CLCC?\r\n"
@@ -36,8 +36,7 @@ char sGSMreset[] =	{
 		"1\r\n"
 };
 char sGSMidle[] = {
-	"AT+CNMI=2,1\r\n"		// new SMS?
-		//"AT+CNMI?\r\n"		// new SMS?
+	//"AT+CNMI?\r\n"		// new SMS?
 	"AT+CGPSINFO\r\n"	// GPS info
 	"1\r\n"
 };
@@ -134,7 +133,7 @@ public:
 			case gpeALF_ME:
 				MEu=aI[i];MEt=aI[i+1];
 				break;
-
+			default: break;
 		}
 
 		return *this;
@@ -158,7 +157,7 @@ public:
 		return *this;
 	}
 };
-class gpcGSM{
+class gpcGSM {
 public:
 	I8x2	sndLAST, is1,
 			cmti;
@@ -235,7 +234,7 @@ public:
 		return pANSW+sprintf( pANSW, "AT+CMGF=1\r\n" );
 	}
 	char* answCMGF( char* pANSW ) {
-		m1 = m2 = m3 = gpeALF_SM;
+		cpms.aM[0] = cpms.aM[1] = cpms.aM[2] = gpeALF_SM;
 		return pANSW+sprintf( pANSW, "AT+CPMS=\"SM\",\"SM\",\"SM\"\r\n" );// "AT+CMGL=\"ALL\"\r\n" );
 	}
 	char* answCMGR( char* pANSW, int i ) {
@@ -317,7 +316,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		while( iCMTI > -1 ) {
 			pGSM->nCMTI++;
 			pGSM->cmti.alf = pAT[iCMTI+1].alf;
-			pGSM->cmti.num = gpfSTR2U8( pSat+pAT[iCMTI+1].num+2 );
+			pGSM->cmti.num = gpfSTR2I8( pSat+pAT[iCMTI+1].num+2 );
 			int a = pAT[iCMTI].num-8, b = (pAT[iCMTI+2].num-3), sub = b-a;
 			gpmMcpy( pSat+a, pSat+b, nINP-b+1 );
 			nINP -= sub;
@@ -342,7 +341,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			} break;
 			case gpeALF_CNMI:			/// New MSG indic to TE
 				if( nAT < 4 ) {			//2,1,0,0,0
-					if( !iOK )
+					if( iOK < 0 )
 					break;
 				}
 				nAT = 0;
@@ -401,7 +400,8 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 				pGSM->bCNT0 = true;
 				break;
 			case gpeALF_CGPSINFO:
-				pGSM->cgps = pSat+pAT[2].num;
+				if( nAT >= 6 )
+					pGSM->cgps = pSat+pAT[2].num;
 				nAT = 0;
 				pGSM->bCNT0 = true;
 				break;
