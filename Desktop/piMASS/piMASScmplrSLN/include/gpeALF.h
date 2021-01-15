@@ -567,8 +567,10 @@ typedef enum gpeALF:I8
 	gpeALF_LG = gpdAB('L', 'G'),
 
 	gpeALF_MA = gpdAB('M', 'A'),
+	gpeALF_ME = gpdAB('M', 'E'),
 	gpeALF_MN = gpdAB('M', 'N'),
 	gpeALF_MS = gpdAB('M', 'S'),
+	gpeALF_MT = gpdAB('M', 'T'),
 	gpeALF_MX = gpdAB('M', 'X'),
 	gpeALF_MY = gpdAB('M', 'Y'),
 
@@ -579,10 +581,13 @@ typedef enum gpeALF:I8
 
 	gpeALF_ON = gpdAB('O', 'N'),
 	gpeALF_or = gpdAB('O', 'R'),
+	gpeALF_PB = gpdAB('P', 'B'),
 	gpeALF_PI = gpdAB('P', 'I'),
 	gpeALF_RE = gpdAB('R', 'E'),
 	gpeALF_sl = gpdAB('S', 'L'),
+	gpeALF_SM = gpdAB('S', 'M'),
 	gpeALF_sr = gpdAB('S', 'R'),
+	gpeALF_SR = gpdAB('S', 'R'),
 	gpeALF_UP = gpdAB('U', 'P'),
 	gpeALF_WB = gpdAB('W', 'B'),
 	gpeALF_WH = gpdAB('W', 'H'),
@@ -717,6 +722,7 @@ typedef enum gpeALF:I8
 	gpeALF_SIN = gpdABC('S', 'I', 'N'),
 	gpeALF_SIT = gpdABC('S', 'I', 'T'),
 	gpeALF_slM = gpdABC('S', 'L', 'M'),
+	gpeALF_SMS = gpdABC('S', 'M', 'S'),
 	gpeALF_SRC = gpdABC('S', 'R', 'C'),
 	gpeALF_srM = gpdABC('S', 'R', 'M'),
 
@@ -770,23 +776,41 @@ typedef enum gpeALF:I8
 	gpeALF_CGMI = gpdABCD('C', 'G', 'M', 'I'),		// SIM7600 - Module Manufacture
 	gpeALF_CGMM = gpdABCD('C', 'G', 'M', 'M'),		// SIM7600 - Module MODEL
 	gpeALF_CGMR = gpdABCD('C', 'G', 'M', 'R'),		// SIM7600 - Module MODEL
+	gpeALF_CGPS = gpdABCD('C', 'G', 'P', 'S'),		// SIM7600 - GPS modul
 	gpeALF_CGSN = gpdABCD('C', 'G', 'S', 'N'),		// SIM7600 - Serial Num
+	gpeALF_CLCC = gpdABCD('C', 'L', 'C', 'C'),		// SIM7600 - List current calls
+	gpeALF_CLIP = gpdABCD('C', 'L', 'I', 'P'),		// SIM7600 - Calling line identification presentation
 
 	gpeALF_CNLC = gpdABCD('C', 'N', 'L', 'C'),
-	gpeALF_COPS = gpdABCD('C', 'O', 'P', 'S'),		/// SIM7600 - PROVIDER?
-
-	gpeALF_CPIN = gpdABCD('C', 'P', 'I', 'N'),		// SIM7600 - AT+CRESET
-
-	gpeALF_comE = gpdABCD('C', 'O', 'M', 'E'),
-	gpeALF_comS = gpdABCD('C', 'O', 'M', 'S'),
-
-	gpeALF_COPY = gpdABCD('C', 'O', 'P', 'Y'),
-
 	gpeALF_CNLT = gpdABCD('C', 'N', 'L', 'T'),
 	gpeALF_CNLX = gpdABCD('C', 'N', 'L', 'X'),
 	gpeALF_CNLY = gpdABCD('C', 'N', 'L', 'Y'),
 	gpeALF_CNLZ = gpdABCD('C', 'N', 'L', 'Z'),
 	gpeALF_CNLW = gpdABCD('C', 'N', 'L', 'W'),
+	gpeALF_CNMI = gpdABCD('C', 'N', 'M', 'I'),		// SIM7600 - New msg indikator
+	gpeALF_CNMP = gpdABCD('C', 'N', 'M', 'P'),		// SIM7600 - Preferred mode selection
+	gpeALF_CMGD = gpdABCD('C', 'M', 'G', 'D'),		// SIM7600 - SMS Delete
+	gpeALF_CMGF = gpdABCD('C', 'M', 'G', 'F'),		// SIM7600 - SMS Format
+	gpeALF_CMGL = gpdABCD('C', 'M', 'G', 'L'),		// SIM7600 - SMS LIST msg pref storage
+	gpeALF_CMGR = gpdABCD('C', 'M', 'G', 'R'),		// SIM7600 - SMS Read
+	gpeALF_CMTI = gpdABCD('C', 'M', 'T', 'I'),		// SIM7600 - SMS ?? Note string ??
+
+	gpeALF_comE = gpdABCD('C', 'O', 'M', 'E'),
+	gpeALF_comS = gpdABCD('C', 'O', 'M', 'S'),
+
+	gpeALF_COPY = gpdABCD('C', 'O', 'P', 'Y'),
+	gpeALF_COPS = gpdABCD('C', 'O', 'P', 'S'),		/// SIM7600 - PROVIDER?
+
+	gpeALF_CPIN = gpdABCD('C', 'P', 'I', 'N'),		// SIM7600 - AT+CRESET
+	gpeALF_CPMS = gpdABCD('C', 'P', 'M', 'S'),		// SIM7600 -
+	gpeALF_CPSI = gpdABCD('C', 'P', 'S', 'I'),		// SIM7600 - Inquiring UE system information
+	gpeALF_CREG = gpdABCD('C', 'R', 'E', 'G'),		// SIM7600 - Network registration
+
+
+
+
+
+
 
 	gpeALF_CRSA = gpdABCD('C', 'R', 'S', 'A'),
 	gpeALF_CRSL = gpdABCD('C', 'R', 'S', 'L'),
@@ -794,6 +818,9 @@ typedef enum gpeALF:I8
 	gpeALF_CRSR = gpdABCD('C', 'R', 'S', 'R'),
 	gpeALF_CRSX = gpdABCD('C', 'R', 'S', 'X'),
 	gpeALF_CRSY = gpdABCD('C', 'R', 'S', 'Y'),
+
+	gpeALF_CSCS = gpdABCD('C', 'S', 'C', 'S'),		// SIM7600 - TE charset
+
 	gpeALF_CTRL = gpdABCD('C', 'T', 'R', 'L'),
 	gpeALF_DEEP = gpdABCD('D', 'E', 'E', 'P'),
 	gpeALF_dimE = gpdABCD('D', 'I', 'M', 'E'),
@@ -801,6 +828,7 @@ typedef enum gpeALF:I8
 	gpeALF_divM = gpdABCD('D', 'I', 'V', 'M'),
 	gpeALF_DRAW = gpdABCD('D', 'R', 'A', 'W'),
 
+	gpeALF_DONE = gpdABCD('D', 'O', 'N', 'E'),
 	gpeALF_DROP = gpdABCD('D', 'R', 'O', 'P'),	// DRCos
 
 	gpeALF_EDGE = gpdABCD('E', 'D', 'G', 'E'),
@@ -1250,6 +1278,8 @@ typedef enum gpeALF:I8
 	//- 8 -----------------
 	gpeALF_AAAAAAAA = gpdABCDEFGH('A', 'A', 'A', 'A', 'A', 'A', 'A', 'A'),
 	gpeALF_BONELIST = gpdABCDEFGH('B', 'O', 'N', 'E', 'L', 'I', 'S', 'T'),
+	gpeALF_CGPSCOLD = gpdABCDEFGH('C', 'G', 'P', 'S', 'C', 'O', 'L', 'D'),
+	gpeALF_CGPSINFO = gpdABCDEFGH('C', 'G', 'P', 'S', 'I', 'N', 'F', 'O'),
 	gpeALF_CONTINUE = gpdABCDEFGH('C', 'O', 'N', 'T', 'I', 'N', 'U', 'E'),
 	gpeALF_GATELIST = gpdABCDEFGH('G', 'A', 'T', 'E', 'L', 'I', 'S', 'T'),
 	gpeALF_GIOLAYER = gpdABCDEFGH('G', 'I', 'O', 'L', 'A', 'Y', 'E', 'R'),
