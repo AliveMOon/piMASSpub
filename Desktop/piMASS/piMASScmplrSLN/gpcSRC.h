@@ -536,13 +536,19 @@ U8 inline gpfSTR2U8( void* pV, void* ppV = NULL ) {
 		*(char**)ppV = p_str;
 	return u8;
 }
-I8 inline gpfSTR2I8( void* pV, void* ppV = NULL ) {
+I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL ) {
 	if( !pV )
 		return 0;
 
 	char *p_str = (char*)pV;
 	U8 nLEN;
-    p_str += gpmVAN(p_str, "+-0123456789xXbBdD", nLEN );
+	int n0 = gpmVAN(p_str, "+-0123456789xXbBdD", nLEN ), n1;
+	if( pSTOP ) {
+		n1 = gpmVAN(p_str, (char*)pSTOP, nLEN );
+		if(n0>n1)
+			n0=n1;
+	}
+    p_str += n0;
 	I8 i8 = strtol( p_str, &p_str, 10 );
 	if( !i8 )
 	{
