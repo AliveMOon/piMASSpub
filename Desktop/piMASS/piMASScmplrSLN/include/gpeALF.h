@@ -131,6 +131,7 @@ typedef enum gpeALFu4:U4
 	gpeALFu4_ARJ = gpdABC('A', 'R', 'J'),
 	gpeALFu4_ARR = gpdABC('A', 'R', 'R'),
 	gpeALFu4_ASM = gpdABC('A', 'S', 'M'),
+	gpeALFu4_ATA = gpdABC('A', 'T', 'A'),
 	gpeALFu4_BIN = gpdABC('B', 'I', 'N'),
 	gpeALFu4_BLK = gpdABC('B', 'L', 'K'),
 	gpeALFu4_BOB = gpdABC('B', 'O', 'B'),
@@ -595,6 +596,7 @@ typedef enum gpeALF:I8
 	gpeALF_WY = gpdAB('W', 'Y'),
 	gpeALF_WW = gpdAB('W', 'W'),
 	gpeALF_ZM = gpdAB('Z', 'M'),
+	gpeALF_ZZ = gpdAB('Z', 'Z'),
 	gpeALF_2 = gpdAB('Z', 'Z'),
 	//- 3 -----------------
 	gpeALF_AAA = gpdABC('A', 'A', 'A'),
@@ -609,6 +611,8 @@ typedef enum gpeALF:I8
 	gpeALF_ARJ = gpdABC('A', 'R', 'J'),
 	gpeALF_ARR = gpdABC('A', 'R', 'R'),
 	gpeALF_ASM = gpdABC('A', 'S', 'M'),
+	gpeALF_ATA = gpdABC('A', 'T', 'A'),		// SIM7600 - Call answer
+	gpeALF_ATH = gpdABC('A', 'T', 'H'),		// SIM7600 - Disconnect existing call
 	gpeALF_BIN = gpdABC('B', 'I', 'N'),
 	gpeALF_BLK = gpdABC('B', 'L', 'K'),
 	gpeALF_BOB = gpdABC('B', 'O', 'B'),
@@ -623,6 +627,9 @@ typedef enum gpeALF:I8
 	gpeALF_CPP = gpdABC('C', 'P', 'P'),
 	gpeALF_CPU = gpdABC('C', 'P', 'U'),
 	gpeALF_CPY = gpdABC('C', 'P', 'Y'),
+
+	gpeALF_CSQ = gpdABC('C', 'S', 'Q'),		// SIM7600 - Siqnal Quality
+
 	gpeALF_CUT = gpdABC('C', 'U', 'T'),
 	gpeALF_DBG = gpdABC('D', 'B', 'G'),
 	gpeALF_DEB = gpdABC('D', 'E', 'B'),
@@ -757,6 +764,7 @@ typedef enum gpeALF:I8
 	gpeALF_xor = gpdABC('X', 'O', 'R'),
 	gpeALF_XYZ = gpdABC('X', 'Y', 'Z'),
 	gpeALF_ZIP = gpdABC('Z', 'I', 'P'),
+	gpeALF_ZZZ = gpdABC('Z', 'Z', 'Z'),
 	gpeALF_3 = gpdABC('Z', 'Z', 'Z'),
 	//- 4 -----------------
 	gpeALF_AAAA = gpdABCD('A', 'A', 'A', 'A'),
@@ -778,8 +786,10 @@ typedef enum gpeALF:I8
 	gpeALF_CGMR = gpdABCD('C', 'G', 'M', 'R'),		// SIM7600 - Module MODEL
 	gpeALF_CGPS = gpdABCD('C', 'G', 'P', 'S'),		// SIM7600 - GPS modul
 	gpeALF_CGSN = gpdABCD('C', 'G', 'S', 'N'),		// SIM7600 - Serial Num
+	gpeALF_CHUP = gpdABCD('C', 'H', 'U', 'P'),		// SIM7600 - Hang up call
 	gpeALF_CLCC = gpdABCD('C', 'L', 'C', 'C'),		// SIM7600 - List current calls
 	gpeALF_CLIP = gpdABCD('C', 'L', 'I', 'P'),		// SIM7600 - Calling line identification presentation
+	gpeALF_CLVL = gpdABCD('C', 'L', 'V', 'L'),		// SIM7600 - Call VOLUME
 
 	gpeALF_CNLC = gpdABCD('C', 'N', 'L', 'C'),
 	gpeALF_CNLT = gpdABCD('C', 'N', 'L', 'T'),
@@ -932,6 +942,7 @@ typedef enum gpeALF:I8
 	gpeALF_remM = gpdABCD('R', 'E', 'M', 'M'),
 	gpeALF_REND = gpdABCD('R', 'E', 'N', 'D'),
 
+	gpeALF_RING = gpdABCD('R', 'I', 'N', 'G'),		// SIM7600 - RING
 	gpeALF_RINP = gpdABCD('R', 'I', 'N', 'P'),
 
 	gpeALF_ROBI = gpdABCD('R', 'O', 'B', 'I'),
@@ -969,11 +980,13 @@ typedef enum gpeALF:I8
 
 	gpeALF_USER = gpdABCD('U', 'S', 'E', 'R'),
 
+	gpeALF_WAIT = gpdABCD('W', 'A', 'I', 'T'),
 	gpeALF_WALK = gpdABCD('W', 'A', 'L', 'K'),
 	gpeALF_WHAM = gpdABCD('W', 'H', 'A', 'M'),
 
 	gpeALF_xorM = gpdABCD('X', 'O', 'R', 'M'),
 
+	gpeALF_ZZZZ = gpdABCD('Z', 'Z', 'Z', 'Z'),
 	gpeALF_4 = gpdABCD('Z', 'Z', 'Z', 'Z'),
 	//- 5 -----------------
 	gpeALF_AAAAA = gpdABCDE('A', 'A', 'A', 'A', 'A'),
@@ -1027,6 +1040,8 @@ typedef enum gpeALF:I8
 	gpeALF_COUNT = gpdABCDE('C', 'O', 'U', 'N', 'T'),
 	gpeALF_CREAT = gpdABCDE('C', 'R', 'E', 'A', 'T'),
 	gpeALF_CROSS = gpdABCDE('C', 'R', 'O', 'S', 'S'),
+	gpeALF_CSDVC = gpdABCDE('C', 'S', 'D', 'V', 'C'),		// SIM7600 - call handset on
+
 	gpeALF_CYCLE = gpdABCDE('C', 'Y', 'C', 'L', 'E'),
 	gpeALF_DEBUG = gpdABCDE('D', 'E', 'B', 'U', 'G'),
 	gpeALF_DEBUS = gpdABCDE('D', 'E', 'B', 'U', 'S'),
@@ -1035,7 +1050,7 @@ typedef enum gpeALF:I8
 	gpeALF_entry = gpdABCDE('E', 'N', 'T', 'R', 'Y'),
 
 	gpeALF_ERECT = gpdABCDE('E', 'R', 'E', 'C', 'T'),
-	gpeALF_ERROR = gpdABCDE('E', 'R', 'R', 'O', 'R'), // SIM7600 - AT+CRESET
+	gpeALF_ERROR = gpdABCDE('E', 'R', 'R', 'O', 'R'),		// SIM7600 - AT+CRESET
 	gpeALF_HELLO = gpdABCDE('H', 'E', 'L', 'L', 'O'),
 	gpeALF_GETMX = gpdABCDE('G', 'E', 'T', 'M', 'X'),
 	gpeALF_GLOBA = gpdABCDE('G', 'L', 'O', 'B', 'A'),
@@ -1085,6 +1100,7 @@ typedef enum gpeALF:I8
 	gpeALF_SETUP = gpdABCDE('S', 'E', 'T', 'U', 'P'),
 	gpeALF_SHARE = gpdABCDE('S', 'H', 'A', 'R', 'E'),
 	gpeALF_SHOES = gpdABCDE('S', 'H', 'O', 'E', 'S'),
+	gpeALF_SIMEI = gpdABCDE('S', 'I', 'M', 'E', 'I'),
 	gpeALF_SLEFT = gpdABCDE('S', 'L', 'E', 'F', 'T'),
 	gpeALF_SLMPo = gpdABCDE('S', 'L', 'M', 'P', 'o'),
 

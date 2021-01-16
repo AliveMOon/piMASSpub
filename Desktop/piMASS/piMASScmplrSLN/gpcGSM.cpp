@@ -14,11 +14,12 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 extern char gpsPUB[0x1000];
-char sGSMreset[] =	{
+char sGSMreset[] =	{		/// 0
 		"AT+CRESET\r\n"		/// CRESET
 		"AT+CGMI\r\n"		// Module Manufacture
 		"AT+CGMM\r\n"		// Module Modell
 		"AT+CGSN\r\n"		// Serial Num
+		"AT+SIMEI?\r\n"		//
 		"AT+CGMR\r\n"
 		"AT+COPS?\r\n"		// provider
 
@@ -27,57 +28,41 @@ char sGSMreset[] =	{
 		"AT+CNMP=2\r\n"		// Preferred mode selection
 
 		"AT+CGPS=1\r\n"
-		"AT+CNMI=2,1\r\n"		// new SMS?
-		"1\r\n"
-
-		"AT+CLCC?\r\n"
-		"AT+CLCC\r\n"
-		"AT+CLIP?\r\n"		// Calling line identification presentation
+		"AT+CNMI=2,1\r\n"	// new SMS?
+		"AT+CSDVC=1\r\n"	// call handset on
+		//"AT+CLVL=4\r\n"	// volume 5
+		"AT+CLIP=1\r\n"		// Calling line identification presentation
 		"1\r\n"
 };
-char sGSMidle[] = {
-	//"AT+CNMI?\r\n"		// new SMS?
+char sGSMidle[] = {		/// 1
+	"AT+CSQ\r\n"
 	"AT+CGPSINFO\r\n"	// GPS info
 	"1\r\n"
 };
+char sGSMwait[] = {		/// 2
+	"AT+CSQ\r\n"
+	"AT+CGPSINFO\r\n"	// GPS info
+	"w 10000 2\r\n"		// WAIT
+	"3\r\n"
+};
+char sGSMhup[] = {		/// 3
+	"AT+CSQ\r\n"
+	"AT+CHUP\r\n"		// Hang up call
+	"AT+CLIP=1\r\n"
+	"1\r\n"
+};
+char sGSMansw[] = {		/// 4
+	"AT+CLVL=4\r\n"		// volume 5
+	"ATA\r\n"
+	"4\r\n"
+};
+char sGSMchat[] = {		/// 5
+	"AT+CSQ\r\n"
+	"AT+CGPSINFO\r\n"	// GPS info
+	"5\r\n"
+};
+
 int aGSMcnt[0x100];
-char sGPSoff[] = {
-				"AT+CATR?\r\n"
-				"AT\r\n"
-				"ATE1\r\n"
-				"AT+CGMI\r\n"
-				"AT+CGMM\r\n"
-				"AT+CGSN\r\n"
-				"AT+CSUB\r\n"
-				"AT+CGMR\r\n"
-				"AT+IPREX?\r\n"
-				"AT+CSQ\r\n"
-				"AT+CICCID\r\n"
-				"AT+SPIC\r\n"
-				"AT+CPIN?\r\n"
-				//"AT+CPIN=2028\r\n"
-				//"AT+CPIN?\r\n"
-				"AT+SPIC\r\n"
-				"AT+CSPN?\r\n"
-				"AT+COPS?\r\n"
-				"AT+CREG?\r\n"
-				"AT+CPSI?\r\n"
-				"AT+CNMP=2\r\n"
-
-				"AT+CGPS=1\r\n"
-				"AT+CGPS?\r\n"
-
-				"AT+CGPSINFO\r\n"
-
-				"AT+CGPS=0\r\n"
-
-				"AT+CGNSPWR=1\r\n"
-				"AT+CGNSTST=1\r\n"
-				"AT+CGNSTST=0\r\n"
-				"AT+CGNSIF\r\n"
-				"AT+CGNSPWR=0\r\n"
-										};
-
 
 char sSER[] = 	"/dev/%s"
 				//"/dev/ttyAMA0"
@@ -139,6 +124,34 @@ public:
 		return *this;
 	}
 };
+class gpcCLIP {
+public:
+	int aI[0x10];
+	char sSTR[0x200];
+	gpcCLIP(){};
+	gpcCLIP& operator = ( char* pSat ) {
+		U4 i = 0, n;
+		U8 nLEN;
+		gpmCLR;
+		for( pSat += gpmNINCS(pSat," \r\n\t:+"); *pSat; pSat += gpmNINCS(pSat," \r\n\t:+") ) {
+			pSat++;
+			switch(pSat[-1]){
+				case '\"':
+					n = gpmVAN(pSat,"\"",nLEN);
+					gpmMcpy( sSTR+i*0x20, pSat, n );
+					pSat += n+1;
+					break;
+				case ',':
+					i++;
+					aI[i] = gpfSTR2I8(pSat,&pSat);
+					break;
+				default: break;
+			}
+		}
+		return *this;
+	}
+};
+
 class gpcCGPS{	// New MSG indic to TE
 public:
 	float	lat; char ns;
@@ -157,32 +170,38 @@ public:
 		return *this;
 	}
 };
+
 class gpcGSM {
 public:
-	I8x2	sndLAST, is1,
-			cmti;
+	I8x2	sndLAST, aIS[2];
 	gpcCPSI	cpsi;
 	gpcCPMS	cpms;
 	gpcCNMI cnmi;
 	gpcCGPS cgps;
+	//gpcCLIP clip;
 	char	sCGMI[0x30],
 			sCGMM[0x30],
 			sCGMR[0x30],
 			sCGSN[0x30],
-			sCOPS[0x30];
-	I4x2	CREG;
-	int 	nCLCC, nCNT, iACTION, iREAD, nCMTI;
+			sCOPS[0x30],
+			sIMEI[0x10];
+	I4x2	CREG, CSQ;
+	int 	nCLCC, nCNT, iACTION, iREAD, nCMTI, nCLIP, nRING, iW;
 	bool	bPINrdy, bSMS, bPB,
+
+			bATA,
+
 			bCGMI, bCGMM, bCGMR, bCGSN, bCOPS,
 			bCLIP,
 			bCNT0, bCNT1;
-	gpcLZY	AT;
+	gpcLZY	AT, clip, cmti;
 
 	gpcGSM(){gpmCLR;};
-	int nAT( I8x2* &pAT, int& iOK, int& iNO, int& iERR, int& iCMTI, bool& bQ1, char* pSat, int nSat ) {
+
+	int nAT( I8x2* &pAT, int& iQ1, int& iOK, int& iNO, int& iERR, int& iCMTI, int& iCLIP, int& iRING, char* pSat, int nSat ) {
 		if( !&pAT )
 			return 0;
-		iOK = iNO = iERR = iCMTI = -1;
+		iQ1 = iOK = iNO = iERR = iCMTI = iCLIP = iRING = -1;
 		if( pSat ? !nSat : true )
 			return 0;
 		U8 nLEN;
@@ -190,7 +209,7 @@ public:
 		I8x2* pATnAT;
 		char* pSatI = pSat, *pSatE = pSat+nSat, aN[]=" ";
 		for( pSatI += gpmNINCS(pSatI," \r\n\t:+,"); pSatI < pSatE; pSatI += gpmNINCS(pSatI," \r\n\t:+,"), nAT++ ) {
-			if( !*pSat )
+			if( !*pSatI )
 				break;
 			pATnAT = (I8x2*)AT.Ux(nAT,sizeof(*pAT));
 			pATnAT->y = pSatE-pSatI;
@@ -205,6 +224,8 @@ public:
 				case gpeALF_NO: 	iNO = nAT;break;
 				case gpeALF_ERROR: 	iERR = nAT;break;
 				case gpeALF_CMTI: 	iCMTI = nAT;break;
+				case gpeALF_CLIP: 	iCLIP = nAT;break;
+				case gpeALF_RING: 	iRING = nAT;break;
 				default: break;
 			}
 			pSatI+=pATnAT->y;
@@ -212,7 +233,7 @@ public:
 			pATnAT->y = pSatI-pSat;
 			switch( *pSatI ){
 				case '?':
-					if( nAT == 1 ) bQ1 = true;
+					if( nAT == 1 ) iQ1 = 1;
 				case '+':
 				case '&':
 				case ':':
@@ -221,14 +242,17 @@ public:
 				default: break;
 			}
 		}
+		I8x2* p_at = ((I8x2*)AT.Ux(0,sizeof(*p_at)));
 		if( &pAT )
-			pAT = ((I8x2*)AT.Ux(0,sizeof(*pAT)));
+			pAT = p_at;
+
+		aIS[0] = p_at[0];
 
 		if( nAT > 1 )
-			is1.alf = ((I8x2*)AT.Ux(1,sizeof(*pAT)))->alf; // pAT[1].alf;
+			aIS[1].alf = p_at[1].alf; // pAT[1].alf;
 		else
-			is1.alf = gpeALF_null;
-		return is1.num = nAT;
+			aIS[1].alf = gpeALF_null;
+		return aIS[1].num = nAT;
 	}
 	char* answCNMI( char* pANSW ) {
 		return pANSW+sprintf( pANSW, "AT+CMGF=1\r\n" );
@@ -255,10 +279,9 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			*pSat, *pSatI, *pSatE,
 			*pSnum;
 	int baud = 115200, aI[0x20], nAT=0,// nWT = 0, nWok = 0,
-		iOK = 0, iERR = 0, iNO = 0, iCMTI = 0, pin = 2028; //5779; //2028; //16550;
+		iQ1 = 0, iOK = 0, iERR = 0, iNO = 0, iCMTI = 0, iCLIP = 0, iRING = 0, pin = 2028; //5779; //2028; //16550;
 	U8 s = -1, nLEN;
 	I8x2 *pAT, aWT[0x10];
-	bool bQ1 = false;
 	if( socket == INVALID_SOCKET ) {
 		sprintf( sOUT, sSER, s_ip );
 		//if( (socket=(SOCKET)serialOpen("/dev/ttyS0",baud)) <0 ){
@@ -276,6 +299,22 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			++nCNT;
 
 			pOUT = pOUT->lzyADD( sGSMidle, gpmSTRLEN(sGSMidle), (s=-1), -1 );
+			aGSMcnt[nCNT] = s;
+			++nCNT;
+
+			pOUT = pOUT->lzyADD( sGSMwait, gpmSTRLEN(sGSMwait), (s=-1), -1 );
+			aGSMcnt[nCNT] = s;
+			++nCNT;
+
+			pOUT = pOUT->lzyADD( sGSMhup, gpmSTRLEN(sGSMhup), (s=-1), -1 );
+			aGSMcnt[nCNT] = s;
+			++nCNT;
+
+			pOUT = pOUT->lzyADD( sGSMansw, gpmSTRLEN(sGSMansw), (s=-1), -1 );
+			aGSMcnt[nCNT] = s;
+			++nCNT;
+
+			pOUT = pOUT->lzyADD( sGSMchat, gpmSTRLEN(sGSMchat), (s=-1), -1 );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
@@ -300,12 +339,14 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 	pSat = pINP ? (char*)pINP->p_alloc : NULL;
 	/// RECV -------------------------------------
 	*sANSW = 0;
+	pGSM->bATA =
 	pGSM->bCNT0 =
 	pGSM->bCNT1 = false;
 
+	//bool bFREEinp = true;
 	if( pSat ) {
 		if(bSTDcout){std::cout << pSat <<std::endl;}
-		nAT = pGSM->nAT( pAT, iOK, iNO, iERR, iCMTI, bQ1, pSat, nINP );
+		nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
 
 		U4 at = 0;
 		for( ; at < nAT; at++ ) {
@@ -313,15 +354,18 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			if(bSTDcout){ std::cout << at <<"."<< sOUT << " "; }
 		}
 		if(bSTDcout){std::cout << "nAT:" << at << std::endl;}
-		while( iCMTI > -1 ) {
-			pGSM->nCMTI++;
-			pGSM->cmti.alf = pAT[iCMTI+1].alf;
-			pGSM->cmti.num = gpfSTR2I8( pSat+pAT[iCMTI+1].num+2 );
-			int a = pAT[iCMTI].num-8, b = (pAT[iCMTI+2].num-3), sub = b-a;
-			gpmMcpy( pSat+a, pSat+b, nINP-b+1 );
-			nINP -= sub;
 
-			nAT = pGSM->nAT( pAT, iOK, iNO, iERR, iCMTI, bQ1, pSat, nINP );
+//-------------------------------------------------------------------------------------
+		///-------------------------------------------------------------------\\
+		/// CALL RING
+		while( iRING > -1 ) {
+			pGSM->nRING++;
+			U8 a = pAT[iRING].num-7, b = pAT[iRING].num+3, sub = b-a;
+			pINP->lzySUB( a, sub );
+			nINP = pINP->nLD();
+			pSat = (char*)pINP->p_alloc;
+
+			nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
 			at = 0;
 			for( ; at < nAT; at++ ) {
 				pAT[at].an2str( sOUT );
@@ -329,263 +373,364 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			}
 			if(bSTDcout){std::cout << "nAT:" << at << std::endl;}
 		}
+		/// CALL CLIP Calling line identification presentation
+		while( pGSM->nRING && iCLIP > -1 ) {
+			if( pGSM->nRING > 0 )
+				pGSM->nRING--;
 
-		switch( pGSM->is1.alf ) {
-			case gpeALF_CMTI: {
-				if( iOK < 0 ) {
-					break;
-				}
-				sprintf( sANSW, "AT+CLCC\r\n" );
+			gpcCLIP* pCLIP = (gpcCLIP*)pGSM->clip.Ux( pGSM->nCLIP, sizeof(*pCLIP) );
+			if( pCLIP ){
+				*pCLIP = pSat + pAT[iCLIP].num;
+				pGSM->nCLIP++;
+			}
+
+			U8 a = pAT[iCLIP].num, b = gpmVAN(pSat+a,"\r\n", nLEN), a8 = a-8;
+			pINP->lzySUB( a8, b+8 );
+			nINP = pINP->nLD();
+			pSat = (char*)pINP->p_alloc;
+
+			nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
+			at = 0;
+			for( ; at < nAT; at++ ) {
+				pAT[at].an2str( sOUT );
+				if(bSTDcout){ std::cout << at <<"."<< sOUT << " "; }
+			}
+			if(bSTDcout){std::cout << "nAT:" << at << std::endl;}
+			//bFREEinp = false;
+		}
+		/// CALL
+		///-------------------------------------------------------------------//
+ //-------------------------------------------------------------------------------------
+		///-------------------------------------------------------------------\\
+		/// SMS New MSG indication || AT+CNMI=2,1 . . . .... +CMTI:
+		while( iCMTI > -1 ) {
+			I8x2* pCMIT = (I8x2*)pGSM->cmti.Ux( pGSM->nCMTI, sizeof(*pCMIT) );
+			if( pCMIT ) {
+				pCMIT->alf = pAT[iCMTI+1].alf;
+				pCMIT->num = gpfSTR2I8( pSat+pAT[iCMTI+1].num+2 );
+				pGSM->nCMTI++;
+				if( pCMIT->num > -1 )
+					pGSM->iREAD = pCMIT->num;
+			}
+
+			U8 a = pAT[iCMTI].num-8, b = (pAT[iCMTI+2].num-3);
+			pINP->lzySUB( a, b-a );
+			nINP = pINP->nLD();
+			pSat = (char*)pINP->p_alloc;
+
+			//gpmMcpy( pSat+a, pSat+b, nINP-b+1 );
+			//nINP -= sub;
+
+			nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
+			at = 0;
+			for( ; at < nAT; at++ ) {
+				pAT[at].an2str( sOUT );
+				if(bSTDcout){ std::cout << at <<"."<< sOUT << " "; }
+			}
+			if(bSTDcout){std::cout << "nAT:" << at << std::endl;}
+			//bFREEinp = false;
+		}
+		/// SMS
+		///-------------------------------------------------------------------//
+//-------------------------------------------------------------------------------------
+		/*if( !bFREEinp) {
+			if( pGSM->nCMTI ) {
+				pGSM->nCMTI = 0;
+				pGSM->answCMGR( sANSW, pGSM->iREAD );
 				nAT = 0;
 				pGSM->bCNT0 = true;
-			} break;
-			case gpeALF_CNMI:			/// New MSG indic to TE
-				if( nAT < 4 ) {			//2,1,0,0,0
-					if( iOK < 0 )
-					break;
-				}
-				nAT = 0;
-				if(bQ1)
-					pGSM->cnmi = pSat+pAT[2].num;
-				pGSM->answCNMI(sANSW);
-				pGSM->bCNT0 = true;
-				break;
-			case gpeALF_CMGF:
-				nAT = 0;
-				pGSM->answCMGF(sANSW);
-				pGSM->bCNT0 = true;
-				break;
-			case gpeALF_CMGL:
-				if( iOK < 0 ) {
-					break;
-				}
-				nAT = 0;
-				pGSM->answCMGR(sANSW, 1);
-				pGSM->bCNT0 = true;
-				break;
-			case gpeALF_CPMS:
-				if( iOK < 0 ) {
-					break;
-				}
-				pGSM->cpms = pSat+pAT[5].num;
-				nAT = 0;
 
-				pGSM->answCSCS(sANSW, "GSM");
-				pGSM->bCNT0 = true;
-				break;
-			case gpeALF_CSCS:
-				if( iOK < 0 ) {
-					break;
-				}
-				nAT = 0;
-				pGSM->answCMGR(sANSW, pGSM->iREAD);
-				pGSM->bCNT0 = true;
-				break;
-			case gpeALF_CMGR:
-				if( iOK < 3 ) {
-					break;
-				}
-				pGSM->iREAD++;
-				nAT = 0;
-				pGSM->bCNT0 = true;
-				break;
-
-
-			case gpeALF_CGPS:
-				nAT = 0;
-				pGSM->bCNT0 = true;
-				break;
-			case gpeALF_CGPSCOLD:
-				nAT = 0;
-				pGSM->bCNT0 = true;
-				break;
-			case gpeALF_CGPSINFO:
-				if( nAT >= 6 )
-					pGSM->cgps = pSat+pAT[2].num;
-				nAT = 0;
-				pGSM->bCNT0 = true;
-				break;
-
-
-			case gpeALF_CRESET: {
-					if( nAT < 7 ) {
-						break;
-					}
-					switch( pAT[4].alf ) {
-						case gpeALF_CPIN: {
-								switch( pAT[5].alf ){
-									case gpeALF_SIM: {
-											switch( pAT[6].alf ){
-												case gpeALF_PIN: {
-														sprintf( sANSW, "AT+CPIN=%d\r\n", pin );
-													} break;
-												case gpeALF_READY:
-													pGSM->bPINrdy = true;
-													break;
-												default: break;
-											}
-										} break;
-									case gpeALF_READY:
-										pGSM->bPINrdy = true;
-										break;
-									default: break;
-								}
-							} break;
-						default:
-							break;
-					}
-
-					nAT = 0;
-				} break;
-			case gpeALF_CPIN: {
-				if( nAT < 5 )
-					break;
-
-				if( pAT[2].alf == gpeALF_CPIN )
-				if( bQ1 ) {
-					switch( pAT[3].alf ) {
-						case gpeALF_SIM: {
-								switch( pAT[4].alf ){
-									case gpeALF_PIN: {
-											sprintf( sANSW, "AT+CPIN=%d\r\n", pin );
-										} break;
-									case gpeALF_READY:
-										pGSM->bPINrdy = true;
-										break;
-									default: break;
-								}
-							} break;
-						case gpeALF_READY:
-							pGSM->bPINrdy = true; /// ** PIN READY
-							break;
-						default: break;
-					}
-					nAT = 0;
-					break;
-				}
-
-				if( nAT < 9 )
-					break;
-				for( U4 i = iOK; i < nAT; i++ ){
-					switch( pAT[i].alf ){
-						case gpeALF_CPIN:
-							pGSM->bPINrdy = (pAT[i+1].alf==gpeALF_READY);
-							break;
-						case gpeALF_SMS:
-							pGSM->bSMS = (pAT[i+1].alf==gpeALF_DONE);
-							break;
-						case gpeALF_PB:
-							pGSM->bPB = (pAT[i+1].alf==gpeALF_DONE);
-							break;
-						default: break;
-					}
-
-				}
-				sprintf( sANSW, "AT+CPIN?\r\n" );
-				nAT = 0;
-			} break;
-			case gpeALF_CGMI: {
-				gpmSTRCPY( pGSM->sCGMI, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
-				pGSM->bCGMI = true;
-				nAT = 0;
-			} break;
-			case gpeALF_CGMM: {
-				gpmSTRCPY( pGSM->sCGMM, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
-				pGSM->bCGMM = true;
-				nAT = 0;
-			} break;
-			case gpeALF_CGMR: {
-				gpmSTRCPY( pGSM->sCGMR, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
-				pGSM->bCGMR = true;
-				nAT = 0;
-			} break;
-			case gpeALF_COPS: {
-				gpmSTRCPY( pGSM->sCOPS, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
-				pGSM->bCOPS= true;
-				nAT = 0;
-			} break;
-			case gpeALF_CGSN: {
-				gpmSTRCPY( pGSM->sCGSN, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
-				pGSM->bCGSN = true;
-				nAT = 0;
-			} break;
-			case gpeALF_CPSI: {
-				if( iOK < 0 )
-				{
-
-					break;
-				}
-				pGSM->cpsi.SysMod = pAT[3].alf;
-				pGSM->cpsi.OpMod = pAT[4].alf;
-				/*char *pSnum = pSat+pAT[4].num+1;
-				pGSM->cpsi.MCC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.MNC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.LAC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.AbsRFChNm 		= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.TrkLOAdj 		= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.C1 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.C2 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.FrqBnd 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.PSC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.Frq 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.SSC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.ECIO 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.RSCP 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.Qual 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.RxLev 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.TXPWR 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.Cpid 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.TAC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.PCellID 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.EUTRA 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.TransBWcfgDWNlnk = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.TransBWcfgUPlnk 	= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.SigREFrecPOW 	= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.SigREFrecQU 		= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->cpsi.SigAvrREFratio	= gpfSTR2U8( pSnum, &pSnum ); pSnum++;*/
-
-				nAT = 0;
-				pGSM->bCNT0 = true;
-			} break;
-			case gpeALF_CREG: {
-				if( iOK < 0 ){
-					break;
-				}
-
-				char *pSnum = pSat+pAT[2].num;
-				pGSM->CREG.x = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				pGSM->CREG.y = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-				if( bQ1 ) {
-					if( pGSM->CREG.y == 2 )
-						sprintf( sANSW, "AT+CREG=2\r\n" );
-				}
-				nAT = 0;
-				pGSM->bCNT0 = true;
-			} break;
-			case gpeALF_CNMP: {
-				nAT = 0;
-				pGSM->bCNT1 = true;
-			} break;
-			case gpeALF_CLCC: {
-				if(bQ1) {
-					pGSM->nCLCC = gpfSTR2U8( pSat+pAT[2].num+1 ); //, &pSnum );
-					if( pGSM->nCLCC ) sprintf( sANSW, "AT+CLCC\r\n" );
-					nAT = 0;
-					break;
-				}
-				nAT = 0;
-			} break;
-			case gpeALF_CLIP: {
+			}
+			else if( pGSM->nCLIP )
+			{
+				pGSM->nCLIP = 0;
+				pGSM->sndLAST.num = 2;
+				pGSM->sndLAST.alf = gpeALF_CLIP;
 				nAT = 0;
 				pGSM->bCLIP = true;
+			}
+
+		} else */
+		switch( pGSM->aIS[0].alf ) {
+			case gpeALF_ATA: {
+					if( iOK < 0 )
+						break;
+					nAT = 0;
+					pGSM->bCNT0 = true;
+				} break;
+			default: {
+				switch( pGSM->aIS[1].alf ) {
+					case gpeALF_SIMEI: {
+							if( iOK < 0 )
+								break;
+							gpmMcpy( pGSM->sIMEI, pSat+pAT[2].num,0xf )[0xf] = 0;
+							nAT = 0;
+							pGSM->bCNT0 = true;
+						} break;
+					case gpeALF_CSQ: {
+							if( iOK < 0 )
+								break;
+
+							sscanf( pSat+pAT[2].num, "%d,%d", &pGSM->CSQ.x, &pGSM->CSQ.y);
+							nAT = 0;
+							pGSM->bCNT0 = true;
+						} break;
+					case gpeALF_CLIP:
+						nAT = 0;
+						pGSM->bCLIP = true;
+						break;
+					case gpeALF_CLVL:
+						nAT = 0;
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CSDVC:
+						nAT = 0;
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CMTI: {
+							if( iOK < 0 )
+								break;
+
+							sprintf( sANSW, "AT+CLCC\r\n" );
+							nAT = 0;
+							pGSM->bCNT0 = true;
+						} break;
+					case gpeALF_CNMI:			/// New MSG indic to TE
+						if( nAT < 4 ) {			//2,1,0,0,0
+							if( iOK < 0 )
+								break;
+						}
+						nAT = 0;
+						if(iQ1>0)
+							pGSM->cnmi = pSat+pAT[2].num;
+						pGSM->answCNMI(sANSW);
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CMGF:
+						nAT = 0;
+						pGSM->answCMGF(sANSW);
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CMGL:
+						if( iOK < 0 )
+							break;
+						nAT = 0;
+						pGSM->answCMGR(sANSW, 1);
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CPMS:
+						if( iOK < 0 )
+							break;
+						pGSM->cpms = pSat+pAT[5].num;
+						nAT = 0;
+						pGSM->iREAD = gpmMAX( 0, pGSM->cpms.SMu-1 );
+						pGSM->answCSCS(sANSW, "GSM");
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CSCS:
+						if( iOK < 0 )
+							break;
+						nAT = 0;
+						pGSM->answCMGR(sANSW, pGSM->iREAD );
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CMGR:
+						if( iOK < 3 ) {
+							break;
+						}
+						pGSM->iREAD++;
+						nAT = 0;
+						pGSM->bCNT0 = true;
+						break;
+
+
+					case gpeALF_CGPS:
+						nAT = 0;
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CGPSCOLD:
+						nAT = 0;
+						pGSM->bCNT0 = true;
+						break;
+					case gpeALF_CGPSINFO:
+						if( nAT >= 6 )
+							pGSM->cgps = pSat+pAT[2].num;
+						nAT = 0;
+						pGSM->bCNT0 = true;
+						break;
+
+
+					case gpeALF_CRESET: {
+							if( nAT < 7 ) {
+								break;
+							}
+							switch( pAT[4].alf ) {
+								case gpeALF_CPIN: {
+										switch( pAT[5].alf ){
+											case gpeALF_SIM: {
+													switch( pAT[6].alf ){
+														case gpeALF_PIN: {
+																sprintf( sANSW, "AT+CPIN=%d\r\n", pin );
+															} break;
+														case gpeALF_READY:
+															pGSM->bPINrdy = true;
+															break;
+														default: break;
+													}
+												} break;
+											case gpeALF_READY:
+												pGSM->bPINrdy = true;
+												break;
+											default: break;
+										}
+									} break;
+								default:
+									break;
+							}
+
+							nAT = 0;
+						} break;
+					case gpeALF_CPIN: {
+						if( nAT < 5 )
+							break;
+
+						if( pAT[2].alf == gpeALF_CPIN )
+						if( iQ1>0 ) {
+							switch( pAT[3].alf ) {
+								case gpeALF_SIM: {
+										switch( pAT[4].alf ){
+											case gpeALF_PIN: {
+													sprintf( sANSW, "AT+CPIN=%d\r\n", pin );
+												} break;
+											case gpeALF_READY:
+												pGSM->bPINrdy = true;
+												break;
+											default: break;
+										}
+									} break;
+								case gpeALF_READY:
+									pGSM->bPINrdy = true; /// ** PIN READY
+									break;
+								default: break;
+							}
+							nAT = 0;
+							break;
+						}
+
+						if( nAT < 9 )
+							break;
+						for( U4 i = iOK; i < nAT; i++ ){
+							switch( pAT[i].alf ){
+								case gpeALF_CPIN:
+									pGSM->bPINrdy = (pAT[i+1].alf==gpeALF_READY);
+									break;
+								case gpeALF_SMS:
+									pGSM->bSMS = (pAT[i+1].alf==gpeALF_DONE);
+									break;
+								case gpeALF_PB:
+									pGSM->bPB = (pAT[i+1].alf==gpeALF_DONE);
+									break;
+								default: break;
+							}
+
+						}
+						sprintf( sANSW, "AT+CPIN?\r\n" );
+						nAT = 0;
+					} break;
+					case gpeALF_CGMI: {
+						gpmSTRCPY( pGSM->sCGMI, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
+						pGSM->bCGMI = true;
+						nAT = 0;
+					} break;
+					case gpeALF_CGMM: {
+						gpmSTRCPY( pGSM->sCGMM, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
+						pGSM->bCGMM = true;
+						nAT = 0;
+					} break;
+					case gpeALF_CGMR: {
+						gpmSTRCPY( pGSM->sCGMR, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
+						pGSM->bCGMR = true;
+						nAT = 0;
+					} break;
+					case gpeALF_COPS: {
+						gpmSTRCPY( pGSM->sCOPS, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
+						pGSM->bCOPS= true;
+						nAT = 0;
+					} break;
+					case gpeALF_CGSN: {
+						gpmSTRCPY( pGSM->sCGSN, pSat+pAT[1].num+gpmNINCS(pSat+pAT[1].num, " \t\r\n") );
+						pGSM->bCGSN = true;
+						nAT = 0;
+					} break;
+					case gpeALF_CPSI: {
+						if( iOK < 0 ) {
+							break;
+						}
+						pGSM->cpsi.SysMod = pAT[3].alf;
+						pGSM->cpsi.OpMod = pAT[4].alf;
+						/*char *pSnum = pSat+pAT[4].num+1;
+						pGSM->cpsi.MCC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.MNC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.LAC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.AbsRFChNm 		= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.TrkLOAdj 		= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.C1 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.C2 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.FrqBnd 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.PSC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.Frq 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.SSC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.ECIO 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.RSCP 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.Qual 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.RxLev 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.TXPWR 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.Cpid 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.TAC 				= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.PCellID 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.EUTRA 			= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.TransBWcfgDWNlnk = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.TransBWcfgUPlnk 	= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.SigREFrecPOW 	= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.SigREFrecQU 		= gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->cpsi.SigAvrREFratio	= gpfSTR2U8( pSnum, &pSnum ); pSnum++;*/
+
+						nAT = 0;
+						pGSM->bCNT0 = true;
+					} break;
+					case gpeALF_CREG: {
+						if( iOK < 0 ){
+							break;
+						}
+
+						char *pSnum = pSat+pAT[2].num;
+						pGSM->CREG.x = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->CREG.y = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						if(iQ1>0) {
+							if( pGSM->CREG.y == 2 )
+								sprintf( sANSW, "AT+CREG=2\r\n" );
+						}
+						nAT = 0;
+						pGSM->bCNT0 = true;
+					} break;
+					case gpeALF_CNMP: {
+						nAT = 0;
+						pGSM->bCNT1 = true;
+					} break;
+					case gpeALF_CLCC: {
+						if(iQ1>0) {
+							pGSM->nCLCC = gpfSTR2U8( pSat+pAT[2].num+1 ); //, &pSnum );
+							if( pGSM->nCLCC ) sprintf( sANSW, "AT+CLCC\r\n" );
+							nAT = 0;
+							break;
+						}
+						nAT = 0;
+					} break;
+
+					default: break;
+				}
 			} break;
-			default: break;
 		}
-	} else if( pGSM->nCMTI ) {
-		pGSM->nCMTI = 0;
-		sprintf( sANSW, "AT+CMGL=\"ALL\"\r\n" );
-		nAT = 0;
-		pGSM->bCNT0 = true;
 	}
 
 	if( nAT )
@@ -593,7 +738,8 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 
 	/// SEND -------------------------------------
-	gpmDEL(pINP);
+	//if( bFREEinp )
+		gpmDEL(pINP);
 	if( *sANSW ) {
 		pS = sANSW;
 		pSe = pS;
@@ -625,17 +771,40 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		}
 		if( bGD )
 			iCNT = pGSM->sndLAST.num;
-		pS = pOUT ? (char*)pOUT->p_alloc+iCNT : NULL;
 
-		pSe = pS;
-		pSe += gpmVAN( pSe, "\r\n", nLEN );
+		pS = (char*)pOUT->p_alloc+iCNT;
+		pSe = pS + gpmVAN( pS, "\r\n", nLEN );
 		if( pSe-pS < 1 )
 			return iCNT;
-		if( *pS != 'A' ) {
-			iCNT = aGSMcnt[pGSM->iACTION = gpfSTR2U8(pS)];
-			pS = (char*)pOUT->p_alloc+iCNT;
-			pSe = pS;
-			pSe += gpmVAN( pSe, "\r\n", nLEN );
+		U8 ms, act;
+		while( *pS != 'A' ) {
+			switch( *pS ) {
+				case 'w':
+				case 'W':
+					ms = gpfSTR2U8(pS, &pS);
+					act = gpfSTR2U8(pS, &pS);
+					if( pGSM->iW >= pWIN->mSEC.x ) {
+						iCNT = aGSMcnt[pGSM->iACTION = act];
+						pS = (char*)pOUT->p_alloc + iCNT;
+					} else if( !pGSM->iW ) {
+						pGSM->iW = ms + pWIN->mSEC.x;
+						iCNT = aGSMcnt[pGSM->iACTION = act];
+						pS = (char*)pOUT->p_alloc + iCNT;
+					} else {
+						// következő sor
+						pS += gpmVAN( pS, "\r\n", nLEN );
+						pS += gpmNINCS( pS, "\r\n" );
+					}
+					pSe = pS + gpmVAN( pS, "\r\n", nLEN );
+					continue;
+
+				default:
+					iCNT = aGSMcnt[pGSM->iACTION = gpfSTR2U8(pS)];
+					pS = (char*)pOUT->p_alloc+iCNT;
+					break;
+			}
+
+			pSe = pS + gpmVAN( pS, "\r\n", nLEN );
 		}
 		pGSM->sndLAST.num = pSe-pS;
 		iCNT += pGSM->sndLAST.num;
