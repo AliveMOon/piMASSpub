@@ -42,7 +42,7 @@ char sGSMidle[] = {		/// 1
 char sGSMwait[] = {		/// 2
 	"AT+CSQ\r\n"
 	"AT+CGPSINFO\r\n"	// GPS info
-	"w 10000 2\r\n"		// WAIT
+	"w 2 4\r\n"		// WAIT
 	"3\r\n"
 };
 char sGSMhup[] = {		/// 3
@@ -61,6 +61,22 @@ char sGSMchat[] = {		/// 5
 	"AT+CSQ\r\n"
 	"AT+CGPSINFO\r\n"	// GPS info
 	"5\r\n"
+};
+char* asACTclr[] = {
+	stdRESET,
+	stdCYAN,
+	stdYELLOW,
+	stdRED,
+	stdGREEN,
+	stdPURPLE,
+};
+char* asACTname[] = {
+	"-INIT-",
+	"   -IDLE-",
+	"      -WAIT-",
+	"---------------- HUP ",
+	"--------- ANSW ",
+	"            -CHAT-",
 };
 
 int aGSMcnt[0x100];
@@ -440,7 +456,8 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 	//bool bFREEinp = true;
 	if( pSat ) {
-		if(bSTDcout){std::cout << pSat <<std::endl;}
+		if(bSTDcout){std::cout  << asACTclr[pGSM->iACTION%6]
+								<< asACTname[pGSM->iACTION%6] << " pSat\r\n" << pSat <<std::endl;}
 		nAT = pGSM->nAT( pAT, iAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, iMISS, pSat, nINP );
 
 		U4 at = 0;
@@ -516,8 +533,8 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 						continue;
 					pC0[i].aI[0xf] = 0;
 					pGSM->nCLIP--;
-					if( i < pGSM->nCLIP )
-						continue;
+					if( i == pGSM->nCLIP )
+						break;
 					pC0[i] = pC0[pGSM->nCLIP];
 					i--;
 				}
@@ -601,6 +618,12 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 							nAT = 0;
 							pGSM->bCNT0 = true;
 						} break;
+					case gpeALF_CHUP:
+						if( pGSM->nCLIP )
+							pGSM->nCLIP = 0;
+						nAT = 0;
+						pGSM->bCNT0 = true;
+						break;
 					case gpeALF_CLIP:
 						nAT = 0;
 						pGSM->bCLIP = true;
@@ -870,6 +893,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		pINP->lzySUB(s=0,pAT[iAT].num-3);
 	else
 		gpmDEL(pINP);
+	const char* pCLR = *sANSW ? stdRUN : stdCMPLR;
 	if( *sANSW ) {
 		pS = sANSW;
 		pSe = pS;
@@ -877,8 +901,11 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		if( pSe-pS < 1 )
 			return iCNT;
 		pSe+=2;
-		if(bSTDcout){std::cout << stdRUN << sANSW <<std::endl;}
+
+
 	} else {
+
+
 		//pS = pOUT ? (char*)pOUT->p_alloc+iCNT : NULL;
 		if( !pOUT ) // !pS )
 			return iCNT;
@@ -906,16 +933,20 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		pSe = pS + gpmVAN( pS, "\r\n", nLEN );
 		if( pSe-pS < 1 )
 			return iCNT;
-		U8 ms, act, oACT = pGSM->iACTION;
+		U8 ms = 20000, act, gd, oACT = pGSM->iACTION;
 		while( *pS != 'A' ) {
 			switch( *pS ) {
 				case 'w':
 				case 'W':
-					ms = gpfSTR2U8(pS, &pS);
-					act = gpfSTR2U8(pS, &pS);
+					act = gpfSTR2U8(pS+gpmVAN(pS," \t\r\n+-0123456789",nLEN), &pS);
+					gd = gpfSTR2U8(pS+gpmVAN(pS," \t\r\n+-0123456789",nLEN), &pS);
+					//ms = 20000;
 
 					if( pGSM->iW >= pWIN->mSEC.x ) {
 						iCNT = aGSMcnt[pGSM->iACTION = act];
+						if( pGSM->iW-pWIN->mSEC.x < (ms/2) )
+							iCNT = aGSMcnt[pGSM->iACTION = gd];
+
 						pS = (char*)pOUT->p_alloc + iCNT;
 						break;
 					} else if( !pGSM->iW ) {
@@ -925,18 +956,18 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 						break;
 					}
 					// következő sor
+					pGSM->iW = 0;
 					pS += gpmVAN( pS, "\r\n", nLEN );
 					pS += gpmNINCS( pS, "\r\n" );
 					break;
 				default: {
 						switch( pGSM->iACTION = gpfSTR2U8(pS) ) {
 							case 1:
-								if( pGSM->iCLIP < pGSM->nCLIP ) {
+								if( pGSM->nCLIP ) {
 									pGSM->iACTION = 2;
 									iCNT = aGSMcnt[pGSM->iACTION];
 									pS = (char*)pOUT->p_alloc+iCNT;
-
-									pGSM->iCLIP++;
+									pGSM->nCLIP = 0;
 									break;
 								}
 							case 5:
@@ -966,6 +997,14 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		gpmMcpy( sANSW, pS, pSe-pS )[pSe-pS] = 0;
 		if(bSTDcout){std::cout << stdRUN << sANSW <<std::endl;}
 	}
+
+	if(bSTDcout){std::cout	<< stdBREAK << "ACT:" << pGSM->iACTION
+							<< stdCMPLR << "CLIP:" << pGSM->iCLIP << "/" << pGSM->nCLIP
+							<< stdRUN << "CMTI:" << pGSM->iCMTI << "/" << pGSM->nCMTI
+							<< pCLR << sANSW <<std::endl;}
+	if( pGSM->iW >= pWIN->mSEC.x )
+		if(bSTDcout){std::cout	<< stdBREAK << "WAIT:" << pGSM->iW-pWIN->mSEC.x << "ms"
+								<<std::endl;}
 
 	int nW = 0;
 	while( pS < pSe ) {
