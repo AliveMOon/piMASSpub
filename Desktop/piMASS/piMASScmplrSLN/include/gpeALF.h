@@ -473,6 +473,7 @@ typedef enum gpeALFu4:U4
 
 	gpeALFu4_NEWROW = gpdABCDEF('N', 'E', 'W', 'R', 'O', 'W'),
 
+	gpeALFu4_MISSED = gpdABCDEF('M', 'I', 'S', 'S', 'E', 'D'),
 	gpeALFu4_MODBUS = gpdABCDEF('M', 'O', 'D', 'B', 'U', 'S'),
 	gpeALFu4_NBUILD = gpdABCDEF('N', 'B', 'U', 'I', 'L', 'D'),
 	gpeALFu4_PICCPY = gpdABCDEF('P', 'I', 'C', 'C', 'P', 'Y'),
@@ -1126,6 +1127,8 @@ typedef enum gpeALF:I8
 
 	gpeALF_WHILE = gpdABCDE('W', 'H', 'I', 'L', 'E'),
 
+	gpeALF_WCDMA = gpdABCDE('W', 'C', 'D', 'M', 'A'),		// SIM7600 - CPSI SysMOD
+
 	gpeALF_WMLBX = gpdABCDE('W', 'M', 'L', 'B', 'X'),		// egér X poziciója mielött le lett nyomva a BAL gomb
 	gpeALF_WMLBY = gpdABCDE('W', 'M', 'L', 'B', 'Y'),		// egér Y poziciója mielött le lett nyomva a BAL gomb
 
@@ -1196,8 +1199,10 @@ typedef enum gpeALF:I8
 	gpeALF_newrow = gpdABCDEF('N', 'E', 'W', 'R', 'O', 'W'),
     gpeALF_NONSEN = gpdABCDEF('N', 'O', 'N', 'S', 'E', 'N'),
 
+	gpeALF_MISSED = gpdABCDEF('M', 'I', 'S', 'S', 'E', 'D'),	// SIM7600 -
 	gpeALF_MODBUS = gpdABCDEF('M', 'O', 'D', 'B', 'U', 'S'),
 	gpeALF_NBUILD = gpdABCDEF('N', 'B', 'U', 'I', 'L', 'D'),
+	gpeALF_ONLINE = gpdABCDEF('O', 'N', 'L', 'I', 'N', 'E'),	// SIM7600 - CPSI OpMod
 	gpeALF_PICCPY = gpdABCDEF('P', 'I', 'C', 'C', 'P', 'Y'),
 	gpeALF_PLANET = gpdABCDEF('P', 'L', 'A', 'N', 'E', 'T'),
 	gpeALF_POLYER = gpdABCDEF('P', 'O', 'L', 'Y', 'E', 'R'),
@@ -1270,6 +1275,7 @@ typedef enum gpeALF:I8
 	gpeALF_NONSENS = gpdABCDEFG('N', 'O', 'N', 'S', 'E', 'N', 'S'),
 	gpeALF_NRENDER = gpdABCDEFG('N', 'R', 'E', 'N', 'D', 'E', 'R'),
 	// 0xffffFFFF                A    B    C    D    E    F    G
+	gpeALF_MISSING = gpdABCDEFG('M', 'I', 'S', 'S', 'I', 'N', 'G'),		// SIM7600 -
 	gpeALF_MWLQKWU = gpdABCDEFG('M', 'W', 'L', 'Q', 'K', 'W', 'U'),
 	gpeALF_U4      = gpeALF_MWLQKWU,
 

@@ -128,7 +128,7 @@ public:
 class gpcCLIP {
 public:
 	char sSTR[0x200];
-	int aI[0x10];
+	I8 aI[0x10];
 	gpcCLIP(){};
 	gpcCLIP& operator = ( char* pSat ) {
 		U4 i = 0, n;
@@ -171,10 +171,20 @@ public:
 		return *this;
 	}
 };
-
+class gpcCREG {
+public:
+	I4x2 	reg;
+	int		stat,lac,ci;
+	gpcCREG(){};
+	gpcCREG& operator = ( char* pSat ) {
+		sscanf( pSat, "%d,%x,%x", stat, lac, ci );
+		return *this;
+	}
+};
 class gpcGSM {
 public:
 	I8x2	sndLAST, aIS[2];
+	I4x2	aMnMx[gpeAT_N];
 	gpcCPSI	cpsi;
 	gpcCPMS	cpms;
 	gpcCNMI cnmi;
@@ -186,7 +196,8 @@ public:
 			sCGSN[0x30],
 			sCOPS[0x30],
 			sIMEI[0x10];
-	I4x2	CREG, CSQ;
+	gpcCREG	CREG;
+	I4x2 	CSQ;
 	int 	nCLCC, nCNT, iACTION, iREAD,
 			nCMTI, nCLIP, nRING, iW,
 			iCMTI, iCLIP;
@@ -200,11 +211,80 @@ public:
 	gpcLZY	AT, clip, cmti;
 
 	gpcGSM(){gpmCLR;};
-
-	int nAT( I8x2* &pAT, int& iQ1, int& iOK, int& iNO, int& iERR, int& iCMTI, int& iCLIP, int& iRING, char* pSat, int nSat ) {
-		if( !&pAT )
+	I8x2* pAT( int& nAT, char* pSat, int nSat ) {
+		nAT = AT.nAT( pSat, nSat );
+		if( !nAT )
+			return NULL;
+		return (I8x2*)AT.p_alloc;
+	}
+	int nAT( I8x2* &pAT0, int& iAT, int& iQ1, int& iOK, int& iNO, int& iERR, int& iCMTI, int& iCLIP, int& iRING, int& iMISS, char* pSat, int nSat ) {
+		if( !&pAT0 )
 			return 0;
-		iQ1 = iOK = iNO = iERR = iCMTI = iCLIP = iRING = -1;
+		int nAT;
+		pAT0 = pAT( nAT, pSat, nSat );
+
+		aMnMx->x = -1;
+		gpfMset( (&aMnMx->x)+1, gpeAT_N*2-1, (&aMnMx->x), sizeof(aMnMx->x) );
+
+		iQ1 = iOK = iNO = iERR = iCMTI = iCLIP = iRING = iMISS = -1;
+		gpeAT j,x;
+		for( int i = 0; i < nAT; i++ ){
+			switch( pAT0[i].alf ){
+				case gpeALF_NO: 		j = gpeAT_no; break;
+				case gpeALF_OK: 		j = gpeAT_ok; break;
+				case gpeALF_AT:			j = gpeAT_at; break;
+				case gpeALF_ERROR: 		j = gpeAT_err; break;
+				case gpeALF_CMTI: 		j = gpeAT_cmti; break;
+				case gpeALF_CLIP: 		j = gpeAT_clip; break;
+				case gpeALF_RING: 		j = gpeAT_ring; break;
+				case gpeALF_MISSING:
+				case gpeALF_MISSED: 	j = gpeAT_miss; break;
+				default: j = gpeAT_N;
+						break;
+			}
+			switch( pSat[pAT0[i].num] ){
+				case '?': 	x = gpeAT_noQ;
+							if(i!=1)
+								break;
+							iQ1 = 1;
+							break;
+				case '+': x = gpeAT_noP; break;
+				case '&': x = gpeAT_noA; break;
+				case ':': x = gpeAT_noPP; break;
+				default: x = gpeAT_no; break;
+			}
+			if( x )
+				pAT0[i].num += gpmNINCS( pSat+pAT0[i].num, " \r\n\t?+&:" );
+			if( j >= gpeAT_N )
+				continue;
+
+			if(aMnMx[j].x < 0)
+				aMnMx[j].x = i;
+			aMnMx[j].y = i;
+			if( !x )
+				continue;
+
+			if(aMnMx[x+j].x < 0)
+				aMnMx[x+j].x = i;
+			aMnMx[x+j].y = i;
+		}
+		iAT = aMnMx[gpeAT_atP].x;	// AT+ első
+		iOK = aMnMx[gpeAT_ok].y;	// utolso
+		iNO = aMnMx[gpeAT_no].y;	// utolso
+		iERR = aMnMx[gpeAT_err].y;	// utolso
+		iCMTI = aMnMx[gpeAT_cmtiPP].x;	// : első (PP)
+		iCLIP = aMnMx[gpeAT_clipPP].x;	// : első (PP)
+		iRING = aMnMx[gpeAT_ring].x;	// első
+		iMISS = aMnMx[gpeAT_miss].x;	// első
+
+		aIS[0] = pAT0[0];
+
+		if( nAT > 1 )
+			aIS[1].alf = pAT0[1].alf; // pAT[1].alf;
+		else
+			aIS[1].alf = gpeALF_null;
+		return aIS[1].num = nAT;
+/*
 		if( pSat ? !nSat : true )
 			return 0;
 		U8 nLEN;
@@ -265,16 +345,7 @@ public:
 			}
 		}
 		I8x2* p_at = ((I8x2*)AT.Ux(0,sizeof(*p_at)));
-		if( &pAT )
-			pAT = p_at;
-
-		aIS[0] = p_at[0];
-
-		if( nAT > 1 )
-			aIS[1].alf = p_at[1].alf; // pAT[1].alf;
-		else
-			aIS[1].alf = gpeALF_null;
-		return aIS[1].num = nAT;
+*/
 	}
 	char* answCNMI( char* pANSW ) {
 		return pANSW+sprintf( pANSW, "AT+CMGF=1\r\n" );
@@ -288,6 +359,7 @@ public:
 	}
 	char* answCSCS( char* pANSW, char* pS ) {
 		return pANSW+sprintf( pANSW, "AT+CSCS=\"%s\"\r\n", pS );
+
 	}
 };
 gpcGSM gsmZERO;
@@ -300,8 +372,9 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			*pS, *pSe,
 			*pSat, *pSatI, *pSatE,
 			*pSnum;
-	int baud = 115200, aI[0x20], nAT=0,// nWT = 0, nWok = 0,
-		iQ1 = 0, iOK = 0, iERR = 0, iNO = 0, iCMTI = 0, iCLIP = 0, iRING = 0, pin = 2028; //5779; //2028; //16550;
+	int baud = 115200, aI[0x20],
+		iAT = 0, nAT=0,// nWT = 0, nWok = 0,
+		iQ1 = 0, iOK = 0, iERR = 0, iNO = 0, iCMTI = 0, iCLIP = 0, iRING = 0, iMISS = 0, pin = 2028; //5779; //2028; //16550;
 	U8 s = -1, nLEN;
 	I8x2 *pAT, aWT[0x10];
 	if( socket == INVALID_SOCKET ) {
@@ -368,7 +441,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 	//bool bFREEinp = true;
 	if( pSat ) {
 		if(bSTDcout){std::cout << pSat <<std::endl;}
-		nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
+		nAT = pGSM->nAT( pAT, iAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, iMISS, pSat, nINP );
 
 		U4 at = 0;
 		for( ; at < nAT; at++ ) {
@@ -387,7 +460,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			nINP = pINP->nLD();
 			pSat = (char*)pINP->p_alloc;
 
-			nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
+			nAT = pGSM->nAT( pAT, iAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, iMISS, pSat, nINP );
 			at = 0;
 			for( ; at < nAT; at++ ) {
 				pAT[at].an2str( sOUT );
@@ -400,15 +473,16 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			if( pGSM->nRING > 0 )
 				pGSM->nRING--;
 
-			gpcCLIP* pCLIP = (gpcCLIP*)pGSM->clip.Ux( pGSM->nCLIP, sizeof(*pCLIP) );
-			if( pCLIP ){
-				*pCLIP = pSat + pAT[iCLIP].num;
+			gpcCLIP* pCn = (gpcCLIP*)pGSM->clip.Ux( pGSM->nCLIP, sizeof(*pCn) ), *pC0;
+			if( pCn ){
+				pC0 = pCn-pGSM->nCLIP;
+				*pCn = pSat + pAT[iCLIP].num;
 				I4 j = pGSM->nCLIP;
 				for( U4 i = 0; i<pGSM->nCLIP; i++ ){
-					if( pCLIP[i].aI[0] != pCLIP[j].aI[0] )
+					if( pC0[i].aI[0] != pCn->aI[0] )
 						continue;
 
-					pCLIP[j=i].aI[0xf]++;
+					pC0[j=i].aI[0xf]++;
 					i=pGSM->nCLIP;
 				}
 				if( j >= pGSM->nCLIP )
@@ -420,7 +494,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			nINP = pINP->nLD();
 			pSat = (char*)pINP->p_alloc;
 
-			nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
+			nAT = pGSM->nAT( pAT, iAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, iMISS, pSat, nINP );
 			at = 0;
 			for( ; at < nAT; at++ ) {
 				pAT[at].an2str( sOUT );
@@ -428,6 +502,39 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			}
 			if(bSTDcout){std::cout << "nAT:" << at << std::endl;}
 			//bFREEinp = false;
+		}
+		while( iMISS>-1 ) {
+			char	*pNs = pSat + pAT[iMISS].num-6, *pNe = pSat + pAT[iMISS+2].num;
+			I8 pnum = gpfSTR2I8( pNe, &pNe );
+
+			gpcCLIP* pCn = (gpcCLIP*)pGSM->clip.Ux( pGSM->nCLIP, sizeof(*pCn) ), *pC0;
+			if( pCn ){
+				pC0 = pCn-pGSM->nCLIP;
+				I4 j = pGSM->nCLIP;
+				for( U4 i = 0; i<pGSM->nCLIP; i++ ){
+					if( pC0[i].aI[0] != pnum )
+						continue;
+					pC0[i].aI[0xf] = 0;
+					pGSM->nCLIP--;
+					if( i < pGSM->nCLIP )
+						continue;
+					pC0[i] = pC0[pGSM->nCLIP];
+					i--;
+				}
+
+			}
+
+			pINP->lzySUB( s = pNs-pSat, pNe-pNs );
+			nINP = pINP->nLD();
+			pSat = (char*)pINP->p_alloc;
+
+			nAT = pGSM->nAT( pAT, iAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, iMISS, pSat, nINP );
+			at = 0;
+			for( ; at < nAT; at++ ) {
+				pAT[at].an2str( sOUT );
+				if(bSTDcout){ std::cout << at <<"."<< sOUT << " "; }
+			}
+			if(bSTDcout){std::cout << "nAT:" << at << std::endl;}
 		}
 		/// CALL
 		///-------------------------------------------------------------------//
@@ -452,7 +559,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			//gpmMcpy( pSat+a, pSat+b, nINP-b+1 );
 			//nINP -= sub;
 
-			nAT = pGSM->nAT( pAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, pSat, nINP );
+			nAT = pGSM->nAT( pAT, iAT, iQ1, iOK, iNO, iERR, iCMTI, iCLIP, iRING, iMISS, pSat, nINP );
 			at = 0;
 			for( ; at < nAT; at++ ) {
 				pAT[at].an2str( sOUT );
@@ -463,29 +570,17 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		}
 		/// SMS
 		///-------------------------------------------------------------------//
-//-------------------------------------------------------------------------------------
-		/*if( !bFREEinp) {
-			if( pGSM->nCMTI ) {
-				pGSM->nCMTI = 0;
-				pGSM->answCMGR( sANSW, pGSM->iREAD );
-				nAT = 0;
-				pGSM->bCNT0 = true;
 
-			}
-			else if( pGSM->nCLIP )
-			{
-				pGSM->nCLIP = 0;
-				pGSM->sndLAST.num = 2;
-				pGSM->sndLAST.alf = gpeALF_CLIP;
-				nAT = 0;
-				pGSM->bCLIP = true;
-			}
-
-		} else */
 		switch( pGSM->aIS[0].alf ) {
 			case gpeALF_ATA: {
 					if( iOK < 0 )
 						break;
+					nAT = 0;
+					pGSM->bCNT0 = true;
+				} break;
+			case gpeALF_CREG: {
+
+					pGSM->CREG = pSat+pAT[0].num;
 					nAT = 0;
 					pGSM->bCNT0 = true;
 				} break;
@@ -526,7 +621,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 							nAT = 0;
 							pGSM->bCNT0 = true;
 						} break;
-					case gpeALF_CNMI:			/// New MSG indic to TE
+					case gpeALF_CNMI: 			/// New MSG indic to TE
 						if( nAT < 4 ) {			//2,1,0,0,0
 							if( iOK < 0 )
 								break;
@@ -735,10 +830,10 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 						}
 
 						char *pSnum = pSat+pAT[2].num;
-						pGSM->CREG.x = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
-						pGSM->CREG.y = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->CREG.reg.x = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
+						pGSM->CREG.reg.y = gpfSTR2U8( pSnum, &pSnum ); pSnum++;
 						if(iQ1>0) {
-							if( pGSM->CREG.y == 2 )
+							if( pGSM->CREG.reg.y == 2 )
 								sprintf( sANSW, "AT+CREG=2\r\n" );
 						}
 						nAT = 0;
@@ -770,6 +865,10 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 	/// SEND -------------------------------------
 	//if( bFREEinp )
+	//U8 s = 0;
+	if( iAT > 0 )
+		pINP->lzySUB(s=0,pAT[iAT].num-3);
+	else
 		gpmDEL(pINP);
 	if( *sANSW ) {
 		pS = sANSW;

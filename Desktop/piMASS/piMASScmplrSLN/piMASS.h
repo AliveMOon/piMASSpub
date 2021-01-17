@@ -459,6 +459,28 @@ inline U1* gpfSTR( U1* pSTR, const U1* pU )
 	pSTR[nU] = 0;
 	return pSTR;
 }
+U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub )
+{
+	/// a viszatérési érték nBYTE, nLEN az UTF(
+	nUTF8 = 0;
+	if( (p_str < pE) ? !*p_str : true )
+		return 0;
+
+	U1* pS = (U1*)p_str;
+	while( pS < pE )
+	{
+		if( (*pS)&0x80 )
+			return pS-p_str;
+
+		if( gpaALFsub[*pS] )
+			return pS-p_str;
+
+		nUTF8++;
+		pS++;
+	}
+	return pS-p_str;
+}
+
 U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub )
 {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
@@ -3972,6 +3994,7 @@ public:
 		return p_buff-p_begin;
 	}
 
+
 };
 
 
@@ -5581,7 +5604,53 @@ public:
 class gpcROBnD;
 class gpcZSnD;
 
+typedef enum gpeAT:U4{
+	gpeAT_no,
+	gpeAT_ok,
+	gpeAT_at,
+	gpeAT_err,
+	gpeAT_cmti,
+	gpeAT_clip,
+	gpeAT_ring,
+	gpeAT_miss,
 
+	gpeAT_noQ,
+	gpeAT_okQ,
+	gpeAT_atQ,
+	gpeAT_errQ,
+	gpeAT_cmtiQ,
+	gpeAT_clipQ,
+	gpeAT_ringQ,
+	gpeAT_missQ,
+
+	gpeAT_noP,
+	gpeAT_okP,
+	gpeAT_atP,
+	gpeAT_errP,
+	gpeAT_cmtiP,
+	gpeAT_clipP,
+	gpeAT_ringP,
+	gpeAT_missP,
+
+	gpeAT_noA,
+	gpeAT_okA,
+	gpeAT_atA,
+	gpeAT_errA,
+	gpeAT_cmtiA,
+	gpeAT_clipA,
+	gpeAT_ringA,
+	gpeAT_missA,
+
+	gpeAT_noPP,
+	gpeAT_okPP,
+	gpeAT_atPP,
+	gpeAT_errPP,
+	gpeAT_cmtiPP,
+	gpeAT_clipPP,
+	gpeAT_ringPP,
+	gpeAT_missPP,
+	gpeAT_N,
+} gpeAT;
 class gpcLZY {
 public:
 	union
@@ -5643,8 +5712,7 @@ public:
 				//;
 				//nO = sizeof(*pO);
 		//pU1x4 = p_alloc + xM;
-		for( U4 i = 0; i < nM; i++ )
-		{
+		for( U4 i = 0; i < nM; i++ ) {
 			if( pM[i].x != x )
 				continue;
 			if( !i )
@@ -5677,8 +5745,7 @@ public:
 		if( !iM )
 			return pM;
 
-		if( iM < nLIM )
-		{
+		if( iM < nLIM ) {
 			iM--;
 			U4x4 t = pM[iM];
 			pM[iM] = pM[iM+1];
@@ -5707,6 +5774,7 @@ public:
 	}
 
 	U4 nPC( void );
+
 	void wait( void ) {
 		if( !this )
 			return;
@@ -5886,8 +5954,7 @@ public:
 		if( !n_byte )
 			return this;
 
-		if( !this )
-		{
+		if( !this ) {
 			iSTRT = 0;
 			gpcLZY* p_lazy = new gpcLZY( n );
 			p_lazy->n_alloc = gpmPAD( n_byte*p_lazy->aSET[gpeLZYxN], 0x10 );
@@ -5919,8 +5986,7 @@ public:
 		else
 			n_load = iSTRT;
 
-		if( p_alloc ? (n_load+n_byte > n_alloc) : true )
-		{
+		if( p_alloc ? (n_load+n_byte > n_alloc) : true ) {
 			U1* p_kill = p_alloc;
 			n_alloc = gpmPAD( (n_load+n_byte*n), 0x10 );
             p_alloc = NULL;
@@ -6268,7 +6334,7 @@ szasz:
 		ins.op = U1x4( op, ((U1)s0<<3)|(sn&7), ((U1)d0<<3)|(dn&7), (di<<4)|(si&7) ).u4;
 		return ins;
 	}
-
+	int nAT( char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
 
 };
 
