@@ -43,16 +43,16 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	std::cout << std::endl;
 
 
-	iABC.xyz_( F4(  0, 30, 45 )*degX(1) );
-	tABC.xyz_( F4( 90, 90, 90 )*degX(1) );
+	iABC.ABC_( F4(  0, 30, 45 )*degX(1) );
+	tABC.ABC_( F4( 90, 90, 90 )*degX(1) );
 
-	oABC.xyz_( iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) )/2 + iABC );
+	oABC.ABC_( iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) )/2 + iABC );
 
 	F4x4	iMX, tMX, oMX;
 	float ab = 0.5;
-	iMX.ABC(iABC, degX(180.0/PI) );
-	oMX.ABC(oABC, degX(180.0/PI) );
-	tMX.ABC(tABC, degX(180.0/PI) );
+	iMX.mxABC(iABC, degX(180.0/PI) );
+	oMX.mxABC(oABC, degX(180.0/PI) );
+	tMX.mxABC(tABC, degX(180.0/PI) );
 	//oMX = iMX.lerp_zyx( tMX, ab );
 
 	std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;
@@ -72,15 +72,15 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;
 	std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl << std::endl;
 
-    iABC.xyz_( iMX.eulABC()*degX(180.0/PI) );
-    tABC.xyz_( oMX.eulABC()*degX(180.0/PI) );
-	//tABC.xyz_( tMX.eABC()*degX(180.0/PI) );
+    iABC.ABC_( iMX.eulABC()*degX(180.0/PI) );
+    tABC.ABC_( oMX.eulABC()*degX(180.0/PI) );
+	//tABC.ABC_( tMX.eABC()*degX(180.0/PI) );
 
 	std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;
 	std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;
 	std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl << std::endl;
 
-	tMX.ABC(tABC, degX(180.0/PI) );
+	tMX.mxABC(tABC, degX(180.0/PI) );
 	std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;
 	std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;
 	std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;
@@ -131,7 +131,7 @@ gpcDrc& gpcDrc::operator = ( const gpcZS& zs ) {
 		if( iXYZ.qlen_xyz() < 32*32 )
 			iXYZ.x = iXYZ.y = iXYZ.z = mmX(450);
 	}
-	gpmMcpyOF( &iABC.x, &zs.aABC, 3 );
+	gpmMcpyOF( &iABC.A, &zs.aABC, 3 );
 
 	ixyz.xyz_(iXYZ.ABC2xyz( txyz, iABC ) );
 
@@ -155,7 +155,7 @@ gpcDrc& gpcDrc::operator = ( const gpcZS& zs ) {
 		AVGms = (msSRT3.x-sMS)/nMS;
 
 		okXYZ.xyz_(iXYZ);
-		okABC.xyz_(iABC);
+		okABC.ABC_(iABC);
 	}
 	return *this;
 }
@@ -181,7 +181,7 @@ gpcZS& gpcZS::operator = ( const gpcDrc& D ) {
 							gpmMcpyOF( &io128.y, &D.oCTRL.y, 3 );
 
 						gpmMcpyOF( &aPOS,	&D.oXYZ.x, 3 );
-						gpmMcpyOF( &aABC,	&D.oABC.x, 3 );
+						gpmMcpyOF( &aABC,	&D.oABC.A, 3 );
 						io128.w = D.MPosS;
 						break;
 					default:
@@ -610,7 +610,7 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 					case 0:
 						/// XYZABCxyz 2. OK ------------- JD.z = 0
 						okXYZ.xyz_(oXYZ);
-						okABC.xyz_(oABC);
+						okABC.ABC_(oABC);
 						okxyz.xyz_(txyz);
 						break;
 					case 9115:	// a J5 túl erös akart lenni
@@ -622,11 +622,11 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 						/// XYZABCxyz 3. NOK ------------- JD.z = ERR
 						if( okXYZ.qlen_xyz() ){
 							tXYZ.xyz_( oXYZ.xyz_(okXYZ) );
-							tABC.xyz_( oABC.xyz_(okABC) );
+							tABC.ABC_( oABC.ABC_(okABC) );
 							std::cout << "9115tXYZ: " << tXYZ.pSTR( gpsJDpubZS ) <<std::endl;
 						} else {
 							tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-							tABC.xyz_( oABC.xyz_(iABC) );
+							tABC.ABC_( oABC.ABC_(iABC) );
 							std::cout << "Err tXYZ: " << tXYZ.pSTR( gpsJDpubZS ) <<std::endl;
 						}
 						break;
@@ -707,7 +707,7 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 		oCTRL.z = 1;
 		JD.y = 0;
 		tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-		tABC.xyz_( oABC.xyz_(iABC) );
+		tABC.ABC_( oABC.ABC_(iABC) );
 		txyz.xyz_( 0 ); //oxyz.xyz_(ixyz) );
 		JD.x = 1;
 		return *this;
@@ -718,11 +718,11 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 		// ezt kaptuk a robitol
 		// ha netán akkor sem mozdul
 		oXYZ.xyz_(iXYZ);
-		oABC.xyz_(iABC);
+		oABC.ABC_(iABC);
 	}
 
 	F4x4 tMX = 1.0, iMX;
-	iMX.ABC(iABC, degX(180.0/PI) );
+	iMX.mxABC(iABC, degX(180.0/PI) );
 	// itt kell le ellenőrizni mondjuk az ütközésre
 	//
 	float ab = 1.0, k;
@@ -856,13 +856,13 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 				tMX.y /= sqrt(yl);
 				tMX.x = tMX.y.X3(tMX.z);
 			}
-			tABC.xyz_( tMX.eulABC()*degX(180.0/PI) );
+			tABC.ABC_( tMX.eulABC()*degX(180.0/PI) );
 			itD = iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) );
 		}
 	}
 
 	if( itD.w < (degX(1)/2) ) {	// kb: 50
-		tABC.xyz_(oABC.xyz_(iABC));
+		tABC.ABC_(oABC.ABC_(iABC));
 	} else {
 
 		k = ((K*float(itD.w))/degX(180.0));
@@ -897,9 +897,9 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 				}
 
 				if( mmABCD.y )
-					oABC.xyz_( ((itD*mmABCD.y)/mmABCD.x)+iABC );
+					oABC.ABC_( ((itD*mmABCD.y)/mmABCD.x)+iABC );
 				else if( ab > 0.0 )
-					oABC.xyz_( (F4(itD)*ab)+iABC );
+					oABC.ABC_( (F4(itD)*ab)+iABC );
 
 
 				if( (oABC.A/degX(180)) > 1 ) {
@@ -953,7 +953,7 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 					}
 				}
 			} else {
-				oABC.xyz_( tABC );
+				oABC.ABC_( tABC );
 			}
 		}
 		oCTRL.z |= 2;
@@ -968,7 +968,7 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 		// ketrec gátolta
         // o-kat berakjuk a t-be
         tXYZ.xyz_( oXYZ );
-		tABC.xyz_( oABC );
+		tABC.ABC_( oABC );
 		std::cout << "CAGE tXYZ: " << tXYZ.pSTR( gpsJDpubZS ) <<std::endl;
 	} else
 		std::cout << "oXYZ: " << oXYZ.pSTR( gpsJDpubZS ) << "\r\ntXYZ: " << tXYZ.pSTR( gpsJDpubZS ) <<std::endl;
@@ -981,7 +981,7 @@ gpcDrc& gpcDrc::judoZS( gpcZS& iZS, U4 mSEC ) {
 			oCTRL.z = 1;
 			JD.y = 0;
 			tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-			tABC.xyz_( oABC.xyz_(iABC) );
+			tABC.ABC_( oABC.ABC_(iABC) );
 			JD.x = 1;
 			break;
 		case 1: // ALAPH ready!
@@ -1092,7 +1092,7 @@ gpcLZY* gpcGT::GTdrcOSzs( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR,
 							break;
 						}
 						ZSnD.aDrc[iD].okXYZ.xyz_( ZSnD.aDrc[iD].tXYZ );
-						ZSnD.aDrc[iD].okABC.xyz_( ZSnD.aDrc[iD].tABC );
+						ZSnD.aDrc[iD].okABC.ABC_( ZSnD.aDrc[iD].tABC );
 						ZSnD.aDrc[iD].okxyz.xyz_( ZSnD.aDrc[iD].txyz );
 					} break;
 				case gpeALF_POS:
@@ -1134,7 +1134,7 @@ gpcLZY* gpcGT::GTdrcOSzs( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR,
 							case gpeZS_DIR0:
 								iNUM = gpeDRCos_ABCa;
 								if( ZSnD.aDrc[iD].okXYZ.qlen_xyz() )
-									ZSnD.aDrc[iD].tABC.xyz_( ZSnD.aDrc[iD].okABC );
+									ZSnD.aDrc[iD].tABC.ABC_( ZSnD.aDrc[iD].okABC );
 								else
 									ZSnD.aDrc[iD].tabc.xyz_( ZSnD.aDrc[iD].iABC );
 								break;

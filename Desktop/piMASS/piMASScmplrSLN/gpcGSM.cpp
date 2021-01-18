@@ -292,7 +292,11 @@ public:
 		iCLIP = aMnMx[gpeAT_clipPP].x;	// : első (PP)
 		iRING = aMnMx[gpeAT_ring].x;	// első
 		iMISS = aMnMx[gpeAT_miss].x;	// első
-
+		if( !nAT )
+		{
+			gpmZ(aIS);
+			return 0;
+		}
 		aIS[0] = pAT0[0];
 
 		if( nAT > 1 )
@@ -568,7 +572,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 					pGSM->iREAD = pCMIT->num;
 			}
 
-			U8 a = pAT[iCMTI].num-8, b = (pAT[iCMTI+2].num-3);
+			U8 a = pAT[iCMTI].num-8, b = (pAT[gpmMIN(iCMTI+2,nAT)].num-3);
 			pINP->lzySUB( a, b-a );
 			nINP = pINP->nLD();
 			pSat = (char*)pINP->p_alloc;
@@ -934,7 +938,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		if( pSe-pS < 1 )
 			return iCNT;
 		U8 ms = 20000, act, gd, oACT = pGSM->iACTION;
-		while( *pS != 'A' ) {
+		while( *pS != 'A' && !*sANSW ) {
 			switch( *pS ) {
 				case 'w':
 				case 'W':

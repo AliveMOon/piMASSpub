@@ -50,7 +50,7 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, I4 ig, U4 nS )
 	U4	iZN = (an * U4x2( 1, mCR.z ))-1,
 		xFND = pM[iZN];
 
-	gpcSRC* p_fnd = xFND ? SRCfnd( xFND ) : NULL;
+	gpcSRC* p_fnd = xFND ? srcFND( xFND ) : NULL;
 	if( p_fnd )
 	{
 
@@ -118,6 +118,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 								"CELLPADDING=0 cellspacing=1 valign=top >\r\n",
 								pNAME
 					);
+
 	bool bTR = false, bTD = false;
 	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
 	{
@@ -135,14 +136,30 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		}
 		buff.lzyFRMT( nS = -1, "%s<TD BGCOLOR=%s BORDER=1> ", bTD ? "</TD>" : "", ((i%z)+(i/z))%2 ? "#bfbfbf":"#afafaf"  );
 
-		pSRC = SRCfnd( pM[i] );
+		pSRC = srcFND( pM[i] );
 		if( !pSRC )
 			continue;
 
+
+
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
-		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
+		pNX = pNUM + sprintf( (char*)pNUM, "%d", i/z );
+
+		if( pSRC->pMINI->nLD() )
+		{
+			sprintf( (char*)gpsSAVEbf, "%s%s/%s.mini", pPATH, pNAME, gpsSVadr  );
+			pSRC->pMINI->lzyWR( (char*)gpsSAVEbf );
+		}
+		if( pSRC->pDBG->nLD() )
+		{
+			sprintf( (char*)gpsSAVEbf, "%s%s/%s.asm", pPATH, pNAME, gpsSVadr  );
+			pSRC->pDBG->lzyWR( (char*)gpsSAVEbf );
+		}
+		pNX += sprintf( (char*)pNX, "\t" );
+
 		if( bALT )
-		buff.lzyFRMT( nS = -1, " %s", gpsSVadr );
+			buff.lzyFRMT( nS = -1, " %s", gpsSVadr );
+
 
 		pA = pSRC->pA;
 		if( !pA )
@@ -156,7 +173,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 		}
 		iB = pSRC->iB();
 		pLFT = pA;
-		pRIG = pA+pSRC->nL;
+		pRIG = pA+pSRC->n_ld_add();
         pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 
         if( bALT )
@@ -264,7 +281,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		if( !pM[i] )
 			continue;
 
-		pSRC = SRCfnd( pM[i] );
+		pSRC = srcFND( pM[i] );
 		if( !pSRC )
 			continue;
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
@@ -280,7 +297,7 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		}
 		iB = pSRC->iB();
 		pLFT = pA;
-		pRIG = pA+pSRC->nL;
+		pRIG = pA+pSRC->n_ld_add();
         pANo = (U1*)gpmSTRiSTR( (char*)pLFT, (char*)gpsSVadr );
 
 		if( !pANo )
@@ -371,7 +388,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 	while( pS < pSe ? *pS : false )
 	{
 		tmp.reset( pS, pSe, &pS, aSP44[nSP] );
-		if(!tmp.nL)
+		if(!tmp.n_ld_add())
 			continue;
 		tmp.IX = nLST;
 		if( tmp.bSUB( *this ) )
@@ -382,7 +399,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		}
 		else if( tmp.bENTR( *this, aSP44[nSP] ) )
 		{
-			std::cout << "[ENTER]"; // <<std::endl;;
+			if(bSTDcout){std::cout << "[ENTER]";} // <<std::endl;};
 		}
 
 		aSP44[momLV].a4x2[1].mx(  aSP44[nSP].a4x2[0] );
@@ -507,37 +524,37 @@ extern U4	gpnCAGEbillBALL,
 gpcDrc gpCHK( gpsMNpub, I4x4( 600, 500, 500 )*mmX(1), I4x4( 600, 500, 400 )*mmX(1), I4x4( 600, 500, 0 )*mmX(1) );
 void gpfMAINchk()
 {
-	std::cout <<std::endl;;;;
+	if(bSTDcout){std::cout <<std::endl;}
 	for( U4 i = 0, e = gpmN(aSIZEOF); i < e; i++  )
 	{
-		std::cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 <<std::endl;;
+		if(bSTDcout){std::cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 <<std::endl;};
 	}
-    std::cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<std::endl;;
-
+    if(bSTDcout){std::cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<std::endl;};
+	if(bSTDcout){std::cout << 	stdRED	"\033[1;31m Megvan már?"
+					stdBLUE "\r\n1. A mini ha szerkesztve van _# ket is rajzolja"
+					stdBLUE "\r\nés ne használja az extra karaktereket!"
+					stdBLUE "\r\n3. rosszul azonosítja hol van a pointer"
+					stdRED	"\r\n2. F5 CPY F6 MOVE stb???"
+					stdRESET << std::endl;}
 	I4x2 snail;
 	for( U4 i = 0; i < 100; i++ )
 	{
 		snail.snail(i);
-		std::cout << i << "->" << snail.pSTR(gpsMNpub) <<std::endl;
+		if(bSTDcout){std::cout << i << "->" << snail.pSTR(gpsMNpub) <<std::endl;}
 	}
 	I4x4 j0 = I4x4( 0, 600, 1500 )*mmX(1), j1 = I4x4( 0, 0, 0 )*mmX(1), t0 = I4x4( 0, 600, 0 )*mmX(1),
 		 up0 = j0-t0, xyz;
 	for( I8 ti = 0, tn = 540*ms2sec; ti < tn; ti+=10*ms2sec )
 	{
 		xyz = j0.drop( j1, up0, mmX(100), ti, tn );
-		std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;
+		if(bSTDcout){std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;}
 	}
 	for( I8 ti = 0, tn = 540*ms2sec; ti < tn; ti+=10*ms2sec )
 	{
 		xyz = j1.drop( j0, up0, mmX(100), ti, tn );
-		std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;
+		if(bSTDcout){std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;}
 	}
-	std::cout << 	"\033[1;31m Megvan már?"
-					"\033[1;34m \r\n1. A mini ha szerkesztve van _# ket is rajzolja"
-					"\033[1;34m \r\nés ne használja az extra karaktereket!"
-					"\033[1;34m \r\n3. rosszul azonosítja hol van a pointer"
-					"\033[1;31m \r\n2. F5 CPY F6 MOVE stb???"
-					"\033[0m" << std::endl;
+
 
 //	char* pSTR = NULL;
 //	for( U4 i = 0; i < gpmN(gpaABC); i++ )
@@ -551,37 +568,48 @@ void gpfMAINchk()
 //		tABC = iMX.eABC()*(180.0/PI);
 //		tMX.ABC( tABC, 180.0/PI);
 //
-//		/*A.a( tABC.x, 180.0/PI);
-//		B.b( tABC.y, 180.0/PI);
-//		C.c( tABC.z, 180.0/PI);
+//		/*A.a( tABC.A, 180.0/PI);
+//		B.b( tABC.B, 180.0/PI);
+//		C.c( tABC.C, 180.0/PI);
 //		tMX = A*B*C;*/
 //		//tMX.abc(tABC, 180.0/PI );
 //		pSTR += iMX.str( pSTR, ",", "\r\n" );
 //		pSTR += tABC.str( pSTR, ",", "\r\n" );
 //		pSTR += tMX.str( pSTR, ",", "\r\n" );
-//		std::cout << gpsMNpub <<std::endl;
+//		if(bSTDcout){std::cout << gpsMNpub <<std::endl;}
 //	}
 //	*gpsMNpub = 0;
 
 }
 #ifdef _WIN64
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR apA, INT nA)
-//int main(int nA, char** apA )
+{
+	if (apA ? nA > 0 : false)
+	{
+		gppEXEfile = gpfP2F(gpsEXEpath, gpsEXEname, (char*)apA, '\\' );
+
+		if(bSTDcout){std::cout << "Start in:" << gpsEXEpath << std::endl;};
+		if(bSTDcout){std::cout << "Exe is:" << gpsEXEname << std::endl;};
+		*gppMASSfile = 0;
+		nA = 1;
+	}
 #else
 int main( int nA, char *apA[] )
-#endif
+
 {
-	gpf_aALF_init();
-	gpfMAINchk();
 
-	if( nA > 0 )
+	if(	apA[0] ? nA > 0 : false )
 	{
-		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, (char*)apA[0] );
+		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, (char*)(apA[0]) );
 
-		std::cout << "Start in:" << gpsEXEpath <<std::endl;;
-		std::cout << "Exe is:" << gpsEXEname <<std::endl;;
+		if(bSTDcout){std::cout << "Start in:" << gpsEXEpath <<std::endl;};
+		if(bSTDcout){std::cout << "Exe is:" << gpsEXEname <<std::endl;};
 		*gppMASSfile = 0;
 	}
+#endif
+
+	gpf_aALF_init();
+	gpfMAINchk();
 
 	gpcDrc tstCAGE;
 	I4x4 tmp;
@@ -589,12 +617,12 @@ int main( int nA, char *apA[] )
 	{
 		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mmX(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mmX(1) );
-		std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mmX(1)).pSTR( gpsMNpub ) <<std::endl;;
+		if(bSTDcout){std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mmX(1)).pSTR( gpsMNpub ) <<std::endl;};
 		tmp = tstCAGE.tXYZ.xyz0();
 		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
-		std::cout << "tstCAGE.tXYZball:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;;
+		if(bSTDcout){std::cout << "tstCAGE.tXYZball:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;};
 		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
-		std::cout << "tstCAGE.tXYZboxx:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;;
+		if(bSTDcout){std::cout << "tstCAGE.tXYZboxx:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;};
 	}
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
 	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );
@@ -607,19 +635,22 @@ int main( int nA, char *apA[] )
 
 		for( int i = 1; i < nA; i++ )
 		{
-			std::cout << apA[i] <<std::endl;;
-			if( gpmSTRiSTR( (char*)apA[i], ".mass" ) )
-			{
-				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, (char*)apA[i] );
+			if (!(apA[i]))
+				continue;
 
-				std::cout << "MASS is:" << gpsMASSname <<std::endl;;
+			if(bSTDcout){std::cout << (apA[i]) <<std::endl;};
+			if( gpmSTRiSTR( (char*)(apA[i]), ".mass" ) )
+			{
+				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, (char*)(apA[i]) );
+
+				if(bSTDcout){std::cout << "MASS is:" << gpsMASSname <<std::endl;};
 				continue;
 			}
 		}
 		if (gppMASSfile == gpsMASSpath)
 		{
 			#ifdef _WIN64
-				std::cout << "\033[1;31m Meg kell szerezni a user HOME könjyvtárát?" << std::endl;
+				if(bSTDcout){std::cout << "\033[1;31m Meg kell szerezni a user HOME könjyvtárát?" << std::endl;}
 			#else
 
 						struct passwd *pw = getpwuid(getuid());
@@ -635,7 +666,7 @@ int main( int nA, char *apA[] )
 
 		strcpy( gppMASSfile, gpsMASSname );
 		U8 s;
-		std::cout << "Load:"<< gpsMASSpath <<std::endl;;
+		if(bSTDcout){std::cout << "Load:"<< gpsMASSpath <<std::endl;};
 		if( gpfACE(gpsMASSpath, 4) > -1 )
 			gpMASS.lzyRD( gpsMASSpath, s = -1, -1 );
 
@@ -664,7 +695,7 @@ int main( int nA, char *apA[] )
         //apCRS[srcDIV] = &main_crs;
         //sdl.draw();
 
-		win.WINrun( 	"                                        "
+		win.winRUN( 	"                                        "
 						"     **** GRANDPACE piMASS V0.1 ****    "
 						"                                        "
 						" 1GB RAM SYSTEM  38911 piMASS BYTE FREE "
@@ -676,9 +707,9 @@ int main( int nA, char *apA[] )
     }
     catch ( const InitError & err )
     {
-        std::cerr << "Error while initializing SDL:  "
+        if(bSTDcout){std::cout << "Error while initializing SDL:  "
                   << err.what()
-                  << std::endl;
+                  << std::endl;}
     }
 
     return 1;

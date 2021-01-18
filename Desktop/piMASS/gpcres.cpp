@@ -131,8 +131,6 @@ gpcRES* gpcALU::ins( gpcRES* pM, gpcRES* pKID )
 	gpcADR adr = alf;
 	adr = pM;
 
-
-
 	gpmDEL(pKID);
 	return pKID;
 }
@@ -144,7 +142,6 @@ gpcALU& gpcALU::zero( void )
 	type = 0;
 	an = 0;
 	pRM->chg( *this );
-
 	return *this;
 }
 gpcALU& gpcALU::equ( gpcALU& b )
@@ -762,7 +759,7 @@ U1* gpcALU::ALUdat( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, double d8 )
 		if( (ty4.x&0xf) <= (typ().x&0xf)  )
 		{
 			// akkor nem jó ha ugyan akkorát akarunk
-			ty4.x = 0x80 + min( 3, (typ().x&0xf)+1 );
+			ty4.x = 0x80 + gpmMIN( 3, (typ().x&0xf)+1 );
 		}
 
 
@@ -886,7 +883,7 @@ gpcALU& gpcALU::equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 x )
 	if( (ty4.x&0xf) <= (typ().x&0xf)  )
 	{
 		// akkor nem jó ha ugyan akkorát akarunk
-		ty4.x = 0x80 + min( 3, (typ().x&0xf)+1 );
+		ty4.x = 0x80 + gpmMIN( 3, (typ().x&0xf)+1 );
 	}
 
 
@@ -983,18 +980,27 @@ gpcALU& gpcALU::equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double d8, U2 x )
 	return *this;
 }
 
+gpcALU& gpcALU::operator = ( I4 a )
+{
+	U1x4 t = gpeTYP_I4;
+	if( a < 0 )
+		return equ( pRM, 0, t, I1x4(-1), -a, 0.0 );
+
+	return equ( pRM, 0, t, 0, a, 0.0  );
+}
+
 gpcALU& gpcALU::operator = ( gpcREG& a )
 {
 	U1x4 t = 0;
 	t.x = a.t();
 	if( t.x&0x40 )
-		equ( pRM, a.xy, t, I1x4(0), 0, a.d8() );
-	else if( t.x&0x80 )
-		equ( pRM, a.xy, t, I1x4(-1), a.u8(), 0.0 );
-	else
-		equ( pRM, a.xy, t, 0, a.u8(), 0.0  );
+		return equ( pRM, a.xy, t, I1x4(0), 0, a.d8() );
+	if( t.x&0x80 )
+		return equ( pRM, a.xy, t, I1x4(-1), a.u8(), 0.0 );
 
-	return *this;
+	return equ( pRM, a.xy, t, 0, a.u8(), 0.0  );
+
+	//return *this;
 }
 
 gpcALU& gpcALU::operator += ( gpcREG& a )

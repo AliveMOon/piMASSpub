@@ -1,4 +1,5 @@
 #include "gpcSRC.h"
+#include "gpccrs.h"
 U1 gpaALFsub[0x100];
 char gpaALF_H_sub[0x100];
 char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
@@ -6,8 +7,7 @@ char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{}
 		*gppTAB = gpsTAB+strlen(gpsTAB),
 		gpsNDAT[] = "-bwllqqqqxxxxxxxx";
 
-U1* gpf_aALF_init( void )
-{
+U1* gpf_aALF_init( void ) {
 	for( int i = 0; i < 0x100; i++ )
 	{
 		if( i >= 'A' && i <= 'Z')
@@ -28,10 +28,7 @@ U1* gpf_aALF_init( void )
 	gpaALF_H_sub['_'] = ('_'-'E')+('A'-1);
 	return gpaALFsub;
 }
-
-
-gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
-{
+gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
 	if( p_end < pS )
 	{
 		if( ppS )
@@ -80,8 +77,7 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS )
 }
 U1		gpsSTRpub[0x10000];
 char 	gpsHD[0x1000], *psHD;
-void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
-{
+void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub ) {
 	if( !this )
 		return;
 
@@ -134,7 +130,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 				continue;
 
 			if( !pTGpub )
-				pTGpub = mass.aTGwip;
+				pTGpub = pMASS->aTGwip;
 
 			for( U4 i = 0; i < nALFtg; i++ )
 			{
@@ -194,7 +190,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			case gpeALF_null:
 				pS++;
 				continue;
-			case gpeALF_SUB:
+			case gpeALF_sub:
 				bSW |= gpeMASSsubMSK;
 				continue;
 			case gpeALF_RET:
@@ -234,7 +230,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 			if( pTGdie[i] < gpeALF_A )
 				continue;
 			// kiszedni a teg listából az SRC-t
-			mass.tag_sub( pTGdie[i], IX );
+			pMASS->tag_sub( pTGdie[i], IX );
 		}
 		gpmDELary(pTGdie);
 	}
@@ -268,7 +264,7 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 					break;
 			}
 			// betenni a teg listába az SRC-t
-			mass.tag_add( pALFtg[nALFtg], IX );			///
+			pMASS->tag_add( pALFtg[nALFtg], IX );			///
 			nALFtg++;
 		}
 
@@ -288,10 +284,72 @@ void gpcSRC::hd( gpcMASS& mass, gpeALF* pTGpub )
 	psHD += sprintf( 	psHD, "\r\nbSW:0x%0.8x",
 						bSW );
 	if( psHD > gpsHD )
-		std::cout << gpsHD;
-	std::cout << "." ;
+		if(bSTDcout){std::cout << gpsHD;}
+	if(bSTDcout){std::cout << ".";}
+}
+gpcLZYdct* gpcMASS::pOPER() {
+	if(!this)
+		return NULL;
+	if( OPER.nIX() )
+		return &OPER;
+
+	char *pSi, *pSe;
+	U4 iOP, iOPe = OPER.nIX();
+	/// -------------------------------------------------------
+	/// OPER
+	/// -------------------------------------------------------
+	if( !iOPe ) {
+		mxOP = gpeALF_null;
+		/// ha nincsen még kitöltve az OPER lista feltöltjük
+		pSe = strchr( (char*)gpasOP[0], ' ' );
+		OPER.dctMILLadd( (U1*)gpasOP[0], pSe-gpasOP[0] );
+		aOP[0].num = 14;
+		aOP[0] = pSe+1;
+		mxOP = aOP[0].alf;
+		iOPe++;
+
+		for( U4 i = 1, ie = gpmN(gpasOP); i < ie; i++ ) {
+			pSe = strchr( (char*)gpasOP[i], ' ' );
+			if( !pSe )
+				continue;
+			U4 n = pSe-gpasOP[i], nn = 0;
+			iOP = 0;
+			iOP = OPER.dctMILLfnd( (U1*)gpasOP[i], pSe-gpasOP[i], iOPe );
+			if( iOP < iOPe )
+			if( OPER.nSTRix(iOP) < n )
+				iOP = iOPe;
+
+			if( iOP >= iOPe ) {
+				iOP = iOPe;
+				OPER.dctMILLadd( (U1*)gpasOP[i], pSe-gpasOP[i] );
+				aOP[iOP].num = 14;
+				aOP[iOP] = pSe+1;
+				iOPe++;
+				if( mxOP < aOP[iOP].alf )
+					mxOP = aOP[iOP].alf;
+			}
+
+		}
+		iOPe = OPER.nIX();
+	}
+
+	return &OPER;
 }
 
+U1 gpcSRC::srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ) {
+	if( !this )
+		return 0;
+	if( msBLD ? msBLD > pW->mSEC.x : true )
+		return 2;
+
+	msBLD = 0;
+	U1 iSCP = 0;
+	if( !gpmSCP.nLNK() )
+		return 0;
+
+	srcCMPLR( *pW->piMASS->pOPER(), iSCP, pW, pSRCstk );
+	return 1;
+}
 
 
 

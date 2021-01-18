@@ -11,7 +11,7 @@ extern char gpsTAB[], *gppTAB;
 // BALL
 //------------------------
 I4x4 gpaCAGEbillBALL[] = {
-	{ mmX(1500), 0, mmX(320), mmX(700) },
+	{ mmX(1500), 0, mmX(320), mmX(350) },						// jOHN
 	{ 0, 0, mmX(320), mmX(420) }, { 0, 0, mmX(-300), mmX(550) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
@@ -35,7 +35,7 @@ U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 // BALL
 //------------------------
 I4x4 gpaCAGEjohnBALL[] = {
-	{ mmX(1500), 0, mmX(320), mmX(700) },
+	{ mmX(1500), 0, mmX(320), mmX(350) },						// bILL
 	{ 0, 0, mmX(320), mmX(300) }, { 0, 0, mmX(-300), mmX(350) },
 	{ mmX(685), mmX(-469), mmX(366),  mmX(300) },
 };
@@ -137,10 +137,11 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 			{
 				case gpeALF_null:
 				case gpeALF_DROP:
+				case gpeALF_CALIB:
 					break;
 				default:
 					tXYZ.xyz_(jd0XYZ);
-					tABC.xyz_(jd0ABC);
+					tABC.ABC_(jd0ABC);
 					break;
 			}
 
@@ -167,13 +168,14 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 					jdPRG.z = (jdPRG.w = jd0PRG.x) * jd0PRG.y;
 					break;
 
-			case gpeALF_DROP:if( jd1XYZ.qlen_xyz() * max( 0, jd0PRG.y-jd0PRG.x) ) {
+			case gpeALF_DROP:if( jd1XYZ.qlen_xyz() * gpmMAX( 0, jd0PRG.y-jd0PRG.x) ) {
 					//I4 lag = mSEC < msSMR2.w ? 0 : mSEC-msSMR2.w;
-					//std::cout << "lag: " << lag << std::endl;
-					jdPRG.y = jdPRG.w = msSRT3.x;	// w-ben örizzük az indulási időt y aktuális idő
+					//if(bSTDcout){std::cout << "lag: " << lag << std::endl;}
+					jdPRG.y = jdPRG.w = msSRT3.x;				// w-ben örizzük az indulási időt y aktuális idő
 					jdPRG.z = jdPRG.w+jd0PRG.a4x2[0].sum();		// z-ben pedig a kívánt megérkezési időt
 					break;
 				}
+			case gpeALF_CALIB:
 			default:
 				jdPRG.null();
 				return true;
@@ -186,13 +188,13 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 			return true;
 		}
 		jd0XYZ.xyz_(okXYZ);
-		jd0ABC.xyz_(okABC);
+		jd0ABC.ABC_(okABC);
 		// itt a txyz azért van a füg.ben txyz-jd0XYZ hossza a sugarat adja meg
 		jd0xyz.xyz_(jd0XYZ.ABC2xyz( txyz, jd0ABC ));	// az okxyz nem jó mert ha nem történt mozgás nincsen benne semmi
-		jd0mx.ABC(jd0ABC,degX(180.0/PI));
+		jd0mx.mxABC(jd0ABC,degX(180.0/PI));
 
 
-		jd1ABC.xyz_(tABC);
+		jd1ABC.ABC_(tABC);
 		jd1up.xyz_(tXYZ-txyz);
 	}
 	I4 zl = sqrt((jd0XYZ-jd0xyz).qlen_xyz());
@@ -224,10 +226,10 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				vec = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
 				tXYZ.xyz_( jd0xyz - vec );
 			} break;
-
+		case gpeALF_CALIB:
 		case gpeALF_DROP: {
 				// I4 lag = mSEC < msSMR2.w ? 0 : mSEC-msSMR2.w;
-				// std::cout << "lag: " << lag << std::endl;
+				// if(bSTDcout){std::cout << "lag: " << lag << std::endl;}
 				/// msSRT3.x robot ms // AVGms átlagos válasz idő
 				/// jd0PRG.x késleltetés
 				I8	tn = jdPRG.z-jdPRG.w,
@@ -256,7 +258,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 							ti = th;
 							jdPRG.y = ti+jdPRG.w;
 							dti = jd0XYZ.drop( jd1XYZ, up0, jd1XYZ.w, ti, tn );
-							std::cout << "HI ";
+							if(bSTDcout){std::cout << "HI ";}
 						}
 						//I4x4 up1 = (jd1XYZ-jd1xyz).xyz0();
 						up0 += ((jd1up-up0)*(I8)(ti-th))/(I8)(tn-th);
@@ -269,7 +271,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 				tXYZ.xyz_( dti );
 				txyz.xyz_( tXYZ-up0 );
 
-				std::cout << ti << "/" << tn << "\t" << tXYZ.pSTR( gpsJDprgPUB ) <<std::endl;
+				if(bSTDcout){std::cout << ti << "/" << tn << "\t" << tXYZ.pSTR( gpsJDprgPUB ) <<std::endl;}
 			} break;
 		default:
 			jdPRG.null();
@@ -369,7 +371,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 							break;
 						}
 						RnD.aDrc[iD].okXYZ.xyz_( RnD.aDrc[iD].tXYZ );
-						RnD.aDrc[iD].okABC.xyz_( RnD.aDrc[iD].tABC );
+						RnD.aDrc[iD].okABC.ABC_( RnD.aDrc[iD].tABC );
 						RnD.aDrc[iD].okxyz.xyz_( RnD.aDrc[iD].txyz );
 					} break;
 				case gpeALF_POS:
@@ -411,7 +413,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 							case gpeZS_DIR0:
 								iNUM = gpeDRCos_ABCa;
 								if( RnD.aDrc[iD].okXYZ.qlen_xyz() )
-									RnD.aDrc[iD].tABC.xyz_( RnD.aDrc[iD].okABC );
+									RnD.aDrc[iD].tABC.ABC_( RnD.aDrc[iD].okABC );
 								else
 									RnD.aDrc[iD].tabc.xyz_( RnD.aDrc[iD].iABC );
 								break;
@@ -487,6 +489,24 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 
 					pANS = RnD.aDrc[iD].answSTAT( pANS, iD );
 					continue;
+				case gpeALF_INFO:
+					if(iD >= nD )
+					{
+						iNUM = gpeDRCos_NONS;
+						break;
+					}
+
+					pANS = RnD.aDrc[iD].answINFO( pANS, iD );
+					continue;
+				case gpeALF_INFOX:
+					if(iD >= nD )
+					{
+						iNUM = gpeDRCos_NONS;
+						break;
+					}
+
+					pANS = RnD.aDrc[iD].answINFOX( pANS, iD, 100 );
+					continue;
 				case gpeALF_STOP:
 				default:
 					break;
@@ -495,7 +515,6 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			if( oD != iD )
 			if( pD )
 			{
-				//pD->cageXYZ( mmX(gpdROBlim), iD );
 				pANS = pD->answSTAT( pANS, iD );
 			}
 			pD = NULL;

@@ -191,8 +191,8 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 {
 	int port = 80, nCMP = nIPA, p;
 	U8 nLEN;
-	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n!" ),
-		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;", nLEN );
+	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n!\"" ),
+		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;\"", nLEN );
 
 	nCMP = pE-pS;
 	//gpmMcpyOF( sPUB, pS, nCMP );
@@ -235,7 +235,18 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		pGT = new gpcGT( an, port );
 		gpmMcpyOF( pGT->s_ip, pS, nCMP );
 		pGT->s_ip[nCMP] = 0;
+		/*switch( alf ) {
+			case gpeALF_GSM:{
+					U8 s = 0;
+					gpmSTRCPY(pGT->s_ip,pIPA);
+					//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s, -1 );
+				} break;
+			default:
+				gpmMcpyOF( pGT->s_ip, pS, nCMP );
+				pGT->s_ip[nCMP] = 0;
+				break;
 
+		}*/
 		return ppGTalloc[iGTfr] = pGT;
 	}
 
@@ -252,7 +263,18 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	pGT = new gpcGT( an, port );
 	gpmMcpyOF( pGT->s_ip, pS, nCMP );
 	pGT->s_ip[nCMP] = 0;
+	/*switch( alf ) {
+		case gpeALF_GSM:{
+				U8 s = 0;
+				gpmSTRCPY(pGT->s_ip,pIPA);
+				//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s, -1 );
+			} break;
+		default:
+			gpmMcpyOF( pGT->s_ip, pS, nCMP );
+			pGT->s_ip[nCMP] = 0;
+			break;
 
+	}*/
 	return ppGTalloc[iGTfr] = pGT;
 }
 gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
@@ -597,11 +619,11 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
 	U8 s;
 	if( !pOUT )
 	{
-		if( !pPUB )
+		if( !pPUBgt )
 			return p_err;
 
-		pOUT = pPUB;
-		pPUB = NULL;
+		pOUT = pPUBgt;
+		pPUBgt = NULL;
 		if( !sGTent[2] )
 		if( sGTent[0] )
 		{
@@ -723,15 +745,15 @@ static const char gp_sHELLO_acc[] = "account 0x%x;\r -= Welcome in piMASS 2020 =
 // static const char gp_sSLMP_read[] = "500000FF03FF00%0.4x000004010000D*%0.6x%0.4x";
 extern U4x4 gpaROBwr[];
 extern U4x4 gpaZSwr[];
-I8 gpcGT::GTcnct( gpcWIN& win ) {
-	if( this ? msGTdie > win.mSEC.x : true )
+I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
+	if( this ? msGTdie > pWIN->mSEC.x : true )
 		return 0;
 
 	struct timeval tv;   // sleep for tenr minutes!
 	tv.tv_sec = 0;
 	tv.tv_usec = gpdGT_LIST_tOUT;
 
-	bool bNEWip = *s_ip == '!';
+	bool bNEWip = (*s_ip == '!');
 	U8 s;
 	if( bNEWip || bGTdie() ) //socket == INVALID_SOCKET )
 	{
@@ -739,11 +761,11 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
         {
 			case 1:
 				gpfSOC_CLOSE( socket );
-				msGTdie = (win.mSEC.x+1500)|1;
+				msGTdie = (pWIN->mSEC.x+1500)|1;
 				return 0;
 			case 3:
 				gpfSOC_CLOSE( sockCNCT );
-				msGTdie = (win.mSEC.x+1500)|1;
+				msGTdie = (pWIN->mSEC.x+1500)|1;
 				return 0;
         }
 
@@ -763,7 +785,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			gpfSOC_CLOSE( sockCNCT );
 		}
 
-		char	*p_print = (char*)win.sGTpub,
+		char	*p_print = (char*)pWIN->sGTpub,
 				s_port[32],
 				*p_err = p_print;
 
@@ -786,7 +808,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 
 			socket = ::socket( p_ainf->ai_family, p_ainf->ai_socktype, p_ainf->ai_protocol );
 
-			GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
+			GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(pWIN->sGTbuff) );
 			p_err += sprintf( p_err, "OK NEW CNCT" );
 
 			addr_in.sin_family = AF_INET;
@@ -800,7 +822,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			//	TCP_NODELAY,	/* name of option */
 			//	(char*)& no_daley,	/* the cast is historical cruft */
 			//	sizeof(int));	/* length of option value */
-			
+
 #else
 			// set non blocking
 			U8 a = fcntl( socket, F_GETFL, NULL );
@@ -817,7 +839,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 
 		// BIND
 		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
-		//std::cout << p_print <<std::endl;
+		//if(bSTDcout){std::cout << p_print <<std::endl;}
 		p_print = p_err;
 
 		fd_set cnct_w;
@@ -832,7 +854,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			// még nem sikerült eldugjuk ne szabadítsák fel
 			sockCNCT = socket;
 			socket = INVALID_SOCKET;
-			msGTdie = (win.mSEC.x+1500)|1;
+			msGTdie = (pWIN->mSEC.x+1500)|1;
 			return 0;
 		}
 		switch( TnID.alf )
@@ -863,14 +885,14 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 		msGTdie = 0;
 	}
 
-	char	*p_err = (char*)win.sGTpub;
-			*win.sGTpub = 0;
+	char	*p_err = (char*)pWIN->sGTpub;
+			*pWIN->sGTpub = 0;
 
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 	{
-		p_err = GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
+		p_err = GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 		if( *p_err )
-			std::cerr << p_err <<std::endl;
+			if(bSTDcout){std::cout << p_err <<std::endl;}
 
 		switch( TnID.alf )
 		{
@@ -881,7 +903,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 				if( sGTent[2] == 'h' )
 					break;
 
-				GTos( *this, &win );
+				GTos( *this, pWIN );
 				break;
 		}
 
@@ -898,7 +920,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 				if( sGTent[2] == 'h' )
 					break;
 
-				GTos( *this, &win );
+				GTos( *this, pWIN );
 				break;
 		}
 	}
@@ -906,10 +928,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 	switch( TnID.alf )
 	{
 		case gpeALF_SLMP:
-			GTslmpDrcRob( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
-			break;
-		case gpeALF_SLMPo:
-			GTslmpDrcZS( *this, &win, win.piMASS ? &win.piMASS->GTacpt : NULL );
+			GTslmpDrcRob( *this, pWIN, pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL );
 			break;
 		default:
 			break;
@@ -917,7 +936,7 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 
 	if( aGTfd[gpeFDsnd].isFD(socket) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 	{
-		U8 s, nOUT = GTout( &win );
+		U8 s, nOUT = GTout( pWIN );
 		if( nOUT <= (gpdHUDn*2) )
 		{
 			if(pHUD ? pHUD->p_alloc : NULL )
@@ -943,9 +962,9 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 			}
 		}
 
-		p_err = GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
+		p_err = GTsnd( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 		if( *p_err )
-			std::cerr << p_err <<std::endl;
+			if(bSTDcout){std::cout << p_err <<std::endl;}
 	}
 
 	aGTfd[gpeFDrcv].setFD( socket );
@@ -963,9 +982,9 @@ I8 gpcGT::GTcnct( gpcWIN& win ) {
 
 	return nS;
 }
-I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
+I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 {
-	if( this ? msGTdie > win.mSEC.x : true )
+	if( this ? msGTdie > pWIN->mSEC.x : true )
 		return 0;
 
 	if( socket == INVALID_SOCKET )
@@ -975,7 +994,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
         {
 			case 1:
 				gpfSOC_CLOSE( socket );
-				msGTdie = (win.mSEC.x+1500)|1;
+				msGTdie = (pWIN->mSEC.x+1500)|1;
 				return 0;
         }
 
@@ -995,7 +1014,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 		ainfo.ai_protocol = IPPROTO_TCP;
 		ainfo.ai_flags = AI_PASSIVE;
 		ainfo.ai_addrlen = sizeof(ainfo);
-		char	*p_print = (char*)win.sGTpub,
+		char	*p_print = (char*)pWIN->sGTpub,
 				s_port[32],
 				*p_err = p_print;
 		sprintf( s_port, "%d", port);
@@ -1005,8 +1024,8 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 		socket = ::socket( p_ainf->ai_family, p_ainf->ai_socktype, p_ainf->ai_protocol );
 
 		p_err += sprintf( p_err, "OK" );
-		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
-		std::cout << p_print <<std::endl;
+		GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(pWIN->sGTbuff) );
+		if(bSTDcout){std::cout << p_print <<std::endl;}
 		p_print = p_err;
 
 		// BIND
@@ -1034,15 +1053,15 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 			return -1;
 		}
 		p_err += sprintf( p_err, "OK" );
-		std::cout << p_print <<std::endl;
+		if(bSTDcout){std::cout << p_print <<std::endl;}
 		p_print = p_err;
 
 		p_err += sprintf( p_err, "\n\t\tLITEN LISTENER - " );
 		error = listen( socket, SOMAXCONN );
 	}
 	//SOCKET acpt_soc;
-	char *p_err = (char*)win.sGTpub;
-	*win.sGTpub = 0;
+	char *p_err = (char*)pWIN->sGTpub;
+	*pWIN->sGTpub = 0;
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( socket, &a_fdset[gpeFDrcv]) )
 	{
 		// LISTENER
@@ -1175,12 +1194,12 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 						break;
 				}
 
-				pACC->GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(win.sGTbuff) );
-				
-				
+				pACC->GTopt( p_err, &p_err, gpdGT_NoDALEY, sizeof(pWIN->sGTbuff) );
+
+
 
 #ifdef _WIN64
-				char* s_buff = (char*)win.sGTpub;
+				char* s_buff = (char*)pWIN->sGTpub;
 				gpmSTRCPY( s_buff, inet_ntoa(clientaddr.sin_addr) );
 				if (strstr(s_buff, pACC->s_ip))
 					gpmSTRCPY(pACC->s_ip, inet_ntoa(pACC->addr_in.sin_addr));
@@ -1188,7 +1207,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 					pACC->gt_ip.num++;
 #else
 				getifaddrs(&pIFadr);
-				char* s_buff = (char*)win.sGTpub,
+				char* s_buff = (char*)pWIN->sGTpub,
 					* pB = s_buff + gpdRECVn / 2, *pBi = pB;
 				void* pIFtmp = NULL;
 				for (pIFa = pIFadr; pIFa != NULL; pIFa = pIFa->ifa_next)
@@ -1233,16 +1252,16 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 		{
-			p_err = p_gt->GTrcv( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
+			p_err = p_gt->GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 			if( *p_err )
-				std::cerr << p_err <<std::endl;
+				if(bSTDcout){std::cout << p_err <<std::endl;}
 
 			if( p_gt )
 			{
 				if( p_gt->sGTent[2] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
-					p_gt->GTos( *this, &win, &cnct ); //, win.piMASS ? &win.piMASS->GTcnct : NULL );
+					p_gt->GTos( *this, pWIN, &cnct ); //, pWIN->piMASS ? &pWIN->piMASS->GTcnct : NULL );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
@@ -1251,7 +1270,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
-				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
+				p_gt->pPUBgt = p_gt->pPUBgt->lzyPLUS( pOUT, s );
 			}
 			gpmDEL(pOUT);
 		}
@@ -1262,7 +1281,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				if( p_gt->sGTent[2] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
-					p_gt->GTos( *this, &win, &cnct );
+					p_gt->GTos( *this, pWIN, &cnct );
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
@@ -1271,7 +1290,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
-				p_gt->pPUB = p_gt->pPUB->lzyPLUS( pOUT, s );
+				p_gt->pPUBgt = p_gt->pPUBgt->lzyPLUS( pOUT, s );
 			}
 			gpmDEL(pOUT);
 		}
@@ -1279,7 +1298,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 		if( aGTfd[gpeFDsnd].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 		{
-			U8 s, nOUT = p_gt->GTout( &win );
+			U8 s, nOUT = p_gt->GTout( pWIN );
 			if( nOUT <= (gpdHUDn*2) ) //if( nOUT < 0x400 )
 			{
 				if(p_gt->pHUD ? p_gt->pHUD->p_alloc : NULL )
@@ -1307,9 +1326,9 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 
 			}
 
-			p_err = p_gt->GTsnd( p_err, (char*)win.sGTbuff, sizeof(win.sGTbuff) );
+			p_err = p_gt->GTsnd( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 			if( *p_err )
-				std::cerr << p_err <<std::endl;
+				if(bSTDcout){std::cout << p_err <<std::endl;}
 		}
 	}
 	aGTfd->zero(3);
@@ -1328,7 +1347,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 				|| 	aGTfd[gpeFDrcv].isFD( p_gt->socket )
 			)
 			{
-				std::cerr << "miért?" <<std::endl;
+				if(bSTDcout){std::cout << "miért?" <<std::endl;}
 			} else
 				gpfSOC_CLOSE( p_gt->socket );
 
@@ -1341,7 +1360,7 @@ I8 gpcGT::GTlst( gpcWIN& win, gpcGTall& cnct )
 		//FD_SET( p_gt->socket, &aGTfd[gpeFDrcv] );
 
 		// ennek az az értelme, ha nincsen buffer nem érdekklödik, hogy írható e.
-		if( !!p_gt->GTout( &win ) || !!p_gt->pDWN ) // || p_gt->pHUD )
+		if( !!p_gt->GTout( pWIN ) || !!p_gt->pDWN ) // || p_gt->pHUD )
 			aGTfd[gpeFDsnd].setFD(p_gt->socket);	//FD_SET( p_gt->socket, &a_fdset[gpeFDsnd] );
 
 		if( aGTfd[gpeFDrcv].nFD >= FD_SETSIZE )

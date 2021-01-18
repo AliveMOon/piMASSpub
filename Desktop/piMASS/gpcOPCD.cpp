@@ -29,81 +29,7 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 
 }
 
-static const gpcOPCD gpaOPCi[] = {
-	// this,	pS,			a, m, i, nDT,				d,		wip, typ;
-	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_null },
-	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TRUE },
 
-	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_CLASS, gpeALF_DEF },
-	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_CLASS, gpeALF_DEF },
-
-	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
-	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_IF },
-	{ gpaOPCi,	"for(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_FOR },
-	{ gpaOPCi,	"while(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_WHILE },
-	{ gpaOPCi,	"switch(",	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SWITCH },
-
-	{ gpaOPCi,	"break",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
-	{ gpaOPCi,	"continue",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_CONTINUE },
-	{ gpaOPCi,	"return",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_RETURN },
-	{ gpaOPCi,	"discard",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
-
-	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_CLASS },
-	{ gpaOPCi,	"pub",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
-	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
-
-	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_NEW },
-	{ gpaOPCi,	"del",		0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_DEL },
-
-	{ gpaOPCi,	"main",		0, 0, 0, 0,					0.0, gpeALF_PRG, gpeALF_MAIN },
-
-
-
-};
-const char* gpasOPER[] = {
-
-
-	"! inv",	"!! LG",	"!= neqLG",
-
-	//". pnt",
-				", stk",	"; newrow",
-	//"+ add", 	"++ inc",	"+= addM", ///--------------- DBG
-
-	"/* comS", 	"*/ comE",	"// com",
-
-
-	"& and", 	"&& andLG",	"&= andM",
-	"* mul", 	"** exp",	"*= mulM",
-							"**= expM",
-	"/ div", 	"/= divM",	"//= rootM",
-	"% rem", 	"%= remM",
-	"^ xor",	"^= xorM",
-
-
-	"= mov", 	"== eqLG",
-	"| or", 	"|| orLG",	"|= orM",
-	"+ add", 	"++ inc",	"+= addM",	/// -------------- GOOD
-	"- sub", 	"++ dec",	"-= subM",
-
-
-	"<= leLG",	"< ltLG", 	"<< sl", 	"<<= slM",
-	">= beLG",	"> bgLG", 	">> sr", 	">>= srM",
-
-	". dot", 	"-> entry", ":: out",
-	"( brakS",	") brakE",
-	"[ dimS", 	"] dimE",
-	"{ begin", 	"} end",
-	"? if",		": else",
-	"@ mail",	"\" str",
-};
 char* gpcCMPL::sLOG( U1* pPUB, char* pTAB, char* sNDAT, gpcLZY* pCMPL )
 {
 	if( this ? !pPUB : true )
@@ -261,94 +187,7 @@ char* gpcCMPL::sASM( U1* pS0, U1* pPUB, char* sNDAT, gpcLZY* pCMPL, gpcCMPL*pA, 
 	return pCOUT;
 }
 
-/*
-U1* gpcMASS::msRST( U1* pS0 )
-{
-	//gpmZ( asPRG );
-	if( !pPUB )
-	{
 
-		pPUB = (U1*)strcpy( (char*)pS0, "false" );
-
-		U8 s8;
-		PC.reset( &CMPL, pPUB );
-		aPC[0] = 0;
-		gpcCMPL* pPC = CMPL.pPC( 0, pS0 );
-		//pPC->i_str = 0;
-		pPUB += pPC->n_str+1;
-		iPC = 0;
-		incLEV();
-
-		iPC = CMPL.nPC();
-		U4 nS;
-		U1 *pS, *pE;
-		for( U4 i = 0, n = gpmN(gpasOPER), nSTR; i < n; i++ )
-		{
-			pE = (U1*)strchr( gpasOPER[i], ' ' );
-			if( !pE )
-				continue;
-// "op ALF" -------------------------------
-			nS = pE-(U1*)gpasOPER[i];
-			pS = (U1*)gpmMcpyOF( pPUB, gpasOPER[i], nS );
-			pS[nS] = 0;
-			pPUB += nS+1;
-
-			CMPL.pPC( 0 )->cmpl_add( &CMPL, pS, nS );
-			pPC = CMPL.pPC( iPC );
-			if( !pPC )
-				continue;
-
-			pPC->iLEV = iLEV;
-			pPC->iPUB = pS-pS0; // op
-
-// "ALF" ----------------------------
-			pE++;
-			nS = strlen( (char*)pE ); //pE-(U1*)gpasOPER[i];
-			pS = (U1*)gpmMcpyOF( pPUB, pE, nS );
-			pS[nS] = 0;
-			pPUB += nS+1;
-
-			pPC->wip = gpeALF_OPER;
-			pPC->typ = gpfSTR2ALF( pS, pS+nS, NULL );
-			if( pPC->typ == gpeALF_MAIN )
-				iMAIN = pPC->iPC;
-
-			iPC++;
-		}
-		nOP0 = iPC;
-		for( U4 i = 1, iN = gpmN(gpaOPCi), nwLEV = iLEV; i < iN; i++ )
-		{
-			gpcOPCD opcd = gpaOPCi[i];
-			nS = opcd.nSTR;
-			pS = opcd.pSTR;
-			pS = (U1*)gpmMcpyOF( pPUB, pS, nS );
-			pPUB[nS] = 0;
-			pPUB += nS+1;
-
-			CMPL.pPC( 0 )->cmpl_add( &CMPL, pS, nS );
-			pPC = CMPL.pPC( iPC );
-			if( !pPC )
-				continue;
-			pPC->iPUB = pS-pS0;
-			pPC->iLEV = iLEV;
-			pPC->typ = opcd.typ;
-			pPC->wip = opcd.wip;
-			pPC->n_dat = opcd.nDAT;
-
-			if( pPC->typ == gpeALF_MAIN )
-				iMAIN = pPC->iPC;
-
-			iPC++;
-		}
-		nOP1 = iPC;
-
-		iPC = iMAIN;
-		incLEV();
-	}
-	rstLEV = iLEV;
-	return pPUB;
-}
-*/
 
 char gpsOP[] = "=<>-+*/";
 I1 gpcCMPL::sOP( char* pS )
@@ -532,7 +371,7 @@ U4 gpcCMPL::cmpl_find( gpcLZY* pCMPL, U1* pS, U4 nS )
 
 	while( pC )
 	{
-		ifPC = pC->p_kid->dict_find( pS, nS, nPC );
+		ifPC = pC->p_kid->dctFND( pS, nS, nPC );
 
 		if( ifPC >= nPC )
 		{
@@ -572,7 +411,7 @@ U4 gpcCMPL::cmpl_best( gpcLZY* pCMPL, U1* pS, U4 nS )
 
 	while( pC )
 	{
-		ifPC = pC->p_kid->dict_find( pS, nS, nPC );
+		ifPC = pC->p_kid->dctFND( pS, nS, nPC );
 
 		if( ifPC >= nPC )
 		{
@@ -617,7 +456,7 @@ gpcLZY* gpcCMPL::cmpl_add( gpcLZY* pCMPL, U1* pS, U4 nS )
 		return pCMPL;
 
 	U4 w = p_kid->nIX();
-	p_kid = p_kid->dict_add( pS, nS );
+	p_kid = p_kid->dctADD( pS, nS );
 	if( w >= p_kid->nIX() )
 		return pCMPL;
 

@@ -28,8 +28,7 @@ bool gpcCRS::miniLOCK( gpcPIC* pPIC, SDL_Renderer* pRNDR, I4x2 allWH ) {
 
 	return true;
 }
-bool gpcCRS::miniRDYesc( gpcWIN& win, gpcPIC* pPIC )
-{
+bool gpcCRS::miniRDYesc( gpcWIN* pWIN, gpcPIC* pPIC ) {
 	bool bESC = false; //, bNoMini;
 	if( CRSfrm.x >= CRSfrm.z )
 	{
@@ -41,7 +40,7 @@ bool gpcCRS::miniRDYesc( gpcWIN& win, gpcPIC* pPIC )
 		CRSfrm.y = CRSfrm.w;
 		bESC = true;
 	}
-	I4x2 &div = win.wDIVcr( id ).a4x2[0];
+	I4x2 div = pWIN->wDIVcr( id ).a4x2[0];
 	fxyz.z = pPIC->txWH.z;
 	if( bESC )
 	{
@@ -64,23 +63,22 @@ bool gpcCRS::miniRDYesc( gpcWIN& win, gpcPIC* pPIC )
 	return false;
 }
 U4 gpcCRS::miniRDYmap(
-						gpcWIN& win, I4x4& lurdAN,
+						gpcWIN* pWIN, I4x4& lurdAN,
 						U4* &pM,	U4* &pC,	U4* &pR,
 						U4* &psCp,	U4* &psRp,	U4& z,
 						U4x4& mZN, bool bSHFT
-					)
-{
-	gpcMAP* pMAP = win.piMASS ? &(win.piMASS->mapCR) : NULL;
+					) {
+	gpcMAP* pMAP = pWIN->piMASS ? &(pWIN->piMASS->mapCR) : NULL;
 	if( !pMAP )
 		return -1;
 
-	gpcMASS& mass = *win.piMASS;
+	//gpcMASS* pMASS = pWIN->piMASS;
 	U4 selID = id;
 	if( bSHFT )
-	if( win.apCRS[win.srcDIV] )
-		selID = win.srcDIV; /// Szomszédol!
+	if( pWIN->apCRS[pWIN->srcDIV] )
+		selID = pWIN->srcDIV; /// Szomszédol!
 
-	I4x4	*p_selAI = (selID == id ? selANIN : win.apCRS[selID]->selANIN),
+	I4x4	*p_selAI = (selID == id ? selANIN : pWIN->apCRS[selID]->selANIN),
 			&xyCR = aXYuvPC[0];
 
 	lurdAN = I4x4( p_selAI[0].a4x2[0], p_selAI[1].a4x2[0] ).lurd();
@@ -91,7 +89,7 @@ U4 gpcCRS::miniRDYmap(
 	/// hanem ha le van nyomva a SHIFT akor e SRC_DIV-vel
 	pMAP->MAPalloc( rdZN, mZN, selID );
 	U4	c, r, ie,
-		i = mass.jDOitREF( win, 0, ie, &pM, &pC, &pR, &z );
+		i = pWIN->piMASS->jDOitREF( pWIN, 0, ie, &pM, &pC, &pR, &z );
 
 	bool bNoMini; //, bTRIG = false;
 	if( selID ) {
@@ -102,6 +100,10 @@ U4 gpcCRS::miniRDYmap(
 
 	gpcSRC* pSrC = NULL;
 	U1 oo;
+#ifdef stdON
+	if(bSTDcout){std::cout << stdRDY " RDY";
+#endif // stdOFF
+
 	for( i = 0; i < ie; i++ ) {
 		if( !pM[i] )
 			continue;
@@ -112,9 +114,10 @@ U4 gpcCRS::miniRDYmap(
 						&& ( c+1 <= lurdAN.z && r <= lurdAN.w )
 					);
 		/// TÁMADÁS HO RUKK!!
-		dim = (pSrC = mass.SRCfnd( pM[i] ))->SRCmill( bNoMini, " \t\r\n" );
+		dim =	(pSrC = pWIN->piMASS->srcFND( pM[i] ))
+				->srcBRK( *pWIN->piMASS->pOPER(), bNoMini, selID, " \t\r\n" );
 
-		//dim = mass.SRCfnd( pM[i] )->CRSdim( bNoMini );
+		//dim = mass.srcFND( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )
 			pC[c] = dim.x;
 		if( pR[r] < dim.y )
@@ -123,7 +126,7 @@ U4 gpcCRS::miniRDYmap(
 		if( pSrC ? !bNoMini : true )
 			continue;
 
-		oo = pSrC->SRCmnMILLscn( *this, bNoMini );
+		oo = pSrC->srcSCN( *this, bNoMini, selID );
 		if( oo&1 )
 			aCRSonPG[0].a4x2[1] = I4x2(c,r);
 		if( oo&2 )
@@ -132,8 +135,8 @@ U4 gpcCRS::miniRDYmap(
 	}
 
 	/// pCp pRp ----------------------------------------
-	psCp = win.apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR );
-	psRp = win.apCRS[selID]->pRp;
+	psCp = pWIN->apCRS[selID]->ZNpos( mZN.a4x2[1], pC, pR );
+	psRp = pWIN->apCRS[selID]->pRp;
 	/// end pCp pRp ----------------------------------------
 	I4x2 brdr = I4x2( psCp[mZN.x],psRp[mZN.y] );
 	if( (CRSfrm.x+brdr.x < 1) || (CRSfrm.y+brdr.y < 1) ) {
@@ -151,14 +154,15 @@ U4 gpcCRS::miniRDYmap(
 ///
 ///------------------------------
 static U1 gpsTITLE[0x100];
-void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pRNDR, bool bSHFT, bool bMOV )
-{
+void gpcCRS::miniRDY(	gpcWIN* pWIN,
+						gpcPIC* pPIC, SDL_Renderer* pRNDR,
+						bool bSHFT, bool bMOV ) {
 	picBG.lzyRST(); bobBG.lzyRST();
 
-	if( !miniLOCK( pPIC, pRNDR, win.wDIVcrALLOCK() ) )
+	if( !miniLOCK( pPIC, pRNDR, pWIN->wDIVcrALLOCK() ) )
 		return;
 
-	if( miniRDYesc(win,pPIC) )
+	if( miniRDYesc(pWIN,pPIC) )
 		return;
 
 	I4x4 lurdAN;
@@ -166,7 +170,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 	U4	*pM, *pC, *pR, *psCp, *psRp,
 		z, c, r, i;
 
-	U4 selID = miniRDYmap( win, lurdAN, pM, pC, pR, psCp, psRp, z, mZN, bSHFT );
+	U4 selID = miniRDYmap( pWIN, lurdAN, pM, pC, pR, psCp, psRp, z, mZN, bSHFT );
 	if( selID > 3 )
 		return;
 
@@ -192,7 +196,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 
 		aCRSonPG[3].a4x2[1] = aCRSonPG[3].a4x2[0];
 	}
-	bool bON=(id==win.onDIV.x), bNoMini;
+	bool bON=(id==pWIN->onDIV.x), bNoMini;
 
 	I4x4 &xyCR = aXYuvPC[0];
 	gpeCLR	c16bg = gpeCLR_blue,
@@ -220,7 +224,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 				xyCR.x = psCp[mZN.x]+((c-mZN.z)*gpdSRC_COLw);
 			c16fr = (iON == I4x2(c,r)*I4x2(1,z))	? gpeCLR_white
 													: (
-														(selID == win.srcDIV) 	? gpeCLR_orange
+														(selID == pWIN->srcDIV) 	? gpeCLR_orange
 																				: gpeCLR_green
 													  );
 
@@ -255,7 +259,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			continue;
 
 		i = r*z;
-		fxyz.y = min( CRSfrm.w, (xyCR.y + xyCR.w) );
+		fxyz.y = gpmMIN( CRSfrm.w, (xyCR.y + xyCR.w) );
 		for( U4 c = 0; c < mZN.x; c++ )
 		{
 			xyCR.x = psCp[c]+CRSfrm.x;
@@ -268,7 +272,7 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			if( (xyCR.x + xyCR.z) < 0 )
 				continue;
 
-			fxyz.x = min( CRSfrm.z, (xyCR.x + xyCR.z) );
+			fxyz.x = gpmMIN( CRSfrm.z, (xyCR.x + xyCR.z) );
 			a = c+1;
 			c16fr = bON&(iON == i+c) ? gpeCLR_white : gpeCLR_blue2;
 			c16ch = gpeCLR_blue2;
@@ -292,9 +296,32 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 			}
 
 			pTITLE = gpsTITLE;
-			if( pSRC = mass.SRCfnd(pM[i+c]) ) {
-				gpcRES* pRES = pSRC->apOUT[3];
-				if( pRES )
+			if( pSRC = pWIN->piMASS->srcFND(pM[i+c]) ) {
+				//gpcRES* pRES = pSRC->apOUT[3];
+				if( pSRC->pMEM  )
+				{
+					if( pSRC->pMEM->pCTRL )
+					{
+						if( *(pSRC->pMEM->pCTRL->sNAME) )
+							pTITLE += sprintf( (char*)pTITLE, "%s", (pSRC->pMEM->pCTRL->sNAME) );
+					}
+					if( pSRC->pMEM->pGL )
+					{
+						if( pSRC->pMEM->pGL->aPICid[0] )
+						{
+							/// CELL PICTURES BACK GROUND -------------------
+							//xyWH azonos a xyPIC[0]-val!
+							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pGL->aPICid[0]-1;
+							picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+						}
+						if( pSRC->pMEM->pGL->aBOBid[0] )
+						{
+							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pGL->aBOBid[0]-1;
+							bobBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
+						}
+					}
+				}
+				/*else if( pRES )
 				{
 					U4	n = pRES->nFND(),
 						i = pRES->iFND( gpeALF_NAME );
@@ -305,19 +332,15 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 							pTITLE += sprintf( (char*)pTITLE, "%s", (char*)alu.pDAT );
 
 					}
-				}
-				if( pSRC->picID )
+				}*/
+				/*if( pSRC->picID )
 				{
 					/// CELL PICTURES BACK GROUND -------------------
 					//xyWH azonos a xyPIC[0]-val!
 					aXYuvPC[2].a4x2[1].x = pSRC->picID-1;
 					picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
-				}
-				if( pSRC->bobID )
-				{
-					aXYuvPC[2].a4x2[1].x = pSRC->bobID-1;
-					bobBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
-				}
+				}*/
+
 			}
 
 
@@ -327,11 +350,11 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 				pMNoffFRM	->pos( xyCR.a4x2[0], fxyz )
 							->frmBRDR( xyCR.a4x2[1], c16fr, 0xf, fxyz-I4x4( xyCR.a4x2[0].MX(0), 0 )  );
 
-				pSRC->SRCmnMILL(
+				pSRC->srcRDY(
 									pMNoff,
 									xyCR.a4x2[0], fxyz.a4x2[0],
 									CRSfrm.z, fxyz.z,
-									*this
+									*this, false, selID
 								);
 
 				if( bON ? iON == i+c : false )	// rajta a pointer
@@ -377,12 +400,12 @@ void gpcCRS::miniRDY( gpcWIN& win, gpcMASS& mass, gpcPIC* pPIC, SDL_Renderer* pR
 				pMNoffFRM	->pos( xyCR.a4x2[0]+I4x2(1,0), fxyz )
 							->print( gpsTITLE, gpeCLR_white );
 
-			pSRC->SRCmnMILL(
+			pSRC->srcRDY(
 								pMNoff,
 								xyCR.a4x2[0], fxyz.a4x2[0],
 								CRSfrm.z, fxyz.z,
 								*this,
-								bNoMini
+								bNoMini, selID
 							);
 		}
 	}

@@ -2,6 +2,8 @@
 #ifndef UIF1248etc_H
 #define UIF1248etc_H
 
+// 
+
 #define NULL nullptr
 #ifdef _WIN64
 	typedef unsigned char		U1;

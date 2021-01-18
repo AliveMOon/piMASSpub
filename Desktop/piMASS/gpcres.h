@@ -66,7 +66,7 @@ public:
 			return NULL;
 		isa.null();
 
-		U4 nSTR = min( str.n_load, gpmSTRLEN( str.p_alloc ) );
+		U4 nSTR = gpmMIN( str.n_load, gpmSTRLEN( str.p_alloc ) );
 		if( nSTR )
 		{
 			an.apSTR[0] = new U1[nSTR+1];
@@ -176,7 +176,7 @@ public:
 
 
 };
-class gpcREG {					// 	pi	x64
+class gpcREG {		// 	pi	x64
 	U8		u;		// 	8	8
 	I8		i;		// 	8	8
 	double	d;		// 	8	8
@@ -188,28 +188,24 @@ public:
 	U4x2	xy;		//	8	8
 
 	gpcREG(){ bD = 0; };
-	~gpcREG()
-	{
+	~gpcREG() {
 		if( bD.u4 == gpeTYP_STR )
 			gpmDELary( pSTR );
 	}
-	gpcREG& bad()
-	{
+	gpcREG& bad() {
 		u = 1;
 		i = -1;
 		d = 0.1;
 		bD.u4 = 0;
 		return *this;
 	}
-	gpcREG& off()
-	{
+	gpcREG& off() {
 		if( bD.u4 == gpeTYP_STR )
 				gpmDELary( pSTR );
 		gpmCLR;
 		return *this;
 	}
-	U1* getSTR()
-	{
+	U1* getSTR() {
 		if( this ? !pSTR : true )
 			return NULL;
 		U1* pS = pSTR;
@@ -217,91 +213,134 @@ public:
 		return pS;
 	}
 
-	gpcREG& operator = ( U1* pU )
-	{
+
+	gpcREG& operator = ( U1* pU ) {
 		pSTR = gpfSTR( pSTR, pU );
 		bD.u4 = gpeTYP_STR;
 		return *this;
 	}
-
-	gpcREG& operator = ( U4 u4 )
-	{
+	gpcREG& operator = ( U4 u4 ) {
 		u = u4;
-		bD.u4 = 2;
+		bD.u4 = gpeTYP_U4;
 		return *this;
 	}
-	gpcREG& operator = ( I4 i4 )
-	{
+	gpcREG& operator = ( I4 i4 ) {
+		if( !i4 )
+			return off();
+
 		if( i4 < 0 )
 		{
 			i = i4;
 			u = -i;
-			bD.u4 = 0x82;
+			bD.u4 = gpeTYP_I4;
 			return *this;
 		}
 		u = i4;
-		bD.u4 = 2;
+		bD.u4 = gpeTYP_U4;
 		return *this;
 	}
-	gpcREG& operator = ( float f4 )
-	{
+	gpcREG& operator = ( float f4 ) {
 		i = (d = f4);
-		bD.u4 = ( f4 < 0.0 ) ? 0x82 : 0;
+		bD.u4 = ( f4 < 0.0 ) ? gpeTYP_I4 : 0;
 		if( bD.u4 || ((float)i != f4) ) // neg? || float?
 		{
 			u = bD.u4 ? -i : i;
-			bD.u4 = 0xc2;
+			bD.u4 = gpeTYP_F;
 			return *this;
 		}
 
 		u = i;
-		bD.u4 = 0x42;
+		bD.u4 = gpeTYP_UF;
 		return *this;
 	}
 
-	gpcREG& operator = ( U8 u8 )
-	{
+	gpcREG& operator = ( U8 u8 ) {
 		u = u8;
-		bD.u4 = 3;
+		bD.u4 = gpeTYP_U8;
 		return *this;
 	}
-	gpcREG& operator = ( I8 i8 )
-	{
+	gpcREG& operator = ( I8 i8 ) {
 		if( i8 < 0 )
 		{
 			i = i8;
 			u = -i;
-			bD.u4 = 0x83;
+			bD.u4 = gpeTYP_I8;
 			return *this;
 		}
 		u = i8;
-		bD.u4 = 3;
+		bD.u4 = gpeTYP_U8;
 		return *this;
 	}
-	gpcREG& operator = ( double d8 )
-	{
+	gpcREG& operator = ( double d8 ) {
 		i = (d = d8);
-		bD.u4 = ( d < 0.0 ) ? 0x83 : 0;
+		bD.u4 = ( d < 0.0 ) ? gpeTYP_I8 : 0;
 		if( bD.u4 || ((double)i != d) ) // neg? || float?
 		{
 			u = bD.u4 ? -i : i;
-			bD.u4 = 0xc3;
+			bD.u4 = gpeTYP_D;
 			return *this;
 		}
 
 		u = i;
-		bD.u4 = 0x43;
+		bD.u4 = gpeTYP_UD;
 		return *this;
 	}
+	gpcREG( float f4 ) { *this = f4; }
+	gpcREG( double d8 ) { *this = d8; }
+	gpcREG( U4 u4 ) { *this = u4; }
+	gpcREG( I4 i4 ) { *this = i4; }
+	gpcREG( U8 u8 ) { *this = u8; }
+	gpcREG( I8 i8 ) { *this = i8; }
 
-	U8 u8()
-	{
+	gpcREG operator --() { return *this = i8()-1; }
+	gpcREG operator ++() { return *this = i8()+1; }
+	gpcREG& operator = ( const gpcREG& b ) {
+		if( &b == this )
+			return *this;
+		gpmMcpy( this, &b, sizeof(*this) );
+		pSTR = gpfSTR( NULL, b.pSTR );
+		return *this;
+	}
+	gpcREG& operator += ( gpcREG& b ) {
+		if( bD.x&0x40 || b.bD.x&0x40 )
+			return *this = d8()+b.d8();
+
+		if( bD.x&0x80 || b.bD.x&0x80 )
+			return *this = i8()+b.i8();
+
+		return *this = u8()+b.u8();
+	}
+	gpcREG& operator -= ( gpcREG& b ) {
+		if( bD.x&0x40 || b.bD.x&0x40 )
+			return *this = d8()-b.d8();
+
+		if( bD.x&0x80 || b.bD.x&0x80 )
+			return *this = i8()-b.i8();
+
+		return *this = u8()-b.u8();
+	}
+	gpcREG& operator *= ( gpcREG& b ) {
+		if( bD.x&0x40 || b.bD.x&0x40 )
+			return *this = d8()*b.d8();
+
+		if( bD.x&0x80 || b.bD.x&0x80 )
+			return *this = i8()*b.i8();
+
+		return *this = u8()*b.u8();
+	}
+	gpcREG& operator /= ( gpcREG& b ) { return *this = d8()/b.d8(); }
+	gpcREG& operator %= ( gpcREG& b ) { return *this = i8()%b.i8(); }
+	gpcREG& operator |= ( gpcREG& b ) { return *this = u8()|b.u8(); }
+	gpcREG& operator &= ( gpcREG& b ) { return *this = u8()&b.u8(); }
+
+	bool	operator == ( gpcREG& b ) { return (d8()-b.d8()) == 0.0;  }
+	bool	operator != ( gpcREG& b ) { return !(*this==b);  }
+	U8 u8() {
 		if( this ? !bD.x : true )
 			return 0;
 		return u;
 	}
-	I8 i8()
-	{
+	I8 i8() {
 		if( this ? !bD.x : true )
 			return 0;
 
@@ -311,8 +350,7 @@ public:
 		return u;
 
 	}
-	double d8()
-	{
+	double d8() {
 		if( this ? !bD.x : true )
 			return 0.0;
 		if( bD.u4&0xf0)
@@ -320,14 +358,8 @@ public:
 
 		return u;
 	}
-	bool bGD()
-	{
-		return bD.x; //.u4&0x1f;
-	}
-	I1 t()
-	{
-		return bD.x;
-	}
+	bool bGD() { return bD.x; }
+	I1 t() { return bD.x; }
 
 };
 
@@ -396,10 +428,6 @@ public:
 	{
 		if( an.w )
 			return an;
-		/*if( !pDAT )
-		{
-			return an.null();
-		}*/
 		if( !an.x )
 			an.x = 1;
 		if( !an.y )
@@ -441,10 +469,6 @@ public:
 	{
 		return typ().area_yz();
 	}
-	/*U4 nT1()
-	{
-		return 1<<(typ.x&0xf);
-	}*/
 	U4 nLOAD()
 	{
 		return AN().w;
@@ -468,6 +492,7 @@ public:
 	gpcALU& equSIG( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, U8 u8, U2 dm = 0 );
 	gpcALU& equ( gpcRES* pM, U4x2 xy, U1x4 ty4, I1x4 op4, double u8, U2 dm = 0 );
 
+	gpcALU& operator = ( I4 a );
 	gpcALU& operator = ( gpcREG& a );
 	gpcALU& operator += ( gpcREG& a );
 	gpcALU& operator -= ( gpcREG& a );
@@ -481,21 +506,9 @@ public:
 	gpcALU& operator /= ( gpcALU& b );
 	gpcALU& operator %= ( gpcALU& b );
 
-
 	gpcALU& operator = ( U1* pSTR );
-
-	gpcALU& operator = ( gpeALF a )
-	{
-		null();
-		alf = a;
-		return *this;
-	}
-
-	gpcALU& operator = ( U4x2& u42 )
-	{
-		sub = u42;
-		return *this;
-	}
+	gpcALU& operator = ( gpeALF a ) { null(); alf = a; return *this; }
+	gpcALU& operator = ( U4x2& u42 ) { sub = u42; return *this; }
 
 	U8 u8() const {
 		if( this ? !pDAT : true )
@@ -703,8 +716,7 @@ class gpcRES {
 	U4x2	nISA;
 
 public:
-	gpcISA*	resISA( void )
-	{
+	gpcISA*	resISA( void ) {
 		if( !pISA )
 			nISA = 0;
 
@@ -722,8 +734,7 @@ public:
 		}
 		return pISA ? pISA+nISA.x : NULL;
 	}
-	U4 resISA_trg( U4 iT, const U4x2& t )
-	{
+	U4 resISA_trg( U4 iT, const U4x2& t ) {
 		if( pISA )
 		if( pISA[iT].isa.aISA[0] == gpeISA_trg )
 		if( pISA[iT].an == t )
@@ -735,8 +746,7 @@ public:
 		resISA()->null();
 		return iT;
 	}
-	gpcISA*	resISA_stp( U1 stp )
-	{
+	gpcISA*	resISA_stp( U1 stp ) {
 		if( this ? !pISA : true )
 			return NULL;
 		gpcISA* pIS = resISA();
@@ -774,30 +784,16 @@ public:
 		return pIS; //resISA();
 	}
 
-	gpcISA*	resISA_an( I8x2& an )
-	{
-		return resISA()->AN( an );
-	}
-	gpcISA*	resISA_var( gpeALF a )
-	{
-		return resISA()->var( a );
-	}
-	gpcISA*	resISA_tag( gpeALF a )
-	{
-		return resISA()->var( a, gpeISA_tag );
-	}
-
-	gpcISA*	resISA_str( gpcLZY& str )
-	{
-		return resISA()->str( str );
-	}
+	gpcISA*	resISA_an( I8x2& an ) { return resISA()->AN( an ); }
+	gpcISA*	resISA_var( gpeALF a ) { return resISA()->var( a ); }
+	gpcISA*	resISA_tag( gpeALF a ) { return resISA()->var( a, gpeISA_tag ); }
+	gpcISA*	resISA_str( gpcLZY& str ) { return resISA()->str( str ); }
 
 	U4 iL() { return iLEV; }
 	gpcRES* pRM() { return pMOM; }
 	gpcRES* null();
 
-	gpcRES( gpcRES* pM = NULL )
-	{
+	gpcRES( gpcRES* pM = NULL ){
         gpmCLR;
         if( !pM )
 			return;
@@ -806,8 +802,7 @@ public:
 		iLEV = pMOM->iLEV+1;
 	}
 
-	~gpcRES()
-	{
+	~gpcRES() {
 		null();
 	}
 

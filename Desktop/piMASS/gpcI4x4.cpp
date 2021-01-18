@@ -92,7 +92,7 @@ I4x4 I4x4::mmABC( const I4x4& b, float alf, float mm ) const {
 I4x4 I4x4::ABC2xyz( I4x4 txyz, const I4x4& iABC ) const {
 
 	F4x4 iMX;
-	iMX.ABC(iABC, degX(180.0/PI) ).t = txyz-*this;
+	iMX.mxABC( iABC, degX(180.0/PI) ).t = txyz-*this;
 
     txyz.w = txyz.abs0().mx().x ? iMX.t.abs0().mx() : 0;
 	if( txyz.w )
@@ -107,8 +107,7 @@ I4x4 I4x4::ABC2xyz( I4x4 txyz, const I4x4& iABC ) const {
 	txyz.w = txyz.abs0().mx().x;
 	return txyz+xyz0();
 }
-I4x4 I4x4::TSrBOX( I4x4 T, I8 r )
-{
+I4x4 I4x4::TSrBOX( I4x4 T, I8 r ) {
 	// a vektorokból korábban ki kell vonni az origot
 	if( T.xyz0() == xyz0() )
 		return xyz0();

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -23,7 +23,7 @@
     <ProjectGuid>{A723D468-952C-41CC-8A5E-3B3628A705F0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>piMASS</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -108,7 +108,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\GnuWin32\include;G:\libjpeg-turbo64\include;G:\glew-2.1.0\include;C:\SDL\include;G:\SDL2-2.0.10\include;G:\SDL2_image-2.0.5\include;C:\Users\AliveMOon\Documents\piMASS;C:\Users\AliveMOon\Documents\piMASS\include;C:\Users\AliveMOon\Documents\piMASS\sys\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VisualStudioDir)\jpeg-9;$(VisualStudioDir)\libjpeg-turbo64\include;$(VisualStudioDir)\glew-2.1.0\include;C:\SDL\include;$(VisualStudioDir)\SDL2-2.0.12\include;$(VisualStudioDir)\SDL2_image-2.0.5\include;$(ProjectDir);$(ProjectDir)include;$(ProjectDir)sys\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <CallingConvention>Cdecl</CallingConvention>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -116,13 +116,13 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>G:\libjpeg-turbo64\lib;C:\Program Files %28x86%29\GnuWin32\lib;G:\SDL2_image-2.0.5\lib\x64;G:\glew-2.1.0\lib\Release\x64;G:\SDL2-2.0.10\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;opengl32.lib;turbojpeg.lib;jpeg.lib;SDL2.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VisualStudioDir);$(VisualStudioDir)\libjpeg-turbo64\lib;$(VisualStudioDir)\SDL2_image-2.0.5\lib\x64;$(VisualStudioDir)\glew-2.1.0\lib\Release\x64;$(VisualStudioDir)\SDL2-2.0.12\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;SDL2.lib;SDL2_image.lib;jpeg.lib;turbojpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>
       </AdditionalOptions>
       <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
@@ -192,8 +192,10 @@
     <ClCompile Include="gpcGTslmpZS.cpp" />
     <ClCompile Include="gpcI4x2.cpp" />
     <ClCompile Include="gpcI4x4.cpp" />
+    <ClCompile Include="gpcI8x2.cpp" />
     <ClCompile Include="gpcLAZY.cpp" />
     <ClCompile Include="gpcOPCD.cpp" />
+    <ClCompile Include="gpCORE.cpp" />
     <ClCompile Include="gpcpic.cpp" />
     <ClCompile Include="gpcres.cpp" />
     <ClCompile Include="gpcres2mini.cpp" />
@@ -203,6 +205,10 @@
     <ClCompile Include="gpcSLMPdcr.cpp" />
     <ClCompile Include="gpcSRC.cpp" />
     <ClCompile Include="gpcSRCbreak.cpp" />
+    <ClCompile Include="gpcSRCdbg.cpp" />
+    <ClCompile Include="gpcSRClnk.cpp" />
+    <ClCompile Include="gpcSRCprnt.cpp" />
+    <ClCompile Include="gpcSRCrun.cpp" />
     <ClCompile Include="gpcTOOL.cpp" />
     <ClCompile Include="gpcU14.cpp" />
     <ClCompile Include="gpcU44.cpp" />
@@ -221,6 +227,7 @@
     <ClInclude Include="gpcpic.h" />
     <ClInclude Include="gpcres.h" />
     <ClInclude Include="gpcSRC.h" />
+    <ClInclude Include="gpeTYP.h" />
     <ClInclude Include="gpsGLSL.h" />
     <ClInclude Include="gpsKEYMAP.h" />
     <ClInclude Include="include\camU.h" />

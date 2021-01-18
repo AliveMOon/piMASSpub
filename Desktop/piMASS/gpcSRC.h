@@ -22,12 +22,15 @@
 //~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //~ SOFTWARE.
 #include "gpcgt.h"
-#include "gpcOPCD.h"
-#include "gpeTYP.h"
+#include <gpcOPCD.h>
+
+//#include "gpeTYP.h"
 
 class gpcRES;
 class gpcCRS;
 class gpcWIN;
+class gpCORE;
+class gpMEM;
 //#include "gpcres.h"
 
 //#include "gpccrs.h"
@@ -37,14 +40,13 @@ class gpcWIN;
 #define gpdSRC_COLw 4
 #define gpdSRC_ROWw 1
 #define gpdPRGsep " \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} "
-
+#define gpdDBG 1
 //extern U1 gpaALFsub[]; //0x100];
 //extern U1 gpsSTRpub[]; //[0x10000];
 
 
 
-enum gpeMASSsw:U8
-{
+enum gpeMASSsw:U8 {
 	gpeMASSzero,
 	gpeMASSsub = gpeMASSzero,
 	gpeMASSret,
@@ -86,8 +88,83 @@ enum gpeMASSsw:U8
 
 
 };
-inline U4 gpfUTF8( const U1* pS, U1** ppS )
-{
+
+static const gpcOPCD gpaOPCi[] = {
+	// this,	pS,			a, m, i, nDT,				d,		wip, typ;
+	{ gpaOPCi,	"false", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_null },
+	{ gpaOPCi,	"true", 	0, 0, 0, sizeof(U1), 		0.0, gpeALF_TRUE },
+
+	{ gpaOPCi,	"U1", 		0, 0, 0, sizeof(U1), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"U2", 		0, 0, 0, sizeof(U2), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"U4", 		0, 0, 0, sizeof(U4), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"U8", 		0, 0, 0, sizeof(U8), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I1", 		0, 0, 0, sizeof(I1), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I2", 		0, 0, 0, sizeof(I2), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I4", 		0, 0, 0, sizeof(I4), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"I8", 		0, 0, 0, sizeof(I8), 		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"F4", 		0, 0, 0, sizeof(float),		0.0, gpeALF_CLASS, gpeALF_DEF },
+	{ gpaOPCi,	"F8", 		0, 0, 0, sizeof(double),	0.0, gpeALF_CLASS, gpeALF_DEF },
+
+	{ gpaOPCi,	"sizeof(", 	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SIZEOF },
+	{ gpaOPCi,	"if(", 		0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_if },
+	{ gpaOPCi,	"for(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_FOR },
+	{ gpaOPCi,	"while(", 	0, 0, 0, 0,					0.0, gpeALF_CYCLE, gpeALF_WHILE },
+	{ gpaOPCi,	"switch(",	0, 0, 0, 0,					0.0, gpeALF_FUNC, gpeALF_SWITCH },
+
+	{ gpaOPCi,	"break",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
+	{ gpaOPCi,	"continue",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_CONTINUE },
+	{ gpaOPCi,	"return",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_RETURN },
+	{ gpaOPCi,	"discard",	0, 0, 0, 0,					0.0, gpeALF_SYS, gpeALF_BREAK },
+
+	{ gpaOPCi,	"class",	0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_CLASS },
+	{ gpaOPCi,	"pub",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
+	{ gpaOPCi,	"prot",		0, 0, 0, 0,					0.0, gpeALF_CLASS, gpeALF_CTRL },
+
+	{ gpaOPCi,	"new",		0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_NEW },
+	{ gpaOPCi,	"del",		0, 0, 0, 0,					0.0, gpeALF_OPER, gpeALF_DEL },
+
+	{ gpaOPCi,	"main",		0, 0, 0, 0,					0.0, gpeALF_PRG, gpeALF_MAIN },
+
+
+
+};
+static const char* gpasOP[] = {
+	"0 nop",
+
+	"! notLG",	"!! LG",	"~ inv",
+
+	", stk",	"; newrow",
+
+	"/* comS", 	"*/ comE",	"// com",
+
+
+	"& and", 	"&& andLG",	"&= andM",
+	"* mul", 	"** exp",	"*= mulM",
+							"**= expM",
+	"/ div", 	"/= divM",	"//= rootM",
+	"% rem", 	"%= remM",
+	"^ xor",	"^= xorM",
+
+
+	"= mov", 	"== eqLG",  "!= neqLG",
+	"| or", 	"|| orLG",	"|= orM",
+	"+ add", 	"++ inc",	"+= addM",	/// -------------- GOOD
+	"- sub", 	"-- dec",	"-= subM",
+
+
+	"<= leLG",	"< ltLG", 	"<< sl", 	"<<= slM",
+	">= beLG",	"> bgLG", 	">> sr", 	">>= srM",
+
+	". dot", 	"-> entry", ":: out",
+	"( brakS",	") brakE",
+	"[ dimS", 	"] dimE",
+	"{ begin", 	"} end",
+	"? if",		": else",
+	"@ mail",	"\" str",
+};
+
+
+inline U4 gpfUTF8( const U1* pS, U1** ppS ) {
 	U4 utf8 = *pS;
 	if( !(utf8&0x80) )
 	{
@@ -234,8 +311,7 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false ) {
 	return pS-pU;
 }
 
-inline U4x2 lenMILL( U4x2 pos, U4x4&crn, U1* pUi, U1* pUie )
-{
+inline U4x2 lenMILL( U4x2 pos, U4x4&crn, U1* pUi, U1* pUie ) {
 	for( ; pUi < pUie; pUi++ )
 	{
 		if( *pUi&0x80 )
@@ -363,7 +439,7 @@ inline U1* gpfUTF8left( U1* pB, U1* pS, U1 n, U1 b ) {
 	if( pB >= pS )
 		return pB;
 
-	if( b )
+	if(b)
 	{
 		while( pS > pB )
 		{
@@ -460,13 +536,19 @@ U8 inline gpfSTR2U8( void* pV, void* ppV = NULL ) {
 		*(char**)ppV = p_str;
 	return u8;
 }
-I8 inline gpfSTR2I8( void* pV, void* ppV = NULL ) {
+I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL ) {
 	if( !pV )
 		return 0;
 
 	char *p_str = (char*)pV;
 	U8 nLEN;
-    p_str += gpmVAN(p_str, "+-0123456789xXbBdD", nLEN );
+	int n0 = gpmVAN(p_str, "+-0123456789xXbBdD", nLEN ), n1;
+	if( pSTOP ) {
+		n1 = gpmVAN(p_str, (char*)pSTOP, nLEN );
+		if(n0>n1)
+			n0=n1;
+	}
+    p_str += n0;
 	I8 i8 = strtol( p_str, &p_str, 10 );
 	if( !i8 )
 	{
@@ -574,8 +656,8 @@ public:
 			*pKC = pK ? pK+outZN.a4x2[1].area() : NULL, //AREAzw(),
 			*pKR = pK ? pKC+outZN.z : NULL;
 
-		mapZN44.z = max( mapZN44.z, gpmPAD( mapZN44.x, 0x10 ) );
-		mapZN44.w = max( mapZN44.w, gpmPAD( mapZN44.y, 0x10 ) );
+		mapZN44.z = gpmMAX( mapZN44.z, gpmPAD( mapZN44.x, 0x10 ) );
+		mapZN44.w = gpmMAX( mapZN44.w, gpmPAD( mapZN44.y, 0x10 ) );
 
 		U4 	nARE = mapZN44.a4x2[1].area(),
 			nALL = nARE + mapZN44.a4x2[1].sum()*4;
@@ -621,99 +703,631 @@ public:
 	}
 };
 
-#define rMNinxt au4x4[0]
+#define iMNindt au4x4[0]
+#define iMNi au4x4[0].x
+#define iMNn au4x4[0].y
+#define iMNdct au4x4[0].z
+#define iMNtyp au4x4[0].w
+
 #define rMNpos ai4x4[1].a4x2[0]
 #define rMNclr au4x4[1].z
-class gpcSCOOP {
-public:
-	gpcLZYdct	dct;
-	gpcLZY		lnk,
-				mini;
-	I8x4 rMN;
-	U4	iDCT, nDCT,
-		nLNK, nMINI;
-	U1	*pALL, *pMN;	/// ezt a gpcSRC::SRCmill adja
-	gpcSCOOP(){ gpmCLR; };
-	void rst( U1* pU )
-	{
-		dct.rst();
-		lnk.lzyRST();
-		mini.lzyRST();
-		iDCT = nDCT =
-		nLNK = nMINI = 0;
-		pALL = pU;	// ezt a gpcSRC::SRCmill adja
-	}
-	U4 nMN() { return nMINI = mini.nLD()/sizeof(rMN); }
+//#define rMNlnk au4x4[1].w
+static char gpsNoWord[] = {
+							"\\ \t\a\r\n*&/%+-|~^?!=$.,:;\'\"{}[]()"
+						};
+static char gpsOPERA[] = {
+							"\\*&/%+-|~^?!=$.,:;{}[]()"
+						};
 
-	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff )
+#define gpmSCP aSCOOP[iSCP]
+
+class gpcSCOOP {
+	gpcLZY 		lzyMiN;		I8x4 rMN;	U4 nMiN;
+public:
+	gpcLZYdct	lzyDCT;					U4 nDCT;
+	gpcLZY		lzyLiNK; 	U4x4 rLNK;	U4 nLiNK;
+	gpcLZY		lzyCNST;				U4 nCNST;
+	gpcLZY		lzyASM;		I4x4 rINS;	U4 nINS;
+
+	U1	*p_str;
+	U8	hsSTR;
+	U4x4 dim;
+
+	gpcSCOOP(){ gpmCLR; };
+
+	bool bGD( U1* pUTF, U1** ppUe )
 	{
+		U8	hs2 = 0;
+		U4	i = 0;
+		while( pUTF[i] )
+		{
+			hs2 += i + (U8)pUTF[i];
+			i++;
+		}
+		if( ppUe )
+			*ppUe = pUTF+i;
+		if( hsSTR == hs2 )
+			return true;
+
+		hsSTR = hs2;
+		return false;
+	}
+
+	void rst( U1* pUTF )
+	{
+		lzyMiN.lzyRST();
+
+		lzyDCT.rst();
+		lzyLiNK.lzyRST();
+		lzyCNST.lzyRST();
+		lzyASM.lzyRST();
+
+		nDCT = nLiNK = nCNST = nMiN = nINS = 0;
+		p_str = pUTF;	// ezt a gpcSRC::srcBRK adja
+	}
+	//I8x4* pMN();
+
+	U4 nMN() {
+		/*if(nMiN)
+			return nMiN;*/
+
+		return nMiN = lzyMiN.nLD(sizeof(rMN));
+	}
+	I8x4* pMN() {
+		if( nMiN )
+			return (I8x4*)lzyMiN.p_alloc;
+
+		return nMN() ? (I8x4*)lzyMiN.p_alloc : NULL;
+	}
+
+
+	U4 nLNK() {
+		if( nLiNK )
+			return nLiNK;
+
+		return nLiNK = lzyLiNK.nLD(sizeof(rLNK));
+	}
+	U4x4* pLNK() {
+		if( nLiNK )
+			return (U4x4*)lzyLiNK.p_alloc;
+
+		return nLNK() ? (U4x4*)lzyLiNK.p_alloc : NULL;
+	}
+
+	U4 nASM() {
+		/*if( nINS )
+			return nINS;*/
+
+		return 	nINS = lzyASM.nLD(sizeof(rINS));
+	}
+
+	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff ) {
 		if( !this )
 			return 0;
 
 		if( !nU )
-			return nMINI;
+			return nMN();
 
-		iDCT = dct.dictMILLfind( pUi, nU, nDCT );
+ 		U8 nS = nU, nI;
+ 		U4 iDCT = lzyDCT.dctMILLfndnS( pUi, nS, nDCT );
+ 		if( iDCT < nDCT )
+		if( (nI=lzyDCT.nSTRix(iDCT)) != nS )
+			iDCT = nDCT;
+
 		if( iDCT >= nDCT )
 		{
-			// nem volt a listában
+			// nem volt a SZóTáRBAN
 			iDCT = nDCT; // a végére kerül ha hozzá adjuk
-			dct.dictMILLadd( pUi, nU );
+			lzyDCT.dctMILLaddS( pUi, nU );
 			nDCT++;
 		}
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		U4x4	link(nMINI,0,0,0);
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, iDCT, typ );
+		rLNK = U4x4(nMN());
+
+		rMN.iMNindt = U4x4( pUi-p_str, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 
-		lnk.lzyADD( &link, sizeof(link), nU = -1, -1 );
+		lzyLiNK.lzyADD( &rLNK, sizeof(rLNK), nU = -1, -1 );
 		return nMN();
 	}
-	U4 STRadd( U4x2 pos, U1* pUi, U8 nU, U4 color )
-	{
+	U4 STRadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
 		if( !nU )
 			return 0;
 
 		if( !nU )
-			return nMINI;
+			return nMN();
 
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 		return nMN();
 	}
-	U4 NOTEadd( U4x2 pos, U1* pUi, U8 nU, U4 color )
-	{
+	U4 NOTEadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
 		if( !nU )
 			return 0;
 
 		if( !nU )
-			return nMINI;
+			return nMN();
 
 		// typ U4x4.w:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.rMNinxt = U4x4( pUi-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		mini.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
 		return nMN();
 	}
 };
+
+class gpCLASS {
+public:
+	gpcLZY lzyOBJ;
+	gpCLASS(){ gpmCLR; };
+};
+
+
+class gpMEM;
+
+class gpOBJ {
+public:
+	gpMEM*	pMEM;
+	I4		dctID, iPTR;
+	I8x2 	AN;
+	gpeCsz 	cAN;
+
+	gpOBJ(){ gpmCLR; };
+
+	gpPTR* 	pPTR();
+	gpPTR* 	pPTRu1();
+	gpPTR* 	pPTRd2D();
+	U1*		pU1();
+
+	gpOBJ& operator = ( gpPTR* pPb ) {
+		gpPTR* pPt = pPTR();
+		if( pPt->mNdID == pPb->mNdID )
+		{
+			*pPt = *pPb;
+			return *this;
+		}
+
+		return *this;
+	}
+	U4 sOF();
+	I4 cID(); // { return pPTR() ? pPTR()->cID : gpeCsz_OFF; }
+	I4x2* pd2D() {
+		if( !this )
+			return 0;
+		return pPTRd2D()->pd2D();
+	}
+
+	bool bARY(){ return pd2D()->area() > 1; }
+	bool bUTF8()
+	{
+		if( cID() != gpeCsz_b )
+			return false;
+		return bARY();
+	}
+	bool bAN() { return this? cAN == gpeCsz_c:false; }
+	bool bALF() { return this? cAN == gpeCsz_a:false; }
+
+
+	/*I4 REcID( I4 c )
+	{
+        if( !this )
+            return gpeCsz_OFF;
+		cid = c;
+		sof = 0;
+		return cid;
+	}
+	gpOBJ* movREF( gpOBJ* pB )
+	{
+		if( this ? !pB : true )
+			return this;
+		if( dctID == pB->dctID )
+			return this;
+
+		cid = pB->cID();
+		sof = pB->sOF();
+
+		d2D = pB->d2D;
+		iPC = pB->iPC;
+		return this;
+	}*/
+
+
+};
+
+class gpROW{
+public:
+	I4		mNdID,	mnID, bIDup;
+	gpeOPid	preOP, pstOP;
+
+	gpROW(){};
+	gpROW* operator = ( gpOBJ& O )
+	{
+		if( !this )
+			return this;
+		if( &O )
+			mNdID = O.dctID;
+
+		mnID = mNdID;
+		if( mnID < 0 )
+			mnID*=-1;
+		return this;
+	}
+	gpROW* operator = ( gpOBJ* pO )
+	{
+		return (*this = *pO);
+	}
+
+};
+
+class gpBLK {
+	I4 nR, iI;
+public:
+	gpMEM*	pMEM;
+
+	I4	bIDm, bIDmR,
+        bID, mnID,
+		iPTR;
+
+	gpcLZY	lzyROW;
+	gpeOPid opID; //grp;
+
+	gpeOPid opIDgrp(){ return (this ? gpaOPgrp[opID] : gpeOPid_nop); }
+
+	gpPTR* BLKpPTR( char *pS );
+	gpROW* pROWadd( I4 iR ) {
+		gpROW* pR = (gpROW*)lzyROW.Ux( iR, sizeof(*pR) );
+		if( !pR )
+			return NULL;
+        //pR->iPC = -1;
+		nR = 0;
+		return pR;
+	}
+	I4 nROW() {
+		if( !this )
+			return 0;
+		if( nR )
+			return nR;
+		return nR = lzyROW.nLD(sizeof(gpROW));
+	}
+	I4 iLAST() { return nROW()-1; }
+	gpROW* pROW( I4 iR = 0, bool bADD = false ) {
+		if( !this )
+			return NULL;
+
+		if( iR < 0 )
+			return NULL;
+
+		if( nROW() <= iR )
+		{
+			if( !bADD )
+				return NULL;
+			gpROW* pRl = pLSTrow();
+			if( pRl )
+			if( pRl->pstOP == gpeOPid_nop )
+				return pRl;
+			return pROWadd( iR );
+		}
+
+		return ((gpROW*)gpmLZYvali( gpROW, &lzyROW )) + iR;
+	}
+	gpROW* pLSTrow() { return pROW(iLAST()); }
+	gpROW* pLSTrow( char* pS, gpOBJ* pO, I4 mnID ) {
+		gpROW* pRl = pROW(iLAST());
+		if( !pRl )
+			return NULL;
+		(*pRl = pO)->mnID = mnID;
+		return pRl;
+	}
+	gpROW* pNEWrow() { return pROW(nROW(), true); }
+
+
+	gpBLK( I4 bid, I4 bIDmom, I4 bIDmomR, I4 mnid ){
+		gpmCLR;
+		iPTR = -1;
+		bID 	= bid;
+		bIDm	= bIDmom;
+		bIDmR	= bIDmomR;
+        mnID    = mnid;
+		gpROW* pR0	= pROW( 0, true );
+	};
+	gpBLK* pRST( gpMEM* pMEM );
+
+	gpBLK* iROWblk( char* pS, I4 i, gpROW** ppR );
+	gpPTR* iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC = NULL, gpOBJ** ppOin = NULL );
+	gpPTR* instFUN( char* pS, I8x2& AN, gpBLK *pARG );
+
+
+	// gpPTR* moveAB( gpROW* pRdst, gpPTR* pPsrc );
+	// gpPTR* subAB( char* pS, gpPTR* pPa, gpROW* pRb, bool bADD );
+};
+class gpcLZYblk {
+	I4		nB;
+public:
+	gpcLZY	lzyBLK;
+
+	gpcLZYblk(){ gpmCLR; }
+	~gpcLZYblk() {
+		gpBLK** ppB0 = gpmLZYvali( gpBLK*, &lzyBLK );
+		if( ppB0 )
+		for( I4 nBLK = lzyBLK.nLD(sizeof(*ppB0)), b = 0; b < nBLK; b++ )
+			gpmDEL( ppB0[b] );
+	}
+	I4 nBLK() {
+		if( !this )
+			return 0;
+		if( nB )
+			return nB;
+		return nB = lzyBLK.nLD(sizeof(gpBLK*));
+	}
+	gpBLK* pSTPdwn( I4 bID ) {
+		return pSTPup( bID, -1, -1, 0 );
+	}
+	gpBLK* pSTPup( I4 bID, I4 bIDmom, I4 bIDr, I4 mnID ){
+		if( bID == -1 )	// pont -1 volt azaz nincs
+			return NULL;
+
+		if( bID < 0 )
+		{
+			bID = nBLK(); // bID -2 vagy kissebb akkor új blokot kérünk
+			nB = 0;
+		} else if( bID >= nBLK() )
+			bID = nBLK();
+
+		gpBLK** ppB = (gpBLK**)lzyBLK.Ux( bID, sizeof(*ppB) );
+		if( *ppB )
+			return (*ppB);
+
+		return (*ppB) = new gpBLK( bID, bIDmom, bIDr, mnID );
+	}
+	gpBLK* pNEWblk( gpeOPid opID, I4 bIDmom, I4 bIDr, I4 mnID ) {
+		gpBLK	*pBLK = pSTPup( -2, bIDmom, bIDr, mnID );
+		if( !pBLK )
+			return NULL;
+        pBLK->iPTR = -1;
+		pBLK->opID = opID;
+		return pBLK;
+	}
+};
+class gpINST {
+public:
+	gpeOPid op; gpeCsz cID;
+	gpeEA mS; U1 iS, xS;
+	gpeEA mD; U1 iD, xD;
+	I8x2	a8x2;
+	gpINST& c( gpeCsz cc ){ cID = cc; return *this; };
+
+	gpINST& Dn( U1 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_Dn;
+			iS = i%8;
+			return *this;
+		}
+		mD = gpeEA_Dn;
+		iD = i%8;
+		return *this;
+	};
+	gpINST& An( U1 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_An;
+			iS = i%8;
+			return *this;
+		}
+		mD = gpeEA_An;
+		iD = i%8;
+		return *this;
+	};
+	gpINST& IAnI( U1 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_IAnI;
+			iS = i%8;
+			return *this;
+		}
+		mD = gpeEA_IAnI;
+		iD = i%8;
+		return *this;
+	};
+	gpINST& IAnIp( U1 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_IAnIp;
+			iS = i%8;
+			return *this;
+		}
+		mD = gpeEA_IAnIp;
+		iD = i%8;
+		return *this;
+	};
+	gpINST& sIAnI( U1 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_sIAnI;
+			iS = i%8;
+			return *this;
+		}
+		mD = gpeEA_sIAnI;
+		iD = i%8;
+		return *this;
+	};
+	gpINST& d16IAnI( I8 d16, U1 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_d16IAnI;
+			iS = i%8;
+			a8x2.x = d16;
+			return *this;
+		}
+		mD = gpeEA_d16IAnI;
+		iD = i%8;
+		a8x2.y = d16;
+		return *this;
+	};
+	gpINST& d16IAnI( I8 d16, U1 i, U1 x ) {
+		if( !mS )
+		{
+			mS = gpeEA_d16IAnDnI;
+			iS = i%8;
+			xS = x%8;
+			a8x2.x = d16;
+			return *this;
+		}
+		mD = gpeEA_d16IAnDnI;
+		iD = i%8;
+		xD = x%8;
+		a8x2.y = d16;
+		return *this;
+	};
+	gpINST& EAw( I8 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_W;
+			a8x2.x = i;
+			return *this;
+		}
+		mD = gpeEA_W;
+		a8x2.y = i;
+		return *this;
+	};
+	gpINST& EAl( I8 i ) {
+		if( !mS )
+		{
+			mS = gpeEA_L;
+			a8x2.x = i;
+			return *this;
+		}
+		mD = gpeEA_L;
+		a8x2.y = i;
+		return *this;
+	};
+	gpINST& instDBG( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 = NULL );
+};
+class gpGL{
+public:
+	I4			aPICid[0x10],
+				aBOBid[0x10];
+	gpcPIC		*apPIC[0x10],
+				*apBOB[0x10];
+	gpcPICAM	*pCAM;
+	SDL_Texture* apTX[0x10];
+	gpGL(){ gpmCLR; };
+	~gpGL(){
+		gpmDEL(pCAM);
+	};
+};
+class gpCTRL{
+public:
+	char	sNAME[0x100];
+	gpCTRL(){ gpmCLR; };
+	/*~gpCTRL(){
+
+	};*/
+};
+class gpMEM {
+public:
+	I8x2 	aA[0x10];
+	I8		*pA, *pD;
+	double	aF[0x10];
+	gpcLZY	lzyMEM,
+			lzyOBJ,
+			lzyCLASS,
+			lzyCODE,
+			lzyBINlnk,
+			*pLZYsrcXFND,
+			*pLZYsrcXFNDall;
+    gpcLZYdctBIN    lzyDCTbin;
+
+	I4		nCD, nXFND,
+			iSTK,nDAT,nINST, pc, pcCPY;
+	U4		msRUN, nDCTscp, nDCTbin;
+	gpINST	*pINST;
+	gpcWIN	*pWIN;
+	gpcMASS	*pMASS;
+	gpcSRC	*pSRC;
+	gpGL	*pGL;
+	gpCTRL	*pCTRL;
+
+	I4x4	*pFREE, *pALLOC;
+	U4		nFREE, nALLOC;
+
+	~gpMEM() {
+		gpmDEL( pLZYsrcXFNDall);
+		gpmDEL( pGL );
+		gpmDELary(pFREE);
+		gpmDELary(pALLOC);
+	}
+	gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i = 0x2000 );
+	gpOBJ* OBJfnd( I4 dctID );
+	gpOBJ* OBJadd( char* pS, I4 dctID );
+	U1*	pUn( I4 iPC = 0, U4 nU1 = 0x100 ) {
+		if( this ? iPC < 0 : true )
+			return NULL;
+		return lzyMEM.Ux( iPC, nU1, true, sizeof(U1) );
+	}
+
+	U4 nALL( I4 iPC );
+	I4x4* pALL( I4 iPC );
+	I4 iFREE( I4 iPC );
+	I4 iALL( U4 nA );
+
+	gpPTR* pPTR( I4 i ) { return (gpPTR*)pUn( i, sizeof(gpPTR)); }
+	gpPTR* pPTRu1( I4 i ) { return pPTR( i )->pPTRu1( this ); }
+
+	gpOBJ* getOBJptr( U1* pU1, U4 nBYTE, I4 nmID );
+
+	gpINST& inst( gpeOPid op ) {
+		gpINST* pI = (gpINST*)lzyCODE.Ux( nCD, sizeof(*pI) );
+		pI->op = op;
+		nCD++;
+		return *pI;
+	};
+	gpOBJ* pOBJ( gpeALF alf ) {
+		if( this ? !alf : true )
+			return NULL;
+		U4 nO = lzyOBJ.nLD(sizeof(gpOBJ)), sOF;
+		if( !nO )
+			return NULL;
+		gpOBJ* pO0 = gpmLZYvali( gpOBJ, &lzyOBJ );
+		for( U4 i = 0; i < nO; i++ )
+		{
+			gpOBJ& obj = pO0[i];
+			if( !(sOF=obj.sOF()) )
+				continue;
+			if( obj.AN.alf != alf )
+				continue;
+			return pO0+i;
+		}
+		return NULL;
+	}
+
+	gpINST* instRDY( gpcLZY* pDBG );
+	gpINST* instALU();
+	U1*		instVAR( U1* p_dst, gpINST& inst );
+	I4		instDOit( gpOBJ& obj, U1* pU1 );
+	I4		instDOitSLMP( gpcGT* pGT );
+	I4		instDOitGSM( gpcGT* pGT );
+	void	funPRINT();
+};
+
 class gpcSRC {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
-    U8		nL,
+    U8		nLD,
 			nA,			// ha nA == 0 nm mi foglaltuk
 			bSW;		// pB = pA+iB()
     U4x4	spcZN, dim;
@@ -723,16 +1337,134 @@ public:
     SOCKET	iGT;
 
     gpeALF	*pALFtg;
-    gpcRES	*pEXE,
+
+    gpcRES	*pEXE0,
 			*apOUT[4];
-	gpcLZY	*pMINI;
+
+	gpcLZY	*pMINI, *pDBG,
+			*pABI;
 
 	gpcMAP	*pMAP;
 
-	gpcSCOOP aSCOOP[2];
+	gpcSCOOP 	aSCOOP[3];
+	gpCORE		*pCORE;
 
-	U4 srcUPDT( SOCKET ig = INVALID_SOCKET )
-	{
+	gpcLZYblk	lzyBLOCK;
+	gpMEM		*pMEM,
+				*pMEMo;
+
+	gpOBJ* srcOBJfnd( I4 dctID );
+	gpOBJ* srcOBJadd( char* pS, I4 dctID );
+	gpBLK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  );
+	gpBLK* srcBLKup( char* pS, gpBLK* pBMom, gpeOPid opID, I4 mnID ) {
+		return srcBLKnew( pS, opID, pBMom->pLSTrow(), pBMom->bID, pBMom->iLAST(), mnID );
+	}
+	gpBLK* srcBLKinsrt( char* pS, gpBLK* pBLKup, gpeOPid opID, I4 mnID ) {
+		if( pBLKup )
+			return srcBLKnew( pS, opID, NULL, -1, -1, mnID );
+
+		gpBLK	*pBLKm = lzyBLOCK.pSTPdwn( pBLKup->bIDm ),
+				*pBLKi = lzyBLOCK.pNEWblk( opID, pBLKup->bIDm, pBLKup->bIDmR, mnID );
+
+		gpROW	*pRuf = pBLKup->pROW(0,true),
+				*pRif = pBLKi->pROW(0,true),
+				*pRml = pBLKm->pLSTrow();
+
+		pRml->bIDup = 	pBLKup->bIDm = pBLKi->bID;
+						pBLKup->bIDmR = 0; // pBLKi->iLAST();
+
+		*pRif = *pRml;
+		pRif->pstOP = opID;
+
+		pBLKi->pNEWrow();
+		return pBLKi;
+	}
+	gpPTR* SRCpPTR( char* pS, gpROW& R );
+
+
+
+	///--------------------------
+	///			INST
+	///--------------------------
+	gpBLK*	srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID );
+	gpBLK*	srcINSTdwnO( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID );
+
+	gpBLK*	srcINSTmov( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	gpBLK*	srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	gpBLK*	srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	gpBLK*	srcINSTmul( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+
+	gpBLK*	srcINSTmov3( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+
+	gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	gpBLK*	srcINSTent2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	gpBLK*	srcINSTadd2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	gpBLK*	srcINSTmul2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+
+
+	bool 		srcINSTrun(); //gpcMASS* pMASS, gpcWIN* pWIN );
+	gpcLZY*		srcINSTmini( gpcLZY* pLZY ); //,gpcMASS* pMASS, gpcWIN* pWIN );
+	///--------------------------
+	///			BLOCK
+	///--------------------------
+	///--------------------------
+	///			CONST & VAR
+	///--------------------------
+	gpBLK* srcBLKmNdID( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID );
+	gpBLK* srcBLKaryUTF8( gpBLK* pBLK, I4 mnID, char* pS, U4 nS );
+	gpBLK* srcBLKaryAN( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID, gpeCsz cAN, const I8x2& AN );
+	gpBLK* srcBLKaryNUM( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID, gpeCsz cAN, const I8x2& AN );
+
+	///--------------------------
+	///			OPERA
+	///--------------------------
+	gpBLK* srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID );
+	gpBLK* srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+	gpBLK* srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+	gpBLK* srcBLKmov( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+	gpBLK* srcBLKanDalf( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+
+	gpBLK* srcBLKmul( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+	gpBLK* srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+
+	gpBLK* srcBLKout( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
+		/// ITT MÉG FENT
+		///LEVdwn(scp,now);
+		/// ITT MÁR LENT
+		///++SP;
+		///++stkCD;
+		if( pBLK )
+		{
+
+		}
+
+		return pBLK;
+	}
+
+	U8 n_ld( U8 in ) {
+		if( !this )
+			return 0;
+
+		if( nLD == in )
+			return nLD;
+		if( nLD < in )
+		{
+			nLD = in;
+			return nLD;
+		}
+		nLD = in;
+		return nLD;
+	}
+	U8 n_ld_add( I8 add = 0 ) {
+		if( !this )
+			return 0;
+
+		if( !add )
+			return nLD;
+		return n_ld( nLD+add );
+	}
+
+	U4 srcUPDT( SOCKET ig = INVALID_SOCKET ) {
 		U8 nLEN = 0;
 		pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 		nVERr = nHD+1;
@@ -740,42 +1472,53 @@ public:
 
 		return nVERr;
 	}
-	bool qBLD( void )
-    {
+	bool qBLD( void ) {
 		if( nVERr > nBLD )
 			return true;	// már kérte valaki
 
-		//nVERr = max( nHD, nBLD ); //+1;
+		//nVERr = gpmMAX( nHD, nBLD ); //+1;
 		return false; // mi kérjük elösször
     }
-    U4 rdyBLD( void )
-    {
+    U4 rdyBLD( void ) {
 		nBLD = nVERr;
 		return nVERr;
     }
 
-	U4 nCLR(void)
-	{
-		return gpmOFF( gpcSRC, nVERr )-gpmOFF( gpcSRC, pALFtg );
-	}
-	U1* pSRCalloc( bool bNoMini )
-	{
+	U4 nCLR(void) { return gpmOFF( gpcSRC, nVERr )-gpmOFF( gpcSRC, pALFtg ); }
+	U1* pSRCalloc( bool bNoMini, U1 selID ) {
 		bool	bHD = false,
 				bMINI = bHD ? false : ( bNoMini ? false : !!pMINI );
+		if( !bMINI )
+		{
+			dim.w = n_ld_add();
+			return pA;
+		}
 
+		if( pDBG->nLD() ? selID == gpdDBG : false )
+		{
+			dim.w = pDBG->nLD();
+			return pDBG->p_alloc;
+		}
+
+		dim.w = bMINI ? pMINI->nLD() : n_ld_add();
 		return bMINI ? pMINI->p_alloc : pA;
 	}
-	U1* pSRCstart( bool bNoMini = false ) // U4x4* pCx2 )
-	{
+	U1* pSRCstart( bool bNoMini, U1 selID ) {
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
 		// és ráadásul a \a elöt6t van a cursor
 		bool	bHD = false,
 				bMINI = bHD	? false : ( bNoMini ? false : !!pMINI );
 
 		U1	*pC = bMINI ? pMINI->p_alloc : pA;
-		dim.w = bMINI ? pMINI->n_load : nL;
+		dim.w = bMINI ? pMINI->nLD() : n_ld_add();
 		if( bMINI )
-			return pC;
+		{
+			if( pDBG->nLD() ? selID != gpdDBG :true )
+				return pC;
+
+			dim.w = pDBG->nLD();
+			return pDBG->p_alloc;
+		}
 
 		if( bHD )
 			return pC;
@@ -785,18 +1528,18 @@ public:
 		return pC;
 	}
 
-	U8 SRCmnCR( I4x2& cr, bool bNoMini ) {
+	U8 SRCmnCR( I4x2& cr, bool bNoMini, U1 selID ) {
 		if( !this )
 		{
 			cr.null();
 			return 0;
 		}
-		cr.y = min( cr.y, dim.y-1 );
+		cr.y = gpmMIN( cr.y, dim.y-1 );
 
 		//if( !cr.sum() )
 		//	return pC - pSRCalloc();;
 		I4x4 cxy = 0;
-		U1 sC[] = " ", *pROW = pSRCstart(bNoMini), *pCe, *pC;
+		U1 sC[] = " ", *pROW = pSRCstart(bNoMini, selID ), *pCe, *pC;
 		U4 n;
 		for( pC = pROW, pCe = pC+dim.w; pC < pCe; pC++ )
 		{
@@ -861,7 +1604,7 @@ public:
 				case '\n':
 				case '\r':
 				case '\a':
-					return pC - pSRCalloc(bNoMini);
+					return pC - pSRCalloc(bNoMini, selID);
 
 				case '\t':
 					sC[0] = *pC;
@@ -876,7 +1619,7 @@ public:
 
 			cxy.x++;
 		}
-		return pC - pSRCalloc(bNoMini);
+		return pC - pSRCalloc(bNoMini, selID);
 	}
 	gpcSRC* SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ); //, I4 fz );
 	I4x2 SRCmini(
@@ -889,31 +1632,38 @@ public:
 					gpcCRS& crs,
 					gpeCLR bg, //gpeCLR fr,
 					gpeCLR ch,
-					bool bNoMini
+					bool bNoMini, U1 selID
 				);
 
-	U4x4 CRSdim( bool bNoMini ) {
+	U4x4 CRSdim( bool bNoMini, U1 selID ) {
 		if( !this )
 			return U4x4( gpdSRC_COLw, gpdSRC_ROWw );
 
-		U1* pC = pSRCstart( bNoMini );
+		U1* pC = pSRCstart( bNoMini, selID );
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 		return dim;
 	}
-	U4x4	SRCmill( bool bNoMini, const char* pVAN = NULL );
-	U1		SRCmnMILLscn( gpcCRS& crs, bool bNoMini );
-	I4x2	SRCmnMILL(
+	U4x4	srcBRK( gpcLZYdct& dOP, //U1 iSCP,
+					bool bNoMini, U1 selID, const char* pVAN = NULL );
+	U1		srcSCN( gpcCRS& crs, bool bNoMini, U1 selID );
+	I4x2	srcRDY(
 						U1x4* pO,
 						I4x2 xy, I4x2 fWH,
 						I4 fz, I4 zz,
 						gpcCRS& crs,
-						bool bNoMini = false
+						bool bNoMini, U1 selID
 					);
-    bool bSUB( gpcMASS& mass ) {
+	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
+	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ); //gpcMASS* pMS );
+	U1 	srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ); //
+	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+
+	bool bSUB( gpcMASS& mass ) {
 		if( !this )
 			return false;
 
-		hd( mass );
+		hd( &mass );
 
 		// beljebb lép
 		return bSW&gpeMASSsubMSK;
@@ -922,7 +1672,7 @@ public:
 		if( !this )
 			return false;
 
-		hd( mass );
+		hd( &mass );
 
 		// kijebb lép
 		return bSW&gpeMASSretMSK;
@@ -932,7 +1682,7 @@ public:
 			return false;
 
 
-		hd( mass );
+		hd( &mass );
 
 		// új sort kezd a táblázatban
 		if( bSW&gpeMASSznMSK )
@@ -955,7 +1705,7 @@ public:
 		if( !this )
 			return false;
 
-		hd( mass );
+		hd( &mass );
 
 		// pointerrel ne lehessen kijelölni
 		// pl. rajzolásnál hasznos, meg gombnál
@@ -967,7 +1717,7 @@ public:
 			return false;
 
 		// input rublika
-		hd( mass );
+		hd( &mass );
 
 		return bSW&gpeMASSinpMSK;
     }
@@ -976,7 +1726,7 @@ public:
 		if( !this )
 			return false;
 
-		hd( mass );
+		hd( &mass );
 
 		// csillagokat kell írni a betű helyett?
 
@@ -991,7 +1741,7 @@ public:
     bool bMAIN( gpcMASS& mass, bool bDBG = false ) {
 		if( !this )
 			return false;
-		hd( mass );
+		hd( &mass );
 
 		bool bM = bSW&gpeMASSmainMSK;
 		if( !bM )
@@ -1001,10 +1751,11 @@ public:
 
 		return true;
     }
-    void hd( gpcMASS& mass, gpeALF* pTGpub = NULL );
+    void hd( gpcMASS *pMASS, gpeALF* pTGpub = NULL );
     void cmpi( gpcMASS& mass, bool bDBG );
 	void cmpi_undo00( gpcMASS& mass, bool bDBG );
     void cmpi_SKELETON( gpcMASS& mass, bool bDBG );
+
 
     //void cmpi_trash2( gpcMASS& mass, bool bDBG );
     //void cmpi_trash( gpcMASS& mass, bool bDBG );
@@ -1012,7 +1763,7 @@ public:
     gpcSRC();
     virtual ~gpcSRC();
 	U8 iB( void ) {
-		if( !pA || !nL )
+		if( !pA || !n_ld_add() )
 			return 0;
 
 		if( pB < pA )
@@ -1020,14 +1771,14 @@ public:
 
 		U8 i = pB-pA;
 		if( i )
-		if( i >= nL )
+		if( i >= n_ld_add() )
 		{
-			if( i == nL )
-				return nL; // ezzel jelezük, ha valaki már kereste
+			if( i == n_ld_add() )
+				return n_ld_add(); // ezzel jelezük, ha valaki már kereste
 							// azaz nem 0
 
-			pB = ( pA ? pA+nL : NULL );
-			return nL;
+			pB = ( pA ? pA+n_ld_add() : NULL );
+			return n_ld_add();
 		}
 
 		if( pB[i] == '\a' )
@@ -1037,27 +1788,25 @@ public:
 		U8 nLEN;
 		i = gpfVAN( pA, (U1*)"\a", nLEN );
 		if( i )
-		if( i >= nL )
+		if( i >= n_ld_add() )
 		{
-			if( i == nL )
-				return nL;	// i = nL -> ezzel jelezük, hogy kerestük de biza nem vót // szar
+			if( i == n_ld_add() )
+				return n_ld_add();	// i = nL -> ezzel jelezük, hogy kerestük de biza nem vót // szar
 
-			pB = ( pA ? pA+nL : NULL );
-			return nL;
+			pB = ( pA ? pA+n_ld_add() : NULL );
+			return n_ld_add();
 		}
 
 		// na meguszta talált egyet
 		pB = pA+i;
 		return i;
 	}
-	U8 iPUB() {
-		return iB()+1;
-	}
+	U8 iPUB() { return iB()+1; }
 	U1* pPUB() {
 		if( this ? pA : NULL )
 		{
-			if( pA[nL] != 0 )
-				pA[nL] = 0;
+			if( pA[n_ld_add()] != 0 )
+				pA[n_ld_add()] = 0;
 			return (U1*)pA+iPUB();
 		}
 
@@ -1066,11 +1815,10 @@ public:
 	gpcSRC& reset( U1* pC, U1* pE, U1** ppSRC, U4x4& spcZN, U4 nADD = 1 );
 
     gpcSRC& SRCcpy( U1* pC, U1* pE );
-	bool SRCcmp( U1* pS, U4 nS )
-	{
-        if( nS != nL )
+	bool SRCcmp( U1* pS, U4 nS ) {
+        if( nS != n_ld_add() )
 			return false;
-		return gpmMcmp( pA, pS, nL ) == nL;
+		return gpmMcmp( pA, pS, n_ld_add() ) == n_ld_add();
 
 		/*U4 nCMP = gpmMcmp( pA, pS, nL )-pA;
 		return nCMP == nL;*/
@@ -1243,8 +1991,7 @@ public:
 	}
 };
 
-class gpcMASS
-{
+class gpcMASS {
 	gpcCLASS	*pTG;
 	gpcLZY		*pSRCc,
 				*pLST;
@@ -1262,9 +2009,6 @@ public:
 	gpcMAP		mapCR;
 
 	gpeALF		aTGwip[0x100];
-	//gpcOPCD		aPRG[0x1000];
-	//U1			asPRG[0x1000],
-	//			*pPUB; //, nDICT;
 
 	// CMPL ----------------------------
 	gpcLZY		CMPL;
@@ -1273,20 +2017,17 @@ public:
 				aiDAT[0x100], alDAT;
 
 	// CPLD ----------------------------
-
-
-
-	//gpcLZY		*apDICTopcd[0x1000];
-	//gpcLZYdct	*apDICTix[0x1000];
 	U4	anDICTix[0x1000],
-		//aLEVsp[0x100],
 		rstLEV, iLEV, nLEV, topLEV;
 
 	/// aGLcnl --------
 	F4		aGLcnl[0x10];
 	int		aGLpic[0x10];
 	//gpcPIC* aGLpPIC[0x10];
-
+	/// OPER --------
+	gpcLZYdct	OPER;
+	I8x2		aOP[0x100];
+	gpeALF		mxOP;
 	/// GATE --------
 	gpcLZYall	GTlzyALL;
 	gpcGTall	GTacpt, GTcnct;
@@ -1299,8 +2040,9 @@ public:
 	/// TXT ---------
 	U4 nTXT = 0;
 	char* pTXT, *pT;
-	U4* pM( U4x2& zn, U1 id = 4 )
-	{
+
+	gpcLZYdct* pOPER();
+	U4* pM( U4x2& zn, U1 id = 4 ) {
 		zn = 0;
 		if( !this )
 			return NULL;
@@ -1309,8 +2051,7 @@ public:
 		zn = mpZN.a4x2[1];
 		return p_map;
 	}
-	U4 getXFNDzn( const U4x2& zn )
-	{
+	U4 getXFNDzn( const U4x2& zn ) {
 		if( !this )
 			return 0;
 
@@ -1322,30 +2063,21 @@ public:
 		U4	i = zn*U4x2( 1, mpZN.z );
 		return pM[i];
 	}
-	U4 getXFNDan( I4x2 an )
-	{
+	U4 getXFNDan( I4x2 an ) {
 		if( this ? !an.x : true )
 			return 0;
 		an.x--;
 		return getXFNDzn(an);
 	}
-	U4 jDOitREF( gpcWIN& win, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ = NULL );
+	U4 jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ = NULL );
 
-	U4 relLEV( void )
-	{
+	U4 relLEV( void ) {
 		return iLEV-rstLEV;
 	}
 
-	gpcCMPL* piLEVmom( void )
-	{
-		return CMPL.pPC( aPC[iLEV-1] );
-	}
-	gpcCMPL* piLEViPC( void )
-	{
-		return CMPL.pPC( aPC[iLEV] );
-	}
-	U4 incLEV( void )
-	{
+	gpcCMPL* piLEVmom( void ) { return CMPL.pPC( aPC[iLEV-1] ); }
+	gpcCMPL* piLEViPC( void ) { return CMPL.pPC( aPC[iLEV] ); }
+	U4 incLEV( void ) {
 
 		aPC[iLEV] = iPC;
 		U4 iDT = aiDAT[iLEV];
@@ -1361,8 +2093,7 @@ public:
 
 	//void reset_o( void );
 	U1* msRST( U1* pPUB );
-	void tag_add( gpeALF tg, U4 iKID )
-	{
+	void tag_add( gpeALF tg, U4 iKID ) {
 		I8 ix, n;
 		U8 s = -1;
 
@@ -1375,8 +2106,7 @@ public:
 		}
 		pLZY->lzyADD( (U4*)&iKID, sizeof(U4), s, 8 );
 	}
-	void tag_sub( gpeALF tg, U4 iKID )
-	{
+	void tag_sub( gpeALF tg, U4 iKID ) {
 		if( !pTG )
 			return;
 		I8 ix;
@@ -1411,33 +2141,26 @@ public:
 
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
-	U1* justDOit( gpcWIN& win ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
+	U1* justDOit( gpcWIN* pWIN ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
+	U1* justDOitOLD( gpcWIN* pWIN ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
 
 
 	gpcMASS&	null();
 	gpcMASS&	operator = ( const gpcMASS& b );
 	/// -------------------
 
-
-
 	gpcMASS(){ gpmCLR; }
 	gpcMASS( const U1* pU, U8 nU );
-	gpcMASS( const gpcMASS& b )
-	{
-		*this = b;
-	}
-
+	gpcMASS( const gpcMASS& b ) { *this = b; }
 
 	virtual ~gpcMASS();
-	gpcSRC* get( U4 i )
-	{
+	gpcSRC* get( U4 i ) {
 		if( i >= nLST )
 			return NULL;
 		gpcSRC** ppS = ppSRC();
 		return ppS ? ppS[i] : NULL;
 	}
-	gpcSRC* SRCfnd( U4 xfnd )
-	{
+	gpcSRC* srcFND( U4 xfnd ) {
 		if(!this)
 			return NULL;
 
@@ -1458,7 +2181,6 @@ public:
 
 		return pFND;
 	}
-
 	gpcSRC* SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n );
 
 

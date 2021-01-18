@@ -1,13 +1,297 @@
 #include "gpcSRC.h"
 #include "gpccrs.h"
+///-------------------------------------------------------------
+///
+///                         gpMEM
+///
+///-------------------------------------------------------------
+U4 gpMEM::nALL( I4 iPC ) {
+	if( this ? (iPC<0) : true )
+		return 0;
+	I4x4* pA = pALL(iPC);
+	return pA ? pA->y : 0;
+}
+I4x4* gpMEM::pALL( I4 iPC ) {
+	if( iPC < 0 )
+		return NULL;
 
+	for( U4 i = 0; i < nALLOC; i++ ) {
+		if( !pALLOC[i].n )
+			continue;
 
+		if( pALLOC[i].i > iPC )
+			continue;
+		if( (iPC-pALLOC[i].i) >= pALLOC[i].n )
+			continue;
 
+		return pALLOC+i;
+	}
+	return NULL;
+}
+I4 gpMEM::iFREE( I4 iPC ) {
+	if( this ? iPC < 0 : true )
+		return -1;
+
+	I4x4* pA = pALL(iPC);
+	if(!pA)
+		return -1;
+	iPC = pA->i;
+	U4 iF = nFREE;
+	for( U4 i = 0; i < nFREE; i++ ) {
+		if( !pFREE[i].n ) {
+			if( iF < i )
+				continue;
+
+			iF = i;
+			continue;
+		}
+
+		if( pFREE[i].n+pFREE[i].i != iPC ) {
+			if( pFREE[i].i != iPC+pA->n )
+				continue;
+
+			pFREE[i].i = iPC;
+			pFREE[i].n += pA->n;
+			pA->n = 0;
+			return pA->i = -1;
+		}
+
+		pFREE[i].n += pA->n;
+		pA->n = 0;
+		return pA->i = -1;
+	}
+
+	if( iF < nFREE ) {
+		pFREE[iF] = *pA;
+		pA->n = 0;
+		return pA->i = -1;
+	}
+
+	I4x4* pKILL = pFREE;
+	nFREE++;
+	pFREE = new I4x4[nFREE];
+	if( pKILL ) {
+		gpmMcpyOF( pFREE, pKILL, iF );
+		delete[] pKILL;
+	}
+	pFREE[iF] = *pA;
+	pA->n = 0;
+	return -1;
+}
+I4 gpMEM::iALL( U4 nA ) {
+	if( this ? nA < 1 : true )
+		return -1;
+	I4	nA0x10 = gpmPAD( nA+1, 0x10 ),
+		iA = -1;
+	for( U4 i = 0; i < nFREE; i++ ) {
+		if( pFREE[i].n < nA0x10 )
+			continue;
+
+		iA = pFREE[i].i;
+		if( (pFREE[i].n-nA0x10) > 0x10 ) {
+			// lecíp
+			pFREE[i].n -= nA0x10;
+			pFREE[i].i += nA0x10;
+		} else {
+			// egészet
+			nA0x10 = pFREE[i].n;
+			pFREE[i].n = 0;
+		}
+		break;
+	}
+	if( iA < 0 ) {
+		iA = nDAT;
+		nDAT += nA0x10;
+	}
+	U4 a = 0;
+	for( ; a < nALLOC; a++ ) {
+		if( pALLOC[a].n )
+			continue;
+
+		pALLOC[a].i = iA;
+		pALLOC[a].n = nA0x10;
+		U1* pA = pUn( iA, nA0x10 );
+		pA[nA] = 0;
+		return iA;
+	}
+
+	I4x4* pKILL = pALLOC;
+	nALLOC= a+1;
+	pALLOC = new I4x4[nALLOC];
+	if( pKILL ) {
+		gpmMcpyOF( pALLOC, pKILL, a );
+		delete[] pKILL;
+	}
+
+	pALLOC[a].i = iA;
+	pALLOC[a].n = nA0x10;
+
+	U1* pA = pUn( iA, nA0x10 );
+	pA[nA] = 0;
+	return iA;
+}
+///--------------------------
+///			gpMEM::gpOBJ
+///--------------------------
+gpOBJ* gpMEM::OBJfnd( I4 dctID ) {
+	if( !this )
+		return NULL;
+	gpOBJ* pO0 = gpmLZYvali( gpOBJ, &lzyOBJ );
+	if( !pO0 )
+		return NULL;
+	for( U4 nO = lzyOBJ.nLD(sizeof(gpOBJ)), o = 0; o < nO; o++ ) {
+		if( pO0[o].dctID != dctID )
+			continue;
+		return pO0+o;
+	}
+	return NULL;
+}
+
+gpOBJ* gpMEM::OBJadd( char* pS, I4 dctID ) {
+	gpOBJ *pO = OBJfnd(dctID);
+	if( pO )
+		return pO;
+
+	U4 nO = lzyOBJ.nLD(sizeof(gpOBJ));
+	pO = (gpOBJ*)lzyOBJ.Ux( nO, sizeof(*pO) );
+	if( !pO )
+		return NULL;
+	pO->pMEM = this;
+	pO->dctID = dctID;
+	pO->iPTR = -1;
+	gpPTR* pPTR = pO->pPTR();
+	return pO;
+}
+///--------------------------
+///			gpOBJ
+///--------------------------
+
+///-------------------------------------------------------------
+///
+///                         gpcSRC
+///
+///-------------------------------------------------------------
 gpcSRC::gpcSRC() {
     //ctor
     gpmCLR;
 }
+///-------------------------------------------------------------
+///  gpcSRC :: (NUM UTF8 AN ALF) -> OBJ(dctID)
+///-------------------------------------------------------------
+gpOBJ* gpcSRC::srcOBJfnd( I4 dctID ) { return pMEM->OBJfnd(dctID); }
+gpOBJ* gpcSRC::srcOBJadd( char* pS,I4 dctID ) { return pMEM->OBJadd(pS,dctID); }
+///-------------------------------------------------------------
+///  gpcSRC :: (NUM UTF8 AN ALF) -> OBJ(dctID) + pBLK->pROW[i]
+///-------------------------------------------------------------
+gpBLK* gpcSRC::srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  ) {
+	gpBLK	*pBLK = lzyBLOCK.pNEWblk( opID, bIDm, bIDmR, mnID )->pRST( pMEM );
+	gpROW	*pRf = pBLK->pROW(0,true);
+	if( !pRf )
+		return pBLK;
 
+	if( !pRml )
+		return pBLK;
+
+	*pRf = *pRml;
+	if( opID != pRml->pstOP )
+		pRf->pstOP = opID;
+	if( gpaOPgrp[opID] != gpeOPid_begin )
+		pBLK->pNEWrow();
+
+	pRml->pstOP = gpeOPid_nop;
+	pRml->bIDup = pBLK->bID;
+	return pBLK;
+}
+
+gpBLK* gpcSRC::srcBLKmNdID( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID ) {
+	gpOBJ *pO = pMEM->OBJadd(pS,dctID);
+	if( !pO )
+		return pBLK;
+
+	if( !pBLK )
+		pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1, mnID );
+
+	gpROW* pRl = pBLK->pLSTrow();
+	if( !pRl )
+		return pBLK;
+	if( pBLK->opIDgrp() == gpeOPid_begin )
+	{
+		pBLK = srcBLKup( pS, pBLK, gpeOPid_nop, mnID );
+		//srcBLKnew( pS, gpeOPid_nop, pRl, pBLK->bID, pBLK->iLAST(), mnID );
+		pRl = pBLK->pLSTrow();
+	}
+
+	*pRl = pO;
+	if( pRl->mnID == mnID )
+		return pBLK;
+
+	pRl->mnID = mnID;
+	return pBLK;
+}
+
+gpBLK* gpcSRC::srcBLKaryNUM( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID, gpeCsz cAN, const I8x2& AN ) {
+
+	pBLK = srcBLKmNdID( pS, pBLK, dctID, mnID );
+	gpOBJ* pO = srcOBJadd( pS, dctID );
+	if( !pO )
+		return pBLK;
+
+	gpPTR* pP = pO->pPTRu1();
+	pP->x = pP->y = 1;
+	pP->z = 0;
+	pP->cID( cAN );
+	U4 nS = sizeof(AN);
+
+	I4x4* pALL = pMEM->pALL( pP->iPC );
+	if( (pALL?pALL->n:0) < nS )
+	{
+		pMEM->iFREE( pP->iPC );
+		pP->iPC = pMEM->iALL( nS );
+	}
+	U1* pA = pMEM->pUn( pP->iPC, nS );
+	gpmMcpy( pA, &AN, nS );
+	return pBLK;
+}
+gpBLK* gpcSRC::srcBLKaryUTF8( gpBLK* pBLK, I4 mnID, char* pS, U4 nS ) {
+	I4 mNdID = mnID;
+	if( mNdID > 0 )
+		mNdID *= -1;
+	else
+		mNdID *= -1;
+
+	pBLK = srcBLKmNdID( pS, pBLK, mNdID, mnID );
+	gpOBJ* pO = srcOBJadd( pS, mNdID );
+	if( !pO )
+		return pBLK;
+
+	gpPTR* pP = pO->pPTRu1();
+	I4x4* pALL = pMEM->pALL( pP->iPC );
+	if( (pALL?pALL->n:0) < nS )
+	{
+		pMEM->iFREE( pP->iPC );
+		pP->iPC = pMEM->iALL( nS );
+	}
+	U1* pA = pMEM->pUn( pP->iPC, nS );
+	gpmMcpy( pA, pS, nS );
+	pP->x = nS;
+	pP->y = 1;
+	pP->z = 0;
+	pP->cID( gpeCsz_b );
+
+	return pBLK;
+}
+gpBLK* gpcSRC::srcBLKaryAN( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID, gpeCsz cAN, const I8x2& AN ) {
+
+	pBLK = srcBLKmNdID( pS, pBLK, dctID, mnID );
+	gpOBJ* pO = srcOBJadd( pS, dctID );
+	if( !pO )
+		return pBLK;
+
+	pO->AN = AN;
+	pO->cAN = cAN;
+	gpPTR* pP = pO->pPTRu1();
+	return pBLK;
+}
 gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
 	U1* pKL = nA ? pA : NULL;
 	if( pSe <= pS )
@@ -15,19 +299,19 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
         // kill
         gpmDELary(pKL);
         pB = pA = NULL;
-        nA = nL = 0;
+        nA = n_ld(0);
 		return *this;
 	}
-	nL = pSe-pS;
-	if( nA < nL+2 )
+	n_ld(pSe-pS);
+	if( nA < n_ld_add()+2 )
 	{
 		gpmDELary(pKL);
-		nA = gpmPAD( nL+2, 0x10 );
+		nA = gpmPAD( n_ld_add()+2, 0x10 );
 		pA = new U1[nA];
 	}
 	U8 nLEN;
 	U4 iA = gpfVAN( pS, (U1*)"\a", nLEN );
-	if( iA >= nL )
+	if( iA >= n_ld_add() )
 	{
 		iA = sizeof(" \a");
 		gpmMcpyOF( pA, " \a", iA );
@@ -35,9 +319,9 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
 	} else
 		iA = 0;
 
-	gpmMcpyOF( pA+iA, pS, nL );
-	nL += iA;
-	pA[nL] = 0;
+	gpmMcpyOF( pA+iA, pS, n_ld_add() );
+	//n_ld += iA;
+	pA[n_ld_add(iA)] = 0;
 
 	pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
 	if( *pB == '\a' )
@@ -45,10 +329,10 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
 
 	return *this;
 }
-gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 nADD ) {
+gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 iADD ) {
 	gpmCLR;
 	spcZN = _spcZN;
-	_spcZN.x += nADD;
+	_spcZN.x += iADD;
 
 	if( pS ? !*pS : true )
 	{
@@ -66,20 +350,20 @@ gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 nADD ) {
 	pS = (pB = pA + gpfVAN( pA, (U1*)"\a", anLEN[0] ));	//...\aA..B
 	if( *pB == '\a' )
 		pS++;											//...\aA..B\aS
-	nL = gpfVAN( pS, (U1*)"\a", anLEN[1] );
-	if( pS+nL >= pSe )
+	n_ld(gpfVAN( pS, (U1*)"\a", anLEN[1] ));
+	if( pS+n_ld_add() >= pSe )
 	{
-		nL = pSe-pS;
+		n_ld(pSe-pS);
 		pS = pSe;
-	} else if( !pS[nL] )
-		pS+=nL;											//...\aA..B\a... . .   . . ...S0
-	else if( pS[nL] != '\a' )
+	} else if( !pS[n_ld_add()] )
+		pS+=n_ld_add();											//...\aA..B\a... . .   . . ...S0
+	else if( pS[n_ld_add()] != '\a' )
 		pS += gpfVAN( pS, (U1*)"\a", anLEN[1], true );	//...\aA..B\a... . .   . . ...S?
 	else
-		pS+=nL;											//...\aA..B\a... . .   . . ...S\a
+		pS+=n_ld_add();											//...\aA..B\a... . .   . . ...S\a
 
 
-	nL = pS-pA;
+	n_ld(pS-pA);
 	if( !ppS )
 		return *this;
 
@@ -99,8 +383,8 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 
 	qBLD();
 
-	nL = &B ? B.nL : 0;
-	if( !nL )	// B kampec;
+	n_ld( &B ? B.n_ld_add() : 0 );
+	if( !n_ld_add() )	// B kampec;
 	{
 		// hagyjuk a pA-t hátha hamarosan mással töltjük meg
 		return *this;
@@ -109,13 +393,13 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 	U8 i = B.iB();
 	// fontos, hogy itt legyenek, mielött a pA-val kezdünk valamit
 
-	if( nA < (nL+2) )
+	if( nA < (n_ld_add()+2) )
 	{
 		// ha nA == 0 volt azt jelenti nem foglalva volt, ha nem valahonnan kölcsönözve
 		if( nA )	// csak akkor felszabadítható ha van mérete, egyébként simán elfelejthető
 			gpmDELary(pA);
 
-		nA = gpmPAD( nL+2, 0x10 );
+		nA = gpmPAD( n_ld_add()+2, 0x10 );
 		pA = new U1[nA];
 	}
 	if( !pA )
@@ -127,13 +411,13 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 
 	// nL = B.nL; ema vót
 	// nL = B.nL; e má vót
-	if( i < nL )
+	if( i < n_ld_add() )
 	{
 		// nL van
 		// i kissebb ez egyértelmű
 		pB = pA+i;
-		gpmMcpyOF( pA, BpA, nL );
-		pA[nL] = 0;
+		gpmMcpyOF( pA, BpA, n_ld_add() );
+		pA[n_ld_add()] = 0;
 		return *this;
 	}
 
@@ -141,11 +425,11 @@ gpcSRC& gpcSRC::operator = ( gpcSRC& B ) {
 	// potoljuk // az elejére rakunk egyet mert kell
 	pB = pA;
 	*pB = '\a';
-	gpmMcpyOF( pB+1, BpA, nL );
-	nL++;
-	pA[nL] = 0;
+	gpmMcpyOF( pB+1, BpA, n_ld_add() );
+	//n_ld++;
+	pA[n_ld_add(1)] = 0;
 
-	for( U8 i = 1; i < nL; i++ )
+	for( U8 i = 1; i < n_ld_add(); i++ )
 	{
 		if( pB[i] != '\a' )
 			continue;
@@ -165,15 +449,17 @@ gpcSRC::~gpcSRC() {
 	if( nA )			// ha nA == 0 nm mi foglaltuk
 		gpmDELary(pA);
 	gpmDELary(pALFtg);
-	gpmDELary(pEXE);
+	gpmDELary(pEXE0);
+	gpmDELary(pABI);
 	for( U1 i = 0; i < gpmN(apOUT); i++ )
 		gpmDELary(apOUT[i]);
 
 	gpmDELary(pMINI);
 	//gpmDELary(pBIG);
 	gpmDELary(pMAP);
-
+	gpmDEL(pCORE);
 }
+
 gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) {
 	if( this ?
 				   ( fxyz.x <= 0 ||	fxyz.y <= 0 )
@@ -184,8 +470,8 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 	if( !p1 ) // ki lehet vele kapcsolni a keret rajzolást ha nem kap pointert
 		return this;
 
-	for( I4 r = max(xy.y,0); r < fxyz.y; r++ )
-	for( I4 c = max(xy.x,0) + r*fxyz.z, s = c-xy.x, ce = c+fxyz.x-s; c < ce; c++ )
+	for( I4 r = gpmMAX(xy.y,0); r < fxyz.y; r++ )
+	for( I4 c = gpmMAX(xy.x,0) + r*fxyz.z, s = c-xy.x, ce = c+fxyz.x-s; c < ce; c++ )
 			p1[c] = 0;
 
 	if( bSW&gpeMASSoffMSK )
@@ -193,40 +479,25 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 
 	// UP
 	if( xy.y >= 0 )
-	for( I4 yz = xy.y*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
+	for( I4 yz = xy.y*fxyz.z, c = gpmMAX(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
 	{
 		p1[c].z = fr;
 		p1[c].w |= 0x1;
 	}
-	/*if( pS1 )
-	{
-		I4 yz = xy.y*fxyz.z, c = max(xy.x,0) + yz + 1, ce = yz + fxyz.x - 1, cs = c;
-		while( *pS1 )
-		{
-			p1[c].z = fr;
-			p1[c].w = *pS1;
-			c++;
-			if( c >= ce )
-				break;
-			pS1++;
-		}
-	}*/
 	//DWN
-	for( I4 yz = (fxyz.y-1)*fxyz.z, c = max(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
+	for( I4 yz = (fxyz.y-1)*fxyz.z, c = gpmMAX(xy.x,0) + yz, ce = yz + fxyz.x; c < ce; c++ )
 	{
 		p1[c].z = fr;
 		p1[c].w |= 0x4;
 	}
-
 	// LEFT
-	for( I4 r = max(xy.y,0), rr = max(xy.x,0) + r*fxyz.z ; r < fxyz.y; r++, rr += fxyz.z )
+	for( I4 r = gpmMAX(xy.y,0), rr = gpmMAX(xy.x,0) + r*fxyz.z ; r < fxyz.y; r++, rr += fxyz.z )
 	{
 		p1[rr].z = fr;
 		p1[rr].w |= 0x8;
 	}
-
 	// RIGHT
-	for( I4 r = max(xy.y,0), rr = fxyz.x-1 + r*fxyz.z; r < fxyz.y; r++, rr += fxyz.z )
+	for( I4 r = gpmMAX(xy.y,0), rr = fxyz.x-1 + r*fxyz.z; r < fxyz.y; r++, rr += fxyz.z )
 	{
 		p1[rr].z = fr;
 		p1[rr].w |= 0x2;
@@ -246,9 +517,8 @@ I4x2 gpcSRC::SRCmini(
 						gpcCRS& crs,
 						gpeCLR bg, //gpeCLR fr,
 						gpeCLR ch,
-						bool bNoMini
-					)
-{
+						bool bNoMini, U1 selID	) {
+
 	if( this ?
 				   ( fx <= 0 	||	fy <= 0 )
 				|| ( xy.x >= fx ||	xy.y >= fy )
@@ -266,13 +536,19 @@ I4x2 gpcSRC::SRCmini(
 			bONpre, bSEL = false;
 	I4 nFILL;
 
-	for( U1* pC = pSRCstart( bNoMini ), *pAL = pSRCalloc( bNoMini ) , *pCe = pC+dim.w; pC < pCe; pC++ ) {
+	for( U1	*pC = pSRCstart( bNoMini, selID ),
+			*pAL = pSRCalloc( bNoMini, selID ),
+			*pCe = pC+dim.w;
+
+			pC < pCe;
+
+			pC++	) {
+
 		if( cxy.y >= fy )
 			break;
 		bONpre = bON;
 		cr = cxy.x + cxy.y*zz;
-		//if( this == crs.apSRC[0] )
-		//if( crs.apSRC[0] == crs.apSRC[1] )
+
 		if( b01 == 3 )
 		if( pC-pAL == crs.iSTR.x )
 		{
@@ -383,6 +659,11 @@ I4x2 gpcSRC::SRCmini(
 	return cxy;
 }
 
+///-------------------------------------------------------------
+///
+///                         gpcMASS
+///
+///-------------------------------------------------------------
 gpcMASS::~gpcMASS()
 {
 	gpcSRC** ppS = ppSRC();
@@ -399,8 +680,7 @@ gpcMASS::~gpcMASS()
 }
 
 
-gpcSRC* gpcMASS::SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n )
-{
+gpcSRC* gpcMASS::SRCadd( gpcSRC* pSRC, U4 xfnd, U4& is, U4& n ) {
 	n = is = nLST;
 
 	if( nLST )

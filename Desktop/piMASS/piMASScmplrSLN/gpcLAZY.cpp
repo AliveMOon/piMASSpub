@@ -307,5 +307,7 @@ int gpcLZY::nAT( char* pSat, int nSat, const char* pFILT ) {
 		pSatI+=pAn->y;
 		pAn->y = pSatI-pSat;
 	}
+	pAn = (I8x2*)Ux(nAT,sizeof(*pAn));
+	pAn->y = pSatE-pSat;
 	return nAT;
 }

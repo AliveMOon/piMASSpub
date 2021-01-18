@@ -11,14 +11,14 @@ gpcGL::gpcGL( gpcWIN& win )
 	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
 	if( !gCntxt )
 	{
-		std::cout <<std::endl << "gpcGL init error" <<std::endl;
+		if(bSTDcout){std::cout <<std::endl << "gpcGL init error" <<std::endl;}
 		return;
 	}
 	glewExperimental = GL_TRUE;
 	glewErr = glewInit();
 	if( glewErr != GLEW_OK )
 	{
-		std::cout <<std::endl << "gpcGL GLEW_NOK error" <<std::endl;
+		if(bSTDcout){std::cout <<std::endl << "gpcGL GLEW_NOK error" <<std::endl;}
 		return;
 	}
 
@@ -33,15 +33,15 @@ gpcGL::gpcGL( gpcWIN& win )
 
 	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
 	if( pTXchar )
-		std::cout << "char" << (void*)win.pSRFchar <<std::endl;
+		if(bSTDcout){std::cout << "char" << (void*)win.pSRFchar <<std::endl;}
 	else
-		std::cout << SDL_GetError() <<std::endl;
+		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
 
 	pTXiso = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFiso );
 	if( pTXiso )
-		std::cout << "char" << (void*)win.pSRFiso <<std::endl;
+		if(bSTDcout){std::cout << "char" << (void*)win.pSRFiso <<std::endl;}
 	else
-		std::cout << SDL_GetError() <<std::endl;
+		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
 
 	/*glGenSamplers( 1, aSMPid );
 	glSamplerParameteri(aSMPid[0], GL_TEXTURE_WRAP_S, GL_REPEAT);

@@ -11,15 +11,15 @@ gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pT
 	U8 s;
 	p_out = p_out->lzyFRMT(
 									s = -1,
-									"%s%0.8x %s %s"
+									"%s%s 0x%0.8x %s"
 									" %d %s"
-									" %s %s %s"
+									" HST:%s USR:%s FIL:%s"
 									" %d %d %s"
 									" %d/%d%s",
-									pTAB, socket, s_type, s_ip,
+									pTAB, s_type, socket,  s_ip,
 									port, bGTdie() ? "die" : "live", //(socket < 0) ? "die" : "live"),
                                     sHOST, sUSER, pFILE > sFILE ? (char*)sFILE : "",
-                                    mSEC.x, mSEC.y, bLOOP() ? "LP" : "<>",
+                                    mSEC.x, mSEC.y, bLOOP() ? "LP" : "-",
                                     nSYNdo, nSYNsum,
 									p_enter
 								);
@@ -76,13 +76,17 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 	if( gpmLZYload(pOUT, U1) )
 		return pOUT ? pOUT->n_load : 0;
 
-	if( !gpmLZYload(pPUB, U1) )
+	if( !gpmLZYload(pPUBgt, U1) )
 		return 0;
 
 	gpmDEL( pOUT );
-	pOUT = pPUB;
-	pPUB = NULL;
-
+	if( pOUT = pPUBgt )
+	{
+		pPUBgt = NULL;
+		GTprmpt();
+		if( pINP )
+			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
+	}
 	return pOUT ? pOUT->n_load : 0;
 }
 void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
@@ -349,7 +353,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 				n_row = p_row_end-p_row; // gpdVAN( (char*)p_row, ";\r\n" );
 				n_com = gpdVAN( (char*)p_row, "+-0123456789 \t;\r\n" );
 				if( n_com ){
-					n_cpy = min( n_com, (sizeof(s_com)-1) );
+					n_cpy = gpmMIN( n_com, (sizeof(s_com)-1) );
 					((U1*)gpmMcpyOF( s_com, p_row, n_cpy ))[n_cpy] = 0;
 				} else
 					*s_com = 0;
@@ -475,7 +479,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 						}
 						break;
 					case gpeALF_MSG:{
-							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "msg%0.8x: %s%s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
+							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "msg 0x%0.8x: %s%s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
 						} break;
 					case gpeALF_HELP:
 						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", gpmGTent );
@@ -526,7 +530,24 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							sprintf( s_atrib, "0x%x>", iCNT );
 							pMISo = pWIN->putMINI( pMISo, gpeNET4_0LST, an, s_atrib );
 						} break;
+					case gpeALF_DBG: {
+							U1* pS = (U1*)s_atrib;
+							I8x4 an = 0;
+							U8 nLEN;
+							for( U1 i = 0; i < 2; i++ )
+							{
+								nLEN = gpmNINCS( pS, ": \t\r\n" );
+								pS += nLEN;
+								an.a8x2[i].num = n_atrib - (pS-(U1*)s_atrib);
+								an.a8x2[i] = pS;
+								pS += an.a8x2[i].num;
+								an.a8x2[i].num = gpfSTR2U8( pS, &pS );
+							}
 
+							//= gpfSTR2U8( pSTR, &pSTR ), j = gpfSTR2U8( pSTR, &pSTR );
+							sprintf( s_atrib, "0x%x>", iCNT );
+							pMISo = pWIN->putDBG( pMISo, gpeNET4_0LST, an, s_atrib );
+						} break;
 					case gpeALF_PIC: {
 
 
@@ -604,10 +625,10 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							{
 								U4 iM = zn*U4x2(1,pWIN->mZ);
 								if( U4 xFND = pWIN->pM[iM] )
-								if( gpcSRC* pSRC = pWIN->piMASS->SRCfnd( xFND ) )
+								if( gpcSRC* pSRC = pWIN->piMASS->srcFND( xFND ) )
 								{
 									pA = pSRC->pA;
-									nA = pSRC->nL;
+									nA = pSRC->n_ld_add();
 								}
 							}
 

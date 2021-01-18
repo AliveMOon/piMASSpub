@@ -23,11 +23,11 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 						bSW );
 	if( psHD > gpsHD )
 	{
-		std::cout << gpsHD;
+		if(bSTDcout){std::cout << gpsHD;
 		psHD = gpsHD;
 		psHD[0] = 0;
 	}
-	std::cout << "." <<std::endl ;
+	if(bSTDcout){std::cout << "." <<std::endl ;
 
 	U1	*pPUB = mass.msRST( gpsSTRpub ),
 		*pS = *pB == '\a' ? pB+1 : pB,
@@ -51,7 +51,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
 	bool bABC;
-	std::cout <<std::endl << "ASM:nP:lv tp dc.n iP\r\n";
+	if(bSTDcout){std::cout <<std::endl << "ASM:nP:lv tp dc.n iP\r\n";
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -64,7 +64,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 			pCOUT = NULL;
 
 		if( pCOUT )
-			std::cout << "ASM:" << pCOUT << "\r\n";
+			if(bSTDcout){std::cout << "ASM:" << pCOUT << "\r\n";
 
 		c = *pS;
 		if( bABC = gpmbABC(c, gpaALFsub) )
@@ -98,7 +98,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 			pS += pFND->n_str;
 			switch( pFND->typ )
 			{
-				case gpeALF_COMS: // "/*"
+				case gpeALF_comS: // "/*"
 					if( U1* pCOM = (U1*)strstr( (char*)pS, "*_/" ) )
 					{
 						pS = pCOM+2;
@@ -107,7 +107,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 					}
 					pFND = NULL;
 					continue;
-				case gpeALF_COM: // "//"
+				case gpeALF_com: // "//"
 					pS += gpmVAN( pS, "\r\n", nLEN );
 					pFND = NULL;
 					continue;
@@ -146,8 +146,8 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 "*_/"
 	}
 
-	std::cout <<std::endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
-	std::cout <<std::endl;
+	if(bSTDcout){std::cout <<std::endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
+	if(bSTDcout){std::cout <<std::endl;}
 	nBLD = nVERr;
 }
 */
@@ -165,11 +165,11 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 						bSW );
 	if( psHD > gpsHD )
 	{
-		std::cout << gpsHD;
+		if(bSTDcout){std::cout << gpsHD;
 		psHD = gpsHD;
 		psHD[0] = 0;
 	}
-	std::cout << "." <<std::endl ;
+	if(bSTDcout){std::cout << "." <<std::endl ;
 
 	U1	*pPUB = mass.msRST( gpsSTRpub ),
 		*pS = *pB == '\a' ? pB+1 : pB,
@@ -193,7 +193,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
 	bool 	bABC;
-	std::cout <<std::endl << "ASM:nP:lv tp dc.n iP\r\n";
+	if(bSTDcout){std::cout <<std::endl << "ASM:nP:lv tp dc.n iP\r\n";
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -206,7 +206,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 			pCOUT = NULL;
 
 		if( pCOUT )
-			std::cout << "ASM:" << pCOUT << "\r\n";
+			if(bSTDcout){std::cout << "ASM:" << pCOUT << "\r\n";
 
 		c = *pS;
 		if( bABC = gpmbABC(c, gpaALFsub) )
@@ -240,7 +240,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 			pS += pFND->n_str;
 			switch( pFND->typ )
 			{
-				case gpeALF_COMS: // "/*"
+				case gpeALF_comS: // "/*"
 					if( U1* pCOM = (U1*)strstr( (char*)pS, "*_/" ) )
 					{
 						pS = pCOM+2;
@@ -249,7 +249,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 					}
 					pFND = NULL;
 					continue;
-				case gpeALF_COM: // "//"
+				case gpeALF_com: // "//"
 					pS += gpmVAN( pS, "\r\n", nLEN );
 					pFND = NULL;
 					continue;
@@ -287,8 +287,8 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 
 	}
 
-	std::cout <<std::endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
-	std::cout <<std::endl;
+	if(bSTDcout){std::cout <<std::endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
+	if(bSTDcout){std::cout <<std::endl;}
 	nBLD = nVERr;
 }
 */

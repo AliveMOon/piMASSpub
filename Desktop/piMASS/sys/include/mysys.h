@@ -3,7 +3,7 @@
 #ifndef MYSYS_H_INCLUDED
 #define MYSYS_H_INCLUDED
 
-#define gpdSYSpi
+//#define gpdSYSpi
 //#define gpdSYSubi
-//#define gpdSYSwin
+#define gpdSYSwin
 #endif // piMASS_H_INCLUDED

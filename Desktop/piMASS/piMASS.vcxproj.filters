@@ -103,6 +103,24 @@
     <ClCompile Include="src\gpccrs_rdy.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="gpcI8x2.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcSRCdbg.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcSRClnk.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcSRCprnt.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpcSRCrun.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="gpCORE.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camU.h">
@@ -142,6 +160,9 @@
       <Filter>Includes</Filter>
     </ClInclude>
     <ClInclude Include="UIF1248etc.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="gpeTYP.h">
       <Filter>Includes</Filter>
     </ClInclude>
   </ItemGroup>

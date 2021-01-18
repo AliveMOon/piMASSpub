@@ -70,6 +70,88 @@ U4x4 gpaROBwr[] = {
 	{ 	0x40A,  refROB.nWu2,	20000, refROB.nRu2	},
 };
 
+/*gpcDrc::gpcDrc( const gpcZS& zs, U4 nm )
+{
+	if( nm != NMnDIF.au4x2[0].x )
+		format( nm );
+	*this = zs;
+}*/
+gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
+	/// DEBUG célból készült nem igazán használható másra
+	gpmCLR;
+	iXYZ.xyz_(a);
+	tXYZ.xyz_(b);
+
+	oXYZ.xyz_( (tXYZ+iXYZ)/2 );
+
+	txyz.xyz_(c);
+
+	I4x4	iR = (iXYZ-txyz).xyz0(),
+			tR = (tXYZ-txyz).xyz0(),
+			oR = (oXYZ-txyz).xyz0();
+
+	I4	iRr = sqrt(iR.qlen_xyz())/0x100,
+		oRr = sqrt(oR.qlen_xyz())/0x100,
+		tRr = sqrt(tR.qlen_xyz())/0x100;
+
+	oXYZ.xyz_( (oR*tRr)/oRr + txyz );
+
+	if(bSTDcout){std::cout << "iR   " << iR.pSTR( pbuff ) << "iRr " << iRr << std::endl;}
+	if(bSTDcout){std::cout << "tR   " << tR.pSTR( pbuff ) << "tRr " << tRr << std::endl;}
+	if(bSTDcout){std::cout << "oR   " << oR.pSTR( pbuff ) << "oRr " << oRr << std::endl;}
+	if(bSTDcout){std::cout << "a    " << a.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oXYZ " << oXYZ.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tXYZ " << tXYZ.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << std::endl;}
+
+
+	iABC.ABC_( F4(  0, 30, 45 )*degX(1) );
+	tABC.ABC_( F4( 90, 90, 90 )*degX(1) );
+
+	oABC.ABC_( iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) )/2 + iABC );
+
+	F4x4	iMX, tMX, oMX;
+	float ab = 0.5;
+	iMX.mxABC(iABC, degX(180.0/PI) );
+	oMX.mxABC(oABC, degX(180.0/PI) );
+	tMX.mxABC(tABC, degX(180.0/PI) );
+	//oMX = iMX.lerp_zyx( tMX, ab );
+
+	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << std::endl;}
+
+	if(bSTDcout){std::cout << "iX   " << iMX.x.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "iY   " << iMX.y.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "iZ   " << iMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+
+	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+
+	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+
+    iABC.ABC_( iMX.eulABC()*degX(180.0/PI) );
+    tABC.ABC_( oMX.eulABC()*degX(180.0/PI) );
+	//tABC.ABC_( tMX.eABC()*degX(180.0/PI) );
+
+	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl << std::endl;}
+
+	tMX.mxABC(tABC, degX(180.0/PI) );
+	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+
+	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << std::endl;}
+}
 
 gpcROB& gpcROB::operator &= ( const gpcDrc& D )
 {
@@ -81,7 +163,7 @@ gpcROB& gpcROB::operator = ( const gpcDrc& D )
 {
 	null();
 	gpmMcpyOF( aXYZ,	&D.oXYZ.x, 3 );
-	gpmMcpyOF( aABC,	&D.oABC.x, 3 );
+	gpmMcpyOF( aABC,	&D.oABC.A, 3 );
 	HS = D.oCTRL.y;
 	if( D.bHS1o() )
 		COM = D.oCTRL.z;
@@ -94,8 +176,7 @@ gpcROB::gpcROB( const gpcDrc& D ) {
 	gpmCLR;
 	*this = D;
 }
-void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
-{
+void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )
 		return;
@@ -104,10 +185,9 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 		return GTslmpBINref( mom, pWIN, pALL );*/
 
 	//, nPAD = gpdZSpad, nPADu2 = nPAD/sizeof(U2);
-	gpcMASS& mass = *(pWIN->piMASS);
-	gpcGT* pGTusr = NULL;
-	gpcLZY	*pLZYinp = mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
-			//*pLZYout = mass.GTlzyALL.LZY( gpdGTlzyIDref(TnID) ),
+	gpcMASS	*pMASS = pWIN->piMASS;
+	gpcGT	*pGTusr = NULL;
+	gpcLZY	*pLZYinp = pMASS->GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
 			*pLZYusr = NULL,
 			*pLZYdead = NULL;
 	gpcROBnD *pROBnD = gpmLZYvali( gpcROBnD, pLZYinp );
@@ -116,6 +196,8 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 			*pU2inp = pROBnD->pU2inp();
 
 	SOCKET	*pSOCK;
+	char sANSW[0x100], *pANSW = sANSW, sCOM[] = "ABCD";
+
 	U4 nSOCK, nD0 = 0, iD0 = 0, eD0, iDRC;
 	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
 	if( pSTR )
@@ -176,8 +258,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 
 		/// ERROR?
 		pROBnD->ioSW.aU2[0] = gpfSTR2U8( gpmMcpy(pW,pD0,4)-2, NULL );
-		if( pROBnD->iWR() && !pROBnD->ioSW.aU2[0] )
-		{
+		if( pROBnD->iWR() && !pROBnD->ioSW.aU2[0] ) {
 			// olvastunk && nincsen hiba
 			/// Good!
 			pU2 = pU2io = pROBnD->pROBioU2();
@@ -189,25 +270,57 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 					iD0 < eD0; iD0 +=4, pU2++ )
 				*pU2 = gpfSTR2U8( gpmMcpy(pW,pD0+iD0,4)-2, NULL );
 
-			if( iD0 > 4 )
-			{
+			if( iD0 > 4 ) {
 				iDRC = pROBnD->iDrc();
+				I4x4	befPOS = pROBnD->aDrc[iDRC].iXYZ,
+						befABC = pROBnD->aDrc[iDRC].iABC;
+
 				// nem fecsegés, hanem adat
 				pROBnD->aDrc[iDRC] = pROBnD->ioROB();
 				pROBnD->aDrc[iDRC].msSMR2.w = pWIN->mSEC.x;
+
+
+				I4	dPOS = (pROBnD->aDrc[iDRC].iXYZ-befPOS).qlen_xyz(),
+					dABC = befABC.mmABC( pROBnD->aDrc[iDRC].iABC, degX(180.0/PI), degX(180.0/PI) ).w;
+				if( dPOS+(dABC>=(degX(1)/2)) ) {
+					pANSW += pROBnD->aDrc[iDRC].answINFOX( pANSW, iDRC, 100 );
+					if( sANSW < pANSW ) {
+						pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+						if( !pSOCK ) {
+							pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+							pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+							nSOCK = gpmLZYload( pLZYusr, SOCKET );
+						}
+
+						for( U4 iS = 0; iS < nSOCK; iS++ ) {
+							pGTusr = pALL->GT( pSOCK[iS] );
+							if( pGTusr->bGTdie() )
+								continue;
+							pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1,	//"\r\n %d."
+																			"%s",
+																			//pGTusr->iCNT,
+																			sANSW );
+							pGTusr->GTback();
+						}
+					}
+				}
+
+
+
 				pROBnD->stpPULL();
 				if( pROBnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pROBnD->pull( pOUT, gpaROBwr );
 			}
 
-		} else {
+		}
+		else {
 			/// error
 			if( pALL ) {
 				/// üzenet a felhasználóknak
 				pSOCK = gpmLZYvali( SOCKET, pLZYusr );
 				if( !pSOCK )
 				{
-					pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+					pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 					pSOCK = gpmLZYvali( SOCKET, pLZYusr );
 					nSOCK = gpmLZYload( pLZYusr, SOCKET );
 				}
@@ -274,6 +387,9 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 	/// Drc judo filter
 	/// ---------------------------------
 	iD0 = pROBnD->stpPUSH( true );
+	I4x4	befPOS = pROBnD->aDrc[iD0].iXYZ,
+			befABC = pROBnD->aDrc[iD0].iABC;
+
 
 	U4x4& JD = pROBnD->aDrc[iD0].JD;
 	U4 JDy = JD.y;
@@ -285,64 +401,85 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 						pROBnD->aROBio[iD0*2]
 						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x )
 					); // pA-ban azaz új out lesz
+
 	if( JDy == JD.y )
 	{
+
 		pOUT = pROBnD->pull( pOUT, gpaROBwr );
 		return;
 	}
-	char sANSW[0x100], *pANSW = sANSW, sCOM[] = "ABCD";
+
+
 	U4& comA = *(U4*)sCOM, msg = JDy+JD.y*0x10;
 	comA = pROBnD->aDrc[iD0].NMnDIF.au4x2[0].x;
-	I4x4 iXYZ = pROBnD->aDrc[iD0].iXYZ;
 	switch( msg )
 	{
 		case 0x04:
-			pANSW += sprintf( pANSW, "%s %0.2x END HS2i off! HS2o off!", sCOM, msg  );
-			break;
 		case 0x10:
-			pANSW += sprintf( pANSW, "%s %0.2x START HS1o on!", sCOM, msg  );
-			break;
 		case 0x11:
-			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS1i on??", sCOM, msg  );
-			break;
 		case 0x21:
-			pANSW += sprintf( pANSW, "%s %0.2x HS1i on! HS1o off!", sCOM, msg  );
-			break;
 		case 0x33:
-			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i on?", sCOM, msg  );
-			break;
 		case 0x40:
 		case 0x41:
-			pANSW += sprintf( pANSW, "%s %0.2x ON maradt a HS2!", sCOM, msg  );
-			break;
 		case 0x43:
-			pANSW += sprintf( pANSW, 	"%s %0.2x HS2i on!  HS2o on!"
-										" Error:%d"
-										" POS: %0.2fmm %0.2fmm %0.2fmm ",
-										sCOM, msg, //JD.x,
-										JD.z,
-										double(iXYZ.x)/mmX(1),
-										double(iXYZ.y)/mmX(1),
-										double(iXYZ.z)/mmX(1)
-										 );
-			break;
 		case 0x44:
-			pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i off?", sCOM, msg  );
+			pANSW += pROBnD->aDrc[iD0].answINFOX( pANSW, iD0, 100 );
 			break;
+		default:
 
+			break;
 	}
-	if( sANSW < pANSW )
-	{
-		pSOCK = gpmLZYvali( SOCKET, pLZYusr );
-		if( !pSOCK )
+	if( sANSW == pANSW ) {
+
+		I4x4 iXYZ = pROBnD->aDrc[iD0].iXYZ;
+		switch( msg )
 		{
-			pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+			case 0x04:
+				pANSW += sprintf( pANSW, "%s %0.2x END HS2i off! HS2o off!", sCOM, msg  );
+				break;
+			case 0x10:
+				pANSW += sprintf( pANSW, "%s %0.2x START HS1o on!", sCOM, msg  );
+				break;
+			case 0x11:
+				pANSW += sprintf( pANSW, "%s %0.2x Wait! HS1i on??", sCOM, msg  );
+				break;
+			case 0x21:
+				pANSW += sprintf( pANSW, "%s %0.2x HS1i on! HS1o off!", sCOM, msg  );
+				break;
+			case 0x33:
+				pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i on?", sCOM, msg  );
+				break;
+			case 0x40:
+			case 0x41:
+				pANSW += sprintf( pANSW, "%s %0.2x ON maradt a HS2!", sCOM, msg  );
+				break;
+			case 0x43:
+				pANSW += sprintf( pANSW, 	"%s %0.2x HS2i on!  HS2o on!"
+											" Error:%d"
+											" POS: %0.2fmm %0.2fmm %0.2fmm ",
+											sCOM, msg, //JD.x,
+											JD.z,
+											double(iXYZ.x)/mmX(1),
+											double(iXYZ.y)/mmX(1),
+											double(iXYZ.z)/mmX(1)
+											 );
+				break;
+			case 0x44:
+				pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i off?", sCOM, msg  );
+				break;
+
+		}
+	}
+
+	if( sANSW < pANSW ) {
+		pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+		if( !pSOCK ) {
+			pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 			pSOCK = gpmLZYvali( SOCKET, pLZYusr );
 			nSOCK = gpmLZYload( pLZYusr, SOCKET );
 		}
 
-		for( U4 iS = 0; iS < nSOCK; iS++ )
-		{
+		for( U4 iS = 0; iS < nSOCK; iS++ ) {
 			pGTusr = pALL->GT( pSOCK[iS] );
 			if( pGTusr->bGTdie() )
 				continue;
@@ -457,109 +594,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL )
 ///-------------------------------------
 ///              - REF -
 ///-------------------------------------
-
-/*gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR ) {
-	U8 s = -1, nLEN;
-	U4 n = gpmSTRLEN( pSTR );
-	if( this ? !n : true )
-		return pANS->lzyFRMT( s, "nonsens" );
-	U1* pEND = pSTR+n, *pCOM;
-	I8x2 an;
-	U1 sCOM[] = "ABCD";
-	U4& com = *(U4*)sCOM, iCin, iCou;
-	U2 nU2, *pU2i = NULL, *pU2o = NULL;
-	gpcLZY	*pLZYinp = NULL,
-			*pLZYout = NULL,
-			*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
-	U4 iSOCK = 0, nSOCK = 0;
-	if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
-	{
-        nSOCK = gpmLZYload(pLZYusr,sockUSR);
-        for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
-        {
-			if( pSOCK[iSOCK] != sockUSR )
-				continue;
-
-			break;
-        }
-	}
-	if( iSOCK >= nSOCK )
-	{
-		pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
-		iSOCK = nSOCK;
-		nSOCK = gpmLZYload(pLZYusr,sockUSR);
-	}
-
-	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ) )
-	{
-		pCOM = pSTR;
-		an.num = pEND-pSTR;
-		an = pCOM;
-		if( an.num )
-		{
-			com = *(U4*)pCOM;
-			pSTR += an.num;
-			if( !pLZYinp )
-				pLZYinp=mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) );
-
-			if( pU2i = (U2*)pLZYinp->p_alloc )
-			for( iCin = 17, nU2 = pLZYinp->n_load/sizeof(U2); iCin < nU2; iCin+=8 )
-			{
-				if( *(U4*)(pU2i+iCin) == com )
-					break;	// iCin menjen végig
-			}
-
-			if( iCin >= nU2 )
-			{
-				iCou = iCin = nU2;
-				// nem vol egyáltalán
-				pU2o = (U2*)(pLZYout->pVALID(pLZYinp,pU2o));
-				if( !pU2o )
-					pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp));
-
-				if( pU2o )
-				for( iCou = 17, nU2 = pLZYout->n_load/sizeof(U2); iCou < nU2; iCou+=8 )
-				{
-					if( pU2o[iCou] ? *(U4*)(pU2o+iCou) == com : true )
-						break;
-				}
-			}
-
-			if( iCou > iCin )
-				iCou = iCin;
-
-			if( !pU2o )
-				pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp));
-
-			if( pU2o )
-				*(U4*)(pU2o+iCou) = com;
-
-		} else
-			pSTR += gpmVAN( pSTR, " \t\a\r\n;", nLEN );
-
-		switch( an.alf )
-		{
-			case gpeALF_FORMAT:
-				gpmZnOF( pU2o, nU2 );
-				break;
-
-			case gpeALF_HELO:
-			case gpeALF_HELLO:
-				return pANS->lzyFRMT( s = -1, "Hello! %d", iCou );
-			case gpeALF_HELP:
-				return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iCou );
-			case gpeALF_LINE:
-				return pANS->lzyFRMT( s = -1, "Line.txt %d", iCou );
-			case gpeALF_JOIN:
-				return pANS->lzyFRMT( s = -1, "Join.txt %d", iCou );
-			default:
-				return pANS->lzyFRMT( s = -1, " %d %s", iCou, sCOM );
-				*(U4*)(pU2o+iCou) = 0;
-				break;
-		}
-	}
-    return pANS->lzyFRMT( s, "ok" );
-}*/
 void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )
@@ -873,25 +907,6 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 			nLEN = pD000->nLEN;
 			pU2inp = (U2*)pLZYinp->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc;
 			gpmMcpy( pU2inp, pD000->pCPY(), nLEN );
-			/*for( U4 i = 0; i < nLEN; i+=4 )
-			{
-				gpmMcpyOF( pW, pD000+i, 4 );
-				pU2inp[i>>2] = gpfSTR2U8( sWORD, NULL );
-				if( i ? true : !pU2inp[i>>2] )
-					continue;
-				switch( pU2inp[i>>2] )
-				{
-					case 0xc050:
-						// ASCII-ból binárisba lett kapcsolva
-						aGTcrs[1] = 's';
-						aGTcrs[0] = '0'; // NEM ASCII
-
-						pOUT = pOUT->lzyADD( gpaSLMPbin[1], sizeof(gpaSLMPbin[1], s = -1 );
-						gpmDEL(pINP);
-						return;
-				}
-				break;
-			}*/
 
 			nSUB += pD000->iEndCD()+nLEN;
 			iCNT++;

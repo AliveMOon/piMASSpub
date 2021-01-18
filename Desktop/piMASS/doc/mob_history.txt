@@ -1,0 +1,547 @@
+    1  git
+    2  sudo apt install git-all
+    3  reboot
+    4  raspivid
+    5  sudo apt update
+    6  sudo apt upgrade
+    7  sudo apt install chromium
+    8  sudo apt install doublecmd-qt
+    9  pibootctl status
+   10  sudo pibootctl status
+   11  sudo apt install pibootctl
+   12  sudo apt install rpibootctl
+   13  sudo apt install pibootctl
+   14  sudo apt install openssh-server
+   15  sudo apt install sshguard
+   16  notepad
+   17  leafpad
+   18  sudo pluma
+   19  sudo apt instal chromium
+   20  sudo apt-get install chromium-browser
+   21  sudo apt install build-essential
+   22  sudo apt codeblocks
+   23  sudo apt install codeblocks
+   24  cd Asztal/
+   25  git clone https://github.com/AliveMOon/piMASSpub.git
+   26  ls
+   27  cd raspicam-0.1.6/
+   28  ls
+   29  mkdir build
+   30  cd build
+   31  sudo apt install cmake
+   32  cmake ..
+   33  make
+   34  sudo make install
+   35  sudo ldconfig
+   36  sudo ./raspicam_test
+   37  ls
+   38  cd utils
+   39  ls
+   40  sudo ./raspicam_test
+   41  pip install pibootctl
+   42  sudo apt-get install libx11-dev
+   43  sudo apt install pibootctl
+   44  sudo pibootctl save cam
+   45  sudo apt install wiringpi
+   46  sudo apt-get install libjpeg-dev
+   47  sudo apt-get install libxi-dev
+   48  sudo apt-get install libx11-dev
+   49  sudo apt-get install libxi-dev
+   50  udo apt-get install libgl1-mesa-dev -y
+   51  udo apt-get install libgl1-mesa-dev 
+   52  sudo apt-get install libgl1-mesa-dev -y
+   53  sudo apt-get install libglu1-mesa-dev -y
+   54  sudo apt-get install libx11-dev -y
+   55  sudo apt-get install libxi-dev -y
+   56  sudo apt-get install libgl1-mesa-dev -y
+   57  sudo apt-get install libglu1-mesa-dev -y
+   58  sudo apt-get install libxrandr-dev -y
+   59  sudo apt-get install libxext-dev -y
+   60  sudo apt-get install libxcursor-dev -y
+   61  sudo apt-get install libxinerama-dev -y
+   62  sudo apt-get install libxi-dev -y 
+   63  sudo apt-get install libglew-dev -y 
+   64  sudo apt install libsdl2-dev libsdl2-2.0-0 -y
+   65  sudo apt install libjpeg9-dev libwebp-dev libtiff5-dev libsdl2-image-dev libsdl2-image-2.0-0 -y
+   66  sudo apt install libmikmod-dev libfishsound1-dev libsmpeg-dev liboggz2-dev libflac-dev libfluidsynth-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 -y
+   67  sudo apt install libfreetype6-dev libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y
+   68  sudo apt install codeblocks
+   69  codeblocks
+   70  sudo doublecmd
+   71  pibootctl status
+   72  bootctl status
+   73  cd Asztal/
+   74  git clone https://github.com/s4mu313/MMALPP.git
+   75  cd MMALPP
+   76  mkdir build && cd build
+   77  cmake ..
+   78  make
+   79  make install
+   80  sudo make install
+   81  ls
+   82  sudo pluma
+   83  cd ~/Asztal/
+   84  git clone https://github.com/glfw/glfw
+   85  sudo apt-get install xorg-dev
+   86  ls
+   87  cd glfw
+   88  ls
+   89  ls src
+   90  mkdir build
+   91  cd build
+   92  cmake ..
+   93  ls
+   94  make
+   95  sudo make install
+   96  cd ~/Asztal/
+   97  ls
+   98  raspistill -o ize.jpg
+   99  git clone https://github.com/raspberrypi/firmware
+  100  ls
+  101  cd firmware/
+  102  ls
+  103  cd opt
+  104  ls
+  105  cd vc
+  106  raspistill -o ize.jpg
+  107  sudo raspistill -o ize.jpg
+  108  cd ~/piMASS
+  109  cd ~/piMASS/
+  110  ls
+  111  cd ~/Asztal/piMASS/
+  112  ls
+  113  cd piMASScmplrSLN
+  114  ls
+  115  ls bin
+  116  ls bin/debug
+  117  ls bin/Debug
+  118  ./bin/Debug/piMASS 
+  119  sudo ./bin/Debug/piMASS 
+  120  cd ~/Asztal/raspicam/simpletest_raspicam/
+  121  ls
+  122  mkdir
+  123  mkdir build
+  124  ls
+  125  cd build
+  126  cmake ..
+  127  make
+  128  ls
+  129  cmake ..
+  130  raspivid
+  131  sudo raspivid
+  132  sudo raspivid -p
+  133  sudo raspivid -p<0,0,640,480>
+  134  sudo raspivid -p0,0,640,480
+  135  sudo raspivid -p 0,0,640,480
+  136  sudo add-apt-repository ppa:waveform/pibootctl
+  137  sudo apt install pibootctl
+  138  pibootctl
+  139  pibootctl status
+  140  ldconfig -p | grep libmmal
+  141  sudo pluma
+  142  git clone https://github.com/cedricve/raspicam.git
+  143  cd raspicam
+  144  ls
+  145  mkdir build
+  146  cd build
+  147  cmake ..
+  148  make
+  149  sudo make install
+  150  modprobe bcm2835-v4l2
+  151  sudo vcgencmd get_camera
+  152  cd ~/Asztal
+  153  raspistill -o test.jpg
+  154  sudo raspistill -o test.jpg
+  155  ldconfig -p | grep libmmal
+  156  git clone https://github.com/raspberrypi/userland.git
+  157  ls
+  158  cd userland
+  159  ls
+  160  ./buildme 
+  161  sudo ./buildme 
+  162  ls
+  163  cd build
+  164  ls
+  165  cmake -DCMAKE_BUILD_TYPE=release -DARM64=ON ../
+  166  make -j8
+  167  sudo make install
+  168  cmake -DCMAKE_BUILD_TYPE=debug -DARM64=ON ../
+  169  make
+  170  sudo make install
+  171  sudo doublecmd
+  172  sudo pulm
+  173  sudo pluma
+  174  pibootctl status
+  175  vcgencmd measure_temp
+  176  sudo vcgencmd measure_temp
+  177  cpu=$(</sys/class/thermal/thermal_zone0/temp)
+  178  echo "$((cpu/1000)) c"
+  179  cpu=$(</sys/class/thermal/thermal_zone0/temp)
+  180  echo "$((cpu/1000)) c"
+  181  plum
+  182  plumb
+  183  plump
+  184  pluma
+  185  sudo raspivid
+  186  sudo raspivid -p 0 0 640 480
+  187  sudo raspivid -p 0,0,640,480
+  188  sudo pluma
+  189  sudo raspivid -p 0,0,640,480
+  190  sudo double
+  191  cd Asztal/
+  192  ls
+  193  cd userland
+  194  ls
+  195  sudo pluma CMakeLists.txt 
+  196  cd build
+  197  ls
+  198  cmake ..
+  199  make
+  200  sudo make install
+  201  cd /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/bin/dwn/
+  202  ls
+  203  ./piMASS
+  204  ls
+  205  sudo ./piMASS
+  206  sudo chmod 777 /dev/vchiq
+  207  sudo plumba
+  208  sudo pluma
+  209  cd ../Debug
+  210  ls
+  211  sudo piMASS
+  212  sudo piMASS 
+  213  sudo ./piMASS
+  214  ls ../../
+  215  sudo piMASS ../../rob.mass
+  216  sudo ./piMASS ../../rob.mass
+  217  sudo plumba
+  218  sudo pluma
+  219  ls
+  220  ./temp
+  221  ./temp.sh
+  222  sudo ./temp.sh
+  223  bash temp.sh
+  224  temp.sh
+  225  ./temp.sh
+  226  raspistill -o ize2.jpg
+  227  pluma
+  228  v4l2-ctl --device /dev/video0 --all
+  229  sudo v4l2-ctl --device /dev/video0 --all
+  230  sudo apt-get install -y v4l-utils
+  231  sudo v4l2-ctl --device /dev/video0 --all
+  232  sudo v4l2-ctl --device /dev/video1 --all
+  233  sudo v4l2-ctl --device /dev/video3 --all
+  234  sudo v4l2-ctl --device /dev/video0 --all
+  235  xrandr
+  236  ls
+  237  temp.sh
+  238  ./temp.sh
+  239  sudo plumba
+  240  sudo pluma
+  241  ./temp.sh
+  242  sudo ./temp.sh
+  243  ./temp.sh
+  244  history
+  245  ./temp.sh
+  246  pluma
+  247  sudo pluma
+  248  sudo gnome-firmware
+  249  ./temp.sh
+  250  temp.sh
+  251  sudo ./temp.sh
+  252  pluma
+  253  sudo pluma
+  254  ifconfig
+  255  sudo ifconfig
+  256  sudo apt install net-tools
+  257  ifconfig
+  258  reboot
+  259  sudo service smbd stop
+  260  sudo service smbd restart
+  261  sudo smbpasswd -a alivemoon
+  262  sudo service smbd start
+  263  whereis samba
+  264  sudo service smbd restart
+  265  sudo apt install samba
+  266  sudo service smbd stop
+  267  sudo service smbd restart
+  268  sudo service smbd stop
+  269  sudo service smbd restart
+  270  ifconfig
+  271  sudo pluma
+  272  sudo smbpasswd -a alivemoon
+  273  sudo service smbd stop
+  274  sudo service smbd restart
+  275  sudo pluma
+  276  sudo service smbd stop
+  277  sudo service smbd restart
+  278  sudo pluma
+  279  sudo ln /var/www/html/ ~/Asztal/piMASS/piMASScmplrSLN/HTML/rob/
+  280  sudo ln /var/www/html ~/Asztal/piMASS/piMASScmplrSLN/HTML/rob
+  281  sudo ln -s /var/www/html /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/HTML/rob
+  282  sudo doublecmd
+  283  ls -la
+  284  ls
+  285  ls -la /var/www/
+  286  ls -la /var/www/html
+  287  ls -la /var/www/ | grep "\->"
+  288  ls -la /var/www/ 
+  289  find . -type l -ls
+  290  ls -l 
+  291  ls -l /var/
+  292  ls -l /var/www
+  293  ls -l /var/www/html
+  294  ls -l ./Asztal/piMASS/piMASScmplrSLN/HTML/rob/html 
+  295  rm /var/www/html
+  296  sudo rm /var/www/html
+  297  sudo rm /var/www/html/
+  298  ls -l ./Asztal/piMASS/piMASScmplrSLN/HTML/rob/html 
+  299  sudo rm -i /var/www/html/
+  300  sudo rm -f /var/www/html/
+  301  sudo rm -f /var/www/html
+  302  ls /var/www/html
+  303  sudo unlink /var/www/html
+  304  ls /var/www/html
+  305  sudo rm  /var/www/html/index.html
+  306  ls /var/www/html
+  307  ls -l ./Asztal/piMASS/piMASScmplrSLN/HTML/rob/html 
+  308  sudo rm  /var/www/html
+  309  sudo unlink  /var/www/html
+  310  sudo unlink  /var/www/html/index.html
+  311  sudo rm  /var/www/html
+  312  sudo rm -i /var/www/html
+  313  sudo rm -d /var/www/html
+  314  ls -l ./Asztal/piMASS/piMASScmplrSLN/HTML/rob/html 
+  315  ls -l ./Asztal/piMASS/piMASScmplrSLN/HTML/rob
+  316  sudo unlink  /var/www/html
+  317  sudo unlink  html
+  318  ls -l ./Asztal/piMASS/piMASScmplrSLN/HTML/rob
+  319  cd ./Asztal/piMASS/piMASScmplrSLN/HTML/rob
+  320  ls
+  321  unlink html
+  322  ls
+  323  ls -l ./Asztal/piMASS/piMASScmplrSLN/HTML/rob
+  324  ls -l
+  325  ln ./Asztal/piMASS/piMASScmplrSLN/HTML/rob/index.html /var/www/html/index.html
+  326  ls -l
+  327  ln -s ./Asztal/piMASS/piMASScmplrSLN/HTML/rob/index.html /var/www/html/index.html
+  328  ln -s "./Asztal/piMASS/piMASScmplrSLN/HTML/rob/" /var/www/html/
+  329  ls -l
+  330  ln -s "./Asztal/piMASS/piMASScmplrSLN/HTML/rob" "/var/www/html"
+  331  sudo ln -s "~/Asztal/piMASS/piMASScmplrSLN/HTML/rob" "/var/www/html"
+  332  ls -l
+  333  cd ..
+  334  ls -l
+  335  sudo ln -s "~/Asztal/piMASS/piMASScmplrSLN/HTML/rob/index.html" "/var/www/html/index.html"
+  336  sudo ln -s "/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/HTML/rob/" "/var/www/html/"
+  337  sudo ln -s "/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/HTML/rob" "/var/www/html"
+  338  sudo smbpasswd -a pi
+  339  sudo smbuser -a pi
+  340  sudo smbpasswd -a alivemoon
+  341  sudo pdbedit -L -v
+  342  samba-tool user list
+  343  sudo samba-tool user list
+  344  useradd pi
+  345  sudo useradd pi
+  346  passwd enter
+  347  passwd pi
+  348  sudo passwd pi
+  349  adduser pi
+  350  sudo adduser pi
+  351  sudo smbpasswd -a pi
+  352  sudo pluma
+  353  sudo service smb restart
+  354  sudo service samba restart
+  355  history
+  356  sudo service smbd restart
+  357  sudo ln -s /var/www/html/ /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/HTML/rob/
+  358  sudo ln /var/www/html/ /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/HTML/rob/
+  359  sudo ln -s /var/www/html/index.html /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/HTML/rob/index.html
+  360  ls -l
+  361  ls
+  362  ls /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/HTML/rob/
+  363  touch test
+  364  ls
+  365  ls -l
+  366  cd test
+  367  cd /var
+  368  ls
+  369  cd www
+  370  ls
+  371  sudo rm html
+  372  ls
+  373  sudo pluma
+  374  ping 192.168.1.90
+  375  sudo pluma
+  376  reboot
+  377  pluma
+  378  df -h
+  379  df
+  380  sudo pluma
+  381  history
+  382  pluma
+  383  sudo service smbd stop
+  384  sudo service smbd restart
+  385  lsdev
+  386  sudo lsdev
+  387  lsusb
+  388  dmesg
+  389  dmesg|tail
+  390  cls
+  391  clr
+  392  fndmnt
+  393  findmnt
+  394  df
+  395  sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
+  396  ls /robo
+  397  cd /robo
+  398  ls
+  399  telnet localhost 6001
+  400  wget
+  401  subo pluma
+  402  subo plumb
+  403  sudo pluma
+  404  reboot
+  405  sudo apt install codeblocks-contrib
+  406  telnet localhost 6001
+  407  screen
+  408  sudo screen
+  409  mc
+  410  sudo apt install mc
+  411  mc
+  412  history
+  413  raspivid -o test.h264
+  414  usermod -a -G video timepi
+  415  usermod -a -G video alivemoon
+  416  sudo usermod -a -G video alivemoon
+  417  raspivid -o test.h264
+  418  usermod -a -G video alivemoon
+  419  raspivid -o test.h264
+  420  sudo chmod 777 /dev/vchiq
+  421  raspivid -o test.h264
+  422  sudo plumb
+  423  sudo pluma
+  424  raspivid -o test.h264
+  425  echo "bcm2835-v4l2" | sudo tee >> /etc/modules
+  426  echo "bcm2835-v4l2" | sudo tee -a /etc/modules
+  427  raspivid -o test.h264
+  428  vcgencmd get_camera
+  429  raspivid -o test.h264
+  430  userland
+  431  sudo apt install vlc
+  432  sudo pluma
+  433  free -m
+  434  sudo base -c “echo ‘start_x=1’ >> /boot/config.txt”
+  435  sudo base -c “echo ‘start_x=1’ >> /boot/firmware/config.txt”
+  436  reboot
+  437  sudo cd /usr/share/mime
+  438  cd /usr/share/mime
+  439  grep <i>extension</i> *
+  440  sudo doublecmd
+  441  sudo cp /home/alivemoon/Asztal/piMASScmplrSLNpi4/bin/Debug/ /usr/sbin/pimass
+  442  sudo cp ~sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/ /usr/sbin/pimass/Asztal/piMASScmplrSLNpi4/bin/Debug/ /usr/sbin/pimass
+  443  sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/ /usr/sbin/pimass
+  444  sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/piMASS /usr/sbin/pimass
+  445  ls
+  446  cd Asztal/
+  447  ls
+  448  cd piMASScmplrSLNpi4
+  449  ls
+  450  pimass zero.mass
+  451  ls *.mass
+  452  pimass rob.mass
+  453  rob.mass
+  454  pimass rob.mass
+  455  sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/piMASS /usr/sbin/pimass
+  456  sudo doublecmd
+  457  reboot
+  458  sudo pluma
+  459  reboot
+  460  sudo apt install minicom
+  461  minicom -D /dev/ttyS0
+  462  cd ~/Asztal/
+  463  ls
+  464  cd piMASScmplrSLNpi4
+  465  ls
+  466  cd SIM7X00-Driver/
+  467  ls
+  468  sudo chmod 777 -R ./
+  469  ls
+  470  cd ..
+  471  ls
+  472  cd SIM7X00/
+  473  ls
+  474  cd Raspberry/
+  475  ls
+  476  cd c
+  477  ls
+  478  sh sim7600_4G_hat_init
+  479  sudo chmod 777 -R ~/Asztal/piMASScmplrSLNpi4
+  480  sh sim7600_4G_hat_init
+  481  sudo sh sim7600_4G_hat_init
+  482  minicom -D /dev/ttyS0
+  483  ifconfig
+  484  sudo pluma
+  485  reboot
+  486  sudo doublecmd
+  487  ls
+  488  code
+  489  ls
+  490  logout
+  491  minicom -D /dev/ttyS0
+  492  sudo minicom -D /dev/ttyS0
+  493  reeboot
+  494  reboot
+  495  cd ~/Asztal/piMASScmplrSLNpi4
+  496  ls
+  497  cd SIM7X00/
+  498  ls
+  499  cd Raspberry/
+  500  ls
+  501  cd c
+  502  ls
+  503  sim7600_4D_hat_init
+  504  sh sim7600_4D_hat_init
+  505  sudo sh sim7600_4D_hat_init
+  506  echo "4" > /sys/class/gpio/export
+  507  sudo echo "4" > /sys/class/gpio/export
+  508  ls
+  509  minicom
+  510  sudo apt install minicom
+  511  minicom -D /dev/ttyS0
+  512  sudo minicom -D /dev/ttyS0
+  513  ls
+  514  lsusb
+  515  lsuart
+  516  dmesg
+  517  dmesg | grep tty
+  518  $ ttyS0
+  519  ls
+  520  cd Letöltések/
+  521  wget https://project-downloads.drogon.net/wiringpi-latest.deb
+  522  ls
+  523  sudo dpkg -i wiringpi-latest.deb
+  524  sudo apt-get install wiringpi
+  525  gpio -v
+  526  gpio readall
+  527  sudo gpio readall
+  528  gpio -v
+  529  cd ..
+  530  cd Asztal/
+  531  git clone git://git.drogon.net/wiringPi
+  532  git clone https://github.com/WiringPi/WiringPi.git
+  533  ls
+  534  cd WiringPi/
+  535  ls
+  536  ./build
+  537  sudo ldconfig
+  538  ls -l /dev
+  539  sudo pluma
+  540  ls -l /dev
+  541  sudo pluma
+  542  history
+  543  cd Asztal/piMASScmplrRPI4
+  544  cd Asztal/piMASScmplrSLNpi4
+  545  ls
+  546  cd doc
+  547  history > mob_history.txt

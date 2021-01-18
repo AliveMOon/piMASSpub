@@ -719,7 +719,7 @@ public:
             {
 				if( !( xFND = pM[i] ) )
 					continue;
-				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
 				if( !pSRC )
 					continue;
 				pNUM = sBUFF+gpfALF2STR( sBUFF, (i%z)+1 );
@@ -772,7 +772,7 @@ public:
 				if( !( xFND = pM[i] ) )
 					continue;
 
-				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
 				if( !pSRC )
 					continue;
 				pNUM = sBUFF+gpfALF2STR( sBUFF, an.x+1 );
@@ -825,14 +825,14 @@ public:
 				if( !( xFND = pM[i] ) )
 					continue;
 
-				gpcSRC* pSRC = piMASS->SRCfnd( xFND );
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
 				if( !pSRC )
 					continue;
 				pNUM = sBUFF+gpfALF2STR( sBUFF, an.x+1 );
 				sprintf( (char*)pNUM, "%d\t", an.y );
                 pLZY = pLZY->lzyFRMT( s=-1, "%s%s: "
 											gpdPUB
-											"\r\n%s\r\n", n ? "" : "\r\n", sBUFF, (char*)pSRC->pSRCstart( false ) );
+											"\r\n%s\r\n", n ? "" : "\r\n", sBUFF, (char*)pSRC->pSRCstart( false, 4 ) );
                 n++;
 
             }
@@ -841,6 +841,61 @@ public:
 
             return pLZY->SYNrdy(b);
 		}
+
+		gpcLZY* putDBG( gpcLZY* pLZY, gpeNET4 nt4, I8x4 an, char* pPRMPT = NULL ) {
+			if( !this )
+				return pLZY;
+			U4x2 zn;
+			U4* pM = piMASS->pM( zn );
+			if( !pM )
+				return pLZY;
+			I8x4 lurdZN = an;
+			if( lurdZN.x && !lurdZN.z )
+				lurdZN.a8x2[1] = lurdZN.a8x2[0];
+			else
+				lurdZN = an.lurd();
+
+			if( lurdZN.x > 0 )
+				lurdZN.x--;
+			else
+				lurdZN = I8x4( 0, 0, zn.x, zn.y );
+
+			U8 i = 0, j = zn.area(), b = -1, s;
+
+            gpcSYNC syn( nt4, 0, mSEC.x, INVALID_SOCKET, 0 );
+			pLZY = pLZY->lzyADD( &syn, sizeof(syn), b );
+
+            U4 xFND, n = 0, z = zn.x;
+            U1 sBUFF[0x20], *pNUM;
+            for( ; i < j; i++ )
+            {
+				an.x = i%z;
+				an.y = i/z;
+				if( an.x < lurdZN.x || an.y < lurdZN.y )
+					continue;
+				if( an.x >= lurdZN.z || an.y > lurdZN.w )
+					continue;
+
+				if( !( xFND = pM[i] ) )
+					continue;
+
+				gpcSRC* pSRC = piMASS->srcFND( xFND );
+				if( !pSRC )
+					continue;
+				pNUM = sBUFF+gpfALF2STR( sBUFF, an.x+1 );
+				sprintf( (char*)pNUM, "%d\t", an.y );
+                pLZY = pLZY->lzyFRMT( s=-1, "%s%s: "
+											gpdPUB
+											"\r\n%s\r\n", n ? "" : "\r\n", sBUFF, (char*)pSRC->pSRCstart( false, 2 ) );
+                n++;
+
+            }
+			if( pPRMPT )
+				pLZY = pLZY->lzyFRMT( s=-1, "\r\n%s", pPRMPT );
+
+            return pLZY->SYNrdy(b);
+		}
+
 		bool bINI_hst_usr() {
 			if( !this )
 				return false;
@@ -851,7 +906,11 @@ public:
 			}
 			if( pUSER <= sUSER )
 			{
+#ifdef _WIN64
+				char* pU = getenv("USER");
+#else
 				char* pU = getlogin();
+
 				if( !pU )
 				{
 					struct passwd *pw = getpwuid(getuid());
@@ -859,6 +918,7 @@ public:
 					if( pU ? *pU == '/' : false )
 						pU++;
 				}
+#endif
 
 				//__uid_t id = getuid();
 				//pCOMP +=
@@ -958,7 +1018,7 @@ public:
 		I4x2& winWHpx() {
 			return winDIVpx.a4x2[1];
 		}
-		void	WINrun( const char* pWELLCOME );
+		void	winRUN( const char* pWELLCOME );
 		bool	WINvar( gpcREG& out, gpeALF alf );
 
 };

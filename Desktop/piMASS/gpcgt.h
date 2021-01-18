@@ -23,6 +23,7 @@
 //~ SOFTWARE.
 
 #include "gpcpic.h"
+#include "sim7x00.h"
 
 #define gpmGTent (sGTent[0]?(char*)sGTent:"\r\n")
 
@@ -205,7 +206,8 @@ public:
 	{
 		return !(*this == b);
 	}
-	bool async( char* pBUFF, gpcALU& alu, gpcRES* pRES );
+	//bool async( char* pBUFF, gpcALU& alu, gpcRES* pRES );
+	bool asyncSYS( char* pBUFF, U1* pCLI );
 
 	gpcDrc& format( U4 nm = 0 ) {
 		U4 nn = gpmOFF(gpcDrc,n_trd);
@@ -260,7 +262,12 @@ public:
 				|(bHS2i()<<0x0c)|(bHS2o()<<0x08)
 				|(bHS3i()<<0x04)|(bHS3o());
 	}
-	gpcLZY* answSTAT( gpcLZY* pANS, U1 id );
+	int		answINFO( char*		pANS, U4 id );
+	gpcLZY* answINFO( gpcLZY* 	pANS, U4 id );
+	gpcLZY* answSTAT( gpcLZY* 	pANS, U4 id, char* pPP = "//" );
+
+	int		answINFOX( char*	pANS, U4 id, I4 x );
+	gpcLZY* answINFOX( gpcLZY*	pANS, U4 id, I4 x );
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
 	bool bHS1o() const { return !!(oCTRL.y&ZShs1);	}
@@ -298,10 +305,10 @@ public:
 	bool jdPRGstp( U4 mSEC );
 
 	gpcDrc& judo( gpcROB& iR, U4 mSEC );
+	gpcDrc& JUDO( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)
-class gpcROBnD
-{
+class gpcROBnD {
 	public:
 		U4x4	pc,
 				ioSW;
@@ -698,30 +705,6 @@ public:
 		return *this;
 	}
 	gpcHUD* put( const void* p_void, I8 n_byte);
-	/*{
-		if( p_void ? !n_byte : true )
-			return this;
-		if(!this)
-		{
-			gpcHUD* p_this = new gpcHUD;
-			if(!p_this)
-				return NULL;
-			return p_this->put(p_void, n_byte);
-		}
-		if( p_alloc )
-		{
-			U1	*p_kill = p_alloc;
-			p_alloc = new U1[n+n_byte];
-			memcpy( p_alloc, p_kill, n );
-			memcpy( p_alloc+n, p_void, n_byte );
-			n += n_byte;
-			gpmDELary(p_kill);
-			return this;
-		}
-		n = n_byte;
-		p_alloc = (U1*)memcpy( new U1[n+(0x10-(n%0x10))], p_void, n );
-		return this;
-	}*/
 
 };
 
@@ -741,7 +724,7 @@ public:
 		if( FD_ISSET( s, &fdS ) )
 		{
 			nFD++;
-			maxSCK = max( maxSCK, s );
+			maxSCK = gpmMAX( maxSCK, s );
 		}
 		return nFD;
 	}
@@ -790,7 +773,7 @@ class gpcGT
 		SOCKADDR_IN	*p_ai, addr_in;
 		gpcGTall	GTacc;
 
-		gpcLZY		*pPUB,
+		gpcLZY		*pPUBgt,
 					*pINP, *pMISi,
 					*pEVENT,
 					*pSYNgt;
@@ -857,6 +840,7 @@ class gpcGT
 			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
 			return true;
 		}
+
 		gpcLZY* GTback()
 		{
 			if( !this )
@@ -886,7 +870,7 @@ class gpcGT
 			if( this )
 			{
 				GTacc.clr();
-				gpmDEL( pPUB );
+				gpmDEL( pPUBgt );
 				gpmDEL( pOUT ); gpmDEL( pMISo );
 				gpmDEL( pINP ); gpmDEL( pMISi );
 				gpmDEL( pDWN );
@@ -909,8 +893,9 @@ class gpcGT
 			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
-		I8		GTcnct( gpcWIN& win ); //, gpcGTall& acpt );
-		I8		GTlst( gpcWIN& win, gpcGTall& );
+		I8		GTgsm( gpcWIN* pWIN );
+		I8		GTcnct( gpcWIN* pWIN ); //, gpcGTall& acpt );
+		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );
 		U1		GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff );
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );

@@ -1,4 +1,6 @@
 #include "piMASS.h"
+extern U1 gpaALFsub[];
+extern char gpaALF_H_sub[];
 char	gps_lzy_pub1[1024*0x100];
 gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 {
@@ -12,17 +14,20 @@ gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 	return lzyADD( (U1*)gps_lzy_pub1, n, iSTRT );
 }
 static const char* gpasADDR[] = {
-	"%0.2x|",
-	"%0.4x|",
-	"%0.8x|",
-	"%0.16llx|",
+	"0x%0.2x|",
+	"0x%0.4x|",
+	"0x%0.8x|",
+	"0x%0.16llx|",
 	"//%0.2x|",
 	"//%0.4x|",
 	"//%0.8x|",
 	"//%0.16llx|",
+	"%S0x%0.2x|",
+	"%S0x%0.4x|",
+	"%S0x%0.8x|",
+	"%S0x%0.16llx|",
 };
-gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN )
-{
+gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN ) {
 	if( nBIN ? !pBIN : true )
 		return this;
 
@@ -69,9 +74,7 @@ gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
-
-gpcLZY* gpcLZY::lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN )
-{
+gpcLZY* gpcLZY::lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN ) {
 	if( nBIN ? !pBIN : true )
 		return this;
 
@@ -118,8 +121,7 @@ gpcLZY* gpcLZY::lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
-gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN )
-{
+gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN, bool bCOM ) {
 	if( nBIN ? !pBIN : true )
 		return this;
 
@@ -129,13 +131,14 @@ gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN )
 		if( !pTHIS )
 			return NULL;
 
-		return pTHIS->lzyHEXw( iSTRT, pBIN, nBIN );
+		return pTHIS->lzyHEXl( iSTRT, pBIN, nBIN, bCOM );
 	}
 
 	iSTRT = n_load;
 	U8 s;
 
-	U1 nLOG = log2( nBIN )/8+4;
+	U1 nLOG = log2( nBIN )/8+(bCOM?4:0);
+
 	char sLINE[0x400], *pLINE = sLINE, *pADDR;
 	//pLINE += sprintf( pLINE, "\"\r\n");
 	for( U4 i = 0, j, je; i < nBIN; i += 16 )
@@ -148,9 +151,9 @@ gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN )
 				pLINE += sprintf( pLINE, "         " );
 				continue;
 			}
-			pLINE += sprintf( pLINE, "%0.8x ", *(U4*)(pBIN+j) );
+			pLINE += sprintf( pLINE, "0x%0.8x ", *(U4*)(pBIN+j) );
 		}
-		pLINE += sprintf( pLINE, "|" );
+		pLINE += sprintf( pLINE, "//" );
 		for( j = i, je = j+16; j < je; j++ )
 		{
 			if( j >= nBIN )
@@ -166,8 +169,7 @@ gpcLZY* gpcLZY::lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN )
 	lzyFRMT( s = -1, "\r\n%s", sLINE );
 	return this;
 }
-U4 gpcLZY::tree_fnd( U4 id, U4& n )
-{
+U4 gpcLZY::tree_fnd( U4 id, U4& n ) {
 	if( !this )
 		return n = 0;
 
@@ -180,8 +182,7 @@ U4 gpcLZY::tree_fnd( U4 id, U4& n )
 
 	return n;
 }
-gpcLZY* gpcLZY::tree_add( U4 id, U4& n )
-{
+gpcLZY* gpcLZY::tree_add( U4 id, U4& n ) {
 	U8 s = -1;
 	if( !this )
 	{
@@ -204,8 +205,7 @@ gpcLZY* gpcLZY::tree_add( U4 id, U4& n )
 	return this;
 }
 
-U8 gpcLZY::tree_fnd( U8 id, U8& n )
-{
+U8 gpcLZY::tree_fnd( U8 id, U8& n ) {
 	if( !this )
 		return n = 0;
 
@@ -218,8 +218,7 @@ U8 gpcLZY::tree_fnd( U8 id, U8& n )
 
 	return n;
 }
-gpcLZY* gpcLZY::tree_add( U8 id, U8& n )
-{
+gpcLZY* gpcLZY::tree_add( U8 id, U8& n ) {
 	U8 s = -1;
 	if( !this )
 	{
@@ -242,8 +241,7 @@ gpcLZY* gpcLZY::tree_add( U8 id, U8& n )
 	return this;
 }
 
-I8 gpcLZY::tree_fnd( I8 id, I8& n )
-{
+I8 gpcLZY::tree_fnd( I8 id, I8& n ) {
 	if( !this )
 		return n = 0;
 
@@ -256,8 +254,7 @@ I8 gpcLZY::tree_fnd( I8 id, I8& n )
 
 	return n;
 }
-gpcLZY* gpcLZY::tree_add( I8 id, I8& n )
-{
+gpcLZY* gpcLZY::tree_add( I8 id, I8& n ) {
 	U8 s = -1;
 	if( !this )
 	{
@@ -279,4 +276,38 @@ gpcLZY* gpcLZY::tree_add( I8 id, I8& n )
 	n_load = s*sizeof(*p_i84);
 	return this;
 }
+int gpcLZY::nAT( char* pSat, int nSat, const char* pFILT ) {
+	if( this ? !pSat : true )
+		return 0;
+	if( !nSat ) {
+		nSat = gpmSTRLEN(pSat);
+		if( !nSat )
+			return 0;
+	}
 
+	U8 nUTF8;
+	int nAT = 0;
+	I8x2* pAn;
+	char* pSatI = pSat, *pSatE = pSat+nSat, aN[]=" ";
+	for( 	pSatI += gpmNINCS(pSatI,pFILT);
+			pSatI < pSatE;
+			pSatI += gpmNINCS(pSatI,pFILT), nAT++ ) {
+
+		if( !*pSatI )
+			break;
+
+		pAn = (I8x2*)Ux(nAT,sizeof(*pAn));
+		pAn->y = pSatE-pSatI;
+		*pAn = pSatI;
+		if( !pAn->alf ) {
+			nAT--;
+			pSatI += gpfABCvan( (U1*)pSatI, (U1*)pSatE, nUTF8, gpaALFsub );
+			continue;
+		}
+		pSatI+=pAn->y;
+		pAn->y = pSatI-pSat;
+	}
+	pAn = (I8x2*)Ux(nAT,sizeof(*pAn));
+	pAn->y = pSatE-pSat;
+	return nAT;
+}
