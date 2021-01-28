@@ -1,6 +1,7 @@
 #include "gpcSRC.h"
 #include "gpccrs.h"
 U1 gpaALFsub[0x100];
+U1 gpaALFsub2[0x100];
 char gpaALF_H_sub[0x100];
 char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
 		gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
@@ -23,9 +24,14 @@ U1* gpf_aALF_init( void ) {
 		}
 		gpaALFsub[i] = 0;
 	}
+	gpmMcpy( gpaALFsub2, gpaALFsub, sizeof(gpaALF_H_sub) );
 	gpmMcpy( gpaALF_H_sub, gpaALFsub, sizeof(gpaALF_H_sub) );
-	gpaALF_H_sub['#'] = ('#'-'E')+('A'-1);
-	gpaALF_H_sub['_'] = ('_'-'E')+('A'-1);
+	gpaALFsub2['+']		= ('+'-'E')+('A'-1);
+	gpaALFsub2['\"']	= ('\"'-'E')+('A'-1);
+	gpaALFsub2[',']		= (','-'E')+('A'-1);
+
+	gpaALF_H_sub['#']	= ('#'-'E')+('A'-1);
+	gpaALF_H_sub['_']	= ('_'-'E')+('A'-1);
 	return gpaALFsub;
 }
 gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {

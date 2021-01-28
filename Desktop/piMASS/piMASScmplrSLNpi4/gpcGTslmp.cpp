@@ -70,12 +70,6 @@ U4x4 gpaROBwr[] = {
 	{ 	0x40A,  refROB.nWu2,	20000, refROB.nRu2	},
 };
 
-/*gpcDrc::gpcDrc( const gpcZS& zs, U4 nm )
-{
-	if( nm != NMnDIF.au4x2[0].x )
-		format( nm );
-	*this = zs;
-}*/
 gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	/// DEBUG célból készült nem igazán használható másra
 	gpmCLR;

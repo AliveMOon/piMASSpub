@@ -1,5 +1,6 @@
 #include "piMASS.h"
 extern U1 gpaALFsub[];
+extern U1 gpaALFsub2[];
 extern char gpaALF_H_sub[];
 char	gps_lzy_pub1[1024*0x100];
 gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
@@ -284,11 +285,10 @@ int gpcLZY::nAT( char* pSat, int nSat, const char* pFILT ) {
 		if( !nSat )
 			return 0;
 	}
-
 	U8 nUTF8;
 	int nAT = 0;
 	I8x2* pAn;
-	char* pSatI = pSat, *pSatE = pSat+nSat, aN[]=" ";
+	char* pSatI = pSat, *pSatE = pSat+nSat; //sN[]=" ";
 	for( 	pSatI += gpmNINCS(pSatI,pFILT);
 			pSatI < pSatE;
 			pSatI += gpmNINCS(pSatI,pFILT), nAT++ ) {
@@ -300,8 +300,30 @@ int gpcLZY::nAT( char* pSat, int nSat, const char* pFILT ) {
 		pAn->y = pSatE-pSatI;
 		*pAn = pSatI;
 		if( !pAn->alf ) {
+
+			pSatI += gpfABCvan( (U1*)pSatI, (U1*)pSatE, nUTF8, gpaALFsub2 );
+			switch( *pSatI ){
+				case 0:
+					pSatI = pSatE;
+					break;
+				case '+':
+					pSatI++;
+					pAn->alf = gpeALF_PLUS;
+					pAn->y = pSatI-pSat;
+					continue;
+				case '\"':
+					pSatI++;
+					pAn->alf = gpeALF_MRK;
+					pAn->y = pSatI-pSat;
+					continue;
+				case ',':
+					pSatI++;
+					pAn->alf = gpeALF_CM;
+					pAn->y = pSatI-pSat;
+					continue;
+				default: break;
+			}
 			nAT--;
-			pSatI += gpfABCvan( (U1*)pSatI, (U1*)pSatE, nUTF8, gpaALFsub );
 			continue;
 		}
 		pSatI+=pAn->y;

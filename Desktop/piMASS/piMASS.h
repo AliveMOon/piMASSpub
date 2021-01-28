@@ -415,6 +415,8 @@ public:
 #define zsOU (zsIN+zsIO)
 #define zsOU100 mmX(zsOU)
 
+
+#define gpfVnN( d, v ) gpfVANnNINCS( (U1*)(d), (U1*)(v))
 double inline gpfRAMADZSAN( double a, double b )
 {
 	if(a==0.0)
@@ -3994,14 +3996,13 @@ public:
 		return p_buff-p_begin;
 	}
 
-
+	int alfFND( gpeALF af, int n );
 };
 
 
 class I8x4 {
 public:
-    union
-    {
+    union {
         struct {
             I8 x,y,z,w;
         };
@@ -4047,46 +4048,39 @@ public:
 
 
     I8x4(){};
-    I8x4( I8 _x, I8 _y = 0, I8 _z = 0, I8 _w = 0 )
-    {
+    I8x4( I8 _x, I8 _y = 0, I8 _z = 0, I8 _w = 0 ) {
         x = _x; y = _y; z = _z; w = _w;
     }
-    I8x4( const I8x2& xy, const I8x2& zw )
-    {
+    I8x4( const I8x2& xy, const I8x2& zw ) {
         a8x2[0] = xy;
         a8x2[1] = zw;
     }
     I8x4( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; };
     I8x4& operator = ( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; return *this; };
 
-    I8x4& operator += ( const I8x4& b )
-    {
+    I8x4& operator += ( const I8x4& b ) {
 		a8x2[0] += b.a8x2[0];
 		a8x2[1] += b.a8x2[1];
 		return *this;
     }
-    I8x4& operator -= ( const I8x4& b )
-    {
+    I8x4& operator -= ( const I8x4& b ) {
 		a8x2[0] -= b.a8x2[0];
 		a8x2[1] -= b.a8x2[1];
 		return *this;
     }
 
-	I8x4& operator += ( const I4x4& b )
-    {
+	I8x4& operator += ( const I4x4& b ) {
 		a8x2[0] += b.a4x2[0];
 		a8x2[1] += b.a4x2[1];
 		return *this;
     }
-    I8x4& operator -= ( const I4x4& b )
-    {
+    I8x4& operator -= ( const I4x4& b ) {
 		a8x2[0] -= b.a4x2[0];
 		a8x2[1] -= b.a4x2[1];
 		return *this;
     }
 
-    I8x4& operator *= ( I8 b )
-    {
+    I8x4& operator *= ( I8 b ) {
 		if( !b )
 		{
 			gpmCLR;
@@ -4100,8 +4094,7 @@ public:
         w *= b;
         return *this;
     }
-    I8x4& operator /= ( I8 b )
-    {
+    I8x4& operator /= ( I8 b ) {
 		if( !b )
 		{
 			x = y = z = w = 0x7FFFffffFFFFffff;
@@ -4115,8 +4108,7 @@ public:
         w /= b;
         return *this;
     }
-    I8x4& operator %= ( I8 b )
-    {
+    I8x4& operator %= ( I8 b ) {
 		if( !b )
 		{
 			x = y = z = w = 0x7FFFffffFFFFffff;
@@ -4133,20 +4125,17 @@ public:
         w %= b;
         return *this;
     }
-    I8x4& operator = ( U8 b )
-    {
+    I8x4& operator = ( U8 b ) {
 		gpmCLR;
         x = gpmMIN( b, 0x7FFFffffFFFFffff );
 		return *this;
     }
-    I8x4& operator = ( I8 b )
-    {
+    I8x4& operator = ( I8 b ) {
         gpmCLR;
         x = b;
 		return *this;
     }
-    I8x4& null( void )
-	{
+    I8x4& null( void ) {
 		gpmCLR;
 		return *this;
 	}
@@ -4187,60 +4176,47 @@ public:
 	I8x4 operator / ( const I8 b ) const { return I8x4( a8x2[0]/b, a8x2[1]/b ); }
 
 
-	I8 operator * ( const I8x4& b ) const
-	{
+	I8 operator * ( const I8x4& b ) const {
 		return x*b.x + y*b.y + z*b.z + w*b.w;
 	}
-	I8x4 operator & ( const I8x4& b ) const
-	{
+	I8x4 operator & ( const I8x4& b ) const {
 		return I8x4( x*b.x, y*b.y, z*b.z, w*b.w );
 	}
-	I8x4 operator + ( const I8x4& b ) const
-	{
+	I8x4 operator + ( const I8x4& b ) const {
 		return I8x4( a8x2[0]+b.a8x2[0], a8x2[1]+b.a8x2[1] );
 	}
-	I8x4 operator - ( const I8x4& b ) const
-	{
+	I8x4 operator - ( const I8x4& b ) const {
 		return I8x4( a8x2[0]-b.a8x2[0], a8x2[1]-b.a8x2[1] );
 	}
-	I8x4 operator / ( const I8x4& b ) const
-	{
+	I8x4 operator / ( const I8x4& b ) const {
 		return I8x4( a8x2[0]/b.a8x2[0], a8x2[1]/b.a8x2[1] );
 	}
-	I8x4 operator % ( const I8x4& b ) const
-	{
+	I8x4 operator % ( const I8x4& b ) const {
 		return I8x4( a8x2[0]%b.a8x2[0], a8x2[1]%b.a8x2[1] );
 	}
 
-	I8x4 operator & ( const I4x2& b ) const
-	{
+	I8x4 operator & ( const I4x2& b ) const {
 		return I8x4( a8x2[0]&b, a8x2[1]&b );
 	}
-	I8x4 operator + ( const I4x2& b ) const
-	{
+	I8x4 operator + ( const I4x2& b ) const {
 		return I8x4( a8x2[0]+b, a8x2[1]+b );
 	}
-	I8x4 operator - ( const I4x2& b ) const
-	{
+	I8x4 operator - ( const I4x2& b ) const {
 		return I8x4( a8x2[0]-b, a8x2[1]-b );
 	}
-	I8x4 operator / ( const I4x2& b ) const
-	{
+	I8x4 operator / ( const I4x2& b ) const {
 		return I8x4( a8x2[0]/b, a8x2[1]/b );
 	}
-	I8x4 operator % ( const I4x2& b ) const
-	{
+	I8x4 operator % ( const I4x2& b ) const {
 		return I8x4( a8x2[0]%b, a8x2[1]%b );
 	}
 
 
 
-    I8 tree_add( gpeALF alf, I8 n_t )
-    {
+    I8 tree_add( gpeALF alf, I8 n_t ) {
 		return tree_add( (I8)alf, n_t );
     }
-    I8 tree_add( I8 i8, I8 n_t )
-	{
+    I8 tree_add( I8 i8, I8 n_t ) {
 		// x érték, y mama, z kicsiegyenlõ, w nagyobb
 		this[n_t].null().x = i8;
 		if( !n_t )
@@ -4275,12 +4251,10 @@ public:
 		}
 		return n_t;
 	}
-	I8 tree_fnd( gpeALF alf, I8 n_t )
-    {
+	I8 tree_fnd( gpeALF alf, I8 n_t ) {
 		return tree_fnd( (I8)alf, n_t );
     }
-	I8 tree_fnd( I8 i8, I8 n_t )
-	{
+	I8 tree_fnd( I8 i8, I8 n_t ) {
 		// figyelem/WARNING
 		// visza térési érték, az, ameddig eljutott a fában
 		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
@@ -4305,8 +4279,7 @@ public:
 		}
 		return n_t;
 	}
-	I8x4 lurd( void )
-	{
+	I8x4 lurd( void ) {
 		// left - up - right - down
 		I8x4  lurd = *this;
 		if( x > z )
@@ -4321,12 +4294,10 @@ public:
 		}
 		return lurd;
 	}
-	I8x4 abs( void ) const
-	{
+	I8x4 abs( void ) const {
 		return I8x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z, w<0 ? -w: w );
 	}
-	I8x4 abs0( void ) const
-	{
+	I8x4 abs0( void ) const {
 		return I8x4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z );
 	}
 
@@ -4334,8 +4305,7 @@ public:
 	{
 		return I8x4( a8x2[0].abs(), a8x2[1].abs() );
 	}*/
-	I8x2 mx()
-	{
+	I8x2 mx() {
 		I8x2 o(x,(I8)0);
 		if( o.x < y )
 		{
@@ -4354,8 +4324,7 @@ public:
 		}
 		return o;
 	}
-	I8x2 mn()
-	{
+	I8x2 mn() {
 		I8x2 o(x,(I8)0);
 		if( o.x > y )
 		{
@@ -5613,6 +5582,13 @@ typedef enum gpeAT:U4{
 	gpeAT_clip,
 	gpeAT_ring,
 	gpeAT_miss,
+	gpeAT_voice,
+	gpeAT_call,
+	gpeAT_begin,
+	gpeAT_end,
+	gpeAT_mrk,
+	gpeAT_creg,
+
 
 	gpeAT_noQ,
 	gpeAT_okQ,
@@ -5622,6 +5598,13 @@ typedef enum gpeAT:U4{
 	gpeAT_clipQ,
 	gpeAT_ringQ,
 	gpeAT_missQ,
+	gpeAT_voiceQ,
+	gpeAT_callQ,
+	gpeAT_beginQ,
+	gpeAT_endQ,
+	gpeAT_mrkQ,
+	gpeAT_cregQ,
+
 
 	gpeAT_noP,
 	gpeAT_okP,
@@ -5631,6 +5614,13 @@ typedef enum gpeAT:U4{
 	gpeAT_clipP,
 	gpeAT_ringP,
 	gpeAT_missP,
+	gpeAT_voiceP,
+	gpeAT_callP,
+	gpeAT_beginP,
+	gpeAT_endP,
+	gpeAT_mrkP,
+	gpeAT_cregP,
+
 
 	gpeAT_noA,
 	gpeAT_okA,
@@ -5640,6 +5630,13 @@ typedef enum gpeAT:U4{
 	gpeAT_clipA,
 	gpeAT_ringA,
 	gpeAT_missA,
+	gpeAT_voiceA,
+	gpeAT_callA,
+	gpeAT_beginA,
+	gpeAT_endA,
+	gpeAT_mrkA,
+	gpeAT_cregA,
+
 
 	gpeAT_noPP,
 	gpeAT_okPP,
@@ -5649,6 +5646,14 @@ typedef enum gpeAT:U4{
 	gpeAT_clipPP,
 	gpeAT_ringPP,
 	gpeAT_missPP,
+	gpeAT_voicePP,
+	gpeAT_callPP,
+	gpeAT_beginPP,
+	gpeAT_endPP,
+	gpeAT_mrkPP,
+	gpeAT_cregPP,
+
+
 	gpeAT_N,
 } gpeAT;
 class gpcLZY {

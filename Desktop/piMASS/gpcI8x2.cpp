@@ -2,7 +2,15 @@
 
 
 extern U1 gpaALFsub[];
-
+int I8x2::alfFND( gpeALF af, int n ) {
+	I8x2* pAT = this;
+	for( int iAT = 0; iAT < n; iAT++ ) {
+		if( pAT[iAT].alf != af )
+			continue;
+		return iAT;
+	}
+	return n;
+}
 I8x2& I8x2::operator = ( const U1* pS )
 {
 	if( num ? ( pS ? !*pS : true ) : true )

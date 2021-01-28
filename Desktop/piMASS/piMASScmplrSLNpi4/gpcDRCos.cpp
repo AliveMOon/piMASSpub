@@ -115,8 +115,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id )
 }
 
 static char gpsJDprgPUB[0x100];
-bool gpcDrc::jdPRGstp( U4 mSEC )
-{
+bool gpcDrc::jdPRGstp( U4 mSEC ) {
 	// ha létre jött mozgá hagyja végre hajtani
 	if( oCTRL.z )
 		return false;

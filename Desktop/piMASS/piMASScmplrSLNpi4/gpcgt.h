@@ -217,8 +217,8 @@ public:
 			return *this;
 
 		NMnDIF.x = nm;
-		iXYZ = oXYZ = tXYZ = I4x4( 400,  0,	300+400,	gpeZS_POS0)&I4x2(mmX(1),1).xxxy();
-		iABC = oABC = tABC = I4x4( 180,  0, 90,			gpeZS_DIR0)&I4x2(degX(1),1).xxxy();
+		iXYZ = oXYZ = tXYZ = I4x4( 500,  0,	50+300+400,	gpeZS_POS0)&I4x2(mmX(1),1).xxxy();
+		iABC = oABC = tABC = I4x4( 180,  0, -45,		gpeZS_DIR0)&I4x2(degX(1),1).xxxy();
 		iXYZ.w = gpeZS_iPOS;
 		iABC.w = gpeZS_iDIR;
 		oXYZ.w = gpeZS_oPOS;
