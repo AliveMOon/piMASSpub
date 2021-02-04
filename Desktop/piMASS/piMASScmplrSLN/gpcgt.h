@@ -809,16 +809,13 @@ class gpcGT
 				sFILE[0x100],
 				*pHOST, *pUSER, *pFILE;
 
-		bool bTEL()
-		{
+		bool bTEL() {
 			return !(mSEC.x&mSEC.y);
 		}
-		bool bLOOP()
-		{
+		bool bLOOP() {
 			return bSW&2;
 		}
-		bool bGTdie()
-        {
+		bool bGTdie() {
             if( !this )
                 return true;
             if( socket == INVALID_SOCKET )
@@ -841,8 +838,7 @@ class gpcGT
 			return true;
 		}
 
-		gpcLZY* GTback()
-		{
+		gpcLZY* GTback() {
 			if( !this )
 				return NULL;
 			// ott van felette
@@ -894,6 +890,8 @@ class gpcGT
 			return this;
 		}
 		I8		GTgsm( gpcWIN* pWIN );
+		I8		GTgsm3( gpcWIN* pWIN );
+		I8		GTgsm2( gpcWIN* pWIN );
 		I8		GTcnct( gpcWIN* pWIN ); //, gpcGTall& acpt );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );

@@ -1,0 +1,67 @@
+- INIT - REG -+IDLE+- WAIT - BEGI - CHAT - END  pS:
+AT+CSQ
++CSQ: 10,99
+
+OK
+
+RING
+
++CLIP: "+36203946481",145,,,,0
+
+0.at2 1.+3 2.csq6 3.+10 4.csq13 5.,18 6.ok26 7.ring35 8.+41 9.clip45 10."48
+ 11.+49 12."61
+ 13.,66 nAT:14
+- INIT - REG -+IDLE+- WAIT - BEGI - CHAT - END  pS:
+CSQ: 10,99
+
+OK
+
+RING
+
++CLIP: "+36203946481",145,,,,0
+
+0.csq3 1.,8 2.ok16 3.ring25 4.+31 5.clip35 6."38
+ 7.+39 8."51
+ 9.,56 nAT:10
+
+
+
+
+
+
+
+
+
+AT+CSQ
++CSQ: 10,99
+
+OK
+
+RING
+
++CLIP: "+36203946481",145,,,,0
+
+MISSED_CALL: 11:13PM +36203946481
+
++SMS FULL
+
+0.at2 1.+3 2.csq6 3.+10 4.csq13 5.,18 6.ok26 7.ring35 8.+41 9.clip45 10."48
+ 11.+49 12."61
+ 13.,66 14.missed80 15.call85 16.pm94 17.+96 18.+112 19.sms115 20.full120 nAT:21
+- INIT - REG -+IDLE+- WAIT - BEGI - CHAT - END  pS:
+CSQ: 10,99
+
+OK
+
+RING
+
++CLIP: "+36203946481",145,,,,0
+
+MISSED_CALL: 11:13PM +36203946481
+
++SMS FULL
+
+0.csq3 1.,8 2.ok16 3.ring25 4.+31 5.clip35 6."38
+ 7.+39 8."51
+ 9.,56 10.missed70 11.call75 12.pm84 13.+86 14.+102 15.sms105 16.full110 nAT:17
+

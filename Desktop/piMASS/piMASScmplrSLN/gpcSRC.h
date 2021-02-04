@@ -310,7 +310,13 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false ) {
 
 	return pS-pU;
 }
-
+inline U8 gpfVANnNINCS( const U1* pSTR, const U1* pVAN ) {
+	U8 nLEN;
+	U1* pS = (U1*)pSTR;
+	pS += gpfVAN( pS, pVAN, nLEN );
+	pS += gpmNINCS( pS, pVAN );
+	return pS-pSTR;
+}
 inline U4x2 lenMILL( U4x2 pos, U4x4&crn, U1* pUi, U1* pUie ) {
 	for( ; pUi < pUie; pUi++ )
 	{
@@ -536,20 +542,20 @@ U8 inline gpfSTR2U8( void* pV, void* ppV = NULL ) {
 		*(char**)ppV = p_str;
 	return u8;
 }
-I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL ) {
+I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL, bool bHEX = false ) {
 	if( !pV )
 		return 0;
 
 	char *p_str = (char*)pV;
 	U8 nLEN;
-	int n0 = gpmVAN(p_str, "+-0123456789xXbBdD", nLEN ), n1;
+	int n0 = gpmVAN(p_str, (bHEX ? "+-0123456789aAbBcCdDeEfF": "+-0123456789xXbBdD"), nLEN ), n1;
 	if( pSTOP ) {
 		n1 = gpmVAN(p_str, (char*)pSTOP, nLEN );
 		if(n0>n1)
 			n0=n1;
 	}
     p_str += n0;
-	I8 i8 = strtol( p_str, &p_str, 10 );
+	I8 i8 = strtol( p_str, &p_str, bHEX ? 16 : 10 );
 	if( !i8 )
 	{
 		switch( *(U1*)p_str )

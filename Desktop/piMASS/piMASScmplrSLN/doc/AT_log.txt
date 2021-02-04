@@ -1,0 +1,94 @@
+char sGSMreset[] =	{		/// 0
+     "AT+CRESET\r\n"		/// CRESET
+     //"AT+CGPS=1\r\n"
+     "AT+CGPSCOLD\r\n"
+     //"AT+CGPSAUTO=1\r\n"
+
+     "AT+CGMI\r\n"		// Module Manufacture
+     "AT+CGMM\r\n"		// Module Modell
+     "AT+CGSN\r\n"		// Serial Num
+     "AT+CGMR\r\n"		// Firmware revision
+     //"AT+SIMEI?\r\n"		// IMEI num
+
+     "1\r\n"
+};
+char sGSMreg[] = {		/// 1	REG
+	"AT+COPS?\r\n"		// Operator selection
+	"AT+CREG?\r\n"		/// Network registration
+	"AT+CPSI?\r\n"		// Inquiring UE system information
+	"AT+CNMP=2\r\n"		// Preferred mode selection //AUTO
+
+	//"AT+CSDVC=3" 		// Switch voice channel device	1hndst 3spkr
+
+	"AT+CNMI=2,1\r\n"	// New message indications to TE
+	"AT+CLIP=1\r\n"		// Calling line identification presentation
+
+	"2\r\n"
+};
+char sGSMidle[] = {		/// 2	IDLE
+	"AT+CSQ\r\n"
+	"AT+CGPSINFO\r\n"	// GPS info
+	"1\r\n"
+};
+char sGSMwait[] = {		/// 3	WAIT ATA
+	"AT+CSQ\r\n"
+	"AT+CGPSINFO\r\n"	// GPS info
+	"w 3 5\r\n"			// WAIT
+	"4\r\n"
+};
+char sGSMhup[] = {		/// 4 	VOICE CALL END
+	"AT+CLVL=0\r\n"		// volume 5
+	"AT+CSQ\r\n"
+	"AT+CHUP\r\n"		// Hang up call
+	//"AT+CLIP=1\r\n"
+	"1\r\n"
+};
+char sGSMansw[] = {		/// 5 	VOICE CALL BEGIN
+	"AT+CLVL=4\r\n"		// volume 5
+	"ATA\r\n"
+	"6\r\n"
+};
+char sGSMchat[] = {		/// 6	VOICE CALL chat
+	"AT+CSQ\r\n"
+	"AT+CGPSINFO\r\n"	// GPS info
+	"5\r\n"
+};
+
+
+ACT:0CLIP:0/0CMTI:0/0AT+CRESET
+
+0.at2 1.+3 2.creset9 3.ok14 nAT:4
+- INIT - REG - IDLE - WAIT - BEGI - CHAT - END  pSat:
+AT+CRESET
+OK
+
+0.at2 1.+3 2.creset9 3.ok14 4.rdy21 5.+26 6.cpin30 7.sim35 8.pin39 nAT:9
+- INIT - REG - IDLE - WAIT - BEGI - CHAT - END  pSat:
+AT+CRESET
+OK
+
+RDY
+
++CPIN: SIM PIN
+
+ACT:0CLIP:0/0CMTI:0/0AT+CPIN=2028
+
+0.at2 1.+3 2.cpin7 3.ok17 nAT:4
+- INIT - REG - IDLE - WAIT - BEGI - CHAT - END  pSat:
+AT+CPIN=2028
+OK
+
+ACT:0CLIP:0/0CMTI:0/0AT+CGPSCOLD
+
+0.+3 1.cpin7 2.ready14 3.sms21 4.done26 5.pb32 6.done37 7.at41 8.+42 9.cgpscold50 10.ok55 nAT:11
+- INIT - REG - IDLE - WAIT - BEGI - CHAT - END  pSat:
+
++CPIN: READY
+
+SMS DONE
+
+PB DONE
+AT+CGPSCOLD
+OK
+
+

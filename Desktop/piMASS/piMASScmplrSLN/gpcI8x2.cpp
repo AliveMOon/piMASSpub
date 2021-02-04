@@ -2,7 +2,43 @@
 
 
 extern U1 gpaALFsub[];
+int I8x2::alfFND( gpeALF af, int n ) {
+	I8x2* pAT = this;
+	for( int iAT = 0; iAT < n; iAT++ ) {
+		if( pAT[iAT].alf != af )
+			continue;
+		return iAT;
+	}
+	return n;
+}
+int I8x2::alfN( gpeALF af, int n_a ) {
+	I8x2* pAT = this;
+	int n = 0;
+	for( int iAT = 0; iAT < n_a; iAT++ ) {
+		if( pAT[iAT].alf != af )
+			continue;
+		n++;
+	}
+	return n;
+}
 
+int I8x2::aALFfnd( const gpeALF* aALF, int n, int nA ) {
+	I8x2* pAT = this;
+	for( int iAT = 0, j; iAT < n; iAT++ ) {
+		if( pAT[iAT].alf == gpeALF_MRK ) {
+			iAT++;
+			iAT += pAT[iAT].alfFND( gpeALF_MRK, n-iAT );
+			continue;
+		}
+
+		for(j = 0; j < nA; j++){
+			if( pAT[iAT].alf == aALF[j] )
+				return iAT;
+		}
+	}
+
+	return n;
+}
 I8x2& I8x2::operator = ( const U1* pS )
 {
 	if( num ? ( pS ? !*pS : true ) : true )

@@ -1,5 +1,6 @@
 #include "piMASS.h"
 extern U1 gpaALFsub[];
+extern U1 gpaALFsub2[];
 extern char gpaALF_H_sub[];
 char	gps_lzy_pub1[1024*0x100];
 gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
@@ -276,38 +277,65 @@ gpcLZY* gpcLZY::tree_add( I8 id, I8& n ) {
 	n_load = s*sizeof(*p_i84);
 	return this;
 }
-int gpcLZY::nAT( char* pSat, int nSat, const char* pFILT ) {
-	if( this ? !pSat : true )
+int gpcLZY::nAT( char* pS, int nS, const char* pFILT ) {
+	if( this ? !pS : true )
 		return 0;
-	if( !nSat ) {
-		nSat = gpmSTRLEN(pSat);
-		if( !nSat )
+	if( !nS ) {
+		nS = gpmSTRLEN(pS);
+		if( !nS )
 			return 0;
 	}
-
 	U8 nUTF8;
 	int nAT = 0;
 	I8x2* pAn;
-	char* pSatI = pSat, *pSatE = pSat+nSat, aN[]=" ";
-	for( 	pSatI += gpmNINCS(pSatI,pFILT);
-			pSatI < pSatE;
-			pSatI += gpmNINCS(pSatI,pFILT), nAT++ ) {
+	char* pSi = pS, *pSe = pS+nS; //sN[]=" ";
+	for( 	pSi += gpmNINCS(pSi,pFILT);
+			pSi < pSe;
+			pSi += gpmNINCS(pSi,pFILT), nAT++ ) {
 
-		if( !*pSatI )
+		if( !*pSi )
 			break;
 
 		pAn = (I8x2*)Ux(nAT,sizeof(*pAn));
-		pAn->y = pSatE-pSatI;
-		*pAn = pSatI;
+		pAn->y = pSe-pSi;
+		*pAn = pSi;
 		if( !pAn->alf ) {
+
+			pSi += gpfABCvan( (U1*)pSi, (U1*)pSe, nUTF8, gpaALFsub2 );
+			switch( *pSi ){
+				case 0:
+					pSi = pSe;
+					break;
+				case '\r':
+				case '\n':
+					pSi += gpmNINCS(pSi, "\r\n" );
+					pAn->alf = gpeALF_CRLF;
+					pAn->y = pSi-pS;
+					continue;
+				case '+':
+					pSi++;
+					pAn->alf = gpeALF_PLUS;
+					pAn->y = pSi-pS;
+					continue;
+				case '\"':
+					pSi++;
+					pAn->alf = gpeALF_MRK;
+					pAn->y = pSi-pS;
+					continue;
+				case ',':
+					pSi++;
+					pAn->alf = gpeALF_CM;
+					pAn->y = pSi-pS;
+					continue;
+				default: break;
+			}
 			nAT--;
-			pSatI += gpfABCvan( (U1*)pSatI, (U1*)pSatE, nUTF8, gpaALFsub );
 			continue;
 		}
-		pSatI+=pAn->y;
-		pAn->y = pSatI-pSat;
+		pSi+=pAn->y;
+		pAn->y = pSi-pS;
 	}
 	pAn = (I8x2*)Ux(nAT,sizeof(*pAn));
-	pAn->y = pSatE-pSat;
+	pAn->y = pSe-pS;
 	return nAT;
 }

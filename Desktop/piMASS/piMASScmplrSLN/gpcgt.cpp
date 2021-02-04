@@ -74,8 +74,7 @@ const char *dz_s_http_dwnl_sFN_sFNpEXP_nS =	"HTTP/1.0 200 OK\r\n" \
 											"Content-Length: %lld\r\n" \
 											"\r\n";
 
-gpcLZY* gpcLZY::qEVENT(void)
-{
+gpcLZY* gpcLZY::qEVENT(void) {
 	if(!this)
 		return NULL;
 	if(aWIP[gpeLZYwip] >= gpeWIP_esc)
@@ -109,8 +108,7 @@ gpcLZY* gpcLZY::qEVENT(void)
 	return NULL;
 }
 
-gpcLZY* gpcGT_DWNL::join( gpcLZY* pOUT, gpcGT& mom, gpcLZY* pEXE )
-{
+gpcLZY* gpcGT_DWNL::join( gpcLZY* pOUT, gpcGT& mom, gpcLZY* pEXE ) {
 	if( pOUT ? pOUT->n_alloc : false )
 		return pOUT;
 	U8 n_size = -1, n_send = 0, s;
@@ -133,8 +131,7 @@ gpcLZY* gpcGT_DWNL::join( gpcLZY* pOUT, gpcGT& mom, gpcLZY* pEXE )
 	}
 }
 
-gpcHUD* gpcHUD::put( const void* p_void, I8 n_byte)
-{
+gpcHUD* gpcHUD::put( const void* p_void, I8 n_byte) {
 	if( p_void ? !n_byte : true )
 		return this;
 	if(!this)
