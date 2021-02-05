@@ -546,6 +546,7 @@ typedef enum gpeALF:I8
 	gpeALF_Z,
 	//- 2 -----------------
 	gpeALF_AA = gpdAB('A', 'A'),
+	gpeALF_AM = gpdAB('A', 'M'),
 	gpeALF_AN = gpdAB('A', 'N'),
 	gpeALF_AT = gpdAB('A', 'T'),
 	gpeALF_CH = gpdAB('C', 'H'),
@@ -590,6 +591,8 @@ typedef enum gpeALF:I8
 	gpeALF_or = gpdAB('O', 'R'),
 	gpeALF_PB = gpdAB('P', 'B'),
 	gpeALF_PI = gpdAB('P', 'I'),
+	gpeALF_PN = gpdAB('P', 'N'),
+	gpeALF_PM = gpdAB('P', 'M'),
 	gpeALF_RE = gpdAB('R', 'E'),
 	gpeALF_sl = gpdAB('S', 'L'),
 	gpeALF_SM = gpdAB('S', 'M'),

@@ -72,21 +72,22 @@ char sGSMchat[] = {		/// 6	VOICE CALL chat
 	"6\r\n"
 };
 char* asACTclr[] = {
-	stdRESET,
-	stdCYAN,
-	stdYELLOW,
-	stdRED,
-	stdGREEN,
-	stdPURPLE,
+	stdRESET,			// RESTE
+	stdCYAN,			// REG
+	stdYELLOW,			// IDLE
+	stdPURPLE,			// WAIT
+	stdRED,				// end
+	stdGREEN,			// begin
+	stdBLUE,			// chat
 };
 char* asACTname[] = {
 	stdYELLOW "-+INIT+-" stdRESET " REG - IDLE - WAIT - BEGI - CHAT - END " 			stdRESET,
 	stdRESET "- INIT " stdYELLOW "-+REG+-" stdRESET " IDLE - WAIT - BEGI - CHAT - END " stdCYAN,
 	stdRESET "- INIT - REG" stdYELLOW " -+IDLE+-" stdRESET " WAIT - BEGI - CHAT - END " stdPURPLE,
 	stdRESET "- INIT - REG - IDLE" stdYELLOW " -+WAIT+-" stdRESET " BEGI - CHAT - END " stdWHITE,
-	stdRESET "- INIT - REG - IDLE - WAIT" stdYELLOW " -+BEGI+-" stdRESET " CHAT - END " stdGREEN,
-	stdRESET "- INIT - REG - IDLE - WAIT - BEGI" stdYELLOW " -+CHAT+-" stdRESET " END " stdCYAN,
 	stdRESET "- INIT - REG - IDLE - WAIT - BEGI - CHAT" stdYELLOW " -+END+" 			stdRED,
+	stdRESET "- INIT - REG - IDLE - WAIT" stdYELLOW " -+BEGI+-" stdRESET " CHAT - END " stdGREEN,
+	stdRESET "- INIT - REG - IDLE - WAIT - BEGI" stdYELLOW " -+CHAT+-" stdRESET " END " stdBLUE,
 };
 
 int aGSMcnt[0x100];
@@ -235,6 +236,16 @@ static const gpeALF aALFok[] = {
 	gpeALF_DONE,
 	gpeALF_READY,
 };
+static const gpeALF aALFmost[] = {
+	gpeALF_AT,
+	gpeALF_ATA,
+	gpeALF_OK,
+	gpeALF_ERROR,
+	gpeALF_PLUS,
+	gpeALF_DONE,
+	gpeALF_READY,
+	gpeALF_RDY,
+};
 static const gpeALF aALFat[] = {
 	gpeALF_AT,
 	gpeALF_ATA,
@@ -252,6 +263,11 @@ static const gpeALF aALFat[] = {
 static const gpeALF aALFvoice[] = {
 	gpeALF_begin,
 	gpeALF_end,
+};
+
+static const gpeALF aALFampm[] = {
+	gpeALF_AM,
+	gpeALF_PM,
 };
 class gpcGSM {
 public:
@@ -272,7 +288,7 @@ public:
 	gpcCREG	CREG;
 	I4x2 	CSQ;
 	int 	nCLCC, nCNT, iACTION, iREAD,
-			nCMTI, nCLIP, nRING, iW,
+			nCMTI, nCLIP, nRING, iW, nATA,
 			iCMTI, iCLIP, iCREG0;
 	bool	bGSMrdy, bPINrdy, bGPS,
 			bSMS, bSMSfull,
@@ -484,7 +500,7 @@ public:
 	int answ2reg( char* pANSW, I8x2 *pAT, int nAT, char* pS, int n ) {
 		*pANSW = 0;
 
-		int	iOK = pAT->aALFfnd( aALFok, nAT, gpmN(aALFok)),
+		int	iOK = pAT->aALFfnd( aALFmost, nAT, gpmN(aALFmost)),
 			iCR = 0, nCM = 0;
 
 		switch( pS[pAT->num] ){
@@ -504,7 +520,7 @@ public:
 		}
 
 		if( iCR > iOK )
-			iOK = iCR + pAT[iCR].aALFfnd( aALFok, nAT-iCR, gpmN(aALFok));
+			iOK = iCR + pAT[iCR].aALFfnd( aALFmost, nAT-iCR, gpmN(aALFmost));
 		for( U4 i = iCR; i < iOK; i++ ) {
 			if( pAT[i].alf == gpeALF_CM )
 				nCM++;
@@ -515,6 +531,7 @@ public:
 		switch( nCM ){
 			case 0:
 				CREG.n 		= gpfSTR2I8( pS, &pS, pSTOP ); pS++;
+
 				break;
 			case 1:
 				CREG.n 		= gpfSTR2I8( pS, &pS, pSTOP ); pS++;
@@ -551,7 +568,7 @@ public:
 		gpcCLIP		*pCn = (gpcCLIP*)clip.Ux( nCLIP, sizeof(*pCn) ),
 					*pC0 = pCn - nCLIP;
 
-		*pCn = pS+pAT[iM].num;
+		*pCn = pS+pAT[iM].num-1;
 
 		I4 j = nCLIP;
 		for( U4 i = 0; i<nCLIP; i++ ){
@@ -567,6 +584,29 @@ public:
 		nCLIP++;
 		return iCRLF;
 	}
+	int answCLIPend( char* pANSW, I8 iNUM  ) {
+		if( !iNUM )
+			return nCLIP;
+		*pANSW = 0;
+		gpcCLIP		*pCn = (gpcCLIP*)clip.Ux( nCLIP, sizeof(*pCn) ),
+					*pC0 = pCn - nCLIP;
+		for( U4 i = 0; i<nCLIP; i++ ) {
+			if( iNUM > 0 )
+			if( pC0[i].aI[0] != iNUM )
+				continue;
+
+			nCLIP--;
+			if( nCLIP > i ) {
+				pC0[i] = pC0[nCLIP];
+				i--;
+			}
+
+		}
+		if( iW )
+			iW = 0;
+		return nCLIP;
+	}
+
 	int answ2CPIN( char* pANSW, I8x2 *pAT, int nAT, int pin ) {
 		*pANSW = 0;
 		switch( pAT[0].alf ) {
@@ -726,8 +766,8 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		pGSM->so( pAT, nAT );
 
 		iA = pAT->aALFfnd(aALFat, nAT, gpmN(aALFat));
-
-
+		if( iA >= nAT )
+			iA = 0;
 		switch( pAT[iA].alf ) {
 			case gpeALF_AT: {
 				if( (iA2 = iA+2) >= nAT )
@@ -749,8 +789,11 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 								aSUB[0] = pAT[iA2].y-5;
 								iA2 += pGSM->answ2reg( pANSW, pAT+iA2, nAT-iA2, pS, 2 );
 								aSUB[1] = pAT[iA2].y;
-								break;
+								if( pAT[iA2].alf != gpeALF_RDY )
+									break;
 							case gpeALF_RDY:
+								if( pAT[iA].y-2 == aSUB[0] )
+									aSUB[0] = pAT[iA2].y-3;
 								pGSM->bGSMrdy = true;
 								aSUB[1] = pAT[iA2].y;
 								break;
@@ -760,6 +803,9 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 									return iCNT;
 								}
 						}
+						if( !pGSM->bGSMrdy )
+							return iCNT;
+
 						if( aSUB[1] > aSUB[0] )
 							break;
 					case gpeALF_CPIN: 													///
@@ -809,8 +855,15 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			} break;
 			case gpeALF_ATA:{
 				aSUB[1] = aSUB[0] = pAT[iA].y-3;	// ATA
-				iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
-				aSUB[1] = pAT[iA2].y;
+				pGSM->iW = 0;
+				pGSM->nATA = gpmMAX(pGSM->nATA, pGSM->nCLIP);
+				if( pGSM->nATA ) {
+					aSUB[1] = pAT[iA].y;
+					break;
+				}
+				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+				aSUB[1] = pAT[iA].y;
+
 			} break;
 			case gpeALF_CPIN:{
 				aSUB[0] = pAT[iA].y-5;	// CPIN
@@ -842,13 +895,17 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			case gpeALF_VOICE:{
 				aSUB[1] = aSUB[0] = gpmMAX(0,pAT[iA].y-5);	//VOICE
 				iA2 = iA+1;
-				iA2 += iA2 + pAT[iA2].aALFfnd(aALFvoice, nAT-iA2, gpmN(aALFvoice));
+				iA2 += pAT[iA2].aALFfnd(aALFvoice, nAT-iA2, gpmN(aALFvoice));
 				switch( pAT[iA2].alf ) {
 					case gpeALF_begin: {
 
 					} break;
 					case gpeALF_end: {
-
+						I8 nCLIP = pGSM->nCLIP;
+						if(	pGSM->answCLIPend( pANSW, -1 ) != nCLIP ) {
+							iCNT = aGSMcnt[pGSM->iACTION = 4];	//CLIP end
+							pGSM->iW = 0;
+						}
 					} break;
 					default: break;
 				}
@@ -856,7 +913,21 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			} break;
 			case gpeALF_MISSED:{
 				aSUB[1] = aSUB[0] = pAT[iA].y-6;	//MISSED
-				aSUB[1] = pAT[iA+1].y-6;
+				iA2 = iA+1;
+				iA2 += pAT[iA2].aALFfnd(aALFampm, nAT-iA2, gpmN(aALFampm));
+				if( iA2 >= nAT )
+					break;
+				iA2 += pAT[iA2].alfFND( gpeALF_PLUS, nAT-iA2 );
+				pSi = pS + pAT[iA2].y;
+				I8 iNUM = gpfSTR2I8( pSi, &pSi );
+				int nC = pGSM->nCLIP;
+				if( iNUM )
+				if(	pGSM->answCLIPend( pANSW, iNUM ) != nC ) {
+					iCNT = aGSMcnt[pGSM->iACTION = 4];	//CLIP end
+					pGSM->iW = 0;
+				}
+				iA2 += pAT[iA2].alfFND( gpeALF_CRLF, nAT-iA2 );
+				aSUB[1] = pAT[iA2].y;
 			} break;
 			case gpeALF_SMS:
 				aSUB[1] = aSUB[0] = pAT[iA].y-3;	//SMS
@@ -879,7 +950,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 				aSUB[1] = pAT[iA].y;
 				break;
 			case gpeALF_COPS:
-				aSUB[1] = aSUB[0] = pAT[iA].y-2;	//COPS
+				aSUB[1] = aSUB[0] = pAT[iA].y-4;	//COPS
 				iA++;
 				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
 				aSUB[1] = pAT[iA].y;
