@@ -47,8 +47,7 @@
 #define gpdABCDEFGHIJKL(a,b,c,d,e,f,g,h,i,j,k,l)	(U8)( gpdABCDEFGHIJK(a,b,c,d,e,f,g,h,i,j,k)*gpdALF + gpdA(l) )
 #define gpdABCDEFGHIJKLM(a,b,c,d,e,f,g,h,i,j,k,l,m)	(U8)( gpdABCDEFGHIJKL(a,b,c,d,e,f,g,h,i,j,k,l)*gpdALF + gpdA(m) )
 
-typedef enum gpeALFu4:U4
-{
+typedef enum gpeALFu4:U4 {
 	gpeALFu4_null = 0,
 	gpeALFu4_A,
 	gpeALFu4_B,
@@ -591,8 +590,8 @@ typedef enum gpeALF:I8
 	gpeALF_or = gpdAB('O', 'R'),
 	gpeALF_PB = gpdAB('P', 'B'),
 	gpeALF_PI = gpdAB('P', 'I'),
-	gpeALF_PN = gpdAB('P', 'N'),
 	gpeALF_PM = gpdAB('P', 'M'),
+	gpeALF_PN = gpdAB('P', 'N'),
 	gpeALF_RE = gpdAB('R', 'E'),
 	gpeALF_sl = gpdAB('S', 'L'),
 	gpeALF_SM = gpdAB('S', 'M'),
@@ -621,6 +620,7 @@ typedef enum gpeALF:I8
 	gpeALF_ARR = gpdABC('A', 'R', 'R'),
 	gpeALF_ASM = gpdABC('A', 'S', 'M'),
 	gpeALF_ATA = gpdABC('A', 'T', 'A'),		// SIM7600 - Call answer
+	gpeALF_ATD = gpdABC('A', 'T', 'D'),		// SIM7600 - Call diallup
 	gpeALF_ATH = gpdABC('A', 'T', 'H'),		// SIM7600 - Disconnect existing call
 	gpeALF_BIN = gpdABC('B', 'I', 'N'),
 	gpeALF_BLK = gpdABC('B', 'L', 'K'),
@@ -673,6 +673,7 @@ typedef enum gpeALF:I8
 	gpeALF_GSM = gpdABC('G', 'S', 'M'),
 	gpeALF_GXT = gpdABC('G', 'X', 'T'),
 	gpeALF_HUD = gpdABC('H', 'U', 'D'),
+	gpeALF_HUP = gpdABC('H', 'U', 'P'),
 	gpeALF_inc = gpdABC('I', 'N', 'C'),
 	gpeALF_INP = gpdABC('I', 'N', 'P'),
 	gpeALF_INT = gpdABC('I', 'N', 'T'),
@@ -790,6 +791,7 @@ typedef enum gpeALF:I8
 	gpeALF_BONE = gpdABCD('B', 'O', 'N', 'E'),
 	gpeALF_BUMM = gpdABCD('B', 'U', 'M', 'M'),
 	gpeALF_BUMP = gpdABCD('B', 'U', 'M', 'P'),
+	gpeALF_BUSY = gpdABCD('B', 'U', 'S', 'Y'),		// SIM7600 - BUSY
 
 	gpeALF_CALL = gpdABCD('C', 'A', 'L', 'L'),		// SIM7600 -
 

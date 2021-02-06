@@ -115,8 +115,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id )
 }
 
 static char gpsJDprgPUB[0x100];
-bool gpcDrc::jdPRGstp( U4 mSEC )
-{
+bool gpcDrc::jdPRGstp( U4 mSEC ) {
 	// ha létre jött mozgá hagyja végre hajtani
 	if( oCTRL.z )
 		return false;
@@ -281,8 +280,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC )
 	jdPRG.y++;
 	return true;
 }
-gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC )
-{
+gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC ) {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
 	if( this ? !n : true )
@@ -349,11 +347,9 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 		if( an.alf ) {
 			comA = *(U4*)pCOM;
 			iNUM = gpeDRCos_NONS;
-			switch( an.alf )
-			{
+			switch( an.alf ) {
 				case gpeALF_BILL:
 						iD = 0;
-
 						if( RnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_BILL )
 							break;
 						RnD.aDrc[iD].format( gpeZS_BILL );

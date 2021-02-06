@@ -374,7 +374,24 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 				switch( cAN.alf )
 				{
-
+					case gpeALF_GSM:{
+							U1* pA;
+							SOCKET sockGSM = gpfSTR2U8( (U1*)s_atrib, &pA );
+							gpcGT* pGT = pALL->GT( sockGSM );
+							if( pGT ? pGT->TnID.alf == gpeALF_GSM : false )
+							{
+								if( pWIN ? pWIN->piMASS : NULL )
+									pOUT = pGT->GTgsmOS( pOUT, pA, *(pWIN->piMASS), socket, pWIN->mSEC.x );
+							} else {
+								pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
+								for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
+								{
+									if( !pALL->ppGTalloc[i] )
+										continue;
+									pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
+								}
+							}
+						} break;
 					case gpeALF_SLMP:{
 							U1* pA;
 							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
