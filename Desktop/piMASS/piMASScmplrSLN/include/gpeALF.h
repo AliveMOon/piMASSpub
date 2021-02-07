@@ -1009,7 +1009,7 @@ typedef enum gpeALF:I8
 	gpeALF_AGAIN = gpdABCDE('A', 'G', 'A', 'I', 'N'),
 	gpeALF_andLG = gpdABCDE('A', 'N', 'D', 'L', 'G'),
 	gpeALF_ARRAY = gpdABCDE('A', 'R', 'R', 'A', 'Y'),
-	gpeALF_begin = gpdABCDE('B', 'E', 'G', 'I', 'N'),		// SIM7600 -
+	gpeALF_begin = gpdABCDE('B', 'E', 'G', 'I', 'N'),		// SIM7600 -pl. VOICE CALL: BEGIN
 	gpeALF_BLOCK = gpdABCDE('B', 'L', 'O', 'C', 'K'),
 	gpeALF_BOBER = gpdABCDE('B', 'O', 'B', 'E', 'R'),
 	gpeALF_brakE = gpdABCDE('B', 'R', 'A', 'K', 'E'),
@@ -1019,6 +1019,8 @@ typedef enum gpeALF:I8
 	gpeALF_CACHE = gpdABCDE('C', 'A', 'C', 'H', 'E'),
 	gpeALF_CALIB = gpdABCDE('C', 'A', 'L', 'I', 'B'),
 	gpeALF_CLASS = gpdABCDE('C', 'L', 'A', 'S', 'S'),
+
+	gpeALF_CMGRD = gpdABCDE('C', 'M', 'G', 'R', 'D'),
 
 	/// CNL -----------------------------------------------
 	gpeALF_CNLiT = gpdABCDE('C', 'N', 'L', 'I', 'T'),
