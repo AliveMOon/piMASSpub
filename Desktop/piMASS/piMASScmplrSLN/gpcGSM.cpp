@@ -732,7 +732,7 @@ public:
 
 		return iOK;
 	}
-	int answCMGRD( char* pANSW, I8x2 *pAT, int nAT, char* pS, const gpeALF* pOKer, int nOKer ) {
+	int answCMGRD( char* pANSW, I8x2 *pAT, int nAT, char* pS, const gpeALF* pOKer, int nOKer, gpcWIN* pWIN  ) {
 		*pANSW = 0;
 		int iOK = pAT->aALFfnd( pOKer, nAT, nOKer );
 		if( iOK >= nAT )
@@ -747,18 +747,27 @@ public:
 		aiPN[4] = aiPN[3];
 		aiPN[5] = iOK;
 		int ucs2;
-		char sUCS2[] = "0x0000";
+		char sUCS2[] = "0x0000", sPATH[0x100];
+		U8 s, s0;
 		lzyPUB.lzyRST();
-		U8 s;
+		lzyPUB.lzyFRMT( s = 0, "\a enter \a\r\n" );
+		s0 = lzyPUB.nLD();
 		for( int i = 0, n = gpmN(aiPN); i<n; i+=2 ) {
 			if( i == 2 )
 				lzyPUB.lzyADD( pS+pAT[aiPN[i]].y, pAT[aiPN[i+1]].y-pAT[aiPN[i]].y-1, s= -1 );
 			else for( char *pSi = pS+pAT[aiPN[i]].y+gpmVAN(pS+pAT[aiPN[i]].y,"0123456789aAbBcCdDeEfF",s), *pSe = pS+pAT[aiPN[i+1]].y-1; pSi < pSe; pSi+=4 )
 				lzyPUB.utf8(gpfSTR2I8( gpmMcpy(sUCS2+2,pSi,4)-2 ));
 
+			if( pWIN )
+			if( !i ) {
+				sprintf( pWIN->gppMASSfile, "%s/sms.mass", lzyPUB.p_alloc+s0+1 );
+				lzyPUB.nLD(s0);
+			}
 			lzyPUB.utf8('\r');
 			lzyPUB.utf8('\n');
 		}
+
+		lzyPUB.lzyWR( pWIN->gpsMASSpath, false, true );
 
 
 		return iOK;
@@ -826,7 +835,7 @@ public:
 	}
 };
 gpcGSM gsmZERO;
-gpcLZY* gpcGT::GTgsmOS( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC ) {
+gpcLZY* gpcGT::GTgsmOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC ) {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
 	if( this ? !n : true )
@@ -1230,7 +1239,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			case gpeALF_CMGRD: {
 				aSUB[1] = aSUB[0] = gpmMAX( 0, pAT[iA].y-6 );	// +CMGRD
 
-				iA2 = pGSM->answCMGRD( pANSW, pAT+iA, nAT-iA, pS, aALFokER, gpmN(aALFokER) );
+				iA2 = pGSM->answCMGRD( pANSW, pAT+iA, nAT-iA, pS, aALFokER, gpmN(aALFokER), pWIN );
 				iA += iA2; //pAT[iA].aALFfnd( aALFokER, nAT-iA, gpmN(aALFokER) );
 				if( iA >= nAT )
 					break;

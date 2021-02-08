@@ -817,18 +817,14 @@ public:
 		return pO;
 	}
 
-	UTF8& operator += ( U8 n )
-	{
-		if( pBK() )
-		{
-			for( U8 i = 0; i < n; i++ )
-			{
+	UTF8& operator += ( U8 n ) {
+		if( pBK() ) {
+			for( U8 i = 0; i < n; i++ ) {
 				if( !*pU )
 					break;
 
 				pU++;
-				while( *pU & 0x80 )
-				{
+				while( *pU & 0x80 ) {
 					if( (*pU & 0xc0) == 0xc0 )
 						break;
 					pU++;
@@ -838,12 +834,9 @@ public:
 		return *this;
 	}
 
-	UTF8& operator -= ( U8 n )
-	{
-		if( pBK() )
-		{
-			for( U8 i = n; i; i++ )
-			{
+	UTF8& operator -= ( U8 n ) {
+		if( pBK() ) {
+			for( U8 i = n; i; i++ ) {
 				if( !*pU )
 					break;
 
@@ -6233,24 +6226,26 @@ public:
 
 		return p_lazy;
 	}
-	gpcLZY* lzyWR( const char* p_file, bool b_over = true ) {
+	gpcLZY* lzyWR( const char* p_file, bool b_over = true, bool bADD = false ) {
 		/// WRITE FILE
 		if( this ? !n_load : true )
 			return this;
+		if( bADD )
+			b_over = true;
 
 		if( !b_over )
 		if( gpfACE(p_file, 4) < 0 )
 			return this;
 
 		char s_buff[gpdMAX_PATH];
-		FILE* p_f = fopen( p_file, "wb" );
+		FILE* p_f = fopen( p_file, bADD ? "ab":"wb" );
 		U8 n_w = 0, n_err = 0, W0 = 0;
 
 		if( !p_f )
 		{
 			if( !gpfMKDR( s_buff, p_file ) )
 				goto close;
-			p_f = fopen(p_file, "wb");
+			p_f = fopen(p_file, bADD ? "ab":"wb" );
 			if( !p_f )
 				goto close;
 		}
@@ -6282,6 +6277,7 @@ close:
 szasz:
 		return this;
 	}
+
 	gpcLZY* lzyFRMT( U8& iSTRT, const char* p_format, ... );
 	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
@@ -6339,23 +6335,30 @@ szasz:
 		return ins;
 	}
 	int nAT( char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
-	gpcLZY* utf8( U4 u ) {
+	gpcLZY* utf8( U4 u, U1 trans = '\a' ) {
 		gpcLZY* pLZY = this;
 		U1 aU[8], nU = 0;
-
-		if( u < 0x80 ) {
-			nU = 1;
-			aU[0] = u;
-		} else if( u < 0x800 ) {
+		if( trans ? u == trans : false ) {
 			nU = 2;
 			aU[1] = (u&0x3f)|0x80; u>>=6;
 			aU[0] = (u&0x1f)|0xc0;
-		} else if( u < 0x1000 ) {
+		}
+		else if( u < 0x80 ) {
+			nU = 1;
+			aU[0] = u;
+		}
+		else if( u < 0x800 ) {
+			nU = 2;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x1f)|0xc0;
+		}
+		else if( u < 0x1000 ) {
 			nU = 3;
 			aU[2] = (u&0x3f)|0x80; u>>=6;
 			aU[1] = (u&0x3f)|0x80; u>>=6;
 			aU[0] = (u&0x0f)|0xe0;
-		} else {
+		}
+		else {
 			nU = 4;
 			aU[3] = (u&0x3f)|0x80; u>>=6;
 			aU[2] = (u&0x3f)|0x80; u>>=6;
