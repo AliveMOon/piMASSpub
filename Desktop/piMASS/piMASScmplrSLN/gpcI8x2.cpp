@@ -11,15 +11,29 @@ int I8x2::alfFND( gpeALF af, int n ) {
 	}
 	return n;
 }
-int I8x2::alfN( gpeALF af, int n_a ) {
+int I8x2::alfN( gpeALF af, int nAT ) {
 	I8x2* pAT = this;
 	int n = 0;
-	for( int iAT = 0; iAT < n_a; iAT++ ) {
+	for( int iAT = 0; iAT < nAT; iAT++ ) {
 		if( pAT[iAT].alf != af )
 			continue;
 		n++;
 	}
 	return n;
+}
+int I8x2::alfRIG( gpeALF af, int nAT, int r ) {
+	I8x2* pAT = this;
+	if( r < 1 )
+		return 0;
+
+	for( int iAT = 0; iAT < nAT; iAT++ ) {
+		if( pAT[iAT].alf != af )
+			continue;
+		if( r==1 )
+			return iAT;
+		r--;
+	}
+	return 0;
 }
 
 int I8x2::aALFfnd( const gpeALF* aALF, int n, int nA ) {

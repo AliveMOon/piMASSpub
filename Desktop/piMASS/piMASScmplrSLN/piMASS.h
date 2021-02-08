@@ -439,8 +439,7 @@ SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 	return h;
 }
 
-inline U1* gpfSTR( U1* pSTR, const U1* pU )
-{
+inline U1* gpfSTR( U1* pSTR, const U1* pU ) {
 	if(pSTR == pU)	/// ha mindkető NULL akkor is kész
 		return pSTR;
 
@@ -461,8 +460,7 @@ inline U1* gpfSTR( U1* pSTR, const U1* pU )
 	pSTR[nU] = 0;
 	return pSTR;
 }
-U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub )
-{
+U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub ) {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
 	if( (p_str < pE) ? !*p_str : true )
@@ -483,8 +481,7 @@ U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFs
 	return pS-p_str;
 }
 
-U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub )
-{
+U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub ) {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
 	if( (p_str < pE) ? !*p_str : true )
@@ -508,8 +505,7 @@ U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaAL
 	}
 	return pS-p_str;
 }
-U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* gpaALF_H_sub )
-{
+U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* gpaALF_H_sub ) {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
 	if( (p_str < pE) ? !*p_str : true )
@@ -3998,6 +3994,7 @@ public:
 
 	int alfFND( gpeALF af, int n );
 	int alfN( gpeALF af, int n );
+	int alfRIG( gpeALF af, int n, int r );
 	int aALFfnd( const gpeALF* aALF, int n, int nA );
 };
 
@@ -6342,7 +6339,32 @@ szasz:
 		return ins;
 	}
 	int nAT( char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
+	gpcLZY* utf8( U4 u ) {
+		gpcLZY* pLZY = this;
+		U1 aU[8], nU = 0;
 
+		if( u < 0x80 ) {
+			nU = 1;
+			aU[0] = u;
+		} else if( u < 0x800 ) {
+			nU = 2;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x1f)|0xc0;
+		} else if( u < 0x1000 ) {
+			nU = 3;
+			aU[2] = (u&0x3f)|0x80; u>>=6;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x0f)|0xe0;
+		} else {
+			nU = 4;
+			aU[3] = (u&0x3f)|0x80; u>>=6;
+			aU[2] = (u&0x3f)|0x80; u>>=6;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x07)|0xf0;
+		}
+		U8 s=-1;
+		return pLZY->lzyADD( aU, nU, s );
+	}
 };
 
 

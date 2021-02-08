@@ -1429,46 +1429,7 @@ typedef enum gpeALF:I8
 	gpeALF_CRPXNLSKVLJFHG = 0x7fffffffffffffff,
 } GPT_ALFA;
 
-int alfLEN( gpeALF alf );/* {
-	if( !alf )
-		return 0;
-
-	if( alf <= gpeALF_4 ) {
-		if( alf <= gpeALF_2 ) {
-			if( alf <= gpeALF_Z )
-				return 1;
-			return 2;
-		}
-		if( alf <= gpeALF_3 )
-				return 3;
-		return 4;
-	}
-
-	if( alf <= gpeALF_8 ) {
-		if( alf <= gpeALF_6 ) {
-			if( alf <= gpeALF_5 )
-				return 5;
-			return 6;
-		}
-		if( alf <= gpeALF_7 )
-				return 7;
-		return 8;
-	}
-
-	if( alf <= gpeALF_12 ) {
-		if( alf <= gpeALF_10 ) {
-			if( alf <= gpeALF_9 )
-				return 9;
-			return 10;
-		}
-		if( alf <= gpeALF_11 )
-				return 11;
-		return 12;
-	}
-	if( alf <= gpeALF_13 )
-		return 13;
-	return 14;
-}*/
+int alfLEN( gpeALF alf );
 U1*		gpf_aALF_init(void);
 //U8 		gpfALF2STR( U1* p_out, I8 d0 );
 inline U8 gpfALF2STR( void* p_out, I8 d0 )

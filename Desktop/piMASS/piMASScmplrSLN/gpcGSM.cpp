@@ -338,7 +338,7 @@ public:
 			bCGMI, bCGMM, bCGMR, bCGSN, bCOPS,
 			bCLIP,
 			bCNT0, bCNT1;
-	gpcLZY	AT, clip, cmti;
+	gpcLZY	AT, clip, cmti, lzyPUB;
 
 	gpcGSM(){gpmCLR;};
 	I8x2* pAT( int& nAT, char* pS, int nS, const char* pFILT = " \r\n\t:+," ) {
@@ -732,7 +732,37 @@ public:
 
 		return iOK;
 	}
+	int answCMGRD( char* pANSW, I8x2 *pAT, int nAT, char* pS, const gpeALF* pOKer, int nOKer ) {
+		*pANSW = 0;
+		int iOK = pAT->aALFfnd( pOKer, nAT, nOKer );
+		if( iOK >= nAT )
+			return nAT;
+		int aiPN[6];
+		aiPN[0] = pAT->alfRIG( gpeALF_MRK, nAT, 3 ); aiPN[1] = aiPN[0]+1;
+		aiPN[1] += pAT[aiPN[1]].alfRIG( gpeALF_MRK, nAT-aiPN[1], 1 ); aiPN[2] = aiPN[1]+1;
 
+		aiPN[2] += pAT[aiPN[2]].alfRIG( gpeALF_MRK, nAT-aiPN[2], 3 ); aiPN[3] = aiPN[2]+1;
+		aiPN[3] += pAT[aiPN[3]].alfRIG( gpeALF_MRK, nAT-aiPN[3], 1 );
+
+		aiPN[4] = aiPN[3];
+		aiPN[5] = iOK;
+		int ucs2;
+		char sUCS2[] = "0x0000";
+		lzyPUB.lzyRST();
+		U8 s;
+		for( int i = 0, n = gpmN(aiPN); i<n; i+=2 ) {
+			if( i == 2 )
+				lzyPUB.lzyADD( pS+pAT[aiPN[i]].y, pAT[aiPN[i+1]].y-pAT[aiPN[i]].y-1, s= -1 );
+			else for( char *pSi = pS+pAT[aiPN[i]].y+gpmVAN(pS+pAT[aiPN[i]].y,"0123456789aAbBcCdDeEfF",s), *pSe = pS+pAT[aiPN[i+1]].y-1; pSi < pSe; pSi+=4 )
+				lzyPUB.utf8(gpfSTR2I8( gpmMcpy(sUCS2+2,pSi,4)-2 ));
+
+			lzyPUB.utf8('\r');
+			lzyPUB.utf8('\n');
+		}
+
+
+		return iOK;
+	}
 	int answ2CPIN( char* pANSW, I8x2 *pAT, int nAT, int pin ) {
 		*pANSW = 0;
 		switch( pAT[0].alf ) {
@@ -1198,9 +1228,14 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 				aSUB[1] = pAT[iA].y;
 			} break;
 			case gpeALF_CMGRD: {
-				iA += pAT[iA].aALFfnd( aALFokER, nAT-iA, gpmN(aALFokER) );
-				if( (pAT[iA].alf!=gpeALF_OK) && (pAT[iA].alf!=gpeALF_ERROR) )
+				aSUB[1] = aSUB[0] = gpmMAX( 0, pAT[iA].y-6 );	// +CMGRD
+
+				iA2 = pGSM->answCMGRD( pANSW, pAT+iA, nAT-iA, pS, aALFokER, gpmN(aALFokER) );
+				iA += iA2; //pAT[iA].aALFfnd( aALFokER, nAT-iA, gpmN(aALFokER) );
+				if( iA >= nAT )
 					break;
+				/*if( (pAT[iA].alf!=gpeALF_OK) && (pAT[iA].alf!=gpeALF_ERROR) )
+					break;*/
 				aSUB[1] = pAT[iA].y;
 			} break;
 			case gpeALF_CPMS: {
@@ -1248,7 +1283,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 			nINP = pINP->nLD();
 			pS = nINP ? (char*)pINP->p_alloc : NULL;
 			if( pS ) {
-				pAT = pGSM->pAT( nAT, pS, nINP, " \t:," ); //, " \r\n\t:," );
+				pAT = pGSM->pAT( nAT, pS, nINP, " \t:" ); //, " \r\n\t:," );
 				if( nAT ) {
 					//pGSM->so(pAT, nAT);
 					if( *pANSW )
