@@ -104,6 +104,17 @@ char* asACTclr[] = {
 	stdBLUE,			// chat
 	stdPURPLE,			// CALL
 };
+char* asACTstat[] = {
+				"INIT",
+				"REG",
+				"IDLE",
+				"WAIT",
+				"END",
+				"BEGI",
+				"CHAT",
+				"CALL",
+
+};
 char* asACTname[] = {
 				stdYELLOW "-+INIT+-" stdRESET	" REG - IDLE - WAIT - BEGI - CHAT - END - CALL"			stdRESET,	// 0
 	stdRESET	"- INIT " stdCYAN "-+REG+-" stdRESET	" IDLE - WAIT - BEGI - CHAT - END - CALL"		stdCYAN,	// 1
@@ -445,22 +456,24 @@ public:
 	}
 	gpcLZY* answSTAT( gpcLZY* pANSW ) {
 		U8 s;
-		pANSW = pANSW->lzyFRMT( s=-1,	"ACT:%s"
+		pANSW = pANSW->lzyFRMT( s=-1,	"\r\n ACT:%s"
 										"\r\n",
-										asACTname[iACTION%gpdACTn] );
+										asACTstat[iACTION%gpdACTn] );
 		if( aNUM[1] ) {
-			pANSW = pANSW->lzyFRMT( s=-1, "call: +%0.11lld last: +%0.11lld\r\n", aNUM[1], aNUM[2] );
+			pANSW = pANSW->lzyFRMT( s=-1, " call: +%0.11lld last: +%0.11lld\r\n", aNUM[1], aNUM[2] );
 		} else if( aNUM[2] ) {
-			pANSW = pANSW->lzyFRMT( s=-1, "last: +%d\r\n", aNUM[2] );
+			pANSW = pANSW->lzyFRMT( s=-1, " last: +%d\r\n", aNUM[2] );
 		}
 		int utc = cgps.utc;
 		pANSW = pANSW->lzyFRMT( s=-1, 	" lat: %c %6.4f lng: %c %6.4f\r\n"
-										" alt:    %6.4f spd:    %6.4f\r\n"
-										" dat: %d\ttim: %d:%d %d\r\n"
-										"\r\n",
-										cgps.ns, cgps.lat, cgps.ew, cgps.log,
+										" alt:   %6.4f spd:   %6.4f\r\n"
+										" dat: %d %0.2d %0.2d\ttim: %d:%d %d\r\n"
+										" sig: %0.2d %0.2d reg: %s\r\n",
+										cgps.ns ? cgps.ns : '?', cgps.lat, cgps.ew ? cgps.ew: '?', cgps.log,
 										cgps.alt, cgps.spd,
-										cgps.dat, utc/10000, (utc%10000)/100, utc%100
+										cgps.dat%100 + 2000, (cgps.dat/100)%100, (cgps.dat/10000)%100,
+										utc/10000, (utc%10000)/100, utc%100,
+										CSQ.x, CSQ.y, CREG.stat == 1 ? "\"ok\"" : "\"searching\""
 
 								);
 		return pANSW->lzyFRMT( s = -1, sSTAT );
@@ -556,6 +569,17 @@ public:
 			default: break;
 		}
 		return 0;
+	}
+	int answ2csq( char* pANSW, I8x2 *pAT, int nAT, char* pS, int n ) {
+		*pANSW = 0;
+
+		int	iOK = pAT->aALFfnd( aALFmost, nAT, gpmN(aALFmost));
+		pS+=pAT[0].num+1;
+		CSQ.x = gpfSTR2I8( pS, &pS );
+		pS++;
+		CSQ.y = gpfSTR2I8( pS, &pS );
+
+		return iOK;
 	}
 	int answ2reg( char* pANSW, I8x2 *pAT, int nAT, char* pS, int n ) {
 		*pANSW = 0;
@@ -896,13 +920,14 @@ gpcLZY* gpcGT::GTgsmOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, 
 	return pANS->lzyFRMT( s = -1, "nonsens" );
 }
 #define gpmGSManswNp2 0x1000
-I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
+gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
+	gpcGSM	*pGSM = pOUT ? (gpcGSM*)pOUT->p_alloc : NULL;
+
 	if( this ? msGTdie > pWIN->mSEC.x : true )
-		return this ? iCNT : 0;
+		return this ? pGSM : 0;
 
 	U8 nLEN, s;
 	int baud = 115200, pin = 2028;
-	gpcGSM	*pGSM = pOUT ? (gpcGSM*)pOUT->p_alloc : NULL;
 	char	*pANSW = NULL, sGO[0x100];
 
 	if( socket == INVALID_SOCKET ) {
@@ -910,7 +935,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		if( (socket=(SOCKET)serialOpen( sGO, baud )) < 0 ) {
 			if(bSTDcout){std::cout << stdALU "GSM ERR:" << strerror(errno) << std::endl;}
 			msGTdie = pWIN->mSEC.x + 3000;
-			return iCNT;
+			return pGSM;
 		}
 		else if( !pOUT ){
 			int nCNT = 0;
@@ -1030,11 +1055,11 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 							case gpeALF_CPIN:
 							default:
 								if( iA2 >= nAT ) {
-									return iCNT;
+									return pGSM;
 								}
 						}
 						if( !pGSM->bGSMrdy )
-							return iCNT;
+							return pGSM;
 
 						if( aSUB[1] > aSUB[0] )
 							break;
@@ -1132,6 +1157,11 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 				iA++;
 				iA += pGSM->answ2pin( pANSW, pAT+iA, nAT-iA, pin );
 				aSUB[1] = pAT[iA].y;
+			} break;
+			case gpeALF_CSQ: {
+				aSUB[1] = aSUB[0] = gpmMAX(0,pAT[iA].y-5);
+				iA2 = iA + pGSM->answ2csq( pANSW, pAT+iA, nAT-iA, pS, 2 );
+				aSUB[1] = pAT[iA2].y;
 			} break;
 			case gpeALF_CREG:{
 				aSUB[1] = aSUB[0] = gpmMAX(0,pAT[iA].y-5);	//+CREG
@@ -1306,7 +1336,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 	}
 
 	if( nAT )
-		return iCNT;
+		return pGSM;
 
 	if( *pANSW ) {
 		pCLR = stdPURPLE;
@@ -1317,7 +1347,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 	}
 	pSe = pS + gpmVAN( pS, "\r\n", nLEN );
 	if( pSe-pS < 1 )
-		return iCNT;
+		return pGSM;
 	pSe+=2;
 
 	int OiCNT = iCNT;
@@ -1447,7 +1477,7 @@ I8 gpcGT::GTgsm( gpcWIN* pWIN ) {
 		pSi += nW;
 	}
 	// *pANSW = 0;
-	return iCNT;
+	return pGSM;
 }
 
 I4 gpMEM::instDOitGSM( gpcGT* pGT ) {
@@ -1455,13 +1485,32 @@ I4 gpMEM::instDOitGSM( gpcGT* pGT ) {
 		return -1;
 
 	I4 cnt = pGT->iCNT;
-	pGT->GTgsm( pWIN );
+	gpcGSM	*pGSM = pGT->GTgsm( pWIN );
 	if( cnt == pGT->iCNT )
 		return cnt;
 
 #ifdef stdON
 	if(bSTDcout){std::cout << stdALU "GSM" << pGT->iCNT;}
 #endif
+	//gpcGSM	*pGSM = pGT->pOUT ? (gpcGSM*)pGT->pOUT->p_alloc : NULL;
+	if( !pGSM )
+		return pGT->iCNT;
+
+	gpOBJ	*pOi = pOBJ(gpeALF_GINP),
+			*pOo = pOBJ(gpeALF_GOUT);
+	U1* pU1 = pOo ? pOo->pU1() : NULL;
+	if( !pU1 )
+		return pGT->iCNT;
+
+	I8x2 an;
+	an.x = *(U4*)pU1;
+	an.y = an.x&0xff;
+	an.x >>= 0x10;
+	int xfnd = pMASS->getXFNDan( an );
+	gpcSRC* pS2 = xfnd ? pMASS->srcFND( xfnd ) : NULL;
+	if( !pS2 )
+		return pGT->iCNT;
+	pS2->pMINI = pGSM->answSTAT( pS2->pMINI->lzyRST() );
 
 	return pGT->iCNT;
 }

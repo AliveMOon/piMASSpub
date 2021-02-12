@@ -74,6 +74,7 @@
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 class gpcRES;
 class gpcDrc;
+class gpcGSM;
 
 class gpcROB {
 public:
@@ -889,9 +890,9 @@ class gpcGT
 			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
-		I8		GTgsm( gpcWIN* pWIN );
-		I8		GTgsm3( gpcWIN* pWIN );
-		I8		GTgsm2( gpcWIN* pWIN );
+		gpcGSM*	GTgsm( gpcWIN* pWIN );
+		/*I8		GTgsm3( gpcWIN* pWIN );
+		I8		GTgsm2( gpcWIN* pWIN );*/
 		I8		GTcnct( gpcWIN* pWIN ); //, gpcGTall& acpt );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );

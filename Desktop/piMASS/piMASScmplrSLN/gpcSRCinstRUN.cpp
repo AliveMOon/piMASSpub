@@ -170,8 +170,12 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	if( pMEM ? !(nO=pMEM->lzyOBJ.nLD(sizeof(gpOBJ))) : true )
 		return pLZY;
 
+
+
 	char sBUFF[0x100];
-	gpOBJ* pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
+	gpOBJ	*pOmn = pMEM->pOBJ(gpeALF_MINI),
+			*pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
+
 	U4x4* pL0 = aSCOOP[0].pLNK();
 	I8x4* pMN0 = aSCOOP[0].pMN();
 	U1* pU1, *pSRC = aSCOOP[0].p_str, *pUdbg = NULL;
@@ -180,6 +184,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	bool bTMP;
 	U4 cID, area = 1;
 	gpPTR* pPTR = NULL;
+
 	for( U4 i = 0; i < nO; i++ ) {
 		gpOBJ& obj = pO0[i];
 		if( !obj.AN.alf )
@@ -192,17 +197,37 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 		if( pP->iPC < 0 )
 			continue;
 
+		pU1 = pP->pU1(obj.pMEM);
+
+		if( pOmn ) {
+			if( pOmn != &obj ) {
+				pMEM->instDOit( obj, pU1 );
+				continue;
+			}
+			cID = pP->cID();
+			if( pP->cID() == gpeCsz_b ){
+				pLZY = pLZY->lzyFRMT( (s=-1), "%s", pU1?(char*)pU1+1:"?" );
+				if( pLZY->nLD() ) {
+					pLZY->n_load--;
+					pLZY->p_alloc[pLZY->nLD()]=0;
+				}
+			}
+			continue;
+		} else {
+			cID = pP->cID();
+			area = pP->pd2D()->area();
+		}
+
 		bTMP = obj.dctID < 0 || (obj.cAN != gpeCsz_a);
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPTR );
 		pUdbg = pLZY ? pLZY->p_alloc : NULL;
-		area = pP->pd2D()->area();
-		pU1 = pP->pU1(obj.pMEM);
+
 
         nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
         if( !nS )
 			continue;
 
-		cID = pP->cID();
+		//cID = pP->cID();
 		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
 		pLZY = pLZY->lzyADD( pS, nS, (s=-1), -1 );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );

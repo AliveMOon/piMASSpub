@@ -136,7 +136,7 @@ gpBLK* gpcSRC::srcINSTent2( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 
 	return pBLKm;
 }
-gpBLK* gpcSRC::srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
+/*gpBLK* gpcSRC::srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
 
@@ -379,7 +379,7 @@ gpBLK* gpcSRC::srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	_move._L.D0.IA0I;
 	_nop;
 	return pBLKm;
-}
+}*/
 gpBLK* gpcSRC::srcINSTadd2( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 	if( !pBLKm )
 		pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );

@@ -5,4 +5,6 @@
   0x2290 d= 0x0000000000000002,
   0x2320 mini= "hello 1210",
   0x2340 print= "hello 1210",
-  0x23b0 agein= 0x0a,
+  0x23b0 again= 0x0a,
+  0x23d0 mimi= "hello 1210 20",
+  0x2420 fps= 20,

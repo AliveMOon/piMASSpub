@@ -1402,7 +1402,7 @@ public:
 
 	gpBLK*	srcINSTmov3( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 
-	gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	//gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTent2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTadd2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTmul2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );

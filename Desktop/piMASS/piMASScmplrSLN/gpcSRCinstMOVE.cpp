@@ -32,7 +32,7 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 
     if( ppR )
 		*ppR = pRi;
-
+	bool bUP = false;
 	if( pBup )
 	if( pBup->iPTR > 0 )
 	if(	pPi = pBup->BLKpPTR( pS ) ) {
@@ -46,8 +46,19 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 			break;
         }
         pOi = pMEM->OBJfnd( pPi->mNdID );
+        /// DEBUG -------------------
+        I8x2 AN = pOi->AN;
+		switch( AN.alf ) {
+			case gpeALF_IX:
+				bUP = true;
+				break;
+			default:
+				break;
+		}
+        /// DEBUG -------------------
         if( ppO )
 			*ppO = pOi;
+		return pPi;
     } else {
     	pPi = pBup->BLKpPTR( pS );
     }
@@ -66,7 +77,6 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 
 	I4x2	DM(1,1);
 	I8x2 	AN(0);
-
 	I4 cIDblk = gpeCsz_L;
 	if(pOi->bAN()) {
 		if(ppSRC) {
@@ -116,6 +126,16 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 
 		AN = pOi->AN;
 		switch( AN.alf ) {
+			case gpeALF_IX:
+				cIDblk = gpeCsz_L;
+				break;
+			case gpeALF_IA:
+			case gpeALF_IN:
+
+			case gpeALF_IW:
+			case gpeALF_IH:
+
+			case gpeALF_IY:
 			case gpeALF_FPS:			/// beépített FPS
 				cIDblk = gpeCsz_L;
 				break;
@@ -151,8 +171,6 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 		pPi->d2D( DM );
 		pPi->iPC = pMEM->iALL( pPi->sOF() );
 	}
-
-
 
 	_move._l.EAl( pPi->iPC ).A0;
 	_jsr.EAl( AN.alf );
