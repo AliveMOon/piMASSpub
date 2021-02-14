@@ -918,15 +918,15 @@ public:
 	}
 
 	bool bARY(){ return pd2D()->area() > 1; }
-	bool bUTF8()
-	{
+	bool bUTF8() {
 		if( cID() != gpeCsz_b )
 			return false;
 		return bARY();
 	}
 	bool bAN() { return this? cAN == gpeCsz_c:false; }
 	bool bALF() { return this? cAN == gpeCsz_a:false; }
-
+	I8 iVAR();
+	bool bVAR();
 
 	/*I4 REcID( I4 c )
 	{

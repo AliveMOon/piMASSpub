@@ -5,6 +5,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+extern gpcVAR gpVAR[];
 gpBLK* gpBLK::iROWblk( char* pS, I4 i, gpROW** ppR )
 {
 	if( ppR ) *ppR = NULL;
@@ -23,6 +24,7 @@ gpBLK* gpBLK::iROWblk( char* pS, I4 i, gpROW** ppR )
 
 	return pMEM->pSRC->lzyBLOCK.pSTPup( pRi->bIDup, -1, -1, pRi->mnID );
 }
+
 gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC, gpOBJ** ppOin )
 {
 	gpOBJ* pOi = NULL;
@@ -47,14 +49,7 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
         }
         pOi = pMEM->OBJfnd( pPi->mNdID );
         /// DEBUG -------------------
-        I8x2 AN = pOi->AN;
-		switch( AN.alf ) {
-			case gpeALF_IX:
-				bUP = true;
-				break;
-			default:
-				break;
-		}
+        bUP = pOi->bVAR();
         /// DEBUG -------------------
         if( ppO )
 			*ppO = pOi;
@@ -124,7 +119,15 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 		if( ppSRC )
 			*ppSRC = NULL;
 
-		AN = pOi->AN;
+		/// beépített FORRÁS változó?
+		I8 i = pOi->iVAR();
+		if( i >= 0 ) {
+			AN.alf = gpVAR[i].alf; //pOi->AN.alf;
+			cIDblk = gpVAR[i].typ;
+		} else {
+			AN.alf = gpeALF_null;
+		}
+		/*AN = pOi->AN;
 		switch( AN.alf ) {
 			case gpeALF_IX:
 				cIDblk = gpeCsz_L;
@@ -141,7 +144,7 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 				break;
 			default:
 				AN.alf = gpeALF_null;
-		}
+		}*/
 	}
 	else if( pPi ) {
 		if( pPi->mNdID < 0 ){

@@ -2498,7 +2498,16 @@ typedef enum gpeZS:U4 {
 	gpeZS_oCTR = MAKE_ID( 'o', 'C', 'T', 'R'	),
 
 } gpeZS;
+class gpcVAR{
+public:
+	gpeALF alf;
+	gpeCsz typ;
+	gpcVAR( gpeALF a, gpeCsz t ){
+		alf = a;
+		typ = t;
+	}
 
+};
 class I4x2 {
 public:
 	union{
@@ -2539,12 +2548,10 @@ public:
         x = pI[0];
         y = pI[1];
     }
-    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
-    {
+    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
 		return sprintf( pBUFF, "%d%s%d%s%s", x, pSeP, y, pSeP, pENT );
     }
-    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
-    {
+    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
@@ -2691,19 +2698,16 @@ public:
 
 	I4x2 operator - (const I4x2& b) const { return I4x2( x-b.x,  y-b.y ); }
 	I4x2 operator - (const U4x2& b) const { return I4x2( x-b.x,  y-b.y ); }
-	bool operator != ( const I4x2& b ) const
-	{
+	bool operator != ( const I4x2& b ) const {
 		if( x != b.x )
 			return true;
 		return y != b.y;
 	}
-	bool operator == ( const I4x2& b ) const
-	{
+	bool operator == ( const I4x2& b ) const {
 		return !(*this!=b);
 	}
 
-	I4x2& operator *= ( I4 i )
-	{
+	I4x2& operator *= ( I4 i ) {
 		if( !i )
 			return null();
 		if( i == 1 )
@@ -2714,8 +2718,7 @@ public:
 
 		return *this;
 	}
-	I4x2& operator /= ( I4 i )
-	{
+	I4x2& operator /= ( I4 i ) {
 		if( i == 1 )
 			return *this;
 
@@ -2730,8 +2733,7 @@ public:
 
 		return *this;
 	}
-	I4x2& operator %= ( I4 i )
-	{
+	I4x2& operator %= ( I4 i ) {
 		if( i == 1 )
 			return null();
 
@@ -2916,15 +2918,13 @@ public:
 
 		return avgr / n;
 	}
-	I4x2& swp()
-	{
+	I4x2& swp() {
 		int t = x;
 		x = y;
 		y = t;
 		return *this;
 	}
-	I4x2& YdivQR( int b )
-	{
+	I4x2& YdivQR( int b ) {
 		if( b<2 ? true : b < -1 )
 		{
 			x = y;
@@ -2937,17 +2937,14 @@ public:
 		qr = div(y,b);
 		return *this;
 	}
-	I4x2& YdivRQ( int b )
-	{
+	I4x2& YdivRQ( int b ) {
 		return YdivQR(b).swp();
 	}
-	I4x2& XdivQR( int b )
-	{
+	I4x2& XdivQR( int b ) {
 		y = x;
 		return YdivQR(b);
 	}
-	I4x2& XdivRQ( int b )
-	{
+	I4x2& XdivRQ( int b ) {
 		y = x;
 		return YdivQR(b).swp();
 	}
@@ -3762,6 +3759,10 @@ public:
 	};
 
     I8x2(){};
+    I8x2( gpeALF a, I4x2 b ){
+    	alf = a;
+    	i4x2[1] = b;
+    };
     I8x2( I4 _x, I4 _y = 0 ) { x = _x; y = _y; }
     I8x2( U8 _x, U8 _y = 0 ) { x = _x; y = _y; }
     I8x2( I8 _x, I8 _y = 0 ) { x = _x; y = _y; }
@@ -5676,6 +5677,8 @@ public:
 		aWIP[gpeLZYwip] = gpeWIP_done,
 		aSET[gpeLZYxN] = n;
 	}
+	gpcLZY( gpcVAR* pALF, U4 n );
+
 	~gpcLZY() { gpmFREE( p_alloc ); }
 	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
 

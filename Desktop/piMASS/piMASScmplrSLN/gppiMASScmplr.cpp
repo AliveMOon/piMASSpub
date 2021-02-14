@@ -20,21 +20,35 @@ U1* gpPTR::pU1( gpMEM* pMEM )
 		return NULL;
 
 	return pMEM->pUn( pPi->iPC, gpaCsz[pPi->cID()] );
-	/*if( !this )
-		return NULL;
-	if( pMEM ? (iPC<0) : true )
-	{
-		if( !bckID )
-			return NULL;
-		gpOBJ* pO = pMEM->OBJfnd(bckID);
-		return pO->pU1();
-	}
-
-	return pMEM->pUn( iPC, gpaCsz[cID] );*/
 }
 ///--------------------------
 ///			gpOBJ
 ///--------------------------
+
+gpcVAR gpVAR[] = {
+		gpcVAR( gpeALF_IA, gpeCsz_L ),
+		gpcVAR( gpeALF_IN, gpeCsz_L ),
+		gpcVAR( gpeALF_IW, gpeCsz_L ),
+		gpcVAR( gpeALF_IH, gpeCsz_L ),
+		gpcVAR( gpeALF_IX, gpeCsz_L ),
+		gpcVAR( gpeALF_IY, gpeCsz_L ),
+
+		gpcVAR( gpeALF_FPS, gpeCsz_L ),
+};
+gpcLZY::gpcLZY( gpcVAR* pVAR, U4 n ) {
+	gpmCLR;
+	I8 nI8 = 0, iI8;
+	for( U4 i = 0; i < n; i++ ) {
+		iI8 = tree_fnd( pVAR[i].alf, nI8 );
+		if( iI8 < nI8 )
+			continue;
+
+		tree_add( pVAR[i].alf, nI8 );
+	}
+}
+
+gpcLZY gpLZYvar( gpVAR, gpmN(gpVAR) );
+
 gpPTR* gpOBJ::pPTR(){
 	if( this ? !pMEM : true )
 		return NULL;
@@ -82,6 +96,29 @@ U4 gpOBJ::sOF() {
 I4 gpOBJ::cID() {
 	return pPTRu1()->cID();
 }
+I8 gpOBJ::iVAR() {
+	if( this ? !AN.alf : true )
+		return -1;
+	I8	n = gpLZYvar.nLD(sizeof(gpcVAR)),
+		i = gpLZYvar.tree_fnd( (I8)AN.alf,n);
+	return i < n ? i : -1;
+}
+bool gpOBJ::bVAR() {
+	return iVAR() >= 0;
+}
+
+I4	gpcWIN::instVARmx(){ return this ? 1 : 0; }
+I4	gpcWIN::instVARmy(){ return this ? 1 : 0; }
+
+I4	gpcWIN::instVARix(){ return this ? apCRS[onDIV.x]->scnIN.x : 0; }
+I4	gpcWIN::instVARiy(){ return this ? apCRS[onDIV.x]->scnIN.y : 0; }
+I4	gpcWIN::instVARiw(){ return this ? apCRS[onDIV.x]->scnIN.z : 0; }
+I4	gpcWIN::instVARih(){ return this ? apCRS[onDIV.x]->scnIN.w : 0; }
+
+I4	gpcWIN::instVARia(){ return this ? apCRS[onDIV.x]->scnZN.x+1 : 0; }
+I4	gpcWIN::instVARin(){ return this ? apCRS[onDIV.x]->scnZN.y : 0; }
+
+
 U1* gpOBJ::pU1(){
 	gpPTR* pP = pPTRu1();
 	if( !pP )

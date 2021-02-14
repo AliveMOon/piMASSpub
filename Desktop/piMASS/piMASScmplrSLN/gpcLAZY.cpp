@@ -174,7 +174,9 @@ U4 gpcLZY::tree_fnd( U4 id, U4& n ) {
 	if( !this )
 		return n = 0;
 
-	n = n_load/sizeof(U4x4);
+	n = nLD(sizeof(U4x4));
+	if( !n )
+		return n;
 	U4x4* p_u44 = (U4x4*)p_alloc;
 	U4 fnd = p_u44->tree_fnd( id, n );
 
@@ -210,7 +212,9 @@ U8 gpcLZY::tree_fnd( U8 id, U8& n ) {
 	if( !this )
 		return n = 0;
 
-	n = n_load/sizeof(U8x4);
+	n = nLD(sizeof(U8x4));
+	if( !n )
+		return n;
 	U8x4* p_u84 = (U8x4*)p_alloc;
 	U8 fnd = p_u84->tree_fnd( id, n );
 
@@ -246,7 +250,9 @@ I8 gpcLZY::tree_fnd( I8 id, I8& n ) {
 	if( !this )
 		return n = 0;
 
-	n = n_load/sizeof(U8x4);
+	n = nLD(sizeof(I8x4));
+	if( !n )
+		return n;
 	I8x4* p_i84 = (I8x4*)p_alloc;
 	I8 fnd = p_i84->tree_fnd( id, n );
 

@@ -23,7 +23,7 @@
  //w = iw; h = ih;
  unsel = 1;
  name = "ize";
- px = ix*480/iw; py = 800*iy/ih;
+ px = ix*800/iw; py = 480*iy/ih;
  mini = print( "
   inx: %d iny: %d
   a %d n %d
