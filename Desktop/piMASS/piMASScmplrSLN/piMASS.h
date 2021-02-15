@@ -211,7 +211,12 @@
 #define gpdBLTstx( st, sxy, dt, dxy ) 	SDL_RenderCopy( dt, st, sxy,  dxy ) 	//SDL_SoftStretch //SDL_BlitScaled	//SDL_LowerBlitScaled
 #define gpdBLTtx( st, sxy, dt, dxy )  	SDL_RenderCopy( dt, st, sxy,  dxy )  //SDL_BlitSurface	//SDL_LowerBlit
 
+/// sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
 
+/// mkdir /piMASS
+/// sudo ln -s /home/alivemoon/Asztal/piMASScmplrSLNpi4/mini_ISO_32x32_1024x1536_3.png /piMASS/mini_char.png
+
+/// sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/piMASS /usr/sbin/pimass
 //#define gpdGT_LIST_tOUT 3
 #define gpdPICbg "/mnt/ram/bg.png"
 #define gpsMINI_CHAR "mini_char_16x32_8x32.png" //"mini_char_64x512.png"	// "mini_char_16x32.png" //

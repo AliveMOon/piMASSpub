@@ -8,8 +8,12 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 {
 	switch( inst.a8x2.alf )
 	{
+		case gpeALF_MLB: *(I4*)p_dst = pWIN->instVARmlb(); break;
 		case gpeALF_MX: *(I4*)p_dst = pWIN->instVARmx(); break;
 		case gpeALF_MY: *(I4*)p_dst = pWIN->instVARmy(); break;
+
+		case gpeALF_MSEC:
+		case gpeALF_MS: *(I4*)p_dst = pWIN->instVARms(); break;
 
 		case gpeALF_iA: *(I4*)p_dst = pWIN->instVARia(); break;
 		case gpeALF_iN: *(I4*)p_dst = pWIN->instVARin(); break;

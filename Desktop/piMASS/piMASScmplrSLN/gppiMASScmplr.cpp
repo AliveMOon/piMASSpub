@@ -26,10 +26,19 @@ U1* gpPTR::pU1( gpMEM* pMEM )
 ///--------------------------
 
 gpcVAR gpVAR[] = {
+		gpcVAR( gpeALF_MSEC, gpeCsz_L ),
+		gpcVAR( gpeALF_MS, gpeCsz_L ),
+
 		gpcVAR( gpeALF_IA, gpeCsz_L ),
 		gpcVAR( gpeALF_IN, gpeCsz_L ),
+
 		gpcVAR( gpeALF_IW, gpeCsz_L ),
 		gpcVAR( gpeALF_IH, gpeCsz_L ),
+
+		gpcVAR( gpeALF_MX, gpeCsz_L ),
+		gpcVAR( gpeALF_MY, gpeCsz_L ),
+		gpcVAR( gpeALF_MLB, gpeCsz_L ),
+
 		gpcVAR( gpeALF_IX, gpeCsz_L ),
 		gpcVAR( gpeALF_IY, gpeCsz_L ),
 
@@ -107,16 +116,7 @@ bool gpOBJ::bVAR() {
 	return iVAR() >= 0;
 }
 
-I4	gpcWIN::instVARmx(){ return this ? 1 : 0; }
-I4	gpcWIN::instVARmy(){ return this ? 1 : 0; }
 
-I4	gpcWIN::instVARix(){ return this ? apCRS[onDIV.x]->scnIN.x : 0; }
-I4	gpcWIN::instVARiy(){ return this ? apCRS[onDIV.x]->scnIN.y : 0; }
-I4	gpcWIN::instVARiw(){ return this ? apCRS[onDIV.x]->scnIN.z : 0; }
-I4	gpcWIN::instVARih(){ return this ? apCRS[onDIV.x]->scnIN.w : 0; }
-
-I4	gpcWIN::instVARia(){ return this ? apCRS[onDIV.x]->scnZN.x+1 : 0; }
-I4	gpcWIN::instVARin(){ return this ? apCRS[onDIV.x]->scnZN.y : 0; }
 
 
 U1* gpOBJ::pU1(){

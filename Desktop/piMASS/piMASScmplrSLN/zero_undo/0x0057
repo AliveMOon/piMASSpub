@@ -41,10 +41,10 @@
  again = 1;
  
 
- a4	  
- cam = mlb;
+ a4	 
+ cam = 1; //mlb;
  ize = b3.test;
  again = 100; b4	   
  t=ms,
  again=1000;
-  a5	  
+  a5	 

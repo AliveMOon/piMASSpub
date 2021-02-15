@@ -108,6 +108,8 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 			I4 imNdID = pPi->mNdID; // (*ppOin) ? (*ppOin)->oID : 0;
 			gpPTR* pPin = (*ppOin)->pPTRu1();
 			//pPi->cpyREF( pMEM->pUn(), pPin );
+			if( !pPin )
+				return pPi;
 			*pPi = *pPin;
 			pPi->iPC = -1;
 			pPi->mNdID = imNdID;

@@ -676,11 +676,8 @@ int main( int nA, char *apA[] )
 		{
 			*pUND = 0;
 		}
-		strcpy( gppMASSfile, gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
 
-
-
-
+		strcpy( gppMASSfile, gpsMINI_ISO ); //gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
 		gpcWIN win( gpsMASSpath, gppMASSfile, gpsMASSname, piMASS );
 		gpcCRS main_crs( win, 0 );
 		win.winRUN( 	"                                        "

@@ -24,7 +24,7 @@
  unsel = 1;
  name = "ize";
  px = ix*480/iw; py = 800*iy/ih;
- test = mlb + (ia-2)*1000 + (in-3)*10000;
+ test = mlb + ia-2 + in-3;
  mini = print( "
   inx: %d iny: %d
   a %d n %d
@@ -41,10 +41,7 @@
  again = 1;
  
 
- a4	  
- cam = mlb;
- ize = b3.test;
- again = 100; b4	   
+ b4	   
  t=ms,
  again=1000;
-  a5	  
+ 
