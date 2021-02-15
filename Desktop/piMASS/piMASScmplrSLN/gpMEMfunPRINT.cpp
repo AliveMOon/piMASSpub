@@ -101,7 +101,6 @@ void gpMEM::funPRINT()
 	pS = pPRNT ? (char*)pPRNT->p_alloc : NULL;
 	nCPY = gpmSTRLEN(pS);
 
-
 	gpPTR *pPhr = pPTR(pA[0]);
 
 	I4 nA = nALL(pPhr->iPC);

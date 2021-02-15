@@ -785,7 +785,7 @@ public:
 			if( pWIN )
 			if( !i ) {
 				sprintf( pWIN->gppMASSfile, "%s/sms.mass", lzyPUB.p_alloc+s0+1 );
-				lzyPUB.nLD(s0);
+				lzyPUB.n_load = s0;
 			}
 			lzyPUB.utf8('\r');
 			lzyPUB.utf8('\n');

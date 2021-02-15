@@ -6339,6 +6339,8 @@ szasz:
 	}
 	int nAT( char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
 	gpcLZY* utf8( U4 u, U1 trans = '\a' ) {
+		if( !u )
+			return this;
 		gpcLZY* pLZY = this;
 		U1 aU[8], nU = 0;
 		if( trans ? u == trans : false ) {

@@ -679,22 +679,10 @@ int main( int nA, char *apA[] )
 		strcpy( gppMASSfile, gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
 
 
-		//I4x4 mouseXY(0,0), mouseW(0), winSIZ(800,600,800,600), SRCxycr(0), SRCin(0);
-		/*SDL_DisplayMode sdlDM;
-		SDL_GetCurrentDisplayMode(0, &sdlDM);
-		winSIZ.z = (sdlDM.w*7)/8;
-		winSIZ.w = sdlDM.h;
-		winSIZ.a4x2[0] = winSIZ.a4x2[1];*/
-
-		gpcWIN win( gpsMASSpath, gppMASSfile, gpsMASSname, piMASS ); //, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
-		//win.pMASS = piMASS;
-        gpcCRS main_crs( win, 0 ); //, *apCRS[4];
 
 
-		// gpmZ(apCRS);
-        //apCRS[srcDIV] = &main_crs;
-        //sdl.draw();
-
+		gpcWIN win( gpsMASSpath, gppMASSfile, gpsMASSname, piMASS );
+		gpcCRS main_crs( win, 0 );
 		win.winRUN( 	"                                        "
 						"     **** GRANDPACE piMASS V0.1 ****    "
 						"                                        "

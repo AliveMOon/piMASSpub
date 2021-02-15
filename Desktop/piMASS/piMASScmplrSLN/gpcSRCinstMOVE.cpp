@@ -127,24 +127,6 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 		} else {
 			AN.alf = gpeALF_null;
 		}
-		/*AN = pOi->AN;
-		switch( AN.alf ) {
-			case gpeALF_IX:
-				cIDblk = gpeCsz_L;
-				break;
-			case gpeALF_IA:
-			case gpeALF_IN:
-
-			case gpeALF_IW:
-			case gpeALF_IH:
-
-			case gpeALF_IY:
-			case gpeALF_FPS:			/// beépített FPS
-				cIDblk = gpeCsz_L;
-				break;
-			default:
-				AN.alf = gpeALF_null;
-		}*/
 	}
 	else if( pPi ) {
 		if( pPi->mNdID < 0 ){
