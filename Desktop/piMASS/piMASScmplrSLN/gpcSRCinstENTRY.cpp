@@ -4,7 +4,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
+U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
 {
 	switch( inst.a8x2.alf )
 	{
@@ -69,7 +69,9 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 				}
 
             } break;
-		case gpeALF_PRINT: funPRINT(); break;
+		case gpeALF_PRINT:	funPRINT(); break;
+		case gpeALF_FND:	funFND(); break;
+		case gpeALF_NEW:	funNEW(); break;
 
 		default:
 			*(I4*)p_dst = 0;

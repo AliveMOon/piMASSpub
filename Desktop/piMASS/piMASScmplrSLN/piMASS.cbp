@@ -130,6 +130,7 @@
 		<Unit filename="SIM7X00/Raspberry/c/sim7x00.h" />
 		<Unit filename="gpCORE.cpp" />
 		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpMEMfunFND.cpp" />
 		<Unit filename="gpMEMfunPRINT.cpp" />
 		<Unit filename="gpMEMinstDOit.cpp" />
 		<Unit filename="gpcCRSbreak.cpp" />

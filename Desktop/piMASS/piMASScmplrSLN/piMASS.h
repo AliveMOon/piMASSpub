@@ -2283,7 +2283,7 @@ public:
 		return n_t;
 	}
 
-	U4	dctADD( U1* p_src, U4& m, U4x4& w );
+	U4	dctADD( const void* pV, U4& m, U4x4& w );
 	U4  dctFND( U1* p_src, U4x4& w );
 
 	U4	dctADDn( void* pBIN, U4& m, U4x4& w );
@@ -3995,6 +3995,32 @@ public:
 	int alfN( gpeALF af, int n );
 	int alfRIG( gpeALF af, int n, int r );
 	int aALFfnd( const gpeALF* aALF, int n, int nA );
+
+	void alfCON( char* pOUT, int nAT ) {
+		I8x2* pAT = this;
+		if( !this )
+			nAT = 0;
+
+		int at = 0;
+		for( ; at < nAT; at++ ) {
+			switch(pAT[at].alf){
+				case gpeALF_PLUS:
+					sprintf( pOUT, "+%lld", pAT[at].num );
+					break;
+				case gpeALF_CM:
+					sprintf( pOUT, ",%lld", pAT[at].num );
+					break;
+				case gpeALF_MRK:
+					sprintf( pOUT, "\"%lld\r\n", pAT[at].num);
+					break;
+				default:
+					pAT[at].an2str( pOUT );
+					break;
+			}
+			std::cout << at <<"."<< pOUT << " ";
+		}
+		std::cout << "nAT:" << at << std::endl;
+	}
 };
 
 
@@ -6059,8 +6085,13 @@ public:
 			memcpy( p_alloc+iSTRT, p_alloc+iSTRT+n_sub, n_hi );
 		}
 
-		n_load -= n_sub;
-		p_alloc[n_load] = 0;
+		if( n_load > n_sub)
+			n_load -= n_sub;
+		else
+			n_load = 0;
+
+		if( p_alloc )
+			p_alloc[n_load] = 0;
 		return this;
 	}
 	gpcLZY* lzy_exp_rand( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 ) {
@@ -6180,7 +6211,7 @@ public:
 		U8 s = -1;
 		return lzyADD( plus.p_alloc, plus.n_load, s );
 	}
-
+	gpcLZY* lzyDIR( const char* p_file, U8& iSTRT );
 	gpcLZY* lzyRD( const char* p_file, U8& iSTRT, U1 n = 0 ) {
 		/// READ FILE
 		if( !p_file )
@@ -6436,13 +6467,14 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	gpcLZYdct* dctADD( U1* pS, U8 nS ) {
+	gpcLZYdct* dctADD( const void* pV, U8 nS ) {
 		if( !this )
 		{
 			gpcLZYdct* p_this = new gpcLZYdct(0);
 
-			return p_this->dctADD( pS, nS );
+			return p_this->dctADD( pV, nS );
 		}
+		U1* pS = (U1*)pV;
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
@@ -6723,12 +6755,8 @@ public:
 	U8			ver;
 
 	gpcLZYdctBIN(){};
-	gpcLZYdctBIN(U4 n)
-	{
-		gpmCLR;
-	}
-	void rst()
-	{
+	gpcLZYdctBIN(U4 n) { gpmCLR; }
+	void rst() {
 		if(!this)
 			return;
 		pIX = NULL;
@@ -6768,10 +6796,8 @@ public:
 		return iIX;
 	}
 	gpcLZYdctBIN* dctADD( U1* pB, U8 nB ) {
-		if( !this )
-		{
+		if( !this ) {
 			gpcLZYdctBIN* p_this = new gpcLZYdctBIN(0);
-
 			return p_this->dctADD( pB, nB );
 		}
 		U8 aSTRT[2]; // = -1;
@@ -6806,37 +6832,31 @@ public:
 		return this;
 	}
 
-	U4 x( void )
-	{
+	U4 x( void ) {
 		if( this ? !ix.n_load : true )
 			return 0;
 
 		return pIX-(U4x4*)ix.p_alloc;
 	}
-	U4 iBIN(void)
-	{
+	U4 iBIN(void) {
 		if( !pIX )
 			return bin.n_load;
 
 		return pIX->x;
 	}
-	void* pBINix( void )
-	{
+	void* pBINix( void ) {
 		return bin.p_alloc+pIX->x;
 	}
-	U8 nIX(void)
-	{
+	U8 nIX(void) {
 		return this ? (ix.n_load / sizeof(U4x4)) : 0;
 	}
-	const void* pBINi( U8 i, const void* pER )
-	{
+	const void* pBINi( U8 i, const void* pER ) {
 		if( !this )
 			return pER;
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 		return bin.p_alloc + p_ix0[i].x;
 	}
-	U4 nBINix( U8 iX )
-	{
+	U4 nBINix( U8 iX ) {
 		if( this ? iX >= nIX() : true )
 			return 0;
 

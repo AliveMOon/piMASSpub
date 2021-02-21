@@ -1,4 +1,5 @@
 #include "piMASS.h"
+#include <dirent.h>
 extern U1 gpaALFsub[];
 extern U1 gpaALFsub2[];
 extern char gpaALF_H_sub[];
@@ -28,6 +29,44 @@ static const char* gpasADDR[] = {
 	"%S0x%0.8x|",
 	"%S0x%0.16llx|",
 };
+gpcLZY* gpcLZY::lzyDIR( const char* p_file, U8& iSTRT ) {
+	if( !p_file )
+		return this;
+
+	struct dirent *pE;
+	struct stat buf;
+	DIR* pD = opendir( p_file );
+	if( !pD )
+		return lzySUB( iSTRT, -1 );
+
+	gpcLZY* pDIR = this;
+	if( iSTRT>pDIR->nLD() )
+		iSTRT = pDIR->nLD();
+
+	U8 s = iSTRT;
+	char s___[] = "---";
+	while( (pE=readdir(pD)) ) {
+
+		if( !(strcmp(".", pE->d_name)))
+			continue;
+		if( !(strcmp("..", pE->d_name)))
+			continue;
+
+		pDIR = pDIR->lzyFRMT( s, "%s/%s", p_file, pE->d_name );
+		stat( (char*)pDIR->p_alloc+s, &buf );
+		if (pE->d_type == DT_DIR)
+			s___[0]='d';
+		else if (pE->d_type == DT_REG)
+			s___[0]='f';
+		s___[1]=(buf.st_mode & S_IRUSR) ? 'r' : '-';
+		s___[2]=(buf.st_mode & S_IWOTH) ? 'w' : '-';
+
+		pDIR = pDIR->lzyFRMT( s, "%s\t%s\t%zd\r\n", pE->d_name, s___, buf.st_size );
+		s = pDIR->nLD();
+	}
+	closedir(pD);
+	return pDIR;
+}
 gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN ) {
 	if( nBIN ? !pBIN : true )
 		return this;

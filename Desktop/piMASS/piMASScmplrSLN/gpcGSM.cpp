@@ -494,7 +494,8 @@ public:
 	void so( I8x2* pAT, int nAT ) {
 		if(!bSTDcout)
 			return;
-		int at = 0;
+		pAT->alfCON(sOUT,nAT);
+		/*int at = 0;
 		for( ; at < nAT; at++ ) {
 			switch(pAT[at].alf){
 				case gpeALF_PLUS:
@@ -512,7 +513,7 @@ public:
 			}
 			std::cout << at <<"."<< sOUT << " ";
 		}
-		std::cout << "nAT:" << at << std::endl;
+		std::cout << "nAT:" << at << std::endl;*/
 	}
 
 	int answCPIN( char* pANSW, int* pSUB, char* pS, I8x2 *pAT, int nAT, int iPLUS, int pin ) {

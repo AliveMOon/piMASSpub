@@ -1,5 +1,6 @@
 
- a0 
+ a0	
+ 
  a = ix;
  b = 20;
  c = a+b
@@ -20,9 +21,12 @@
  
  
  
- a1    b1	  
- a2    b2	  
- a3 
+ a1	
+   b1	  
+ a2	
+    b2	  
+ a3	
+ 
   b3	 
  //x = ix; y = iy;
  //w = iw; h = ih;
@@ -30,7 +34,7 @@
  name = "ize";
  px = ix*480/iw; py = 800*iy/ih;
  txy = mlb + (ia-2)*1000 + (in-3)*10000;
- lst = fnd( txy, "cageDB/cage/", "pxSCR.xyr", px, py, 10 );
+ lst = fnd( "cageDB/cage/", "px.xy", txy, px, py );
  mini = print( "
   inx:%d iny:%d
   a %d n %d
@@ -50,7 +54,8 @@
  
 
 
- a4 
+ a4	
+  
  cam = mlb;
  ize = b3.txy;
  again = 100;
@@ -60,4 +65,5 @@
  again=1000;
 
 
- a5 
+ a5	
+ 

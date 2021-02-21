@@ -16,7 +16,7 @@ U1* gpPTR::pU1( gpMEM* pMEM )
 		return pMEM->pUn( iPC, gpaCsz[cID()] );
 
 	gpPTR* pPi = pPTRu1(pMEM);
-	if( !pPi->bPTR() )
+	if( pPi->bPTR() )
 		return NULL;
 
 	return pMEM->pUn( pPi->iPC, gpaCsz[pPi->cID()] );
@@ -44,6 +44,17 @@ gpcVAR gpVAR[] = {
 
 		gpcVAR( gpeALF_FPS, gpeCsz_L ),
 };
+gpcVAR gpFUN[] = {
+		gpcVAR( gpeALF_SIN, gpeCsz_L ),
+		gpcVAR( gpeALF_COS, gpeCsz_L ),
+
+		gpcVAR( gpeALF_FND, gpeCsz_L ),
+		gpcVAR( gpeALF_NEW, gpeCsz_L ),
+
+		gpcVAR( gpeALF_PRINT, gpeCsz_b ),
+
+};
+
 gpcLZY::gpcLZY( gpcVAR* pVAR, U4 n ) {
 	gpmCLR;
 	I8 nI8 = 0, iI8;
@@ -56,7 +67,30 @@ gpcLZY::gpcLZY( gpcVAR* pVAR, U4 n ) {
 	}
 }
 
-gpcLZY gpLZYvar( gpVAR, gpmN(gpVAR) );
+gpcLZY 	gpLZYvar( gpVAR, gpmN(gpVAR) ),
+		gpLZYfun( gpFUN, gpmN(gpFUN) );
+
+I8 gpOBJ::iVAR() {
+	if( this ? !AN.alf : true )
+		return -1;
+	I8	n = gpLZYvar.nLD(sizeof(gpcVAR)),
+		i = gpLZYvar.tree_fnd( (I8)AN.alf,n);
+	return i < n ? i : -1;
+}
+bool gpOBJ::bVAR() {
+	return iVAR() >= 0;
+}
+I8 gpOBJ::iFUN() {
+	if( this ? !AN.alf : true )
+		return -1;
+	I8	n = gpLZYfun.nLD(sizeof(gpcVAR)),
+		i = gpLZYfun.tree_fnd( (I8)AN.alf,n);
+	return i < n ? i : -1;
+}
+bool gpOBJ::bFUN() {
+	return iFUN() >= 0;
+}
+
 
 gpPTR* gpOBJ::pPTR(){
 	if( this ? !pMEM : true )
@@ -105,16 +139,7 @@ U4 gpOBJ::sOF() {
 I4 gpOBJ::cID() {
 	return pPTRu1()->cID();
 }
-I8 gpOBJ::iVAR() {
-	if( this ? !AN.alf : true )
-		return -1;
-	I8	n = gpLZYvar.nLD(sizeof(gpcVAR)),
-		i = gpLZYvar.tree_fnd( (I8)AN.alf,n);
-	return i < n ? i : -1;
-}
-bool gpOBJ::bVAR() {
-	return iVAR() >= 0;
-}
+
 
 
 

@@ -150,7 +150,7 @@ gpINST* gpMEM::instALU() {
 						// find OBJ
 						break;
 					case gpeOPid_jsr: {
-							instVAR( pALL + pA[0], ins );
+							instJSR( pALL + pA[0], ins );
 						} break;
 					default: break;
 				}

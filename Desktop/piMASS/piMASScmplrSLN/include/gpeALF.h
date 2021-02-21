@@ -836,6 +836,9 @@ typedef enum gpeALF:I8
 
 	gpeALF_FMX = gpdABC('F', 'M', 'X'),
 	gpeALF_FMY = gpdABC('F', 'M', 'Y'),
+
+	gpeALF_FND = gpdABC('F', 'N', 'D'),
+
 	gpeALF_FOR = gpdABC('F', 'O', 'R'),
 	gpeALF_FPS = gpdABC('F', 'P', 'S'),
 	gpeALF_GET = gpdABC('G', 'E', 'T'),
@@ -948,7 +951,33 @@ typedef enum gpeALF:I8
 	gpeALF_WMY = gpdABC('W', 'M', 'Y'),
 	gpeALF_YPR = gpdABC('Y', 'P', 'R'),
 	gpeALF_xor = gpdABC('X', 'O', 'R'),
-	gpeALF_XYZ = gpdABC('X', 'Y', 'Z'),
+
+	gpeALF_XXA = gpdABC('X', 'X', 'A'),
+	gpeALF_XXB, gpeALF_XXC, gpeALF_XXD,
+	gpeALF_XXE, gpeALF_XXF, gpeALF_XXG, gpeALF_XXH,
+	gpeALF_XXI, gpeALF_XXJ, gpeALF_XXK, gpeALF_XXL,
+	gpeALF_XXM, gpeALF_XXN, gpeALF_XXO, gpeALF_XXP,
+	gpeALF_XXQ, gpeALF_XXR, gpeALF_XXS, gpeALF_XXT,
+	gpeALF_XXU, gpeALF_XXV, gpeALF_XXW,
+	gpeALF_XXX, gpeALF_XXY, gpeALF_XXZ,
+
+	gpeALF_XYA, gpeALF_XYB, gpeALF_XYC, gpeALF_XYD,
+	gpeALF_XYE, gpeALF_XYF, gpeALF_XYG, gpeALF_XYH,
+	gpeALF_XYI, gpeALF_XYJ, gpeALF_XYK, gpeALF_XYL,
+	gpeALF_XYM, gpeALF_XYN, gpeALF_XYO, gpeALF_XYP,
+	gpeALF_XYQ, gpeALF_XYR, gpeALF_XYS, gpeALF_XYT,
+	gpeALF_XYU, gpeALF_XYV, gpeALF_XYW,
+	gpeALF_XYX, gpeALF_XYY, gpeALF_XYZ,
+
+	gpeALF_XZA, gpeALF_XZB, gpeALF_XZC, gpeALF_XZD,
+	gpeALF_XZE, gpeALF_XZF, gpeALF_XZG, gpeALF_XZH,
+	gpeALF_XZI, gpeALF_XZJ, gpeALF_XZK, gpeALF_XZL,
+	gpeALF_XZM, gpeALF_XZN, gpeALF_XZO, gpeALF_XZP,
+	gpeALF_XZQ, gpeALF_XZR, gpeALF_XZS, gpeALF_XZT,
+	gpeALF_XZU, gpeALF_XZV, gpeALF_XZW,
+	gpeALF_XZX, gpeALF_XZY, gpeALF_XZZ,
+
+	//gpeALF_XYZ = gpdABC('X', 'Y', 'Z'),
 	gpeALF_ZIP = gpdABC('Z', 'I', 'P'),
 	gpeALF_ZZZ = gpdABC('Z', 'Z', 'Z'),
 	gpeALF_3 = gpdABC('Z', 'Z', 'Z'),
