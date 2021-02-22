@@ -101,7 +101,7 @@ public:
 
 };
 gpITM* gpITM::dir( gpITMlst *pIDlst ) {
-	sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
+	char *pFILE = pIDlst->pF+sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
 	gpcLZY dir, rd; U8 s;
 	dir.lzyDIR( pIDlst->sPATH, s = 0 );
 	char	*pS = (char*)dir.p_alloc,
@@ -119,10 +119,10 @@ gpITM* gpITM::dir( gpITMlst *pIDlst ) {
 		aaaa.a8x2[0].y = aaaa.a8x2[1].x;
 		switch( aaaa.a8x2[1].alf ) {
 			case gpeALF_XYR: {
-					pXYZW = pIDlst->pAA( aaaa.a8x2[0], sizeof(*pXYZW) );
+					pXYZW = (I4x4*)pAA( aaaa.a8x2[0], sizeof(*pXYZW) );
 					if( !pXYZW )
 						break;
-					pF = pIDlst->pF;
+					pF = pFILE;
 					pF += gpfALF2STR( pF, aaaa.a8x2[0].x );
 					*pF = '.'; ++pF;
 					gpfALF2STR( pF, aaaa.a8x2[0].y );
@@ -139,6 +139,8 @@ gpITM* gpITM::dir( gpITMlst *pIDlst ) {
 }
 gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
 	char* pF = pIDlst->pF + sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
+	gpcLZY wr;
+	U8 s;
 	switch( pAT[1].alf ) {
 		case gpeALF_XYR: {
 			I8x2 aa( pAT[0].alf,pAT[1].alf);
@@ -149,7 +151,9 @@ gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
 			if( !pXYR )
 				break;
 			(*pXYR) = pVAR ? (*(I4x4*)pVAR) : I4x4(0);
-
+			wr
+			.lzyADD( pXYR, sizeof(*pXYR), s=0, -1)
+			->lzyWR( pIDlst->sPATH);
 		} break;
 		default: break;
 	}
@@ -196,7 +200,7 @@ gpITMlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
 		dir.lzyDIR( sPATH, nLEN = 0 );
 		pIl = *ppITMlst;
 		if( !pIl )
-			*ppITMlst = (pIl=new gpITMlst(sPATH,nU1));
+			*ppITMlst = (pIl=new gpITMlst(sPATH,pFILE-sPATH));
 
 		char	*pS = (char*)dir.p_alloc,
 				*pSi = pS, *pSn = pSi + dir.nLD(),
@@ -204,9 +208,9 @@ gpITMlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
 		while( pSi < pSn ) {
 			pSt = pSi + gpmVAN(pSi,   "\t", nLEN )+1;
 			pSe = pSt + gpmVAN(pSt, "\r\n", nLEN );
-
-			if( !strcmp(pSi,"0x") )
-			if( *pSt=='d' || *pSt=='D' ) {
+			int oo = gpmMcmp(pSi,"0x",2);
+			if( oo == 2 )
+			if( ((*pSt)=='d') || ((*pSt)=='D') ) {
 				ixITM = pIl->itmLST.nLD(sizeof(*pITM));
 				pITM = (gpITM*)pIl->itmLST.Ux( ixITM, sizeof(*pITM) );
 				pITM->mID = pITM->ID = gpfSTR2I8( pSi );
@@ -231,6 +235,7 @@ void gpMEM::funFND() {
 		*pI4 = (I4*)pUn(pA[7], nI4 ), nCPY,
 		i = nI4/gpaCsz[gpeCsz_l], j,
 		ixITM;
+	gpcLZY* pPRNT = NULL;
 	gpPTR *pPi;
 	--i;
 	if( !i )
@@ -267,7 +272,7 @@ void gpMEM::funFND() {
 	pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
 	I8 ixTYP = pPi->i8(this);
 	I4 nAT;
-	U8 nLEN;
+	U8 nLEN, s;
 	gpcLZY	AT;
 	I8x2* pAT = NULL;
 	if(ixTYP == '\"') {
@@ -287,9 +292,9 @@ void gpMEM::funFND() {
 
 	pAT->alfCON( sPUB, nAT );
 	I4x4 xyzw = 0, *pXYZW;
-	I4x2 *pON, *pIA;
+	I4x2 *pON = NULL, *pIA;
 	gpcLZY onLZY, iaLZY;
-	I4 onCNT = nITM, iaCNT = 0;
+	I4 onCNT = gpmPAD(nITM+1,0x10), iaCNT = 0;
 	for( I4 iA = 0, n; iA < nAT; iA+= 2 ) {
 		n = alfLEN(pAT[iA].alf);
 		pSi = pS +pAT[iA].num-n;
@@ -312,26 +317,32 @@ void gpMEM::funFND() {
 					pON = (I4x2*)onLZY.Ux( onCNT, sizeof(*pON) );
 					pON->x = ixITM;
 					pON->y = sqrt((xyzw.a4x2[0]-pXYZW->a4x2[0]).qlen());
-					if( pON->y > (xyzw.z+pXYZW->z) )
-						continue;
 					onCNT++;
 				}
 				pIA->y = onCNT-pIA->x;
 				if( pIA->y ) {
+
 					pON = (I4x2*)onLZY.Ux( pIA->x, sizeof(*pON) );
 
 					pON[0].median( pIA->y, (I4x2*)onLZY.p_alloc, true );
-					if( pXYZW->w )
-						pIA->y = gpmMIN( pXYZW->w, pIA->y );
-					gpmMcpyOF( pON, onLZY.p_alloc, pIA->y );
+					if( xyzw.w )
+						pIA->y = gpmMIN( xyzw.w, pIA->y );
+					//gpmMcpyOF( pON, onLZY.p_alloc, pIA->y );
 					onCNT = pIA->sum();
-					pIl->aixITMsel[0] = pON[0].x;
+					iaCNT++;
+
+					for( i = 0; i < pIA->y; i++ ) {
+						pPRNT = pPRNT->lzyFRMT( (s=-1), "\r\n %d 0x%0.4x %d", pON[i].x, pI0[pON[i].x].ID, pON[i].y );
+					}
 				}
 				if( iSW ? iSW!=1 : true )
 					break;
+
 				// select
-				if( pON ) {
+				if( pON )
+				if( pON[0].y < xyzw.z ) {
 					pIl->aixITMsel[1] = pIl->aixITMsel[0];
+					pIl->aixITMsel[0] = pON[0].x;
 					break;
 				}
 				// ITM + alf.XYR
@@ -365,7 +376,30 @@ void gpMEM::funFND() {
 	/// pxSCR.xyr
 
 
+	gpPTR *pPhr = pPTR(pA[0]);
+	pS = pPRNT ? (char*)pPRNT->p_alloc : NULL;
+	nCPY = gpmSTRLEN(pS)+2;
+	I4 nA = nALL(pPhr->iPC);
+	if( nA < nCPY ) {
+		if( nA )
+			iFREE( pPhr->iPC );
+		pPhr->iPC = iALL( nCPY );
+	}
+	nA = nALL(pPhr->iPC);
+	pPhr->cID(gpeCsz_b);
+	I4x2 dm(nCPY,1);
+	pPhr->d2D( dm );
 
+	U1* pDST = pPhr->pU1( this );
+	if( pDST )
+		sprintf( (char*)pDST, "\"%s\"", pS );
+		//gpmMcpy( pDST, pS, nCPY )[nCPY] = 0;
+
+	if(bSTDcout_jsr)
+	{std::cout	<< stdCYAN << "funFND:"
+				<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
+
+	gpmDEL(pPRNT);
 }
 
 void gpMEM::funNEW() {

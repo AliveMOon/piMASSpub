@@ -1305,7 +1305,7 @@ public:
 	I4		instDOitSLMP( gpcGT* pGT );
 	I4		instDOitGSM( gpcGT* pGT );
 
-	gpcLZY* memPRINT( I4 *pI4, I4 nI4 );
+	gpcLZY* memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 );
 	void	funPRINT();
 
 	void	funFND();
