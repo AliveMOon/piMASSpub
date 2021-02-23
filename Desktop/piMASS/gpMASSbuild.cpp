@@ -7,7 +7,46 @@ char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{}
 		gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 		*gppTAB = gpsTAB+strlen(gpsTAB),
 		gpsNDAT[] = "-bwllqqqqxxxxxxxx";
+int alfLEN( gpeALF alf ) {
+	if( !alf )
+		return 0;
 
+	if( alf <= gpeALF_4 ) {
+		if( alf <= gpeALF_2 ) {
+			if( alf <= gpeALF_Z )
+				return 1;
+			return 2;
+		}
+		if( alf <= gpeALF_3 )
+				return 3;
+		return 4;
+	}
+
+	if( alf <= gpeALF_8 ) {
+		if( alf <= gpeALF_6 ) {
+			if( alf <= gpeALF_5 )
+				return 5;
+			return 6;
+		}
+		if( alf <= gpeALF_7 )
+				return 7;
+		return 8;
+	}
+
+	if( alf <= gpeALF_12 ) {
+		if( alf <= gpeALF_10 ) {
+			if( alf <= gpeALF_9 )
+				return 9;
+			return 10;
+		}
+		if( alf <= gpeALF_11 )
+				return 11;
+		return 12;
+	}
+	if( alf <= gpeALF_13 )
+		return 13;
+	return 14;
+}
 U1* gpf_aALF_init( void ) {
 	for( int i = 0; i < 0x100; i++ )
 	{
@@ -26,6 +65,8 @@ U1* gpf_aALF_init( void ) {
 	}
 	gpmMcpy( gpaALFsub2, gpaALFsub, sizeof(gpaALF_H_sub) );
 	gpmMcpy( gpaALF_H_sub, gpaALFsub, sizeof(gpaALF_H_sub) );
+	gpaALFsub2['\n']	= ('\n'-'E')+('A'-1);
+	gpaALFsub2['\r']	= ('\r'-'E')+('A'-1);
 	gpaALFsub2['+']		= ('+'-'E')+('A'-1);
 	gpaALFsub2['\"']	= ('\"'-'E')+('A'-1);
 	gpaALFsub2[',']		= (','-'E')+('A'-1);

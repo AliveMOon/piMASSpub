@@ -284,9 +284,10 @@ bool gpcMASS::SRCsave( U1* pPATH, U1* pFILE ) {
 		pSRC = srcFND( pM[i] );
 		if( !pSRC )
 			continue;
+
 		pNUM = pALF+gpfALF2STR( pALF, (i%z)+1 );
-		pNX = pNUM + sprintf( (char*)pNUM, "%d\t", i/z );
-		buff.lzyFRMT( nS = -1, "\a %s", gpsSVadr );
+		pNX = pNUM + sprintf( (char*)pNUM, "%d", i/z );
+		buff.lzyFRMT( nS = -1, "\a %s\t", gpsSVadr );
 
 		pA = pSRC->pA;
 		if( !pA )
@@ -627,6 +628,11 @@ int main( int nA, char *apA[] )
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
 	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );
 	*gpsKEYbuff = 0;
+	U8 dS = -1;
+	gpcLZY* pDR = ((gpcLZY*)NULL)->lzyDIR(".", dS);
+	if( pDR )
+		std::cout << (char*)pDR->p_alloc << std::endl;
+
     try
     {
 		IMG_Init( IMG_INIT_JPG|IMG_INIT_PNG );
@@ -676,25 +682,10 @@ int main( int nA, char *apA[] )
 		{
 			*pUND = 0;
 		}
-		strcpy( gppMASSfile, gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
 
-
-		//I4x4 mouseXY(0,0), mouseW(0), winSIZ(800,600,800,600), SRCxycr(0), SRCin(0);
-		/*SDL_DisplayMode sdlDM;
-		SDL_GetCurrentDisplayMode(0, &sdlDM);
-		winSIZ.z = (sdlDM.w*7)/8;
-		winSIZ.w = sdlDM.h;
-		winSIZ.a4x2[0] = winSIZ.a4x2[1];*/
-
-		gpcWIN win( gpsMASSpath, gppMASSfile, gpsMASSname, piMASS ); //, winSIZ ); //SDL_INIT_VIDEO | SDL_INIT_TIMER );
-		//win.pMASS = piMASS;
-        gpcCRS main_crs( win, 0 ); //, *apCRS[4];
-
-
-		// gpmZ(apCRS);
-        //apCRS[srcDIV] = &main_crs;
-        //sdl.draw();
-
+		strcpy( gppMASSfile, gpsMINI_ISO ); //gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
+		gpcWIN win( gpsMASSpath, gppMASSfile, gpsMASSname, piMASS );
+		gpcCRS main_crs( win, 0 );
 		win.winRUN( 	"                                        "
 						"     **** GRANDPACE piMASS V0.1 ****    "
 						"                                        "

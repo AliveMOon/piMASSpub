@@ -90,6 +90,19 @@
 					<Add directory="../piMASS" />
 				</Compiler>
 			</Target>
+			<Target title="SMS_dbg">
+				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="sms.mass" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+				</Compiler>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wzero-as-null-pointer-constant" />
@@ -117,6 +130,7 @@
 		<Unit filename="SIM7X00/Raspberry/c/sim7x00.h" />
 		<Unit filename="gpCORE.cpp" />
 		<Unit filename="gpMASSbuild.cpp" />
+		<Unit filename="gpMEMfunFND.cpp" />
 		<Unit filename="gpMEMfunPRINT.cpp" />
 		<Unit filename="gpMEMinstDOit.cpp" />
 		<Unit filename="gpcCRSbreak.cpp" />

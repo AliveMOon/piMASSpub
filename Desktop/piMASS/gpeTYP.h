@@ -191,6 +191,11 @@ public:
 	bool bPTR(){ return this ? (cid == gpeCsz_ptr) : false; }
     gpPTR* 	cpyREF( U1* pALL, gpPTR* pRF );
     gpPTR*	cpy( gpMEM* pMEM, gpPTR* pB );
+
+    I8		i8( gpMEM* pMEM );
+    double	d8( gpMEM* pMEM );
+    bool bUTF8();
+    bool bARY();
 };
 static const U4 gpaCsz[] = {
 

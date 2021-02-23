@@ -4,7 +4,8 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-
+extern gpcLZY gpLZYfun;
+extern gpcVAR gpFUN[];
 gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 
 		///					pRl
@@ -41,15 +42,10 @@ gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 }
 gpPTR* gpBLK::instFUN( char* pS, I8x2& AN, gpBLK *pARG )
 {
-
-	switch( AN.alf ) {
-		case gpeALF_SIN:
-		case gpeALF_COS:
-		case gpeALF_PRINT:
-			break;
-		default:
-			return pARG->BLKpPTR( pS );
-	}
+	I8	nF = gpLZYfun.nLD(sizeof(gpcVAR)),
+		iF = gpLZYfun.tree_fnd( (I8)AN.alf,nF);
+	if( iF >= nF )
+		return pARG->BLKpPTR( pS );
 
 	I4 nR = pARG->nROW();
 	_move._q.A7.D7;
@@ -64,22 +60,12 @@ gpPTR* gpBLK::instFUN( char* pS, I8x2& AN, gpBLK *pARG )
 			_move._l.EAl( pOa->iPTR ).sIA7I;
 		}
 	}
-		gpPTR* pP = BLKpPTR( pS );
 
-		switch( AN.alf ) {
-			case gpeALF_SIN:
-			case gpeALF_COS:
-				pP->cID(gpeCsz_L);
-				break;
-			case gpeALF_PRINT:
-				pP->cID(gpeCsz_b);
-				break;
-			default:
-				break;
-		}
+	gpPTR* pP = BLKpPTR( pS );
+	pP->cID( gpFUN[iF].typ );
 
-		_move._l.EAl( iPTR ).A0;
-		_jsr.EAl( AN.alf );
+	_move._l.EAl( iPTR ).A0;
+	_jsr.EAl( AN.alf );
 
 	if( nR ) _move._q.D7.A7;
 

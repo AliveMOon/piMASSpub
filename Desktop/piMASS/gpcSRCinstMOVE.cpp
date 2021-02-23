@@ -5,6 +5,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
+extern gpcVAR gpVAR[];
 gpBLK* gpBLK::iROWblk( char* pS, I4 i, gpROW** ppR )
 {
 	if( ppR ) *ppR = NULL;
@@ -23,6 +24,7 @@ gpBLK* gpBLK::iROWblk( char* pS, I4 i, gpROW** ppR )
 
 	return pMEM->pSRC->lzyBLOCK.pSTPup( pRi->bIDup, -1, -1, pRi->mnID );
 }
+
 gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC, gpOBJ** ppOin )
 {
 	gpOBJ* pOi = NULL;
@@ -32,7 +34,7 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 
     if( ppR )
 		*ppR = pRi;
-
+	bool bUP = false;
 	if( pBup )
 	if( pBup->iPTR > 0 )
 	if(	pPi = pBup->BLKpPTR( pS ) ) {
@@ -46,8 +48,12 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 			break;
         }
         pOi = pMEM->OBJfnd( pPi->mNdID );
+        /// DEBUG -------------------
+        bUP = pOi->bVAR();
+        /// DEBUG -------------------
         if( ppO )
 			*ppO = pOi;
+		return pPi;
     } else {
     	pPi = pBup->BLKpPTR( pS );
     }
@@ -66,7 +72,6 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 
 	I4x2	DM(1,1);
 	I8x2 	AN(0);
-
 	I4 cIDblk = gpeCsz_L;
 	if(pOi->bAN()) {
 		if(ppSRC) {
@@ -103,6 +108,8 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 			I4 imNdID = pPi->mNdID; // (*ppOin) ? (*ppOin)->oID : 0;
 			gpPTR* pPin = (*ppOin)->pPTRu1();
 			//pPi->cpyREF( pMEM->pUn(), pPin );
+			if( !pPin )
+				return pPi;
 			*pPi = *pPin;
 			pPi->iPC = -1;
 			pPi->mNdID = imNdID;
@@ -114,13 +121,13 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 		if( ppSRC )
 			*ppSRC = NULL;
 
-		AN = pOi->AN;
-		switch( AN.alf ) {
-			case gpeALF_FPS:			/// beépített FPS
-				cIDblk = gpeCsz_L;
-				break;
-			default:
-				AN.alf = gpeALF_null;
+		/// beépített FORRÁS változó?
+		I8 i = pOi->iVAR();
+		if( i >= 0 ) {
+			AN.alf = gpVAR[i].alf; //pOi->AN.alf;
+			cIDblk = gpVAR[i].typ;
+		} else {
+			AN.alf = gpeALF_null;
 		}
 	}
 	else if( pPi ) {
@@ -151,8 +158,6 @@ gpPTR* gpBLK::iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC,
 		pPi->d2D( DM );
 		pPi->iPC = pMEM->iALL( pPi->sOF() );
 	}
-
-
 
 	_move._l.EAl( pPi->iPC ).A0;
 	_jsr.EAl( AN.alf );

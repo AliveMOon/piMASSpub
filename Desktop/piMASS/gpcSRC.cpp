@@ -449,10 +449,10 @@ gpcSRC::~gpcSRC() {
 	if( nA )			// ha nA == 0 nm mi foglaltuk
 		gpmDELary(pA);
 	gpmDELary(pALFtg);
-	gpmDELary(pEXE0);
-	gpmDELary(pABI);
-	for( U1 i = 0; i < gpmN(apOUT); i++ )
-		gpmDELary(apOUT[i]);
+//	gpmDELary(pEXE0);
+//	gpmDELary(pABI);
+//	for( U1 i = 0; i < gpmN(apOUT); i++ )
+//		gpmDELary(apOUT[i]);
 
 	gpmDELary(pMINI);
 	//gpmDELary(pBIG);

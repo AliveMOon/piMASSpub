@@ -1,4 +1,5 @@
 #include "piMASS.h"
+#include <dirent.h>
 extern U1 gpaALFsub[];
 extern U1 gpaALFsub2[];
 extern char gpaALF_H_sub[];
@@ -28,6 +29,44 @@ static const char* gpasADDR[] = {
 	"%S0x%0.8x|",
 	"%S0x%0.16llx|",
 };
+gpcLZY* gpcLZY::lzyDIR( const char* p_file, U8& iSTRT ) {
+	if( !p_file )
+		return this;
+
+	struct dirent *pE;
+	struct stat buf;
+	DIR* pD = opendir( p_file );
+	if( !pD )
+		return lzySUB( iSTRT, -1 );
+
+	gpcLZY* pDIR = this;
+	if( iSTRT>pDIR->nLD() )
+		iSTRT = pDIR->nLD();
+
+	U8 s = iSTRT;
+	char s___[] = "---";
+	while( (pE=readdir(pD)) ) {
+
+		if( !(strcmp(".", pE->d_name)))
+			continue;
+		if( !(strcmp("..", pE->d_name)))
+			continue;
+
+		pDIR = pDIR->lzyFRMT( s, "%s/%s", p_file, pE->d_name );
+		stat( (char*)pDIR->p_alloc+s, &buf );
+		if (pE->d_type == DT_DIR)
+			s___[0]='d';
+		else if (pE->d_type == DT_REG)
+			s___[0]='f';
+		s___[1]=(buf.st_mode & S_IRUSR) ? 'r' : '-';
+		s___[2]=(buf.st_mode & S_IWOTH) ? 'w' : '-';
+
+		pDIR = pDIR->lzyFRMT( s, "%s\t%s\t%zd\r\n", pE->d_name, s___, buf.st_size );
+		s = pDIR->nLD();
+	}
+	closedir(pD);
+	return pDIR;
+}
 gpcLZY* gpcLZY::lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN ) {
 	if( nBIN ? !pBIN : true )
 		return this;
@@ -174,7 +213,9 @@ U4 gpcLZY::tree_fnd( U4 id, U4& n ) {
 	if( !this )
 		return n = 0;
 
-	n = n_load/sizeof(U4x4);
+	n = nLD(sizeof(U4x4));
+	if( !n )
+		return n;
 	U4x4* p_u44 = (U4x4*)p_alloc;
 	U4 fnd = p_u44->tree_fnd( id, n );
 
@@ -210,7 +251,9 @@ U8 gpcLZY::tree_fnd( U8 id, U8& n ) {
 	if( !this )
 		return n = 0;
 
-	n = n_load/sizeof(U8x4);
+	n = nLD(sizeof(U8x4));
+	if( !n )
+		return n;
 	U8x4* p_u84 = (U8x4*)p_alloc;
 	U8 fnd = p_u84->tree_fnd( id, n );
 
@@ -246,7 +289,9 @@ I8 gpcLZY::tree_fnd( I8 id, I8& n ) {
 	if( !this )
 		return n = 0;
 
-	n = n_load/sizeof(U8x4);
+	n = nLD(sizeof(I8x4));
+	if( !n )
+		return n;
 	I8x4* p_i84 = (I8x4*)p_alloc;
 	I8 fnd = p_i84->tree_fnd( id, n );
 
@@ -277,59 +322,65 @@ gpcLZY* gpcLZY::tree_add( I8 id, I8& n ) {
 	n_load = s*sizeof(*p_i84);
 	return this;
 }
-int gpcLZY::nAT( char* pSat, int nSat, const char* pFILT ) {
-	if( this ? !pSat : true )
+int gpcLZY::nAT( char* pS, int nS, const char* pFILT ) {
+	if( this ? !pS : true )
 		return 0;
-	if( !nSat ) {
-		nSat = gpmSTRLEN(pSat);
-		if( !nSat )
+	if( !nS ) {
+		nS = gpmSTRLEN(pS);
+		if( !nS )
 			return 0;
 	}
 	U8 nUTF8;
 	int nAT = 0;
 	I8x2* pAn;
-	char* pSatI = pSat, *pSatE = pSat+nSat; //sN[]=" ";
-	for( 	pSatI += gpmNINCS(pSatI,pFILT);
-			pSatI < pSatE;
-			pSatI += gpmNINCS(pSatI,pFILT), nAT++ ) {
+	char* pSi = pS, *pSe = pS+nS; //sN[]=" ";
+	for( 	pSi += gpmNINCS(pSi,pFILT);
+			pSi < pSe;
+			pSi += gpmNINCS(pSi,pFILT), nAT++ ) {
 
-		if( !*pSatI )
+		if( !*pSi )
 			break;
 
 		pAn = (I8x2*)Ux(nAT,sizeof(*pAn));
-		pAn->y = pSatE-pSatI;
-		*pAn = pSatI;
+		pAn->y = pSe-pSi;
+		*pAn = pSi;
 		if( !pAn->alf ) {
 
-			pSatI += gpfABCvan( (U1*)pSatI, (U1*)pSatE, nUTF8, gpaALFsub2 );
-			switch( *pSatI ){
+			pSi += gpfABCvan( (U1*)pSi, (U1*)pSe, nUTF8, gpaALFsub2 );
+			switch( *pSi ){
 				case 0:
-					pSatI = pSatE;
+					pSi = pSe;
 					break;
+				case '\r':
+				case '\n':
+					pSi += gpmNINCS(pSi, "\r\n" );
+					pAn->alf = gpeALF_CRLF;
+					pAn->y = pSi-pS;
+					continue;
 				case '+':
-					pSatI++;
+					pSi++;
 					pAn->alf = gpeALF_PLUS;
-					pAn->y = pSatI-pSat;
+					pAn->y = pSi-pS;
 					continue;
 				case '\"':
-					pSatI++;
+					pSi++;
 					pAn->alf = gpeALF_MRK;
-					pAn->y = pSatI-pSat;
+					pAn->y = pSi-pS;
 					continue;
 				case ',':
-					pSatI++;
+					pSi++;
 					pAn->alf = gpeALF_CM;
-					pAn->y = pSatI-pSat;
+					pAn->y = pSi-pS;
 					continue;
 				default: break;
 			}
 			nAT--;
 			continue;
 		}
-		pSatI+=pAn->y;
-		pAn->y = pSatI-pSat;
+		pSi+=pAn->y;
+		pAn->y = pSi-pS;
 	}
 	pAn = (I8x2*)Ux(nAT,sizeof(*pAn));
-	pAn->y = pSatE-pSat;
+	pAn->y = pSe-pS;
 	return nAT;
 }

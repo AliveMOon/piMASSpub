@@ -1021,6 +1021,17 @@ public:
 		void	winRUN( const char* pWELLCOME );
 		bool	WINvar( gpcREG& out, gpeALF alf );
 
+		I4	instVARix();
+		I4	instVARiy();
+		I4	instVARia();
+		I4	instVARin();
+		I4	instVARiw();
+		I4	instVARih();
+
+		I4	instVARmlb();
+		I4	instVARms();
+		I4	instVARmx();
+		I4	instVARmy();
 };
 
 #endif // GPCWIN_H

@@ -93,8 +93,7 @@ gpPTR* gpPTR::pPTRu1( gpMEM* pMEM ) {
 	}
 	return pPi;
 }
-gpPTR* gpPTR::cpyREF( U1* pALL, gpPTR* pRF )
-{
+gpPTR* gpPTR::cpyREF( U1* pALL, gpPTR* pRF ) {
 	if( !pRF )
 		return pNULL();
 
@@ -108,8 +107,7 @@ gpPTR* gpPTR::cpyREF( U1* pALL, gpPTR* pRF )
 	cID( gpeCsz_ptr );
 	return this;
 }
-gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb )
-{
+gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb ) {
 	if( !this )
 		return NULL;
 
@@ -135,6 +133,59 @@ gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb )
 	_move.c((gpeCsz)cID()).IA0I.IA1I;
 	return this;
 }
+I8 gpPTR::i8( gpMEM* pMEM ) {
+	if( this ? !pMEM : true )
+		return 0;
+	gpPTR* pPi = pPTRu1(pMEM);
+	U1* p_u = pPi->pU1( pMEM );
+	switch( pPi->cID() ) {
+		case gpeCsz_Q: return *(I8*)p_u;
+		case gpeCsz_q: return (I8)(*(U8*)p_u);
+		case gpeCsz_L: return (I8)(*(I4*)p_u);
+		case gpeCsz_l: return (I8)(*(U4*)p_u);
+		case gpeCsz_W: return (I8)(*(I2*)p_u);
+		case gpeCsz_w: return (I8)(*(U2*)p_u);
+		case gpeCsz_B: return (I8)(*(I1*)p_u);
+		case gpeCsz_b: return (I8)(*(U1*)p_u);
+		case gpeCsz_f: return (I8)(*(float*)p_u);
+		case gpeCsz_d: return (I8)(*(double*)p_u);
+		case gpeCsz_4: return (I8)(*(U4*)p_u);
+		default: break;
+	}
+	return 0;
+}
+double gpPTR::d8( gpMEM* pMEM ) {
+	if( this ? !pMEM : true )
+		return 0;
+	gpPTR* pPi = pPTRu1(pMEM);
+	U1* p_u = pPi->pU1( pMEM );
+	switch( pPi->cID() ) {
+		case gpeCsz_Q: return *(double*)p_u;
+		case gpeCsz_q: return (double)(*(U8*)p_u);
+		case gpeCsz_L: return (double)(*(I4*)p_u);
+		case gpeCsz_l: return (double)(*(U4*)p_u);
+		case gpeCsz_W: return (double)(*(I2*)p_u);
+		case gpeCsz_w: return (double)(*(U2*)p_u);
+		case gpeCsz_B: return (double)(*(I1*)p_u);
+		case gpeCsz_b: return (double)(*(U1*)p_u);
+		case gpeCsz_f: return (double)(*(float*)p_u);
+		case gpeCsz_d: return (double)(*(double*)p_u);
+		case gpeCsz_4: return (double)(*(U4*)p_u);
+		default: break;
+	}
+	return 0;
+}
+bool gpPTR::bARY() {
+	if( cID() != gpeCsz_b )
+		return false;
+	return area() > 1;
+}
+bool gpPTR::bUTF8() {
+	if( cID() != gpeCsz_b )
+		return false;
+	return bARY();
+}
+
 gpBLK* gpBLK::pRST( gpMEM* pM )
 {
 	if( this ? !!pMEM : true )

@@ -6,359 +6,359 @@ bool bITT =  false; //true; // false; //
 extern U1 gpaALFsub[];
 
 
-gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK ) {
-	if( win.pM ? !this : true )
-		return pOUT;
-
-	if( !nISA.x )
-	{
-		gpmDELary( pISA );
-		return pOUT;
-	}
-
-	if( pOUT ? false : !deep )
-	{
-		pOUT = new gpcRES( pMOM );
-	}
-	gpcSTK stk( pSTK, pOUT, pSRC );
-	U4 iASG, nOUT = 0;
-
-	U8 u8;
-	I8 i8;
-	double d8;
-
-	U1	sBUFF[0x1000],
-		*pB = sBUFF+0x20, *pS = pB, nB;
-
-	gpcREG err;
-	I1x4 isa = 0; //, back;
-	bool bROW = false;
-
-	gpcMASS& mass = *win.piMASS;
-
-
-
-	U4	mZ = win.mZ,
-		mN = win.mN, mxZN = mZ*mN + 1; //, znI = mxZN;
-	U4x2 trg = 0;
-	U4 anFND = 0;
-	gpcADR A0;
-	gpcREG D0;
-	gpcALU A, B, FND;
-	gpcSRC	*pANS = NULL;
-	gpcRES	*pANcall = NULL, *pDOT = NULL;
-	U1		*pSTR = NULL;
-
-	for( U4 i = 0; i < nISA.x; i++ )
-	{
-		gpcISA &IS = pISA[i];
-		gpfFLG &flg = stk.main;
-		if( (U1)IS.isa.aISA[0] > ' ' )
-		{
-			*pB = (U1)IS.isa.aISA[0];
-			pB++;
-		}
-
-		switch( IS.isa.aISA[0] )
-        {
-			case gpeISA_trg: {	// -------------------------------------------------------------------------------------
-					trg = IS.an;
-				} continue;
-
-
-			case gpeISA_an: {	// -------------------------------------------------------------------------------------
-						//pB += sprintf( (char*)pB, "%s", IS.an.pSTRalf4n( sBUFF ));
-						anFND = 0;
-						B = gpeALF_null;
-						if( IS.an.x ? IS.an.x > mZ : true )
-							break;
-						if( IS.an.y < mN )
-						if(	anFND = win.pM[IS.an.y*mZ + IS.an.x-1] )
-						if( pANS = mass.srcFND( anFND ) )
-							pSTR = pANS->pB+1;
-					} break;
-
-			case gpeISA_anFUN: {	// -------------------------------------------------------------------------------------
-					//pB += sprintf( (char*)pB, "%s", IS.an.pSTRalf4n( sBUFF ));
-					stk.aAN[flg.iA] = IS.an;
-					//flg.iA++;
-				} break;
-
-
-			/// gpcREG D[]	// --------------------------------------------------------------------------------------
- 			case gpeISA_u8: {	// --------------------------------------------------------------------------------------
-					D0 = IS.an.u8;
-					B = gpeALF_null;
-				} break;
-			case gpeISA_i8: {	// --------------------------------------------------------------------------------------
-					D0 = -((I8)IS.an.u8);
-					B = gpeALF_null;
-				} break;
-			case gpeISA_d8: {	// --------------------------------------------------------------------------------------
-					D0 = IS.an.d8;
-					B = gpeALF_null;
-				} break;
-
-
-
-			/// gpeISA_var	// --------------------------------------------------------------------------------------
- 			case gpeISA_var: {	// --------------------------------------------------------------------------------------
-					A0 = IS.an.var;	/// gpcADR
-					if( !A0.an.alf )
-						break;
-
-					if( pDOT ) /// pANS->apOUT[3]
-					{
-						A0 = pDOT;
-						pDOT = NULL;
-						if( !A0.pRM )
-							break;
-						if( pANS ? pANS->bSW&gpeMASSloopMSK : false )
-							pSRC->bSW |= gpeMASSloopMSK;
-						// lokális változó és már használta valaki
-						isa = pISA[i-1-IS.i].isa;
-						if( isa.aISA[0] == gpeISA_trg )
-							isa = pISA[i-2-IS.i].isa;
-						B = A0.pRM->ALU( A0.iA );
-						break;
-					}
-
-					if( pOUT )
-					{
-						A0 = pOUT;
-						if( A0.pRM )
-						{
-							(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = A0.pRM->ALU( A0.iA );
-							break;
-						}
-					}
-					// na még mindig nincsen
-					A0 = this;
-					if( A0.pRM )
-					{
-						// forrásként használható
-						if( IS.isa.aISA[1] == gpeISA_assign )
-						{
-							FND = pOUT->ADD( A0.an.alf, 0,0 );
-							FND.equ( A0.pRM->ALU( A0.iA ) );
-						} else
-							B = A0.pRM->ALU( A0.iA );
-						break;
-					}
-					// na most nézzük meg van e beépített változó rá
-					if( win.WINvar( D0, A0.an.alf ) )
-					{
-						// valamit kapott
-						pSRC->bSW |= gpeMASSloopMSK;
-						pSTR = D0.getSTR();
-						break;
-					}
-
-					(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = pOUT->ADD( A0.an.alf, 0,0 );
-				} break;
-
-			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
-					//pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
-					stk.aVR[flg.iV] = IS.an.var;
-					//flg.iV++;
-				} break;
-
-
-			case gpeISA_tag: {
-					 //pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
-					stk.aTG[flg.iG] = IS.an.var;
-					//flg.iG++;
-				} break;
-
-
-			case gpeISA_str: {
-					pSTR = IS.an.apSTR[0];
-					//pB += sprintf( (char*)pB, "%s", (stk.apSTR[flg.iS] = IS.an.aSTR[0])) ;
-					//flg.iS++;
-				} break;
-			case gpeISA_row:
-				bROW = true;
-				break;
-			case gpeISA_nop:
-			default:
-				break;
-		}
-		// CALL
-		if( IS.pRES )
-			pOUT = IS.pRES->RESrun( pOUT, pMN, win, pSRC, this, deep+1, &stk );
-
-
-		switch( isa.aISA[1] ) {
-			case gpeISA_u8:
-			case gpeISA_i8:
-			case gpeISA_d8: {
-						B = D0;
-					} break;
-
-			case gpeISA_an:{} break;
-			case gpeISA_anFUN:{} break;
-			case gpeISA_var:{
-
-				} break;
-			case gpeISA_FUN:{} break;
-			case gpeISA_dim:{} break;
-			case gpeISA_not:{} break;
-			case gpeISA_str:{} break;
-			case gpeISA_tag:{} break;
-			case gpeISA_dollar:{} break;
-			case gpeISA_rem:{
-					if( A.pRM ? D0.bGD() : false )
-						A %= D0;
-				} break;
-			case gpeISA_and:{} break;
-			case gpeISA_brkB:{} break;
-			case gpeISA_brkE:{} break;
-			case gpeISA_mul:{
-					if( A.pRM ? D0.bGD() : false )
-						A *= D0;
-				} break;
-			case gpeISA_plus:{
-					if( A.alf && B.alf )
-					{
-						A += B;
-						B = gpeALF_null;
-						break;
-					}
-
-					if( A.pRM ? D0.bGD() : false )
-						A += D0;
-				} break;
-			case gpeISA_sub:{
-					if( A.pRM ? D0.bGD() : false )
-						A -= D0;
-				} break;
-			case gpeISA_div:{
-					if( A.pRM ? D0.bGD() : false )
-						A /= D0;
-				} break;
-
-
-
-
-			case gpeISA_dot:{
-					pANcall = NULL;
-					if( anFND )
-						pDOT = ( pANS = mass.srcFND( anFND ) ) ? pANS->apOUT[3] : NULL;
-					else
-						pDOT = NULL;
-				} break;
-
-
-			case gpeISA_row:
-				bROW = true;
-				break;
-			case gpeISA_litl:{} break;
-
-
-
-			case gpeISA_assign:{
-					if( D0.bGD() )
-						A = D0;
-					else if( pSTR )
-					{
-                        A = pSTR;
-                        pSTR = NULL;
-					}
-					if( A.alf && B.alf )
-					{
-						A.equ( B );
-					}
-					else if( pANcall )
-					{
-						pANcall;
-					}
-					B = gpeALF_null;
-				} break;
-
-
-
-			case gpeISA_gret:{} break;
-			case gpeISA_exp:{} break;
-			case gpeISA_root:{} break;
-			case gpeISA_brkDB:{} break;
-			case gpeISA_brkDE:{} break;
-			case gpeISA_equ:{} break;
-			case gpeISA_trg:{} break;
-			case gpeISA_blkB:{} break;
-			case gpeISA_or:{} break;
-			case gpeISA_blkE:{} break;
-
-			case gpeISA_nop:
-			default:
-				break;
-		}
-		isa = IS.isa;
-		if( (U1)isa.aISA[1] > ' ' )
-		{
-			//B.isa = IS.isa;
-			//stk.stpFLG();
-			*pB = (U1)IS.isa.aISA[1];
-			pB++;
-		}
-
-		switch( isa.aISA[1] )
-		{
-			case gpeISA_assign:
-				A = FND;
-				B = gpeALF_null;
-				break;
-			case gpeISA_dot:{
-					pANcall = NULL;
-					if( anFND )
-						pDOT = ( pANS = mass.srcFND( anFND ) ) ? pANS->apOUT[3] : NULL;
-					else
-						pDOT = NULL;
-				} break;
-		}
-
-		if( !bITT )
-			continue;
-
-		if( !bROW )
-			continue;
-
-		bROW = false;
-
-		if( pS < pB )
-		{
-			*pB = 0;
-			if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
-			pB = pS;
-		}
-	}
-	*pB = 0;
-
-	if( bITT )
-	if( pS < pB )
-	{
-		if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
-		pB = pS;
-	}
-
-	if( !pSRC )
-		return pOUT;
-
-	pSRC->pMINI = pOUT->res2mini(
-									pSRC->pMINI, sBUFF,
-
-									( nASG && (pSRC->bSW&gpeMASSdebugMSK) )
-									? this : NULL,
-
-									deep
-								);
-
-	if( deep )
-		return pOUT;
-
-	if( pSRC->pMINI ? !pSRC->pMINI->n_load : false  )
-		gpmDEL(pSRC->pMINI);
-	return pOUT;
-}
+//gpcRES* gpcRES::RESrun( gpcRES* pOUT, gpcLZY* pMN, gpcWIN& win, gpcSRC* pSRC, gpcRES* pMOM, U4 deep, gpcSTK* pSTK ) {
+//	if( win.pM ? !this : true )
+//		return pOUT;
+//
+//	if( !nISA.x )
+//	{
+//		gpmDELary( pISA );
+//		return pOUT;
+//	}
+//
+//	if( pOUT ? false : !deep )
+//	{
+//		pOUT = new gpcRES( pMOM );
+//	}
+//	gpcSTK stk( pSTK, pOUT, pSRC );
+//	U4 iASG, nOUT = 0;
+//
+//	U8 u8;
+//	I8 i8;
+//	double d8;
+//
+//	U1	sBUFF[0x1000],
+//		*pB = sBUFF+0x20, *pS = pB, nB;
+//
+//	gpcREG err;
+//	I1x4 isa = 0; //, back;
+//	bool bROW = false;
+//
+//	gpcMASS& mass = *win.piMASS;
+//
+//
+//
+//	U4	mZ = win.mZ,
+//		mN = win.mN, mxZN = mZ*mN + 1; //, znI = mxZN;
+//	U4x2 trg = 0;
+//	U4 anFND = 0;
+//	gpcADR A0;
+//	gpcREG D0;
+//	gpcALU A, B, FND;
+//	gpcSRC	*pANS = NULL;
+//	gpcRES	*pANcall = NULL, *pDOT = NULL;
+//	U1		*pSTR = NULL;
+//
+//	for( U4 i = 0; i < nISA.x; i++ )
+//	{
+//		gpcISA &IS = pISA[i];
+//		gpfFLG &flg = stk.main;
+//		if( (U1)IS.isa.aISA[0] > ' ' )
+//		{
+//			*pB = (U1)IS.isa.aISA[0];
+//			pB++;
+//		}
+//
+//		switch( IS.isa.aISA[0] )
+//        {
+//			case gpeISA_trg: {	// -------------------------------------------------------------------------------------
+//					trg = IS.an;
+//				} continue;
+//
+//
+//			case gpeISA_an: {	// -------------------------------------------------------------------------------------
+//						//pB += sprintf( (char*)pB, "%s", IS.an.pSTRalf4n( sBUFF ));
+//						anFND = 0;
+//						B = gpeALF_null;
+//						if( IS.an.x ? IS.an.x > mZ : true )
+//							break;
+//						if( IS.an.y < mN )
+//						if(	anFND = win.pM[IS.an.y*mZ + IS.an.x-1] )
+//						if( pANS = mass.srcFND( anFND ) )
+//							pSTR = pANS->pB+1;
+//					} break;
+//
+//			case gpeISA_anFUN: {	// -------------------------------------------------------------------------------------
+//					//pB += sprintf( (char*)pB, "%s", IS.an.pSTRalf4n( sBUFF ));
+//					stk.aAN[flg.iA] = IS.an;
+//					//flg.iA++;
+//				} break;
+//
+//
+//			/// gpcREG D[]	// --------------------------------------------------------------------------------------
+// 			case gpeISA_u8: {	// --------------------------------------------------------------------------------------
+//					D0 = IS.an.u8;
+//					B = gpeALF_null;
+//				} break;
+//			case gpeISA_i8: {	// --------------------------------------------------------------------------------------
+//					D0 = -((I8)IS.an.u8);
+//					B = gpeALF_null;
+//				} break;
+//			case gpeISA_d8: {	// --------------------------------------------------------------------------------------
+//					D0 = IS.an.d8;
+//					B = gpeALF_null;
+//				} break;
+//
+//
+//
+//			/// gpeISA_var	// --------------------------------------------------------------------------------------
+// 			case gpeISA_var: {	// --------------------------------------------------------------------------------------
+//					A0 = IS.an.var;	/// gpcADR
+//					if( !A0.an.alf )
+//						break;
+//
+//					if( pDOT ) /// pANS->apOUT[3]
+//					{
+//						A0 = pDOT;
+//						pDOT = NULL;
+//						if( !A0.pRM )
+//							break;
+//						if( pANS ? pANS->bSW&gpeMASSloopMSK : false )
+//							pSRC->bSW |= gpeMASSloopMSK;
+//						// lokális változó és már használta valaki
+//						isa = pISA[i-1-IS.i].isa;
+//						if( isa.aISA[0] == gpeISA_trg )
+//							isa = pISA[i-2-IS.i].isa;
+//						B = A0.pRM->ALU( A0.iA );
+//						break;
+//					}
+//
+//					if( pOUT )
+//					{
+//						A0 = pOUT;
+//						if( A0.pRM )
+//						{
+//							(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = A0.pRM->ALU( A0.iA );
+//							break;
+//						}
+//					}
+//					// na még mindig nincsen
+//					A0 = this;
+//					if( A0.pRM )
+//					{
+//						// forrásként használható
+//						if( IS.isa.aISA[1] == gpeISA_assign )
+//						{
+//							FND = pOUT->ADD( A0.an.alf, 0,0 );
+//							FND.equ( A0.pRM->ALU( A0.iA ) );
+//						} else
+//							B = A0.pRM->ALU( A0.iA );
+//						break;
+//					}
+//					// na most nézzük meg van e beépített változó rá
+//					if( win.WINvar( D0, A0.an.alf ) )
+//					{
+//						// valamit kapott
+//						pSRC->bSW |= gpeMASSloopMSK;
+//						pSTR = D0.getSTR();
+//						break;
+//					}
+//
+//					(IS.isa.aISA[1] == gpeISA_assign ? FND : B) = pOUT->ADD( A0.an.alf, 0,0 );
+//				} break;
+//
+//			case gpeISA_FUN: { 	// --------------------------------------------------------------------------------------
+//					//pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) ) ;
+//					stk.aVR[flg.iV] = IS.an.var;
+//					//flg.iV++;
+//				} break;
+//
+//
+//			case gpeISA_tag: {
+//					 //pB += sprintf( (char*)pB, "%s", IS.an.strVAR( sBUFF ) );
+//					stk.aTG[flg.iG] = IS.an.var;
+//					//flg.iG++;
+//				} break;
+//
+//
+//			case gpeISA_str: {
+//					pSTR = IS.an.apSTR[0];
+//					//pB += sprintf( (char*)pB, "%s", (stk.apSTR[flg.iS] = IS.an.aSTR[0])) ;
+//					//flg.iS++;
+//				} break;
+//			case gpeISA_row:
+//				bROW = true;
+//				break;
+//			case gpeISA_nop:
+//			default:
+//				break;
+//		}
+//		// CALL
+//		if( IS.pRES )
+//			pOUT = IS.pRES->RESrun( pOUT, pMN, win, pSRC, this, deep+1, &stk );
+//
+//
+//		switch( isa.aISA[1] ) {
+//			case gpeISA_u8:
+//			case gpeISA_i8:
+//			case gpeISA_d8: {
+//						B = D0;
+//					} break;
+//
+//			case gpeISA_an:{} break;
+//			case gpeISA_anFUN:{} break;
+//			case gpeISA_var:{
+//
+//				} break;
+//			case gpeISA_FUN:{} break;
+//			case gpeISA_dim:{} break;
+//			case gpeISA_not:{} break;
+//			case gpeISA_str:{} break;
+//			case gpeISA_tag:{} break;
+//			case gpeISA_dollar:{} break;
+//			case gpeISA_rem:{
+//					if( A.pRM ? D0.bGD() : false )
+//						A %= D0;
+//				} break;
+//			case gpeISA_and:{} break;
+//			case gpeISA_brkB:{} break;
+//			case gpeISA_brkE:{} break;
+//			case gpeISA_mul:{
+//					if( A.pRM ? D0.bGD() : false )
+//						A *= D0;
+//				} break;
+//			case gpeISA_plus:{
+//					if( A.alf && B.alf )
+//					{
+//						A += B;
+//						B = gpeALF_null;
+//						break;
+//					}
+//
+//					if( A.pRM ? D0.bGD() : false )
+//						A += D0;
+//				} break;
+//			case gpeISA_sub:{
+//					if( A.pRM ? D0.bGD() : false )
+//						A -= D0;
+//				} break;
+//			case gpeISA_div:{
+//					if( A.pRM ? D0.bGD() : false )
+//						A /= D0;
+//				} break;
+//
+//
+//
+//
+//			case gpeISA_dot:{
+//					pANcall = NULL;
+//					if( anFND )
+//						pDOT = ( pANS = mass.srcFND( anFND ) ) ? pANS->apOUT[3] : NULL;
+//					else
+//						pDOT = NULL;
+//				} break;
+//
+//
+//			case gpeISA_row:
+//				bROW = true;
+//				break;
+//			case gpeISA_litl:{} break;
+//
+//
+//
+//			case gpeISA_assign:{
+//					if( D0.bGD() )
+//						A = D0;
+//					else if( pSTR )
+//					{
+//                        A = pSTR;
+//                        pSTR = NULL;
+//					}
+//					if( A.alf && B.alf )
+//					{
+//						A.equ( B );
+//					}
+//					else if( pANcall )
+//					{
+//						pANcall;
+//					}
+//					B = gpeALF_null;
+//				} break;
+//
+//
+//
+//			case gpeISA_gret:{} break;
+//			case gpeISA_exp:{} break;
+//			case gpeISA_root:{} break;
+//			case gpeISA_brkDB:{} break;
+//			case gpeISA_brkDE:{} break;
+//			case gpeISA_equ:{} break;
+//			case gpeISA_trg:{} break;
+//			case gpeISA_blkB:{} break;
+//			case gpeISA_or:{} break;
+//			case gpeISA_blkE:{} break;
+//
+//			case gpeISA_nop:
+//			default:
+//				break;
+//		}
+//		isa = IS.isa;
+//		if( (U1)isa.aISA[1] > ' ' )
+//		{
+//			//B.isa = IS.isa;
+//			//stk.stpFLG();
+//			*pB = (U1)IS.isa.aISA[1];
+//			pB++;
+//		}
+//
+//		switch( isa.aISA[1] )
+//		{
+//			case gpeISA_assign:
+//				A = FND;
+//				B = gpeALF_null;
+//				break;
+//			case gpeISA_dot:{
+//					pANcall = NULL;
+//					if( anFND )
+//						pDOT = ( pANS = mass.srcFND( anFND ) ) ? pANS->apOUT[3] : NULL;
+//					else
+//						pDOT = NULL;
+//				} break;
+//		}
+//
+//		if( !bITT )
+//			continue;
+//
+//		if( !bROW )
+//			continue;
+//
+//		bROW = false;
+//
+//		if( pS < pB )
+//		{
+//			*pB = 0;
+//			if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
+//			pB = pS;
+//		}
+//	}
+//	*pB = 0;
+//
+//	if( bITT )
+//	if( pS < pB )
+//	{
+//		if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
+//		pB = pS;
+//	}
+//
+//	if( !pSRC )
+//		return pOUT;
+//
+//	pSRC->pMINI = pOUT->res2mini(
+//									pSRC->pMINI, sBUFF,
+//
+//									( nASG && (pSRC->bSW&gpeMASSdebugMSK) )
+//									? this : NULL,
+//
+//									deep
+//								);
+//
+//	if( deep )
+//		return pOUT;
+//
+//	if( pSRC->pMINI ? !pSRC->pMINI->n_load : false  )
+//		gpmDEL(pSRC->pMINI);
+//	return pOUT;
+//}
 
 U4 gpcMASS::jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, U4* pZ ) {
 	/// U4 i éppen hol tartott, ha át kell méretezni a pSRC mapot majd relocalja az it
@@ -438,7 +438,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 			continue;
 
 		aGLpic[0] = pSRC->picID = 0;
-		gpmDEL( pSRC->apOUT[0] );
+		//gpmDEL( pSRC->apOUT[0] );
 		if( pSRC->qBLD() ) {
 			pSRC->msBLD = pWIN->mSEC.x + pSRC->msBLTdly;
 			pSRC->rdyBLD();
@@ -446,7 +446,7 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 
 		if( pSRC->srcBLD( pWIN, NULL ) == 1 ) {
 
-			gpmDEL( pSRC->pEXE0 );
+			//gpmDEL( pSRC->pEXE0 );
 
 			if( !pSRC->msBLTdly )
 				pSRC->msBLTdly = gpdSYNmSEC;
@@ -462,18 +462,18 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 										);
 			pSRC->msBLD = 0;
 
-			pSRC->apOUT[0] = pSRC->apOUT[1];
+			/*pSRC->apOUT[0] = pSRC->apOUT[1];
 			pSRC->apOUT[1] = pSRC->apOUT[2];
 			pSRC->apOUT[2] = pSRC->apOUT[3];
-			pSRC->apOUT[3] = NULL;
+			pSRC->apOUT[3] = NULL;*/
 		}
-		else if( pSRC->bSW&gpeMASSloopMSK )
+		/*else if( pSRC->bSW&gpeMASSloopMSK )
 		{
 			pSRC->apOUT[0] = pSRC->apOUT[1];
 			pSRC->apOUT[1] = pSRC->apOUT[2];
 			pSRC->apOUT[2] = pSRC->apOUT[3];
 			pSRC->apOUT[3] = NULL;
-		}
+		}*/
 
 		if( !pSRC->srcINSTrun() )
 			continue;
@@ -527,7 +527,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 			continue;
 
 		aGLpic[0] = pSRC->picID = 0;
-		gpmDEL( pSRC->apOUT[0] );
+		//gpmDEL( pSRC->apOUT[0] );
 		if( pSRC->qBLD() ) {
 			pSRC->msBLD = pWIN->mSEC.x + pSRC->msBLTdly;
 			pSRC->rdyBLD();
@@ -537,8 +537,8 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 			pSRC->srcBLD( pWIN, NULL );
 
-			gpmDEL( pSRC->pEXE0 );
-			pSRC->pEXE0 = pSRC->pEXE0->compiEASY( pSRC->pSRCstart( true, 4 ), NULL, NULL, NULL );
+			//gpmDEL( pSRC->pEXE0 );
+			//pSRC->pEXE0 = pSRC->pEXE0->compiEASY( pSRC->pSRCstart( true, 4 ), NULL, NULL, NULL );
 
 			if( !pSRC->msBLTdly )
 				pSRC->msBLTdly = gpdSYNmSEC;
@@ -546,27 +546,27 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 				pWIN->pSYNwin = pWIN->pSYNwin->syncADD( gpcSYNC( gpeNET4_0SRC, (i%pWIN->mZ)+((i/pWIN->mZ)<<16) , pWIN->mSEC.y, pSRC->iGT, 0 ), pWIN->msSYN );
 			pSRC->msBLD = 0;
 
-			pSRC->apOUT[0] = pSRC->apOUT[1];
+			/* pSRC->apOUT[0] = pSRC->apOUT[1];
 			pSRC->apOUT[1] = pSRC->apOUT[2];
 			pSRC->apOUT[2] = pSRC->apOUT[3];
-			pSRC->apOUT[3] = NULL;
+			pSRC->apOUT[3] = NULL;*/
 		}
 		else if( pSRC->bSW&gpeMASSloopMSK )
 		{
-			pSRC->apOUT[0] = pSRC->apOUT[1];
+			/* pSRC->apOUT[0] = pSRC->apOUT[1];
 			pSRC->apOUT[1] = pSRC->apOUT[2];
 			pSRC->apOUT[2] = pSRC->apOUT[3];
-			pSRC->apOUT[3] = NULL;
+			pSRC->apOUT[3] = NULL;*/
 		}
 
-		if( !pSRC->apOUT[3] )
-		{
-			if( !pSRC->srcINSTrun() ) //this,pWIN) )
-				continue;
+		//if( !pSRC->apOUT[3] )
+		//{
+		if( !pSRC->srcINSTrun() ) //this,pWIN) )
+			continue;
 
-			pWIN->nJDOIT.x++;
-			pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI); //,this,pWIN);
-		}
+		pWIN->nJDOIT.x++;
+		pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI); //,this,pWIN);
+		//}
 
 
 
@@ -574,7 +574,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 
 		/// READY
-		gpcRES& res = *pSRC->apOUT[3];
+		gpcRES res; // = NULL; //*pSRC->apOUT[3];
 		gpcPIC	*pTRG = NULL, *pPIC = NULL, *pSPR = NULL;
 
 		for(

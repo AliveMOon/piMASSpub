@@ -36,8 +36,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( !pROBnD )
 		return pGT->iCNT;
 
-	if( pOi )
-	{
+	if( pOi ) {
 	#ifdef stdON
 		if(bSTDcout){std::cout << stdALU "rINP" << std::endl;}
     #endif

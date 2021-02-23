@@ -4,13 +4,27 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
+U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
 {
 	switch( inst.a8x2.alf )
 	{
-		case gpeALF_FPS:
-			*(U4*)p_dst = pWIN->mSEC.w;
-			break;
+		case gpeALF_MLB: *(I4*)p_dst = pWIN->instVARmlb(); break;
+		case gpeALF_MX: *(I4*)p_dst = pWIN->instVARmx(); break;
+		case gpeALF_MY: *(I4*)p_dst = pWIN->instVARmy(); break;
+
+		case gpeALF_MSEC:
+		case gpeALF_MS: *(I4*)p_dst = pWIN->instVARms(); break;
+
+		case gpeALF_iA: *(I4*)p_dst = pWIN->instVARia(); break;
+		case gpeALF_iN: *(I4*)p_dst = pWIN->instVARin(); break;
+
+		case gpeALF_IX: *(I4*)p_dst = pWIN->instVARix(); break;
+		case gpeALF_IY: *(I4*)p_dst = pWIN->instVARiy(); break;
+		case gpeALF_IW: *(I4*)p_dst = pWIN->instVARiw(); break;
+		case gpeALF_IH: *(I4*)p_dst = pWIN->instVARih(); break;
+
+
+		case gpeALF_FPS: *(U4*)p_dst = pWIN->mSEC.w; break;
         case gpeALF_entry: if(pSRC) {
                 I4      *pI4 = (I4*)pUn(pA[7], sizeof(*pI4)*2); // pSRC->srcMEMiPC( pA[7], 4 );
                 gpOBJ   *pOan = pSRC->srcOBJfnd( pI4[1] ),
@@ -55,9 +69,12 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 				}
 
             } break;
-		case gpeALF_PRINT: funPRINT(); break;
+		case gpeALF_PRINT:	funPRINT(); break;
+		case gpeALF_FND:	funFND(); break;
+		case gpeALF_NEW:	funNEW(); break;
 
 		default:
+			*(I4*)p_dst = 0;
 			break;
 	}
 	return p_dst;

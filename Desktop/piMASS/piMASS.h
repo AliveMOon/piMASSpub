@@ -211,7 +211,12 @@
 #define gpdBLTstx( st, sxy, dt, dxy ) 	SDL_RenderCopy( dt, st, sxy,  dxy ) 	//SDL_SoftStretch //SDL_BlitScaled	//SDL_LowerBlitScaled
 #define gpdBLTtx( st, sxy, dt, dxy )  	SDL_RenderCopy( dt, st, sxy,  dxy )  //SDL_BlitSurface	//SDL_LowerBlit
 
+/// sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
 
+/// mkdir /piMASS
+/// sudo ln -s /home/alivemoon/Asztal/piMASScmplrSLNpi4/mini_ISO_32x32_1024x1536_3.png /piMASS/mini_char.png
+
+/// sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/piMASS /usr/sbin/pimass
 //#define gpdGT_LIST_tOUT 3
 #define gpdPICbg "/mnt/ram/bg.png"
 #define gpsMINI_CHAR "mini_char_16x32_8x32.png" //"mini_char_64x512.png"	// "mini_char_16x32.png" //
@@ -439,8 +444,7 @@ SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 	return h;
 }
 
-inline U1* gpfSTR( U1* pSTR, const U1* pU )
-{
+inline U1* gpfSTR( U1* pSTR, const U1* pU ) {
 	if(pSTR == pU)	/// ha mindkető NULL akkor is kész
 		return pSTR;
 
@@ -461,8 +465,7 @@ inline U1* gpfSTR( U1* pSTR, const U1* pU )
 	pSTR[nU] = 0;
 	return pSTR;
 }
-U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub )
-{
+U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub ) {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
 	if( (p_str < pE) ? !*p_str : true )
@@ -483,8 +486,7 @@ U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFs
 	return pS-p_str;
 }
 
-U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub )
-{
+U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub ) {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
 	if( (p_str < pE) ? !*p_str : true )
@@ -508,8 +510,7 @@ U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaAL
 	}
 	return pS-p_str;
 }
-U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* gpaALF_H_sub )
-{
+U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* gpaALF_H_sub ) {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
 	nUTF8 = 0;
 	if( (p_str < pE) ? !*p_str : true )
@@ -821,18 +822,14 @@ public:
 		return pO;
 	}
 
-	UTF8& operator += ( U8 n )
-	{
-		if( pBK() )
-		{
-			for( U8 i = 0; i < n; i++ )
-			{
+	UTF8& operator += ( U8 n ) {
+		if( pBK() ) {
+			for( U8 i = 0; i < n; i++ ) {
 				if( !*pU )
 					break;
 
 				pU++;
-				while( *pU & 0x80 )
-				{
+				while( *pU & 0x80 ) {
 					if( (*pU & 0xc0) == 0xc0 )
 						break;
 					pU++;
@@ -842,12 +839,9 @@ public:
 		return *this;
 	}
 
-	UTF8& operator -= ( U8 n )
-	{
-		if( pBK() )
-		{
-			for( U8 i = n; i; i++ )
-			{
+	UTF8& operator -= ( U8 n ) {
+		if( pBK() ) {
+			for( U8 i = n; i; i++ ) {
 				if( !*pU )
 					break;
 
@@ -2289,7 +2283,7 @@ public:
 		return n_t;
 	}
 
-	U4	dctADD( U1* p_src, U4& m, U4x4& w );
+	U4	dctADD( const void* pV, U4& m, U4x4& w );
 	U4  dctFND( U1* p_src, U4x4& w );
 
 	U4	dctADDn( void* pBIN, U4& m, U4x4& w );
@@ -2509,7 +2503,16 @@ typedef enum gpeZS:U4 {
 	gpeZS_oCTR = MAKE_ID( 'o', 'C', 'T', 'R'	),
 
 } gpeZS;
+class gpcVAR{
+public:
+	gpeALF alf;
+	gpeCsz typ;
+	gpcVAR( gpeALF a, gpeCsz t ){
+		alf = a;
+		typ = t;
+	}
 
+};
 class I4x2 {
 public:
 	union{
@@ -2550,12 +2553,10 @@ public:
         x = pI[0];
         y = pI[1];
     }
-    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
-    {
+    size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
 		return sprintf( pBUFF, "%d%s%d%s%s", x, pSeP, y, pSeP, pENT );
     }
-    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  )
-    {
+    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
@@ -2702,19 +2703,16 @@ public:
 
 	I4x2 operator - (const I4x2& b) const { return I4x2( x-b.x,  y-b.y ); }
 	I4x2 operator - (const U4x2& b) const { return I4x2( x-b.x,  y-b.y ); }
-	bool operator != ( const I4x2& b ) const
-	{
+	bool operator != ( const I4x2& b ) const {
 		if( x != b.x )
 			return true;
 		return y != b.y;
 	}
-	bool operator == ( const I4x2& b ) const
-	{
+	bool operator == ( const I4x2& b ) const {
 		return !(*this!=b);
 	}
 
-	I4x2& operator *= ( I4 i )
-	{
+	I4x2& operator *= ( I4 i ) {
 		if( !i )
 			return null();
 		if( i == 1 )
@@ -2725,8 +2723,7 @@ public:
 
 		return *this;
 	}
-	I4x2& operator /= ( I4 i )
-	{
+	I4x2& operator /= ( I4 i ) {
 		if( i == 1 )
 			return *this;
 
@@ -2741,8 +2738,7 @@ public:
 
 		return *this;
 	}
-	I4x2& operator %= ( I4 i )
-	{
+	I4x2& operator %= ( I4 i ) {
 		if( i == 1 )
 			return null();
 
@@ -2927,15 +2923,13 @@ public:
 
 		return avgr / n;
 	}
-	I4x2& swp()
-	{
+	I4x2& swp() {
 		int t = x;
 		x = y;
 		y = t;
 		return *this;
 	}
-	I4x2& YdivQR( int b )
-	{
+	I4x2& YdivQR( int b ) {
 		if( b<2 ? true : b < -1 )
 		{
 			x = y;
@@ -2948,17 +2942,14 @@ public:
 		qr = div(y,b);
 		return *this;
 	}
-	I4x2& YdivRQ( int b )
-	{
+	I4x2& YdivRQ( int b ) {
 		return YdivQR(b).swp();
 	}
-	I4x2& XdivQR( int b )
-	{
+	I4x2& XdivQR( int b ) {
 		y = x;
 		return YdivQR(b);
 	}
-	I4x2& XdivRQ( int b )
-	{
+	I4x2& XdivRQ( int b ) {
 		y = x;
 		return YdivQR(b).swp();
 	}
@@ -3773,6 +3764,10 @@ public:
 	};
 
     I8x2(){};
+    I8x2( gpeALF a, I4x2 b ){
+    	alf = a;
+    	i4x2[1] = b;
+    };
     I8x2( I4 _x, I4 _y = 0 ) { x = _x; y = _y; }
     I8x2( U8 _x, U8 _y = 0 ) { x = _x; y = _y; }
     I8x2( I8 _x, I8 _y = 0 ) { x = _x; y = _y; }
@@ -3997,6 +3992,35 @@ public:
 	}
 
 	int alfFND( gpeALF af, int n );
+	int alfN( gpeALF af, int n );
+	int alfRIG( gpeALF af, int n, int r );
+	int aALFfnd( const gpeALF* aALF, int n, int nA );
+
+	void alfCON( char* pOUT, int nAT ) {
+		I8x2* pAT = this;
+		if( !this )
+			nAT = 0;
+
+		int at = 0;
+		for( ; at < nAT; at++ ) {
+			switch(pAT[at].alf){
+				case gpeALF_PLUS:
+					sprintf( pOUT, "+%lld", pAT[at].num );
+					break;
+				case gpeALF_CM:
+					sprintf( pOUT, ",%lld", pAT[at].num );
+					break;
+				case gpeALF_MRK:
+					sprintf( pOUT, "\"%lld\r\n", pAT[at].num);
+					break;
+				default:
+					pAT[at].an2str( pOUT );
+					break;
+			}
+			std::cout << at <<"."<< pOUT << " ";
+		}
+		std::cout << "nAT:" << at << std::endl;
+	}
 };
 
 
@@ -5684,6 +5708,8 @@ public:
 		aWIP[gpeLZYwip] = gpeWIP_done,
 		aSET[gpeLZYxN] = n;
 	}
+	gpcLZY( gpcVAR* pALF, U4 n );
+
 	~gpcLZY() { gpmFREE( p_alloc ); }
 	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
 
@@ -6059,8 +6085,13 @@ public:
 			memcpy( p_alloc+iSTRT, p_alloc+iSTRT+n_sub, n_hi );
 		}
 
-		n_load -= n_sub;
-		p_alloc[n_load] = 0;
+		if( n_load > n_sub)
+			n_load -= n_sub;
+		else
+			n_load = 0;
+
+		if( p_alloc )
+			p_alloc[n_load] = 0;
 		return this;
 	}
 	gpcLZY* lzy_exp_rand( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 ) {
@@ -6180,7 +6211,7 @@ public:
 		U8 s = -1;
 		return lzyADD( plus.p_alloc, plus.n_load, s );
 	}
-
+	gpcLZY* lzyDIR( const char* p_file, U8& iSTRT );
 	gpcLZY* lzyRD( const char* p_file, U8& iSTRT, U1 n = 0 ) {
 		/// READ FILE
 		if( !p_file )
@@ -6234,24 +6265,26 @@ public:
 
 		return p_lazy;
 	}
-	gpcLZY* lzyWR( const char* p_file, bool b_over = true ) {
+	gpcLZY* lzyWR( const char* p_file, bool b_over = true, bool bADD = false ) {
 		/// WRITE FILE
 		if( this ? !n_load : true )
 			return this;
+		if( bADD )
+			b_over = true;
 
 		if( !b_over )
 		if( gpfACE(p_file, 4) < 0 )
 			return this;
 
 		char s_buff[gpdMAX_PATH];
-		FILE* p_f = fopen( p_file, "wb" );
+		FILE* p_f = fopen( p_file, bADD ? "ab":"wb" );
 		U8 n_w = 0, n_err = 0, W0 = 0;
 
 		if( !p_f )
 		{
 			if( !gpfMKDR( s_buff, p_file ) )
 				goto close;
-			p_f = fopen(p_file, "wb");
+			p_f = fopen(p_file, bADD ? "ab":"wb" );
 			if( !p_f )
 				goto close;
 		}
@@ -6283,6 +6316,7 @@ close:
 szasz:
 		return this;
 	}
+
 	gpcLZY* lzyFRMT( U8& iSTRT, const char* p_format, ... );
 	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
@@ -6340,7 +6374,41 @@ szasz:
 		return ins;
 	}
 	int nAT( char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
-
+	gpcLZY* utf8( U4 u, U1 trans = '\a' ) {
+		if( !u )
+			return this;
+		gpcLZY* pLZY = this;
+		U1 aU[8], nU = 0;
+		if( trans ? u == trans : false ) {
+			nU = 2;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x1f)|0xc0;
+		}
+		else if( u < 0x80 ) {
+			nU = 1;
+			aU[0] = u;
+		}
+		else if( u < 0x800 ) {
+			nU = 2;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x1f)|0xc0;
+		}
+		else if( u < 0x1000 ) {
+			nU = 3;
+			aU[2] = (u&0x3f)|0x80; u>>=6;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x0f)|0xe0;
+		}
+		else {
+			nU = 4;
+			aU[3] = (u&0x3f)|0x80; u>>=6;
+			aU[2] = (u&0x3f)|0x80; u>>=6;
+			aU[1] = (u&0x3f)|0x80; u>>=6;
+			aU[0] = (u&0x07)|0xf0;
+		}
+		U8 s=-1;
+		return pLZY->lzyADD( aU, nU, s );
+	}
 };
 
 
@@ -6399,13 +6467,14 @@ public:
 		pIX = p_ix0+iIX;
 		return iIX;
 	}
-	gpcLZYdct* dctADD( U1* pS, U8 nS ) {
+	gpcLZYdct* dctADD( const void* pV, U8 nS ) {
 		if( !this )
 		{
 			gpcLZYdct* p_this = new gpcLZYdct(0);
 
-			return p_this->dctADD( pS, nS );
+			return p_this->dctADD( pV, nS );
 		}
+		U1* pS = (U1*)pV;
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;
@@ -6686,12 +6755,8 @@ public:
 	U8			ver;
 
 	gpcLZYdctBIN(){};
-	gpcLZYdctBIN(U4 n)
-	{
-		gpmCLR;
-	}
-	void rst()
-	{
+	gpcLZYdctBIN(U4 n) { gpmCLR; }
+	void rst() {
 		if(!this)
 			return;
 		pIX = NULL;
@@ -6731,10 +6796,8 @@ public:
 		return iIX;
 	}
 	gpcLZYdctBIN* dctADD( U1* pB, U8 nB ) {
-		if( !this )
-		{
+		if( !this ) {
 			gpcLZYdctBIN* p_this = new gpcLZYdctBIN(0);
-
 			return p_this->dctADD( pB, nB );
 		}
 		U8 aSTRT[2]; // = -1;
@@ -6769,37 +6832,31 @@ public:
 		return this;
 	}
 
-	U4 x( void )
-	{
+	U4 x( void ) {
 		if( this ? !ix.n_load : true )
 			return 0;
 
 		return pIX-(U4x4*)ix.p_alloc;
 	}
-	U4 iBIN(void)
-	{
+	U4 iBIN(void) {
 		if( !pIX )
 			return bin.n_load;
 
 		return pIX->x;
 	}
-	void* pBINix( void )
-	{
+	void* pBINix( void ) {
 		return bin.p_alloc+pIX->x;
 	}
-	U8 nIX(void)
-	{
+	U8 nIX(void) {
 		return this ? (ix.n_load / sizeof(U4x4)) : 0;
 	}
-	const void* pBINi( U8 i, const void* pER )
-	{
+	const void* pBINi( U8 i, const void* pER ) {
 		if( !this )
 			return pER;
 		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 		return bin.p_alloc + p_ix0[i].x;
 	}
-	U4 nBINix( U8 iX )
-	{
+	U4 nBINix( U8 iX ) {
 		if( this ? iX >= nIX() : true )
 			return 0;
 

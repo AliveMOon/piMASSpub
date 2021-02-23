@@ -30,6 +30,7 @@ class gpcRES;
 class gpcCRS;
 class gpcWIN;
 class gpCORE;
+class gpITMlst;
 class gpMEM;
 //#include "gpcres.h"
 
@@ -542,20 +543,20 @@ U8 inline gpfSTR2U8( void* pV, void* ppV = NULL ) {
 		*(char**)ppV = p_str;
 	return u8;
 }
-I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL ) {
+I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL, bool bHEX = false ) {
 	if( !pV )
 		return 0;
 
 	char *p_str = (char*)pV;
 	U8 nLEN;
-	int n0 = gpmVAN(p_str, "+-0123456789xXbBdD", nLEN ), n1;
+	int n0 = gpmVAN(p_str, (bHEX ? "+-0123456789aAbBcCdDeEfF": "+-0123456789xXbBdD"), nLEN ), n1;
 	if( pSTOP ) {
 		n1 = gpmVAN(p_str, (char*)pSTOP, nLEN );
 		if(n0>n1)
 			n0=n1;
 	}
     p_str += n0;
-	I8 i8 = strtol( p_str, &p_str, 10 );
+	I8 i8 = strtol( p_str, &p_str, bHEX ? 16 : 10 );
 	if( !i8 )
 	{
 		switch( *(U1*)p_str )
@@ -918,39 +919,17 @@ public:
 	}
 
 	bool bARY(){ return pd2D()->area() > 1; }
-	bool bUTF8()
-	{
+	bool bUTF8() {
 		if( cID() != gpeCsz_b )
 			return false;
 		return bARY();
 	}
 	bool bAN() { return this? cAN == gpeCsz_c:false; }
 	bool bALF() { return this? cAN == gpeCsz_a:false; }
-
-
-	/*I4 REcID( I4 c )
-	{
-        if( !this )
-            return gpeCsz_OFF;
-		cid = c;
-		sof = 0;
-		return cid;
-	}
-	gpOBJ* movREF( gpOBJ* pB )
-	{
-		if( this ? !pB : true )
-			return this;
-		if( dctID == pB->dctID )
-			return this;
-
-		cid = pB->cID();
-		sof = pB->sOF();
-
-		d2D = pB->d2D;
-		iPC = pB->iPC;
-		return this;
-	}*/
-
+	I8 iVAR();
+	bool bVAR();
+	I8 iFUN();
+	bool bFUN();
 
 };
 
@@ -960,8 +939,7 @@ public:
 	gpeOPid	preOP, pstOP;
 
 	gpROW(){};
-	gpROW* operator = ( gpOBJ& O )
-	{
+	gpROW* operator = ( gpOBJ& O ) {
 		if( !this )
 			return this;
 		if( &O )
@@ -972,8 +950,7 @@ public:
 			mnID*=-1;
 		return this;
 	}
-	gpROW* operator = ( gpOBJ* pO )
-	{
+	gpROW* operator = ( gpOBJ* pO ) {
 		return (*this = *pO);
 	}
 
@@ -1323,11 +1300,16 @@ public:
 
 	gpINST* instRDY( gpcLZY* pDBG );
 	gpINST* instALU();
-	U1*		instVAR( U1* p_dst, gpINST& inst );
+	U1*		instJSR( U1* p_dst, gpINST& inst );
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
 	I4		instDOitSLMP( gpcGT* pGT );
 	I4		instDOitGSM( gpcGT* pGT );
+
+	gpcLZY* memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 );
 	void	funPRINT();
+
+	void	funFND();
+	void	funNEW();
 };
 
 class gpcSRC {
@@ -1344,11 +1326,9 @@ public:
 
     gpeALF	*pALFtg;
 
-    gpcRES	*pEXE0,
-			*apOUT[4];
+    //gpcRES	*apOUT[4];
 
-	gpcLZY	*pMINI, *pDBG,
-			*pABI;
+	gpcLZY	*pMINI, *pDBG;
 
 	gpcMAP	*pMAP;
 
@@ -1402,7 +1382,7 @@ public:
 
 	gpBLK*	srcINSTmov3( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 
-	gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	//gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTent2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTadd2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTmul2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
@@ -2026,6 +2006,9 @@ public:
 	U4	anDICTix[0x1000],
 		rstLEV, iLEV, nLEV, topLEV;
 
+	/// DB
+	gpcLZYdct	dctDB;
+	gpcLZY		lstDB;
 	/// aGLcnl --------
 	F4		aGLcnl[0x10];
 	int		aGLpic[0x10];
@@ -2047,7 +2030,8 @@ public:
 	U4 nTXT = 0;
 	char* pTXT, *pT;
 
-	gpcLZYdct* pOPER();
+	gpITMlst*	iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE );
+	gpcLZYdct*	pOPER();
 	U4* pM( U4x2& zn, U1 id = 4 ) {
 		zn = 0;
 		if( !this )

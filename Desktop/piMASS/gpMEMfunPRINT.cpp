@@ -4,39 +4,65 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-void gpMEM::funPRINT()
+gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 {
-	I4	nI4 = pD[7]-pA[7],
-		*pI4 = (I4*)pUn(pA[7], nI4 ), nCPY;
-	nI4 /= gpaCsz[gpeCsz_l];
-
 	U8 nLEN, s;
 	I4x2 AB;
 	gpeCsz cAB;
-	I4 i = nI4-1;
+	I4 i = nI4-1, nCPY, nSKIP = 0;
 	gpPTR *pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
 
 	char	sFRMT[0x100], *pNUM,
 			*pS = pPi ? (char*)pUn(pPi->iPC, pPi->sOF() ) : NULL,
 			*pSe = pS;
 
-	gpcLZY* pPRNT = NULL;
 
-	nCPY = gpmVAN( pSe, "%", nLEN );
+
+	nCPY = gpmVAN( pSe, "%\\", nLEN );
 	while(nCPY) {
-
-
 		s = -1;
-		pPRNT = pPRNT->lzyADD( pSe, nCPY, s, -1 );
+		pPRNT = pPRNT->lzyADD( pSe+nSKIP, nCPY-nSKIP, s, -1 );
 		pSe += nCPY;
-		if( *pSe != '%' )
-			break;
+		switch( *pSe ){
+			case '%':
+				break;
+			case '\\':{
+					pSe++;
+					switch( *pSe ) {
+						case 'r':
+						case 'R':
+							sFRMT[0]='\r';
+							break;
+						case 'n':
+						case 'N':
+							sFRMT[0]='\n';
+							break;
+						case 't':
+						case 'T':
+							sFRMT[0]='\t';
+							break;
+						case 'a':
+						case 'A':
+							sFRMT[0]='\a';
+							break;
+					}
+					sFRMT[1] = 0;
+					pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT );
+					nCPY = gpmVAN( pSe, "%\\", nLEN );
+					if(!nCPY)
+						continue;
+					nSKIP = 1;
+				} continue;
+			default:
+				nCPY = 0;
+			continue;
+		}
 		// %7.3x--------------------------
 		// %%%
 		nCPY = gpmNINCS( pSe, "%" );
 		if( !(nCPY&1) ) {
 			// páros
-			nCPY += gpmVAN( pSe+nCPY, "%", nLEN );
+			nCPY += gpmVAN( pSe+nCPY, "%\\", nLEN );
 			continue;
 		}
 		pSe += nCPY;
@@ -47,16 +73,11 @@ void gpMEM::funPRINT()
 		}
 
 		pSe++;
-		nCPY = gpmVAN( pSe, "%", nLEN );
+		nCPY = gpmVAN( pSe, "%\\", nLEN );
 
 		i--;
 		if( i < 0 )
 			continue;
-
-		/*if( AB.area() )
-			sFRMT[0] = sprintf( sFRMT+1, "%%%d.%d%c", (int)AB.x, (int)AB.y, pSe[-1] );
-		else
-			sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );*/
 
 		pPi = pPTRu1(pI4[i]);
 		U1* pU1 = pPi->pU1(this);
@@ -78,6 +99,7 @@ void gpMEM::funPRINT()
 					sFRMT[0] = sprintf( sFRMT+1, "%%%d.%d%c", (int)AB.x, (int)AB.y, pSe[-1] );
 				else
 					sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );
+
 				switch( pPi->cID() ) {
 					case gpeCsz_Q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(I8*)pU1 ); break;
 					case gpeCsz_q: pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT+1, *(U8*)pU1 ); break;
@@ -93,18 +115,23 @@ void gpMEM::funPRINT()
 					default: break;
 				}
 			} break;
-
 		}
-
 	}
 
-	pS = pPRNT ? (char*)pPRNT->p_alloc : NULL;
-	nCPY = gpmSTRLEN(pS);
+	return pPRNT;
+}
+void gpMEM::funPRINT()
+{
+	I4	nI4 = pD[7]-pA[7],
+		*pI4 = (I4*)pUn(pA[7], nI4 ); //, nCPY;
+	nI4 /= gpaCsz[gpeCsz_l];
 
+	gpcLZY* pPRNT = memPRINT(NULL,pI4,nI4);
 
 	gpPTR *pPhr = pPTR(pA[0]);
-
-	I4 nA = nALL(pPhr->iPC);
+	char *pS = pPRNT ? (char*)pPRNT->p_alloc : NULL;
+	I4	nCPY = gpmSTRLEN(pS),
+		nA = nALL(pPhr->iPC);
 	if( nA < nCPY ) {
 		if( nA )
 			iFREE( pPhr->iPC );
@@ -123,5 +150,5 @@ void gpMEM::funPRINT()
 	{std::cout	<< stdCYAN << "funPRINT:"
 				<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
 
-
+	gpmDEL(pPRNT);
 }

@@ -88,8 +88,9 @@ U4x4& U4x4::str2date( U1* p_str, U1* p_end, U1** pp_str )
 	return *this;
 }
 
-U4  U4x4::dctADD( U1* p_src, U4& m, U4x4& w )
+U4  U4x4::dctADD( const void* pV, U4& m, U4x4& w )
 {
+	U1* p_src = (U1*)pV;
 	m = 0;
 	U4x4* p_w = this;
 	U2	n_w = &w-p_w;

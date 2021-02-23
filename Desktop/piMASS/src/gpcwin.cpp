@@ -165,15 +165,6 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	pSDLrndr = SDL_CreateRenderer(	pSDLwin, -1,
 									SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
-	/*if(
-		winID.x = SDL_CreateWindowAndRenderer(	winSIZ.z, winSIZ.w,
-												SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL,
-												&pSDLwin, &pSDLrndr ) != 0
-	)
-        throw InitError();
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1" );
-	*/
-
 	if( !(pSRFwin = SDL_GetWindowSurface( pSDLwin )) )
 		throw InitError();
 
@@ -189,17 +180,23 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	if( pSRFchar != pSRFload )
 		gpmSDL_FreeSRF( pSRFload );
 
-
-	chrPIC.x = 8; //*4;
-	chrPIC.y = 32; //*4;
+	/*
+	chrPIC.x = 8;
+	chrPIC.y = 32;
 	chrPIC.w = pSRFchar->w/chrPIC.x;
 	chrPIC.h = pSRFchar->h/chrPIC.y;
 	U1x4* pC = (U1x4*)((char*)pSRFchar->pixels + 4*pSRFchar->pitch);
 	for( U4 i = 0; i < 0x80; i++ )
 		pC[(i>>4)*pSRFchar->w + (i&0xf)] = 0x01010101*(gpsHUNtx[i]-' ');
+	*/
+	/// sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
 
+	/// mkdir /piMASS
+	/// sudo ln -s /home/alivemoon/Asztal/piMASScmplrSLNpi4/mini_ISO_32x32_1024x1536_3.png /piMASS/mini_char.png
+
+	/// sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/piMASS /usr/sbin/pimass
 	gpmSTRCPY( gppMASSfile, gpsMINI_ISO );
-	pSRFiso = IMG_Load( gpsMASSpath );
+	pSRFiso = IMG_Load( "/piMASS/mini_char.png" ); //gpsMASSpath );
 	chrTX.x = 32; //*4;
 	chrTX.y = 32; //*4;
 	chrTX.z = pSRFiso->w/chrTX.x;
@@ -211,12 +208,11 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	pHOST = sHOST;
 	pUSER = sUSER;
 
-	pGL =  new gpcGL( *this ); //true ? new gpcGL( *this ) : NULL;
-	if( !pGL ) //? !pGL->pTXback : true )
+	pGL =  new gpcGL( *this );
+	if( !pGL )
 		return;
 
 	pGL->GLSLset( I8x2( 0, 0 ) );
-	//pGL->VBOnew( aVxD, gpmN(aVxD)/2, 2 );
 	pGL->IBOnew( aIxD, gpmN(aIxD) );
 
 }
@@ -234,16 +230,17 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 	F4 tmpFx4;
 	bool bMOV = false;
 	while( gppKEYbuff ) {
-		usleep(33);
+		//usleep(33);
 		mSEC.y = mSEC.x;
 		mSEC.x = SDL_GetTicks();
 		mSEC.z = mSEC.x-mSEC.y;
-		mSEC.w = 1000/gpmMAX( 1, mSEC.z);
+		mSEC.w = 1000/gpmMAX( 1, mSEC.z); // FPS
 
 
 		gpcCRS& crs = *apCRS[srcDIV]; // ? *apCRS[srcDIV] : main_crs;
 		reSCAN();
 		/// ----------------------------------------------
+		///					SDL & GL
 		///
 		///		0 pTRD->RNDR
 		/// 	1 pPIC->LOCK
@@ -305,7 +302,6 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 							->glSETcnl( 0, F4(0.9f,0.9f,0.9f,1.0f) )
 							->glSETtx( 0, p_tx, pP->txWH.a4x2[1] )
 							->glDRW( w.a4x2[0], FRMwh );
-							//->glDRW( 0, w.a4x2[0], FRMwh );
 						}
 					}
 
@@ -345,8 +341,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 
 
 			nJDOIT.z = mSEC.x;
-			if( piMASS )
-			{
+			if( piMASS ) {
 
 				U1	*pS = gppMOUSEbuff,
 					*pE = pS;
@@ -430,8 +425,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 				if( pS < gppKEYbuff )
 					crs.CRSins( piMASS, gppKEYbuff, pS );
 
-				crs.miniRDY(	this, //piMASS,
-								pPIC, pSDLrndr, bSHIFT, bMOV );
+				crs.miniRDY(	this, pPIC, pSDLrndr, bSHIFT, bMOV );
 				if( bMOV )
 					bMOV = false;
 
@@ -443,15 +437,14 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 					if( crs.id == i )
 						continue;
 					if( bSW&(1<<i) )
-						apCRS[i]->miniRDY(	this, //piMASS,
-											pPIC, pSDLrndr, bSHIFT );
+						apCRS[i]->miniRDY(	this, pPIC, pSDLrndr, bSHIFT );
 				}
 			} else {
 				crs.miniINS( gppKEYbuff, gppMOUSEbuff, gpsKEYbuff );
 			}
 
 			pPIC->unLOCK();
-		}
+		                       }
 
 		/// ----------------------------------------------
 		///

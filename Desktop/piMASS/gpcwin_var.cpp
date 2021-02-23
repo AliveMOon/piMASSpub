@@ -1,9 +1,20 @@
 #include "gpccrs.h"
 #include <gpsKEYMAP.h>
-//extern const U1 gpsKEYMAP[];
 
-bool gpcWIN::WINvar( gpcREG& out, gpeALF alf )
-{
+I4	gpcWIN::instVARmx(){ return this ? mouseXY.x : 0; }
+I4	gpcWIN::instVARmy(){ return this ? mouseXY.y : 0; }
+I4	gpcWIN::instVARms(){ return this ? mSEC.x: 0; }
+I4	gpcWIN::instVARmlb(){ return this ? !!(nMB&1): 0; }
+
+I4	gpcWIN::instVARix(){ return this ? apCRS[onDIV.x]->scnIN.x : 0; }
+I4	gpcWIN::instVARiy(){ return this ? apCRS[onDIV.x]->scnIN.y : 0; }
+I4	gpcWIN::instVARiw(){ return this ? apCRS[onDIV.x]->scnIN.z : 0; }
+I4	gpcWIN::instVARih(){ return this ? apCRS[onDIV.x]->scnIN.w : 0; }
+
+I4	gpcWIN::instVARia(){ return this ? apCRS[onDIV.x]->scnZN.x+1 : 0; }
+I4	gpcWIN::instVARin(){ return this ? apCRS[onDIV.x]->scnZN.y : 0; }
+
+bool gpcWIN::WINvar( gpcREG& out, gpeALF alf ) {
 	out.off();
 	if( alf ?  !apCRS[onDIV.x] : true  )
 		return out.bGD();
