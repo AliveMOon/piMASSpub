@@ -6150,10 +6150,9 @@ public:
 		}
 
 		if( n_hi )
-		if( n_load <= dst_hi )
-		{
+		if( n_load <= dst_hi ) {
 			// nincsen átfedésben mehet sima kopival
-			memcpy( p_alloc+dst_hi, p_kill+src_hi, n_hi );
+			memcpy( p_alloc+dst_hi, (p_kill?p_kill:p_alloc)+src_hi, n_hi );
 		}
 		else if( dst_hi < src_hi )
 		{

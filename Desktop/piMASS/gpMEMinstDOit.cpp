@@ -98,6 +98,38 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
         return gpeCsz_OFF;
 
 	I4 cID = gpeCsz_OFF;
+	if(
+			(obj.AN.alf == gpeALF_PIC)
+		||	(obj.AN.alf >= gpeALF_PICA && obj.AN.alf <= gpeALF_PICZ)
+	) {
+		U1 iPIC = 0;
+		if( obj.AN.alf != gpeALF_PIC )
+			iPIC = obj.AN.alf - gpeALF_PICA +1;
+		cID = gpeCsz_b;
+		if( !bCID ) {
+			U1* pS = pU1;
+			I4 picID 	= obj.bUTF8()
+						? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
+						: *(I4*)pU1;
+			gpcPIC* pPIC = pMASS->PIC.PIC( picID );
+			if( pPIC )
+			{
+				gpdGLapPIC[iPIC] = pMASS->PIC.PIC( picID );
+				gpdGLaPICid[iPIC] = picID+1;
+				return cID;
+			}
+			if( !*pS )
+				return cID;
+
+			I8x2 alfN(0,14);
+
+			alfN = pS;
+			alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+			gpdGLapPIC[iPIC] = pMASS->PIC.PIC( alfN );
+		}
+		return cID;
+	}
+
 	switch( obj.AN.alf )
 	{
 		/// --------------------------------------------------------------------------

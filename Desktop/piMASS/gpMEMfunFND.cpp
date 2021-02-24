@@ -255,6 +255,7 @@ void gpMEM::funFND() {
 		case 1: // SEL
 			break;
 		default:
+			iSW = 0; break;
 			return; break;
 	}
 
@@ -297,7 +298,7 @@ void gpMEM::funFND() {
 	if( !i )
 		return;
 
-	pAT->alfCON( sPUB, nAT );
+	//pAT->alfCON( sPUB, nAT );
 	I4x4 xyzw = 0, *pXYZW;
 	I4x2 *pON = NULL, *pIA;
 	gpcLZY onLZY, iaLZY;
@@ -343,7 +344,7 @@ void gpMEM::funFND() {
 					iaCNT++;
 
 					for( i = 0; i < pIA->y; i++ ) {
-						pPRNT = pPRNT->lzyFRMT( (s=-1), "\r\n %4d 0x%0.4x %d", pON[i].x, pI0[pON[i].x].ID, pON[i].y );
+						pPRNT = pPRNT->lzyFRMT( (s=-1), "\r\n %4d 0x%0.4llx %d", pON[i].x, pI0[pON[i].x].ID, pON[i].y );
 						I4x4* pXYR = (I4x4*)pI0[pON[i].x].pAA( aa, sizeof(I4x4) );
 						if( pXYR )
 							pPRNT = pPRNT->lzyFRMT( (s=-1), " xyr: %d, %d, %d", pXYR->x, pXYR->y, pXYR->z );
@@ -366,6 +367,10 @@ void gpMEM::funFND() {
 				if( iSW!=1 ) {
 					pIl->iSW=0;
 					pIl->aixITMsel[0]=nITM;
+					if( pON ? (pON[0].y<xyzw.z) : false )
+						break;
+					U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z );
+					pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
 					break;
 				}
 

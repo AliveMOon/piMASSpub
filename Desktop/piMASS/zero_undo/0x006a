@@ -62,8 +62,7 @@
  again=1000;
 
  a5	 
-  b5	 
+  b5	
  
   cnl = b3.lst;
-  again = 200;
-   
+  

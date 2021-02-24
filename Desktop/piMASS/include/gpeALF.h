@@ -1142,13 +1142,15 @@ typedef enum gpeALF:I8
 
 
 	/// PICo 0 -----------------------------------------------
-	gpeALF_PICo = gpdABCD('P', 'I', 'C', 'O'),
-	/// i 1
-	gpeALF_PICi = gpdABCD('P', 'I', 'C', 'I'),
-	/// v 5
-	gpeALF_PICv = gpdABCD('P', 'I', 'C', 'V'),
-	/// x 10
-	gpeALF_PICx = gpdABCD('P', 'I', 'C', 'X'),
+	gpeALF_PICA = gpdABCD('P', 'I', 'C', 'A'),
+	gpeALF_PICB, gpeALF_PICC, gpeALF_PICD,
+	gpeALF_PICE, gpeALF_PICF, gpeALF_PICG, 	gpeALF_PICH,
+	gpeALF_PICI, gpeALF_PICJ, gpeALF_PICK, 	gpeALF_PICL,
+	gpeALF_PICM, gpeALF_PICN, gpeALF_PICO, 	gpeALF_PICP,
+	gpeALF_PICQ, gpeALF_PICR, gpeALF_PICS, 	gpeALF_PICT,
+	gpeALF_PICU, gpeALF_PICV, 				gpeALF_PICW,
+	gpeALF_PICX, gpeALF_PICY, gpeALF_PICZ,
+
 
 
 
