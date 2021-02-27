@@ -157,6 +157,7 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 		{
 			frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
+			std::cout << (char*)frgLOG.p_alloc << std::endl;
 		}
 		return isSUCC;
 	}

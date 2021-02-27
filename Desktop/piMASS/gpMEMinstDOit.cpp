@@ -88,10 +88,12 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 #define gpdCTRL (pCTRL?pCTRL:(pCTRL = new gpCTRL))
 
 #define gpdGL (pMgl?pMgl:(pMgl = new gpGL))
+//#define gpdGLpVTX	gpdGL->pVTX
+//#define gpdGLpPIX	gpdGL->pPIX
 #define gpdGLmskPIC	gpdGL->mskPIC
 #define gpdGLapPIC	gpdGL->apPIC
 #define gpdGLpTRG	gpdGL->pTRG
-#define gpdGLpTRGxy	gpdGL->trgWH.a4x2[1]
+#define gpdGLpTRGxy	gpdGL->trgWH.a4x2[0]
 #define gpdGLpTRGwh	gpdGL->trgWH.a4x2[1]
 #define gpmGLnCNL 	gpdGL->lzyCNL.nLD(sizeof(F4))
 #define gpmGLaCNL( a ) ((float*)gpdGL->lzyCNL.Ux( (a), sizeof(F4) ))
@@ -306,7 +308,29 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
 				gpdGLapPIC[0] = pMASS->PIC.PIC( alfN );
 			} break;
+		/// Vertex SHADERT
+		case gpeALF_VTX: {									cID = gpeCsz_b; if( bCID ) break;
+				//if( !pMgl ) break;
+				if(obj.bUTF8())
+					gpdGL->VTX( (char*)pU1 );
+			} break;
+		/// Pixel SHADERT Compile?
+		case gpeALF_PIX: {									cID = gpeCsz_b; if( bCID ) break;
+				//if( !pMgl ) break;
+				if( obj.bUTF8() )
+					gpdGL->PIX( (char*)pU1 );
 
+				gpOBJ* pOnm = pOBJ(gpeALF_NAME);
+				if( !pOnm->bUTF8() ) break;
+				gpPTR* pP = pOnm->pPTRu1();
+				pU1 = pP->pU1(this);
+				if( !pU1 )
+					break;
+
+				I8x2 aNM(0,14);
+				aNM = (char*)pU1+ ((*pU1 == '\"') ? 1 : 0);
+				pWgl->GLSLset( aNM, pMgl->pPIX, pMgl->pVTX );
+			} break;
 		/// Target PICTURE
 		case gpeALF_TRGH: 									cID = gpeCsz_l; if( bCID ) break;
 				gpdGLpTRGwh.y =  *(U4*)pU1; break;
@@ -331,7 +355,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				}
 				I8x2 an(0,14);
 				if( obj.bUTF8() )
-					an = pU1;
+					an = (char*)pU1+ ((*pU1 == '\"') ? 1 : 0);
 				else
 					an = I8x2( *(I4*)pU1, 0 );
 

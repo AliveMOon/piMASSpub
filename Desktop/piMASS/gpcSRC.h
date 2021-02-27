@@ -1207,10 +1207,32 @@ public:
 	gpcPIC		*apPIC[0x10],
 				*apBOB[0x10],
 				*pTRG;
-	gpcLZY		lzyCNL;
+	gpcLZY		lzyCNL, lzyVTX, lzyPIX;
 	U4 			nCNL, mskPIC, nBLD;
 	gpcPICAM	*pCAM;
-	SDL_Texture* apTX[0x10];
+	SDL_Texture	*apTX[0x10];
+	char		*pVTX, *pPIX;
+	char* VTX( char* pVX ) {
+		if( pVX ? !*pVX : true )
+			return pVTX;
+		U8 nLEN, s = 0;
+		pVX += gpmNINCS( pVX, "\"");
+		U4 nVX = gpmVAN(pVX,"\"",nLEN);
+		lzyVTX.lzyADD( pVX, nVX, s = 0 );
+
+		return pVTX = (char*)lzyVTX.p_alloc;
+	}
+
+	char* PIX( char* pPX ) {
+		if( pPX ? !*pPX : true )
+			return pPIX;
+		U8 nLEN, s = 0;
+		pPX += gpmNINCS( pPX, "\"");
+		U4 nPX = gpmVAN(pPX,"\"",nLEN);
+		lzyPIX.lzyADD( pPX, nPX, s = 0 );
+
+		return pPIX = (char*)lzyPIX.p_alloc;
+	}
 	gpGL(){ gpmCLR; };
 	~gpGL(){
 		gpmDEL(pCAM);

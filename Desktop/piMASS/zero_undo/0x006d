@@ -30,9 +30,9 @@
  name = "ize";
  px = ix*480/iw; py = 800*iy/ih;
  txy = mlb + (ia-2)*1000 + (in-3)*10000;
- lst = fnd( txy,	"zeroDB/scr/",
- 					"pxSCR.xyr", 
- 				px, py, 30, 4 );
+ lst = fnd( txy, "zeroDB/scr/",
+ 				"pxSCR.xyr", 
+ 				px, py, 30); //, 4 );
  mini = print( "
   inx:%d iny:%d
   a %d n %d
@@ -60,6 +60,7 @@
  b4	 
  name = "pen";
  pix = "
+
  #version 120
  varying vec2 fr_uv;
  uniform sampler2D	tex0,	// space
@@ -70,8 +71,7 @@
  uniform vec4 		aCNL[8];
 
 
- void main()
- {
+ void main() {
       vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
                 cUV = aCNL[0].xy/tgPX,
 		crs = abs(fUV-cUV)*tgPX;
@@ -89,7 +89,6 @@
  trgw = 480;
  trgh = 800;
  trg = "draw";
- pic = "cam1";
   cnl = b3.lst;
   gpu = "pen";
   again = 200;
