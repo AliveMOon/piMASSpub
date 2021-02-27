@@ -29,6 +29,7 @@
 class gpcRES;
 class gpcCRS;
 class gpcWIN;
+class gpcGL;
 class gpCORE;
 class gpITMlst;
 class gpMEM;
@@ -742,8 +743,7 @@ public:
 
 	gpcSCOOP(){ gpmCLR; };
 
-	bool bGD( U1* pUTF, U1** ppUe )
-	{
+	bool bGD( U1* pUTF, U1** ppUe ) {
 		U8	hs2 = 0;
 		U4	i = 0;
 		while( pUTF[i] )
@@ -760,8 +760,7 @@ public:
 		return false;
 	}
 
-	void rst( U1* pUTF )
-	{
+	void rst( U1* pUTF ) {
 		lzyMiN.lzyRST();
 
 		lzyDCT.rst();
@@ -1202,16 +1201,27 @@ public:
 };
 class gpGL{
 public:
+	I4x4		trgWH;
 	I4			aPICid[0x10],
 				aBOBid[0x10];
 	gpcPIC		*apPIC[0x10],
-				*apBOB[0x10];
+				*apBOB[0x10],
+				*pTRG;
+	gpcLZY		lzyCNL;
+	U4 			nCNL, mskPIC, nBLD;
 	gpcPICAM	*pCAM;
 	SDL_Texture* apTX[0x10];
 	gpGL(){ gpmCLR; };
 	~gpGL(){
 		gpmDEL(pCAM);
 	};
+	U4 nBUILD() {
+		if( !this )
+			return 0;
+		mskPIC = nCNL = 0;
+		nBLD++;
+		return nBLD;
+	}
 };
 class gpCTRL{
 public:
@@ -1242,7 +1252,8 @@ public:
 	gpcWIN	*pWIN;
 	gpcMASS	*pMASS;
 	gpcSRC	*pSRC;
-	gpGL	*pGL;
+	gpGL	*pMgl;
+	gpcGL	*pWgl;
 	gpCTRL	*pCTRL;
 
 	I4x4	*pFREE, *pALLOC;
@@ -1250,7 +1261,7 @@ public:
 
 	~gpMEM() {
 		gpmDEL( pLZYsrcXFNDall);
-		gpmDEL( pGL );
+		gpmDEL( pMgl );
 		gpmDELary(pFREE);
 		gpmDELary(pALLOC);
 	}
@@ -1987,8 +1998,7 @@ class gpcMASS {
 				*apSP[0x100];
 	U4x4 		aSP44[0x100];
 
-	gpcSRC** ppSRC( void )
-	{
+	gpcSRC** ppSRC( void ) {
 		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
@@ -2010,7 +2020,7 @@ public:
 	gpcLZYdct	dctDB;
 	gpcLZY		lstDB;
 	/// aGLcnl --------
-	F4		aGLcnl[0x10];
+	//F4		aGLcnl[0x10];
 	int		aGLpic[0x10];
 	//gpcPIC* aGLpPIC[0x10];
 	/// OPER --------

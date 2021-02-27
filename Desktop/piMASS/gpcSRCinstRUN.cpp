@@ -170,8 +170,8 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	if( pMEM ? !(nO=pMEM->lzyOBJ.nLD(sizeof(gpOBJ))) : true )
 		return pLZY;
 
-
-
+	pMEM->pWgl = pMEM->pWIN ? pMEM->pWIN->pGL : NULL;
+	pMEM->pMgl->nBUILD();
 	char sBUFF[0x100];
 	gpOBJ	*pOmn = pMEM->pOBJ(gpeALF_MINI),
 			*pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );

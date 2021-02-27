@@ -87,46 +87,112 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 }
 #define gpdCTRL (pCTRL?pCTRL:(pCTRL = new gpCTRL))
 
-#define gpdGL (pGL?pGL:(pGL = new gpGL))
-#define gpdGLapPIC gpdGL->apPIC
+#define gpdGL (pMgl?pMgl:(pMgl = new gpGL))
+#define gpdGLmskPIC	gpdGL->mskPIC
+#define gpdGLapPIC	gpdGL->apPIC
+#define gpdGLpTRG	gpdGL->pTRG
+#define gpdGLpTRGxy	gpdGL->trgWH.a4x2[1]
+#define gpdGLpTRGwh	gpdGL->trgWH.a4x2[1]
+#define gpmGLnCNL 	gpdGL->lzyCNL.nLD(sizeof(F4))
+#define gpmGLaCNL( a ) ((float*)gpdGL->lzyCNL.Ux( (a), sizeof(F4) ))
+#define gpmGLaCNL4( a ) ((F4*)gpdGL->lzyCNL.Ux( (a), sizeof(F4) ))
 #define gpdGLaPICid gpdGL->aPICid
 #define gpdGLpCAM (gpdGL->pCAM?gpdGL->pCAM:(gpdGL->pCAM = new gpcPICAM))
+
 I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 	bool bCID = this ? !pU1 : true;
 	gpcGT* pGT;
 	if( obj.cAN != gpeCsz_a )
         return gpeCsz_OFF;
 
+
+	SDL_Texture* apTX[0x10];
+	U1 sSHF[0x8];
+	U8 nLEN;
+	U8& shuffle = *(U8*)sSHF;
 	I4 cID = gpeCsz_OFF;
+	if(
+			(obj.AN.alf == gpeALF_CNL)
+		||	(obj.AN.alf >= gpeALF_CNLA && obj.AN.alf <= gpeALF_CNLZ)
+	) {
+		U1 iCNL = (obj.AN.alf==gpeALF_CNL ) ? 0 : obj.AN.alf-gpeALF_CNLA+1;
+		cID = gpeCsz_L; if( bCID )
+							return cID;
+		// ix id dist 'xyr' x, y, r
+		// 1 0x0003 29 xyr: 131, 471, 30
+		I4 ix, dist, nCNL = 0, i; I8 id;
+		if( obj.bUTF8() ) {
+			U1* pS = pU1+1, *pSe = pS+gpmVAN( pS, "\"", nLEN ), *pSx;
+			for( pS += gpmNINCS(pS," \t\r\n"); pS < pSe; pS += gpmNINCS(pS," \t\r\n") ) {
+				ix = gpfSTR2I8(pS,&pS);
+				id = gpfSTR2I8(pS,&pS);
+				pS += gpmNINCS(pS," \t");
+				if( *pS == '+' )
+					pS += gpmNINCS(pS,"+");
+				else
+					dist = gpfSTR2I8(pS,&pS);
+
+				pS += gpmNINCS(pS," \t");
+				pSx = pS;
+				pS = pSx+gpmVAN(pS,": \t\r\n", nLEN);
+
+				shuffle = 0;
+				gpmMcpy(sSHF,pSx, gpmMIN(4,pS-pSx) );
+				pSx = pS;
+				pS += gpmVAN(pS,"\r\n", nLEN);
+				float* pF = gpmGLaCNL(nCNL);
+				for( pSx += gpmNINCS(pSx,": \t\r\n"), i=0; pSx < pS; pSx += gpmNINCS(pSx,", \t\r\n") ) {
+					pF[i] = gpfSTR2I8(pSx, &pSx);
+					if(*pSx == '.')
+					if( pF[i] < 0.0 )
+						pF[i] -= gpmSTR2D(pSx);
+					else
+						pF[i] += gpmSTR2D(pSx);
+					i++;
+				}
+
+				nCNL++;
+				if( pMgl ) pMgl->nCNL = nCNL;
+			}
+		}
+
+
+		return cID;
+	}
+
 	if(
 			(obj.AN.alf == gpeALF_PIC)
 		||	(obj.AN.alf >= gpeALF_PICA && obj.AN.alf <= gpeALF_PICZ)
 	) {
-		U1 iPIC = 0;
-		if( obj.AN.alf != gpeALF_PIC )
-			iPIC = obj.AN.alf - gpeALF_PICA +1;
-		cID = gpeCsz_b;
-		if( !bCID ) {
-			U1* pS = pU1;
-			I4 picID 	= obj.bUTF8()
-						? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
-						: *(I4*)pU1;
-			gpcPIC* pPIC = pMASS->PIC.PIC( picID );
-			if( pPIC )
-			{
-				gpdGLapPIC[iPIC] = pMASS->PIC.PIC( picID );
-				gpdGLaPICid[iPIC] = picID+1;
-				return cID;
-			}
-			if( !*pS )
+		U4 iPIC = (obj.AN.alf==gpeALF_PIC ) ? 0 : obj.AN.alf-gpeALF_PICA+1;
+
+		cID = gpeCsz_L; if( bCID )
+							return cID;
+
+		U1* pS = pU1;
+		I4 picID 	= obj.bUTF8()
+					? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
+					: *(I4*)pU1;
+		gpcPIC* pPIC = pMASS->PIC.PIC( picID );
+		if( pPIC )
+		{
+			gpdGLapPIC[iPIC] = pMASS->PIC.PIC( picID );
+			if( !gpdGLapPIC[iPIC] )
 				return cID;
 
-			I8x2 alfN(0,14);
-
-			alfN = pS;
-			alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
-			gpdGLapPIC[iPIC] = pMASS->PIC.PIC( alfN );
+			gpdGLmskPIC |= 1<<iPIC;
+			gpdGLaPICid[iPIC] = picID+1;
+			return cID;
 		}
+		if( !*pS )
+			return cID;
+
+		I8x2 alfN(0,14);
+
+		alfN = pS;
+		alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+		gpdGLapPIC[iPIC] = pMASS->PIC.PIC( alfN );
+
 		return cID;
 	}
 
@@ -170,7 +236,8 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		} break;
 		case gpeALF_AGAIN: {								cID = gpeCsz_l; if( bCID ) break;
 			msRUN = *(U4*)pU1;
-			if( !msRUN ) break;
+			if( !msRUN )
+				break;
 			msRUN += pWIN->mSEC.x;
 		} break;
 		case gpeALF_NAME: {									cID = gpeCsz_b; if( bCID ) break;
@@ -212,30 +279,71 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 						pWIN->pPICbg = gpdGLapPIC[0];
 			}
 		} break;
-		/// GFX
-		case gpeALF_PIC: {								cID = gpeCsz_b; if( bCID ) break;
-			U1* pS = pU1;
-			I4 picID 	= obj.bUTF8()
-						? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
-						: *(I4*)pU1;
-			gpcPIC* pPIC = pMASS->PIC.PIC( picID );
-			if( pPIC )
-			{
-				gpdGLapPIC[0] = pMASS->PIC.PIC( picID );
-				gpdGLaPICid[0] = picID+1;
-				break;
-			}
-			if( !*pS )
-				break;
+		///----------------------------------------------------
+		///
+		///				OpenGL render
+		///
+		///----------------------------------------------------
+		case gpeALF_PIC: {									cID = gpeCsz_b; if( bCID ) break;
+				U1* pS = pU1;
+				I4 picID 	= obj.bUTF8()
+							? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
+							: *(I4*)pU1;
+				gpcPIC* pPIC = pMASS->PIC.PIC( picID );
+				if( pPIC )
+				{
+					gpdGLapPIC[0] = pMASS->PIC.PIC( picID );
+					gpdGLaPICid[0] = picID+1;
+					break;
+				}
 
-			I8x2 alfN(0,14);
+				if( !*pS )
+					break;
 
-			alfN = pS;
-			alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
-			if( !(gpdGLapPIC[0] = pMASS->PIC.PIC( alfN )) )
-				break;
+				I8x2 alfN(0,14);
 
-		} break;
+				alfN = pS;
+				alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
+				gpdGLapPIC[0] = pMASS->PIC.PIC( alfN );
+			} break;
+
+		/// Target PICTURE
+		case gpeALF_TRGH: 									cID = gpeCsz_l; if( bCID ) break;
+				gpdGLpTRGwh.y =  *(U4*)pU1; break;
+		case gpeALF_TRGW: 									cID = gpeCsz_l; if( bCID ) break;
+				gpdGLpTRGwh.x =  *(U4*)pU1; break;
+		case gpeALF_TRG:{									cID = gpeCsz_b; if( bCID ) break;
+				//U1* pS = pU1;
+				I4 trg_id 	= obj.bUTF8()
+							? pMASS->PIC.alfFND(pU1)
+							: *(I4*)pU1;
+				gpdGLpTRG = pMASS->PIC.PIC( trg_id );
+
+			} break;
+
+		/// DRAW with GPU
+		case gpeALF_GPU: if( pWgl ? gpdGLpTRG : NULL  ) {	cID = gpeCsz_b; if( bCID ) break;
+				for( I4 i = 0, msk = gpdGLmskPIC; 	msk; 	i++, msk>>=1 ) {
+					//pMASS
+					apTX[i] = (msk&1)
+							? gpdGLapPIC[i]->surDRWtx(pWgl->pRNDR)
+							: NULL;
+				}
+				I8x2 an(0,14);
+				if( obj.bUTF8() )
+					an = pU1;
+				else
+					an = I8x2( *(I4*)pU1, 0 );
+
+				pWgl
+				->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, true, true )
+				->GLSLset( an )
+				->glSETbox( gpdGLpTRGxy, gpdGLpTRGwh )
+				->glSETcnl( 0, gpmGLaCNL4(0), gpmGLnCNL )
+				->glSETtx( gpdGLmskPIC, gpdGLapPIC )
+				->glDRW( gpdGLpTRGxy, gpdGLpTRGwh )
+				->glDONE();
+			} break;
 		default:
 			break;
 	}

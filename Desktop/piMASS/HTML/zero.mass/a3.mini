@@ -1,6 +1,6 @@
 
- ACT:IDLE
- lat: N 4705.3750 lng: E 1754.2422
- alt:   265.8000 spd:   0.0000
- dat: 2021 02 22	tim: 21:22 29
- sig: 24 99 reg: "ok"
+ ACT:REG
+ lat: ? 0.0000 lng: ? 0.0000
+ alt:   0.0000 spd:   0.0000
+ dat: 2000 00 00	tim: 0:0 0
+ sig: 00 00 reg: "ok"

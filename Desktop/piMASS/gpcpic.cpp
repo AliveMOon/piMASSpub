@@ -545,6 +545,7 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 }
 
 U4 gpcPICall::alfFND( U1* pS ) {
+	pS += gpmNINCS(pS," \t\"");
 	I8x2 TnID(0,14);
 	TnID = pS;
 	TnID.num = gpfSTR2U8( pS+TnID.num, &pS );

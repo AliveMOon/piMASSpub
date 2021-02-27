@@ -31,6 +31,7 @@
 
 #define gpdUP ('a'-'A')
 #define gpdUP_CASE(a){ if( a >= 'a' && a <= 'z' ){ a -= gpdUP; }}
+#define gpmUP(a)( a = ( a >= 'a' && a <= 'z' ) ? a-gpdUP : a )
 #define gpdALF 								('Z'-'@')
 #define gpdA(a)								( a -'@' )
 #define gpdAB(a,b)							(U8)( gpdA(a)*gpdALF + gpdA(b) )
@@ -803,8 +804,11 @@ typedef enum gpeALF:I8
 	gpeALF_BOX = gpdABC('B', 'O', 'X'),
 	gpeALF_CAM = gpdABC('C', 'A', 'M'),
 	gpeALF_CLR = gpdABC('C', 'L', 'R'),
+
 	gpeALF_CMX = gpdABC('C', 'M', 'X'),
 	gpeALF_CMY = gpdABC('C', 'M', 'Y'),
+	gpeALF_CMZ = gpdABC('C', 'M', 'Z'),
+	/// CNL 0 -----------------------------------------------
 	gpeALF_CNL = gpdABC('C', 'N', 'L'),
 	gpeALF_com = gpdABC('C', 'O', 'M'),
 	gpeALF_COS = gpdABC('C', 'O', 'S'),
@@ -1009,12 +1013,16 @@ typedef enum gpeALF:I8
 	gpeALF_CLIP = gpdABCD('C', 'L', 'I', 'P'),		// SIM7600 - Calling line identification presentation
 	gpeALF_CLVL = gpdABCD('C', 'L', 'V', 'L'),		// SIM7600 - Call VOLUME
 
-	gpeALF_CNLC = gpdABCD('C', 'N', 'L', 'C'),
-	gpeALF_CNLT = gpdABCD('C', 'N', 'L', 'T'),
-	gpeALF_CNLX = gpdABCD('C', 'N', 'L', 'X'),
-	gpeALF_CNLY = gpdABCD('C', 'N', 'L', 'Y'),
-	gpeALF_CNLZ = gpdABCD('C', 'N', 'L', 'Z'),
-	gpeALF_CNLW = gpdABCD('C', 'N', 'L', 'W'),
+	/// CNLA 1 -----------------------------------------------
+	gpeALF_CNLA = gpdABCD('C', 'N', 'L', 'A'),
+	gpeALF_CNLB, gpeALF_CNLC, gpeALF_CNLD,
+	gpeALF_CNLE, gpeALF_CNLF, gpeALF_CNLG, 	gpeALF_CNLH,
+	gpeALF_CNLI, gpeALF_CNLJ, gpeALF_CNLK, 	gpeALF_CNLL,
+	gpeALF_CNLM, gpeALF_CNLN, gpeALF_CNLO, 	gpeALF_CNLP,
+	gpeALF_CNLQ, gpeALF_CNLR, gpeALF_CNLS, 	gpeALF_CNLT,
+	gpeALF_CNLU, gpeALF_CNLV, 				gpeALF_CNLW,
+	gpeALF_CNLX, gpeALF_CNLY, gpeALF_CNLZ,
+
 	gpeALF_CNMI = gpdABCD('C', 'N', 'M', 'I'),		// SIM7600 - New msg indikator
 	gpeALF_CNMP = gpdABCD('C', 'N', 'M', 'P'),		// SIM7600 - Preferred mode selection
 	gpeALF_CMGD = gpdABCD('C', 'M', 'G', 'D'),		// SIM7600 - SMS Delete
@@ -1141,7 +1149,7 @@ typedef enum gpeALF:I8
 	gpeALF_PASS = gpdABCD('P', 'A', 'S', 'S'),
 
 
-	/// PICo 0 -----------------------------------------------
+	/// PICA 1 -----------------------------------------------
 	gpeALF_PICA = gpdABCD('P', 'I', 'C', 'A'),
 	gpeALF_PICB, gpeALF_PICC, gpeALF_PICD,
 	gpeALF_PICE, gpeALF_PICF, gpeALF_PICG, 	gpeALF_PICH,
