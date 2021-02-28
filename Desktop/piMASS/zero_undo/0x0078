@@ -151,28 +151,13 @@
 		crs = abs(fUV-cUV)*tgPX;
 
       gl_FragColor = texture2D( tex0, fUV );
-      vec2 d = dis(fUV,aCNL[0].xy);
-      float r = length(d), rr = abs(r-30);
-      gl_FragColor.r = rr < 1 ? 1.0 : gl_FragColor.r;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
+      if( mn( fUV, aCNL[0].xy ) < 2.0 )
           gl_FragColor.r = 1.0;
-
-      d = dis(fUV,aCNL[1].xy);
-      r = length(d), rr = abs(r-30);
-      gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
+      if( mn( fUV, aCNL[1].xy ) < 2.0 )
           gl_FragColor.g = 1.0;
-
-      d = dis(fUV,aCNL[2].xy);
-      r = length(d), rr = abs(r-30);
-      gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
+      if( mn( fUV, aCNL[2].xy ) < 2.0 )
           gl_FragColor.g = 1.0;
-
-      d = dis(fUV,aCNL[3].xy);
-      r = length(d), rr = abs(r-30);
-      gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
+      if( mn( fUV, aCNL[3].xy ) < 2.0 )
           gl_FragColor.g = 1.0;
  }
 

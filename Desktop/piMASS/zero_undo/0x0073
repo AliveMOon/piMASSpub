@@ -133,17 +133,8 @@
  uniform vec2		tgPX;
  uniform vec2		aTX[8];
  uniform vec4 		aCNL[8];
- 
- vec2 dis( vec2 fUV, vec2 cnl ){
-      return abs(fUV*tgPX - cnl );
- }
- float l( vec2 fUV, vec2 cnl ) {
-       return length(dis(fUV,cnl));
- }
- float mn( vec2 fUV, vec2 cnl ) {
-       vec2 d = dis(fUV,cnl);
-       return min(d.x,d.y);
- }
+
+
  void main()
  {
       vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
@@ -151,29 +142,8 @@
 		crs = abs(fUV-cUV)*tgPX;
 
       gl_FragColor = texture2D( tex0, fUV );
-      vec2 d = dis(fUV,aCNL[0].xy);
-      float r = length(d), rr = abs(r-30);
-      gl_FragColor.r = rr < 1 ? 1.0 : gl_FragColor.r;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
-          gl_FragColor.r = 1.0;
-
-      d = dis(fUV,aCNL[1].xy);
-      r = length(d), rr = abs(r-30);
-      gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
-          gl_FragColor.g = 1.0;
-
-      d = dis(fUV,aCNL[2].xy);
-      r = length(d), rr = abs(r-30);
-      gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
-          gl_FragColor.g = 1.0;
-
-      d = dis(fUV,aCNL[3].xy);
-      r = length(d), rr = abs(r-30);
-      gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
-      if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
-          gl_FragColor.g = 1.0;
+      if( min(crs.x,crs.y) < 2.0 )
+          gl_FragColor.rg = 1;
  }
 
  ";
