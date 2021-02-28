@@ -144,6 +144,15 @@
        vec2 d = dis(fUV,cnl);
        return min(d.x,d.y);
  }
+ vec3 line( vec2 fUV, vec2 c0, vec2 c1 ) {
+       vec2 px = fUV*tgPX - c0,
+            c01 = c1-c0;
+       float l = length(c01),
+             pxl = dot( px, c01/l ),
+             pxm = length(px-(c01*pxl/l));
+
+       return vec3( pxm, pxl, l );
+ }
  void main()
  {
       vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
@@ -161,6 +170,10 @@
       r = length(d), rr = abs(r-30);
       gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
       if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
+          gl_FragColor.g = 1.0;
+
+      vec3 xyz = line( fUV,aCNL[0].xy,aCNL[1].xy);
+      if( xyz.x < 1 && xyz.y > -1 && xyz.y-1 < xyz.z )
           gl_FragColor.g = 1.0;
 
       d = dis(fUV,aCNL[2].xy);

@@ -75,6 +75,7 @@ public:
 	char	sPATH[0x400], *pF;
 	I8		newID;
 	I4		aixITMsel[2], iSW;
+	gpITM	itmSEL;
 	gpcLZY	itmLST;
 	gpITMlst(){};
 	gpITMlst( char* pU1, U2 nU1 ) {
@@ -142,22 +143,28 @@ gpITM* gpITM::dir( gpITMlst *pIDlst ) {
 	return this;
 }
 gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
-	char* pF = pIDlst->pF + sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
+
+	char* pF = pIDlst ? pIDlst->pF + sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID ) : NULL;
+
 	gpcLZY wr;
 	U8 s;
 	switch( pAT[1].alf ) {
 		case gpeALF_XYR: {
 			I8x2 aa( pAT[0].alf,pAT[1].alf);
-			pF += gpfALF2STR( pF, aa.x );
-			*pF = '.'; ++pF;
-			gpfALF2STR( pF, aa.y );
 			I4x4* pXYR = (I4x4*)pAA( aa, sizeof(I4x4) );
 			if( !pXYR )
 				break;
 			if( (*pXYR) == (pVAR?(*(I4x4*)pVAR):I4x4(0)) )
 				break;
-
 			(*pXYR) = pVAR ? (*(I4x4*)pVAR) : I4x4(0);
+
+			if( !pF )
+				break;
+
+			pF += gpfALF2STR( pF, aa.x );
+			*pF = '.'; ++pF;
+			gpfALF2STR( pF, aa.y );
+
 			wr
 			.lzyADD( pXYR, sizeof(*pXYR), s=0, -1)
 			->lzyWR( pIDlst->sPATH);
@@ -354,12 +361,23 @@ void gpMEM::funFND() {
 				pI0 = pIl->pITM( 0 );
 				if(pON&&pI0){
 					if( (pIl->aixITMsel[0]==pON[0].x) && (pIl->iSW==1) && (iSW==1) ) {
+						/// folyamatosan le van lenyomva
+						/// DRAG
 						pI0[pON[0].x].store( pIl, pAT+iA, &xyzw );
+						I4x4* pXYR = (I4x4*)pIl->itmSEL.pAA( aa, sizeof(I4x4) );
+						if( !pXYR )
+							break;
+						U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", pON[0].x, pI0[pON[i].x].ID, pXYR->x, pXYR->y, pXYR->z );
+						pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
 						break;
 					}
 					if( (iSW==1) && (pON[0].y<xyzw.z) ) {
+						/// igen benne van, most lett lenyomva
+						/// SELECT
 						pIl->aixITMsel[0] = pON[0].x;
 						pIl->iSW=1;
+						I4x4* pXYR = (I4x4*)pI0[pON[0].x].pAA( aa, sizeof(I4x4) );
+						pIl->itmSEL.store( NULL, pAT+iA, pXYR );
 						break;
 					}
 				}
@@ -367,9 +385,19 @@ void gpMEM::funFND() {
 				if( iSW!=1 ) {
 					pIl->iSW=0;
 					pIl->aixITMsel[0]=nITM;
-					if( pON ? (pON[0].y<xyzw.z) : false )
+					if( pON ? (pON[0].y<xyzw.z) : false ) {
+						/// igen benne van, DE nincs lenyomva
+						/// ON
+						U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z );
+						pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
 						break;
-					U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z );
+					}
+					/// nincs benne nincs lenyomva
+					/// FREE search
+					U4 nPUB = sprintf( sPUB, 	"\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d"
+												"\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d",
+												nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z,
+												nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z );
 					pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
 					break;
 				}
@@ -377,7 +405,8 @@ void gpMEM::funFND() {
 				pITM = pIl->pITM( nITM );
 				if( !pITM )
 					break;
-
+				/// nincs benne, DE lelett nyomva
+				/// ADD
 				pIl->aixITMsel[0] = nITM;
 				pIl->iSW=1;
 				pITM->store( pIl, pAT+iA, &xyzw );
