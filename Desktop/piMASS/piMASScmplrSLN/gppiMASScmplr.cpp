@@ -215,8 +215,8 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 
 	if( pMEM ) {
 		gpmDEL(pMEMo);
-        if( pMEM ? pMEM->pGL : NULL )
-            gpmDEL( pMEM->pGL->pCAM );
+        if( pMEM ? pMEM->pMgl : NULL )
+            gpmDEL( pMEM->pMgl->pCAM );
 
 		pMEMo = pMEM;
 	}

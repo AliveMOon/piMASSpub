@@ -74,7 +74,8 @@ class gpITMlst {
 public:
 	char	sPATH[0x400], *pF;
 	I8		newID;
-	I4		aixITMsel[2];
+	I4		aixITMsel[2], iSW;
+	gpITM	itmSEL;
 	gpcLZY	itmLST;
 	gpITMlst(){};
 	gpITMlst( char* pU1, U2 nU1 ) {
@@ -91,10 +92,14 @@ public:
 			pITM[i].null();
 	}
 	gpITM* pITM( I4 ix ) {
+		U4 n = itmLST.nLD(sizeof(gpITM));
 		gpITM* pI = this ? (gpITM*)itmLST.Ux( ix, sizeof(*pI) ) : NULL;
 		if( !pI )
 			return NULL;
-		pI->mID = pI->ID = newID++;
+		if( ix < n )
+			return pI;
+		pI->mID = pI->ID = newID;
+		++newID;
 		pI->dir( this );
 		return pI;
 	}
@@ -138,19 +143,28 @@ gpITM* gpITM::dir( gpITMlst *pIDlst ) {
 	return this;
 }
 gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
-	char* pF = pIDlst->pF + sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
+
+	char* pF = pIDlst ? pIDlst->pF + sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID ) : NULL;
+
 	gpcLZY wr;
 	U8 s;
 	switch( pAT[1].alf ) {
 		case gpeALF_XYR: {
 			I8x2 aa( pAT[0].alf,pAT[1].alf);
-			pF += gpfALF2STR( pF, aa.x );
-			*pF = '.'; ++pF;
-			gpfALF2STR( pF, aa.y );
 			I4x4* pXYR = (I4x4*)pAA( aa, sizeof(I4x4) );
 			if( !pXYR )
 				break;
+			if( (*pXYR) == (pVAR?(*(I4x4*)pVAR):I4x4(0)) )
+				break;
 			(*pXYR) = pVAR ? (*(I4x4*)pVAR) : I4x4(0);
+
+			if( !pF )
+				break;
+
+			pF += gpfALF2STR( pF, aa.x );
+			*pF = '.'; ++pF;
+			gpfALF2STR( pF, aa.y );
+
 			wr
 			.lzyADD( pXYR, sizeof(*pXYR), s=0, -1)
 			->lzyWR( pIDlst->sPATH);
@@ -215,7 +229,7 @@ gpITMlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
 				pITM = (gpITM*)pIl->itmLST.Ux( ixITM, sizeof(*pITM) );
 				pITM->mID = pITM->ID = gpfSTR2I8( pSi );
 				pITM->dir( pIl );
-				if( pIl->newID < pITM->ID )
+				if( pIl->newID <= pITM->ID )
 					pIl->newID = pITM->ID+1;
 			}
 			pSi = pSe + gpmNINCS( pSe, "\r\n\t ");
@@ -248,6 +262,7 @@ void gpMEM::funFND() {
 		case 1: // SEL
 			break;
 		default:
+			iSW = 0; break;
 			return; break;
 	}
 
@@ -290,7 +305,7 @@ void gpMEM::funFND() {
 	if( !i )
 		return;
 
-	pAT->alfCON( sPUB, nAT );
+	//pAT->alfCON( sPUB, nAT );
 	I4x4 xyzw = 0, *pXYZW;
 	I4x2 *pON = NULL, *pIA;
 	gpcLZY onLZY, iaLZY;
@@ -299,15 +314,18 @@ void gpMEM::funFND() {
 		n = alfLEN(pAT[iA].alf);
 		pSi = pS +pAT[iA].num-n;
 		pSe = pSi+pAT[iA+1].num;
+		I8x2 aa( pAT[iA].alf,pAT[iA+1].alf);
 		switch( pAT[iA+1].alf ) {
 			case gpeALF_XYR:
 				j = 0;
 				xyzw = 0;
+				/// függvény paramétereit olvassa XYR
 				while( i>-1 ) {
 					pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
 					xyzw.aXYZW[j++] = pPi->i8(this);
 					i--;
 				}
+				/// ITEM-ek távolságának kiszámítása a megadott xy poziciohoz képest
 				pIA = (I4x2*)onLZY.Ux( iaCNT, sizeof(*pIA) );
 				pIA->x = onCNT;
 				for( ixITM = 0; ixITM < nITM; ixITM++ ) {
@@ -316,43 +334,85 @@ void gpMEM::funFND() {
 						continue;
 					pON = (I4x2*)onLZY.Ux( onCNT, sizeof(*pON) );
 					pON->x = ixITM;
-					pON->y = sqrt((xyzw.a4x2[0]-pXYZW->a4x2[0]).qlen());
+					if( (pIl->aixITMsel[0]==ixITM) && (pIl->iSW==1) && (iSW==1) )
+						pON->y = -1;
+					else
+						pON->y = sqrt((xyzw.a4x2[0]-pXYZW->a4x2[0]).qlen());
 					onCNT++;
 				}
 				pIA->y = onCNT-pIA->x;
 				if( pIA->y ) {
-
 					pON = (I4x2*)onLZY.Ux( pIA->x, sizeof(*pON) );
-
+					/// sorting MEDIAN --------------------------------
 					pON[0].median( pIA->y, (I4x2*)onLZY.p_alloc, true );
 					if( xyzw.w )
 						pIA->y = gpmMIN( xyzw.w, pIA->y );
-					//gpmMcpyOF( pON, onLZY.p_alloc, pIA->y );
 					onCNT = pIA->sum();
 					iaCNT++;
 
 					for( i = 0; i < pIA->y; i++ ) {
-						pPRNT = pPRNT->lzyFRMT( (s=-1), "\r\n %d 0x%0.4x %d", pON[i].x, pI0[pON[i].x].ID, pON[i].y );
+						pPRNT = pPRNT->lzyFRMT( (s=-1), "\r\n %4d 0x%0.4llx %d", pON[i].x, pI0[pON[i].x].ID, pON[i].y );
+						I4x4* pXYR = (I4x4*)pI0[pON[i].x].pAA( aa, sizeof(I4x4) );
+						if( pXYR )
+							pPRNT = pPRNT->lzyFRMT( (s=-1), " xyr: %d, %d, %d", pXYR->x, pXYR->y, pXYR->z );
 					}
 				}
-				if( iSW ? iSW!=1 : true )
-					break;
 
-				// select
-				if( pON )
-				if( pON[0].y < xyzw.z ) {
-					pIl->aixITMsel[1] = pIl->aixITMsel[0];
-					pIl->aixITMsel[0] = pON[0].x;
+				pI0 = pIl->pITM( 0 );
+				if(pON&&pI0){
+					if( (pIl->aixITMsel[0]==pON[0].x) && (pIl->iSW==1) && (iSW==1) ) {
+						/// folyamatosan le van lenyomva
+						/// DRAG
+						pI0[pON[0].x].store( pIl, pAT+iA, &xyzw );
+						I4x4* pXYR = (I4x4*)pIl->itmSEL.pAA( aa, sizeof(I4x4) );
+						if( !pXYR )
+							break;
+						U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", pON[0].x, pI0[pON[i].x].ID, pXYR->x, pXYR->y, pXYR->z );
+						pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
+						break;
+					}
+					if( (iSW==1) && (pON[0].y<xyzw.z) ) {
+						/// igen benne van, most lett lenyomva
+						/// SELECT
+						pIl->aixITMsel[0] = pON[0].x;
+						pIl->iSW=1;
+						I4x4* pXYR = (I4x4*)pI0[pON[0].x].pAA( aa, sizeof(I4x4) );
+						pIl->itmSEL.store( NULL, pAT+iA, pXYR );
+						break;
+					}
+				}
+
+				if( iSW!=1 ) {
+					pIl->iSW=0;
+					pIl->aixITMsel[0]=nITM;
+					if( pON ? (pON[0].y<xyzw.z) : false ) {
+						/// igen benne van, DE nincs lenyomva
+						/// ON
+						U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z );
+						pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
+						break;
+					}
+					/// nincs benne nincs lenyomva
+					/// FREE search
+					U4 nPUB = sprintf( sPUB, 	"\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d"
+												"\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d",
+												nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z,
+												nITM, pIl->newID, xyzw.x, xyzw.y, xyzw.z );
+					pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
 					break;
 				}
-				// ITM + alf.XYR
+
 				pITM = pIl->pITM( nITM );
 				if( !pITM )
 					break;
-				pIl->aixITMsel[1] = pIl->aixITMsel[0] = nITM;
-				pI0 = pITM-pIl->aixITMsel[0];
+				/// nincs benne, DE lelett nyomva
+				/// ADD
+				pIl->aixITMsel[0] = nITM;
+				pIl->iSW=1;
 				pITM->store( pIl, pAT+iA, &xyzw );
+				pI0 = pITM - pIl->aixITMsel[0];
 				break;
+
 			case gpeALF_MOM:
 				break;
 			default: break;

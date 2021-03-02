@@ -461,19 +461,8 @@ U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT,
 											pWIN->msSYN
 										);
 			pSRC->msBLD = 0;
-
-			/*pSRC->apOUT[0] = pSRC->apOUT[1];
-			pSRC->apOUT[1] = pSRC->apOUT[2];
-			pSRC->apOUT[2] = pSRC->apOUT[3];
-			pSRC->apOUT[3] = NULL;*/
 		}
-		/*else if( pSRC->bSW&gpeMASSloopMSK )
-		{
-			pSRC->apOUT[0] = pSRC->apOUT[1];
-			pSRC->apOUT[1] = pSRC->apOUT[2];
-			pSRC->apOUT[2] = pSRC->apOUT[3];
-			pSRC->apOUT[3] = NULL;
-		}*/
+
 
 		if( !pSRC->srcINSTrun() )
 			continue;
@@ -682,7 +671,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 							} break;
 				/// DRAW with GPU
-						case gpeALF_GPU:if( pTRG && pGL ) {
+				/*	case gpeALF_GPU:if( pTRG && pGL ) {
 								for( I4 i = 0, msk = mskPIC; msk; i++, msk>>=1 )
 								{
 									apTX[i] = 	aGLpPIC[i]
@@ -697,7 +686,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 								->glSETtx( mskPIC, aGLpPIC )
 								->glDRW( trgWH.a4x2[0], trgWH.a4x2[1] )
 								->glDONE();
-							} break;
+							} break;*/
 				///----------------------------------------------------
 
 				///----------------------------------------------------
@@ -767,7 +756,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 							pGT->GTcnct( pWIN );
 					} break;
 
-					case gpeALF_PICo:{
+					case gpeALF_PICO:{
 							aGLpPIC[0] = PIC.aluFND( alu );
 							if( !aGLpPIC[0] )
 								break;
@@ -775,7 +764,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 							aGLpic[0] = aGLpPIC[0]->id+1;
 							mskPIC |= 1;
 						} break;
-					case gpeALF_PICi:{
+					case gpeALF_PICI:{
 							aGLpPIC[1] = PIC.aluFND( alu );
 							if( !aGLpPIC[1] )
 								break;
@@ -799,7 +788,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 							aGLpic[4] = aGLpPIC[4]->id+1;
 							mskPIC |= 1<<4;
 						} break;
-					case gpeALF_PICv:{
+					case gpeALF_PICV:{
 							aGLpPIC[5] = PIC.aluFND( alu );
 							if( !aGLpPIC[5] )
 								break;
@@ -815,7 +804,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 							aGLpic[6] = aGLpPIC[6]->id+1;
 							mskPIC |= 1<<6;
 						} break;
-					case gpeALF_PICx:{
+					case gpeALF_PICX:{
 							aGLpPIC[10] = PIC.aluFND( alu );
 							if( !aGLpPIC[10] )
 								break;
@@ -839,7 +828,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 						} break;
 
 
-
+/*
 					case gpeALF_CNLX:	case gpeALF_CNLY:	case gpeALF_CNLZ:	case gpeALF_CNLW:	{
 						aGLcnl[0].aXYZW[(alu.alf-gpeALF_CNLT)%4] = alu.d8();
 						if( nCNL < 1 )
@@ -865,6 +854,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 						if( nCNL < 11 )
 							nCNL = 11;
 						} break;
+*/
 
 
 					case gpeALF_RINP: {
@@ -1059,6 +1049,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 				//}
 			}
 			else switch( alu.alf ) {
+					/*
 				case gpeALF_CNLiiX: case gpeALF_CNLiiY: case gpeALF_CNLiiZ: case gpeALF_CNLiiW: {
 					aGLcnl[2].aXYZW[(alu.alf-gpeALF_CNLiiT)%4] = alu.d8();
 					if( nCNL < 3 )
@@ -1099,7 +1090,7 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 					if( nCNL < 13 )
 						nCNL = 13;
 					} break;
-
+*/
 
 
 				case gpeALF_PICiii:{

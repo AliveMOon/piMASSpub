@@ -26,7 +26,7 @@
 //? #define gpdNEW_CMPLR
 
 #define bSTDcout true //false //true
-#define bSTDcout_V4l2 (bSTDcout&false)
+#define bSTDcout_V4l2 (bSTDcout&false) //true) // false)//
 #define bSTDcout_jsr false //(bSTDcout&true)
 #define bSTDcout_slmp (bSTDcout&true)
 #define bSTDcoutCMP true //false //true
@@ -6150,10 +6150,9 @@ public:
 		}
 
 		if( n_hi )
-		if( n_load <= dst_hi )
-		{
+		if( n_load <= dst_hi ) {
 			// nincsen átfedésben mehet sima kopival
-			memcpy( p_alloc+dst_hi, p_kill+src_hi, n_hi );
+			memcpy( p_alloc+dst_hi, (p_kill?p_kill:p_alloc)+src_hi, n_hi );
 		}
 		else if( dst_hi < src_hi )
 		{
