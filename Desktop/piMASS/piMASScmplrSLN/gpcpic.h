@@ -548,8 +548,7 @@ public:
 
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
-	SDL_Texture		*pTX,*pTXlock,
-                                *pRTX;
+	SDL_Texture		*pTX,*pTXlock,*pRTX;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
@@ -592,8 +591,7 @@ public:
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc );
-	SDL_Surface* surFREE( SDL_Surface* pF )
-	{
+	SDL_Surface* surFREE( SDL_Surface* pF ) {
 		if( !pF )
 			return pF;
 		bool bFREE = pSRF == pF;

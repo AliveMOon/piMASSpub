@@ -194,12 +194,9 @@
              gl_FragColor = texture2D( tex1, fUV );
            }
       }
-      else if( f15 == 374 ) {
-             gl_FragColor = vec4(1,1,1,1);
-
-      } else if(length(aTX[1]) > 0) {
+      else if(length(aTX[1]) > 0) {
           gl_FragColor = texture2D( tex1, fUV );
-          pen = texture2D( tex1, vec2(4.5,11.5)/vec2(15.0,25.0) );
+          pen = texture2D( tex1, vec2(4.5, 11.5)/vec2(15.0, 25.0) );
 
           if( dr3 < 0.77 ) {
               if( f1525.y < 10.0 ) {
@@ -213,10 +210,12 @@
                                                         (fUV-vec2(1.0/3.0,2.0/5.0))
                                                         *vec2(3.0/2.0,5.0/1.0)
                                                       )
-                                     ) * vec4(0.5,0.75,0.5,1.0)
+                                     )
+                                     * vec4(0.5,0.75,0.5,1.0)
                                   );
               } else if( (f1525.y<20.0) && (f1525.x>5.0) ) {
-                if( l(fUV-vec2(0,1.0/5.0),aCNL[0].xy) < aCNL[0].w )
+
+                  if( l(fUV-vec2(0,1.0/5.0),aCNL[0].xy) < aCNL[0].w )
                       gl_FragColor = (
                                          texture2D( tex2, (
                                                             (fUV-vec2(1.0/3.0,3.0/5.0))
@@ -224,7 +223,7 @@
                                                           )
                                          ) * vec4(0.5,0.75,0.5,1.0)
                                       );
-                else
+                  else
                      gl_FragColor = draw;
               }
           }
@@ -320,13 +319,12 @@
   trg = "penna";
   picA = "draw";
   picB = "cam1";
-  picC = "mask";
   cnl = print( "0 0x0 0 xyr: %d, %d, %d, %d \r\n ",
  				px, py, rr, 8
  		 );
   gpu = "penna";
-  mskAB = "mask"
-  trgcpA = rr;
+  pic = "draw";
+  trgcpy = rr;
   again = 264;
 
    b5	 
@@ -336,7 +334,7 @@
  trg = "combi";
  pica = "cam1";
  picb = "penna";
- cnl = b3.lst;
- gpu = "combi";
- again = 200;
+  cnl = b3.lst;
+  gpu = "combi";
+  again = 200;
    

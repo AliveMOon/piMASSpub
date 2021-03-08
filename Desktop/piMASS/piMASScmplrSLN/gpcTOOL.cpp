@@ -558,8 +558,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 #define gpdSPCdbgOFF if(false)
 #define gpdSPCdbgCOUT if(false)
 #define gpdLZYdbSPClim 0x20
-class gpcTRDspc
-{
+class gpcTRDspc {
 public:
 	gpcLZY*	pDB;
 	U1		sRAM[0x100], *pRAM,

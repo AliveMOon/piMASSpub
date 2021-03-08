@@ -1298,6 +1298,7 @@ typedef enum gpeALF:I8
 	gpeALF_LABEL = gpdABCDE('L', 'A', 'B', 'E', 'L'),
 	gpeALF_LATHE = gpdABCDE('L', 'A', 'T', 'H', 'E'),
 	gpeALF_LOCAL = gpdABCDE('L', 'O', 'C', 'A', 'L'),
+	gpeALF_MSKAB = gpdABCDE('M', 'S', 'K', 'A', 'B'),
 	gpeALF_NEGLG = gpdABCDE('N', 'E', 'G', 'L', 'G'),
 	gpeALF_neqLG = gpdABCDE('N', 'E', 'Q', 'L', 'G'),
 	gpeALF_NGATE = gpdABCDE('N', 'G', 'A', 'T', 'E'),
@@ -1350,8 +1351,18 @@ typedef enum gpeALF:I8
 	gpeALF_THISA = gpdABCDE('T', 'H', 'I', 'S', 'A'),
 	gpeALF_THISN = gpdABCDE('T', 'H', 'I', 'S', 'N'),
 	gpeALF_TOKEN = gpdABCDE('T', 'O', 'K', 'E', 'N'),
+	gpeALF_TOOLA = gpdABCDE('T', 'O', 'O', 'L', 'A'),
+	gpeALF_TOOLB, gpeALF_TOOLC, gpeALF_TOOLD, gpeALF_TOOLE,
+	gpeALF_TOOLF, gpeALF_TOOLG, gpeALF_TOOLH, gpeALF_TOOLI,
+	gpeALF_TOOLJ, gpeALF_TOOLK, gpeALF_TOOLL, gpeALF_TOOLM,
+	gpeALF_TOOLN, gpeALF_TOOLO, gpeALF_TOOLP, gpeALF_TOOLQ,
+	gpeALF_TOOLR, gpeALF_TOOLS, gpeALF_TOOLT,
+	gpeALF_TOOLU, gpeALF_TOOLV, gpeALF_TOOLW,
+	gpeALF_TOOLX, gpeALF_TOOLY, gpeALF_TOOLZ,
+
 	gpeALF_TOUCH = gpdABCDE('T', 'O', 'U', 'C', 'H'),
 	gpeALF_TRACK = gpdABCDE('T', 'R', 'A', 'C', 'K'),
+	gpeALF_TRGCP = gpdABCDE('T', 'R', 'G', 'C', 'P'),
 
 	gpeALF_UNDEF = gpdABCDE('U', 'N', 'D', 'E', 'F'),
 
@@ -1465,7 +1476,15 @@ typedef enum gpeALF:I8
 	gpeALF_SWITCH = gpdABCDEF('S', 'W', 'I', 'T', 'C', 'H'),
 	gpeALF_TARGET = gpdABCDEF('T', 'A', 'R', 'G', 'E', 'T'),
 	gpeALF_TELNET = gpdABCDEF('T', 'E', 'L', 'N', 'E', 'T'),
-	gpeALF_TRGCPY = gpdABCDEF('T', 'R', 'G', 'C', 'P', 'Y'),
+	gpeALF_TRGCPA = gpdABCDEF('T', 'R', 'G', 'C', 'P', 'A'),
+	gpeALF_TRGCPB, gpeALF_TRGCPC, gpeALF_TRGCPD, gpeALF_TRGCPE,
+	gpeALF_TRGCPF, gpeALF_TRGCPG, gpeALF_TRGCPH, gpeALF_TRGCPI,
+	gpeALF_TRGCPJ, gpeALF_TRGCPK, gpeALF_TRGCPL, gpeALF_TRGCPM,
+	gpeALF_TRGCPN, gpeALF_TRGCPO, gpeALF_TRGCPP, gpeALF_TRGCPQ,
+	gpeALF_TRGCPR, gpeALF_TRGCPS, gpeALF_TRGCPT,
+	gpeALF_TRGCPU, gpeALF_TRGCPV, gpeALF_TRGCPW,
+	gpeALF_TRGCPX, gpeALF_TRGCPY, gpeALF_TRGCPZ,
+
 
 	gpeALF_6 = gpdABCDEF('Z', 'Z', 'Z', 'Z', 'Z', 'Z'),
 
