@@ -121,16 +121,14 @@ gpcLZY* gpfSRF2JPG( gpcLZY* pBUFF, SDL_Surface* pSRF, I4 q )
 
 #ifdef gpdSYSubi
 
-U4 gpcCAMubi::getImageTypeSize( RASPICAM_FORMAT f )
-{
+U4 gpcCAMubi::getImageTypeSize( RASPICAM_FORMAT f ) {
     if( f != RASPICAM_FORMAT_RGB )
         return 0;
 
     return qryBUF.length; //infBUF.bytesused;
 }
 
-bool gpcCAMubi::openCAM()
-{
+bool gpcCAMubi::openCAM() {
     if( bOPEN )
         return bOPEN;
 
@@ -317,6 +315,7 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
     }
     if( wip != 9 ) {
         /// 9. VIDIOC_QBUF ----------------
+        if(bSTDcout_V4l2){std::cout << " 9. VIDIOC_QBUF ----------------" << std::endl;}
         infBUF.type = type;
         infBUF.memory = V4L2_MEMORY_MMAP;
         infBUF.index = 0;
@@ -331,8 +330,7 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
     return res;
 }
 
-U4 gpcCAMubi::grab()
-{
+U4 gpcCAMubi::grab() {
     int res;
     if( wip == 9 ) {
         /// 10. VIDIOC_DQBUF --------------------
@@ -347,8 +345,7 @@ U4 gpcCAMubi::grab()
 
     return nGRB++;
 }
-void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f )
-{
+void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f ) {
     U1* pRGB = (U1*)pPIX;
     if(bSTDcout_V4l2){std::cout << "CPY" << std::endl;}
     int res ;
@@ -446,8 +443,7 @@ void call_cam( gpcTHRD_CAM* pTC ) {
 	}
 }
 
-U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
-{
+U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc ) {
 	if( !this )
 		return NULL;
 

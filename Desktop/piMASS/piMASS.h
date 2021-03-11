@@ -26,7 +26,7 @@
 //? #define gpdNEW_CMPLR
 
 #define bSTDcout true //false //true
-#define bSTDcout_V4l2 (bSTDcout&false)
+#define bSTDcout_V4l2 (bSTDcout&false) //true) // false)//
 #define bSTDcout_jsr false //(bSTDcout&true)
 #define bSTDcout_slmp (bSTDcout&true)
 #define bSTDcoutCMP true //false //true
@@ -189,6 +189,8 @@
 	}*/
 	#define gpmSTRiSTR strcasestr
 #endif
+
+
 #define gpdSYNmSEC		333
 #define gpdRECVn 		(0x30000/0x4) 	//0x4000*4	//	(0x30000/0x10)
 #define gpdHUDn			(gpdRECVn/0x4)
@@ -944,48 +946,40 @@ public:
 	U1x4& operator |= ( const U1x4& b ) { u4 |= b.u4; return *this; }
 	U1x4& operator -= ( const U1x4& b ) { x-=b.x; y-=b.y; z-=b.z; w-=b.w; return *this; }
 
-    U1x4& null()
-    {
+    U1x4& null() {
 		u4 = 0;
 		return *this;
     }
-    U1x4( U4 b )
-    {
+    U1x4( U4 b ) {
         u4 = b;
     }
-    U1x4( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 )
-    {
+    U1x4( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 ) {
         x = _x; y = _y; z = _z; w = _w;
     }
     U1x4& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
-    U4 area_xy()
-    {
+    U4 area_xy() {
 		U4 a = x;
 		a *= y;
 		return a;
     }
-    U4 area_yz()
-    {
+    U4 area_yz() {
 		U4 a = y;
 		a *= z;
 		return a;
     }
-    U4 area_zw()
-    {
+    U4 area_zw() {
 		U4 a = z;
 		a *= w;
 		return a;
     }
-    U4 area()
-    {
+    U4 area() {
 		U4 a = x;
 		a *= y;
 		a *= z;
 		a *= w;
 		return a;
     }
-    U4 area_xyz()
-    {
+    U4 area_xyz() {
 		U4 a = x;
 		a *= y;
 		a *= z;
@@ -1351,8 +1345,7 @@ public:
 	U1x4 operator >> ( const U1x4& b ) const {
 		return U1x4( x>>b.x, y>>b.y, z>>b.z, w>>b.w );
 	}
-	U1x4& operator >>= ( U1 b )
-	{
+	U1x4& operator >>= ( U1 b ) {
 		if( !b )
 			return *this;
 		if( b > 7 )
@@ -1363,8 +1356,7 @@ public:
 		w >>= b;
 		return *this;
 	}
-	U1x4& operator <<= ( U1 b )
-	{
+	U1x4& operator <<= ( U1 b ) {
 		if( !b )
 			return *this;
 		if( b > 7 )
@@ -1382,8 +1374,7 @@ public:
 	U1x4* cpyX( U1x4 *p_s,
 				U4 dw, 		U4 dwh,
 				U4 dsx = 1,	U4 dsy = 0,
-				U4 ssx = 1,	U4 ssy = 0 )
-	{
+				U4 ssx = 1,	U4 ssy = 0 ) {
 		U1x4* p_d = this;
 		for( U1x4*	p_de = p_d+dwh;
 
@@ -1397,16 +1388,10 @@ public:
 		return this;
 
 	}
-	U1x4 xyz0() const
-	{
-		return U1x4(x,y,z);
-	}
-	U1x4 xy00() const
-	{
-		return U1x4(x,y);
-	}
-	U1x4& e8xyz_( const U1x4& b )
-	{
+	int hstX( I4x4* pH, int p, int shr, int w, int h );
+	U1x4 xyz0() const { return U1x4(x,y,z); }
+	U1x4 xy00() const { return U1x4(x,y); }
+	U1x4& e8xyz_( const U1x4& b ) {
 		U4 bb = b.x;
 		x = (bb*bb)>>8;
 		bb = b.y;
@@ -1415,8 +1400,7 @@ public:
 		z = (bb*bb)>>8;
 		return *this;
 	}
-	U1x4& e8( const U1x4& b )
-	{
+	U1x4& e8( const U1x4& b ) {
 		U4 bb = b.x;
 		x = (bb*bb)>>8;
 		bb = b.y;
@@ -2063,73 +2047,34 @@ public:
 
 class U4x4 {
 public:
-    union
-    {
-        struct
-        {
-            U4 x,y,z,w;
-        };
-        struct
-        {
-			U4x2 a4x2[2];
-		};
-        struct
-        {
-            U4 aXYZW[4];
-        };
-        struct
-        {
-            U2 aU2[8];
-        };
-        struct
-        {
-            U1x4 aRGBAx4[4];
-        };
-
+    union {
+        struct { U4 x,y,z,w; };
+        struct { U4x2 a4x2[2]; };
+        struct { U4 aXYZW[4]; };
+        struct { U2 aU2[8]; };
+        struct { U1x4 aRGBAx4[4]; };
     };
 
     U4x4(){};
-    U4x4& null( void )
-	{
-		gpmCLR;
-		return *this;
-	}
-    U4x4( U4 _x, U4 _y = 0, U4 _z = 0, U4 _w = 0 )
-    {
-        x = _x; y = _y; z = _z; w = _w;
-    }
+    U4x4& null( void ) { gpmCLR; return *this; }
+    U4x4( U4 _x, U4 _y = 0, U4 _z = 0, U4 _w = 0 ) { x = _x; y = _y; z = _z; w = _w; }
 	U4x4( const I4x2 _xy, I4x2* p_zw = NULL );
-    U4x4( const U4x2 _xy, U4 _z = 0, U4 _w = 0 )
-    {
+    U4x4( const U4x2 _xy, U4 _z = 0, U4 _w = 0 ) {
         a4x2[0] = _xy;
         z = _z;
         w = _w;
     }
-    U4x4( U4x2& _xy, U4x2* p_zw = NULL )
-    {
+    U4x4( U4x2& _xy, U4x2* p_zw = NULL ) {
         a4x2[0] = _xy;
         a4x2[1] = p_zw ? *p_zw : _xy;
     }
-    U4x4( U4x2& _xy, U4x2& _zw )
-    {
+    U4x4( U4x2& _xy, U4x2& _zw ) {
         a4x2[0] = _xy;
         a4x2[1] = _zw;
     }
-    U4x4& operator = ( U4 b )
-    {
-        x = y = z = w = b;
-		return *this;
-    }
-    U4x4& operator = ( I4 b )
-    {
-        x = y = z = w = abs(b);
-		return *this;
-    }
-    U4x4& operator = ( const U4x2& b )
-    {
-		a4x2[1] = a4x2[0] = b;
-		return *this;
-    }
+    U4x4& operator = ( U4 b ) { x = y = z = w = b; return *this; }
+    U4x4& operator = ( I4 b ) { x = y = z = w = abs(b); return *this; }
+    U4x4& operator = ( const U4x2& b ) { a4x2[1] = a4x2[0] = b; return *this; }
     U4x4& operator = ( const I4x2& b );
 
 
@@ -2138,7 +2083,29 @@ public:
 		sprintf( pBUFF, "%d%s%d%s%d%s%d%s", x,pSP,y,pSP,z,pSP,w,pSP );
 		return pBUFF;
     }
-
+	U4x4 xyz_HSTaqi( U4 n, U4 a ) {
+		/// HISTI listában meg lehet keresni
+		/// hol jön össze elég DARAB
+		U4x4 aqu(0), aqui(0), *pH = this;
+		for( int i = 0, j = 0; i < n; i++, j=0 ) {
+			aqu += pH[i];
+			if( aqu.x < a ) {
+				aqui.x = i;
+				j++;
+			}
+			if( aqu.y < a ) {
+				aqui.y = i;
+				j++;
+			}
+			if( aqu.z < a ) {
+				aqui.z = i;
+				j++;
+			}
+			if( !j )
+				break;
+		}
+		return aqui;
+	}
     bool operator != ( const U4x4& b ) const {
 		if( a4x2[0] != b.a4x2[0] )
 			return true;
@@ -2203,25 +2170,21 @@ public:
 		return *this;
 	}
 
-    U4x4 zwxy( void )  const
-    {
+    U4x4 zwxy( void )  const {
 		return U4x4( z,w, x,y );
     }
-    U4x4& xyz_( U4x4 b )
-	{
+    U4x4& xyz_( U4x4 b ) {
 		a4x2[0] = b.a4x2[0];
 		z = b.z;
 		return *this;
 	}
-	U4x4 xyz0( void ) const
-	{
+	U4x4 xyz0( void ) const {
 		U4x4 o = *this;
 		o.w = 0;
 		return o;
 	}
 
-	U4 tree_add( U4 u4, U4 n_t )
-	{
+	U4 tree_add( U4 u4, U4 n_t ) {
 		// x érték, y mama, z kicsiegyenlõ, w nagyobb
 		this[n_t].null().x = u4;
 		if( !n_t )
@@ -2256,8 +2219,7 @@ public:
 		}
 		return n_t;
 	}
-	U4 tree_fnd( U4 u4, U4 n_t )
-	{
+	U4 tree_fnd( U4 u4, U4 n_t ) {
 		// figyelem/WARNING
 		// visza térési érték, az, ameddig eljutott a fában
 		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
@@ -2302,44 +2264,30 @@ class U8x4 {
 public:
     union
     {
-        struct
-        {
-            U8 x,y,z,w;
-        };
-        struct
-        {
-            U8 aXYZW[4];
-        };
-        struct
-        {
+        struct { U8 x,y,z,w; };
+        struct { U8 aXYZW[4]; };
+        struct {
             gpeALF labe;
             U8 mom, up, nx;
         };
     };
     U8x4(){};
-    U8x4( U8 _x, U8 _y = 0, U8 _z = 0, U8 _w = 0 )
-    {
-        x = _x; y = _y; z = _z; w = _w;
-    }
-    U8x4& operator = ( U8 b )
-    {
+    U8x4( U8 _x, U8 _y = 0, U8 _z = 0, U8 _w = 0 ) { x = _x; y = _y; z = _z; w = _w; }
+    U8x4& operator = ( U8 b ) {
 		gpmCLR;
         x = b;
         return *this;
     }
-    U8x4& operator = ( I8 b )
-    {
+    U8x4& operator = ( I8 b ) {
 		gpmCLR;
         x = abs(b);
         return *this;
     }
-    U8x4& null( void )
-	{
+    U8x4& null( void ) {
 		gpmCLR;
 		return *this;
 	}
-    U8 tree_add( U8 u8, U8 n_t )
-	{
+    U8 tree_add( U8 u8, U8 n_t ) {
 		// x érték, y mama, z kicsiegyenlõ, w nagyobb
 		this[n_t].null().x = u8;
 		if( !n_t )
@@ -2372,8 +2320,7 @@ public:
 		}
 		return n_t;
 	}
-	U8 tree_fnd( U8 u8, U8 n_t )
-	{
+	U8 tree_fnd( U8 u8, U8 n_t ) {
 		// figyelem/WARNING
 		// visza térési érték, az, ameddig eljutott a fában
 		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
@@ -2398,8 +2345,7 @@ public:
 		}
 		return n_t;
 	}
-	U8 tree_fndHARD( U8 u8, U8 n_t )
-	{
+	U8 tree_fndHARD( U8 u8, U8 n_t ) {
 		// figyelem/WARNING
 		// visza térési érték, az, ameddig eljutott a fában
 		// kell még egy ellenörzés, hogy tényleg azonos e a két elem
@@ -2516,20 +2462,13 @@ public:
 class I4x2 {
 public:
 	union{
-		struct{
-			int x,y;
-		};
-		struct{
-			div_t qr;
-		};
-		struct{
-			U8 u8;
-		};
-		struct{
-			gpeOPtyp	typ;
-			U1			wh;
-			gpeOPid		pst, pre;
-			I4 iCD;
+		struct{ int x,y; };
+		struct{ div_t qr; };
+		struct{ U8 u8; };
+		struct{	gpeOPtyp	typ;
+				U1			wh;
+				gpeOPid		pst, pre;
+				I4 iCD;
 		};
 	};
 
@@ -2751,7 +2690,14 @@ public:
 
 		return *this;
 	}
+	I4x2& operator <<= ( I4 i ) { x<<=i; y<<=i; return *this; }
+	I4x2& operator >>= ( I4 i ) { x>>=i; y>>=i; return *this; }
+	I4x2& operator &= ( I4 i ) { x&=i; y&=i; return *this; }
+	I4x2& operator |= ( I4 i ) { x|=i; y|=i; return *this; }
+
+
 	I4x2& null( void ) { gpmCLR; return *this; }
+
 
 	I4x2& operator += ( const U4x2& u ) {
 		I4x2 b = u;
@@ -3068,63 +3014,34 @@ public:
 
 class I4x4 {
 public:
-	union
-    {
-		struct {
-			I4 x,y,z,w;
-		};
-		struct {
-			I4 i,n,zz,ww;
-		};
-		struct
-        {
-			gpeOPid pre, pst;	// 0, 1
-			gpeCsz	cID;		// 2,
-			U1		d0;			// 3,
-			U4		op;			// 4,
-			I4		aOB[2];		// 8, 12; //0x10
+	union {
+		struct { I4 x,y,z,w; };
+		struct { I4 r,g,b,a; };
+		struct { I4 i,n,zz,ww; };
+		struct {	gpeOPid pre, pst;	// 0, 1
+					gpeCsz	cID;		// 2,
+					U1		d0;			// 3,
+					U4		op;			// 4,
+					I4		aOB[2];		// 8, 12; //0x10
         };
-		struct
-        {
-			I4 A,B,C,D;
-		};
-		struct
-        {
-			I4 aXYZW[4];
-		};
-		struct
-        {
-			gpeZS aZS[4];
-		};
-		struct
-        {
-			I4x2 a4x2[2];
-		};
+		struct { I4 A,B,C,D; };
+		struct { I4 aXYZW[4]; };
+		struct { gpeZS aZS[4]; };
+		struct { I4x2 a4x2[2]; };
 
-		struct
-        {
-			SDL_Rect xyWH;
-        };
+		struct { SDL_Rect xyWH; };
 
-        struct
-        {
-			U4x2 au4x2[2];
-        };
+        struct { U4x2 au4x2[2]; };
 
 	};
 	U1x4 opw() { return (U1x4)op; }
 	I4x4(){};
-    I4x4( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 )
-    {
-        x = _x; y = _y; z = _z; w = _w;
-    }
-	I4x4( I4x2 _xy, I4x2 _zw )
-    {
+    I4x4( I4 _x, I4 _y = 0, I4 _z = 0, I4 _w = 0 ) { x = _x; y = _y; z = _z; w = _w; }
+	I4x4( I4x2 _xy, I4x2 _zw ) {
         a4x2[0] = _xy;
         a4x2[1] = _zw;
     }
-    I4x4( U4x2 _xy, U4x2 _zw )
-    {
+    I4x4( U4x2 _xy, U4x2 _zw ) {
         a4x2[0] = _xy;
         a4x2[1] = _zw;
     }
@@ -3137,6 +3054,7 @@ public:
 		gpmMcpy( this, pB, sizeof(*this) );
 		return *this;
 	}
+	I4x4& operator = ( const U1x4 b ) { x = b.x; y = b.y; z = b.z; w = b.w; return *this; }
     I4x4& operator = ( const F4 f4 );
     I4x4& operator = ( I4x2 b ) { a4x2[1] = a4x2[0] = b; return *this; }
     I4x4& operator ++() { ++a4x2[0]; ++a4x2[1]; return *this; }
@@ -3151,8 +3069,7 @@ public:
     }
 
 
-	I4x4 mx_mx( I4 r )
-	{
+	I4x4 mx_mx( I4 r ) {
 		I8 m = abs0().mx().x;
 		if( !m )
 			return 0;
@@ -3160,16 +3077,14 @@ public:
 		return I4x4( ((I8)x*(I8)r)/m, ((I8)y*(I8)r)/m, ((I8)z*(I8)r)/m, w );
 	}
 
-	I4x4 lim_mx( I4 r )
-	{
+	I4x4 lim_mx( I4 r ) {
 		I8 l = abs0().mx().x;
 		if( l < r )
 			return *this;
 
 		return mx_mx(r);
 	}
-	I4x4 lim_mx( const I4x4& b, I4 r ) const
-	{
+	I4x4 lim_mx( const I4x4& b, I4 r ) const {
 		I4x4 v4 = b-xyz0();
 		I8 l = v4.abs0().mx().x;
 		if( l < r )
@@ -3180,8 +3095,7 @@ public:
 	}
 
 
-	I4x4 len_mx( I4 r )
-	{
+	I4x4 len_mx( I4 r ) {
 		I8 l = abs0().mx().x;
 		if( !l )
 			return 0;
@@ -3189,24 +3103,21 @@ public:
 		return I4x4( ((I8)x*(I8)r)/l, ((I8)y*(I8)r)/l, ((I8)z*(I8)r)/l, w );
 	}
 
-	I4x4 len_xyz( I4 r )
-	{
+	I4x4 len_xyz( I4 r ) {
 		I8 l = qlen_xyz();
 		if( !l )
 			return 0;
 		l = sqrt(l);
 		return I4x4( ((I8)x*(I8)r)/l, ((I8)y*(I8)r)/l, ((I8)z*(I8)r)/l, w );
 	}
-	I4x4 lim_xyz( I4 r )
-	{
+	I4x4 lim_xyz( I4 r ) {
 		I8 l = qlen_xyz();
 		if( l < r*r )
 			return *this;
 
 		return len_xyz(r);
 	}
-	I4x4 lim_xyz( const I4x4& b, I4 r ) const
-	{
+	I4x4 lim_xyz( const I4x4& b, I4 r ) const {
 		I4x4 d = b-xyz0();
 		I8 l = d.qlen_xyz();
 		if( l < r*r )
@@ -3216,16 +3127,12 @@ public:
 		return xyz0()+d;
 	}
 
-    bool operator != ( const I4x4& b ) const
-	{
+    bool operator != ( const I4x4& b ) const {
 		if( a4x2[0] != b.a4x2[0] )
 			return true;
 		return a4x2[1] != b.a4x2[1];
 	}
-	bool operator == ( const I4x4& b ) const
-	{
-		return !(*this!=b);
-	}
+	bool operator == ( const I4x4& b ) const { return !(*this!=b); }
 
 
 
@@ -3370,7 +3277,27 @@ public:
 		return *this;
 	}
 
+	I4x4& operator <<= ( I4 i ) {
+		a4x2[0] <<= i;
+		a4x2[1] <<= i;
+		return *this;
+	}
+	I4x4& operator >>= ( I4 i ) {
+		a4x2[0] >>= i;
+		a4x2[1] >>= i;
+		return *this;
+	}
 
+	I4x4& operator &= ( I4 i ) {
+		a4x2[0] &= i;
+		a4x2[1] &= i;
+		return *this;
+	}
+	I4x4& operator |= ( I4 i ) {
+		a4x2[0] |= i;
+		a4x2[1] |= i;
+		return *this;
+	}
 
 	I4x4 operator + (const I4x4& b) const { return I4x4( x+b.x, y+b.y, z+b.z, w+b.w ); }
 	I4x4 operator - (const I4x4& b) const { return I4x4( x-b.x, y-b.y, z-b.z, w-b.w ); }
@@ -3389,16 +3316,10 @@ public:
 	I8x4 operator * ( float b ) const;
 	I8x4 operator * ( double b ) const;
 
-	I4x4 operator / ( int b ) const {
-		return I4x4( a4x2[0]/b, a4x2[1]/b );
-	}
-	I4x4 operator % ( int b ) const {
-		return I4x4( a4x2[0]%b, a4x2[1]%b );
-	}
+	I4x4 operator / ( int b ) const { return I4x4( a4x2[0]/b, a4x2[1]/b ); }
+	I4x4 operator % ( int b ) const { return I4x4( a4x2[0]%b, a4x2[1]%b ); }
 
-	U8 operator * (const I4x2& b) const {
-		return a4x2[0]*b + a4x2[1]*b;
-	}
+	U8 operator * (const I4x2& b) const { return a4x2[0]*b + a4x2[1]*b; }
 
 	I8x4 operator & (const I4x2& b) const;
 	I8x4 operator & (const U4x2& b) const;
@@ -3542,7 +3463,29 @@ public:
 		}
 		return mx;
 	}
-
+	I4x4 xyz_HSTaqi( U4 n, U4 a ) {
+		/// HISTI listában meg lehet keresni
+		/// hol jön össze elég DARAB
+		I4x4 aqu(0), aqui(0), *pH = this;
+		for( int i = 0, j = 0; i < n; i++, j=0 ) {
+			aqu += pH[i];
+			if( aqu.x < a ) {
+				aqui.x = i;
+				j++;
+			}
+			if( aqu.y < a ) {
+				aqui.y = i;
+				j++;
+			}
+			if( aqu.z < a ) {
+				aqui.z = i;
+				j++;
+			}
+			if( !j )
+				break;
+		}
+		return aqui;
+	}
 
 	I4 median( U4 n, bool b_inc = false ) {
 		// b_inc == true - incrementált növekvő sorban leszenk

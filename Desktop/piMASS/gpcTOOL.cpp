@@ -558,8 +558,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 #define gpdSPCdbgOFF if(false)
 #define gpdSPCdbgCOUT if(false)
 #define gpdLZYdbSPClim 0x20
-class gpcTRDspc
-{
+class gpcTRDspc {
 public:
 	gpcLZY*	pDB;
 	U1		sRAM[0x100], *pRAM,
@@ -1162,3 +1161,184 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 	aiQC[0]++;
 }
+
+U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
+							gpcPIC* pR, gpcPIC* pA, gpcPIC* pB,
+							char* pNAME, char *pPATH, char *pFILE ) {
+
+	SDL_Surface FSsrf;
+	U4	frm;
+	int w, h, acc;
+	SDL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
+	if( pSRF ? ((pSRF->w!=w) && (pSRF->h!=h)) : false )
+		gpmSDL_FreeSRF(pSRF);
+	if( !pSRF ) {
+		pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
+		if( !pSRF )
+			return NULL;
+	}
+	gpcLZY* pALL = pMEM->pMASS->PIClzyALL.LZY( TnID );
+	if(!pALL)
+		return pSRF ? (U1x4*)pSRF->pixels : NULL;
+
+	SDL_RenderReadPixels(	pMEM->pWIN->pSDLrndr, NULL, 0,
+							pSRF->pixels,
+							pSRF->pitch );
+	SDL_Surface	*pAsrf = pA ? pA->pSRF : NULL,						// A. draw
+				*pBsrf = pB ? pB->pSRF : NULL, 						// B. cam1
+				*pKILLsrf;
+	int
+		/// B. CAM
+		Cn = pBsrf->pitch/pBsrf->w,
+		Cp = pBsrf->pitch/Cn,
+		Cw = pBsrf->w, Ch = pBsrf->h,
+		/// this FOOD
+		p = pSRF->pitch/sizeof(U1x4),
+		f = (w/2) + p*Ch,
+		m = f + p*Ch, mi,
+		cw = Cw>>3, ch = (Ch>>3)*(Cw>>1);
+
+
+
+	U1x4	*pMSK = pSRF ? (U1x4*)pSRF->pixels : NULL, cM,
+			*pCAM = pBsrf ? (U1x4*)pBsrf->pixels : NULL, cC,
+			*pDRW = pAsrf ? (U1x4*)pAsrf->pixels : NULL, cD[2],
+			*pFOOD = pMSK + f, Fmsk, Fsmp;
+	I4x4 Fs4;
+	int Ry,Rx,Gy,Bx;
+	for( int y = 0, yh = p*(Ch/2),x,xw, i = 0; y < yh; y += p )
+	for( x = y, xw = x+(Cw/2); x < xw; x++, i++ ) {
+		Fmsk = pFOOD[x];
+		Fsmp = pFOOD[x+yh];
+		if( (Fmsk.srt3().x < 0x80) | (Fsmp.srt3().x < 0x1) ) {
+			// üres
+
+			continue;
+		}
+		//Fsmp.u4 &= 0xfffcfcfc;
+		Fs4 = Fsmp;
+		//Fs4 &= Fs4;
+		//Fs4 >>= 8;
+		Fs4 &= 0xFc;
+		//Fs4 >>= 1;
+		Ry = (Rx = Fs4.r)*p;
+		Gy = Fs4.g*p;
+		Bx = Fs4.b;
+		mi = ((i/cw)&3) + (i/ch)*p + m;
+		pMSK[mi+Gy+Rx] = pMSK[mi+Gy-Bx] = pMSK[mi-Ry-Bx] = Fmsk;
+	}
+
+	return pMSK;
+}
+
+
+//	int PXn = sizeof(U1x4),
+//		/// DRAW		// cD //
+//		Dp = pAsrf->pitch/PXn, Dxy,
+//		Dw = pAsrf->w, Dh = pAsrf->h,
+//		/// SPACE
+//		sh = 2, x = (1<<sh), aNd = x-1, xx = x*x,
+//		Sx = gpmMIN(0x100,Dw/2), Sy = (Dh*4)/5,
+//		Sc = Sx/x, Sxy = Sx + Sy*Dp,
+//		/// MASK 		// cM //
+//		Mw = (Dw*2)/3, Mh = Dh/5,
+//		/// FOOD
+//		Fx = Sx, Fy = (Dh*2)/5,
+//		Fw = Mw/x, Fh = Mh/x,
+//		Fxy = Fx + Fy*Dp, Fwh = Fw*Fh, FhDp = Fh*Dp,
+//		/// FOODnSPACE
+//		FSp = Sc+gpmMAX(Fw,Sc), FSh = Sc+gpmMAX(Fh*2,Sc),
+//		FSph = FSp*FSh,
+//		FSn = FSp*FSh,
+//		/// CAM
+//		Cp = pBsrf->pitch/PXn,
+//		Cw = pBsrf->w, Ch = pBsrf->h, Car = (Cw*Ch)/xx,
+//		Cxy, i;
+//
+//	/*if( !pMSK ) {
+//		pSRF = pPmsk->pSRF = SDL_CreateRGBSurface( 0, Dw, Dw, 32, 0,0,0,0 );
+//		if( !pSRF )
+//			break;
+//		pMSK = (U1x4*)pSRF->pixels;
+//	}
+//	Mp = pSRF->pitch;*/
+//	int nH = (Sc+2*sizeof(I4x4))/(FSn*PXn);
+//	if( !nH )
+//		nH = 1;
+//	I4x4 	aqRGBi,
+//			*pBxx = ((I4x4*)pALL->Ux( xx+nH, FSn*PXn ))-1,
+//			*pH = pBxx-Sc;
+//
+//
+//	i = (pBxx[xx+1].x) % xx;
+//	pBxx[xx+1].x++;
+//
+//
+//	Cxy = ((Cw*(i&aNd))/x) + (Cp*(i>>sh));
+//	pCAM[Cxy].hstX( pH, Cp, Sc, Cw/x, Ch/x );
+//	aqRGBi = pH->xyz_HSTaqi(Sc,(Car*2)/3);
+//	aqRGBi.w = i;
+//	U4 u4NM, nDIF = 0, iD;
+//	pFOOD = (U1x4*)pALL->Ux( i, FSn*PXn );
+//	for( int j = 0, Dj, Fj; j<Fwh; j++ ) {
+//		Dj = Fxy+(j%Fw)+((j/Fw)*Dp);
+//		cD[0] = pDRW[Dj]; 		// Dmask
+//		cD[1] = pDRW[Dj+FhDp];	// Dsampl
+//		Fj = j+Sc;
+//		cF[0] = pFOOD[Fj];
+//		cF[1] = pFOOD[Fj+FSph];
+//		/// D > F
+//		iD = 	(cD[0].u4 != cF[0].u4)			// 1 		MASK	MOVE SPACE
+//				| ((cD[1].u4 != cF[1].u4)<<1);  // 2		SAMPLE
+//												// 1|2 3	M|S
+//		switch(iD){
+//			case 0x1:
+//
+//				break;
+//			case 0x2: break;
+//			case 0x3: break;
+//			default:
+//				continue;
+//		}
+//		nDIF++;
+//
+//
+//
+//	}
+//
+//	char* pF = pFILE;
+//	if( (pBxx[i].xyz0() != aqRGBi.xyz0()) || (nDIF > 0) ) {
+//		pF += gpfALF2STR( pF, TnID.alf );
+//		/// FOOD etetni kell másikkal a diskről ha van
+//		if( nDIF > 0 ) {
+//			/// lett bele rajzolva menteni kell
+//			pBxx[i].w = i;
+//			u4NM = pBxx[i]*I4x4(0x1,0x100,0x10000,0x1000000);
+//			sprintf( pF, "%s/0x%x_%dx%d.png", pNAME, u4NM, Fw, Fh );
+//			/// cpy DRAW -> MSK
+//			gpmMcpyOF( &FSsrf, pSRF, 1 );
+//			FSsrf.pixels = pFOOD;
+//			FSsrf.w = FSsrf.pitch = FSp;
+//			FSsrf.pitch*=PXn;
+//			FSsrf.h = FSh;
+//			IMG_SavePNG( &FSsrf, pPATH );
+//			FSsrf.pixels = NULL;
+//		}
+//
+//		pBxx[i] = aqRGBi;
+//		U4 u4NM = pBxx[i]*I4x4(0x1,0x100,0x10000,0x1000000);
+//		sprintf( pF, "%s/0x%x_%dx%d.png", pNAME, u4NM, Fw, Fh );
+//		pKILLsrf = IMG_Load( pPATH );
+//		if( pKILLsrf ) {
+//			//FSsrf.pixels = pFOOD;
+//			//FSsrf.w = FSsrf.pitch = FSp;
+//			//FSsrf.h = FSh;
+//			gpmMcpyOF(pFOOD,pKILLsrf->pixels,FSn);
+//			gpmSDL_FreeSRF(pKILLsrf);
+//		}
+//
+//	}
+//
+//	//gpmSDL_FreeSRF(pRsrf);
+//}
+

@@ -1,6 +1,5 @@
 
- ACT:IDLE
- lat: N 4707.1084 lng: E 1755.0887
- alt:   238.4000 spd:   0.0000
- dat: 2021 02 28	tim: 10:17 37
- sig: 10 99 reg: "ok"
+  0x2100 cam= 0x01,
+  0x2160 unsel= 0x01,
+  0x2180 pic= "penna",
+  0x21d0 again= 0x40,

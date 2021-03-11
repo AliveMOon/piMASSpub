@@ -101,6 +101,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 #define gpdGLaPICid gpdGL->aPICid
 #define gpdGLpCAM (gpdGL->pCAM?gpdGL->pCAM:(gpdGL->pCAM = new gpcPICAM))
 
+
 I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 	bool bCID = this ? !pU1 : true;
 	gpcGT* pGT;
@@ -113,10 +114,8 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 	U8 nLEN;
 	U8& shuffle = *(U8*)sSHF;
 	I4 cID = gpeCsz_OFF;
-	if(
-			(obj.AN.alf == gpeALF_CNL)
-		||	(obj.AN.alf >= gpeALF_CNLA && obj.AN.alf <= gpeALF_CNLZ)
-	) {
+	/// GLSL CHANNALs -------------------------------------------------------
+	if((obj.AN.alf == gpeALF_CNL)||(obj.AN.alf >= gpeALF_CNLA && obj.AN.alf <= gpeALF_CNLZ)) {
 		U1 iCNL = (obj.AN.alf==gpeALF_CNL ) ? 0 : obj.AN.alf-gpeALF_CNLA+1;
 		cID = gpeCsz_L; if( bCID )
 							return cID;
@@ -161,16 +160,41 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 
 		return cID;
 	}
+	/// GLSL Target COPY -------------------------------------------------------
+	if((obj.AN.alf == gpeALF_TRGCP)||(obj.AN.alf >= gpeALF_TRGCPA && obj.AN.alf <= gpeALF_TRGCPZ)) {
+		cID = gpeCsz_L; if( bCID )
+							return cID;
+		U4 iPIC = (obj.AN.alf==gpeALF_TRGCP ) ? 0 : obj.AN.alf-gpeALF_TRGCPA+1;
+		int trig = *(I4*)pU1;
+		if( trig != 1 )
+			return cID;
 
-	if(
-			(obj.AN.alf == gpeALF_PIC)
-		||	(obj.AN.alf >= gpeALF_PICA && obj.AN.alf <= gpeALF_PICZ)
-	) {
-		U4 iPIC = (obj.AN.alf==gpeALF_PIC ) ? 0 : obj.AN.alf-gpeALF_PICA+1;
+		if( !gpdGLpTRG )
+			return cID;
+		SDL_Surface* pSRF = gpdGLapPIC[iPIC]->pSRF;
+		if( !pSRF ) {
+			if( gpdGLpTRG->pRTX ) {
+				int w=0, h=0, acc=0;
+				U4 frm;
+				SDL_QueryTexture( gpdGLpTRG->pRTX, &frm, &acc, &w, &h );
+				pSRF = gpdGLapPIC[iPIC]->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
+			}
+			if( !pSRF )
+				return cID;
+		}
 
+		SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
+								pSRF->pixels,
+								pSRF->pitch 	);
+		gpdGLapPIC[iPIC]->pREF = NULL;
+		return cID;
+	}
+	/// GLSL SET TETURE -------------------------------------------------------
+	if((obj.AN.alf == gpeALF_PIC)||(obj.AN.alf >= gpeALF_PICA && obj.AN.alf <= gpeALF_PICZ)) {
 		cID = gpeCsz_L; if( bCID )
 							return cID;
 
+		U4 iPIC = (obj.AN.alf==gpeALF_PIC ) ? 0 : obj.AN.alf-gpeALF_PICA+1;
 		U1* pS = pU1;
 		I4 picID 	= obj.bUTF8()
 					? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
@@ -308,6 +332,69 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
 				gpdGLapPIC[0] = pMASS->PIC.PIC( alfN );
 			} break;
+		case gpeALF_TRGCP: {								cID = gpeCsz_L; if( bCID ) break;
+				int trig = *(I4*)pU1;
+				if( trig != 1 )
+					break;
+				if( !gpdGLpTRG )
+					break;
+				if( !gpdGLapPIC[0]->pSRF ) {
+					if( gpdGLpTRG->pRTX )
+					{
+						int w=0, h=0, acc=0;
+						U4 frm;
+						SDL_QueryTexture( gpdGLpTRG->pRTX, &frm, &acc, &w, &h );
+						gpdGLapPIC[0]->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
+					}
+				}
+				if( !gpdGLapPIC[0]->pSRF )
+					break;
+				SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
+										gpdGLapPIC[0]->pSRF->pixels,
+										gpdGLapPIC[0]->pSRF->pitch 	);
+				gpdGLapPIC[0]->pREF = NULL;
+			} break;
+		case gpeALF_MSKAB: {							cID = gpeCsz_L; if( bCID ) break;
+
+				U1* pS = pU1;
+				I4 mskID 	= obj.bUTF8()
+							? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )	// "mask"
+							: *(I4*)pU1;
+				if(mskID<1)
+					break;
+				if( gpdGLpTRG ? !gpdGLpTRG->pRTX : true )
+					break;
+
+				U4	iPdrw = 1,													// A. draw
+					iPsrc = 2;													// B. cam1
+				if( gpdGLapPIC[iPsrc] ? !gpdGLapPIC[iPsrc]->pSRF : true )
+					break;
+				//if( gpdGLapPIC[iPdrw] ? !gpdGLapPIC[iPdrw]->pSRF : true )
+				//	break;
+
+				gpcPIC* pPmsk = pMASS->PIC.PIC( mskID );						// "mask"
+				if( !pPmsk )
+					break;
+				pPmsk->TOOLmaskAB(  this,
+									gpdGLpTRG, gpdGLapPIC[iPdrw], gpdGLapPIC[iPsrc],
+									pWIN->gpsMASSname,
+									pWIN->gpsMASSpath ,pWIN->gppMASSfile );
+
+				pPmsk->pREF = NULL;
+			} break;
+
+		/// Target PICTURE
+		case gpeALF_TRGH: 									cID = gpeCsz_l; if( bCID ) break;
+				gpdGLpTRGwh.y =  *(U4*)pU1; break;
+		case gpeALF_TRGW: 									cID = gpeCsz_l; if( bCID ) break;
+				gpdGLpTRGwh.x =  *(U4*)pU1; break;
+		case gpeALF_TRG:{									cID = gpeCsz_b; if( bCID ) break;
+				//U1* pS = pU1;
+				I4 trg_id 	= obj.bUTF8()
+							? pMASS->PIC.alfFND(pU1)
+							: *(I4*)pU1;
+				gpdGLpTRG = pMASS->PIC.PIC( trg_id );
+			} break;
 		/// Vertex SHADERT
 		case gpeALF_VTX: {									cID = gpeCsz_b; if( bCID ) break;
 				//if( !pMgl ) break;
@@ -316,7 +403,6 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 			} break;
 		/// Pixel SHADERT Compile?
 		case gpeALF_PIX: {									cID = gpeCsz_b; if( bCID ) break;
-				//if( !pMgl ) break;
 				if( obj.bUTF8() )
 					gpdGL->PIX( (char*)pU1 );
 
@@ -331,19 +417,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				aNM = (char*)pU1+ ((*pU1 == '\"') ? 1 : 0);
 				pWgl->GLSLset( aNM, pMgl->pPIX, pMgl->pVTX );
 			} break;
-		/// Target PICTURE
-		case gpeALF_TRGH: 									cID = gpeCsz_l; if( bCID ) break;
-				gpdGLpTRGwh.y =  *(U4*)pU1; break;
-		case gpeALF_TRGW: 									cID = gpeCsz_l; if( bCID ) break;
-				gpdGLpTRGwh.x =  *(U4*)pU1; break;
-		case gpeALF_TRG:{									cID = gpeCsz_b; if( bCID ) break;
-				//U1* pS = pU1;
-				I4 trg_id 	= obj.bUTF8()
-							? pMASS->PIC.alfFND(pU1)
-							: *(I4*)pU1;
-				gpdGLpTRG = pMASS->PIC.PIC( trg_id );
 
-			} break;
 
 		/// DRAW with GPU
 		case gpeALF_GPU: if( pWgl ? gpdGLpTRG : NULL  ) {	cID = gpeCsz_b; if( bCID ) break;

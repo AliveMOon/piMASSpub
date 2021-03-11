@@ -535,6 +535,7 @@ public:
 
 	}
 };
+
 class gpcPIC {
 public:
 	I8x2			TnID, alfN;
@@ -548,8 +549,7 @@ public:
 
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
-	SDL_Texture		*pTX,*pTXlock,
-                                *pRTX;
+	SDL_Texture		*pTX,*pTXlock,*pRTX;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
@@ -563,8 +563,7 @@ public:
 
 
 
-	~gpcPIC()
-	{
+	~gpcPIC() {
 		unLOCK();
 		for( U4 i = 0; i < nBOB; i++ )
 			gpmDEL(ppBOB[i]);
@@ -577,23 +576,20 @@ public:
 
 	}
 	gpcPIC(){ gpmCLR; pFILE = sFILE; };
-	gpcPIC( I8x2 an, U4 i )
-	{
+	gpcPIC( I8x2 an, U4 i ) {
 		gpmCLR;
 		id = i;
 		TnID = an;
 	}
 
-	U1* getPIX()
-	{
+	U1* getPIX() {
 		if( !this )
 			return NULL;
 
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc );
-	SDL_Surface* surFREE( SDL_Surface* pF )
-	{
+	SDL_Surface* surFREE( SDL_Surface* pF ) {
 		if( !pF )
 			return pF;
 		bool bFREE = pSRF == pF;
@@ -830,6 +826,9 @@ public:
 	U1x4* food( U1x4* pPET, U4 i, U4 n,
 				char* pPATH, char* pDIR, const char* pEXP = ".png" );
 
+	U1x4* TOOLmaskAB(	gpMEM* pMEM,
+						gpcPIC* pA, gpcPIC* pB, gpcPIC* pM,
+						char* pNAME, char *pPATH, char *pFILE );
 };
 
 class gpcPICall

@@ -1,5 +1,30 @@
 
-  0x2100 cam= 0,
-  0x2120 mlb= 0,
-  0x2150 ize= 0,
-  0x21d0 again= 0x03e8,
+  0x2100 name= "penna",
+  0x2150 pix= "
+ #version 120
+ varying vec2 fr_uv;
+ uniform sampler2D	tex0,	// space
+                        tex1,	// maski
+			tex2;	// src pl.: cam
+ uniform vec2		tgPX;
+ uniform vec2		aTX[8];
+ uniform vec4 		aCNL[8];
+ vec2 dis( vec2 fUV, vec2 cnl ){
+      return abs(fUV*tgPX - cnl );
+ }
+ float l( vec2 fUV, vec2 cnl ) {
+       return length(dis(fUV,cnl));
+ }
+ void main()
+ {
+      vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
+                cUV = aCNL[0].xy/tgPX,
+		crs = abs(fUV-cUV)*tgPX;
+      gl_FragColor = vec4(0,0,0,1);
+      if( length(aTX[1]) > 0 )
+          gl_FragColor = texture2D( tex1, fUV );
+      if( l(fUV,aCNL[0].xy) < aCNL[0].w )
+          gl_FragColor = vec4( 0.5, 0,0,1 );
+ }
+ ",
+  0x2460 again= 0x03e8,
