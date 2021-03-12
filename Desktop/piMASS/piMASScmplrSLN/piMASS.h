@@ -2690,7 +2690,14 @@ public:
 
 		return *this;
 	}
+	I4x2& operator <<= ( I4 i ) { x<<=i; y<<=i; return *this; }
+	I4x2& operator >>= ( I4 i ) { x>>=i; y>>=i; return *this; }
+	I4x2& operator &= ( I4 i ) { x&=i; y&=i; return *this; }
+	I4x2& operator |= ( I4 i ) { x|=i; y|=i; return *this; }
+
+
 	I4x2& null( void ) { gpmCLR; return *this; }
+
 
 	I4x2& operator += ( const U4x2& u ) {
 		I4x2 b = u;
@@ -3009,6 +3016,7 @@ class I4x4 {
 public:
 	union {
 		struct { I4 x,y,z,w; };
+		struct { I4 r,g,b,a; };
 		struct { I4 i,n,zz,ww; };
 		struct {	gpeOPid pre, pst;	// 0, 1
 					gpeCsz	cID;		// 2,
@@ -3046,6 +3054,7 @@ public:
 		gpmMcpy( this, pB, sizeof(*this) );
 		return *this;
 	}
+	I4x4& operator = ( const U1x4 b ) { x = b.x; y = b.y; z = b.z; w = b.w; return *this; }
     I4x4& operator = ( const F4 f4 );
     I4x4& operator = ( I4x2 b ) { a4x2[1] = a4x2[0] = b; return *this; }
     I4x4& operator ++() { ++a4x2[0]; ++a4x2[1]; return *this; }
@@ -3268,7 +3277,27 @@ public:
 		return *this;
 	}
 
+	I4x4& operator <<= ( I4 i ) {
+		a4x2[0] <<= i;
+		a4x2[1] <<= i;
+		return *this;
+	}
+	I4x4& operator >>= ( I4 i ) {
+		a4x2[0] >>= i;
+		a4x2[1] >>= i;
+		return *this;
+	}
 
+	I4x4& operator &= ( I4 i ) {
+		a4x2[0] &= i;
+		a4x2[1] &= i;
+		return *this;
+	}
+	I4x4& operator |= ( I4 i ) {
+		a4x2[0] |= i;
+		a4x2[1] |= i;
+		return *this;
+	}
 
 	I4x4 operator + (const I4x4& b) const { return I4x4( x+b.x, y+b.y, z+b.z, w+b.w ); }
 	I4x4 operator - (const I4x4& b) const { return I4x4( x-b.x, y-b.y, z-b.z, w-b.w ); }
