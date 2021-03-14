@@ -1388,7 +1388,8 @@ public:
 		return this;
 
 	}
-	int hstX( I4x4* pH, int p, int shr, int w, int h );
+	int hstX( I4x4* pH, int p, int shr, int w, int h = 0 );
+	int hstXrgb( I4x4* pH, int p, int shr, int w, int h = 0 );
 	U1x4 xyz0() const { return U1x4(x,y,z); }
 	U1x4 xy00() const { return U1x4(x,y); }
 	U1x4& e8xyz_( const U1x4& b ) {

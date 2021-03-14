@@ -829,6 +829,9 @@ public:
 	U1x4* TOOLmaskAB(	gpMEM* pMEM,
 						gpcPIC* pA, gpcPIC* pB, gpcPIC* pM,
 						char* pNAME, char *pPATH, char *pFILE );
+	U1x4* TOOLmaskAB2(	gpMEM* pMEM,
+						gpcPIC* pA, gpcPIC* pB, gpcPIC* pM,
+						char* pNAME, char *pPATH, char *pFILE );
 };
 
 class gpcPICall
