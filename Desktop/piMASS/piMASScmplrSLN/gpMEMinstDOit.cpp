@@ -376,7 +376,8 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				if( !pPmsk )
 					break;
 				pPmsk->TOOLmaskAB(  this,
-									gpdGLpTRG, gpdGLapPIC[iPdrw], gpdGLapPIC[iPsrc],
+									gpdGLpTRG, //gpdGLapPIC[iPdrw],
+									gpdGLapPIC[iPsrc],
 									pWIN->gpsMASSname,
 									pWIN->gpsMASSpath ,pWIN->gppMASSfile );
 

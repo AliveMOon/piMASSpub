@@ -827,7 +827,8 @@ public:
 				char* pPATH, char* pDIR, const char* pEXP = ".png" );
 
 	U1x4* TOOLmaskAB(	gpMEM* pMEM,
-						gpcPIC* pA, gpcPIC* pB, gpcPIC* pM,
+						gpcPIC* pR, //gpcPIC* pB,
+						gpcPIC* pB,
 						char* pNAME, char *pPATH, char *pFILE );
 	U1x4* TOOLmaskAB2(	gpMEM* pMEM,
 						gpcPIC* pA, gpcPIC* pB, gpcPIC* pM,

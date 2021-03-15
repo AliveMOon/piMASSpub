@@ -1162,7 +1162,8 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	aiQC[0]++;
 }
 U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
-							gpcPIC* pR, gpcPIC* pA, gpcPIC* pB,
+							gpcPIC* pR, //gpcPIC* pA,
+							gpcPIC* pB,
 							char* pNAME, char *pPATH, char *pFILE ) {
 	U4	frm;
 	int w, h, acc;
@@ -1178,10 +1179,10 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 	if(!pALL)
 		return pSRF ? (U1x4*)pSRF->pixels : NULL;
 
-	SDL_RenderReadPixels(	pMEM->pWIN->pSDLrndr, NULL, 0,
-							pSRF->pixels,
-							pSRF->pitch );
-	SDL_Surface	// *pAsrf = pA ? pA->pSRF : NULL,						// A. draw
+	//SDL_RenderReadPixels(	pMEM->pWIN->pSDLrndr, NULL, 0,
+	//						pSRF->pixels,
+	//						pSRF->pitch );
+	SDL_Surface	//*pAsrf = pA ? pA->pSRF : NULL,						// A. draw
 				*pBsrf = pB ? pB->pSRF : NULL; 						// B. cam1
 
 	int dv = 2,
@@ -1203,7 +1204,8 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 		Fcr = Fcl*Frw,
 		FSn = Sc2*Sc2, FSnOF = FSn*sizeof(U1x4),
 		nBx = Sc+Fcr+4, pls = ((nBx*sizeof(I4x4))/FSnOF) + 1,
-		Ry,Rx,Gy,Bx;
+		Ry,Rx,Gy,Bx,
+		cmbOF = Fh2*Sc2, iBx, Cxy;
 
 
 	I4x4 	aqRGBi,
@@ -1217,39 +1219,32 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 			*pCMBcr, *pCMBs,
 			*pCMBy, *pCMBd,
 			Fmsk, Fsmp;
+	U4 u4NM, iRQ;
 
 	/// DRAWot átfésüli FS - Food&Space
-	int iBx = pBx[Fcr].x%Fcr,
+	pBx[Fcr].y = pBx[Fcr].x;
+	for( pBx[Fcr].y = pBx[Fcr].x+0x10; pBx[Fcr].x < pBx[Fcr].y; pBx[Fcr].x++ ) {
+		iBx = pBx[Fcr].x%Fcr;
 		Cxy = (iBx%Fcl)*Fw
-			+ (iBx/Fcl)*Cp*Fh,
-		 cmbOF = Fh2*Sc2;
-	U4 u4NM;
-
-	switch( Cn ){
-		case 3:
-			((U1x4*)(((U1*)pCAM)+(Cxy*3)))->hstXrgb( pH, Cp, Sc, Fw, Fh );
-			break;
-		case 4:
-			pCAM[Cxy].hstX( pH, Cp, Sc, Fw, Fh );
-			break;
-		default:
-			return pMSK;
-			break;
-	}
-	aqRGBi = pH->xyz_HSTaqi(Sc,(Fwh*2)/3);
-	aqRGBi >>= 2;
-	aqRGBi.w = iBx;
+			+ (iBx/Fcl)*Cp*Fh;
+		switch( Cn ){
+			case 3:
+				((U1x4*)(((U1*)pCAM)+(Cxy*3)))->hstXrgb( pH, Cp, Sc, Fw, Fh );
+				break;
+			case 4:
+				pCAM[Cxy].hstX( pH, Cp, Sc, Fw, Fh );
+				break;
+			default:
+				return pMSK;
+				break;
+		}
+		aqRGBi = pH->xyz_HSTaqi(Sc,(Fwh*2)/3);
+		aqRGBi >>= 2;
+		aqRGBi.w = iBx;
+		iRQ = ( pBx[iBx].xyz0() != aqRGBi.xyz0() );
 
 
-	if( pBx[iBx].xyz0() != aqRGBi.xyz0() ) {
-		char* pF = pFILE;
-		U8 nLEN;
-		U1 nPNT = gpmVAN(pNAME,".", nLEN);
-		gpmMcpy(pF,pNAME,nPNT)[nPNT] = 0;
-		pF += nPNT;
-		pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
 		pCMBcr = (U1x4*)pALL->Ux( Fcr, FSnOF );
-
 		gpmZnOF(pCMBcr,FSn);
 		pM = pMSK	+ p*Ch + Cw2
 					+ (iBx%Fcl)*Fw2 + (iBx/Fcl)*p*Fh2;
@@ -1277,65 +1272,279 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 				pCMBd[Gy+Rx] = pCMBd[Gy-Bx] = pCMBd[0-Ry-Bx] = Fmsk;
 			}
 		}
+		pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
+		if( gpmMcmpOF( pSTRi, pCMBcr, FSn ) < FSn )
+			iRQ |= 2;
 
-		if( gpmMcmpOF( pSTRi, pCMBcr, FSn ) < FSn ) {
-			// STORE pBxx[i]
-			u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
-			sprintf( pF, "MSK/i%0.8xh0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
-			SDL_Surface* pStr = SDL_CreateRGBSurface( 0, Sc2, Sc2, 32, 0,0,0,0 );
-			gpmMcpyOF( (U1x4*)pStr->pixels, pCMBcr, FSn );
-			IMG_SavePNG( pStr, pPATH );
-			gpmSDL_FreeSRF(pStr);
-		}
+		if(iRQ)
+			break;
+	}
+	if( pBx[Fcr].x >= pBx[Fcr].y  )
+		return pMSK;
+
+	pREF = NULL;
+	char* pF = pFILE;
+	U8 nLEN;
+	U1 nPNT = gpmVAN(pNAME,".", nLEN);
+	gpmMcpy(pF,pNAME,nPNT)[nPNT] = 0;
+	pF += nPNT;
+
+	if( iRQ>>1 ) {
+		// STORE pBxx[i]
+		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
+		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
+		SDL_Surface* pStr = SDL_CreateRGBSurface( 0, Sc2, Sc2, 32, 0,0,0,0 );
+		gpmMcpyOF( (U1x4*)pStr->pixels, pCMBcr, FSn );
+		IMG_SavePNG( pStr, pPATH );
+		gpmSDL_FreeSRF(pStr);
+	}
+
+	if( iRQ&1 ){
 		// LOAD aqRGBi
 		pBx[iBx] = aqRGBi;
 		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
-		sprintf( pF, "MSK/i%0.8xh0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
+		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
 		SDL_Surface* pStr = IMG_Load( pPATH );
-		if( pStr ? pStr->pixels : NULL )
+		if( pStr ? pStr->pixels : NULL ) {
 			gpmMcpyOF( pSTRi, pStr->pixels, FSn );
+			for( U4 i = 0; i < FSn; i++ ){
+				pSTRi[i] = ((U1x4*)pStr->pixels)[i].swpZX().u4;
+			}
+		}
 		else
 			gpmZnOF(pSTRi,FSn);
 		gpmSDL_FreeSRF(pStr);
 
-		pCMBd =
-		(pCMBs = pSTRi + Sc) + Sc2*Sc;
+
+	}
+
+	pREF = NULL;
+	pM = pMSK	+ p*Ch + Cw2
+				+ (iBx%Fcl)*Fw2 + (iBx/Fcl)*p*Fh2;
+
+	pCMBd =
+	(pCMBs = pSTRi + Sc) + Sc2*Sc;
+	for( int y = 0; y < Fh2; y++ ) {
+		pCMBy = pCMBs + Fw2 + y*Sc2;
+		gpmMcpyOF( pM + y*p,		pCMBy,			Fw2 );
+		gpmMcpyOF( pM + (y+Ch2)*p,	pCMBy+cmbOF,	Fw2 );
+	}
+
+	gpmZnOF(pCMBcr,FSn);
+	int mw = (iBx/Fc4)%4, mh = iBx/(Fcl*Fr4);
+	for( int j = mh*(Fcl*Fr4), je = j+(Fcl*Fr4), ie; j<je; j+=Fcl )
+	for( iBx = j+mw*Fc4, ie = iBx+Fc4; iBx < ie; iBx++ ) {
+		pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
+		for( int o = 0; o < FSn; o++ ){
+			pCMBcr[o] |= pSTRi[o];
+		}
+	}
+	/// SPACE
+	pM = pMSK + p*(Ch*2-0x100) + Cw2-0x100;
+	for( int j = 0; j < Sc; j++ )
+	for( iBx = 0; iBx < Sc; iBx++ ) {
+		pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
+	}
+	pM += p*0x100;
+	pCMBcr += Sc2*Sc;
+	for( int j = 0; j < Sc; j++ )
+	for( iBx = 0; iBx < Sc2; iBx++ ) {
+		pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
+	}
+
+	pBx[Fcr].x++;
+	return pMSK;
+}
+U1x4* gpcPIC::TOOLmaskAB2(	gpMEM* pMEM,
+							gpcPIC* pR, gpcPIC* pA, gpcPIC* pB,
+							char* pNAME, char *pPATH, char *pFILE ) {
+	U4	frm;
+	int w, h, acc;
+	SDL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
+	if( pSRF ? ((pSRF->w!=w) && (pSRF->h!=h)) : false )
+		gpmSDL_FreeSRF(pSRF);
+	if( !pSRF ) {
+		pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
+		if( !pSRF )
+			return NULL;
+	}
+	gpcLZY* pALL = pMEM->pMASS->PIClzyALL.LZY( TnID );
+	if(!pALL)
+		return pSRF ? (U1x4*)pSRF->pixels : NULL;
+
+	SDL_RenderReadPixels(	pMEM->pWIN->pSDLrndr, NULL, 0,
+							pSRF->pixels,
+							pSRF->pitch );
+	SDL_Surface	*pAsrf = pA ? pA->pSRF : NULL,						// A. draw
+				*pBsrf = pB ? pB->pSRF : NULL; 						// B. cam1
+
+	int dv = 2,
+		/// B. CAM
+		Cn = pBsrf->pitch/pBsrf->w,
+		Cp = pBsrf->pitch/Cn,
+		Cw = pBsrf->w, Cw2 = Cw/2,
+		Ch = pBsrf->h, Ch2 = Ch/2,
+
+		p = pSRF->pitch/sizeof(U1x4),
+
+		Sc = 64, Sc2 = Sc*2,
+		Fw = Sc/dv, Fw2 = Fw/2,
+		Fh = Fw, Fh2 = Fh/2,
+		Fwh = Fw*Fh,
+
+		Fcl = Cw/Fw, Fc4 = Fcl/4,
+		Frw = Ch/Fh, Fr4 = Frw/4, Fc4r4 = Fc4*Fr4,
+		Fcr = Fcl*Frw,
+		FSn = Sc2*Sc2, FSnOF = FSn*sizeof(U1x4),
+		nBx = Sc+Fcr+4, pls = ((nBx*sizeof(I4x4))/FSnOF) + 1,
+		Ry,Rx,Gy,Bx,
+		cmbOF = Fh2*Sc2, iBx, Cxy;
+
+
+	I4x4 	aqRGBi,
+			*pBx = ((I4x4*)pALL->Ux( Fcr + 1 + pls, FSnOF ))-nBx,
+			*pH = pBx+Fcr+4, Fs4;
+
+	U1x4	*pMSK = pSRF ? (U1x4*)pSRF->pixels : NULL, *pM,
+			*pDRW = pAsrf ? (U1x4*)pAsrf->pixels : NULL, *pD,	// A. draw
+			*pCAM = pBsrf ? (U1x4*)pBsrf->pixels : NULL,		// B. cam1
+			*pSTRi,
+			*pCMBcr, *pCMBs,
+			*pCMBy, *pCMBd,
+			Fmsk, Fsmp;
+	U4 u4NM, iRQ;
+
+	/// DRAWot átfésüli FS - Food&Space
+	pBx[Fcr].y = pBx[Fcr].x;
+	for( pBx[Fcr].y = pBx[Fcr].x+0x10; pBx[Fcr].x < pBx[Fcr].y; pBx[Fcr].x++ ) {
+		iBx = pBx[Fcr].x%Fcr;
+		Cxy = (iBx%Fcl)*Fw
+			+ (iBx/Fcl)*Cp*Fh;
+		switch( Cn ){
+			case 3:
+				((U1x4*)(((U1*)pCAM)+(Cxy*3)))->hstXrgb( pH, Cp, Sc, Fw, Fh );
+				break;
+			case 4:
+				pCAM[Cxy].hstX( pH, Cp, Sc, Fw, Fh );
+				break;
+			default:
+				return pMSK;
+				break;
+		}
+		aqRGBi = pH->xyz_HSTaqi(Sc,(Fwh*2)/3);
+		aqRGBi >>= 2;
+		aqRGBi.w = iBx;
+		iRQ = ( pBx[iBx].xyz0() != aqRGBi.xyz0() );
+
+
+		pCMBcr = (U1x4*)pALL->Ux( Fcr, FSnOF );
+		gpmZnOF(pCMBcr,FSn);
+		pD = (pDRW?pDRW:pMSK)	+ p*Ch + Cw2
+								+ (iBx%Fcl)*Fw2 + (iBx/Fcl)*p*Fh2;
+		pCMBd = (pCMBs = pCMBcr + Sc) + Sc2*Sc;
 		for( int y = 0; y < Fh2; y++ ) {
 			pCMBy = pCMBs + Fw2 + y*Sc2;
-			gpmMcpyOF( pM + y*p,		pCMBy,			Fw2 );
-			gpmMcpyOF( pM + (y+Ch2)*p,	pCMBy+cmbOF,	Fw2 );
-		}
+			gpmMcpyOF( pCMBy, 		pD + y*p, 		Fw2 );
+			gpmMcpyOF( pCMBy+cmbOF, pD + (y+Ch2)*p, Fw2 );
+			for( int x = 0; x < Fw2; x++ ){
+				Fmsk = pCMBy[x];
+				Fsmp = pCMBy[x+cmbOF];
+				if( (Fmsk.srt3().x<0xF0) | (Fsmp.srt3().x<0x1) )
+				{
+					pCMBy[x+cmbOF].u4 = pCMBy[x].u4 = 0;
+					continue;
+				}
 
+				Fs4 = Fsmp;
+				Fs4 >>= 2;
+				//Fs4 >>= 1;
+				Ry = (Rx = Fs4.r)*Sc2;
+				Gy = Fs4.g*Sc2;
+				Bx = Fs4.b;
 
-		gpmZnOF(pCMBcr,FSn);
-		int mw = (iBx/Fc4)%4, mh = iBx/(Fcl*Fr4);
-		for( int j = mh*(Fcl*Fr4), je = j+(Fcl*Fr4), ie; j<je; j+=Fcl )
-		for( iBx = j+mw*Fc4, ie = iBx+Fc4; iBx < ie; iBx++ ) {
-			pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
-			for( int o = 0; o < FSn; o++ ){
-				pCMBcr[o] |= pSTRi[o];
+				pCMBd[Gy+Rx] = pCMBd[Gy-Bx] = pCMBd[0-Ry-Bx] = Fmsk;
 			}
 		}
-		/// SPACE
-		pM = pMSK	//+ p*Ch + Cw2
-					+ p*(Ch*2-0x100) + Cw2-0x100;
-		for( int j = 0; j < Sc; j++ )
-		for( iBx = 0; iBx < Sc; iBx++ ) {
-			pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
+		pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
+		if( gpmMcmpOF( pSTRi, pCMBcr, FSn ) < FSn )
+			iRQ |= 2;
+
+		if(iRQ)
+			break;
+	}
+	if( pBx[Fcr].x >= pBx[Fcr].y  )
+		return pMSK;
+
+	pREF = NULL;
+	char* pF = pFILE;
+	U8 nLEN;
+	U1 nPNT = gpmVAN(pNAME,".", nLEN);
+	gpmMcpy(pF,pNAME,nPNT)[nPNT] = 0;
+	pF += nPNT;
+
+	if( iRQ>>1 ) {
+		// STORE pBxx[i]
+		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
+		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
+		SDL_Surface* pStr = SDL_CreateRGBSurface( 0, Sc2, Sc2, 32, 0,0,0,0 );
+		gpmMcpyOF( (U1x4*)pStr->pixels, pCMBcr, FSn );
+		IMG_SavePNG( pStr, pPATH );
+		gpmSDL_FreeSRF(pStr);
+	}
+
+	if( iRQ&1 ){
+		// LOAD aqRGBi
+		pBx[iBx] = aqRGBi;
+		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
+		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
+		SDL_Surface* pStr = IMG_Load( pPATH );
+		if( pStr ? pStr->pixels : NULL ) {
+			gpmMcpyOF( pSTRi, pStr->pixels, FSn );
+			for( U4 i = 0; i < FSn; i++ ){
+				pSTRi[i] = ((U1x4*)pStr->pixels)[i].swpZX().u4;
+			}
 		}
-		pM += p*0x100;
-		pCMBcr += Sc2*Sc;
-		for( int j = 0; j < Sc; j++ )
-		for( iBx = 0; iBx < Sc2; iBx++ ) {
-			pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
-		}
+		else
+			gpmZnOF(pSTRi,FSn);
+		gpmSDL_FreeSRF(pStr);
 
 
 	}
 
+	pM = pMSK	+ p*Ch + Cw2
+				+ (iBx%Fcl)*Fw2 + (iBx/Fcl)*p*Fh2;
 
-	pBx[Fcr+0].x++;
+	pCMBd =
+	(pCMBs = pSTRi + Sc) + Sc2*Sc;
+	for( int y = 0; y < Fh2; y++ ) {
+		pCMBy = pCMBs + Fw2 + y*Sc2;
+		gpmMcpyOF( pM + y*p,		pCMBy,			Fw2 );
+		gpmMcpyOF( pM + (y+Ch2)*p,	pCMBy+cmbOF,	Fw2 );
+	}
+
+	gpmZnOF(pCMBcr,FSn);
+	int mw = (iBx/Fc4)%4, mh = iBx/(Fcl*Fr4);
+	for( int j = mh*(Fcl*Fr4), je = j+(Fcl*Fr4), ie; j<je; j+=Fcl )
+	for( iBx = j+mw*Fc4, ie = iBx+Fc4; iBx < ie; iBx++ ) {
+		pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
+		for( int o = 0; o < FSn; o++ ){
+			pCMBcr[o] |= pSTRi[o];
+		}
+	}
+	/// SPACE
+	pM = pMSK + p*(Ch*2-0x100) + Cw2-0x100;
+	for( int j = 0; j < Sc; j++ )
+	for( iBx = 0; iBx < Sc; iBx++ ) {
+		pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
+	}
+	pM += p*0x100;
+	pCMBcr += Sc2*Sc;
+	for( int j = 0; j < Sc; j++ )
+	for( iBx = 0; iBx < Sc2; iBx++ ) {
+		pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
+	}
+
+	pBx[Fcr].x++;
 	return pMSK;
 }
-
 
