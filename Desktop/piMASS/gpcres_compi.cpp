@@ -1,8 +1,7 @@
 #include "gpcres.h"
 extern U1 gpaALFsub[];
 
-gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM )
-{
+gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM ) {
 	if( pE )
 	if( pS >= pE )
 		return this;

@@ -997,7 +997,7 @@ public:
 		{
 			if( !bADD )
 				return NULL;
-			gpROW* pRl = pLSTrow();
+			gpROW* pRl = pLASTrow();
 			if( pRl )
 			if( pRl->pstOP == gpeOPid_nop )
 				return pRl;
@@ -1006,8 +1006,8 @@ public:
 
 		return ((gpROW*)gpmLZYvali( gpROW, &lzyROW )) + iR;
 	}
-	gpROW* pLSTrow() { return pROW(iLAST()); }
-	gpROW* pLSTrow( char* pS, gpOBJ* pO, I4 mnID ) {
+	gpROW* pLASTrow() { return pROW(iLAST()); }
+	gpROW* pLASTrow( char* pS, gpOBJ* pO, I4 mnID ) {
 		gpROW* pRl = pROW(iLAST());
 		if( !pRl )
 			return NULL;
@@ -1253,11 +1253,13 @@ public:
 
 	};*/
 };
+/// CCR XNZVC
+
 class gpMEM {
 public:
 	I8x2 	aA[0x10];
-	I8		*pA, *pD;
-	double	aF[0x10];
+	I8		*pA, *pD, i8;
+	double	aF[0x10], d8;
 	gpcLZY	lzyMEM,
 			lzyOBJ,
 			lzyCLASS,
@@ -1268,8 +1270,11 @@ public:
     gpcLZYdctBIN    lzyDCTbin;
 
 	I4		nCD, nXFND,
-			iSTK,nDAT,nINST, pc, pcCPY;
+			iSTK,nDAT,nINST,
+			pc, pcCPY;
 	U4		msRUN, nDCTscp, nDCTbin;
+	gpeCCR	ccr;
+
 	gpINST	*pINST;
 	gpcWIN	*pWIN;
 	gpcMASS	*pMASS;
@@ -1280,7 +1285,6 @@ public:
 
 	I4x4	*pFREE, *pALLOC;
 	U4		nFREE, nALLOC;
-
 	~gpMEM() {
 		gpmDEL( pLZYsrcXFNDall);
 		gpmDEL( pMgl );
@@ -1376,7 +1380,7 @@ public:
 	gpOBJ* srcOBJadd( char* pS, I4 dctID );
 	gpBLK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  );
 	gpBLK* srcBLKup( char* pS, gpBLK* pBMom, gpeOPid opID, I4 mnID ) {
-		return srcBLKnew( pS, opID, pBMom->pLSTrow(), pBMom->bID, pBMom->iLAST(), mnID );
+		return srcBLKnew( pS, opID, pBMom->pLASTrow(), pBMom->bID, pBMom->iLAST(), mnID );
 	}
 	gpBLK* srcBLKinsrt( char* pS, gpBLK* pBLKup, gpeOPid opID, I4 mnID ) {
 		if( pBLKup )
@@ -1387,7 +1391,7 @@ public:
 
 		gpROW	*pRuf = pBLKup->pROW(0,true),
 				*pRif = pBLKi->pROW(0,true),
-				*pRml = pBLKm->pLSTrow();
+				*pRml = pBLKm->pLASTrow();
 
 		pRml->bIDup = 	pBLKup->bIDm = pBLKi->bID;
 						pBLKup->bIDmR = 0; // pBLKi->iLAST();

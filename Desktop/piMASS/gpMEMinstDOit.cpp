@@ -376,7 +376,8 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				if( !pPmsk )
 					break;
 				pPmsk->TOOLmaskAB(  this,
-									gpdGLpTRG, gpdGLapPIC[iPdrw], gpdGLapPIC[iPsrc],
+									gpdGLpTRG, //gpdGLapPIC[iPdrw],
+									gpdGLapPIC[iPsrc],
 									pWIN->gpsMASSname,
 									pWIN->gpsMASSpath ,pWIN->gppMASSfile );
 
@@ -417,7 +418,6 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				aNM = (char*)pU1+ ((*pU1 == '\"') ? 1 : 0);
 				pWgl->GLSLset( aNM, pMgl->pPIX, pMgl->pVTX );
 			} break;
-
 
 		/// DRAW with GPU
 		case gpeALF_GPU: if( pWgl ? gpdGLpTRG : NULL  ) {	cID = gpeCsz_b; if( bCID ) break;

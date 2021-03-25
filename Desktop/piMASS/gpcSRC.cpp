@@ -211,14 +211,14 @@ gpBLK* gpcSRC::srcBLKmNdID( char* pS, gpBLK* pBLK, I4 dctID, I4 mnID ) {
 	if( !pBLK )
 		pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1, mnID );
 
-	gpROW* pRl = pBLK->pLSTrow();
+	gpROW* pRl = pBLK->pLASTrow();
 	if( !pRl )
 		return pBLK;
 	if( pBLK->opIDgrp() == gpeOPid_begin )
 	{
 		pBLK = srcBLKup( pS, pBLK, gpeOPid_nop, mnID );
 		//srcBLKnew( pS, gpeOPid_nop, pRl, pBLK->bID, pBLK->iLAST(), mnID );
-		pRl = pBLK->pLSTrow();
+		pRl = pBLK->pLASTrow();
 	}
 
 	*pRl = pO;

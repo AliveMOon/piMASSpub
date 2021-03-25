@@ -17,7 +17,7 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 		//if( !pBLK )
 		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 
-		gpROW* pRl = pBLK->pLSTrow();
+		gpROW* pRl = pBLK->pLASTrow();
 		if( !pRl )
 			return pBLK;
 
@@ -28,6 +28,12 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 			case gpeOPid_dimS:
 			case gpeOPid_begin:
 				return srcBLKup( pS, pBLK, opID, mnID );
+			case gpeOPid_sub:
+				///							pRl
+				/// a + b - c == d - e + 	f -
+				pRl->pstOP = opID;
+				pBLK->pNEWrow();
+				return pBLK;
 			case gpeOPid_nop:
 				pBLK->opID = opID;
 			case gpeOPid_add:
@@ -40,7 +46,7 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 					gpBLK	*pBLKm = srcINSTanDalf( pS, NULL, pBLK );
 					if( pBLKm->opIDgrp() == gpeOPid_add )
 					{
-						pRl = pBLKm->pLSTrow();
+						pRl = pBLKm->pLASTrow();
 						pRl->pstOP = opID;
 						pBLKm->pNEWrow();
 						return pBLKm;
@@ -54,7 +60,7 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 						/// IGEN volt alatta ADD
 						///				pRl
 						/// a -	b *		c +
-						pRl = pBLKm->pLSTrow();
+						pRl = pBLKm->pLASTrow();
 						pRl->pstOP = opID;
 						pBLKm->pNEWrow();
 						return pBLKm;
@@ -170,7 +176,22 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 			case gpeOPid_or:
 				pMEM->inst( opB ).c((gpeCsz)cIDc).D0.D1;
 			break;
-			default: break;
+			default: {
+				switch( opB ) {
+					case gpeOPid_eqLG:
+						_cmp.c((gpeCsz)cIDc).D0.D1;
+						_seq.c((gpeCsz)cIDc).D1;
+						break;
+					case gpeOPid_neqLG:
+						_cmp.c((gpeCsz)cIDc).D0.D1;
+						_sne.c((gpeCsz)cIDc).D1;
+
+						break;
+
+					default: break;
+				}
+				_and.c((gpeCsz)cIDc).EAl(1).D1;
+			} break;
 		}
 
 		pPb->cID(cIDc);

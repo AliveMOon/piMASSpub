@@ -174,7 +174,7 @@
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
 
-	#define gpdMAX_PATH PATH_MAX
+	#define gpdMAX_PATH (PATH_MAX/2)
 
 	#define gpdEV_tOUT		7
 	#define gpdTCP_tOUT		1000/20
@@ -1388,7 +1388,8 @@ public:
 		return this;
 
 	}
-	int hstX( I4x4* pH, int p, int shr, int w, int h );
+	int hstX( I4x4* pH, int p, int shr, int w, int h = 0 );
+	int hstXrgb( I4x4* pH, int p, int shr, int w, int h = 0 );
 	U1x4 xyz0() const { return U1x4(x,y,z); }
 	U1x4 xy00() const { return U1x4(x,y); }
 	U1x4& e8xyz_( const U1x4& b ) {

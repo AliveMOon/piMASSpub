@@ -305,6 +305,8 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 										pBLK = srcBLKmov( pS, mnID, pBLK, opID, pDBG );
 										break;
 									case gpeOPid_add: /// +
+										pBLK = srcBLKadd( pS, mnID, pBLK, opID, pDBG );
+										break;
 									case gpeOPid_sub: /// ==
 										pBLK = srcBLKadd( pS, mnID, pBLK, opID, pDBG );
 										break;

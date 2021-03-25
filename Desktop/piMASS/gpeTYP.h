@@ -69,6 +69,9 @@ typedef enum gpeOPid:U1{
 	gpeOPid_jsr,
 
 	gpeOPid_SWAP,	gpeOPid_EXTB,	gpeOPid_EXT,	gpeOPid_EXTL,
+
+	gpeOPid_CMP,
+	gpeOPid_SEQ,	gpeOPid_SNE,
 } gpeOPid_U1;
 static gpeOPid gpaOPgrp[] = {
 	gpeOPid_nop,
@@ -107,6 +110,8 @@ static gpeOPid gpaOPgrp[] = {
 	gpeOPid_entry,
 
 	gpeOPid_entry,	gpeOPid_EXT,	gpeOPid_EXT,	gpeOPid_EXT,
+	gpeOPid_CMP,
+	gpeOPid_SEQ, gpeOPid_SEQ,
 };
 static const char* gpasCsz[] = {
 
@@ -157,7 +162,44 @@ typedef enum gpeCsz:U1{
 	gpeCsz_K,	//  e	16		11:10	KID
 	gpeCsz_OFF,	//	f	16		11:11	ZRO
 } gpeCsz_U1;
+typedef enum gpeCCR:U4 {
+	gpeCCR_null,	// 00000
+	gpeCCR_c,		// 00001
+	gpeCCR_v,		// 00010
+	gpeCCR_vc,		// 00011
 
+	gpeCCR_z,		// 00100
+	gpeCCR_zc,		// 00101
+	gpeCCR_zv,		// 00110
+	gpeCCR_zvc,		// 00111
+
+	gpeCCR_n,		// 01000
+	gpeCCR_nc,		// 01001
+	gpeCCR_nv,		// 01010
+	gpeCCR_nvc,		// 01011
+	gpeCCR_nz,		// 01100
+	gpeCCR_nzc,		// 01101
+	gpeCCR_nzv,		// 01110
+	gpeCCR_nzvc,	// 01111
+
+	gpeCCR_x,		// 10000
+	gpeCCR_xc,		// 10001
+	gpeCCR_xv,		// 10010
+	gpeCCR_xvc,		// 10011
+	gpeCCR_xz,		// 10100
+	gpeCCR_xzc,		// 10101
+	gpeCCR_xzv,		// 10110
+	gpeCCR_xzvc,	// 10111
+	gpeCCR_xn,		// 11000
+	gpeCCR_xnc,		// 11001
+	gpeCCR_xnv,		// 11010
+	gpeCCR_xnvc,	// 11011
+	gpeCCR_xnz,		// 11100
+	gpeCCR_xnzc,	// 11101
+	gpeCCR_xnzv,	// 11110
+	gpeCCR_xnzvc,	// 11111
+
+} gpeCCR_U4;
 class U4x2;
 class I4x2;
 class gpBLK;

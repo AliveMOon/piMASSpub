@@ -177,7 +177,7 @@ gpBLK* gpcSRC::srcBLKmov( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 		//	pBLK = srcBLKnull( pS, pBLK, pO->dctID, mnID );
 		//}
 
-		gpROW* pRl = pBLK->pLSTrow();
+		gpROW* pRl = pBLK->pLASTrow();
 		if( !pRl)
 			return pBLK;
 

@@ -17,7 +17,7 @@ gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 		//if( !pBLK )
 		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 
-		gpROW* pRl = pBLK->pLSTrow();
+		gpROW* pRl = pBLK->pLASTrow();
 		if( !pRl )
 			return pBLK;
 		if( pBLK->opIDgrp() == gpaOPgrp[opID] )
@@ -162,7 +162,7 @@ gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY
 		pBLK = pBLKm;
 
 	}
-	gpROW	*pRl = pBLK->pLSTrow();
+	gpROW	*pRl = pBLK->pLASTrow();
 	return pBLK;
 	/// a veszö egyenlőre csinál helyet
 	//pBLK->pNEWrow();
