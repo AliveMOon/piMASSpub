@@ -3693,6 +3693,9 @@ public:
 			I8		num;
 		};
 		struct {
+			gpeALF	a, b;
+		};
+		struct {
 			I4x2 i4x2[2];
 		};
 		struct {

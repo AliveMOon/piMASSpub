@@ -148,29 +148,38 @@ gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
 
 	gpcLZY wr;
 	U8 s;
-	switch( pAT[1].alf ) {
+	I8x2 aa( pAT[0].alf,pAT[1].alf);
+	switch( aa.b ) {
 		case gpeALF_XYR: {
-			I8x2 aa( pAT[0].alf,pAT[1].alf);
 			I4x4* pXYR = (I4x4*)pAA( aa, sizeof(I4x4) );
 			if( !pXYR )
 				break;
 			if( (*pXYR) == (pVAR?(*(I4x4*)pVAR):I4x4(0)) )
 				break;
 			(*pXYR) = pVAR ? (*(I4x4*)pVAR) : I4x4(0);
-
-			if( !pF )
+			if( !pF ) break;
+			wr.lzyADD( pXYR, sizeof(*pXYR), s=0, -1);
+		} break;
+		case gpeALF_ID: {
+			I8* pI8 = (I8*)pAA( aa, sizeof(*pI8) );
+			if( !pI8 )
 				break;
-
-			pF += gpfALF2STR( pF, aa.x );
-			*pF = '.'; ++pF;
-			gpfALF2STR( pF, aa.y );
-
-			wr
-			.lzyADD( pXYR, sizeof(*pXYR), s=0, -1)
-			->lzyWR( pIDlst->sPATH);
+			if( (*pI8) == (pVAR?(*(I8*)pVAR):0) )
+				break;
+			(*pI8) = (pVAR?(*(I8*)pVAR):0);
+			if( !pF ) break;
+			wr.lzyADD( pI8, sizeof(*pI8), s=0, -1);
 		} break;
 		default: break;
 	}
+
+	if( pF ? !wr.nLD() : true )
+		return this;
+
+	pF += gpfALF2STR( pF, aa.x );
+	*pF = '.'; ++pF;
+	gpfALF2STR( pF, aa.y );
+	wr.lzyWR( pIDlst->sPATH );
 	return this;
 }
 
@@ -324,12 +333,13 @@ void gpMEM::funFND() {
 		I8x2 aa( pAT[iA].alf,pAT[iA+1].alf);
 		switch( pAT[iA+1].alf ) {
 			case gpeALF_XYR:
-				j = 0;
 				xyzw = 0;
 				/// függvény paramétereit olvassa XYR
-				while( i>-1 ) {
+				for( j = 0; j < 3; j++ ) {
 					pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
-					xyzw.aXYZW[j++] = pPi->i8(this);
+					xyzw.aXYZW[j] = pPi->i8(this);
+					if( !i )
+						break;
 					i--;
 				}
 				xyzw.w = nOUT;
@@ -349,6 +359,7 @@ void gpMEM::funFND() {
 						pON->y = sqrt((xyzw.a4x2[0]-pXYZW->a4x2[0]).qlen());
 					onCNT++;
 				}
+				/// FND NEAR XY
 				pIA->y = onCNT-pIA->x;
 				if( pIA->y ) {
 					pON = (I4x2*)onLZY.Ux( pIA->x, sizeof(*pON) );
@@ -422,7 +433,8 @@ void gpMEM::funFND() {
 				pI0 = pITM - pIl->aixITMsel[0];
 				break;
 
-			case gpeALF_MOM:
+			case gpeALF_ID:
+
 				break;
 			default: break;
 		}
