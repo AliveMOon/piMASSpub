@@ -35,8 +35,8 @@
  px = ix*640/iw; py = 960*iy/ih;
  txy = mlb + (ia-2)*1000 + (in-3)*10000;
  lst = fnd( txy,	"zeroDB/scr/",
-                        "pxSCR.xyr", 4,
- 			px, py, 30 );
+                        "pxSCR.xyr",
+ 			px, py, 30, 4 );
  mini = print( "
   inx:%d iny:%d
   a %d n %d
@@ -358,6 +358,6 @@
  again = 200;
     a12	 
  ize  = in == 10;
- ii = (in==10) + (ia!=1)*10 + mlb*100;
+ ii = (in==10) + (ia!=1)*100;
  again = 100;
   

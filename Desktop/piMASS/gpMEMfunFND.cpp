@@ -282,7 +282,7 @@ void gpMEM::funFND() {
 	--i;
 	if( !i )
 		return;
-	/// i 2: VAR id/sNAME
+	/// i 2: FORMAT
 
 	pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
 	I8 ixTYP = pPi->i8(this);
@@ -305,6 +305,12 @@ void gpMEM::funFND() {
 	if( !i )
 		return;
 
+	/// i 3: nOUT
+	pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
+	I8 nOUT = pPi->i8(this);
+	--i;
+	if( !i )
+		return;
 	//pAT->alfCON( sPUB, nAT );
 	I4x4 xyzw = 0, *pXYZW;
 	I4x2 *pON = NULL, *pIA;
@@ -314,6 +320,7 @@ void gpMEM::funFND() {
 		n = alfLEN(pAT[iA].alf);
 		pSi = pS +pAT[iA].num-n;
 		pSe = pSi+pAT[iA+1].num;
+
 		I8x2 aa( pAT[iA].alf,pAT[iA+1].alf);
 		switch( pAT[iA+1].alf ) {
 			case gpeALF_XYR:
@@ -325,6 +332,8 @@ void gpMEM::funFND() {
 					xyzw.aXYZW[j++] = pPi->i8(this);
 					i--;
 				}
+				xyzw.w = nOUT;
+
 				/// ITEM-ek távolságának kiszámítása a megadott xy poziciohoz képest
 				pIA = (I4x2*)onLZY.Ux( iaCNT, sizeof(*pIA) );
 				pIA->x = onCNT;
@@ -345,8 +354,8 @@ void gpMEM::funFND() {
 					pON = (I4x2*)onLZY.Ux( pIA->x, sizeof(*pON) );
 					/// sorting MEDIAN --------------------------------
 					pON[0].median( pIA->y, (I4x2*)onLZY.p_alloc, true );
-					if( xyzw.w )
-						pIA->y = gpmMIN( xyzw.w, pIA->y );
+					if( nOUT )
+						pIA->y = gpmMIN( nOUT, pIA->y );
 					onCNT = pIA->sum();
 					iaCNT++;
 

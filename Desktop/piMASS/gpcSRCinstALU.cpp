@@ -126,8 +126,10 @@ gpINST* gpMEM::instALU() {
 			p_dst = NULL;
 			break;
 	}
+
 	switch(gpaOPgrp[ins.op]) {
 		case gpeOPid_CMP:{
+				ccr = gpeCCR_null;
 				switch( ins.cID ) {
 					case gpeCsz_f:
 					case gpeCsz_d: {
