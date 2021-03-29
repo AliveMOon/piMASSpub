@@ -3908,16 +3908,32 @@ public:
 	gpeCsz gpCszNUM( const char* pS, U4 nS );
 	gpeCsz gpCszALF( const char* pS, U4 nS );
 	//U8
-	size_t an2str( void* p_b, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
+	size_t ab2str( void* p_b, const void* p_p = NULL ) {
 		if( !p_b )
 			return 0;
-		U1* p_buff = (U1*)p_b;
-		if( !this )
-		{
+		char	*p_buff = (char*)p_b,
+				*p_post = (char*)p_p;
+		if( !this ) {
 			*p_buff = 0;
 			return 0;
 		}
-		U1* p_begin = p_buff;
+		char* p_begin = p_buff;
+		p_buff += gpfALF2STR( p_buff, a );
+		if( p_post )
+			p_buff += sprintf( (char*)p_buff, "%s", p_post );
+		p_buff += gpfALF2STR( p_buff, b );
+		return p_buff-p_begin;
+	}
+	size_t an2str( void* p_b, const U1* p_p = NULL, bool b_hex = false, bool b0x0 = false ) {
+		if( !p_b )
+			return 0;
+		char	*p_buff = (char*)p_b,
+				*p_post = (char*)p_p;
+		if( !this ) {
+			*p_buff = 0;
+			return 0;
+		}
+		char *p_begin = p_buff;
 		p_buff += gpfALF2STR( p_buff, alf );
 
 		I8 nn = num;
@@ -3931,9 +3947,9 @@ public:
 					? ( b0x0	? "0x%0.8llx"
 								: "%llx" )
 					: "%lld";
-		p_buff += sprintf( (char*)p_buff, pPAT, nn );
+		p_buff += sprintf( p_buff, pPAT, nn );
 		if( p_post )
-			p_buff += sprintf( (char*)p_buff, "%s", p_post );
+			p_buff += sprintf( p_buff, "%s", p_post );
 
 		return p_buff-p_begin;
 	}
@@ -5659,7 +5675,17 @@ public:
 
 	~gpcLZY() { gpmFREE( p_alloc ); }
 	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
+	U8 nSUM(){
+		U8 sum = nLD();
+		if( !sum )
+			return 0;
 
+		sum = sum*sum/2;
+		for( U8 i = 0, e = nLD(); i < e; i++ ){
+			sum += p_alloc[i];
+		}
+		return sum;
+	}
 
 	U1x4& typ() { return *(U1x4*)&type; }
 	U4x4* pMAP( U4 nX, U4 nLIM, size_t nBYTE ) {
