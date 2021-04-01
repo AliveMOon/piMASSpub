@@ -126,7 +126,95 @@ gpINST* gpMEM::instALU() {
 			p_dst = NULL;
 			break;
 	}
+
 	switch(gpaOPgrp[ins.op]) {
+		case gpeOPid_CMP:{
+				ccr = gpeCCR_null;
+				switch( ins.cID ) {
+					case gpeCsz_f:
+					case gpeCsz_d: {
+							if( ins.cID == gpeCsz_f )
+								d8 = *((float*)p_dst) - *((float*)p_src);
+							else
+								d8 = *((double*)p_dst) - *((double*)p_src);
+							if( d8 != 0.0 ) {
+								if( d8 < 0.0 )
+									ccr = gpeCCR_n;
+							} else
+								ccr = gpeCCR_z;
+						} break;
+
+					default: {
+						switch( ins.cID ) {
+							case gpeCsz_Q: i8 = *((I8*)p_dst) - *((I8*)p_src); break;
+							case gpeCsz_q: i8 = *((U8*)p_dst) - *((U8*)p_src); break;
+							case gpeCsz_L: i8 = *((I4*)p_dst) - *((I4*)p_src); break;
+							case gpeCsz_4:
+							case gpeCsz_l: i8 = *((U4*)p_dst) - *((U4*)p_src); break;
+							case gpeCsz_W: i8 = *((I2*)p_dst) - *((I2*)p_src); break;
+							case gpeCsz_w: i8 = *((U2*)p_dst) - *((U2*)p_src); break;
+							case gpeCsz_B: i8 = *((I1*)p_dst) - *((I1*)p_src); break;
+							case gpeCsz_b: i8 = *((U1*)p_dst) - *((U1*)p_src); break;
+							default: break;
+						}
+						if( i8 ) {
+							if( i8 < 0 )
+								ccr = gpeCCR_n;
+						} else
+							ccr = gpeCCR_z;
+
+					} break;
+				}
+
+			} break;
+		case gpeOPid_SEQ:{
+				if( !p_src  )
+					break;
+				p_dst = p_src;
+				switch(ins.op) {
+					case gpeOPid_SEQ:{
+							bool b = ccr&gpeCCR_z;
+							if( !b ) {
+								gpmZn( p_dst, sOF );
+								break;
+							}
+
+							switch( ins.cID ) {
+								case gpeCsz_Q: *((I8*)p_dst) = 0x7fffFFFFffffFFFF; break;
+								case gpeCsz_q: *((U8*)p_dst) = 0xffffFFFFffffFFFF; break;
+								case gpeCsz_L: *((I4*)p_dst) = 0x7fffFFFF; break;
+								case gpeCsz_4:
+								case gpeCsz_l: *((U4*)p_dst) = 0xffffFFFF; break;
+								case gpeCsz_W: *((I2*)p_dst) = 0x7FFF; break;
+								case gpeCsz_w: *((U2*)p_dst) = 0xFFFF; break;
+								case gpeCsz_B: *((I1*)p_dst) = 0x7F; break;
+								case gpeCsz_b: *((U1*)p_dst) = 0xFF; break;
+								default: break;
+							}
+						} break;
+					case gpeOPid_SNE:{
+							bool b = ccr&gpeCCR_z;
+							if( b ) {
+								gpmZn( p_dst, sOF );
+								break;
+							}
+
+							switch( ins.cID ) {
+								case gpeCsz_Q: *((I8*)p_dst) = 0x7fffFFFFffffFFFF; break;
+								case gpeCsz_q: *((U8*)p_dst) = 0xffffFFFFffffFFFF; break;
+								case gpeCsz_L: *((I4*)p_dst) = 0x7fffFFFF; break;
+								case gpeCsz_4:
+								case gpeCsz_l: *((U4*)p_dst) = 0xffffFFFF; break;
+								case gpeCsz_W: *((I2*)p_dst) = 0x7FFF; break;
+								case gpeCsz_w: *((U2*)p_dst) = 0xFFFF; break;
+								case gpeCsz_B: *((I1*)p_dst) = 0x7F; break;
+								case gpeCsz_b: *((U1*)p_dst) = 0xFF; break;
+								default: break;
+							}
+						} break;
+					default: break;
+				}
+			} break;
 		case gpeOPid_EXT:{
 				switch(ins.op) {
 					case gpeOPid_EXTB:
@@ -171,12 +259,8 @@ gpINST* gpMEM::instALU() {
 				U8 mx = gpaCszMX[ins.cID];
 				switch( ins.cID ) {
 					case gpeCsz_Q: gpmMUL( I8, ins.op, mx ); break;
-					case gpeCsz_q:
-						gpmMUL( U8, ins.op, mx );
-						break;
-					case gpeCsz_L:
-						gpmMUL( int, ins.op, mx );
-						break;
+					case gpeCsz_q: gpmMUL( U8, ins.op, mx ); break;
+					case gpeCsz_L: gpmMUL( int, ins.op, mx ); break;
 					case gpeCsz_l: gpmMUL( U4, ins.op, mx ); break;
 					case gpeCsz_W: gpmMUL( I2, ins.op, mx ); break;
 					case gpeCsz_w: gpmMUL( U2, ins.op, mx ); break;
@@ -192,8 +276,7 @@ gpINST* gpMEM::instALU() {
 				if( !p_dst || !p_src )
 					break;
 
-				switch( ins.cID )
-				{
+				switch( ins.cID ) {
 					case gpeCsz_Q: gpmADD( I8, ins.op ); break;
 					case gpeCsz_q: gpmADD( U8, ins.op ); break;
 					case gpeCsz_L:{

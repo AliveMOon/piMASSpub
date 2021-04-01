@@ -1179,11 +1179,7 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 	if(!pALL)
 		return pSRF ? (U1x4*)pSRF->pixels : NULL;
 
-	//SDL_RenderReadPixels(	pMEM->pWIN->pSDLrndr, NULL, 0,
-	//						pSRF->pixels,
-	//						pSRF->pitch );
-	SDL_Surface	//*pAsrf = pA ? pA->pSRF : NULL,						// A. draw
-				*pBsrf = pB ? pB->pSRF : NULL; 						// B. cam1
+	SDL_Surface	*pBsrf = pB ? pB->pSRF : NULL; 						// B. cam1
 
 	int dv = 2,
 		/// B. CAM
@@ -1213,7 +1209,6 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 			*pH = pBx+Fcr+4, Fs4;
 
 	U1x4	*pMSK = pSRF ? (U1x4*)pSRF->pixels : NULL, *pM,
-			// *pDRW = pAsrf ? (U1x4*)pAsrf->pixels : NULL, *pD,	// A. draw
 			*pCAM = pBsrf ? (U1x4*)pBsrf->pixels : NULL,		// B. cam1
 			*pSTRi,
 			*pCMBcr, *pCMBs,

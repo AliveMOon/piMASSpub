@@ -39,6 +39,10 @@
 #define _ext	pMEM->inst( gpeOPid_EXT )
 #define _extL	pMEM->inst( gpeOPid_EXTL )
 
+#define _cmp	pMEM->inst( gpeOPid_CMP )
+#define _seq	pMEM->inst( gpeOPid_SEQ )
+#define _sne	pMEM->inst( gpeOPid_SNE )
+
 #define A0 An(0)
 #define A1 An(1)
 #define A2 An(2)

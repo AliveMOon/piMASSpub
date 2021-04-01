@@ -174,7 +174,7 @@
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
 
-	#define gpdMAX_PATH PATH_MAX
+	#define gpdMAX_PATH (PATH_MAX/2)
 
 	#define gpdEV_tOUT		7
 	#define gpdTCP_tOUT		1000/20
@@ -768,6 +768,18 @@ inline size_t gpfMM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL ) {
 	return nA;
 }
 
+inline U2 swp2( const void* p ) {
+	register U2 u = *(U2*)p;
+	return    (u<<8)|(u>>8);
+}
+inline U4 swp4( const void* p ) {
+	register U4 u = *(U4*)p;
+	return    (u<<24)
+			|((u&0xFF000000)>>24)
+			|((u&0xFF0000)>>8)
+			|((u&0xFF00)<<8);
+}
+
 class UTF8 {
 	U1* pU;
 public:
@@ -953,9 +965,7 @@ public:
     U1x4( U4 b ) {
         u4 = b;
     }
-    U1x4( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 ) {
-        x = _x; y = _y; z = _z; w = _w;
-    }
+    U1x4( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 ) { x=_x; y=_y; z=_z; w=_w; }
     U1x4& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
     U4 area_xy() {
 		U4 a = x;
@@ -1130,6 +1140,13 @@ public:
 			p1[i].z = p2[i].x;
 			p1[i].w = p2[i].y;
 		}
+		return this;
+	}
+	U1x4* wzyx( const void* pV, U4 n ) {
+		U1x4 *p1 = this;
+		U4* pU =(U4*)pV;
+		for( U4 i = 0; i < n; i++ )
+			p1[i].u4 = swp4(pU+i);
 		return this;
 	}
 
@@ -3693,6 +3710,9 @@ public:
 			I8		num;
 		};
 		struct {
+			gpeALF	a, b;
+		};
+		struct {
 			I4x2 i4x2[2];
 		};
 		struct {
@@ -3905,16 +3925,32 @@ public:
 	gpeCsz gpCszNUM( const char* pS, U4 nS );
 	gpeCsz gpCszALF( const char* pS, U4 nS );
 	//U8
-	size_t an2str( void* p_b, const U1* p_post = NULL, bool b_hex = false, bool b0x0 = false ) {
+	size_t ab2str( void* p_b, const void* p_p = NULL ) {
 		if( !p_b )
 			return 0;
-		U1* p_buff = (U1*)p_b;
-		if( !this )
-		{
+		char	*p_buff = (char*)p_b,
+				*p_post = (char*)p_p;
+		if( !this ) {
 			*p_buff = 0;
 			return 0;
 		}
-		U1* p_begin = p_buff;
+		char* p_begin = p_buff;
+		p_buff += gpfALF2STR( p_buff, a );
+		if( p_post )
+			p_buff += sprintf( (char*)p_buff, "%s", p_post );
+		p_buff += gpfALF2STR( p_buff, b );
+		return p_buff-p_begin;
+	}
+	size_t an2str( void* p_b, const U1* p_p = NULL, bool b_hex = false, bool b0x0 = false ) {
+		if( !p_b )
+			return 0;
+		char	*p_buff = (char*)p_b,
+				*p_post = (char*)p_p;
+		if( !this ) {
+			*p_buff = 0;
+			return 0;
+		}
+		char *p_begin = p_buff;
 		p_buff += gpfALF2STR( p_buff, alf );
 
 		I8 nn = num;
@@ -3928,9 +3964,9 @@ public:
 					? ( b0x0	? "0x%0.8llx"
 								: "%llx" )
 					: "%lld";
-		p_buff += sprintf( (char*)p_buff, pPAT, nn );
+		p_buff += sprintf( p_buff, pPAT, nn );
 		if( p_post )
-			p_buff += sprintf( (char*)p_buff, "%s", p_post );
+			p_buff += sprintf( p_buff, "%s", p_post );
 
 		return p_buff-p_begin;
 	}
@@ -4320,24 +4356,11 @@ public:
 
     F2(){};
 
-    F2( I4 _x, I4 _y = 0 )
-    {
-        x = _x; y = _y;
-    }
-    F2( float _x, float _y = 0.0 )
-    {
-        x = _x; y = _y;
-    }
-    F2( float* pF )
-    {
-        gpmMcpyOF( this, pF, 1 );
-    }
-    F2( I4x2 xy )
-    {
-        x = xy.x; y = xy.y;
-    }
-    bool operator != ( const F2& b )
-    {
+    F2( I4 _x, I4 _y = 0 ) { x = _x; y = _y; }
+    F2( float _x, float _y = 0.0 ) { x = _x; y = _y; }
+    F2( float* pF ) { gpmMcpyOF( this, pF, 1 ); }
+    F2( I4x2 xy ) { x = xy.x; y = xy.y; }
+    bool operator != ( const F2& b ) {
 		if( x != b.x )
 			return true;
 		if( y != b.y )
@@ -4345,177 +4368,73 @@ public:
 
 		return false;
     }
-    bool operator == ( const F2& b )
-    {
-		return !(*this!=b);
-    }
+    bool operator == ( const F2& b ) { return !(*this!=b); }
 
-    F2& operator = ( I4 b )
-    {
-		x = b; y = 0;
-		return *this;
-    }
+    F2& operator = ( I4 b ) { x = b; y = 0; return *this; }
 
-    F2& operator = ( const I4x2& xy )
-    {
-		x = xy.x; y = xy.y;
-		return *this;
-    }
+    F2& operator = ( const I4x2& xy ) { x = xy.x; y = xy.y; return *this; }
 
-	F2& operator += ( const float b )
-    {
-		x += b; y += b;
-		return *this;
-    }
-    F2& operator -= ( const float b )
-    {
-		x -= b; y -= b;
-		return *this;
-    }
-    F2& operator *= ( const float b )
-    {
-		x *= b; y *= b;
-		return *this;
-    }
-    F2& operator %= ( const float b )
-    {
-		x = frac(x/b); y = frac(y/b);
-		return *this;
-    }
-    F2& operator /= ( const float b )
-    {
-		x /= b; y /= b;
-		return *this;
-    }
+	F2& operator += ( const float b ) { x += b; y += b; return *this; }
+    F2& operator -= ( const float b ) { x -= b; y -= b; return *this; }
+    F2& operator *= ( const float b ) { x *= b; y *= b; return *this; }
+    F2& operator %= ( const float b ) { x = frac(x/b); y = frac(y/b); return *this; }
+    F2& operator /= ( const float b ) { x /= b; y /= b; return *this; }
 
 
-    F2& operator += ( const F2& xy )
-    {
-		x += xy.x; y += xy.y;
-		return *this;
-    }
-    F2& operator -= ( const F2& xy )
-    {
-		x -= xy.x; y -= xy.y;
-		return *this;
-    }
-    F2& operator &= ( const F2& xy )
-    {
-		x *= xy.x; y *= xy.y;
-		return *this;
-    }
-    F2& operator %= ( const F2& xy )
-    {
-		x = frac(x/xy.x); y = frac(y/xy.y);
-		return *this;
-    }
-    F2& operator /= ( const F2& xy )
-    {
-		x /= xy.x; y /= xy.y;
-		return *this;
-    }
+    F2& operator += ( const F2& xy ) { x += xy.x; y += xy.y; return *this; }
+    F2& operator -= ( const F2& xy ) { x -= xy.x; y -= xy.y; return *this; }
+    F2& operator &= ( const F2& xy ) { x *= xy.x; y *= xy.y; return *this; }
+    F2& operator %= ( const F2& xy ) { x = frac(x/xy.x); y = frac(y/xy.y); return *this; }
+    F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 
-    double sum( void ) const
-    {
-        return x+y;
-    }
-    double qlen( void ) const
-    {
-        return x*x+y*y;
-    }
-    F2 norm( void ) const
-	{
+    double sum( void ) const { return x+y; }
+    double qlen( void ) const { return x*x+y*y; }
+    F2 norm( void ) const {
         float l = sqrt(qlen());
 		return F2( x/l, y/l );
 	}
-	float dot( const F2& b ) const
-	{
-        return x*b.x + y*b.y;
-	}
+	float dot( const F2& b ) const { return x*b.x + y*b.y; }
 
-	F2 operator + ( float b ) const
-	{
-        return F2( x+b, y+b );
-	}
-	F2 operator - ( float b ) const
-	{
-        return F2( x-b, y-b );
-	}
-	F2 operator * ( float b ) const
-	{
-        return F2( x*b, y*b );
-	}
-	F2 operator / ( float b ) const
-	{
-        return F2( x/b, y/b );
-	}
+	F2 operator + ( float b ) const { return F2( x+b, y+b ); }
+	F2 operator - ( float b ) const { return F2( x-b, y-b ); }
+	F2 operator * ( float b ) const { return F2( x*b, y*b ); }
+	F2 operator / ( float b ) const { return F2( x/b, y/b ); }
 
-	F2 operator + ( const F2& b ) const
-	{
-        return F2( x+b.x, y+b.y );
-	}
-	F2 operator - ( const F2& b ) const
-	{
-        return F2( x-b.x, y-b.y );
-	}
-	float operator * ( const F2& b ) const
-	{
-        return x*b.x+y*b.y;
-	}
-	F2 operator & ( const F2& b ) const
-	{
-        return F2( x*b.x, y*b.y );
-	}
-	F2 operator / ( const F2& b ) const
-	{
-        return F2( x/b.x, y/b.y );
-	}
-	F2& add( F2 b, U4 n )
-	{
+	F2 operator + ( const F2& b ) const { return F2( x+b.x, y+b.y ); }
+	F2 operator - ( const F2& b ) const { return F2( x-b.x, y-b.y ); }
+	float operator * ( const F2& b ) const { return x*b.x+y*b.y; }
+	F2 operator & ( const F2& b ) const { return F2( x*b.x, y*b.y ); }
+	F2 operator / ( const F2& b ) const { return F2( x/b.x, y/b.y ); }
+	F2& add( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] += b;
 
 		return *this;
 	}
-	F2& sub( F2 b, U4 n )
-	{
+	F2& sub( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] -= b;
 
 		return *this;
 	}
-	F2& mul( F2 b, U4 n )
-	{
+	F2& mul( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] &= b;
 
 		return *this;
 	}
-	F2& div( F2 b, U4 n )
-	{
+	F2& div( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] /= b;
 
 		return *this;
 	}
 
-	F2 left()
-	{
-		return F2(-y,x);
-	}
-	F2 right()
-	{
-		return F2(y,-x);
-	}
-	F2 SCRlft()
-	{
-		return right();
-	}
-	F2 SCRrig()
-	{
-		return left();
-	}
+	F2 left() { return F2(-y,x); }
+	F2 right() { return F2(y,-x); }
+	F2 SCRlft() { return right(); }
+	F2 SCRrig() { return left(); }
 };
 
 class F4 {
@@ -4577,6 +4496,9 @@ public:
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
+	F4& sXYZW( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
+	F4& swpXYZ0( const void* pV );
+
 	F4 sqrt() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z),sqrtf(w)); }
     F4 sqrt_xyz0() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z)); }
     double sum( void ) const		{ return x+y+z+w; }
@@ -4584,12 +4506,12 @@ public:
     double qlen( void ) const		{ return x*x+y*y+z*z+w*w; }
     double qlen_xyz( void ) const	{ return x*x+y*y+z*z; }
 
-    F4 N3( void ) const {
+    F4 N3( void ) const { /// NORMALIZE
         float l = sqrtf(qlen_xyz());
 		return F4( x/l, y/l, z/l );
 	}
 	float dot_xyz( F4 b ) const { return x*b.x + y*b.y + z*b.z; }
-    F4 X3( F4 b ) const {
+    F4 X3( F4 b ) const {	/// CROSS PRODUCT
 		return F4(
 						y * b.z - z * b.y,
 						z * b.x - x * b.z,
@@ -5295,57 +5217,45 @@ class D4 {
 public:
     double x,y,z,w;
     D4(){};
-    D4( I4 _x, I4 _y, I4 _z, I4 _w )
-    {
+    D4( I4 _x, I4 _y, I4 _z, I4 _w ) {
         x = _x; y = _y; z = _z; w = _w;
     }
-    D4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 )
-    {
+    D4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 ) {
         x = _x; y = _y; z = _z; w = _w;
     }
-    D4( double* pD )
-    {
+    D4( double* pD ) {
         gpmMcpyOF( this, pD, 1 );
     }
-    double sum( void ) const
-    {
+    double sum( void ) const {
         return x+y+z+w;
     }
-    double sum_xyz( void ) const
-    {
+    double sum_xyz( void ) const {
         return x+y+z;
     }
-    double qlen( void ) const
-    {
+    double qlen( void ) const {
         return x*x+y*y+z*z+w*w;
     }
-    double qlen_xyz( void ) const
-    {
+    double qlen_xyz( void ) const {
         return x*x+y*y+z*z;
     }
-    D4 N3( void ) const
-	{
+    D4 N3( void ) const {
         double l = sqrt(qlen_xyz());
 		return D4( x/l, y/l, z/l );
 	}
-	double dot_xyz( D4 b ) const
-	{
+	double dot_xyz( D4 b ) const {
         return x*b.x + y*b.y + z*b.z;
 	}
-    D4 X3( D4 b ) const
-	{
+    D4 X3( D4 b ) const {
 		return D4(
 						y * b.z - z * b.y,
 						z * b.x - x * b.z,
 						x * b.y - y * b.x
 				);
 	}
-	D4 operator + ( const D4& b ) const
-	{
+	D4 operator + ( const D4& b ) const {
         return D4( x+b.x, y+b.y, z+b.z, w+b.w );
 	}
-	D4 operator - ( const D4& b ) const
-	{
+	D4 operator - ( const D4& b ) const {
         return D4( x-b.x, y-b.y, z-b.z, w-b.w );
 	}
 };
@@ -5656,7 +5566,17 @@ public:
 
 	~gpcLZY() { gpmFREE( p_alloc ); }
 	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
+	U8 nSUM(){
+		U8 sum = nLD();
+		if( !sum )
+			return 0;
 
+		sum = sum*sum/2;
+		for( U8 i = 0, e = nLD(); i < e; i++ ){
+			sum += p_alloc[i];
+		}
+		return sum;
+	}
 
 	U1x4& typ() { return *(U1x4*)&type; }
 	U4x4* pMAP( U4 nX, U4 nLIM, size_t nBYTE ) {
@@ -6375,12 +6295,13 @@ public:
 		str.lzyRST();
 		ix.lzyRST();
 	}
-	U4 dctFND( U1* pS, U8 nS, U4& nIX ) {
+	U4 dctFND( void* p, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;
 			return 0;
 		}
+		U1* pS = (U1*)p;
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;

@@ -199,6 +199,7 @@ gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i ) {
 	pSRC = pS;
 	pWIN = pW;
 	pMASS = pWIN ? pWIN->piMASS : NULL;
+	pWgl = pWIN ? pWIN->pGL : NULL;
 	pA = (I8*)aA;
 	pD = (I8*)(aA+8);
 	pA[7] = iSTK = nDAT = i;

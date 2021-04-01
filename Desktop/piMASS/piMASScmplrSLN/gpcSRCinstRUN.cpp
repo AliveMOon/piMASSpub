@@ -23,6 +23,15 @@ gpINST& gpINST::instDBG( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 
 	switch( op )
 	{
+		case gpeOPid_CMP:
+			pB += sprintf( pB, "cmp" );
+			break;
+		case gpeOPid_SEQ:
+			pB += sprintf( pB, "seq" );
+			break;
+		case gpeOPid_SNE:
+			pB += sprintf( pB, "sne" );
+			break;
 		case gpeOPid_SWAP:
 			pB += sprintf( pB, "swap" );
 			break;

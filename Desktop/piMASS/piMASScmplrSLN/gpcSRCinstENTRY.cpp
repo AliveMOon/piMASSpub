@@ -83,7 +83,7 @@ gpBLK* gpcSRC::srcBLKanDalf( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZ
 	/// + a0.b
 	/// * a0.b
 
-	gpROW* pRl = pBLK->pLSTrow();
+	gpROW* pRl = pBLK->pLASTrow();
 	if( !pRl )
 		return pBLK;
 

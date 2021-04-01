@@ -21,7 +21,7 @@ gpBLK* gpcSRC::srcBLKmul( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 		//if( !pBLK )
 		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 
-		gpROW* pRl = pBLK->pLSTrow();
+		gpROW* pRl = pBLK->pLASTrow();
 		if( !pRl )
 			return pBLK;
 
@@ -43,7 +43,7 @@ gpBLK* gpcSRC::srcBLKmul( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 					gpBLK	*pBLKm = srcINSTanDalf( pS, NULL, pBLK );
 					if( pBLKm->opIDgrp() == gpeOPid_mul )
 					{
-						pRl = pBLKm->pLSTrow();
+						pRl = pBLKm->pLASTrow();
 						pRl->pstOP = opID;
 						pBLKm->pNEWrow();
 						return pBLKm;

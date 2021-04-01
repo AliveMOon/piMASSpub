@@ -107,9 +107,9 @@ static const GLenum gpaDRWmod[] = {
 			GL_LINES,
 			GL_LINE_STRIP,
 		};
+class gpc3Dlst;
 
-class gpcGL
-{
+class gpcGL {
 public:
 	GLint	oPrgID,
 			ATvxID, ATuvID,
@@ -152,9 +152,13 @@ public:
 
 				aIXn[0x10],
 				nBUFF, nV;
+
 	U4x2 aVXn[0x10];
 	F4* pV;
 
+	gpc3Dlst* p3Dlst;
+
+	I4 iLWO( gpeALF a, const char* pPATH, gpcLZY& rd );
 	gpcGL* GLSLset( const gpcALU& alu, const char* pF = NULL, const char* pV = NULL );
 	gpcGL* GLSLset( const I8x2& an, const char* pF = NULL, const char* pV = NULL  );
 	~gpcGL()
@@ -216,10 +220,6 @@ public:
 		glClearColor( ms*0.13, 0.0f, ms*0.3, 0.0f );
 		glClearDepth(1.0);
 		glClear( b );
-
-		//glEnable(GL_TEXTURE_2D);
-		//SDL_SetRenderTarget( pRNDR, pTRG );
-		//char* pERR = (char*)SDL_GetError();
 
 		return this;
 	}

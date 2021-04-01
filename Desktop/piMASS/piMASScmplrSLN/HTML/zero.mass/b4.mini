@@ -35,7 +35,7 @@
                 cUV = aCNL[0].xy/tgPX,
 		crs = abs(fUV-cUV)*tgPX;
 
-      gl_FragColor = texture2D( tex0, fUV )
+      gl_FragColor = texture2D( tex2, fUV )
                    + texture2D( tex1, fUV );
       vec2 d = dis(fUV,aCNL[0].xy);
       float r = length(d), rr = abs(r-30);
@@ -67,6 +67,6 @@
  }
 
  ",
-  0x2940 t= 179768,
-  0x2960 ms= 179768,
+  0x2940 t= 77952,
+  0x2960 ms= 77952,
   0x2990 again= 0x03e8,

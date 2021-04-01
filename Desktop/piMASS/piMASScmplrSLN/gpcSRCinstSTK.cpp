@@ -32,6 +32,8 @@ gpBLK* gpcSRC::srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 					pBLKm = srcINSTmov( pS, pBLKm, pBLK );
 					break;
 				case gpeOPid_add:
+					pBLKm = srcINSTadd( pS, pBLKm, pBLK );
+					break;
 				case gpeOPid_sub:
 					pBLKm = srcINSTadd( pS, pBLKm, pBLK );
 					break;
@@ -52,7 +54,7 @@ gpBLK* gpcSRC::srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 
 		}
 
-		gpROW	*pRl = pBLK->pLSTrow();
+		gpROW	*pRl = pBLK->pLASTrow();
 		if( !pRl )
 			return pBLK;
 

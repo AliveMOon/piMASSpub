@@ -674,7 +674,7 @@ int main( int nA, char *apA[] )
 		U8 s;
 		if(bSTDcout){std::cout << "Load:"<< gpsMASSpath <<std::endl;};
 		if( gpfACE(gpsMASSpath, 4) > -1 )
-			gpMASS.lzyRD( gpsMASSpath, s = -1, -1 );
+			gpMASS.lzyRD( gpsMASSpath, s = -1 );
 
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 		if( piMASS )

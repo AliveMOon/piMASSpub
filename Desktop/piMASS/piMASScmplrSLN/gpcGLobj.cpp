@@ -1,0 +1,528 @@
+#include "gpccrs.h"
+#include "gpsGLSL.h"
+typedef enum LWO_ID:U4
+{
+	LWO_ID_FORM	= MAKE_ID('F','O','R','M'),
+	LWO_ID_LWO2	= MAKE_ID('L','W','O','2'),
+
+	/**  PRIMARY CHUNK ID  **/
+	LWO_ID_LAYR	= MAKE_ID('L','A','Y','R'),
+	LWO_ID_PNTS	= MAKE_ID('P','N','T','S'),
+	LWO_ID_VMAP	= MAKE_ID('V','M','A','P'),
+
+	LWO_ID_VMAD	= MAKE_ID('V','M','A','D'),
+
+	LWO_ID_POLS	= MAKE_ID('P','O','L','S'),
+	LWO_ID_TAGS	= MAKE_ID('T','A','G','S'),
+	LWO_ID_PTAG	= MAKE_ID('P','T','A','G'),
+	LWO_ID_ENVL	= MAKE_ID('E','N','V','L'),
+	LWO_ID_CLIP	= MAKE_ID('C','L','I','P'),
+	LWO_ID_SURF	= MAKE_ID('S','U','R','F'),
+	LWO_ID_BBOX	= MAKE_ID('B','B','O','X'),
+	LWO_ID_DESC	= MAKE_ID('D','E','S','C'),
+	LWO_ID_TEXT	= MAKE_ID('T','E','X','T'),
+	LWO_ID_ICON	= MAKE_ID('I','C','O','N'),
+
+	/**  POLS TYPE  **/
+	LWO_ID_FACE	= MAKE_ID('F','A','C','E'),
+	LWO_ID_CRVS	= MAKE_ID('C','U','R','V'),
+	LWO_ID_PCHS	= MAKE_ID('P','T','C','H'),
+	LWO_ID_MBAL	= MAKE_ID('M','B','A','L'),
+	LWO_ID_BONE	= MAKE_ID('B','O','N','E'),
+
+	/**  PTAG TYPE  **/
+//	LWO_ID_SURF	= MAKE_ID('S','U','R','F'),
+	LWO_ID_BNID	= MAKE_ID('B','N','I','D'),
+	LWO_ID_SGMP	= MAKE_ID('S','G','M','P'),
+	LWO_ID_PART	= MAKE_ID('P','A','R','T'),
+
+	/**  IMAGE SUB-CHUNK ID  */
+	LWO_ID_STIL	= MAKE_ID('S','T','I','L'),
+	LWO_ID_ISEQ	= MAKE_ID('I','S','E','Q'),
+	LWO_ID_ANIM	= MAKE_ID('A','N','I','M'),
+	LWO_ID_XREF	= MAKE_ID('X','R','E','F'),
+	LWO_ID_STCC	= MAKE_ID('S','T','C','C'),
+	LWO_ID_CONT	= MAKE_ID('C','O','N','T'),
+	LWO_ID_BRIT	= MAKE_ID('B','R','I','T'),
+	LWO_ID_SATR	= MAKE_ID('S','A','T','R'),
+	LWO_ID_HUE	= MAKE_ID('H','U','E',' '),
+	LWO_ID_GAMM	= MAKE_ID('G','A','M','M'),
+	LWO_ID_NEGA	= MAKE_ID('N','E','G','A'),
+	LWO_ID_CROP	= MAKE_ID('C','R','O','P'),
+	LWO_ID_ALPH	= MAKE_ID('A','L','P','H'),
+	LWO_ID_COMP	= MAKE_ID('C','O','M','P'),
+	LWO_ID_IFLT	= MAKE_ID('I','F','L','T'),
+	LWO_ID_PFLT	= MAKE_ID('P','F','L','T'),
+
+	/**  ENVELOPE SUB-CHUNK  **/
+	LWO_ID_PRE	= MAKE_ID('P','R','E',' '),
+	LWO_ID_POST	= MAKE_ID('P','O','S','T'),
+	LWO_ID_KEY	= MAKE_ID('K','E','Y',' '),
+	LWO_ID_SPAN	= MAKE_ID('S','P','A','N'),
+	LWO_ID_CHAN	= MAKE_ID('C','H','A','N'),
+
+	/**  SURFACE SUB-CHUNK ID  */
+	LWO_ID_COLR	= MAKE_ID('C','O','L','R'),
+	LWO_ID_DIFF	= MAKE_ID('D','I','F','F'),
+	LWO_ID_LUMI	= MAKE_ID('L','U','M','I'),
+	LWO_ID_SPEC	= MAKE_ID('S','P','E','C'),
+	LWO_ID_REFL	= MAKE_ID('R','E','F','L'),
+	LWO_ID_TRAN	= MAKE_ID('T','R','A','N'),
+	LWO_ID_TRNL	= MAKE_ID('T','R','N','L'),
+	LWO_ID_GLOS	= MAKE_ID('G','L','O','S'),
+	LWO_ID_SHRP	= MAKE_ID('S','H','R','P'),
+	LWO_ID_BUMP	= MAKE_ID('B','U','M','P'),
+	LWO_ID_SIDE	= MAKE_ID('S','I','D','E'),
+	LWO_ID_SMAN	= MAKE_ID('S','M','A','N'),
+	LWO_ID_RFOP	= MAKE_ID('R','F','O','P'),
+	LWO_ID_RIMG	= MAKE_ID('R','I','M','G'),
+	LWO_ID_RSAN	= MAKE_ID('R','S','A','N'),
+	LWO_ID_RIND	= MAKE_ID('R','I','N','D'),
+	LWO_ID_CLRH	= MAKE_ID('C','L','R','H'),
+	LWO_ID_TROP	= MAKE_ID('T','R','O','P'),
+	LWO_ID_TIMG	= MAKE_ID('T','I','M','G'),
+	LWO_ID_CLRF	= MAKE_ID('C','L','R','F'),
+	LWO_ID_ADTR	= MAKE_ID('A','D','T','R'),
+	LWO_ID_GLOW	= MAKE_ID('G','L','O','W'),
+	LWO_ID_LINE	= MAKE_ID('L','I','N','E'),
+	//LWO_ID_ALPH	= MAKE_ID('A','L','P','H'),
+	LWO_ID_AVAL	= MAKE_ID('A','V','A','L'),
+	LWO_ID_GVAL	= MAKE_ID('G','V','A','L'),
+	LWO_ID_BLOK	= MAKE_ID('B','L','O','K'),
+	LWO_ID_LCOL	= MAKE_ID('L','C','O','L'),
+	LWO_ID_LSIZ	= MAKE_ID('L','S','I','Z'),
+	LWO_ID_CMNT	= MAKE_ID('C','M','N','T'),
+
+	/**  TEXTURE LAYER  **/
+	//LWO_ID_CHAN	= MAKE_ID('C','H','A','N'),
+	LWO_ID_TYPE	= MAKE_ID('T','Y','P','E'),
+	LWO_ID_NAME	= MAKE_ID('N','A','M','E'),
+	LWO_ID_ENAB	= MAKE_ID('E','N','A','B'),
+	LWO_ID_OPAC	= MAKE_ID('O','P','A','C'),
+	LWO_ID_FLAG	= MAKE_ID('F','L','A','G'),
+	LWO_ID_PROJ	= MAKE_ID('P','R','O','J'),
+	LWO_ID_STCK	= MAKE_ID('S','T','C','K'),
+	LWO_ID_TAMP	= MAKE_ID('T','A','M','P'),
+
+	/**  TEXTURE MAPPING  **/
+	LWO_ID_TMAP	= MAKE_ID('T','M','A','P'),
+	LWO_ID_AXIS	= MAKE_ID('A','X','I','S'),
+	LWO_ID_CNTR	= MAKE_ID('C','N','T','R'),
+	LWO_ID_SIZE	= MAKE_ID('S','I','Z','E'),
+	LWO_ID_ROTA	= MAKE_ID('R','O','T','A'),
+	LWO_ID_OREF	= MAKE_ID('O','R','E','F'),
+	LWO_ID_FALL	= MAKE_ID('F','A','L','L'),
+	LWO_ID_CSYS	= MAKE_ID('C','S','Y','S'),
+
+	/**  IMAGE MAP  **/
+	LWO_ID_IMAP	= MAKE_ID('I','M','A','P'),
+	LWO_ID_IMAG	= MAKE_ID('I','M','A','G'),
+	LWO_ID_WRAP	= MAKE_ID('W','R','A','P'),
+	LWO_ID_WRPW	= MAKE_ID('W','R','P','W'),
+	LWO_ID_WRPH	= MAKE_ID('W','R','P','H'),
+//	LWO_ID_VMAP	= MAKE_ID('V','M','A','P'),
+	LWO_ID_AAST	= MAKE_ID('A','A','S','T'),
+	LWO_ID_PIXB	= MAKE_ID('P','I','X','B'),
+
+	/**  PROCUDUAL TEXTURE  **/
+	LWO_ID_PROC	= MAKE_ID('P','R','O','C'),
+//	LWO_ID_COLR	= MAKE_ID('C','O','L','R'),
+	LWO_ID_VALU	= MAKE_ID('V','A','L','U'),
+	LWO_ID_FUNC	= MAKE_ID('F','U','N','C'),
+	LWO_ID_FTPS	= MAKE_ID('F','T','P','S'),
+	LWO_ID_ITPS	= MAKE_ID('I','T','P','S'),
+	LWO_ID_ETPS	= MAKE_ID('E','T','P','S'),
+
+	/**  GRADIENT **/
+	LWO_ID_GRAD	= MAKE_ID('G','R','A','D'),
+	LWO_ID_GRST	= MAKE_ID('G','R','S','T'),
+	LWO_ID_GREN	= MAKE_ID('G','R','E','N'),
+
+	/**  SHADER PLUGIN  */
+	LWO_ID_SHDR	= MAKE_ID('S','H','D','R'),
+	LWO_ID_DATA	= MAKE_ID('D','A','T','A'),
+
+
+	/**  VMAP TYPE  **/
+	LWO_ID_MNVW	= MAKE_ID('M','N','V','W'),
+	LWO_ID_MORF	= MAKE_ID('M','O','R','F'),
+	LWO_ID_TXUV	= MAKE_ID('T','X','U','V'),
+	LWO_ID_WGHT	= MAKE_ID('W','G','H','T'),
+	/**  saját id-k **/
+	LWO_ID_LIGHT	= MAKE_ID('l','i','g','h'),
+	LWO_ID_COLOR	= MAKE_ID('c','o','l','o'),
+};
+char gp_man_lws[] =
+	"manus\n"
+	"bone_mother\n"
+	"bone_groin\n"
+	"bone_waist\n"
+	"bone_throax\n"
+
+	"bone_l.upperarm\n"
+	"bone_l.forearm\n"
+	"bone_l.hand\n"
+
+	"bone_r.upperarm\n"
+	"bone_r.forearm\n"
+	"bone_r.hand\n"
+
+	"bone_l.thigh\n"
+	"bone_l.shin\n"
+	"bone_l.feet\n"
+
+	"bone_r.thigh\n"
+	"bone_r.shin\n"
+	"bone_r.feet\n"
+
+	"bone_neck\n"
+	"bone_head\n\0"
+;
+class gpc3Dblnd {
+public:
+	U1x4 ix;
+	F4	 wg;
+	gpc3Dblnd(){};
+	gpc3Dblnd& BLset( U1 x, float w ) {
+		if( this ? w == 0.0 : true )
+			return *this;
+		U1 u; float f;
+		for( U4 i = 0; i < 4; i++ ) {
+			if( wg.aXYZW[i] >= w )
+				continue;
+			u = ix.aXYZW[i];
+			f = wg.aXYZW[i];
+			wg.aXYZW[i] = w;
+			ix.aXYZW[i] = x;
+			if( f == 0.0 )
+				break;
+			w = f;
+			x = u;
+		}
+
+		return *this;
+	}
+};
+class gpc3Dly {
+public:
+	char	sNAME[0x100];
+	I4x4	id;
+	gpcLZY	pnt, blnd, tx,
+			fcLST, fcIX, fcSUM,
+			bon;
+	gpcLZYdct mapLSTmn,mapLSTwg,mapLSTtx,mapLSTmr;
+	F4 piv, bbox[2];
+	gpc3Dly(){
+		gpmCLR;
+	}
+};
+class gpc3D {
+public:
+	char sPATH[gpdMAX_PATH];
+	I8x4 id;
+	gpcLZY	*p_lwo,
+			ly3D,
+			tgIX;
+
+	~gpc3D(){
+		gpmDEL(p_lwo);
+	}
+	gpc3D( I4 i, const char* pP, gpeALF alf ) {
+		gpmCLR;
+		U8 nLEN;
+		id.x = i;
+		id.a8x2[0].b = alf;
+		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
+		gpmSTRCPY( sPATH, pP );
+	}
+	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
+};
+class gpc3Dlst {
+public:
+	gpcLZY lst3D;
+	gpcLZYdct bonLST;
+
+	~gpc3Dlst(){
+		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
+		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			gpmDEL( pp3D[i3D] );
+		}
+	}
+	gpc3Dlst(){
+		gpmCLR;
+		U8 nLEN;
+		char* pS = gp_man_lws, *pSe;
+		while( *pS ) {
+			pSe = pS+gpmVAN( pS, "\r\n", nLEN );
+			bonLST.dctADD( pS, pSe-pS );
+			pS = pSe+gpmNINCS(pSe, "\r\n" );
+		}
+	}
+	gpc3D* p3D( I4 i ) { return ((gpc3D**)lst3D.Ux( i, sizeof(gpc3D*) ))[0]; }
+	gpc3D* p3D(  gpeALF alf, const char* pP ) {
+		if( !this )
+			return NULL;
+
+		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
+		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			if( !pp3D[i3D] ) {
+				if( e3D > i3D )
+					e3D = i3D;
+				continue;
+			}
+			if( pp3D[i3D]->id.a8x2[0].a != alf )
+				continue;
+			return pp3D[i3D];
+		}
+		pp3D = (gpc3D**)lst3D.Ux( e3D, sizeof(gpc3D*) );
+		return (*pp3D) = new gpc3D( e3D, pP, alf );
+	}
+};
+
+F4& F4::swpXYZ0( const void* pV ) {
+	((U1x4*)&x)->wzyx(pV,3);
+	return *this;
+}
+F4& F4::sXYZW( const char* p_str, char** pp_str ) {
+	U8 nLEN;
+	gpmCLR;
+	const char* pPAT = "+-0123456789.,";
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	x = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	y = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	z = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	w = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+	if( !pp_str )
+		return *this;
+	(*pp_str) = (char*)p_str;
+	return *this;
+}
+
+gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
+	if( !this )
+		return NULL;
+	U8 s;
+	if( !lwo.nLD() )
+		return this;
+	U4* pU4 = (U4*)lwo.p_alloc, *pU4i = pU4;
+	if( *pU4i != LWO_ID_FORM )
+		return this;
+	pU4i++;
+	U4 n = swp4(pU4i), chunk;
+	pU4i++;
+	if( *pU4i != LWO_ID_LWO2 )
+		return this;
+	pU4i++;
+	I8 i8w = lwo.nSUM();
+	if( id.w == i8w )
+		return this;
+	char	*pU0 = (char*)lwo.p_alloc,
+			*pUnx = (char*)pU4i,
+			*pUe = pUnx+n,
+			*pUi;
+	gpc3Dly* pLY = NULL;
+	while( pUnx < pUe ){
+		pU4i = (U4*)pUnx;
+		chunk = *pU4i; pU4i++;
+		n = swp4(pU4i); pU4i++;
+
+
+		pUi = (char*)pU4i;
+		pUnx = pUi+n;
+		switch( chunk ) {
+			case LWO_ID_TAGS: {
+					I4x2* pTG;
+					while( pUi < pUnx ) {
+						pTG = (I4x2*)tgIX.Ux( tgIX.nLD(sizeof(I4x2)), sizeof(I4x2) );
+						pTG->x = pUi-pU0;
+						pTG->y = gpmSTRLEN(pUi);
+						pUi += gpmPAD( pTG->y+1,2 );
+					}
+				} break;
+			case LWO_ID_LAYR: {
+					if( pLY ) {
+
+					}
+					pLY = (gpc3Dly*)ly3D.Ux( ly3D.nLD(sizeof(gpc3Dly)), sizeof(gpc3Dly) );
+					pLY->id.w = swp4( pU4i ); pU4i++;
+					pLY->id.x = pLY->id.w&0xffff;	// momID
+					pLY->id.y = pLY->id.w>>16;		// layID
+
+
+					pLY->piv.swpXYZ0( pU4i ); pU4i+=3;
+					pUi = (char*)pU4i;
+					if( pUi < pUnx )
+						gpmSTRCPY( pLY->sNAME, pUi );
+				} break;
+			case LWO_ID_PNTS: {
+					U4 nP = (pUnx-pUi)/(sizeof(float)*3);
+					F4* pP0 = ((F4*)pLY->pnt.Ux( nP, sizeof(F4) ))-nP;
+					for( U4 i = 0; i < nP; i++ )
+						pP0[i].swpXYZ0( pU4i + i*3 );
+				} break;
+			case LWO_ID_BBOX: {
+					pLY->bbox[0].swpXYZ0( pU4i ); pU4i+=3;
+					pLY->bbox[1].swpXYZ0( pU4i ); pU4i+=3;
+				} break;
+			case LWO_ID_POLS: {
+					pUi += 4;
+					switch( *pU4i ) {
+						case LWO_ID_FACE: {
+								U4x2* pFl;
+								U4 *pFs,*pFi;
+								while( pUi < pUnx ) {
+									pFl = (U4x2*)pLY->fcLST.Ux( pLY->fcLST.nLD(sizeof(*pFl)), sizeof(*pFl) );
+									pFl->x = pLY->fcIX.nLD(sizeof(U4));
+									pFl->y = swp2(pUi)&0x03ff; pUi+=2;
+
+									pFs = (U4*)pLY->fcSUM.Ux( pFl->y, sizeof(*pFs) );
+									(*pFs)++;
+
+									pFi = (U4*)pLY->fcIX.Ux( pFl->sum(), sizeof(*pFi) ) - pFl->y;
+									for( U4 i = 0; i < pFl->y; i++ ) {
+										if( *pUi&0x80 ) {
+											pFi[i] = swp4( pUi )&0x7FFFffff; pUi+= 4;
+										} else {
+											pFi[i] = swp2( pUi ); pUi+= 2;
+										}
+									}
+								}
+								std::cout << std::endl;
+								pFs = (U4*)pLY->fcSUM.Ux( 0, sizeof(*pFs) );
+								for( U4 i = 0, e = pLY->fcSUM.nLD(sizeof(*pFs)); i < e; i++ ) {
+									if( !pFs[i] )
+										continue;
+									if(bSTDcout){ std::cout << i << " " << pFs[i] << std::endl; }
+
+								}
+
+							} break;
+						default: break;
+					}
+
+				} break;
+			case LWO_ID_VMAP: {
+					pUi += 4;
+					U2 d = swp2(pUi); pUi += 2;
+					U4 ix = 0, nUi, iBn, iBx, ip, uf;
+					switch( *pU4i ) {
+						case LWO_ID_MNVW: {
+							} break;
+						case LWO_ID_WGHT: {
+								gpc3Dblnd* pBl;
+								ix = pLY->mapLSTwg.nIX();
+								nUi = gpmSTRLEN(pUi);
+								pLY->mapLSTwg.dctADD( pUi, nUi );
+								iBx = dctBN.dctFND( pUi, nUi, iBn );
+								if( iBx >= iBn )
+									break;
+								pUi += gpmPAD( nUi+1,2 );
+								if( ix >= pLY->mapLSTwg.nIX() )
+									break;
+								while( pUi < pUnx ) {
+									if( *pUi&0x80 ) {
+										ip = swp4( pUi )&0x7FFFffff; pUi+= 4;
+									} else {
+										ip = swp2( pUi ); pUi+= 2;
+									}
+									pBl = (gpc3Dblnd*)pLY->fcLST.Ux( ip, sizeof(*pBl) );
+									uf = swp4( pUi );
+									pBl->BLset( iBx, *(float*)&uf ); pUi+= 4;
+								}
+							} break;
+						case LWO_ID_TXUV: {
+								ix = pLY->mapLSTtx.nIX();
+								nUi = gpmSTRLEN(pUi);
+								pLY->mapLSTtx.dctADD( pUi, nUi );
+								pUi += gpmPAD( nUi+1,2 );
+								if( ix >= pLY->mapLSTtx.nIX() )
+									break;
+
+							} break;
+						case LWO_ID_MORF: {
+								ix = pLY->mapLSTmr.nIX();
+								nUi = gpmSTRLEN(pUi);
+								pLY->mapLSTmr.dctADD( pUi, nUi );
+								pUi += gpmPAD( nUi+1,2 );
+								if( ix >= pLY->mapLSTmr.nIX() )
+									break;
+
+							} break;
+						default: break;
+					}
+				} break;
+			case LWO_ID_VMAD: {
+					pUi += 4;
+					U2 d = swp2(pUi); pUi += 2;
+					switch( *pU4i ) {
+						case LWO_ID_MNVW: {
+							} break;
+						case LWO_ID_WGHT: {
+							} break;
+						case LWO_ID_TXUV: {
+							} break;
+						case LWO_ID_MORF: {
+							} break;
+						default: break;
+					}
+				} break;
+			case LWO_ID_CLIP: {
+					pUi += 4;
+					if( pU4i[1] != LWO_ID_STIL )
+						break;
+
+				} break;
+			case LWO_ID_SURF: {
+					pUi += 4;
+
+				} break;
+			case LWO_ID_PTAG: {
+					pUi += 4;
+
+				} break;
+			default: break;
+		}
+
+	}
+
+
+
+	if( p_lwo ){
+		// RESET
+
+	}
+	p_lwo = p_lwo->lzyADD( lwo.p_alloc, lwo.nLD(), s=0 );
+	id.w = i8w;
+
+
+
+
+	return this;
+}
+I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
+	if( !this )
+		return -1;
+	I4 id = -1;
+
+	if( !p3Dlst )
+		p3Dlst = new gpc3Dlst;
+
+	gpc3D* p3D = p3Dlst->p3D( a, pPATH )->pLWO(rd, p3Dlst->bonLST );
+	return id;
+}
