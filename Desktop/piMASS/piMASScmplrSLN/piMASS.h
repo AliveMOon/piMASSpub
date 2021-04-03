@@ -4387,6 +4387,8 @@ public:
     F2& operator %= ( const F2& xy ) { x = frac(x/xy.x); y = frac(y/xy.y); return *this; }
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
+	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
+	F2& swpXY( const void* pV );
 
     double sum( void ) const { return x+y; }
     double qlen( void ) const { return x*x+y*y; }
@@ -4459,6 +4461,10 @@ public:
 		};
 		struct
 		{
+			U4 uXYZW[4];
+		};
+		struct
+		{
 			F2	aF2[2];
 		};
 	};
@@ -4518,6 +4524,7 @@ public:
 						x * b.y - y * b.x
 				);
 	}
+	F4 xyz1() const { return F4(x,y,z,1.0);}
 
 	F4  cos() const { return F4(  cosf(x), cosf(y), cosf(z), cosf(w)); };
 	F4  sin() const { return F4(  sinf(x), sinf(y), sinf(z), sinf(w)); };
