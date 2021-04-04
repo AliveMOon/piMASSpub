@@ -314,14 +314,14 @@ public:
 	char	sNAME[0x100];
 	I4x4	id;
 	gpcLZY	pnt, blnd, tx,
-			fcLST, fcIX, fcSUM, srSUM,
+			fcLST, fcIX, fcSUM, srSUM, prSUM,
 			bon;
 	gpcLZYdct	mapDCTmn;
 	gpcLZYdct	mapDCTwg; gpcLZY mapIXwg, mapBLwg;
 	gpcLZYdct	mapDCTtx; gpcLZY mapIXtx, mapF2tx, MAP;
 	gpcLZYdct	mapDCTmr; gpcLZY mapIXmr, mapBLmr;
 	gpcLZYdct	mapDCTsr;
-	gpcLZYdct	mapDCTpt;
+	gpcLZYdct	mapDCTpt; gpcLZY mapIXprt;
 
 	F4 piv, bbox[2];
 	gpc3Dly(){
@@ -475,6 +475,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 			*pUi;
 	gpc3Dly* pLY = NULL;
 	gpc3Dmap* pMAP = NULL;
+	I4x2* pTG;
 	while( pUnx < pUe ){
 		pU4i = (U4*)pUnx;
 		chunk = *pU4i; pU4i++;
@@ -485,13 +486,14 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 		pUnx = pUi+n;
 		switch( chunk ) {
 			case LWO_ID_TAGS: {
-					I4x2* pTG;
+
 					while( pUi < pUnx ) {
 						pTG = (I4x2*)tgIX.Ux( tgIX.nLD(sizeof(I4x2)), sizeof(I4x2) );
 						pTG->x = pUi-pU0;
 						pTG->y = gpmSTRLEN(pUi);
 						pUi += gpmPAD( pTG->y+1,2 );
 					}
+					pTG = (I4x2*)tgIX.Ux( 0, sizeof(I4x2) );
 				} break;
 			case LWO_ID_LAYR: {
 					if( pLY ) {
@@ -708,13 +710,29 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 									nF++;
 								}
 								for( U4 i = 0, e = pLY->srSUM.nLD(sizeof(U4)); i < e; i++ ){
-									std::cout << i << " " << *(U4*)(pLY->srSUM.Ux(i,sizeof(U4))) << std::endl;
+									std::cout << i << " " << (char*)(pU0+pTG[i].x) << " " << *(U4*)(pLY->srSUM.Ux(i,sizeof(U4))) << std::endl;
 								}
 							} break;
 						case LWO_ID_PART: {
-								break;
+								U4x2* pF, *pPRT;
+								U4 iF, *pFi, nF = 0;
 								while( pUi < pUnx ) {
+									iF = swp2( pUi ); pUi += 2;
+									if( *pUi&0x80 ) {
+										ix = swp4( pUi )&0x7FFFffff; pUi+= 4;
+									} else {
+										ix = swp2( pUi ); pUi+= 2;
+									}
+									(*(U4*)pLY->prSUM.Ux( ix, sizeof(U4) ))++;
 
+									pPRT = (U4x2*)pLY->mapIXprt.Ux( nF, sizeof(U4) );
+									pPRT->y = ix;
+									pPRT->x = nF;
+									nF++;
+								}
+
+								for( U4 i = 0, e = pLY->prSUM.nLD(sizeof(U4)); i < e; i++ ){
+									std::cout << i << " " << (char*)(pU0+pTG[i].x) << " " << *(U4*)(pLY->prSUM.Ux(i,sizeof(U4))) << std::endl;
 								}
 							} break;
 						default: break;
