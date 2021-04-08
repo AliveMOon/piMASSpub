@@ -1827,6 +1827,7 @@ class U4x2 {
 public:
 	union {
 		struct { U4 x,y; };
+		struct { U4 i,n; };
 		struct { gpeALFu4 a4; U4 n4; };
 		struct { U1x4 aCLR[2]; };
 		struct { gpeALF var; };
@@ -2481,6 +2482,7 @@ class I4x2 {
 public:
 	union{
 		struct{ int x,y; };
+		struct{ int i,n; };
 		struct{ div_t qr; };
 		struct{ U8 u8; };
 		struct{	gpeOPtyp	typ;
@@ -2517,7 +2519,6 @@ public:
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
-	// cnt = fract * U42(1, w);
 	I4x2& snail( I4 i ) {
 		if( !i )
 			return null();
@@ -2569,6 +2570,7 @@ public:
 
 		return *this;
 	}
+	// cnt = fract * U42(1, w);
 	I4x2& cnt2fract(U4 w, U8 cnt) {
 		U1 lg = log2(w * w);
 		w = 1<<(lg/2);
@@ -6302,7 +6304,7 @@ public:
 		str.lzyRST();
 		ix.lzyRST();
 	}
-	U4 dctFND( void* p, U8 nS, U4& nIX ) {
+	U4 dctFND( const void* p, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;

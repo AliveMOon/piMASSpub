@@ -210,6 +210,14 @@ public:
 		return this;
 	}
 };
+class gpc3Dsrf {
+public:
+	char sNAME[0x100],
+		 sPIC[0x100],
+		 sVMAP[0x100];
+	I4 imag, imap;
+	gpc3Dsrf(){};
+};
 class gpc3Dvx {
 public:
 	F4 xyzi, up;
@@ -228,56 +236,105 @@ public:
 	}
 	bool good( gpc3Dvx& b, float x = 0.0, float u = 0.0 ) { return !bad(b,x,u); }
 };
+class gpc3Dfc {
+public:
+	U4x2	*pFC;
+	U4		*pIX, iFC;
+	gpcLZY	LST, IX, SUM;
+
+	gpc3Dfc(){}
+	gpc3Dfc* pFACEswp( void* pV, U4 n ) {
+		if(!this)
+			return NULL;
+		U1* pUi = (U1*)pV, *pUe = pUi+n;
+		U4 *pFs;
+		while( pUi < pUe ) {
+			pFC = (U4x2*)LST.Ux( iFC = LST.nLD(sizeof(*pFC)), sizeof(*pFC) );
+			pFC->i = IX.nLD(sizeof(U4));
+			pFC->n = swp2(pUi)&0x03ff; pUi+=2;
+
+			pFs = (U4*)SUM.Ux( pFC->n, sizeof(*pFs) );
+			(*pFs)++;
+
+			pIX = (U4*)IX.Ux( pFC->sum(), sizeof(*pIX) ) - pFC->n;
+			for( U4 i = 0; i < pFC->n; i++ ) {
+				if( *pUi&0x80 ) {
+					pIX[i] = swp4( pUi )&0x7FFFffff; pUi+= 4;
+				} else {
+					pIX[i] = swp2( pUi ); pUi+= 2;
+				}
+			}
+		}
+		return this;
+	}
+	void COUT(){
+		if(!this)
+			return;
+		U4 *pFs = (U4*)SUM.Ux( 0, sizeof(*pFs) );
+		for( U4 i = 0, e = SUM.nLD(sizeof(*pFs)); i < e; i++ ) {
+			if( !pFs[i] )
+				continue;
+			if(bSTDcout){ std::cout << i << " " << pFs[i] << std::endl; }
+		}
+	}
+};
 class gpc3Dmap {
 public:
 	gpcLZY pnt, fcl, fci;
+	U4 id;
 
-	gpc3Dmap(	gpcLZY& p,
-				gpcLZY& fl, gpcLZY& fi,
+	gpc3Dmap(	U4 ix, gpcLZY& p,
+				gpc3Dfc& fc,
 				gpcLZY& b,
 				gpcLZY& t, U4x2 *pIX2,
 				void* p_u, void* p_nx
 			) {
 		U1 *pUi = (U1*)p_u, *pUnx = (U1*)p_nx;
-		fcl = fl;
-		fci = fi;
-		F4* pPs = (F4*)p.p_alloc, v0, v1,v2;
-		F2* pTs = ((F2*)t.p_alloc)+pIX2->x;
-		U4x2 *pF = (U4x2*)fl.p_alloc;
-		U4	nP = p.nLD(sizeof(*pPs)), nF = fl.nLD(sizeof(*pF)),
-			*pFi = (U4*)fi.p_alloc, ip, uf;
+		id = ix;
+		fcl = fc.LST;
+		fci = fc.IX;
+
+		F4	*pPs = (F4*)p.p_alloc, v0, v1,v2;
+		F2	*pTs = ((F2*)t.p_alloc)+pIX2->x;
+		U4x2	*pF = (U4x2*)fc.LST.p_alloc;
+
+		U4	nP = p.nLD(sizeof(*pPs)),
+			nF = fc.LST.nLD(sizeof(*pF)),
+			*pFi = (U4*)fc.IX.p_alloc, ip, uf;
+
 		gpc3Dblnd* pB = (gpc3Dblnd*)b.p_alloc;
-		gpc3Dvx	tmP,
-				*pPd = (gpc3Dvx*)pnt.Ux( nP, sizeof(tmP) )-nP, *pPip;
-		for( U4 i = 0; i < nP; i++ ){
+
+		gpc3Dvx	tmP, *pPd = (gpc3Dvx*)pnt.Ux( nP, sizeof(tmP) )-nP;
+		for( U4 i = 0; i < nP; i++ ) {
 			pPd[i].xyzi = pPs[i];
 			pPd[i].xyzi.uXYZW[3] = pB[i].ix.u4;
 			pPd[i].uv = pTs[i];
 		}
-		for( U4 f = 0, i, ip, x,n; f < nF; f++ ){
-			for( x = pF[f].x, n = pF[f].y, i = 0; i < n; i++ ) {
-				ip = pFi[i+x];
-				v0 = pPd[ip].xyzi;
-				v1 = (pPd[pFi[((i-1+n)%n)+x]].xyzi - v0).N3();
-				v2 = (pPd[pFi[((i+1)%n)+x]].xyzi - v0).N3();
-				pPd[ip].up += v2.X3(v1).N3().xyz1();
-			}
+
+		for( U4 f = 0, i, ip, x,n; f < nF; f++ )
+		for( x = pF[f].x, n = pF[f].y, i = 0; i < n; i++ ) {
+			ip = pFi[i+x];
+			v0 = pPd[ip].xyzi;
+			v1 = (pPd[pFi[((i-1+n)%n)+x]].xyzi - v0).N3();
+			v2 = (pPd[pFi[((i+1  )%n)+x]].xyzi - v0).N3();
+			pPd[ip].up += v2.X3(v1).N3().xyz1();
 		}
-		for( U4 p = 0; p < nP; p++ ) {
+
+		for( U4 p = 0; p < nP; p++ )
 			pPd[p].up = pPd[p].up.N3();
-		}
 
 		while( pUi < pUnx ) {
 			if( *pUi&0x80 ) {
-				ip = swp4( pUi )&0x7FFFffff; pUi+= 4;
+				ip = swp4( pUi )&0x7FFFffff; pUi+=4;
 			} else {
-				ip = swp2( pUi ); pUi+= 2;
+				ip = swp2( pUi ); pUi+=2;
 			}
 			if( *pUi&0x80 ) {
-				uf = swp4( pUi )&0x7FFFffff; pUi+= 4;
+				uf = swp4( pUi )&0x7FFFffff; pUi+=4;
 			} else {
-				uf = swp2( pUi ); pUi+= 2;
+				uf = swp2( pUi ); pUi+=2;
 			}
+
 			pF = (U4x2*)fcl.Ux( uf, sizeof(*pF) );
 			pFi = (U4*)fci.Ux( pF->sum()+pIX2->x, sizeof(*pFi) ) - pF->y;
 			for( U4 i = 0, t, te; i < pF->y; i++ ) {
@@ -293,15 +350,12 @@ public:
 
 				if( pFi[i] == t )
 					break;
+
 				pFi[i] = t;
 				if( t < te )
 					break;
 
-
-				pPip = (gpc3Dvx*)pnt.Ux( te, sizeof(*pPd) );
-				*pPip = tmP;
-
-
+				*(gpc3Dvx*)pnt.Ux( te, sizeof(*pPd) ) = tmP;
 				break;
 			}
 		}
@@ -313,14 +367,14 @@ class gpc3Dly {
 public:
 	char	sNAME[0x100];
 	I4x4	id;
-	gpcLZY	pnt, blnd, tx,
-			fcLST, fcIX, fcSUM, srSUM, prSUM,
+	gpcLZY	pnt, blnd, tx, MAP,
+			srSUM, prSUM,
 			bon;
-
+	gpc3Dfc fc;
 
 	gpcLZYdct	mapDCTmn;
 	gpcLZYdct	mapDCTwg; gpcLZY mapIXwg, mapBLwg;
-	gpcLZYdct	mapDCTtx; gpcLZY mapIXtx, mapF2tx, MAP;
+	gpcLZYdct	mapDCTtx; gpcLZY mapIXtx, mapF2tx;
 	gpcLZYdct	mapDCTmr; gpcLZY mapIXmr, mapBLmr;
 	gpcLZYdct	mapDCTsr; gpcLZY mapIXsr;
 	gpcLZYdct	mapDCTpt; gpcLZY mapIXprt;
@@ -330,6 +384,179 @@ public:
 	gpc3Dly(){
 		gpmCLR;
 	}
+	gpc3Dly* pLY( gpcLZY& ly3D, U4* pU4i ) {
+		if( !this ){
+			gpc3Dly* pTHIS = (gpc3Dly*)ly3D.Ux( ly3D.nLD(sizeof(gpc3Dly)), sizeof(gpc3Dly) );
+			if( !pTHIS )
+				return NULL;
+
+			return pTHIS->pLY( ly3D, pU4i );
+		}
+
+		id.w = swp4( pU4i ); pU4i++;
+		id.x = id.w&0xffff;		// momID
+		id.y = id.w>>16;		// layID
+
+
+		piv.swpXYZ0( pU4i ); pU4i+=3;
+		gpmSTRCPY( sNAME, pU4i );
+		return this;
+	}
+	F4* pPNTSswp( const void* pV, U4 n ) {
+		F4* pP0 = ((F4*)pnt.Ux( n, sizeof(*pP0) ))-n;
+		if( !pV )
+			return pP0;
+		float *pF = (float*)pV;
+		for( U4 i = 0; i < n; i++ )
+			pP0[i].swpXYZ0( pF + i*3 );
+		return pP0;
+	}
+	F4* pBBOXswp( const void* pV ) {
+		float *pF = (float*)pV;
+		bbox[0].swpXYZ0( pF ); pF+=3;
+		bbox[1].swpXYZ0( pF );
+	}
+	I4 pWGHTswp( const void* pV, U4 n, gpcLZYdct& dctBN  ) {
+		U4	nUi = gpmSTRLEN(pV), ip, uf,
+			iBn, iBx = dctBN.dctFND( pV, nUi, iBn );
+		if( iBx >= iBn )
+			return -1; /// ha nem csont egyenlőre nem kell
+
+		I4 ix = mapDCTwg.nIX();
+		mapDCTwg.dctADD( pV, nUi );
+
+		if(ix >= mapDCTwg.nIX())
+			return -1;
+
+		char* pUi = ((char*)pV) + gpmPAD( nUi+1,2 ), *pUnx = ((char*)pV)+n;
+		gpc3Dblnd* pBl;
+		U4x2 *pIX2 = (U4x2*)mapIXwg.Ux( ix, sizeof(*pIX2) );
+		pIX2->i = iBx; pIX2->n = 0;
+		while( pUi < pUnx ) {
+			if( *pUi&0x80 ) {
+				ip = swp4( pUi )&0x7FFFffff; pUi+= 4;
+			} else {
+				ip = swp2( pUi ); pUi+= 2;
+			}
+			pBl = (gpc3Dblnd*)mapBLwg.Ux( ip, sizeof(*pBl) );
+			uf = swp4( pUi );
+			if(uf)
+				pIX2->n++;
+			pBl->BLset( iBx, *(float*)&uf ); pUi+= 4;
+		}
+
+		return ix;
+	}
+	I4 pTXUVswp( const void* pV, U4 n ) {
+		F2* pTX;
+		/// megreressük melyik csont a listában
+		I4 ix = mapDCTtx.nIX(), nUi = gpmSTRLEN(pV), ip;
+		mapDCTtx.dctADD( pV, nUi );
+		//pUi += gpmPAD( nUi+1,2 );
+		if( ix >= mapDCTtx.nIX() )
+			return -1;
+
+		char* pUi = ((char*)pV) + gpmPAD( nUi+1,2 ), *pUnx = ((char*)pV)+n;
+		U4x2 *pIX2 = (U4x2*)mapIXtx.Ux( ix, sizeof(*pIX2) );
+		pIX2->x = mapF2tx.nLD(sizeof(*pTX));
+		while( pUi < pUnx ) {
+			if( *pUi&0x80 ) {
+				ip = swp4( pUi )&0x7FFFffff; pUi+= 4;
+			} else {
+				ip = swp2( pUi ); pUi+= 2;
+			}
+			pTX = (F2*)mapF2tx.Ux( ip, sizeof(*pTX) );
+			pTX->swpXY( pUi ); pUi += sizeof(*pTX);
+		}
+		pIX2->y = mapF2tx.nLD(sizeof(*pTX))-pIX2->x;
+		return ix;
+	}
+	gpc3Dmap* pMAPswp( const void* pV, U4 n ){
+		U4	nx, nUi = gpmSTRLEN(pV),
+
+		ix = mapDCTtx.dctFND( pV, nUi, nx );
+		if( ix >= nx )
+			return NULL;
+		char* pUi = ((char*)pV) + gpmPAD( nUi+1,2 ), *pUnx = ((char*)pV)+n;
+		U4x2 *pIX2 = (U4x2*)mapIXtx.Ux( ix, sizeof(*pIX2) );
+		gpc3Dmap** ppM = (gpc3Dmap**)MAP.Ux( ix, sizeof(*ppM) );
+		gpmDEL( *ppM );
+		return (*ppM) = new gpc3Dmap(	ix, pnt, fc,
+										mapBLwg,
+										mapF2tx, pIX2,
+										pUi, pUnx
+									);
+
+	}
+
+	gpc3Dly* SRFswp( const void* pV, U4 n ) {
+		char* pUi = ((char*)pV), *pUnx = ((char*)pV)+n;
+		gpc3Dblnd* pBl;
+		U4x2* pF;
+		U4 iF, *pFi, nF = 0, ix;
+		while( pUi < pUnx ) {
+			iF = swp2( pUi ); pUi += 2;
+			if( *pUi&0x80 ) {
+				ix = swp4( pUi )&0x7FFFffff; pUi+= 4;
+			} else {
+				ix = swp2( pUi ); pUi+= 2;
+			}
+			(*(U4*)srSUM.Ux( ix, sizeof(U4) ))++;
+
+			pF = (U4x2*)fc.LST.Ux( iF, sizeof(*pF) );
+			pFi = (U4*)fc.IX.Ux( pF->sum(), sizeof(*pFi) ) - pF->i;
+			for( U4 i = 0; i < pF->y; i++ ) {
+				pBl = (gpc3Dblnd*)mapBLwg.Ux( pFi[i], sizeof(*pBl) );
+				pBl->SRFset( ix );
+			}
+			nF++;
+		}
+		return this;
+	}
+	gpc3Dly* SRFcout( gpcLZY& lzySRF, const void* pLWO, U4x2* pTG, U4 nGD = 1 ) {
+		U1* pU0 = (U1*)pLWO;
+		for( U4 i = 0, e = srSUM.nLD(sizeof(U4)), n; i < e; i++ ){
+			n = *(U4*)(srSUM.Ux(i,sizeof(U4)));
+			if( n < nGD )
+				continue;
+			gpc3Dsrf* pSRF = (gpc3Dsrf*)lzySRF.Ux( i, sizeof(*pSRF) );
+			if( !pSRF->sNAME[0] )
+				gpmSTRCPY( pSRF->sNAME, pU0+pTG[i].x );
+			std::cout << i << " " << n << " " << pSRF->sNAME <<  std::endl;
+		}
+		return this;
+	}
+
+	gpc3Dly* PRTswp( const void* pV, U4 n ) {
+		char* pUi = ((char*)pV), *pUnx = ((char*)pV)+n;
+		U4x2* pF, *pPRT;
+		U4 iF, *pFi, nF = 0, ix;
+		while( pUi < pUnx ) {
+			iF = swp2( pUi ); pUi += 2;
+			if( *pUi&0x80 ) {
+				ix = swp4( pUi )&0x7FFFffff; pUi+= 4;
+			} else {
+				ix = swp2( pUi ); pUi+= 2;
+			}
+			(*(U4*)prSUM.Ux( ix, sizeof(U4) ))++;
+
+			pPRT = (U4x2*)mapIXprt.Ux( nF, sizeof(U4) );
+			pPRT->i = nF;
+			pPRT->n = ix;
+			nF++;
+		}
+		return this;
+	}
+	gpc3Dly* PRTcout( const void* pLWO, U4x2* pTG, U4 nGD = 1 ) {
+		U1* pU0 = (U1*)pLWO;
+		for( U4 i = 0, e = prSUM.nLD(sizeof(U4)), n; i < e; i++ ){
+			n = *(U4*)(prSUM.Ux(i,sizeof(U4)));
+			if( n < nGD )
+				continue;
+			std::cout << i << " " << n << " " << (char*)(pU0+pTG[i].x) <<  std::endl;
+		}
+		return this;
+	}
 };
 class gpc3D {
 public:
@@ -338,7 +565,8 @@ public:
 
 	gpcLZY	*p_lwo,
 			ly3D,
-			tgIX;
+			tgIX,
+			lzySRF;
 
 	~gpc3D(){
 		gpmDEL(p_lwo);
@@ -466,8 +694,9 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 		return this;
 	pU4i++;
 	U4	n = swp4(pU4i),
-		chunk,cNULL=0,
+		chunk[2],
 		nUi, ix, nx, ip, uf;
+	chunk[1] = 0;
 	pU4i++;
 	if( *pU4i != LWO_ID_LWO2 )
 		return this;
@@ -481,85 +710,40 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 			*pUi;
 	gpc3Dly* pLY = NULL;
 	gpc3Dmap* pMAP = NULL;
-	I4x2* pTG;
+	U4x2* pTG;
 	while( pUnx < pUe ){
 		pU4i = (U4*)pUnx;
-		chunk = *pU4i; pU4i++;
+		chunk[0] = *pU4i; pU4i++;
 		n = swp4(pU4i); pU4i++;
 
 
 		pUi = (char*)pU4i;
 		pUnx = pUi+n;
-		switch( chunk ) {
+		std::cout << pUi-pU0 << " LWO_ID_"<< (char*)chunk << ": "  << std::endl;
+		switch( chunk[0] ) {
 			case LWO_ID_TAGS: {
-
 					while( pUi < pUnx ) {
-						pTG = (I4x2*)tgIX.Ux( tgIX.nLD(sizeof(I4x2)), sizeof(I4x2) );
-						pTG->x = pUi-pU0;
-						pTG->y = gpmSTRLEN(pUi);
+						pTG = (U4x2*)tgIX.Ux( tgIX.nLD(sizeof(U4x2)), sizeof(U4x2) );
+						pTG->i = pUi-pU0;
+						pTG->n = gpmSTRLEN(pUi);
 						pUi += gpmPAD( pTG->y+1,2 );
 					}
-					pTG = (I4x2*)tgIX.Ux( 0, sizeof(I4x2) );
+					pTG = (U4x2*)tgIX.Ux( 0, sizeof(*pTG) );
 				} break;
 			case LWO_ID_LAYR: {
 					if( pLY ) {
 
 					}
-					pLY = (gpc3Dly*)ly3D.Ux( ly3D.nLD(sizeof(gpc3Dly)), sizeof(gpc3Dly) );
-					pLY->id.w = swp4( pU4i ); pU4i++;
-					pLY->id.x = pLY->id.w&0xffff;	// momID
-					pLY->id.y = pLY->id.w>>16;		// layID
-
-
-					pLY->piv.swpXYZ0( pU4i ); pU4i+=3;
-					pUi = (char*)pU4i;
-					if( pUi < pUnx )
-						gpmSTRCPY( pLY->sNAME, pUi );
+					pLY = ((gpc3Dly*)NULL)->pLY(ly3D,pU4i);
 				} break;
-			case LWO_ID_PNTS: {
-					std::cout << "LWO_ID_PNTS:"<<  std::endl;
-					n = (pUnx-pUi)/(sizeof(float)*3);
-					F4* pP0 = ((F4*)pLY->pnt.Ux( n, sizeof(F4) ))-n;
-					for( U4 i = 0; i < n; i++ )
-						pP0[i].swpXYZ0( pU4i + i*3 );
-				} break;
-			case LWO_ID_BBOX: {
-					pLY->bbox[0].swpXYZ0( pU4i ); pU4i+=3;
-					pLY->bbox[1].swpXYZ0( pU4i ); pU4i+=3;
-				} break;
+			case LWO_ID_PNTS: pLY->pPNTSswp( pU4i, (pUnx-pUi)/(sizeof(float)*3) ); break;
+			case LWO_ID_BBOX: pLY->pBBOXswp(pU4i); break;
 			case LWO_ID_POLS: {
-					std::cout << "LWO_ID_POLS:"<<  std::endl;
 					pUi += 4;
 					switch( *pU4i ) {
 						case LWO_ID_FACE: {
 								std::cout << "\tLWO_ID_FACE:"<<  std::endl;
-								U4x2* pFl;
-								U4 *pFs,*pFi;
-								while( pUi < pUnx ) {
-									pFl = (U4x2*)pLY->fcLST.Ux( pLY->fcLST.nLD(sizeof(*pFl)), sizeof(*pFl) );
-									pFl->x = pLY->fcIX.nLD(sizeof(U4));
-									pFl->y = swp2(pUi)&0x03ff; pUi+=2;
-
-									pFs = (U4*)pLY->fcSUM.Ux( pFl->y, sizeof(*pFs) );
-									(*pFs)++;
-
-									pFi = (U4*)pLY->fcIX.Ux( pFl->sum(), sizeof(*pFi) ) - pFl->y;
-									for( U4 i = 0; i < pFl->y; i++ ) {
-										if( *pUi&0x80 ) {
-											pFi[i] = swp4( pUi )&0x7FFFffff; pUi+= 4;
-										} else {
-											pFi[i] = swp2( pUi ); pUi+= 2;
-										}
-									}
-								}
-								pFs = (U4*)pLY->fcSUM.Ux( 0, sizeof(*pFs) );
-								for( U4 i = 0, e = pLY->fcSUM.nLD(sizeof(*pFs)); i < e; i++ ) {
-									if( !pFs[i] )
-										continue;
-									if(bSTDcout){ std::cout << i << " " << pFs[i] << std::endl; }
-
-								}
-
+								pLY->fc.pFACEswp(pUi,pUnx-pUi)->COUT();
 							} break;
 						case LWO_ID_BONE: {
 								std::cout << "\tLWO_ID_BONE:"<<  std::endl;
@@ -569,7 +753,6 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 
 				} break;
 			case LWO_ID_VMAP: {
-					std::cout << "LWO_ID_VMAP:"<<  std::endl;
 					pUi += 4;
 					U2 d = swp2(pUi); pUi += 2;
 					U4 ix = 0, nUi, iD;
@@ -578,65 +761,19 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 						case LWO_ID_MNVW: {
 							} break;
 						case LWO_ID_WGHT: {
-								std::cout << "\tLWO_ID_WGHT:"<<  std::endl;
-								gpc3Dblnd* pBl;
-								/// megreressük melyik csont a listában
-								nUi = gpmSTRLEN(pUi);
-								U4 iBn, iBx = dctBN.dctFND( pUi, nUi, iBn );
-								if( iBx >= iBn )
-									break;
-
-								ix = pLY->mapDCTwg.nIX();
-								pLY->mapDCTwg.dctADD( pUi, nUi );
-								pUi += gpmPAD( nUi+1,2 );
-								if(ix>=pLY->mapDCTwg.nIX())
-									break;
-
+								std::cout << "\tLWO_ID_WGHT:"<<  std::flush;
+								I4 ix = pLY->pWGHTswp( pUi, pUnx-pUi, dctBN );
 								U4x2 *pIX2 = (U4x2*)pLY->mapIXwg.Ux( ix, sizeof(*pIX2) );
-								pIX2->x = iBx;
-								pIX2->y = 0;
-								while( pUi < pUnx ) {
-									if( *pUi&0x80 ) {
-										ip = swp4( pUi )&0x7FFFffff; pUi+= 4;
-									} else {
-										ip = swp2( pUi ); pUi+= 2;
-									}
-									pBl = (gpc3Dblnd*)pLY->mapBLwg.Ux( ip, sizeof(*pBl) );
-									uf = swp4( pUi );
-									if(uf)
-										pIX2->y++;
-									pBl->BLset( iBx, *(float*)&uf ); pUi+= 4;
-								}
-
 								std::cout << pLY->mapDCTwg.sSTRix(ix,"ERR")  << " iBx:" << pIX2->x << " n:" << pIX2->y << std::endl;
 							} break;
 						case LWO_ID_TXUV: {
-								std::cout << "\tLWO_ID_TXUV:"<<  std::endl;
-								F2* pTX;
-								/// megreressük melyik csont a listában
-								ix = pLY->mapDCTtx.nIX();
-								nUi = gpmSTRLEN(pUi);
-								pLY->mapDCTtx.dctADD( pUi, nUi );
-								pUi += gpmPAD( nUi+1,2 );
-								if( ix >= pLY->mapDCTtx.nIX() )
-									break;
-
+								std::cout << "\tLWO_ID_TXUV:"<<  std::flush;
+								I4 ix = pLY->pTXUVswp( pUi, pUnx-pUi );
 								U4x2 *pIX2 = (U4x2*)pLY->mapIXtx.Ux( ix, sizeof(*pIX2) );
-								pIX2->x = pLY->mapF2tx.nLD(sizeof(*pTX));
-								while( pUi < pUnx ) {
-									if( *pUi&0x80 ) {
-										ip = swp4( pUi )&0x7FFFffff; pUi+= 4;
-									} else {
-										ip = swp2( pUi ); pUi+= 2;
-									}
-									pTX = (F2*)pLY->mapF2tx.Ux( ip, sizeof(*pTX) );
-									pTX->swpXY( pUi ); pUi += sizeof(*pTX);
-								}
-								pIX2->y = pLY->mapF2tx.nLD(sizeof(*pTX))-pIX2->x;
 								std::cout << pLY->mapDCTtx.sSTRix(ix,"ERR") << " iTX:" << pIX2->x << " nTX:" << pIX2->y << std::endl;
 							} break;
 						case LWO_ID_MORF: {
-								std::cout << "\tLWO_ID_MORF:"<<  std::endl;
+								std::cout << "\tLWO_ID_MORF:"<<  std::flush;
 								ix = pLY->mapDCTmr.nIX();
 								nUi = gpmSTRLEN(pUi);
 								pLY->mapDCTmr.dctADD( pUi, nUi );
@@ -649,7 +786,6 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 					}
 				} break;
 			case LWO_ID_VMAD: {
-					std::cout << "LWO_ID_VMAD:"<<  std::endl;
 					pUi += 4;
 					U2 d = swp2(pUi); pUi += 2;
 					U4 iD, *pFi;
@@ -661,33 +797,35 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 							} break;
 						case LWO_ID_TXUV: {
 								std::cout << "\tLWO_ID_TXUV:"<<  std::endl;
-								nUi = gpmSTRLEN(pUi);
-								ix = pLY->mapDCTtx.dctFND( pUi, nUi, nx );
-								if( ix >= nx )
-									break;
-								pUi += gpmPAD( nUi+1,2 );
-								U4x2 *pIX2 = (U4x2*)pLY->mapIXtx.Ux( ix, sizeof(*pIX2) );
-
-								gpc3Dmap** ppM = (gpc3Dmap**)pLY->MAP.Ux( ix, sizeof(*ppM) );
-								gpmDEL( *ppM );
-								pMAP =
-								(*ppM) = new gpc3Dmap(	pLY->pnt,
-														pLY->fcLST, pLY->fcIX,
-														pLY->mapBLwg,
-														pLY->mapF2tx, pIX2,
-														pUi, pUnx
-													);
+								gpc3Dmap* pMAP = pLY->pMAPswp( pUi, pUnx-pUi );
 								if( !pMAP )
 									break;
-								std::cout << pLY->mapDCTtx.sSTRix(ix,"ERR") << " nP:" << pLY->pnt.nLD(sizeof(F4)) << " nPm:" << pMAP->pnt.nLD(sizeof(gpc3Dvx)) << std::endl;
+								std::cout << pLY->mapDCTtx.sSTRix(pMAP->id,"ERR") << " nP:" << pLY->pnt.nLD(sizeof(F4)) << " nPm:" << pMAP->pnt.nLD(sizeof(gpc3Dvx)) << std::endl;
 							} break;
 						case LWO_ID_MORF: {
 							} break;
 						default: break;
 					}
 				} break;
+
+			case LWO_ID_PTAG: {
+					pUi += 4;
+					switch( *pU4i )
+					{
+						case LWO_ID_COLR:
+							break;
+						case LWO_ID_SURF: {
+								std::cout << "\tLWO_ID_SURF:"<<  std::endl;
+								pLY->SRFswp( pUi, pUnx-pUi )->SRFcout( lzySRF, pU0, pTG );
+							} break;
+						case LWO_ID_PART: {
+								std::cout << "\tLWO_ID_PART:"<<  std::endl;
+								pLY->PRTswp( pUi, pUnx-pUi )->PRTcout( pU0, pTG );
+							} break;
+						default: break;
+					}
+				} break;
 			case LWO_ID_CLIP: {
-					std::cout << "LWO_ID_CLIP:";
 					pUi += 4;
 					if( pU4i[1] != LWO_ID_STIL )
 						break;
@@ -700,11 +838,9 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 					ix = pLY->mapDCTcl.nIX();
 					pLY->mapDCTcl.dctADD( pUp, nUi-(pUp-pUi));
 
-					std::cout << pLY->mapDCTcl.sSTRix(ix,"ERR") <<  std::endl;
+					std::cout << pLY->mapDCTcl.sSTRix(ix,"ERR") << std::endl;
 				} break;
 			case LWO_ID_SURF: {
-					std::cout << "LWO_ID_SURF:"<<  std::endl;
-					//pUi += 4;
 					nUi = gpmSTRLEN(pUi);
 					for( ix = 0; ix < tgIX.nLD(sizeof(*pTG)); ix++ ) {
 						if( pTG[ix].y != nUi )
@@ -718,27 +854,38 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 					pLY->mapDCTsr.dctADD( pUi, nUi );
 					pUi+= gpmPAD( nUi+1,2 );
 					pUi+= sizeof(U2);
-					std::cout << ix << " " << iS << " "<< *(U4*)(pLY->srSUM.Ux(ix,sizeof(U4))) << " " << (char*)(pU0+pTG[ix].x) <<  std::endl;
+					gpc3Dsrf* pSRF = (gpc3Dsrf*)lzySRF.Ux( ix, sizeof(*pSRF) );
+					if( !pSRF->sNAME[0] )
+						gpmSTRCPY( pSRF->sNAME, pU0+pTG[ix].x );
+
+					std::cout << ix << " " << iS << " "<< *(U4*)(pLY->srSUM.Ux(ix,sizeof(U4))) << " " << pSRF->sNAME <<  std::endl;
 					char* pSUB, *pSS;
 					while( pUi < pUnx ) {
-						chunk = *(U4*)pUi; pUi += sizeof(U4);
+						chunk[0] = *(U4*)pUi; pUi += sizeof(U4);
 						n = swp2( pUi ); pUi += sizeof(U2);
 						pSUB = pUi;
 						pUi += n;
-						std::cout << (char*)&chunk << " "<< n << std::endl;
-						switch( chunk ) {
+						std::cout << (char*)chunk << " "<< n << std::endl;
+						switch( chunk[0] ) {
 							case LWO_ID_BLOK: {
 									while( pSUB < pUi ) {
-										chunk = *(U4*)pSUB; pSUB += sizeof(U4);
+										chunk[0] = *(U4*)pSUB; pSUB += sizeof(U4);
 										n = swp2( pSUB ); pSUB += sizeof(U2);
-										std::cout << " " << (char*)&chunk << " "<< n << std::endl;
+										std::cout << " " << (char*)chunk << " " << n << std::flush;
 										pSS = pSUB;
 										pSUB += n;
-										switch( chunk ) {
+										switch( chunk[0] ) {
 											case LWO_ID_IMAG: {
-													ix = swp2(pSS);
-													std::cout << " " << ix << " " << pLY->mapDCTcl.sSTRix(ix,"ERR") <<  std::endl;
+													pSRF->imag = swp2(pSS)-1;
+													gpmSTRCPY( pSRF->sPIC, pLY->mapDCTcl.sSTRix(pSRF->imag,"ERR") );
+													std::cout << " " << pSRF->imag << " " << pSRF->sPIC <<  std::endl;
 												} break;
+											case LWO_ID_VMAP: {
+													gpmSTRCPY( pSRF->sVMAP, pSS );
+													pSRF->imap = pLY->mapDCTtx.dctFND( pSRF->sVMAP, gpmSTRLEN(pSRF->sVMAP), n );
+													std::cout << " " << pSRF->imap << " " << pLY->mapDCTtx.sSTRix(pSRF->imap,"ERR") <<  std::endl;
+												} break;
+
 											default: break;
 										}
 									}
@@ -746,73 +893,6 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 							default: break;
 
 						}
-					}
-				} break;
-			case LWO_ID_PTAG: {
-					std::cout << "LWO_ID_PTAG:"<<  std::endl;
-					pUi += 4;
-					switch( *pU4i )
-					{
-						case LWO_ID_COLR:
-							break;
-						case LWO_ID_SURF: {
-								std::cout << "\tLWO_ID_SURF:"<<  std::endl;
-
-								gpc3Dblnd* pBl;
-								U4x2* pF;
-								U4 iF, *pFi, nF = 0;
-								while( pUi < pUnx ) {
-									iF = swp2( pUi ); pUi += 2;
-									if( *pUi&0x80 ) {
-										ix = swp4( pUi )&0x7FFFffff; pUi+= 4;
-									} else {
-										ix = swp2( pUi ); pUi+= 2;
-									}
-									(*(U4*)pLY->srSUM.Ux( ix, sizeof(U4) ))++;
-
-									pF = (U4x2*)pLY->fcLST.Ux( iF, sizeof(*pF) );
-									pFi = (U4*)pLY->fcIX.Ux( pF->sum(), sizeof(*pFi) ) - pF->y;
-									for( U4 i = 0; i < pF->y; i++ ) {
-										pBl = (gpc3Dblnd*)pLY->mapBLwg.Ux( pFi[i], sizeof(*pBl) );
-										pBl->SRFset( ix );
-									}
-									nF++;
-								}
-								for( U4 i = 0, e = pLY->srSUM.nLD(sizeof(U4)), n; i < e; i++ ){
-									n = *(U4*)(pLY->srSUM.Ux(i,sizeof(U4)));
-									if(!n)
-										continue;
-
-									std::cout << i << " " << *(U4*)(pLY->srSUM.Ux(i,sizeof(U4))) << " " << (char*)(pU0+pTG[i].x) <<  std::endl;
-								}
-							} break;
-						case LWO_ID_PART: {
-								std::cout << "\tLWO_ID_PART:"<<  std::endl;
-								U4x2* pF, *pPRT;
-								U4 iF, *pFi, nF = 0;
-								while( pUi < pUnx ) {
-									iF = swp2( pUi ); pUi += 2;
-									if( *pUi&0x80 ) {
-										ix = swp4( pUi )&0x7FFFffff; pUi+= 4;
-									} else {
-										ix = swp2( pUi ); pUi+= 2;
-									}
-									(*(U4*)pLY->prSUM.Ux( ix, sizeof(U4) ))++;
-
-									pPRT = (U4x2*)pLY->mapIXprt.Ux( nF, sizeof(U4) );
-									pPRT->y = ix;
-									pPRT->x = nF;
-									nF++;
-								}
-
-								for( U4 i = 0, e = pLY->prSUM.nLD(sizeof(U4)), n; i < e; i++ ){
-									n = *(U4*)(pLY->prSUM.Ux(i,sizeof(U4)));
-									if( !n )
-										continue;
-									std::cout << i << " " << n << " " << (char*)(pU0+pTG[i].x) << std::endl;
-								}
-							} break;
-						default: break;
 					}
 				} break;
 			default: break;
