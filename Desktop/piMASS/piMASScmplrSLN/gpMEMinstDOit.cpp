@@ -433,14 +433,19 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				else
 					an = I8x2( *(I4*)pU1, 0 );
 
-				pWgl
-				->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, true, true )
-				->GLSLset( an )
-				->glSETbox( gpdGLpTRGxy, gpdGLpTRGwh )
-				->glSETcnl( 0, gpmGLaCNL4(0), gpmGLnCNL )
-				->glSETtx( gpdGLmskPIC, gpdGLapPIC )
-				->glDRW( gpdGLpTRGxy, gpdGLpTRGwh )
-				->glDONE();
+				pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, true, true )
+					->GLSLset( an )
+					->glSETbox( gpdGLpTRGxy, gpdGLpTRGwh )
+					->glSETcnl( 0, gpmGLaCNL4(0), gpmGLnCNL )
+					->glSETtx( gpdGLmskPIC, gpdGLapPIC )
+					->glDRW( gpdGLpTRGxy, gpdGLpTRGwh )
+					->glDONE();
+			} break;
+		case gpeALF_SCENE: if( pWgl ? gpdGLpTRG : NULL  ) {	cID = gpeCsz_b; if( bCID ) break;
+				if( obj.bUTF8() ) {
+					pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, true, true )
+						->glSCENE( this, (char*)pU1+ ((*pU1 == '\"') ? 1 : 0) );
+				}
 			} break;
 		default:
 			break;

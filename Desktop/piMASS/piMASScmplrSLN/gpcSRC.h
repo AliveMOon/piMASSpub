@@ -2066,6 +2066,7 @@ public:
 	U4 nTXT = 0;
 	char* pTXT, *pT;
 
+	gpITMlst*	iDBu( gpMEM* pMEM, char *pU, char* sPATH, char* pFILE );
 	gpITMlst*	iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE );
 	gpcLZYdct*	pOPER();
 	U4* pM( U4x2& zn, U1 id = 4 ) {

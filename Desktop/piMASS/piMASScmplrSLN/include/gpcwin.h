@@ -111,6 +111,7 @@ class gpc3Dlst;
 
 class gpcGL {
 public:
+	char	sPUB[0x1000];
 	GLint	oPrgID,
 			ATvxID, ATuvID,
 			gVxSucc,
@@ -599,7 +600,7 @@ public:
 	}
 
 
-
+	gpcGL* glSCENE( gpMEM* pMEM, char* pSTR );
 
 
 

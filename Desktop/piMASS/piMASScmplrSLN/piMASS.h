@@ -3978,7 +3978,7 @@ public:
 	int alfRIG( gpeALF af, int n, int r );
 	int aALFfnd( const gpeALF* aALF, int n, int nA );
 
-	void alfCON( char* pOUT, int nAT ) {
+	I8x2* alfCON( char* pOUT, int nAT ) {
 		I8x2* pAT = this;
 		if( !this )
 			nAT = 0;
@@ -4002,6 +4002,7 @@ public:
 			std::cout << at <<"."<< pOUT << " ";
 		}
 		std::cout << "nAT:" << at << std::endl;
+		return this;
 	}
 };
 
@@ -5545,8 +5546,7 @@ typedef enum gpeAT:U4{
 } gpeAT;
 class gpcLZY {
 public:
-	union
-	{
+	union {
 		struct{
 			U1* p_alloc, aXYZW[4], aSET[4];
 
@@ -5666,16 +5666,6 @@ public:
 		return pM+iM;
 	}
 
-	U1x4* pU1x4( U4x4& m, U4 nX ) {
-		if( !this )
-			return NULL;
-
-		U4 nLIM = (n_alloc-sizeof(U4x4)*nX)/(nX*sizeof(U1x4));
-		if( m.w >= nLIM )
-			return NULL;
-
-		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
-	}
 
 	U4 nPC( void );
 
@@ -5838,13 +5828,11 @@ public:
 		if( n_load*2 < n_alloc )
 		{
 			U8 new_alloc = gpmPAD( ((n_alloc*3)/4), 0x10 );
-			if( !new_alloc )
-			{
+			if( !new_alloc ) {
 				(*p_alloc) = n_load = 0;
 				return this;
 			}
-			else if( n_alloc > new_alloc )
-			{
+			else if( n_alloc > new_alloc ) {
 				gpmFREE( p_alloc );
 				n_alloc = new_alloc;
 				p_alloc = gpmALLOC( n_alloc+0x10 );
@@ -6065,10 +6053,7 @@ public:
 
 	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub, U1 n = 0 ) {
 		if( !this )
-		{
-			//start = n_u1;
 			return lzyADD( p_u1, n_u1, iSTRT, n );
-		}
 		lzy_exp( iSTRT, n_sub,  n_u1, n );
 		gpmMcpyOF( p_alloc+iSTRT, p_u1, n_u1 );
 		return this;
@@ -6281,6 +6266,48 @@ szasz:
 		U8 s=-1;
 		return pLZY->lzyADD( aU, nU, s );
 	}
+	U1* pU1n( int i = 0, int n = 1 ) {
+		if( !this )
+			return NULL;
+		if( !i )
+			return p_alloc;
+
+		i *= n;
+		if( i >= nLD() )
+			return NULL;
+
+		return p_alloc+i;
+	}
+
+	U1x4* pU1x4( U4x4& m, U4 nX ) {
+		if( !this )
+			return NULL;
+
+		U4 nLIM = (n_alloc-sizeof(U4x4)*nX)/(nX*sizeof(U1x4));
+		if( m.w >= nLIM )
+			return NULL;
+
+		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
+	}
+	U4* pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
+	U4x2* pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
+	U4x4* pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
+
+	I4* pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
+	I4x2* pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
+	I4x4* pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
+
+	I8x2* pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
+	I8x4* pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
+	U8x4* pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
+	float* pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
+	F2* pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
+	F4* pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
+	F4x4* pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
+	D4* pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
+
+
+
 };
 
 

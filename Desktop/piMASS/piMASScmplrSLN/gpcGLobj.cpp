@@ -719,7 +719,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 
 		pUi = (char*)pU4i;
 		pUnx = pUi+n;
-		std::cout << pUi-pU0 << " LWO_ID_"<< (char*)chunk << ": "  << std::endl;
+		std::cout << pUi-pU0 << " LWO_ID_"<< (char*)chunk << ": "  << std::flush; //endl;
 		switch( chunk[0] ) {
 			case LWO_ID_TAGS: {
 					while( pUi < pUnx ) {
@@ -894,6 +894,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 
 						}
 					}
+					std::cout << std::endl;
 				} break;
 			default: break;
 		}

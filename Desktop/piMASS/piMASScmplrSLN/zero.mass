@@ -351,10 +351,16 @@
  trgw = 640;
  trgh = 960;
  trg = "combi";
+ scene = "zeroDB/scr/, cam.eye.yz, pxSCR.xyr, 0, 1,
+                       cam.eye.xx, pxSCR.xyr, 0, 2,
+                       cam.trg.yz, pxSCR.xyr, 0, 3,
+                       man.pos.yz, pxSCR.xyr, 0, 9";
+
  pica = "cam1";
  picb = "penna";
  cnl = b3.lst;
  gpu = "combi";
+
  again = 200;
     a12	 
  ize  = in == 10;

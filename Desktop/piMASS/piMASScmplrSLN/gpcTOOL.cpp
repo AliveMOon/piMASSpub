@@ -592,11 +592,9 @@ public:
 		U4 ptch = 0x80;
 		U4x4* pM = pDB->xFND( pMAP->x, ptch*0x80, gpdLZYdbSPClim );
 		U1x4* p_u = NULL, *p_s = NULL;
-		if( pM )
-		{
+		if( pM ) {
 			p_u = pDB->pU1x4( *pM, ptch*0x80 );
-			if( pM->y )
-			{
+			if( pM->y ) {
 				pSspc[0]
 				.cpyX( 	p_u,						0x40*4,	spcWH.x*0x100, 	4,	spcWH.x*4,	1,	ptch );
 				pSspc[spcWH.x*0x100]

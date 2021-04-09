@@ -252,27 +252,30 @@ gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
 	wr.lzyWR( pIDlst->sPATH );
 	return this;
 }
-
 gpITMlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
 	I8 ixDB = pPi->i8(pMEM);
-	U8 nLEN;
-	U1* pU1 = NULL;
-
-	U4 nDB = dctDB.nIX(), nU1 = 0;
-	if(!nDB) {
-		dctDB.dctADD( " ", 1 );
-		nDB = dctDB.nIX();
-	}
-
 	if(ixDB == '\"') {
 		ixDB = 0;
-		if(pPi->bUTF8()) {
-			pU1 = pPi->pU1(pMEM)+1;
-			nU1 = pU1 ? gpmVAN( pU1, "\"", nLEN ) : 0;
-			if( nU1 )
-				ixDB = dctDB.dctFND( pU1, nU1, nDB );
-		}
+		if(pPi->bUTF8())
+			return iDBu( pMEM, (char*)pPi->pU1(pMEM), sPATH, pFILE );
 	}
+
+	return NULL;
+}
+gpITMlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
+	if(!this)
+		return NULL;
+	I8 ixDB = 0;
+	U8 nLEN;
+	U4 nDB = dctDB.nIX(), nU1 = 0, nU0;
+	if(!nDB) { dctDB.dctADD( " ", 1 ); nDB = dctDB.nIX(); }
+
+	pU1 += gpmNINCS(pU1,"\" \t\r\n,");
+	nU0 = pU1 ? gpmVAN( pU1, "\" \t\r\n,", nLEN ) : 0;
+	nU1 = pU1 ? gpmVAN( pU1, "\"", nLEN ) : 0;
+	if( nU0 )
+		ixDB = dctDB.dctFND( pU1, nU0, nDB );
+
 	if( !ixDB )
 		return NULL;
 

@@ -1332,6 +1332,8 @@ typedef enum gpeALF:I8
 	gpeALF_rootM = gpdABCDE('R', 'O', 'O', 'T', 'M'),
 	gpeALF_RULES = gpdABCDE('R', 'U', 'L', 'E', 'S'),
 
+	gpeALF_SCENE = gpdABCDE('S', 'C', 'E', 'N', 'E'),
+
 	gpeALF_SETUP = gpdABCDE('S', 'E', 'T', 'U', 'P'),
 	gpeALF_SHARE = gpdABCDE('S', 'H', 'A', 'R', 'E'),
 	gpeALF_SHOES = gpdABCDE('S', 'H', 'O', 'E', 'S'),

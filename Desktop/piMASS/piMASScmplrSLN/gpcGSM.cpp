@@ -495,25 +495,6 @@ public:
 		if(!bSTDcout)
 			return;
 		pAT->alfCON(sOUT,nAT);
-		/*int at = 0;
-		for( ; at < nAT; at++ ) {
-			switch(pAT[at].alf){
-				case gpeALF_PLUS:
-					sprintf( sOUT, "+%lld", pAT[at].num );
-					break;
-				case gpeALF_CM:
-					sprintf( sOUT, ",%lld", pAT[at].num );
-					break;
-				case gpeALF_MRK:
-					sprintf( sOUT, "\"%lld\r\n", pAT[at].num);
-					break;
-				default:
-					pAT[at].an2str( sOUT );
-					break;
-			}
-			std::cout << at <<"."<< sOUT << " ";
-		}
-		std::cout << "nAT:" << at << std::endl;*/
 	}
 
 	int answCPIN( char* pANSW, int* pSUB, char* pS, I8x2 *pAT, int nAT, int iPLUS, int pin ) {
