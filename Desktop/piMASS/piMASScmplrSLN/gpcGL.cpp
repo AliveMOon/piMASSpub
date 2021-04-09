@@ -504,6 +504,10 @@ GLuint  gpcGL::GLSLfrg( const char* pS ) {
 
 
 */
+gpeALF alfSCN0[] = {
+	gpeALF_CAM,
+	gpeALF_MAN,
+};
 
 gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	U8 nLEN;
@@ -512,34 +516,47 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	int nAT = AT.nAT( pS, pSe-pS );
 	if(!nAT)
 		return this;
+	F4	cam_eye, cam_trg, cam_pos, cam_abc,
+		man_eye, man_trg, man_pos, man_abc;
 
 	I8x2* pAT = AT.pI8x2();
 	pAT->alfCON( sPUB,nAT);
 	gpITMlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
-	for( U4 iAT = pAT[0].alfFND( gpeALF_CM, nAT );
+	for( U4 iAT = pAT[0].aALFvan( alfSCN0, nAT, gpmN(alfSCN0) );
 			iAT < nAT;
-			iAT += pAT[iAT].alfFND( gpeALF_CM, nAT-iAT ) ){
-
-		if( pAT[iAT].alf == gpeALF_CM ) {
-			iAT++;
-			if(iAT>=nAT)
-				break;
-		}
+			iAT += pAT[iAT].aALFvan( alfSCN0, nAT-iAT, gpmN(alfSCN0) ) ){
+		U4 iAT1 = iAT+1;
 
 		switch( pAT[iAT].alf ) {
 			case gpeALF_CAM:{
-				switch( pAT[iAT].alf ) {
+				switch( pAT[iAT1].alf ) {
 					case gpeALF_EYE:
 						break;
-					case gpeALF_MAN:
+					case gpeALF_TRG:
+						break;
+					case gpeALF_POS:
+						break;
+					case gpeALF_ABC:
 						break;
 					default: break;
 				}
 			} break;
-			case gpeALF_MAN:
-			break;
+			case gpeALF_MAN: {
+				switch( pAT[iAT1].alf ) {
+					case gpeALF_EYE:
+						break;
+					case gpeALF_TRG:
+						break;
+					case gpeALF_POS:
+						break;
+					case gpeALF_ABC:
+						break;
+					default: break;
+				}
+			} break;
 			default: break;
 		}
+		iAT++;
 	}
 	return this;
 }

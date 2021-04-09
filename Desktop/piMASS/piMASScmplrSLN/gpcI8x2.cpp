@@ -36,7 +36,7 @@ int I8x2::alfRIG( gpeALF af, int nAT, int r ) {
 	return 0;
 }
 
-int I8x2::aALFfnd( const gpeALF* aALF, int n, int nA ) {
+int I8x2::aALFvan( const gpeALF* aALF, int n, int nA ) {
 	I8x2* pAT = this;
 	for( int iAT = 0, j; iAT < n; iAT++ ) {
 		if( pAT[iAT].alf == gpeALF_MRK ) {

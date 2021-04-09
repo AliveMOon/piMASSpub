@@ -3976,7 +3976,7 @@ public:
 	int alfFND( gpeALF af, int n );
 	int alfN( gpeALF af, int n );
 	int alfRIG( gpeALF af, int n, int r );
-	int aALFfnd( const gpeALF* aALF, int n, int nA );
+	int aALFvan( const gpeALF* aALF, int n, int nA );
 
 	I8x2* alfCON( char* pOUT, int nAT ) {
 		I8x2* pAT = this;
