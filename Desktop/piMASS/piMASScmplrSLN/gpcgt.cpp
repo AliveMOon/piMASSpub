@@ -236,7 +236,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 			case gpeALF_GSM:{
 					U8 s = 0;
 					gpmSTRCPY(pGT->s_ip,pIPA);
-					//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s, -1 );
+					//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s );
 				} break;
 			default:
 				gpmMcpyOF( pGT->s_ip, pS, nCMP );
@@ -264,7 +264,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 		case gpeALF_GSM:{
 				U8 s = 0;
 				gpmSTRCPY(pGT->s_ip,pIPA);
-				//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s, -1 );
+				//pGT->pINP = pGT->pINP->lzyADD( pIPA, gpmSTRLEN(pIPA), s );
 			} break;
 		default:
 			gpmMcpyOF( pGT->s_ip, pS, nCMP );

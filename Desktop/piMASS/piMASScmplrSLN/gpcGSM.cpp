@@ -921,45 +921,45 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 		}
 		else if( !pOUT ){
 			int nCNT = 0;
-			pOUT = pOUT->lzyADD( pGSM ? pGSM : &gsmZERO, sizeof(gsmZERO), (s=0), -1 );
+			pOUT = pOUT->lzyADD( pGSM ? pGSM : &gsmZERO, sizeof(gsmZERO), (s=0) );
 			iCNT = pOUT->nLD();
 			/// 0 CRESET
-			pOUT = pOUT->lzyADD( sGSMreset, gpmSTRLEN(sGSMreset)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMreset, gpmSTRLEN(sGSMreset)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 1 CREG
-			pOUT = pOUT->lzyADD( sGSMreg, gpmSTRLEN(sGSMreg)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMreg, gpmSTRLEN(sGSMreg)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 2 IDLE
-			pOUT = pOUT->lzyADD( sGSMidle, gpmSTRLEN(sGSMidle)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMidle, gpmSTRLEN(sGSMidle)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 2 WAIT ATA
-			pOUT = pOUT->lzyADD( sGSMwait, gpmSTRLEN(sGSMwait)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMwait, gpmSTRLEN(sGSMwait)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 4 	VOICE CALL END
-			pOUT = pOUT->lzyADD( sGSMhup, gpmSTRLEN(sGSMhup)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMhup, gpmSTRLEN(sGSMhup)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 5 	VOICE CALL BEGIN
-			pOUT = pOUT->lzyADD( sGSMansw, gpmSTRLEN(sGSMansw)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMansw, gpmSTRLEN(sGSMansw)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 6	VOICE CALL chat
-			pOUT = pOUT->lzyADD( sGSMchat, gpmSTRLEN(sGSMchat)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMchat, gpmSTRLEN(sGSMchat)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 7	VOICE CALL
-			pOUT = pOUT->lzyADD( sGSMcall, gpmSTRLEN(sGSMcall)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMcall, gpmSTRLEN(sGSMcall)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
@@ -987,7 +987,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	if( nR > 0 ) {
 		nR = read( socket, pANSW, nR );
 		if( nR > 0 )
-			pINP = pINP->lzyADD( pANSW, nR, s=-1, -1 );
+			pINP = pINP->lzyADD( pANSW, nR, s=-1 );
 		nINP = pINP->nLD();
 	}
 
@@ -1296,7 +1296,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 			if( nR > 0 ) {
 				nR = read( socket, pANSW, nR );
 				if( nR > 0 )
-					pINP = pINP->lzyADD( pANSW, nR, s=-1, -1 );
+					pINP = pINP->lzyADD( pANSW, nR, s=-1 );
 				//nINP = pINP->nLD();
 			}
 			s = aSUB[0];

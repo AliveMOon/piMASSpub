@@ -835,9 +835,9 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
 
-		lzyLiNK.lzyADD( &rLNK, sizeof(rLNK), nU = -1, -1 );
+		lzyLiNK.lzyADD( &rLNK, sizeof(rLNK), nU = -1 );
 		return nMN();
 	}
 	U4 STRadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
@@ -854,7 +854,7 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
 		return nMN();
 	}
 	U4 NOTEadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
@@ -871,7 +871,7 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
 		return nMN();
 	}
 };
@@ -1254,6 +1254,211 @@ public:
 	};*/
 };
 /// CCR XNZVC
+class gpITMlst;
+
+class gpITM {
+public:
+	I8 mID, ID;
+	gpcLZY	atLST,
+			voidLST;
+	gpITM(){};
+	~gpITM(){
+	};
+	gpITM* read( gpITMlst *pIDlst );
+	gpITM* store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR );
+	gpITM& null(){
+		/// ha lesz valami törölni való
+		gpmCLR;
+		return *this;
+	}
+	size_t sOF( gpeALF b ) {
+		switch( b ) {
+			case gpeALF_XYR: return sizeof(I4x4);
+			case gpeALF_ID: return sizeof(I8);
+			case gpeALF_LWO:
+				return sizeof(I4);
+			default: break;
+		}
+		return 0;
+	}
+	U1* fndXB( gpeALF b ) {
+		I8x4* pA0 = (I8x4*)atLST.Ux( 0, sizeof(*pA0) );
+		I4 iA = 0;
+		for( I4 nA = atLST.nLD(sizeof(*pA0)); iA < nA; iA++ ) {
+			if( pA0[iA].a8x2[0].b != b )
+				continue;
+			return voidLST.Ux( pA0[iA].a8x2[1].x, pA0[iA].a8x2[1].y, true, 1 );
+		}
+		return NULL;
+	}
+
+	U1* fndAA( I8x2& aa ) {
+		I8x4* pA0 = (I8x4*)atLST.Ux( 0, sizeof(*pA0) );
+		I4 iA = 0;
+		for( I4 nA = atLST.nLD(sizeof(*pA0)); iA < nA; iA++ ) {
+			if( pA0[iA].a8x2[0] != aa )
+				continue;
+			return voidLST.Ux( pA0[iA].a8x2[1].x, pA0[iA].a8x2[1].y, true, 1 );
+		}
+		return NULL;
+	}
+	U1* pAB( I8x2& aa, size_t& n ) {
+		U1* pU = fndAA( aa );
+		n = sOF(aa.b);
+		if( pU )
+			return pU;
+
+
+		I8x4* pA0 = NULL;
+		I4 nA = atLST.nLD(sizeof(*pA0));
+		pA0 = (I8x4*)atLST.Ux( nA, sizeof(*pA0) );
+		if( !pA0 )
+			return NULL;
+
+		pA0->a8x2[0] = aa;
+		pA0->a8x2[1].x = voidLST.nLD();
+		pA0->a8x2[1].y = n;
+		return voidLST.Ux( pA0->a8x2[1].x, pA0->a8x2[1].y, true, 1 );
+	}
+	I4x4* fndXYR( gpeALF alf ) {
+		if( !this )
+			return NULL;
+		I8x2 aa( alf, gpeALF_XYR );
+		return (I4x4*)fndAA( aa );
+	}
+};
+class gpITMlst {
+public:
+	char	sPATH[0x400], *pF;
+	I8		newID;
+	I4		aixITMsel[2], iSW;
+	gpITM	itmSEL;
+	gpcLZY	itmLST;
+	gpMEM*	pMEM;
+	gpITMlst(){};
+	gpITMlst( gpMEM* pM, char* pU1, U2 nU1 ) {
+		gpmCLR;
+		pMEM = pM;
+		pF = sPATH+nU1;
+		gpmMcpy( sPATH, pU1, nU1 );
+	}
+	~gpITMlst(){
+		gpITM* pITM = (gpITM*)itmLST.p_alloc;
+		if( !pITM )
+			return;
+
+		for( I4 i = 0, n = itmLST.nLD(sizeof(gpITM)); i < n; i++ )
+			pITM[i].null();
+	}
+	gpITM* pITM( I4 ix = 0 ) {
+		U4 n = itmLST.nLD(sizeof(gpITM));
+		gpITM* pI = this ? (gpITM*)itmLST.Ux( ix, sizeof(*pI) ) : NULL;
+		if( !pI )
+			return NULL;
+		if( ix < n )
+			return pI;
+		pI->mID = pI->ID = newID;
+		++newID;
+		pI->read( this );
+		return pI;
+	}
+	gpITM* pITMid( I8 id ) {
+		U4 n = itmLST.nLD(sizeof(gpITM));
+		if( n ? (id>=newID): true)
+			return NULL;
+		gpITM* pI = this ? (gpITM*)itmLST.Ux( 0, sizeof(*pI) ) : NULL;
+		if( !pI )
+			return NULL;
+		for( U4 i = 0; i < n; i++ ) {
+			if( pI[i].ID == id )
+				return pI+i;
+		}
+		return NULL;
+	}
+	int nITM() { return itmLST.nLD(sizeof(gpITM)); }
+};
+
+class gpc3Dly;
+class gpc3Dtri {
+public:
+	gpcLZY	ixPRT,
+			p,l,t;
+
+};
+class gpc3D {
+public:
+	char sPATH[gpdMAX_PATH];
+	I8x4 id;
+
+	gpcLZY	*p_lwo,
+			ly3D,
+			tgIX,
+			lzySRF;
+
+	~gpc3D(){
+		gpmDEL(p_lwo);
+	}
+	gpc3D( I4 i, const char* pP, gpeALF alf ) {
+		gpmCLR;
+		U8 nLEN;
+		id.x = i;
+		id.a8x2[0].b = alf;
+		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
+		gpmSTRCPY( sPATH, pP );
+	}
+	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
+	U4 nLY();
+	gpc3Dly* pLYix( U4 i );
+	gpc3D* prt2ix();
+};
+class gpc3Dlst {
+public:
+	gpcLZY lst3D;
+	gpcLZYdct bonLST;
+
+	~gpc3Dlst(){
+		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
+		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			gpmDEL( pp3D[i3D] );
+		}
+	}
+	gpc3Dlst();/*{
+		gpmCLR;
+		U8 nLEN;
+		char* pS = gp_man_lws, *pSe;
+		while( *pS ) {
+			pSe = pS+gpmVAN( pS, "\r\n", nLEN );
+			bonLST.dctADD( pS, pSe-pS );
+			pS = pSe+gpmNINCS(pSe, "\r\n" );
+		}
+	}*/
+	gpc3D* p3Dix( I4 i ) {
+		if( i < 0 ) return NULL;
+		gpc3D* p3D = ((gpc3D**)lst3D.Ux(i,sizeof(gpc3D*)))[0];
+		return p3D;
+	}
+	gpc3D* p3D( gpeALF alf, const char* pP ) {
+		if( !this )
+			return NULL;
+
+		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );//, *p3D;
+		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			if( !pp3D[i3D] ) {
+				if( e3D > i3D )
+					e3D = i3D;
+				continue;
+			}
+			if( pp3D[i3D]->id.a8x2[0].a != alf )
+				continue;
+			return pp3D[i3D];
+		}
+		pp3D = (gpc3D**)lst3D.Ux( e3D, sizeof(gpc3D*) );
+		pp3D[0] = new gpc3D( e3D, pP, alf );
+		return pp3D[0];
+	}
+};
 
 class gpMEM {
 public:

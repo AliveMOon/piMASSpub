@@ -107,6 +107,7 @@ static const GLenum gpaDRWmod[] = {
 			GL_LINES,
 			GL_LINE_STRIP,
 		};
+class gpc3D;
 class gpc3Dlst;
 
 class gpcGL {
@@ -135,7 +136,8 @@ public:
 			VxSsrc,
 			FrSlog,
 			frSsrc,
-			Lnklog;
+			Lnklog,
+			scnDEC1;
 
 	SDL_Renderer* pRNDR;
 	I4x2	luXY,	trgWHpx,
@@ -384,6 +386,7 @@ public:
 		xyWH.a4x2[0] += divPX.a4x2[0];
 		return glSETbox( xyWH.a4x2[0], xyWH.a4x2[1] );
 	}
+	gpcGL* glSETvx( gpc3D* p3D );
 	gpcGL* glSETcnl( U4 i, F4 xyzw ) {
 		if( !this )
 			return NULL;
@@ -556,7 +559,7 @@ public:
 			//Allocate string
 			if( maxLength )
 			{
-				Lnklog.lzyADD( NULL, maxLength, s = -1, -1 );
+				Lnklog.lzyADD( NULL, maxLength, s = -1 );
 				//char* infoLog = new char[ maxLength ];
 
 				//Get info log

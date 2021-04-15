@@ -402,7 +402,7 @@ GLuint gpcGL::GLSLvtx( const char* pS ) {
 		//Allocate string
 		if( maxLength )
 		{
-			VxSlog.lzyADD( NULL, maxLength, s, -1 );
+			VxSlog.lzyADD( NULL, maxLength, s );
 			//char* infoLog = new char[ maxLength ];
 
 			//Get info log
@@ -461,7 +461,7 @@ GLuint  gpcGL::GLSLfrg( const char* pS ) {
 		//Allocate string
 		if( maxLength )
 		{
-			FrSlog.lzyADD( NULL, maxLength, s, -1 );
+			FrSlog.lzyADD( NULL, maxLength, s );
 			//char* infoLog = new char[ maxLength ];
 
 			//Get info log
@@ -490,76 +490,7 @@ GLuint  gpcGL::GLSLfrg( const char* pS ) {
 	return gFrSID;
 
 }
-/**
-"zeroDB/scr/,	cam.eye.yz, pxSCR.xyr, 0, 1,
-				cam.eye.xx, pxSCR.xyr, 0, 2,
-				cam.trg.yz, pxSCR.xyr, 0, 3,
-				man.pos.yz, pxSCR.xyr, 0, 9"
-0.zerodb6 1.scr10 2.,12
- 3.cam16 4.eye20 5.yz23 6.pxscr30 7.xyr34 8.,38 9.,41
- 10.cam69 11.eye73 12.xx76 13.pxscr83 14.xyr87 15.,91 16.,94
- 17.cam122 18.trg126 19.yz129 20.pxscr136 21.xyr140 22.,144 23.,147
- 24.man175 25.pos179 26.yz182 27.pxscr189 28.xyr193 29.,197 30."200
- nAT:31
 
-
-*/
-gpeALF alfSCN0[] = {
-	gpeALF_CAM,
-	gpeALF_MAN,
-};
-
-gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
-	U8 nLEN;
-	char* pSe = pS+gpmVAN( pS, "\"", nLEN );
-	gpcLZY	AT;
-	int nAT = AT.nAT( pS, pSe-pS );
-	if(!nAT)
-		return this;
-	F4	cam_eye, cam_trg, cam_pos, cam_abc,
-		man_eye, man_trg, man_pos, man_abc;
-
-	I8x2* pAT = AT.pI8x2();
-	pAT->alfCON( sPUB,nAT);
-	gpITMlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
-	for( U4 iAT = pAT[0].aALFvan( alfSCN0, nAT, gpmN(alfSCN0) );
-			iAT < nAT;
-			iAT += pAT[iAT].aALFvan( alfSCN0, nAT-iAT, gpmN(alfSCN0) ) ){
-		U4 iAT1 = iAT+1;
-
-		switch( pAT[iAT].alf ) {
-			case gpeALF_CAM:{
-				switch( pAT[iAT1].alf ) {
-					case gpeALF_EYE:
-						break;
-					case gpeALF_TRG:
-						break;
-					case gpeALF_POS:
-						break;
-					case gpeALF_ABC:
-						break;
-					default: break;
-				}
-			} break;
-			case gpeALF_MAN: {
-				switch( pAT[iAT1].alf ) {
-					case gpeALF_EYE:
-						break;
-					case gpeALF_TRG:
-						break;
-					case gpeALF_POS:
-						break;
-					case gpeALF_ABC:
-						break;
-					default: break;
-				}
-			} break;
-			default: break;
-		}
-		iAT++;
-	}
-	return this;
-}
 
 
 

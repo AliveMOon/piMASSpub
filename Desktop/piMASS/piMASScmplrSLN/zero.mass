@@ -351,10 +351,10 @@
  trgw = 640;
  trgh = 960;
  trg = "combi";
- scene = "zeroDB/scr/, cam.eye.yz, pxSCR.xyr, 0, 1,
-                       cam.eye.xx, pxSCR.xyr, 0, 2,
-                       cam.trg.yz, pxSCR.xyr, 0, 3,
-                       man.pos.yz, pxSCR.xyr, 0, 9";
+ scene = "zeroDB/scr/, cam.eye.yx, pxSCR.xyr, 1, 2,
+                       cam.eye.__y, pxSCR.xyr, 1, 3,
+                       cam.trg.yx, pxSCR.xyr, 1, 4,
+                       man.pos.yx, pxSCR.xyr, 1, 9";
 
  pica = "cam1";
  picb = "penna";

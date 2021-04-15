@@ -21,7 +21,7 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 	nCPY = gpmVAN( pSe, "%\\", nLEN );
 	while(nCPY) {
 		s = -1;
-		pPRNT = pPRNT->lzyADD( pSe+nSKIP, nCPY-nSKIP, s, -1 );
+		pPRNT = pPRNT->lzyADD( pSe+nSKIP, nCPY-nSKIP, s );
 		pSe += nCPY;
 		switch( *pSe ){
 			case '%':

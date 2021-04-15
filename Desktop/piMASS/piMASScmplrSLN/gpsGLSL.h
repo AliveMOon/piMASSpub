@@ -2,7 +2,6 @@
 #ifndef gpsGLSL_H
 #define gpsGLSL_H
 
-
 static const char gpsGLSLvx[] = //{
 "#version 120																\n"
 "attribute	vec2	v_vx;													\n"
@@ -426,7 +425,8 @@ const char gpsGLSLfrgISO[] = //{
 "	gl_FragColor = gl_FragColor*gl_FragColor.a + F*F.a;\n"
 "}\n";
 //};
-static const char gpsGLSLfrgISOaa[] =// {
+
+static const char gpsGLSLfrgISOaa[] = //{
 "#version 120																							\n"
 "varying vec2 fr_uv;																					\n"
 "uniform sampler2D tex0;					// MINI_CHAR_xXy_zXw.png									\n"
@@ -561,5 +561,7 @@ static const char gpsGLSLfrgISOaa[] =// {
 "	gl_FragColor = gl_FragColor*gl_FragColor.a + F*F.a;\n"
 "}\n";
 //};
+
+
 
 #endif

@@ -1,7 +1,6 @@
 #include "gpccrs.h"
 #include "gpsGLSL.h"
-typedef enum LWO_ID:U4
-{
+typedef enum LWO_ID:U4 {
 	LWO_ID_FORM	= MAKE_ID('F','O','R','M'),
 	LWO_ID_LWO2	= MAKE_ID('L','W','O','2'),
 
@@ -152,7 +151,8 @@ typedef enum LWO_ID:U4
 	LWO_ID_LIGHT	= MAKE_ID('l','i','g','h'),
 	LWO_ID_COLOR	= MAKE_ID('c','o','l','o'),
 };
-char gp_man_lws[] =
+
+char gp_man_lws[] = //{
 	"manus\n"
 	"bone_mother\n"
 	"bone_groin\n"
@@ -176,8 +176,19 @@ char gp_man_lws[] =
 	"bone_r.feet\n"
 
 	"bone_neck\n"
-	"bone_head\n\0"
-;
+	"bone_head\n\0";
+//};
+
+gpc3Dlst::gpc3Dlst(){
+	gpmCLR;
+	U8 nLEN;
+	char* pS = gp_man_lws, *pSe;
+	while( *pS ) {
+		pSe = pS+gpmVAN( pS, "\r\n", nLEN );
+		bonLST.dctADD( pS, pSe-pS );
+		pS = pSe+gpmNINCS(pSe, "\r\n" );
+	}
+}
 class gpc3Dblnd {
 public:
 	U1x4 ix, srf, part;
@@ -369,7 +380,7 @@ public:
 	I4x4	id;
 	gpcLZY	pnt, blnd, tx, MAP,
 			srSUM, prSUM,
-			bon;
+			bon, tri;
 	gpc3Dfc fc;
 
 	gpcLZYdct	mapDCTmn;
@@ -384,13 +395,13 @@ public:
 	gpc3Dly(){
 		gpmCLR;
 	}
-	gpc3Dly* pLY( gpcLZY& ly3D, U4* pU4i ) {
+	gpc3Dly* pLYadd( gpcLZY& ly3D, U4* pU4i ) {
 		if( !this ){
 			gpc3Dly* pTHIS = (gpc3Dly*)ly3D.Ux( ly3D.nLD(sizeof(gpc3Dly)), sizeof(gpc3Dly) );
 			if( !pTHIS )
 				return NULL;
 
-			return pTHIS->pLY( ly3D, pU4i );
+			return pTHIS->pLYadd( ly3D, pU4i );
 		}
 
 		id.w = swp4( pU4i ); pU4i++;
@@ -547,6 +558,14 @@ public:
 		}
 		return this;
 	}
+	U4 nTRI() { return tri.nLD(sizeof(gpc3Dtri)); }
+	gpc3Dtri* pTRI() {
+		if( !nTRI() ) {
+			gpcLZY srt = mapIXprt;
+			U4x2* pFC = ((U4x2*)srt.Ux( srt.nLD()*2, 1 ))-srt.nLD();
+		}
+		return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
+	}
 	gpc3Dly* PRTcout( const void* pLWO, U4x2* pTG, U4 nGD = 1 ) {
 		U1* pU0 = (U1*)pLWO;
 		for( U4 i = 0, e = prSUM.nLD(sizeof(U4)), n; i < e; i++ ){
@@ -558,72 +577,7 @@ public:
 		return this;
 	}
 };
-class gpc3D {
-public:
-	char sPATH[gpdMAX_PATH];
-	I8x4 id;
 
-	gpcLZY	*p_lwo,
-			ly3D,
-			tgIX,
-			lzySRF;
-
-	~gpc3D(){
-		gpmDEL(p_lwo);
-	}
-	gpc3D( I4 i, const char* pP, gpeALF alf ) {
-		gpmCLR;
-		U8 nLEN;
-		id.x = i;
-		id.a8x2[0].b = alf;
-		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
-		gpmSTRCPY( sPATH, pP );
-	}
-	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
-};
-class gpc3Dlst {
-public:
-	gpcLZY lst3D;
-	gpcLZYdct bonLST;
-
-	~gpc3Dlst(){
-		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
-		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
-		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
-			gpmDEL( pp3D[i3D] );
-		}
-	}
-	gpc3Dlst(){
-		gpmCLR;
-		U8 nLEN;
-		char* pS = gp_man_lws, *pSe;
-		while( *pS ) {
-			pSe = pS+gpmVAN( pS, "\r\n", nLEN );
-			bonLST.dctADD( pS, pSe-pS );
-			pS = pSe+gpmNINCS(pSe, "\r\n" );
-		}
-	}
-	gpc3D* p3D( I4 i ) { return ((gpc3D**)lst3D.Ux( i, sizeof(gpc3D*) ))[0]; }
-	gpc3D* p3D( gpeALF alf, const char* pP ) {
-		if( !this )
-			return NULL;
-
-		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
-		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
-		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
-			if( !pp3D[i3D] ) {
-				if( e3D > i3D )
-					e3D = i3D;
-				continue;
-			}
-			if( pp3D[i3D]->id.a8x2[0].a != alf )
-				continue;
-			return pp3D[i3D];
-		}
-		pp3D = (gpc3D**)lst3D.Ux( e3D, sizeof(gpc3D*) );
-		return (*pp3D) = new gpc3D( e3D, pP, alf );
-	}
-};
 
 F2& F2::swpXY( const void* pV ) {
 	((U1x4*)&x)->wzyx(pV,2);
@@ -734,7 +688,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 					if( pLY ) {
 
 					}
-					pLY = ((gpc3Dly*)NULL)->pLY(ly3D,pU4i);
+					pLY = ((gpc3Dly*)NULL)->pLYadd(ly3D,pU4i);
 				} break;
 			case LWO_ID_PNTS: pLY->pPNTSswp( pU4i, (pUnx-pUi)/(sizeof(float)*3) ); break;
 			case LWO_ID_BBOX: pLY->pBBOXswp(pU4i); break;
@@ -919,11 +873,209 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !this )
 		return -1;
-	I4 id = -1;
 
 	if( !p3Dlst )
 		p3Dlst = new gpc3Dlst;
 
 	gpc3D* p3D = p3Dlst->p3D( a, pPATH )->pLWO(rd, p3Dlst->bonLST );
-	return id;
+	return p3D ? p3D->id.x : -1; //id;
 }
+/**
+"zeroDB/scr/,	cam.eye.yz, pxSCR.xyr, 0, 1,
+				cam.eye.xx, pxSCR.xyr, 0, 2,
+				cam.trg.yz, pxSCR.xyr, 0, 3,
+				man.pos.yz, pxSCR.xyr, 0, 9"
+
+0.zerodb6 1.scr10 2.,12
+	0			1			2			3		4			5			6		7		8
+	 3.cam 16	 4.eye 20	 5.yz 23	 6., 24	 7.pxscr 30	 8.xyr 34	 9., 35	10., 38	11., 41
+	12.cam 69	13.eye 73	14.xx 76	15., 77	16.pxscr 83	17.xyr 87	18., 88	19., 91	20., 94
+	21.cam122	22.trg126	23.yz129	24.,130	25.pxscr136	26.xyr140	27.,141	28.,144	29.,147
+	30.man175	31.pos179	32.yz182	33.,183	34.pxscr189	35.xyr193	36.,194	37.,197
+	38."200
+
+nAT:39
+*/
+
+gpeALF alfSCN0[] = {
+	gpeALF_CAM,
+	gpeALF_MAN,
+	gpeALF_MRK,
+};
+gpeALF alfSCN1[] = {
+	gpeALF_EYE,
+	gpeALF_TRG,
+	gpeALF_POS,
+	gpeALF_ABC,
+};
+char	sSCNdec1[] = "eye trg pos abc \"";
+F4& F4::aaLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
+	//gpmCLR;
+	F4 d(0.0), a, b;
+	int nPLS = gpmNINCS( pS, "." );
+	if( nPLS >= nS )
+		return *this;
+
+	pS += nPLS;
+	nS -= nPLS;
+	char* pSRC = NULL, *pI;
+	switch( alfV ) {
+		case gpeALF_XYR:
+			a = ppV[1] ? *(I4x4*)ppV[1] : I4x4(0);
+			b = ppV[0] ? *(I4x4*)ppV[0] : I4x4(0);
+			d = a-b;
+			d.w = 0.0;
+			pSRC = "xyr";
+			break;
+		default: break;
+	}
+	if( !pSRC )
+		return *this;
+
+	for( int i = 0, c; i < nS; i++ ) {
+		c = pS[i];
+		if( c >= '0' && c <= '9' ) {
+			aXYZW[i%4] = c;
+			continue;
+		}
+		switch(c){
+			case '_':
+				continue;
+			default:
+				pI = strchr( pSRC, pS[i] );
+				if(!pI)
+					continue;
+				aXYZW[i%4] = d.aXYZW[(pI-pSRC)%4];
+		}
+	}
+
+	return *this;
+}
+
+static const char gpsGLSLvx3D[] = //{
+"#version 120																\n"
+"attribute	vec2	v_vx;													\n"
+"attribute	vec2	v_uv;													\n"
+"varying	vec2	fr_uv;													\n"
+"void main()																\n"
+"{																			\n"
+"	gl_Position			= vec4( v_vx*vec2(2.0,-2.0)+vec2(-1.0,1.0), 0, 1);	\n"
+"	fr_uv				= v_uv;												\n"
+"}																			\n\0";
+//};
+static const char gpsGLSLfrg3D[] = //{
+"#version 120																\n"
+"varying vec2 fr_uv;														\n"
+"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
+"uniform vec4 		aCNL[8];				// CNL							\n"
+"void main()																\n"
+"{																			\n"
+"	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0];						\n"
+"	if( gl_FragColor.a < (1/0x100) )										\n"
+" 		discard;															\n"
+"}																			\n"
+"\n\0";
+//};
+
+U4 gpc3D::nLY() { return ly3D.nLD(sizeof(gpc3Dly)); }
+gpc3Dly* gpc3D::pLYix( U4 i ) {
+	if( this ? nLY()<=i : true )
+		return NULL;
+	return (gpc3Dly*)ly3D.Ux( i, sizeof(gpc3Dly) );
+}
+gpc3D* gpc3D::prt2ix() {
+	gpc3Dly* pLY;
+	for( U4 i = 0, n = nLY(); i < n; i++ ) {
+		pLY = pLYix(i);
+		if( !pLY )
+			continue;
+		gpc3Dtri* pTRI = pLY->pTRI();
+	}
+	return this;
+}
+gpcGL* gpcGL::glSETvx( gpc3D* p3D ) {
+
+	p3D->prt2ix();
+	return this;
+}
+gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
+	int nD1 = scnDEC1.nLD() ? scnDEC1.nLD() : scnDEC1.nAT(sSCNdec1,sizeof(sSCNdec1));
+
+	U8 nLEN;
+	char* pSe = pS+gpmVAN( pS, "\"", nLEN ), *pN, *pNx, *pU1;
+	gpcLZY	AT;
+	int nAT = AT.nAT( pS, pSe-pS," \r\n\t:+" ), i0, i1, iAs, iF4;
+	if(!nAT)
+		return this;
+	F4	aCAM[0x20],
+		*pMAN = aCAM+(gpmN(aCAM)/2);
+	gpmZ(aCAM);
+	U1 *apV[2]; size_t aVn[2], nU1;
+	gpITM	*apI[2], *pI0;
+	I8x2	*pAT = AT.pI8x2(),
+			*pD1 = scnDEC1.pI8x2(), aaS;
+	pAT->alfCON( sPUB,nAT);
+	gpITMlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
+	gpeALF alfD;
+	for( U4 iAT = pAT[0].aALFvan( alfSCN0, nAT, gpmN(alfSCN0) ), iAnx, iAT1;
+			iAT < nAT;
+			iAT += iAnx ){
+		if( pAT[iAT].alf == gpeALF_MRK )
+			break;
+		iAT1 = iAT+1;
+		iAnx = pAT[iAT1].aALFvan( alfSCN0, nAT-iAT1, gpmN(alfSCN0) )+1;
+		pNx = pS+pAT[iAT+iAnx].num;
+
+		pN = pS+pAT[iAT].num;
+		pN += gpmVAN( pN, "0123456789",nLEN );
+		if( pN > pNx )
+			continue;
+		apI[0] = pIl->pITMid(gpmSTR2U8(pN,10));
+		if( !apI[0] )
+			continue;
+
+		pN += gpmVAN( pN, "0123456789",nLEN );
+		if( pN > pNx )
+			continue;
+		apI[1] = pIl->pITMid(gpmSTR2U8(pN,10));
+		if( !apI[1] )
+			continue;
+
+
+
+
+		alfD = pAT[iAT+2].alf;
+
+		//aaS.a = pAT[iAT+3].alf == gpeALF_CM ? pAT[iAT+4].alf:pAT[iAT+3].alf;
+		iAs = pAT[iAT+3].alf == gpeALF_CM ? iAT+5:iAT+4;
+		aaS.b = pAT[iAs].alf;
+		aaS.a = pAT[iAs-1].alf;
+
+		nU1 = pAT[iAT+2].num-pAT[iAT+1].num;
+		pU1 = pS+pAT[iAT+1].num;
+
+		apV[0] = apI[0]->pAB(aaS,aVn[0]);
+		apV[1] = apI[1]->pAB(aaS,aVn[1]);
+
+		iF4 = pD1->alfFND(pAT[iAT+1].alf,nD1);
+		switch( pAT[iAT].alf ) {
+			case gpeALF_CAM: aCAM[iF4].aaLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
+			case gpeALF_MAN: pMAN[iF4].aaLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
+			default: break;
+		}
+	}
+	pI0 = pIl->pITM();
+	I8x2 vf( gpeALF_SCENE, (I8)5 );
+	for( int i = 0, n = pIl->nITM(); i < n; i++ ) {
+		apV[0] = pI0[i].fndXB( gpeALF_LWO );
+		if( !apV[0] ) continue;
+
+		gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
+		if( !p3D ) continue;
+
+		GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
+		glSETvx( p3D );
+	}
+	return this;
+}
+

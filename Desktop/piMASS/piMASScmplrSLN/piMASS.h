@@ -349,7 +349,7 @@ public:
 #define gpdSQRT3 1.7320508075688772935274463415059f
 #define gpmNINCS( s, v )	strspn( (char*)(s), (char*)(v) )
 #define gpmSTR2D( p )	strtod( (char*)(p), (char**)&(p) )
-#define gpmSTR2U8( p, r )	strtol( (char*)(p), (char**)&(p), (r) )
+#define gpmSTR2U8( p, radx )	strtol( (char*)(p), (char**)&(p), (radx) )
 #define gpdVAN	strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
 #define gpmCLR	if( this ) bzero( this, sizeof(*this) )
@@ -4505,6 +4505,7 @@ public:
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
+    F4& aaLOAD( char* pS, U4 nS, gpeALF alfS, U1** ppV, size_t* pN );
 	F4& sXYZW( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
 	F4& swpXYZ0( const void* pV );
 
@@ -5572,9 +5573,9 @@ public:
 		aSET[gpeLZYxN] = n;
 	}
 	gpcLZY( gpcVAR* pALF, U4 n );
-
-	~gpcLZY() { gpmFREE( p_alloc ); }
-	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
+	gpcLZY( const gpcLZY& b );
+ 	~gpcLZY() { gpmFREE( p_alloc ); }
+	size_t nLD( size_t n = 1 ) const { return this ? n_load/n : 0; }
 	U8 nSUM(){
 		U8 sum = nLD();
 		if( !sum )
@@ -5861,7 +5862,8 @@ public:
 			p_lazy->n_load = n_byte;
 			return p_lazy;
 		}
-
+		if( n > 0x80 )
+			n = 4;
 		if( !n )
 		{
 			if( !aSET[gpeLZYxN] )
@@ -6058,15 +6060,14 @@ public:
 		gpmMcpyOF( p_alloc+iSTRT, p_u1, n_u1 );
 		return this;
 	}
-	gpcLZY& operator = ( const gpcLZY& plus ) {
+	gpcLZY& operator = ( const gpcLZY& b ) {
 		U8 s = 0;
-		lzyINS( plus.p_alloc, plus.n_load, s, -1 );
-
+		lzyINS( b.p_alloc, b.nLD(), s, -1 );
 		return *this;
 	}
 	gpcLZY* operator += ( const gpcLZY& plus ) {
 		U8 s = -1;
-		return lzyADD( plus.p_alloc, plus.n_load, s );
+		return lzyADD( plus.p_alloc, plus.nLD(), s );
 	}
 	gpcLZY* lzyDIR( const char* p_file, U8& iSTRT );
 	gpcLZY* lzyRD( const char* p_file, U8& iSTRT, U1 n = 0 ) {
@@ -6202,20 +6203,23 @@ szasz:
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
 	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 ) {
+		if( !this )
+			return NULL;
+
 		if( iPC < 0 )
 			iPC *= -1;
 		if( !stp )
 			stp = n;
 		U8	e = iPC*stp + n;
-		if( e <= n_load )
+		if( e <= nLD() )
 			 return p_alloc + iPC*stp; //n;
 
 		U8 s = -1, ee = e+n*3;
 
-		lzyADD( NULL, ee-n_load, s, -1 );
+		lzyADD( NULL, ee-nLD(), s );
 		if( bZ )
-			gpmZn( p_alloc+s, n_load-s );
-		if( n_load > e )
+			gpmZn( p_alloc+s, nLD()-s );
+		if( nLD() > e )
 			n_load = e;
 
         return p_alloc + iPC*stp; //*n;//+e-n*2;
