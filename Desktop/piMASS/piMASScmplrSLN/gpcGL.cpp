@@ -53,29 +53,24 @@ gpcGL::gpcGL( gpcWIN& win ) {
 
 
 
-gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
+gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, bool bDEP ) {
 	if( this ? !pRNDR : true )
 		return NULL;
 
-	if(pT)
-	{
+	if(pT) {
 		if( pT->txWH.a4x2[1] != wh )
 			gpmSDL_FreeTX( pT->pRTX );
 
-		if(!pT->pRTX)
-		{
+		if(!pT->pRTX) {
 			pT->pRTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
 			if(!pT->pRTX)
 				return NULL;
 			pT->txWH.a4x2[1] = wh;
 		}
 
-		if(pRTX!=pT->pRTX)
-		{
-			if(pPICrtx)
-			{
-				if(!pPICrtx->pSRF)
-				{
+		if(pRTX!=pT->pRTX) {
+			if(pPICrtx) {
+				if(!pPICrtx->pSRF) {
 					int w=0, h=0, acc=0;
 					U4 frm;
 					SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
@@ -89,16 +84,28 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, bool bCLR, bool bDEP ) {
 		}
 		pPICrtx=pT;
 		SDL_SetRenderTarget(pRNDR,pRTX=pPICrtx->pRTX);
-	} else {
+	}
+	else {
 		pPICrtx=NULL;
 		SDL_SetRenderTarget(pRNDR,pRTX=NULL);
 	}
 
 	GLbitfield b = GL_STENCIL_BUFFER_BIT;
-	if( bCLR )
+	if( !tC )
 		b |= GL_COLOR_BUFFER_BIT;
-	if( bDEP )
+	else if( tC > 0 )
+	if( pT->tC < tC ) {
+		b |= GL_COLOR_BUFFER_BIT;
+		pT->tC = tC;
+	}
+
+	if( !tD )
+		b |= GL_COLOR_BUFFER_BIT;
+	else if( tD > 0 )
+	if( pT->tD < tD ) {
 		b |= GL_DEPTH_BUFFER_BIT;
+		pT->tD = tD;
+	}
 
 	glClearColor( 0.0f, 0.0f, 0.25, 1.0f );
 	glClearDepth((GLclampd)1.0);

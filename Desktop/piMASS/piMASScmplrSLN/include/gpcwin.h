@@ -106,6 +106,7 @@ static const GLenum gpaDRWmod[] = {
 			GL_TRIANGLE_FAN,
 			GL_LINES,
 			GL_LINE_STRIP,
+			GL_TRIANGLES,
 		};
 class gpc3D;
 class gpc3Dlst;
@@ -171,7 +172,7 @@ public:
 	}
 
 	gpcGL( gpcWIN& win );
-	gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, bool bC = true, bool bD = true );
+	gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
 	gpcGL* TRG( SDL_Renderer* pSDLrndr,
 				I4x2 lXY, const I4x2& tWH, float ms,
 				bool bCLR = true, bool bDEP = true ) {

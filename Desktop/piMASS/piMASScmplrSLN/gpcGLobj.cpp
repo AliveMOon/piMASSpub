@@ -1086,12 +1086,12 @@ F4& F4::aaLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
 
 static const char gpsGLSLvx3D[] = //{
 "#version 120																\n"
-"attribute	vec2	v_vx;													\n"
+"attribute	vec3	v_vx;													\n"
 "attribute	vec2	v_uv;													\n"
 "varying	vec2	fr_uv;													\n"
 "void main()																\n"
 "{																			\n"
-"	gl_Position			= vec4( v_vx*vec2(2.0,-2.0)+vec2(-1.0,1.0), 0, 1);	\n"
+"	gl_Position			= vec4( v_vx*0.5,1.0 )+vec4( 0, -0.5, 0.33, 0); \n"  								// *vec2(2.0,-2.0)+vec2(-1.0,1.0), 0, 1);	\n"
 "	fr_uv				= v_uv;												\n"
 "}																			\n\0";
 //};
@@ -1102,9 +1102,9 @@ static const char gpsGLSLfrg3D[] = //{
 "uniform vec4 		aCNL[8];				// CNL							\n"
 "void main()																\n"
 "{																			\n"
-"	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0];						\n"
-"	if( gl_FragColor.a < (1/0x100) )										\n"
-" 		discard;															\n"
+"	gl_FragColor = vec4(1,1,1,1) + texture2D( tex0, fr_uv )*aCNL[0];		\n"
+"	//if( gl_FragColor.a < (1/0x100) )										\n"
+" 	//	discard;															\n"
 "}																			\n"
 "\n\0";
 //};
@@ -1183,7 +1183,8 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p ) {
 				if( !pT0[t].aIIXN[2].y )
 					continue;
 				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );
-				glDrawElements( gpaDRWmod[0], pT0[t].aIIXN[2].a4x2[1].n, GL_UNSIGNED_INT, NULL );
+				glDrawElements( GL_TRIANGLES, // gpaDRWmod[0],
+								pT0[t].aIIXN[2].a4x2[1].n, GL_UNSIGNED_INT, NULL );
 
 			}
 			glDisableVertexAttribArray( ATvxID );
@@ -1261,6 +1262,9 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	}
 	pI0 = pIl->pITM();
 	I8x2 vf( gpeALF_SCENE, (I8)5 );
+	if( !pMEM->pMgl )
+		return this;
+
 	for( int i = 0, n = pIl->nITM(); i < n; i++ ) {
 		apV[0] = pI0[i].fndXB( gpeALF_LWO );
 		if( !apV[0] ) continue;
@@ -1268,10 +1272,11 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
 		if( !p3D ) continue;
 
+		//glSETtrg( pMEM->pMgl->pTRG, pMEM->pMgl->trgWH.a4x2[1], tCD, tCD ); //gpdGLpTRG, gpdGLpTRGwh, true, true )
 		GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
 		//glSET3D( p3D );
 		glDRW3D(p3D);
-		glDONE();
+
 	}
 
 	return this;

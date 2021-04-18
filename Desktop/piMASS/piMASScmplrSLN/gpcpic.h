@@ -544,6 +544,7 @@ public:
 	U4				id, iSRC, aiQC[2],
 					nPIXall, nPIX,
 					nBOBall, nBOB,
+					tC,tD,
 
 					bppS, nPKavg;
 

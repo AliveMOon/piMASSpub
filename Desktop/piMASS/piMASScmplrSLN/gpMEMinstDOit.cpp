@@ -93,6 +93,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 #define gpdGLmskPIC	gpdGL->mskPIC
 #define gpdGLapPIC	gpdGL->apPIC
 #define gpdGLpTRG	gpdGL->pTRG
+#define gpdGLpTRG	gpdGL->pTRG
 #define gpdGLpTRGxy	gpdGL->trgWH.a4x2[0]
 #define gpdGLpTRGwh	gpdGL->trgWH.a4x2[1]
 #define gpmGLnCNL 	gpdGL->lzyCNL.nLD(sizeof(F4))
@@ -432,8 +433,8 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 					an = (char*)pU1+ ((*pU1 == '\"') ? 1 : 0);
 				else
 					an = I8x2( *(I4*)pU1, 0 );
-
-				pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, true, true )
+				U4 tCD = pWIN ? pWIN->nJDOIT.w : 0;
+				pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD )
 					->GLSLset( an )
 					->glSETbox( gpdGLpTRGxy, gpdGLpTRGwh )
 					->glSETcnl( 0, gpmGLaCNL4(0), gpmGLnCNL )
@@ -443,8 +444,10 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 			} break;
 		case gpeALF_SCENE: if( pWgl ? gpdGLpTRG : NULL  ) {	cID = gpeCsz_b; if( bCID ) break;
 				if( obj.bUTF8() ) {
-					pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, true, true )
+					U4 tCD = pWIN ? pWIN->nJDOIT.w : 0;
+					pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD )
 						->glSCENE( this, (char*)pU1+ ((*pU1 == '\"') ? 1 : 0) );
+					pWgl->glDONE();
 				}
 			} break;
 		default:
