@@ -159,7 +159,8 @@ public:
 	U4x2 aVXn[0x10];
 	F4* pV;
 
-	gpc3Dlst* p3Dlst;
+	gpc3D*		p3D;
+	gpc3Dlst*	p3Dlst;
 
 	I4 iLWO( gpeALF a, const char* pPATH, gpcLZY& rd );
 	gpcGL* GLSLset( const gpcALU& alu, const char* pF = NULL, const char* pV = NULL );
@@ -243,6 +244,39 @@ public:
 		glBufferData( GL_ARRAY_BUFFER, aVXn[0].area() * sizeof(*pD), pD, GL_STATIC_DRAW );
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		return aVXid[0];
+	}
+	U4x4 IBOobj( U4x4& iIXn,const GLuint* pD, U4 nD, U4 nX ) {
+		if( iIXn.y )
+			return iIXn;
+		iIXn.y++;
+
+		if( iIXn.x )
+			glDeleteBuffers(1,  &iIXn.x );
+		//Create IBO
+		iIXn.a4x2[1] = U4x2( nX, nD );
+
+		//aIXn[0] = nD;
+		glGenBuffers( 1, &iIXn.x );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iIXn.x );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, iIXn.a4x2[1].area()*sizeof(*pD), pD, GL_STATIC_DRAW );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+		return iIXn;
+	}
+	U4x4 VBOobj( U4x4& iVXn, const GLfloat* pD, U4 nD, U4 nX ) {
+		//Create VBO
+		if( iVXn.y )
+			return iVXn;
+		iVXn.y++;
+
+		if( iVXn.x )
+			glDeleteBuffers(1,  &iVXn.x );
+
+		iVXn.a4x2[1] = U4x2( nX, nD );
+		glGenBuffers( 1, &iVXn.x );
+		glBindBuffer( GL_ARRAY_BUFFER, iVXn.x );
+		glBufferData( GL_ARRAY_BUFFER, iVXn.a4x2[1].area(), pD, GL_STATIC_DRAW );
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+		return iVXn;
 	}
 	GLuint viBO( U1 md, const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
@@ -449,7 +483,8 @@ public:
 		}
 		return this;
 	}
-	gpcGL* glDONE(){ glUseProgram(0); return this; }
+	gpcGL* glDRW3D( gpc3D* p );
+	gpcGL* glDONE(){ glUseProgram(0); p3D = NULL; return this; }
 	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
 		if( !this )
 			return NULL;
@@ -520,8 +555,7 @@ public:
 
 		return this;
 	}
-	gpcGL* SWP( SDL_Window* pWIN )
-	{
+	gpcGL* SWP( SDL_Window* pWIN ) {
 		if( !this )
 			return NULL;
 

@@ -1,8 +1,7 @@
 #include "gpccrs.h"
 #include "gpsGLSL.h"
 
-gpcGL::gpcGL( gpcWIN& win )
-{
+gpcGL::gpcGL( gpcWIN& win ) {
 	gpmCLR;
 	oPrgID = -1;
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );

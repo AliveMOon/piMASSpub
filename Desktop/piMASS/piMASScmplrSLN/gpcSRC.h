@@ -1381,9 +1381,29 @@ public:
 class gpc3Dly;
 class gpc3Dtri {
 public:
-	gpcLZY	ixPRT,
-			p,l,t;
+	U4 prt;
+	gpcLZY	p,l,t,
+			srf;
+	U4x4 aIIXN[4];
 
+	gpc3Dtri(){};
+	gpc3Dtri* null() {
+		p.null();
+		l.null();
+		t.null();
+		srf.null();
+	}
+	U4x4* pSRF( U4 s ) {
+		if( !this )
+			return NULL;
+
+		U4x4* pS = srf.pU4x4n( srf.nLD(sizeof(*pS)) );
+		*pS = U4x4( s, p.nLD(sizeof(U4)), l.nLD(sizeof(U4)), t.nLD(sizeof(U4)) );
+		return pS;
+	}
+	~gpc3Dtri(){
+		null();
+	};
 };
 class gpc3D {
 public:
@@ -1409,7 +1429,7 @@ public:
 	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
 	U4 nLY();
 	gpc3Dly* pLYix( U4 i );
-	gpc3D* prt2ix();
+	gpc3D* prt2ix( gpcGL* pGL );
 };
 class gpc3Dlst {
 public:

@@ -269,8 +269,8 @@ public:
 
 			pIX = (U4*)IX.Ux( pFC->sum(), sizeof(*pIX) ) - pFC->n;
 			for( U4 i = 0; i < pFC->n; i++ ) {
-				if( *pUi&0x80 ) {
-					pIX[i] = swp4( pUi )&0x7FFFffff; pUi+= 4;
+				if( *pUi == 0xff ) {
+					pIX[i] = swp4( pUi )&0xFFffff; pUi+= 4;
 				} else {
 					pIX[i] = swp2( pUi ); pUi+= 2;
 				}
@@ -291,15 +291,19 @@ public:
 };
 class gpc3Dmap {
 public:
-	gpcLZY pnt, fcl, fci;
+	gpcLZY tri, pnt, fcl, fci, fps, fpsSRT;
 	U4 id;
+	U4x4 iVXn;
 
 	gpc3Dmap(	U4 ix, gpcLZY& p,
 				gpc3Dfc& fc,
 				gpcLZY& b,
-				gpcLZY& t, U4x2 *pIX2,
+				gpcLZY& t,
+				U4x2 *pIX2,
+				gpcLZY& ps,
 				void* p_u, void* p_nx
 			) {
+		fps = ps;
 		U1 *pUi = (U1*)p_u, *pUnx = (U1*)p_nx;
 		id = ix;
 		fcl = fc.LST;
@@ -371,6 +375,100 @@ public:
 			}
 		}
 
+
+	}
+	~gpc3Dmap() {
+		U4 nTR = nTRI();
+		gpc3Dtri* pTR = (gpc3Dtri*)tri.Ux( nTR, sizeof(*pTR) );
+		for( U4 t = 0; t < nTR; t++ )
+			pTR[t].null();
+	}
+	U4 nTRI() { return tri.nLD(sizeof(gpc3Dtri)); }
+	gpc3Dtri* pTRI( gpcLZY& buf, const void* pLWO = NULL, U4x2* pTG = NULL ) {
+		if( nTRI() )
+			return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
+		if( !pLWO )
+			pTG = NULL;
+
+		U4x2 	*pTMP = ((U4x2*)buf.Ux( fps.nLD() + 1, 1 ))-(fps.nLD()+1),
+				*pPRT = fps.pU4x2(),//(U4x2*)fps.p_alloc,
+				*pFl0 = fcl.pU4x2(),
+				*pFli;
+		U4	nFC = fps.nLD(sizeof(*pTMP)),
+			*pFi0 = fci.pU4(),
+			*pFii, *pU4;
+
+
+		pPRT->median(nFC,pTMP,true);
+		gpc3Dtri* pTR = NULL;
+		U4x4* pSRF;
+
+
+		for( U4 i = 0, p = -1, s = -1; i < nFC; i++ ) {
+			if( p != pPRT[i].prt ) {
+				if( pTR ) {
+					pSRF = pTR->pSRF(-1);
+					if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
+												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
+												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
+												<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
+				}
+				pTR = (gpc3Dtri*)tri.Ux( tri.nLD(sizeof(*pTR)), sizeof(*pTR) );
+				pTR->prt = p = pPRT[i].prt;
+				if( pTG ) std::cout << "PART:" <<((char*)pLWO) + pTG[p].x << std::endl;
+				s = -1;
+				pSRF = 0;
+			}
+			if( s != pPRT[i].srf ){
+				s = pPRT[i].srf;
+				if( pSRF ){
+					pSRF = pTR->pSRF(s);
+					if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
+												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
+												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
+												<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
+				} else
+					pSRF = pTR->pSRF(s);
+				if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF->x].x
+												<< " 1p:" << pSRF->y
+												<< " 2p:" << pSRF->z/2
+												<< " 3p:" << pSRF->w/3 << std::flush;
+			}
+
+			pFli = pFl0+pPRT[i].i;
+			pFii = pFi0 + pFli->x;
+			switch( pFli->y ) {
+				case 0:
+					break;
+				case 1:
+					pU4 = (U4*)pTR->p.pU4n( -1 ); //pTR->p.nLD(sizeof(*pU4)) );
+					gpmMcpyOF( pU4, pFii, 1 ); break;
+				case 2:
+					pU4 = (U4*)pTR->l.pU4n( -1, 2 ); //pTR->l.nLD(sizeof(*pU4)), 2 );
+					gpmMcpyOF( pU4, pFii, 2 ); break;
+				case 3:
+					pU4 = (U4*)pTR->t.pU4n( -1, 3 ); //pTR->t.nLD(sizeof(*pU4)), 3 );
+					gpmMcpyOF( pU4, pFii, 3 ); break;
+				default:
+					for( U4 i0 = *pFii, j = 1, je = pFli->y-1; j < je; j++ ) {
+						pU4 = (U4*)pTR->t.pU4n( -1, 3 ); //pTR->t.nLD(sizeof(*pU4)), 3 );
+						pU4[0] = i0;
+						pU4[1] = pFii[j];
+						pU4[2] = pFii[j+1];
+					}
+					break;
+			}
+
+		}
+		if( !pSRF )
+			return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
+
+		pSRF = pTR->pSRF(-1);
+		if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
+												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
+												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
+												<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
+		return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 	}
 };
 
@@ -380,7 +478,7 @@ public:
 	I4x4	id;
 	gpcLZY	pnt, blnd, tx, MAP,
 			srSUM, prSUM,
-			bon, tri;
+			bon, buf;
 	gpc3Dfc fc;
 
 	gpcLZYdct	mapDCTmn;
@@ -495,30 +593,39 @@ public:
 		return (*ppM) = new gpc3Dmap(	ix, pnt, fc,
 										mapBLwg,
 										mapF2tx, pIX2,
+										mapIXprt,
 										pUi, pUnx
 									);
-
 	}
 
 	gpc3Dly* SRFswp( const void* pV, U4 n ) {
 		char* pUi = ((char*)pV), *pUnx = ((char*)pV)+n;
 		gpc3Dblnd* pBl;
-		U4x2* pF;
-		U4 iF, *pFi, nF = 0, ix;
+		U4x2	*pSRF, srf, *pFl,
+				*pPRT;
+		U4 *pFi, nF = 0;
+		/// PTAG { type[ID4], ( poly[VX], tag[U2] )* }
 		while( pUi < pUnx ) {
-			iF = swp2( pUi ); pUi += 2;
-			if( *pUi&0x80 ) {
-				ix = swp4( pUi )&0x7FFFffff; pUi+= 4;
-			} else {
-				ix = swp2( pUi ); pUi+= 2;
-			}
-			(*(U4*)srSUM.Ux( ix, sizeof(U4) ))++;
 
-			pF = (U4x2*)fc.LST.Ux( iF, sizeof(*pF) );
-			pFi = (U4*)fc.IX.Ux( pF->sum(), sizeof(*pFi) ) - pF->i;
-			for( U4 i = 0; i < pF->y; i++ ) {
+			/// poly[VX]
+			if( *pUi == 0xff ) {
+				srf.i = swp4( pUi )&0xFFffff; pUi+= 4;
+			} else {
+				srf.i = swp2( pUi ); pUi+= 2;
+			}
+			/// tag[U2]
+			srf.srf = swp2( pUi ); pUi += 2;
+
+			(*(U4*)srSUM.Ux( srf.srf, sizeof(U4) ))++;
+			pPRT = (U4x2*)mapIXprt.Ux( srf.i, sizeof(*pPRT) );
+			pPRT->srf = srf.srf;
+			// FACE
+			pFl = (U4x2*)fc.LST.Ux( srf.i, sizeof(*pSRF) );
+			pFi = (U4*)fc.IX.Ux( pFl->sum(), sizeof(*pFi) ) - pFl->n;
+
+			for( U4 i = 0; i < pFl->n; i++ ) {
 				pBl = (gpc3Dblnd*)mapBLwg.Ux( pFi[i], sizeof(*pBl) );
-				pBl->SRFset( ix );
+				pBl->SRFset( srf.srf );
 			}
 			nF++;
 		}
@@ -540,31 +647,28 @@ public:
 
 	gpc3Dly* PRTswp( const void* pV, U4 n ) {
 		char* pUi = ((char*)pV), *pUnx = ((char*)pV)+n;
-		U4x2* pF, *pPRT;
-		U4 iF, *pFi, nF = 0, ix;
+		U4x2* pF, *pPRT, prt;
+		U4 *pFi, nF = mapIXprt.nLD(sizeof(*pPRT)), ix;
+		/// PTAG { type[ID4], ( poly[VX], tag[U2] )* }
 		while( pUi < pUnx ) {
-			iF = swp2( pUi ); pUi += 2;
-			if( *pUi&0x80 ) {
-				ix = swp4( pUi )&0x7FFFffff; pUi+= 4;
-			} else {
-				ix = swp2( pUi ); pUi+= 2;
-			}
-			(*(U4*)prSUM.Ux( ix, sizeof(U4) ))++;
 
-			pPRT = (U4x2*)mapIXprt.Ux( nF, sizeof(U4) );
-			pPRT->i = nF;
-			pPRT->n = ix;
+			/// poly[VX]
+			if( *pUi == 0xff ) {
+				prt.i = swp4( pUi )&0xFFffff; pUi+= 4;
+			} else {
+				prt.i = swp2( pUi ); pUi+= 2;
+			}
+			/// tag[U2]
+			prt.prt = swp2( pUi ); pUi += 2;
+
+			(*(U4*)prSUM.Ux( prt.prt, sizeof(U4) ))++;
+
+			pPRT = (U4x2*)mapIXprt.Ux( prt.i, sizeof(*pPRT) );
+			pPRT->i = prt.i;
+			pPRT->prt = prt.prt;
 			nF++;
 		}
 		return this;
-	}
-	U4 nTRI() { return tri.nLD(sizeof(gpc3Dtri)); }
-	gpc3Dtri* pTRI() {
-		if( !nTRI() ) {
-			gpcLZY srt = mapIXprt;
-			U4x2* pFC = ((U4x2*)srt.Ux( srt.nLD()*2, 1 ))-srt.nLD();
-		}
-		return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 	}
 	gpc3Dly* PRTcout( const void* pLWO, U4x2* pTG, U4 nGD = 1 ) {
 		U1* pU0 = (U1*)pLWO;
@@ -575,6 +679,34 @@ public:
 			std::cout << i << " " << n << " " << (char*)(pU0+pTG[i].x) <<  std::endl;
 		}
 		return this;
+	}
+	U4 nMAP( const void* pLWO = NULL, U4x2* pTG = NULL ) {
+		if(!this)
+			return 0;
+		U4 nM = MAP.nLD(sizeof(gpc3Dmap*));
+		if( !nM )
+			return 0;
+
+		gpc3Dmap	**ppM = (gpc3Dmap**)MAP.ppVOID(), //MAP.Ux( 0, sizeof(*ppM) ),
+					*pM = NULL;
+		for( U4 m = 0; m < nM; m++ ){
+			pM = ppM[m];
+			if( !pM )
+				continue;
+			pM->pTRI( buf, pLWO, pTG );
+		}
+
+		return nM;
+	}
+	gpc3Dmap* pMAP( U4 ix ) {
+		if(!this)
+			return NULL;
+		U4 nM = MAP.nLD(sizeof(gpc3Dmap*));
+		if( nM < ix )
+			return NULL;
+
+		gpc3Dmap **ppM = (gpc3Dmap**)MAP.ppVOID();
+		return ppM ? ppM[ix] : NULL;
 	}
 };
 
@@ -983,21 +1115,84 @@ gpc3Dly* gpc3D::pLYix( U4 i ) {
 		return NULL;
 	return (gpc3Dly*)ly3D.Ux( i, sizeof(gpc3Dly) );
 }
-gpc3D* gpc3D::prt2ix() {
+gpc3D* gpc3D::prt2ix( gpcGL* pGL ) {
 	gpc3Dly* pLY;
-	for( U4 i = 0, n = nLY(); i < n; i++ ) {
+	//gpc3Dtri* pTR;
+	for( U4 i = 0, n = nLY(), nTR, nMAP; i < n; i++ ) {
 		pLY = pLYix(i);
-		if( !pLY )
+		nMAP = pLY->nMAP( p_lwo->p_alloc, tgIX.pU4x2()  );
+		if( !nMAP )
 			continue;
-		gpc3Dtri* pTRI = pLY->pTRI();
+		gpc3Dmap* pM;
+		gpc3Dtri* pT0;
+		for( U4 m = 0, nT; m < nMAP; m++ ){
+			pM = pLY->pMAP(m);
+			if( pGL ? !pM : true )
+				continue;
+			gpc3Dvx* pVX = (gpc3Dvx*)pM->pnt.p_alloc;
+
+			//pM->iVXn =
+			if( !pM->iVXn.y )
+				pGL->VBOobj( pM->iVXn, (GLfloat*)pVX, pM->pnt.nLD(sizeof(*pVX)), sizeof(*pVX) );
+
+			nT = pM->nTRI();
+			pT0 = pM->pTRI( pLY->buf );
+			for( U4 t = 0; t < nT; t++ ) {
+				if( pT0[t].aIIXN[2].y )
+					continue;
+				pGL->IBOobj( pT0[t].aIIXN[2], pT0[t].t.pU4(), pT0[t].t.nU4(3), 3 );
+
+			}
+		}
 	}
 	return this;
 }
-gpcGL* gpcGL::glSETvx( gpc3D* p3D ) {
+gpcGL* gpcGL::glDRW3D( gpc3D* p ) {
+	p3D = p->prt2ix( this );
+	if( !p3D )
+		return this;
 
-	p3D->prt2ix();
+	gpc3Dly* pLY;
+	gpc3Dmap* pM;
+	gpc3Dtri* pT0;
+	for( U4 i = 0, n = p3D->nLY(), nMAP; i < n; i++ ) {
+		pLY = p3D->pLYix(i);
+		nMAP = pLY->nMAP( p3D->p_lwo->p_alloc, p3D->tgIX.pU4x2() );
+		if( !nMAP )
+			continue;
+
+		for( U4 m = 0, nT; m < nMAP; m++ ){
+			pM = pLY->pMAP(m);
+			if( !pM )
+				continue;
+			gpc3Dvx* pVX = (gpc3Dvx*)pM->pnt.p_alloc;
+			if( !pM->iVXn.y )
+				continue;
+			U4 glU4;
+			glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x );
+			glU4 = gpmOFF(gpc3Dvx,xyzi);
+			glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, sizeof(gpc3Dvx), &glU4 );
+			glEnableVertexAttribArray( ATvxID );
+			glU4 = gpmOFF(gpc3Dvx,uv);
+			glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(gpc3Dvx), &glU4 );
+			glEnableVertexAttribArray( ATuvID );
+
+			nT = pM->nTRI();
+			pT0 = pM->pTRI( pLY->buf );
+			for( U4 t = 0; t < nT; t++ ) {
+				if( !pT0[t].aIIXN[2].y )
+					continue;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );
+				glDrawElements( gpaDRWmod[0], pT0[t].aIIXN[2].a4x2[1].n, GL_UNSIGNED_INT, NULL );
+
+			}
+			glDisableVertexAttribArray( ATvxID );
+			glDisableVertexAttribArray( ATuvID );
+		}
+	}
 	return this;
 }
+
 gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	int nD1 = scnDEC1.nLD() ? scnDEC1.nLD() : scnDEC1.nAT(sSCNdec1,sizeof(sSCNdec1));
 
@@ -1074,8 +1269,11 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		if( !p3D ) continue;
 
 		GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
-		glSETvx( p3D );
+		//glSET3D( p3D );
+		glDRW3D(p3D);
+		glDONE();
 	}
+
 	return this;
 }
 
