@@ -323,7 +323,7 @@
       if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
           gl_FragColor.g = 1.0;
       float v = dot( gl_FragColor, vec4(0.3,0.3,0.3,0) );
-      if( v < 0.453 )
+      if( v < 0.1237 )
           discard;
  }
 

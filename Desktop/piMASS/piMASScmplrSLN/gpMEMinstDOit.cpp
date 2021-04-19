@@ -445,7 +445,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		case gpeALF_SCENE: if( pWgl ? gpdGLpTRG : NULL  ) {	cID = gpeCsz_b; if( bCID ) break;
 				if( obj.bUTF8() ) {
 					U4 tCD = pWIN ? pWIN->nJDOIT.w : 0;
-					pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD )
+					pWgl->glSETtrg3D( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD )
 						->glSCENE( this, (char*)pU1+ ((*pU1 == '\"') ? 1 : 0) );
 					pWgl->glDONE();
 				}

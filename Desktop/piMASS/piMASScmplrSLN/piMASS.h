@@ -1822,7 +1822,7 @@ public:
 		struct { U4 x,y; };
 		struct { U4 i,n; };
 		struct { gpeALFu4 a4; U4 n4; };
-		struct { U1x4 aCLR[2]; };
+		struct { U1x4 aU1x4[2]; };
 		struct { U2 xl,xh,prt,srf; };
 		struct { gpeALF var; };
 		struct { U8 u8; };
@@ -4457,6 +4457,7 @@ public:
 		struct { float ry,rp,rr,r0; };
 		struct { float aXYZW[4]; };
 		struct { U4 uXYZW[4]; };
+		struct { U1x4 aU1x4[4]; };
 		struct { F2	aF2[2]; };
 	};
 
@@ -6271,6 +6272,9 @@ szasz:
 	U4* pU4n( int i = 0, int n = 1 ) { return (U4*)Ux( (i<0 ? nLD(sizeof(U4)): i) , sizeof(U4)*n, true, sizeof(U4)); }
 	U4x2* pU4x2n( int i = 0, int n = 1 ) { return (U4x2*)Ux((i<0 ? nLD(sizeof(U4x2)): i),sizeof(U4x2)*n, true, sizeof(U4x2)); }
 	U4x4* pU4x4n( int i = 0, int n = 1 ) { return (U4x4*)Ux((i<0 ? nLD(sizeof(U4x4)): i),sizeof(U4x4)*n, true, sizeof(U4x4)); }
+
+	char* pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
+	I1* pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
 
 	U4* pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
 	U4x2* pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }

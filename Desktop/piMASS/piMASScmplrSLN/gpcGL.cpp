@@ -113,7 +113,74 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, boo
 	glViewport( 0, 0, wh.x, wh.y );
 	return this;
 }
+gpcGL* gpcGL::glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, bool bDEP ) {
+	if( this ? !pRNDR : true )
+		return NULL;
 
+	if(pT) {
+		if( pT->txWH.a4x2[1] != wh )
+			gpmSDL_FreeTX( pT->pRTX );
+
+		if(!pT->pRTX) {
+			pT->pRTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
+			if(!pT->pRTX)
+				return NULL;
+			pT->txWH.a4x2[1] = wh;
+		}
+
+		if(pRTX!=pT->pRTX) {
+			if(pPICrtx) {
+				if(!pPICrtx->pSRF) {
+					int w=0, h=0, acc=0;
+					U4 frm;
+					SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
+					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
+				}
+				if( pPICrtx->pSRF )
+					SDL_RenderReadPixels(pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
+				pPICrtx->pREF = NULL;
+			}
+			SDL_SetRenderTarget(pRNDR,NULL);
+		}
+		pPICrtx=pT;
+		SDL_SetRenderTarget(pRNDR,pRTX=pPICrtx->pRTX);
+	}
+	else {
+		pPICrtx=NULL;
+		SDL_SetRenderTarget(pRNDR,pRTX=NULL);
+	}
+
+	GLbitfield b = GL_STENCIL_BUFFER_BIT;
+	if( !tC )
+		b |= GL_COLOR_BUFFER_BIT;
+	else if( tC > 0 )
+	if( pT->tC < tC ) {
+		b |= GL_COLOR_BUFFER_BIT;
+		pT->tC = tC;
+		glClearColor( 0.125, 0.0f, 0.125, 1.0f );
+	}
+
+	if( !tD )
+		b |= GL_DEPTH_BUFFER_BIT;
+	else if( tD > 0 )
+	if( pT->tD < tD ) {
+		b |= GL_DEPTH_BUFFER_BIT;
+		pT->tD = tD;
+		glClearDepth(1.0f);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc( //GL_LESS); //
+						GL_LEQUAL);
+		//glEnable(GL_TEXTURE_2D);
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+		//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		//glEnableClientState(GL_VERTEX_ARRAY);
+	}
+
+
+	glClear( b );
+	glViewport( 0, 0, wh.x, wh.y );
+	return this;
+}
 GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {
 	if( !pSvrtx )
 		pSvrtx = gpsGLSLvx;

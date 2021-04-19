@@ -24,6 +24,8 @@ gpITM* gpITM::read( gpITMlst *pIDlst ) {
 	char *pFILE = pIDlst->pF+sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
 	gpcLZY dir, rd; U8 s, n;
 	dir.lzyDIR( pIDlst->sPATH, s = 0 );
+	if( !dir.p_alloc )
+		return this;
 	char	*pS = (char*)dir.p_alloc,
 			*pSi = pS, *pSn = pSi + dir.nLD(),
 			*pSt, *pSe, *pF, *pNM = pSi + gpmNINCS( pSi, "\r\n\t "), *pMNe;

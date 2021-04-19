@@ -108,6 +108,7 @@ static const GLenum gpaDRWmod[] = {
 			GL_LINE_STRIP,
 			GL_TRIANGLES,
 		};
+class gpc3Dvx;
 class gpc3D;
 class gpc3Dlst;
 
@@ -173,6 +174,7 @@ public:
 
 	gpcGL( gpcWIN& win );
 	gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
+	gpcGL* glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
 	gpcGL* TRG( SDL_Renderer* pSDLrndr,
 				I4x2 lXY, const I4x2& tWH, float ms,
 				bool bCLR = true, bool bDEP = true ) {
@@ -247,38 +249,31 @@ public:
 		return aVXid[0];
 	}
 	U4x4 IBOobj( U4x4& iIXn,const GLuint* pD, U4 nD, U4 nX ) {
+		iIXn.a4x2[1] = U4x2( nX, nD );
+		if( !iIXn.a4x2[1].area() ) {
+			if( iIXn.x ) {
+				glDeleteBuffers(1,  &iIXn.x );
+				iIXn.x = -1;
+			}
+			iIXn.y = 0;
+			return iIXn;
+		}
 		if( iIXn.y )
 			return iIXn;
 		iIXn.y++;
-
+		GLenum e = 0;
 		if( iIXn.x )
 			glDeleteBuffers(1,  &iIXn.x );
-		//Create IBO
-		iIXn.a4x2[1] = U4x2( nX, nD );
 
-		//aIXn[0] = nD;
 		glGenBuffers( 1, &iIXn.x );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iIXn.x );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, iIXn.a4x2[1].area()*sizeof(*pD), pD, GL_STATIC_DRAW );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, iIXn.a4x2[1].area()*sizeof(*pD), pD, GL_STATIC_DRAW ); (e = glGetError());
+		if( e )
+			std::cout << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  std::endl;
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 		return iIXn;
 	}
-	U4x4 VBOobj( U4x4& iVXn, const GLfloat* pD, U4 nD, U4 nX ) {
-		//Create VBO
-		if( iVXn.y )
-			return iVXn;
-		iVXn.y++;
-
-		if( iVXn.x )
-			glDeleteBuffers(1,  &iVXn.x );
-
-		iVXn.a4x2[1] = U4x2( nX, nD );
-		glGenBuffers( 1, &iVXn.x );
-		glBindBuffer( GL_ARRAY_BUFFER, iVXn.x );
-		glBufferData( GL_ARRAY_BUFFER, iVXn.a4x2[1].area(), pD, GL_STATIC_DRAW );
-		glBindBuffer( GL_ARRAY_BUFFER, 0 );
-		return iVXn;
-	}
+	U4x4 VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD );
 	GLuint viBO( U1 md, const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
 		if(aVXid[md])
