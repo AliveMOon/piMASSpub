@@ -192,7 +192,7 @@ public:
 		if( bD.u4 == gpeTYP_STR )
 			gpmDELary( pSTR );
 	}
-	gpcREG& bad() {
+	gpcREG& bNG() {
 		u = 1;
 		i = -1;
 		d = 0.1;

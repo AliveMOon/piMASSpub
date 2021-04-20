@@ -773,11 +773,12 @@ inline U2 swp2( const void* p ) {
 	return    (u<<8)|(u>>8);
 }
 inline U4 swp4( const void* p ) {
-	register U4 u = *(U4*)p;
-	return    (u<<24)
+	register U4 u = *(U4*)p,
+	uu =	 (u<<24)
 			|((u&0xFF000000)>>24)
 			|((u&0xFF0000)>>8)
 			|((u&0xFF00)<<8);
+	return uu;
 }
 
 class UTF8 {
@@ -4450,8 +4451,7 @@ public:
 
 class F4 {
 public:
-	union
-	{
+	union {
 		struct { float x,y,z,w; };
 		struct { float A,B,C,D; };
 		struct { float ry,rp,rr,r0; };
@@ -4473,9 +4473,7 @@ public:
 		return sprintf( pBUFF, "%8.2f%s%8.2f%s%8.2f%s%8.2f%s%s", x, pSeP, y, pSeP, z, pSeP, w, pSeP, pENT );
     }
     char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) { str( pBUFF, pSeP, pENT ); return pBUFF; }
-    F4& aaLOAD( char* pS, U4 nS, gpeALF alfS, U1** ppV, size_t* pN );
-	F4& sXYZW( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
-	F4& swpXYZ0( const void* pV );
+
 
 	F4 sqrt() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z),sqrtf(w)); }
     F4 sqrt_xyz0() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z)); }
@@ -4554,8 +4552,13 @@ public:
 	F4 operator * ( const F4x4& b ) const;
 	F4& operator /= ( const F4x4& b );
 	F4 operator / ( const F4x4& b ) const;
+
 	F4& xyz_( F4 b ) { aF2[0] = b.aF2[0]; z = b.z; return *this; }
-	F4 xyz0() const { return F4(x,y,z); }
+	F4	xyz0() const { return F4(x,y,z); }
+	F4&	aaLOAD( char* pS, U4 nS, gpeALF alfS, U1** ppV, size_t* pN );
+	F4&	sXYZW( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
+	F4&	swpXYZ0( const void* pV );
+
 	F4 abs() const { return F4(x>=0.0?x:-x,y>=0.0?y:-y,z>=0.0?z:-z,w>=0.0?w:-w); }
 	F4& add( F4 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )

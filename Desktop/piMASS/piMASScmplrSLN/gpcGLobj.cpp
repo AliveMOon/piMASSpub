@@ -238,31 +238,32 @@ public:
 };
 class gpc3Dvx {
 public:
-	F4 xyzi, up;
-	F2 uv; U4x2 ps;
+	F4 xyzi, up;		//  0 16
+	F2 uv; U4x2 ps;		// 32 40
+						// 48
 	gpc3Dvx(){}
-	bool bad( gpc3Dvx& b, float x = 0.0, float u = 0.0 ) {
+	bool bNG( gpc3Dvx& b, float x = 0.0, float u = 0.0 ) {
 		if(!this)
 			return false;
 
-		if( (uv-b.uv).qlen() > u*u )
+		if( (uv-b.uv).qlen() >= u*u )
 			return true;
-		if( (xyzi-b.xyzi).qlen_xyz() > x*x )
+		if( (xyzi-b.xyzi).qlen_xyz() >= x*x )
 			return true;
 
 		return false;
 	}
-	bool good( gpc3Dvx& b, float x = 0.0, float u = 0.0 ) { return !bad(b,x,u); }
+	bool bGD( gpc3Dvx& b, float x = 0.0, float u = 0.0 ) { return !bNG(b,x,u); }
 	char* pSTR( gpcLZY buf, const char* p_lwo, U4x2* pTG ) {
 		if( !this )
 			return buf.pCHAR();
 		U8 s = -1;
 		buf.lzyFRMT( s,
-			" xyz: %4.3f, %4.3f, %4.3f"
-			" i: %d %d %d %d "
-			" up: %0.2f, %0.2f, %0.2f"
-			" uv: %0.3f, %0.3f"
-			" ps.x: %s:%s",
+			" x:%4.3f,%4.3f,%4.3f"
+			" i:%d %d %d %d"
+			" n:%0.2f,%0.2f,%0.2f"
+			" u:%0.3f,%0.3f"
+			" p.x:%s:%s",
 			xyzi.x, xyzi.y, xyzi.z,
 			xyzi.aU1x4[3].x, xyzi.aU1x4[3].y, xyzi.aU1x4[3].z, xyzi.aU1x4[3].w,
 			up.x, up.y, up.z,
@@ -285,14 +286,14 @@ public:
 		U1* pUi = (U1*)pV, *pUe = pUi+n;
 		U4 *pFs;
 		while( pUi < pUe ) {
-			pFC = (U4x2*)LST.Ux( iFC = LST.nLD(sizeof(*pFC)), sizeof(*pFC) );
+			pFC = LST.pU4x2n( iFC = LST.nLD(sizeof(*pFC)) );
 			pFC->i = IX.nLD(sizeof(U4));
 			pFC->n = swp2(pUi)&0x03ff; pUi+=2;
 
 			pFs = (U4*)SUM.Ux( pFC->n, sizeof(*pFs) );
 			(*pFs)++;
 
-			pIX = (U4*)IX.Ux( pFC->sum(), sizeof(*pIX) ) - pFC->n;
+			pIX = IX.pU4n(pFC->sum()) - pFC->n;
 			for( U4 i = 0; i < pFC->n; i++ ) {
 				if( *pUi == 0xff ) {
 					pIX[i] = swp4( pUi )&0xFFffff; pUi+= 4;
@@ -334,13 +335,13 @@ public:
 		fcl = fc.LST;
 		fci = fc.IX;
 
-		F4	*pPs = (F4*)p.p_alloc, v0, v1,v2;
-		F2	*pTs = ((F2*)t.p_alloc)+pIX2->x;
-		U4x2	*pF = (U4x2*)fc.LST.p_alloc;
+		F4	*pPs = p.pF4(), v0, v1,v2;
+		F2	*pTs = t.pF2()+pIX2->x;
+		U4x2	*pFl = (U4x2*)fc.LST.p_alloc;
 
 		U4	nP = p.nLD(sizeof(*pPs)),
-			nF = fc.LST.nLD(sizeof(*pF)),
-			*pFi = (U4*)fc.IX.p_alloc, ip, uf;
+			nF = fc.LST.nLD(sizeof(*pFl)),
+			*pFi = fc.IX.pU4(), ip, uf;
 
 		gpc3Dblnd* pB = (gpc3Dblnd*)b.p_alloc;
 
@@ -350,12 +351,11 @@ public:
 			pPd[i].xyzi.uXYZW[3] = pB[i].ix.u4;
 			pPd[i].uv = pTs[i];
 			pPd[i].ps = pB[i].ps;
-			//pPd[i].ps.x = pB[i].ps.aU1x4[0].u4;
-			//pPd[i].ps.y = pB[i].ps.aU1x4[1].u4;
 		}
 
+
 		for( U4 f = 0, i, ip, x,n; f < nF; f++ )
-		for( x = pF[f].x, n = pF[f].y, i = 0; i < n; i++ ) {
+		for( x = pFl[f].x, n = pFl[f].y, i = 0; i < n; i++ ) {
 			ip = pFi[i+x];
 			v0 = pPd[ip].xyzi;
 			v1 = (pPd[pFi[((i-1+n)%n)+x]].xyzi - v0).N3();
@@ -367,27 +367,30 @@ public:
 			pPd[p].up = pPd[p].up.N3();
 
 		while( pUi < pUnx ) {
-			if( *pUi&0x80 ) {
-				ip = swp4( pUi )&0x7FFFffff; pUi+=4;
+			if( *pUi == 0xff ) {
+				ip = swp4( pUi )&0xFFffff; pUi+=4;
 			} else {
 				ip = swp2( pUi ); pUi+=2;
 			}
-			if( *pUi&0x80 ) {
-				uf = swp4( pUi )&0x7FFFffff; pUi+=4;
+			if( *pUi == 0xff ) {
+				uf = swp4( pUi )&0xFFffff; pUi+=4;
 			} else {
 				uf = swp2( pUi ); pUi+=2;
 			}
 
-			pF = (U4x2*)fcl.Ux( uf, sizeof(*pF) );
-			pFi = (U4*)fci.Ux( pF->sum()+pIX2->x, sizeof(*pFi) ) - pF->y;
-			for( U4 i = 0, t, te; i < pF->y; i++ ) {
+			pFl = fcl.pU4x2( uf );
+			pFi = fci.pU4( pFl->sum()+pIX2->x ) - pFl->y;
+
+			for( U4 i = 0, ie = pFl->y, t, te; i < ie; i++ ) {
 				if( pFi[i] != ip )
 					continue;
 				pPd = (gpc3Dvx*)pnt.Ux( ip, sizeof(tmP) );
 				tmP = *pPd;
 				tmP.uv.swpXY( pUi ); pUi += sizeof(F2);
+
+
 				for( t = p.nLD(sizeof(tmP)), te = pnt.nLD(sizeof(tmP)); t < te; t++ ) {
-					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pPd) ))->good(tmP, 1.0/256.0, 1.0/256.0 )  )
+					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pPd) ))->bGD(tmP, 1.0/4096.0, 1.0/1024.0 )  )
 						break;
 				}
 
@@ -543,15 +546,15 @@ public:
 		F4* pP0 = ((F4*)pnt.Ux( n, sizeof(*pP0) ))-n;
 		if( !pV )
 			return pP0;
-		float *pF = (float*)pV;
+		//float *pF = (float*)pV;
 		for( U4 i = 0; i < n; i++ )
-			pP0[i].swpXYZ0( pF + i*3 );
+			pP0[i].swpXYZ0( ((U4*)pV) + i*3 );
 		return pP0;
 	}
 	F4* pBBOXswp( const void* pV ) {
-		float *pF = (float*)pV;
-		bbox[0].swpXYZ0( pF ); pF+=3;
-		bbox[1].swpXYZ0( pF );
+		U4 *pU = (U4*)pV;
+		bbox[0].swpXYZ0( pU ); pU+=3;
+		bbox[1].swpXYZ0( pU );
 	}
 	I4 pWGHTswp( const void* pV, U4 n, gpcLZYdct& dctBN  ) {
 		U4	nUi = gpmSTRLEN(pV), ip, uf,
@@ -774,7 +777,7 @@ F2& F2::sXY( const char* p_str, char** pp_str ) {
 }
 
 F4& F4::swpXYZ0( const void* pV ) {
-	((U1x4*)&x)->wzyx(pV,3);
+	((U1x4*)this)->wzyx(pV,3);
 	return *this;
 }
 
@@ -1129,7 +1132,8 @@ static const char gpsGLSLvx3D[] = //{
 "varying	vec2	fr_uv;													\n"
 "void main()																\n"
 "{																			\n"
-"	gl_Position			= vec4( v_vx.xyz*vec3( 0.5, 0.5, 0.5) + vec3( 0, -0.5, 0.5) , 1 );  \n"
+//"	gl_Position			= vec4( v_vx.xyz*vec3( 0.5, 0.5, 0.5) + vec3( 0, -0.5, 0.5) , 1 );  \n"
+"	gl_Position			= vec4( v_vx + vec3( 0.0, -0.5, -0.75), 1.0 );  \n"
 "	fr_uv				= v_uv; 											\n"
 "}																			\n\0";
 //};
@@ -1140,7 +1144,7 @@ static const char gpsGLSLfrg3D[] = //{
 "uniform vec4 		aCNL[8];				// CNL							\n"
 "void main()																\n"
 "{																			\n"
-"	gl_FragColor = vec4(fr_uv,1.0,1.0) + texture2D( tex0, fr_uv );			\n"
+"	gl_FragColor = vec4(fr_uv,1.0,1.0) + texture2D( tex0, fr_uv )*0;			\n"
 "	//if( gl_FragColor.a < (1/0x100) )										\n"
 " 	//	discard;															\n"
 "}																			\n"
@@ -1162,13 +1166,12 @@ U4x4 gpcGL::VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD ) {
 	if( iVXn.x )
 		glDeleteBuffers(1,  &iVXn.x );
 
-	iVXn.a4x2[1] = U4x2( sizeof(pVX), nD );
+	iVXn.a4x2[1] = U4x2( sizeof(*pVX), nD );
 	GLsizeiptr n_byte = iVXn.a4x2[1].area();
 	glGenBuffers( 1, &iVXn.x );
 	glBindBuffer( GL_ARRAY_BUFFER, iVXn.x );
 	glBufferData( GL_ARRAY_BUFFER, n_byte, pVX, GL_STATIC_DRAW ); (e = glGetError());
-	if( e )
-		std::cout << e << " glBufferData( GL_ARRAY_BUFFER" <<  std::endl;
+	if( e ) std::cout << e << " glBufferData( GL_ARRAY_BUFFER" <<  std::endl;
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	return iVXn;
 }
@@ -1208,7 +1211,9 @@ gpc3D* gpc3D::prt2ix( gpcGL* pGL ) {
 	}
 	return this;
 }
-gpcGL* gpcGL::glDRW3D( gpc3D* p ) {
+gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
+	if( !msk )
+		return this;
 	p3D = p->prt2ix( this );
 	if( !p3D )
 		return this;
@@ -1228,60 +1233,40 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p ) {
 			pM = pLY->pMAP(m);
 			if( pM ? !pM->iVXn.y : true )
 				continue;
-			/*gpc3Dvx* pVX = (gpc3Dvx*)pM->pnt.p_alloc;
-			if( !pM->iVXn.y )
-				continue;*/
 			glU4x4.x = gpmOFF(gpc3Dvx,xyzi);
 			glU4x4.y = gpmOFF(gpc3Dvx,uv);
 			glU4x4.z = sizeof(gpc3Dvx);
 			nT = pM->nTRI();
 			pT0 = pM->pTRI( pLY->buf );
 			GLenum e = 0;
-			for( U4 t = 0; t < nT; t++ ) {
-				if( !pT0[t].aIIXN[2].y )
+	{ /// VERTEX ------------------------------------------
+				glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x ); (e = glGetError()); if( e ) std::cout << e << " glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x )" <<  std::endl;
+				/// XYZ
+				glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.x) ); (e = glGetError()); if( e ) std::cout << e << " glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.x )" <<  std::endl;
+				glEnableVertexAttribArray( ATvxID ); (e = glGetError()); if( e ) std::cout << e << " glEnableVertexAttribArray( ATvxID )" <<  std::endl;
+				/// UV
+				glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.y) ); (e = glGetError()); if( e ) std::cout << e << " glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.y )" <<  std::endl;
+				glEnableVertexAttribArray( ATuvID ); (e = glGetError()); if( e ) std::cout << e << " glEnableVertexAttribArray( ATuvID )" <<  std::endl;
+	}
+			for( U4 t = 0; t < nT; t++, msk >>= 1 ) {
+				if( (msk&1) ? !pT0[t].aIIXN[2].y : true )
 					continue;
 				glU4x4.w = pT0[t].aIIXN[2].a4x2[1].area();
-	/// VERTEX ------------------------------------------
-				glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x ); (e = glGetError());
-				if( e )
-					std::cout << e << " glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x )" <<  std::endl;
-				/// XYZ
-				glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.x) ); (e = glGetError());
-				if( e )
-					std::cout << e << " glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.x )" <<  std::endl;
-				glEnableVertexAttribArray( ATvxID ); (e = glGetError());
-				if( e )
-					std::cout << e << " glEnableVertexAttribArray( ATvxID )" <<  std::endl;
-				/// UV
-				glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.y) ); (e = glGetError());
-				if( e )
-					std::cout << e << " glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.y )" <<  std::endl;
-				glEnableVertexAttribArray( ATuvID ); (e = glGetError());
-				if( e )
-					std::cout << e << " glEnableVertexAttribArray( ATuvID )" <<  std::endl;
+
 
 	/// ELEMENT ------------------------------------------
-				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x ); (e = glGetError());
-				if( e )
-					std::cout << e << " glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x )" <<  std::endl;
-
-
-
-				glDrawElements( GL_TRIANGLES, //gpaDRWmod[3], /// GL_TRIANGLES,
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x ); (e = glGetError()); if( e ) std::cout << e << " glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x )" <<  std::endl;
+				glDrawElements( //GL_TRIANGLES,
+								gpaDRWmod[3], /// GL_TRIANGLES,
 								glU4x4.w,
 								GL_UNSIGNED_INT,
-								NULL ); (e = glGetError());
-				if( e )
-					std::cout << e << " glDrawElements" <<  std::endl;
-
-
-
-				glDisableVertexAttribArray( ATvxID );
-				glDisableVertexAttribArray( ATuvID );
-				glBindBuffer( GL_ARRAY_BUFFER, 0 );
+								NULL ); (e = glGetError()); if( e ) std::cout << e << " glDrawElements" <<  std::endl;
 				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-				glBindVertexArray( 0 );
 			}
+			glDisableVertexAttribArray( ATvxID );
+			glDisableVertexAttribArray( ATuvID );
+			glBindBuffer( GL_ARRAY_BUFFER, 0 );
+			glBindVertexArray( 0 );
 		}
 	}
 	return this;
@@ -1371,7 +1356,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 
 		gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
 		if( !p3D ) continue;
-		glDRW3D(p3D);
+		glDRW3D(p3D, -1 ); //pMEM->pWIN ? pMEM->pWIN->nJDOIT.w : -1 );
 	}
 	return this;
 }

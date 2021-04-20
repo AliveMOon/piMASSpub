@@ -479,7 +479,7 @@ public:
 		}
 		return this;
 	}
-	gpcGL* glDRW3D( gpc3D* p );
+	gpcGL* glDRW3D( gpc3D* p, U4 msk = -1 );
 	gpcGL* glDONE(){ glUseProgram(0); p3D = NULL; return this; }
 	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
 		if( !this )
