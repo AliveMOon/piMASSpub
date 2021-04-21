@@ -182,6 +182,7 @@
 		<Unit filename="gpcwin_var.cpp" />
 		<Unit filename="gpeTYP.h" />
 		<Unit filename="gppiMASScmplr.cpp" />
+		<Unit filename="gpsGLSL.h" />
 		<Unit filename="include/camU.h" />
 		<Unit filename="include/gpcND.h" />
 		<Unit filename="include/gpcOPCD.h" />

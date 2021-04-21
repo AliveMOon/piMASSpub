@@ -1,7 +1,44 @@
 #pragma once
 #ifndef gpsGLSL_H
 #define gpsGLSL_H
-
+#define gpdGUIfrDEPTH "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = (f-n)*0.85+n; \n" // ((f-n)*0.85+n+f)/2.0;	\n"
+#define gpdGUIfr3Dc "	gl_FragColor = vec4(fr_uv,1.0);											\n"
+#define gpdGUIfr3Dd "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = ((f-n)*fr_uv.z+n+f)/2.0;	\n"
+///-------------------------------------------------
+///					 wrkDIST * imgSIZE
+///		fokLEN	 =	-------------------
+///					 objSIZE + imgSIZE
+///
+///		imgSIZE: SONY IMX219 1/4" 3.67mm x 2.76mm px1.12um
+///-------------------------------------------------
+static const char gpsGLSLvx3D[] = //{
+"#version 120																	\n"
+"attribute	vec3	v_vx;														\n"
+"attribute	vec2	v_uv;														\n"
+"varying	vec3	fr_uv;														\n"
+"void main()																	\n"
+"{																				\n"
+"	vec3	mv	= v_vx + vec3( 0.0, -0.5, -7.0 ), 								\n"
+"			p	= mv*vec3(1.0, 480.0/800.0, 2.0/20.0) + vec3( 0.0, 0.0, 2.0 ); 	\n"
+"	vec2 d = vec2((2.0/p.z)-0.5, 1.0 ), sb = vec2(0,2.0);						\n"
+"	p = p*d.xxy-sb.xxy;															\n"
+"	gl_Position			= vec4( p*-1.0, 1.0 ); 				 					\n"
+"	fr_uv				= vec3( v_uv, abs(p.z) );								\n"
+"}																				\n\0";
+//};
+static const char gpsGLSLfrg3D[] = //{
+"#version 120																\n"
+"varying vec3 fr_uv;														\n"
+"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
+"uniform vec4 		aCNL[8];				// CNL							\n"
+"void main()																\n"
+"{																			\n"
+"   if( !gl_FrontFacing ) discard;											\n"
+	gpdGUIfr3Dc
+	gpdGUIfr3Dd
+"}																			\n"
+"\n\0";
+//};
 static const char gpsGLSLvx[] = //{
 "#version 120																\n"
 "attribute	vec2	v_vx;													\n"
@@ -9,8 +46,8 @@ static const char gpsGLSLvx[] = //{
 "varying	vec2	fr_uv;													\n"
 "void main()																\n"
 "{																			\n"
-"	gl_Position			= vec4( v_vx*vec2(2.0,-2.0)+vec2(-1.0,1.0), 0, 1);	\n"
-"	fr_uv				= v_uv;												\n"
+"	gl_Position	= vec4( v_vx*vec2(2.0,-2.0)+vec2(-1.0,1.0), -0.9, 1.0);		\n"
+"	fr_uv		= v_uv;														\n"
 "}																			\n\0";
 //};
 static const char gpsGLSLfrgREF[] = //{
@@ -23,18 +60,20 @@ static const char gpsGLSLfrgREF[] = //{
 "	gl_FragColor = texture2D( tex0, fr_uv )*aCNL[0];						\n"
 "	if( gl_FragColor.a < (1/0x100) )										\n"
 " 		discard;															\n"
+	gpdGUIfrDEPTH
 "}																			\n"
 "\n\0";
 //};
 static const char gpsGLSLfrgLINE[] = // {
-"#version 120														\n"
-"varying vec2 fr_uv;												\n"
-"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png\n"
-"uniform vec4 		aCNL[8];				// CNL					\n"
-"void main()														\n"
-"{																	\n"
-"	gl_FragColor = aCNL[0];											\n"
-"}																	\n"
+"#version 120															\n"
+"varying vec2 fr_uv;													\n"
+"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png	\n"
+"uniform vec4 		aCNL[8];				// CNL						\n"
+"void main()															\n"
+"{																		\n"
+"	gl_FragColor = aCNL[0];												\n"
+	gpdGUIfrDEPTH
+"}																		\n"
 "\n\0";
 //};
 
@@ -280,15 +319,16 @@ static const char gpsGLSLfrgISOo[] = //{
 "			}  //else																		\n"
 "			gl_FragColor = max( gl_FragColor, Aga*texture2D( gpdTXlo, cl.zw ));							\n"
 "		}																				\n"
-"	}																									\n"
-"	\n"
-"	if( B < 0.5 )																						\n"
-"	{																									\n"
-"		if( gl_FragColor.a < 0.33 )																						\n"
-" 			discard;\n"
-" 		return;\n"
-"	}																									\n"
+"	}																					\n"
+"																						\n"
+"	if( B < 0.5 )																		\n"
+"	{																					\n"
+"		if( gl_FragColor.a < 0.33 )														\n"
+" 			discard;																	\n"
+" 		return;																			\n"
+"	}																					\n"
 "	gl_FragColor += Bc/(6+B+gl_FragColor.a);											\n"
+	gpdGUIfrDEPTH
 "}\n";
 //};
 const char gpsGLSLfrgISO[] = //{
@@ -422,7 +462,8 @@ const char gpsGLSLfrgISO[] = //{
 "	//F.a *= dot(F.rgb, m0p13.www );\n"
 " 	if( F.a < 1.0/255.0 ) \n"
 "		discard; \n"
-"	gl_FragColor = gl_FragColor*gl_FragColor.a + F*F.a;\n"
+"	gl_FragColor = gl_FragColor*gl_FragColor.a + F*F.a;										\n"
+	gpdGUIfrDEPTH
 "}\n";
 //};
 
@@ -558,7 +599,8 @@ static const char gpsGLSLfrgISOaa[] = //{
 "	//F.a *= dot(F.rgb, m0p13.www );\n"
 " 	if( F.a < 1.0/255.0 ) \n"
 "		discard; \n"
-"	gl_FragColor = gl_FragColor*gl_FragColor.a + F*F.a;\n"
+"	gl_FragColor = gl_FragColor*gl_FragColor.a + F*F.a;										\n"
+	gpdGUIfrDEPTH
 "}\n";
 //};
 

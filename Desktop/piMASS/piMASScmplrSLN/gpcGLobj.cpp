@@ -390,7 +390,7 @@ public:
 
 
 				for( t = p.nLD(sizeof(tmP)), te = pnt.nLD(sizeof(tmP)); t < te; t++ ) {
-					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pPd) ))->bGD(tmP, 1.0/4096.0, 1.0/1024.0 )  )
+					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pPd) ))->bGD(tmP, 0.0/4096.0, 0.0/1024.0 )  )
 						break;
 				}
 
@@ -435,7 +435,7 @@ public:
 		U4x4* pSRF;
 
 
-		for( U4 i = 0, p = -1, s = -1; i < nFC; i++ ) {
+		for( U4 i = 0, p = -1, s = -1,nf; i < nFC; i++ ) {
 			if( p != pPRT[i].prt ) {
 				if( pTR ) {
 					pSRF = pTR->pSRF(-1);
@@ -468,20 +468,23 @@ public:
 
 			pFli = pFl0+pPRT[i].i;
 			pFii = pFi0 + pFli->x;
-			switch( pFli->y ) {
+			switch( nf = pFli->y ) {
 				case 0:
 					break;
 				case 1:
 					pU4 = (U4*)pTR->p.pU4n( -1 ); //pTR->p.nLD(sizeof(*pU4)) );
-					gpmMcpyOF( pU4, pFii, 1 ); break;
+					gpmMcpyOF( pU4, pFii, 1 );
+					break;
 				case 2:
 					pU4 = (U4*)pTR->l.pU4n( -1, 2 ); //pTR->l.nLD(sizeof(*pU4)), 2 );
-					gpmMcpyOF( pU4, pFii, 2 ); break;
+					gpmMcpyOF( pU4, pFii, 2 );
+					break;
 				case 3:
 					pU4 = (U4*)pTR->t.pU4n( -1, 3 ); //pTR->t.nLD(sizeof(*pU4)), 3 );
-					gpmMcpyOF( pU4, pFii, 3 ); break;
+					gpmMcpyOF( pU4, pFii, 3 );
+					break;
 				default:
-					for( U4 i0 = *pFii, j = 1, je = pFli->y-1; j < je; j++ ) {
+					for( U4 i0 = *pFii, j = 1, je = nf-1; j < je; j++ ) {
 						pU4 = (U4*)pTR->t.pU4n( -1, 3 ); //pTR->t.nLD(sizeof(*pU4)), 3 );
 						pU4[0] = i0;
 						pU4[1] = pFii[j];
@@ -877,7 +880,6 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 							} break;
 						default: break;
 					}
-
 				} break;
 			case LWO_ID_VMAP: {
 					pUi += 4;
@@ -1125,30 +1127,7 @@ F4& F4::aaLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
 	return *this;
 }
 
-static const char gpsGLSLvx3D[] = //{
-"#version 120																\n"
-"attribute	vec3	v_vx;													\n"
-"attribute	vec2	v_uv;													\n"
-"varying	vec2	fr_uv;													\n"
-"void main()																\n"
-"{																			\n"
-//"	gl_Position			= vec4( v_vx.xyz*vec3( 0.5, 0.5, 0.5) + vec3( 0, -0.5, 0.5) , 1 );  \n"
-"	gl_Position			= vec4( v_vx + vec3( 0.0, -0.5, -0.75), 1.0 );  \n"
-"	fr_uv				= v_uv; 											\n"
-"}																			\n\0";
-//};
-static const char gpsGLSLfrg3D[] = //{
-"#version 120																\n"
-"varying vec2 fr_uv;														\n"
-"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
-"uniform vec4 		aCNL[8];				// CNL							\n"
-"void main()																\n"
-"{																			\n"
-"	gl_FragColor = vec4(fr_uv,1.0,1.0) + texture2D( tex0, fr_uv )*0;			\n"
-"	//if( gl_FragColor.a < (1/0x100) )										\n"
-" 	//	discard;															\n"
-"}																			\n"
-"\n\0";
+
 //};
 
 U4 gpc3D::nLY() { return ly3D.nLD(sizeof(gpc3Dly)); }

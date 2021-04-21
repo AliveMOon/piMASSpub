@@ -5861,8 +5861,7 @@ public:
 		if( p_alloc ? (n_load+n_byte > n_alloc) : true ) {
 			U1* p_kill = p_alloc;
 			n_alloc = gpmPAD( (n_load+n_byte*n), 0x10 );
-            p_alloc = NULL;
-			p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
+            p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
 			if( p_kill )
 			{
 				gpmMcpy( p_alloc, p_kill, n_load );

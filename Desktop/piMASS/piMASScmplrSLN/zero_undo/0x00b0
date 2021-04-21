@@ -293,8 +293,6 @@
       vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
                 cUV = aCNL[0].xy/tgPX,
 		crs = abs(fUV-cUV)*tgPX;
-      float Df = gl_DepthRange.far, Dn = gl_DepthRange.near;
-      gl_FragDepth = (Df-Dn)*0.99 + Dn;
 
       gl_FragColor = texture2D( tex2, fUV )
                    + texture2D( tex1, fUV );
@@ -326,9 +324,9 @@
       if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
           gl_FragColor.g = 1.0;
       float v = dot( gl_FragColor, vec4(0.3,0.3,0.3,0) );
-      if( v < 0.3453 )
-          discard;
-
+      //if( v < 0.453 )
+      //    discard;
+      gl_FragDepth = 0.9;
  }
 
  ";

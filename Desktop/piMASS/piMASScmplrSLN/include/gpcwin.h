@@ -223,9 +223,13 @@ public:
 		if( bDEP )
 			b |= GL_DEPTH_BUFFER_BIT;
 
+		if( !b )
+			return this;
+
 		ms = sin( ms/1000.0 )+1.0;
 		glClearColor( ms*0.13, 0.0f, ms*0.3, 0.0f );
 		glClearDepth(1.0);
+		glDepthRange(0.0,1.0);
 		glClear( b );
 
 		return this;

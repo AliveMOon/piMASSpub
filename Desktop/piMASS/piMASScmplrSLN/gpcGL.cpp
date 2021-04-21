@@ -90,7 +90,7 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, boo
 		SDL_SetRenderTarget(pRNDR,pRTX=NULL);
 	}
 
-	GLbitfield b = GL_STENCIL_BUFFER_BIT;
+	GLbitfield b = 0; //GL_STENCIL_BUFFER_BIT;
 	if( !tC )
 		b |= GL_COLOR_BUFFER_BIT;
 	else if( tC > 0 )
@@ -105,12 +105,23 @@ gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, boo
 	if( pT->tD < tD ) {
 		b |= GL_DEPTH_BUFFER_BIT;
 		pT->tD = tD;
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+		glDepthFunc(
+						GL_LESS
+						//GL_LEQUAL
+						//GL_GREATER
+					);
 	}
 
 	glClearColor( 0.0f, 0.0f, 0.25, 1.0f );
 	glClearDepth((GLclampd)1.0);
-	glClear( b );
+	glDepthRange(0.0,1.0);
 	glViewport( 0, 0, wh.x, wh.y );
+	if( !b )
+		return this;
+
+	glClear( b );
 	return this;
 }
 gpcGL* gpcGL::glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, bool bDEP ) {
@@ -150,7 +161,7 @@ gpcGL* gpcGL::glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, b
 		SDL_SetRenderTarget(pRNDR,pRTX=NULL);
 	}
 
-	GLbitfield b = GL_STENCIL_BUFFER_BIT;
+	GLbitfield b = 0; //GL_STENCIL_BUFFER_BIT;
 	if( !tC )
 		b |= GL_COLOR_BUFFER_BIT;
 	else if( tC > 0 )
@@ -167,18 +178,23 @@ gpcGL* gpcGL::glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, b
 		b |= GL_DEPTH_BUFFER_BIT;
 		pT->tD = tD;
 		glClearDepth(1.0f);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc( //GL_LESS); //
-						GL_LEQUAL);
+		glDepthMask(GL_FALSE);
 		//glEnable(GL_TEXTURE_2D);
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-		//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		//glEnableClientState(GL_VERTEX_ARRAY);
+		//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+		//glGenF
 	}
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc( GL_LESS
+				 //GL_LEQUAL
+				//	GL_GREATER
+					);
+	glDepthRange(0.0,1.0);
+	glViewport( 0, 0, wh.x, wh.y );
+	if( !b )
+		return this;
 
 	glClear( b );
-	glViewport( 0, 0, wh.x, wh.y );
 	return this;
 }
 GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {

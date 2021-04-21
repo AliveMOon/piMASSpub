@@ -161,7 +161,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL );
 
 	SDL_SetHint( SDL_HINT_RENDER_DRIVER, "1" );
-
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
 	pSDLrndr = SDL_CreateRenderer(	pSDLwin, -1,
 									SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
