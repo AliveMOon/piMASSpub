@@ -1,0 +1,11 @@
+
+sudo apt install libsdl2-dev
+
+sudo apt install libglm-dev
+
+c::b>ProjBuildOpt>LinkerSet:linker lib: 
+GL 
+GLEW 
+SDL2
+
+sudo apt install libglew-dev

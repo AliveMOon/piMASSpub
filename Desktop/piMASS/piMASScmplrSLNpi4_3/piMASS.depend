@@ -1,0 +1,5014 @@
+# depslib dependency file v1.0
+1591455790 source:/home/pi/Desktop/piMASS/gpcalu.cpp
+	"gpcwin.h"
+
+1591047907 /home/pi/Desktop/piMASS/include/gpcwin.h
+	"gpcres.h"
+
+1591980472 /home/pi/Desktop/piMASS//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1591980543 /home/pi/Desktop/piMASS//gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1591904660 /home/pi/Desktop/piMASS//gpcgt.h
+	"gpcpic.h"
+
+1591904684 /home/pi/Desktop/piMASS//gpcpic.h
+	"piMASS.h"
+
+1592041226 /home/pi/Desktop/piMASS//piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	"gpeALF.h"
+
+1588640220 /home/pi/Desktop/piMASS/include/camU.h
+
+1586798831 /usr/include/SDL2/SDL.h
+	"SDL_main.h"
+	"SDL_stdinc.h"
+	"SDL_assert.h"
+	"SDL_atomic.h"
+	"SDL_audio.h"
+	"SDL_clipboard.h"
+	"SDL_cpuinfo.h"
+	"SDL_endian.h"
+	"SDL_error.h"
+	"SDL_events.h"
+	"SDL_filesystem.h"
+	"SDL_gamecontroller.h"
+	"SDL_haptic.h"
+	"SDL_hints.h"
+	"SDL_joystick.h"
+	"SDL_loadso.h"
+	"SDL_log.h"
+	"SDL_messagebox.h"
+	"SDL_mutex.h"
+	"SDL_power.h"
+	"SDL_render.h"
+	"SDL_rwops.h"
+	"SDL_sensor.h"
+	"SDL_shape.h"
+	"SDL_system.h"
+	"SDL_thread.h"
+	"SDL_timer.h"
+	"SDL_version.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_main.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_stdinc.h
+	"SDL_config.h"
+	<sys/types.h>
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<stdarg.h>
+	<stdlib.h>
+	<malloc.h>
+	<stddef.h>
+	<stdarg.h>
+	<memory.h>
+	<string.h>
+	<strings.h>
+	<wchar.h>
+	<inttypes.h>
+	<stdint.h>
+	<ctype.h>
+	<math.h>
+	<float.h>
+	<alloca.h>
+	<malloc.h>
+	<malloc.h>
+	<malloc.h>
+	<stdlib.h>
+	<sal.h>
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_config.h
+	<SDL2/_real_SDL_config.h>
+
+1586798831 /usr/include/SDL2/SDL_platform.h
+	"AvailabilityMacros.h"
+	"TargetConditionals.h"
+	<winapifamily.h>
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/begin_code.h
+
+1586798831 /usr/include/SDL2/close_code.h
+
+1586798831 /usr/include/SDL2/SDL_assert.h
+	"SDL_config.h"
+	"begin_code.h"
+	<signal.h>
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_atomic.h
+	"SDL_stdinc.h"
+	"SDL_platform.h"
+	"begin_code.h"
+	<sys/cpuinline.h>
+	<mbarrier.h>
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_audio.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_endian.h"
+	"SDL_mutex.h"
+	"SDL_thread.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_error.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_endian.h
+	"SDL_stdinc.h"
+	<endian.h>
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_mutex.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_thread.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_atomic.h"
+	"SDL_mutex.h"
+	"begin_code.h"
+	<process.h>
+	<process.h>
+	<stdlib.h>
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_rwops.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_clipboard.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_cpuinfo.h
+	"SDL_stdinc.h"
+	<intrin.h>
+	<intrin.h>
+	<altivec.h>
+	<arm_neon.h>
+	<armintr.h>
+	<arm_neon.h>
+	<armintr.h>
+	<arm_neon.h>
+	<mm3dnow.h>
+	<immintrin.h>
+	<mmintrin.h>
+	<xmmintrin.h>
+	<emmintrin.h>
+	<pmmintrin.h>
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_events.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_keyboard.h"
+	"SDL_mouse.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_quit.h"
+	"SDL_gesture.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_video.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_pixels.h
+	"SDL_stdinc.h"
+	"SDL_endian.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_rect.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_pixels.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_surface.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_blendmode.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_blendmode.h
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_keyboard.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_keycode.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_keycode.h
+	"SDL_stdinc.h"
+	"SDL_scancode.h"
+
+1586798831 /usr/include/SDL2/SDL_scancode.h
+	"SDL_stdinc.h"
+
+1586798831 /usr/include/SDL2/SDL_mouse.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_joystick.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_gamecontroller.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_rwops.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_quit.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+
+1586798831 /usr/include/SDL2/SDL_gesture.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_touch.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_filesystem.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_haptic.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_hints.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_loadso.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_log.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_messagebox.h
+	"SDL_stdinc.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_power.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_render.h
+	"SDL_stdinc.h"
+	"SDL_rect.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_system.h
+	"SDL_stdinc.h"
+	"SDL_keyboard.h"
+	"SDL_render.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_timer.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1586798831 /usr/include/SDL2/SDL_version.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1580767326 /usr/include/SDL2/SDL_image.h
+	"SDL.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
+1591905728 /home/pi/Desktop/piMASS/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1590039560 /home/pi/Desktop/piMASS/include/gpeALF.h
+	"piMASS.h"
+
+1588640220 /home/pi/Desktop/piMASS/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1591835633 source:/home/pi/Desktop/piMASS/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1591904660 /home/pi/Desktop/piMASS/gpcgt.h
+	"gpcpic.h"
+
+1591904684 /home/pi/Desktop/piMASS/gpcpic.h
+	"piMASS.h"
+
+1592041226 /home/pi/Desktop/piMASS/piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	"gpeALF.h"
+
+1591980543 /home/pi/Desktop/piMASS/gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1591455790 source:/home/pi/Desktop/piMASS/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1588640220 source:/home/pi/Desktop/piMASS/gpcLAZY.cpp
+	"piMASS.h"
+
+1591904308 source:/home/pi/Desktop/piMASS/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1591904446 source:/home/pi/Desktop/piMASS/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1591455790 source:/home/pi/Desktop/piMASS/gpcres.cpp
+	"gpcwin.h"
+
+1591455790 source:/home/pi/Desktop/piMASS/gpcres2mini.cpp
+	"gpcres.h"
+
+1591980472 /home/pi/Desktop/piMASS/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1591455790 source:/home/pi/Desktop/piMASS/gpcres_compi.cpp
+	"gpcres.h"
+
+1591455789 source:/home/pi/Desktop/piMASS/gpcres_run.cpp
+	"gpcwin.h"
+
+1591455790 source:/home/pi/Desktop/piMASS/gpcresflt.cpp
+	"gpcwin.h"
+
+1591747158 source:/home/pi/Desktop/piMASS/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1591963897 /home/pi/Desktop/piMASS/include/gpccrs.h
+	"gpcwin.h"
+
+1591904476 source:/home/pi/Desktop/piMASS/gpcU14.cpp
+	"gpcSRC.h"
+
+1591455790 source:/home/pi/Desktop/piMASS/gpcU44.cpp
+	"gpcSRC.h"
+
+1591904067 source:/home/pi/Desktop/piMASS/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1591455790 source:/home/pi/Desktop/piMASS/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1591980199 source:/home/pi/Desktop/piMASS/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1591954176 source:/home/pi/Desktop/piMASS/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1588640220 source:/home/pi/Desktop/piMASS/src/gpcND.cpp
+	"gpcND.h"
+
+1588640220 /home/pi/Desktop/piMASS/include/gpcND.h
+	"gpcSRC.h"
+
+1591455789 source:/home/pi/Desktop/piMASS/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1591957532 source:/home/pi/Desktop/piMASS/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1586798831 /usr/include/SDL2/SDL_opengl.h
+	"SDL_config.h"
+	"gl_mangle.h"
+	<windows.h>
+	"SDL_opengl_glext.h"
+
+1586798831 /usr/include/SDL2/SDL_opengl_glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1586798831 /usr/include/SDL2/SDL_opengles2.h
+	"SDL_config.h"
+	<OpenGLES/ES2/gl.h>
+	<OpenGLES/ES2/glext.h>
+	<GLES2/gl2platform.h>
+	<GLES2/gl2.h>
+	<GLES2/gl2ext.h>
+	"SDL_opengles2_khrplatform.h"
+	"SDL_opengles2_gl2platform.h"
+	"SDL_opengles2_gl2.h"
+	"SDL_opengles2_gl2ext.h"
+
+1586798831 /usr/include/SDL2/SDL_opengles2_khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<stdint.h>
+
+1586798831 /usr/include/SDL2/SDL_opengles2_gl2platform.h
+
+1586798831 /usr/include/SDL2/SDL_opengles2_gl2.h
+
+1586798831 /usr/include/SDL2/SDL_opengles2_gl2ext.h
+
+1591963896 source:/home/pi/Desktop/piMASS/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1591904182 source:/home/pi/Desktop/piMASS/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1591904402 source:/home/pi/Desktop/piMASS/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591744481 source:/home/pi/Desktop/piMASS/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1591904372 source:/home/pi/Desktop/piMASS/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591904337 source:/home/pi/Desktop/piMASS/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1591455790 source:/home/pi/Desktop/piMASS/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591904284 source:/home/pi/Desktop/piMASS/gpcTOOL.cpp
+	"gpcwin.h"
+
+1585857679 source:/home/pi/Desktop/piMASS/gpcF4.cpp
+	"gpcSRC.h"
+
+1591455789 source:/home/pi/Desktop/piMASS/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591904356 source:/home/pi/Desktop/piMASS/gpcGTslmpZS.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591449824 source:/home/pi/Desktop/piMASS/gpcCRSbreak.cpp
+
+1591959630 source:/home/pi/Desktop/piMASS/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1591845637 /home/pi/Desktop/piMASS//UIF1248etc.h
+
+1591836340 /home/pi/Desktop/piMASS/gpsGLSL.h
+
+1591842824 /home/pi/Desktop/piMASS//gpsKEYMAP.h
+
+1591836340 /home/pi/Desktop/piMASS//gpsGLSL.h
+
+1591980543 /home/pi/Desktop/piMASS//gpeTYP.h
+
+1591980543 /home/pi/Desktop/piMASS/gpeTYP.h
+
+1591904372 source:/home/pi/Desktop/piMASScmpi/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591904660 /home/pi/Desktop/piMASScmpi/gpcgt.h
+	"gpcpic.h"
+
+1591904684 /home/pi/Desktop/piMASScmpi/gpcpic.h
+	"piMASS.h"
+
+1592086637 /home/pi/Desktop/piMASScmpi/piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	"gpeALF.h"
+
+1588640220 /home/pi/Desktop/piMASScmpi/include/camU.h
+
+1591905728 /home/pi/Desktop/piMASScmpi/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1592092328 /home/pi/Desktop/piMASScmpi//gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1591904660 /home/pi/Desktop/piMASScmpi//gpcgt.h
+	"gpcpic.h"
+
+1591904684 /home/pi/Desktop/piMASScmpi//gpcpic.h
+	"piMASS.h"
+
+1592086637 /home/pi/Desktop/piMASScmpi//piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	"gpeALF.h"
+
+1591845637 /home/pi/Desktop/piMASScmpi//UIF1248etc.h
+
+1592064985 /home/pi/Desktop/piMASScmpi/include/gpeALF.h
+	"piMASS.h"
+
+1591980543 /home/pi/Desktop/piMASScmpi//gpeTYP.h
+
+1591980472 /home/pi/Desktop/piMASScmpi//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1588640220 /home/pi/Desktop/piMASScmpi/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1592064474 /home/pi/Desktop/piMASScmpi/include/gpcwin.h
+	"gpcres.h"
+
+1591455790 source:/home/pi/Desktop/piMASScmpi/gpcalu.cpp
+	"gpcwin.h"
+
+1591449824 source:/home/pi/Desktop/piMASScmpi/gpcCRSbreak.cpp
+
+1591455789 source:/home/pi/Desktop/piMASScmpi/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591904182 source:/home/pi/Desktop/piMASScmpi/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1592064029 /home/pi/Desktop/piMASScmpi/include/gpccrs.h
+	"gpcwin.h"
+
+1591836340 /home/pi/Desktop/piMASScmpi/gpsGLSL.h
+
+1591835633 source:/home/pi/Desktop/piMASScmpi/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1592092328 /home/pi/Desktop/piMASScmpi/gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1591980543 /home/pi/Desktop/piMASScmpi/gpeTYP.h
+
+1592064474 source:/home/pi/Desktop/piMASScmpi/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591904402 source:/home/pi/Desktop/piMASScmpi/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591904356 source:/home/pi/Desktop/piMASScmpi/gpcGTslmpZS.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1591744481 source:/home/pi/Desktop/piMASScmpi/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1591904337 source:/home/pi/Desktop/piMASScmpi/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1588640220 source:/home/pi/Desktop/piMASScmpi/gpcLAZY.cpp
+	"piMASS.h"
+
+1592089623 source:/home/pi/Desktop/piMASScmpi/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1591904446 source:/home/pi/Desktop/piMASScmpi/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1591455790 source:/home/pi/Desktop/piMASScmpi/gpcres.cpp
+	"gpcwin.h"
+
+1591455790 source:/home/pi/Desktop/piMASScmpi/gpcres2mini.cpp
+	"gpcres.h"
+
+1591980472 /home/pi/Desktop/piMASScmpi/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1591455790 source:/home/pi/Desktop/piMASScmpi/gpcres_compi.cpp
+	"gpcres.h"
+
+1592073072 source:/home/pi/Desktop/piMASScmpi/gpcres_run.cpp
+	"gpcwin.h"
+
+1591455790 source:/home/pi/Desktop/piMASScmpi/gpcresflt.cpp
+	"gpcwin.h"
+
+1591455790 source:/home/pi/Desktop/piMASScmpi/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1592073124 source:/home/pi/Desktop/piMASScmpi/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1592074815 source:/home/pi/Desktop/piMASScmpi/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1591904284 source:/home/pi/Desktop/piMASScmpi/gpcTOOL.cpp
+	"gpcwin.h"
+
+1591904476 source:/home/pi/Desktop/piMASScmpi/gpcU14.cpp
+	"gpcSRC.h"
+
+1592088827 source:/home/pi/Desktop/piMASScmpi/gpcU44.cpp
+	"gpcSRC.h"
+
+1591904067 source:/home/pi/Desktop/piMASScmpi/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1591842824 /home/pi/Desktop/piMASScmpi//gpsKEYMAP.h
+
+1591455790 source:/home/pi/Desktop/piMASScmpi/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1591980199 source:/home/pi/Desktop/piMASScmpi/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1592067443 source:/home/pi/Desktop/piMASScmpi/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1592067970 source:/home/pi/Desktop/piMASScmpi/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1588640220 source:/home/pi/Desktop/piMASScmpi/src/gpcND.cpp
+	"gpcND.h"
+
+1588640220 /home/pi/Desktop/piMASScmpi/include/gpcND.h
+	"gpcSRC.h"
+
+1591455789 source:/home/pi/Desktop/piMASScmpi/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1591957532 source:/home/pi/Desktop/piMASScmpi/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1591836340 /home/pi/Desktop/piMASScmpi//gpsGLSL.h
+
+1592093801 source:/home/pi/Desktop/piMASScmpi/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1592088827 source:/home/pi/Desktop/piMASScmpi/gpcI8x2.cpp
+	"gpcSRC.h"
+
+1593946320 source:/home/pi/Desktop/piMASS/piMASScmpi/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi/gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi/gpcpic.h
+	"piMASS.h"
+
+1597061918 /home/pi/Desktop/piMASS/piMASScmpi/piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi/include/camU.h
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1597214785 /home/pi/Desktop/piMASS/piMASScmpi//gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi//gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi//gpcpic.h
+	"piMASS.h"
+
+1597061918 /home/pi/Desktop/piMASS/piMASScmpi//piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi//UIF1248etc.h
+
+1597121580 /home/pi/Desktop/piMASS/piMASScmpi/include/gpeALF.h
+	"piMASS.h"
+
+1596165773 /home/pi/Desktop/piMASS/piMASScmpi//gpeTYP.h
+	<UIF1248etc.h>
+
+1594295281 /home/pi/Desktop/piMASS/piMASScmpi//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1596855652 /home/pi/Desktop/piMASS/piMASScmpi/include/gpcwin.h
+	"gpcres.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcalu.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcCRSbreak.cpp
+
+1597122402 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1596855652 /home/pi/Desktop/piMASS/piMASScmpi/include/gpccrs.h
+	"gpcwin.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi/gpsGLSL.h
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1597214785 /home/pi/Desktop/piMASS/piMASScmpi/gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1596165773 /home/pi/Desktop/piMASS/piMASScmpi/gpeTYP.h
+	<UIF1248etc.h>
+
+1596855652 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcGTslmpZS.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcLAZY.cpp
+	"piMASS.h"
+
+1597214785 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1594138407 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcres.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcres2mini.cpp
+	"gpcres.h"
+
+1594295281 /home/pi/Desktop/piMASS/piMASScmpi/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcres_compi.cpp
+	"gpcres.h"
+
+1596855969 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcres_run.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcresflt.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1597110239 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1597209115 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1597214786 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcTOOL.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcU14.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcU44.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi//gpsKEYMAP.h
+
+1596496283 source:/home/pi/Desktop/piMASS/piMASScmpi/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1596855652 source:/home/pi/Desktop/piMASS/piMASScmpi/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1596855652 source:/home/pi/Desktop/piMASS/piMASScmpi/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1597157328 source:/home/pi/Desktop/piMASS/piMASScmpi/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/src/gpcND.cpp
+	"gpcND.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi/include/gpcND.h
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmpi/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1596497770 source:/home/pi/Desktop/piMASS/piMASScmpi/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmpi//gpsGLSL.h
+
+1597214786 /home/pi/Desktop/piMASS/piMASScmpi/gpcSRClnk.h
+	"piMASS.h"
+
+1597209009 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/gpcpic.h
+	"piMASS.h"
+
+1593289255 /home/dezso/Asztal/piMASScmpi/piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/include/camU.h
+
+1586798831 /usr/include/SDL2/SDL_shape.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi//gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi//gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi//gpcpic.h
+	"piMASS.h"
+
+1593289255 /home/dezso/Asztal/piMASScmpi//piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi//UIF1248etc.h
+
+1593166346 /home/dezso/Asztal/piMASScmpi//gpeTYP.h
+	<UIF1248etc.h>
+
+1593166346 /home/dezso/Asztal/piMASScmpi/include/gpeALF.h
+	"piMASS.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/include/gpcwin.h
+	"gpcres.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcalu.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcCRSbreak.cpp
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/include/gpccrs.h
+	"gpcwin.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/gpsGLSL.h
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcGTslmpZS.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcLAZY.cpp
+	"piMASS.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcres.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcres2mini.cpp
+	"gpcres.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/gpeTYP.h
+	<UIF1248etc.h>
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcres_compi.cpp
+	"gpcres.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcres_run.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcresflt.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593193807 source:/home/dezso/Asztal/piMASScmpi/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593290171 /home/dezso/Asztal/piMASScmpi/gpcSRClnk.h
+	"piMASS.h"
+
+1593284272 source:/home/dezso/Asztal/piMASScmpi/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcTOOL.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcU14.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcU44.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1593166346 /home/dezso/Asztal/piMASScmpi//gpsKEYMAP.h
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/src/gpcND.cpp
+	"gpcND.h"
+
+1593166346 /home/dezso/Asztal/piMASScmpi/include/gpcND.h
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Asztal/piMASScmpi/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1593166346 /home/dezso/Asztal/piMASScmpi//gpsGLSL.h
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcpic.h
+	"piMASS.h"
+
+1593289255 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/include/camU.h
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpcpic.h
+	"piMASS.h"
+
+1593289255 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//UIF1248etc.h
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpeTYP.h
+	<UIF1248etc.h>
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/include/gpeALF.h
+	"piMASS.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/include/gpcwin.h
+	"gpcres.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcalu.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcCRSbreak.cpp
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/include/gpccrs.h
+	"gpcwin.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpsGLSL.h
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcGTslmpZS.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcLAZY.cpp
+	"piMASS.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcres.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcres2mini.cpp
+	"gpcres.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpeTYP.h
+	<UIF1248etc.h>
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcres_compi.cpp
+	"gpcres.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcres_run.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcresflt.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593193807 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593294983 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcSRClnk.h
+	"piMASS.h"
+
+1593284272 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcTOOL.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcU14.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcU44.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpsKEYMAP.h
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/src/gpcND.cpp
+	"gpcND.h"
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/include/gpcND.h
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1593166346 /home/dezso/Dokumentumok/piMASSpub/Desktop/piMASS/piMASScmpi//gpsGLSL.h
+
+1597209260 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCrun.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1595890682 /home/pi/Desktop/piMASS/piMASScmpi//gpcSRClnk.h
+	"piMASS.h"
+
+1597209173 source:/home/pi/Desktop/piMASS/piMASScmpi/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1596979136 source:/home/pi/Desktop/piMASS/piMASScmpi/gpCORE.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593946320 source:/home/pi/Desktop/piMASS/piMASScmplr/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr/gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr/gpcpic.h
+	"piMASS.h"
+
+1597061918 /home/pi/Desktop/piMASS/piMASScmplr/piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr/include/camU.h
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1597226544 /home/pi/Desktop/piMASS/piMASScmplr//gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr//gpcgt.h
+	"gpcpic.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr//gpcpic.h
+	"piMASS.h"
+
+1597061918 /home/pi/Desktop/piMASS/piMASScmplr//piMASS.h
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr//UIF1248etc.h
+
+1596165773 /home/pi/Desktop/piMASS/piMASScmplr//gpeTYP.h
+	<UIF1248etc.h>
+
+1597121580 /home/pi/Desktop/piMASS/piMASScmplr/include/gpeALF.h
+	"piMASS.h"
+
+1594295281 /home/pi/Desktop/piMASS/piMASScmplr//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1596855652 /home/pi/Desktop/piMASS/piMASScmplr/include/gpcwin.h
+	"gpcres.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcalu.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcCRSbreak.cpp
+
+1597122402 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1596855652 /home/pi/Desktop/piMASS/piMASScmplr/include/gpccrs.h
+	"gpcwin.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr/gpsGLSL.h
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1597226544 /home/pi/Desktop/piMASS/piMASScmplr/gpcSRC.h
+	"gpcgt.h"
+	"gpcOPCD.h"
+
+1596855652 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcGTslmpZS.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcLAZY.cpp
+	"piMASS.h"
+
+1597214785 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1596979136 source:/home/pi/Desktop/piMASS/piMASScmplr/gpCORE.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1597214786 /home/pi/Desktop/piMASS/piMASScmplr/gpcSRClnk.h
+	"piMASS.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1594138407 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcres.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcres2mini.cpp
+	"gpcres.h"
+
+1594295281 /home/pi/Desktop/piMASS/piMASScmplr/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1596165773 /home/pi/Desktop/piMASS/piMASScmplr/gpeTYP.h
+	<UIF1248etc.h>
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcres_compi.cpp
+	"gpcres.h"
+
+1596855969 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcres_run.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcresflt.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1597225433 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1597209115 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1597209009 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1597226545 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1597209173 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1597209260 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcSRCrun.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcTOOL.cpp
+	"gpcwin.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcU14.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcU44.cpp
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr//gpsKEYMAP.h
+
+1597226544 source:/home/pi/Desktop/piMASS/piMASScmplr/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1596855652 source:/home/pi/Desktop/piMASS/piMASScmplr/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1596855652 source:/home/pi/Desktop/piMASS/piMASScmplr/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1597157328 source:/home/pi/Desktop/piMASS/piMASScmplr/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/src/gpcND.cpp
+	"gpcND.h"
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr/include/gpcND.h
+	"gpcSRC.h"
+
+1593166346 source:/home/pi/Desktop/piMASS/piMASScmplr/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1596497770 source:/home/pi/Desktop/piMASS/piMASScmplr/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1593166346 /home/pi/Desktop/piMASS/piMASScmplr//gpsGLSL.h
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1603233215 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcgt.h
+	"gpcpic.h"
+
+1597231905 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcpic.h
+	"piMASS.h"
+
+1603247389 /home/pi/Desktop/piMASS/piMASScmplrSLN/piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1597231908 /home/pi/Desktop/piMASS/piMASScmplrSLN/include/camU.h
+
+1597231908 /home/pi/Desktop/piMASS/piMASScmplrSLN/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1603676474 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1603233215 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpcgt.h
+	"gpcpic.h"
+
+1597231905 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpcpic.h
+	"piMASS.h"
+
+1603247389 /home/pi/Desktop/piMASS/piMASScmplrSLN//piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<wiringPi.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1597247016 /home/pi/Desktop/piMASS/piMASScmplrSLN//UIF1248etc.h
+
+1603035900 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpeTYP.h
+	<UIF1248etc.h>
+
+1603138991 /home/pi/Desktop/piMASS/piMASScmplrSLN/include/gpeALF.h
+	"piMASS.h"
+
+1597231905 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1597231908 /home/pi/Desktop/piMASS/piMASScmplrSLN/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1597501914 /home/pi/Desktop/piMASS/piMASScmplrSLN/include/gpcwin.h
+	"gpcres.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcalu.cpp
+	"gpcwin.h"
+
+1597231904 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcCRSbreak.cpp
+
+1601206820 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1597231904 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1597231908 /home/pi/Desktop/piMASS/piMASScmplrSLN/include/gpccrs.h
+	"gpcwin.h"
+
+1597231905 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpsGLSL.h
+
+1603220961 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1603676474 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1600983039 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1601554215 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1601207991 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcGTslmpZS.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1601207969 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1598203137 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1603299104 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcLAZY.cpp
+	"piMASS.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1597737745 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpCORE.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1598198975 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRClnk.h
+	"piMASS.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcres.cpp
+	"gpcwin.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcres2mini.cpp
+	"gpcres.h"
+
+1597231905 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1603035900 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpeTYP.h
+	<UIF1248etc.h>
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcres_compi.cpp
+	"gpcres.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcresflt.cpp
+	"gpcwin.h"
+
+1603234307 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1602814953 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1601645924 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1602425399 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1602735646 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCrun.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcTOOL.cpp
+	"gpcwin.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcU14.cpp
+	"gpcSRC.h"
+
+1602785947 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcU44.cpp
+	"gpcSRC.h"
+
+1597231905 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1597231905 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpsKEYMAP.h
+
+1598383075 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1603681668 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcres_run.cpp
+	"gpcwin.h"
+
+1603667978 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603587785 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1597231914 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1603338692 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1597231914 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/src/gpcND.cpp
+	"gpcND.h"
+
+1597231908 /home/pi/Desktop/piMASS/piMASScmplrSLN/include/gpcND.h
+	"gpcSRC.h"
+
+1597231914 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1597659925 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1597231905 /home/pi/Desktop/piMASS/piMASScmplrSLN//gpsGLSL.h
+
+1603671656 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gppiMASScmplr.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603675004 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinst.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603033182 /home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinst.h
+
+1603558484 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinstRUN.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603684767 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpcSRCinstALU.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603551323 source:/home/pi/Desktop/piMASS/piMASScmplrSLN/gpMEMinstDOit.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcCRSbreak.cpp
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1604021745 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcgt.h
+	"gpcpic.h"
+
+1604393697 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1604372244 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1604107598 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/include/camU.h
+
+1586798831 /usr/include/SDL2/SDL_sensor.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1604455780 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1604021745 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//gpcgt.h
+	"gpcpic.h"
+
+1604393697 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1604372244 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<GLFW/glfw3.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1603951023 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//UIF1248etc.h
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//gpeTYP.h
+	<UIF1248etc.h>
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/include/gpeALF.h
+	"piMASS.h"
+
+1604021744 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/include/gpcwin.h
+	"gpcres.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcalu.cpp
+	"gpcwin.h"
+
+1604367151 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1604021745 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/include/gpccrs.h
+	"gpcwin.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpsGLSL.h
+
+1604367942 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1604455780 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1604021745 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcLAZY.cpp
+	"piMASS.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpCORE.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRClnk.h
+	"piMASS.h"
+
+1604386829 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1604021745 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcres.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcres2mini.cpp
+	"gpcres.h"
+
+1604021744 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpeTYP.h
+	<UIF1248etc.h>
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcres_compi.cpp
+	"gpcres.h"
+
+1604366755 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcres_run.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcresflt.cpp
+	"gpcwin.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1604021745 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCinst.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCinst.h
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCinstALU.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCinstRUN.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604019424 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcSRCrun.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcTOOL.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcU14.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcU44.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//gpsKEYMAP.h
+
+1604367151 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1604386800 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gpMEMinstDOit.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604461107 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/gppiMASScmplr.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604368428 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1604021744 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1603951027 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/src/gpcND.cpp
+	"gpcND.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/include/gpcND.h
+	"gpcSRC.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN//gpsGLSL.h
+
+1603987724 /usr/local/include/mmalpp/mmalpp.h
+	"include/mmalpp_component.h"
+	"include/mmalpp_port.h"
+	"include/mmalpp_types.h"
+	"include/mmalpp_buffer.h"
+	"include/mmalpp_connection.h"
+	"include/mmalpp_pool.h"
+	"include/mmalpp_support.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_component.h
+	<string>
+	"mmalpp_port.h"
+	"mmalpp_connection.h"
+	"utils/mmalpp_component_utils.h"
+	"mmalpp_support.h"
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_port.h
+	<functional>
+	<memory>
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_port.h>
+	<interface/mmal/mmal_pool.h>
+	<interface/mmal/mmal_queue.h>
+	<interface/mmal/util/mmal_connection.h>
+	"utils/mmalpp_port_utils.h"
+	"mmalpp_buffer.h"
+	"mmalpp_pool.h"
+	"mmalpp_types.h"
+	"mmalpp_fwd_decl.h"
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/utils/mmalpp_port_utils.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_port.h>
+	<interface/mmal/util/mmal_util_params.h>
+	<interface/mmal/util/mmal_util.h>
+	"exceptions/mmalpp_exceptions.h"
+	"../../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/utils/exceptions/mmalpp_exceptions.h
+	<stdexcept>
+	<interface/mmal/mmal_types.h>
+	"../../../macros.h"
+
+1603987724 /usr/local/include/mmalpp/macros.h
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_buffer.h
+	<iterator>
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_buffer.h>
+	"utils/mmalpp_buffer_utils.h"
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/utils/mmalpp_buffer_utils.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_buffer.h>
+	"exceptions/mmalpp_exceptions.h"
+	"../../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_pool.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_pool.h>
+	"mmalpp_queue.h"
+	"utils/mmalpp_pool_utils.h"
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_queue.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_queue.h>
+	"mmalpp_buffer.h"
+	"utils/mmalpp_queue_utils.h"
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/utils/mmalpp_queue_utils.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_queue.h>
+	"exceptions/mmalpp_exceptions.h"
+	"../../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/utils/mmalpp_pool_utils.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_pool.h>
+	<interface/mmal/mmal_port.h>
+	<interface/mmal/util/mmal_util.h>
+	"exceptions/mmalpp_exceptions.h"
+	"../../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_types.h
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_fwd_decl.h
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_connection.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/util/mmal_connection.h>
+	"mmalpp_port.h"
+	"mmalpp_fwd_decl.h"
+	"utils/mmalpp_connection_utils.h"
+	"../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/utils/mmalpp_connection_utils.h
+	<string>
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_port.h>
+	<interface/mmal/mmal_pool.h>
+	<interface/mmal/util/mmal_connection.h>
+	"exceptions/mmalpp_exceptions.h"
+	"../../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/utils/mmalpp_component_utils.h
+	<interface/mmal/mmal_types.h>
+	<interface/mmal/mmal_component.h>
+	"exceptions/mmalpp_exceptions.h"
+	"../../macros.h"
+
+1603987724 /usr/local/include/mmalpp/include/mmalpp_support.h
+	<interface/mmal/mmal_port.h>
+	"../macros.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_types.h
+	"mmal_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_common.h
+	<stdlib.h>
+	<string.h>
+	<stddef.h>
+	<assert.h>
+	<interface/vcos/vcos.h>
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos.h
+	"interface/vcos/vcos_assert.h"
+	"vcos_types.h"
+	"interface/vcos/pthreads/vcos_platform.h"
+	"vcos_platform.h"
+	"interface/vcos/vcos_init.h"
+	"interface/vcos/vcos_semaphore.h"
+	"interface/vcos/vcos_thread.h"
+	"interface/vcos/vcos_mutex.h"
+	"interface/vcos/vcos_mem.h"
+	"interface/vcos/vcos_logging.h"
+	"interface/vcos/vcos_string.h"
+	"interface/vcos/vcos_event.h"
+	"interface/vcos/vcos_thread_attr.h"
+	"interface/vcos/vcos_tls.h"
+	"interface/vcos/vcos_reentrant_mutex.h"
+	"interface/vcos/vcos_named_semaphore.h"
+	"interface/vcos/vcos_quickslow_mutex.h"
+	"interface/vcos/vcos_event_flags.h"
+	"interface/vcos/vcos_queue.h"
+	"interface/vcos/vcos_legacy_isr.h"
+	"interface/vcos/vcos_timer.h"
+	"interface/vcos/vcos_mempool.h"
+	"interface/vcos/vcos_isr.h"
+	"interface/vcos/vcos_atomic_flags.h"
+	"interface/vcos/vcos_once.h"
+	"interface/vcos/vcos_blockpool.h"
+	"interface/vcos/vcos_file.h"
+	"interface/vcos/vcos_cfg.h"
+	"interface/vcos/vcos_cmd.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_assert.h
+	"interface/vcos/vcos_types.h"
+	"interface/vcos/user_nodefs.h"
+	"assert.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_types.h
+	<stddef.h>
+	"interface/vcos/pthreads/vcos_platform_types.h"
+	"vcos_platform_types.h"
+	"interface/vcos/vcos_attr.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/pthreads/vcos_platform_types.h
+	"interface/vcos/vcos_inttypes.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_inttypes.h
+	<inttypes.h>
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_attr.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/user_nodefs.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/pthreads/vcos_platform.h
+	<pthread.h>
+	<semaphore.h>
+	<unistd.h>
+	<sys/types.h>
+	<sched.h>
+	<errno.h>
+	<unistd.h>
+	<string.h>
+	<strings.h>
+	<time.h>
+	<signal.h>
+	<stddef.h>
+	<stdlib.h>
+	<dlfcn.h>
+	"vcos_futex_mutex.h"
+	"interface/vcos/generic/vcos_generic_event_flags.h"
+	"interface/vcos/generic/vcos_generic_blockpool.h"
+	"interface/vcos/generic/vcos_mem_from_malloc.h"
+	"interface/vcos/generic/vcos_generic_reentrant_mtx.h"
+	"interface/vcos/generic/vcos_generic_named_sem.h"
+	"interface/vcos/generic/vcos_generic_quickslow_mutex.h"
+	"interface/vcos/generic/vcos_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/pthreads/vcos_futex_mutex.h
+	"interface/vcos/vcos_types.h"
+	"vcos_platform.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/generic/vcos_generic_event_flags.h
+	"interface/vcos/vcos_types.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/generic/vcos_generic_blockpool.h
+	"interface/vcos/vcos_types.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/generic/vcos_mem_from_malloc.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/generic/vcos_generic_reentrant_mtx.h
+	"interface/vcos/vcos_types.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/generic/vcos_generic_named_sem.h
+	"interface/vcos/vcos_types.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/generic/vcos_generic_quickslow_mutex.h
+	"interface/vcos/vcos_types.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/generic/vcos_common.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_init.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_semaphore.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_thread.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_mutex.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_mem.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_logging.h
+	<stdarg.h>
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+	"vcos_logging_control.h"
+	"interface/vcos/vcos_cmd.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_logging_control.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_cmd.h
+	"interface/vcos/vcos.h"
+	"interface/vcos/vcos_stdint.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_stdint.h
+	<limits.h>
+	<stdint.h>
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_string.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+	<linux/string.h>
+	<string.h>
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_event.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_thread_attr.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_tls.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_reentrant_mutex.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_named_semaphore.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_quickslow_mutex.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_event_flags.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_queue.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_legacy_isr.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_timer.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_mempool.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_isr.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_atomic_flags.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_once.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_blockpool.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vcos/vcos_cfg.h
+	"interface/vcos/vcos_types.h"
+	"vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_port.h
+	"mmal_types.h"
+	"mmal_format.h"
+	"mmal_buffer.h"
+	"mmal_parameters.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_format.h
+	"mmal_types.h"
+	"mmal_encodings.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_encodings.h
+	"mmal_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_buffer.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_parameters.h
+	"mmal_common.h"
+	"mmal_parameters_camera.h"
+	"mmal_parameters_video.h"
+	"mmal_parameters_audio.h"
+	"mmal_parameters_clock.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_parameters_camera.h
+	"mmal_parameters_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_parameters_common.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_parameters_video.h
+	"mmal_parameters_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_parameters_audio.h
+	"mmal_parameters_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_parameters_clock.h
+	"mmal_clock.h"
+	"mmal_parameters_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_clock.h
+	"interface/vcos/vcos.h"
+	"mmal_types.h"
+	"mmal_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_pool.h
+	"mmal_queue.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_queue.h
+	"mmal_buffer.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/util/mmal_connection.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/util/mmal_util_params.h
+	"interface/mmal/mmal.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal.h
+	"mmal_common.h"
+	"mmal_types.h"
+	"mmal_port.h"
+	"mmal_component.h"
+	"mmal_parameters.h"
+	"mmal_queue.h"
+	"mmal_pool.h"
+	"mmal_events.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_component.h
+	"mmal_types.h"
+	"mmal_port.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_events.h
+	"mmal_common.h"
+	"mmal_parameters.h"
+	"mmal_port.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/util/mmal_util.h
+	"interface/mmal/mmal.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/GLES2/gl2platform.h
+	"../KHR/khrplatform.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/KHR/khrplatform.h
+	<stdint.h>
+	<inttypes.h>
+	<vcinclude/common.h>
+	<stdint.h>
+
+1603995519 /home/alivemoon/Asztal/userland/vcinclude/common.h
+	"interface/vcos/vcos_stdint.h"
+	"interface/vctypes/vc_image_types.h"
+	<vc/intrinsics.h>
+	<limits.h>
+	<limits.h>
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vctypes/vc_image_types.h
+	"interface/vcos/vcos_stdint.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/GLES2/gl2.h
+	"gl2platform.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/GLES2/gl2ext.h
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/bcm_host.h
+	<stdint.h>
+	"interface/vmcs_host/vc_dispmanx.h"
+	"interface/vmcs_host/vc_tvservice.h"
+	"interface/vmcs_host/vc_cec.h"
+	"interface/vmcs_host/vc_cecservice.h"
+	"interface/vmcs_host/vcgencmd.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/vc_dispmanx.h
+	"interface/vcos/vcos.h"
+	"interface/vctypes/vc_image_types.h"
+	"vc_dispservice_x_defs.h"
+	"interface/vmcs_host/vc_dispmanx_types.h"
+	"interface/vchi/vchi.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/vc_dispservice_x_defs.h
+	"interface/vctypes/vc_image_types.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vmcs_host/vc_dispmanx_types.h
+	"interface/vctypes/vc_image_types.h"
+	"interface/vctypes/vc_display_types.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vctypes/vc_display_types.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vchi/vchi.h
+	"interface/vcos/vcos.h"
+	"interface/vchi/vchi_cfg.h"
+	"interface/vchi/vchi_common.h"
+	"interface/vchi/connections/connection.h"
+	"vchi_mh.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vchi/vchi_cfg.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vchi/vchi_common.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vchi/connections/connection.h
+	"interface/vchi/vchi_cfg_internal.h"
+	"interface/vchi/vchi_common.h"
+	"interface/vchi/message_drivers/message.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vchi/vchi_cfg_internal.h
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vchi/message_drivers/message.h
+	"interface/vchi/vchi_cfg_internal.h"
+	"interface/vcos/vcos.h"
+	"interface/vchi/vchi_common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vchi/vchi_mh.h
+	<interface/vcos/vcos.h>
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/vc_tvservice.h
+	"vcinclude/common.h"
+	"interface/vcos/vcos.h"
+	"interface/vchi/vchi.h"
+	"interface/vmcs_host/vc_tvservice_defs.h"
+	"interface/vmcs_host/vc_hdmi.h"
+	"interface/vmcs_host/vc_sdtv.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vmcs_host/vc_tvservice_defs.h
+	"vcinclude/common.h"
+	"interface/vchi/message_drivers/message.h"
+	"vc_hdmi.h"
+	"vc_sdtv.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vmcs_host/vc_hdmi.h
+	"vc_hdmi_property.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vmcs_host/vc_hdmi_property.h
+	"vcinclude/common.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vmcs_host/vc_sdtv.h
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/vc_cec.h
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/vc_cecservice.h
+	"vcinclude/common.h"
+	"interface/vcos/vcos.h"
+	"interface/vchi/vchi.h"
+	"interface/vmcs_host/vc_cecservice_defs.h"
+	"interface/vmcs_host/vc_cec.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vmcs_host/vc_cecservice_defs.h
+	"vcinclude/common.h"
+	"interface/vcos/vcos.h"
+	"interface/vcos/vcos_logging.h"
+	"interface/vchi/message_drivers/message.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/vmcs_host/vc_cec.h
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/vcgencmd.h
+	"vchost_platform_config.h"
+	"interface/vchi/vchi.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/vchost_platform_config.h
+	"linux/vchost_config.h"
+	"vchost_config.h"
+
+1603998495 /home/alivemoon/Asztal/firmware/opt/vc/include/interface/vmcs_host/linux/vchost_config.h
+	"interface/vcos/vcos.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/mmal_logging.h
+	"mmal_common.h"
+	"interface/vcos/vcos_logging.h"
+
+1603995519 /home/alivemoon/Asztal/userland/interface/mmal/util/mmal_default_components.h
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/RaspiCommonSettings.h
+	"interface/mmal/mmal_parameters_camera.h"
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/RaspiCamControl.h
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/RaspiPreview.h
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/RaspiCLI.h
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/RaspiHelpers.h
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/RaspiGPS.h
+	<pthread.h>
+	<time.h>
+	"libgps_loader.h"
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/libgps_loader.h
+	"gps.h"
+
+1603995519 /home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys/gps.h
+	<sys/types.h>
+	<sys/time.h>
+	<stdbool.h>
+	<inttypes.h>
+	<limits.h>
+	<time.h>
+	<signal.h>
+	<stdio.h>
+	<pthread.h>
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1605062766 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcgt.h
+	"gpcpic.h"
+
+1604551972 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1604989537 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1604107598 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/include/camU.h
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1604856152 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1605062766 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//gpcgt.h
+	"gpcpic.h"
+
+1604551972 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1604989537 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1603951023 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//UIF1248etc.h
+
+1604830533 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//gpeTYP.h
+	<UIF1248etc.h>
+
+1604567216 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/include/gpeALF.h
+	"piMASS.h"
+
+1604021744 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/include/gpcwin.h
+	"gpcres.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcalu.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcCRSbreak.cpp
+
+1604367151 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1604021745 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/include/gpccrs.h
+	"gpcwin.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpsGLSL.h
+
+1604367942 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1604856152 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1604021745 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcLAZY.cpp
+	"piMASS.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpCORE.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRClnk.h
+	"piMASS.h"
+
+1604989232 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1604021745 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcres.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcres2mini.cpp
+	"gpcres.h"
+
+1604021744 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1604830533 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpeTYP.h
+	<UIF1248etc.h>
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcres_compi.cpp
+	"gpcres.h"
+
+1604559285 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcres_run.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcresflt.cpp
+	"gpcwin.h"
+
+1605242664 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1604021745 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1604551972 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1604551972 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604989537 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCinst.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604570419 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCinst.h
+
+1604984032 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCinstALU.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604944330 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCinstRUN.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604019424 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcSRCrun.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcTOOL.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcU14.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcU44.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//gpsKEYMAP.h
+
+1604367151 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpMASSbuild.cpp
+	"gpcSRC.h"
+
+1605338319 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gpMEMinstDOit.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604852644 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/gppiMASScmplr.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604368428 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1604021744 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1604551972 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1603951027 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/src/gpcND.cpp
+	"gpcND.h"
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/include/gpcND.h
+	"gpcSRC.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1603951024 /home/alivemoon/Asztal/piMASS/piMASScmplrSLNpi4//gpsGLSL.h
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1612976719 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcgt.h
+	"gpcpic.h"
+	"sim7x00.h"
+
+1618753029 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1619295165 /home/alivemoon/Asztal/piMASScmplrSLNpi4/piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1604107598 /home/alivemoon/Asztal/piMASScmplrSLNpi4/include/camU.h
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1618694641 /home/alivemoon/Asztal/piMASScmplrSLNpi4//gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1612976719 /home/alivemoon/Asztal/piMASScmplrSLNpi4//gpcgt.h
+	"gpcpic.h"
+	"sim7x00.h"
+
+1618753029 /home/alivemoon/Asztal/piMASScmplrSLNpi4//gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1619295165 /home/alivemoon/Asztal/piMASScmplrSLNpi4//piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1603951022 /home/alivemoon/Asztal/piMASScmplrSLNpi4//UIF1248etc.h
+
+1616533557 /home/alivemoon/Asztal/piMASScmplrSLNpi4//gpeTYP.h
+	<UIF1248etc.h>
+
+1617918387 /home/alivemoon/Asztal/piMASScmplrSLNpi4/include/gpeALF.h
+	"piMASS.h"
+
+1618929667 /home/alivemoon/Asztal/piMASScmplrSLNpi4//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1619371428 /home/alivemoon/Asztal/piMASScmplrSLNpi4/include/gpcwin.h
+	"gpcres.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcalu.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcCRSbreak.cpp
+
+1612573888 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1619374077 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1604021744 /home/alivemoon/Asztal/piMASScmplrSLNpi4/include/gpccrs.h
+	"gpcwin.h"
+
+1618982674 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpsGLSL.h
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1618694641 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1612803248 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1618929667 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1617988415 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1613658482 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcLAZY.cpp
+	"piMASS.h"
+	<dirent.h>
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1606180456 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpCORE.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1610552363 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRClnk.h
+	"piMASS.h"
+
+1615334681 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1604021744 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcres.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcres2mini.cpp
+	"gpcres.h"
+
+1618929667 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1616533557 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpeTYP.h
+	<UIF1248etc.h>
+
+1616348322 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcres_compi.cpp
+	"gpcres.h"
+
+1614382980 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcres_run.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcresflt.cpp
+	"gpcwin.h"
+
+1605353698 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1608275494 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1605903884 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616972211 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinst.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616510547 /home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinst.h
+
+1616714788 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstALU.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstRUN.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604019424 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCrun.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1617980350 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcTOOL.cpp
+	"gpcwin.h"
+
+1615530012 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcU14.cpp
+	"gpcSRC.h"
+
+1613747616 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcU44.cpp
+	"gpcSRC.h"
+
+1613398582 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4//gpsKEYMAP.h
+
+1612478326 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpMASSbuild.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1618771134 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpMEMinstDOit.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1618506726 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gppiMASScmplr.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1619295165 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1613336870 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1614387680 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1603951026 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpcND.cpp
+	"gpcND.h"
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4/include/gpcND.h
+	"gpcSRC.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1619352233 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1618982674 /home/alivemoon/Asztal/piMASScmplrSLNpi4//gpsGLSL.h
+
+1616685203 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstADD.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstENTRY.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstMOVE.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstMUL.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstFUN.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616411464 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSRCinstSTK.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpMEMfunPRINT.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1608893973 /home/alivemoon/Asztal/piMASScmplrSLNpi4/SIM7X00/Raspberry/c/sim7x00.h
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcGSM.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+	<wiringSerial.h>
+
+1618775647 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpMEMfunFND.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1618966724 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcGLobj.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpc_mitsub.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1612976719 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcgt.h
+	"gpcpic.h"
+	"sim7x00.h"
+
+1619546266 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1619488705 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1604107598 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/include/camU.h
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/include/gpcOPCD.h
+	"gpcSRC.h"
+	"gpcres.h"
+
+1618694641 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1612976719 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//gpcgt.h
+	"gpcpic.h"
+	"sim7x00.h"
+
+1619546266 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//gpcpic.h
+	"piMASS.h"
+	<linux/v4l2-common.h>
+	<linux/v4l2-controls.h>
+	<linux/videodev2.h>
+	<sys/mman.h>
+
+1619488705 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//piMASS.h
+	"mysys.h"
+	<exception>
+	<mysys.h>
+	<errno.h>
+	<stdio.h>
+	<malloc.h>
+	<string.h>
+	<ctime>
+	<fstream>
+	<iostream>
+	<vector>
+	<inttypes.h>
+	<stdarg.h>
+	<setjmp.h>
+	<math.h>
+	<thread>
+	<stdint.h>
+	<assert.h>
+	<string>
+	<stdlib.h>
+	<io.h>
+	<direct.h>
+	<malloc.h>
+	<memory.h>
+	<WinSock2.h>
+	<ws2tcpip.h>
+	"camU.h"
+	<iphlpapi.h>
+	<fcntl.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<jpeglib.h>
+	<GL/glew.h>
+	<raspicam/raspicam.h>
+	<camU.h>
+	<unistd.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/stat.h>
+	<netdb.h>
+	<fcntl.h>
+	<ifaddrs.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<ifaddrs.h>
+	<X11/X.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	"X11/bitmaps/gray"
+	<X11/Xatom.h>
+	<X11/Xcursor/Xcursor.h>
+	<linux/limits.h>
+	<pwd.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_opengl.h>
+	<SDL_opengles2.h>
+	"gpcOPCD.h"
+	<UIF1248etc.h>
+	<gpeTYP.h>
+	"gpeALF.h"
+
+1603951022 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//UIF1248etc.h
+
+1616533557 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//gpeTYP.h
+	<UIF1248etc.h>
+
+1617918387 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/include/gpeALF.h
+	"piMASS.h"
+
+1618929667 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/include/gpcSCHL.h
+	"piMASS.h"
+	"gpcSRC.h"
+
+1619527696 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/include/gpcwin.h
+	"gpcres.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcalu.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcCRSbreak.cpp
+
+1612573888 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcDRCos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1619539724 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcGL.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1604021744 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/include/gpccrs.h
+	"gpcwin.h"
+
+1618982674 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpsGLSL.h
+
+1618966724 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcGLobj.cpp
+	"gpccrs.h"
+	"gpsGLSL.h"
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcGSM.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+	<wiringSerial.h>
+
+1618694641 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRC.h
+	"gpcgt.h"
+	<gpcOPCD.h>
+
+1616510547 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinst.h
+
+1610552363 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRClnk.h
+	"piMASS.h"
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcgt.cpp
+	"gpcgt.h"
+	"gpcSRC.h"
+	"gpcwin.h"
+
+1612803248 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcgtos.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1618929667 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcGTslmp.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcI4x2.cpp
+	"gpcSRC.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcI4x4.cpp
+	"gpcSRC.h"
+
+1617988415 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcI8x2.cpp
+	<gpcSRC.h>
+
+1613658482 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcLAZY.cpp
+	"piMASS.h"
+	<dirent.h>
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcOPCD.cpp
+	"gpcSRC.h"
+
+1606180456 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpCORE.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1615334681 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcpic.cpp
+	"gpcpic.h"
+	"gpcSRC.h"
+
+1604021744 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcres.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcres2mini.cpp
+	"gpcres.h"
+
+1618929667 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcres.h
+	"gpcSRC.h"
+	"gpcSCHL.h"
+	"gpcOPCD.h"
+	"gpeTYP.h"
+
+1616533557 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpeTYP.h
+	<UIF1248etc.h>
+
+1616348322 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcres_compi.cpp
+	"gpcres.h"
+
+1619500587 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcres_run.cpp
+	"gpcwin.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcresflt.cpp
+	"gpcwin.h"
+
+1605353698 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRC.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1608275494 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCbreak.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1605903884 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCdbg.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616972211 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinst.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616685203 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstADD.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616714788 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstALU.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstENTRY.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstFUN.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstMOVE.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616366298 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstMUL.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstRUN.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1616411464 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCinstSTK.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRClnk.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCprnt.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1604019424 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcSRCrun.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1619526295 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcTOOL.cpp
+	"gpcwin.h"
+
+1615530012 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcU14.cpp
+	"gpcSRC.h"
+
+1613747616 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcU44.cpp
+	"gpcSRC.h"
+
+1613398582 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpcwin_var.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//gpsKEYMAP.h
+
+1612478326 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpMASSbuild.cpp
+	"gpcSRC.h"
+	"gpccrs.h"
+
+1618775647 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpMEMfunFND.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1618405042 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpMEMfunPRINT.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1619543801 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gpMEMinstDOit.cpp
+	"gpcSRC.h"
+	"gpcSRCinst.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1618506726 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/gppiMASScmplr.cpp
+	"gpcSRC.h"
+	"gpcSRClnk.h"
+	"gpccrs.h"
+
+1619295165 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/piMASS_main.cpp
+	"piMASS.h"
+	"gpcSRC.h"
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+
+1613336870 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/src/gpccrs.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1614387680 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/src/gpccrs_rdy.cpp
+	"gpccrs.h"
+	"gpcSRC.h"
+
+1603951026 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/src/gpcND.cpp
+	"gpcND.h"
+
+1603951024 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3/include/gpcND.h
+	"gpcSRC.h"
+
+1604366756 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/src/gpcPROTO.cpp
+	"gpcSRC.h"
+
+1619458758 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4_3/src/gpcwin.cpp
+	"gpccrs.h"
+	<gpsKEYMAP.h>
+	<gpsGLSL.h>
+
+1618982674 /home/alivemoon/Asztal/piMASScmplrSLNpi4_3//gpsGLSL.h
+

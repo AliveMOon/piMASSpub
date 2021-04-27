@@ -1,0 +1,163 @@
+ a0	 
+ 
+ a = ix;
+ b = 20;
+ c = a+b
+  *(a + b)
+  *b/a
+ ,
+ d = c%4;
+ mii = print( "
+  hello %d",c );
+ again = 10;
+ mini = print( "%s %d",mii,fps );
+  b0	  
+ ginp = 0x10002;
+ gout = 0x10003;
+ gsm = "ttyS0";
+ again = 500;
+ 
+ 
+ 
+  a1	 
+    b1	   a2	 
+    b2	   a3	 
+ 
+  b3	 
+ //x = ix; y = iy;
+ //w = iw; h = ih;
+ unsel = 1;
+ name = "ize";
+ px = ix*480/iw; py = 800*iy/ih;
+ txy = mlb + (ia-2)*1000 + (in-3)*10000;
+ lst = fnd( txy,	"zeroDB/scr/",
+ 					"pxSCR.xyr", 
+ 				px, py, 30, 4 );
+ mini = print( "
+  inx:%d iny:%d
+  a %d n %d
+  %d/480 %d/800
+  w %d h %d b: %d
+  t: %d
+  lst: %s
+ ",
+            ix, iy,
+            ia, in,
+            px, py,
+            iw, ih, 
+ 			mlb, txy,
+            lst
+  );
+ again = 1;
+ pic = "draw";
+
+ c3	 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  a4	 
+ 
+ cam = mlb;
+ ize = b3.txy;
+ again = 1000;
+
+ b4	 
+ name = "pen";
+ pix = "
+ #version 120
+ varying vec2 fr_uv;
+ uniform sampler2D	tex0,	// space
+                        tex1,	// maski
+			tex2;	// src pl.: cam
+ uniform vec2		tgPX;
+ uniform vec2		aTX[8];
+ uniform vec4 		aCNL[8];
+
+
+ void main()
+ {
+      vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
+                cUV = aCNL[0].xy/tgPX,
+		crs = abs(fUV-cUV)*tgPX;
+
+      gl_FragColor = texture2D( tex0, fUV );
+      if( min(crs.x,crs.y) < 2.0 )
+          gl_FragColor.rg = 1;
+ }
+
+ ";
+ t=ms;
+ again=1000;
+
+ a5	 
+  b5	 
+
+ trgw = 480;
+ trgh = 800;
+ trg = "draw";
+ pic = "cam1";
+  cnl = b3.lst;
+  gpu = "pen";
+  again = 200;
+   

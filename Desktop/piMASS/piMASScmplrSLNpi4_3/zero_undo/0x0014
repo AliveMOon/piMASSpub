@@ -1,0 +1,17 @@
+ a0	 
+ a = 10;
+ b = 20;
+ c = a+b;
+ d = 1;
+ f = 0xffff; g = 33; 
+ h = 40; i = 1; 
+ Hello = a - b * c 
+ 		+ d 
+ 		- f * e / 100 
+ 		*  (200 + f * g + h)  
+ 		+ i ;
+ 
+ mini = print( "ize = %d\r\n",
+ 				 hello );
+ 
+   a1	   
