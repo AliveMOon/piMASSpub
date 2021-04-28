@@ -1150,7 +1150,7 @@ U4x4 gpcGL::VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD ) {
 	glGenBuffers( 1, &iVXn.x );
 	glBindBuffer( GL_ARRAY_BUFFER, iVXn.x );
 	glBufferData( GL_ARRAY_BUFFER, n_byte, pVX, GL_STATIC_DRAW ); (e = glGetError());
-	if( e ) std::cout << e << " glBufferData( GL_ARRAY_BUFFER" <<  std::endl;
+	if( e ) std::cout << std::hex << e << " glBufferData( GL_ARRAY_BUFFER" <<  std::endl;
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	return iVXn;
 }
@@ -1190,6 +1190,46 @@ gpc3D* gpc3D::prt2ix( gpcGL* pGL ) {
 	}
 	return this;
 }
+gpcGL* gpcGL::glDRW( I4x2 xy, I4x2 wh ) {
+	if( !this )
+		return NULL;
+	GLenum e = 0;
+
+	if( aUniID[0] > -1 )
+	if( pPICrtx ) {
+		glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
+	} else {
+		glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
+	}
+
+	if( aUniID[1] > -1 ) {
+		glUniform2f( aUniID[1], (float)xy.x, (float)xy.y ); gpfGLerr();
+	}
+	if( aUniID[2] > -1 ) {
+		glUniform2f( aUniID[2], (float)wh.x, (float)wh.y ); gpfGLerr();
+	}
+
+
+	glBindBuffer( GL_ARRAY_BUFFER, aVXid[0] ); gpfGLerr();
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[0] ); gpfGLerr();
+
+	glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), 0 ); gpfGLerr();
+	glEnableVertexAttribArray( ATvxID ); gpfGLerr();
+	glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), gpmGLBOFF(sizeof(F2)) ); gpfGLerr();
+	glEnableVertexAttribArray( ATuvID ); gpfGLerr();
+
+
+	glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL ); gpfGLerr();
+
+	glDisableVertexAttribArray( ATvxID );
+	glDisableVertexAttribArray( ATuvID );
+
+	glBindBuffer( GL_ARRAY_BUFFER, 0 );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+	glBindVertexArray( 0 );
+
+	return this;
+}
 gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 	if( !msk )
 		return this;
@@ -1201,7 +1241,7 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 	gpc3Dmap* pM;
 	gpc3Dtri* pT0;
 	U4x4 glU4x4;
-
+	GLenum e = 0;
 	for( U4 i = 0, n = p3D->nLY(), nMAP; i < n; i++ ) {
 		pLY = p3D->pLYix(i);
 		nMAP = pLY->nMAP( p3D->p_lwo->p_alloc, p3D->tgIX.pU4x2() );
@@ -1217,15 +1257,15 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 			glU4x4.z = sizeof(gpc3Dvx);
 			nT = pM->nTRI();
 			pT0 = pM->pTRI( pLY->buf );
-			GLenum e = 0;
+
 	{ /// VERTEX ------------------------------------------
-				glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x ); (e = glGetError()); if( e ) std::cout << e << " glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x )" <<  std::endl;
+				glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x );  gpfGLerr();
 				/// XYZ
-				glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.x) ); (e = glGetError()); if( e ) std::cout << e << " glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.x )" <<  std::endl;
-				glEnableVertexAttribArray( ATvxID ); (e = glGetError()); if( e ) std::cout << e << " glEnableVertexAttribArray( ATvxID )" <<  std::endl;
+				glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.x) );  gpfGLerr();
+				glEnableVertexAttribArray( ATvxID ); gpfGLerr();
 				/// UV
-				glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.y) ); (e = glGetError()); if( e ) std::cout << e << " glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.y )" <<  std::endl;
-				glEnableVertexAttribArray( ATuvID ); (e = glGetError()); if( e ) std::cout << e << " glEnableVertexAttribArray( ATuvID )" <<  std::endl;
+				glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.y) );  gpfGLerr();
+				glEnableVertexAttribArray( ATuvID ); (e = glGetError());  gpfGLerr();
 	}
 			for( U4 t = 0; t < nT; t++, msk >>= 1 ) {
 				if( (msk&1) ? !pT0[t].aIIXN[2].y : true )
@@ -1234,18 +1274,18 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 
 
 	/// ELEMENT ------------------------------------------
-				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x ); (e = glGetError()); if( e ) std::cout << e << " glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x )" <<  std::endl;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );  gpfGLerr();
 				glDrawElements( //GL_TRIANGLES,
 								gpaDRWmod[3], /// GL_TRIANGLES,
 								glU4x4.w,
 								GL_UNSIGNED_INT,
-								NULL ); (e = glGetError()); if( e ) std::cout << e << " glDrawElements" <<  std::endl;
-				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+								NULL ); (e = glGetError());  gpfGLerr();
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ); gpfGLerr();
 			}
-			glDisableVertexAttribArray( ATvxID );
-			glDisableVertexAttribArray( ATuvID );
-			glBindBuffer( GL_ARRAY_BUFFER, 0 );
-			glBindVertexArray( 0 );
+			glDisableVertexAttribArray( ATvxID ); gpfGLerr();
+			glDisableVertexAttribArray( ATuvID ); gpfGLerr();
+			glBindBuffer( GL_ARRAY_BUFFER, 0 ); gpfGLerr();
+			glBindVertexArray( 0 ); gpfGLerr();
 		}
 	}
 	return this;
@@ -1328,7 +1368,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
 	glUseProgram( gProgID ); (e = glGetError());
 	if( e )
-		std::cout << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  std::endl;
+		std::cout << std::hex << e << " glUseProgram( gProgID" <<  std::endl;
 	for( int i = 0, n = pIl->nITM(); i < n; i++ ) {
 		apV[0] = pI0[i].fndXB( gpeALF_LWO );
 		if( !apV[0] ) continue;

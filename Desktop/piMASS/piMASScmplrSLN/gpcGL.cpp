@@ -7,16 +7,15 @@ gpcGL::gpcGL( gpcWIN& win ) {
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
 	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
-	if( !gCntxt )
-	{
+	if( !gCntxt ) {
 		if(bSTDcout){std::cout <<std::endl << "gpcGL init error" <<std::endl;}
 		return;
 	}
 	glewExperimental = GL_TRUE;
 	glewErr = glewInit();
-	if( glewErr != GLEW_OK )
-	{
+	if( glewErr != GLEW_OK ) {
 		if(bSTDcout){std::cout <<std::endl << "gpcGL GLEW_NOK error" <<std::endl;}
 		return;
 	}
@@ -50,116 +49,64 @@ gpcGL::gpcGL( gpcWIN& win ) {
 	glSamplerParameterf(aSMPid[0], GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);*/
 
 }
-
-
-
-gpcGL* gpcGL::glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, bool bDEP ) {
-	if( this ? !pRNDR : true )
+gpcGL* gpcGL::TRG( 	SDL_Renderer* pSDLrndr,
+					I4x2 lXY, const I4x2& tWH, float ms,
+					bool bCLR, bool bDEP ) {
+	if( !this )
 		return NULL;
 
-	if(pT) {
-		if( pT->txWH.a4x2[1] != wh )
-			gpmSDL_FreeTX( pT->pRTX );
+	if( pRNDR != pSDLrndr )
+		pRNDR = pSDLrndr;
 
-		if(!pT->pRTX) {
-			pT->pRTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
-			if(!pT->pRTX)
-				return NULL;
-			pT->txWH.a4x2[1] = wh;
-		}
+	if( !pRNDR )
+		return NULL;
+	SDL_Surface* pSRF = pPICrtx->pPICrtxSRF();
+	if( pSRF ) {
+		glReadPixels(	0, 0,
+						pSRF->w, pSRF->h,
+						GL_RGBA, GL_UNSIGNED_BYTE,
+						pSRF->pixels );
+		pPICrtx->pREF = NULL;
+		glBindFramebuffer(GL_FRAMEBUFFER, 0 ); //pPICrtx ? pPICrtx->glRNDR.w : 0);
+		gpfGLerr();
+		pPICrtx = NULL;
+	} else
+		SDL_SetRenderTarget(pRNDR,NULL);
 
-		if(pRTX!=pT->pRTX) {
-			if(pPICrtx) {
-				if(!pPICrtx->pSRF) {
-					int w=0, h=0, acc=0;
-					U4 frm;
-					SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
-					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-				}
-				if( pPICrtx->pSRF )
-					SDL_RenderReadPixels(pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
-				pPICrtx->pREF = NULL;
-			}
-			SDL_SetRenderTarget(pRNDR,NULL);
-		}
-		pPICrtx=pT;
-		SDL_SetRenderTarget(pRNDR,pRTX=pPICrtx->pRTX);
-	}
-	else {
-		pPICrtx=NULL;
-		SDL_SetRenderTarget(pRNDR,pRTX=NULL);
+	if( pTRG )
+	if( trgWHpx != tWH )
+	{
+		gpmSDL_FreeTX( pTRG );
+		pTRG = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, tWH.x, tWH.y );
+		if( !pTRG )
+			return NULL;
+
 	}
 
-	GLbitfield b = 0; //GL_STENCIL_BUFFER_BIT;
-	if( !tC )
-		b |= GL_COLOR_BUFFER_BIT;
-	else if( tC > 0 )
-	if( pT->tC < tC ) {
-		b |= GL_COLOR_BUFFER_BIT;
-		pT->tC = tC;
-	}
+	luXY = lXY;
+	trgWHpx = tWH;
 
-	if( !tD )
+	GLbitfield b = 0;
+	if( bCLR )
 		b |= GL_COLOR_BUFFER_BIT;
-	else if( tD > 0 )
-	if( pT->tD < tD ) {
+	if( bDEP )
 		b |= GL_DEPTH_BUFFER_BIT;
-		pT->tD = tD;
-		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_FALSE);
-		glDepthFunc(
-						GL_LESS
-						//GL_LEQUAL
-						//GL_GREATER
-					);
-	}
 
-	glClearColor( 0.0f, 0.0f, 0.25, 1.0f );
-	glClearDepth((GLclampd)1.0);
-	glDepthRange(0.0,1.0);
-	glViewport( 0, 0, wh.x, wh.y );
 	if( !b )
 		return this;
-
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+	ms = sin( ms/1000.0 )+1.0;
+	glClearColor( ms*0.13, 0.0f, ms*0.3, 0.0f );
+	glClearDepth(1.0);
+	glDepthRange(0.0,1.0);
 	glClear( b );
+
 	return this;
 }
-gpcGL* gpcGL::glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, bool bDEP ) {
+gpcGL* gpcGL::glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD, bool b3D ) { //, bool bCLR, bool bDEP ) {
 	if( this ? !pRNDR : true )
 		return NULL;
-
-	if(pT) {
-		if( pT->txWH.a4x2[1] != wh )
-			gpmSDL_FreeTX( pT->pRTX );
-
-		if(!pT->pRTX) {
-			pT->pRTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
-			if(!pT->pRTX)
-				return NULL;
-			pT->txWH.a4x2[1] = wh;
-		}
-
-		if(pRTX!=pT->pRTX) {
-			if(pPICrtx) {
-				if(!pPICrtx->pSRF) {
-					int w=0, h=0, acc=0;
-					U4 frm;
-					SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
-					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-				}
-				if( pPICrtx->pSRF )
-					SDL_RenderReadPixels(pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
-				pPICrtx->pREF = NULL;
-			}
-			SDL_SetRenderTarget(pRNDR,NULL);
-		}
-		pPICrtx=pT;
-		SDL_SetRenderTarget(pRNDR,pRTX=pPICrtx->pRTX);
-	}
-	else {
-		pPICrtx=NULL;
-		SDL_SetRenderTarget(pRNDR,pRTX=NULL);
-	}
 
 	GLbitfield b = 0; //GL_STENCIL_BUFFER_BIT;
 	if( !tC )
@@ -168,33 +115,51 @@ gpcGL* gpcGL::glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC, I4 tD ) { //, bool bCLR, b
 	if( pT->tC < tC ) {
 		b |= GL_COLOR_BUFFER_BIT;
 		pT->tC = tC;
-		glClearColor( 0.125, 0.0f, 0.125, 1.0f );
+		if( b3D )
+			glClearColor( 0.125, 0.0f, 0.125, 1.0f );
+		else
+			glClearColor( 0.0, 0.0f, 0.125, 1.0f );
 	}
 
 	if( !tD )
 		b |= GL_DEPTH_BUFFER_BIT;
 	else if( tD > 0 )
 	if( pT->tD < tD ) {
+
 		b |= GL_DEPTH_BUFFER_BIT;
 		pT->tD = tD;
 		glClearDepth(1.0f);
-		glDepthMask(GL_FALSE);
+
 		//glEnable(GL_TEXTURE_2D);
 		//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 		//glGenF
 	}
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST); gpfGLerr();
+	glDepthFunc( GL_LEQUAL );
+	glDepthRange(0.0,1.0); gpfGLerr();
+	glViewport( 0, 0, wh.x, wh.y ); gpfGLerr();
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc( GL_LESS
-				 //GL_LEQUAL
-				//	GL_GREATER
-					);
-	glDepthRange(0.0,1.0);
-	glViewport( 0, 0, wh.x, wh.y );
+	if(pT) {
+		pT->pPICrtx( pPICrtx, wh );
+		if( pPICrtx != pT ) {
+			pPICrtx = pT;
+			//if( false )
+			glBindFramebuffer(	GL_FRAMEBUFFER,
+								//GL_DRAW_BUFFER,
+								pPICrtx->glRNDR.z ); gpfGLerr( " glBindFramebuffer" );
+		}
+	} else {
+		glBindFramebuffer(GL_FRAMEBUFFER, pPICrtx ? pPICrtx->glRNDR.w : 0); gpfGLerr();
+		pPICrtx = NULL;
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0); gpfGLerr();
+		//SDL_SetRenderTarget(pRNDR,NULL);
+	}
+
 	if( !b )
 		return this;
 
-	glClear( b );
+	glClear( b ); gpfGLerr( "glClear" );
 	return this;
 }
 GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {

@@ -267,7 +267,6 @@
  uniform vec2		tgPX;
  uniform vec2		aTX[8];
  uniform vec4 		aCNL[8];
- //out float gp_FragDepth;
 
  vec2 dis( vec2 fUV, vec2 cnl ){
       return abs(fUV*tgPX - cnl );
@@ -294,10 +293,14 @@
                 cUV = aCNL[0].xy/tgPX,
 		crs = abs(fUV-cUV)*tgPX;
       float Df = gl_DepthRange.far, Dn = gl_DepthRange.near;
-      gl_FragDepth = (Df-Dn)*0.99 + Dn;
+      //gl_FragColor.rgb = fract(gl_FragCoord.zzz*vec3(1.0,2.0,4.0));
+      //gl_FragColor.a = 1.0;
+      //return;
 
       gl_FragColor = texture2D( tex2, fUV )
                    + texture2D( tex1, fUV );
+      gl_FragDepth = (Df-Dn)*0.99 + Dn;
+
       vec2 d = dis(fUV,aCNL[0].xy);
       float r = length(d), rr = abs(r-30);
       gl_FragColor.r = rr < 1 ? 1.0 : gl_FragColor.r;
@@ -356,7 +359,7 @@
    b5	 
 
  trgw = 640;
- trgh = 960;
+  trgh = 960;
  trg = "combi";
  scene = "zeroDB/scr/, cam.eye.yx, pxSCR.xyr, 1, 2,
                        cam.eye.__y, pxSCR.xyr, 1, 3,

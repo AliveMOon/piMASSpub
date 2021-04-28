@@ -172,8 +172,14 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 
 		if( !gpdGLpTRG )
 			return cID;
-		SDL_Surface* pSRF = gpdGLapPIC[iPIC]->pSRF;
-		if( !pSRF ) {
+		SDL_Surface* pSRF = gpdGLapPIC[iPIC]->pPICrtxSRF(); //pSRF;
+		if( !pSRF )
+			return cID;
+		glTextureSubImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 0, 0,
+								gpdGLapPIC[iPIC]->txWH.a4x2[1].x,
+								gpdGLapPIC[iPIC]->txWH.a4x2[1].y, 0,
+								gpdGLapPIC[iPIC]->pSRF->pixels );
+		/*if( !pSRF ) {
 			if( gpdGLpTRG->pRTX ) {
 				int w=0, h=0, acc=0;
 				U4 frm;
@@ -182,12 +188,12 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 			}
 			if( !pSRF )
 				return cID;
-		}
+		}*/
 
-		SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
+		/*SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
 								pSRF->pixels,
 								pSRF->pitch 	);
-		gpdGLapPIC[iPIC]->pREF = NULL;
+		gpdGLapPIC[iPIC]->pREF = NULL;*/
 		return cID;
 	}
 	/// GLSL SET TETURE -------------------------------------------------------
@@ -339,7 +345,14 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 					break;
 				if( !gpdGLpTRG )
 					break;
-				if( !gpdGLapPIC[0]->pSRF ) {
+				SDL_Surface* pSRF = gpdGLapPIC[0]->pPICrtxSRF(); //pSRF;
+				if( !pSRF )
+					break;
+				glTextureSubImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 0, 0,
+										gpdGLapPIC[0]->txWH.a4x2[1].x,
+										gpdGLapPIC[0]->txWH.a4x2[1].y, 0,
+										gpdGLapPIC[0]->pSRF->pixels );
+				/* if( !gpdGLapPIC[0]->pSRF ) {
 					if( gpdGLpTRG->pRTX )
 					{
 						int w=0, h=0, acc=0;
@@ -353,7 +366,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
 										gpdGLapPIC[0]->pSRF->pixels,
 										gpdGLapPIC[0]->pSRF->pitch 	);
-				gpdGLapPIC[0]->pREF = NULL;
+				gpdGLapPIC[0]->pREF = NULL;*/
 			} break;
 		case gpeALF_MSKAB: {							cID = gpeCsz_L; if( bCID ) break;
 
@@ -363,7 +376,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 							: *(I4*)pU1;
 				if(mskID<1)
 					break;
-				if( gpdGLpTRG ? !gpdGLpTRG->pRTX : true )
+				if( gpdGLpTRG ? !gpdGLpTRG->glRNDR.x : true )
 					break;
 
 				U4	iPdrw = 1,													// A. draw
@@ -434,7 +447,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				else
 					an = I8x2( *(I4*)pU1, 0 );
 				U4 tCD = pWIN ? pWIN->nJDOIT.w : 0;
-				pWgl->glSETtrg( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD )
+				pWgl->glSETtrg3D( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD )
 					->GLSLset( an )
 					->glSETbox( gpdGLpTRGxy, gpdGLpTRGwh )
 					->glSETcnl( 0, gpmGLaCNL4(0), gpmGLnCNL )
@@ -445,7 +458,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		case gpeALF_SCENE: if( pWgl ? gpdGLpTRG : NULL  ) {	cID = gpeCsz_b; if( bCID ) break;
 				if( obj.bUTF8() ) {
 					U4 tCD = pWIN ? pWIN->nJDOIT.w : 0;
-					pWgl->glSETtrg3D( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD )
+					pWgl->glSETtrg3D( gpdGLpTRG, gpdGLpTRGwh, tCD, tCD, true )
 						->glSCENE( this, (char*)pU1+ ((*pU1 == '\"') ? 1 : 0) );
 					pWgl->glDONE();
 				}

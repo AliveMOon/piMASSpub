@@ -1163,11 +1163,13 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 							gpcPIC* pR, //gpcPIC* pA,
 							gpcPIC* pB,
 							char* pNAME, char *pPATH, char *pFILE ) {
-	U4	frm;
-	int w, h, acc;
-	SDL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
+	//U4	frm;
+	int w = pMEM->pWgl->pPICrtx->txWH.a4x2[1].x,
+		h = pMEM->pWgl->pPICrtx->txWH.a4x2[1].y; //, acc;
+	//SDL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
 	if( pSRF ? ((pSRF->w!=w) && (pSRF->h!=h)) : false )
 		gpmSDL_FreeSRF(pSRF);
+
 	if( !pSRF ) {
 		pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
 		if( !pSRF )
@@ -1351,9 +1353,10 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 U1x4* gpcPIC::TOOLmaskAB2(	gpMEM* pMEM,
 							gpcPIC* pR, gpcPIC* pA, gpcPIC* pB,
 							char* pNAME, char *pPATH, char *pFILE ) {
-	U4	frm;
-	int w, h, acc;
-	SDL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
+	//U4	frm;
+	int w = pMEM->pWgl->pPICrtx->txWH.a4x2[1].x,
+		h = pMEM->pWgl->pPICrtx->txWH.a4x2[1].y; //, acc;
+	//DL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
 	if( pSRF ? ((pSRF->w!=w) && (pSRF->h!=h)) : false )
 		gpmSDL_FreeSRF(pSRF);
 	if( !pSRF ) {

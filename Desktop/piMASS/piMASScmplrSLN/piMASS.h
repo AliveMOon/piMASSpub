@@ -435,6 +435,13 @@ double inline gpfRAMADZSAN( double a, double b )
 
 	return PI*(3.0*(a+b)-sqrt((3.0*a + b)*(a + 3.0*b)));
 }
+GLenum inline gpfGLerr( const char* pERR = "" ) {
+	GLenum e = glGetError();
+	if( !e )
+		return 0;
+	std::cout << std::hex << e << pERR <<  std::endl;
+	return e;
+}
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
 {
@@ -2328,6 +2335,9 @@ public:
 		}
 		return n_t;
 	}
+
+	U8 sum( void ) const { return (I8)x + y + z + w; }
+	U8 volume( void ) const { return x*y*z*w; }
 
 	U4	dctADD( const void* pV, U4& m, U4x4& w );
 	U4  dctFND( U1* p_src, U4x4& w );

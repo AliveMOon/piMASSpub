@@ -1135,19 +1135,24 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 							if( !aGLpPIC[i]->pSRF )
 							{
-								if( pTRG->pRTX )
+								if( aGLpPIC[i]->glRNDR.x )
+									aGLpPIC[i]->pSRF = SDL_CreateRGBSurface( 0,	aGLpPIC[i]->txWH.a4x2[1].x,
+																				aGLpPIC[i]->txWH.a4x2[1].y, 32, 0,0,0,0 );
+								/*if( pTRG->pRTX )
 								{
 									int w=0, h=0, acc=0;
 									U4 frm;
 									SDL_QueryTexture( pTRG->pRTX, &frm, &acc, &w, &h );
 									aGLpPIC[i]->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-								}
+								}*/
 							}
 							if( !aGLpPIC[i]->pSRF )
 								break;
-							SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
+							glTextureSubImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 0, 0,	aGLpPIC[i]->txWH.a4x2[1].x,
+																					aGLpPIC[i]->txWH.a4x2[1].y, 0, aGLpPIC[i]->pSRF->pixels );
+							/*SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
 													aGLpPIC[i]->pSRF->pixels,
-													aGLpPIC[i]->pSRF->pitch 	);
+													aGLpPIC[i]->pSRF->pitch 	);*/
 							aGLpPIC[i]->pREF = NULL;
 
 						} break;

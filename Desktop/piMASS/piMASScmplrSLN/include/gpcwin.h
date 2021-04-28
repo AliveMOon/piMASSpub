@@ -147,7 +147,8 @@ public:
 			aTXwh[0x10];
 
 	gpcPIC* pPICrtx;
-	SDL_Texture	*pRTX, *pTRG,
+	SDL_Texture	//*pRTX,
+				*pTRG,
 				*pTXchar,
 				*pTXiso;
 
@@ -173,67 +174,12 @@ public:
 	}
 
 	gpcGL( gpcWIN& win );
-	gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
-	gpcGL* glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
+	//gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
+	gpcGL* glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0, bool b3D = false ); // bool bC = true, bool bD = true );
 	gpcGL* TRG( SDL_Renderer* pSDLrndr,
 				I4x2 lXY, const I4x2& tWH, float ms,
-				bool bCLR = true, bool bDEP = true ) {
-		if( !this )
-			return NULL;
+				bool bCLR = true, bool bDEP = true );
 
-		if( pRNDR != pSDLrndr )
-			pRNDR = pSDLrndr;
-
-		if( !pRNDR )
-			return NULL;
-		if( pRTX )
-		{
-			if(pPICrtx)
-			{
-				if(!pPICrtx->pSRF)
-				{
-					int w=0, h=0, acc=0;
-					U4 frm;
-					SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
-					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-				}
-				if( pPICrtx->pSRF )
-					SDL_RenderReadPixels( pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
-				pPICrtx->pREF = NULL;
-			}
-			pPICrtx=NULL;
-			SDL_SetRenderTarget(pRNDR,pRTX=NULL);
-		}
-
-		if( pTRG )
-		if( trgWHpx != tWH )
-		{
-			gpmSDL_FreeTX( pTRG );
-			pTRG = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, tWH.x, tWH.y );
-			if( !pTRG )
-				return NULL;
-		}
-
-		luXY = lXY;
-		trgWHpx = tWH;
-
-		GLbitfield b = 0;
-		if( bCLR )
-			b |= GL_COLOR_BUFFER_BIT;
-		if( bDEP )
-			b |= GL_DEPTH_BUFFER_BIT;
-
-		if( !b )
-			return this;
-
-		ms = sin( ms/1000.0 )+1.0;
-		glClearColor( ms*0.13, 0.0f, ms*0.3, 0.0f );
-		glClearDepth(1.0);
-		glDepthRange(0.0,1.0);
-		glClear( b );
-
-		return this;
-	}
 	GLuint IBOnew( const GLuint* pD, U4 nD ) {
 		//Create IBO
 		aIXn[0] = nD;
@@ -272,8 +218,7 @@ public:
 		glGenBuffers( 1, &iIXn.x );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iIXn.x );
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, iIXn.a4x2[1].area()*sizeof(*pD), pD, GL_STATIC_DRAW ); (e = glGetError());
-		if( e )
-			std::cout << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  std::endl;
+		if( e ) std::cout << std::hex << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  std::endl;
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 		return iIXn;
 	}
@@ -485,40 +430,7 @@ public:
 	}
 	gpcGL* glDRW3D( gpc3D* p, U4 msk = -1 );
 	gpcGL* glDONE(){ glUseProgram(0); p3D = NULL; return this; }
-	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
-		if( !this )
-			return NULL;
-
-		if( aUniID[0] > -1 )
-		if( pPICrtx )
-			glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w );
-		else
-			glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y );
-
-		if( aUniID[1] > -1 )
-			glUniform2f( aUniID[1], (float)xy.x, (float)xy.y );
-		if( aUniID[2] > -1 )
-			glUniform2f( aUniID[2], (float)wh.x, (float)wh.y );
-
-		glBindBuffer( GL_ARRAY_BUFFER, aVXid[0] );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[0] );
-
-		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), 0 );
-		glEnableVertexAttribArray( ATvxID );
-		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), gpmGLBOFF(sizeof(F2)) );
-		glEnableVertexAttribArray( ATuvID );
-
-		glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
-
-		glDisableVertexAttribArray( ATvxID );
-		glDisableVertexAttribArray( ATuvID );
-
-		glBindBuffer( GL_ARRAY_BUFFER, 0 );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-		glBindVertexArray( 0 );
-
-		return this;
-	}
+	gpcGL* glDRW( I4x2 xy, I4x2 wh );
 	gpcGL* glDRW( U1 mode, I4x2 xy, I4x2 wh ) {
 		if( !this )
 			return NULL;
@@ -643,8 +555,7 @@ public:
 
 
 };
-class gpcWIN
-{
+class gpcWIN {
 	public:
 		gpcMASS*		piMASS;
 		gpcCRS			*apCRS[4];
