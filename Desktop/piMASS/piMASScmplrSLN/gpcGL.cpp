@@ -49,6 +49,20 @@ gpcGL::gpcGL( gpcWIN& win ) {
 	glSamplerParameterf(aSMPid[0], GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);*/
 
 }
+gpcGL* gpcGL::SWP( gpcWIN* pWIN ) { // SDL_Window* pWIN ) {
+		if( !this )
+			return NULL;
+		//SDL_RenderPresent( pWIN->pSDLrndr);
+		SDL_GL_SwapWindow( pWIN->pSDLwin );
+
+		if( oPrgID < 0 )
+			return this;
+
+		glUseProgram(oPrgID);
+		//SDL_RenderClear( pRNDR );
+
+		return this;
+}
 gpcGL* gpcGL::TRG( 	SDL_Renderer* pSDLrndr,
 					I4x2 lXY, const I4x2& tWH, float ms,
 					bool bCLR, bool bDEP ) {
@@ -64,7 +78,8 @@ gpcGL* gpcGL::TRG( 	SDL_Renderer* pSDLrndr,
 	if( pSRF ) {
 		glReadPixels(	0, 0,
 						pSRF->w, pSRF->h,
-						GL_RGBA, GL_UNSIGNED_BYTE,
+						GL_BGRA,
+						GL_UNSIGNED_BYTE,
 						pSRF->pixels );
 		pPICrtx->pREF = NULL;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0 ); //pPICrtx ? pPICrtx->glRNDR.w : 0);

@@ -755,63 +755,7 @@ public:
 };
 
 
-F2& F2::swpXY( const void* pV ) {
-	((U1x4*)&x)->wzyx(pV,2);
-	return *this;
-}
-F2& F2::sXY( const char* p_str, char** pp_str ) {
-	U8 nLEN;
-	gpmCLR;
-	const char* pPAT = "+-0123456789.,";
-	p_str += gpmVAN( p_str, pPAT, nLEN );
-	x = gpmSTR2D(p_str);
-	if( *p_str == ',' )
-		p_str++;
 
-	p_str += gpmVAN( p_str, pPAT, nLEN );
-	y = gpmSTR2D(p_str);
-	if( *p_str == ',' )
-		p_str++;
-
-	if( !pp_str )
-		return *this;
-	(*pp_str) = (char*)p_str;
-	return *this;
-}
-
-F4& F4::swpXYZ0( const void* pV ) {
-	((U1x4*)this)->wzyx(pV,3);
-	return *this;
-}
-
-F4& F4::sXYZW( const char* p_str, char** pp_str ) {
-	U8 nLEN;
-	gpmCLR;
-	const char* pPAT = "+-0123456789.,";
-	p_str += gpmVAN( p_str, pPAT, nLEN );
-	x = gpmSTR2D(p_str);
-	if( *p_str == ',' )
-		p_str++;
-
-	p_str += gpmVAN( p_str, pPAT, nLEN );
-	y = gpmSTR2D(p_str);
-	if( *p_str == ',' )
-		p_str++;
-
-	p_str += gpmVAN( p_str, pPAT, nLEN );
-	z = gpmSTR2D(p_str);
-	if( *p_str == ',' )
-		p_str++;
-
-	p_str += gpmVAN( p_str, pPAT, nLEN );
-	w = gpmSTR2D(p_str);
-	if( *p_str == ',' )
-		p_str++;
-	if( !pp_str )
-		return *this;
-	(*pp_str) = (char*)p_str;
-	return *this;
-}
 
 gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 	if( !this )
@@ -1072,60 +1016,7 @@ I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 nAT:39
 */
 
-gpeALF alfSCN0[] = {
-	gpeALF_CAM,
-	gpeALF_MAN,
-	gpeALF_MRK,
-};
-gpeALF alfSCN1[] = {
-	gpeALF_EYE,
-	gpeALF_TRG,
-	gpeALF_POS,
-	gpeALF_ABC,
-};
-char	sSCNdec1[] = "eye trg pos abc \"";
-F4& F4::aaLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
-	//gpmCLR;
-	F4 d(0.0), a, b;
-	int nPLS = gpmNINCS( pS, "." );
-	if( nPLS >= nS )
-		return *this;
 
-	pS += nPLS;
-	nS -= nPLS;
-	char* pSRC = NULL, *pI;
-	switch( alfV ) {
-		case gpeALF_XYR:
-			a = ppV[1] ? *(I4x4*)ppV[1] : I4x4(0);
-			b = ppV[0] ? *(I4x4*)ppV[0] : I4x4(0);
-			d = a-b;
-			d.w = 0.0;
-			pSRC = "xyr";
-			break;
-		default: break;
-	}
-	if( !pSRC )
-		return *this;
-
-	for( int i = 0, c; i < nS; i++ ) {
-		c = pS[i];
-		if( c >= '0' && c <= '9' ) {
-			aXYZW[i%4] = c;
-			continue;
-		}
-		switch(c){
-			case '_':
-				continue;
-			default:
-				pI = strchr( pSRC, pS[i] );
-				if(!pI)
-					continue;
-				aXYZW[i%4] = d.aXYZW[(pI-pSRC)%4];
-		}
-	}
-
-	return *this;
-}
 
 
 //};
@@ -1291,6 +1182,18 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 	return this;
 }
 
+gpeALF alfSCN0[] = {
+	gpeALF_CAM,
+	gpeALF_MAN,
+	gpeALF_MRK,
+};
+gpeALF alfSCN1[] = {
+	gpeALF_EYE,
+	gpeALF_TRG,
+	gpeALF_POS,
+	gpeALF_ABC,
+};
+char	sSCNdec1[] = "eye trg pos abc \"";
 gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	int nD1 = scnDEC1.nLD() ? scnDEC1.nLD() : scnDEC1.nAT(sSCNdec1,sizeof(sSCNdec1));
 
@@ -1313,7 +1216,10 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	gpITMlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
 	gpeALF alfD;
 	GLenum e = 0;
-
+	I8x4 prv(-1,-1,-1,-1);
+	std::cout << "\033[2J\033[1;1H";
+	//std::cout <<  "\033[2J" << std::flush;
+	//system("clear");
 	for( U4 iAT = pAT[0].aALFvan( alfSCN0, nAT, gpmN(alfSCN0) ), iAnx, iAT1;
 			iAT < nAT;
 			iAT += iAnx ){
@@ -1327,19 +1233,24 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		pN += gpmVAN( pN, "0123456789ATuvID",nLEN );
 		if( pN > pNx )
 			continue;
-		apI[0] = pIl->pITMid(gpmSTR2U8(pN,10));
-		if( !apI[0] )
-			continue;
+		prv.a8x2[0].x = gpmSTR2U8(pN,10);
+		if( prv.a8x2[0].y != prv.a8x2[0].x ) {
+			apI[0] = pIl->pITMid(prv.a8x2[0].x);
+			if( !apI[0] )
+				continue;
+			prv.a8x2[0].y = prv.a8x2[0].x;
+		}
 
 		pN += gpmVAN( pN, "0123456789",nLEN );
 		if( pN > pNx )
 			continue;
-		apI[1] = pIl->pITMid(gpmSTR2U8(pN,10));
-		if( !apI[1] )
-			continue;
-
-
-
+		prv.a8x2[1].x = gpmSTR2U8(pN,10);
+		if( prv.a8x2[1].y != prv.a8x2[1].x ) {
+			apI[1] = pIl->pITMid(prv.a8x2[1].x);
+			if( !apI[1] )
+				continue;
+			prv.a8x2[1].y = prv.a8x2[1].x;
+		}
 
 		alfD = pAT[iAT+2].alf;
 
@@ -1351,13 +1262,16 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		nU1 = pAT[iAT+2].num-pAT[iAT+1].num;
 		pU1 = pS+pAT[iAT+1].num;
 
-		apV[0] = apI[0]->pAB(aaS,aVn[0]);
-		apV[1] = apI[1]->pAB(aaS,aVn[1]);
+		apV[0] = apI[0]->pAB(aaS,aVn[0]); //apV[0].str(sPUB);
+		apV[1] = apI[1]->pAB(aaS,aVn[1]); //apV[1].str(sPUB);
 
 		iF4 = pD1->alfFND(pAT[iAT+1].alf,nD1);
 		switch( pAT[iAT].alf ) {
-			case gpeALF_CAM: aCAM[iF4].aaLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
-			case gpeALF_MAN: pMAN[iF4].aaLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
+			case gpeALF_CAM:
+						std::cout <<  (apI[0] ? apI[0]->ID : (I8)-1) << " " <<  (apI[1] ? apI[1]->ID : (I8)-1) << " " << std::endl;
+						aCAM[iF4].abLOAD( pU1, nU1, aaS.b, apV, aVn );
+						break;
+			case gpeALF_MAN: pMAN[iF4].abLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
 			default: break;
 		}
 	}
@@ -1366,15 +1280,27 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	if( !pMEM->pMgl )
 		return this;
 	GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
-	glUseProgram( gProgID ); (e = glGetError());
-	if( e )
-		std::cout << std::hex << e << " glUseProgram( gProgID" <<  std::endl;
+	glUseProgram( gProgID ); gpfGLerr( " glUseProgram( gProgID" );
+
+	F4x4 view;
+	glMatrixMode(GL_MODELVIEW);
+    {
+        F4	eye = aCAM[0]/64.0f,
+			cntr = 0,
+			up = { 0.f, 0.f, 1.f };
+		view.lat( eye, cntr, up );
+       // mat4x4_look_at( view, eye, cntr, up );
+    }
+    glLoadMatrixf((const GLfloat*)&view);
+    view.str(sPUB,",", "\r\n" );
+	std::cout << sPUB << std::endl;
 	for( int i = 0, n = pIl->nITM(); i < n; i++ ) {
 		apV[0] = pI0[i].fndXB( gpeALF_LWO );
 		if( !apV[0] ) continue;
 
 		gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
 		if( !p3D ) continue;
+
 		glDRW3D(p3D, -1 ); //pMEM->pWIN ? pMEM->pWIN->nJDOIT.w : -1 );
 	}
 	return this;

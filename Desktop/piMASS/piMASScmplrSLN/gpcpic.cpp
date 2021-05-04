@@ -611,7 +611,7 @@ gpcPIC* gpcPIC::pPICrtx( gpcPIC* pOLD, I4x2 wh ) {
 	if( SDL_Surface* poSRF = pOLD->pPICrtxSRF() ){
 		glReadPixels(	0, 0,
 						poSRF->w, poSRF->h, //pPICrtx->txWH.a4x2[1].x, pPICrtx->txWH.a4x2[1].y,
-						GL_RGBA,
+						GL_BGRA, //GL_RGBA,
 						GL_UNSIGNED_BYTE,
 						poSRF->pixels ); gpfGLerr( " glReadPixels " );
 		pOLD->pREF = NULL;

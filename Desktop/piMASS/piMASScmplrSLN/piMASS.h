@@ -4565,7 +4565,7 @@ public:
 
 	F4& xyz_( F4 b ) { aF2[0] = b.aF2[0]; z = b.z; return *this; }
 	F4	xyz0() const { return F4(x,y,z); }
-	F4&	aaLOAD( char* pS, U4 nS, gpeALF alfS, U1** ppV, size_t* pN );
+	F4&	abLOAD( char* pS, U4 nS, gpeALF alfS, U1** ppV, size_t* pN );
 	F4&	sXYZW( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
 	F4&	swpXYZ0( const void* pV );
 
@@ -4685,6 +4685,13 @@ public:
 		w = pF[12];
 		return *this;
 	}
+	F4& col4x3( const float* pF ) {
+		x = pF[0];
+		y = pF[4];
+		z = pF[8];
+		w = 0.0;
+		return *this;
+	}
 
 	F4 abs0( void ) const { return F4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z ); }
 
@@ -4765,6 +4772,7 @@ public:
 		pB += t.str( pB, pSeP, pENT );
 		return pB-pBUFF;
     }
+	F4x4& lat( F4 e, F4 c, F4 u );
 
 	F4x4& operator = ( float a ) {
 		gpmCLR;
@@ -4830,12 +4838,19 @@ public:
 		t /= b.w;
 		return *this;
 	};
-	F4x4 transp() {
+	F4x4 T4x4() {
 		F4x4 c;
 		c.x.col4x4(&x.x);
 		c.y.col4x4(&x.y);
 		c.z.col4x4(&x.z);
 		c.t.col4x4(&x.w);
+		return c;
+	}
+	F4x4 T3x3() {
+		F4x4 c = *this;
+		c.x.col4x3(&x.x);
+		c.y.col4x3(&x.y);
+		c.z.col4x3(&x.z);
 		return c;
 	}
 	F4x4& operator *= ( const F4x4& b ) {
@@ -5203,6 +5218,7 @@ public:
 		return o;
 	}
 
+	F4x4& lat( F4x4 e, F4x4 c, F4x4 u );
 };
 
 class D4 {

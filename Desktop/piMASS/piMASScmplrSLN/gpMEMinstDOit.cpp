@@ -175,25 +175,13 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		SDL_Surface* pSRF = gpdGLapPIC[iPIC]->pPICrtxSRF(); //pSRF;
 		if( !pSRF )
 			return cID;
-		glTextureSubImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 0, 0,
-								gpdGLapPIC[iPIC]->txWH.a4x2[1].x,
-								gpdGLapPIC[iPIC]->txWH.a4x2[1].y, 0,
-								gpdGLapPIC[iPIC]->pSRF->pixels );
-		/*if( !pSRF ) {
-			if( gpdGLpTRG->pRTX ) {
-				int w=0, h=0, acc=0;
-				U4 frm;
-				SDL_QueryTexture( gpdGLpTRG->pRTX, &frm, &acc, &w, &h );
-				pSRF = gpdGLapPIC[iPIC]->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-			}
-			if( !pSRF )
-				return cID;
-		}*/
 
-		/*SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
-								pSRF->pixels,
-								pSRF->pitch 	);
-		gpdGLapPIC[iPIC]->pREF = NULL;*/
+		glReadPixels(	0, 0,
+				pSRF->w, pSRF->h,
+				GL_BGRA,
+				GL_UNSIGNED_BYTE,
+				pSRF->pixels );
+		gpdGLapPIC[iPIC]->pREF = NULL;
 		return cID;
 	}
 	/// GLSL SET TETURE -------------------------------------------------------
@@ -348,25 +336,12 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				SDL_Surface* pSRF = gpdGLapPIC[0]->pPICrtxSRF(); //pSRF;
 				if( !pSRF )
 					break;
-				glTextureSubImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 0, 0,
-										gpdGLapPIC[0]->txWH.a4x2[1].x,
-										gpdGLapPIC[0]->txWH.a4x2[1].y, 0,
-										gpdGLapPIC[0]->pSRF->pixels );
-				/* if( !gpdGLapPIC[0]->pSRF ) {
-					if( gpdGLpTRG->pRTX )
-					{
-						int w=0, h=0, acc=0;
-						U4 frm;
-						SDL_QueryTexture( gpdGLpTRG->pRTX, &frm, &acc, &w, &h );
-						gpdGLapPIC[0]->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-					}
-				}
-				if( !gpdGLapPIC[0]->pSRF )
-					break;
-				SDL_RenderReadPixels(	pWIN->pSDLrndr, NULL, 0,
-										gpdGLapPIC[0]->pSRF->pixels,
-										gpdGLapPIC[0]->pSRF->pitch 	);
-				gpdGLapPIC[0]->pREF = NULL;*/
+				glReadPixels(	0, 0,
+						pSRF->w, pSRF->h,
+						GL_BGRA,
+						GL_UNSIGNED_BYTE,
+						pSRF->pixels );
+				gpdGLapPIC[0]->pREF = NULL;
 			} break;
 		case gpeALF_MSKAB: {							cID = gpeCsz_L; if( bCID ) break;
 

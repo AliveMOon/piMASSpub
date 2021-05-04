@@ -24,7 +24,7 @@
     b1	   a2	 
     b2	                                                             a3	 
  
-   cam = 1; //mlb;
+   cam = 1; //1; //mlb;
    unsel = 1;
    pic = "penna";
    again = 64;
@@ -297,7 +297,7 @@
       //gl_FragColor.a = 1.0;
       //return;
 
-      gl_FragColor = texture2D( tex2, fUV )
+      gl_FragColor = texture2D( tex2, fUV )*0.25
                    + texture2D( tex1, fUV );
       gl_FragDepth = (Df-Dn)*0.99 + Dn;
 
@@ -328,9 +328,9 @@
       gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
       if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
           gl_FragColor.g = 1.0;
-      float v = dot( gl_FragColor, vec4(0.3,0.3,0.3,0) );
-      if( v < 0.3453 )
-          discard;
+      //float v = dot( gl_FragColor, vec4(0.3,0.3,0.3,0) );
+      //if( v < 0.3453 )
+      //    discard;
 
  }
 
@@ -361,10 +361,10 @@
  trgw = 640;
   trgh = 960;
  trg = "combi";
- scene = "zeroDB/scr/, cam.eye.yx, pxSCR.xyr, 1, 2,
-                       cam.eye.__y, pxSCR.xyr, 1, 3,
-                       cam.trg.yx, pxSCR.xyr, 1, 4,
-                       man.pos.yx, pxSCR.xyr, 1, 9";
+ scene = "zeroDB/scr/, cam.eye.xy, pxSCR.xyr, 1, 2,
+                       cam.eye.__yx, pxSCR.xyr, 1, 3,
+                       cam.trg.xy, pxSCR.xyr, 1, 4,
+                       man.pos.xy, pxSCR.xyr, 1, 9";
 
  pica = "cam1";
  picb = "penna";

@@ -111,6 +111,7 @@ static const GLenum gpaDRWmod[] = {
 class gpc3Dvx;
 class gpc3D;
 class gpc3Dlst;
+class gpcWIN;
 
 class gpcGL {
 public:
@@ -175,10 +176,12 @@ public:
 
 	gpcGL( gpcWIN& win );
 	//gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
-	gpcGL* glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0, bool b3D = false ); // bool bC = true, bool bD = true );
+	gpcGL* SWP( gpcWIN* pWIN ); // SDL_Window* pWIN );
 	gpcGL* TRG( SDL_Renderer* pSDLrndr,
 				I4x2 lXY, const I4x2& tWH, float ms,
 				bool bCLR = true, bool bDEP = true );
+	gpcGL* glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0, bool b3D = false ); // bool bC = true, bool bD = true );
+
 
 	GLuint IBOnew( const GLuint* pD, U4 nD ) {
 		//Create IBO
@@ -464,20 +467,6 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 		glBindVertexArray( 0 );
-
-		return this;
-	}
-	gpcGL* SWP( SDL_Window* pWIN ) {
-		if( !this )
-			return NULL;
-
-		SDL_GL_SwapWindow( pWIN );
-
-		if( oPrgID < 0 )
-			return this;
-
-		glUseProgram(oPrgID);
-		//SDL_RenderClear( pRNDR );
 
 		return this;
 	}

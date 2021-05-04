@@ -1262,8 +1262,7 @@ public:
 	gpcLZY	atLST,
 			voidLST;
 	gpITM(){};
-	~gpITM(){
-	};
+	~gpITM(){};
 	gpITM* read( gpITMlst *pIDlst );
 	gpITM* store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR );
 	gpITM& null(){
@@ -1292,19 +1291,19 @@ public:
 		return NULL;
 	}
 
-	U1* fndAA( I8x2& aa ) {
+	U1* fndAB( I8x2& ab ) {
 		I8x4* pA0 = (I8x4*)atLST.Ux( 0, sizeof(*pA0) );
 		I4 iA = 0;
 		for( I4 nA = atLST.nLD(sizeof(*pA0)); iA < nA; iA++ ) {
-			if( pA0[iA].a8x2[0] != aa )
+			if( pA0[iA].a8x2[0] != ab )
 				continue;
 			return voidLST.Ux( pA0[iA].a8x2[1].x, pA0[iA].a8x2[1].y, true, 1 );
 		}
 		return NULL;
 	}
-	U1* pAB( I8x2& aa, size_t& n ) {
-		U1* pU = fndAA( aa );
-		n = sOF(aa.b);
+	U1* pAB( I8x2& ab, size_t& n ) {
+		U1* pU = fndAB( ab );
+		n = sOF(ab.b);
 		if( pU )
 			return pU;
 
@@ -1315,7 +1314,7 @@ public:
 		if( !pA0 )
 			return NULL;
 
-		pA0->a8x2[0] = aa;
+		pA0->a8x2[0] = ab;
 		pA0->a8x2[1].x = voidLST.nLD();
 		pA0->a8x2[1].y = n;
 		return voidLST.Ux( pA0->a8x2[1].x, pA0->a8x2[1].y, true, 1 );
@@ -1323,8 +1322,8 @@ public:
 	I4x4* fndXYR( gpeALF alf ) {
 		if( !this )
 			return NULL;
-		I8x2 aa( alf, gpeALF_XYR );
-		return (I4x4*)fndAA( aa );
+		I8x2 ab( alf, gpeALF_XYR );
+		return (I4x4*)fndAB( ab );
 	}
 };
 class gpITMlst {

@@ -97,62 +97,28 @@ gpITM* gpITM::read( gpITMlst *pIDlst ) {
 gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
 
 	char* pF = pIDlst ? pIDlst->pF + sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID ) : NULL;
-
 	gpcLZY wr;
 	U8 s;
-	I8x2 aa( pAT[0].alf,pAT[1].alf);
-	size_t n = sOF(aa.b);
+	I8x2 ab( pAT[0].alf,pAT[1].alf);
+	size_t n = sOF(ab.b);
 	if( !n )
 		return this;
-	U1 *pV = pAB( aa, n );
+	U1 *pV = pAB( ab, n );
 	if( gpmMcmp(pV,pVAR,n) == n )
 		return this;
 	gpmMcpy(pV,pVAR,n);
-	switch( aa.b ) {
-		case gpeALF_LWO: {
-				pF = NULL;
-
-
-			} break;
-		default:
-			break;
+	switch( ab.b ) {
+		case gpeALF_LWO: return this; //pF = NULL; break;
+		default: break;
 	}
 	if( !pF )
 		return this;
+
 	wr.lzyADD( pV, n, s=0 );
-	pF += aa.ab2str(pF,".");
+	pF += ab.ab2str(pF,".");
 	wr.lzyWR( pIDlst->sPATH );
 	return this;
 
-	switch( aa.b ) {
-		case gpeALF_XYR: {
-			I4x4* pXYR = (I4x4*)pAB( aa, n = 0 ); //sizeof(I4x4) );
-			if( !pXYR )
-				break;
-			if( (*pXYR) == (pVAR?(*(I4x4*)pVAR):I4x4(0)) )
-				break;
-			(*pXYR) = pVAR ? (*(I4x4*)pVAR) : I4x4(0);
-			if( !pF ) break;
-			wr.lzyADD( pXYR, sizeof(*pXYR), s=0 );
-		} break;
-		case gpeALF_ID: {
-			I8* pI8 = (I8*)pAB( aa, n = 0 ); //sizeof(*pI8) );
-			if( !pI8 )
-				break;
-			if( (*pI8) == (pVAR?(*(I8*)pVAR):0) )
-				break;
-			(*pI8) = (pVAR?(*(I8*)pVAR):0);
-			if( !pF ) break;
-			wr.lzyADD( pI8, sizeof(*pI8), s=0 );
-		} break;
-		default: break;
-	}
-
-	if( pF ? !wr.nLD() : true )
-		return this;
-	pF += aa.ab2str(pF,".");
-	wr.lzyWR( pIDlst->sPATH );
-	return this;
 }
 gpITMlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
 	I8 ixDB = pPi->i8(pMEM);
@@ -364,7 +330,7 @@ void gpMEM::funFND() {
 						I4x4* pXYR = (I4x4*)pIl->itmSEL.pAB( aa, sOF );
 						if( !pXYR )
 							break;
-						U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", pON[0].x, pI0[pON[i].x].ID, pXYR->x, pXYR->y, pXYR->z );
+						U4 nPUB = sprintf( sPUB, "\r\n x%4d 0x%0.4llx ++ xyr: %d, %d, %d", pON[0].x, pI0[pON[i].x].ID, pXYR->x, pXYR->y, pXYR->z );
 						pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
 						break;
 					}

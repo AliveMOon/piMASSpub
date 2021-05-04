@@ -16,13 +16,12 @@ static const char gpsGLSLvx3D[] = //{
 "attribute	vec3	v_vx;														\n"
 "attribute	vec2	v_uv;														\n"
 "varying	vec3	fr_uv;														\n"
-"void main()																	\n"
-"{																				\n"
-"	vec3	mv	= v_vx + vec3( 0.0, -0.5, -7.0 ), 								\n"
+"void main() {																	\n"
+"	vec3	mv	= ( vec4(v_vx,1.0)*gl_ModelViewMatrix ).xyz,					\n"
 "			p	= mv*vec3(1.0, 480.0/800.0, 2.0/20.0) + vec3( 0.0, 0.0, 2.0 ); 	\n"
 "	vec2 d = vec2((2.0/p.z)-0.5, 1.0 ), sb = vec2(0,2.0);						\n"
 "	p = p*d.xxy-sb.xxy;															\n"
-"	gl_Position			= vec4( p*-1.0, 1.0 ); 				 					\n"
+"	gl_Position			= vec4( p*-1.0, 1.0 );									\n"
 "	fr_uv				= vec3( v_uv, abs(p.z) );								\n"
 "}																				\n\0";
 //};
