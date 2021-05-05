@@ -297,8 +297,8 @@
       //gl_FragColor.a = 1.0;
       //return;
 
-      gl_FragColor = texture2D( tex2, fUV )
-                   + texture2D( tex1, fr_uv )*0.125 ;
+      gl_FragColor = texture2D( tex2, fr_UV )*0.125
+                   + texture2D( tex1, fUV );
       gl_FragDepth = (Df-Dn)*0.99 + Dn;
 
       vec2 d = dis(fUV,aCNL[0].xy);

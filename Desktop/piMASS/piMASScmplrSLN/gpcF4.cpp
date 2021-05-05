@@ -123,20 +123,6 @@ F4& F4::abLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
 	return *this;
 }
 
-F4x4& F4x4::lat( F4 e, F4 c, F4 u ) {
-	gpmCLR;
-	//e.x *= -1.0;
-	t = e-c;
-	t.w = 1.0;
-	z = t.N3();
-	y = u.N3();
-
-	x = y.X3(z.N3()).N3();
-	y = z.X3(x).N3();
-	//*this = T4x4();
-	return *this ;
-}
-
 F4x4& F4x4::latR( F4 e, F4 c, F4 u ) {
 	gpmCLR;
 
@@ -150,9 +136,7 @@ F4x4& F4x4::latR( F4 e, F4 c, F4 u ) {
 
 	t.z = sqrt(z.qlen_xyz());
 	z /= t.z;
-
-	r = sqrt(x.qlen());
-	x /= r;
+	x /= sqrt(x.qlen());
 	y = z.X3(x).N3();
 
 	*this = T3x3();

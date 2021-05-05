@@ -1200,7 +1200,7 @@ gpdSTATICoff gpsGLSLvx3D[] = //{
 "attribute	vec2	v_uv;														\n"
 "varying	vec3	fr_uv;														\n"
 "void main() {																	\n"
-"	vec3	mv	= ( gl_ModelViewMatrix*vec4(v_vx,1.0) ).xyz,					\n"
+"	vec3	mv	= ( gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(v_vx,1.0) ).xyz,					\n"
 "			xyz	= vec3(1.0, 480.0/800.0, 1.0/250.0), 							\n"
 "			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 							\n"
 "	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);				\n"
@@ -1310,8 +1310,14 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
 	glUseProgram( gProgID ); gpfGLerr( " glUseProgram( gProgID" );
 
-	F4x4 view;
+	F4x4 view, word = 1.0;
 	glMatrixMode(GL_MODELVIEW);
+	word.x = F4( 1.0, 0.0, 0.0 );
+	word.y = F4( 0.0, 0.0, 1.0 );
+	word.z = F4( 0.0,-1.0, 0.0 );
+	glLoadMatrixf((const GLfloat*)&word);
+
+	glMatrixMode(GL_PROJECTION);
     {
         F4	eye = aCAM[0], ///4.0f,
 			cntr = 0,

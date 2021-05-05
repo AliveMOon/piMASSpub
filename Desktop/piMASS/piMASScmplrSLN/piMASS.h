@@ -4772,7 +4772,6 @@ public:
 		pB += t.str( pB, pSeP, pENT );
 		return pB-pBUFF;
     }
-	F4x4& lat( F4 e, F4 c, F4 u );
 	F4x4& latR( F4 e, F4 c, F4 u );
 
 	F4x4& operator = ( float a ) {
