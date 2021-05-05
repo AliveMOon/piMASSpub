@@ -1193,7 +1193,35 @@ gpeALF alfSCN1[] = {
 	gpeALF_POS,
 	gpeALF_ABC,
 };
-char	sSCNdec1[] = "eye trg pos abc \"";
+gpdSTATICoff sSCNdec1[] = "eye trg pos abc \"";
+gpdSTATICoff gpsGLSLvx3D[] = //{
+"#version 120																	\n"
+"attribute	vec3	v_vx;														\n"
+"attribute	vec2	v_uv;														\n"
+"varying	vec3	fr_uv;														\n"
+"void main() {																	\n"
+"	vec3	mv	= ( gl_ModelViewMatrix*vec4(v_vx,1.0) ).xyz,					\n"
+"			xyz	= vec3(1.0, 480.0/800.0, 1.0/250.0), 							\n"
+"			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 							\n"
+"	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);				\n"
+"	p = p*d.xxy*xyz.xyx - sb.xxy;												\n"
+"	gl_Position			= vec4( p*-1.0, 1.0 );									\n"
+"	fr_uv				= vec3( v_uv, p.z );									\n"
+"}																				\n\0";
+//};
+gpdSTATICoff gpsGLSLfrg3D[] = //{
+"#version 120																\n"
+"varying vec3 fr_uv;														\n"
+"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
+"uniform vec4 		aCNL[8];				// CNL							\n"
+"void main()																\n"
+"{																			\n"
+"   if( gl_FrontFacing ) discard;											\n"
+	gpdGUIfr3Dc
+	gpdGUIfr3Dd
+"}																			\n"
+"\n\0";
+//};
 gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	int nD1 = scnDEC1.nLD() ? scnDEC1.nLD() : scnDEC1.nAT(sSCNdec1,sizeof(sSCNdec1));
 
@@ -1285,10 +1313,10 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	F4x4 view;
 	glMatrixMode(GL_MODELVIEW);
     {
-        F4	eye = aCAM[0]/64.0f,
+        F4	eye = aCAM[0], ///4.0f,
 			cntr = 0,
 			up = { 0.f, 0.f, 1.f };
-		view.lat( eye, cntr, up );
+		view.latR( eye, cntr, up );
        // mat4x4_look_at( view, eye, cntr, up );
     }
     glLoadMatrixf((const GLfloat*)&view);

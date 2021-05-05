@@ -322,7 +322,7 @@ gpcLZY* gpcLZY::tree_add( I8 id, I8& n ) {
 	n_load = s*sizeof(*p_i84);
 	return this;
 }
-int gpcLZY::nAT( char* pS, int nS, const char* pFILT ) {
+int gpcLZY::nAT( const char* pS, int nS, const char* pFILT ) {
 	if( this ? !pS : true )
 		return 0;
 	if( !nS ) {
@@ -333,7 +333,7 @@ int gpcLZY::nAT( char* pS, int nS, const char* pFILT ) {
 	U8 nUTF8;
 	int nAT = 0;
 	I8x2* pAn;
-	char* pSi = pS, *pSe = pS+nS; //sN[]=" ";
+	char* pSi = (char*)pS, *pSe = pSi+nS; //sN[]=" ";
 	for( 	pSi += gpmNINCS(pSi,pFILT);
 			pSi < pSe;
 			pSi += gpmNINCS(pSi,pFILT), nAT++ ) {

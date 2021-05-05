@@ -362,7 +362,7 @@
   trgh = 960;
  trg = "combi";
  scene = "zeroDB/scr/, cam.eye.xy, pxSCR.xyr, 1, 2,
-                       cam.eye.__yx, pxSCR.xyr, 1, 3,
+                       cam.eye.__xy, pxSCR.xyr, 1, 3,
                        cam.trg.xy, pxSCR.xyr, 1, 4,
                        man.pos.xy, pxSCR.xyr, 1, 9";
 

@@ -4773,6 +4773,7 @@ public:
 		return pB-pBUFF;
     }
 	F4x4& lat( F4 e, F4 c, F4 u );
+	F4x4& latR( F4 e, F4 c, F4 u );
 
 	F4x4& operator = ( float a ) {
 		gpmCLR;
@@ -6237,7 +6238,7 @@ szasz:
 		ins.op = U1x4( op, ((U1)s0<<3)|(sn&7), ((U1)d0<<3)|(dn&7), (di<<4)|(si&7) ).u4;
 		return ins;
 	}
-	int nAT( char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
+	int nAT( const char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
 	gpcLZY* utf8( U4 u, U1 trans = '\a' ) {
 		if( !u )
 			return this;

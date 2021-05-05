@@ -1,9 +1,11 @@
 #pragma once
 #ifndef gpsGLSL_H
 #define gpsGLSL_H
-#define gpdGUIfrDEPTH "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = (f-n)*0.85+n; \n" // ((f-n)*0.85+n+f)/2.0;	\n" // gl_FragCoord.z-0.1;\n" //
+#define gpdGUIfrDEPTH "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = (f-n)*0.85+n; \n"
 #define gpdGUIfr3Dc "	gl_FragColor = vec4(fr_uv,1.0);											\n"
 #define gpdGUIfr3Dd "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = ((f-n)*fr_uv.z+n+f)/2.0;	\n"
+#define gpdSTATICoff static const char  //static const
+
 ///-------------------------------------------------
 ///					 wrkDIST * imgSIZE
 ///		fokLEN	 =	-------------------
@@ -11,34 +13,8 @@
 ///
 ///		imgSIZE: SONY IMX219 1/4" 3.67mm x 2.76mm px1.12um
 ///-------------------------------------------------
-static const char gpsGLSLvx3D[] = //{
-"#version 120																	\n"
-"attribute	vec3	v_vx;														\n"
-"attribute	vec2	v_uv;														\n"
-"varying	vec3	fr_uv;														\n"
-"void main() {																	\n"
-"	vec3	mv	= ( vec4(v_vx,1.0)*gl_ModelViewMatrix ).xyz,					\n"
-"			p	= mv*vec3(1.0, 480.0/800.0, 2.0/20.0) + vec3( 0.0, 0.0, 2.0 ); 	\n"
-"	vec2 d = vec2((2.0/p.z)-0.5, 1.0 ), sb = vec2(0,2.0);						\n"
-"	p = p*d.xxy-sb.xxy;															\n"
-"	gl_Position			= vec4( p*-1.0, 1.0 );									\n"
-"	fr_uv				= vec3( v_uv, abs(p.z) );								\n"
-"}																				\n\0";
-//};
-static const char gpsGLSLfrg3D[] = //{
-"#version 120																\n"
-"varying vec3 fr_uv;														\n"
-"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
-"uniform vec4 		aCNL[8];				// CNL							\n"
-"void main()																\n"
-"{																			\n"
-"   if( !gl_FrontFacing ) discard;											\n"
-	gpdGUIfr3Dc
-	gpdGUIfr3Dd
-"}																			\n"
-"\n\0";
-//};
-static const char gpsGLSLvx[] = //{
+
+gpdSTATICoff gpsGLSLvx[] = //{
 "#version 120																\n"
 "attribute	vec2	v_vx;													\n"
 "attribute	vec2	v_uv;													\n"
@@ -49,7 +25,7 @@ static const char gpsGLSLvx[] = //{
 "	fr_uv		= v_uv;														\n"
 "}																			\n\0";
 //};
-static const char gpsGLSLfrgREF[] = //{
+gpdSTATICoff gpsGLSLfrgREF[] = //{
 "#version 120																\n"
 "varying vec2 fr_uv;														\n"
 "uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
@@ -63,7 +39,7 @@ static const char gpsGLSLfrgREF[] = //{
 "}																			\n"
 "\n\0";
 //};
-static const char gpsGLSLfrgLINE[] = // {
+gpdSTATICoff gpsGLSLfrgLINE[] = // {
 "#version 120															\n"
 "varying vec2 fr_uv;													\n"
 "uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png	\n"
@@ -76,7 +52,7 @@ static const char gpsGLSLfrgLINE[] = // {
 "\n\0";
 //};
 
-static const char gpsGLSLfrgISOo[] = //{
+gpdSTATICoff gpsGLSLfrgISOo[] = //{
 "#version 120																							\n"
 "varying vec2 fr_uv;																					\n"
 "uniform sampler2D tex0;					// MINI_CHAR_xXy_zXw.png									\n"
@@ -330,7 +306,8 @@ static const char gpsGLSLfrgISOo[] = //{
 	gpdGUIfrDEPTH
 "}\n";
 //};
-const char gpsGLSLfrgISO[] = //{
+
+gpdSTATICoff gpsGLSLfrgISO[] = //{
 "#version 120																							\n"
 "varying vec2 fr_uv;																					\n"
 "uniform sampler2D tex0;					// MINI_CHAR_xXy_zXw.png									\n"
@@ -466,7 +443,7 @@ const char gpsGLSLfrgISO[] = //{
 "}\n";
 //};
 
-static const char gpsGLSLfrgISOaa[] = //{
+gpdSTATICoff gpsGLSLfrgISOaa[] = //{
 "#version 120																							\n"
 "varying vec2 fr_uv;																					\n"
 "uniform sampler2D tex0;					// MINI_CHAR_xXy_zXw.png									\n"
