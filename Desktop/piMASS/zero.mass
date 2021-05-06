@@ -22,9 +22,9 @@
  
   a1	 
     b1	   a2	 
-    b2	   a3	 
+    b2	                                                             a3	 
  
-   cam = 1; //mlb;
+   cam = 1; //1; //mlb;
    unsel = 1;
    pic = "penna";
    again = 64;
@@ -267,7 +267,7 @@
  uniform vec2		tgPX;
  uniform vec2		aTX[8];
  uniform vec4 		aCNL[8];
- 
+
  vec2 dis( vec2 fUV, vec2 cnl ){
       return abs(fUV*tgPX - cnl );
  }
@@ -292,9 +292,15 @@
       vec2	fUV = fr_uv*vec2(1.0,-1.0) + vec2(0.0,1.0),
                 cUV = aCNL[0].xy/tgPX,
 		crs = abs(fUV-cUV)*tgPX;
+      float Df = gl_DepthRange.far, Dn = gl_DepthRange.near;
+      //gl_FragColor.rgb = fract(gl_FragCoord.zzz*vec3(1.0,2.0,4.0));
+      //gl_FragColor.a = 1.0;
+      //return;
 
       gl_FragColor = texture2D( tex2, fUV )
-                   + texture2D( tex1, fUV );
+                   + texture2D( tex1, fr_uv )*0.125 ;
+      gl_FragDepth = (Df-Dn)*0.99 + Dn;
+
       vec2 d = dis(fUV,aCNL[0].xy);
       float r = length(d), rr = abs(r-30);
       gl_FragColor.r = rr < 1 ? 1.0 : gl_FragColor.r;
@@ -322,6 +328,10 @@
       gl_FragColor.g = rr < 1 ? 1.0 : gl_FragColor.g;
       if( min(d.x,d.y) < 1.0 && length(d)<10.0 )
           gl_FragColor.g = 1.0;
+      //float v = dot( gl_FragColor, vec4(0.3,0.3,0.3,0) );
+      //if( v < 0.3453 )
+      //    discard;
+
  }
 
  ";
@@ -349,12 +359,18 @@
    b5	 
 
  trgw = 640;
- trgh = 960;
+  trgh = 960;
  trg = "combi";
+ scene = "zeroDB/scr/, cam.eye.xy, pxSCR.xyr, 1, 2,
+                       cam.eye.__xy, pxSCR.xyr, 1, 3,
+                       cam.trg.xy, pxSCR.xyr, 1, 4,
+                       man.pos.xy, pxSCR.xyr, 1, 9";
+
  pica = "cam1";
  picb = "penna";
  cnl = b3.lst;
  gpu = "combi";
+
  again = 200;
     a12	 
  ize  = in == 10;

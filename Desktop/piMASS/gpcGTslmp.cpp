@@ -341,7 +341,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 					// nyugta?
 					pOUT = pROBnD->pull( pOUT, gpaROBwr );
 					break;
-				case 0x0000: // good!
+				case 0x0000: // bGD!
 					break;
 				case 0xc050:
 					break;

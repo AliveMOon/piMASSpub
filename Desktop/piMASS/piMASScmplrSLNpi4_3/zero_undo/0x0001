@@ -1,6 +1,0 @@
- a0	
- Hello = ize + b - c * d * e / 100 
- 		+ ( 200 + f );
- mini = print( "ize = %d\r\n", hello );
- 
-  

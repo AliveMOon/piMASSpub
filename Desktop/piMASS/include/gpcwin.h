@@ -41,13 +41,63 @@ public:
 };
 
 #define gpdNdiv gpmN(apCRS)
+typedef enum gpe3Dat:U4 {
+	gpe3Dat_null,
+	gpe3Dat_vx,			//  1
+
+	gpe3Dat_ix,			//  2
+	gpe3Dat_vxix,		//  3
+
+	gpe3Dat_up,			//  4
+	gpe3Dat_vxup,		//  5
+	gpe3Dat_ixup,		//  6
+	gpe3Dat_vxixup,		//  7
+
+	gpe3Dat_uv,			//  8
+	gpe3Dat_vxuv,		//  9
+	gpe3Dat_ixuv,		//  a
+	gpe3Dat_vxixuv,		//  b
+	gpe3Dat_upuv,		//  c
+	gpe3Dat_vxupuv,		//  d
+	gpe3Dat_ixupuv,		//  e
+	gpe3Dat_vxixupuv,	//  f
+
+	gpe3Dat_ps,			// 10
+	gpe3Dat_vxps,		// 11
+
+	gpe3Dat_ixps,		// 12
+	gpe3Dat_vxixps,		// 13
+
+	gpe3Dat_upps,		// 14
+	gpe3Dat_vxupps,		// 15
+	gpe3Dat_ixupps,		// 16
+	gpe3Dat_vxixupps,	// 17
+
+	gpe3Dat_uvps,		// 18
+	gpe3Dat_vxuvps,		// 19
+	gpe3Dat_ixuvps,		// 1a
+	gpe3Dat_vxixuvps,	// 1b
+	gpe3Dat_upuvps,		// 1c
+	gpe3Dat_vxupuvps,	// 1d
+	gpe3Dat_ixupuvps,	// 1e
+	gpe3Dat_vxixupuvps,	// 1f
+
+	gpe3Dat_VTX,		// 20
+	gpe3Dat_FRG 		= 0x40,
+	gpe3Dat_VTXFRG 		= 0x60,
+	gpe3Dat_LNK 		= 0x80,
+	gpe3Dat_VTXLNK 		= 0xA0,
+	gpe3Dat_FRGLNK 		= 0xC0,
+	gpe3Dat_VTXFRGLNK 	= 0xE0,
+};
+
 class gpcGLSL
 {
 public:
 	GLint	isSUCC, nLOG,
 			PrgID, nT, nU,
 
-			ATvxID, ATuvID,
+			ATvxID, ATixID, ATupID, ATuvID, ATpsID,
 
 			aTexID[GL_ACTIVE_TEXTURE-GL_TEXTURE0],
 			aUniID[0x10];
@@ -58,7 +108,7 @@ public:
 	gpcLZY	vtxLOG, vtxSRC,
 			frgLOG, frgSRC,
 			lnkLOG;
-	U4 nSUCC;
+	gpe3Dat nSUCC;
 	I8x2	ID;
 private:
 	GLint GLSLvtx( const char* pSvrtx );
@@ -98,7 +148,11 @@ public:
 
 		return nT;
 	}
-	gpcGLSL* pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  );
+	gpcGLSL* pNEW(	const I8x2& an, const char* pF, const char* pV,
+					const char* pATvx = "v_vx", const char* pATix = "v_ix",
+					const char* pATup = "v_up",
+					const char* pATuv = "v_uv", const char* pATps = "v_ps",
+					const char* pATtx = "tex"  );
 
 };
 
@@ -106,13 +160,20 @@ static const GLenum gpaDRWmod[] = {
 			GL_TRIANGLE_FAN,
 			GL_LINES,
 			GL_LINE_STRIP,
+			GL_TRIANGLES,
 		};
+class gpc3Dvx;
+class gpc3D;
 class gpc3Dlst;
+class gpcWIN;
+
+
 
 class gpcGL {
 public:
+	char	sPUB[0x1000];
 	GLint	oPrgID,
-			ATvxID, ATuvID,
+			ATvxID, ATixID, ATupID, ATuvID, ATpsID,
 			gVxSucc,
 			gFrSucc, aTexID[0x8],
 			gPrgSucc, aUniID[0x8],
@@ -134,7 +195,8 @@ public:
 			VxSsrc,
 			FrSlog,
 			frSsrc,
-			Lnklog;
+			Lnklog,
+			scnDEC1;
 
 	SDL_Renderer* pRNDR;
 	I4x2	luXY,	trgWHpx,
@@ -142,7 +204,8 @@ public:
 			aTXwh[0x10];
 
 	gpcPIC* pPICrtx;
-	SDL_Texture	*pRTX, *pTRG,
+	SDL_Texture	//*pRTX,
+				*pTRG,
 				*pTXchar,
 				*pTXiso;
 
@@ -156,7 +219,8 @@ public:
 	U4x2 aVXn[0x10];
 	F4* pV;
 
-	gpc3Dlst* p3Dlst;
+	gpc3D*		p3D;
+	gpc3Dlst*	p3Dlst;
 
 	I4 iLWO( gpeALF a, const char* pPATH, gpcLZY& rd );
 	gpcGL* GLSLset( const gpcALU& alu, const char* pF = NULL, const char* pV = NULL );
@@ -167,62 +231,14 @@ public:
 	}
 
 	gpcGL( gpcWIN& win );
-	gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, bool bC = true, bool bD = true );
+	//gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
+	gpcGL* SWP( gpcWIN* pWIN ); // SDL_Window* pWIN );
 	gpcGL* TRG( SDL_Renderer* pSDLrndr,
 				I4x2 lXY, const I4x2& tWH, float ms,
-				bool bCLR = true, bool bDEP = true ) {
-		if( !this )
-			return NULL;
+				bool bCLR = true, bool bDEP = true );
+	gpcGL* glSETtrg3D( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0, bool b3D = false ); // bool bC = true, bool bD = true );
 
-		if( pRNDR != pSDLrndr )
-			pRNDR = pSDLrndr;
 
-		if( !pRNDR )
-			return NULL;
-		if( pRTX )
-		{
-			if(pPICrtx)
-			{
-				if(!pPICrtx->pSRF)
-				{
-					int w=0, h=0, acc=0;
-					U4 frm;
-					SDL_QueryTexture( pRTX, &frm, &acc, &w, &h );
-					pPICrtx->pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-				}
-				if( pPICrtx->pSRF )
-					SDL_RenderReadPixels( pRNDR, NULL, 0, pPICrtx->pSRF->pixels, pPICrtx->pSRF->pitch );
-				pPICrtx->pREF = NULL;
-			}
-			pPICrtx=NULL;
-			SDL_SetRenderTarget(pRNDR,pRTX=NULL);
-		}
-
-		if( pTRG )
-		if( trgWHpx != tWH )
-		{
-			gpmSDL_FreeTX( pTRG );
-			pTRG = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, tWH.x, tWH.y );
-			if( !pTRG )
-				return NULL;
-		}
-
-		luXY = lXY;
-		trgWHpx = tWH;
-
-		GLbitfield b = 0;
-		if( bCLR )
-			b |= GL_COLOR_BUFFER_BIT;
-		if( bDEP )
-			b |= GL_DEPTH_BUFFER_BIT;
-
-		ms = sin( ms/1000.0 )+1.0;
-		glClearColor( ms*0.13, 0.0f, ms*0.3, 0.0f );
-		glClearDepth(1.0);
-		glClear( b );
-
-		return this;
-	}
 	GLuint IBOnew( const GLuint* pD, U4 nD ) {
 		//Create IBO
 		aIXn[0] = nD;
@@ -241,6 +257,31 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		return aVXid[0];
 	}
+	U4x4 IBOobj( U4x4& iIXn,const GLuint* pD, U4 nD, U4 nX ) {
+		iIXn.a4x2[1] = U4x2( nX, nD );
+		if( !iIXn.a4x2[1].area() ) {
+			if( iIXn.x ) {
+				glDeleteBuffers(1,  &iIXn.x );
+				iIXn.x = -1;
+			}
+			iIXn.y = 0;
+			return iIXn;
+		}
+		if( iIXn.y )
+			return iIXn;
+		iIXn.y++;
+		GLenum e = 0;
+		if( iIXn.x )
+			glDeleteBuffers(1,  &iIXn.x );
+
+		glGenBuffers( 1, &iIXn.x );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iIXn.x );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, iIXn.a4x2[1].area()*sizeof(*pD), pD, GL_STATIC_DRAW ); (e = glGetError());
+		if( e ) std::cout << std::hex << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  std::endl;
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+		return iIXn;
+	}
+	U4x4 VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD );
 	GLuint viBO( U1 md, const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
 		if(aVXid[md])
@@ -383,6 +424,7 @@ public:
 		xyWH.a4x2[0] += divPX.a4x2[0];
 		return glSETbox( xyWH.a4x2[0], xyWH.a4x2[1] );
 	}
+	gpcGL* glSETvx( gpc3D* p3D );
 	gpcGL* glSETcnl( U4 i, F4 xyzw ) {
 		if( !this )
 			return NULL;
@@ -445,41 +487,9 @@ public:
 		}
 		return this;
 	}
-	gpcGL* glDONE(){ glUseProgram(0); return this; }
-	gpcGL* glDRW( I4x2 xy, I4x2 wh ) {
-		if( !this )
-			return NULL;
-
-		if( aUniID[0] > -1 )
-		if( pPICrtx )
-			glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w );
-		else
-			glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y );
-
-		if( aUniID[1] > -1 )
-			glUniform2f( aUniID[1], (float)xy.x, (float)xy.y );
-		if( aUniID[2] > -1 )
-			glUniform2f( aUniID[2], (float)wh.x, (float)wh.y );
-
-		glBindBuffer( GL_ARRAY_BUFFER, aVXid[0] );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[0] );
-
-		glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), 0 );
-		glEnableVertexAttribArray( ATvxID );
-		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), gpmGLBOFF(sizeof(F2)) );
-		glEnableVertexAttribArray( ATuvID );
-
-		glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL );
-
-		glDisableVertexAttribArray( ATvxID );
-		glDisableVertexAttribArray( ATuvID );
-
-		glBindBuffer( GL_ARRAY_BUFFER, 0 );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-		glBindVertexArray( 0 );
-
-		return this;
-	}
+	gpcGL* glDRW3D( gpc3D* p, U4 msk = -1 );
+	gpcGL* glDONE(){ glUseProgram(0); p3D = NULL; return this; }
+	gpcGL* glDRW( I4x2 xy, I4x2 wh );
 	gpcGL* glDRW( U1 mode, I4x2 xy, I4x2 wh ) {
 		if( !this )
 			return NULL;
@@ -516,21 +526,6 @@ public:
 
 		return this;
 	}
-	gpcGL* SWP( SDL_Window* pWIN )
-	{
-		if( !this )
-			return NULL;
-
-		SDL_GL_SwapWindow( pWIN );
-
-		if( oPrgID < 0 )
-			return this;
-
-		glUseProgram(oPrgID);
-		//SDL_RenderClear( pRNDR );
-
-		return this;
-	}
 
 	GLuint GLSLvtx( const char* pS = NULL );
 	GLuint GLSLfrg( const char* pS = NULL );
@@ -555,7 +550,7 @@ public:
 			//Allocate string
 			if( maxLength )
 			{
-				Lnklog.lzyADD( NULL, maxLength, s = -1, -1 );
+				Lnklog.lzyADD( NULL, maxLength, s = -1 );
 				//char* infoLog = new char[ maxLength ];
 
 				//Get info log
@@ -599,14 +594,13 @@ public:
 	}
 
 
-
+	gpcGL* glSCENE( gpMEM* pMEM, char* pSTR );
 
 
 
 
 };
-class gpcWIN
-{
+class gpcWIN {
 	public:
 		gpcMASS*		piMASS;
 		gpcCRS			*apCRS[4];

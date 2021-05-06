@@ -169,7 +169,7 @@
 
 	#define ace access
 	#define mkd( a, b ) ( mkdir( a,b ) )
-	#define gpmALLOC( n ) ((U1*)memalign( 0x10, n ))
+	#define gpmALLOC( n ) ((U1*)memalign( 0x10, (n) ))
 	#define gpmFREE( p ) free( p )
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
@@ -349,7 +349,7 @@ public:
 #define gpdSQRT3 1.7320508075688772935274463415059f
 #define gpmNINCS( s, v )	strspn( (char*)(s), (char*)(v) )
 #define gpmSTR2D( p )	strtod( (char*)(p), (char**)&(p) )
-#define gpmSTR2U8( p, r )	strtol( (char*)(p), (char**)&(p), (r) )
+#define gpmSTR2U8( p, radx )	strtol( (char*)(p), (char**)&(p), (radx) )
 #define gpdVAN	strcspn
 #define gpmPAD( n, p ) ( (n) + (((n)%(p)) ? ((p)-((n)%(p))) : 0) )
 #define gpmCLR	if( this ) bzero( this, sizeof(*this) )
@@ -434,6 +434,13 @@ double inline gpfRAMADZSAN( double a, double b )
 		return 2.0*a*PI;
 
 	return PI*(3.0*(a+b)-sqrt((3.0*a + b)*(a + 3.0*b)));
+}
+GLenum inline gpfGLerr( const char* pERR = "" ) {
+	GLenum e = glGetError();
+	if( !e )
+		return 0;
+	std::cout << std::hex << e << pERR <<  std::endl;
+	return e;
 }
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
 SOCKET inline gpfSOC_CLOSE( SOCKET& h )
@@ -768,6 +775,19 @@ inline size_t gpfMM( U1* pA, size_t nA, U1* pB, size_t nB, U1** ppFND = NULL ) {
 	return nA;
 }
 
+inline U2 swp2( const void* p ) {
+	register U2 u = *(U2*)p;
+	return    (u<<8)|(u>>8);
+}
+inline U4 swp4( const void* p ) {
+	register U4 u = *(U4*)p,
+	uu =	 (u<<24)
+			|((u&0xFF000000)>>24)
+			|((u&0xFF0000)>>8)
+			|((u&0xFF00)<<8);
+	return uu;
+}
+
 class UTF8 {
 	U1* pU;
 public:
@@ -953,9 +973,7 @@ public:
     U1x4( U4 b ) {
         u4 = b;
     }
-    U1x4( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 ) {
-        x = _x; y = _y; z = _z; w = _w;
-    }
+    U1x4( U1 _x, U1 _y, U1 _z = 0, U1 _w = 0 ) { x=_x; y=_y; z=_z; w=_w; }
     U1x4& str2time( U1* p_str, U1* p_end, U1** pp_str = NULL );
     U4 area_xy() {
 		U4 a = x;
@@ -1130,6 +1148,13 @@ public:
 			p1[i].z = p2[i].x;
 			p1[i].w = p2[i].y;
 		}
+		return this;
+	}
+	U1x4* wzyx( const void* pV, U4 n ) {
+		U1x4 *p1 = this;
+		U4* pU =(U4*)pV;
+		for( U4 i = 0; i < n; i++ )
+			p1[i].u4 = swp4(pU+i);
 		return this;
 	}
 
@@ -1496,18 +1521,11 @@ class U2x2 {
 public:
 	union
 	{
-		struct
-		{
-			U2 x,y;
-		};
-		struct
-		{
-			U1x4 aCLR[2];
-		};
-		struct
-		{
-			U4 u4;
-		};
+		struct { U2 x,y; };
+		struct { U2 i,n; };
+		struct { U2 prt,srf; };
+		struct { U1x4 aCLR[2]; };
+		struct { U4 u4; };
 	};
 
     U2x2(){};
@@ -1810,8 +1828,10 @@ class U4x2 {
 public:
 	union {
 		struct { U4 x,y; };
+		struct { U4 i,n; };
 		struct { gpeALFu4 a4; U4 n4; };
-		struct { U1x4 aCLR[2]; };
+		struct { U1x4 aU1x4[2]; };
+		struct { U2 xl,xh,prt,srf; };
 		struct { gpeALF var; };
 		struct { U8 u8; };
 		struct { U1* apSTR[gpeU4x2nSTR]; };
@@ -1819,17 +1839,10 @@ public:
 	};
 
     U4x2(){};
-    U4x2( U4 _x, U4 _y = 0 )
-    {
-        x = _x; y = _y;
-    }
+    U4x2( U4 _x, U4 _y = 0 ) { x = _x; y = _y; }
     U4x2( const I8x2& an );
     U4x2( const I4x2& i42 );
-	U4x2( const SDL_Surface& srf )
-	{
-		x = srf.w;
-		y = srf.h;
-	}
+	U4x2( const SDL_Surface& srf ) { x = srf.w; y = srf.h; }
 	U4x2& operator ++() { ++x;++y; return *this; }
 	U4x2& operator --() { --x;--y; return *this; }
 
@@ -1840,28 +1853,20 @@ public:
 	}
 	U4x2& operator = ( const I8x2& an );
 	// cnt = fract * U4x2(1, w);
-    U4 strALF4N( U1* pBUFF )
-    {
+    U4 strALF4N( U1* pBUFF ) {
 		U4 n = gpfALF2STR( pBUFF, a4 );
 		return n+sprintf( (char*)(pBUFF+n), "%d", n4 );
     }
-	U1* pSTRalf4n( U1* pBUFF )
-    {
-		//sprintf( (char*)(pBUFF+gpfALF2STR( pBUFF, a4 )), "%d", n4 );
-		return pBUFF + gpfALF2STR( pBUFF, a4 );
-    }
-    U1* strVAR( U1* pBUFF )
-    {
+	U1* pSTRalf4n( U1* pBUFF ) { return pBUFF + gpfALF2STR( pBUFF, a4 ); }
+    U1* strVAR( U1* pBUFF ) {
 		gpfALF2STR( pBUFF, var );
 		return pBUFF;
     }
-	U1* str( U1* pBUFF, const char* pSP = ", " )
-    {
+	U1* str( U1* pBUFF, const char* pSP = ", " ) {
 		sprintf( (char*)pBUFF, "%d%s%d%s", x,pSP,y,pSP );
 		return pBUFF;
     }
-	U4x2& cnt2fract(U4 w, U8 cnt)
-	{
+	U4x2& cnt2fract(U4 w, U8 cnt) {
 		U1 lg = log2(w * w);
 		w = 1<<(lg/2);
 		U8 X = w * w;
@@ -1892,8 +1897,7 @@ public:
 	U4x2& operator += ( const U4x2& b ) { x += b.x; y += b.y; return *this; }
 	U4x2& operator -= ( const U4x2& b ) { x -= b.x; y -= b.y; return *this; }
 	U4x2& operator &= ( const U4x2& u ) { x *= u.x; y *= u.y; return *this; }
-	U4x2& operator /= ( const U4x2& u )
-	{
+	U4x2& operator /= ( const U4x2& u ) {
 		if( u.x )
 			x /= u.x;
 		else
@@ -1905,8 +1909,7 @@ public:
 			y = 0xffffFFFF;
 		return *this;
 	}
-	U4x2& operator %= ( const U4x2& u )
-	{
+	U4x2& operator %= ( const U4x2& u ) {
 		if( u.x )
 			x %= u.x;
 		else
@@ -1918,19 +1921,13 @@ public:
 			y = 0;
 		return *this;
 	}
-	U4x2& operator += ( U4 u )
-	{
-		x += u;
-		y += u;
-		return *this;
-	}
+	U4x2& operator += ( U4 u ) { x += u; y += u; return *this; }
 	U4x2& operator += ( I4 i )		{ x += i; y += i; return *this; }
 	U4x2& operator += ( float f )	{ x += f; y += f; return *this; }
 	U4x2& operator -= ( U4 u ) 		{ x -= u; y -= u; return *this; }
 	U4x2& operator -= ( I4 i ) 		{ x -= i; y -= i; return *this; }
 	U4x2& operator -= ( float f ) 	{ x -= f; y -= f; return *this; }
-	U4x2& operator = ( int i )
-	{
+	U4x2& operator = ( int i ) {
 		if( !i )
 			return null();
 
@@ -1947,29 +1944,18 @@ public:
 	U4x2 operator - (const U4 b) const 		{ return U4x2( x-b, y-b );		}
 	U4x2 operator - (const U4x2 b) const	{ return U4x2( x-b.x, y-b.y );	}
 
-	bool operator != ( const U4x2& b ) const
-	{
+	bool operator != ( const U4x2& b ) const {
 		if( x != b.x )
 			return true;
 		return y != b.y;
 	}
-	bool operator == ( const U4x2& b ) const
-	{
-		return !(*this!=b);
-	}
+	bool operator == ( const U4x2& b ) const { return !(*this!=b); }
 
 	U8 operator * (const U4x2& b) const		{ return (U8)x*b.x + (U8)y*b.y;	}
 	U4x2 operator & (const U4x2& b) const	{ return U4x2( x*b.x, y*b.y );	}
-	U4x2 operator / (const U4x2& b) const
-	{
-		return U4x2( b.x ? x/b.x : 0xffffffff, b.y ? y/b.y : 0xffffffff );
-	}
-	U4x2 operator % (const U4x2& b) const
-	{
-		return U4x2( b.x ? x%b.x : 0, b.y ? y%b.y : 0 );
-	}
-	U4x2& operator *= ( U4 i )
-	{
+	U4x2 operator / (const U4x2& b) const	{ return U4x2( b.x ? x/b.x : 0xffffffff, b.y ? y/b.y : 0xffffffff ); }
+	U4x2 operator % (const U4x2& b) const { return U4x2( b.x ? x%b.x : 0, b.y ? y%b.y : 0 ); }
+	U4x2& operator *= ( U4 i ) {
 		if( !i )
 			return null();
 		if( i == 1 )
@@ -1980,8 +1966,7 @@ public:
 
 		return *this;
 	}
-	U4x2& operator /= ( U4 i )
-	{
+	U4x2& operator /= ( U4 i ) {
 		if( i == 1 )
 			return *this;
 
@@ -1996,8 +1981,7 @@ public:
 
 		return *this;
 	}
-	U4x2& operator %= ( U4 i )
-	{
+	U4x2& operator %= ( U4 i ) {
 		if( i == 1 )
 			return null();
 
@@ -2018,12 +2002,8 @@ public:
 	U4 mn() const 		{ return (!this?0:(x<y?x:y)); }
 	U4 mx() const 		{ return (!this?0:(x>y?x:y)); }
 
-	U4x2 abs( void ) const
-	{
-		return U4x2( x<0?-x:x, y<0?-y:y );
-	}
-	U4x2& mx( U4x2 b )
-	{
+	U4x2 abs( void ) const { return U4x2( x<0?-x:x, y<0?-y:y ); }
+	U4x2& mx( U4x2 b ) {
 		if( x < b.x )
 			x = b.x;
 		if( y < b.y )
@@ -2031,8 +2011,7 @@ public:
 		return *this;
 	}
 
-	U4x2& mn( const U4x2& b )
-	{
+	U4x2& mn( const U4x2& b ) {
 		if( x > b.x )
 			x = b.x;
 		if( y > b.y )
@@ -2042,6 +2021,117 @@ public:
 	U4x2& mx( I4x2 b );
 	U4x2& mn( I4x2 b );
 
+	U4 average( U4 n ) {
+		// vigyázz ez sorrendezi az értékeket
+		if( !this || n < 1 )
+			return 0;
+
+		if( n < 2 )
+			return this[0].y;
+		else if( n < 3 )
+			return (this[1].y+this[0].y)/2;
+
+
+		I8 avgr = 0;
+		for( U4 j = 0; j < n; j++ )
+			avgr += this[j].y;
+
+		return avgr / n;
+	}
+	U4 median( U4 n, U4x2* p_tree, bool b_inc = false ) {
+		// b_inc == true - incrementált növekvő sorban leszenk
+		// b_inc == false - dekrementáslt csökkenő sorban leszenk (nem definiálod akkor ez, azaz csökenő )
+		if( !this || n < 1 )
+			return 0;
+
+		if( n < 2 )
+			return this->y;
+
+		U4	i, j, l, r;
+		U4x2 x;
+
+		r = n;
+		while( r >= 1 ) {
+			// az öszes elem számát "r" elosztom 2-tővel kerekítés nélkül
+			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "l" lesz a küszöb
+			l = ldiv( r, 2 ).quot;
+			while( r > 0 ) {
+				// a következő elemet berakom az x-be
+				x = this[r-1];
+
+				i = r;
+				if ( i*2 <= n ) {
+					// i mutatja majd azt a helyet ahonva az x et be akarnám rakni
+					while( i*2 <= n ) {
+						j = i*2;
+						// azt jelenti, hogy az i nek van ága
+						if( j+1 <= n )
+						if( p_tree[j+1].y < p_tree[j].y )
+							j++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
+
+						if( x.y > p_tree[j].y ) {
+							// azt jelenti hogy az x nagyobb volt mint az ág ezért lejebb rakom a tartalmát
+							p_tree[i] = p_tree[j];
+							// és következő ciklusban az ágról akarom folytatni
+							i = j;
+						} else {
+							// azt jelenti, nincs ennél magasabb szám az ágakon
+							break;
+						}
+					}//while
+					p_tree[i] = x;
+				} else {
+					p_tree[r] = x;
+				}
+
+				// r-et csökkentem jöhet a következő elem
+				r--;
+			}
+		}
+		l = ldiv( r, 2).quot;
+		r = n;
+		i = 1;
+		while ( r >= 1 ) {
+			x = p_tree[r];
+			p_tree[r] = p_tree[1];
+			r--;
+			l = 1;
+			while ( l <= r ) {
+				i = l*2;
+				if ( i <= r ) {
+					if( i+1 <= r )
+					if( p_tree[i+1].y < p_tree[i].y )
+						i++;
+
+					if( x.y > p_tree[i].y ) {
+						p_tree[l] = p_tree[i];
+					} else {
+						p_tree[l] = x;
+						break;
+					}
+				} else {
+					p_tree[l] = x;
+					break;
+				}
+				l = i;
+			}//while
+
+		}
+
+		if( b_inc ) {
+			for( U4 i = 0; i < n; i++ )
+				this[i] = p_tree[n-i];
+			if( n < 3 )
+				return average( n );
+			return this[n/2].y;
+		}
+
+		gpmMcpyOF( this, p_tree+1, n );
+		if( n < 3 )
+			return average( n );
+
+		return this[n/2].y;
+	}
 };
 
 
@@ -2246,6 +2336,9 @@ public:
 		return n_t;
 	}
 
+	U8 sum( void ) const { return (I8)x + y + z + w; }
+	U8 volume( void ) const { return x*y*z*w; }
+
 	U4	dctADD( const void* pV, U4& m, U4x4& w );
 	U4  dctFND( U1* p_src, U4x4& w );
 
@@ -2267,10 +2360,7 @@ public:
     {
         struct { U8 x,y,z,w; };
         struct { U8 aXYZW[4]; };
-        struct {
-            gpeALF labe;
-            U8 mom, up, nx;
-        };
+        struct { gpeALF labe; U8 mom, up, nx; };
     };
     U8x4(){};
     U8x4( U8 _x, U8 _y = 0, U8 _z = 0, U8 _w = 0 ) { x = _x; y = _y; z = _z; w = _w; }
@@ -2464,6 +2554,7 @@ class I4x2 {
 public:
 	union{
 		struct{ int x,y; };
+		struct{ int i,n; };
 		struct{ div_t qr; };
 		struct{ U8 u8; };
 		struct{	gpeOPtyp	typ;
@@ -2500,7 +2591,6 @@ public:
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
-	// cnt = fract * U42(1, w);
 	I4x2& snail( I4 i ) {
 		if( !i )
 			return null();
@@ -2552,6 +2642,7 @@ public:
 
 		return *this;
 	}
+	// cnt = fract * U42(1, w);
 	I4x2& cnt2fract(U4 w, U8 cnt) {
 		U1 lg = log2(w * w);
 		w = 1<<(lg/2);
@@ -2602,9 +2693,7 @@ public:
 	}
 
 
-	I8 operator * (const I4x2& b) const {
-		return (I8)x*b.x + (I8)y * b.y;
-	}
+	I8 operator * (const I4x2& b) const { return (I8)x*b.x + (I8)y * b.y; }
 
 
 	I4x2 operator & (U8 b) const {
@@ -2850,26 +2939,7 @@ public:
 			y = b.y;
 		return *this;
 	}
-	I4 average( I4 n ) {
-		// vigyázz ez sorrendezi az értékeket
-		if( !this || n < 1 )
-			return 0;
 
-		if( n < 2 )
-		{
-			return this[0].y;
-		}
-		else if( n < 3 )
-		{
-			return (this[1].y+this[0].y)/2;
-		}
-
-		I8 avgr = 0;
-		for( U4 j = 0; j < n; j++ )
-			avgr += this[j].y;
-
-		return avgr / n;
-	}
 	I4x2& swp() {
 		int t = x;
 		x = y;
@@ -2900,6 +2970,24 @@ public:
 		y = x;
 		return YdivQR(b).swp();
 	}
+
+	I4 average( I4 n ) {
+		// vigyázz ez sorrendezi az értékeket
+		if( !this || n < 1 )
+			return 0;
+
+		if( n < 2 )
+			return this[0].y;
+		else if( n < 3 )
+			return (this[1].y+this[0].y)/2;
+
+
+		I8 avgr = 0;
+		for( U4 j = 0; j < n; j++ )
+			avgr += this[j].y;
+
+		return avgr / n;
+	}
 	I4 median( U4 n, I4x2* p_tree, bool b_inc = false ) {
 		// b_inc == true - incrementált növekvő sorban leszenk
 		// b_inc == false - dekrementáslt csökkenő sorban leszenk (nem definiálod akkor ez, azaz csökenő )
@@ -2913,30 +3001,25 @@ public:
 		I4x2 x;
 
 		r = n;
-		while( r >= 1 )
-		{
+		while( r >= 1 ) {
 			// az öszes elem számát "r" elosztom 2-tővel kerekítés nélkül
 			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "l" lesz a küszöb
 			l = ldiv( r, 2 ).quot;
-			while( r > 0 )
-			{
+			while( r > 0 ) {
 				// a következő elemet berakom az x-be
 				x = this[r-1];
 
 				i = r;
-				if ( i*2 <= n )
-				{
+				if ( i*2 <= n ) {
 					// i mutatja majd azt a helyet ahonva az x et be akarnám rakni
-					while( i*2 <= n )
-					{
+					while( i*2 <= n ) {
 						j = i*2;
 						// azt jelenti, hogy az i nek van ága
 						if( j+1 <= n )
 						if( p_tree[j+1].y < p_tree[j].y )
 							j++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
 
-						if( x.y > p_tree[j].y )
-						{
+						if( x.y > p_tree[j].y ) {
 							// azt jelenti hogy az x nagyobb volt mint az ág ezért lejebb rakom a tartalmát
 							p_tree[i] = p_tree[j];
 							// és következő ciklusban az ágról akarom folytatni
@@ -2958,23 +3041,19 @@ public:
 		l = ldiv( r, 2).quot;
 		r = n;
 		i = 1;
-		while ( r >= 1 )
-		{
+		while ( r >= 1 ) {
 			x = p_tree[r];
 			p_tree[r] = p_tree[1];
 			r--;
 			l = 1;
-			while ( l <= r )
-			{
+			while ( l <= r ) {
 				i = l*2;
-				if ( i <= r )
-				{
+				if ( i <= r ) {
 					if( i+1 <= r )
 					if( p_tree[i+1].y < p_tree[i].y )
 						i++;
 
-					if( x.y > p_tree[i].y )
-					{
+					if( x.y > p_tree[i].y ) {
 						p_tree[l] = p_tree[i];
 					} else {
 						p_tree[l] = x;
@@ -2989,8 +3068,7 @@ public:
 
 		}
 
-		if( b_inc )
-		{
+		if( b_inc ) {
 			for( U4 i = 0; i < n; i++ )
 				this[i] = p_tree[n-i];
 			if( n < 3 )
@@ -3685,29 +3763,13 @@ public:
 class I8x2 {
 public:
 	union{
-		struct {
-			I8 x,y;
-		};
-		struct {
-			gpeALF	alf;
-			I8		num;
-		};
-		struct {
-			gpeALF	a, b;
-		};
-		struct {
-			I4x2 i4x2[2];
-		};
-		struct {
-			U4x2 u4x2[2];
-		};
-
-		struct {
-			U8 ux,uy;
-		};
-		struct {
-			double dx,dy;
-		};
+		struct { I8 x,y; };
+		struct { gpeALF	alf; I8 num; };
+		struct { gpeALF	a, b; };
+		struct { I4x2 i4x2[2]; };
+		struct { U4x2 u4x2[2]; };
+		struct { U8 ux,uy; };
+		struct { double dx,dy; };
 	};
 
     I8x2(){};
@@ -3742,11 +3804,9 @@ public:
 		cnt %= X;
 		null();
 
-		while( cnt )
-		{
+		while( cnt ) {
 			w >>= 1;
-			switch(cnt&3)
-			{
+			switch(cnt&3) {
 				case 1:
 					x += w;
 					y += w;
@@ -3957,9 +4017,9 @@ public:
 	int alfFND( gpeALF af, int n );
 	int alfN( gpeALF af, int n );
 	int alfRIG( gpeALF af, int n, int r );
-	int aALFfnd( const gpeALF* aALF, int n, int nA );
+	int aALFvan( const gpeALF* aALF, int n, int nA );
 
-	void alfCON( char* pOUT, int nAT ) {
+	I8x2* alfCON( char* pOUT, int nAT ) {
 		I8x2* pAT = this;
 		if( !this )
 			nAT = 0;
@@ -3983,6 +4043,7 @@ public:
 			std::cout << at <<"."<< pOUT << " ";
 		}
 		std::cout << "nAT:" << at << std::endl;
+		return this;
 	}
 };
 
@@ -3990,40 +4051,21 @@ public:
 class I8x4 {
 public:
     union {
-        struct {
-            I8 x,y,z,w;
-        };
-        struct {
-            I8 A,B,C,D;
-        };
-        struct {
-            I8 aXYZW[4];
-        };
-        struct {
-            I8x2 a8x2[2];
-        };
-        struct {
-            gpeALF labe;
-            I8 mom, up, nx;
-        };
-        struct {
-            I4x4 ai4x4[2];
-        };
-        struct {
-            U4x4 au4x4[2];
-        };
-        struct {
-            U4x4 af4x4[2];
-        };
+        struct { I8 x,y,z,w; };
+        struct { I8 A,B,C,D; };
+        struct { I8 aXYZW[4]; };
+        struct { I8x2 a8x2[2]; };
+        struct { gpeALF labe; I8 mom, up, nx; };
+        struct { I4x4 ai4x4[2]; };
+        struct { U4x4 au4x4[2]; };
+        struct { U4x4 af4x4[2]; };
         ///-----------------------------------------
 		///
 		///				-= piMASS cmplr =-
 		///
 		///-----------------------------------------
-        struct /// src/mn/dct
-        {
-			I4 iS,nS,dctID,typ,px,py, clr,res;
-        };
+         /// src/mn/dct
+        struct { I4 iS,nS,dctID,typ,px,py, clr,res; };
     };
 	///-----------------------------------------
 	///
@@ -4035,13 +4077,8 @@ public:
 
 
     I8x4(){};
-    I8x4( I8 _x, I8 _y = 0, I8 _z = 0, I8 _w = 0 ) {
-        x = _x; y = _y; z = _z; w = _w;
-    }
-    I8x4( const I8x2& xy, const I8x2& zw ) {
-        a8x2[0] = xy;
-        a8x2[1] = zw;
-    }
+    I8x4( I8 _x, I8 _y = 0, I8 _z = 0, I8 _w = 0 ) { x = _x; y = _y; z = _z; w = _w; }
+    I8x4( const I8x2& xy, const I8x2& zw ) { a8x2[0] = xy; a8x2[1] = zw; }
     I8x4( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; };
     I8x4& operator = ( const I4x4& b ){ x = b.x; y = b.y; z = b.z; w = b.w; return *this; };
 
@@ -4339,24 +4376,11 @@ public:
 
     F2(){};
 
-    F2( I4 _x, I4 _y = 0 )
-    {
-        x = _x; y = _y;
-    }
-    F2( float _x, float _y = 0.0 )
-    {
-        x = _x; y = _y;
-    }
-    F2( float* pF )
-    {
-        gpmMcpyOF( this, pF, 1 );
-    }
-    F2( I4x2 xy )
-    {
-        x = xy.x; y = xy.y;
-    }
-    bool operator != ( const F2& b )
-    {
+    F2( I4 _x, I4 _y = 0 ) { x = _x; y = _y; }
+    F2( float _x, float _y = 0.0 ) { x = _x; y = _y; }
+    F2( float* pF ) { gpmMcpyOF( this, pF, 1 ); }
+    F2( I4x2 xy ) { x = xy.x; y = xy.y; }
+    bool operator != ( const F2& b ) {
 		if( x != b.x )
 			return true;
 		if( y != b.y )
@@ -4364,238 +4388,103 @@ public:
 
 		return false;
     }
-    bool operator == ( const F2& b )
-    {
-		return !(*this!=b);
-    }
+    bool operator == ( const F2& b ) { return !(*this!=b); }
 
-    F2& operator = ( I4 b )
-    {
-		x = b; y = 0;
-		return *this;
-    }
+    F2& operator = ( I4 b ) { x = b; y = 0; return *this; }
 
-    F2& operator = ( const I4x2& xy )
-    {
-		x = xy.x; y = xy.y;
-		return *this;
-    }
+    F2& operator = ( const I4x2& xy ) { x = xy.x; y = xy.y; return *this; }
 
-	F2& operator += ( const float b )
-    {
-		x += b; y += b;
-		return *this;
-    }
-    F2& operator -= ( const float b )
-    {
-		x -= b; y -= b;
-		return *this;
-    }
-    F2& operator *= ( const float b )
-    {
-		x *= b; y *= b;
-		return *this;
-    }
-    F2& operator %= ( const float b )
-    {
-		x = frac(x/b); y = frac(y/b);
-		return *this;
-    }
-    F2& operator /= ( const float b )
-    {
-		x /= b; y /= b;
-		return *this;
-    }
+	F2& operator += ( const float b ) { x += b; y += b; return *this; }
+    F2& operator -= ( const float b ) { x -= b; y -= b; return *this; }
+    F2& operator *= ( const float b ) { x *= b; y *= b; return *this; }
+    F2& operator %= ( const float b ) { x = frac(x/b); y = frac(y/b); return *this; }
+    F2& operator /= ( const float b ) { x /= b; y /= b; return *this; }
 
 
-    F2& operator += ( const F2& xy )
-    {
-		x += xy.x; y += xy.y;
-		return *this;
-    }
-    F2& operator -= ( const F2& xy )
-    {
-		x -= xy.x; y -= xy.y;
-		return *this;
-    }
-    F2& operator &= ( const F2& xy )
-    {
-		x *= xy.x; y *= xy.y;
-		return *this;
-    }
-    F2& operator %= ( const F2& xy )
-    {
-		x = frac(x/xy.x); y = frac(y/xy.y);
-		return *this;
-    }
-    F2& operator /= ( const F2& xy )
-    {
-		x /= xy.x; y /= xy.y;
-		return *this;
-    }
+    F2& operator += ( const F2& xy ) { x += xy.x; y += xy.y; return *this; }
+    F2& operator -= ( const F2& xy ) { x -= xy.x; y -= xy.y; return *this; }
+    F2& operator &= ( const F2& xy ) { x *= xy.x; y *= xy.y; return *this; }
+    F2& operator %= ( const F2& xy ) { x = frac(x/xy.x); y = frac(y/xy.y); return *this; }
+    F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
+	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
+	F2& swpXY( const void* pV );
 
-    double sum( void ) const
-    {
-        return x+y;
-    }
-    double qlen( void ) const
-    {
-        return x*x+y*y;
-    }
-    F2 norm( void ) const
-	{
+    double sum( void ) const { return x+y; }
+    double qlen( void ) const { return x*x+y*y; }
+    F2 norm( void ) const {
         float l = sqrt(qlen());
 		return F2( x/l, y/l );
 	}
-	float dot( const F2& b ) const
-	{
-        return x*b.x + y*b.y;
-	}
+	float dot( const F2& b ) const { return x*b.x + y*b.y; }
 
-	F2 operator + ( float b ) const
-	{
-        return F2( x+b, y+b );
-	}
-	F2 operator - ( float b ) const
-	{
-        return F2( x-b, y-b );
-	}
-	F2 operator * ( float b ) const
-	{
-        return F2( x*b, y*b );
-	}
-	F2 operator / ( float b ) const
-	{
-        return F2( x/b, y/b );
-	}
+	F2 operator + ( float b ) const { return F2( x+b, y+b ); }
+	F2 operator - ( float b ) const { return F2( x-b, y-b ); }
+	F2 operator * ( float b ) const { return F2( x*b, y*b ); }
+	F2 operator / ( float b ) const { return F2( x/b, y/b ); }
 
-	F2 operator + ( const F2& b ) const
-	{
-        return F2( x+b.x, y+b.y );
-	}
-	F2 operator - ( const F2& b ) const
-	{
-        return F2( x-b.x, y-b.y );
-	}
-	float operator * ( const F2& b ) const
-	{
-        return x*b.x+y*b.y;
-	}
-	F2 operator & ( const F2& b ) const
-	{
-        return F2( x*b.x, y*b.y );
-	}
-	F2 operator / ( const F2& b ) const
-	{
-        return F2( x/b.x, y/b.y );
-	}
-	F2& add( F2 b, U4 n )
-	{
+	F2 operator + ( const F2& b ) const { return F2( x+b.x, y+b.y ); }
+	F2 operator - ( const F2& b ) const { return F2( x-b.x, y-b.y ); }
+	float operator * ( const F2& b ) const { return x*b.x+y*b.y; }
+	F2 operator & ( const F2& b ) const { return F2( x*b.x, y*b.y ); }
+	F2 operator / ( const F2& b ) const { return F2( x/b.x, y/b.y ); }
+	F2& add( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] += b;
 
 		return *this;
 	}
-	F2& sub( F2 b, U4 n )
-	{
+	F2& sub( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] -= b;
 
 		return *this;
 	}
-	F2& mul( F2 b, U4 n )
-	{
+	F2& mul( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] &= b;
 
 		return *this;
 	}
-	F2& div( F2 b, U4 n )
-	{
+	F2& div( F2 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
 			this[i] /= b;
 
 		return *this;
 	}
 
-	F2 left()
-	{
-		return F2(-y,x);
-	}
-	F2 right()
-	{
-		return F2(y,-x);
-	}
-	F2 SCRlft()
-	{
-		return right();
-	}
-	F2 SCRrig()
-	{
-		return left();
-	}
+	F2 left() { return F2(-y,x); }
+	F2 right() { return F2(y,-x); }
+	F2 SCRlft() { return right(); }
+	F2 SCRrig() { return left(); }
 };
 
 class F4 {
 public:
-	union
-	{
-		struct
-		{
-			float x,y,z,w;
-		};
-		struct
-		{
-			float A,B,C,D;
-		};
-		struct
-		{
-			float ry,rp,rr,r0;
-		};
-		struct
-		{
-			float aXYZW[4];
-		};
-		struct
-		{
-			F2	aF2[2];
-		};
+	union {
+		struct { float x,y,z,w; };
+		struct { float A,B,C,D; };
+		struct { float ry,rp,rr,r0; };
+		struct { float aXYZW[4]; };
+		struct { U4 uXYZW[4]; };
+		struct { U1x4 aU1x4[4]; };
+		struct { F2	aF2[2]; };
 	};
 
     F4(){};
-    F4( I4 _x, I4 _y=0, I4 _z=0, I4 _w=0 ) {
-        x = _x; y = _y; z = _z; w = _w;
-    }
-    F4( float _x, float _y = 0.0, float _z = 0.0, float _w = 0.0 ) {
-        x = _x; y = _y; z = _z; w = _w;
-    }
-    F4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 ) {
-        x = _x; y = _y; z = _z; w = _w;
-    }
-    F4( float* pF ) {
-        gpmMcpyOF( this, pF, 1 );
-    }
-    F4( I4x2 xy, I4x2 zw = 0 ) {
-        aF2[0] = xy;
-        aF2[1] = zw;
-    }
-    F4( const I4x4 i4 ) {
-        aF2[0] = i4.a4x2[0];
-        aF2[1] = i4.a4x2[1];
-    }
-	F4& operator = ( const I4x4 i4 ) {
-        aF2[0] = i4.a4x2[0];
-        aF2[1] = i4.a4x2[1];
-        return *this;
-    }
+    F4( I4 _x, I4 _y=0, I4 _z=0, I4 _w=0 ) { x = _x; y = _y; z = _z; w = _w; }
+    F4( float _x, float _y = 0.0, float _z = 0.0, float _w = 0.0 ) { x = _x; y = _y; z = _z; w = _w; }
+    F4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 ) { x = _x; y = _y; z = _z; w = _w; }
+    F4( float* pF ) { gpmMcpyOF( this, pF, 1 ); }
+    F4( I4x2 xy, I4x2 zw = 0 ) { aF2[0] = xy; aF2[1] = zw; }
+    F4( const I4x4 i4 ) { aF2[0] = i4.a4x2[0]; aF2[1] = i4.a4x2[1]; }
+	F4& operator = ( const I4x4 i4 ) { aF2[0] = i4.a4x2[0]; aF2[1] = i4.a4x2[1]; return *this; }
     size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
 		return sprintf( pBUFF, "%8.2f%s%8.2f%s%8.2f%s%8.2f%s%s", x, pSeP, y, pSeP, z, pSeP, w, pSeP, pENT );
     }
-    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
-		str( pBUFF, pSeP, pENT );
-		return pBUFF;
-    }
+    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) { str( pBUFF, pSeP, pENT ); return pBUFF; }
+
+
 	F4 sqrt() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z),sqrtf(w)); }
     F4 sqrt_xyz0() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z)); }
     double sum( void ) const		{ return x+y+z+w; }
@@ -4603,18 +4492,19 @@ public:
     double qlen( void ) const		{ return x*x+y*y+z*z+w*w; }
     double qlen_xyz( void ) const	{ return x*x+y*y+z*z; }
 
-    F4 N3( void ) const {
+    F4 N3( void ) const { /// NORMALIZE
         float l = sqrtf(qlen_xyz());
 		return F4( x/l, y/l, z/l );
 	}
 	float dot_xyz( F4 b ) const { return x*b.x + y*b.y + z*b.z; }
-    F4 X3( F4 b ) const {
+    F4 X3( F4 b ) const {	/// CROSS PRODUCT
 		return F4(
 						y * b.z - z * b.y,
 						z * b.x - x * b.z,
 						x * b.y - y * b.x
 				);
 	}
+	F4 xyz1() const { return F4(x,y,z,1.0);}
 
 	F4  cos() const { return F4(  cosf(x), cosf(y), cosf(z), cosf(w)); };
 	F4  sin() const { return F4(  sinf(x), sinf(y), sinf(z), sinf(w)); };
@@ -4672,8 +4562,13 @@ public:
 	F4 operator * ( const F4x4& b ) const;
 	F4& operator /= ( const F4x4& b );
 	F4 operator / ( const F4x4& b ) const;
+
 	F4& xyz_( F4 b ) { aF2[0] = b.aF2[0]; z = b.z; return *this; }
-	F4 xyz0() const { return F4(x,y,z); }
+	F4	xyz0() const { return F4(x,y,z); }
+	F4&	abLOAD( char* pS, U4 nS, gpeALF alfS, U1** ppV, size_t* pN );
+	F4&	sXYZW( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
+	F4&	swpXYZ0( const void* pV );
+
 	F4 abs() const { return F4(x>=0.0?x:-x,y>=0.0?y:-y,z>=0.0?z:-z,w>=0.0?w:-w); }
 	F4& add( F4 b, U4 n ) {
 		for( U4 i = 0; i < n; i++ )
@@ -4790,6 +4685,13 @@ public:
 		w = pF[12];
 		return *this;
 	}
+	F4& col4x3( const float* pF ) {
+		x = pF[0];
+		y = pF[4];
+		z = pF[8];
+		w = 0.0;
+		return *this;
+	}
 
 	F4 abs0( void ) const { return F4( x<0 ? -x: x, y<0 ? -y: y, z<0 ? -z: z ); }
 
@@ -4870,6 +4772,7 @@ public:
 		pB += t.str( pB, pSeP, pENT );
 		return pB-pBUFF;
     }
+	F4x4& latR( F4 e, F4 c, F4 u );
 
 	F4x4& operator = ( float a ) {
 		gpmCLR;
@@ -4935,12 +4838,19 @@ public:
 		t /= b.w;
 		return *this;
 	};
-	F4x4 transp() {
+	F4x4 T4x4() {
 		F4x4 c;
 		c.x.col4x4(&x.x);
 		c.y.col4x4(&x.y);
 		c.z.col4x4(&x.z);
 		c.t.col4x4(&x.w);
+		return c;
+	}
+	F4x4 T3x3() {
+		F4x4 c = *this;
+		c.x.col4x3(&x.x);
+		c.y.col4x3(&x.y);
+		c.z.col4x3(&x.z);
 		return c;
 	}
 	F4x4& operator *= ( const F4x4& b ) {
@@ -5308,63 +5218,52 @@ public:
 		return o;
 	}
 
+	F4x4& lat( F4x4 e, F4x4 c, F4x4 u );
 };
 
 class D4 {
 public:
     double x,y,z,w;
     D4(){};
-    D4( I4 _x, I4 _y, I4 _z, I4 _w )
-    {
+    D4( I4 _x, I4 _y, I4 _z, I4 _w ) {
         x = _x; y = _y; z = _z; w = _w;
     }
-    D4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 )
-    {
+    D4( double _x, double _y = 0.0, double _z = 0.0, double _w = 0.0 ) {
         x = _x; y = _y; z = _z; w = _w;
     }
-    D4( double* pD )
-    {
+    D4( double* pD ) {
         gpmMcpyOF( this, pD, 1 );
     }
-    double sum( void ) const
-    {
+    double sum( void ) const {
         return x+y+z+w;
     }
-    double sum_xyz( void ) const
-    {
+    double sum_xyz( void ) const {
         return x+y+z;
     }
-    double qlen( void ) const
-    {
+    double qlen( void ) const {
         return x*x+y*y+z*z+w*w;
     }
-    double qlen_xyz( void ) const
-    {
+    double qlen_xyz( void ) const {
         return x*x+y*y+z*z;
     }
-    D4 N3( void ) const
-	{
+    D4 N3( void ) const {
         double l = sqrt(qlen_xyz());
 		return D4( x/l, y/l, z/l );
 	}
-	double dot_xyz( D4 b ) const
-	{
+	double dot_xyz( D4 b ) const {
         return x*b.x + y*b.y + z*b.z;
 	}
-    D4 X3( D4 b ) const
-	{
+    D4 X3( D4 b ) const {
 		return D4(
 						y * b.z - z * b.y,
 						z * b.x - x * b.z,
 						x * b.y - y * b.x
 				);
 	}
-	D4 operator + ( const D4& b ) const
-	{
+	D4 operator + ( const D4& b ) const {
         return D4( x+b.x, y+b.y, z+b.z, w+b.w );
 	}
-	D4 operator - ( const D4& b ) const
-	{
+	D4 operator - ( const D4& b ) const {
         return D4( x-b.x, y-b.y, z-b.z, w-b.w );
 	}
 };
@@ -5645,8 +5544,7 @@ typedef enum gpeAT:U4{
 } gpeAT;
 class gpcLZY {
 public:
-	union
-	{
+	union {
 		struct{
 			U1* p_alloc, aXYZW[4], aSET[4];
 
@@ -5661,7 +5559,14 @@ public:
 			U8		n_l8, n_a8;
 		};
 	};
+	gpcLZY* null(){
+		if(!this)
+			return this;
 
+		gpmDELary(p_alloc);
+		gpmCLR;
+		return this;
+	}
 	gpcLZY( void ) { gpmCLR; }
 	gpcLZY( U1 n ) {
 		gpmCLR;
@@ -5672,9 +5577,9 @@ public:
 		aSET[gpeLZYxN] = n;
 	}
 	gpcLZY( gpcVAR* pALF, U4 n );
-
-	~gpcLZY() { gpmFREE( p_alloc ); }
-	size_t nLD( size_t n = 1 ) { return this ? n_load/n : 0; }
+	gpcLZY( const gpcLZY& b );
+ 	~gpcLZY() { gpmFREE( p_alloc ); }
+	size_t nLD( size_t n = 1 ) const { return this ? n_load/n : 0; }
 	U8 nSUM(){
 		U8 sum = nLD();
 		if( !sum )
@@ -5766,16 +5671,6 @@ public:
 		return pM+iM;
 	}
 
-	U1x4* pU1x4( U4x4& m, U4 nX ) {
-		if( !this )
-			return NULL;
-
-		U4 nLIM = (n_alloc-sizeof(U4x4)*nX)/(nX*sizeof(U1x4));
-		if( m.w >= nLIM )
-			return NULL;
-
-		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
-	}
 
 	U4 nPC( void );
 
@@ -5938,13 +5833,11 @@ public:
 		if( n_load*2 < n_alloc )
 		{
 			U8 new_alloc = gpmPAD( ((n_alloc*3)/4), 0x10 );
-			if( !new_alloc )
-			{
+			if( !new_alloc ) {
 				(*p_alloc) = n_load = 0;
 				return this;
 			}
-			else if( n_alloc > new_alloc )
-			{
+			else if( n_alloc > new_alloc ) {
 				gpmFREE( p_alloc );
 				n_alloc = new_alloc;
 				p_alloc = gpmALLOC( n_alloc+0x10 );
@@ -5973,7 +5866,8 @@ public:
 			p_lazy->n_load = n_byte;
 			return p_lazy;
 		}
-
+		if( n > 0x80 )
+			n = 4;
 		if( !n )
 		{
 			if( !aSET[gpeLZYxN] )
@@ -5993,8 +5887,7 @@ public:
 		if( p_alloc ? (n_load+n_byte > n_alloc) : true ) {
 			U1* p_kill = p_alloc;
 			n_alloc = gpmPAD( (n_load+n_byte*n), 0x10 );
-            p_alloc = NULL;
-			p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
+            p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
 			if( p_kill )
 			{
 				gpmMcpy( p_alloc, p_kill, n_load );
@@ -6165,23 +6058,19 @@ public:
 
 	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub, U1 n = 0 ) {
 		if( !this )
-		{
-			//start = n_u1;
 			return lzyADD( p_u1, n_u1, iSTRT, n );
-		}
 		lzy_exp( iSTRT, n_sub,  n_u1, n );
 		gpmMcpyOF( p_alloc+iSTRT, p_u1, n_u1 );
 		return this;
 	}
-	gpcLZY& operator = ( const gpcLZY& plus ) {
+	gpcLZY& operator = ( const gpcLZY& b ) {
 		U8 s = 0;
-		lzyINS( plus.p_alloc, plus.n_load, s, -1 );
-
+		lzyINS( b.p_alloc, b.nLD(), s, -1 );
 		return *this;
 	}
 	gpcLZY* operator += ( const gpcLZY& plus ) {
 		U8 s = -1;
-		return lzyADD( plus.p_alloc, plus.n_load, s );
+		return lzyADD( plus.p_alloc, plus.nLD(), s );
 	}
 	gpcLZY* lzyDIR( const char* p_file, U8& iSTRT );
 	gpcLZY* lzyRD( const char* p_file, U8& iSTRT, U1 n = 0 ) {
@@ -6317,20 +6206,23 @@ szasz:
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
 	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 ) {
+		if( !this )
+			return NULL;
+
 		if( iPC < 0 )
 			iPC *= -1;
 		if( !stp )
 			stp = n;
 		U8	e = iPC*stp + n;
-		if( e <= n_load )
+		if( e <= nLD() )
 			 return p_alloc + iPC*stp; //n;
 
 		U8 s = -1, ee = e+n*3;
 
-		lzyADD( NULL, ee-n_load, s, -1 );
+		lzyADD( NULL, ee-nLD(), s );
 		if( bZ )
-			gpmZn( p_alloc+s, n_load-s );
-		if( n_load > e )
+			gpmZn( p_alloc+s, nLD()-s );
+		if( nLD() > e )
 			n_load = e;
 
         return p_alloc + iPC*stp; //*n;//+e-n*2;
@@ -6345,7 +6237,7 @@ szasz:
 		ins.op = U1x4( op, ((U1)s0<<3)|(sn&7), ((U1)d0<<3)|(dn&7), (di<<4)|(si&7) ).u4;
 		return ins;
 	}
-	int nAT( char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
+	int nAT( const char* pSat, int nSat = 0, const char* pFILT = " \r\n\t:+," );
 	gpcLZY* utf8( U4 u, U1 trans = '\a' ) {
 		if( !u )
 			return this;
@@ -6381,6 +6273,56 @@ szasz:
 		U8 s=-1;
 		return pLZY->lzyADD( aU, nU, s );
 	}
+	U1* pU1n( int i = 0, int n = 1 ) {
+		if( !this )
+			return NULL;
+		if( !i )
+			return p_alloc;
+
+		i *= n;
+		if( i >= nLD() )
+			return NULL;
+
+		return p_alloc+i;
+	}
+
+	U1x4* pU1x4( U4x4& m, U4 nX ) {
+		if( !this )
+			return NULL;
+
+		U4 nLIM = (n_alloc-sizeof(U4x4)*nX)/(nX*sizeof(U1x4));
+		if( m.w >= nLIM )
+			return NULL;
+
+		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
+	}
+	I8 nU4( I8 x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
+	U4* pU4n( int i = 0, int n = 1 ) { return (U4*)Ux( (i<0 ? nLD(sizeof(U4)): i) , sizeof(U4)*n, true, sizeof(U4)); }
+	U4x2* pU4x2n( int i = 0, int n = 1 ) { return (U4x2*)Ux((i<0 ? nLD(sizeof(U4x2)): i),sizeof(U4x2)*n, true, sizeof(U4x2)); }
+	U4x4* pU4x4n( int i = 0, int n = 1 ) { return (U4x4*)Ux((i<0 ? nLD(sizeof(U4x4)): i),sizeof(U4x4)*n, true, sizeof(U4x4)); }
+
+	char* pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
+	I1* pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
+
+	U4* pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
+	U4x2* pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
+	U4x4* pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
+
+	I4* pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
+	I4x2* pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
+	I4x4* pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
+
+	I8x2* pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
+	I8x4* pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
+	U8x4* pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
+	float* pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
+	F2* pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
+	F4* pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
+	F4x4* pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
+	D4* pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
+	void** ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
+
+
 };
 
 
@@ -6404,12 +6346,13 @@ public:
 		str.lzyRST();
 		ix.lzyRST();
 	}
-	U4 dctFND( U1* pS, U8 nS, U4& nIX ) {
+	U4 dctFND( const void* p, U8 nS, U4& nIX ) {
 		if( !this )
 		{
 			nIX = 0;
 			return 0;
 		}
+		U1* pS = (U1*)p;
 		U8 aSTRT[2]; // = -1;
 		if( !str.p_alloc )
 			ver = 0;

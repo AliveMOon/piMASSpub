@@ -66,7 +66,11 @@ gpcLZY::gpcLZY( gpcVAR* pVAR, U4 n ) {
 		tree_add( pVAR[i].alf, nI8 );
 	}
 }
-
+gpcLZY::gpcLZY( const gpcLZY& b ) {
+	gpmCLR;
+	U8 s = 0;
+	lzyADD( b.p_alloc, b.nLD(), s, 2 );
+}
 gpcLZY 	gpLZYvar( gpVAR, gpmN(gpVAR) ),
 		gpLZYfun( gpFUN, gpmN(gpFUN) );
 

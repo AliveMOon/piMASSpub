@@ -544,12 +544,15 @@ public:
 	U4				id, iSRC, aiQC[2],
 					nPIXall, nPIX,
 					nBOBall, nBOB,
+					tC,tD,
 
 					bppS, nPKavg;
+	U4x4			glRNDR;
 
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
-	SDL_Texture		*pTX,*pTXlock,*pRTX;
+	SDL_Texture		*pTX,*pTXlock;
+	//gpcPIC		*pRTX;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
@@ -570,7 +573,7 @@ public:
 
 		gpmDELary(ppBOB);
 		gpmSDL_FreeTX(pTX);
-		gpmSDL_FreeTX(pRTX);
+		//gpmSDL_FreeTX(pRTX);
 		gpmSDL_FreeSRF(pSRF);
 		gpmSDL_FreeSRF(pSHR);
 
@@ -581,6 +584,36 @@ public:
 		id = i;
 		TnID = an;
 	}
+	/*SDL_Texture* pPICrtx2( SDL_Renderer* pRNDR, I4x2 wh ) {
+		if( !this )
+			return NULL;
+
+		if( txWH.a4x2[1] != wh ) {
+			gpmSDL_FreeTX( pRTX );
+			if( gDid ) {
+				glDeleteRenderbuffers(1,&gDid);
+				gDid = 0;
+			}
+		}
+
+		if(!pRTX) {
+			pRTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
+			if(!pRTX)
+				return NULL;
+			txWH.a4x2[1] = wh;
+			if( !gDid ) {
+				glGenRenderbuffers(1,&gDid);
+				glBindRenderbuffer(GL_RENDERBUFFER, gDid );
+				glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, wh.x, wh.y );
+			}
+		}
+
+		return pRTX;
+	}*/
+	U4x4 pPICrtxFREE();
+
+	SDL_Surface* pPICrtxSRF();
+	gpcPIC* pPICrtx( gpcPIC* pOLD, I4x2 wh );
 
 	U1* getPIX() {
 		if( !this )

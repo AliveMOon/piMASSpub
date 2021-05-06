@@ -159,9 +159,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 
 	pSDLwin = SDL_CreateWindow(	"Custom shader with SDL2 renderer!", SDL_WINDOWPOS_CENTERED,
 								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL );
-
 	SDL_SetHint( SDL_HINT_RENDER_DRIVER, "1" );
-
+	//
 	pSDLrndr = SDL_CreateRenderer(	pSDLwin, -1,
 									SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
@@ -180,15 +179,6 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	if( pSRFchar != pSRFload )
 		gpmSDL_FreeSRF( pSRFload );
 
-	/*
-	chrPIC.x = 8;
-	chrPIC.y = 32;
-	chrPIC.w = pSRFchar->w/chrPIC.x;
-	chrPIC.h = pSRFchar->h/chrPIC.y;
-	U1x4* pC = (U1x4*)((char*)pSRFchar->pixels + 4*pSRFchar->pitch);
-	for( U4 i = 0; i < 0x80; i++ )
-		pC[(i>>4)*pSRFchar->w + (i&0xf)] = 0x01010101*(gpsHUNtx[i]-' ');
-	*/
 	/// sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
 
 	/// mkdir /piMASS
@@ -333,7 +323,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 					->glDRW( w.a4x2[0], FRMwh );
 				}
 
-				pGL->SWP( pSDLwin );
+				pGL->SWP( this ); //pSDLwin );
 			}
 
 			*gppKEYbuff = 0;

@@ -495,25 +495,6 @@ public:
 		if(!bSTDcout)
 			return;
 		pAT->alfCON(sOUT,nAT);
-		/*int at = 0;
-		for( ; at < nAT; at++ ) {
-			switch(pAT[at].alf){
-				case gpeALF_PLUS:
-					sprintf( sOUT, "+%lld", pAT[at].num );
-					break;
-				case gpeALF_CM:
-					sprintf( sOUT, ",%lld", pAT[at].num );
-					break;
-				case gpeALF_MRK:
-					sprintf( sOUT, "\"%lld\r\n", pAT[at].num);
-					break;
-				default:
-					pAT[at].an2str( sOUT );
-					break;
-			}
-			std::cout << at <<"."<< sOUT << " ";
-		}
-		std::cout << "nAT:" << at << std::endl;*/
 	}
 
 	int answCPIN( char* pANSW, int* pSUB, char* pS, I8x2 *pAT, int nAT, int iPLUS, int pin ) {
@@ -574,7 +555,7 @@ public:
 	int answ2csq( char* pANSW, I8x2 *pAT, int nAT, char* pS, int n ) {
 		*pANSW = 0;
 
-		int	iOK = pAT->aALFfnd( aALFmost, nAT, gpmN(aALFmost));
+		int	iOK = pAT->aALFvan( aALFmost, nAT, gpmN(aALFmost));
 		pS+=pAT[0].num+1;
 		CSQ.x = gpfSTR2I8( pS, &pS );
 		pS++;
@@ -585,7 +566,7 @@ public:
 	int answ2reg( char* pANSW, I8x2 *pAT, int nAT, char* pS, int n ) {
 		*pANSW = 0;
 
-		int	iOK = pAT->aALFfnd( aALFmost, nAT, gpmN(aALFmost)),
+		int	iOK = pAT->aALFvan( aALFmost, nAT, gpmN(aALFmost)),
 			iCR = 0, nCM = 0;
 
 		switch( pS[pAT->num] ){
@@ -605,7 +586,7 @@ public:
 		}
 
 		if( iCR > iOK )
-			iOK = iCR + pAT[iCR].aALFfnd( aALFmost, nAT-iCR, gpmN(aALFmost));
+			iOK = iCR + pAT[iCR].aALFvan( aALFmost, nAT-iCR, gpmN(aALFmost));
 		for( U4 i = iCR; i < iOK; i++ ) {
 			if( pAT[i].alf == gpeALF_CM )
 				nCM++;
@@ -693,7 +674,7 @@ public:
 	}
 	int answ2gps( char* pANSW, I8x2 *pAT, int nAT, char* pS ) {
 		*pANSW = 0;
-		int iOK = pAT->alfFND( gpeALF_OK, nAT ); //pAT->aALFfnd( aALFok, nAT, gpmN(aALFok) );
+		int iOK = pAT->alfFND( gpeALF_OK, nAT ); //pAT->aALFvan( aALFok, nAT, gpmN(aALFok) );
 		if(iOK>nAT)
 			return nAT;
 		char	*pSi, *pSe, *pSl;
@@ -759,7 +740,7 @@ public:
 	}
 	int answCMGRD( char* pANSW, I8x2 *pAT, int nAT, char* pS, const gpeALF* pOKer, int nOKer, gpcWIN* pWIN  ) {
 		*pANSW = 0;
-		int iOK = pAT->aALFfnd( pOKer, nAT, nOKer );
+		int iOK = pAT->aALFvan( pOKer, nAT, nOKer );
 		if( iOK >= nAT )
 			return nAT;
 		int aiPN[6];
@@ -940,45 +921,45 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 		}
 		else if( !pOUT ){
 			int nCNT = 0;
-			pOUT = pOUT->lzyADD( pGSM ? pGSM : &gsmZERO, sizeof(gsmZERO), (s=0), -1 );
+			pOUT = pOUT->lzyADD( pGSM ? pGSM : &gsmZERO, sizeof(gsmZERO), (s=0) );
 			iCNT = pOUT->nLD();
 			/// 0 CRESET
-			pOUT = pOUT->lzyADD( sGSMreset, gpmSTRLEN(sGSMreset)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMreset, gpmSTRLEN(sGSMreset)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 1 CREG
-			pOUT = pOUT->lzyADD( sGSMreg, gpmSTRLEN(sGSMreg)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMreg, gpmSTRLEN(sGSMreg)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 2 IDLE
-			pOUT = pOUT->lzyADD( sGSMidle, gpmSTRLEN(sGSMidle)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMidle, gpmSTRLEN(sGSMidle)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 2 WAIT ATA
-			pOUT = pOUT->lzyADD( sGSMwait, gpmSTRLEN(sGSMwait)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMwait, gpmSTRLEN(sGSMwait)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 4 	VOICE CALL END
-			pOUT = pOUT->lzyADD( sGSMhup, gpmSTRLEN(sGSMhup)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMhup, gpmSTRLEN(sGSMhup)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 5 	VOICE CALL BEGIN
-			pOUT = pOUT->lzyADD( sGSMansw, gpmSTRLEN(sGSMansw)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMansw, gpmSTRLEN(sGSMansw)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 6	VOICE CALL chat
-			pOUT = pOUT->lzyADD( sGSMchat, gpmSTRLEN(sGSMchat)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMchat, gpmSTRLEN(sGSMchat)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
 			/// 7	VOICE CALL
-			pOUT = pOUT->lzyADD( sGSMcall, gpmSTRLEN(sGSMcall)+1, (s=-1), -1 );
+			pOUT = pOUT->lzyADD( sGSMcall, gpmSTRLEN(sGSMcall)+1, (s=-1) );
 			aGSMcnt[nCNT] = s;
 			++nCNT;
 
@@ -1006,7 +987,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	if( nR > 0 ) {
 		nR = read( socket, pANSW, nR );
 		if( nR > 0 )
-			pINP = pINP->lzyADD( pANSW, nR, s=-1, -1 );
+			pINP = pINP->lzyADD( pANSW, nR, s=-1 );
 		nINP = pINP->nLD();
 	}
 
@@ -1021,7 +1002,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 								<< pS <<std::endl; }
 		pGSM->so( pAT, nAT );
 
-		iA = pAT->aALFfnd(aALFat, nAT, gpmN(aALFat));
+		iA = pAT->aALFvan(aALFat, nAT, gpmN(aALFat));
 		if( iA >= nAT )
 			iA = 0;
 		switch( pAT[iA].alf ) {
@@ -1033,10 +1014,10 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 					/// --------------------- CRESET BEGIN ----------------------------	//
 					case gpeALF_CRESET: 												///
-						iA2 = iA2 + pAT[iA2].aALFfnd(  aALFat, nAT-iA2, gpmN(aALFat));	///
+						iA2 = iA2 + pAT[iA2].aALFvan(  aALFat, nAT-iA2, gpmN(aALFat));	///
 						if( pAT[iA2].alf == gpeALF_PLUS ){
 							iA2++;
-							iA2 = iA2 + pAT[iA2].aALFfnd(  aALFat, nAT-iA2, gpmN(aALFat));
+							iA2 = iA2 + pAT[iA2].aALFvan(  aALFat, nAT-iA2, gpmN(aALFat));
 
 						}
 
@@ -1079,45 +1060,45 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CLIP: {
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CMTI: {
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CGPSINFO: {
-						//iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						//iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						iA2 += pGSM->answ2gps( pANSW, pAT+iA2, nAT-iA2, pS ); // cgps = pS+pAT[2].num;
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CSQ: {
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CGPS: {
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CGMR: {
 						iA2+=2;
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CMGR: {
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CMGRD: {
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					case gpeALF_CPMS: {
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 					} break;
 					default:
-						iA2 += pAT[iA2].aALFfnd( aALFok, nAT-iA2, gpmN(aALFok) );
+						iA2 += pAT[iA2].aALFvan( aALFok, nAT-iA2, gpmN(aALFok) );
 						aSUB[1] = pAT[iA2].y;
 						break;
 				}
@@ -1130,7 +1111,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 					aSUB[1] = pAT[iA].y;
 					break;
 				}
-				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+				iA += pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				aSUB[1] = pAT[iA].y;
 
 			} break;
@@ -1138,7 +1119,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 				aSUB[1] = aSUB[0] = pAT[iA].y-3;	// ATA
 				pGSM->iW = 0;
 				iA++;
-				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+				iA += pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				if( iA >= nAT )
 					break;
 				aSUB[1] = pAT[iA].y;
@@ -1147,7 +1128,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 			case gpeALF_CSDVC: {
 				aSUB[1] = aSUB[0] = pAT[iA].y-5;	// CSDVC
 				iA++;
-				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+				iA += pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				if( iA >= nAT )
 					break;
 				aSUB[1] = pAT[iA].y;
@@ -1172,7 +1153,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 			case gpeALF_CLIP:{
 				aSUB[1] = aSUB[0] = gpmMAX(0,pAT[iA].y-5);	//+CLIP
 				iA += pGSM->answCLIP( pANSW, pAT+iA, nAT-iA, pS );
-						//pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+						//pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				aSUB[1] = pAT[iA].y;
 			} break;
 
@@ -1192,7 +1173,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 			case gpeALF_VOICE:{
 				aSUB[1] = aSUB[0] = gpmMAX(0,pAT[iA].y-5);	//VOICE
 				iA2 = iA+1;
-				iA2 += pAT[iA2].aALFfnd(aALFvoice, nAT-iA2, gpmN(aALFvoice));
+				iA2 += pAT[iA2].aALFvan(aALFvoice, nAT-iA2, gpmN(aALFvoice));
 				switch( pAT[iA2].alf ) {
 					case gpeALF_begin: {
 
@@ -1216,7 +1197,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 			case gpeALF_MISSED:{
 				aSUB[1] = aSUB[0] = pAT[iA].y-6;	//MISSED
 				iA2 = iA+1;
-				iA2 += pAT[iA2].aALFfnd(aALFampm, nAT-iA2, gpmN(aALFampm));
+				iA2 += pAT[iA2].aALFvan(aALFampm, nAT-iA2, gpmN(aALFampm));
 				if( iA2 >= nAT )
 					break;
 				iA2 += pAT[iA2].alfFND( gpeALF_PLUS, nAT-iA2 );
@@ -1264,14 +1245,14 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 						pGSM->iREAD = pCMTI->num;
 				}
 
-				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+				iA += pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				aSUB[1] = pAT[iA].y;
 			} break;
 			case gpeALF_CMGRD: {
 				aSUB[1] = aSUB[0] = gpmMAX( 0, pAT[iA].y-6 );	// +CMGRD
 
 				iA2 = pGSM->answCMGRD( pANSW, pAT+iA, nAT-iA, pS, aALFokER, gpmN(aALFokER), pWIN );
-				iA += iA2; //pAT[iA].aALFfnd( aALFokER, nAT-iA, gpmN(aALFokER) );
+				iA += iA2; //pAT[iA].aALFvan( aALFokER, nAT-iA, gpmN(aALFokER) );
 				if( iA >= nAT )
 					break;
 				/*if( (pAT[iA].alf!=gpeALF_OK) && (pAT[iA].alf!=gpeALF_ERROR) )
@@ -1279,7 +1260,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 				aSUB[1] = pAT[iA].y;
 			} break;
 			case gpeALF_CPMS: {
-				int iOK = pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) ),
+				int iOK = pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) ),
 					nUSED = gpfSTR2I8(pS+pAT[iA].y+1);
 				if( nUSED  )
 					sprintf( pANSW, "AT+CMGRD=%d\r\n", nUSED-1 );
@@ -1296,14 +1277,14 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 			case gpeALF_COPS:
 				aSUB[1] = aSUB[0] = pAT[iA].y-4;	//COPS
 				iA++;
-				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+				iA += pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				aSUB[1] = pAT[iA].y;
 				break;
 			default:
 				if(iA >= nAT)
 					iA = 0;
 				aSUB[1] = aSUB[0] = gpmMAX( 0, pAT[iA].y-(alfLEN(pAT[iA].alf)+1));	//+CMTI
-				iA += pAT[iA].aALFfnd( aALFok, nAT-iA, gpmN(aALFok) );
+				iA += pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				aSUB[1] = pAT[iA].y;
 				break;
 
@@ -1315,7 +1296,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 			if( nR > 0 ) {
 				nR = read( socket, pANSW, nR );
 				if( nR > 0 )
-					pINP = pINP->lzyADD( pANSW, nR, s=-1, -1 );
+					pINP = pINP->lzyADD( pANSW, nR, s=-1 );
 				//nINP = pINP->nLD();
 			}
 			s = aSUB[0];

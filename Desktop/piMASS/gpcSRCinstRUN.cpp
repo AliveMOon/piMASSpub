@@ -238,7 +238,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 
 		//cID = pP->cID();
 		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
-		pLZY = pLZY->lzyADD( pS, nS, (s=-1), -1 );
+		pLZY = pLZY->lzyADD( pS, nS, (s=-1) );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );
 
 		/// ---------------------------------
