@@ -41,13 +41,63 @@ public:
 };
 
 #define gpdNdiv gpmN(apCRS)
+typedef enum gpe3Dat:U4 {
+	gpe3Dat_null,
+	gpe3Dat_vx,			//  1
+
+	gpe3Dat_ix,			//  2
+	gpe3Dat_vxix,		//  3
+
+	gpe3Dat_up,			//  4
+	gpe3Dat_vxup,		//  5
+	gpe3Dat_ixup,		//  6
+	gpe3Dat_vxixup,		//  7
+
+	gpe3Dat_uv,			//  8
+	gpe3Dat_vxuv,		//  9
+	gpe3Dat_ixuv,		//  a
+	gpe3Dat_vxixuv,		//  b
+	gpe3Dat_upuv,		//  c
+	gpe3Dat_vxupuv,		//  d
+	gpe3Dat_ixupuv,		//  e
+	gpe3Dat_vxixupuv,	//  f
+
+	gpe3Dat_ps,			// 10
+	gpe3Dat_vxps,		// 11
+
+	gpe3Dat_ixps,		// 12
+	gpe3Dat_vxixps,		// 13
+
+	gpe3Dat_upps,		// 14
+	gpe3Dat_vxupps,		// 15
+	gpe3Dat_ixupps,		// 16
+	gpe3Dat_vxixupps,	// 17
+
+	gpe3Dat_uvps,		// 18
+	gpe3Dat_vxuvps,		// 19
+	gpe3Dat_ixuvps,		// 1a
+	gpe3Dat_vxixuvps,	// 1b
+	gpe3Dat_upuvps,		// 1c
+	gpe3Dat_vxupuvps,	// 1d
+	gpe3Dat_ixupuvps,	// 1e
+	gpe3Dat_vxixupuvps,	// 1f
+
+	gpe3Dat_VTX,		// 20
+	gpe3Dat_FRG 		= 0x40,
+	gpe3Dat_VTXFRG 		= 0x60,
+	gpe3Dat_LNK 		= 0x80,
+	gpe3Dat_VTXLNK 		= 0xA0,
+	gpe3Dat_FRGLNK 		= 0xC0,
+	gpe3Dat_VTXFRGLNK 	= 0xE0,
+};
+
 class gpcGLSL
 {
 public:
 	GLint	isSUCC, nLOG,
 			PrgID, nT, nU,
 
-			ATvxID, ATuvID,
+			ATvxID, ATixID, ATupID, ATuvID, ATpsID,
 
 			aTexID[GL_ACTIVE_TEXTURE-GL_TEXTURE0],
 			aUniID[0x10];
@@ -58,7 +108,7 @@ public:
 	gpcLZY	vtxLOG, vtxSRC,
 			frgLOG, frgSRC,
 			lnkLOG;
-	U4 nSUCC;
+	gpe3Dat nSUCC;
 	I8x2	ID;
 private:
 	GLint GLSLvtx( const char* pSvrtx );
@@ -98,7 +148,11 @@ public:
 
 		return nT;
 	}
-	gpcGLSL* pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx = "v_vx", const char* pATuv = "v_uv", const char* pATtx = "tex"  );
+	gpcGLSL* pNEW(	const I8x2& an, const char* pF, const char* pV,
+					const char* pATvx = "v_vx", const char* pATix = "v_ix",
+					const char* pATup = "v_up",
+					const char* pATuv = "v_uv", const char* pATps = "v_ps",
+					const char* pATtx = "tex"  );
 
 };
 
@@ -113,11 +167,13 @@ class gpc3D;
 class gpc3Dlst;
 class gpcWIN;
 
+
+
 class gpcGL {
 public:
 	char	sPUB[0x1000];
 	GLint	oPrgID,
-			ATvxID, ATuvID,
+			ATvxID, ATixID, ATupID, ATuvID, ATpsID,
 			gVxSucc,
 			gFrSucc, aTexID[0x8],
 			gPrgSucc, aUniID[0x8],

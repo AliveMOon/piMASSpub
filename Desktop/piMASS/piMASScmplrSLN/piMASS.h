@@ -169,7 +169,7 @@
 
 	#define ace access
 	#define mkd( a, b ) ( mkdir( a,b ) )
-	#define gpmALLOC( n ) ((U1*)memalign( 0x10, n ))
+	#define gpmALLOC( n ) ((U1*)memalign( 0x10, (n) ))
 	#define gpmFREE( p ) free( p )
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }

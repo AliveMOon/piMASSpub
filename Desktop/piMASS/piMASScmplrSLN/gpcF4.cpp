@@ -126,11 +126,11 @@ F4& F4::abLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
 F4x4& F4x4::latR( F4 e, F4 c, F4 u ) {
 	gpmCLR;
 
-	z.aF2[0] = e.aF2[0]-c.aF2[0];
+	z.aF2[0] = e.aF2[0];
 	z.aF2[0].x *= -1.0f;
 	float r = sqrt(z.aF2[0].qlen());
-	x = u.N3().X3(z/r);
 
+	x = u.N3().X3(z/r);
 	z.aF2[0] *= e.aF2[1].x/r;
 	z.z = e.aF2[1].y;
 

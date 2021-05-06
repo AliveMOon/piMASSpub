@@ -195,14 +195,14 @@ GPC_RES* GPC_RES::fun_lwo( GPC_WBx64* p_wb )
 				p_gio->p_gio_lay = new GPC_GIOx64_LAY[p_gio->gio_n_lay+1];
 
 				if( p_kill_lay )
-					gp_memcpy( p_gio->p_gio_lay, p_kill_lay, p_gio->gio_n_lay*sizeof(GPC_GIOx64_LAY) );
+				    gp_memcpy( p_gio->p_gio_lay, p_kill_lay, p_gio->gio_n_lay*sizeof(GPC_GIOx64_LAY) );
 
 				p_lay = p_gio->p_gio_lay+p_gio->gio_n_lay;
 				
 				p_gio->gio_n_lay++;
 				
 				p_lay->lay_clear();
-				p_lay->lay_id = (GPF_SWAP_U4( (char*)p_u4 )&0xffff0000)>>16;
+				p_lay->lay_id = (GPF_SWAP_U4((char*)p_u4)&0xffff0000)>>16;
 				p_lay->parent_id = GPF_SWAP_U4( (char*)p_u4 )&0xffff;
 				p_lay->p_lay_gio = p_gio;
 

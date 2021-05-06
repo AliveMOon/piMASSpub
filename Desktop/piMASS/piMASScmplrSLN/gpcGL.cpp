@@ -174,7 +174,7 @@ GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {
 	if( !pSvrtx )
 		pSvrtx = gpsGLSLvx;
 	U8 s;
-	nSUCC &= ~1;
+	*(U4*)&nSUCC &= ~((U4)gpe3Dat_VTX);
 	isSUCC = GL_FALSE;
 
 	vrtxID = glCreateShader( GL_VERTEX_SHADER );
@@ -194,7 +194,7 @@ GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {
 		pVTX = (char*)pSvrtx;
 		vtxLOG.lzyRST();
 		vtxSRC.lzyFRMT( s = -1, "%s", pSvrtx );
-		nSUCC |= 1;
+		*(U4*)&nSUCC |= gpe3Dat_VTX;
 	}
 
 	return isSUCC;
@@ -204,7 +204,7 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 		pSfrg = gpsGLSLfrgISO;
 	U8 s;
 	nT = 0;
-	nSUCC &= ~2;
+	*(U4*)&nSUCC &= ~gpe3Dat_FRG;
 	isSUCC = GL_FALSE;
 
 	frgID = glCreateShader( GL_FRAGMENT_SHADER );
@@ -227,16 +227,16 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 	pFRG = (char*)pSfrg;
 	frgLOG.lzyRST();
 	frgSRC.lzyFRMT( s = -1, "%s", pSfrg );
-	nSUCC |= 2;
+	*(U4*)&nSUCC |= gpe3Dat_FRG;
 	return isSUCC;
 }
 
 GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 
-	if( (nSUCC&0x7) == 0x7 )
+	if( (nSUCC&gpe3Dat_VTXFRGLNK) == gpe3Dat_VTXFRGLNK )
 		return GL_TRUE;
 
-	if( (nSUCC&0x7) != 3 )
+	if( (nSUCC&gpe3Dat_VTXFRGLNK) != gpe3Dat_VTXFRG )
 		return GL_FALSE;
 
 	glUseProgram(0);
@@ -263,7 +263,7 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 		}
 	} else {
 		lnkLOG.lzyRST();
-		nSUCC |= 0x4;
+		*(U4*)&nSUCC |= gpe3Dat_LNK;
 	}
 
 	glDetachShader( PrgID, vrtxID );
@@ -294,33 +294,53 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 
 	return GL_TRUE;
 }
-gpcGLSL* gpcGLSL::pNEW( const I8x2& an, const char* pF, const char* pV, const char* pATvx, const char* pATuv, const char* pATtx ) {
+
+
+gpcGLSL* gpcGLSL::pNEW( const I8x2& an, const char* pF, const char* pV,
+						const char* pATvx, const char* pATix,
+						const char* pATup,
+						const char* pATuv, const char* pATps,
+						const char* pATtx ) {
 	if( !this )
 	{
 		gpcGLSL* pTHIS = new gpcGLSL( an, pF, pV );
 		if( !pTHIS )
 			return NULL;
 
-		if( (pTHIS->nSUCC&0x7) != 0x7 )
+		if( (pTHIS->nSUCC&gpe3Dat_VTXFRGLNK) != gpe3Dat_VTXFRGLNK )
 		{
 			gpmDEL(pTHIS);
 			return NULL;
 		}
 
-		return pTHIS->pNEW( an, pF, pV, pATvx, pATuv, pATtx );
+		return pTHIS->pNEW( an, pF, pV,
+									pATvx, pATix,
+									pATup,
+									pATuv, pATps,
+									pATtx );
 	}
 	fndTX( pATtx );
 	// ATTRIBUTES ----------------------
 	ATvxID = glGetAttribLocation( PrgID, pATvx );
-	if( ATvxID < 0 )
-		return this;
-	nSUCC |= 8;
+	if( ATvxID >= 0 )
+		*(U4*)&nSUCC |= gpe3Dat_vx;
+
+	ATixID = glGetAttribLocation( PrgID, pATix );
+	if( ATixID >= 0 )
+		*(U4*)&nSUCC |= gpe3Dat_ix;
+
+	ATupID = glGetAttribLocation( PrgID, pATup );
+	if( ATupID >= 0 )
+		*(U4*)&nSUCC |= gpe3Dat_up;
 
 	ATuvID = glGetAttribLocation( PrgID, pATuv );
-	if( ATuvID < 0 )
-		return this;
+	if( ATuvID >= 0 )
+		*(U4*)&nSUCC |= gpe3Dat_uv;
 
-	nSUCC |= 0x10;
+	ATpsID = glGetAttribLocation( PrgID, pATps );
+	if( ATpsID >= 0 )
+		*(U4*)&nSUCC |= gpe3Dat_ps;
+
 	return this;
 }
 gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV ) {
@@ -430,7 +450,10 @@ gpcGL* gpcGL::GLSLset( const I8x2& an, const char* pF, const char* pV ) {
 	gpmMcpyOF( aTexID, pGLSL->aTexID, gpmN(aTexID) );
 	gpmMcpyOF( aUniID, pGLSL->aUniID, gpmN(aUniID) );
 	ATvxID = pGLSL->ATvxID;
+	ATixID = pGLSL->ATixID;
+	ATupID = pGLSL->ATupID;
 	ATuvID = pGLSL->ATuvID;
+	ATpsID = pGLSL->ATpsID;
 	return this;
 }
 
@@ -462,18 +485,15 @@ GLuint gpcGL::GLSLvtx( const char* pS ) {
 		glGetShaderiv( tmpID, GL_INFO_LOG_LENGTH, &maxLength );
 
 		//Allocate string
-		if( maxLength )
-		{
+		if( maxLength ) {
 			VxSlog.lzyADD( NULL, maxLength, s );
 			//char* infoLog = new char[ maxLength ];
 
 			//Get info log
 			glGetShaderInfoLog( tmpID, maxLength, &infoLogLength, (char*)(VxSlog.p_alloc+s) );
+			VxSlog.n_load = s;
 			if( infoLogLength > 0 )
-			{
-				VxSlog.n_load = s+infoLogLength;
-			} else
-				VxSlog.n_load = s;
+				VxSlog.n_load += infoLogLength;
 		}
 
 		//Deallocate string
@@ -521,18 +541,15 @@ GLuint  gpcGL::GLSLfrg( const char* pS ) {
 		glGetShaderiv( tmpID, GL_INFO_LOG_LENGTH, &maxLength );
 
 		//Allocate string
-		if( maxLength )
-		{
+		if( maxLength ) {
 			FrSlog.lzyADD( NULL, maxLength, s );
 			//char* infoLog = new char[ maxLength ];
 
 			//Get info log
 			glGetShaderInfoLog( tmpID, maxLength, &infoLogLength, (char*)(FrSlog.p_alloc+s) );
+			FrSlog.n_load = s;
 			if( infoLogLength > 0 )
-			{
-				FrSlog.n_load = s+infoLogLength;
-			} else
-				FrSlog.n_load = s;
+				FrSlog.n_load += infoLogLength;
 		}
 
 		//Deallocate string

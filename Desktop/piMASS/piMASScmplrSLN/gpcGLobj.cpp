@@ -1131,7 +1131,7 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 	gpc3Dly* pLY;
 	gpc3Dmap* pM;
 	gpc3Dtri* pT0;
-	U4x4 glU4x4;
+	U4 glU4[0x10];
 	GLenum e = 0;
 	for( U4 i = 0, n = p3D->nLY(), nMAP; i < n; i++ ) {
 		pLY = p3D->pLYix(i);
@@ -1143,38 +1143,61 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 			pM = pLY->pMAP(m);
 			if( pM ? !pM->iVXn.y : true )
 				continue;
-			glU4x4.x = gpmOFF(gpc3Dvx,xyzi);
-			glU4x4.y = gpmOFF(gpc3Dvx,uv);
-			glU4x4.z = sizeof(gpc3Dvx);
+			glU4[0] = gpmOFF(gpc3Dvx,xyzi);
+			glU4[1] = gpmOFF(gpc3Dvx,xyzi.w);
+			glU4[2] = gpmOFF(gpc3Dvx,up);
+			glU4[3] = gpmOFF(gpc3Dvx,uv);
+			glU4[4] = gpmOFF(gpc3Dvx,ps);
+			glU4[5] = sizeof(gpc3Dvx);
 			nT = pM->nTRI();
 			pT0 = pM->pTRI( pLY->buf );
 
-	{ /// VERTEX ------------------------------------------
+	/// VERTEX ------------------------------------------
 				glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x );  gpfGLerr();
 				/// XYZ
-				glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.x) );  gpfGLerr();
-				glEnableVertexAttribArray( ATvxID ); gpfGLerr();
+				if( ATvxID > -1 ) {
+					glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[0]) );  gpfGLerr( "ATvxID" );
+					glEnableVertexAttribArray( ATvxID ); gpfGLerr();
+				}
+				/// ix blnd
+				if( ATixID > -1 ) {
+					glVertexAttribPointer( ATixID, 4, GL_BYTE, GL_FALSE, glU4[5], gpmGLBOFF(glU4[1]) );  gpfGLerr( "ATixID" );
+					glEnableVertexAttribArray( ATixID ); gpfGLerr();
+				}
+				/// UP XYZ
+				if( ATupID > -1 ) {
+					glVertexAttribPointer( ATupID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[2]) );  gpfGLerr( "ATupID" );
+					glEnableVertexAttribArray( ATupID ); gpfGLerr();
+				}
 				/// UV
-				glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.y) );  gpfGLerr();
-				glEnableVertexAttribArray( ATuvID ); (e = glGetError());  gpfGLerr();
-	}
+				if( ATuvID > -1 ) {
+					glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[3]) );  gpfGLerr( "ATuvID" );
+					glEnableVertexAttribArray( ATuvID ); (e = glGetError());  gpfGLerr();
+				}
+				/// PrtSrf
+				if( ATpsID > -1 ) {
+					glVertexAttribPointer( ATpsID, 2, GL_INT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[4]) );  gpfGLerr( "ATpsID" );
+					glEnableVertexAttribArray( ATpsID ); (e = glGetError());  gpfGLerr();
+				}
 			for( U4 t = 0; t < nT; t++, msk >>= 1 ) {
 				if( (msk&1) ? !pT0[t].aIIXN[2].y : true )
 					continue;
-				glU4x4.w = pT0[t].aIIXN[2].a4x2[1].area();
+				glU4[6] = pT0[t].aIIXN[2].a4x2[1].area();
 
 
 	/// ELEMENT ------------------------------------------
-				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );  gpfGLerr();
-				glDrawElements( //GL_TRIANGLES,
-								gpaDRWmod[3], /// GL_TRIANGLES,
-								glU4x4.w,
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );  gpfGLerr( "GL_ELEMENT_ARRAY_BUFFER");
+				glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
+								glU4[6],
 								GL_UNSIGNED_INT,
-								NULL ); (e = glGetError());  gpfGLerr();
+								NULL ); gpfGLerr( "glDrawElements");
 				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ); gpfGLerr();
 			}
-			glDisableVertexAttribArray( ATvxID ); gpfGLerr();
-			glDisableVertexAttribArray( ATuvID ); gpfGLerr();
+			if( ATvxID > -1 ) { glDisableVertexAttribArray( ATvxID ); gpfGLerr(); }
+			if( ATixID > -1 ) { glDisableVertexAttribArray( ATixID ); gpfGLerr(); }
+			if( ATupID > -1 ) { glDisableVertexAttribArray( ATupID ); gpfGLerr(); }
+			if( ATuvID > -1 ) { glDisableVertexAttribArray( ATuvID ); gpfGLerr(); }
+			if( ATpsID > -1 ) { glDisableVertexAttribArray( ATpsID ); gpfGLerr(); }
 			glBindBuffer( GL_ARRAY_BUFFER, 0 ); gpfGLerr();
 			glBindVertexArray( 0 ); gpfGLerr();
 		}
@@ -1197,11 +1220,16 @@ gpdSTATICoff sSCNdec1[] = "eye trg pos abc \"";
 gpdSTATICoff gpsGLSLvx3D[] = //{
 "#version 120																	\n"
 "attribute	vec3	v_vx;														\n"
+"attribute	ivec4	v_ix;														\n"
+"attribute	vec3	v_up;														\n"
 "attribute	vec2	v_uv;														\n"
+"attribute	ivec2	v_ps;														\n"
 "varying	vec3	fr_uv;														\n"
+"uniform vec2 tgPX;																						\n"
 "void main() {																	\n"
 "	vec3	mv	= ( gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(v_vx,1.0) ).xyz,					\n"
-"			xyz	= vec3(1.0, 480.0/800.0, 1.0/250.0), 							\n"
+"			xyz	= vec3(1.0, tgPX.x/tgPX.y, 1.0/250.0), 							\n"
+//"			xyz	= vec3(1.0, 640.0/960.0, 1.0/250.0), 							\n"
 "			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 							\n"
 "	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);				\n"
 "	p = p*d.xxy*xyz.xyx - sb.xxy;												\n"
@@ -1310,11 +1338,19 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
 	glUseProgram( gProgID ); gpfGLerr( " glUseProgram( gProgID" );
 
+	if( aUniID[0] > -1 )
+	if( pPICrtx ) {
+		glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
+	} else {
+		glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
+	}
+
 	F4x4 view, word = 1.0;
 	glMatrixMode(GL_MODELVIEW);
 	word.x = F4( 1.0, 0.0, 0.0 );
 	word.y = F4( 0.0, 0.0, 1.0 );
 	word.z = F4( 0.0,-1.0, 0.0 );
+	word.t = F4( 0.0, 0.0, 0.0, 1.0 );
 	glLoadMatrixf((const GLfloat*)&word);
 
 	glMatrixMode(GL_PROJECTION);
