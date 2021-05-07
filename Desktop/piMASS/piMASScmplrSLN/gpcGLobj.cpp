@@ -1218,35 +1218,50 @@ gpeALF alfSCN1[] = {
 };
 gpdSTATICoff sSCNdec1[] = "eye trg pos abc \"";
 gpdSTATICoff gpsGLSLvx3D[] = //{
-"#version 120																	\n"
-"attribute	vec3	v_vx;														\n"
-"attribute	ivec4	v_ix;														\n"
-"attribute	vec3	v_up;														\n"
-"attribute	vec2	v_uv;														\n"
-"attribute	ivec2	v_ps;														\n"
-"varying	vec3	fr_uv;														\n"
-"uniform vec2 tgPX;																						\n"
-"void main() {																	\n"
-"	vec3	mv	= ( gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(v_vx,1.0) ).xyz,					\n"
+"#version 120																		\n"
+"attribute	vec3	v_vx;															\n"
+"attribute	ivec4	v_ix;															\n"
+"attribute	vec3	v_up;															\n"
+"attribute	vec2	v_uv;															\n"
+"attribute	ivec2	v_ps;															\n"
+"varying	vec3	fr_uv;															\n"
+"varying	vec3	fr_up;															\n"
+"varying	vec2	fr_ps;															\n"
+"uniform vec2 tgPX;																	\n"
+"void main() {																		\n"
+"	vec3	mv	= ( gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(v_vx,1.0) ).xyz,	\n"
 "			xyz	= vec3(1.0, tgPX.x/tgPX.y, 1.0/250.0), 							\n"
-//"			xyz	= vec3(1.0, 640.0/960.0, 1.0/250.0), 							\n"
 "			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 							\n"
 "	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);				\n"
 "	p = p*d.xxy*xyz.xyx - sb.xxy;												\n"
 "	gl_Position			= vec4( p*-1.0, 1.0 );									\n"
 "	fr_uv				= vec3( v_uv, p.z );									\n"
+"	fr_up				= v_up;													\n"
+"	fr_ps				= v_ps;													\n"
 "}																				\n\0";
 //};
 gpdSTATICoff gpsGLSLfrg3D[] = //{
 "#version 120																\n"
 "varying vec3 fr_uv;														\n"
+"varying vec3 fr_up;														\n"
+"varying vec2 fr_ps;														\n"
 "uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
 "uniform vec4 		aCNL[8];				// CNL							\n"
 "void main()																\n"
 "{																			\n"
 "   if( gl_FrontFacing ) discard;											\n"
-	gpdGUIfr3Dc
-	gpdGUIfr3Dd
+"	vec2 mx = gl_FragCoord.xy/2;											\n"
+"   float xx	=  mx.x-floor(mx.x)											\n"
+"				+ (mx.y-floor(mx.y)) * 2.0;									\n"
+"   if( xx < 1 )															\n"
+		gpdGUIfr3Dc
+"   else if( xx < 2 )														\n"
+		gpdGUIfr3Du
+"   else if( xx < 3 )														\n"
+		gpdGUIfr3Dp
+"   else 																	\n"
+		gpdGUIfr3Dc
+		gpdGUIfr3Dd
 "}																			\n"
 "\n\0";
 //};

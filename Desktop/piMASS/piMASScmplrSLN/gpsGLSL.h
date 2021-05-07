@@ -2,7 +2,11 @@
 #ifndef gpsGLSL_H
 #define gpsGLSL_H
 #define gpdGUIfrDEPTH "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = (f-n)*0.85+n; \n"
+
 #define gpdGUIfr3Dc "	gl_FragColor = vec4(fr_uv,1.0);											\n"
+#define gpdGUIfr3Du "	gl_FragColor = vec4(fr_up,1.0);											\n"
+#define gpdGUIfr3Dp "	gl_FragColor = vec4(fr_ps.xyy,1.0);										\n"
+
 #define gpdGUIfr3Dd "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = ((f-n)*fr_uv.z+n+f)/2.0;	\n"
 #define gpdSTATICoff static const char  //static const
 
