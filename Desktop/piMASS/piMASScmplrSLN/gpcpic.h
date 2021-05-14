@@ -535,7 +535,23 @@ public:
 
 	}
 };
+class gpcGL;
+class gpc3Dsrf;
 
+/*class gpcTXscn { ///B
+public:
+	gpcLZYdct	picDCT;
+	gpcLZY		ixLST,ixSRT;
+	U4			nRDY, nBLD;
+	U1			aIX[0x100];
+	gpcTXscn(){}
+	gpcTXscn* srfADD( gpcGL* pGL, gpc3Dsrf* pSRF, char* pPATH, char* pFILE );
+	bool bRDY(){ return this ? nRDY<nBLD : false; }
+	U4 noRDY() { return (nRDY = nBLD+1); }
+	U4 yesRDY() { return (nRDY = nBLD); }
+	I4x4* pSRT();
+	U4 nSRT() { return this ? ixSRT.nLD(sizeof(I4x4)) : 0; };
+};*/
 class gpcPIC {
 public:
 	I8x2			TnID, alfN;
@@ -552,19 +568,16 @@ public:
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
 	SDL_Texture		*pTX,*pTXlock;
-	//gpcPIC		*pRTX;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
 	U4x4			nJDOIT;
 	gpcPIC			*pSRC;
+	//gpcTXscn		*pSCN;
 	gpcBOB			**ppBOB;
 
 	bool			bTHRD;
 	std::thread		T;
-	//U1		*pPIX;
-
-
 
 	~gpcPIC() {
 		unLOCK();
@@ -573,7 +586,6 @@ public:
 
 		gpmDELary(ppBOB);
 		gpmSDL_FreeTX(pTX);
-		//gpmSDL_FreeTX(pRTX);
 		gpmSDL_FreeSRF(pSRF);
 		gpmSDL_FreeSRF(pSHR);
 
@@ -584,32 +596,7 @@ public:
 		id = i;
 		TnID = an;
 	}
-	/*SDL_Texture* pPICrtx2( SDL_Renderer* pRNDR, I4x2 wh ) {
-		if( !this )
-			return NULL;
 
-		if( txWH.a4x2[1] != wh ) {
-			gpmSDL_FreeTX( pRTX );
-			if( gDid ) {
-				glDeleteRenderbuffers(1,&gDid);
-				gDid = 0;
-			}
-		}
-
-		if(!pRTX) {
-			pRTX = SDL_CreateTexture( pRNDR, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_TARGET, wh.x, wh.y );
-			if(!pRTX)
-				return NULL;
-			txWH.a4x2[1] = wh;
-			if( !gDid ) {
-				glGenRenderbuffers(1,&gDid);
-				glBindRenderbuffer(GL_RENDERBUFFER, gDid );
-				glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, wh.x, wh.y );
-			}
-		}
-
-		return pRTX;
-	}*/
 	U4x4 pPICrtxFREE();
 
 	SDL_Surface* pPICrtxSRF();
@@ -808,46 +795,7 @@ public:
 
 
 	}
-	SDL_Texture* surDRWtx_o( SDL_Renderer* pRNDR ) {
-		SDL_Surface* pS = surDRW();
 
-		if( pREF == pS )
-			return pTX;
-
-		int acc = 0;
-		U4 frm;
-		pREF = pS;
-
-		if( pREF ? pTX : NULL )
-		{
-			SDL_QueryTexture( pTX, &frm, &acc, &txWH.z, &txWH.w );
-			if( (pREF->format ? pREF->format->format : 0)  != frm
-				|| pREF->w != txWH.z || pREF->h != txWH.w
-				|| acc != SDL_TEXTUREACCESS_STREAMING )
-			{
-				gpmSDL_FreeTX(pTX);
-				pTX = SDL_CreateTexture( pRNDR, pREF->format->format,
-												SDL_TEXTUREACCESS_STREAMING,
-												pREF->w, pREF->h );
-				txWH.z = pREF->w;
-				txWH.w = pREF->h;
-			}
-
-			if( pTX )
-			{
-				void* pLOCK;
-				int pitch;
-				if( SDL_LockTexture( pTX, NULL, &pLOCK, &pitch ) )
-					return pTX;
-
-				memcpy( pLOCK, pREF->pixels, pitch*pREF->h );
-				SDL_UnlockTexture(pTX);
-			}
-			return pTX;
-		}
-
-		return pTX = SDL_CreateTextureFromSurface( pRNDR, pREF );
-	}
 	U1x4* TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 						char* pNAME, char *pPATH, char *pFILE );
 	U1x4* TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
@@ -863,9 +811,7 @@ public:
 						gpcPIC* pR, //gpcPIC* pB,
 						gpcPIC* pB,
 						char* pNAME, char *pPATH, char *pFILE );
-	U1x4* TOOLmaskAB2(	gpMEM* pMEM,
-						gpcPIC* pA, gpcPIC* pB, gpcPIC* pM,
-						char* pNAME, char *pPATH, char *pFILE );
+	SDL_Surface* pPICrd( char *pPATH, char *pFILE );
 };
 
 class gpcPICall
@@ -873,16 +819,10 @@ class gpcPICall
 	gpcPIC	**ppPIC, *pPIC;
 	U4		nPICall, iPICfr, nPICld;
 public:
-	U4		alfFND( U1* pS );
+	U4		alfFND( void* pSTR );
 	gpcPIC*	aluFND( gpcALU& alu );
-//	{
-//		U4 i =	alu.bSTR() ?
-//				PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
-//				: alu.u8();
-//
-//	}
-	gpcPIC*	PIC( U4 i )
-	{
+
+	gpcPIC*	PIC( U4 i ) {
 		if( pPIC ? pPIC->id == i : false )
 			return pPIC;
 

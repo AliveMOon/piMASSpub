@@ -540,8 +540,8 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc ) {
 	return pSRF ? (U1*)pSRF->pixels : NULL;
 }
 
-U4 gpcPICall::alfFND( U1* pS ) {
-	pS += gpmNINCS(pS," \t\"");
+U4 gpcPICall::alfFND( void* pV ) {
+	U1* pS = (U1*)pV + gpmNINCS((U1*)pV," \t\"");
 	I8x2 TnID(0,14);
 	TnID = pS;
 	TnID.num = gpfSTR2U8( pS+TnID.num, &pS );

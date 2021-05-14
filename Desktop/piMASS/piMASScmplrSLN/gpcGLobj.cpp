@@ -228,14 +228,7 @@ public:
 		return this;
 	}
 };
-class gpc3Dsrf {
-public:
-	char sNAME[0x100],
-		 sPIC[0x100],
-		 sVMAP[0x100];
-	I4 imag, imap;
-	gpc3Dsrf(){};
-};
+
 class gpc3Dvx {
 public:
 	F4 xyzi, up;		//  0 16
@@ -345,26 +338,26 @@ public:
 
 		gpc3Dblnd* pB = (gpc3Dblnd*)b.p_alloc;
 
-		gpc3Dvx	tmP, *pPd = ((gpc3Dvx*)pnt.Ux( nP, sizeof(tmP) ))-nP;
+		gpc3Dvx	tmP, *pVX = ((gpc3Dvx*)pnt.Ux( nP, sizeof(tmP) ))-nP;
 		for( U4 i = 0; i < nP; i++ ) {
-			pPd[i].xyzi = pPs[i];
-			pPd[i].xyzi.uXYZW[3] = pB[i].ix.u4;
-			pPd[i].uv = pTs[i];
-			pPd[i].ps = pB[i].ps;
+			pVX[i].xyzi = pPs[i];
+			pVX[i].xyzi.uXYZW[3] = pB[i].ix.u4;
+			pVX[i].uv = pTs[i];
+			pVX[i].ps = pB[i].ps;
 		}
 
 
 		for( U4 f = 0, i, ip, x,n; f < nF; f++ )
 		for( x = pFl[f].x, n = pFl[f].y, i = 0; i < n; i++ ) {
 			ip = pFi[i+x];
-			v0 = pPd[ip].xyzi;
-			v1 = (pPd[pFi[((i-1+n)%n)+x]].xyzi - v0).N3();
-			v2 = (pPd[pFi[((i+1  )%n)+x]].xyzi - v0).N3();
-			pPd[ip].up += v2.X3(v1).N3().xyz1();
+			v0 = pVX[ip].xyzi;
+			v1 = (pVX[pFi[((i-1+n)%n)+x]].xyzi - v0).N3();
+			v2 = (pVX[pFi[((i+1  )%n)+x]].xyzi - v0).N3();
+			pVX[ip].up += v2.X3(v1).N3().xyz1();
 		}
 
 		for( U4 p = 0; p < nP; p++ )
-			pPd[p].up = pPd[p].up.N3();
+			pVX[p].up = pVX[p].up.N3();
 
 		while( pUi < pUnx ) {
 			if( *pUi == 0xff ) {
@@ -384,13 +377,13 @@ public:
 			for( U4 i = 0, ie = pFl->y, t, te; i < ie; i++ ) {
 				if( pFi[i] != ip )
 					continue;
-				pPd = (gpc3Dvx*)pnt.Ux( ip, sizeof(tmP) );
-				tmP = *pPd;
+				pVX = (gpc3Dvx*)pnt.Ux( ip, sizeof(tmP) );
+				tmP = *pVX;
 				tmP.uv.swpXY( pUi ); pUi += sizeof(F2);
 
 
 				for( t = p.nLD(sizeof(tmP)), te = pnt.nLD(sizeof(tmP)); t < te; t++ ) {
-					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pPd) ))->bGD(tmP, 0.0/4096.0, 0.0/1024.0 )  )
+					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pVX) ))->bGD(tmP, 0.0/4096.0, 0.0/1024.0 )  )
 						break;
 				}
 
@@ -401,7 +394,7 @@ public:
 				if( t < te )
 					break;
 
-				*(gpc3Dvx*)pnt.Ux( te, sizeof(*pPd) ) = tmP;
+				*(gpc3Dvx*)pnt.Ux( te, sizeof(*pVX) ) = tmP;
 				break;
 			}
 		}
@@ -414,15 +407,16 @@ public:
 		for( U4 t = 0; t < nTR; t++ )
 			pTR[t].null();
 	}
+
 	U4 nTRI() { return tri.nLD(sizeof(gpc3Dtri)); }
-	gpc3Dtri* pTRI( gpcLZY& buf, const void* pLWO = NULL, U4x2* pTG = NULL ) {
+	gpc3Dtri* pTRI0( gpcLZY& buf, const void* pLWO = NULL, U4x2* pTG = NULL ) {
 		if( nTRI() )
 			return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 		if( !pLWO )
 			pTG = NULL;
 
 		U4x2 	*pTMP = ((U4x2*)buf.Ux( fps.nLD() + 1, 1 ))-(fps.nLD()+1),
-				*pPRT = fps.pU4x2(),//(U4x2*)fps.p_alloc,
+				*pPRT = fps.pU4x2(),
 				*pFl0 = fcl.pU4x2(),
 				*pFli;
 		U4	nFC = fps.nLD(sizeof(*pTMP)),
@@ -432,13 +426,13 @@ public:
 
 		pPRT->median(nFC,pTMP,true);
 		gpc3Dtri* pTR = NULL;
-		U4x4* pSRF;
+		U4x4* pSRF = NULL;
 
 
 		for( U4 i = 0, p = -1, s = -1,nf; i < nFC; i++ ) {
 			if( p != pPRT[i].prt ) {
 				if( pTR ) {
-					pSRF = pTR->pSRF(-1);
+					pSRF = pTR->pSRFadd(-1);
 					if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
 												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
 												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
@@ -448,18 +442,18 @@ public:
 				pTR->prt = p = pPRT[i].prt;
 				if( pTG ) std::cout << "PART:" <<((char*)pLWO) + pTG[p].x << std::endl;
 				s = -1;
-				pSRF = 0;
+				pSRF = NULL;
 			}
 			if( s != pPRT[i].srf ){
 				s = pPRT[i].srf;
 				if( pSRF ){
-					pSRF = pTR->pSRF(s);
+					pSRF = pTR->pSRFadd(s);
 					if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
 												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
 												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
 												<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
 				} else
-					pSRF = pTR->pSRF(s);
+					pSRF = pTR->pSRFadd(s);
 				if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF->x].x
 												<< " 1p:" << pSRF->y
 												<< " 2p:" << pSRF->z/2
@@ -492,12 +486,11 @@ public:
 					}
 					break;
 			}
-
 		}
 		if( !pSRF )
 			return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 
-		pSRF = pTR->pSRF(-1);
+		pSRF = pTR->pSRFadd(-1);
 		if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
 												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
 												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
@@ -515,7 +508,7 @@ public:
 			bon, buf;
 	gpc3Dfc fc;
 
-	gpcLZYdct	mapDCTmn;
+	//gpcLZYdct	mapDCTmn;
 	gpcLZYdct	mapDCTwg; gpcLZY mapIXwg, mapBLwg;
 	gpcLZYdct	mapDCTtx; gpcLZY mapIXtx, mapF2tx;
 	gpcLZYdct	mapDCTmr; gpcLZY mapIXmr, mapBLmr;
@@ -737,7 +730,7 @@ public:
 			pM = ppM[m];
 			if( !pM )
 				continue;
-			pM->pTRI( buf, pLWO, pTG );
+			pM->pTRI0( buf, pLWO, pTG );
 		}
 
 		return nM;
@@ -927,7 +920,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 					pLY->mapDCTsr.dctADD( pUi, nUi );
 					pUi+= gpmPAD( nUi+1,2 );
 					pUi+= sizeof(U2);
-					gpc3Dsrf* pSRF = (gpc3Dsrf*)lzySRF.Ux( ix, sizeof(*pSRF) );
+					gpc3Dsrf* pSRF = pSRFadd(ix);
 					if( !pSRF->sNAME[0] )
 						gpmSTRCPY( pSRF->sNAME, pU0+pTG[ix].x );
 
@@ -1046,32 +1039,36 @@ U4x4 gpcGL::VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD ) {
 	return iVXn;
 }
 gpc3D* gpc3D::prt2ix( gpcGL* pGL ) {
+	if( !this )
+		return NULL;
+
 	gpc3Dly* pLY;
-	//gpc3Dtri* pTR;
+	gpc3Dmap* pM;
+	gpc3Dtri* pT0;
 	for( U4 i = 0, n = nLY(), nTR, nMAP; i < n; i++ ) {
 		pLY = pLYix(i);
 		nMAP = pLY->nMAP( p_lwo->p_alloc, tgIX.pU4x2()  );
 		if( !nMAP )
 			continue;
-		gpc3Dmap* pM;
-		gpc3Dtri* pT0;
+
 		for( U4 m = 0, nT; m < nMAP; m++ ){
 			pM = pLY->pMAP(m);
 			if( pGL ? !pM : true )
 				continue;
-			gpc3Dvx* pVX = (gpc3Dvx*)pM->pnt.p_alloc;
 
-			//pM->iVXn =
+			gpc3Dvx* pVX = (gpc3Dvx*)pM->pnt.p_alloc;
 			if( !pM->iVXn.y )
 				pGL->VBOobj( pM->iVXn, pVX, pM->pnt.nLD(sizeof(*pVX)) );
 
 			nT = pM->nTRI();
-			pT0 = pM->pTRI( pLY->buf );
+			pT0 = pM->pTRI0( pLY->buf );
 			for( U4 t = 0; t < nT; t++ ) {
 				if( pT0[t].aIIXN[2].y )
 					continue;
 				if( pGL->IBOobj( pT0[t].aIIXN[2], pT0[t].t.pU4(), pT0[t].t.nU4(3), 3 ).y != 1 )
 					continue;
+
+				continue;
 
 				for( U4 i = 0, n = pT0[t].t.nU4(3), *pIX = pT0[t].t.pU4(), j=0, je;  i < n; i++ )
 				for( je = j+3; j < je; j++ )
@@ -1121,17 +1118,113 @@ gpcGL* gpcGL::glDRW( I4x2 xy, I4x2 wh ) {
 
 	return this;
 }
-gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
+gpc3Dsrf* gpc3D::pSRFadd( U4 i ) {
+	gpc3Dsrf* pSRF = this ? (gpc3Dsrf*)lzySRF.Ux(i,sizeof(gpc3Dsrf)) : NULL;
+	if( !pSRF )
+		return NULL;
+	if( pSRF->ix == i )
+		return pSRF;
+
+	pSRF->ix = i;
+	return pSRF;
+}
+gpc3Dsrf* gpc3D::pSRFi( U4 i ) {
+	if( this ? (i>=nSRF()) : true )
+		return NULL;
+
+	return pSRFadd(i);
+}
+gpcPIC* gpcGL::pPICsrf( gpc3Dsrf* pSRF, char* pPATH ) { //, char* pFILE ) {
+	char sALF[0x100];
+	gpcPIC* pPIC = NULL;
+	if( !pSRF->an.alf ) {
+		pSRF->an.num = 14;
+		pSRF->an = (U1*)gpfSTRdrop( sALF, pSRF->sPIC, NULL, "_ \t" );
+	}
+
+	pPIC = pMASS->PIC.PIC(pSRF->an);
+
+	if( pPIC ? !!pPIC->pSRF : true )
+		return pPIC;
+	// load
+	pPIC->pPICrd( pPATH, pSRF->sPIC );
+	return pPIC;
+
+}
+/*I4x4* gpcTXscn::pSRT() {
+	if( !bRDY() )
+		return NULL;
+	ixSRT = ixLST;
+
+	I4x4* pI0 = ixSRT.pI4x4();
+	U4 nIX = ixSRT.nI4x4();
+	if( nIX < 2 ){
+		if( nIX ) aIX[0] = pI0->y;
+		return pI0;
+	}
+
+
+	pI0->median( nIX, true );
+
+	yesRDY();
+	return pI0;
+}*/
+U4 glU4vx[] = {
+	gpmOFF(gpc3Dvx,xyzi),		// 00
+	gpmOFF(gpc3Dvx,xyzi.w),		// 01
+	gpmOFF(gpc3Dvx,up),			// 02
+	gpmOFF(gpc3Dvx,uv),			// 03
+	gpmOFF(gpc3Dvx,ps),			// 04
+	sizeof(gpc3Dvx),			// 05
+	6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
+};
+void gpcGL::onATscn( U4* glU4 ) {
+	/// XYZ
+	if( ATvxID > -1 ) {
+		glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[0]) );  gpfGLerr( "ATvxID" );
+		glEnableVertexAttribArray( ATvxID ); gpfGLerr();
+	}
+	/// ix blnd
+	if( ATixID > -1 ) {
+		glVertexAttribPointer( ATixID, 4, GL_BYTE, GL_FALSE, glU4[5], gpmGLBOFF(glU4[1]) );  gpfGLerr( "ATixID" );
+		glEnableVertexAttribArray( ATixID ); gpfGLerr();
+	}
+	/// UP XYZ
+	if( ATupID > -1 ) {
+		glVertexAttribPointer( ATupID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[2]) );  gpfGLerr( "ATupID" );
+		glEnableVertexAttribArray( ATupID ); gpfGLerr();
+	}
+	/// UV
+	if( ATuvID > -1 ) {
+		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[3]) );  gpfGLerr( "ATuvID" );
+		glEnableVertexAttribArray( ATuvID ); gpfGLerr();
+	}
+	/// PrtSrf
+	if( ATpsID > -1 ) {
+		glVertexAttribPointer( ATpsID, 2, GL_INT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[4]) );  gpfGLerr( "ATpsID" );
+		glEnableVertexAttribArray( ATpsID ); gpfGLerr();
+	}
+}
+void gpcGL::offATscn() {
+	if( ATvxID > -1 ) { glDisableVertexAttribArray( ATvxID ); gpfGLerr(); }
+	if( ATixID > -1 ) { glDisableVertexAttribArray( ATixID ); gpfGLerr(); }
+	if( ATupID > -1 ) { glDisableVertexAttribArray( ATupID ); gpfGLerr(); }
+	if( ATuvID > -1 ) { glDisableVertexAttribArray( ATuvID ); gpfGLerr(); }
+	if( ATpsID > -1 ) { glDisableVertexAttribArray( ATpsID ); gpfGLerr(); }
+}
+gpcGL* gpcGL::glDRW3D( gpc3D* p3d, U4 msk ) {
 	if( !msk )
 		return this;
-	p3D = p->prt2ix( this );
+	p3D = p3d->prt2ix( this );
 	if( !p3D )
 		return this;
 
+	U4x4* pSRFx4;
 	gpc3Dly* pLY;
 	gpc3Dmap* pM;
 	gpc3Dtri* pT0;
-	U4 glU4[0x10];
+	gpcPIC* pPIC;
+
 	GLenum e = 0;
 	for( U4 i = 0, n = p3D->nLY(), nMAP; i < n; i++ ) {
 		pLY = p3D->pLYix(i);
@@ -1143,61 +1236,76 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 			pM = pLY->pMAP(m);
 			if( pM ? !pM->iVXn.y : true )
 				continue;
-			glU4[0] = gpmOFF(gpc3Dvx,xyzi);
-			glU4[1] = gpmOFF(gpc3Dvx,xyzi.w);
-			glU4[2] = gpmOFF(gpc3Dvx,up);
-			glU4[3] = gpmOFF(gpc3Dvx,uv);
-			glU4[4] = gpmOFF(gpc3Dvx,ps);
-			glU4[5] = sizeof(gpc3Dvx);
+
 			nT = pM->nTRI();
-			pT0 = pM->pTRI( pLY->buf );
+			pT0 = pM->pTRI0( pLY->buf );
 
 	/// VERTEX ------------------------------------------
-				glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x );  gpfGLerr();
-				/// XYZ
-				if( ATvxID > -1 ) {
-					glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[0]) );  gpfGLerr( "ATvxID" );
-					glEnableVertexAttribArray( ATvxID ); gpfGLerr();
-				}
-				/// ix blnd
-				if( ATixID > -1 ) {
-					glVertexAttribPointer( ATixID, 4, GL_BYTE, GL_FALSE, glU4[5], gpmGLBOFF(glU4[1]) );  gpfGLerr( "ATixID" );
-					glEnableVertexAttribArray( ATixID ); gpfGLerr();
-				}
-				/// UP XYZ
-				if( ATupID > -1 ) {
-					glVertexAttribPointer( ATupID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[2]) );  gpfGLerr( "ATupID" );
-					glEnableVertexAttribArray( ATupID ); gpfGLerr();
-				}
-				/// UV
-				if( ATuvID > -1 ) {
-					glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[3]) );  gpfGLerr( "ATuvID" );
-					glEnableVertexAttribArray( ATuvID ); (e = glGetError());  gpfGLerr();
-				}
-				/// PrtSrf
-				if( ATpsID > -1 ) {
-					glVertexAttribPointer( ATpsID, 2, GL_INT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[4]) );  gpfGLerr( "ATpsID" );
-					glEnableVertexAttribArray( ATpsID ); (e = glGetError());  gpfGLerr();
-				}
+			glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x );  gpfGLerr();
+
+			onATscn(glU4vx);
+
 			for( U4 t = 0; t < nT; t++, msk >>= 1 ) {
 				if( (msk&1) ? !pT0[t].aIIXN[2].y : true )
 					continue;
-				glU4[6] = pT0[t].aIIXN[2].a4x2[1].area();
+
+
+
+				/*if( pPICrtx ) {
+					pSRFx4 = pT0[t].pSRF(0);
+					for( U4 s = 0, ns = pT0[t].nSRF(), n; s < ns; s++ ) {
+						n = pSRFx4[s+1].w-pSRFx4[s].w;
+						if( n < 1 )
+							continue;
+
+						pPICrtx->pSCN = pPICrtx->pSCN->srfADD( this, p3D->pSRFi(pSRFx4[s].x), p3D->sPATH, NULL );
+					}
+					if( pPICrtx->pSCN )
+					if( I4x4* pI4x4 = pPICrtx->pSCN->pSRT() ) {
+						U4 n = pPICrtx->pSCN->nSRT();
+						if()
+						for( U4 i = 0; i < n; i++ ) {
+
+						}
+					}
+				}*/
+
+				glU4vx[6] = pT0[t].aIIXN[2].a4x2[1].area();
 
 
 	/// ELEMENT ------------------------------------------
 				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );  gpfGLerr( "GL_ELEMENT_ARRAY_BUFFER");
-				glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
-								glU4[6],
-								GL_UNSIGNED_INT,
-								NULL ); gpfGLerr( "glDrawElements");
+				if( pSRFx4 = pT0[t].pSRF(0) ) {
+					for( U4 s = 0, ns = pT0[t].nSRF(), n; s < ns; s++ ) {
+						pPIC = pPICsrf( p3D->pSRFi(pSRFx4[s].x), p3D->sPATH );
+						if( !pPIC )
+							continue;
+						glSETtx( 0, pPIC->surDRWtx(pRNDR), pPIC->txWH.a4x2[1] );
+
+						glU4vx[0x7] = pSRFx4[s].w;
+						glU4vx[0x8] = pSRFx4[s+1].w;
+						glU4vx[0x9] = glU4vx[8]-glU4vx[7];
+						glU4vx[0xa] = glU4vx[0x9]/3;
+						glU4vx[0xb] = glU4vx[0x7]*sizeof(U4);
+						glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
+									glU4vx[0x9],
+									GL_UNSIGNED_INT,
+									(void*)glU4vx[0xb] );
+						/*glDrawRangeElements( 	gpaDRWmod[3],
+												glU4vx[0x7], glU4vx[0x8],
+												glU4vx[0xa],
+												GL_UNSIGNED_INT, NULL );*/
+					}
+				} else
+					glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
+									glU4vx[6],
+									GL_UNSIGNED_INT,
+									NULL ); gpfGLerr( "glDrawElements");
 				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ); gpfGLerr();
 			}
-			if( ATvxID > -1 ) { glDisableVertexAttribArray( ATvxID ); gpfGLerr(); }
-			if( ATixID > -1 ) { glDisableVertexAttribArray( ATixID ); gpfGLerr(); }
-			if( ATupID > -1 ) { glDisableVertexAttribArray( ATupID ); gpfGLerr(); }
-			if( ATuvID > -1 ) { glDisableVertexAttribArray( ATuvID ); gpfGLerr(); }
-			if( ATpsID > -1 ) { glDisableVertexAttribArray( ATpsID ); gpfGLerr(); }
+
+			offATscn();
+
 			glBindBuffer( GL_ARRAY_BUFFER, 0 ); gpfGLerr();
 			glBindVertexArray( 0 ); gpfGLerr();
 		}
@@ -1235,7 +1343,7 @@ gpdSTATICoff gpsGLSLvx3D[] = //{
 "	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);				\n"
 "	p = p*d.xxy*xyz.xyx - sb.xxy;												\n"
 "	gl_Position			= vec4( p*-1.0, 1.0 );									\n"
-"	fr_uv				= vec3( v_uv, p.z );									\n"
+"	fr_uv				= vec3( v_uv*vec2(1,-1)+vec2(0,1), p.z );									\n"
 "	fr_up				= v_up;													\n"
 "	fr_ps				= v_ps;													\n"
 "}																				\n\0";
@@ -1246,6 +1354,7 @@ gpdSTATICoff gpsGLSLfrg3D[] = //{
 "varying vec3 fr_up;														\n"
 "varying vec2 fr_ps;														\n"
 "uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
+"uniform sampler2D	tex1;					// MINI_CHAR_xXy_zXw.png		\n"
 "uniform vec4 		aCNL[8];				// CNL							\n"
 "void main()																\n"
 "{																			\n"
@@ -1253,15 +1362,15 @@ gpdSTATICoff gpsGLSLfrg3D[] = //{
 "	vec2 mx = gl_FragCoord.xy/2;											\n"
 "   float xx	=  mx.x-floor(mx.x)											\n"
 "				+ (mx.y-floor(mx.y)) * 2.0;									\n"
-"   if( xx < 1 )															\n"
-		gpdGUIfr3Dc
+"   if( true ) // xx < 1 )															\n"
+		gpdGUIfr3Dc0
 "   else if( xx < 2 )														\n"
 		gpdGUIfr3Du
 "   else if( xx < 3 )														\n"
 		gpdGUIfr3Dp
 "   else 																	\n"
-		gpdGUIfr3Dc
-		gpdGUIfr3Dd
+		gpdGUIfr3Dc0
+	gpdGUIfr3Dd
 "}																			\n"
 "\n\0";
 //};

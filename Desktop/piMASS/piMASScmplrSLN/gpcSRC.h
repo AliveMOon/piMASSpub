@@ -1392,7 +1392,19 @@ public:
 		t.null();
 		srf.null();
 	}
+	U4 nSRF() {
+		if( !this )
+			return 0;
+		U4 n = srf.nLD(sizeof(U4x4));
+		return n>1 ? n-1 : 0;
+	}
 	U4x4* pSRF( U4 s ) {
+		if( s >= nSRF() )
+			return NULL;
+
+		return srf.pU4x4n( s );
+	}
+	U4x4* pSRFadd( U4 s ) {
 		if( !this )
 			return NULL;
 
@@ -1404,15 +1416,24 @@ public:
 		null();
 	};
 };
+class gpc3Dsrf {	///B
+public:
+	char sNAME[0x100],
+		 sPIC[0x100], //,sALF[0x100],
+		 sVMAP[0x100];
+	I4 imag, imap, ix;
+	I8x2 an;
+	gpc3Dsrf(){};
+};
 class gpc3D {
+	gpcLZY lzySRF;
 public:
 	char sPATH[gpdMAX_PATH];
 	I8x4 id;
 
 	gpcLZY	*p_lwo,
 			ly3D,
-			tgIX,
-			lzySRF;
+			tgIX;
 
 	~gpc3D(){
 		gpmDEL(p_lwo);
@@ -1429,6 +1450,9 @@ public:
 	U4 nLY();
 	gpc3Dly* pLYix( U4 i );
 	gpc3D* prt2ix( gpcGL* pGL );
+	U4 nSRF() { return this ? lzySRF.nLD(sizeof(gpc3Dsrf)) : 0; }
+	gpc3Dsrf* pSRFi( U4 i );
+	gpc3Dsrf* pSRFadd( U4 i );
 };
 class gpc3Dlst {
 public:

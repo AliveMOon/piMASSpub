@@ -162,6 +162,7 @@ static const GLenum gpaDRWmod[] = {
 			GL_LINE_STRIP,
 			GL_TRIANGLES,
 		};
+class gpcMASS;
 class gpc3Dvx;
 class gpc3D;
 class gpc3Dlst;
@@ -204,8 +205,7 @@ public:
 			aTXwh[0x10];
 
 	gpcPIC* pPICrtx;
-	SDL_Texture	//*pRTX,
-				*pTRG,
+	SDL_Texture	*pTRG,
 				*pTXchar,
 				*pTXiso;
 
@@ -221,16 +221,16 @@ public:
 
 	gpc3D*		p3D;
 	gpc3Dlst*	p3Dlst;
+	gpcMASS*	pMASS;
 
 	I4 iLWO( gpeALF a, const char* pPATH, gpcLZY& rd );
 	gpcGL* GLSLset( const gpcALU& alu, const char* pF = NULL, const char* pV = NULL );
 	gpcGL* GLSLset( const I8x2& an, const char* pF = NULL, const char* pV = NULL  );
-	~gpcGL()
-	{
+	~gpcGL() {
 		SDL_GL_DeleteContext( gCntxt );
 	}
 
-	gpcGL( gpcWIN& win );
+	gpcGL( gpcWIN* p_win );
 	//gpcGL* glSETtrg( gpcPIC* pT, I4x2 wh, I4 tC = 0, I4 tD = 0 ); // bool bC = true, bool bD = true );
 	gpcGL* SWP( gpcWIN* pWIN ); // SDL_Window* pWIN );
 	gpcGL* TRG( SDL_Renderer* pSDLrndr,
@@ -588,16 +588,16 @@ public:
 		aTexID[1] = glGetUniformLocation( gProgID, "tex1" );
 		aTexID[2] = glGetUniformLocation( gProgID, "tex2" );
 		aTexID[3] = glGetUniformLocation( gProgID, "tex3" );
+		///aTexID[8] = glGetUniformLocation( gProgID, "tex8" );
 		gPrgSucc = GL_TRUE;
 		return gProgID;
 
 	}
 
-
-	gpcGL* glSCENE( gpMEM* pMEM, char* pSTR );
-
-
-
+	gpcPIC* pPICsrf( gpc3Dsrf* pSRF, char* pPATH );
+	gpcGL*	glSCENE( gpMEM* pMEM, char* pSTR );
+	void onATscn( U4* glU4 );
+	void offATscn();
 
 };
 class gpcWIN {

@@ -335,8 +335,8 @@ public:
 
 
 
-#define gpmMAX( a, b ) ( a > b ? a : b )
-#define gpmMIN( a, b ) ( a < b ? a : b )
+#define gpmMAX( a, b ) ( ((a)>(b)) ? (a):(b) )
+#define gpmMIN( a, b ) ( ((a)<(b)) ? (a):(b) )
 #define PI acos(-1.0)
 #define PIp2 (PI/2.0)
 #define PI2 (PI*2.0)
@@ -915,7 +915,7 @@ enum gpeISA : I1 {
 	gpeISA_blkE		= '}',
 
 };
-
+char* gpfSTRdrop( char* p_dst, char* p_str, char* p_end, const char* p_drop );
 class U1x4 {
 public:
     union
@@ -6297,9 +6297,10 @@ szasz:
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
 	I8 nU4( I8 x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
-	U4* pU4n( int i = 0, int n = 1 ) { return (U4*)Ux( (i<0 ? nLD(sizeof(U4)): i) , sizeof(U4)*n, true, sizeof(U4)); }
-	U4x2* pU4x2n( int i = 0, int n = 1 ) { return (U4x2*)Ux((i<0 ? nLD(sizeof(U4x2)): i),sizeof(U4x2)*n, true, sizeof(U4x2)); }
-	U4x4* pU4x4n( int i = 0, int n = 1 ) { return (U4x4*)Ux((i<0 ? nLD(sizeof(U4x4)): i),sizeof(U4x4)*n, true, sizeof(U4x4)); }
+	U4*		pU4n( int i = 0, int n = 1 ) 	{ return (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
+	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
+	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
+	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
 
 	char* pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
 	I1* pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
@@ -6310,7 +6311,9 @@ szasz:
 
 	I4* pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
 	I4x2* pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
+	U4 nI4x2() { return nLD(sizeof(I4x2)); };
 	I4x4* pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
+	U4 nI4x4() { return nLD(sizeof(I4x4)); };
 
 	I8x2* pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
 	I8x4* pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }

@@ -1,14 +1,15 @@
 #include "gpccrs.h"
 #include "gpsGLSL.h"
 
-gpcGL::gpcGL( gpcWIN& win ) {
+gpcGL::gpcGL( gpcWIN* p_win ) {
 	gpmCLR;
+	pMASS = p_win->piMASS;
 	oPrgID = -1;
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
-	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
+	gCntxt = SDL_GL_CreateContext( p_win->pSDLwin );
 	if( !gCntxt ) {
 		if(bSTDcout){std::cout <<std::endl << "gpcGL init error" <<std::endl;}
 		return;
@@ -22,22 +23,22 @@ gpcGL::gpcGL( gpcWIN& win ) {
 
 	glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
 
-	trgWHpx = win.winSIZ.a4x2[1];
+	trgWHpx = p_win->winSIZ.a4x2[1];
 	pTRG = SDL_CreateTexture(
-								win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+								p_win->pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 								trgWHpx.x, trgWHpx.y
 							);
 	gVxSucc = GL_FALSE;
 
-	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
+	pTXchar = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFchar );
 	if( pTXchar )
-		if(bSTDcout){std::cout << "char" << (void*)win.pSRFchar <<std::endl;}
+		if(bSTDcout){std::cout << "char" << (void*)p_win->pSRFchar <<std::endl;}
 	else
 		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
 
-	pTXiso = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFiso );
+	pTXiso = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFiso );
 	if( pTXiso )
-		if(bSTDcout){std::cout << "char" << (void*)win.pSRFiso <<std::endl;}
+		if(bSTDcout){std::cout << "char" << (void*)p_win->pSRFiso <<std::endl;}
 	else
 		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
 

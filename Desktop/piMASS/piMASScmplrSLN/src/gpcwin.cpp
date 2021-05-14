@@ -198,7 +198,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	pHOST = sHOST;
 	pUSER = sUSER;
 
-	pGL =  new gpcGL( *this );
+	pGL =  new gpcGL( this );
 	if( !pGL )
 		return;
 

@@ -1675,8 +1675,7 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 
 	if( !p_out )
 		return 0;
-	if( !d0 )
-	{
+	if( !d0 ) {
 		*(U1*)p_out = 0;
 		return 0;
 	}
@@ -1686,15 +1685,13 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 
 	*p_end = 0;
 	bool b_minus = false;
-	if( d0 < 0 )
-	{
+	if( d0 < 0 ) {
 		b_minus = true;
 		d0 *= -1;
 	}
 
 	I8 d1;
-	while( d0 )
-	{
+	while( d0 ) {
 		d1 = d0;
 		d0 = (d0-1)/gpdALF;
 		p_buff--;
@@ -1711,6 +1708,7 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 	((U1*)p_out)[n] = 0;
 	return n;
 }
+
 inline gpeALF gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL );
 
 
