@@ -4409,7 +4409,7 @@ public:
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
 	F2& swpXY( const void* pV );
-
+	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }
     double qlen( void ) const { return x*x+y*y; }
     F2 norm( void ) const {

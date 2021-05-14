@@ -377,9 +377,10 @@ public:
 			for( U4 i = 0, ie = pFl->y, t, te; i < ie; i++ ) {
 				if( pFi[i] != ip )
 					continue;
+				/// VMAD
 				pVX = (gpc3Dvx*)pnt.Ux( ip, sizeof(tmP) );
 				tmP = *pVX;
-				tmP.uv.swpXY( pUi ); pUi += sizeof(F2);
+				tmP.uv.swpXYflpY( pUi ); pUi += sizeof(F2);
 
 
 				for( t = p.nLD(sizeof(tmP)), te = pnt.nLD(sizeof(tmP)); t < te; t++ ) {
@@ -602,7 +603,7 @@ public:
 				ip = swp2( pUi ); pUi+= 2;
 			}
 			pTX = (F2*)mapF2tx.Ux( ip, sizeof(*pTX) );
-			pTX->swpXY( pUi ); pUi += sizeof(*pTX);
+			pTX->swpXYflpY( pUi ); pUi += sizeof(*pTX);
 		}
 		pIX2->y = mapF2tx.nLD(sizeof(*pTX))-pIX2->x;
 		return ix;
@@ -1151,24 +1152,7 @@ gpcPIC* gpcGL::pPICsrf( gpc3Dsrf* pSRF, char* pPATH ) { //, char* pFILE ) {
 	return pPIC;
 
 }
-/*I4x4* gpcTXscn::pSRT() {
-	if( !bRDY() )
-		return NULL;
-	ixSRT = ixLST;
 
-	I4x4* pI0 = ixSRT.pI4x4();
-	U4 nIX = ixSRT.nI4x4();
-	if( nIX < 2 ){
-		if( nIX ) aIX[0] = pI0->y;
-		return pI0;
-	}
-
-
-	pI0->median( nIX, true );
-
-	yesRDY();
-	return pI0;
-}*/
 U4 glU4vx[] = {
 	gpmOFF(gpc3Dvx,xyzi),		// 00
 	gpmOFF(gpc3Dvx,xyzi.w),		// 01
@@ -1343,7 +1327,7 @@ gpdSTATICoff gpsGLSLvx3D[] = //{
 "	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);				\n"
 "	p = p*d.xxy*xyz.xyx - sb.xxy;												\n"
 "	gl_Position			= vec4( p*-1.0, 1.0 );									\n"
-"	fr_uv				= vec3( v_uv*vec2(1,-1)+vec2(0,1), p.z );									\n"
+"	fr_uv				= vec3( v_uv, p.z ); //*vec2(1,-1)+vec2(0,1), p.z );	\n"
 "	fr_up				= v_up;													\n"
 "	fr_ps				= v_ps;													\n"
 "}																				\n\0";
@@ -1479,7 +1463,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 
 	glMatrixMode(GL_PROJECTION);
     {
-        F4	eye = aCAM[0], ///4.0f,
+        F4	eye = aCAM[0]/4.0f,
 			cntr = 0,
 			up = { 0.f, 0.f, 1.f };
 		view.latR( eye, cntr, up );

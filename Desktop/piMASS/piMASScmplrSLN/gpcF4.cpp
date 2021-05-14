@@ -24,6 +24,11 @@ F2& F2::swpXY( const void* pV ) {
 	((U1x4*)&x)->wzyx(pV,2);
 	return *this;
 }
+F2& F2::swpXYflpY( const void* pV ) {
+	((U1x4*)&x)->wzyx(pV,2);
+	y = 1-y;
+	return *this;
+}
 F2& F2::sXY( const char* p_str, char** pp_str ) {
 	U8 nLEN;
 	gpmCLR;
