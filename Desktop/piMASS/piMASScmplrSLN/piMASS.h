@@ -6002,8 +6002,7 @@ public:
 			new_load = iSTRT + n_add + n_hi;
 		U1* p_kill = NULL;
 
-		if( new_load > n_alloc )
-		{
+		if( new_load > n_alloc ) {
 			n_alloc += gpmPAD( (n_add*n), 0x10 );
 			p_kill = p_alloc;
 			p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
@@ -6349,6 +6348,7 @@ public:
 		str.lzyRST();
 		ix.lzyRST();
 	}
+	U4x4* pIXi( U4 i ) { return ix.pU4x4(i); }
 	U4 dctFND( const void* p, U8 nS, U4& nIX ) {
 		if( !this )
 		{

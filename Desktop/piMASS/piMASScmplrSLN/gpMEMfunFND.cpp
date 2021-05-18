@@ -52,12 +52,18 @@ gpITM* gpITM::read( gpITMlst *pIDlst ) {
 			rd.lzyRD( pIDlst->sPATH, s = 0 );
 			switch( ABbb.a8x2[0].b ) {
 				case gpeALF_LWO: {
-						/// keressünk egy iloyen nevű objectet
+						/// keressünk egy ilyen nevű objectet
 						I4* p3Did = (I4*)pV;
 						*p3Did = 	pIDlst->pMEM
 									? pIDlst->pMEM->pWgl->iLWO( ABbb.a8x2[0].a, pIDlst->sPATH, rd )
 									: -1;
 
+					} break;
+				case gpeALF_LWS: {
+						I4* p3Did = (I4*)pV;
+						*p3Did = 	pIDlst->pMEM
+									? pIDlst->pMEM->pWgl->iLWS( ABbb.a8x2[0].a, pIDlst->sPATH, rd )
+									: -1;
 					} break;
 				default:
 					if( rd.nLD() )

@@ -1454,28 +1454,214 @@ public:
 	gpc3Dsrf* pSRFi( U4 i );
 	gpc3Dsrf* pSRFadd( U4 i );
 };
+
+class gpc3Dact {
+public:
+	float	b, e, start, mix, fade, gim, loop, long_s;
+	I8		begin_ms, end_ms, start_ms, loop_ms, long_ms;
+	gpc3Dact(	float _begin, float _end,
+			float _start, float _mix,
+			float _fade, float _gim, float _loop )
+	{
+		b		= _begin;
+		e		= _end;
+		start	= _start;
+		mix		= _mix;
+		fade	= _fade;
+		gim		= _gim;
+		loop	= _loop;
+
+		long_ms = (I8)((long_s = e-b)*ms2sec);
+		begin_ms = (I8)(b*ms2sec);
+		end_ms = (I8)(e*ms2sec);
+		loop_ms = (I8)(loop*ms2sec);
+		start_ms = (I8)(start*ms2sec);
+	}
+	float sec( I8 ms )
+	{
+		float sec = 0.0;
+		ms += start_ms - begin_ms;
+		//I8 act_ms = start_ms + act_ms - begin_ms;
+
+		if( ms < long_ms )
+			sec = float(ms)/ms2sec;
+		else if( end_ms <= loop_ms )
+			sec = long_s;
+		else
+			sec = float(ms%long_ms)/ms2sec;
+
+		return sec + b;
+	}
+};
+
+static const   gpc3Dact gp_a_action_man[] = {
+	//			begin,	end,	start,	mix,	fade,	gim,		loop
+	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_DEF,
+	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_IDLE,
+	gpc3Dact(	 32.0,	34.0,	32.5,	33.5,	0.5,	1.0,		32.0	),	//GPE_ACTION_WALK,
+	gpc3Dact(	 36.5,	38.5,	36.5,	38.5,	0.5,	0.3,		37.0	),	//GPE_ACTION_RUN,
+	gpc3Dact(	 40.0,	42.0,	40.0,	41.5,	0.5,	0.3,		42.0	),	//GPE_ACTION_JUMP,
+	gpc3Dact(	 43.0,	45.0,	43.0,	44.5,	0.5,	1.0,		43.0	),	//GPE_ACTION_SLEFT,
+	gpc3Dact(	 46.0,	48.0,	46.0,	47.5,	0.5,	1.0,		46.0	),	//GPE_ACTION_SRIGHT,
+	gpc3Dact(	 49.0,	51.0,	49.5,	51.5,	0.5,	0.5,		49.0	),	//GPE_ACTION_FLINCH,
+	gpc3Dact(	 53.0,	54.0,	53.0,	53.75,	0.25,	0.1,		54.0	),	//GPE_ACTION_BOX,
+	gpc3Dact(	 55.0,	56.0,	55.0,	55.5,	0.5,	0.1,		56.0	),	//GPE_ACTION_KICK,
+	gpc3Dact(	 57.0,	58.0,	57.0,	57.75,	0.25,	0.2,		58.0	),	//GPE_ACTION_ABOARD,
+	gpc3Dact(	 58.0,	60.0,	58.0,	60.0,	0.25,	0.2,		60.0	),	//GPE_ACTION_DEBUS,
+	gpc3Dact(	 61.0,	61.5,	61.0,	61.5,	0.25,	0.1,		61.5	),	//GPE_ACTION_STOW,
+	gpc3Dact(	 61.5,	62.0,	61.5,	62.0,	0.25,	0.1,		62.0	),	//GPE_ACTION_STOWUP,
+	gpc3Dact(	 63.0,	64.0,	63.0,	63.75,	0.25,	0.1,		64.0	),	//GPE_ACTION_WHAM,
+	gpc3Dact(	 65.0,	69.0,	65.0,	68.9,	0.01,	0.1,		69.0	),	//GPE_ACTION_KO,
+	gpc3Dact(	 69.0,	74.0,	69.0,	73.9,	0.5,	0.1,		74.0	),	//GPE_ACTION_ERECT,
+};
+
+static const char gp_man_lws[] =
+	"manus\n"
+	"bone_mother\n"
+	"bone_groin\n"
+	"bone_waist\n"
+	"bone_throax\n"
+
+	"bone_l.upperarm\n"
+	"bone_l.forearm\n"
+	"bone_l.hand\n"
+
+	"bone_r.upperarm\n"
+	"bone_r.forearm\n"
+	"bone_r.hand\n"
+
+	"bone_l.thigh\n"
+	"bone_l.shin\n"
+	"bone_l.feet\n"
+
+	"bone_r.thigh\n"
+	"bone_r.shin\n"
+	"bone_r.feet\n"
+
+	"bone_neck\n"
+	"bone_head\n\0";
+
+
+static const char gp_s_lws[] =
+		"LoadObjectLayer\n"
+		"AddBone\n"
+		"AddNullObject\n"
+		"AddLight\n"
+		"AddCamera\n"
+		"NumChannels\n"
+		"Channel\n"
+		"{\n"
+		"Envelope\n"
+		"Key\n"
+		"}\n"
+		"ParentItem\n"
+		"BoneName\n"
+		"BoneRestPosition\n"
+		"BoneRestDirection\n"
+		"BoneRestLength\n"
+		;
+
+typedef enum GPE_LWS_COM:int {
+		GPE_LWS_COM_LoadObjectLayer,
+		GPE_LWS_COM_AddBone,
+		GPE_LWS_COM_AddNullObject,
+		GPE_LWS_COM_AddLight,
+		GPE_LWS_COM_AddCamera,
+		GPE_LWS_COM_NumChannels,
+		GPE_LWS_COM_Channel,
+		GPE_LWS_COM_C_open,
+		GPE_LWS_COM_Envelope,
+		GPE_LWS_COM_Key,
+		GPE_LWS_COM_C_close	,
+		GPE_LWS_COM_ParentItem,
+		GPE_LWS_COM_BoneName,
+		GPE_LWS_COM_BoneRestPosition,
+		GPE_LWS_COM_BoneRestDirection,
+		GPE_LWS_COM_BoneRestLength,
+} GPT_LWS_COM;
+typedef enum GPE_LWS_iTYP:U4 {
+	gpeLWSiTYP_OBJ = 0x10000000,
+	gpeLWSiTYP_LIG = 0x20000000,
+	gpeLWSiTYP_CAM = 0x30000000,
+	gpeLWSiTYP_BON = 0x40000000,
+
+} GPT_LWS_iTYP;
+class gpc3Dkey {
+public:
+	float val,sec; int spn;
+	float aP[6];
+	gpc3Dkey(){};
+
+	gpc3Dkey& operator = ( const char* pS );
+};
+class gpc3Dcnl {
+public:
+	gpcLZY aKEY[9];
+	U4 nKEY( U1 c ) { return c > 8 ? 0 : (this ? aKEY[c].nLD(sizeof(gpc3Dkey)): 0); }
+	gpc3Dkey* pKEYs( U1 c, float s );
+	gpc3Dkey* pKEYins( U1 c, float s );
+};
+class gpc3Ditm {
+public:
+	char sNAME[0x100], *pNAME;
+	U4	objIX,	objID,
+		momIX,	momID,
+		trgID,	layID,
+		mxIX,	nLEV;
+	F4  rstXYZ, rstYPR, rstWHD;
+
+	gpc3Dcnl	cnl;
+
+	gpc3Ditm(){};
+
+};
+
+class gpc3Dgym {
+	public:
+	char sPATH[gpdMAX_PATH];
+	I8x4 id;
+
+	I4x4	olcb;
+	gpcLZY	*p_lws,
+			itmLST;
+
+	U4 n3Ditm() { return this ? itmLST.nLD(sizeof(gpc3Ditm)) : 0; }
+	gpc3Ditm* p3Ditm( U4 i, U4 id );
+
+	~gpc3Dgym(){
+		gpmDEL(p_lws);
+	}
+	gpc3Dgym( I4 i, const char* pP, gpeALF alf ) {
+		gpmCLR;
+		U8 nLEN;
+		id.x = i;
+		id.a8x2[0].b = alf;
+		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
+		gpmSTRCPY( sPATH, pP );
+	}
+	gpc3Dgym* pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT );
+};
 class gpc3Dlst {
 public:
 	gpcLZY lst3D;
-	gpcLZYdct bonLST;
+	gpcLZYdct bnDCT, lwsDCT;
+	gpcLZY lst3Dgym;
 
 	~gpc3Dlst(){
-		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
+		gpc3D **pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
 		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
 		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
 			gpmDEL( pp3D[i3D] );
 		}
-	}
-	gpc3Dlst();/*{
-		gpmCLR;
-		U8 nLEN;
-		char* pS = gp_man_lws, *pSe;
-		while( *pS ) {
-			pSe = pS+gpmVAN( pS, "\r\n", nLEN );
-			bonLST.dctADD( pS, pSe-pS );
-			pS = pSe+gpmNINCS(pSe, "\r\n" );
+
+		gpc3Dgym **pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( 0, sizeof(gpc3Dgym*) );
+		//I4
+		i3D = 0, e3D = lst3Dgym.nLD(sizeof(gpc3Dgym*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			gpmDEL( pp3Dgym[i3D] );
 		}
-	}*/
+	}
+	gpc3Dlst();
 	gpc3D* p3Dix( I4 i ) {
 		if( i < 0 ) return NULL;
 		gpc3D* p3D = ((gpc3D**)lst3D.Ux(i,sizeof(gpc3D*)))[0];
@@ -1501,6 +1687,29 @@ public:
 		pp3D[0] = new gpc3D( e3D, pP, alf );
 		return pp3D[0];
 	}
+
+	/// TRACK
+	gpc3Dgym* p3Dgym( gpeALF alf, const char* pP ) {
+		if( !this )
+			return NULL;
+
+		gpc3Dgym **pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( 0, sizeof(gpc3Dgym*) );//, *p3D;
+		I4 i3D = 0, e3D = lst3Dgym.nLD(sizeof(gpc3Dgym*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			if( !pp3Dgym[i3D] ) {
+				if( e3D > i3D )
+					e3D = i3D;
+				continue;
+			}
+			if( pp3Dgym[i3D]->id.a8x2[0].a != alf )
+				continue;
+			return pp3Dgym[i3D];
+		}
+		pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( e3D, sizeof(gpc3Dgym*) );
+		pp3Dgym[0] = new gpc3Dgym( e3D, pP, alf );
+		return pp3Dgym[0];
+	}
+
 };
 
 class gpMEM {
@@ -2111,8 +2320,7 @@ class gpcCLASS {
 	I8	nLST, nCLASS,
 		idFND, ixFND;
 
-	gpcLZY** ppCLASS( I8 ix )
-	{
+	gpcLZY** ppCLASS( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
@@ -2149,8 +2357,7 @@ class gpcCLASS {
 		}
 		return ppC+ix;
 	}
-	gpcCLASS( I8 id )
-	{
+	gpcCLASS( I8 id ) {
 		gpmCLR;
 		I8 n = 0;
 		pLST = pLST->tree_add( id, n );
@@ -2160,13 +2367,11 @@ class gpcCLASS {
 		nLST = n;
 	}
 public:
-	gpcCLASS( void )
-	{
+	gpcCLASS( void ) {
 		gpmCLR;
 	}
 
-	gpcLZY* pGET( I8 ix )
-	{
+	gpcLZY* pGET( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
@@ -2176,16 +2381,14 @@ public:
 
 		return *ppC;
 	}
-	gpcLZY** ppGET( I8 ix )
-	{
+	gpcLZY** ppGET( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
 		return ppCLASS( ix );
 	}
 
-	I8 fnd( I8 id )
-	{
+	I8 fnd( I8 id ) {
 		if( id ? !this : true )
 			return nLST;
 
@@ -2195,8 +2398,7 @@ public:
 
 		return pLST->tree_fnd(id, nLST);
 	}
-	gpcLZY* p_fnd( I8 id, I8& ix )
-	{
+	gpcLZY* p_fnd( I8 id, I8& ix ) {
 		ix = 0;
 		if( id ? !this : true )
 			return NULL;
@@ -2224,8 +2426,7 @@ public:
 		idFND = id;
 		return pFND = *ppC;
 	}
-	gpcCLASS* add( I8 id, I8& ix, I8& n )
-	{
+	gpcCLASS* add( I8 id, I8& ix, I8& n ) {
 		if( !id )
 		{
 			ix = n = (this ? nLST: 0);

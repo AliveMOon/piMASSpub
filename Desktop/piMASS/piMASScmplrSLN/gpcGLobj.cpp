@@ -152,40 +152,21 @@ typedef enum LWO_ID:U4 {
 	LWO_ID_COLOR	= MAKE_ID('c','o','l','o'),
 };
 
-char gp_man_lws[] = //{
-	"manus\n"
-	"bone_mother\n"
-	"bone_groin\n"
-	"bone_waist\n"
-	"bone_throax\n"
 
-	"bone_l.upperarm\n"
-	"bone_l.forearm\n"
-	"bone_l.hand\n"
-
-	"bone_r.upperarm\n"
-	"bone_r.forearm\n"
-	"bone_r.hand\n"
-
-	"bone_l.thigh\n"
-	"bone_l.shin\n"
-	"bone_l.feet\n"
-
-	"bone_r.thigh\n"
-	"bone_r.shin\n"
-	"bone_r.feet\n"
-
-	"bone_neck\n"
-	"bone_head\n\0";
-//};
 
 gpc3Dlst::gpc3Dlst(){
 	gpmCLR;
 	U8 nLEN;
-	char* pS = gp_man_lws, *pSe;
+	char* pS = (char*)gp_man_lws, *pSe;
 	while( *pS ) {
 		pSe = pS+gpmVAN( pS, "\r\n", nLEN );
-		bonLST.dctADD( pS, pSe-pS );
+		bnDCT.dctADD( pS, pSe-pS );
+		pS = pSe+gpmNINCS(pSe, "\r\n" );
+	}
+	pS = (char*)gp_s_lws;
+	while( *pS ) {
+		pSe = pS+gpmVAN( pS, "\r\n", nLEN );
+		lwsDCT.dctADD( pS, pSe-pS );
 		pS = pSe+gpmNINCS(pSe, "\r\n" );
 	}
 }
@@ -509,7 +490,6 @@ public:
 			bon, buf;
 	gpc3Dfc fc;
 
-	//gpcLZYdct	mapDCTmn;
 	gpcLZYdct	mapDCTwg; gpcLZY mapIXwg, mapBLwg;
 	gpcLZYdct	mapDCTtx; gpcLZY mapIXtx, mapF2tx;
 	gpcLZYdct	mapDCTmr; gpcLZY mapIXmr, mapBLmr;
@@ -553,9 +533,9 @@ public:
 		bbox[0].swpXYZ0( pU ); pU+=3;
 		bbox[1].swpXYZ0( pU );
 	}
-	I4 pWGHTswp( const void* pV, U4 n, gpcLZYdct& dctBN  ) {
+	I4 pWGHTswp( const void* pV, U4 n, gpcLZYdct& bnDCT  ) {
 		U4	nUi = gpmSTRLEN(pV), ip, uf,
-			iBn, iBx = dctBN.dctFND( pV, nUi, iBn );
+			iBn, iBx = bnDCT.dctFND( pV, nUi, iBn );
 		if( iBx >= iBn )
 			return -1; /// ha nem csont egyenlőre nem kell
 
@@ -747,11 +727,318 @@ public:
 		return ppM ? ppM[ix] : NULL;
 	}
 };
+gpc3Ditm* gpc3Dgym::p3Ditm( U4 i, U4 id ) {
+	if( i > n3Ditm() )
+		i = n3Ditm();
+	gpc3Ditm* pITM = (gpc3Ditm*)itmLST.Ux( i, sizeof(*pITM) );
 
+	pITM->objIX = i;
+	pITM->objID = id;
+	return pITM;
+}
+gpc3Dkey* gpc3Dcnl::pKEYs( U1 c, float s ){
+	if( !nKEY(c) )
+		return NULL;
 
+	gpc3Dkey* pK0 = (gpc3Dkey*)aKEY[c].p_alloc;
 
+	U4	aiK[2] = { 0, nKEY(c) },
+		nK = aiK[1],
+		iK;
+	while( nK ) {
+		iK = (aiK[1]+aiK[0])/2;
+		if( pK0[iK].sec == s )
+			return pK0+iK;
 
-gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
+		if( pK0[iK].sec > s ) {
+			// ez nagy
+			if(iK<=aiK[0]) return NULL;	// kisebb nincs
+
+			iK--;
+			if(pK0[iK].sec <= s )
+				return pK0+iK; 	// ez az <=
+
+			// nagyobb
+			aiK[1] = iK;
+			nK = aiK[1]-aiK[0];
+			continue;
+		}
+
+		// ez kicsi
+		if( iK+1 >= aiK[1] ) return NULL;	// köv nincs
+
+		iK++;
+		if( pK0[iK].sec == s )	// köv az
+				return pK0+iK;
+		else if( pK0[iK].sec > s )
+				return pK0+iK-1; // ez kicsi köv nagyobb
+
+		aiK[0] = iK;
+		nK = aiK[1]-aiK[0];
+	}
+	return NULL;
+}
+gpc3Dkey* gpc3Dcnl::pKEYins( U1 c, float s ){
+	if( !nKEY(c) ){
+		if( this ? c>8 : true )
+			return NULL;
+		gpc3Dkey* pK0 = (gpc3Dkey*)aKEY[c].Ux(0,sizeof(*pK0));
+		pK0->sec = s;
+		return pK0;
+	}
+
+	gpc3Dkey* pK0 = (gpc3Dkey*)aKEY[c].p_alloc;
+
+	U4	aiK[2] = { 0, nKEY(c) },
+		nK = aiK[1],
+		iK;
+	while( nK ) {
+		iK = (aiK[1]+aiK[0])/2;
+		if( pK0[iK].sec == s )
+			return pK0+iK;
+
+		if( pK0[iK].sec > s ) {
+			// ez nagy
+			if(iK<=aiK[0]) {	// kisebb nincs
+				iK=aiK[0];
+				U8 strt = iK*sizeof(*pK0);
+				aKEY[c].lzyINS( NULL,sizeof(*pK0), strt, 0 );
+				pK0 = (gpc3Dkey*)aKEY[c].Ux(iK,sizeof(*pK0));
+				pK0->sec = s;
+				return pK0;
+			}
+			iK--;
+			if(pK0[iK].sec <= s )
+				return pK0+iK; 	// ez az <=
+
+			// nagyobb
+			aiK[1] = iK;
+			nK = aiK[1]-aiK[0];
+			continue;
+		}
+
+		// ez kicsi
+		if( iK+1 >= aiK[1] ) {	// köv nincs
+			pK0 = (gpc3Dkey*)aKEY[c].Ux(aiK[1],sizeof(*pK0));
+			pK0->sec = s;
+			return pK0;
+		}
+		iK++;
+		if( pK0[iK].sec == s )	// köv az
+				return pK0+iK;
+		else if( pK0[iK].sec > s ) {
+			U8 strt = iK*sizeof(*pK0);
+			aKEY[c].lzyINS( NULL,sizeof(*pK0), strt, 0 );
+			pK0 = (gpc3Dkey*)aKEY[c].Ux(iK,sizeof(*pK0));
+			pK0->sec = s;
+			return pK0;
+		}
+
+		aiK[0] = iK;
+		nK = aiK[1]-aiK[0];
+	}
+	return NULL;
+}
+gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
+	U8 nL;
+	char* pE = (char*)pS + gpmVAN(pS,"\r\n}", nL );
+	int i = 0;
+	while( pS < pE ) {
+		switch( i ) {
+			case 0:
+				val = gpmSTR2D( pS ); break;
+			case 1:
+				sec = gpmSTR2D( pS ); break;
+			case 2:
+				spn = gpmSTR2D( pS ); break;
+			default:
+				aP[(i-3)%6] = gpmSTR2D( pS ); break;
+		}
+		i++;
+	}
+	return *this;
+}
+gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
+	if( !this )
+		return NULL;
+	std::cout << "gpc3Dgym::pLWS" << std::endl;
+	U8 s = lws.nLD();
+	if( !s )
+		return this;
+	U4x4* pU4x4;
+	char* pS = (char*)lws.p_alloc, *pSe = pS+s, *pA;
+	GPE_LWS_COM si;
+	U4 nD, iD, nS, nL, iCNL = 0, nENV = 0;
+	olcb = I4x4(-1,-1,-1,-1);
+
+	gpc3Ditm	*pITM = NULL, *pNULL = NULL,	// 0x10000000
+				*pLIG = NULL,					// 0x20000000
+				*pCAM = NULL,					// 0x30000000
+				*pBON = NULL,					// 0x40000000
+				*pMOM = NULL, *pCOUT = NULL;
+	I8 momID;
+	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pSe; pS += gpmNINCS( pS, " \t\r\n" ) )
+	{
+		si = (GPE_LWS_COM)lwsDCT.dctFND( pS, nS = pSe-pS, nD );
+		pU4x4 = lwsDCT.pIXi((U4)si);
+		if( !pU4x4 ) {
+			pS += gpmVAN( pS, "\r\n", s );
+			continue;
+		}
+
+		pA = pS + pU4x4->y;
+		pS = pA + gpmVAN( pA, "\r\n", s );
+		switch( si ) {
+			case GPE_LWS_COM_LoadObjectLayer:{
+				pBON = NULL;
+				olcb.x++;
+				olcb.w=-1;
+				pMOM = pITM = p3Ditm( -1, gpeLWSiTYP_OBJ|olcb.x );
+				pITM->layID = gpfSTR2I8(pA, &pA);
+				pA += gpmNINCS(pA," \t\"");
+				U4 n = gpmVAN(pA," \t\"\r\n",s);
+				gpmMcpy( pITM->sNAME, pA, n )[n] = 0;
+				pITM->pNAME = strrchr(pITM->sNAME,'/');
+				if( !pITM->pNAME )
+					pITM->pNAME = pITM->sNAME;
+				if( pITM->pNAME[0] == '/' )
+					pITM->pNAME++;
+			} break;
+			case GPE_LWS_COM_AddBone:{
+				olcb.w++;
+				pMOM = pBON = p3Ditm( -1, gpeLWSiTYP_BON| (olcb.w<<16) | (pITM->objID&0xffff) );
+			} break;
+			case GPE_LWS_COM_AddNullObject:{
+				pBON = pITM = NULL;
+				olcb.x++;
+				olcb.w=-1;
+				pMOM = pNULL = p3Ditm( -1, gpeLWSiTYP_OBJ|olcb.x );
+				//pITM->layID = gpfSTR2I8(pA, &pA);
+				pA += gpmNINCS(pA," \t\"");
+				U4 n = gpmVAN(pA," \t\"\r\n",s);
+				gpmMcpy( pNULL->sNAME, pA, n )[n] = 0;
+				pNULL->pNAME = strrchr(pNULL->sNAME,'/');
+				if( !pNULL->pNAME )
+					pNULL->pNAME = pNULL->sNAME;
+				if( pNULL->pNAME[0] == '/' )
+					pNULL->pNAME++;
+			} break;
+			case GPE_LWS_COM_AddLight:{
+				pBON = pITM = pNULL = NULL;
+				olcb.y++;
+				olcb.w=-1;
+				pMOM = pLIG = p3Ditm( -1, gpeLWSiTYP_LIG|olcb.y );
+				pLIG->pNAME = pNULL->sNAME;
+			} break;
+			case GPE_LWS_COM_AddCamera:{
+				pBON = pITM = pNULL = pLIG = NULL;
+				olcb.z++;
+				olcb.w=-1;
+				pMOM = pCAM = p3Ditm( -1, gpeLWSiTYP_LIG|olcb.y );
+				pCAM->pNAME = pCAM->sNAME;
+			} break;
+			case GPE_LWS_COM_NumChannels:{} break;
+			case GPE_LWS_COM_Channel:{
+				iCNL = gpfSTR2I8(pA, &pA);
+			} break;
+			case GPE_LWS_COM_C_open:{} break;
+			case GPE_LWS_COM_Envelope:{
+
+			} break;
+			case GPE_LWS_COM_Key:{
+				gpc3Dkey key;
+				key = pA;
+				pCOUT = pBON ? pBON
+								: (pITM ? pITM
+								: (pNULL ? pNULL
+								: (pLIG ? pLIG
+								: (pCAM ? pCAM
+								:  NULL
+									))));
+				if( !pCOUT )
+					break;
+				gpc3Dkey* pKEY = pCOUT->cnl.pKEYins(iCNL, key.sec );
+				if( !pKEY )
+					break;
+				*pKEY = key;
+			} break;
+			case GPE_LWS_COM_C_close:{} break;
+			case GPE_LWS_COM_ParentItem:{
+				if( !pMOM )
+					continue;
+				pMOM->momID = momID = gpfSTR2I8( pA, &pA, NULL, true );
+				while( pMOM->momID ) {
+					pMOM--;
+					if( pMOM->objID != momID )
+						continue;
+					pCOUT = pBON ? pBON
+								: (pITM ? pITM
+								: (pNULL ? pNULL
+								: (pLIG ? pLIG
+								: (pCAM ? pCAM
+								:  NULL
+									))));
+					if( !pCOUT )
+						break;
+
+					pCOUT->momIX = pMOM->objIX;
+					pCOUT->nLEV = pMOM->nLEV+1;
+					break;
+				}
+				pMOM = NULL;
+				if( !pCOUT )
+					break;
+
+				std::cout	<< pCOUT->objIX << ". l:" << pCOUT->nLEV << " "
+							<< pCOUT->sNAME <<  " 0x" <<  std::hex << pCOUT->objID
+											<<  " 0x" <<  std::hex << pCOUT->momID
+											<< (pNULL ? "NULL":"") << std::endl;
+			} break;
+			case GPE_LWS_COM_BoneName:{
+				pA += gpmNINCS(pA," \t\"");
+				nD = gpmVAN(pA," \t\"\r\n",s);
+				gpmMcpy( pBON->sNAME, pA, nD )[nD] = 0;
+				pBON->pNAME = strrchr(pBON->sNAME,'/');
+				if( !pBON->pNAME )
+					pBON->pNAME = pBON->sNAME;
+				else
+					nD -= pBON->pNAME-pBON->sNAME;
+
+				if( pBON->pNAME[0] == '/' )
+					pBON->pNAME++;
+				pBON->mxIX = bnDCT.dctFND( pBON->pNAME, nD, iD );
+
+			} break;
+			case GPE_LWS_COM_BoneRestPosition:{ if( !pBON ) break;
+				pBON->rstXYZ.sXYZW( pA, &pA );
+			} break;
+			case GPE_LWS_COM_BoneRestDirection:{ if( !pBON ) break;
+				pBON->rstYPR.sXYZW( pA, &pA );
+			} break;
+			case GPE_LWS_COM_BoneRestLength:{ if( !pBON ) break;
+				pBON->rstWHD.sXYZW( pA, &pA );
+			} break;
+			default: {
+				continue;
+			}
+		}
+
+	}
+
+	return this;
+}
+I4 gpcGL::iLWS( gpeALF a, const char* pPATH, gpcLZY& rd ) {
+	if( !this )
+		return -1;
+
+	if( !p3Dlst )
+		p3Dlst = new gpc3Dlst;
+
+	gpc3Dgym* p3Dgym = p3Dlst->p3Dgym( a, pPATH )->pLWS(rd, p3Dlst->lwsDCT, p3Dlst->bnDCT );
+	return p3Dgym ? p3Dgym->id.x : -1;
+}
+
+gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 	if( !this )
 		return NULL;
 	U8 s;
@@ -829,7 +1116,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 							} break;
 						case LWO_ID_WGHT: {
 								std::cout << "\tLWO_ID_WGHT:"<<  std::flush;
-								I4 ix = pLY->pWGHTswp( pUi, pUnx-pUi, dctBN );
+								I4 ix = pLY->pWGHTswp( pUi, pUnx-pUi, bnDCT );
 								U4x2 *pIX2 = (U4x2*)pLY->mapIXwg.Ux( ix, sizeof(*pIX2) );
 								std::cout << pLY->mapDCTwg.sSTRix(ix,"ERR")  << " iBx:" << pIX2->x << " n:" << pIX2->y << std::endl;
 							} break;
@@ -982,7 +1269,6 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 
 	return this;
 }
-
 I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !this )
 		return -1;
@@ -990,7 +1276,7 @@ I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !p3Dlst )
 		p3Dlst = new gpc3Dlst;
 
-	gpc3D* p3D = p3Dlst->p3D( a, pPATH )->pLWO(rd, p3Dlst->bonLST );
+	gpc3D* p3D = p3Dlst->p3D( a, pPATH )->pLWO(rd, p3Dlst->bnDCT );
 	return p3D ? p3D->id.x : -1; //id;
 }
 /**

@@ -222,7 +222,7 @@ public:
 	gpc3D*		p3D;
 	gpc3Dlst*	p3Dlst;
 	gpcMASS*	pMASS;
-
+	I4 iLWS( gpeALF a, const char* pPATH, gpcLZY& rd );
 	I4 iLWO( gpeALF a, const char* pPATH, gpcLZY& rd );
 	gpcGL* GLSLset( const gpcALU& alu, const char* pF = NULL, const char* pV = NULL );
 	gpcGL* GLSLset( const I8x2& an, const char* pF = NULL, const char* pV = NULL  );

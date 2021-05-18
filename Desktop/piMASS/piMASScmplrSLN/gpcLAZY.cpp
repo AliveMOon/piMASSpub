@@ -226,8 +226,7 @@ U4 gpcLZY::tree_fnd( U4 id, U4& n ) {
 }
 gpcLZY* gpcLZY::tree_add( U4 id, U4& n ) {
 	U8 s = -1;
-	if( !this )
-	{
+	if( !this ) {
 		gpcLZY* p_this = lzyADD( NULL, sizeof(U4x4), s, 8 );
 		if( !p_this )
 			return NULL;
@@ -264,8 +263,7 @@ U8 gpcLZY::tree_fnd( U8 id, U8& n ) {
 }
 gpcLZY* gpcLZY::tree_add( U8 id, U8& n ) {
 	U8 s = -1;
-	if( !this )
-	{
+	if( !this ) {
 		gpcLZY* p_this = lzyADD( NULL, sizeof(U8x4), s, 8 );
 		if( !p_this )
 			return NULL;
