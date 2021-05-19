@@ -31,7 +31,7 @@ class gpcCRS;
 class gpcWIN;
 class gpcGL;
 class gpCORE;
-class gpITMlst;
+class gpDBlst;
 class gpMEM;
 //#include "gpcres.h"
 
@@ -1254,32 +1254,23 @@ public:
 	};*/
 };
 /// CCR XNZVC
-class gpITMlst;
+class gpDBlst;
 
-class gpITM {
+class gpDBitm {
 public:
 	I8 mID, ID;
 	gpcLZY	atLST,
 			voidLST;
-	gpITM(){};
-	~gpITM(){};
-	gpITM* read( gpITMlst *pIDlst );
-	gpITM* store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR );
-	gpITM& null(){
+	gpDBitm(){};
+	~gpDBitm(){};
+	gpDBitm* read( gpDBlst *pIDlst );
+	gpDBitm* store( gpDBlst *pIDlst, I8x2* pAT, void* pVAR );
+	gpDBitm& null(){
 		/// ha lesz valami törölni való
 		gpmCLR;
 		return *this;
 	}
-	size_t sOF( gpeALF b ) {
-		switch( b ) {
-			case gpeALF_XYR: return sizeof(I4x4);
-			case gpeALF_ID: return sizeof(I8);
-			case gpeALF_LWO:
-				return sizeof(I4);
-			default: break;
-		}
-		return 0;
-	}
+	size_t sOF( gpeALF b );
 	U1* fndXB( gpeALF b ) {
 		I8x4* pA0 = (I8x4*)atLST.Ux( 0, sizeof(*pA0) );
 		I4 iA = 0;
@@ -1326,32 +1317,32 @@ public:
 		return (I4x4*)fndAB( ab );
 	}
 };
-class gpITMlst {
+class gpDBlst {
 public:
 	char	sPATH[0x400], *pF;
 	I8		newID;
 	I4		aixITMsel[2], iSW;
-	gpITM	itmSEL;
+	gpDBitm	itmSEL;
 	gpcLZY	itmLST;
 	gpMEM*	pMEM;
-	gpITMlst(){};
-	gpITMlst( gpMEM* pM, char* pU1, U2 nU1 ) {
+	gpDBlst(){};
+	gpDBlst( gpMEM* pM, char* pU1, U2 nU1 ) {
 		gpmCLR;
 		pMEM = pM;
 		pF = sPATH+nU1;
 		gpmMcpy( sPATH, pU1, nU1 );
 	}
-	~gpITMlst(){
-		gpITM* pITM = (gpITM*)itmLST.p_alloc;
+	~gpDBlst(){
+		gpDBitm* pITM = (gpDBitm*)itmLST.p_alloc;
 		if( !pITM )
 			return;
 
-		for( I4 i = 0, n = itmLST.nLD(sizeof(gpITM)); i < n; i++ )
+		for( I4 i = 0, n = itmLST.nLD(sizeof(gpDBitm)); i < n; i++ )
 			pITM[i].null();
 	}
-	gpITM* pITM( I4 ix = 0 ) {
-		U4 n = itmLST.nLD(sizeof(gpITM));
-		gpITM* pI = this ? (gpITM*)itmLST.Ux( ix, sizeof(*pI) ) : NULL;
+	gpDBitm* pITM( I4 ix = 0 ) {
+		U4 n = itmLST.nLD(sizeof(gpDBitm));
+		gpDBitm* pI = this ? (gpDBitm*)itmLST.Ux( ix, sizeof(*pI) ) : NULL;
 		if( !pI )
 			return NULL;
 		if( ix < n )
@@ -1361,11 +1352,11 @@ public:
 		pI->read( this );
 		return pI;
 	}
-	gpITM* pITMid( I8 id ) {
-		U4 n = itmLST.nLD(sizeof(gpITM));
+	gpDBitm* pITMid( I8 id ) {
+		U4 n = itmLST.nLD(sizeof(gpDBitm));
 		if( n ? (id>=newID): true)
 			return NULL;
-		gpITM* pI = this ? (gpITM*)itmLST.Ux( 0, sizeof(*pI) ) : NULL;
+		gpDBitm* pI = this ? (gpDBitm*)itmLST.Ux( 0, sizeof(*pI) ) : NULL;
 		if( !pI )
 			return NULL;
 		for( U4 i = 0; i < n; i++ ) {
@@ -1374,10 +1365,13 @@ public:
 		}
 		return NULL;
 	}
-	int nITM() { return itmLST.nLD(sizeof(gpITM)); }
+	int nITM() { return itmLST.nLD(sizeof(gpDBitm)); }
 };
 
+
 class gpc3Dly;
+class gpc3Dlst;
+
 class gpc3Dtri {
 public:
 	U4 prt;
@@ -1584,14 +1578,17 @@ typedef enum GPE_LWS_iTYP:U4 {
 	gpeLWSiTYP_LIG = 0x20000000,
 	gpeLWSiTYP_CAM = 0x30000000,
 	gpeLWSiTYP_BON = 0x40000000,
-
+	gpeLWSiTYP_TYP = 0xF0000000,
 } GPT_LWS_iTYP;
 class gpc3Dkey {
 public:
 	float val,sec; int spn;
 	float aP[6];
 	gpc3Dkey(){};
-
+	gpc3Dkey( const char* pS ){
+		gpmCLR;
+		*this = pS;
+	};
 	gpc3Dkey& operator = ( const char* pS );
 };
 class gpc3Dcnl {
@@ -1602,23 +1599,42 @@ public:
 	gpc3Dkey* pKEYins( U1 c, float s );
 };
 class gpc3Ditm {
+	gpc3D*		p_3D;
 public:
-	char sNAME[0x100], *pNAME;
+	char sNAME[0x100];
 	U4	objIX,	objID,
 		momIX,	momID,
 		trgID,	layID,
-		mxIX,	nLEV;
+		mxIX,	nLEV, nNAME;
 	F4  rstXYZ, rstYPR, rstWHD;
 
 	gpc3Dcnl	cnl;
 
 	gpc3Ditm(){};
+	gpc3D* p3D( gpcGL* pGL, const char* pP, char *pF );
+	char* pNAME( char* pN = NULL ) {
+		if( !this )
+			return NULL;
+		if( !pN )
+			return sNAME+nNAME;
+		U8 s;
+		pN += gpmNINCS(pN," \t\"");
+		U4 n = gpmVAN(pN," \t\"\r\n",s);
+		gpmMcpy( sNAME, pN, n )[n] = 0;
 
+		char* pCH = strrchr(sNAME,'/');
+		nNAME = pCH ? pCH - sNAME : 0;
+		if( sNAME[nNAME] == '/' )
+			nNAME++;
+
+		return sNAME+nNAME;
+	}
 };
 
 class gpc3Dgym {
 	public:
-	char sPATH[gpdMAX_PATH];
+	char sPATH[gpdMAX_PATH], *pFILE,
+		 sPUB[gpdMAX_PATH], *pPUB;
 	I8x4 id;
 
 	I4x4	olcb;
@@ -1626,19 +1642,12 @@ class gpc3Dgym {
 			itmLST;
 
 	U4 n3Ditm() { return this ? itmLST.nLD(sizeof(gpc3Ditm)) : 0; }
-	gpc3Ditm* p3Ditm( U4 i, U4 id );
-
+	gpc3Ditm* p3DitmADD( U4 i, U4 id );
+	gpc3Ditm* p3Dii( U4 i );
 	~gpc3Dgym(){
 		gpmDEL(p_lws);
 	}
-	gpc3Dgym( I4 i, const char* pP, gpeALF alf ) {
-		gpmCLR;
-		U8 nLEN;
-		id.x = i;
-		id.a8x2[0].b = alf;
-		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
-		gpmSTRCPY( sPATH, pP );
-	}
+	gpc3Dgym( I4 i, const char* pP, gpeALF alf );
 	gpc3Dgym* pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT );
 };
 class gpc3Dlst {
@@ -1689,7 +1698,7 @@ public:
 	}
 
 	/// TRACK
-	gpc3Dgym* p3Dgym( gpeALF alf, const char* pP ) {
+	gpc3Dgym* p3DgymADD( gpeALF alf, const char* pP ) {
 		if( !this )
 			return NULL;
 
@@ -1709,7 +1718,12 @@ public:
 		pp3Dgym[0] = new gpc3Dgym( e3D, pP, alf );
 		return pp3Dgym[0];
 	}
-
+	gpc3Dgym* p3DgymIX( I4 i ) {
+		if( this ? i < 0 : true )
+			return NULL;
+		gpc3Dgym** pp3Dgym = ((gpc3Dgym**)lst3Dgym.Ux(0,sizeof(gpc3Dgym*)));
+		return pp3Dgym[i];
+	}
 };
 
 class gpMEM {
@@ -2515,8 +2529,8 @@ public:
 	U4 nTXT = 0;
 	char* pTXT, *pT;
 
-	gpITMlst*	iDBu( gpMEM* pMEM, char *pU, char* sPATH, char* pFILE );
-	gpITMlst*	iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE );
+	gpDBlst*	iDBu( gpMEM* pMEM, char *pU, char* sPATH, char* pFILE );
+	gpDBlst*	iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE );
 	gpcLZYdct*	pOPER();
 	U4* pM( U4x2& zn, U1 id = 4 ) {
 		zn = 0;

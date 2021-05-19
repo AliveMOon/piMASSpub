@@ -727,7 +727,7 @@ public:
 		return ppM ? ppM[ix] : NULL;
 	}
 };
-gpc3Ditm* gpc3Dgym::p3Ditm( U4 i, U4 id ) {
+gpc3Ditm* gpc3Dgym::p3DitmADD( U4 i, U4 id ) {
 	if( i > n3Ditm() )
 		i = n3Ditm();
 	gpc3Ditm* pITM = (gpc3Ditm*)itmLST.Ux( i, sizeof(*pITM) );
@@ -735,6 +735,12 @@ gpc3Ditm* gpc3Dgym::p3Ditm( U4 i, U4 id ) {
 	pITM->objIX = i;
 	pITM->objID = id;
 	return pITM;
+}
+gpc3Ditm* gpc3Dgym::p3Dii( U4 i ) {
+	if( i > n3Ditm() )
+		return NULL;
+
+	return (gpc3Ditm*)itmLST.Ux( i, sizeof(gpc3Ditm) );
 }
 gpc3Dkey* gpc3Dcnl::pKEYs( U1 c, float s ){
 	if( !nKEY(c) )
@@ -858,6 +864,28 @@ gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
 	}
 	return *this;
 }
+#define gpdITMis (pBON 	? pBON 				\
+						: (pITM ? pITM 		\
+						: (pNULL ? pNULL 	\
+						: (pLIG ? pLIG 		\
+						: (pCAM ? pCAM 		\
+						:  NULL 			\
+							)))))
+gpc3Dgym::gpc3Dgym( I4 i, const char* pP, gpeALF alf ) {
+	gpmCLR;
+	U8 nLEN;
+	id.x = i;
+	id.a8x2[0].b = alf;
+	id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
+	gpmSTRCPY( sPATH, pP );
+	pFILE = strrchr(sPATH,'/' );
+	if( pFILE )
+		pFILE++;
+	else
+		pFILE = sPATH+gpmSTRLEN(sPATH);
+	gpmSTRCPY( sPUB, sPATH );
+	pPUB = sPUB+(pFILE-sPATH);
+}
 gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 	if( !this )
 		return NULL;
@@ -866,11 +894,11 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 	if( !s )
 		return this;
 	U4x4* pU4x4;
-	char* pS = (char*)lws.p_alloc, *pSe = pS+s, *pA;
+	char* pS = (char*)lws.p_alloc, *pSe = pS+s, *pA, *pCH;
 	GPE_LWS_COM si;
 	U4 nD, iD, nS, nL, iCNL = 0, nENV = 0;
 	olcb = I4x4(-1,-1,-1,-1);
-
+	gpc3Dkey* pKEY;
 	gpc3Ditm	*pITM = NULL, *pNULL = NULL,	// 0x10000000
 				*pLIG = NULL,					// 0x20000000
 				*pCAM = NULL,					// 0x30000000
@@ -893,76 +921,65 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				pBON = NULL;
 				olcb.x++;
 				olcb.w=-1;
-				pMOM = pITM = p3Ditm( -1, gpeLWSiTYP_OBJ|olcb.x );
+				pMOM = (pITM = p3DitmADD( -1, gpeLWSiTYP_OBJ|olcb.x ));
 				pITM->layID = gpfSTR2I8(pA, &pA);
-				pA += gpmNINCS(pA," \t\"");
-				U4 n = gpmVAN(pA," \t\"\r\n",s);
-				gpmMcpy( pITM->sNAME, pA, n )[n] = 0;
-				pITM->pNAME = strrchr(pITM->sNAME,'/');
-				if( !pITM->pNAME )
-					pITM->pNAME = pITM->sNAME;
-				if( pITM->pNAME[0] == '/' )
-					pITM->pNAME++;
+				pITM->pNAME(pA);
 			} break;
 			case GPE_LWS_COM_AddBone:{
 				olcb.w++;
-				pMOM = pBON = p3Ditm( -1, gpeLWSiTYP_BON| (olcb.w<<16) | (pITM->objID&0xffff) );
+				pMOM = pBON = p3DitmADD( -1, gpeLWSiTYP_BON| (olcb.w<<16) | (pITM->objID&0xffff) );
 			} break;
 			case GPE_LWS_COM_AddNullObject:{
 				pBON = pITM = NULL;
 				olcb.x++;
 				olcb.w=-1;
-				pMOM = pNULL = p3Ditm( -1, gpeLWSiTYP_OBJ|olcb.x );
-				//pITM->layID = gpfSTR2I8(pA, &pA);
-				pA += gpmNINCS(pA," \t\"");
-				U4 n = gpmVAN(pA," \t\"\r\n",s);
-				gpmMcpy( pNULL->sNAME, pA, n )[n] = 0;
-				pNULL->pNAME = strrchr(pNULL->sNAME,'/');
-				if( !pNULL->pNAME )
-					pNULL->pNAME = pNULL->sNAME;
-				if( pNULL->pNAME[0] == '/' )
-					pNULL->pNAME++;
+				pMOM = pNULL = p3DitmADD( -1, gpeLWSiTYP_OBJ|olcb.x );
+				pNULL->pNAME(pA);
+
 			} break;
 			case GPE_LWS_COM_AddLight:{
 				pBON = pITM = pNULL = NULL;
 				olcb.y++;
 				olcb.w=-1;
-				pMOM = pLIG = p3Ditm( -1, gpeLWSiTYP_LIG|olcb.y );
-				pLIG->pNAME = pNULL->sNAME;
+				pMOM = pLIG = p3DitmADD( -1, gpeLWSiTYP_LIG|olcb.y );
+
 			} break;
 			case GPE_LWS_COM_AddCamera:{
 				pBON = pITM = pNULL = pLIG = NULL;
 				olcb.z++;
 				olcb.w=-1;
-				pMOM = pCAM = p3Ditm( -1, gpeLWSiTYP_LIG|olcb.y );
-				pCAM->pNAME = pCAM->sNAME;
+				pMOM = pCAM = p3DitmADD( -1, gpeLWSiTYP_CAM|olcb.y );
+
 			} break;
 			case GPE_LWS_COM_NumChannels:{} break;
 			case GPE_LWS_COM_Channel:{
 				iCNL = gpfSTR2I8(pA, &pA);
 			} break;
-			case GPE_LWS_COM_C_open:{} break;
+			case GPE_LWS_COM_C_open:{
+				pS = pA; // + gpmNINCS(pA," \t\"");
+			} break;
 			case GPE_LWS_COM_Envelope:{
-
+				pA += gpmNINCS(pA," \t\"\r\n");
+				nENV = gpfSTR2I8(pA, &pA);
+				pS = pA + gpmVAN( pA, "\r\n", s );
 			} break;
 			case GPE_LWS_COM_Key:{
-				gpc3Dkey key;
-				key = pA;
-				pCOUT = pBON ? pBON
-								: (pITM ? pITM
-								: (pNULL ? pNULL
-								: (pLIG ? pLIG
-								: (pCAM ? pCAM
-								:  NULL
-									))));
+				gpc3Dkey key = pA;
+				pCOUT = gpdITMis;
 				if( !pCOUT )
 					break;
-				gpc3Dkey* pKEY = pCOUT->cnl.pKEYins(iCNL, key.sec );
+				pKEY = pCOUT->cnl.pKEYins(iCNL, key.sec );
 				if( !pKEY )
 					break;
+				//std::cout << key.sec << " " << std::flush;
 				*pKEY = key;
 			} break;
-			case GPE_LWS_COM_C_close:{} break;
+			case GPE_LWS_COM_C_close:{
+				pCOUT = gpdITMis;
+				if( pCOUT )
+					std::cout << " " << nENV << "/" << pCOUT->cnl.nKEY(iCNL) << " c:" << iCNL << std::flush;
+
+			} break;
 			case GPE_LWS_COM_ParentItem:{
 				if( !pMOM )
 					continue;
@@ -971,13 +988,8 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 					pMOM--;
 					if( pMOM->objID != momID )
 						continue;
-					pCOUT = pBON ? pBON
-								: (pITM ? pITM
-								: (pNULL ? pNULL
-								: (pLIG ? pLIG
-								: (pCAM ? pCAM
-								:  NULL
-									))));
+
+					pCOUT = gpdITMis;
 					if( !pCOUT )
 						break;
 
@@ -995,18 +1007,10 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 											<< (pNULL ? "NULL":"") << std::endl;
 			} break;
 			case GPE_LWS_COM_BoneName:{
-				pA += gpmNINCS(pA," \t\"");
-				nD = gpmVAN(pA," \t\"\r\n",s);
-				gpmMcpy( pBON->sNAME, pA, nD )[nD] = 0;
-				pBON->pNAME = strrchr(pBON->sNAME,'/');
-				if( !pBON->pNAME )
-					pBON->pNAME = pBON->sNAME;
-				else
-					nD -= pBON->pNAME-pBON->sNAME;
+				pNULL->pNAME(pA);
 
-				if( pBON->pNAME[0] == '/' )
-					pBON->pNAME++;
-				pBON->mxIX = bnDCT.dctFND( pBON->pNAME, nD, iD );
+
+				pBON->mxIX = bnDCT.dctFND( pNULL->pNAME(), gpmSTRLEN(pNULL->pNAME()), iD );
 
 			} break;
 			case GPE_LWS_COM_BoneRestPosition:{ if( !pBON ) break;
@@ -1034,7 +1038,7 @@ I4 gpcGL::iLWS( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !p3Dlst )
 		p3Dlst = new gpc3Dlst;
 
-	gpc3Dgym* p3Dgym = p3Dlst->p3Dgym( a, pPATH )->pLWS(rd, p3Dlst->lwsDCT, p3Dlst->bnDCT );
+	gpc3Dgym* p3Dgym = p3Dlst->p3DgymADD( a, pPATH )->pLWS(rd, p3Dlst->lwsDCT, p3Dlst->bnDCT );
 	return p3Dgym ? p3Dgym->id.x : -1;
 }
 
@@ -1278,6 +1282,42 @@ I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 
 	gpc3D* p3D = p3Dlst->p3D( a, pPATH )->pLWO(rd, p3Dlst->bnDCT );
 	return p3D ? p3D->id.x : -1; //id;
+}
+gpc3D* gpc3Ditm::p3D( gpcGL* pGL, const char* pP, char *pF ) {
+	if( !this )
+		return NULL;
+	if( p_3D ? true : !pP )
+		return p_3D;
+
+	if( !pF ) {
+		pF = strrchr( (char*)pP, '/' );
+		if( !pF ){
+			pF = (char*)pP+gpmSTRLEN(pP);
+			pF += sprintf( pF, "/" );
+		} else {
+			pF++;
+		}
+	}
+
+	U8 s;
+	I8x2 AB;
+	AB.num = gpmSTRLEN(pNAME());
+	AB = pNAME();
+	gpcLZY rd;
+	char sPATH[0x100], *pFILE = (char*)gpmMcpy( sPATH, pP, pF-pP ) + (pF-pP);
+	gpmSTRCPY( pFILE, pNAME() );
+	while( gpmACE(sPATH,4) < 0 ) {
+		pFILE[-1] = 0;
+		pFILE = strrchr(sPATH,'/');
+		if(!pFILE)
+			return p_3D;
+		pFILE++;
+		gpmSTRCPY( pFILE, pNAME() );
+	}
+
+	rd.lzyRD( sPATH, s = 0 );
+	I4 i = pGL->iLWO( AB.a, sPATH, rd );
+	return (p_3D = pGL->p3Dlst->p3Dix( i ));
 }
 /**
 "zeroDB/scr/,	cam.eye.yz, pxSCR.xyr, 0, 1,
@@ -1657,13 +1697,13 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		*pMAN = aCAM+(gpmN(aCAM)/2);
 	gpmZ(aCAM);
 	U1 *apV[2]; size_t aVn[2], nU1;
-	gpITM	*apI[2], *pI0;
+	gpDBitm	*apI[2], *pI0;
 	I8x2	*pAT = AT.pI8x2(),
 			*pD1 = scnDEC1.pI8x2(), aaS;
 
 	///pAT->alfCON( sPUB,nAT);
 
-	gpITMlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
+	gpDBlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
 	gpeALF alfD;
 	GLenum e = 0;
 	I8x4 prv(-1,-1,-1,-1);
@@ -1758,14 +1798,38 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
     glLoadMatrixf((const GLfloat*)&view);
     view.str(sPUB,",", "\r\n" );
 	std::cout << sPUB << std::endl;
+	gpc3Dgym* p3Dg;
+	gpc3Ditm* p3Di;
 	for( int i = 0, n = pIl->nITM(); i < n; i++ ) {
-		apV[0] = pI0[i].fndXB( gpeALF_LWO );
-		if( !apV[0] ) continue;
+		apV[0] = pI0[i].fndXB( gpeALF_LWS );
+		if( apV[0] ) {
+			p3Dg = p3Dlst->p3DgymIX( *(I4*)apV[0] );
+			if( !p3Dg ) continue;
 
-		gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
-		if( !p3D ) continue;
+			for( U4 i = 0, ni = p3Dg->n3Ditm(); i < ni; i++ ){
+				p3Di = p3Dg->p3Dii(i);
+				if( !p3Di )
+					break;
+				switch( p3Di->objID&gpeLWSiTYP_TYP ){
+					case gpeLWSiTYP_OBJ:
+						p3D = p3Di->p3D( this, p3Dg->sPUB, p3Dg->pPUB );
+						glDRW3D(p3D, -1 );
+						break;
+					case gpeLWSiTYP_LIG:
+					case gpeLWSiTYP_CAM:
+					case gpeLWSiTYP_BON:
+					default: break;
+				}
+			}
+		} else {
+			apV[0] = pI0[i].fndXB( gpeALF_LWO );
+			if( !apV[0] ) continue;
 
-		glDRW3D(p3D, -1 ); //pMEM->pWIN ? pMEM->pWIN->nJDOIT.w : -1 );
+			gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
+			if( !p3D ) continue;
+
+			glDRW3D(p3D, -1 ); //pMEM->pWIN ? pMEM->pWIN->nJDOIT.w : -1 );
+		}
 	}
 	return this;
 }
