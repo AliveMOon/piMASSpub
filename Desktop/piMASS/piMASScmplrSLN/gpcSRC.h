@@ -1420,7 +1420,8 @@ public:
 	gpc3Dsrf(){};
 };
 class gpc3D {
-	gpcLZY lzySRF;
+	gpcLZY	lzySRF,
+			rstMX;
 public:
 	char sPATH[gpdMAX_PATH];
 	I8x4 id;
@@ -1447,6 +1448,15 @@ public:
 	U4 nSRF() { return this ? lzySRF.nLD(sizeof(gpc3Dsrf)) : 0; }
 	gpc3Dsrf* pSRFi( U4 i );
 	gpc3Dsrf* pSRFadd( U4 i );
+	U4 nMX() {
+		return this ? rstMX.nF4x4() : 0;
+	}
+	F4x4* pMX( U4 n ) {
+		if( !n )
+			return rstMX.pF4x4( 0 );
+		F4x4* pMX = rstMX.pF4x4(n);
+		return pMX ? pMX-n : NULL;
+	}
 };
 
 class gpc3Dact {
@@ -1471,8 +1481,7 @@ public:
 		loop_ms = (I8)(loop*ms2sec);
 		start_ms = (I8)(start*ms2sec);
 	}
-	float sec( I8 ms )
-	{
+	float sec( I8 ms ) const {
 		float sec = 0.0;
 		ms += start_ms - begin_ms;
 		//I8 act_ms = start_ms + act_ms - begin_ms;
@@ -1760,6 +1769,30 @@ public:
 	}
 	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
 	U4* pBONadd( gpc3Ditm* pBON = NULL );
+	F4x4* pMXl( float s ) {
+		if( sec == s )
+			return &mxL;
+		float v;
+		F4 xyz, ypr, scl(1,1,1);
+		sec = s;
+		for( U1 c = 0; c < 6; c++ ){
+			v = cnl.valKEYs(c,sec);
+			switch( c ) {
+				case 0: xyz.x = v; break;
+				case 1: xyz.y = v; break;
+				case 2: xyz.z = v; break;
+				case 3: ypr.ry = v; break;
+				case 4: ypr.rp = v; break;
+				case 5: ypr.rr = v; break;
+				case 6: scl.x = v; break;
+				case 7: scl.y = v; break;
+				case 8: scl.z = v; break;
+			}
+		}
+		mxL.ypr(ypr);
+		mxL.t.xyz_( xyz );
+		return &mxL;
+	}
 };
 
 class gpc3Dgym {
@@ -1861,77 +1894,7 @@ public:
 	I8 mSEC; gpeACT ACT;
 
 	gpc3Dtrk(){}
-	F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
-
-		if( !p3Di )
-			return pMX;
-		gpc3Dact *pACT = gpaACT_man+p3Di->ACT;
-		if( p3Di->ACT != act ) {
-			pACT = gpaACT_man[p3Di->ACT = act];
-			p3Di->mSEC = ms;
-		}
-		F4 xyz, ypr, scl(1,1,1);
-		float sec = pACT->sec(ms-p3Di->mSEC), v;
-		if( p3Di->sec != sec ) {
-			p3Di->sec = sec;
-			for( U1 c = 0; c < 6; c++ ){
-				v = p3Di->cnl.valKEYs(c,sec);
-				switch( c ) {
-					case 0: xyz.x = v; break;
-					case 1: xyz.y = v; break;
-					case 2: xyz.z = v; break;
-					case 3: ypr.ry = v; break;
-					case 4: ypr.rp = v; break;
-					case 5: ypr.rr = v; break;
-					case 6: scl.x = v; break;
-					case 7: scl.y = v; break;
-					case 8: scl.z = v; break;
-				}
-			}
-			p3Di->mxL.ypr(ypr);
-			p3Di->mxL.t.xyz_( xyz );
-			p3Di->stkIX = p3Di->itmIX;
-		}
-
-
-		gpc3Ditm	*p3Di0 = p3Dg->p3Dii(0),
-					*p3Diu = p3Di,
-					*p3Dim	= ((p3Diu->itmIX != p3Diu->momIX)
-							? p3Di0+p3Diu->momIX : NULL;
-		while( p3Dim ) {
-			if( (p3Dim->sec == sec) && (p3Dim->ACT == act) ){
-				p3Diu = p3Di0+p3Diu->stkIX;
-
-				break;
-			}
-			p3Dim->ACT = act;
-			p3Dim->sec = sec;
-			for( U1 c = 0; c < 6; c++ ){
-				v = p3Dim->cnl.valKEYs(c,sec);
-				switch( c ) {
-					case 0: xyz.x = v; break;
-					case 1: xyz.y = v; break;
-					case 2: xyz.z = v; break;
-					case 3: ypr.ry = v; break;
-					case 4: ypr.rp = v; break;
-					case 5: ypr.rr = v; break;
-					case 6: scl.x = v; break;
-					case 7: scl.y = v; break;
-					case 8: scl.z = v; break;
-				}
-			}
-			p3Dim->mxL.ypr(ypr);
-			p3Dim->mxL.t.xyz_( xyz );
-
-			p3Dim->stkIX = p3Diu->itmIX;
-			p3Diu = p3Dim;
-			p3Dim = ((p3Diu->itmIX != p3Diu->momIX) ? p3Di0+p3Diu->momIX : p3Dim;
-		}
-
-
-
-		return pMX;
-	}
+	F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act );
 
 };
 class gpMEM {

@@ -6321,6 +6321,7 @@ szasz:
 	F2* pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
 	F4* pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
 	F4x4* pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
+	U4 nF4x4() { return nLD(sizeof(F4x4)); };
 	D4* pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
 	void** ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
 

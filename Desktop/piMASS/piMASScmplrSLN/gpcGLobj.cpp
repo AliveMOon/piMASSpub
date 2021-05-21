@@ -1711,6 +1711,79 @@ gpdSTATICoff gpsGLSLfrg3D[] = //{
 "}																			\n"
 "\n\0";
 //};
+
+F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
+	if( !p3Di )
+		return pMX;
+	const gpc3Dact *pACT = gpaACT_man+p3Di->ACT;
+	if( p3Di->ACT != act ) {
+		pACT = gpaACT_man+(p3Di->ACT=act);
+		mSEC = ms;
+	}
+	F4 xyz, ypr, scl(1,1,1);
+
+	/// mxL ez az ITEM ---------------------
+	float sec = pACT->sec(ms-mSEC), v;
+	p3Di->pMXl(sec);
+	p3Di->stkIX = p3Di->itmIX;
+
+	gpc3Ditm	*p3Di0 = p3Dg->p3Dii(0),
+				*p3Diu = NULL,
+				*p3Dim	= ((p3Di->itmIX != p3Di->momIX)
+						? p3Di0+p3Di->momIX : NULL),
+				*p3Dib,*p3Dibm;
+	U4			*pBix, nB;
+	if( !p3Dim ) {
+		p3Di->mxW = p3Di->mxL;
+		p3Diu = p3Di; // ez a ROOT nincs anya
+	}
+	else while( p3Dim ) {
+		if( (p3Dim->sec == sec) && (p3Dim->ACT == act) ) {
+			break;
+		}
+
+		p3Dim->stkIX = p3Diu ? p3Diu->itmIX : p3Di->itmIX;
+		/// mxL MOM ---------------------
+		p3Dim->ACT = act;
+		p3Dim->pMXl(sec);
+
+		p3Diu = p3Dim;
+		if(p3Diu->itmIX != p3Diu->momIX) {
+			p3Dim = p3Di0+p3Diu->momIX;
+			continue;
+		}
+
+		p3Diu->mxW = p3Diu->mxL;
+		p3Dim = NULL;
+		break;
+	}
+
+	while( p3Diu ) {
+		if( nB = p3Diu->nBON() ) {
+			pBix = p3Diu->pBONadd();
+			for( U4 i = 0; i < nB; i++ ) {
+				p3Dib = p3Di0+pBix[i];
+				p3Dib->ACT = act;
+				p3Dib->pMXl(sec);
+			}
+			for( U4 i = 0; i < nB; i++ ) {
+				p3Dib = p3Di0+pBix[i];
+				p3Dibm = p3Di0+p3Dib->momIX;
+				p3Dib->mxW = p3Dib->mxL*p3Dibm->mxW;
+			}
+		}
+		if( p3Diu == p3Di )
+			break; // felért ehez
+
+		p3Dim = p3Diu;
+		p3Diu = p3Di0+p3Diu->stkIX;
+		p3Diu->mxW = p3Diu->mxL*p3Dim->mxW;
+	}
+
+
+	return pMX;
+}
+
 F4x4 aMX[0x40],arMX[0x40];
 gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	int nD1 = scnDEC1.nLD() ? scnDEC1.nLD() : scnDEC1.nAT(sSCNdec1,sizeof(sSCNdec1));
@@ -1803,7 +1876,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
 	}
 
-	F4x4 view, wMX = 1.0, uMX;
+	F4x4 view, wMX = 1.0, uMX, *pRSTmx;
 	uMX.x = F4( 1.0, 0.0, 0.0 );
 	uMX.y = F4( 0.0, 0.0, 1.0 );
 	uMX.z = F4( 0.0,-1.0, 0.0 );
@@ -1826,7 +1899,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	gpc3Dgym* p3Dg;
 	gpc3Ditm* p3Di;
 	gpc3Dtrk* p3Dt = NULL;
-
+	size_t n3Dt;
 
 	for( int i = 0, n = pIl->nITM(); i < n; i++ ) {
 
@@ -1839,7 +1912,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 			apV[2] = pI0[i].fndXB( gpeALF_TRK );
 			if( !apV[2] ) {
 				I8x2 ab( gpeALF_MAN, gpeALF_TRK );
-				p3Dt = (gpc3Dtrk*)pI0[i].pAB( ab, sizeof(gpc3Dtrk) );
+				p3Dt = (gpc3Dtrk*)pI0[i].pAB( ab, n3Dt );
 			} else
 				p3Dt = (gpc3Dtrk*)apV[2];
 
@@ -1855,6 +1928,17 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 							break;
 
 						p3D = p3Di->p3D( this, p3Dg->sPUB, p3Dg->pPUB );
+						if( p3Di->nBON() ) {
+							U4 n3Db = p3D->nMX();
+							if( !n3Db ) {
+								pRSTmx = p3D->pMX( p3Di->nBON() );
+								n3Db = p3D->nMX();
+
+							} else {
+								pRSTmx = p3D->pMX( 0 );
+							}
+						}
+
 						glDRW3D(p3D, -1 );
 						break;
 					case gpeLWSiTYP_LIG:
