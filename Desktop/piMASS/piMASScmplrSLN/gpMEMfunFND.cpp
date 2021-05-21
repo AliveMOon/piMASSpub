@@ -131,6 +131,7 @@ size_t gpDBitm::sOF( gpeALF b ) {
 	switch( b ) {
 		case gpeALF_XYR: return sizeof(I4x4);
 		case gpeALF_ID: return sizeof(I8);
+		case gpeALF_TRK: return sizeof(gpc3Dtrk);
 		case gpeALF_LWS:
 		case gpeALF_LWO:
 			return sizeof(I4);

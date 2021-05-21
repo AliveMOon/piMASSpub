@@ -1487,8 +1487,27 @@ public:
 		return sec + b;
 	}
 };
-
-static const   gpc3Dact gp_a_action_man[] = {
+typedef enum gpeACT : int {
+	gpeACT_DEF,
+	gpeACT_IDLE,	// <BEGIN>  1.0 <END> 31.0 <START>  1.0 <MIX>  0.0  <FADE> 0.25 <GIM> 1.0 <LOOP> 1.0 <ENDTRACK>
+	gpeACT_WALK,	// <BEGIN> 32.5 <END> 34.5 <START> 32.5 <MIX> 33.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 33.0 <ENDTRACK>
+	gpeACT_RUN,		// <BEGIN> 36.5 <END> 38.5 <START> 36.5 <MIX> 38.5  <FADE> 0.5  <GIM> 0.3 <LOOP> 37.0 <ENDTRACK>
+	gpeACT_JUMP,	// <BEGIN> 40.0 <END> 42.0 <START> 40.0 <MIX> 41.5  <FADE> 0.5  <GIM> 0.3 <STOP> <ENDTRACK>
+	gpeACT_SLEFT,	// <BEGIN> 43.0 <END> 45.0 <START> 43.0 <MIX> 44.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 43.0 <ENDTRACK>
+	gpeACT_SRIGHT,	// <BEGIN> 46.0 <END> 48.0 <START> 46.0 <MIX> 47.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 46.0 <ENDTRACK>
+	gpeACT_FLINCH,	// <BEGIN> 49.0 <END> 52.0 <START> 49.5 <MIX> 51.5  <FADE> 0.5  <GIM> 0.5 <LOOP> 50.0 <ENDTRACK>
+	gpeACT_BOX,		// <BEGIN> 53.0 <END> 54.0 <START> 53.0 <MIX> 53.75 <FADE> 0.25 <GIM> 0.1 <LOOP> 53.0 <ENDTRACK>
+	gpeACT_KICK,	// <BEGIN> 55.0 <END> 56.0 <START> 55.0 <MIX> 55.5  <FADE> 0.5  <GIM> 0.1 <LOOP> 55.0 <ENDTRACK>
+	gpeACT_ABOARD,	// <BEGIN> 57.0 <END> 58.0 <START> 57.0 <MIX> 57.75 <FADE> 0.25 <GIM> 0.2 <STOP> <ENDTRACK>
+	gpeACT_DEBUS,	// <BEGIN> 58.0 <END> 60.0 <START> 58.0 <MIX> 60.0  <FADE> 0.25 <GIM> 0.2 <STOP> <ENDTRACK>
+	gpeACT_STOW,	// <BEGIN> 61.0 <END> 61.5 <START> 61.0 <MIX> 61.5  <FADE> 0.25 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_STOWUP,	// <BEGIN> 61.5 <END> 62.0 <START> 61.5 <MIX> 62.0  <FADE> 0.25 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_WHAM,	// <BEGIN> 63.0 <END> 64.0 <START> 63.0 <MIX> 63.75 <FADE> 0.25 <GIM> 0.1 <LOOP> 63.0 <ENDTRACK>
+	gpeACT_KO,		// <BEGIN> 65.0 <END> 69.0 <START> 65.0 <MIX> 68.9  <FADE> 0.01 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_ERECT,	// <BEGIN> 69.0 <END> 74.0 <START> 69.0 <MIX> 73.9  <FADE> 0.5  <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_END,
+} gpeACT_int;
+static const   gpc3Dact gpaACT_man[] = {
 	//			begin,	end,	start,	mix,	fade,	gim,		loop
 	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_DEF,
 	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_IDLE,
@@ -1553,6 +1572,8 @@ static const char gp_s_lws[] =
 		"BoneRestPosition\n"
 		"BoneRestDirection\n"
 		"BoneRestLength\n"
+		"Plugin\n"
+		"EndPlugin\n"
 		;
 
 typedef enum GPE_LWS_COM:int {
@@ -1572,6 +1593,8 @@ typedef enum GPE_LWS_COM:int {
 		GPE_LWS_COM_BoneRestPosition,
 		GPE_LWS_COM_BoneRestDirection,
 		GPE_LWS_COM_BoneRestLength,
+		GPE_LWS_COM_Plugin,
+		GPE_LWS_COM_EndPlugin,
 } GPT_LWS_COM;
 typedef enum GPE_LWS_iTYP:U4 {
 	gpeLWSiTYP_OBJ = 0x10000000,
@@ -1590,25 +1613,131 @@ public:
 		*this = pS;
 	};
 	gpc3Dkey& operator = ( const char* pS );
+	float operator * ( float s ) {
+			return	 (this[1].val-val)*(s-sec)
+					/(this[1].sec-sec);
+	}
 };
 class gpc3Dcnl {
 public:
 	gpcLZY aKEY[9];
 	U4 nKEY( U1 c ) { return c > 8 ? 0 : (this ? aKEY[c].nLD(sizeof(gpc3Dkey)): 0); }
-	gpc3Dkey* pKEYs( U1 c, float s );
+	float valKEYs( U1 c, float s );
 	gpc3Dkey* pKEYins( U1 c, float s );
 };
+
+//#include <ctime>
+static const I8 gpaMONTH[] = {
+			// 2012
+			31,
+			29+31,				//29
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2013
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2014
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2015
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			};
+
+class gpcTIME {
+public:
+	I8	year,
+		mounth,
+		day,
+		hour,
+		minute,
+		sec,
+		msec;
+
+	gpcTIME( void ) { gpmCLR; }
+	I8 get_msec( bool b_touch = false ) {
+		std::time_t t = std::time(0);   // get time now
+		std::tm* now = std::localtime(&t);
+
+		year = (now->tm_year+1900) - 2012; //local_time.wYear-2012;
+		mounth = year*12 + now->tm_mon; // local_time.wMonth;
+		day =	year*365 + (year/4) + 1
+				+ gpaMONTH[(year%4)*12 + now->tm_mon] + now->tm_mday;
+
+		hour = day*24 + now->tm_hour; //local_time.wHour;
+		minute = hour*60  + now->tm_min; //+ local_time.wMinute;
+		sec = minute*60   + now->tm_sec; //+ local_time.wSecond;
+
+		return msec = sec*ms2sec;
+	}
+};
+
+
 class gpc3Ditm {
 	gpc3D*		p_3D;
 public:
 	char sNAME[0x100];
-	U4	objIX,	objID,
+	U4	itmIX,	itmID,
 		momIX,	momID,
 		trgID,	layID,
-		mxIX,	nLEV, nNAME;
-	F4  rstXYZ, rstYPR, rstWHD;
+		mxIX,	nLEV,
+		nNAME,	stkIX;
+	F4  	rstXYZ, rstYPR, rstWHD;
+
+	// TRACK -----------------
+	F4x4	mxL, mxW, mxiW;
+	float sec; gpeACT ACT;
 
 	gpc3Dcnl	cnl;
+	gpcLZY	bonLST;
+	bool	bNULL;
+
 
 	gpc3Ditm(){};
 	gpc3D* p3D( gpcGL* pGL, const char* pP, char *pF );
@@ -1629,6 +1758,8 @@ public:
 
 		return sNAME+nNAME;
 	}
+	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
+	U4* pBONadd( gpc3Ditm* pBON = NULL );
 };
 
 class gpc3Dgym {
@@ -1725,7 +1856,84 @@ public:
 		return pp3Dgym[i];
 	}
 };
+class gpc3Dtrk {
+public:
+	I8 mSEC; gpeACT ACT;
 
+	gpc3Dtrk(){}
+	F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
+
+		if( !p3Di )
+			return pMX;
+		gpc3Dact *pACT = gpaACT_man+p3Di->ACT;
+		if( p3Di->ACT != act ) {
+			pACT = gpaACT_man[p3Di->ACT = act];
+			p3Di->mSEC = ms;
+		}
+		F4 xyz, ypr, scl(1,1,1);
+		float sec = pACT->sec(ms-p3Di->mSEC), v;
+		if( p3Di->sec != sec ) {
+			p3Di->sec = sec;
+			for( U1 c = 0; c < 6; c++ ){
+				v = p3Di->cnl.valKEYs(c,sec);
+				switch( c ) {
+					case 0: xyz.x = v; break;
+					case 1: xyz.y = v; break;
+					case 2: xyz.z = v; break;
+					case 3: ypr.ry = v; break;
+					case 4: ypr.rp = v; break;
+					case 5: ypr.rr = v; break;
+					case 6: scl.x = v; break;
+					case 7: scl.y = v; break;
+					case 8: scl.z = v; break;
+				}
+			}
+			p3Di->mxL.ypr(ypr);
+			p3Di->mxL.t.xyz_( xyz );
+			p3Di->stkIX = p3Di->itmIX;
+		}
+
+
+		gpc3Ditm	*p3Di0 = p3Dg->p3Dii(0),
+					*p3Diu = p3Di,
+					*p3Dim	= ((p3Diu->itmIX != p3Diu->momIX)
+							? p3Di0+p3Diu->momIX : NULL;
+		while( p3Dim ) {
+			if( (p3Dim->sec == sec) && (p3Dim->ACT == act) ){
+				p3Diu = p3Di0+p3Diu->stkIX;
+
+				break;
+			}
+			p3Dim->ACT = act;
+			p3Dim->sec = sec;
+			for( U1 c = 0; c < 6; c++ ){
+				v = p3Dim->cnl.valKEYs(c,sec);
+				switch( c ) {
+					case 0: xyz.x = v; break;
+					case 1: xyz.y = v; break;
+					case 2: xyz.z = v; break;
+					case 3: ypr.ry = v; break;
+					case 4: ypr.rp = v; break;
+					case 5: ypr.rr = v; break;
+					case 6: scl.x = v; break;
+					case 7: scl.y = v; break;
+					case 8: scl.z = v; break;
+				}
+			}
+			p3Dim->mxL.ypr(ypr);
+			p3Dim->mxL.t.xyz_( xyz );
+
+			p3Dim->stkIX = p3Diu->itmIX;
+			p3Diu = p3Dim;
+			p3Dim = ((p3Diu->itmIX != p3Diu->momIX) ? p3Di0+p3Diu->momIX : p3Dim;
+		}
+
+
+
+		return pMX;
+	}
+
+};
 class gpMEM {
 public:
 	I8x2 	aA[0x10];

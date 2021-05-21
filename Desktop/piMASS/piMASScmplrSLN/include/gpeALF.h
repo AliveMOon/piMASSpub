@@ -940,7 +940,16 @@ typedef enum gpeALF:I8
 	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
 
 	gpeALF_TAG = gpdABC('T', 'A', 'G'),
-	gpeALF_TRG = gpdABC('T', 'R', 'G'),
+
+	gpeALF_TRA = gpdABC('T', 'R', 'A'),
+	gpeALF_TRB, gpeALF_TRC, gpeALF_TRD, gpeALF_TRE,
+	gpeALF_TRF, gpeALF_TRG, gpeALF_TRH, gpeALF_TRI,
+	gpeALF_TRJ, gpeALF_TRK, gpeALF_TRL, gpeALF_TRM,
+	gpeALF_TRN, gpeALF_TRO, gpeALF_TRP, gpeALF_TRQ,
+	gpeALF_TRR, gpeALF_TRS, gpeALF_TRT, gpeALF_TRU,
+	gpeALF_TRV, gpeALF_TRW, gpeALF_TRX, gpeALF_TRY,
+	gpeALF_TRZ,
+
 	gpeALF_TYF = gpdABC('T', 'Y', 'F'),
 	gpeALF_TYI = gpdABC('T', 'Y', 'I'),
 	gpeALF_TYU = gpdABC('T', 'Y', 'U'),
