@@ -1623,8 +1623,17 @@ public:
 	};
 	gpc3Dkey& operator = ( const char* pS );
 	float operator * ( float s ) {
-			return	 (this[1].val-val)*(s-sec)
-					/(this[1].sec-sec);
+			if( s==sec )
+				return val;
+			if( this[1].val==val )
+				return val;
+			if( this[1].sec<=sec )
+				return this[1].val;
+
+			return	 (this[1].val-val)
+					*((s-sec)/(this[1].sec-sec))
+
+					+ val;
 	}
 };
 class gpc3Dcnl {
@@ -1791,6 +1800,7 @@ public:
 		}
 		mxL.ypr(ypr);
 		mxL.t.xyz_( xyz );
+		mxW = mxL;
 		return &mxL;
 	}
 };

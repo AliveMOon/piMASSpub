@@ -901,23 +901,7 @@ gpc3Dgym::gpc3Dgym( I4 i, const char* pP, gpeALF alf ) {
 	gpmSTRCPY( sPUB, sPATH );
 	pPUB = sPUB+(pFILE-sPATH);
 }
-U4* gpc3Ditm::pBONadd( gpc3Ditm* pBON ) {
-	if( !this )
-		return NULL;
-	if( !pBON )
-		return nBON() ? bonLST.pU4() : NULL;
 
-	U4	*pU4 = bonLST.pU4(), ni = bonLST.nLD(sizeof(U4));
-	if( pU4 )
-	for( U4 i = 0; i < ni; i++ ) {
-		if( pU4[i] != pBON->itmIX )
-			continue;
-		return pU4+i;
-	}
-	pU4 = bonLST.pU4n(-1);
-	*pU4 = pBON->itmIX;
-	return pU4;
-}
 gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 	if( !this )
 		return NULL;
@@ -1712,7 +1696,7 @@ gpdSTATICoff gpsGLSLfrg3D[] = //{
 "\n\0";
 //};
 
-F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
+F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
 	if( !p3Di )
 		return pMX;
 	const gpc3Dact *pACT = gpaACT_man+p3Di->ACT;
@@ -1733,32 +1717,40 @@ F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
 						? p3Di0+p3Di->momIX : NULL),
 				*p3Dib,*p3Dibm;
 	U4			*pBix, nB;
-	if( !p3Dim ) {
-		p3Di->mxW = p3Di->mxL;
+	if( !p3Dim )
 		p3Diu = p3Di; // ez a ROOT nincs anya
-	}
-	else while( p3Dim ) {
-		if( (p3Dim->sec == sec) && (p3Dim->ACT == act) ) {
-			break;
-		}
+	else {
+		while( p3Dim ) {
+			p3Dim->stkIX = p3Diu ? p3Diu->itmIX : p3Di->itmIX;
+			if( (p3Dim->sec == sec) && (p3Dim->ACT == act) ) {
+				if( p3Diu )
+					break;
+				p3Diu = p3Dim;
+				break;
+			}
 
-		p3Dim->stkIX = p3Diu ? p3Diu->itmIX : p3Di->itmIX;
-		/// mxL MOM ---------------------
-		p3Dim->ACT = act;
-		p3Dim->pMXl(sec);
+			/// mxL MOM ---------------------
+			p3Dim->ACT = act;
+			p3Dim->pMXl(sec);
 
-		p3Diu = p3Dim;
-		if(p3Diu->itmIX != p3Diu->momIX) {
+			p3Diu = p3Dim;
+			if(p3Diu->itmIX == p3Diu->momIX)
+				break;
 			p3Dim = p3Di0+p3Diu->momIX;
-			continue;
 		}
-
-		p3Diu->mxW = p3Diu->mxL;
-		p3Dim = NULL;
-		break;
 	}
 
+	p3Dim = NULL;
 	while( p3Diu ) {
+		if( p3Dim )
+			p3Diu->mxW = p3Diu->mxL*p3Dim->mxW;
+		else {
+			p3Dim	= ((p3Diu->itmIX != p3Diu->momIX)
+						? p3Di0+p3Diu->momIX : NULL);
+			if( p3Dim )
+				p3Diu->mxW = p3Diu->mxL*p3Dim->mxW;
+		}
+
 		if( nB = p3Diu->nBON() ) {
 			pBix = p3Diu->pBONadd();
 			for( U4 i = 0; i < nB; i++ ) {
@@ -1769,7 +1761,7 @@ F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
 			for( U4 i = 0; i < nB; i++ ) {
 				p3Dib = p3Di0+pBix[i];
 				p3Dibm = p3Di0+p3Dib->momIX;
-				p3Dib->mxW = p3Dib->mxL*p3Dibm->mxW;
+				p3Dib->mxW =  p3Dib->mxL*p3Dibm->mxW;
 			}
 		}
 		if( p3Diu == p3Di )
@@ -1777,11 +1769,37 @@ F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
 
 		p3Dim = p3Diu;
 		p3Diu = p3Di0+p3Diu->stkIX;
-		p3Diu->mxW = p3Diu->mxL*p3Dim->mxW;
+
 	}
 
+	*pMX = p3Di->mxW;
+	pBix = p3Di->pBONadd();
+	if( !pBix )
+		return pMX;
+	nB = p3Di->nBON();
+	for( U4 i = 0; i < nB; i++ ) {
+		p3Dib = p3Di0+pBix[i];
+		pMX[p3Dib->mxIX] = p3Dib->mxW;
+	}
 
 	return pMX;
+}
+U4* gpc3Ditm::pBONadd( gpc3Ditm* pBON ) {
+	if( !this )
+		return NULL;
+	if( !pBON )
+		return nBON() ? bonLST.pU4() : NULL;
+
+	U4	*pU4 = bonLST.pU4(), ni = bonLST.nLD(sizeof(U4));
+	if( pU4 )
+	for( U4 i = 0; i < ni; i++ ) {
+		if( pU4[i] != pBON->itmIX )
+			continue;
+		return pU4+i;
+	}
+	pU4 = bonLST.pU4n(-1);
+	*pU4 = pBON->itmIX;
+	return pU4;
 }
 
 F4x4 aMX[0x40],arMX[0x40];
@@ -1927,23 +1945,39 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 						if( p3Di->bNULL )
 							break;
 
+						glMatrixMode(GL_MODELVIEW);
+						aMX[0] = aMX[1]*uMX;
+						glLoadMatrixf((const GLfloat*)&aMX[0]);
+
 						p3D = p3Di->p3D( this, p3Dg->sPUB, p3Dg->pPUB );
 						if( p3Di->nBON() ) {
 							U4 n3Db = p3D->nMX();
-							if( !n3Db ) {
+							if( n3Db )
+								pRSTmx = p3D->pMX( 0 );
+							else {
 								pRSTmx = p3D->pMX( p3Di->nBON() );
 								n3Db = p3D->nMX();
-
-							} else {
-								pRSTmx = p3D->pMX( 0 );
 							}
 						}
+						if( !p3Dnull )
+						if( strstr(p3Di->sNAME, "eye" ) )
+							p3Dnull = p3D;
 
-						glDRW3D(p3D, -1 );
+						glDRW3D(p3D, p3Di->nBON() ? 0x9 : -1 );
+						break;
+					case gpeLWSiTYP_BON:
+						if( !p3Dnull )
+							break;
+						glMatrixMode(GL_MODELVIEW);
+						aMX[0] = p3Di->mxW*uMX;
+						//if( aMX[0].t.w < 1.0 )
+						//	p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
+						glLoadMatrixf((const GLfloat*)&aMX[0]);
+
+						glDRW3D( p3Dnull, -1 );
 						break;
 					case gpeLWSiTYP_LIG:
 					case gpeLWSiTYP_CAM:
-					case gpeLWSiTYP_BON:
 					default: break;
 				}
 			}

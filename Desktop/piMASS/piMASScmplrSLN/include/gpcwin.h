@@ -219,7 +219,7 @@ public:
 	U4x2 aVXn[0x10];
 	F4* pV;
 
-	gpc3D*		p3D;
+	gpc3D		*p3D, *p3Dnull;
 	gpc3Dlst*	p3Dlst;
 	gpcMASS*	pMASS;
 	I4 iLWS( gpeALF a, const char* pPATH, gpcLZY& rd );
