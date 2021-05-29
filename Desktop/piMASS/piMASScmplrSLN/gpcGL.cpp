@@ -271,13 +271,15 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 	glDeleteShader( vrtxID );
 	glDetachShader( PrgID, frgID );
 	glDeleteShader( frgID );
-
-	aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
-	aUniID[1] = glGetUniformLocation( PrgID, "DIVxy" 	);
-	aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
-	aUniID[3] = glGetUniformLocation( PrgID, "aTX" 		);
-	aUniID[4] = glGetUniformLocation( PrgID, "aCNL"		);
-	nU = 5;
+	nU = 0;
+	aUniID[nU++] = glGetUniformLocation( PrgID, "tgPX" 	);	// 0
+	aUniID[nU++] = glGetUniformLocation( PrgID, "DIVxy" );	// 1
+	aUniID[nU++] = glGetUniformLocation( PrgID, "FRMwh" );	// 2
+	aUniID[nU++] = glGetUniformLocation( PrgID, "aTX" 	);	// 3
+	aUniID[nU++] = glGetUniformLocation( PrgID, "aCNL"	);	// 4
+	aUniID[nU++] = glGetUniformLocation( PrgID, "aMX"	);	// 5
+	aUniID[nU++] = glGetUniformLocation( PrgID, "aMXi"	);	// 6
+	//nU = 5;
 
 	if( !ppUlst )
 		return GL_TRUE;

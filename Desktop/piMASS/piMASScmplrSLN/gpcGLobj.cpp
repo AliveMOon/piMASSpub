@@ -1098,6 +1098,7 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 			} break;
 			case GPE_LWS_COM_BoneRestDirection:{ if( !pBON ) break;
 				pBON->rstYPR.sXYZW( pA, &pA );
+				pBON->rstYPR *= PI/180.0f;
 			} break;
 			case GPE_LWS_COM_BoneRestLength:{ if( !pBON ) break;
 				pBON->rstWHD.sXYZW( pA, &pA );
@@ -1710,17 +1711,20 @@ gpdSTATICoff gpsGLSLvx3D[] = //{
 "varying	vec3	fr_up;															\n"
 "varying	vec2	fr_ps;															\n"
 "uniform vec2 tgPX;																	\n"
+"uniform mat4 aMX[20], aMXi[20];													\n"
 "void main() {																		\n"
-"	vec3	mv	= ( gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(v_vx,1.0) ).xyz,	\n"
-"			xyz	= vec3(1.0, tgPX.x/tgPX.y, 1.0/250.0), 							\n"
-"			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 							\n"
-"	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);				\n"
-"	p = p*d.xxy*xyz.xyx - sb.xxy;												\n"
-"	gl_Position			= vec4( p*-1.0, 1.0 );									\n"
-"	fr_uv				= vec3( v_uv, p.z ); //*vec2(1,-1)+vec2(0,1), p.z );	\n"
-"	fr_up				= v_up;													\n"
-"	fr_ps				= v_ps;													\n"
-"}																				\n\0";
+"   mat4   	mx = aMX[v_ix.x]*aMXi[v_ix.x];											\n"
+"	vec3	vmx = (mx*vec4(v_vx,1.0)).xyz, vmx2 = (vmx+v_vx)/2.0,					\n"
+"			mv	= ( gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(vmx2,1.0) ).xyz,	\n"
+"			xyz	= vec3(1.0, tgPX.x/tgPX.y, 1.0/250.0), 								\n"
+"			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 								\n"
+"	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);					\n"
+"	p = p*d.xxy*xyz.xyx - sb.xxy;													\n"
+"	gl_Position			= vec4( p*-1.0, 1.0 );										\n"
+"	fr_uv				= vec3( v_uv, p.z ); //*vec2(1,-1)+vec2(0,1), p.z );		\n"
+"	fr_up				= v_up;														\n"
+"	fr_ps				= v_ps;														\n"
+"}																					\n\0";
 //};
 gpdSTATICoff gpsGLSLfrg3D[] = //{
 "#version 120																\n"
@@ -1754,8 +1758,10 @@ F4x4* gpc3Ditm::pMXl( float s ) {
 		return &mxL;
 	}
 	float v;
-	F4 xyz, ypr, scl(1,1,1);
+	F4 xyz = rstXYZ, ypr = rstYPR, scl = rstWHD;
 	sec = s;
+
+	if( sec > 0.25)
 	for( U1 c = 0; c < 6; c++ ){
 		v = cnl.valKEYs(c,sec);
 		switch( c ) {
@@ -1782,7 +1788,7 @@ F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT a
 	if( !p3Di )
 		return pMX;
 	F4 xyz, ypr, scl(1,1,1);
-	float sec = 0.0; //, v;
+	float sec = 0.125; //, v;
 	switch( act ) {
 		case gpeACT_DEF:
 			if( mSEC >= ms )
@@ -2049,22 +2055,26 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 								if( n3Db )
 									pRSTmx = p3D->pMX( 0 );
 								else {
-									pRSTmx = p3D->pMX( p3Di->nBON() );
+									pRSTmx = p3D->pMX( p3Di->nBON()+2 );
 									n3Db = p3D->nMX();
 
-									p3Dt->pTRK( aMX+1, p3Dg, p3Di, 0, gpeACT_DEF );
-									for( U4 i = 0; i < n3Db; i++ ){
-										pRSTmx[i] = aMX[2+i].inv();
+									p3Dt->pTRK( aMXi+1, p3Dg, p3Di, 0, gpeACT_DEF );
+									for( U4 i = 1; i < n3Db; i++ ) {
+										pRSTmx[i] = aMXi[i].inv();
 									}
-
+									pRSTmx[0] = pRSTmx[1];
 								}
+								if( aUniID[5] > -1 )
+									glUniformMatrix4fv( aUniID[5], 18, GL_FALSE, (const GLfloat*)&aMX[1] );
+								if( aUniID[6] > -1 )
+									glUniformMatrix4fv( aUniID[6], 18, GL_FALSE, (const GLfloat*)(pRSTmx+1) );
 							}
 
 							if( !p3Dnull )
 							if( strstr(p3Di->sNAME, "eye" ) )
 								p3Dnull = p3D;
 
-							glDRW3D( p3D, p3Di->nBON() ? 0x9 : -1 );
+							glDRW3D( p3D, -1 ); //p3Di->nBON() ? 0x9 : -1 );
 						} break;
 					case gpeLWSiTYP_BON:
 						if( !p3Dnull )
