@@ -1454,7 +1454,7 @@ public:
 	F4x4* pMX( U4 n ) {
 		if( !n )
 			return rstMX.pF4x4( 0 );
-		F4x4* pMX = rstMX.pF4x4(n);
+		F4x4* pMX = rstMX.pF4x4n(0,n);
 		return pMX ? pMX-n : NULL;
 	}
 };
@@ -1479,19 +1479,18 @@ public:
 		begin_ms = (I8)(b*ms2sec);
 		end_ms = (I8)(e*ms2sec);
 		loop_ms = (I8)(loop*ms2sec);
-		start_ms = (I8)(start*ms2sec);
+		start_ms = ((I8)(start-b))*ms2sec;
 	}
 	float sec( I8 ms ) const {
 		float sec = 0.0;
-		ms += start_ms - begin_ms;
-		//I8 act_ms = start_ms + act_ms - begin_ms;
+		ms += start_ms; // - begin_ms;
 
 		if( ms < long_ms )
-			sec = float(ms)/ms2sec;
+			sec = float(ms)/float(ms2sec);
 		else if( end_ms <= loop_ms )
 			sec = long_s;
 		else
-			sec = float(ms%long_ms)/ms2sec;
+			sec = float(ms%long_ms)/float(ms2sec);
 
 		return sec + b;
 	}
@@ -1518,7 +1517,7 @@ typedef enum gpeACT : int {
 } gpeACT_int;
 static const   gpc3Dact gpaACT_man[] = {
 	//			begin,	end,	start,	mix,	fade,	gim,		loop
-	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_DEF,
+	gpc3Dact(	  0.0,	1.0,	 0.0,	 0.0,	0.25,	1.0,		0.0		),	//GPE_ACTION_DEF,
 	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_IDLE,
 	gpc3Dact(	 32.0,	34.0,	32.5,	33.5,	0.5,	1.0,		32.0	),	//GPE_ACTION_WALK,
 	gpc3Dact(	 36.5,	38.5,	36.5,	38.5,	0.5,	0.3,		37.0	),	//GPE_ACTION_RUN,
@@ -1614,7 +1613,7 @@ typedef enum GPE_LWS_iTYP:U4 {
 } GPT_LWS_iTYP;
 class gpc3Dkey {
 public:
-	float val,sec; int spn;
+	float val, sec; int spn;
 	float aP[6];
 	gpc3Dkey(){};
 	gpc3Dkey( const char* pS ){
@@ -1623,18 +1622,18 @@ public:
 	};
 	gpc3Dkey& operator = ( const char* pS );
 	float operator * ( float s ) {
-			if( s==sec )
+			if( s == sec )
 				return val;
+			if( this[1].sec<=s )
+				return this[1].val;
 			if( this[1].val==val )
 				return val;
-			if( this[1].sec<=sec )
-				return this[1].val;
 
-			return	 (this[1].val-val)
-					*((s-sec)/(this[1].sec-sec))
-
+			return	   (this[1].val-val)
+					* ((s-sec)/(this[1].sec-sec))
 					+ val;
 	}
+	size_t sOUT( char* pBUFF, const char* pEND = "\r\n" );
 };
 class gpc3Dcnl {
 public:
@@ -1778,31 +1777,7 @@ public:
 	}
 	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
 	U4* pBONadd( gpc3Ditm* pBON = NULL );
-	F4x4* pMXl( float s ) {
-		if( sec == s )
-			return &mxL;
-		float v;
-		F4 xyz, ypr, scl(1,1,1);
-		sec = s;
-		for( U1 c = 0; c < 6; c++ ){
-			v = cnl.valKEYs(c,sec);
-			switch( c ) {
-				case 0: xyz.x = v; break;
-				case 1: xyz.y = v; break;
-				case 2: xyz.z = v; break;
-				case 3: ypr.ry = v; break;
-				case 4: ypr.rp = v; break;
-				case 5: ypr.rr = v; break;
-				case 6: scl.x = v; break;
-				case 7: scl.y = v; break;
-				case 8: scl.z = v; break;
-			}
-		}
-		mxL.ypr(ypr);
-		mxL.t.xyz_( xyz );
-		mxW = mxL;
-		return &mxL;
-	}
+	F4x4* pMXl( float s );
 };
 
 class gpc3Dgym {

@@ -4853,6 +4853,11 @@ public:
 		c.z.col4x3(&x.z);
 		return c;
 	}
+	F4x4 inv() {
+		F4x4 i = T3x3();
+		i.t.xyz_( t*-1 );
+		return i;
+	}
 	F4x4& operator *= ( const F4x4& b ) {
         F4 v;
 		F4x4 c = *this;
@@ -6296,23 +6301,26 @@ szasz:
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
 	I8 nU4( I8 x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
-	U4*		pU4n( int i = 0, int n = 1 ) 	{ return (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
+	U4*		pU4n( int i = 0, int n = 1 ) 	{ return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
 	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
 	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
 	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
+	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
 
 	char* pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
 	I1* pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
 
-	U4* pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
-	U4x2* pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
-	U4x4* pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
+	U4*		pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
+	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
+	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
 
-	I4* pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
-	I4x2* pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
-	U4 nI4x2() { return nLD(sizeof(I4x2)); };
-	I4x4* pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
-	U4 nI4x4() { return nLD(sizeof(I4x4)); };
+	I4* 	pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
+
+	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
+	U4		nI4x2() { return nLD(sizeof(I4x2)); };
+
+	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
+	U4		nI4x4() { return nLD(sizeof(I4x4)); };
 
 	I8x2* pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
 	I8x4* pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }

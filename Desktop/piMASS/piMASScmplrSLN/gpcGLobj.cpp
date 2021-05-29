@@ -749,7 +749,6 @@ float gpc3Dcnl::valKEYs( U1 c, float s ){
 
 	if( !nK )
 		return 0.0f;
-
 	gpc3Dkey* pK0 = (gpc3Dkey*)aKEY[c].p_alloc;
 	if( pK0->sec >= s )
 		return pK0->val;
@@ -778,7 +777,8 @@ float gpc3Dcnl::valKEYs( U1 c, float s ){
 		}
 
 		// ez kicsi
-		if( iK+1 >= aiK[1] ) return pK0[nK-1].val;	// köv nincs
+		if( iK+1 >= aiK[1] )
+			return pK0[iK]*s;	// köv nincs
 
 		iK++;
 		if( pK0[iK].sec == s )	// köv az
@@ -865,11 +865,14 @@ gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
 	char* pE = (char*)pS + gpmVAN(pS,"\r\n}", nL );
 	int i = 0;
 	while( pS < pE ) {
+		pS += gpmNINCS(pS, " \t" );
 		switch( i ) {
 			case 0:
-				val = gpmSTR2D( pS ); break;
+				val = gpmSTR2D( pS );
+				break;
 			case 1:
-				sec = gpmSTR2D( pS ); break;
+				sec = gpmSTR2D( pS );
+				break;
 			case 2:
 				spn = gpmSTR2D( pS ); break;
 			default:
@@ -878,6 +881,39 @@ gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
 		i++;
 	}
 	return *this;
+}
+size_t sLWOfloat( char* pBUFF, float f ) {
+	char* pBi = pBUFF;
+	int d = f, dd = 0;
+	f -= d;
+	pBi += sprintf( pBi, " %d", d );
+
+	f *= 10.0;
+	d = f;
+	if( !d )
+		return pBi-pBUFF;
+	*pBi = '.';
+	pBi++;
+	f -= d;
+	f *= 10.0;
+	while( f != 0 ) {
+		d = f;
+		f -= d;
+		f *= 10.0;
+
+		dd*=10;
+		dd+=d;
+	}
+
+	pBi += sprintf( pBi, "%d", dd );
+
+	return pBi-pBUFF;
+}
+size_t gpc3Dkey::sOUT( char* pBUFF, const char* pEND ) {
+	if( !this )
+		return 0;
+	//char* pBi = pBUFF;
+	return sprintf( pBUFF, " %f %f %d %f %f %f %f %f %f%s", val, sec, spn, aP[0], aP[1], aP[2], aP[3], aP[4], aP[5] ,pEND );
 }
 #define gpdITMis (pBON 	? pBON 				\
 						: (pITM ? pITM 		\
@@ -910,7 +946,8 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 	if( !s )
 		return this;
 	U4x4* pU4x4;
-	char* pS = (char*)lws.p_alloc, *pSe = pS+s, *pA, *pCH;
+	char	*pS = (char*)lws.p_alloc, *pSe = pS+s, *pA, *pCH,
+			sDBG[0x100];
 	GPE_LWS_COM si;
 	U4 nD, iD, nS, nL, iCNL = 0, nENV = 0;
 	olcb = I4x4(-1,-1,-1,-1);
@@ -922,6 +959,10 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				*pMOM = NULL, *pIS = NULL,
 				*pROOT = NULL, *pI0 = NULL;
 	I8 momID;
+	/*sDBG = pS[210000];
+	pS[210000] = 0;
+	std::cout << pS+170000 << std::endl;
+	pS[210000] = *sDBG;*/
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pSe; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
 		si = (GPE_LWS_COM)lwsDCT.dctFND( pS, nS = pSe-pS, nD );
@@ -973,7 +1014,7 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				iCNL = gpfSTR2I8(pA, &pA);
 			} break;
 			case GPE_LWS_COM_C_open:{
-				pS = pA; // + gpmNINCS(pA," \t\"");
+				pS = pA;
 			} break;
 			case GPE_LWS_COM_Envelope:{
 				pA += gpmNINCS(pA," \t\"\r\n");
@@ -985,11 +1026,24 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				pIS = gpdITMis;
 				if( !pIS )
 					break;
-				pKEY = pIS->cnl.pKEYins(iCNL, key.sec );
-				if( !pKEY )
+				pKEY = pIS->cnl.pKEYins(iCNL, key.sec );	/// key.sec>=33.5 && key.sec<=33.6 && iCNL == 3
+				if( pKEY )
+					*pKEY = key;
+
+				break;
+
+				U4 nD = pKEY->sOUT( sDBG ), nA = pS-pA, nEQ;
+				if( !nD )
 					break;
-				//std::cout << key.sec << " " << std::flush;
-				*pKEY = key;
+				nEQ = gpmMcmp(sDBG,pA,gpmMIN(nD,nA));
+				if( nEQ == nA )
+					break;
+				key = pA;
+				pKEY = pIS->cnl.pKEYins(iCNL, key.sec );
+				if( pKEY )
+					*pKEY = key;
+				sDBG[nEQ] = 0;
+				std::cout << sDBG << std::endl;
 			} break;
 			case GPE_LWS_COM_C_close:{
 				break;
@@ -1612,10 +1666,6 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p3d, U4 msk ) {
 									glU4vx[0x9],
 									GL_UNSIGNED_INT,
 									(void*)glU4vx[0xb] );
-						/*glDrawRangeElements( 	gpaDRWmod[3],
-												glU4vx[0x7], glU4vx[0x8],
-												glU4vx[0xa],
-												GL_UNSIGNED_INT, NULL );*/
 					}
 				} else
 					glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
@@ -1695,7 +1745,36 @@ gpdSTATICoff gpsGLSLfrg3D[] = //{
 "}																			\n"
 "\n\0";
 //};
+F4x4* gpc3Ditm::pMXl( float s ) {
+	if( sec == s ) {
+		mxW = mxL;
+		return &mxL;
+	}
+	float v;
+	F4 xyz, ypr, scl(1,1,1);
+	sec = s;
+	for( U1 c = 0; c < 6; c++ ){
+		v = cnl.valKEYs(c,sec);
+		switch( c ) {
+			case 0: xyz.x = v; break;
+			case 1: xyz.y = v; break;
+			case 2: xyz.z = v; break;
+			case 3: ypr.ry = v; break;
+			case 4: ypr.rp = v; break;
+			case 5: ypr.rr = v; break;
+			case 6: scl.x = v; break;
+			case 7: scl.y = v; break;
+			case 8: scl.z = v; break;
+		}
+	}
 
+	std::cout	<< sNAME << " " << xyz.x << " " << xyz.y << " " << xyz.z
+				<< " " << (ypr.ry*180.0f/PI) << " " << (ypr.rp*180.0f/PI) << " " << (ypr.rr*180.0f/PI) << std::endl;
+	mxL.ypr(ypr);
+	mxL.t.xyz_( xyz );
+	mxW = mxL;
+	return &mxL;
+}
 F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
 	if( !p3Di )
 		return pMX;
@@ -1708,6 +1787,7 @@ F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT a
 
 	/// mxL ez az ITEM ---------------------
 	float sec = pACT->sec(ms-mSEC), v;
+	std::cout << "\r\n TRK:" << sec << std::flush;
 	p3Di->pMXl(sec);
 	p3Di->stkIX = p3Di->itmIX;
 
@@ -1790,19 +1870,19 @@ U4* gpc3Ditm::pBONadd( gpc3Ditm* pBON ) {
 	if( !pBON )
 		return nBON() ? bonLST.pU4() : NULL;
 
-	U4	*pU4 = bonLST.pU4(), ni = bonLST.nLD(sizeof(U4));
-	if( pU4 )
-	for( U4 i = 0; i < ni; i++ ) {
-		if( pU4[i] != pBON->itmIX )
+	U4	*pBix = bonLST.pU4(), nB = bonLST.nLD(sizeof(U4));
+	if( pBix )
+	for( U4 i = 0; i < nB; i++ ) {
+		if( pBix[i] != pBON->itmIX )
 			continue;
-		return pU4+i;
+		return pBix+i;
 	}
-	pU4 = bonLST.pU4n(-1);
-	*pU4 = pBON->itmIX;
-	return pU4;
+	pBix = bonLST.pU4n(-1);
+	*pBix = pBON->itmIX;
+	return pBix;
 }
 
-F4x4 aMX[0x40],arMX[0x40];
+F4x4 aMX[0x40], aMXi[0x40];
 gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	int nD1 = scnDEC1.nLD() ? scnDEC1.nLD() : scnDEC1.nAT(sSCNdec1,sizeof(sSCNdec1));
 
@@ -1939,39 +2019,45 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 				if( !p3Di )
 					break;
 				switch( p3Di->itmID&gpeLWSiTYP_TYP ){
-					case gpeLWSiTYP_OBJ:
-						p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
+					case gpeLWSiTYP_OBJ: {
 
-						if( p3Di->bNULL )
-							break;
+							p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x,gpeACT_WALK );
+							if( p3Di->bNULL )
+								break;
 
-						glMatrixMode(GL_MODELVIEW);
-						aMX[0] = aMX[1]*uMX;
-						glLoadMatrixf((const GLfloat*)&aMX[0]);
+							glMatrixMode(GL_MODELVIEW);
+							aMX[0] = aMX[1]*uMX;
+							glLoadMatrixf((const GLfloat*)&aMX[0]);
 
-						p3D = p3Di->p3D( this, p3Dg->sPUB, p3Dg->pPUB );
-						if( p3Di->nBON() ) {
-							U4 n3Db = p3D->nMX();
-							if( n3Db )
-								pRSTmx = p3D->pMX( 0 );
-							else {
-								pRSTmx = p3D->pMX( p3Di->nBON() );
+							p3D = p3Di->p3D( this, p3Dg->sPUB, p3Dg->pPUB );
+							U4 n3Db = p3Di->nBON();
+							if( n3Db ) {
 								n3Db = p3D->nMX();
-							}
-						}
-						if( !p3Dnull )
-						if( strstr(p3Di->sNAME, "eye" ) )
-							p3Dnull = p3D;
+								if( n3Db )
+									pRSTmx = p3D->pMX( 0 );
+								else {
+									pRSTmx = p3D->pMX( p3Di->nBON() );
+									n3Db = p3D->nMX();
 
-						glDRW3D(p3D, p3Di->nBON() ? 0x9 : -1 );
-						break;
+									p3Dt->pTRK( aMX+1, p3Dg, p3Di, 0, gpeACT_DEF );
+									for( U4 i = 0; i < n3Db; i++ ){
+										pRSTmx[i] = aMX[2+i].inv();
+									}
+
+								}
+							}
+							if( !p3Dnull )
+							if( strstr(p3Di->sNAME, "eye" ) )
+								p3Dnull = p3D;
+
+							glDRW3D( p3D, p3Di->nBON() ? 0x9 : -1 );
+						} break;
 					case gpeLWSiTYP_BON:
 						if( !p3Dnull )
 							break;
+
 						glMatrixMode(GL_MODELVIEW);
 						aMX[0] = p3Di->mxW*uMX;
-						//if( aMX[0].t.w < 1.0 )
-						//	p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
 						glLoadMatrixf((const GLfloat*)&aMX[0]);
 
 						glDRW3D( p3Dnull, -1 );
