@@ -1565,7 +1565,7 @@ gpcPIC* gpcGL::pPICsrf( gpc3Dsrf* pSRF, char* pPATH ) { //, char* pFILE ) {
 
 }
 
-U4 glU4vx[] = {
+int aglVXi4[] = {
 	gpmOFF(gpc3Dvx,xyzi),		// 00
 	gpmOFF(gpc3Dvx,xyzi.w),		// 01
 	gpmOFF(gpc3Dvx,up),			// 02
@@ -1574,7 +1574,7 @@ U4 glU4vx[] = {
 	sizeof(gpc3Dvx),			// 05
 	6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
 };
-void gpcGL::onATscn( U4* glU4 ) {
+void gpcGL::onATscn( int* glU4 ) {
 	/// XYZ
 	if( ATvxID > -1 ) {
 		glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[0]) );  gpfGLerr( "ATvxID" );
@@ -1639,37 +1639,40 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p3d, U4 msk ) {
 	/// VERTEX ------------------------------------------
 			glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x );  gpfGLerr();
 
-			onATscn(glU4vx);
+			onATscn(aglVXi4);
 
 			for( U4 t = 0; t < nT; t++, msk >>= 1 ) {
 				if( (msk&1) ? !pT0[t].aIIXN[2].y : true )
 					continue;
 
-				glU4vx[6] = pT0[t].aIIXN[2].a4x2[1].area();
+				aglVXi4[6] = pT0[t].aIIXN[2].a4x2[1].area();
 
 
 	/// ELEMENT ------------------------------------------
 				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );  gpfGLerr( "GL_ELEMENT_ARRAY_BUFFER");
 				if( pSRFx4 = pT0[t].pSRF(0) ) {
 					for( U4 s = 0, ns = pT0[t].nSRF(), n; s < ns; s++ ) {
+						aglVXi4[0x7] = pSRFx4[s].w;
+						aglVXi4[0x8] = pSRFx4[s+1].w;
+						aglVXi4[0x9] = aglVXi4[8]-aglVXi4[7];
+						aglVXi4[0xa] = aglVXi4[0x9]/3;
+						if( aglVXi4[0xa] < 1 )
+							continue;
+						aglVXi4[0xb] = aglVXi4[0x7]*sizeof(U4);
 						pPIC = pPICsrf( p3D->pSRFi(pSRFx4[s].x), p3D->sPATH );
 						if( !pPIC )
 							continue;
 						glSETtx( 0, pPIC->surDRWtx(pRNDR), pPIC->txWH.a4x2[1] );
 
-						glU4vx[0x7] = pSRFx4[s].w;
-						glU4vx[0x8] = pSRFx4[s+1].w;
-						glU4vx[0x9] = glU4vx[8]-glU4vx[7];
-						glU4vx[0xa] = glU4vx[0x9]/3;
-						glU4vx[0xb] = glU4vx[0x7]*sizeof(U4);
+
 						glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
-									glU4vx[0x9],
+									aglVXi4[0x9],
 									GL_UNSIGNED_INT,
-									(void*)glU4vx[0xb] );
+									(void*)aglVXi4[0xb] );
 					}
 				} else
 					glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
-									glU4vx[6],
+									aglVXi4[6],
 									GL_UNSIGNED_INT,
 									NULL ); gpfGLerr( "glDrawElements");
 				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ); gpfGLerr();
@@ -1778,16 +1781,25 @@ F4x4* gpc3Ditm::pMXl( float s ) {
 F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
 	if( !p3Di )
 		return pMX;
-	const gpc3Dact *pACT = gpaACT_man+p3Di->ACT;
-	if( p3Di->ACT != act ) {
-		pACT = gpaACT_man+(p3Di->ACT=act);
-		mSEC = ms;
-	}
 	F4 xyz, ypr, scl(1,1,1);
+	float sec = 0.0; //, v;
+	switch( act ) {
+		case gpeACT_DEF:
+			if( mSEC >= ms )
+				break;
 
-	/// mxL ez az ITEM ---------------------
-	float sec = pACT->sec(ms-mSEC), v;
+			mSEC = ms;
+			break;
+		default:
+			if( p3Di->ACT != act ) {
+				p3Di->ACT = act;
+				mSEC = ms;
+			}
+			sec = gpaACT_man[act].sec(ms-mSEC);
+			break;
+	}
 	std::cout << "\r\n TRK:" << sec << std::flush;
+	/// mxL ez az ITEM ---------------------
 	p3Di->pMXl(sec);
 	p3Di->stkIX = p3Di->itmIX;
 
@@ -2021,7 +2033,8 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 				switch( p3Di->itmID&gpeLWSiTYP_TYP ){
 					case gpeLWSiTYP_OBJ: {
 
-							p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x,gpeACT_WALK );
+							p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
+																				//gpeACT_DEF );
 							if( p3Di->bNULL )
 								break;
 
@@ -2046,6 +2059,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 
 								}
 							}
+
 							if( !p3Dnull )
 							if( strstr(p3Di->sNAME, "eye" ) )
 								p3Dnull = p3D;

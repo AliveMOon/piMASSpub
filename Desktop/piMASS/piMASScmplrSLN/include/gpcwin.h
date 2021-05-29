@@ -596,7 +596,7 @@ public:
 
 	gpcPIC* pPICsrf( gpc3Dsrf* pSRF, char* pPATH );
 	gpcGL*	glSCENE( gpMEM* pMEM, char* pSTR );
-	void onATscn( U4* glU4 );
+	void onATscn( int* glU4 );
 	void offATscn();
 
 };
