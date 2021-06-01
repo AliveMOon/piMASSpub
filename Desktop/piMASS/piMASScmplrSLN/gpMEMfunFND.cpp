@@ -20,7 +20,7 @@ extern char gpaALF_H_sub[];
 
 /// pxSCR.xyr
 
-gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
+gpITM* gpITM::read( gpITMlst *pIDlst ) {
 	char *pFILE = pIDlst->pF+sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
 	gpcLZY dir, rd; U8 s, n;
 	dir.lzyDIR( pIDlst->sPATH, s = 0 );
@@ -42,7 +42,6 @@ gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 		U1 *pV = pAB( ABbb.a8x2[0], n=0 );
 		if( pV ) {
 			switch( ABbb.a8x2[0].b ) {
-				case gpeALF_LWS:
 				case gpeALF_LWO:
 					gpmMcpy( pFILE, pNM, pMNe-pNM )[pMNe-pNM] = 0;
 					break;
@@ -53,18 +52,12 @@ gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 			rd.lzyRD( pIDlst->sPATH, s = 0 );
 			switch( ABbb.a8x2[0].b ) {
 				case gpeALF_LWO: {
-						/// keressünk egy ilyen nevű objectet
+						/// keressünk egy iloyen nevű objectet
 						I4* p3Did = (I4*)pV;
 						*p3Did = 	pIDlst->pMEM
 									? pIDlst->pMEM->pWgl->iLWO( ABbb.a8x2[0].a, pIDlst->sPATH, rd )
 									: -1;
 
-					} break;
-				case gpeALF_LWS: {
-						I4* p3Did = (I4*)pV;
-						*p3Did = 	pIDlst->pMEM
-									? pIDlst->pMEM->pWgl->iLWS( ABbb.a8x2[0].a, pIDlst->sPATH, rd )
-									: -1;
 					} break;
 				default:
 					if( rd.nLD() )
@@ -101,45 +94,67 @@ gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 
 	return this;
 }
-gpDBitm* gpDBitm::store( gpDBlst *pIDlst, I8x2* pAT, void* pVAR ) {
+gpITM* gpITM::store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR ) {
 
 	char* pF = pIDlst ? pIDlst->pF + sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID ) : NULL;
+
 	gpcLZY wr;
 	U8 s;
-	I8x2 ab( pAT[0].alf,pAT[1].alf);
-	size_t n = sOF(ab.b);
+	I8x2 aa( pAT[0].alf,pAT[1].alf);
+	size_t n = sOF(aa.b);
 	if( !n )
 		return this;
-	U1 *pV = pAB( ab, n );
+	U1 *pV = pAB( aa, n );
 	if( gpmMcmp(pV,pVAR,n) == n )
 		return this;
 	gpmMcpy(pV,pVAR,n);
-	switch( ab.b ) {
-		case gpeALF_LWO: return this; //pF = NULL; break;
-		default: break;
+	switch( aa.b ) {
+		case gpeALF_LWO: {
+				pF = NULL;
+
+
+			} break;
+		default:
+			break;
 	}
 	if( !pF )
 		return this;
-
 	wr.lzyADD( pV, n, s=0 );
-	pF += ab.ab2str(pF,".");
+	pF += aa.ab2str(pF,".");
 	wr.lzyWR( pIDlst->sPATH );
 	return this;
 
-}
-size_t gpDBitm::sOF( gpeALF b ) {
-	switch( b ) {
-		case gpeALF_XYR: return sizeof(I4x4);
-		case gpeALF_ID: return sizeof(I8);
-		case gpeALF_TRK: return sizeof(gpc3Dtrk);
-		case gpeALF_LWS:
-		case gpeALF_LWO:
-			return sizeof(I4);
+	switch( aa.b ) {
+		case gpeALF_XYR: {
+			I4x4* pXYR = (I4x4*)pAB( aa, n = 0 ); //sizeof(I4x4) );
+			if( !pXYR )
+				break;
+			if( (*pXYR) == (pVAR?(*(I4x4*)pVAR):I4x4(0)) )
+				break;
+			(*pXYR) = pVAR ? (*(I4x4*)pVAR) : I4x4(0);
+			if( !pF ) break;
+			wr.lzyADD( pXYR, sizeof(*pXYR), s=0 );
+		} break;
+		case gpeALF_ID: {
+			I8* pI8 = (I8*)pAB( aa, n = 0 ); //sizeof(*pI8) );
+			if( !pI8 )
+				break;
+			if( (*pI8) == (pVAR?(*(I8*)pVAR):0) )
+				break;
+			(*pI8) = (pVAR?(*(I8*)pVAR):0);
+			if( !pF ) break;
+			wr.lzyADD( pI8, sizeof(*pI8), s=0 );
+		} break;
 		default: break;
 	}
-	return 0;
+
+	if( pF ? !wr.nLD() : true )
+		return this;
+	pF += aa.ab2str(pF,".");
+	wr.lzyWR( pIDlst->sPATH );
+	return this;
 }
-gpDBlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
+gpITMlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
 	I8 ixDB = pPi->i8(pMEM);
 	if(ixDB == '\"') {
 		ixDB = 0;
@@ -149,7 +164,7 @@ gpDBlst* gpcMASS::iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE ) {
 
 	return NULL;
 }
-gpDBlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
+gpITMlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
 	if(!this)
 		return NULL;
 	I8 ixDB = 0;
@@ -167,15 +182,15 @@ gpDBlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
 		return NULL;
 
 	I4 ixITM;
-	gpDBitm* pITM;
-	gpDBlst *pIl = NULL;
+	gpITM* pITM;
+	gpITMlst *pIl = NULL;
 	gpcLZY dir;
 
 	if( ixDB >= nDB ) {
 		dctDB.dctADD( pU1, nU1 );
 		ixDB = nDB;
 		nDB = dctDB.nIX();
-		gpDBlst **ppITMlst = (gpDBlst**)lstDB.Ux( ixDB, sizeof(gpDBlst*) );
+		gpITMlst **ppITMlst = (gpITMlst**)lstDB.Ux( ixDB, sizeof(gpITMlst*) );
 
 
 		gpmMcpy( pFILE, pU1, nU1 )[nU1] = 0;
@@ -183,7 +198,7 @@ gpDBlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
 		dir.lzyDIR( sPATH, nLEN = 0 );
 		pIl = *ppITMlst;
 		if( !pIl )
-			*ppITMlst = (pIl=new gpDBlst( pMEM, sPATH,pFILE-sPATH));
+			*ppITMlst = (pIl=new gpITMlst( pMEM, sPATH,pFILE-sPATH));
 
 		char	*pS = (char*)dir.p_alloc,
 				*pSi = pS, *pSn = pSi + dir.nLD(),
@@ -195,7 +210,7 @@ gpDBlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
 			if( oo == 2 )
 			if( ((*pSt)=='d') || ((*pSt)=='D') ) {
 				ixITM = pIl->itmLST.nLD(sizeof(*pITM));
-				pITM = (gpDBitm*)pIl->itmLST.Ux( ixITM, sizeof(*pITM) );
+				pITM = (gpITM*)pIl->itmLST.Ux( ixITM, sizeof(*pITM) );
 				pITM->mID = pITM->ID = gpfSTR2I8( pSi );
 				pITM->read( pIl );
 				if( pIl->newID <= pITM->ID )
@@ -208,7 +223,7 @@ gpDBlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
 	if( pIl )
 		return pIl;
 
-	return *(gpDBlst**)lstDB.Ux( ixDB, sizeof(gpDBlst*) );;
+	return *(gpITMlst**)lstDB.Ux( ixDB, sizeof(gpITMlst*) );;
 }
 
 void gpMEM::funFND() {
@@ -241,10 +256,10 @@ void gpMEM::funFND() {
 	/// i 1: DB id/sNAME
 	pPi = (gpPTR*)pUn(pI4[i],sizeof(gpPTR));
 	pP = sPUB + sprintf( sPUB, "./" );
-	gpDBlst *pIl  = pMASS->iDB( this, pPi, sPUB, pP );
+	gpITMlst *pIl  = pMASS->iDB( this, pPi, sPUB, pP );
 	if( !pIl )
 		return;
-	gpDBitm	*pI0 = (gpDBitm*)pIl->itmLST.p_alloc,
+	gpITM	*pI0 = (gpITM*)pIl->itmLST.p_alloc,
 			*pITM;
 	I4 nITM = pI0 ? pIl->itmLST.nLD(sizeof(*pI0)) : 0;
 
@@ -349,7 +364,7 @@ void gpMEM::funFND() {
 						I4x4* pXYR = (I4x4*)pIl->itmSEL.pAB( aa, sOF );
 						if( !pXYR )
 							break;
-						U4 nPUB = sprintf( sPUB, "\r\n x%4d 0x%0.4llx ++ xyr: %d, %d, %d", pON[0].x, pI0[pON[i].x].ID, pXYR->x, pXYR->y, pXYR->z );
+						U4 nPUB = sprintf( sPUB, "\r\n %4d 0x%0.4llx ++ xyr: %d, %d, %d", pON[0].x, pI0[pON[i].x].ID, pXYR->x, pXYR->y, pXYR->z );
 						pPRNT = pPRNT->lzyINS( (U1*)sPUB, nPUB, (s=0), 0 );
 						break;
 					}

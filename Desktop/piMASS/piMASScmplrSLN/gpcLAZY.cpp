@@ -226,7 +226,8 @@ U4 gpcLZY::tree_fnd( U4 id, U4& n ) {
 }
 gpcLZY* gpcLZY::tree_add( U4 id, U4& n ) {
 	U8 s = -1;
-	if( !this ) {
+	if( !this )
+	{
 		gpcLZY* p_this = lzyADD( NULL, sizeof(U4x4), s, 8 );
 		if( !p_this )
 			return NULL;
@@ -263,7 +264,8 @@ U8 gpcLZY::tree_fnd( U8 id, U8& n ) {
 }
 gpcLZY* gpcLZY::tree_add( U8 id, U8& n ) {
 	U8 s = -1;
-	if( !this ) {
+	if( !this )
+	{
 		gpcLZY* p_this = lzyADD( NULL, sizeof(U8x4), s, 8 );
 		if( !p_this )
 			return NULL;
@@ -320,7 +322,7 @@ gpcLZY* gpcLZY::tree_add( I8 id, I8& n ) {
 	n_load = s*sizeof(*p_i84);
 	return this;
 }
-int gpcLZY::nAT( const char* pS, int nS, const char* pFILT ) {
+int gpcLZY::nAT( char* pS, int nS, const char* pFILT ) {
 	if( this ? !pS : true )
 		return 0;
 	if( !nS ) {
@@ -331,7 +333,7 @@ int gpcLZY::nAT( const char* pS, int nS, const char* pFILT ) {
 	U8 nUTF8;
 	int nAT = 0;
 	I8x2* pAn;
-	char* pSi = (char*)pS, *pSe = pSi+nS; //sN[]=" ";
+	char* pSi = pS, *pSe = pS+nS; //sN[]=" ";
 	for( 	pSi += gpmNINCS(pSi,pFILT);
 			pSi < pSe;
 			pSi += gpmNINCS(pSi,pFILT), nAT++ ) {

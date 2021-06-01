@@ -152,21 +152,40 @@ typedef enum LWO_ID:U4 {
 	LWO_ID_COLOR	= MAKE_ID('c','o','l','o'),
 };
 
+char gp_man_lws[] = //{
+	"manus\n"
+	"bone_mother\n"
+	"bone_groin\n"
+	"bone_waist\n"
+	"bone_throax\n"
 
+	"bone_l.upperarm\n"
+	"bone_l.forearm\n"
+	"bone_l.hand\n"
+
+	"bone_r.upperarm\n"
+	"bone_r.forearm\n"
+	"bone_r.hand\n"
+
+	"bone_l.thigh\n"
+	"bone_l.shin\n"
+	"bone_l.feet\n"
+
+	"bone_r.thigh\n"
+	"bone_r.shin\n"
+	"bone_r.feet\n"
+
+	"bone_neck\n"
+	"bone_head\n\0";
+//};
 
 gpc3Dlst::gpc3Dlst(){
 	gpmCLR;
 	U8 nLEN;
-	char* pS = (char*)gp_man_lws, *pSe;
+	char* pS = gp_man_lws, *pSe;
 	while( *pS ) {
 		pSe = pS+gpmVAN( pS, "\r\n", nLEN );
-		bnDCT.dctADD( pS, pSe-pS );
-		pS = pSe+gpmNINCS(pSe, "\r\n" );
-	}
-	pS = (char*)gp_s_lws;
-	while( *pS ) {
-		pSe = pS+gpmVAN( pS, "\r\n", nLEN );
-		lwsDCT.dctADD( pS, pSe-pS );
+		bonLST.dctADD( pS, pSe-pS );
 		pS = pSe+gpmNINCS(pSe, "\r\n" );
 	}
 }
@@ -209,7 +228,14 @@ public:
 		return this;
 	}
 };
-
+class gpc3Dsrf {
+public:
+	char sNAME[0x100],
+		 sPIC[0x100],
+		 sVMAP[0x100];
+	I4 imag, imap;
+	gpc3Dsrf(){};
+};
 class gpc3Dvx {
 public:
 	F4 xyzi, up;		//  0 16
@@ -319,26 +345,26 @@ public:
 
 		gpc3Dblnd* pB = (gpc3Dblnd*)b.p_alloc;
 
-		gpc3Dvx	tmP, *pVX = ((gpc3Dvx*)pnt.Ux( nP, sizeof(tmP) ))-nP;
+		gpc3Dvx	tmP, *pPd = ((gpc3Dvx*)pnt.Ux( nP, sizeof(tmP) ))-nP;
 		for( U4 i = 0; i < nP; i++ ) {
-			pVX[i].xyzi = pPs[i];
-			pVX[i].xyzi.uXYZW[3] = pB[i].ix.u4;
-			pVX[i].uv = pTs[i];
-			pVX[i].ps = pB[i].ps;
+			pPd[i].xyzi = pPs[i];
+			pPd[i].xyzi.uXYZW[3] = pB[i].ix.u4;
+			pPd[i].uv = pTs[i];
+			pPd[i].ps = pB[i].ps;
 		}
 
 
 		for( U4 f = 0, i, ip, x,n; f < nF; f++ )
 		for( x = pFl[f].x, n = pFl[f].y, i = 0; i < n; i++ ) {
 			ip = pFi[i+x];
-			v0 = pVX[ip].xyzi;
-			v1 = (pVX[pFi[((i-1+n)%n)+x]].xyzi - v0).N3();
-			v2 = (pVX[pFi[((i+1  )%n)+x]].xyzi - v0).N3();
-			pVX[ip].up += v2.X3(v1).N3().xyz1();
+			v0 = pPd[ip].xyzi;
+			v1 = (pPd[pFi[((i-1+n)%n)+x]].xyzi - v0).N3();
+			v2 = (pPd[pFi[((i+1  )%n)+x]].xyzi - v0).N3();
+			pPd[ip].up += v2.X3(v1).N3().xyz1();
 		}
 
 		for( U4 p = 0; p < nP; p++ )
-			pVX[p].up = pVX[p].up.N3();
+			pPd[p].up = pPd[p].up.N3();
 
 		while( pUi < pUnx ) {
 			if( *pUi == 0xff ) {
@@ -358,14 +384,13 @@ public:
 			for( U4 i = 0, ie = pFl->y, t, te; i < ie; i++ ) {
 				if( pFi[i] != ip )
 					continue;
-				/// VMAD
-				pVX = (gpc3Dvx*)pnt.Ux( ip, sizeof(tmP) );
-				tmP = *pVX;
-				tmP.uv.swpXYflpY( pUi ); pUi += sizeof(F2);
+				pPd = (gpc3Dvx*)pnt.Ux( ip, sizeof(tmP) );
+				tmP = *pPd;
+				tmP.uv.swpXY( pUi ); pUi += sizeof(F2);
 
 
 				for( t = p.nLD(sizeof(tmP)), te = pnt.nLD(sizeof(tmP)); t < te; t++ ) {
-					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pVX) ))->bGD(tmP, 0.0/4096.0, 0.0/1024.0 )  )
+					if( ((gpc3Dvx*)pnt.Ux( pFi[i], sizeof(*pPd) ))->bGD(tmP, 0.0/4096.0, 0.0/1024.0 )  )
 						break;
 				}
 
@@ -376,7 +401,7 @@ public:
 				if( t < te )
 					break;
 
-				*(gpc3Dvx*)pnt.Ux( te, sizeof(*pVX) ) = tmP;
+				*(gpc3Dvx*)pnt.Ux( te, sizeof(*pPd) ) = tmP;
 				break;
 			}
 		}
@@ -389,16 +414,15 @@ public:
 		for( U4 t = 0; t < nTR; t++ )
 			pTR[t].null();
 	}
-
 	U4 nTRI() { return tri.nLD(sizeof(gpc3Dtri)); }
-	gpc3Dtri* pTRI0( gpcLZY& buf, const void* pLWO = NULL, U4x2* pTG = NULL ) {
+	gpc3Dtri* pTRI( gpcLZY& buf, const void* pLWO = NULL, U4x2* pTG = NULL ) {
 		if( nTRI() )
 			return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 		if( !pLWO )
 			pTG = NULL;
 
 		U4x2 	*pTMP = ((U4x2*)buf.Ux( fps.nLD() + 1, 1 ))-(fps.nLD()+1),
-				*pPRT = fps.pU4x2(),
+				*pPRT = fps.pU4x2(),//(U4x2*)fps.p_alloc,
 				*pFl0 = fcl.pU4x2(),
 				*pFli;
 		U4	nFC = fps.nLD(sizeof(*pTMP)),
@@ -408,13 +432,13 @@ public:
 
 		pPRT->median(nFC,pTMP,true);
 		gpc3Dtri* pTR = NULL;
-		U4x4* pSRF = NULL;
+		U4x4* pSRF;
 
 
 		for( U4 i = 0, p = -1, s = -1,nf; i < nFC; i++ ) {
 			if( p != pPRT[i].prt ) {
 				if( pTR ) {
-					pSRF = pTR->pSRFadd(-1);
+					pSRF = pTR->pSRF(-1);
 					if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
 												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
 												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
@@ -424,18 +448,18 @@ public:
 				pTR->prt = p = pPRT[i].prt;
 				if( pTG ) std::cout << "PART:" <<((char*)pLWO) + pTG[p].x << std::endl;
 				s = -1;
-				pSRF = NULL;
+				pSRF = 0;
 			}
 			if( s != pPRT[i].srf ){
 				s = pPRT[i].srf;
 				if( pSRF ){
-					pSRF = pTR->pSRFadd(s);
+					pSRF = pTR->pSRF(s);
 					if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
 												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
 												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
 												<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
 				} else
-					pSRF = pTR->pSRFadd(s);
+					pSRF = pTR->pSRF(s);
 				if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF->x].x
 												<< " 1p:" << pSRF->y
 												<< " 2p:" << pSRF->z/2
@@ -468,11 +492,12 @@ public:
 					}
 					break;
 			}
+
 		}
 		if( !pSRF )
 			return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 
-		pSRF = pTR->pSRFadd(-1);
+		pSRF = pTR->pSRF(-1);
 		if( pTG ) std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
 												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
 												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
@@ -490,6 +515,7 @@ public:
 			bon, buf;
 	gpc3Dfc fc;
 
+	gpcLZYdct	mapDCTmn;
 	gpcLZYdct	mapDCTwg; gpcLZY mapIXwg, mapBLwg;
 	gpcLZYdct	mapDCTtx; gpcLZY mapIXtx, mapF2tx;
 	gpcLZYdct	mapDCTmr; gpcLZY mapIXmr, mapBLmr;
@@ -533,9 +559,9 @@ public:
 		bbox[0].swpXYZ0( pU ); pU+=3;
 		bbox[1].swpXYZ0( pU );
 	}
-	I4 pWGHTswp( const void* pV, U4 n, gpcLZYdct& bnDCT  ) {
+	I4 pWGHTswp( const void* pV, U4 n, gpcLZYdct& dctBN  ) {
 		U4	nUi = gpmSTRLEN(pV), ip, uf,
-			iBn, iBx = bnDCT.dctFND( pV, nUi, iBn );
+			iBn, iBx = dctBN.dctFND( pV, nUi, iBn );
 		if( iBx >= iBn )
 			return -1; /// ha nem csont egyenlőre nem kell
 
@@ -583,7 +609,7 @@ public:
 				ip = swp2( pUi ); pUi+= 2;
 			}
 			pTX = (F2*)mapF2tx.Ux( ip, sizeof(*pTX) );
-			pTX->swpXYflpY( pUi ); pUi += sizeof(*pTX);
+			pTX->swpXY( pUi ); pUi += sizeof(*pTX);
 		}
 		pIX2->y = mapF2tx.nLD(sizeof(*pTX))-pIX2->x;
 		return ix;
@@ -711,7 +737,7 @@ public:
 			pM = ppM[m];
 			if( !pM )
 				continue;
-			pM->pTRI0( buf, pLWO, pTG );
+			pM->pTRI( buf, pLWO, pTG );
 		}
 
 		return nM;
@@ -727,409 +753,67 @@ public:
 		return ppM ? ppM[ix] : NULL;
 	}
 };
-gpc3Ditm* gpc3Dgym::p3DitmADD( U4 i, U4 id ) {
-	if( i > n3Ditm() )
-		i = n3Ditm();
-	gpc3Ditm* pITM = (gpc3Ditm*)itmLST.Ux( i, sizeof(*pITM) );
 
-	pITM->momIX = pITM->itmIX = i;
-	pITM->itmID = id;
-	return pITM;
-}
-gpc3Ditm* gpc3Dgym::p3Dii( U4 i ) {
-	if( i > n3Ditm() )
-		return NULL;
 
-	return (gpc3Ditm*)itmLST.Ux( i, sizeof(gpc3Ditm) );
-}
-float gpc3Dcnl::valKEYs( U1 c, float s ){
-	U4	aiK[2] = { 0, nKEY(c) },
-		nK = aiK[1],
-		iK;
-
-	if( !nK )
-		return 0.0f;
-	gpc3Dkey* pK0 = (gpc3Dkey*)aKEY[c].p_alloc;
-	if( pK0->sec >= s )
-		return pK0->val;
-	else if( pK0[nK-1].sec <= s )
-		return pK0[nK-1].val;
-
-	while( nK ) {
-		iK = (aiK[1]+aiK[0])/2;
-		if( pK0[iK].sec == s )
-			return pK0[iK].val;
-
-		if( pK0[iK].sec > s ) {
-			// ez nagy
-			if(iK<=aiK[0]) return pK0->val;	// kisebb nincs
-
-			iK--;
-			if(pK0[iK].sec == s )
-				return pK0[iK].val;
-			if(pK0[iK].sec <= s )
-				return	pK0[iK]*s; 	// ez az <=
-
-			// nagyobb
-			aiK[1] = iK;
-			nK = aiK[1]-aiK[0];
-			continue;
-		}
-
-		// ez kicsi
-		if( iK+1 >= aiK[1] )
-			return pK0[iK]*s;	// köv nincs
-
-		iK++;
-		if( pK0[iK].sec == s )	// köv az
-				return pK0[iK].val;
-		else if( pK0[iK].sec > s )
-				return pK0[iK-1]*s; // ez kicsi köv nagyobb
-
-		aiK[0] = iK;
-		nK = aiK[1]-aiK[0];
-	}
-	return 0.0f;
-}
-gpc3Dkey* gpc3Dcnl::pKEYins( U1 c, float s ){
-	if( !nKEY(c) ){
-		if( this ? c>8 : true )
-			return NULL;
-		gpc3Dkey* pK0 = (gpc3Dkey*)aKEY[c].Ux(0,sizeof(*pK0));
-		pK0->sec = s;
-		return pK0;
-	}
-
-	gpc3Dkey* pK0 = (gpc3Dkey*)aKEY[c].p_alloc;
-	U4	aiK[2] = { 0, nKEY(c) },
-		nK = aiK[1],
-		iK;
-
-	if( pK0[nK-1].sec == s )
-		return pK0+nK-1;
-	else if( pK0[nK-1].sec < s ) {	// köv nincs
-		pK0 = (gpc3Dkey*)aKEY[c].Ux(nK,sizeof(*pK0));
-		pK0->sec = s;
-		return pK0;
-	}
-
-	while( nK ) {
-		iK = (aiK[1]+aiK[0])/2;
-		if( pK0[iK].sec == s )
-			return pK0+iK;
-
-		if( pK0[iK].sec > s ) {
-			// ez nagy
-			if(iK<=aiK[0]) {	// kisebb nincs
-				iK=aiK[0];
-				U8 strt = iK*sizeof(*pK0);
-				aKEY[c].lzyINS( NULL,sizeof(*pK0), strt, 0 );
-				pK0 = (gpc3Dkey*)aKEY[c].Ux(iK,sizeof(*pK0));
-				pK0->sec = s;
-				return pK0;
-			}
-			iK--;
-			if(pK0[iK].sec <= s )
-				return pK0+iK; 	// ez az <=
-
-			// nagyobb
-			aiK[1] = iK;
-			nK = aiK[1]-aiK[0];
-			continue;
-		}
-
-		// ez kicsi
-		if( iK+1 >= aiK[1] ) {	// köv nincs
-			pK0 = (gpc3Dkey*)aKEY[c].Ux(aiK[1],sizeof(*pK0));
-			pK0->sec = s;
-			return pK0;
-		}
-		iK++;
-		if( pK0[iK].sec == s )	// köv az
-				return pK0+iK;
-		else if( pK0[iK].sec > s ) {
-			U8 strt = iK*sizeof(*pK0);
-			aKEY[c].lzyINS( NULL,sizeof(*pK0), strt, 0 );
-			pK0 = (gpc3Dkey*)aKEY[c].Ux(iK,sizeof(*pK0));
-			pK0->sec = s;
-			return pK0;
-		}
-
-		aiK[0] = iK;
-		nK = aiK[1]-aiK[0];
-	}
-	return NULL;
-}
-gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
-	U8 nL;
-	char* pE = (char*)pS + gpmVAN(pS,"\r\n}", nL );
-	int i = 0;
-	while( pS < pE ) {
-		pS += gpmNINCS(pS, " \t" );
-		switch( i ) {
-			case 0:
-				val = gpmSTR2D( pS );
-				break;
-			case 1:
-				sec = gpmSTR2D( pS );
-				break;
-			case 2:
-				spn = gpmSTR2D( pS ); break;
-			default:
-				aP[(i-3)%6] = gpmSTR2D( pS ); break;
-		}
-		i++;
-	}
+F2& F2::swpXY( const void* pV ) {
+	((U1x4*)&x)->wzyx(pV,2);
 	return *this;
 }
-size_t sLWOfloat( char* pBUFF, float f ) {
-	char* pBi = pBUFF;
-	int d = f, dd = 0;
-	f -= d;
-	pBi += sprintf( pBi, " %d", d );
-
-	f *= 10.0;
-	d = f;
-	if( !d )
-		return pBi-pBUFF;
-	*pBi = '.';
-	pBi++;
-	f -= d;
-	f *= 10.0;
-	while( f != 0 ) {
-		d = f;
-		f -= d;
-		f *= 10.0;
-
-		dd*=10;
-		dd+=d;
-	}
-
-	pBi += sprintf( pBi, "%d", dd );
-
-	return pBi-pBUFF;
-}
-size_t gpc3Dkey::sOUT( char* pBUFF, const char* pEND ) {
-	if( !this )
-		return 0;
-	//char* pBi = pBUFF;
-	return sprintf( pBUFF, " %f %f %d %f %f %f %f %f %f%s", val, sec, spn, aP[0], aP[1], aP[2], aP[3], aP[4], aP[5] ,pEND );
-}
-#define gpdITMis (pBON 	? pBON 				\
-						: (pITM ? pITM 		\
-						: (pNULL ? pNULL 	\
-						: (pLIG ? pLIG 		\
-						: (pCAM ? pCAM 		\
-						:  NULL 			\
-							)))))
-gpc3Dgym::gpc3Dgym( I4 i, const char* pP, gpeALF alf ) {
-	gpmCLR;
+F2& F2::sXY( const char* p_str, char** pp_str ) {
 	U8 nLEN;
-	id.x = i;
-	id.a8x2[0].b = alf;
-	id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
-	gpmSTRCPY( sPATH, pP );
-	pFILE = strrchr(sPATH,'/' );
-	if( pFILE )
-		pFILE++;
-	else
-		pFILE = sPATH+gpmSTRLEN(sPATH);
-	gpmSTRCPY( sPUB, sPATH );
-	pPUB = sPUB+(pFILE-sPATH);
+	gpmCLR;
+	const char* pPAT = "+-0123456789.,";
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	x = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	y = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	if( !pp_str )
+		return *this;
+	(*pp_str) = (char*)p_str;
+	return *this;
 }
 
-gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
-	if( !this )
-		return NULL;
-	std::cout << "gpc3Dgym::pLWS" << std::endl;
-	U8 s = lws.nLD();
-	if( !s )
-		return this;
-	U4x4* pU4x4;
-	char	*pS = (char*)lws.p_alloc, *pSe = pS+s, *pA, *pCH,
-			sDBG[0x100];
-	GPE_LWS_COM si;
-	U4 nD, iD, nS, nL, iCNL = 0, nENV = 0;
-	olcb = I4x4(-1,-1,-1,-1);
-	gpc3Dkey* pKEY;
-	gpc3Ditm	*pITM = NULL, *pNULL = NULL,	// 0x10000000
-				*pLIG = NULL,					// 0x20000000
-				*pCAM = NULL,					// 0x30000000
-				*pBON = NULL,					// 0x40000000
-				*pMOM = NULL, *pIS = NULL,
-				*pROOT = NULL, *pI0 = NULL;
-	I8 momID;
-	/*sDBG = pS[210000];
-	pS[210000] = 0;
-	std::cout << pS+170000 << std::endl;
-	pS[210000] = *sDBG;*/
-	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pSe; pS += gpmNINCS( pS, " \t\r\n" ) )
-	{
-		si = (GPE_LWS_COM)lwsDCT.dctFND( pS, nS = pSe-pS, nD );
-		pU4x4 = lwsDCT.pIXi((U4)si);
-		if( !pU4x4 ) {
-			pS += gpmVAN( pS, "\r\n", s );
-			continue;
-		}
-
-		pA = pS + pU4x4->y;
-		pS = pA + gpmVAN( pA, "\r\n", s );
-		switch( si ) {
-			case GPE_LWS_COM_LoadObjectLayer:{
-				pNULL = pBON = NULL;
-				olcb.x++;
-				olcb.w=-1;
-				pMOM = (pITM = p3DitmADD( -1, gpeLWSiTYP_OBJ|olcb.x ));
-				pITM->layID = gpfSTR2I8(pA, &pA);
-				pITM->pNAME(pA);
-			} break;
-			case GPE_LWS_COM_AddBone:{
-				olcb.w++;
-				pMOM = pBON = p3DitmADD( -1, gpeLWSiTYP_BON| (olcb.w<<16) | (pITM->itmID&0xffff) );
-			} break;
-			case GPE_LWS_COM_AddNullObject:{
-				pBON = pITM = NULL;
-				olcb.x++;
-				olcb.w=-1;
-				pMOM = pNULL = p3DitmADD( -1, gpeLWSiTYP_OBJ|olcb.x );
-				pNULL->pNAME(pA);
-				pNULL->bNULL = true;
-			} break;
-			case GPE_LWS_COM_AddLight:{
-				pBON = pITM = pNULL = NULL;
-				olcb.y++;
-				olcb.w=-1;
-				pMOM = pLIG = p3DitmADD( -1, gpeLWSiTYP_LIG|olcb.y );
-
-			} break;
-			case GPE_LWS_COM_AddCamera:{
-				pBON = pITM = pNULL = pLIG = NULL;
-				olcb.z++;
-				olcb.w=-1;
-				pMOM = pCAM = p3DitmADD( -1, gpeLWSiTYP_CAM|olcb.y );
-
-			} break;
-			case GPE_LWS_COM_NumChannels:{} break;
-			case GPE_LWS_COM_Channel:{
-				iCNL = gpfSTR2I8(pA, &pA);
-			} break;
-			case GPE_LWS_COM_C_open:{
-				pS = pA;
-			} break;
-			case GPE_LWS_COM_Envelope:{
-				pA += gpmNINCS(pA," \t\"\r\n");
-				nENV = gpfSTR2I8(pA, &pA);
-				pS = pA + gpmVAN( pA, "\r\n", s );
-			} break;
-			case GPE_LWS_COM_Key:{
-				gpc3Dkey key = pA;
-				pIS = gpdITMis;
-				if( !pIS )
-					break;
-				pKEY = pIS->cnl.pKEYins(iCNL, key.sec );	/// key.sec>=33.5 && key.sec<=33.6 && iCNL == 3
-				if( pKEY )
-					*pKEY = key;
-
-				break;
-
-				U4 nD = pKEY->sOUT( sDBG ), nA = pS-pA, nEQ;
-				if( !nD )
-					break;
-				nEQ = gpmMcmp(sDBG,pA,gpmMIN(nD,nA));
-				if( nEQ == nA )
-					break;
-				key = pA;
-				pKEY = pIS->cnl.pKEYins(iCNL, key.sec );
-				if( pKEY )
-					*pKEY = key;
-				sDBG[nEQ] = 0;
-				std::cout << sDBG << std::endl;
-			} break;
-			case GPE_LWS_COM_C_close:{
-				break;
-				pIS = gpdITMis;
-				if( pIS )
-					std::cout << " " << nENV << "/" << pIS->cnl.nKEY(iCNL) << " c:" << iCNL << std::flush;
-
-			} break;
-			case GPE_LWS_COM_ParentItem:{
-				if( !pMOM )
-					continue;
-				pMOM->momID = momID = gpfSTR2I8( pA, &pA, NULL, true );
-				while( pMOM->momID ) {
-					pMOM--;
-					if( pMOM->itmID != momID )
-						continue;
-
-					pIS = gpdITMis;
-					if( !pIS )
-						break;
-					pIS->momIX = pMOM->itmIX;
-					pIS->nLEV = pMOM->nLEV+1;
-					if( pIS == pBON ){
-						pI0 = pBON-pBON->itmIX;
-						pROOT = pIS;
-						while( (pROOT->itmID&gpeLWSiTYP_TYP) == gpeLWSiTYP_BON ) {
-							pROOT = pI0+pROOT->momIX;
-						}
-						pROOT->pBONadd( pIS );
-					}
-					break;
-				}
-				pMOM = NULL;
-				//if( !pIS )
-					//break;
-
-				std::cout	<< pIS->itmIX	<< ". l:"	<< pIS->nLEV << " "
-							<< pIS->sNAME	<<  " 0x"	<<  std::hex << pIS->itmID
-											<<  " 0x"	<<  std::hex << pIS->momID
-											<< (pNULL ? "NULL":"") << std::endl;
-			} break;
-
-			case GPE_LWS_COM_BoneName:{
-				pBON->pNAME(pA);
-
-
-				pBON->mxIX = bnDCT.dctFND( pBON->pNAME(), gpmSTRLEN(pBON->pNAME()), iD );
-
-			} break;
-			case GPE_LWS_COM_BoneRestPosition:{ if( !pBON ) break;
-				pBON->rstXYZ.sXYZW( pA, &pA );
-			} break;
-			case GPE_LWS_COM_BoneRestDirection:{ if( !pBON ) break;
-				pBON->rstYPR.sXYZW( pA, &pA );
-				pBON->rstYPR *= PI/180.0f;
-			} break;
-			case GPE_LWS_COM_BoneRestLength:{ if( !pBON ) break;
-				pBON->rstWHD.sXYZW( pA, &pA );
-			} break;
-			case GPE_LWS_COM_Plugin: {
-				char* pEP = strstr( pS, "EndPlugin" );
-				if( !pEP )
-					break;
-				pS = pEP+gpmVAN( pEP, "\r\n", s );
-			} break;
-			default: {
-				continue;
-			}
-		}
-
-	}
-
-	return this;
-}
-I4 gpcGL::iLWS( gpeALF a, const char* pPATH, gpcLZY& rd ) {
-	if( !this )
-		return -1;
-
-	if( !p3Dlst )
-		p3Dlst = new gpc3Dlst;
-
-	gpc3Dgym* p3Dgym = p3Dlst->p3DgymADD( a, pPATH )->pLWS(rd, p3Dlst->lwsDCT, p3Dlst->bnDCT );
-	return p3Dgym ? p3Dgym->id.x : -1;
+F4& F4::swpXYZ0( const void* pV ) {
+	((U1x4*)this)->wzyx(pV,3);
+	return *this;
 }
 
-gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
+F4& F4::sXYZW( const char* p_str, char** pp_str ) {
+	U8 nLEN;
+	gpmCLR;
+	const char* pPAT = "+-0123456789.,";
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	x = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	y = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	z = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+
+	p_str += gpmVAN( p_str, pPAT, nLEN );
+	w = gpmSTR2D(p_str);
+	if( *p_str == ',' )
+		p_str++;
+	if( !pp_str )
+		return *this;
+	(*pp_str) = (char*)p_str;
+	return *this;
+}
+
+gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& dctBN ) {
 	if( !this )
 		return NULL;
 	U8 s;
@@ -1207,7 +891,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 							} break;
 						case LWO_ID_WGHT: {
 								std::cout << "\tLWO_ID_WGHT:"<<  std::flush;
-								I4 ix = pLY->pWGHTswp( pUi, pUnx-pUi, bnDCT );
+								I4 ix = pLY->pWGHTswp( pUi, pUnx-pUi, dctBN );
 								U4x2 *pIX2 = (U4x2*)pLY->mapIXwg.Ux( ix, sizeof(*pIX2) );
 								std::cout << pLY->mapDCTwg.sSTRix(ix,"ERR")  << " iBx:" << pIX2->x << " n:" << pIX2->y << std::endl;
 							} break;
@@ -1299,7 +983,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 					pLY->mapDCTsr.dctADD( pUi, nUi );
 					pUi+= gpmPAD( nUi+1,2 );
 					pUi+= sizeof(U2);
-					gpc3Dsrf* pSRF = pSRFadd(ix);
+					gpc3Dsrf* pSRF = (gpc3Dsrf*)lzySRF.Ux( ix, sizeof(*pSRF) );
 					if( !pSRF->sNAME[0] )
 						gpmSTRCPY( pSRF->sNAME, pU0+pTG[ix].x );
 
@@ -1360,6 +1044,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 
 	return this;
 }
+
 I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !this )
 		return -1;
@@ -1367,44 +1052,8 @@ I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !p3Dlst )
 		p3Dlst = new gpc3Dlst;
 
-	gpc3D* p3D = p3Dlst->p3D( a, pPATH )->pLWO(rd, p3Dlst->bnDCT );
+	gpc3D* p3D = p3Dlst->p3D( a, pPATH )->pLWO(rd, p3Dlst->bonLST );
 	return p3D ? p3D->id.x : -1; //id;
-}
-gpc3D* gpc3Ditm::p3D( gpcGL* pGL, const char* pP, char *pF ) {
-	if( !this )
-		return NULL;
-	if( p_3D ? true : !pP )
-		return p_3D;
-
-	if( !pF ) {
-		pF = strrchr( (char*)pP, '/' );
-		if( !pF ){
-			pF = (char*)pP+gpmSTRLEN(pP);
-			pF += sprintf( pF, "/" );
-		} else {
-			pF++;
-		}
-	}
-
-	U8 s;
-	I8x2 AB;
-	AB.num = gpmSTRLEN(pNAME());
-	AB = pNAME();
-	gpcLZY rd;
-	char sPATH[0x100], *pFILE = (char*)gpmMcpy( sPATH, pP, pF-pP ) + (pF-pP);
-	gpmSTRCPY( pFILE, pNAME() );
-	while( gpmACE(sPATH,4) < 0 ) {
-		pFILE[-1] = 0;
-		pFILE = strrchr(sPATH,'/');
-		if(!pFILE)
-			return p_3D;
-		pFILE++;
-		gpmSTRCPY( pFILE, pNAME() );
-	}
-
-	rd.lzyRD( sPATH, s = 0 );
-	I4 i = pGL->iLWO( AB.a, sPATH, rd );
-	return (p_3D = pGL->p3Dlst->p3Dix( i ));
 }
 /**
 "zeroDB/scr/,	cam.eye.yz, pxSCR.xyr, 0, 1,
@@ -1423,7 +1072,60 @@ gpc3D* gpc3Ditm::p3D( gpcGL* pGL, const char* pP, char *pF ) {
 nAT:39
 */
 
+gpeALF alfSCN0[] = {
+	gpeALF_CAM,
+	gpeALF_MAN,
+	gpeALF_MRK,
+};
+gpeALF alfSCN1[] = {
+	gpeALF_EYE,
+	gpeALF_TRG,
+	gpeALF_POS,
+	gpeALF_ABC,
+};
+char	sSCNdec1[] = "eye trg pos abc \"";
+F4& F4::aaLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
+	//gpmCLR;
+	F4 d(0.0), a, b;
+	int nPLS = gpmNINCS( pS, "." );
+	if( nPLS >= nS )
+		return *this;
 
+	pS += nPLS;
+	nS -= nPLS;
+	char* pSRC = NULL, *pI;
+	switch( alfV ) {
+		case gpeALF_XYR:
+			a = ppV[1] ? *(I4x4*)ppV[1] : I4x4(0);
+			b = ppV[0] ? *(I4x4*)ppV[0] : I4x4(0);
+			d = a-b;
+			d.w = 0.0;
+			pSRC = "xyr";
+			break;
+		default: break;
+	}
+	if( !pSRC )
+		return *this;
+
+	for( int i = 0, c; i < nS; i++ ) {
+		c = pS[i];
+		if( c >= '0' && c <= '9' ) {
+			aXYZW[i%4] = c;
+			continue;
+		}
+		switch(c){
+			case '_':
+				continue;
+			default:
+				pI = strchr( pSRC, pS[i] );
+				if(!pI)
+					continue;
+				aXYZW[i%4] = d.aXYZW[(pI-pSRC)%4];
+		}
+	}
+
+	return *this;
+}
 
 
 //};
@@ -1448,41 +1150,37 @@ U4x4 gpcGL::VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD ) {
 	glGenBuffers( 1, &iVXn.x );
 	glBindBuffer( GL_ARRAY_BUFFER, iVXn.x );
 	glBufferData( GL_ARRAY_BUFFER, n_byte, pVX, GL_STATIC_DRAW ); (e = glGetError());
-	if( e ) std::cout << std::hex << e << " glBufferData( GL_ARRAY_BUFFER" <<  std::endl;
+	if( e ) std::cout << e << " glBufferData( GL_ARRAY_BUFFER" <<  std::endl;
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	return iVXn;
 }
 gpc3D* gpc3D::prt2ix( gpcGL* pGL ) {
-	if( !this )
-		return NULL;
-
 	gpc3Dly* pLY;
-	gpc3Dmap* pM;
-	gpc3Dtri* pT0;
+	//gpc3Dtri* pTR;
 	for( U4 i = 0, n = nLY(), nTR, nMAP; i < n; i++ ) {
 		pLY = pLYix(i);
 		nMAP = pLY->nMAP( p_lwo->p_alloc, tgIX.pU4x2()  );
 		if( !nMAP )
 			continue;
-
+		gpc3Dmap* pM;
+		gpc3Dtri* pT0;
 		for( U4 m = 0, nT; m < nMAP; m++ ){
 			pM = pLY->pMAP(m);
 			if( pGL ? !pM : true )
 				continue;
-
 			gpc3Dvx* pVX = (gpc3Dvx*)pM->pnt.p_alloc;
+
+			//pM->iVXn =
 			if( !pM->iVXn.y )
 				pGL->VBOobj( pM->iVXn, pVX, pM->pnt.nLD(sizeof(*pVX)) );
 
 			nT = pM->nTRI();
-			pT0 = pM->pTRI0( pLY->buf );
+			pT0 = pM->pTRI( pLY->buf );
 			for( U4 t = 0; t < nT; t++ ) {
 				if( pT0[t].aIIXN[2].y )
 					continue;
 				if( pGL->IBOobj( pT0[t].aIIXN[2], pT0[t].t.pU4(), pT0[t].t.nU4(3), 3 ).y != 1 )
 					continue;
-
-				continue;
 
 				for( U4 i = 0, n = pT0[t].t.nU4(3), *pIX = pT0[t].t.pU4(), j=0, je;  i < n; i++ )
 				for( je = j+3; j < je; j++ )
@@ -1492,137 +1190,18 @@ gpc3D* gpc3D::prt2ix( gpcGL* pGL ) {
 	}
 	return this;
 }
-gpcGL* gpcGL::glDRW( I4x2 xy, I4x2 wh ) {
-	if( !this )
-		return NULL;
-	GLenum e = 0;
-
-	if( aUniID[0] > -1 )
-	if( pPICrtx ) {
-		glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
-	} else {
-		glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
-	}
-
-	if( aUniID[1] > -1 ) {
-		glUniform2f( aUniID[1], (float)xy.x, (float)xy.y ); gpfGLerr();
-	}
-	if( aUniID[2] > -1 ) {
-		glUniform2f( aUniID[2], (float)wh.x, (float)wh.y ); gpfGLerr();
-	}
-
-
-	glBindBuffer( GL_ARRAY_BUFFER, aVXid[0] ); gpfGLerr();
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[0] ); gpfGLerr();
-
-	glVertexAttribPointer( ATvxID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), 0 ); gpfGLerr();
-	glEnableVertexAttribArray( ATvxID ); gpfGLerr();
-	glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, sizeof(F4), gpmGLBOFF(sizeof(F2)) ); gpfGLerr();
-	glEnableVertexAttribArray( ATuvID ); gpfGLerr();
-
-
-	glDrawElements( GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL ); gpfGLerr();
-
-	glDisableVertexAttribArray( ATvxID );
-	glDisableVertexAttribArray( ATuvID );
-
-	glBindBuffer( GL_ARRAY_BUFFER, 0 );
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-	glBindVertexArray( 0 );
-
-	return this;
-}
-gpc3Dsrf* gpc3D::pSRFadd( U4 i ) {
-	gpc3Dsrf* pSRF = this ? (gpc3Dsrf*)lzySRF.Ux(i,sizeof(gpc3Dsrf)) : NULL;
-	if( !pSRF )
-		return NULL;
-	if( pSRF->ix == i )
-		return pSRF;
-
-	pSRF->ix = i;
-	return pSRF;
-}
-gpc3Dsrf* gpc3D::pSRFi( U4 i ) {
-	if( this ? (i>=nSRF()) : true )
-		return NULL;
-
-	return pSRFadd(i);
-}
-gpcPIC* gpcGL::pPICsrf( gpc3Dsrf* pSRF, char* pPATH ) { //, char* pFILE ) {
-	char sALF[0x100];
-	gpcPIC* pPIC = NULL;
-	if( !pSRF->an.alf ) {
-		pSRF->an.num = 14;
-		pSRF->an = (U1*)gpfSTRdrop( sALF, pSRF->sPIC, NULL, "_ \t" );
-	}
-
-	pPIC = pMASS->PIC.PIC(pSRF->an);
-
-	if( pPIC ? !!pPIC->pSRF : true )
-		return pPIC;
-	// load
-	pPIC->pPICrd( pPATH, pSRF->sPIC );
-	return pPIC;
-
-}
-
-int aglVXi4[] = {
-	gpmOFF(gpc3Dvx,xyzi),		// 00
-	gpmOFF(gpc3Dvx,xyzi.w),		// 01
-	gpmOFF(gpc3Dvx,up),			// 02
-	gpmOFF(gpc3Dvx,uv),			// 03
-	gpmOFF(gpc3Dvx,ps),			// 04
-	sizeof(gpc3Dvx),			// 05
-	6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
-};
-void gpcGL::onATscn( int* glU4 ) {
-	/// XYZ
-	if( ATvxID > -1 ) {
-		glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[0]) );  gpfGLerr( "ATvxID" );
-		glEnableVertexAttribArray( ATvxID ); gpfGLerr();
-	}
-	/// ix blnd
-	if( ATixID > -1 ) {
-		glVertexAttribPointer( ATixID, 4, GL_BYTE, GL_FALSE, glU4[5], gpmGLBOFF(glU4[1]) );  gpfGLerr( "ATixID" );
-		glEnableVertexAttribArray( ATixID ); gpfGLerr();
-	}
-	/// UP XYZ
-	if( ATupID > -1 ) {
-		glVertexAttribPointer( ATupID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[2]) );  gpfGLerr( "ATupID" );
-		glEnableVertexAttribArray( ATupID ); gpfGLerr();
-	}
-	/// UV
-	if( ATuvID > -1 ) {
-		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[3]) );  gpfGLerr( "ATuvID" );
-		glEnableVertexAttribArray( ATuvID ); gpfGLerr();
-	}
-	/// PrtSrf
-	if( ATpsID > -1 ) {
-		glVertexAttribPointer( ATpsID, 2, GL_INT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[4]) );  gpfGLerr( "ATpsID" );
-		glEnableVertexAttribArray( ATpsID ); gpfGLerr();
-	}
-}
-void gpcGL::offATscn() {
-	if( ATvxID > -1 ) { glDisableVertexAttribArray( ATvxID ); gpfGLerr(); }
-	if( ATixID > -1 ) { glDisableVertexAttribArray( ATixID ); gpfGLerr(); }
-	if( ATupID > -1 ) { glDisableVertexAttribArray( ATupID ); gpfGLerr(); }
-	if( ATuvID > -1 ) { glDisableVertexAttribArray( ATuvID ); gpfGLerr(); }
-	if( ATpsID > -1 ) { glDisableVertexAttribArray( ATpsID ); gpfGLerr(); }
-}
-gpcGL* gpcGL::glDRW3D( gpc3D* p3d, U4 msk ) {
+gpcGL* gpcGL::glDRW3D( gpc3D* p, U4 msk ) {
 	if( !msk )
 		return this;
-	p3D = p3d->prt2ix( this );
+	p3D = p->prt2ix( this );
 	if( !p3D )
 		return this;
 
-	U4x4* pSRFx4;
 	gpc3Dly* pLY;
 	gpc3Dmap* pM;
 	gpc3Dtri* pT0;
-	gpcPIC* pPIC;
+	U4x4 glU4x4;
 
-	GLenum e = 0;
 	for( U4 i = 0, n = p3D->nLY(), nMAP; i < n; i++ ) {
 		pLY = p3D->pLYix(i);
 		nMAP = pLY->nMAP( p3D->p_lwo->p_alloc, p3D->tgIX.pU4x2() );
@@ -1633,274 +1212,45 @@ gpcGL* gpcGL::glDRW3D( gpc3D* p3d, U4 msk ) {
 			pM = pLY->pMAP(m);
 			if( pM ? !pM->iVXn.y : true )
 				continue;
-
+			glU4x4.x = gpmOFF(gpc3Dvx,xyzi);
+			glU4x4.y = gpmOFF(gpc3Dvx,uv);
+			glU4x4.z = sizeof(gpc3Dvx);
 			nT = pM->nTRI();
-			pT0 = pM->pTRI0( pLY->buf );
-
-	/// VERTEX ------------------------------------------
-			glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x );  gpfGLerr();
-
-			onATscn(aglVXi4);
-
+			pT0 = pM->pTRI( pLY->buf );
+			GLenum e = 0;
+	{ /// VERTEX ------------------------------------------
+				glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x ); (e = glGetError()); if( e ) std::cout << e << " glBindBuffer( GL_ARRAY_BUFFER, pM->iVXn.x )" <<  std::endl;
+				/// XYZ
+				glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.x) ); (e = glGetError()); if( e ) std::cout << e << " glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.x )" <<  std::endl;
+				glEnableVertexAttribArray( ATvxID ); (e = glGetError()); if( e ) std::cout << e << " glEnableVertexAttribArray( ATvxID )" <<  std::endl;
+				/// UV
+				glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, gpmGLBOFF(glU4x4.y) ); (e = glGetError()); if( e ) std::cout << e << " glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4x4.z, &glU4x4.y )" <<  std::endl;
+				glEnableVertexAttribArray( ATuvID ); (e = glGetError()); if( e ) std::cout << e << " glEnableVertexAttribArray( ATuvID )" <<  std::endl;
+	}
 			for( U4 t = 0; t < nT; t++, msk >>= 1 ) {
 				if( (msk&1) ? !pT0[t].aIIXN[2].y : true )
 					continue;
-
-				aglVXi4[6] = pT0[t].aIIXN[2].a4x2[1].area();
+				glU4x4.w = pT0[t].aIIXN[2].a4x2[1].area();
 
 
 	/// ELEMENT ------------------------------------------
-				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x );  gpfGLerr( "GL_ELEMENT_ARRAY_BUFFER");
-				if( pSRFx4 = pT0[t].pSRF(0) ) {
-					for( U4 s = 0, ns = pT0[t].nSRF(), n; s < ns; s++ ) {
-						aglVXi4[0x7] = pSRFx4[s].w;
-						aglVXi4[0x8] = pSRFx4[s+1].w;
-						aglVXi4[0x9] = aglVXi4[8]-aglVXi4[7];
-						aglVXi4[0xa] = aglVXi4[0x9]/3;
-						if( aglVXi4[0xa] < 1 )
-							continue;
-						aglVXi4[0xb] = aglVXi4[0x7]*sizeof(U4);
-						pPIC = pPICsrf( p3D->pSRFi(pSRFx4[s].x), p3D->sPATH );
-						if( !pPIC )
-							continue;
-						glSETtx( 0, pPIC->surDRWtx(pRNDR), pPIC->txWH.a4x2[1] );
-
-
-						glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
-									aglVXi4[0x9],
-									GL_UNSIGNED_INT,
-									(void*)aglVXi4[0xb] );
-					}
-				} else
-					glDrawElements( gpaDRWmod[3], /// GL_TRIANGLES,
-									aglVXi4[6],
-									GL_UNSIGNED_INT,
-									NULL ); gpfGLerr( "glDrawElements");
-				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ); gpfGLerr();
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x ); (e = glGetError()); if( e ) std::cout << e << " glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pT0[t].aIIXN[2].x )" <<  std::endl;
+				glDrawElements( //GL_TRIANGLES,
+								gpaDRWmod[3], /// GL_TRIANGLES,
+								glU4x4.w,
+								GL_UNSIGNED_INT,
+								NULL ); (e = glGetError()); if( e ) std::cout << e << " glDrawElements" <<  std::endl;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 			}
-
-			offATscn();
-
-			glBindBuffer( GL_ARRAY_BUFFER, 0 ); gpfGLerr();
-			glBindVertexArray( 0 ); gpfGLerr();
+			glDisableVertexAttribArray( ATvxID );
+			glDisableVertexAttribArray( ATuvID );
+			glBindBuffer( GL_ARRAY_BUFFER, 0 );
+			glBindVertexArray( 0 );
 		}
 	}
 	return this;
 }
 
-gpeALF alfSCN0[] = {
-	gpeALF_CAM,
-	gpeALF_MAN,
-	gpeALF_MRK,
-};
-gpeALF alfSCN1[] = {
-	gpeALF_EYE,
-	gpeALF_TRG,
-	gpeALF_POS,
-	gpeALF_ABC,
-};
-gpdSTATICoff sSCNdec1[] = "eye trg pos abc \"";
-gpdSTATICoff gpsGLSLvx3D[] = //{
-"#version 120																		\n"
-"attribute	vec3	v_vx;															\n"
-"attribute	ivec4	v_ix;															\n"
-"attribute	vec3	v_up;															\n"
-"attribute	vec2	v_uv;															\n"
-"attribute	ivec2	v_ps;															\n"
-"varying	vec3	fr_uv;															\n"
-"varying	vec3	fr_up;															\n"
-"varying	vec2	fr_ps;															\n"
-"uniform vec2 tgPX;																	\n"
-"uniform mat4 aMX[20], aMXi[20];													\n"
-"void main() {																		\n"
-"   mat4   	mx = aMX[v_ix.x]*aMXi[v_ix.x];											\n"
-"	vec3	vmx = (mx*vec4(v_vx,1.0)).xyz, vmx2 = (vmx+v_vx)/2.0,					\n"
-"			mv	= ( gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(vmx2,1.0) ).xyz,	\n"
-"			xyz	= vec3(1.0, tgPX.x/tgPX.y, 1.0/250.0), 								\n"
-"			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 								\n"
-"	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);					\n"
-"	p = p*d.xxy*xyz.xyx - sb.xxy;													\n"
-"	gl_Position			= vec4( p*-1.0, 1.0 );										\n"
-"	fr_uv				= vec3( v_uv, p.z ); //*vec2(1,-1)+vec2(0,1), p.z );		\n"
-"	fr_up				= v_up;														\n"
-"	fr_ps				= v_ps;														\n"
-"}																					\n\0";
-//};
-gpdSTATICoff gpsGLSLfrg3D[] = //{
-"#version 120																\n"
-"varying vec3 fr_uv;														\n"
-"varying vec3 fr_up;														\n"
-"varying vec2 fr_ps;														\n"
-"uniform sampler2D	tex0;					// MINI_CHAR_xXy_zXw.png		\n"
-"uniform sampler2D	tex1;					// MINI_CHAR_xXy_zXw.png		\n"
-"uniform vec4 		aCNL[8];				// CNL							\n"
-"void main()																\n"
-"{																			\n"
-"   if( gl_FrontFacing ) discard;											\n"
-"	vec2 mx = gl_FragCoord.xy/2;											\n"
-"   float xx	=  mx.x-floor(mx.x)											\n"
-"				+ (mx.y-floor(mx.y)) * 2.0;									\n"
-"   if( true ) // xx < 1 )															\n"
-		gpdGUIfr3Dc0
-"   else if( xx < 2 )														\n"
-		gpdGUIfr3Du
-"   else if( xx < 3 )														\n"
-		gpdGUIfr3Dp
-"   else 																	\n"
-		gpdGUIfr3Dc0
-	gpdGUIfr3Dd
-"}																			\n"
-"\n\0";
-//};
-F4x4* gpc3Ditm::pMXl( float s ) {
-	if( sec == s ) {
-		mxW = mxL;
-		return &mxL;
-	}
-	float v;
-	F4 xyz = rstXYZ, ypr = rstYPR, scl = rstWHD;
-	sec = s;
-
-	if( sec > 0.25)
-	for( U1 c = 0; c < 6; c++ ){
-		v = cnl.valKEYs(c,sec);
-		switch( c ) {
-			case 0: xyz.x = v; break;
-			case 1: xyz.y = v; break;
-			case 2: xyz.z = v; break;
-			case 3: ypr.ry = v; break;
-			case 4: ypr.rp = v; break;
-			case 5: ypr.rr = v; break;
-			case 6: scl.x = v; break;
-			case 7: scl.y = v; break;
-			case 8: scl.z = v; break;
-		}
-	}
-
-	std::cout	<< sNAME << " " << xyz.x << " " << xyz.y << " " << xyz.z
-				<< " " << (ypr.ry*180.0f/PI) << " " << (ypr.rp*180.0f/PI) << " " << (ypr.rr*180.0f/PI) << std::endl;
-	mxL.ypr(ypr);
-	mxL.t.xyz_( xyz );
-	mxW = mxL;
-	return &mxL;
-}
-F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
-	if( !p3Di )
-		return pMX;
-	F4 xyz, ypr, scl(1,1,1);
-	float sec = 0.125; //, v;
-	switch( act ) {
-		case gpeACT_DEF:
-			if( mSEC >= ms )
-				break;
-
-			mSEC = ms;
-			break;
-		default:
-			if( p3Di->ACT != act ) {
-				p3Di->ACT = act;
-				mSEC = ms;
-			}
-			sec = gpaACT_man[act].sec(ms-mSEC);
-			break;
-	}
-	std::cout << "\r\n TRK:" << sec << std::flush;
-	/// mxL ez az ITEM ---------------------
-	p3Di->pMXl(sec);
-	p3Di->stkIX = p3Di->itmIX;
-
-	gpc3Ditm	*p3Di0 = p3Dg->p3Dii(0),
-				*p3Diu = NULL,
-				*p3Dim	= ((p3Di->itmIX != p3Di->momIX)
-						? p3Di0+p3Di->momIX : NULL),
-				*p3Dib,*p3Dibm;
-	U4			*pBix, nB;
-	if( !p3Dim )
-		p3Diu = p3Di; // ez a ROOT nincs anya
-	else {
-		while( p3Dim ) {
-			p3Dim->stkIX = p3Diu ? p3Diu->itmIX : p3Di->itmIX;
-			if( (p3Dim->sec == sec) && (p3Dim->ACT == act) ) {
-				if( p3Diu )
-					break;
-				p3Diu = p3Dim;
-				break;
-			}
-
-			/// mxL MOM ---------------------
-			p3Dim->ACT = act;
-			p3Dim->pMXl(sec);
-
-			p3Diu = p3Dim;
-			if(p3Diu->itmIX == p3Diu->momIX)
-				break;
-			p3Dim = p3Di0+p3Diu->momIX;
-		}
-	}
-
-	p3Dim = NULL;
-	while( p3Diu ) {
-		if( p3Dim )
-			p3Diu->mxW = p3Diu->mxL*p3Dim->mxW;
-		else {
-			p3Dim	= ((p3Diu->itmIX != p3Diu->momIX)
-						? p3Di0+p3Diu->momIX : NULL);
-			if( p3Dim )
-				p3Diu->mxW = p3Diu->mxL*p3Dim->mxW;
-		}
-
-		if( nB = p3Diu->nBON() ) {
-			pBix = p3Diu->pBONadd();
-			for( U4 i = 0; i < nB; i++ ) {
-				p3Dib = p3Di0+pBix[i];
-				p3Dib->ACT = act;
-				p3Dib->pMXl(sec);
-			}
-			for( U4 i = 0; i < nB; i++ ) {
-				p3Dib = p3Di0+pBix[i];
-				p3Dibm = p3Di0+p3Dib->momIX;
-				p3Dib->mxW =  p3Dib->mxL*p3Dibm->mxW;
-			}
-		}
-		if( p3Diu == p3Di )
-			break; // felért ehez
-
-		p3Dim = p3Diu;
-		p3Diu = p3Di0+p3Diu->stkIX;
-
-	}
-
-	*pMX = p3Di->mxW;
-	pBix = p3Di->pBONadd();
-	if( !pBix )
-		return pMX;
-	nB = p3Di->nBON();
-	for( U4 i = 0; i < nB; i++ ) {
-		p3Dib = p3Di0+pBix[i];
-		pMX[p3Dib->mxIX] = p3Dib->mxW;
-	}
-
-	return pMX;
-}
-U4* gpc3Ditm::pBONadd( gpc3Ditm* pBON ) {
-	if( !this )
-		return NULL;
-	if( !pBON )
-		return nBON() ? bonLST.pU4() : NULL;
-
-	U4	*pBix = bonLST.pU4(), nB = bonLST.nLD(sizeof(U4));
-	if( pBix )
-	for( U4 i = 0; i < nB; i++ ) {
-		if( pBix[i] != pBON->itmIX )
-			continue;
-		return pBix+i;
-	}
-	pBix = bonLST.pU4n(-1);
-	*pBix = pBON->itmIX;
-	return pBix;
-}
-
-F4x4 aMX[0x40], aMXi[0x40];
 gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	int nD1 = scnDEC1.nLD() ? scnDEC1.nLD() : scnDEC1.nAT(sSCNdec1,sizeof(sSCNdec1));
 
@@ -1913,18 +1263,17 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	F4	aCAM[0x20],
 		*pMAN = aCAM+(gpmN(aCAM)/2);
 	gpmZ(aCAM);
-	U1 *apV[8]; size_t aVn[8], nU1;
-	gpDBitm	*apI[2], *pI0;
+	U1 *apV[2]; size_t aVn[2], nU1;
+	gpITM	*apI[2], *pI0;
 	I8x2	*pAT = AT.pI8x2(),
 			*pD1 = scnDEC1.pI8x2(), aaS;
 
 	///pAT->alfCON( sPUB,nAT);
 
-	gpDBlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
+	gpITMlst *pIl = pMEM->pMASS->iDBu( pMEM, pS, sPUB, sPUB + sprintf( sPUB, "./" ) );
 	gpeALF alfD;
 	GLenum e = 0;
-	I8x4 prv(-1,-1,-1,-1);
-	std::cout << "\033[2J\033[1;1H";
+
 	for( U4 iAT = pAT[0].aALFvan( alfSCN0, nAT, gpmN(alfSCN0) ), iAnx, iAT1;
 			iAT < nAT;
 			iAT += iAnx ){
@@ -1938,26 +1287,23 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		pN += gpmVAN( pN, "0123456789ATuvID",nLEN );
 		if( pN > pNx )
 			continue;
-		prv.a8x2[0].x = gpmSTR2U8(pN,10);
-		if( prv.a8x2[0].y != prv.a8x2[0].x ) {
-			apI[0] = pIl->pITMid(prv.a8x2[0].x);
-			if( !apI[0] )
-				continue;
-			prv.a8x2[0].y = prv.a8x2[0].x;
-		}
+		apI[0] = pIl->pITMid(gpmSTR2U8(pN,10));
+		if( !apI[0] )
+			continue;
 
 		pN += gpmVAN( pN, "0123456789",nLEN );
 		if( pN > pNx )
 			continue;
-		prv.a8x2[1].x = gpmSTR2U8(pN,10);
-		if( prv.a8x2[1].y != prv.a8x2[1].x ) {
-			apI[1] = pIl->pITMid(prv.a8x2[1].x);
-			if( !apI[1] )
-				continue;
-			prv.a8x2[1].y = prv.a8x2[1].x;
-		}
+		apI[1] = pIl->pITMid(gpmSTR2U8(pN,10));
+		if( !apI[1] )
+			continue;
+
+
+
 
 		alfD = pAT[iAT+2].alf;
+
+		//aaS.a = pAT[iAT+3].alf == gpeALF_CM ? pAT[iAT+4].alf:pAT[iAT+3].alf;
 		iAs = pAT[iAT+3].alf == gpeALF_CM ? iAT+5:iAT+4;
 		aaS.b = pAT[iAs].alf;
 		aaS.a = pAT[iAs-1].alf;
@@ -1965,16 +1311,13 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 		nU1 = pAT[iAT+2].num-pAT[iAT+1].num;
 		pU1 = pS+pAT[iAT+1].num;
 
-		apV[0] = apI[0]->pAB(aaS,aVn[0]); //apV[0].str(sPUB);
-		apV[1] = apI[1]->pAB(aaS,aVn[1]); //apV[1].str(sPUB);
+		apV[0] = apI[0]->pAB(aaS,aVn[0]);
+		apV[1] = apI[1]->pAB(aaS,aVn[1]);
 
 		iF4 = pD1->alfFND(pAT[iAT+1].alf,nD1);
 		switch( pAT[iAT].alf ) {
-			case gpeALF_CAM:
-						std::cout <<  (apI[0] ? apI[0]->ID : (I8)-1) << " " <<  (apI[1] ? apI[1]->ID : (I8)-1) << " " << std::endl;
-						aCAM[iF4].abLOAD( pU1, nU1, aaS.b, apV, aVn );
-						break;
-			case gpeALF_MAN: pMAN[iF4].abLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
+			case gpeALF_CAM: aCAM[iF4].aaLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
+			case gpeALF_MAN: pMAN[iF4].aaLOAD( pU1, nU1, aaS.b, apV, aVn ); break;
 			default: break;
 		}
 	}
@@ -1983,123 +1326,16 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	if( !pMEM->pMgl )
 		return this;
 	GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
-	glUseProgram( gProgID ); gpfGLerr( " glUseProgram( gProgID" );
-
-	if( aUniID[0] > -1 )
-	if( pPICrtx ) {
-		glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
-	} else {
-		glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
-	}
-
-	F4x4 view, wMX = 1.0, uMX, *pRSTmx;
-	uMX.x = F4( 1.0, 0.0, 0.0 );
-	uMX.y = F4( 0.0, 0.0, 1.0 );
-	uMX.z = F4( 0.0,-1.0, 0.0 );
-	uMX.t = F4( 0.0, 0.0, 0.0, 1.0 );
-
-	glMatrixMode(GL_MODELVIEW);
-	aMX[0] = uMX;
-	glLoadMatrixf((const GLfloat*)&aMX[0]);
-
-	glMatrixMode(GL_PROJECTION);
-    {
-        F4	eye = aCAM[0]/4.0f,
-			cntr = 0,
-			up = { 0.f, 0.f, 1.f };
-		view.latR( eye, cntr, up );
-    }
-    glLoadMatrixf((const GLfloat*)&view);
-    view.str(sPUB,",", "\r\n" );
-	std::cout << sPUB << std::endl;
-	gpc3Dgym* p3Dg;
-	gpc3Ditm* p3Di;
-	gpc3Dtrk* p3Dt = NULL;
-	size_t n3Dt;
-
+	glUseProgram( gProgID ); (e = glGetError());
+	if( e )
+		std::cout << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  std::endl;
 	for( int i = 0, n = pIl->nITM(); i < n; i++ ) {
+		apV[0] = pI0[i].fndXB( gpeALF_LWO );
+		if( !apV[0] ) continue;
 
-
-		apV[0] = pI0[i].fndXB( gpeALF_LWS );
-		if( apV[0] ) {
-			p3Dg = p3Dlst->p3DgymIX( *(I4*)apV[0] );
-			if( !p3Dg ) continue;
-
-			apV[2] = pI0[i].fndXB( gpeALF_TRK );
-			if( !apV[2] ) {
-				I8x2 ab( gpeALF_MAN, gpeALF_TRK );
-				p3Dt = (gpc3Dtrk*)pI0[i].pAB( ab, n3Dt );
-			} else
-				p3Dt = (gpc3Dtrk*)apV[2];
-
-			for( U4 i = 0, ni = p3Dg->n3Ditm(); i < ni; i++ ){
-				p3Di = p3Dg->p3Dii(i);
-				if( !p3Di )
-					break;
-				switch( p3Di->itmID&gpeLWSiTYP_TYP ){
-					case gpeLWSiTYP_OBJ: {
-
-							p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
-																				//gpeACT_DEF );
-							if( p3Di->bNULL )
-								break;
-
-							glMatrixMode(GL_MODELVIEW);
-							aMX[0] = aMX[1]*uMX;
-							glLoadMatrixf((const GLfloat*)&aMX[0]);
-
-							p3D = p3Di->p3D( this, p3Dg->sPUB, p3Dg->pPUB );
-							U4 n3Db = p3Di->nBON();
-							if( n3Db ) {
-								n3Db = p3D->nMX();
-								if( n3Db )
-									pRSTmx = p3D->pMX( 0 );
-								else {
-									pRSTmx = p3D->pMX( p3Di->nBON()+2 );
-									n3Db = p3D->nMX();
-
-									p3Dt->pTRK( aMXi+1, p3Dg, p3Di, 0, gpeACT_DEF );
-									for( U4 i = 1; i < n3Db; i++ ) {
-										pRSTmx[i] = aMXi[i].inv();
-									}
-									pRSTmx[0] = pRSTmx[1];
-								}
-								if( aUniID[5] > -1 )
-									glUniformMatrix4fv( aUniID[5], 18, GL_FALSE, (const GLfloat*)&aMX[1] );
-								if( aUniID[6] > -1 )
-									glUniformMatrix4fv( aUniID[6], 18, GL_FALSE, (const GLfloat*)(pRSTmx+1) );
-							}
-
-							if( !p3Dnull )
-							if( strstr(p3Di->sNAME, "eye" ) )
-								p3Dnull = p3D;
-
-							glDRW3D( p3D, -1 ); //p3Di->nBON() ? 0x9 : -1 );
-						} break;
-					case gpeLWSiTYP_BON:
-						if( !p3Dnull )
-							break;
-
-						glMatrixMode(GL_MODELVIEW);
-						aMX[0] = p3Di->mxW*uMX;
-						glLoadMatrixf((const GLfloat*)&aMX[0]);
-
-						glDRW3D( p3Dnull, -1 );
-						break;
-					case gpeLWSiTYP_LIG:
-					case gpeLWSiTYP_CAM:
-					default: break;
-				}
-			}
-		} else {
-			apV[0] = pI0[i].fndXB( gpeALF_LWO );
-			if( !apV[0] ) continue;
-
-			gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
-			if( !p3D ) continue;
-
-			glDRW3D(p3D, -1 );
-		}
+		gpc3D* p3D = p3Dlst->p3Dix( *(I4*)apV[0] );
+		if( !p3D ) continue;
+		glDRW3D(p3D, -1 ); //pMEM->pWIN ? pMEM->pWIN->nJDOIT.w : -1 );
 	}
 	return this;
 }

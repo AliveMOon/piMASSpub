@@ -159,8 +159,8 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 
 	pSDLwin = SDL_CreateWindow(	"Custom shader with SDL2 renderer!", SDL_WINDOWPOS_CENTERED,
 								SDL_WINDOWPOS_CENTERED, winSIZ.z, winSIZ.w, SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL );
+
 	SDL_SetHint( SDL_HINT_RENDER_DRIVER, "1" );
-	//
 	pSDLrndr = SDL_CreateRenderer(	pSDLwin, -1,
 									SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
@@ -198,7 +198,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 	pHOST = sHOST;
 	pUSER = sUSER;
 
-	pGL =  new gpcGL( this );
+	pGL =  new gpcGL( *this );
 	if( !pGL )
 		return;
 
@@ -323,7 +323,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 					->glDRW( w.a4x2[0], FRMwh );
 				}
 
-				pGL->SWP( this ); //pSDLwin );
+				pGL->SWP( pSDLwin );
 			}
 
 			*gppKEYbuff = 0;

@@ -75,35 +75,16 @@ U1* gpf_aALF_init( void ) {
 	gpaALF_H_sub['_']	= ('_'-'E')+('A'-1);
 	return gpaALFsub;
 }
-char* gpfSTRdrop( char* p_dst, char* p_str, char* p_end, const char* p_drop ) {
-	if( !p_end )
-		p_end = p_str+gpmSTRLEN(p_str);
-	if( !p_drop )
-		return (char*)gpmSTRnCPY( p_dst, p_str, p_end-p_str );
-	U8 nL;
-	size_t n, m;
-	char* pD = (char*)p_dst;
-	p_str += gpmMIN( p_end-p_str, gpmNINCS(p_str,p_drop) );
-	while( p_str < p_end ) {
-		n = gpmMIN( p_end-p_str, gpmVAN(p_str,p_drop,nL) );
-
-		gpmSTRnCPY( p_dst, p_str, n );
-		p_dst += n;
-		p_str += n;
-		p_str += gpmMIN( p_end-p_str, gpmNINCS(p_str,p_drop) );
-	}
-	*p_dst = 0;
-	return pD;
-}
-
 gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
-	if( p_end < pS ) {
+	if( p_end < pS )
+	{
 		if( ppS )
 			*ppS = (U1*)p_end;
 		return gpeALF_null;
 	}
 
-	if( pS ? !*pS : true ) {
+	if( pS ? !*pS : true )
+	{
 		if( ppS )
 			*ppS = (U1*)pS;
 
@@ -113,7 +94,8 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
 	U8 alf = 0;
 	U1 c, utf;
 
-	while( pS < p_end) {
+	while( pS < p_end)
+	{
 		c = *(U1*)pS;
 		//utf = 0x80;
 		if( (c>>6) == 2 ) { // ha van UTF8 szemét
