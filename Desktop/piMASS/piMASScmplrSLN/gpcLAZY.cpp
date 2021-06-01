@@ -4,6 +4,87 @@ extern U1 gpaALFsub[];
 extern U1 gpaALFsub2[];
 extern char gpaALF_H_sub[];
 char	gps_lzy_pub1[1024*0x100];
+gpcLZY* gpcLZY::lzyADD( const void* p_void, U8 n_byte, U8& iSTRT, U1 n ) {
+	if( !n_byte )
+		return this;
+
+	if( !this ) {
+		iSTRT = 0;
+		gpcLZY* p_lazy = new gpcLZY( n );
+		p_lazy->n_alloc = gpmPAD( n_byte*p_lazy->aSET[gpeLZYxN], 0x10 );
+		p_lazy->p_alloc = gpmALLOC( p_lazy->n_alloc+0x10 ); //, 0x10 );
+		if( !p_void )
+		{
+			p_lazy->p_alloc[p_lazy->n_load = n_byte] = 0;
+			return p_lazy;
+		}
+
+		((U1*)memcpy( p_lazy->p_alloc, p_void, n_byte ))[n_byte] = 0;
+		p_lazy->n_load = n_byte;
+		return p_lazy;
+	}
+	if( n > 0x80 )
+		n = 4;
+	if( !n )
+	{
+		if( !aSET[gpeLZYxN] )
+			aSET[gpeLZYxN] = 4;
+
+		n = aSET[gpeLZYxN];
+	}
+	else if( !aSET[gpeLZYxN] )
+			aSET[gpeLZYxN] = n;
+
+
+	if( iSTRT > n_load )
+		iSTRT = n_load;
+	else
+		n_load = iSTRT;
+
+	if( p_alloc ? (n_load+n_byte > n_alloc) : true ) {
+		U1* p_kill = p_alloc;
+		n_alloc = gpmPAD( (n_load+n_byte*n), 0x10 );
+		p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
+		if( p_kill )
+		{
+			gpmMcpy( p_alloc, p_kill, n_load );
+			gpmFREE( p_kill );
+		} else
+			n_load = 0;
+	}
+
+	if( p_void )
+		gpmMcpy( p_alloc+n_load, p_void, n_byte );
+
+	n_load += n_byte;
+	p_alloc[n_load] = 0;
+	return this;
+}
+
+U1*  gpcLZY::Ux( I8 iPC, U4 n, bool bZ, U4 stp ) {
+		if( !this )
+			return NULL;
+
+		if( iPC < 0 )
+			iPC *= -1;
+		if( !stp )
+			stp = n;
+		U8	e = iPC*stp + n;
+		if( e <= nLD() )
+			 return iPC ? p_alloc + iPC*stp : p_alloc;
+
+		U8 s = -1, ee = e+n*3;
+
+		lzyADD( NULL, ee-nLD(), s );
+		if( bZ )
+			gpmZn( p_alloc+s, nLD()-s );
+		if( nLD() > e )
+			n_load = e;
+		if( !iPC )
+			return p_alloc;
+
+        return p_alloc + iPC*stp;
+}
 gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 {
 	va_list vl;
@@ -226,8 +307,7 @@ U4 gpcLZY::tree_fnd( U4 id, U4& n ) {
 }
 gpcLZY* gpcLZY::tree_add( U4 id, U4& n ) {
 	U8 s = -1;
-	if( !this )
-	{
+	if( !this ) {
 		gpcLZY* p_this = lzyADD( NULL, sizeof(U4x4), s, 8 );
 		if( !p_this )
 			return NULL;
@@ -264,8 +344,7 @@ U8 gpcLZY::tree_fnd( U8 id, U8& n ) {
 }
 gpcLZY* gpcLZY::tree_add( U8 id, U8& n ) {
 	U8 s = -1;
-	if( !this )
-	{
+	if( !this ) {
 		gpcLZY* p_this = lzyADD( NULL, sizeof(U8x4), s, 8 );
 		if( !p_this )
 			return NULL;
@@ -322,7 +401,7 @@ gpcLZY* gpcLZY::tree_add( I8 id, I8& n ) {
 	n_load = s*sizeof(*p_i84);
 	return this;
 }
-int gpcLZY::nAT( char* pS, int nS, const char* pFILT ) {
+int gpcLZY::nAT( const char* pS, int nS, const char* pFILT ) {
 	if( this ? !pS : true )
 		return 0;
 	if( !nS ) {
@@ -333,7 +412,7 @@ int gpcLZY::nAT( char* pS, int nS, const char* pFILT ) {
 	U8 nUTF8;
 	int nAT = 0;
 	I8x2* pAn;
-	char* pSi = pS, *pSe = pS+nS; //sN[]=" ";
+	char* pSi = (char*)pS, *pSe = pSi+nS; //sN[]=" ";
 	for( 	pSi += gpmNINCS(pSi,pFILT);
 			pSi < pSe;
 			pSi += gpmNINCS(pSi,pFILT), nAT++ ) {

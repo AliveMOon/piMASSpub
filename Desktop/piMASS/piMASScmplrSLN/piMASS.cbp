@@ -135,6 +135,7 @@
 		<Unit filename="gpMEMinstDOit.cpp" />
 		<Unit filename="gpcCRSbreak.cpp" />
 		<Unit filename="gpcDRCos.cpp" />
+		<Unit filename="gpcF4.cpp" />
 		<Unit filename="gpcGL.cpp" />
 		<Unit filename="gpcGLobj.cpp" />
 		<Unit filename="gpcGSM.cpp" />

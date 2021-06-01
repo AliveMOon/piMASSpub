@@ -540,8 +540,8 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc ) {
 	return pSRF ? (U1*)pSRF->pixels : NULL;
 }
 
-U4 gpcPICall::alfFND( U1* pS ) {
-	pS += gpmNINCS(pS," \t\"");
+U4 gpcPICall::alfFND( void* pV ) {
+	U1* pS = (U1*)pV + gpmNINCS((U1*)pV," \t\"");
 	I8x2 TnID(0,14);
 	TnID = pS;
 	TnID.num = gpfSTR2U8( pS+TnID.num, &pS );
@@ -575,4 +575,90 @@ gpcPIC*	gpcPICall::aluFND( gpcALU& alu ) {
 	alfN = pS;
 	alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
 	return PIC( alfN );
+}
+SDL_Surface* gpcPIC::pPICrtxSRF() {
+	if( !this )
+		return NULL;
+	if( pSRF )
+		return pSRF;
+
+	pREF = NULL;
+	if( !glRNDR.z )
+		return NULL;
+
+	pSRF = SDL_CreateRGBSurface( 0, txWH.a4x2[1].x, txWH.a4x2[1].y, 32, 0,0,0,0 );
+	pREF = NULL;
+	return pSRF;
+}
+U4x4 gpcPIC::pPICrtxFREE(){
+	if( this ? !glRNDR.sum() : true )
+		return U4x4(0);
+	if( glRNDR.y ) glDeleteFramebuffers(1,&glRNDR.z); gpfGLerr( " glDeleteFramebuffers ");
+	if( glRNDR.x ) glDeleteTextures(2, &glRNDR.x ); gpfGLerr( " glDeleteTextures ");
+	glRNDR = 0;
+	return glRNDR;
+}
+gpcPIC* gpcPIC::pPICrtx( gpcPIC* pOLD, I4x2 wh ) {
+	if( !this )
+		return NULL;
+
+	if( txWH.a4x2[1] != wh ) {
+		pPICrtxFREE();
+		txWH.a4x2[1] = wh;
+	}
+
+	if( pOLD ? pOLD != this : false )
+	if( SDL_Surface* poSRF = pOLD->pPICrtxSRF() ){
+		glReadPixels(	0, 0,
+						poSRF->w, poSRF->h, //pPICrtx->txWH.a4x2[1].x, pPICrtx->txWH.a4x2[1].y,
+						GL_BGRA, //GL_RGBA,
+						GL_UNSIGNED_BYTE,
+						poSRF->pixels ); gpfGLerr( " glReadPixels " );
+		pOLD->pREF = NULL;
+	}
+
+
+	if( glRNDR.x )
+		return this;
+
+	if( !glRNDR.w )
+		glGetIntegerv( GL_FRAMEBUFFER_BINDING, (GLint*)&glRNDR.w );
+
+	glBindFramebuffer(GL_FRAMEBUFFER, glRNDR.w); gpfGLerr();
+	/// ------ Y. DEPTH --------
+	glGenTextures(2, &glRNDR.x); 										gpfGLerr();
+	glBindTexture(	GL_TEXTURE_2D, glRNDR.x ); 							gpfGLerr();
+	glTexImage2D(	GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT,
+					txWH.a4x2[1].x, txWH.a4x2[1].y,
+					0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0); 		gpfGLerr();
+	GLfloat border[] = {1.0f, 0.0f,0.0f,0.0f };
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+	glBindTexture(GL_TEXTURE_2D, 0);									gpfGLerr();
+	/// ------ Y. COLOR  ------
+	//glGenRenderbuffers(1,&glRNDR.y); 									gpfGLerr();
+	glBindTexture(	GL_TEXTURE_2D, glRNDR.y ); 							gpfGLerr();
+	glTexImage2D(	GL_TEXTURE_2D,0,GL_RGBA,
+					txWH.a4x2[1].x, txWH.a4x2[1].y,
+					0,GL_RGBA,GL_UNSIGNED_BYTE,NULL ); 					gpfGLerr();
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); gpfGLerr();
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); gpfGLerr();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	/// ------ Z. FBO ------
+	glGenFramebuffers(1, &glRNDR.z);									gpfGLerr();
+	glBindFramebuffer(GL_FRAMEBUFFER, glRNDR.z);						gpfGLerr();
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, glRNDR.x, 0); gpfGLerr();
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glRNDR.y, 0); gpfGLerr();
+
+	GLenum drawBuffs[] = {GL_COLOR_ATTACHMENT0};
+	glDrawBuffers(1, drawBuffs); gpfGLerr();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); gpfGLerr();
+	glBindTexture(GL_TEXTURE_2D, 0); gpfGLerr();
+	return this;
 }
