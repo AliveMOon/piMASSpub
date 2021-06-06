@@ -1,14 +1,14 @@
  a0	 
- T
+ 
  R# o# b# i#                                            	
   R# o# b# i#                                            	 b0	 b0  d0	  																							
- mini = "wget -O ./calib_rics/calib%s http://192.168.1.160:5000/api/camera/take_and_save_picture_given_name?name=%s",
+ mini = "wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture", 
   e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rr = 0x10000;
  rout = rr + 3;
  rinp = rr + 2;
- john = d1.mini;
+ bill = d0.mini;
  //john 
  	
  slmp = "192.168.1.90 10000";
@@ -233,8 +233,8 @@
 //0870| b3	 
  a = 10;
  b = 20;
- CÃ = a+b
-  * (a + b)
+ C = a+b
+  *(a + b)
   *b/a
  ,
  d = c%4;  aa3	   

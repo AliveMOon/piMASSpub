@@ -4,7 +4,8 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-
+extern gpcLZY gpLZYfun;
+extern gpcVAR gpFUN[];
 gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 
 		///					pRl
@@ -16,7 +17,7 @@ gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 		//if( !pBLK )
 		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 
-		gpROW* pRl = pBLK->pLSTrow();
+		gpROW* pRl = pBLK->pLASTrow();
 		if( !pRl )
 			return pBLK;
 		if( pBLK->opIDgrp() == gpaOPgrp[opID] )
@@ -32,25 +33,43 @@ gpBLK* gpcSRC::srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID ) {
 		if( pO )
 		{
 			/// FUN(
-
 		} else {
 			/// (
 			pO = srcOBJadd( pS, mnID<0 ? mnID :-mnID );
-			*pRl = *pO;
 		}
+		*pRl = *pO;
 		return srcBLKup( pS, pBLK, opID, mnID );
 }
-gpBLK* gpBLK::instFUN( gpeALF alf, gpBLK *pARG )
+gpPTR* gpBLK::instFUN( char* pS, I8x2& AN, gpBLK *pARG )
 {
-	switch( alf ) {
-		case gpeALF_SIN:
-		case gpeALF_COS:
+	I8	nF = gpLZYfun.nLD(sizeof(gpcVAR)),
+		iF = gpLZYfun.tree_fnd( (I8)AN.alf,nF);
+	if( iF >= nF )
+		return pARG->BLKpPTR( pS );
 
-			break;
-		default:
-			break;
+	I4 nR = pARG->nROW();
+	_move._q.A7.D7;
+	if( nR ) {
+		gpOBJ	*pOa;
+		gpROW	*pRi;
+		gpPTR	*pPi;
+		for( I4 iR = 0; iR < pARG->nROW(); iR++ ) {
+			pPi = pARG->iROWptr( pS, iR, &pRi, &pOa );
+			if( !pPi )
+				continue;
+			_move._l.EAl( pOa->iPTR ).sIA7I;
+		}
 	}
-	return this;
+
+	gpPTR* pP = BLKpPTR( pS );
+	pP->cID( gpFUN[iF].typ );
+
+	_move._l.EAl( iPTR ).A0;
+	_jsr.EAl( AN.alf );
+
+	if( nR ) _move._q.D7.A7;
+
+	return pP;
 }
 gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID ) {
 	if( !pBLKm )
@@ -60,43 +79,46 @@ gpBLK* gpcSRC::srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I
     if(!nR)
         return pBLKm;
 
-	//I4 aiPC[2], sOF = 0, cID = -1;
-	//U1* pU1 = NULL;
-	gpcSRC	*pSin;
-	gpROW	*pRm, *pRa;
-	gpOBJ	*pO, *pOa, *pOin = NULL;
-	gpPTR	*pPu = pBLKup->BLKpPTR( pS ),
-			*pPd = pBLKm->iROWptr(	pS, pBLKup->bIDmR, &pO, &pRm ),
-			*pPb = NULL, *pPa;
-	gpeOPid opB, opA;
+	gpBLK	*pBu = NULL;
+	gpROW	*pRi, *pRm;
+	gpOBJ	*pOi, *pOb = NULL, *pOm = NULL;
+	gpPTR	*pPi, *pPb = NULL, *pPd = NULL;
 
-	for( I4 iR = 0; iR < nR; opB=opA, iR++ ) {
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSin, &pOin );
-		opA = pRa->pstOP;
-		if( !pPa )
+	for( I4 iR = nR-1; iR > -1 ; pPb=pPi, pOb = pOi, iR-- ) {
+		pBu = pBLK->iROWblk( pS, iR, &pRi );
+		if( !pBu )
 			continue;
 
-		if( !pPb )
-			pPb = pPd;
-
-		switch( opA ) {
-			case gpeOPid_brakS:
-				pBLK->instFUN( pOa->AN.alf, pBLKup );
-				break;
+		pPi = pBu->BLKpPTR( pS );
+		pOi = pMEM->OBJfnd( pPi->mNdID );
+		pPd = pBLKm->iROWptr( pS, pBLK->bIDmR, &pRm, &pOm );
+		pPb = pBLK->instFUN( pS, pOm->AN, pBu );
+		if( pPi == pPb ) {
+			/// IGEN ugyan az mint az pBu NEM történt fun
+			// akkor a pBLK->iPRT <--= pBu->iPRT
+			_nop;
+			pPd->cpyREF( pMEM->pUn(), pPb);
+		} else {
+			/// NEM ugyan az mint az pBu IGEN történt FUN
+			// akkor a pBLK->iPRT marad
+			_nop;
+			pPd->cpyREF(pMEM->pUn(), pPb);
 		}
-	}
 
-	if( pPd->iPC < 0 ) {
-		pPd->cpyREF(pPu);
-		_nop;
-		return pBLKm;
+		break;
 	}
-	_move._l.EAl(pPu->iPC).A0;
+	/*_nop;
+	pPi->cpyREF(pPb);*/
+	return pBLKm;
+
+
+	/*_move._l.EAl(pPu->iPC).A0;
 	_move._l.EAl(pPd->iPC).A1;
 	_move._L.IA0I.IA1I;
 	_nop;
-	return pBLKm;
+	return pBLKm;*/
 }
+
 gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
 	///kEND(scp);
 	U1* pU1 = NULL;
@@ -125,8 +147,11 @@ gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY
 					/// a, 		b +
 					/// a = 	b +
 					/// a * 	b +
-				pBLKm = srcINSTmul( pS, pBLKm, pBLK );
+					pBLKm = srcINSTmul( pS, pBLKm, pBLK );
 				} break;
+			case gpeOPid_stk:
+					pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
+				break;
 		}
 
 
@@ -137,15 +162,9 @@ gpBLK* gpcSRC::srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY
 		pBLK = pBLKm;
 
 	}
-	//return pBLK;
-
-	gpROW	*pRl = pBLK->pLSTrow();
-	if( !pRl )
-		return pBLK;
-
-	pRl->pstOP = opID;
-	/// a veszö egyenlőre csinál helyet
-	pBLK->pNEWrow();
+	gpROW	*pRl = pBLK->pLASTrow();
 	return pBLK;
+	/// a veszö egyenlőre csinál helyet
+	//pBLK->pNEWrow();
 }
 

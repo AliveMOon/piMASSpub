@@ -121,23 +121,33 @@ gpcLZY* gpfSRF2JPG( gpcLZY* pBUFF, SDL_Surface* pSRF, I4 q )
 
 #ifdef gpdSYSubi
 
-U4 gpcCAMubi::getImageTypeSize( RASPICAM_FORMAT f )
-{
+U4 gpcCAMubi::getImageTypeSize( RASPICAM_FORMAT f ) {
     if( f != RASPICAM_FORMAT_RGB )
         return 0;
 
-    return queryBuffer.length; //bufferinfo.bytesused;
+    return qryBUF.length; //infBUF.bytesused;
 }
 
-bool gpcCAMubi::openCAM()
-{
+bool gpcCAMubi::openCAM() {
     if( bOPEN )
         return bOPEN;
 
     ///  1. Open the device ---------------
     if(bSTDcout_V4l2){std::cout << "1. Open the device ---------------" << std::endl;}
     if( fd < 0 )
+	{
         fd = open("/dev/video0",O_RDWR);
+		if(fd < 0) {
+			char sVIDx[0x80];
+			for( U4 i = 1; i < 8; i++ ) {
+				sprintf( sVIDx, "/dev/video%d", i );
+				fd = open(sVIDx,O_RDWR);
+				if(fd < 0)
+					continue;
+				break;
+			}
+		}
+	}
 
     if(fd < 0) {
         perror("Failed to open device, OPEN");
@@ -149,20 +159,20 @@ bool gpcCAMubi::openCAM()
     if( wip == 1 )
     {
         if(bSTDcout_V4l2){std::cout << "2. Ask the device if it can capture frames" << std::endl;}
-        if(ioctl(fd, VIDIOC_QUERYCAP, &capability) < 0){
+        if(ioctl(fd, VIDIOC_QUERYCAP, &capBLTY) < 0){
             // something went wrong... exit
             perror("Failed to get device capabilities, VIDIOC_QUERYCAP");
             //return bOPEN;
         } else {
-             if(bSTDcout_V4l2){std::cout << "driver:" << (char*)capability.driver << std::endl;}
+             if(bSTDcout_V4l2){std::cout << "driver:" << (char*)capBLTY.driver << std::endl;}
         }
         wip = 2;
     }
 
     bool bBREAK = false;
     /// 3. ------------------------------------------------------
-    fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    int r = ioctl(fd,VIDIOC_ENUM_FMT,&fmtdesc);
+    frmDeSC.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    int r = ioctl(fd,VIDIOC_ENUM_FMT,&frmDeSC);
     U4  pixFMT = 0,
         iWH0 = -1, iWH;
     I4  ar0 = wh0.area(), df0 = ar0,
@@ -170,40 +180,40 @@ bool gpcCAMubi::openCAM()
     U4x2 aWH[8];
     gpfMset( aWH, gpmN(aWH), &wh0, sizeof(*aWH) );
     while( r > -1 ) {
-        if(bSTDcout_V4l2){std::cout << fmtdesc.description << std::endl;}
-        frmsize.type = fmtdesc.type;
-        frmsize.pixel_format = fmtdesc.pixelformat;
-        frmsize.index = 0;
+        if(bSTDcout_V4l2){std::cout << frmDeSC.description << std::endl;}
+        frmSZ.type = frmDeSC.type;
+        frmSZ.pixel_format = frmDeSC.pixelformat;
+        frmSZ.index = 0;
         /// 4. ------------------------------------------------------
-        r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize);
+        r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmSZ);
 
         while( r > -1 ) {
-            if(frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
-                if(bSTDcout_V4l2){std::cout  << "discrete w:" << frmsize.discrete.width << " h:" << frmsize.discrete.height << std::endl;}
-                switch( frmsize.pixel_format ) {
+            if(frmSZ.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+                if(bSTDcout_V4l2){std::cout  << "discrete w:" << frmSZ.discrete.width << " h:" << frmSZ.discrete.height << std::endl;}
+                switch( frmSZ.pixel_format ) {
                     case V4L2_PIX_FMT_YUYV:
                         pixFMT = V4L2_PIX_FMT_YUYV;
                         iWH0 = 0;
                         break;
                     default:
-                        frmsize.index++;
-                        r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize);
+                        frmSZ.index++;
+                        r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmSZ);
                         continue;
                 }
-                ar = frmsize.discrete.width*frmsize.discrete.height;
+                ar = frmSZ.discrete.width*frmSZ.discrete.height;
                 df = ar0<ar ? ar-ar0 : ar0-ar;
                 if( df0 > df )
                 {
                     iWH = iWH0;
 
                     df0 = df;
-                    aWH[iWH].x = frmsize.discrete.width;
-                    aWH[iWH].y = frmsize.discrete.height;
+                    aWH[iWH].x = frmSZ.discrete.width;
+                    aWH[iWH].y = frmSZ.discrete.height;
                 }
             } else {
-                if(bSTDcout_V4l2){std::cout  << "-------- w:" << frmsize.stepwise.min_width << " h:" << frmsize.stepwise.min_height << std::endl
-                                        << "-------- w:" << frmsize.stepwise.max_width << " h:" << frmsize.stepwise.max_height << std::endl;}
-                switch( frmsize.pixel_format ) {
+                if(bSTDcout_V4l2){std::cout  << "-------- w:" << frmSZ.stepwise.min_width << " h:" << frmSZ.stepwise.min_height << std::endl
+                                        << "-------- w:" << frmSZ.stepwise.max_width << " h:" << frmSZ.stepwise.max_height << std::endl;}
+                switch( frmSZ.pixel_format ) {
                     case V4L2_PIX_FMT_RGB24:
                         bBREAK = true;
                         pixFMT = V4L2_PIX_FMT_RGB24;
@@ -215,25 +225,25 @@ bool gpcCAMubi::openCAM()
                         iWH0 = 0;
                         break;
                     default:
-                        frmsize.index++;
-                        r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize);
+                        frmSZ.index++;
+                        r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmSZ);
                         continue;
                 }
                 iWH = iWH0;
-                aWH[iWH].x = gpmMAX( frmsize.stepwise.min_width,    gpmMIN(aWH[iWH].x,frmsize.stepwise.max_width) );
-                aWH[iWH].y = gpmMAX( frmsize.stepwise.min_height,   gpmMIN(aWH[iWH].y,frmsize.stepwise.max_height) );
+                aWH[iWH].x = gpmMAX( frmSZ.stepwise.min_width,    gpmMIN(aWH[iWH].x,frmSZ.stepwise.max_width) );
+                aWH[iWH].y = gpmMAX( frmSZ.stepwise.min_height,   gpmMIN(aWH[iWH].y,frmSZ.stepwise.max_height) );
             }
 
             if( bBREAK ) break;
 
-            frmsize.index++;
-            r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize);
+            frmSZ.index++;
+            r = ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmSZ);
         }
         if( bBREAK )
             break;
 
-        fmtdesc.index++;
-        r = ioctl(fd,VIDIOC_ENUM_FMT,&fmtdesc);
+        frmDeSC.index++;
+        r = ioctl(fd,VIDIOC_ENUM_FMT,&frmDeSC);
     }
     if( !pixFMT )
         return bOPEN;
@@ -268,33 +278,33 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
     }
 
     if( pBUFF ) {
-        munmap(pBUFF, queryBuffer.length);
+        munmap(pBUFF, qryBUF.length);
     }
 
     /// 6. VIDIOC_REQBUFS ----------
     if(bSTDcout_V4l2){std::cout << "6. VIDIOC_REQBUFS ----------" << std::endl;}
-    requestBuffer.count = 1;                    // one request buffer
-    requestBuffer.type = format.type ;          // request a buffer wich we an use for capturing frames
-    requestBuffer.memory = V4L2_MEMORY_MMAP;
-    res = ioctl(fd, VIDIOC_REQBUFS, &requestBuffer);
+    reqBUF.count = 1;                    // one request buffer
+    reqBUF.type = format.type ;          // request a buffer wich we an use for capturing frames
+    reqBUF.memory = V4L2_MEMORY_MMAP;
+    res = ioctl(fd, VIDIOC_REQBUFS, &reqBUF);
     if( res < 0){
         return res;
     }
 
     if(bSTDcout_V4l2){std::cout << "7. VIDIOC_QUERYBUF ----------------" << std::endl;}
     /// 7. VIDIOC_QUERYBUF ----------
-    queryBuffer.type = format.type ;
-    queryBuffer.memory = V4L2_MEMORY_MMAP;
-    queryBuffer.index = 0;
-    res = ioctl(fd, VIDIOC_QUERYBUF, &queryBuffer);
+    qryBUF.type = format.type ;
+    qryBUF.memory = V4L2_MEMORY_MMAP;
+    qryBUF.index = 0;
+    res = ioctl(fd, VIDIOC_QUERYBUF, &qryBUF);
     if( res < 0){
         return res;
     }
 
-    pBUFF = (char*)mmap(    NULL, queryBuffer.length,
+    pBUFF = (char*)mmap(    NULL, qryBUF.length,
                             PROT_READ | PROT_WRITE,
                             MAP_SHARED,
-                            fd, queryBuffer.m.offset    );
+                            fd, qryBUF.m.offset    );
 
     /// 8. VIDIOC_STREAMON ----------------
     if(bSTDcout_V4l2){std::cout << " 8. VIDIOC_STREAMON ----------------" << std::endl;}
@@ -305,10 +315,11 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
     }
     if( wip != 9 ) {
         /// 9. VIDIOC_QBUF ----------------
-        bufferinfo.type = type;
-        bufferinfo.memory = V4L2_MEMORY_MMAP;
-        bufferinfo.index = 0;
-        res = ioctl(fd, VIDIOC_QBUF, &bufferinfo);
+        if(bSTDcout_V4l2){std::cout << " 9. VIDIOC_QBUF ----------------" << std::endl;}
+        infBUF.type = type;
+        infBUF.memory = V4L2_MEMORY_MMAP;
+        infBUF.index = 0;
+        res = ioctl(fd, VIDIOC_QBUF, &infBUF);
         if( res < 0){
             return res;
         }
@@ -319,13 +330,12 @@ int gpcCAMubi::setCaptureSize( U4 w, U4 h, U4 picFRM ) {
     return res;
 }
 
-U4 gpcCAMubi::grab()
-{
+U4 gpcCAMubi::grab() {
     int res;
     if( wip == 9 ) {
         /// 10. VIDIOC_DQBUF --------------------
         if(bSTDcout_V4l2){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
-        res = ioctl(fd, VIDIOC_DQBUF, &bufferinfo);
+        res = ioctl(fd, VIDIOC_DQBUF, &infBUF);
         if( res < 0){
             return nGRB++;
         }
@@ -335,12 +345,11 @@ U4 gpcCAMubi::grab()
 
     return nGRB++;
 }
-void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f )
-{
+void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f ) {
     U1* pRGB = (U1*)pPIX;
     if(bSTDcout_V4l2){std::cout << "CPY" << std::endl;}
     int res ;
-    switch( format.fmt.pix.pixelformat ){ //frmsize.pixel_format ) {
+    switch( format.fmt.pix.pixelformat ){ //frmSZ.pixel_format ) {
         case V4L2_PIX_FMT_YUYV: {
 //                                      U               V
 // 4x4            start + 0:	Y'00	Cb00	Y'01	Cr00	Y'02	Cb01	Y'03	Cr01
@@ -348,7 +357,7 @@ void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f )
 //                start + 16:	Y'20	Cb20	Y'21	Cr20	Y'22	Cb21	Y'23	Cr21
 //                start + 24:	Y'30	Cb30	Y'31	Cr30	Y'32	Cb31	Y'33	Cr31
                 I4 y1,cb,y2,cr, sub;
-                for( U4 s = 0, d = 0; s < queryBuffer.length-4; s+=4, d+=6 )
+                for( U4 s = 0, d = 0; s < qryBUF.length-4; s+=4, d+=6 )
                 {
                     y1 = ((U1*)pBUFF)[s]-16;
                     cb = ((U1*)pBUFF)[s+1]-128;
@@ -366,17 +375,17 @@ void* gpcCAMubi::retrieve( void *pPIX, RASPICAM_FORMAT f )
                 }
             } break;
         default:
-            gpmMcpy(pPIX, pBUFF, queryBuffer.length );
+            gpmMcpy(pPIX, pBUFF, qryBUF.length );
             break;
     }
     if( wip != 9 ) {
         wip = 9;
         /// 9.1 VIDIOC_QBUF ----------------
-        bufferinfo.type = type;
-        bufferinfo.memory = V4L2_MEMORY_MMAP;
-        bufferinfo.index = 0;
+        infBUF.type = type;
+        infBUF.memory = V4L2_MEMORY_MMAP;
+        infBUF.index = 0;
         if(bSTDcout_V4l2){std::cout << " 9.1 VIDIOC_QBUF ----------------" << std::endl;}
-        res = ioctl(fd, VIDIOC_QBUF, &bufferinfo);
+        res = ioctl(fd, VIDIOC_QBUF, &infBUF);
         if(res < 0)
             return NULL;
         if(bSTDcout_V4l2){std::cout << " 9.2 VIDIOC_QBUF ----------------" << std::endl;}
@@ -434,8 +443,7 @@ void call_cam( gpcTHRD_CAM* pTC ) {
 	}
 }
 
-U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
-{
+U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc ) {
 	if( !this )
 		return NULL;
 
@@ -532,7 +540,8 @@ U1* gpcPIC::getPIX( gpcPICAM* pC, U4 qc )
 	return pSRF ? (U1*)pSRF->pixels : NULL;
 }
 
-U4 gpcPICall::alfFND( U1* pS ) {
+U4 gpcPICall::alfFND( void* pV ) {
+	U1* pS = (U1*)pV + gpmNINCS((U1*)pV," \t\"");
 	I8x2 TnID(0,14);
 	TnID = pS;
 	TnID.num = gpfSTR2U8( pS+TnID.num, &pS );
@@ -566,4 +575,90 @@ gpcPIC*	gpcPICall::aluFND( gpcALU& alu ) {
 	alfN = pS;
 	alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
 	return PIC( alfN );
+}
+SDL_Surface* gpcPIC::pPICrtxSRF() {
+	if( !this )
+		return NULL;
+	if( pSRF )
+		return pSRF;
+
+	pREF = NULL;
+	if( !glRNDR.z )
+		return NULL;
+
+	pSRF = SDL_CreateRGBSurface( 0, txWH.a4x2[1].x, txWH.a4x2[1].y, 32, 0,0,0,0 );
+	pREF = NULL;
+	return pSRF;
+}
+U4x4 gpcPIC::pPICrtxFREE(){
+	if( this ? !glRNDR.sum() : true )
+		return U4x4(0);
+	if( glRNDR.y ) glDeleteFramebuffers(1,&glRNDR.z); gpfGLerr( " glDeleteFramebuffers ");
+	if( glRNDR.x ) glDeleteTextures(2, &glRNDR.x ); gpfGLerr( " glDeleteTextures ");
+	glRNDR = 0;
+	return glRNDR;
+}
+gpcPIC* gpcPIC::pPICrtx( gpcPIC* pOLD, I4x2 wh ) {
+	if( !this )
+		return NULL;
+
+	if( txWH.a4x2[1] != wh ) {
+		pPICrtxFREE();
+		txWH.a4x2[1] = wh;
+	}
+
+	if( pOLD ? pOLD != this : false )
+	if( SDL_Surface* poSRF = pOLD->pPICrtxSRF() ){
+		glReadPixels(	0, 0,
+						poSRF->w, poSRF->h, //pPICrtx->txWH.a4x2[1].x, pPICrtx->txWH.a4x2[1].y,
+						GL_BGRA, //GL_RGBA,
+						GL_UNSIGNED_BYTE,
+						poSRF->pixels ); gpfGLerr( " glReadPixels " );
+		pOLD->pREF = NULL;
+	}
+
+
+	if( glRNDR.x )
+		return this;
+
+	if( !glRNDR.w )
+		glGetIntegerv( GL_FRAMEBUFFER_BINDING, (GLint*)&glRNDR.w );
+
+	glBindFramebuffer(GL_FRAMEBUFFER, glRNDR.w); gpfGLerr();
+	/// ------ Y. DEPTH --------
+	glGenTextures(2, &glRNDR.x); 										gpfGLerr();
+	glBindTexture(	GL_TEXTURE_2D, glRNDR.x ); 							gpfGLerr();
+	glTexImage2D(	GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT,
+					txWH.a4x2[1].x, txWH.a4x2[1].y,
+					0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0); 		gpfGLerr();
+	GLfloat border[] = {1.0f, 0.0f,0.0f,0.0f };
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+	glBindTexture(GL_TEXTURE_2D, 0);									gpfGLerr();
+	/// ------ Y. COLOR  ------
+	//glGenRenderbuffers(1,&glRNDR.y); 									gpfGLerr();
+	glBindTexture(	GL_TEXTURE_2D, glRNDR.y ); 							gpfGLerr();
+	glTexImage2D(	GL_TEXTURE_2D,0,GL_RGBA,
+					txWH.a4x2[1].x, txWH.a4x2[1].y,
+					0,GL_RGBA,GL_UNSIGNED_BYTE,NULL ); 					gpfGLerr();
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); gpfGLerr();
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); gpfGLerr();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	/// ------ Z. FBO ------
+	glGenFramebuffers(1, &glRNDR.z);									gpfGLerr();
+	glBindFramebuffer(GL_FRAMEBUFFER, glRNDR.z);						gpfGLerr();
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, glRNDR.x, 0); gpfGLerr();
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glRNDR.y, 0); gpfGLerr();
+
+	GLenum drawBuffs[] = {GL_COLOR_ATTACHMENT0};
+	glDrawBuffers(1, drawBuffs); gpfGLerr();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); gpfGLerr();
+	glBindTexture(GL_TEXTURE_2D, 0); gpfGLerr();
+	return this;
 }

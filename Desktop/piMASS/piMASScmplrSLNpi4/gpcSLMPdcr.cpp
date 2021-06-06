@@ -348,50 +348,25 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 	{
 		case 4:{
 			// 5->6 jelzünk hogy olvastuk a HS2i-t
+			/*nm = NMnDIF.x;
+			gpcADR A0 = gpfSTR2ALF( sNM, sNM+4 );	/// gpcADR
+			A0 = pRES;
+			if( !A0.pRM )
+				return false;
+
+			gpcALU aB = A0.pRM->ALU( A0.iA );
+			if(!aB.bSTR())
+				return false;
+			if(!alu.pDAT)
+				return false;*/
+
 			char	*pP = pBUFF;
 
 			pP += okXYZ.str( pP, "_" );
 			pP += okABC.str( pP, "_" );
 			pP += sprintf( pP, ".png" );
 			pP++;
-			//U4 nS = 0, n = 0;
-			/*char* pS = (char*)pCLI;
-			while(pS=strstr(pS,"%s")) {
-				nS++;
-				pS += 2;
-			}
-            switch( nS ){
-				case 4:
-					n = sprintf( pP, (char*)pCLI, pBUFF, pBUFF, pBUFF, pBUFF );
-					break;
-				case 3:
-					n = sprintf( pP, (char*)pCLI, pBUFF, pBUFF, pBUFF );
-					break;
-				case 2:
-					n = sprintf( pP, (char*)pCLI, pBUFF, pBUFF );
-					break;
-				case 1:
-					n = sprintf( pP, (char*)pCLI, pBUFF );
-					break;
-				default:
-					n = sprintf( pP, (char*)pCLI,
-													pBUFF, pBUFF, pBUFF, pBUFF,
-													pBUFF, pBUFF, pBUFF, pBUFF,
-													pBUFF, pBUFF, pBUFF, pBUFF,
-													pBUFF, pBUFF, pBUFF, pBUFF
-								);
-
-					//n = sprintf( pP, (char*)pCLI );
-					break;
-            }*/
-
-			U4 n = sprintf( pP, (char*)pCLI,	pBUFF,
-												pBUFF, pBUFF, pBUFF,
-												pBUFF, pBUFF, pBUFF, pBUFF,
-												pBUFF, pBUFF, pBUFF, pBUFF,
-												pBUFF, pBUFF, pBUFF, pBUFF
-			);
-
+			U4 n = sprintf( pP, (char*)pCLI, pBUFF );
 			if( n )
                 pP[n-1] = 0;
 			if( n_join < n_trd )

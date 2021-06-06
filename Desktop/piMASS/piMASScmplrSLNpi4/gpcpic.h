@@ -47,28 +47,25 @@ class gpcCAMubi
 //-lmmal_util
 //-lmmal_vc_client
     /// openCAM ----------------------------------------------------------------
-    int fd;                             ///  1. Open the device ---------------
-    v4l2_capability     capability;     ///  2. Ask the device if it can capture frames
-    v4l2_fmtdesc        fmtdesc;        ///  3. VIDIOC_ENUM_FMT-----------------
-    v4l2_frmsizeenum    frmsize;        ///  4. VIDIOC_ENUM_FRAMESIZES ---------
+    int fd;							///  1. Open the device ---------------
+    v4l2_capability     capBLTY;	///  2. Ask the device if it can capture frames
+    v4l2_fmtdesc        frmDeSC;	///  3. VIDIOC_ENUM_FMT-----------------
+    v4l2_frmsizeenum    frmSZ;		///  4. VIDIOC_ENUM_FRAMESIZES ---------
     /// setCaptureSize ---------------------------------------------------------
-    v4l2_format         format;         ///  5. VIDIOC_S_FMT -------------------
-    v4l2_requestbuffers requestBuffer;  ///  6. VIDIOC_REQBUFS -----------------
-    v4l2_buffer         queryBuffer;    ///  7. VIDIOC_QUERYBUF ----------------
-    int type;                           ///  8. VIDIOC_STREAMON ----------------
+    v4l2_format         format;		///  5. VIDIOC_S_FMT -------------------
+    v4l2_requestbuffers reqBUF;		///  6. VIDIOC_REQBUFS -----------------
+    v4l2_buffer         qryBUF;		///  7. VIDIOC_QUERYBUF ----------------
+    int type;						///  8. VIDIOC_STREAMON ----------------
     /// greb -------------------------------------------------------------------
-    v4l2_buffer         bufferinfo;     ///  9. VIDIOC_QBUF --------------------
-                                        /// 10. VIDIOC_DQBUF -------------------
+    v4l2_buffer         infBUF;     ///  9. VIDIOC_QBUF --------------------
+									/// 10. VIDIOC_DQBUF -------------------
     /// retrieve ---------------------------------------------------------------
-                                        /// 11. VIDIOC_STREAMOFF ---------------
-
-    //v4l2_frmivalenum frmival;
-
+									/// 11. VIDIOC_STREAMOFF ---------------
 
     bool bOPEN;
     U1      wip;
 public:
-    char* pBUFF;                        /// mmap << queryBuffer.length
+    char* pBUFF;                        /// mmap << qryBUF.length
     U4x2 wh0;
 
 
@@ -95,7 +92,7 @@ public:
         {
             /// 10. VIDIOC_DQBUF --------------------
             if(bSTDcout){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
-            res = ioctl(fd, VIDIOC_DQBUF, &bufferinfo);
+            res = ioctl(fd, VIDIOC_DQBUF, &infBUF);
             if( res >= 0)
             if(bSTDcout){std::cout << "10.2 VIDIOC_DQBUF --------------------" << std::endl;}
 
@@ -106,7 +103,7 @@ public:
         }
         if( !pBUFF )
             return;
-        munmap(pBUFF, queryBuffer.length);
+        munmap(pBUFF, qryBUF.length);
         pBUFF = NULL;
     }
     ~gpcCAMubi()
@@ -538,6 +535,23 @@ public:
 
 	}
 };
+class gpcGL;
+class gpc3Dsrf;
+
+/*class gpcTXscn { ///B
+public:
+	gpcLZYdct	picDCT;
+	gpcLZY		ixLST,ixSRT;
+	U4			nRDY, nBLD;
+	U1			aIX[0x100];
+	gpcTXscn(){}
+	gpcTXscn* srfADD( gpcGL* pGL, gpc3Dsrf* pSRF, char* pPATH, char* pFILE );
+	bool bRDY(){ return this ? nRDY<nBLD : false; }
+	U4 noRDY() { return (nRDY = nBLD+1); }
+	U4 yesRDY() { return (nRDY = nBLD); }
+	I4x4* pSRT();
+	U4 nSRT() { return this ? ixSRT.nLD(sizeof(I4x4)) : 0; };
+};*/
 class gpcPIC {
 public:
 	I8x2			TnID, alfN;
@@ -546,57 +560,56 @@ public:
 	U4				id, iSRC, aiQC[2],
 					nPIXall, nPIX,
 					nBOBall, nBOB,
+					tC,tD,
 
 					bppS, nPKavg;
+	U4x4			glRNDR;
 
 	SDL_Surface		*pSRF, *pSHR, *pREF;
 
-	SDL_Texture		*pTX,*pTXlock,
-                                *pRTX;
+	SDL_Texture		*pTX,*pTXlock;
 	U1x4			*pLOCK;
 
 	I4x4			xyOUT, xySRC, txWH;
 	U4x4			nJDOIT;
 	gpcPIC			*pSRC;
+	//gpcTXscn		*pSCN;
 	gpcBOB			**ppBOB;
 
 	bool			bTHRD;
 	std::thread		T;
-	//U1		*pPIX;
 
-
-
-	~gpcPIC()
-	{
+	~gpcPIC() {
 		unLOCK();
 		for( U4 i = 0; i < nBOB; i++ )
 			gpmDEL(ppBOB[i]);
 
 		gpmDELary(ppBOB);
 		gpmSDL_FreeTX(pTX);
-		gpmSDL_FreeTX(pRTX);
 		gpmSDL_FreeSRF(pSRF);
 		gpmSDL_FreeSRF(pSHR);
 
 	}
 	gpcPIC(){ gpmCLR; pFILE = sFILE; };
-	gpcPIC( I8x2 an, U4 i )
-	{
+	gpcPIC( I8x2 an, U4 i ) {
 		gpmCLR;
 		id = i;
 		TnID = an;
 	}
 
-	U1* getPIX()
-	{
+	U4x4 pPICrtxFREE();
+
+	SDL_Surface* pPICrtxSRF();
+	gpcPIC* pPICrtx( gpcPIC* pOLD, I4x2 wh );
+
+	U1* getPIX() {
 		if( !this )
 			return NULL;
 
 		return pSRF ? (U1*)pSRF->pixels : NULL;
 	}
 	U1* getPIX( gpcPICAM* pC, U4 qc );
-	SDL_Surface* surFREE( SDL_Surface* pF )
-	{
+	SDL_Surface* surFREE( SDL_Surface* pF ) {
 		if( !pF )
 			return pF;
 		bool bFREE = pSRF == pF;
@@ -782,46 +795,7 @@ public:
 
 
 	}
-	SDL_Texture* surDRWtx_o( SDL_Renderer* pRNDR ) {
-		SDL_Surface* pS = surDRW();
 
-		if( pREF == pS )
-			return pTX;
-
-		int acc = 0;
-		U4 frm;
-		pREF = pS;
-
-		if( pREF ? pTX : NULL )
-		{
-			SDL_QueryTexture( pTX, &frm, &acc, &txWH.z, &txWH.w );
-			if( (pREF->format ? pREF->format->format : 0)  != frm
-				|| pREF->w != txWH.z || pREF->h != txWH.w
-				|| acc != SDL_TEXTUREACCESS_STREAMING )
-			{
-				gpmSDL_FreeTX(pTX);
-				pTX = SDL_CreateTexture( pRNDR, pREF->format->format,
-												SDL_TEXTUREACCESS_STREAMING,
-												pREF->w, pREF->h );
-				txWH.z = pREF->w;
-				txWH.w = pREF->h;
-			}
-
-			if( pTX )
-			{
-				void* pLOCK;
-				int pitch;
-				if( SDL_LockTexture( pTX, NULL, &pLOCK, &pitch ) )
-					return pTX;
-
-				memcpy( pLOCK, pREF->pixels, pitch*pREF->h );
-				SDL_UnlockTexture(pTX);
-			}
-			return pTX;
-		}
-
-		return pTX = SDL_CreateTextureFromSurface( pRNDR, pREF );
-	}
 	U1x4* TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 						char* pNAME, char *pPATH, char *pFILE );
 	U1x4* TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
@@ -833,6 +807,11 @@ public:
 	U1x4* food( U1x4* pPET, U4 i, U4 n,
 				char* pPATH, char* pDIR, const char* pEXP = ".png" );
 
+	U1x4* TOOLmaskAB(	gpMEM* pMEM,
+						gpcPIC* pR, //gpcPIC* pB,
+						gpcPIC* pB,
+						char* pNAME, char *pPATH, char *pFILE );
+	SDL_Surface* pPICrd( char *pPATH, char *pFILE );
 };
 
 class gpcPICall
@@ -840,16 +819,10 @@ class gpcPICall
 	gpcPIC	**ppPIC, *pPIC;
 	U4		nPICall, iPICfr, nPICld;
 public:
-	U4		alfFND( U1* pS );
+	U4		alfFND( void* pSTR );
 	gpcPIC*	aluFND( gpcALU& alu );
-//	{
-//		U4 i =	alu.bSTR() ?
-//				PIC.alfFND( (U1*)alu.pDAT ) 	// ez a kép neve
-//				: alu.u8();
-//
-//	}
-	gpcPIC*	PIC( U4 i )
-	{
+
+	gpcPIC*	PIC( U4 i ) {
 		if( pPIC ? pPIC->id == i : false )
 			return pPIC;
 

@@ -105,6 +105,46 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
     return this;
 }
+int U1x4::hstXrgb( I4x4* pH, int p, int n, int w, int h ) {
+	if( n ? n>0x100 : true )
+		return 0;
+
+	if(!h)
+		h = w;
+	w*=3;
+	p*=3;
+
+	int c = 0x100/n;
+	if( (0x100/c) > n )
+		c++;
+
+	gpmZnOF(pH,n);
+	for( U1 *pS = (U1*)this, *pSe = pS+p*h, *pSi, *pSie; pS < pSe; pS += p )
+	for( pSi = pS, pSie = pSi+w; pSi<pSie; pSi+=3 ){
+		pH[pSi[0]/c].x++;
+		pH[pSi[1]/c].y++;
+		pH[pSi[2]/c].z++;
+	}
+	return n;
+}
+int U1x4::hstX( I4x4* pH, int p, int n, int w, int h ) {
+	if( n ? n>0x100 : true )
+		return 0;
+	if(!h)
+		h = w;
+	int c = 0x100/n;
+	if( (0x100/c) > n )
+		c++;
+
+	gpmZnOF(pH,n);
+	for( U1x4 *pS = this, *pSe = pS+p*h, *pSi, *pSie; pS < pSe; pS += p )
+	for( pSi = pS, pSie = pSi+w; pSi<pSie; pSi++ ){
+		pH[pSi->x/c].x++;
+		pH[pSi->y/c].y++;
+		pH[pSi->z/c].z++;
+	}
+	return n;
+}
 U4 U1x4::bugU1( I4x2* pR, U4* pM, I4 mom,
 				I4 b, I4* pD, U4 n,
 				I4 rg, U4 nX ) {

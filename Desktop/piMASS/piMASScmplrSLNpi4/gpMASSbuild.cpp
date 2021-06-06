@@ -1,12 +1,52 @@
 #include "gpcSRC.h"
 #include "gpccrs.h"
 U1 gpaALFsub[0x100];
+U1 gpaALFsub2[0x100];
 char gpaALF_H_sub[0x100];
 char	gpsPRG[] = gpdPRGsep, //" \t\r\n\a .,:;!? =<> -+*/%^ &~|@#$ \\ \" \' ()[]{} ",
 		gpsTAB[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
 		*gppTAB = gpsTAB+strlen(gpsTAB),
 		gpsNDAT[] = "-bwllqqqqxxxxxxxx";
+int alfLEN( gpeALF alf ) {
+	if( !alf )
+		return 0;
 
+	if( alf <= gpeALF_4 ) {
+		if( alf <= gpeALF_2 ) {
+			if( alf <= gpeALF_Z )
+				return 1;
+			return 2;
+		}
+		if( alf <= gpeALF_3 )
+				return 3;
+		return 4;
+	}
+
+	if( alf <= gpeALF_8 ) {
+		if( alf <= gpeALF_6 ) {
+			if( alf <= gpeALF_5 )
+				return 5;
+			return 6;
+		}
+		if( alf <= gpeALF_7 )
+				return 7;
+		return 8;
+	}
+
+	if( alf <= gpeALF_12 ) {
+		if( alf <= gpeALF_10 ) {
+			if( alf <= gpeALF_9 )
+				return 9;
+			return 10;
+		}
+		if( alf <= gpeALF_11 )
+				return 11;
+		return 12;
+	}
+	if( alf <= gpeALF_13 )
+		return 13;
+	return 14;
+}
 U1* gpf_aALF_init( void ) {
 	for( int i = 0; i < 0x100; i++ )
 	{
@@ -23,21 +63,47 @@ U1* gpf_aALF_init( void ) {
 		}
 		gpaALFsub[i] = 0;
 	}
+	gpmMcpy( gpaALFsub2, gpaALFsub, sizeof(gpaALF_H_sub) );
 	gpmMcpy( gpaALF_H_sub, gpaALFsub, sizeof(gpaALF_H_sub) );
-	gpaALF_H_sub['#'] = ('#'-'E')+('A'-1);
-	gpaALF_H_sub['_'] = ('_'-'E')+('A'-1);
+	gpaALFsub2['\n']	= ('\n'-'E')+('A'-1);
+	gpaALFsub2['\r']	= ('\r'-'E')+('A'-1);
+	gpaALFsub2['+']		= ('+'-'E')+('A'-1);
+	gpaALFsub2['\"']	= ('\"'-'E')+('A'-1);
+	gpaALFsub2[',']		= (','-'E')+('A'-1);
+
+	gpaALF_H_sub['#']	= ('#'-'E')+('A'-1);
+	gpaALF_H_sub['_']	= ('_'-'E')+('A'-1);
 	return gpaALFsub;
 }
+char* gpfSTRdrop( char* p_dst, char* p_str, char* p_end, const char* p_drop ) {
+	if( !p_end )
+		p_end = p_str+gpmSTRLEN(p_str);
+	if( !p_drop )
+		return (char*)gpmSTRnCPY( p_dst, p_str, p_end-p_str );
+	U8 nL;
+	size_t n, m;
+	char* pD = (char*)p_dst;
+	p_str += gpmMIN( p_end-p_str, gpmNINCS(p_str,p_drop) );
+	while( p_str < p_end ) {
+		n = gpmMIN( p_end-p_str, gpmVAN(p_str,p_drop,nL) );
+
+		gpmSTRnCPY( p_dst, p_str, n );
+		p_dst += n;
+		p_str += n;
+		p_str += gpmMIN( p_end-p_str, gpmNINCS(p_str,p_drop) );
+	}
+	*p_dst = 0;
+	return pD;
+}
+
 gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
-	if( p_end < pS )
-	{
+	if( p_end < pS ) {
 		if( ppS )
 			*ppS = (U1*)p_end;
 		return gpeALF_null;
 	}
 
-	if( pS ? !*pS : true )
-	{
+	if( pS ? !*pS : true ) {
 		if( ppS )
 			*ppS = (U1*)pS;
 
@@ -47,8 +113,7 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
 	U8 alf = 0;
 	U1 c, utf;
 
-	while( pS < p_end)
-	{
+	while( pS < p_end) {
 		c = *(U1*)pS;
 		//utf = 0x80;
 		if( (c>>6) == 2 ) { // ha van UTF8 szemét

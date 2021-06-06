@@ -1208,6 +1208,7 @@ public:
             case gpeOPid_stk: /// ,
 				kEND(scp);
 				break;
+			default: break;
 		}
 		return SP;
 	}

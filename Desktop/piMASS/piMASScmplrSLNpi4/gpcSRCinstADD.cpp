@@ -17,7 +17,7 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 		//if( !pBLK )
 		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
 
-		gpROW* pRl = pBLK->pLSTrow();
+		gpROW* pRl = pBLK->pLASTrow();
 		if( !pRl )
 			return pBLK;
 
@@ -28,6 +28,14 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 			case gpeOPid_dimS:
 			case gpeOPid_begin:
 				return srcBLKup( pS, pBLK, opID, mnID );
+			case gpeOPid_sub:
+				///							pRl
+				/// a + b - c == d - e + 	f -
+				pRl->pstOP = opID;
+				pBLK->pNEWrow();
+				return pBLK;
+			case gpeOPid_nop:
+				pBLK->opID = opID;
 			case gpeOPid_add:
 				///							pRl
 				/// a + b - c == d - e + 	f -
@@ -38,7 +46,7 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 					gpBLK	*pBLKm = srcINSTanDalf( pS, NULL, pBLK );
 					if( pBLKm->opIDgrp() == gpeOPid_add )
 					{
-						pRl = pBLKm->pLSTrow();
+						pRl = pBLKm->pLASTrow();
 						pRl->pstOP = opID;
 						pBLKm->pNEWrow();
 						return pBLKm;
@@ -52,7 +60,7 @@ gpBLK* gpcSRC::srcBLKadd( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* 
 						/// IGEN volt alatta ADD
 						///				pRl
 						/// a -	b *		c +
-						pRl = pBLKm->pLSTrow();
+						pRl = pBLKm->pLASTrow();
 						pRl->pstOP = opID;
 						pBLKm->pNEWrow();
 						return pBLKm;
@@ -75,35 +83,35 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
     if(!nR)
         return pBLKm;
 	gpcSRC	*pSRC = NULL;
-	gpROW	*pRa;
-	gpOBJ	*pOa, *pOin = NULL;
-	gpPTR	*pPb = NULL, *pPa;
+	gpROW	*pRi;
+	gpOBJ	*pOi, *pOin = NULL;
+	gpPTR	*pPb = NULL, *pPi;
 	gpeOPid opB, opA;
 	for( I4 iR = 0; iR < nR; opB=opA, iR++ )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOin );
-		opA = pRa->pstOP;
-		if( !pPa )
+		pPi = pBLK->iROWptr( pS, iR, &pRi, &pOi, &pSRC, &pOin );
+		opA = pRi->pstOP;
+		if( !pPi )
 			continue;
 		if( !pPb ) {
-			pPb = pBLK->BLKpPTR( pS )->cpy( pMEM, pPa );
+			pPb = pBLK->BLKpPTR( pS )->cpy( pMEM, pPi );
 			continue;
 		}
 
-		bool 	bSIGa = pPa->cID&((I4)gpeCsz_B),
-				bSIGb = pPb->cID&((I4)gpeCsz_B),
+		bool 	bSIGa = pPi->cID()&((I4)gpeCsz_B),
+				bSIGb = pPb->cID()&((I4)gpeCsz_B),
 				bSIGc = bSIGb|bSIGa;
 
-		U4	nA = gpaCsz[pPa->cID], //pPa->sOF(),
-			nB = gpaCsz[pPb->cID], //pPb->sOF(),
+		U4	nA = gpaCsz[pPi->cID()], //pPa->sOF(),
+			nB = gpaCsz[pPb->cID()], //pPb->sOF(),
 			nMN = gpmMIN(nA,nB),
 			nMX = gpmMAX(nA,nB);
 
 		if(!bSIGa)
 		if(nA<nMX)
 			_xor._q.D0.D0;
-		_move._l.EAl( pPa->iPC ).A0;
-		_move.c((gpeCsz)pPa->cID).IA0I.D0;
+		_move._l.EAl( pPi->iPC ).A0;
+		_move.c((gpeCsz)pPi->cID()).IA0I.D0;
 		if(bSIGa)
 		if(nA<nMX)
 		switch(nA) {
@@ -118,7 +126,7 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 		if(nB<nMX)
 			_xor._q.D1.D1;
 		_move._l.EAl( pPb->iPC ).A0;
-		_move.c((gpeCsz)pPb->cID).IA0I.D1;
+		_move.c((gpeCsz)pPb->cID()).IA0I.D1;
 		if(bSIGb)
 		if(nB<nMX)
 		switch(nB) {
@@ -129,7 +137,7 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 				break;
 		}
 
-		I4 cIDc = pPb->cID;
+		I4 cIDc = pPb->cID();
 		if( !bSIGc ) {
 			switch( nMX ) {
 				case 0:
@@ -168,11 +176,26 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 			case gpeOPid_or:
 				pMEM->inst( opB ).c((gpeCsz)cIDc).D0.D1;
 			break;
-			default: break;
+			default: {
+				switch( opB ) {
+					case gpeOPid_eqLG:
+						_cmp.c((gpeCsz)cIDc).D0.D1;
+						_seq.c((gpeCsz)cIDc).D1;
+						break;
+					case gpeOPid_neqLG:
+						_cmp.c((gpeCsz)cIDc).D0.D1;
+						_sne.c((gpeCsz)cIDc).D1;
+
+						break;
+
+					default: break;
+				}
+				_and.c((gpeCsz)cIDc).EAl(1).D1;
+			} break;
 		}
 
-		pPb->cID = cIDc;
-		I4x2 DMb = pPb->pd2D()->MX( *pPa->pd2D() );
+		pPb->cID(cIDc);
+		I4x2 DMb = pPb->pd2D()->MX( *pPi->pd2D() );
 
 		U4 nC = pMEM->nALL(pPb->iPC);
 		if( nC < nMX ) {
@@ -183,7 +206,7 @@ gpBLK* gpcSRC::srcINSTadd( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 			pPb->iPC = pMEM->iALL( pPb->sOF() );
 		}
 		_move._l.EAl( pPb->iPC ).A0;
-		_move.c((gpeCsz)pPb->cID).D1.IA0I;
+		_move.c((gpeCsz)pPb->cID()).D1.IA0I;
 
 
 	}

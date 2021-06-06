@@ -18,7 +18,7 @@ gpcCRS::~gpcCRS() {
 	//dtor
 	gpmDELary(pCp);
 }
-I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
+I4x4 gpcCRS::scnZNCR(	gpcWIN& win,
 						gpcMASS& mass, const I4x2& _xy, U1 srcDIV )
 {
 
@@ -75,8 +75,7 @@ I4x4 gpcCRS::scnZNCR(	gpcWIN& win, //U1 iDIV,
 }
 
 
-void gpcCRS::CRSstpCL( //gpcWIN& win,
-						gpcMASS* pMASS, U1 stp, bool bSH, bool bCT )
+void gpcCRS::CRSstpCL( gpcMASS* pMASS, U1 stp, bool bSH, bool bCT )
 {
 	// ha van shift akkor a 2. cursort mozgatja
 	if( !this )
@@ -122,7 +121,7 @@ void gpcCRS::CRSstpCL( //gpcWIN& win,
 	iSTR.x = apSRC[1]->iPUB();
 	iSTR.y = apSRC[1]->n_ld_add();
 }
-void gpcCRS::CRSstpED( //gpcWIN* pWIN, gpcMASS* pMASS,
+void gpcCRS::CRSstpED(
 						U1 stp, bool bSH, bool bCT )
 {
 	// ha van shift akkor a 2. cursort mozgatja

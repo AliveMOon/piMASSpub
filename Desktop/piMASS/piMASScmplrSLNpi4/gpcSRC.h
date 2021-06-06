@@ -29,7 +29,9 @@
 class gpcRES;
 class gpcCRS;
 class gpcWIN;
+class gpcGL;
 class gpCORE;
+class gpDBlst;
 class gpMEM;
 //#include "gpcres.h"
 
@@ -310,7 +312,13 @@ inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false ) {
 
 	return pS-pU;
 }
-
+inline U8 gpfVANnNINCS( const U1* pSTR, const U1* pVAN ) {
+	U8 nLEN;
+	U1* pS = (U1*)pSTR;
+	pS += gpfVAN( pS, pVAN, nLEN );
+	pS += gpmNINCS( pS, pVAN );
+	return pS-pSTR;
+}
 inline U4x2 lenMILL( U4x2 pos, U4x4&crn, U1* pUi, U1* pUie ) {
 	for( ; pUi < pUie; pUi++ )
 	{
@@ -536,14 +544,20 @@ U8 inline gpfSTR2U8( void* pV, void* ppV = NULL ) {
 		*(char**)ppV = p_str;
 	return u8;
 }
-I8 inline gpfSTR2I8( void* pV, void* ppV = NULL ) {
+I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL, bool bHEX = false ) {
 	if( !pV )
 		return 0;
 
 	char *p_str = (char*)pV;
 	U8 nLEN;
-    p_str += gpmVAN(p_str, "+-0123456789xXbBdD", nLEN );
-	I8 i8 = strtol( p_str, &p_str, 10 );
+	int n0 = gpmVAN(p_str, (bHEX ? "+-0123456789aAbBcCdDeEfF": "+-0123456789xXbBdD"), nLEN ), n1;
+	if( pSTOP ) {
+		n1 = gpmVAN(p_str, (char*)pSTOP, nLEN );
+		if(n0>n1)
+			n0=n1;
+	}
+    p_str += n0;
+	I8 i8 = strtol( p_str, &p_str, bHEX ? 16 : 10 );
 	if( !i8 )
 	{
 		switch( *(U1*)p_str )
@@ -729,8 +743,7 @@ public:
 
 	gpcSCOOP(){ gpmCLR; };
 
-	bool bGD( U1* pUTF, U1** ppUe )
-	{
+	bool bGD( U1* pUTF, U1** ppUe ) {
 		U8	hs2 = 0;
 		U4	i = 0;
 		while( pUTF[i] )
@@ -747,8 +760,7 @@ public:
 		return false;
 	}
 
-	void rst( U1* pUTF )
-	{
+	void rst( U1* pUTF ) {
 		lzyMiN.lzyRST();
 
 		lzyDCT.rst();
@@ -823,9 +835,9 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
 
-		lzyLiNK.lzyADD( &rLNK, sizeof(rLNK), nU = -1, -1 );
+		lzyLiNK.lzyADD( &rLNK, sizeof(rLNK), nU = -1 );
 		return nMN();
 	}
 	U4 STRadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
@@ -842,7 +854,7 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
 		return nMN();
 	}
 	U4 NOTEadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
@@ -859,7 +871,7 @@ public:
 		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
-		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1, -1 );
+		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
 		return nMN();
 	}
 };
@@ -897,8 +909,8 @@ public:
 
 		return *this;
 	}
-	U4 sOF() { return this ? pPTR()->sOF() : NULL; }
-	I4 cID() { return pPTR() ? pPTR()->cID : gpeCsz_OFF; }
+	U4 sOF();
+	I4 cID(); // { return pPTR() ? pPTR()->cID : gpeCsz_OFF; }
 	I4x2* pd2D() {
 		if( !this )
 			return 0;
@@ -906,39 +918,17 @@ public:
 	}
 
 	bool bARY(){ return pd2D()->area() > 1; }
-	bool bUTF8()
-	{
+	bool bUTF8() {
 		if( cID() != gpeCsz_b )
 			return false;
 		return bARY();
 	}
 	bool bAN() { return this? cAN == gpeCsz_c:false; }
 	bool bALF() { return this? cAN == gpeCsz_a:false; }
-
-
-	/*I4 REcID( I4 c )
-	{
-        if( !this )
-            return gpeCsz_OFF;
-		cid = c;
-		sof = 0;
-		return cid;
-	}
-	gpOBJ* movREF( gpOBJ* pB )
-	{
-		if( this ? !pB : true )
-			return this;
-		if( dctID == pB->dctID )
-			return this;
-
-		cid = pB->cID();
-		sof = pB->sOF();
-
-		d2D = pB->d2D;
-		iPC = pB->iPC;
-		return this;
-	}*/
-
+	I8 iVAR();
+	bool bVAR();
+	I8 iFUN();
+	bool bFUN();
 
 };
 
@@ -948,8 +938,7 @@ public:
 	gpeOPid	preOP, pstOP;
 
 	gpROW(){};
-	gpROW* operator = ( gpOBJ& O )
-	{
+	gpROW* operator = ( gpOBJ& O ) {
 		if( !this )
 			return this;
 		if( &O )
@@ -960,8 +949,7 @@ public:
 			mnID*=-1;
 		return this;
 	}
-	gpROW* operator = ( gpOBJ* pO )
-	{
+	gpROW* operator = ( gpOBJ* pO ) {
 		return (*this = *pO);
 	}
 
@@ -1009,7 +997,7 @@ public:
 		{
 			if( !bADD )
 				return NULL;
-			gpROW* pRl = pLSTrow();
+			gpROW* pRl = pLASTrow();
 			if( pRl )
 			if( pRl->pstOP == gpeOPid_nop )
 				return pRl;
@@ -1018,8 +1006,8 @@ public:
 
 		return ((gpROW*)gpmLZYvali( gpROW, &lzyROW )) + iR;
 	}
-	gpROW* pLSTrow() { return pROW(iLAST()); }
-	gpROW* pLSTrow( char* pS, gpOBJ* pO, I4 mnID ) {
+	gpROW* pLASTrow() { return pROW(iLAST()); }
+	gpROW* pLASTrow( char* pS, gpOBJ* pO, I4 mnID ) {
 		gpROW* pRl = pROW(iLAST());
 		if( !pRl )
 			return NULL;
@@ -1040,8 +1028,11 @@ public:
 	};
 	gpBLK* pRST( gpMEM* pMEM );
 
-	gpPTR* iROWptr( char* pS, U4 i, gpOBJ** ppO, gpROW** ppR, gpcSRC** ppSRC = NULL, gpOBJ** ppOin = NULL );
-	gpBLK* instFUN( gpeALF alf, gpBLK *pARG );
+	gpBLK* iROWblk( char* pS, I4 i, gpROW** ppR );
+	gpPTR* iROWptr( char* pS, I4 i, gpROW** ppR, gpOBJ** ppO, gpcSRC** ppSRC = NULL, gpOBJ** ppOin = NULL );
+	gpPTR* instFUN( char* pS, I8x2& AN, gpBLK *pARG );
+
+
 	// gpPTR* moveAB( gpROW* pRdst, gpPTR* pPsrc );
 	// gpPTR* subAB( char* pS, gpPTR* pPa, gpROW* pRb, bool bADD );
 };
@@ -1210,16 +1201,49 @@ public:
 };
 class gpGL{
 public:
+	I4x4		trgWH;
 	I4			aPICid[0x10],
 				aBOBid[0x10];
 	gpcPIC		*apPIC[0x10],
-				*apBOB[0x10];
+				*apBOB[0x10],
+				*pTRG;
+	gpcLZY		lzyCNL, lzyVTX, lzyPIX;
+	U4 			nCNL, mskPIC, nBLD;
 	gpcPICAM	*pCAM;
-	SDL_Texture* apTX[0x10];
+	SDL_Texture	*apTX[0x10];
+	char		*pVTX, *pPIX;
+	char* VTX( char* pVX ) {
+		if( pVX ? !*pVX : true )
+			return pVTX;
+		U8 nLEN, s = 0;
+		pVX += gpmNINCS( pVX, "\"");
+		U4 nVX = gpmVAN(pVX,"\"",nLEN);
+		lzyVTX.lzyADD( pVX, nVX, s = 0 );
+
+		return pVTX = (char*)lzyVTX.p_alloc;
+	}
+
+	char* PIX( char* pPX ) {
+		if( pPX ? !*pPX : true )
+			return pPIX;
+		U8 nLEN, s = 0;
+		pPX += gpmNINCS( pPX, "\"");
+		U4 nPX = gpmVAN(pPX,"\"",nLEN);
+		lzyPIX.lzyADD( pPX, nPX, s = 0 );
+
+		return pPIX = (char*)lzyPIX.p_alloc;
+	}
 	gpGL(){ gpmCLR; };
 	~gpGL(){
 		gpmDEL(pCAM);
 	};
+	U4 nBUILD() {
+		if( !this )
+			return 0;
+		mskPIC = nCNL = 0;
+		nBLD++;
+		return nBLD;
+	}
 };
 class gpCTRL{
 public:
@@ -1229,11 +1253,640 @@ public:
 
 	};*/
 };
+/// CCR XNZVC
+class gpDBlst;
+
+class gpDBitm {
+public:
+	I8 mID, ID;
+	gpcLZY	atLST,
+			voidLST;
+	gpDBitm(){};
+	~gpDBitm(){};
+	gpDBitm* read( gpDBlst *pIDlst );
+	gpDBitm* store( gpDBlst *pIDlst, I8x2* pAT, void* pVAR );
+	gpDBitm& null(){
+		/// ha lesz valami törölni való
+		gpmCLR;
+		return *this;
+	}
+	size_t sOF( gpeALF b );
+	U1* fndXB( gpeALF b ) {
+		I8x4* pA0 = (I8x4*)atLST.Ux( 0, sizeof(*pA0) );
+		I4 iA = 0;
+		for( I4 nA = atLST.nLD(sizeof(*pA0)); iA < nA; iA++ ) {
+			if( pA0[iA].a8x2[0].b != b )
+				continue;
+			return voidLST.Ux( pA0[iA].a8x2[1].x, pA0[iA].a8x2[1].y, true, 1 );
+		}
+		return NULL;
+	}
+
+	U1* fndAB( I8x2& ab ) {
+		I8x4* pA0 = (I8x4*)atLST.Ux( 0, sizeof(*pA0) );
+		I4 iA = 0;
+		for( I4 nA = atLST.nLD(sizeof(*pA0)); iA < nA; iA++ ) {
+			if( pA0[iA].a8x2[0] != ab )
+				continue;
+			return voidLST.Ux( pA0[iA].a8x2[1].x, pA0[iA].a8x2[1].y, true, 1 );
+		}
+		return NULL;
+	}
+	U1* pAB( I8x2& ab, size_t& n ) {
+		U1* pU = fndAB( ab );
+		n = sOF(ab.b);
+		if( pU )
+			return pU;
+
+
+		I8x4* pA0 = NULL;
+		I4 nA = atLST.nLD(sizeof(*pA0));
+		pA0 = (I8x4*)atLST.Ux( nA, sizeof(*pA0) );
+		if( !pA0 )
+			return NULL;
+
+		pA0->a8x2[0] = ab;
+		pA0->a8x2[1].x = voidLST.nLD();
+		pA0->a8x2[1].y = n;
+		return voidLST.Ux( pA0->a8x2[1].x, pA0->a8x2[1].y, true, 1 );
+	}
+	I4x4* fndXYR( gpeALF alf ) {
+		if( !this )
+			return NULL;
+		I8x2 ab( alf, gpeALF_XYR );
+		return (I4x4*)fndAB( ab );
+	}
+};
+class gpDBlst {
+public:
+	char	sPATH[0x400], *pF;
+	I8		newID;
+	I4		aixITMsel[2], iSW;
+	gpDBitm	itmSEL;
+	gpcLZY	itmLST;
+	gpMEM*	pMEM;
+	gpDBlst(){};
+	gpDBlst( gpMEM* pM, char* pU1, U2 nU1 ) {
+		gpmCLR;
+		pMEM = pM;
+		pF = sPATH+nU1;
+		gpmMcpy( sPATH, pU1, nU1 );
+	}
+	~gpDBlst(){
+		gpDBitm* pITM = (gpDBitm*)itmLST.p_alloc;
+		if( !pITM )
+			return;
+
+		for( I4 i = 0, n = itmLST.nLD(sizeof(gpDBitm)); i < n; i++ )
+			pITM[i].null();
+	}
+	gpDBitm* pITM( I4 ix = 0 ) {
+		U4 n = itmLST.nLD(sizeof(gpDBitm));
+		gpDBitm* pI = this ? (gpDBitm*)itmLST.Ux( ix, sizeof(*pI) ) : NULL;
+		if( !pI )
+			return NULL;
+		if( ix < n )
+			return pI;
+		pI->mID = pI->ID = newID;
+		++newID;
+		pI->read( this );
+		return pI;
+	}
+	gpDBitm* pITMid( I8 id ) {
+		U4 n = itmLST.nLD(sizeof(gpDBitm));
+		if( n ? (id>=newID): true)
+			return NULL;
+		gpDBitm* pI = this ? (gpDBitm*)itmLST.Ux( 0, sizeof(*pI) ) : NULL;
+		if( !pI )
+			return NULL;
+		for( U4 i = 0; i < n; i++ ) {
+			if( pI[i].ID == id )
+				return pI+i;
+		}
+		return NULL;
+	}
+	int nITM() { return itmLST.nLD(sizeof(gpDBitm)); }
+};
+
+
+class gpc3Dly;
+class gpc3Dlst;
+
+class gpc3Dtri {
+public:
+	U4 prt;
+	gpcLZY	p,l,t,
+			srf;
+	U4x4 aIIXN[4];
+
+	gpc3Dtri(){};
+	gpc3Dtri* null() {
+		p.null();
+		l.null();
+		t.null();
+		srf.null();
+	}
+	U4 nSRF() {
+		if( !this )
+			return 0;
+		U4 n = srf.nLD(sizeof(U4x4));
+		return n>1 ? n-1 : 0;
+	}
+	U4x4* pSRF( U4 s ) {
+		if( s >= nSRF() )
+			return NULL;
+
+		return srf.pU4x4n( s );
+	}
+	U4x4* pSRFadd( U4 s ) {
+		if( !this )
+			return NULL;
+
+		U4x4* pS = srf.pU4x4n( srf.nLD(sizeof(*pS)) );
+		*pS = U4x4( s, p.nLD(sizeof(U4)), l.nLD(sizeof(U4)), t.nLD(sizeof(U4)) );
+		return pS;
+	}
+	~gpc3Dtri(){
+		null();
+	};
+};
+class gpc3Dsrf {	///B
+public:
+	char sNAME[0x100],
+		 sPIC[0x100], //,sALF[0x100],
+		 sVMAP[0x100];
+	I4 imag, imap, ix;
+	I8x2 an;
+	gpc3Dsrf(){};
+};
+class gpc3D {
+	gpcLZY	lzySRF,
+			rstMX;
+public:
+	char sPATH[gpdMAX_PATH];
+	I8x4 id;
+
+	gpcLZY	*p_lwo,
+			ly3D,
+			tgIX;
+
+	~gpc3D(){
+		gpmDEL(p_lwo);
+	}
+	gpc3D( I4 i, const char* pP, gpeALF alf ) {
+		gpmCLR;
+		U8 nLEN;
+		id.x = i;
+		id.a8x2[0].b = alf;
+		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
+		gpmSTRCPY( sPATH, pP );
+	}
+	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
+	U4 nLY();
+	gpc3Dly* pLYix( U4 i );
+	gpc3D* prt2ix( gpcGL* pGL );
+	U4 nSRF() { return this ? lzySRF.nLD(sizeof(gpc3Dsrf)) : 0; }
+	gpc3Dsrf* pSRFi( U4 i );
+	gpc3Dsrf* pSRFadd( U4 i );
+	U4 nMX() {
+		return this ? rstMX.nF4x4() : 0;
+	}
+	F4x4* pMX( U4 n ) {
+		if( !n )
+			return rstMX.pF4x4( 0 );
+		F4x4* pMX = rstMX.pF4x4n(0,n);
+		return rstMX.pF4x4( 0 );
+	}
+};
+
+class gpc3Dact {
+public:
+	float	b, e, start, mix, fade, gim, loop, long_s;
+	I8		begin_ms, end_ms, start_ms, loop_ms, long_ms;
+	gpc3Dact(	float _begin, float _end,
+			float _start, float _mix,
+			float _fade, float _gim, float _loop )
+	{
+		b		= _begin;
+		e		= _end;
+		start	= _start;
+		mix		= _mix;
+		fade	= _fade;
+		gim		= _gim;
+		loop	= _loop;
+
+		long_ms = (I8)((long_s = e-b)*ms2sec);
+		begin_ms = (I8)(b*ms2sec);
+		end_ms = (I8)(e*ms2sec);
+		loop_ms = (I8)(loop*ms2sec);
+		start_ms = ((I8)(start-b))*ms2sec;
+	}
+	float sec( I8 ms ) const {
+		float sec = 0.0;
+		ms += start_ms; // - begin_ms;
+
+		if( ms < long_ms )
+			sec = float(ms)/float(ms2sec);
+		else if( end_ms <= loop_ms )
+			sec = long_s;
+		else
+			sec = float(ms%long_ms)/float(ms2sec);
+
+		return sec + b;
+	}
+};
+typedef enum gpeACT : int {
+	gpeACT_DEF,
+	gpeACT_IDLE,	// <BEGIN>  1.0 <END> 31.0 <START>  1.0 <MIX>  0.0  <FADE> 0.25 <GIM> 1.0 <LOOP> 1.0 <ENDTRACK>
+	gpeACT_WALK,	// <BEGIN> 32.5 <END> 34.5 <START> 32.5 <MIX> 33.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 33.0 <ENDTRACK>
+	gpeACT_RUN,		// <BEGIN> 36.5 <END> 38.5 <START> 36.5 <MIX> 38.5  <FADE> 0.5  <GIM> 0.3 <LOOP> 37.0 <ENDTRACK>
+	gpeACT_JUMP,	// <BEGIN> 40.0 <END> 42.0 <START> 40.0 <MIX> 41.5  <FADE> 0.5  <GIM> 0.3 <STOP> <ENDTRACK>
+	gpeACT_SLEFT,	// <BEGIN> 43.0 <END> 45.0 <START> 43.0 <MIX> 44.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 43.0 <ENDTRACK>
+	gpeACT_SRIGHT,	// <BEGIN> 46.0 <END> 48.0 <START> 46.0 <MIX> 47.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 46.0 <ENDTRACK>
+	gpeACT_FLINCH,	// <BEGIN> 49.0 <END> 52.0 <START> 49.5 <MIX> 51.5  <FADE> 0.5  <GIM> 0.5 <LOOP> 50.0 <ENDTRACK>
+	gpeACT_BOX,		// <BEGIN> 53.0 <END> 54.0 <START> 53.0 <MIX> 53.75 <FADE> 0.25 <GIM> 0.1 <LOOP> 53.0 <ENDTRACK>
+	gpeACT_KICK,	// <BEGIN> 55.0 <END> 56.0 <START> 55.0 <MIX> 55.5  <FADE> 0.5  <GIM> 0.1 <LOOP> 55.0 <ENDTRACK>
+	gpeACT_ABOARD,	// <BEGIN> 57.0 <END> 58.0 <START> 57.0 <MIX> 57.75 <FADE> 0.25 <GIM> 0.2 <STOP> <ENDTRACK>
+	gpeACT_DEBUS,	// <BEGIN> 58.0 <END> 60.0 <START> 58.0 <MIX> 60.0  <FADE> 0.25 <GIM> 0.2 <STOP> <ENDTRACK>
+	gpeACT_STOW,	// <BEGIN> 61.0 <END> 61.5 <START> 61.0 <MIX> 61.5  <FADE> 0.25 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_STOWUP,	// <BEGIN> 61.5 <END> 62.0 <START> 61.5 <MIX> 62.0  <FADE> 0.25 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_WHAM,	// <BEGIN> 63.0 <END> 64.0 <START> 63.0 <MIX> 63.75 <FADE> 0.25 <GIM> 0.1 <LOOP> 63.0 <ENDTRACK>
+	gpeACT_KO,		// <BEGIN> 65.0 <END> 69.0 <START> 65.0 <MIX> 68.9  <FADE> 0.01 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_ERECT,	// <BEGIN> 69.0 <END> 74.0 <START> 69.0 <MIX> 73.9  <FADE> 0.5  <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_END,
+} gpeACT_int;
+static const   gpc3Dact gpaACT_man[] = {
+	//			begin,	end,	start,	mix,	fade,	gim,		loop
+	gpc3Dact(	  0.0,	1.0,	 0.0,	 0.0,	0.25,	1.0,		0.0		),	//GPE_ACTION_DEF,
+	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_IDLE,
+	gpc3Dact(	 32.0,	34.0,	32.5,	33.5,	0.5,	1.0,		32.0	),	//GPE_ACTION_WALK,
+	gpc3Dact(	 36.5,	38.5,	36.5,	38.5,	0.5,	0.3,		37.0	),	//GPE_ACTION_RUN,
+	gpc3Dact(	 40.0,	42.0,	40.0,	41.5,	0.5,	0.3,		42.0	),	//GPE_ACTION_JUMP,
+	gpc3Dact(	 43.0,	45.0,	43.0,	44.5,	0.5,	1.0,		43.0	),	//GPE_ACTION_SLEFT,
+	gpc3Dact(	 46.0,	48.0,	46.0,	47.5,	0.5,	1.0,		46.0	),	//GPE_ACTION_SRIGHT,
+	gpc3Dact(	 49.0,	51.0,	49.5,	51.5,	0.5,	0.5,		49.0	),	//GPE_ACTION_FLINCH,
+	gpc3Dact(	 53.0,	54.0,	53.0,	53.75,	0.25,	0.1,		54.0	),	//GPE_ACTION_BOX,
+	gpc3Dact(	 55.0,	56.0,	55.0,	55.5,	0.5,	0.1,		56.0	),	//GPE_ACTION_KICK,
+	gpc3Dact(	 57.0,	58.0,	57.0,	57.75,	0.25,	0.2,		58.0	),	//GPE_ACTION_ABOARD,
+	gpc3Dact(	 58.0,	60.0,	58.0,	60.0,	0.25,	0.2,		60.0	),	//GPE_ACTION_DEBUS,
+	gpc3Dact(	 61.0,	61.5,	61.0,	61.5,	0.25,	0.1,		61.5	),	//GPE_ACTION_STOW,
+	gpc3Dact(	 61.5,	62.0,	61.5,	62.0,	0.25,	0.1,		62.0	),	//GPE_ACTION_STOWUP,
+	gpc3Dact(	 63.0,	64.0,	63.0,	63.75,	0.25,	0.1,		64.0	),	//GPE_ACTION_WHAM,
+	gpc3Dact(	 65.0,	69.0,	65.0,	68.9,	0.01,	0.1,		69.0	),	//GPE_ACTION_KO,
+	gpc3Dact(	 69.0,	74.0,	69.0,	73.9,	0.5,	0.1,		74.0	),	//GPE_ACTION_ERECT,
+};
+
+static const char gp_man_lws[] =
+	"manus\n"
+	"bone_mother\n"
+	"bone_groin\n"
+	"bone_waist\n"
+	"bone_throax\n"
+
+	"bone_l.upperarm\n"
+	"bone_l.forearm\n"
+	"bone_l.hand\n"
+
+	"bone_r.upperarm\n"
+	"bone_r.forearm\n"
+	"bone_r.hand\n"
+
+	"bone_l.thigh\n"
+	"bone_l.shin\n"
+	"bone_l.feet\n"
+
+	"bone_r.thigh\n"
+	"bone_r.shin\n"
+	"bone_r.feet\n"
+
+	"bone_neck\n"
+	"bone_head\n\0";
+
+
+static const char gp_s_lws[] =
+		"LoadObjectLayer\n"
+		"AddBone\n"
+		"AddNullObject\n"
+		"AddLight\n"
+		"AddCamera\n"
+		"NumChannels\n"
+		"Channel\n"
+		"{\n"
+		"Envelope\n"
+		"Key\n"
+		"}\n"
+		"ParentItem\n"
+		"BoneName\n"
+		"BoneRestPosition\n"
+		"BoneRestDirection\n"
+		"BoneRestLength\n"
+		"Plugin\n"
+		"EndPlugin\n"
+		;
+
+typedef enum GPE_LWS_COM:int {
+		GPE_LWS_COM_LoadObjectLayer,
+		GPE_LWS_COM_AddBone,
+		GPE_LWS_COM_AddNullObject,
+		GPE_LWS_COM_AddLight,
+		GPE_LWS_COM_AddCamera,
+		GPE_LWS_COM_NumChannels,
+		GPE_LWS_COM_Channel,
+		GPE_LWS_COM_C_open,
+		GPE_LWS_COM_Envelope,
+		GPE_LWS_COM_Key,
+		GPE_LWS_COM_C_close	,
+		GPE_LWS_COM_ParentItem,
+		GPE_LWS_COM_BoneName,
+		GPE_LWS_COM_BoneRestPosition,
+		GPE_LWS_COM_BoneRestDirection,
+		GPE_LWS_COM_BoneRestLength,
+		GPE_LWS_COM_Plugin,
+		GPE_LWS_COM_EndPlugin,
+} GPT_LWS_COM;
+typedef enum GPE_LWS_iTYP:U4 {
+	gpeLWSiTYP_OBJ = 0x10000000,
+	gpeLWSiTYP_LIG = 0x20000000,
+	gpeLWSiTYP_CAM = 0x30000000,
+	gpeLWSiTYP_BON = 0x40000000,
+	gpeLWSiTYP_TYP = 0xF0000000,
+} GPT_LWS_iTYP;
+class gpc3Dkey {
+public:
+	float val, sec; int spn;
+	float aP[6];
+	gpc3Dkey(){};
+	gpc3Dkey( const char* pS ){
+		gpmCLR;
+		*this = pS;
+	};
+	gpc3Dkey& operator = ( const char* pS );
+	float operator * ( float s ) {
+			if( s == sec )
+				return val;
+			if( this[1].sec<=s )
+				return this[1].val;
+			if( this[1].val==val )
+				return val;
+
+			return	   (this[1].val-val)
+					* ((s-sec)/(this[1].sec-sec))
+					+ val;
+	}
+	size_t sOUT( char* pBUFF, const char* pEND = "\r\n" );
+};
+class gpc3Dcnl {
+public:
+	gpcLZY aKEY[9];
+	U4 nKEY( U1 c ) { return c > 8 ? 0 : (this ? aKEY[c].nLD(sizeof(gpc3Dkey)): 0); }
+	float valKEYs( U1 c, float s );
+	gpc3Dkey* pKEYins( U1 c, float s );
+};
+
+//#include <ctime>
+static const I8 gpaMONTH[] = {
+			// 2012
+			31,
+			29+31,				//29
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2013
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2014
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2015
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			};
+
+class gpcTIME {
+public:
+	I8	year,
+		mounth,
+		day,
+		hour,
+		minute,
+		sec,
+		msec;
+
+	gpcTIME( void ) { gpmCLR; }
+	I8 get_msec( bool b_touch = false ) {
+		std::time_t t = std::time(0);   // get time now
+		std::tm* now = std::localtime(&t);
+
+		year = (now->tm_year+1900) - 2012; //local_time.wYear-2012;
+		mounth = year*12 + now->tm_mon; // local_time.wMonth;
+		day =	year*365 + (year/4) + 1
+				+ gpaMONTH[(year%4)*12 + now->tm_mon] + now->tm_mday;
+
+		hour = day*24 + now->tm_hour; //local_time.wHour;
+		minute = hour*60  + now->tm_min; //+ local_time.wMinute;
+		sec = minute*60   + now->tm_sec; //+ local_time.wSecond;
+
+		return msec = sec*ms2sec;
+	}
+};
+
+
+class gpc3Ditm {
+	gpc3D*		p_3D;
+public:
+	char sNAME[0x100];
+	U4	itmIX,	itmID,
+		momIX,	momID,
+		trgID,	layID,
+		mxIX,	nLEV,
+		nNAME,	stkIX;
+	F4  	rstXYZ, rstYPR, rstWHD;
+
+	// TRACK -----------------
+	F4x4	mxL, mxW, mxiW;
+	float sec; gpeACT ACT;
+
+	gpc3Dcnl	cnl;
+	gpcLZY	bonLST;
+	bool	bNULL;
+
+
+	gpc3Ditm(){};
+	gpc3D* p3D( gpcGL* pGL, const char* pP, char *pF );
+	char* pNAME( char* pN = NULL ) {
+		if( !this )
+			return NULL;
+		if( !pN )
+			return sNAME+nNAME;
+		U8 s;
+		pN += gpmNINCS(pN," \t\"");
+		U4 n = gpmVAN(pN," \t\"\r\n",s);
+		gpmMcpy( sNAME, pN, n )[n] = 0;
+
+		char* pCH = strrchr(sNAME,'/');
+		nNAME = pCH ? pCH - sNAME : 0;
+		if( sNAME[nNAME] == '/' )
+			nNAME++;
+
+		return sNAME+nNAME;
+	}
+	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
+	U4* pBONadd( gpc3Ditm* pBON = NULL );
+	F4x4* pMXl( float s );
+};
+
+class gpc3Dgym {
+	public:
+	char sPATH[gpdMAX_PATH], *pFILE,
+		 sPUB[gpdMAX_PATH], *pPUB;
+	I8x4 id;
+
+	I4x4	olcb;
+	gpcLZY	*p_lws,
+			itmLST;
+
+	U4 n3Ditm() { return this ? itmLST.nLD(sizeof(gpc3Ditm)) : 0; }
+	gpc3Ditm* p3DitmADD( U4 i, U4 id );
+	gpc3Ditm* p3Dii( U4 i );
+	~gpc3Dgym(){
+		gpmDEL(p_lws);
+	}
+	gpc3Dgym( I4 i, const char* pP, gpeALF alf );
+	gpc3Dgym* pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT );
+};
+class gpc3Dlst {
+public:
+	gpcLZY lst3D;
+	gpcLZYdct bnDCT, lwsDCT;
+	gpcLZY lst3Dgym;
+
+	~gpc3Dlst(){
+		gpc3D **pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
+		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			gpmDEL( pp3D[i3D] );
+		}
+
+		gpc3Dgym **pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( 0, sizeof(gpc3Dgym*) );
+		//I4
+		i3D = 0, e3D = lst3Dgym.nLD(sizeof(gpc3Dgym*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			gpmDEL( pp3Dgym[i3D] );
+		}
+	}
+	gpc3Dlst();
+	gpc3D* p3Dix( I4 i ) {
+		if( i < 0 ) return NULL;
+		gpc3D* p3D = ((gpc3D**)lst3D.Ux(i,sizeof(gpc3D*)))[0];
+		return p3D;
+	}
+	gpc3D* p3D( gpeALF alf, const char* pP ) {
+		if( !this )
+			return NULL;
+
+		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );//, *p3D;
+		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			if( !pp3D[i3D] ) {
+				if( e3D > i3D )
+					e3D = i3D;
+				continue;
+			}
+			if( pp3D[i3D]->id.a8x2[0].a != alf )
+				continue;
+			return pp3D[i3D];
+		}
+		pp3D = (gpc3D**)lst3D.Ux( e3D, sizeof(gpc3D*) );
+		pp3D[0] = new gpc3D( e3D, pP, alf );
+		return pp3D[0];
+	}
+
+	/// TRACK
+	gpc3Dgym* p3DgymADD( gpeALF alf, const char* pP ) {
+		if( !this )
+			return NULL;
+
+		gpc3Dgym **pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( 0, sizeof(gpc3Dgym*) );//, *p3D;
+		I4 i3D = 0, e3D = lst3Dgym.nLD(sizeof(gpc3Dgym*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			if( !pp3Dgym[i3D] ) {
+				if( e3D > i3D )
+					e3D = i3D;
+				continue;
+			}
+			if( pp3Dgym[i3D]->id.a8x2[0].a != alf )
+				continue;
+			return pp3Dgym[i3D];
+		}
+		pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( e3D, sizeof(gpc3Dgym*) );
+		pp3Dgym[0] = new gpc3Dgym( e3D, pP, alf );
+		return pp3Dgym[0];
+	}
+	gpc3Dgym* p3DgymIX( I4 i ) {
+		if( this ? i < 0 : true )
+			return NULL;
+		gpc3Dgym** pp3Dgym = ((gpc3Dgym**)lst3Dgym.Ux(0,sizeof(gpc3Dgym*)));
+		return pp3Dgym[i];
+	}
+};
+class gpc3Dtrk {
+public:
+	I8 mSEC; gpeACT ACT;
+
+	gpc3Dtrk(){}
+	F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act );
+
+};
 class gpMEM {
 public:
 	I8x2 	aA[0x10];
-	I8		*pA, *pD;
-	double	aF[0x10];
+	I8		*pA, *pD, i8;
+	double	aF[0x10], d8;
 	gpcLZY	lzyMEM,
 			lzyOBJ,
 			lzyCLASS,
@@ -1244,28 +1897,31 @@ public:
     gpcLZYdctBIN    lzyDCTbin;
 
 	I4		nCD, nXFND,
-			iSTK,nDAT,nINST, pc, pcCPY;
+			iSTK,nDAT,nINST,
+			pc, pcCPY;
 	U4		msRUN, nDCTscp, nDCTbin;
+	gpeCCR	ccr;
+
 	gpINST	*pINST;
 	gpcWIN	*pWIN;
 	gpcMASS	*pMASS;
 	gpcSRC	*pSRC;
-	gpGL	*pGL;
+	gpGL	*pMgl;
+	gpcGL	*pWgl;
 	gpCTRL	*pCTRL;
 
 	I4x4	*pFREE, *pALLOC;
 	U4		nFREE, nALLOC;
-
 	~gpMEM() {
 		gpmDEL( pLZYsrcXFNDall);
-		gpmDEL( pGL );
+		gpmDEL( pMgl );
 		gpmDELary(pFREE);
 		gpmDELary(pALLOC);
 	}
 	gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i = 0x2000 );
 	gpOBJ* OBJfnd( I4 dctID );
 	gpOBJ* OBJadd( char* pS, I4 dctID );
-	U1*	pUn( I4 iPC, U4 nU1 = 0x100 ) {
+	U1*	pUn( I4 iPC = 0, U4 nU1 = 0x100 ) {
 		if( this ? iPC < 0 : true )
 			return NULL;
 		return lzyMEM.Ux( iPC, nU1, true, sizeof(U1) );
@@ -1276,7 +1932,8 @@ public:
 	I4 iFREE( I4 iPC );
 	I4 iALL( U4 nA );
 
-	gpPTR* pPTR( I4 iPC ) { return (gpPTR*)pUn( iPC, sizeof(gpPTR)); }
+	gpPTR* pPTR( I4 i ) { return (gpPTR*)pUn( i, sizeof(gpPTR)); }
+	gpPTR* pPTRu1( I4 i ) { return pPTR( i )->pPTRu1( this ); }
 
 	gpOBJ* getOBJptr( U1* pU1, U4 nBYTE, I4 nmID );
 
@@ -1307,10 +1964,16 @@ public:
 
 	gpINST* instRDY( gpcLZY* pDBG );
 	gpINST* instALU();
-	U1*		instVAR( U1* p_dst, gpINST& inst );
+	U1*		instJSR( U1* p_dst, gpINST& inst );
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
 	I4		instDOitSLMP( gpcGT* pGT );
+	I4		instDOitGSM( gpcGT* pGT );
 
+	gpcLZY* memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 );
+	void	funPRINT();
+
+	void	funFND();
+	void	funNEW();
 };
 
 class gpcSRC {
@@ -1327,11 +1990,9 @@ public:
 
     gpeALF	*pALFtg;
 
-    gpcRES	*pEXE0,
-			*apOUT[4];
+    //gpcRES	*apOUT[4];
 
-	gpcLZY	*pMINI, *pDBG,
-			*pABI;
+	gpcLZY	*pMINI, *pDBG;
 
 	gpcMAP	*pMAP;
 
@@ -1346,7 +2007,7 @@ public:
 	gpOBJ* srcOBJadd( char* pS, I4 dctID );
 	gpBLK* srcBLKnew( char* pS, gpeOPid opID, gpROW* pRml, I4 bIDm, I4 bIDmR, I4 mnID  );
 	gpBLK* srcBLKup( char* pS, gpBLK* pBMom, gpeOPid opID, I4 mnID ) {
-		return srcBLKnew( pS, opID, pBMom->pLSTrow(), pBMom->bID, pBMom->iLAST(), mnID );
+		return srcBLKnew( pS, opID, pBMom->pLASTrow(), pBMom->bID, pBMom->iLAST(), mnID );
 	}
 	gpBLK* srcBLKinsrt( char* pS, gpBLK* pBLKup, gpeOPid opID, I4 mnID ) {
 		if( pBLKup )
@@ -1357,7 +2018,7 @@ public:
 
 		gpROW	*pRuf = pBLKup->pROW(0,true),
 				*pRif = pBLKi->pROW(0,true),
-				*pRml = pBLKm->pLSTrow();
+				*pRml = pBLKm->pLASTrow();
 
 		pRml->bIDup = 	pBLKup->bIDm = pBLKi->bID;
 						pBLKup->bIDmR = 0; // pBLKi->iLAST();
@@ -1376,6 +2037,7 @@ public:
 	///			INST
 	///--------------------------
 	gpBLK*	srcINSTdwn( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID );
+	gpBLK*	srcINSTdwnO( char* pS, gpBLK *pBLKm, gpBLK* pBLK, gpBLK* pBLKup, I4 mnID );
 
 	gpBLK*	srcINSTmov( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
@@ -1384,7 +2046,7 @@ public:
 
 	gpBLK*	srcINSTmov3( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 
-	gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
+	//gpBLK*	srcINSTmov2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTent2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTadd2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
 	gpBLK*	srcINSTmul2( char* pS, gpBLK *pBLKm, gpBLK* pBLK );
@@ -1408,95 +2070,8 @@ public:
 	///--------------------------
 	gpBLK* srcBLKbrakS( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID );
 	gpBLK* srcBLKbrakE( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
-	gpBLK* srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
-		///kEND(scp);
-		U1* pU1 = NULL;
-		while( pBLK ? (pBLK->opIDgrp() != gpeOPid_stk) : false )
-		{
-			/// FENT
-			gpBLK	*pBLKm = lzyBLOCK.pSTPdwn( pBLK->bIDm );
-			gpROW	*pR0 = pBLK->pROW(),
-					*pRd = pBLKm->pROW(pBLK->bIDmR);
-			I4 nR = pBLK->nROW(), iPC, sOF;
-			switch( pBLK->opIDgrp() )
-			{
-				case gpeOPid_brakS:
-				case gpeOPid_dimS:
-				case gpeOPid_begin:
-
-					break;
-				case gpeOPid_mov:
-					pBLKm = srcINSTmov( pS, pBLKm, pBLK );
-					break;
-				case gpeOPid_add:
-				case gpeOPid_sub:
-					pBLKm = srcINSTadd( pS, pBLKm, pBLK );
-					// move.l d0, -(A6)
-					break;
-				case gpeOPid_mul:{
-						///			pRl
-						/// a, 		_ +
-						/// a, 		b +
-						/// a = 	b +
-						/// a * 	b +
-					pBLKm = srcINSTmul( pS, pBLKm, pBLK );
-					} break;
-				case gpeOPid_entry:{
-					pBLKm = srcINSTanDalf( pS, pBLKm, pBLK );
-					} break;
-				default: break;
-			}
-
-
-			if( !pBLKm )
-				break;
-			/// LENT
-			pBLK = pBLKm;
-
-		}
-
-		gpROW	*pRl = pBLK->pLSTrow();
-		if( !pRl )
-			return pBLK;
-
-		pRl->pstOP = opID;
-		/// a veszö egyenlőre csinál helyet
-		pBLK->pNEWrow();
-		return pBLK;
-	}
-	gpBLK* srcBLKmov( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG ) {
-		///kMOV(scp); //, iOPe ); // Ai--; // Ai--; //
-		///kOBJ(scp); //, iOPe );
-		///++SP;
-		///*pSTRT = now;
-		//if( !pBLK )
-		//	pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1 );
-		//if( !pBLK )
-		//{
-		//	gpOBJ* pO = srcOBJmn( pS, mnID, gpeCsz_L, I4x2(1,1) );
-		//	pBLK = srcBLKnull( pS, pBLK, pO->dctID, mnID );
-		//}
-
-		gpROW* pRl = pBLK->pLSTrow();
-		if( !pRl)
-			return pBLK;
-
-		switch( pBLK->opIDgrp() )
-		{
-			case gpeOPid_mov:
-				///							pRl
-				/// a = b += c *= d %= 		e =
-				pRl->pstOP = opID;
-				pBLK->pNEWrow();
-				return pBLK;
-			default:
-				break;
-		}
-		///							 		pRl	//up
-		/// a, 10, b; c, d;  e = f + 		g =
-		//gpBLK* pBup =
-		return srcBLKup( pS, pBLK, opID, mnID );
-	}
+	gpBLK* srcBLKstk( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
+	gpBLK* srcBLKmov( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
 	gpBLK* srcBLKanDalf( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
 
 	gpBLK* srcBLKmul( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZY* pDBG );
@@ -1718,7 +2293,8 @@ public:
         dim.z = gpfUTFlen( pC, pC+dim.w, dim.x, dim.y ); // x oszlop y sor
 		return dim;
 	}
-	U4x4	srcBRK( bool bNoMini, U1 selID, const char* pVAN = NULL );
+	U4x4	srcBRK( gpcLZYdct& dOP, //U1 iSCP,
+					bool bNoMini, U1 selID, const char* pVAN = NULL );
 	U1		srcSCN( gpcCRS& crs, bool bNoMini, U1 selID );
 	I4x2	srcRDY(
 						U1x4* pO,
@@ -1914,8 +2490,7 @@ class gpcCLASS {
 	I8	nLST, nCLASS,
 		idFND, ixFND;
 
-	gpcLZY** ppCLASS( I8 ix )
-	{
+	gpcLZY** ppCLASS( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
@@ -1952,8 +2527,7 @@ class gpcCLASS {
 		}
 		return ppC+ix;
 	}
-	gpcCLASS( I8 id )
-	{
+	gpcCLASS( I8 id ) {
 		gpmCLR;
 		I8 n = 0;
 		pLST = pLST->tree_add( id, n );
@@ -1963,13 +2537,11 @@ class gpcCLASS {
 		nLST = n;
 	}
 public:
-	gpcCLASS( void )
-	{
+	gpcCLASS( void ) {
 		gpmCLR;
 	}
 
-	gpcLZY* pGET( I8 ix )
-	{
+	gpcLZY* pGET( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
@@ -1979,16 +2551,14 @@ public:
 
 		return *ppC;
 	}
-	gpcLZY** ppGET( I8 ix )
-	{
+	gpcLZY** ppGET( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
 		return ppCLASS( ix );
 	}
 
-	I8 fnd( I8 id )
-	{
+	I8 fnd( I8 id ) {
 		if( id ? !this : true )
 			return nLST;
 
@@ -1998,8 +2568,7 @@ public:
 
 		return pLST->tree_fnd(id, nLST);
 	}
-	gpcLZY* p_fnd( I8 id, I8& ix )
-	{
+	gpcLZY* p_fnd( I8 id, I8& ix ) {
 		ix = 0;
 		if( id ? !this : true )
 			return NULL;
@@ -2027,8 +2596,7 @@ public:
 		idFND = id;
 		return pFND = *ppC;
 	}
-	gpcCLASS* add( I8 id, I8& ix, I8& n )
-	{
+	gpcCLASS* add( I8 id, I8& ix, I8& n ) {
 		if( !id )
 		{
 			ix = n = (this ? nLST: 0);
@@ -2075,8 +2643,7 @@ class gpcMASS {
 				*apSP[0x100];
 	U4x4 		aSP44[0x100];
 
-	gpcSRC** ppSRC( void )
-	{
+	gpcSRC** ppSRC( void ) {
 		return (gpcSRC**)(pSRCc ? pSRCc->p_alloc : NULL);
 	}
 public:
@@ -2094,8 +2661,11 @@ public:
 	U4	anDICTix[0x1000],
 		rstLEV, iLEV, nLEV, topLEV;
 
+	/// DB
+	gpcLZYdct	dctDB;
+	gpcLZY		lstDB;
 	/// aGLcnl --------
-	F4		aGLcnl[0x10];
+	//F4		aGLcnl[0x10];
 	int		aGLpic[0x10];
 	//gpcPIC* aGLpPIC[0x10];
 	/// OPER --------
@@ -2115,7 +2685,9 @@ public:
 	U4 nTXT = 0;
 	char* pTXT, *pT;
 
-	gpcLZYdct* pOPER();
+	gpDBlst*	iDBu( gpMEM* pMEM, char *pU, char* sPATH, char* pFILE );
+	gpDBlst*	iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE );
+	gpcLZYdct*	pOPER();
 	U4* pM( U4x2& zn, U1 id = 4 ) {
 		zn = 0;
 		if( !this )

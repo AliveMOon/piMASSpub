@@ -115,7 +115,7 @@ U4 gpcCRS::miniRDYmap(
 					);
 		/// TÁMADÁS HO RUKK!!
 		dim =	(pSrC = pWIN->piMASS->srcFND( pM[i] ))
-				->srcBRK( bNoMini, selID, " \t\r\n" );
+				->srcBRK( *pWIN->piMASS->pOPER(), bNoMini, selID, " \t\r\n" );
 
 		//dim = mass.srcFND( pM[i] )->CRSdim( bNoMini );
 		if( pC[c] < dim.x )
@@ -305,18 +305,18 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 						if( *(pSRC->pMEM->pCTRL->sNAME) )
 							pTITLE += sprintf( (char*)pTITLE, "%s", (pSRC->pMEM->pCTRL->sNAME) );
 					}
-					if( pSRC->pMEM->pGL )
+					if( pSRC->pMEM->pMgl )
 					{
-						if( pSRC->pMEM->pGL->aPICid[0] )
+						if( pSRC->pMEM->pMgl->aPICid[0] )
 						{
 							/// CELL PICTURES BACK GROUND -------------------
 							//xyWH azonos a xyPIC[0]-val!
-							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pGL->aPICid[0]-1;
+							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pMgl->aPICid[0]-1;
 							picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
 						}
-						if( pSRC->pMEM->pGL->aBOBid[0] )
+						if( pSRC->pMEM->pMgl->aBOBid[0] )
 						{
-							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pGL->aBOBid[0]-1;
+							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pMgl->aBOBid[0]-1;
 							bobBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
 						}
 					}

@@ -7,7 +7,7 @@ extern char gpaALF_H_sub[];
 
 
 
-gpPTR* gpPTR::pNULL(){ gpmCLR; return this; }
+gpPTR* gpPTR::pNULL( I4 i ){ gpmCLR; iPC = i; return this; }
 gpPTR* gpPTR::d2D( I4x2& d2 ){
     x = d2.x;
     y = d2.y;
@@ -23,7 +23,7 @@ U4 gpPTR::sOF(){
 	if( w )
         return w;
     if(!cSZ)
-        cSZ = gpaCsz[cID];
+        cSZ = gpaCsz[cID()];
 
     return w = area()*cSZ;
 }
@@ -33,13 +33,13 @@ gpPTR& gpPTR::operator = ( gpBLK* pBLK ) {
     gpPTR* pBp = pBLK->BLKpPTR( NULL );
     if( !pBp ) {
         iPC = -1;
-        cID = gpeCsz_OFF;
+        cID( gpeCsz_OFF );
         return *this;
     }
 	mNdID = pBp->mNdID;
     iPC = pBp->iPC;
-    cID = pBp->cID;
-    cSZ = gpaCsz[cID];
+    cID(pBp->cID());
+    cSZ = gpaCsz[cID()];
     d2D( *pBp->pd2D() );
     return *this;
 }
@@ -49,13 +49,13 @@ gpPTR& gpPTR::operator = ( gpOBJ* pO ) {
 	gpPTR* pPo = pO->pPTR();
     if( !pO ) {
         iPC = -1;
-        cID = gpeCsz_OFF;
+		cID( gpeCsz_OFF );
         return *this;
     }
     mNdID = pPo->mNdID;
     iPC = pPo->iPC;
-    cID = pPo->cID;
-    cSZ = gpaCsz[cID];
+    cID(pPo->cID());
+    cSZ = gpaCsz[cID()];
     d2D( *pPo->pd2D() );
     return *this;
 }
@@ -67,7 +67,7 @@ gpPTR* gpcSRC::SRCpPTR( char* pS, gpROW& R ) {
 						: NULL )
     if( pBup->iPTR > 0 ) {
 		pPTR = pBup->BLKpPTR( pS );
-        while( pPTR->cID == gpeCsz_ptr ) {
+        while( pPTR->cID() == gpeCsz_ptr ) {
 			pPTR = pMEM->pPTR( pPTR->iPC );
         }
         return pPTR;
@@ -78,22 +78,42 @@ gpPTR* gpcSRC::SRCpPTR( char* pS, gpROW& R ) {
     pPTR = pO->pPTR();
     return pPTR;
 }
-gpPTR* gpPTR::cpyREF( gpPTR* pRF ) {
+gpPTR* gpPTR::pPTR( gpMEM* pMEM ){
+	return this ? (gpPTR*)pMEM->pUn( iPC ) : NULL;
+}
+gpPTR* gpPTR::pPTRu1( gpMEM* pMEM ) {
+	gpPTR* pPi = this, *pPu;
+	while(pPi->bPTR()){
+		pPu = pPi->pPTR( pMEM );
+		if( pPu ) {
+			pPi = pPu;
+			continue;
+		}
+		break;
+	}
+	return pPi;
+}
+gpPTR* gpPTR::cpyREF( U1* pALL, gpPTR* pRF ) {
 	if( !pRF )
 		return pNULL();
-	gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
-	/*if(iPC<0)
-		return this;*/
-	bckID = pRF->mNdID;
+
+	pRF->sOF();
+	if(pRF->bPTR()) {
+		gpmMcpy( this, pRF, gpmOFF(gpPTR,mNdID) );
+		return this;
+	}
+	iPC = (U1*)pRF - pALL;
+	x = y = 1;
+	cID( gpeCsz_ptr );
 	return this;
 }
-gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pB )
-{
+gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pPb ) {
 	if( !this )
 		return NULL;
 
 	I4 iPPC = iPC;
-	cpyREF(pB);
+	pPb = pPb->pPTRu1(pMEM);
+	*this = *pPb;
 	iPC = iPPC;
 
 	U4	nA = pMEM->nALL(iPC),
@@ -105,12 +125,67 @@ gpPTR* gpPTR::cpy( gpMEM* pMEM, gpPTR* pB )
 			pMEM->iFREE( iPC );
 		iPC = pMEM->iALL( nB );
 	}
+	if( (pPb->iPC < 0) || (iPC < 0) )
+		return this;
 
-	_move._l.EAl( pB->iPC ).A0;
+	_move._l.EAl( pPb->iPC ).A0;
 	_move._l.EAl( iPC ).A1;
-	_move.c((gpeCsz)cID).IA0I.IA1I;
+	_move.c((gpeCsz)cID()).IA0I.IA1I;
 	return this;
 }
+I8 gpPTR::i8( gpMEM* pMEM ) {
+	if( this ? !pMEM : true )
+		return 0;
+	gpPTR* pPi = pPTRu1(pMEM);
+	U1* p_u = pPi->pU1( pMEM );
+	switch( pPi->cID() ) {
+		case gpeCsz_Q: return *(I8*)p_u;
+		case gpeCsz_q: return (I8)(*(U8*)p_u);
+		case gpeCsz_L: return (I8)(*(I4*)p_u);
+		case gpeCsz_l: return (I8)(*(U4*)p_u);
+		case gpeCsz_W: return (I8)(*(I2*)p_u);
+		case gpeCsz_w: return (I8)(*(U2*)p_u);
+		case gpeCsz_B: return (I8)(*(I1*)p_u);
+		case gpeCsz_b: return (I8)(*(U1*)p_u);
+		case gpeCsz_f: return (I8)(*(float*)p_u);
+		case gpeCsz_d: return (I8)(*(double*)p_u);
+		case gpeCsz_4: return (I8)(*(U4*)p_u);
+		default: break;
+	}
+	return 0;
+}
+double gpPTR::d8( gpMEM* pMEM ) {
+	if( this ? !pMEM : true )
+		return 0;
+	gpPTR* pPi = pPTRu1(pMEM);
+	U1* p_u = pPi->pU1( pMEM );
+	switch( pPi->cID() ) {
+		case gpeCsz_Q: return *(double*)p_u;
+		case gpeCsz_q: return (double)(*(U8*)p_u);
+		case gpeCsz_L: return (double)(*(I4*)p_u);
+		case gpeCsz_l: return (double)(*(U4*)p_u);
+		case gpeCsz_W: return (double)(*(I2*)p_u);
+		case gpeCsz_w: return (double)(*(U2*)p_u);
+		case gpeCsz_B: return (double)(*(I1*)p_u);
+		case gpeCsz_b: return (double)(*(U1*)p_u);
+		case gpeCsz_f: return (double)(*(float*)p_u);
+		case gpeCsz_d: return (double)(*(double*)p_u);
+		case gpeCsz_4: return (double)(*(U4*)p_u);
+		default: break;
+	}
+	return 0;
+}
+bool gpPTR::bARY() {
+	if( cID() != gpeCsz_b )
+		return false;
+	return area() > 1;
+}
+bool gpPTR::bUTF8() {
+	if( cID() != gpeCsz_b )
+		return false;
+	return bARY();
+}
+
 gpBLK* gpBLK::pRST( gpMEM* pM )
 {
 	if( this ? !!pMEM : true )
@@ -124,6 +199,7 @@ gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i ) {
 	pSRC = pS;
 	pWIN = pW;
 	pMASS = pWIN ? pWIN->piMASS : NULL;
+	pWgl = pWIN ? pWIN->pGL : NULL;
 	pA = (I8*)aA;
 	pD = (I8*)(aA+8);
 	pA[7] = iSTK = nDAT = i;

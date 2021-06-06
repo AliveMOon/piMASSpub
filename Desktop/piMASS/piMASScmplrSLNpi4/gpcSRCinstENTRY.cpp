@@ -4,19 +4,34 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
+U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
 {
 	switch( inst.a8x2.alf )
 	{
-		case gpeALF_FPS:
-			*(U4*)p_dst = pWIN->mSEC.w;
-			break;
+		case gpeALF_MLB: *(I4*)p_dst = pWIN->instVARmlb(); break;
+		case gpeALF_MX: *(I4*)p_dst = pWIN->instVARmx(); break;
+		case gpeALF_MY: *(I4*)p_dst = pWIN->instVARmy(); break;
+
+		case gpeALF_MSEC:
+		case gpeALF_MS: *(I4*)p_dst = pWIN->instVARms(); break;
+
+		case gpeALF_iA: *(I4*)p_dst = pWIN->instVARia(); break;
+		case gpeALF_iN: *(I4*)p_dst = pWIN->instVARin(); break;
+
+		case gpeALF_IX: *(I4*)p_dst = pWIN->instVARix(); break;
+		case gpeALF_IY: *(I4*)p_dst = pWIN->instVARiy(); break;
+		case gpeALF_IW: *(I4*)p_dst = pWIN->instVARiw(); break;
+		case gpeALF_IH: *(I4*)p_dst = pWIN->instVARih(); break;
+
+
+		case gpeALF_FPS: *(U4*)p_dst = pWIN->mSEC.w; break;
         case gpeALF_entry: if(pSRC) {
                 I4      *pI4 = (I4*)pUn(pA[7], sizeof(*pI4)*2); // pSRC->srcMEMiPC( pA[7], 4 );
                 gpOBJ   *pOan = pSRC->srcOBJfnd( pI4[1] ),
 						*pOa = NULL,
 						*pOfrm = NULL;
-                gpPTR	*pPhr = NULL,	*pPfrm = NULL;
+                gpPTR	*pPhr = NULL,
+						*pPfrm = NULL;
 
                 U4      xfnd = pMASS->getXFNDan( pOan->AN ),
 						nA, 	nCPY;
@@ -26,11 +41,11 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 				if( pOa = pSRC->srcOBJfnd(pI4[0]) )
                 if( pOfrm = pSfrm->pMEM->pOBJ(pOa->AN.alf) )
 				{
-					I4 iPhr = pA[0];
-					pPhr = pPTR(iPhr);
+					//I4 iPhr = pA[0];
+					pPhr = pPTRu1(pA[0]);
 
 					/// tervek szerint a isza térési cim A0-ban lesz
-					pPfrm = pOfrm->pPTR();
+					pPfrm = pOfrm->pPTRu1();
 					nCPY = pOfrm->sOF();
 					pCPY = pOfrm->pU1();
 
@@ -41,20 +56,25 @@ U1* gpMEM::instVAR( U1* p_dst, gpINST& inst )
 						pPhr->iPC = iALL( nCPY );
 					}
 					nA = nALL(pPhr->iPC);
-					pPhr->cID = pPfrm->cID;
+					pPhr->cID(pPfrm->cID());
 					pPhr->d2D( *pPfrm->pd2D() );
 
 					pDST = pPhr->pU1( this );
 					if( pDST )
 						gpmMcpy( pDST, pCPY, nCPY )[nCPY] = 0;
 
-					if(bSTDcout_ent)
-						{std::cout	<< stdCYAN << "gpeALF_entry:"
-									<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
+					if(bSTDcout_jsr)
+					{std::cout	<< stdCYAN << "gpeALF_entry:"
+								<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
 				}
 
             } break;
+		case gpeALF_PRINT:	funPRINT(); break;
+		case gpeALF_FND:	funFND(); break;
+		case gpeALF_NEW:	funNEW(); break;
+
 		default:
+			*(I4*)p_dst = 0;
 			break;
 	}
 	return p_dst;
@@ -63,7 +83,7 @@ gpBLK* gpcSRC::srcBLKanDalf( char* pS, I4 mnID, gpBLK* pBLK, gpeOPid opID, gpcLZ
 	/// + a0.b
 	/// * a0.b
 
-	gpROW* pRl = pBLK->pLSTrow();
+	gpROW* pRl = pBLK->pLASTrow();
 	if( !pRl )
 		return pBLK;
 
@@ -92,18 +112,18 @@ gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
     if(!nR)
         return pBLKm;
 	gpcSRC	*pSRC = NULL;
-	gpROW	*pRa;
+	gpROW	*pRi;
 	gpOBJ	*pOblk,*pOa, *pOin = NULL;
-	gpPTR	*pPb = NULL, *pPa;
+	gpPTR	*pPb = NULL, *pPi;
 	gpeOPid opB, opA;
 	for( I4 iR = 0; iR < nR; opB=opA, iR++ )
 	{
-		pPa = pBLK->iROWptr( pS, iR, &pOa, &pRa, &pSRC, &pOin );
-		opA = pRa->pstOP;
-		if( !pPa )
+		pPi = pBLK->iROWptr( pS, iR, &pRi, &pOa, &pSRC, &pOin );
+		opA = pRi->pstOP;
+		if( !pPi )
 			continue;
 		if( !pPb ) {
-			pPb = pPa; // pBLK->BLKpPTR( pS )->cpy( pMEM, pPa );
+			pPb = pPi; // pBLK->BLKpPTR( pS )->cpy( pMEM, pPi );
 			continue;
 		}
 
@@ -120,10 +140,12 @@ gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 		_move._q.A7.D7;
 
 			_move._l.EAl( pPb->mNdID ).sIA7I;
-			_move._l.EAl( pPa->mNdID ).sIA7I;
+			_move._l.EAl( pPi->mNdID ).sIA7I;
+
 			pPb = pBLK->BLKpPTR( pS );
-			pPb->cpyREF(pPa);
-			pPb->iPC = -1;
+			//pPb->cpyREF( pMEM->pUn(), pPi);
+			//pPb->iPC = -1;
+
 			_move._l.EAl( pBLK->iPTR ).A0;
 			_jsr.EAl( gpeALF_entry );
 

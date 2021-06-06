@@ -70,6 +70,12 @@ U4x4 gpaROBwr[] = {
 	{ 	0x40A,  refROB.nWu2,	20000, refROB.nRu2	},
 };
 
+/*gpcDrc::gpcDrc( const gpcZS& zs, U4 nm )
+{
+	if( nm != NMnDIF.au4x2[0].x )
+		format( nm );
+	*this = zs;
+}*/
 gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	/// DEBUG célból készült nem igazán használható másra
 	gpmCLR;
@@ -111,39 +117,39 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	tMX.mxABC(tABC, degX(180.0/PI) );
 	//oMX = iMX.lerp_zyx( tMX, ab );
 
-	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTRf4( pbuff ) << std::endl;}
 	if(bSTDcout){std::cout << std::endl;}
 
-	if(bSTDcout){std::cout << "iX   " << iMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "iY   " << iMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "iZ   " << iMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){std::cout << "iX   " << iMX.x.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "iY   " << iMX.y.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "iZ   " << iMX.z.pSTRf4( pbuff ) << std::endl << std::endl;}
 
-	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTRf4( pbuff ) << std::endl << std::endl;}
 
-	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTRf4( pbuff ) << std::endl << std::endl;}
 
     iABC.ABC_( iMX.eulABC()*degX(180.0/PI) );
     tABC.ABC_( oMX.eulABC()*degX(180.0/PI) );
 	//tABC.ABC_( tMX.eABC()*degX(180.0/PI) );
 
-	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTRf4( pbuff ) << std::endl << std::endl;}
 
 	tMX.mxABC(tABC, degX(180.0/PI) );
-	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTRf4( pbuff ) << std::endl << std::endl;}
 
-	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTRf4( pbuff ) << std::endl;}
+	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTRf4( pbuff ) << std::endl;}
 	if(bSTDcout){std::cout << std::endl;}
 }
 
@@ -252,8 +258,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 
 		/// ERROR?
 		pROBnD->ioSW.aU2[0] = gpfSTR2U8( gpmMcpy(pW,pD0,4)-2, NULL );
-		if( pROBnD->iWR() && !pROBnD->ioSW.aU2[0] )
-		{
+		if( pROBnD->iWR() && !pROBnD->ioSW.aU2[0] ) {
 			// olvastunk && nincsen hiba
 			/// Good!
 			pU2 = pU2io = pROBnD->pROBioU2();
@@ -265,8 +270,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 					iD0 < eD0; iD0 +=4, pU2++ )
 				*pU2 = gpfSTR2U8( gpmMcpy(pW,pD0+iD0,4)-2, NULL );
 
-			if( iD0 > 4 )
-			{
+			if( iD0 > 4 ) {
 				iDRC = pROBnD->iDrc();
 				I4x4	befPOS = pROBnD->aDrc[iDRC].iXYZ,
 						befABC = pROBnD->aDrc[iDRC].iABC;
@@ -337,7 +341,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 					// nyugta?
 					pOUT = pROBnD->pull( pOUT, gpaROBwr );
 					break;
-				case 0x0000: // good!
+				case 0x0000: // bGD!
 					break;
 				case 0xc050:
 					break;
@@ -590,109 +594,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 ///-------------------------------------
 ///              - REF -
 ///-------------------------------------
-
-/*gpcLZY* gpcGT::GTslmpOSref( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR ) {
-	U8 s = -1, nLEN;
-	U4 n = gpmSTRLEN( pSTR );
-	if( this ? !n : true )
-		return pANS->lzyFRMT( s, "nonsens" );
-	U1* pEND = pSTR+n, *pCOM;
-	I8x2 an;
-	U1 sCOM[] = "ABCD";
-	U4& com = *(U4*)sCOM, iCin, iCou;
-	U2 nU2, *pU2i = NULL, *pU2o = NULL;
-	gpcLZY	*pLZYinp = NULL,
-			*pLZYout = NULL,
-			*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
-	U4 iSOCK = 0, nSOCK = 0;
-	if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) )
-	{
-        nSOCK = gpmLZYload(pLZYusr,sockUSR);
-        for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ )
-        {
-			if( pSOCK[iSOCK] != sockUSR )
-				continue;
-
-			break;
-        }
-	}
-	if( iSOCK >= nSOCK )
-	{
-		pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
-		iSOCK = nSOCK;
-		nSOCK = gpmLZYload(pLZYusr,sockUSR);
-	}
-
-	for( pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ); *pSTR; pSTR += gpmNINCS( pSTR, " \t\a\r\n;" ) )
-	{
-		pCOM = pSTR;
-		an.num = pEND-pSTR;
-		an = pCOM;
-		if( an.num )
-		{
-			com = *(U4*)pCOM;
-			pSTR += an.num;
-			if( !pLZYinp )
-				pLZYinp=mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) );
-
-			if( pU2i = (U2*)pLZYinp->p_alloc )
-			for( iCin = 17, nU2 = pLZYinp->n_load/sizeof(U2); iCin < nU2; iCin+=8 )
-			{
-				if( *(U4*)(pU2i+iCin) == com )
-					break;	// iCin menjen végig
-			}
-
-			if( iCin >= nU2 )
-			{
-				iCou = iCin = nU2;
-				// nem vol egyáltalán
-				pU2o = (U2*)(pLZYout->pVALID(pLZYinp,pU2o));
-				if( !pU2o )
-					pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp));
-
-				if( pU2o )
-				for( iCou = 17, nU2 = pLZYout->n_load/sizeof(U2); iCou < nU2; iCou+=8 )
-				{
-					if( pU2o[iCou] ? *(U4*)(pU2o+iCou) == com : true )
-						break;
-				}
-			}
-
-			if( iCou > iCin )
-				iCou = iCin;
-
-			if( !pU2o )
-				pU2o = (U2*)((pLZYout=mass.GTlzyALL.LZY(gpdGTlzyIDref(TnID)))->pVALID(pLZYinp));
-
-			if( pU2o )
-				*(U4*)(pU2o+iCou) = com;
-
-		} else
-			pSTR += gpmVAN( pSTR, " \t\a\r\n;", nLEN );
-
-		switch( an.alf )
-		{
-			case gpeALF_FORMAT:
-				gpmZnOF( pU2o, nU2 );
-				break;
-
-			case gpeALF_HELO:
-			case gpeALF_HELLO:
-				return pANS->lzyFRMT( s = -1, "Hello! %d", iCou );
-			case gpeALF_HELP:
-				return pANS->lzyFRMT( s = -1, "ReadMe.txt %d", iCou );
-			case gpeALF_LINE:
-				return pANS->lzyFRMT( s = -1, "Line.txt %d", iCou );
-			case gpeALF_JOIN:
-				return pANS->lzyFRMT( s = -1, "Join.txt %d", iCou );
-			default:
-				return pANS->lzyFRMT( s = -1, " %d %s", iCou, sCOM );
-				*(U4*)(pU2o+iCou) = 0;
-				break;
-		}
-	}
-    return pANS->lzyFRMT( s, "ok" );
-}*/
 void gpcGT::GTslmpREF( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	U8 nOUT = GTout( pWIN ), s;
 	if( nOUT )
@@ -1006,25 +907,6 @@ void gpcGT::GTslmpBINref( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 			nLEN = pD000->nLEN;
 			pU2inp = (U2*)pLZYinp->lzyINS( NULL, nLEN/2, s = 0, nLEN/2 )->p_alloc;
 			gpmMcpy( pU2inp, pD000->pCPY(), nLEN );
-			/*for( U4 i = 0; i < nLEN; i+=4 )
-			{
-				gpmMcpyOF( pW, pD000+i, 4 );
-				pU2inp[i>>2] = gpfSTR2U8( sWORD, NULL );
-				if( i ? true : !pU2inp[i>>2] )
-					continue;
-				switch( pU2inp[i>>2] )
-				{
-					case 0xc050:
-						// ASCII-ból binárisba lett kapcsolva
-						aGTcrs[1] = 's';
-						aGTcrs[0] = '0'; // NEM ASCII
-
-						pOUT = pOUT->lzyADD( gpaSLMPbin[1], sizeof(gpaSLMPbin[1], s = -1 );
-						gpmDEL(pINP);
-						return;
-				}
-				break;
-			}*/
 
 			nSUB += pD000->iEndCD()+nLEN;
 			iCNT++;

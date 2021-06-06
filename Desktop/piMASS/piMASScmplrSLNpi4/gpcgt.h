@@ -23,6 +23,7 @@
 //~ SOFTWARE.
 
 #include "gpcpic.h"
+#include "sim7x00.h"
 
 #define gpmGTent (sGTent[0]?(char*)sGTent:"\r\n")
 
@@ -73,6 +74,7 @@
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 class gpcRES;
 class gpcDrc;
+class gpcGSM;
 
 class gpcROB {
 public:
@@ -217,8 +219,8 @@ public:
 			return *this;
 
 		NMnDIF.x = nm;
-		iXYZ = oXYZ = tXYZ = I4x4( 500,  0,	50+300+400,	gpeZS_POS0)&I4x2(mmX(1),1).xxxy();
-		iABC = oABC = tABC = I4x4( 180,  0, -45,		gpeZS_DIR0)&I4x2(degX(1),1).xxxy();
+		iXYZ = oXYZ = tXYZ = I4x4( 400,  0,	300+400,	gpeZS_POS0)&I4x2(mmX(1),1).xxxy();
+		iABC = oABC = tABC = I4x4( 180,  0, 90,			gpeZS_DIR0)&I4x2(degX(1),1).xxxy();
 		iXYZ.w = gpeZS_iPOS;
 		iABC.w = gpeZS_iDIR;
 		oXYZ.w = gpeZS_oPOS;
@@ -307,8 +309,7 @@ public:
 	gpcDrc& JUDO( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)
-class gpcROBnD
-{
+class gpcROBnD {
 	public:
 		U4x4	pc,
 				ioSW;
@@ -809,16 +810,13 @@ class gpcGT
 				sFILE[0x100],
 				*pHOST, *pUSER, *pFILE;
 
-		bool bTEL()
-		{
+		bool bTEL() {
 			return !(mSEC.x&mSEC.y);
 		}
-		bool bLOOP()
-		{
+		bool bLOOP() {
 			return bSW&2;
 		}
-		bool bGTdie()
-        {
+		bool bGTdie() {
             if( !this )
                 return true;
             if( socket == INVALID_SOCKET )
@@ -841,8 +839,7 @@ class gpcGT
 			return true;
 		}
 
-		gpcLZY* GTback()
-		{
+		gpcLZY* GTback() {
 			if( !this )
 				return NULL;
 			// ott van felette
@@ -893,6 +890,9 @@ class gpcGT
 			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
+		gpcGSM*	GTgsm( gpcWIN* pWIN );
+		/*I8		GTgsm3( gpcWIN* pWIN );
+		I8		GTgsm2( gpcWIN* pWIN );*/
 		I8		GTcnct( gpcWIN* pWIN ); //, gpcGTall& acpt );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );
@@ -900,6 +900,7 @@ class gpcGT
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );
 		char*	GTsnd( char* p_err, char* s_buff, U4 n_buff );
 
+		gpcLZY*	GTgsmOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC );
 
 
 		gpcLZY* GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC );
