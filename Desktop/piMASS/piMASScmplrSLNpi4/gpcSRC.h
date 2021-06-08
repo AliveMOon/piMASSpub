@@ -1429,6 +1429,7 @@ public:
 	gpcLZY	*p_lwo,
 			ly3D,
 			tgIX;
+	U4 nRDY, nBLD;
 
 	~gpc3D(){
 		gpmDEL(p_lwo);
@@ -1440,6 +1441,7 @@ public:
 		id.a8x2[0].b = alf;
 		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
 		gpmSTRCPY( sPATH, pP );
+		nBLD = nRDY+1;
 	}
 	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
 	U4 nLY();
@@ -1641,6 +1643,7 @@ public:
 	U4 nKEY( U1 c ) { return c > 8 ? 0 : (this ? aKEY[c].nLD(sizeof(gpc3Dkey)): 0); }
 	float valKEYs( U1 c, float s );
 	gpc3Dkey* pKEYins( U1 c, float s );
+	gpc3Dkey* pKEYinsIX( U1 c, I4 i, I4 nE, float s );
 };
 
 //#include <ctime>
@@ -1737,9 +1740,10 @@ public:
 
 
 class gpc3Ditm {
-	gpc3D*		p_3D;
+	gpc3D*		p3D;
 public:
 	char sNAME[0x100];
+	gpeALF alfN;
 	U4	itmIX,	itmID,
 		momIX,	momID,
 		trgID,	layID,
@@ -1757,7 +1761,7 @@ public:
 
 
 	gpc3Ditm(){};
-	gpc3D* p3D( gpcGL* pGL, const char* pP, char *pF );
+	gpc3D* p3Di( gpcGL* pGL, const char* pP, char *pF );
 	char* pNAME( char* pN = NULL ) {
 		if( !this )
 			return NULL;
@@ -1769,10 +1773,16 @@ public:
 		gpmMcpy( sNAME, pN, n )[n] = 0;
 
 		char* pCH = strrchr(sNAME,'/');
-		nNAME = pCH ? pCH - sNAME : 0;
-		if( sNAME[nNAME] == '/' )
-			nNAME++;
+		if( pCH ) {
+			nNAME = pCH ? pCH - sNAME : 0;
+			pCH += gpmNINCS(pCH,"/");
+			nNAME = pCH-sNAME;
+		} else
+			nNAME = 0;
+		//if( sNAME[nNAME] == '/' )
+		//	nNAME++;
 
+		alfN = gpfSTR2ALF( (U1*)sNAME+nNAME, (U1*)sNAME+gpmSTRLEN(sNAME+nNAME), NULL, '_' );
 		return sNAME+nNAME;
 	}
 	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
@@ -1825,7 +1835,7 @@ public:
 		gpc3D* p3D = ((gpc3D**)lst3D.Ux(i,sizeof(gpc3D*)))[0];
 		return p3D;
 	}
-	gpc3D* p3D( gpeALF alf, const char* pP ) {
+	gpc3D* p3Dl( gpeALF alf, const char* pP ) {
 		if( !this )
 			return NULL;
 
@@ -1837,7 +1847,7 @@ public:
 					e3D = i3D;
 				continue;
 			}
-			if( pp3D[i3D]->id.a8x2[0].a != alf )
+			if( pp3D[i3D]->id.a8x2[0].b != alf )
 				continue;
 			return pp3D[i3D];
 		}

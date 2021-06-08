@@ -3,7 +3,7 @@
 extern U1 gpaALFsub[];
 extern U1 gpaALFsub2[];
 extern char gpaALF_H_sub[];
-char	gps_lzy_pub1[1024*0x100];
+static char	gps_lzy_pub1[1024*0x100*2];
 gpcLZY* gpcLZY::lzyADD( const void* p_void, size_t n_byte, U8& iSTRT, U1 n ) {
 	if( !n_byte )
 		return this;
@@ -90,10 +90,12 @@ gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 	va_list vl;
 	va_start(vl, p_format);
 	gps_lzy_pub1[0] = 0;
-	U8 n = vsprintf( gps_lzy_pub1, p_format, vl );
+	size_t n = vsprintf( gps_lzy_pub1, p_format, vl );
 	if( n < 1 )
 		return this;
-	U8 s = -1;
+	if( n >= sizeof(gps_lzy_pub1) ){
+		std::cout << "lzyFRMT" << std::endl;
+	}
 	return lzyADD( (U1*)gps_lzy_pub1, n, iSTRT );
 }
 static const char* gpasADDR[] = {

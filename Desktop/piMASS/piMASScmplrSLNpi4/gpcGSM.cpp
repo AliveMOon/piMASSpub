@@ -465,17 +465,19 @@ public:
 			pANSW = pANSW->lzyFRMT( s=-1, " last: +%d\r\n", aNUM[2] );
 		}
 		int utc = cgps.utc;
-		pANSW = pANSW->lzyFRMT( s=-1, 	" lat: %c %6.4f lng: %c %6.4f\r\n"
-										" alt:   %6.4f spd:   %6.4f\r\n"
-										" dat: %d %0.2d %0.2d\ttim: %d:%d %d\r\n"
-										" sig: %0.2d %0.2d reg: %s\r\n",
-										cgps.ns ? cgps.ns : '?', cgps.lat, cgps.ew ? cgps.ew: '?', cgps.log,
-										cgps.alt, cgps.spd,
-										cgps.dat%100 + 2000, (cgps.dat/100)%100, (cgps.dat/10000)%100,
-										utc/10000, (utc%10000)/100, utc%100,
-										CSQ.x, CSQ.y, CREG.stat == 1 ? "\"ok\"" : "\"searching\""
 
-								);
+
+
+		pANSW = pANSW->lzyFRMT( s=-1, 	" dat: %d %0.2d %0.2d\ttim: %d:%d %d\r\n",
+										(cgps.dat%100) + 2000, (cgps.dat/100)%100, (cgps.dat/10000)%100,
+										utc/10000, (utc%10000)/100, utc%100 );
+		pANSW = pANSW->lzyFRMT( s=-1, 	" sig: %0.2d %0.2d reg: %s\r\n",
+										CSQ.x, CSQ.y, ((CREG.stat == 1) ? "\"ok\"" : "\"searching\"") );
+		pANSW = pANSW->lzyFRMT( s=-1, 	" lat: %c %6.4f lng: %c %6.4f\r\n",
+										(cgps.ns ? cgps.ns : '?'), cgps.lat, (cgps.ew ? cgps.ew: '?'), cgps.log );
+		pANSW = pANSW->lzyFRMT( s=-1, 	" alt:   %6.4f spd:   %6.4f\r\n",
+										cgps.alt, cgps.spd );
+
 		return pANSW->lzyFRMT( s = -1, sSTAT );
 	}
 	char* answCNMI( char* pANSW ) {

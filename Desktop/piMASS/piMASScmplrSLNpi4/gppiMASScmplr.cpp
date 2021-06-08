@@ -194,14 +194,14 @@ gpINST* gpMEM::instRDY( gpcLZY* pDBG ) {
 		return this ? pINST : NULL;
 
 	if( !pcCPY )
-	{
 		pcCPY = gpmPAD(nDAT,0x10);
-	}
+
 	U8 s = -1;
 	pINST = (gpINST*)lzyMEM.Ux( pcCPY, lzyCODE.n_load, true, 1 );
 
 	gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
 	nDAT = lzyMEM.n_load;
+	if(bSTDcoutCMP)
 	for( I4 i = 0; i < nCD; i++ )
 		pINST[i].instDBG(pDBG,this,lzyMEM.p_alloc);
 

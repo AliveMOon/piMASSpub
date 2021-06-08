@@ -1719,7 +1719,7 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 	return n;
 }
 
-inline gpeALF gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL );
+inline gpeALF gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL, char skip = 0 );
 
 
 
