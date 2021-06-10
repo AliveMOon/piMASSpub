@@ -54,6 +54,30 @@
 #include <math.h>
 #include <thread>
 
+//#define stdOFF      0
+#define stdRESET	"\033[0m"
+
+#define stdBLACK	"\033[1;30m"
+#define stdRED		"\033[1;31m"
+#define stdGREEN	"\033[1;32m"
+#define stdYELLOW	"\033[1;33m"
+#define stdBLUE		"\033[1;34m"
+#define stdPURPLE	"\033[1;35m"
+#define stdCYAN		"\033[1;36m"
+#define stdWHITE	"\033[1;36m"
+
+#define stdALU		stdYELLOW
+#define stdMINI		stdBLUE
+#define stdRUN		stdPURPLE
+#define stdCMPLR	stdRED
+#define stdDBG		stdCYAN
+#define stdBREAK	stdGREEN
+#define stdRDY		stdCYAN
+
+#define gpdCOUT std::cout << stdCYAN
+#define gpdENDL stdRESET << std::endl
+#define gpdFLUSH stdRESET << std::flush
+
 #ifdef _WIN64
 
 	#pragma once
@@ -441,7 +465,7 @@ GLenum inline gpfGLerr( const char* pERR = "" ) {
 	GLenum e = glGetError();
 	if( !e )
 		return 0;
-	if( bSTDcout_3D )  std::cout << std::hex << e << pERR <<  std::endl;
+	if( bSTDcout_3D ) gpdCOUT << std::hex << e << pERR <<  gpdENDL;
 	return e;
 }
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
@@ -557,25 +581,7 @@ U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* 
 		)
 #endif
 
-//#define stdOFF      0
-#define stdRESET	"\033[0m"
 
-#define stdBLACK	"\033[1;30m"
-#define stdRED		"\033[1;31m"
-#define stdGREEN	"\033[1;32m"
-#define stdYELLOW	"\033[1;33m"
-#define stdBLUE		"\033[1;34m"
-#define stdPURPLE	"\033[1;35m"
-#define stdCYAN		"\033[1;36m"
-#define stdWHITE	"\033[1;36m"
-
-#define stdALU		stdYELLOW
-#define stdMINI		stdBLUE
-#define stdRUN		stdPURPLE
-#define stdCMPLR	stdRED
-#define stdDBG		stdCYAN
-#define stdBREAK	stdGREEN
-#define stdRDY		stdCYAN
 
 enum gpeCLR: U1
 {
@@ -4042,9 +4048,9 @@ public:
 					pAT[at].an2str( pOUT );
 					break;
 			}
-			std::cout << at <<"."<< pOUT << " ";
+			gpdCOUT << at <<"."<< pOUT << " ";
 		}
-		std::cout << "nAT:" << at << std::endl;
+		gpdCOUT << "nAT:" << at << gpdENDL;
 		return this;
 	}
 };
@@ -4534,7 +4540,7 @@ public:
 		return false;
     }
     bool operator == ( const F4& b ) { return !(*this!=b); }
-
+	F4& operator = ( const float b ) { aF2[0] = aF2[1] = b; return *this; }
     F4& operator = ( const I4x2& b ) { aF2[0] = aF2[1] = b; return *this; }
 
     F4& operator += ( const float b ) { aF2[0] += b; aF2[1] += b; return *this; }
@@ -4775,7 +4781,6 @@ public:
 		return pB-pBUFF;
     }
     F4x4& latR( F4 e, F4 c, F4 u );
-	F4x4& latR2( F4 e, F4 c, F4 u );
 
 	F4x4& operator = ( float a ) {
 		gpmCLR;
@@ -4849,13 +4854,7 @@ public:
 		c.t.col4x4(&x.w);
 		return c;
 	}
-	F4x4 T3x3() {
-		F4x4 c = *this;
-		c.x.col4x3(&x.x);
-		c.y.col4x3(&x.y);
-		c.z.col4x3(&x.z);
-		return c;
-	}
+	F4x4 T3x3( float s = 1.0 );
 	F4x4 inv();
 
 	F4x4& operator *= ( const float b ) {

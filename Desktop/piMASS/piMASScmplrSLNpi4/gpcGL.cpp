@@ -11,13 +11,13 @@ gpcGL::gpcGL( gpcWIN* p_win ) {
 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
 	gCntxt = SDL_GL_CreateContext( p_win->pSDLwin );
 	if( !gCntxt ) {
-		if(bSTDcout){std::cout <<std::endl << "gpcGL init error" <<std::endl;}
+		if(bSTDcout){gpdCOUT <<gpdENDL << "gpcGL init error" <<gpdENDL;}
 		return;
 	}
 	glewExperimental = GL_TRUE;
 	glewErr = glewInit();
 	if( glewErr != GLEW_OK ) {
-		if(bSTDcout){std::cout <<std::endl << "gpcGL GLEW_NOK error" <<std::endl;}
+		if(bSTDcout){gpdCOUT <<gpdENDL << "gpcGL GLEW_NOK error" <<gpdENDL;}
 		return;
 	}
 
@@ -32,15 +32,15 @@ gpcGL::gpcGL( gpcWIN* p_win ) {
 
 	pTXchar = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFchar );
 	if( pTXchar )
-		if(bSTDcout){std::cout << "char" << (void*)p_win->pSRFchar <<std::endl;}
+		if(bSTDcout){gpdCOUT << "char" << (void*)p_win->pSRFchar <<gpdENDL;}
 	else
-		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
+		if(bSTDcout){gpdCOUT << SDL_GetError() <<gpdENDL;}
 
 	pTXiso = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFiso );
 	if( pTXiso )
-		if(bSTDcout){std::cout << "char" << (void*)p_win->pSRFiso <<std::endl;}
+		if(bSTDcout){gpdCOUT << "char" << (void*)p_win->pSRFiso <<gpdENDL;}
 	else
-		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
+		if(bSTDcout){gpdCOUT << SDL_GetError() <<gpdENDL;}
 
 }
 gpcGL* gpcGL::SWP( gpcWIN* pWIN ) { // SDL_Window* pWIN ) {
@@ -188,7 +188,7 @@ GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {
 		if( nLOG ) {
 			vtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vtxLOG.p_alloc );
-			std::cout << (char*)vtxLOG.p_alloc << std::endl;
+			gpdCOUT << (char*)vtxLOG.p_alloc << gpdENDL;
 		}
 		return isSUCC;
 	} else {
@@ -218,7 +218,7 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 		if( nLOG ) {
 			frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
-			std::cout << (char*)frgLOG.p_alloc << std::endl;
+			gpdCOUT << (char*)frgLOG.p_alloc << gpdENDL;
 		}
 		return isSUCC;
 	}

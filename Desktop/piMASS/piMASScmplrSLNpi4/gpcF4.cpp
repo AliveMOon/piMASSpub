@@ -98,8 +98,8 @@ F4& F4::abLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
 			a = ppV[1] ? *(I4x4*)ppV[1] : I4x4(0);
 			b = ppV[0] ? *(I4x4*)ppV[0] : I4x4(0);
 			d = a-b;
-			std::cout	<< a.x << " " << a.y << " "<< a.z << "\n"
-						<< b.x << " " << b.y << " "<< b.z << std::endl;
+			gpdCOUT	<< a.x << " " << a.y << " "<< a.z << "\n"
+						<< b.x << " " << b.y << " "<< b.z << gpdENDL;
 			d.w = 0.0;
 			pSRC = "xyr";
 			break;
@@ -127,7 +127,24 @@ F4& F4::abLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
 
 	return *this;
 }
+F4x4 F4x4::T3x3( float s ) {
+	F4x4 c = *this;
+	if( s == 0.0 ){
+		c.z = c.y = c.x = 0.0;
+		return c;
+	}
 
+	c.x.col4x3(&x.x);
+	c.y.col4x3(&x.y);
+	c.z.col4x3(&x.z);
+	if( s == 1.0 )
+		return c;
+
+	c.x *= s;
+	c.y *= s;
+	c.z *= s;
+	return c;
+}
 F4x4& F4x4::latR( F4 e, F4 c, F4 u ) {
 	gpmCLR;
 
@@ -144,31 +161,12 @@ F4x4& F4x4::latR( F4 e, F4 c, F4 u ) {
 	x /= sqrt(x.qlen());
 	y = z.X3(x).N3();
 
-	*this = T3x3();
-	return *this ;
-}
-F4x4& F4x4::latR2( F4 e, F4 c, F4 u ) {
-	gpmCLR;
-
-	z.aF2[0] = e.aF2[0];
-	z.aF2[0].x *= -1.0f;
-	float r = sqrt(z.aF2[0].qlen());
-
-	x = u.N3().X3(z/r);
-	z.aF2[0] *= e.aF2[1].x/r;
-	z.z = e.aF2[1].y;
-
-	t.z = sqrt(z.qlen_xyz());
-	z /= t.z;
-	x /= sqrt(x.qlen());
-	y = z.X3(x).N3();
-
-	*this = T3x3();
+	*this = T3x3(1.0/t.z);
+	t.z = -0.5;
 	return *this ;
 }
 
-F4x4 F4x4::inv( void )
-{
+F4x4 F4x4::inv( void ) {
 	F4x4 mxi; //dst;
 	float tmp[12], src[16], det;
 	float* p_src16 = (float*) this;

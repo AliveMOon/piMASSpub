@@ -94,7 +94,7 @@ gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 	if( n < 1 )
 		return this;
 	if( n >= sizeof(gps_lzy_pub1) ){
-		std::cout << "lzyFRMT" << std::endl;
+		gpdCOUT << "lzyFRMT" << gpdENDL;
 	}
 	return lzyADD( (U1*)gps_lzy_pub1, n, iSTRT );
 }

@@ -8,7 +8,7 @@ extern char gpaALF_H_sub[];
 
 
 gpINST* gpMEM::instALU() {
-	//if(bSTDcout){std::cout << stdALU "+";
+	//if(bSTDcout){gpdCOUT << stdALU "+";
 	gpINST& ins = pINST[pc];
 	pc++;
 

@@ -49,7 +49,7 @@ gpcLZY* gpcROBnD::pull( gpcLZY* pOUT, U4x4* pROBrw ) {
 gpcDrc& gpcDrc::operator = ( const gpcROB& rob ) {
 	if( rob.name != NMnDIF.x )
 	{
-		if(bSTDcout){std::cout << "\033[1;31mIlegal W rob!\033[0m" << std::endl;}
+		if(bSTDcout){gpdCOUT << "\033[1;31mIlegal W rob!\033[0m" << gpdENDL;}
 		return *this;
 	}
 
@@ -327,7 +327,7 @@ void drc_trd( char* pBUFF ) {
 	char	sBUFF[0x100];
 	strcpy( sBUFF, pBUFF+gpmNINCS(pBUFF, "\" \a\t") );
 	int o = system( sBUFF );
-	if(bSTDcout_slmp){std::cout << o << ":" << sBUFF <<std::endl;};
+	if(bSTDcout_slmp){gpdCOUT << o << ":" << sBUFF <<gpdENDL;};
 }
 
 bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
@@ -376,9 +376,9 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 			}
 			trd = std::thread( drc_trd, pP );
 			n_trd++;
-            if(bSTDcout_slmp){std::cout << pP+1 <<std::endl;};
+            if(bSTDcout_slmp){gpdCOUT << pP+1 <<gpdENDL;};
 			//int o = system( pP+1 );
-			//if(bSTDcout){std::cout << o << ":" << pP+1 <<std::endl;};
+			//if(bSTDcout){gpdCOUT << o << ":" << pP+1 <<gpdENDL;};
 		} return true;
 	}
 	return false;
@@ -434,11 +434,11 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
 							if( okXYZ.qlen_xyz() ){
 								tXYZ.xyz_( oXYZ.xyz_(okXYZ) );
 								tABC.ABC_( oABC.ABC_(okABC) );
-								if(bSTDcout){std::cout << "9115tXYZ: " << tXYZ.pSTR( gpsJDpub ) << std::endl;}
+								if(bSTDcout){gpdCOUT << "9115tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							} else {
 								tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
 								tABC.ABC_( oABC.ABC_(iABC) );
-								if(bSTDcout){std::cout << "Err tXYZ: " << tXYZ.pSTR( gpsJDpub ) << std::endl;}
+								if(bSTDcout){gpdCOUT << "Err tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							}
 							break;
 					}
@@ -450,13 +450,13 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
 					/// megnézzük holt tart a robot
 					U4	lag = (mSEC-msSMR2.w),
 						lagX = msSRT3.x+lag;
-					if(bSTDcout){std::cout << "HS1ms-msSRT3=" << HS1ms << "-" << lagX << "=" << (I8)HS1ms-(I8)lagX << std::endl;}
+					if(bSTDcout){gpdCOUT << "HS1ms-msSRT3=" << HS1ms << "-" << lagX << "=" << (I8)HS1ms-(I8)lagX << gpdENDL;}
 					if( HS1ms < lagX )
 					{
 						HS1ms = 0;
 						//oCTRL.z = 0;
 						//JD.y = 0;
-						if(bSTDcout){std::cout << "\033[1;32mEXTRA GO! lag:" << lag << "ms\033[0m" << std::endl;}
+						if(bSTDcout){gpdCOUT << "\033[1;32mEXTRA GO! lag:" << lag << "ms\033[0m" << gpdENDL;}
 						//break;
 					}
 				}
@@ -742,9 +742,9 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
         // o-kat berakjuk a t-be
         tXYZ.xyz_( oXYZ );
 		tABC.ABC_( oABC );
-		if(bSTDcout){std::cout << "CAGE tXYZ: " << tXYZ.pSTR( gpsJDpub ) <<std::endl;}
+		if(bSTDcout){gpdCOUT << "CAGE tXYZ: " << tXYZ.pSTR( gpsJDpub ) <<gpdENDL;}
 	} else
-		if(bSTDcout){std::cout << "oXYZ: " << oXYZ.pSTR( gpsJDpub ) << "\r\ntXYZ: " << tXYZ.pSTR( gpsJDpub ) <<std::endl;}
+		if(bSTDcout){gpdCOUT << "oXYZ: " << oXYZ.pSTR( gpsJDpub ) << "\r\ntXYZ: " << tXYZ.pSTR( gpsJDpub ) <<gpdENDL;}
 
 	JD.y = 0;
 	switch( JD.x )
@@ -822,11 +822,11 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 							if( okXYZ.qlen_xyz() ){
 								tXYZ.xyz_( oXYZ.xyz_(okXYZ) );
 								tABC.ABC_( oABC.ABC_(okABC) );
-								if(bSTDcout){std::cout << "9115tXYZ: " << tXYZ.pSTR( gpsJDpub ) << std::endl;}
+								if(bSTDcout){gpdCOUT << "9115tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							} else {
 								tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
 								tABC.ABC_( oABC.ABC_(iABC) );
-								if(bSTDcout){std::cout << "Err tXYZ: " << tXYZ.pSTR( gpsJDpub ) << std::endl;}
+								if(bSTDcout){gpdCOUT << "Err tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							}
 							break;
 					}
@@ -838,13 +838,13 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 					/// megnézzük holt tart a robot
 					U4	lag = (mSEC-msSMR2.w),
 						lagX = msSRT3.x+lag;
-					if(bSTDcout){std::cout << "HS1ms-msSRT3=" << HS1ms << "-" << lagX << "=" << (I8)HS1ms-(I8)lagX << std::endl;}
+					if(bSTDcout){gpdCOUT << "HS1ms-msSRT3=" << HS1ms << "-" << lagX << "=" << (I8)HS1ms-(I8)lagX << gpdENDL;}
 					if( HS1ms < lagX )
 					{
 						HS1ms = 0;
 						//oCTRL.z = 0;
 						//JD.y = 0;
-						if(bSTDcout){std::cout << "\033[1;32mEXTRA GO! lag:" << lag << "ms\033[0m" << std::endl;}
+						if(bSTDcout){gpdCOUT << "\033[1;32mEXTRA GO! lag:" << lag << "ms\033[0m" << gpdENDL;}
 						//break;
 					}
 				}
@@ -1139,9 +1139,9 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
         // o-kat berakjuk a t-be
         tXYZ.xyz_( oXYZ );
 		tABC.ABC_( oABC );
-		if(bSTDcout){std::cout << "CAGE tXYZ: " << tXYZ.pSTR( gpsJDpub ) <<std::endl;}
+		if(bSTDcout){gpdCOUT << "CAGE tXYZ: " << tXYZ.pSTR( gpsJDpub ) <<gpdENDL;}
 	} else
-		if(bSTDcout){std::cout << "oXYZ: " << oXYZ.pSTR( gpsJDpub ) << "\r\ntXYZ: " << tXYZ.pSTR( gpsJDpub ) <<std::endl;}
+		if(bSTDcout){gpdCOUT << "oXYZ: " << oXYZ.pSTR( gpsJDpub ) << "\r\ntXYZ: " << tXYZ.pSTR( gpsJDpub ) <<gpdENDL;}
 
 	JD.y = 0;
 	switch( JD.x )

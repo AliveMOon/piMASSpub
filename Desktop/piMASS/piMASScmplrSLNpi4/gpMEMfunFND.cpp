@@ -439,8 +439,8 @@ void gpMEM::funFND() {
 		//gpmMcpy( pDST, pS, nCPY )[nCPY] = 0;
 
 	if(bSTDcout_jsr)
-	{std::cout	<< stdCYAN << "funFND:"
-				<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
+	{gpdCOUT	<< stdCYAN << "funFND:"
+				<< stdALU << (pDST?(char*)pDST:"?") << gpdENDL;}
 
 	gpmDEL(pPRNT);
 }
