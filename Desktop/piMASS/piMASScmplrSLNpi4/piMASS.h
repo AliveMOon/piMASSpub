@@ -1833,7 +1833,7 @@ public:
 		struct { U4 i,n; };
 		struct { gpeALFu4 a4; U4 n4; };
 		struct { U1x4 aU1x4[2]; };
-		struct { U2 xl,xh,prt,srf; };
+		struct { U2 xl,xh,srf,prt; };
 		struct { gpeALF var; };
 		struct { U8 u8; };
 		struct { U1* apSTR[gpeU4x2nSTR]; };

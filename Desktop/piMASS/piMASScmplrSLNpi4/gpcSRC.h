@@ -1743,7 +1743,7 @@ class gpc3Ditm {
 	gpc3D*		p3D;
 public:
 	char sNAME[0x100];
-	gpeALF alfN;
+	gpeALF alfNM;
 	U4	itmIX,	itmID,
 		momIX,	momID,
 		trgID,	layID,
@@ -1762,29 +1762,7 @@ public:
 
 	gpc3Ditm(){};
 	gpc3D* p3Di( gpcGL* pGL, const char* pP, char *pF );
-	char* pNAME( char* pN = NULL ) {
-		if( !this )
-			return NULL;
-		if( !pN )
-			return sNAME+nNAME;
-		U8 s;
-		pN += gpmNINCS(pN," \t\"");
-		U4 n = gpmVAN(pN," \t\"\r\n",s);
-		gpmMcpy( sNAME, pN, n )[n] = 0;
-
-		char* pCH = strrchr(sNAME,'/');
-		if( pCH ) {
-			nNAME = pCH ? pCH - sNAME : 0;
-			pCH += gpmNINCS(pCH,"/");
-			nNAME = pCH-sNAME;
-		} else
-			nNAME = 0;
-		//if( sNAME[nNAME] == '/' )
-		//	nNAME++;
-
-		alfN = gpfSTR2ALF( (U1*)sNAME+nNAME, (U1*)sNAME+gpmSTRLEN(sNAME+nNAME), NULL, '_' );
-		return sNAME+nNAME;
-	}
+	char* pNAME( char* pN = NULL );
 	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
 	U4* pBONadd( gpc3Ditm* pBON = NULL );
 	F4x4* pMXl( float s );

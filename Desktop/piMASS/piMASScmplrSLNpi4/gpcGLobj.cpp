@@ -209,7 +209,6 @@ public:
 		return this;
 	}
 };
-
 class gpc3Dvx {
 public:
 	F4 xyzi, up;		//  0 16
@@ -415,14 +414,18 @@ public:
 			if( p != pPRT[i].prt ) {
 				if( pTR ) {
 					pSRF = pTR->pSRFadd(-1);
-					if( pTG ) if( bSTDcout_3D )  std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
+					if( pTG )
+					if( bSTDcout_3D )
+						std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
 												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
 												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
 												<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
 				}
 				pTR = (gpc3Dtri*)tri.Ux( tri.nLD(sizeof(*pTR)), sizeof(*pTR) );
 				pTR->prt = p = pPRT[i].prt;
-				if( pTG ) if( bSTDcout_3D )  std::cout << "PART:" <<((char*)pLWO) + pTG[p].x << std::endl;
+				if( pTG )
+				//if( bSTDcout_3D )
+					std::cout << "PART:" <<((char*)pLWO) + pTG[p].x << std::endl;
 				s = -1;
 				pSRF = NULL;
 			}
@@ -473,10 +476,12 @@ public:
 			return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 
 		pSRF = pTR->pSRFadd(-1);
-		if( pTG ) if( bSTDcout_3D )  std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
-												<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
-												<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
-												<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
+		if( pTG )
+		if( bSTDcout_3D )
+			std::cout << " SRF:"	<< " " << ((char*)pLWO) + pTG[pSRF[-1].x].x
+									<< " 1n:" << (pSRF[0].y-pSRF[-1].y)
+									<< " 2n:" << (pSRF[0].z-pSRF[-1].z)/2
+									<< " 3n:" << (pSRF[0].w-pSRF[-1].w)/3 << std::endl;
 		return (gpc3Dtri*)tri.Ux( 0, sizeof(gpc3Dtri) );
 	}
 };
@@ -1369,6 +1374,29 @@ I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	gpc3D* p3D = p3Dlst->p3Dl( a, pPATH )->pLWO(rd, p3Dlst->bnDCT );
 	return p3D ? p3D->id.x : -1; //id;
 }
+char* gpc3Ditm::pNAME( char* pN ) {
+	if( !this )
+		return NULL;
+	if( alfNM )
+		return sNAME+nNAME;
+	U8 s;
+	pN += gpmNINCS(pN," \t\"");
+	U4 n = gpmVAN(pN," \t\"\r\n",s);
+	gpmMcpy( sNAME, pN, n )[n] = 0;
+
+	char* pCH = strrchr(sNAME,'/');
+	if( pCH ) {
+		nNAME = pCH ? pCH - sNAME : 0;
+		pCH += gpmNINCS(pCH,"/");
+		nNAME = pCH-sNAME;
+	} else
+		nNAME = 0;
+	//if( sNAME[nNAME] == '/' )
+	//	nNAME++;
+
+	alfNM = gpfSTR2ALF( (U1*)sNAME+nNAME, (U1*)sNAME+nNAME+gpmSTRLEN(sNAME+nNAME), NULL, '_' );
+	return sNAME+nNAME;
+}
 gpc3D* gpc3Ditm::p3Di( gpcGL* pGL, const char* pP, char *pF ) {
 	if( !this )
 		return NULL;
@@ -1391,18 +1419,18 @@ gpc3D* gpc3Ditm::p3Di( gpcGL* pGL, const char* pP, char *pF ) {
 	AB = pNAME();*/
 
 	gpcLZY rd;
-	char sPATH[0x100], *pFILE = (char*)gpmMcpy( sPATH, pP, pF-pP ) + (pF-pP);
-	gpmSTRCPY( pFILE, pNAME() );
+	char sPATH[0x100], *pFL = (char*)gpmMcpy( sPATH, pP, pF-pP ) + (pF-pP);
+	gpmSTRCPY( pFL, pNAME() );
 	while( gpmACE(sPATH,4) < 0 ) {
-		pFILE[-1] = 0;
-		pFILE = strrchr(sPATH,'/');
-		if(!pFILE)
+		pFL[-1] = 0;
+		pFL = strrchr(sPATH,'/');
+		if(!pFL)
 			return p3D;
-		pFILE++;
-		gpmSTRCPY( pFILE, pNAME() );
+		pFL++;
+		gpmSTRCPY( pFL, pNAME() );
 	}
 	rd.lzyRD( sPATH, s = 0 );
-	I4 i = pGL->iLWO( alfN, sPATH, rd );
+	I4 i = pGL->iLWO( alfNM, sPATH, rd );
 	p3D = pGL->p3Dlst->p3Dix( i );
 	return p3D;
 }
@@ -1457,27 +1485,29 @@ gpc3D* gpc3D::prt2ix( gpcGL* pGL ) {
 	if( !this )
 		return NULL;
 
-	gpc3Dly* pLY;
-	gpc3Dmap* pM;
-	gpc3Dtri* pT0;
-	for( U4 i = 0, n = nLY(), nTR, nMAP; i < n; i++ ) {
+	gpc3Dly* pLY = NULL;
+	gpc3Dmap* pM = NULL;
+	gpc3Dtri* pT0 = NULL;
+	gpc3Dvx* pVX = NULL;
+	U4 i = 0,n,m, nMAP, t,nT;
+	for( n = nLY(); i < n; i++ ) {
 		pLY = pLYix(i);
 		nMAP = pLY->nMAP( p_lwo->p_alloc, tgIX.pU4x2()  );
 		if( !nMAP )
 			continue;
 
-		for( U4 m = 0, nT; m < nMAP; m++ ){
+		for( m = 0; m < nMAP; m++ ){
 			pM = pLY->pMAP(m);
 			if( pGL ? !pM : true )
 				continue;
 
-			gpc3Dvx* pVX = (gpc3Dvx*)pM->pnt.p_alloc;
+			pVX = (gpc3Dvx*)pM->pnt.p_alloc;
 			if( !pM->iVXn.y )
 				pGL->VBOobj( pM->iVXn, pVX, pM->pnt.nLD(sizeof(*pVX)) );
 
 			nT = pM->nTRI();
 			pT0 = pM->pTRI0( pLY->buf );
-			for( U4 t = 0; t < nT; t++ ) {
+			for( t = 0; t < nT; t++ ) {
 				if( pT0[t].aIIXN[2].y )
 					continue;
 				if( pGL->IBOobj( pT0[t].aIIXN[2], pT0[t].t.pU4(), pT0[t].t.nU4(3), 3 ).y != 1 )
@@ -1499,18 +1529,18 @@ gpcGL* gpcGL::glDRW( I4x2 xy, I4x2 wh ) {
 		return NULL;
 	GLenum e = 0;
 
-	if( aUniID[0] > -1 )
+	if( aUniID[gpeUniID_tgPX] > -1 )
 	if( pPICrtx ) {
-		glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
+		glUniform2f( aUniID[gpeUniID_tgPX], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
 	} else {
-		glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
+		glUniform2f( aUniID[gpeUniID_tgPX], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
 	}
 
-	if( aUniID[1] > -1 ) {
-		glUniform2f( aUniID[1], (float)xy.x, (float)xy.y ); gpfGLerr();
+	if( aUniID[gpeUniID_DIVxy] > -1 ) {
+		glUniform2f( aUniID[gpeUniID_DIVxy], (float)xy.x, (float)xy.y ); gpfGLerr();
 	}
-	if( aUniID[2] > -1 ) {
-		glUniform2f( aUniID[2], (float)wh.x, (float)wh.y ); gpfGLerr();
+	if( aUniID[gpeUniID_FRMwh] > -1 ) {
+		glUniform2f( aUniID[gpeUniID_FRMwh], (float)wh.x, (float)wh.y ); gpfGLerr();
 	}
 
 
@@ -1578,7 +1608,7 @@ int aglVXi4[] = {
 	6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
 };
 
-gpcGL* gpcGL::glDRW3D( U4 l, gpc3D* p3d, U4 msk ) {
+gpcGL* gpcGL::glDRW3D( U4 l, gpc3D* p3d, U8 msk ) {
 	if( !msk )
 		return this;
 	p3D = p3d->prt2ix( this );
@@ -1617,6 +1647,8 @@ gpcGL* gpcGL::glDRW3D( U4 l, gpc3D* p3d, U4 msk ) {
 			onATscn(aglVXi4);
 
 			for( U4 t = 0; t < nT; t++, msk >>= 1 ) {
+				if( !msk )
+					break;
 				if( (msk&1) ? !pT0[t].aIIXN[2].y : true )
 					continue;
 
@@ -1681,9 +1713,11 @@ gpdSTATICoff gpsGLSLvx3D[] = //{
 "varying	vec3	fr_up;															\n"
 "varying	vec2	fr_ps;															\n"
 "uniform vec2 tgPX;																	\n"
+"uniform vec2 nBON;																	\n"
 "uniform mat4 aMX[20], aMXi[20];													\n"
 "void main() {																		\n"
-"   int  	ix = int(v_ix.x*255);	 												\n"
+"   int  	ix =  int(v_ix.x*255);													\n"
+" 	if(nBON.x<1) ix = 0; 															\n"
 "   mat4   	mxi = aMXi[ix], mx = aMX[ix]*mxi;										\n"
 "	vec3	vmx = (mx*vec4(v_vx,1.0)).xyz, vmx2 = (vmx+v_vx)/2.0,					\n"
 "			mv	= (gl_ProjectionMatrix*gl_ModelViewMatrix*vec4(vmx,1.0)).xyz,		\n"
@@ -1958,11 +1992,11 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 	GLSLset( vf, gpsGLSLfrg3D, gpsGLSLvx3D );
 	glUseProgram( gProgID ); gpfGLerr( " glUseProgram( gProgID" );
 
-	if( aUniID[0] > -1 )
+	if( aUniID[gpeUniID_tgPX] > -1 )
 	if( pPICrtx ) {
-		glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
+		glUniform2f( aUniID[gpeUniID_tgPX], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w ); gpfGLerr();
 	} else {
-		glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
+		glUniform2f( aUniID[gpeUniID_tgPX], (float)trgWHpx.x, (float)trgWHpx.y ); gpfGLerr();
 	}
 
 	F4x4 view, wMX = 1.0, uMX, *pRSTmx;
@@ -2022,7 +2056,7 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 							glLoadMatrixf((const GLfloat*)&aMX[0]);
 
 							p3D = p3Di->p3Di( this, p3Dg->sPUB, p3Dg->pPUB );
-							U4 n3Db = p3Di->nBON();
+							GLint n3Db = p3Di->nBON();
 							if( n3Db ) {
 								n3Db = p3D->nMX();
 								if( n3Db ) {
@@ -2043,12 +2077,14 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 										pRSTmx[i] = aMXi[i].inv();
 									pRSTmx[0] = pRSTmx[1];
 								}
-								if( aUniID[5] > -1 )
-									glUniformMatrix4fv( aUniID[5], 19, GL_FALSE, (const GLfloat*)&aMX[1] );
-								if( aUniID[6] > -1 )
-									glUniformMatrix4fv( aUniID[6], 19, GL_FALSE, (const GLfloat*)(pRSTmx+1) );
+								if( aUniID[gpeUniID_aMX] > -1 )
+									glUniformMatrix4fv( aUniID[gpeUniID_aMX], 19, GL_FALSE, (const GLfloat*)&aMX[1] );
+								if( aUniID[gpeUniID_aMXi] > -1 )
+									glUniformMatrix4fv( aUniID[gpeUniID_aMXi], 19, GL_FALSE, (const GLfloat*)(pRSTmx+1) );
 							}
-
+							if( aUniID[gpeUniID_nBON] > -1 )
+								//glUniform1i( aUniID[gpeUniID_nBON], n3Db ); gpfGLerr();
+								glUniform2f( aUniID[gpeUniID_nBON], (float)n3Db, (float)n3Db ); gpfGLerr();
 
 							if( !p3Dnull )
 							if( strstr(p3Di->sNAME, "eye" ) )

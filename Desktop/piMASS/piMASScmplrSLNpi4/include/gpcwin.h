@@ -90,9 +90,19 @@ typedef enum gpe3Dat:U4 {
 	gpe3Dat_FRGLNK 		= 0xC0,
 	gpe3Dat_VTXFRGLNK 	= 0xE0,
 };
+typedef enum gpeUniID:I4 {
+	gpeUniID_tgPX,				// 0
+	gpeUniID_DIVxy,				// 1
+	gpeUniID_FRMwh,				// 2
+	gpeUniID_aTX,				// 3
+	gpeUniID_aCNL,				// 4
+	gpeUniID_aMX,
+	gpeUniID_aMXi,
+	gpeUniID_nBON,
+	gpeUniID_iLST,
+} gptUniID;
 
-class gpcGLSL
-{
+class gpcGLSL {
 public:
 	GLint	isSUCC, nLOG,
 			PrgID, nT, nU,
@@ -100,7 +110,7 @@ public:
 			ATvxID, ATixID, ATupID, ATuvID, ATpsID,
 
 			aTexID[GL_ACTIVE_TEXTURE-GL_TEXTURE0],
-			aUniID[0x10];
+			aUniID[0x10], nUniID;
 
 	GLuint	vrtxID,
 			frgID;
@@ -177,7 +187,7 @@ public:
 			ATvxID, ATixID, ATupID, ATuvID, ATpsID,
 			gVxSucc,
 			gFrSucc, aTexID[0x8],
-			gPrgSucc, aUniID[0x8],
+			gPrgSucc, aUniID[0xf], nUniID,
 			gSucc;
 	GLuint	tmpID,
 			gProgID,
@@ -277,7 +287,7 @@ public:
 		glGenBuffers( 1, &iIXn.x );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iIXn.x );
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, iIXn.a4x2[1].area()*sizeof(*pD), pD, GL_STATIC_DRAW ); (e = glGetError());
-		if( e ) std::cout << std::hex << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  std::endl;
+		if( e ) gpdCOUT << std::hex << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  gpdENDL;
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 		return iIXn;
 	}
@@ -429,8 +439,8 @@ public:
 		if( !this )
 			return NULL;
 
-		if( aUniID[4] > -1 )
-			glUniform4fv( aUniID[4]+i, 1, (GLfloat*)&xyzw );
+		if( aUniID[gpeUniID_aCNL] > -1 )
+			glUniform4fv( aUniID[gpeUniID_aCNL]+i, 1, (GLfloat*)&xyzw );
 
 		return this;
 	}
@@ -438,8 +448,8 @@ public:
 		if( !this )
 			return NULL;
 
-		if( aUniID[4] > -1 )
-			glUniform4fv( aUniID[4]+i, n, (GLfloat*)pXYZW );
+		if( aUniID[gpeUniID_aCNL] > -1 )
+			glUniform4fv( aUniID[gpeUniID_aCNL]+i, n, (GLfloat*)pXYZW );
 
 		return this;
 	}
@@ -451,8 +461,8 @@ public:
 			return this;
 		if( !pTX )
 		{
-			if( aUniID[3] > -1 )
-				glUniform2f( aUniID[3]+i, 0, 0 );
+			if( aUniID[gpeUniID_aTX] > -1 )
+				glUniform2f( aUniID[gpeUniID_aTX]+i, 0, 0 );
 			return this;
 		}
 
@@ -462,8 +472,8 @@ public:
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 		//glBindSampler(i,aSMPid[0]);
 
-		if( aUniID[3] > -1 )
-			glUniform2f( aUniID[3]+i, (float)wh.x, (float)wh.y );
+		if( aUniID[gpeUniID_aTX] > -1 )
+			glUniform2f( aUniID[gpeUniID_aTX]+i, (float)wh.x, (float)wh.y );
 
 		aTXwh[i] = wh;
 		return this;
@@ -478,8 +488,8 @@ public:
 			{
 				continue;
 
-				if( aUniID[3] > -1 )
-					glUniform2f( aUniID[3]+i, 0, 0 );
+				if( aUniID[gpeUniID_aTX] > -1 )
+					glUniform2f( aUniID[gpeUniID_aTX]+i, 0, 0 );
 				continue;
 			}
 
@@ -487,7 +497,7 @@ public:
 		}
 		return this;
 	}
-	gpcGL* glDRW3D( U4 l, gpc3D* p, U4 msk = -1 );
+	gpcGL* glDRW3D( U4 l, gpc3D* p, U8 msk = -1 );
 	gpcGL* glDONE(){ glUseProgram(0); p3D = NULL; return this; }
 	gpcGL* glDRW( I4x2 xy, I4x2 wh );
 	gpcGL* glDRW( U1 mode, I4x2 xy, I4x2 wh ) {
@@ -496,16 +506,16 @@ public:
 		/*if( mode )
 			return NULL;*/
 
-		if( aUniID[0] > -1 )
+		if( aUniID[gpeUniID_tgPX] > -1 )
 		if( pPICrtx )
-			glUniform2f( aUniID[0], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w );
+			glUniform2f( aUniID[gpeUniID_tgPX], (float)pPICrtx->txWH.z, (float)pPICrtx->txWH.w );
 		else
-			glUniform2f( aUniID[0], (float)trgWHpx.x, (float)trgWHpx.y );
+			glUniform2f( aUniID[gpeUniID_tgPX], (float)trgWHpx.x, (float)trgWHpx.y );
 
-		if( aUniID[1] > -1 )
-			glUniform2f( aUniID[1], (float)xy.x, (float)xy.y );
-		if( aUniID[2] > -1 )
-			glUniform2f( aUniID[2], (float)wh.x, (float)wh.y );
+		if( aUniID[gpeUniID_DIVxy] > -1 )
+			glUniform2f( aUniID[gpeUniID_DIVxy], (float)xy.x, (float)xy.y );
+		if( aUniID[gpeUniID_FRMwh] > -1 )
+			glUniform2f( aUniID[gpeUniID_FRMwh], (float)wh.x, (float)wh.y );
 
 		glBindBuffer( GL_ARRAY_BUFFER, aVXid[mode] );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[mode] );
