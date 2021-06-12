@@ -31,7 +31,7 @@ class gpcCRS;
 class gpcWIN;
 class gpcGL;
 class gpCORE;
-class gpITMlst;
+class gpDBlst;
 class gpMEM;
 //#include "gpcres.h"
 
@@ -1254,32 +1254,23 @@ public:
 	};*/
 };
 /// CCR XNZVC
-class gpITMlst;
+class gpDBlst;
 
-class gpITM {
+class gpDBitm {
 public:
 	I8 mID, ID;
 	gpcLZY	atLST,
 			voidLST;
-	gpITM(){};
-	~gpITM(){};
-	gpITM* read( gpITMlst *pIDlst );
-	gpITM* store( gpITMlst *pIDlst, I8x2* pAT, void* pVAR );
-	gpITM& null(){
+	gpDBitm(){};
+	~gpDBitm(){};
+	gpDBitm* read( gpDBlst *pIDlst );
+	gpDBitm* store( gpDBlst *pIDlst, I8x2* pAT, void* pVAR );
+	gpDBitm& null(){
 		/// ha lesz valami törölni való
 		gpmCLR;
 		return *this;
 	}
-	size_t sOF( gpeALF b ) {
-		switch( b ) {
-			case gpeALF_XYR: return sizeof(I4x4);
-			case gpeALF_ID: return sizeof(I8);
-			case gpeALF_LWO:
-				return sizeof(I4);
-			default: break;
-		}
-		return 0;
-	}
+	size_t sOF( gpeALF b );
 	U1* fndXB( gpeALF b ) {
 		I8x4* pA0 = (I8x4*)atLST.Ux( 0, sizeof(*pA0) );
 		I4 iA = 0;
@@ -1326,32 +1317,32 @@ public:
 		return (I4x4*)fndAB( ab );
 	}
 };
-class gpITMlst {
+class gpDBlst {
 public:
 	char	sPATH[0x400], *pF;
 	I8		newID;
 	I4		aixITMsel[2], iSW;
-	gpITM	itmSEL;
+	gpDBitm	itmSEL;
 	gpcLZY	itmLST;
 	gpMEM*	pMEM;
-	gpITMlst(){};
-	gpITMlst( gpMEM* pM, char* pU1, U2 nU1 ) {
+	gpDBlst(){};
+	gpDBlst( gpMEM* pM, char* pU1, U2 nU1 ) {
 		gpmCLR;
 		pMEM = pM;
 		pF = sPATH+nU1;
 		gpmMcpy( sPATH, pU1, nU1 );
 	}
-	~gpITMlst(){
-		gpITM* pITM = (gpITM*)itmLST.p_alloc;
+	~gpDBlst(){
+		gpDBitm* pITM = (gpDBitm*)itmLST.p_alloc;
 		if( !pITM )
 			return;
 
-		for( I4 i = 0, n = itmLST.nLD(sizeof(gpITM)); i < n; i++ )
+		for( I4 i = 0, n = itmLST.nLD(sizeof(gpDBitm)); i < n; i++ )
 			pITM[i].null();
 	}
-	gpITM* pITM( I4 ix = 0 ) {
-		U4 n = itmLST.nLD(sizeof(gpITM));
-		gpITM* pI = this ? (gpITM*)itmLST.Ux( ix, sizeof(*pI) ) : NULL;
+	gpDBitm* pITM( I4 ix = 0 ) {
+		U4 n = itmLST.nLD(sizeof(gpDBitm));
+		gpDBitm* pI = this ? (gpDBitm*)itmLST.Ux( ix, sizeof(*pI) ) : NULL;
 		if( !pI )
 			return NULL;
 		if( ix < n )
@@ -1361,11 +1352,11 @@ public:
 		pI->read( this );
 		return pI;
 	}
-	gpITM* pITMid( I8 id ) {
-		U4 n = itmLST.nLD(sizeof(gpITM));
+	gpDBitm* pITMid( I8 id ) {
+		U4 n = itmLST.nLD(sizeof(gpDBitm));
 		if( n ? (id>=newID): true)
 			return NULL;
-		gpITM* pI = this ? (gpITM*)itmLST.Ux( 0, sizeof(*pI) ) : NULL;
+		gpDBitm* pI = this ? (gpDBitm*)itmLST.Ux( 0, sizeof(*pI) ) : NULL;
 		if( !pI )
 			return NULL;
 		for( U4 i = 0; i < n; i++ ) {
@@ -1374,10 +1365,13 @@ public:
 		}
 		return NULL;
 	}
-	int nITM() { return itmLST.nLD(sizeof(gpITM)); }
+	int nITM() { return itmLST.nLD(sizeof(gpDBitm)); }
 };
 
+
 class gpc3Dly;
+class gpc3Dlst;
+
 class gpc3Dtri {
 public:
 	U4 prt;
@@ -1392,7 +1386,19 @@ public:
 		t.null();
 		srf.null();
 	}
+	U4 nSRF() {
+		if( !this )
+			return 0;
+		U4 n = srf.nLD(sizeof(U4x4));
+		return n>1 ? n-1 : 0;
+	}
 	U4x4* pSRF( U4 s ) {
+		if( s >= nSRF() )
+			return NULL;
+
+		return srf.pU4x4n( s );
+	}
+	U4x4* pSRFadd( U4 s ) {
 		if( !this )
 			return NULL;
 
@@ -1404,15 +1410,26 @@ public:
 		null();
 	};
 };
+class gpc3Dsrf {	///B
+public:
+	char sNAME[0x100],
+		 sPIC[0x100], //,sALF[0x100],
+		 sVMAP[0x100];
+	I4 imag, imap, ix;
+	I8x2 an;
+	gpc3Dsrf(){};
+};
 class gpc3D {
+	gpcLZY	lzySRF,
+			rstMX;
 public:
 	char sPATH[gpdMAX_PATH];
 	I8x4 id;
 
 	gpcLZY	*p_lwo,
 			ly3D,
-			tgIX,
-			lzySRF;
+			tgIX;
+	U4 nRDY, nBLD;
 
 	~gpc3D(){
 		gpmDEL(p_lwo);
@@ -1424,61 +1441,398 @@ public:
 		id.a8x2[0].b = alf;
 		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
 		gpmSTRCPY( sPATH, pP );
+		nBLD = nRDY+1;
 	}
 	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
 	U4 nLY();
 	gpc3Dly* pLYix( U4 i );
 	gpc3D* prt2ix( gpcGL* pGL );
+	U4 nSRF() { return this ? lzySRF.nLD(sizeof(gpc3Dsrf)) : 0; }
+	gpc3Dsrf* pSRFi( U4 i );
+	gpc3Dsrf* pSRFadd( U4 i );
+	U4 nMX() {
+		return this ? rstMX.nF4x4() : 0;
+	}
+	F4x4* pMX( U4 n ) {
+		if( !n )
+			return rstMX.pF4x4( 0 );
+		F4x4* pMX = rstMX.pF4x4n(0,n);
+		return rstMX.pF4x4( 0 );
+	}
+};
+
+class gpc3Dact {
+public:
+	float	b, e, start, mix, fade, gim, loop, long_s;
+	I8		begin_ms, end_ms, start_ms, loop_ms, long_ms;
+	gpc3Dact(	float _begin, float _end,
+			float _start, float _mix,
+			float _fade, float _gim, float _loop )
+	{
+		b		= _begin;
+		e		= _end;
+		start	= _start;
+		mix		= _mix;
+		fade	= _fade;
+		gim		= _gim;
+		loop	= _loop;
+
+		long_ms = (I8)((long_s = e-b)*ms2sec);
+		begin_ms = (I8)(b*ms2sec);
+		end_ms = (I8)(e*ms2sec);
+		loop_ms = (I8)(loop*ms2sec);
+		start_ms = ((I8)(start-b))*ms2sec;
+	}
+	float sec( I8 ms ) const {
+		float sec = 0.0;
+		ms += start_ms; // - begin_ms;
+
+		if( ms < long_ms )
+			sec = float(ms)/float(ms2sec);
+		else if( end_ms <= loop_ms )
+			sec = long_s;
+		else
+			sec = float(ms%long_ms)/float(ms2sec);
+
+		return sec + b;
+	}
+};
+typedef enum gpeACT : int {
+	gpeACT_DEF,
+	gpeACT_IDLE,	// <BEGIN>  1.0 <END> 31.0 <START>  1.0 <MIX>  0.0  <FADE> 0.25 <GIM> 1.0 <LOOP> 1.0 <ENDTRACK>
+	gpeACT_WALK,	// <BEGIN> 32.5 <END> 34.5 <START> 32.5 <MIX> 33.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 33.0 <ENDTRACK>
+	gpeACT_RUN,		// <BEGIN> 36.5 <END> 38.5 <START> 36.5 <MIX> 38.5  <FADE> 0.5  <GIM> 0.3 <LOOP> 37.0 <ENDTRACK>
+	gpeACT_JUMP,	// <BEGIN> 40.0 <END> 42.0 <START> 40.0 <MIX> 41.5  <FADE> 0.5  <GIM> 0.3 <STOP> <ENDTRACK>
+	gpeACT_SLEFT,	// <BEGIN> 43.0 <END> 45.0 <START> 43.0 <MIX> 44.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 43.0 <ENDTRACK>
+	gpeACT_SRIGHT,	// <BEGIN> 46.0 <END> 48.0 <START> 46.0 <MIX> 47.5  <FADE> 0.5  <GIM> 1.0 <LOOP> 46.0 <ENDTRACK>
+	gpeACT_FLINCH,	// <BEGIN> 49.0 <END> 52.0 <START> 49.5 <MIX> 51.5  <FADE> 0.5  <GIM> 0.5 <LOOP> 50.0 <ENDTRACK>
+	gpeACT_BOX,		// <BEGIN> 53.0 <END> 54.0 <START> 53.0 <MIX> 53.75 <FADE> 0.25 <GIM> 0.1 <LOOP> 53.0 <ENDTRACK>
+	gpeACT_KICK,	// <BEGIN> 55.0 <END> 56.0 <START> 55.0 <MIX> 55.5  <FADE> 0.5  <GIM> 0.1 <LOOP> 55.0 <ENDTRACK>
+	gpeACT_ABOARD,	// <BEGIN> 57.0 <END> 58.0 <START> 57.0 <MIX> 57.75 <FADE> 0.25 <GIM> 0.2 <STOP> <ENDTRACK>
+	gpeACT_DEBUS,	// <BEGIN> 58.0 <END> 60.0 <START> 58.0 <MIX> 60.0  <FADE> 0.25 <GIM> 0.2 <STOP> <ENDTRACK>
+	gpeACT_STOW,	// <BEGIN> 61.0 <END> 61.5 <START> 61.0 <MIX> 61.5  <FADE> 0.25 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_STOWUP,	// <BEGIN> 61.5 <END> 62.0 <START> 61.5 <MIX> 62.0  <FADE> 0.25 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_WHAM,	// <BEGIN> 63.0 <END> 64.0 <START> 63.0 <MIX> 63.75 <FADE> 0.25 <GIM> 0.1 <LOOP> 63.0 <ENDTRACK>
+	gpeACT_KO,		// <BEGIN> 65.0 <END> 69.0 <START> 65.0 <MIX> 68.9  <FADE> 0.01 <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_ERECT,	// <BEGIN> 69.0 <END> 74.0 <START> 69.0 <MIX> 73.9  <FADE> 0.5  <GIM> 0.1 <STOP> <ENDTRACK>
+	gpeACT_END,
+} gpeACT_int;
+static const   gpc3Dact gpaACT_man[] = {
+	//			begin,	end,	start,	mix,	fade,	gim,		loop
+	gpc3Dact(	  0.0,	1.0,	 0.0,	 0.0,	0.25,	1.0,		0.0		),	//GPE_ACTION_DEF,
+	gpc3Dact(	  1.0,	31.0,	 1.0,	 0.0,	0.25,	1.0,		1.0		),	//GPE_ACTION_IDLE,
+	gpc3Dact(	 32.0,	34.0,	32.5,	33.5,	0.5,	1.0,		32.0	),	//GPE_ACTION_WALK,
+	gpc3Dact(	 36.5,	38.5,	36.5,	38.5,	0.5,	0.3,		37.0	),	//GPE_ACTION_RUN,
+	gpc3Dact(	 40.0,	42.0,	40.0,	41.5,	0.5,	0.3,		42.0	),	//GPE_ACTION_JUMP,
+	gpc3Dact(	 43.0,	45.0,	43.0,	44.5,	0.5,	1.0,		43.0	),	//GPE_ACTION_SLEFT,
+	gpc3Dact(	 46.0,	48.0,	46.0,	47.5,	0.5,	1.0,		46.0	),	//GPE_ACTION_SRIGHT,
+	gpc3Dact(	 49.0,	51.0,	49.5,	51.5,	0.5,	0.5,		49.0	),	//GPE_ACTION_FLINCH,
+	gpc3Dact(	 53.0,	54.0,	53.0,	53.75,	0.25,	0.1,		54.0	),	//GPE_ACTION_BOX,
+	gpc3Dact(	 55.0,	56.0,	55.0,	55.5,	0.5,	0.1,		56.0	),	//GPE_ACTION_KICK,
+	gpc3Dact(	 57.0,	58.0,	57.0,	57.75,	0.25,	0.2,		58.0	),	//GPE_ACTION_ABOARD,
+	gpc3Dact(	 58.0,	60.0,	58.0,	60.0,	0.25,	0.2,		60.0	),	//GPE_ACTION_DEBUS,
+	gpc3Dact(	 61.0,	61.5,	61.0,	61.5,	0.25,	0.1,		61.5	),	//GPE_ACTION_STOW,
+	gpc3Dact(	 61.5,	62.0,	61.5,	62.0,	0.25,	0.1,		62.0	),	//GPE_ACTION_STOWUP,
+	gpc3Dact(	 63.0,	64.0,	63.0,	63.75,	0.25,	0.1,		64.0	),	//GPE_ACTION_WHAM,
+	gpc3Dact(	 65.0,	69.0,	65.0,	68.9,	0.01,	0.1,		69.0	),	//GPE_ACTION_KO,
+	gpc3Dact(	 69.0,	74.0,	69.0,	73.9,	0.5,	0.1,		74.0	),	//GPE_ACTION_ERECT,
+};
+
+static const char gp_man_lws[] =
+	"manus\n"
+	"bone_mother\n"
+	"bone_groin\n"
+	"bone_waist\n"
+	"bone_throax\n"
+
+	"bone_l.upperarm\n"
+	"bone_l.forearm\n"
+	"bone_l.hand\n"
+
+	"bone_r.upperarm\n"
+	"bone_r.forearm\n"
+	"bone_r.hand\n"
+
+	"bone_l.thigh\n"
+	"bone_l.shin\n"
+	"bone_l.feet\n"
+
+	"bone_r.thigh\n"
+	"bone_r.shin\n"
+	"bone_r.feet\n"
+
+	"bone_neck\n"
+	"bone_head\n\0";
+
+
+static const char gp_s_lws[] =
+		"LoadObjectLayer\n"
+		"AddBone\n"
+		"AddNullObject\n"
+		"AddLight\n"
+		"AddCamera\n"
+		"NumChannels\n"
+		"Channel\n"
+		"{\n"
+		"Envelope\n"
+		"Key\n"
+		"}\n"
+		"ParentItem\n"
+		"BoneName\n"
+		"BoneRestPosition\n"
+		"BoneRestDirection\n"
+		"BoneRestLength\n"
+		"Plugin\n"
+		"EndPlugin\n"
+		;
+
+typedef enum GPE_LWS_COM:int {
+		GPE_LWS_COM_LoadObjectLayer,
+		GPE_LWS_COM_AddBone,
+		GPE_LWS_COM_AddNullObject,
+		GPE_LWS_COM_AddLight,
+		GPE_LWS_COM_AddCamera,
+		GPE_LWS_COM_NumChannels,
+		GPE_LWS_COM_Channel,
+		GPE_LWS_COM_C_open,
+		GPE_LWS_COM_Envelope,
+		GPE_LWS_COM_Key,
+		GPE_LWS_COM_C_close	,
+		GPE_LWS_COM_ParentItem,
+		GPE_LWS_COM_BoneName,
+		GPE_LWS_COM_BoneRestPosition,
+		GPE_LWS_COM_BoneRestDirection,
+		GPE_LWS_COM_BoneRestLength,
+		GPE_LWS_COM_Plugin,
+		GPE_LWS_COM_EndPlugin,
+} GPT_LWS_COM;
+typedef enum GPE_LWS_iTYP:U4 {
+	gpeLWSiTYP_OBJ = 0x10000000,
+	gpeLWSiTYP_LIG = 0x20000000,
+	gpeLWSiTYP_CAM = 0x30000000,
+	gpeLWSiTYP_BON = 0x40000000,
+	gpeLWSiTYP_TYP = 0xF0000000,
+} GPT_LWS_iTYP;
+class gpc3Dkey {
+public:
+	float val, sec; int spn;
+	float aP[6];
+	gpc3Dkey(){};
+	gpc3Dkey( const char* pS ){
+		gpmCLR;
+		*this = pS;
+	};
+	gpc3Dkey& operator = ( const char* pS );
+	float operator * ( float s ) {
+			if( s == sec )
+				return val;
+			if( this[1].sec<=s )
+				return this[1].val;
+			if( this[1].val==val )
+				return val;
+
+			return	   (this[1].val-val)
+					* ((s-sec)/(this[1].sec-sec))
+					+ val;
+	}
+	size_t sOUT( char* pBUFF, const char* pEND = "\r\n" );
+};
+class gpc3Dcnl {
+public:
+	gpcLZY aKEY[9];
+	U4 nKEY( U1 c ) { return c > 8 ? 0 : (this ? aKEY[c].nLD(sizeof(gpc3Dkey)): 0); }
+	float valKEYs( U1 c, float s );
+	gpc3Dkey* pKEYins( U1 c, float s );
+	gpc3Dkey* pKEYinsIX( U1 c, I4 i, I4 nE, float s );
+};
+
+//#include <ctime>
+static const I8 gpaMONTH[] = {
+			// 2012
+			31,
+			29+31,				//29
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2013
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2014
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			// 2015
+			31,
+			28+31,				// 28
+			31+28+31,
+			30+31+28+31,
+
+			31+30+31+28+31,
+			30+31+30+31+28+31,
+			31+30+31+30+31+28+31,
+			31+31+30+31+30+31+28+31,
+
+			30+31+31+30+31+30+31+28+31,
+			31+30+31+31+30+31+30+31+28+31,
+			30+31+30+31+31+30+31+30+31+28+31,
+			31+30+31+30+31+31+30+31+30+31+28+31,
+			};
+
+class gpcTIME {
+public:
+	I8	year,
+		mounth,
+		day,
+		hour,
+		minute,
+		sec,
+		msec;
+
+	gpcTIME( void ) { gpmCLR; }
+	I8 get_msec( bool b_touch = false ) {
+		std::time_t t = std::time(0);   // get time now
+		std::tm* now = std::localtime(&t);
+
+		year = (now->tm_year+1900) - 2012; //local_time.wYear-2012;
+		mounth = year*12 + now->tm_mon; // local_time.wMonth;
+		day =	year*365 + (year/4) + 1
+				+ gpaMONTH[(year%4)*12 + now->tm_mon] + now->tm_mday;
+
+		hour = day*24 + now->tm_hour; //local_time.wHour;
+		minute = hour*60  + now->tm_min; //+ local_time.wMinute;
+		sec = minute*60   + now->tm_sec; //+ local_time.wSecond;
+
+		return msec = sec*ms2sec;
+	}
+};
+
+
+class gpc3Ditm {
+	gpc3D*		p3D;
+public:
+	char sNAME[0x100];
+	gpeALF alfNM;
+	U4	itmIX,	itmID,
+		momIX,	momID,
+		trgID,	layID,
+		mxIX,	nLEV,
+		nNAME,	stkIX;
+	F4  	rstXYZ, rstYPR, rstWHD;
+
+	// TRACK -----------------
+	F4x4	mxL, mxW, mxiW;
+	float sec; gpeACT ACT;
+
+	gpc3Dcnl	cnl;
+	gpcLZY	bonLST;
+	bool	bNULL;
+
+
+	gpc3Ditm(){};
+	gpc3D* p3Do() { return p3D; }
+	gpc3D* p3Dobj( gpcGL* pGL, const char* pP, char *pF );
+	char* pNAME( char* pN = NULL );
+	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
+	U4* pBONadd( gpc3Ditm* pBON = NULL );
+	F4x4* pMXl( float s );
+};
+
+class gpc3Dgym {
+	public:
+	char sPATH[gpdMAX_PATH], *pFILE,
+		 sPUB[gpdMAX_PATH], *pPUB;
+	I8x4 id;
+
+	I4x4	olcb;
+	gpcLZY	*p_lws,
+			itmLST;
+
+	U4 n3Ditm() { return this ? itmLST.nLD(sizeof(gpc3Ditm)) : 0; }
+	gpc3Ditm* p3DitmADD( U4 i, U4 id );
+	gpc3Ditm* p3Dii( U4 i );
+	~gpc3Dgym(){
+		gpmDEL(p_lws);
+	}
+	gpc3Dgym( I4 i, const char* pP, gpeALF alf );
+	gpc3Dgym* pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT );
 };
 class gpc3Dlst {
 public:
 	gpcLZY lst3D;
-	gpcLZYdct bonLST;
+	gpcLZYdct bnDCT, lwsDCT;
+	gpcLZY lst3Dgym;
 
 	~gpc3Dlst(){
-		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
+		gpc3D **pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );
 		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
 		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
 			gpmDEL( pp3D[i3D] );
 		}
-	}
-	gpc3Dlst();/*{
-		gpmCLR;
-		U8 nLEN;
-		char* pS = gp_man_lws, *pSe;
-		while( *pS ) {
-			pSe = pS+gpmVAN( pS, "\r\n", nLEN );
-			bonLST.dctADD( pS, pSe-pS );
-			pS = pSe+gpmNINCS(pSe, "\r\n" );
+
+		gpc3Dgym **pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( 0, sizeof(gpc3Dgym*) );
+		//I4
+		i3D = 0, e3D = lst3Dgym.nLD(sizeof(gpc3Dgym*));
+		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+			gpmDEL( pp3Dgym[i3D] );
 		}
-	}*/
+	}
+	gpc3Dlst();
 	gpc3D* p3Dix( I4 i ) {
 		if( i < 0 ) return NULL;
 		gpc3D* p3D = ((gpc3D**)lst3D.Ux(i,sizeof(gpc3D*)))[0];
 		return p3D;
 	}
-	gpc3D* p3D( gpeALF alf, const char* pP ) {
-		if( !this )
+	gpc3D* p3DobjADD( gpeALF alf, const char* pP );
+
+	gpc3Dgym* p3DgymIX( I4 i ) {
+		if( this ? i < 0 : true )
 			return NULL;
-
-		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );//, *p3D;
-		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
-		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
-			if( !pp3D[i3D] ) {
-				if( e3D > i3D )
-					e3D = i3D;
-				continue;
-			}
-			if( pp3D[i3D]->id.a8x2[0].a != alf )
-				continue;
-			return pp3D[i3D];
-		}
-		pp3D = (gpc3D**)lst3D.Ux( e3D, sizeof(gpc3D*) );
-		pp3D[0] = new gpc3D( e3D, pP, alf );
-		return pp3D[0];
+		gpc3Dgym** pp3Dgym = ((gpc3Dgym**)lst3Dgym.Ux(0,sizeof(gpc3Dgym*)));
+		return pp3Dgym[i];
 	}
-};
+	gpc3Dgym* p3DgymADD( gpeALF alf, const char* pP );
 
+};
+class gpc3Dtrk {
+public:
+	I8 mSEC; gpeACT ACT;
+
+	gpc3Dtrk(){}
+	F4x4* pGYM( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act );
+
+};
 class gpMEM {
 public:
 	I8x2 	aA[0x10];
@@ -2087,8 +2441,7 @@ class gpcCLASS {
 	I8	nLST, nCLASS,
 		idFND, ixFND;
 
-	gpcLZY** ppCLASS( I8 ix )
-	{
+	gpcLZY** ppCLASS( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
@@ -2125,8 +2478,7 @@ class gpcCLASS {
 		}
 		return ppC+ix;
 	}
-	gpcCLASS( I8 id )
-	{
+	gpcCLASS( I8 id ) {
 		gpmCLR;
 		I8 n = 0;
 		pLST = pLST->tree_add( id, n );
@@ -2136,13 +2488,11 @@ class gpcCLASS {
 		nLST = n;
 	}
 public:
-	gpcCLASS( void )
-	{
+	gpcCLASS( void ) {
 		gpmCLR;
 	}
 
-	gpcLZY* pGET( I8 ix )
-	{
+	gpcLZY* pGET( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
@@ -2152,16 +2502,14 @@ public:
 
 		return *ppC;
 	}
-	gpcLZY** ppGET( I8 ix )
-	{
+	gpcLZY** ppGET( I8 ix ) {
 		if( ix >= nLST )
 			return NULL;
 
 		return ppCLASS( ix );
 	}
 
-	I8 fnd( I8 id )
-	{
+	I8 fnd( I8 id ) {
 		if( id ? !this : true )
 			return nLST;
 
@@ -2171,8 +2519,7 @@ public:
 
 		return pLST->tree_fnd(id, nLST);
 	}
-	gpcLZY* p_fnd( I8 id, I8& ix )
-	{
+	gpcLZY* p_fnd( I8 id, I8& ix ) {
 		ix = 0;
 		if( id ? !this : true )
 			return NULL;
@@ -2200,8 +2547,7 @@ public:
 		idFND = id;
 		return pFND = *ppC;
 	}
-	gpcCLASS* add( I8 id, I8& ix, I8& n )
-	{
+	gpcCLASS* add( I8 id, I8& ix, I8& n ) {
 		if( !id )
 		{
 			ix = n = (this ? nLST: 0);
@@ -2290,8 +2636,8 @@ public:
 	U4 nTXT = 0;
 	char* pTXT, *pT;
 
-	gpITMlst*	iDBu( gpMEM* pMEM, char *pU, char* sPATH, char* pFILE );
-	gpITMlst*	iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE );
+	gpDBlst*	iDBu( gpMEM* pMEM, char *pU, char* sPATH, char* pFILE );
+	gpDBlst*	iDB( gpMEM* pMEM, gpPTR *pPi, char* sPATH, char* pFILE );
 	gpcLZYdct*	pOPER();
 	U4* pM( U4x2& zn, U1 id = 4 ) {
 		zn = 0;

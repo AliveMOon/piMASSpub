@@ -23,11 +23,11 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 						bSW );
 	if( psHD > gpsHD )
 	{
-		if(bSTDcout){std::cout << gpsHD;
+		if(bSTDcout){gpdCOUT << gpsHD;
 		psHD = gpsHD;
 		psHD[0] = 0;
 	}
-	if(bSTDcout){std::cout << "." <<std::endl ;
+	if(bSTDcout){gpdCOUT << "." <<gpdENDL ;
 
 	U1	*pPUB = mass.msRST( gpsSTRpub ),
 		*pS = *pB == '\a' ? pB+1 : pB,
@@ -51,7 +51,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
 	bool bABC;
-	if(bSTDcout){std::cout <<std::endl << "ASM:nP:lv tp dc.n iP\r\n";
+	if(bSTDcout){gpdCOUT <<gpdENDL << "ASM:nP:lv tp dc.n iP\r\n";
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -64,7 +64,7 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 			pCOUT = NULL;
 
 		if( pCOUT )
-			if(bSTDcout){std::cout << "ASM:" << pCOUT << "\r\n";
+			if(bSTDcout){gpdCOUT << "ASM:" << pCOUT << "\r\n";
 
 		c = *pS;
 		if( bABC = gpmbABC(c, gpaALFsub) )
@@ -146,8 +146,8 @@ void gpcSRC::cmpi_undo00( gpcMASS& mass, bool bDBG )
 "*_/"
 	}
 
-	if(bSTDcout){std::cout <<std::endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
-	if(bSTDcout){std::cout <<std::endl;}
+	if(bSTDcout){gpdCOUT <<gpdENDL << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
+	if(bSTDcout){gpdCOUT <<gpdENDL;}
 	nBLD = nVERr;
 }
 */
@@ -165,11 +165,11 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 						bSW );
 	if( psHD > gpsHD )
 	{
-		if(bSTDcout){std::cout << gpsHD;
+		if(bSTDcout){gpdCOUT << gpsHD;
 		psHD = gpsHD;
 		psHD[0] = 0;
 	}
-	if(bSTDcout){std::cout << "." <<std::endl ;
+	if(bSTDcout){gpdCOUT << "." <<gpdENDL ;
 
 	U1	*pPUB = mass.msRST( gpsSTRpub ),
 		*pS = *pB == '\a' ? pB+1 : pB,
@@ -193,7 +193,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 	mass.incLEV();
 	char	*pCOUT = NULL, sVAN[] = ".";
 	bool 	bABC;
-	if(bSTDcout){std::cout <<std::endl << "ASM:nP:lv tp dc.n iP\r\n";
+	if(bSTDcout){gpdCOUT <<gpdENDL << "ASM:nP:lv tp dc.n iP\r\n";
 
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pE; pS += gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -206,7 +206,7 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 			pCOUT = NULL;
 
 		if( pCOUT )
-			if(bSTDcout){std::cout << "ASM:" << pCOUT << "\r\n";
+			if(bSTDcout){gpdCOUT << "ASM:" << pCOUT << "\r\n";
 
 		c = *pS;
 		if( bABC = gpmbABC(c, gpaALFsub) )
@@ -287,8 +287,8 @@ void gpcSRC::cmpi_SKELETON( gpcMASS& mass, bool bDBG )
 
 	}
 
-	if(bSTDcout){std::cout <<std::endl << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
-	if(bSTDcout){std::cout <<std::endl;}
+	if(bSTDcout){gpdCOUT <<gpdENDL << "alDAT:" << mass.alDAT << "BLD/VER:"<< nBLD << nVERr;
+	if(bSTDcout){gpdCOUT <<gpdENDL;}
 	nBLD = nVERr;
 }
 */

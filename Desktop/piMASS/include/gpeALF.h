@@ -865,7 +865,8 @@ typedef enum gpeALF:I8
 	gpeALF_KEY = gpdABC('K', 'E', 'Y'),
 	gpeALF_LOG = gpdABC('L', 'O', 'G'),
 	gpeALF_LWO = gpdABC('L', 'W', 'O'),
-	gpeALF_LWS = gpdABC('L', 'W', 'S'),
+	gpeALF_LWP, gpeALF_LWQ, gpeALF_LWR, gpeALF_LWS,
+	//gpeALF_LWS = gpdABC('L', 'W', 'S'),
 	gpeALF_MAN = gpdABC('M', 'A', 'N'),
 	gpeALF_MAX = gpdABC('M', 'A', 'X'),
 	gpeALF_MEM = gpdABC('M', 'E', 'M'),
@@ -939,7 +940,16 @@ typedef enum gpeALF:I8
 	gpeALF_SYS = gpdABC('S', 'Y', 'S'),
 
 	gpeALF_TAG = gpdABC('T', 'A', 'G'),
-	gpeALF_TRG = gpdABC('T', 'R', 'G'),
+
+	gpeALF_TRA = gpdABC('T', 'R', 'A'),
+	gpeALF_TRB, gpeALF_TRC, gpeALF_TRD, gpeALF_TRE,
+	gpeALF_TRF, gpeALF_TRG, gpeALF_TRH, gpeALF_TRI,
+	gpeALF_TRJ, gpeALF_TRK, gpeALF_TRL, gpeALF_TRM,
+	gpeALF_TRN, gpeALF_TRO, gpeALF_TRP, gpeALF_TRQ,
+	gpeALF_TRR, gpeALF_TRS, gpeALF_TRT, gpeALF_TRU,
+	gpeALF_TRV, gpeALF_TRW, gpeALF_TRX, gpeALF_TRY,
+	gpeALF_TRZ,
+
 	gpeALF_TYF = gpdABC('T', 'Y', 'F'),
 	gpeALF_TYI = gpdABC('T', 'Y', 'I'),
 	gpeALF_TYU = gpdABC('T', 'Y', 'U'),
@@ -1675,8 +1685,7 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 
 	if( !p_out )
 		return 0;
-	if( !d0 )
-	{
+	if( !d0 ) {
 		*(U1*)p_out = 0;
 		return 0;
 	}
@@ -1686,15 +1695,13 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 
 	*p_end = 0;
 	bool b_minus = false;
-	if( d0 < 0 )
-	{
+	if( d0 < 0 ) {
 		b_minus = true;
 		d0 *= -1;
 	}
 
 	I8 d1;
-	while( d0 )
-	{
+	while( d0 ) {
 		d1 = d0;
 		d0 = (d0-1)/gpdALF;
 		p_buff--;
@@ -1711,7 +1718,8 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 	((U1*)p_out)[n] = 0;
 	return n;
 }
-inline gpeALF gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL );
+
+inline gpeALF gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL, char skip = 0 );
 
 
 

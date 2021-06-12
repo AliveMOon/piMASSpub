@@ -112,7 +112,7 @@
 			<Add option="`sdl2-config --cflags`" />
 			<Add directory="/home/alivemoon/Asztal/userland" />
 			<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
-			<Add directory="/home/alivemoon/Asztal/piMASS/piMASScmplrSLN/sys" />
+			<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
 			<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4/SIM7X00/Raspberry/c" />
 		</Compiler>
 		<Linker>

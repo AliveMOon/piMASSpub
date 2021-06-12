@@ -8,7 +8,7 @@ extern char gpaALF_H_sub[];
 
 
 gpINST* gpMEM::instALU() {
-	//if(bSTDcout){std::cout << stdALU "+";
+	//if(bSTDcout){gpdCOUT << stdALU "+";
 	gpINST& ins = pINST[pc];
 	pc++;
 
@@ -79,11 +79,11 @@ gpINST* gpMEM::instALU() {
 		case gpeEA_d16IAnI:
 		case gpeEA_d16IAnDnI: {
 				switch( ins.mD ) {
-					case gpeEA_IAnI: 						off = pA[ins.iD]; break;
-					case gpeEA_IAnIp: 						off = pA[ins.iD]; pA[ins.iD]+=sOF; break;
-					case gpeEA_sIAnI:						pA[ins.iD]-=sOF; off = pA[ins.iD]; break;
-					case gpeEA_d16IAnI:						off = pA[ins.iD] + ins.a8x2.y; break;
-					case gpeEA_d16IAnDnI:					off = pA[ins.iD] + pD[ins.xD] + ins.a8x2.y; break;
+					case gpeEA_IAnI: 		off = pA[ins.iD]; break;
+					case gpeEA_IAnIp: 		off = pA[ins.iD]; pA[ins.iD]+=sOF; break;
+					case gpeEA_sIAnI:		pA[ins.iD]-=sOF; off = pA[ins.iD]; break;
+					case gpeEA_d16IAnI:		off = pA[ins.iD] + ins.a8x2.y; break;
+					case gpeEA_d16IAnDnI:	off = pA[ins.iD] + pD[ins.xD] + ins.a8x2.y; break;
 					default:
 						off = -1;
 						break;

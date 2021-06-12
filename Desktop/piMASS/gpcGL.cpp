@@ -1,45 +1,46 @@
 #include "gpccrs.h"
 #include "gpsGLSL.h"
 
-gpcGL::gpcGL( gpcWIN& win ) {
+gpcGL::gpcGL( gpcWIN* p_win ) {
 	gpmCLR;
+	pMASS = p_win->piMASS;
 	oPrgID = -1;
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
-	gCntxt = SDL_GL_CreateContext( win.pSDLwin );
+	gCntxt = SDL_GL_CreateContext( p_win->pSDLwin );
 	if( !gCntxt ) {
-		if(bSTDcout){std::cout <<std::endl << "gpcGL init error" <<std::endl;}
+		if(bSTDcout){gpdCOUT <<gpdENDL << "gpcGL init error" <<gpdENDL;}
 		return;
 	}
 	glewExperimental = GL_TRUE;
 	glewErr = glewInit();
 	if( glewErr != GLEW_OK ) {
-		if(bSTDcout){std::cout <<std::endl << "gpcGL GLEW_NOK error" <<std::endl;}
+		if(bSTDcout){gpdCOUT <<gpdENDL << "gpcGL GLEW_NOK error" <<gpdENDL;}
 		return;
 	}
 
 	glGetIntegerv( GL_CURRENT_PROGRAM, &oPrgID );
 
-	trgWHpx = win.winSIZ.a4x2[1];
+	trgWHpx = p_win->winSIZ.a4x2[1];
 	pTRG = SDL_CreateTexture(
-								win.pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+								p_win->pSDLrndr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
 								trgWHpx.x, trgWHpx.y
 							);
 	gVxSucc = GL_FALSE;
 
-	pTXchar = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFchar );
+	pTXchar = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFchar );
 	if( pTXchar )
-		if(bSTDcout){std::cout << "char" << (void*)win.pSRFchar <<std::endl;}
+		if(bSTDcout){gpdCOUT << "char" << (void*)p_win->pSRFchar <<gpdENDL;}
 	else
-		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
+		if(bSTDcout){gpdCOUT << SDL_GetError() <<gpdENDL;}
 
-	pTXiso = SDL_CreateTextureFromSurface( win.pSDLrndr, win.pSRFiso );
+	pTXiso = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFiso );
 	if( pTXiso )
-		if(bSTDcout){std::cout << "char" << (void*)win.pSRFiso <<std::endl;}
+		if(bSTDcout){gpdCOUT << "char" << (void*)p_win->pSRFiso <<gpdENDL;}
 	else
-		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
+		if(bSTDcout){gpdCOUT << SDL_GetError() <<gpdENDL;}
 
 }
 gpcGL* gpcGL::SWP( gpcWIN* pWIN ) { // SDL_Window* pWIN ) {
@@ -75,7 +76,7 @@ gpcGL* gpcGL::TRG( 	SDL_Renderer* pSDLrndr,
 						GL_UNSIGNED_BYTE,
 						pSRF->pixels );
 		pPICrtx->pREF = NULL;
-		glBindFramebuffer(GL_FRAMEBUFFER, 0 ); //pPICrtx ? pPICrtx->glRNDR.w : 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0 );
 		gpfGLerr();
 		pPICrtx = NULL;
 	} else
@@ -181,15 +182,15 @@ GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {
 	glShaderSource( vrtxID, 1, &pSvrtx, 0 );
 	glCompileShader( vrtxID );
 	glGetShaderiv( vrtxID, GL_COMPILE_STATUS, &isSUCC );
-	if( isSUCC != GL_TRUE )
-	{
+	if( isSUCC != GL_TRUE ) {
 		//Get info string length
 		glGetShaderiv( vrtxID, GL_INFO_LOG_LENGTH, &nLOG );
-		if( nLOG )
-		{
+		if( nLOG ) {
 			vtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vtxLOG.p_alloc );
+			gpdCOUT << (char*)vtxLOG.p_alloc << gpdENDL;
 		}
+		return isSUCC;
 	} else {
 		pVTX = (char*)pSvrtx;
 		vtxLOG.lzyRST();
@@ -211,15 +212,13 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 	glShaderSource( frgID, 1, &pSfrg, 0 );
 	glCompileShader( frgID );
 	glGetShaderiv( frgID, GL_COMPILE_STATUS, &isSUCC );
-	if( isSUCC != GL_TRUE )
-	{
+	if( isSUCC != GL_TRUE ) {
 		//Get info string length
 		glGetShaderiv( frgID, GL_INFO_LOG_LENGTH, &nLOG );
-		if( nLOG )
-		{
+		if( nLOG ) {
 			frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
-			std::cout << (char*)frgLOG.p_alloc << std::endl;
+			gpdCOUT << (char*)frgLOG.p_alloc << gpdENDL;
 		}
 		return isSUCC;
 	}
@@ -270,13 +269,16 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 	glDeleteShader( vrtxID );
 	glDetachShader( PrgID, frgID );
 	glDeleteShader( frgID );
-
-	aUniID[0] = glGetUniformLocation( PrgID, "tgPX" 	);
-	aUniID[1] = glGetUniformLocation( PrgID, "DIVxy" 	);
-	aUniID[2] = glGetUniformLocation( PrgID, "FRMwh" 	);
-	aUniID[3] = glGetUniformLocation( PrgID, "aTX" 		);
-	aUniID[4] = glGetUniformLocation( PrgID, "aCNL"		);
-	nU = 5;
+	nUniID = 0;
+	aUniID[gpeUniID_tgPX] = glGetUniformLocation( PrgID, "tgPX" 	);	// 0
+	aUniID[gpeUniID_DIVxy] = glGetUniformLocation( PrgID, "DIVxy" );	// 1
+	aUniID[gpeUniID_FRMwh] = glGetUniformLocation( PrgID, "FRMwh" );	// 2
+	aUniID[gpeUniID_aTX] = glGetUniformLocation( PrgID, "aTX" 	);	// 3
+	aUniID[gpeUniID_aCNL] = glGetUniformLocation( PrgID, "aCNL"	);	// 4
+	aUniID[gpeUniID_aMX] = glGetUniformLocation( PrgID, "aMX"	);	// 5
+	aUniID[gpeUniID_aMXi] = glGetUniformLocation( PrgID, "aMXi"	);	// 6
+	aUniID[gpeUniID_nBON] = glGetUniformLocation( PrgID, "nBON"	);	// 7
+	nUniID =  gpeUniID_iLST;//nU = 5;
 
 	if( !ppUlst )
 		return GL_TRUE;
@@ -286,10 +288,10 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 		if( ppUlst[i] ? !*ppUlst[i] : true )
 			break;
 
-		aUniID[nU] = glGetUniformLocation( PrgID, ppUlst[i] );
-		if( aUniID[nU] < 0 )
-			continue;
-		nU++;
+		aUniID[nUniID] = glGetUniformLocation( PrgID, ppUlst[i] );
+		//if( aUniID[nUniID] < 0 )
+		//	continue;
+		nUniID++;
 	}
 
 	return GL_TRUE;
@@ -343,6 +345,44 @@ gpcGLSL* gpcGLSL::pNEW( const I8x2& an, const char* pF, const char* pV,
 
 	return this;
 }
+void gpcGL::onATscn( int* glU4 ) {
+	/// XYZ
+	if( ATvxID > -1 ) {
+		glVertexAttribPointer( ATvxID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[0]) );  gpfGLerr( "ATvxID" );
+		glEnableVertexAttribArray( ATvxID ); gpfGLerr();
+	}
+	/// ix blnd
+	if( ATixID > -1 ) {
+		glVertexAttribPointer( ATixID, 4, 	GL_UNSIGNED_BYTE,
+											GL_TRUE,//
+											//GL_FALSE,
+													glU4[5], gpmGLBOFF(glU4[1]) );  gpfGLerr( "ATixID" );
+		glEnableVertexAttribArray( ATixID ); gpfGLerr();
+	}
+	/// UP XYZ
+	if( ATupID > -1 ) {
+		glVertexAttribPointer( ATupID, 3, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[2]) );  gpfGLerr( "ATupID" );
+		glEnableVertexAttribArray( ATupID ); gpfGLerr();
+	}
+	/// UV
+	if( ATuvID > -1 ) {
+		glVertexAttribPointer( ATuvID, 2, GL_FLOAT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[3]) );  gpfGLerr( "ATuvID" );
+		glEnableVertexAttribArray( ATuvID ); gpfGLerr();
+	}
+	/// PrtSrf
+	if( ATpsID > -1 ) {
+		glVertexAttribPointer( ATpsID, 2, GL_INT, GL_FALSE, glU4[5], gpmGLBOFF(glU4[4]) );  gpfGLerr( "ATpsID" );
+		glEnableVertexAttribArray( ATpsID ); gpfGLerr();
+	}
+}
+void gpcGL::offATscn() {
+	if( ATvxID > -1 ) { glDisableVertexAttribArray( ATvxID ); gpfGLerr(); }
+	if( ATixID > -1 ) { glDisableVertexAttribArray( ATixID ); gpfGLerr(); }
+	if( ATupID > -1 ) { glDisableVertexAttribArray( ATupID ); gpfGLerr(); }
+	if( ATuvID > -1 ) { glDisableVertexAttribArray( ATuvID ); gpfGLerr(); }
+	if( ATpsID > -1 ) { glDisableVertexAttribArray( ATpsID ); gpfGLerr(); }
+}
+
 gpcGL* gpcGL::GLSLset( const gpcALU& alu, const char* pF, const char* pV ) {
 	if( !this )
 		return this;

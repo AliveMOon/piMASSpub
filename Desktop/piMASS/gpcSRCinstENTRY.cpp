@@ -64,8 +64,8 @@ U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
 						gpmMcpy( pDST, pCPY, nCPY )[nCPY] = 0;
 
 					if(bSTDcout_jsr)
-					{std::cout	<< stdCYAN << "gpeALF_entry:"
-								<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
+					{gpdCOUT	<< stdCYAN << "gpeALF_entry:"
+								<< stdALU << (pDST?(char*)pDST:"?") << gpdENDL;}
 				}
 
             } break;
@@ -134,7 +134,7 @@ gpBLK* gpcSRC::srcINSTanDalf( char* pS, gpBLK *pBLKm, gpBLK* pBLK ) {
 		}
 
 		#ifdef stdON
-			if(bSTDcout){std::cout << stdALU "pSRC" << std::endl;}
+			if(bSTDcout){gpdCOUT << stdALU "pSRC" << gpdENDL;}
 		#endif
 
 		_move._q.A7.D7;

@@ -4,6 +4,16 @@
 #define gpdGUIfrDEPTH "	float f = gl_DepthRange.far, n = gl_DepthRange.near; gl_FragDepth = (f-n)*0.85+n; \n"
 
 #define gpdGUIfr3Dc "	gl_FragColor = vec4(fr_uv,1.0);											\n"
+#define gpdGUIfr3Dc0 "	gl_FragColor = texture2D( tex0, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc1 "	gl_FragColor = texture2D( tex1, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc2 "	gl_FragColor = texture2D( tex2, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc3 "	gl_FragColor = texture2D( tex3, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc4 "	gl_FragColor = texture2D( tex4, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc5 "	gl_FragColor = texture2D( tex5, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc6 "	gl_FragColor = texture2D( tex6, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc7 "	gl_FragColor = texture2D( tex7, fr_uv.xy );								\n"
+#define gpdGUIfr3Dc8 "	gl_FragColor = texture2D( tex8, fr_uv.xy );								\n"
+
 #define gpdGUIfr3Du "	gl_FragColor = vec4(fr_up,1.0);											\n"
 #define gpdGUIfr3Dp "	gl_FragColor = vec4(fr_ps.xyy,1.0);										\n"
 

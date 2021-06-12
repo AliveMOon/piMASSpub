@@ -320,7 +320,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 
 	gpdEXPdbgCOUT
-	if(bSTDcout){std::cout << "Explode: " << any <<std::endl;}
+	if(bSTDcout){gpdCOUT << "Explode: " << any <<gpdENDL;}
 
 
 	U4 mom = 0, nBtrd = 0;
@@ -351,18 +351,18 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			trd = i;
 			break;
 		}
-		gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: nTRD " << i <<std::endl;}
+		gpdEXPdbgCOUT if(bSTDcout){gpdCOUT << "Explode: nTRD " << i <<gpdENDL;}
 		aBUG[i].trd = std::thread( TRDexp, aBUG+i );
 		aBUG[i].n_run++;
 		trd++;
 	}
 
 	gpdEXPdbgCOUT
-	if(bSTDcout){std::cout << "Explode: nTRD " << trd <<std::endl;}
+	if(bSTDcout){gpdCOUT << "Explode: nTRD " << trd <<gpdENDL;}
 
 	aBUG[trd].loop();
 
-	gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: mainLOOP " << trd <<std::endl;}
+	gpdEXPdbgCOUT if(bSTDcout){gpdCOUT << "Explode: mainLOOP " << trd <<gpdENDL;}
 	for( U4 i = 0; i <= trd; i++ ) {
 		if( aBUG[i].n_join < aBUG[i].n_run )
 		{
@@ -481,10 +481,10 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			gpdEXPdbgCOUT
 			if( nBOB )
 			{
-				if(bSTDcout){std::cout << "Explode: " << nB << "/" << nA <<std::endl;}
+				if(bSTDcout){gpdCOUT << "Explode: " << nB << "/" << nA <<gpdENDL;}
 				for( U4 i = 0; i < k2; i++)
 				if( pBB = ppBOB[i] )
-					if(bSTDcout){std::cout << i << "BOB:"
+					if(bSTDcout){gpdCOUT << i << "BOB:"
 								<< pBB->wCNTR.x
 								<< "x"
 								<< pBB->wCNTR.y
@@ -493,13 +493,13 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 								<< "rnd"
 								<< pBB->nRND
 								<< "A"
-								<< pBB->nAREA <<std::endl;}
+								<< pBB->nAREA <<gpdENDL;}
 			}
 			delete[] pF;
 		} else
 			delete[] pF;
 	}
-	//gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: " << nB << "/" << nA <<std::endl;}
+	//gpdEXPdbgCOUT if(bSTDcout){gpdCOUT << "Explode: " << nB << "/" << nA <<gpdENDL;}
 	return (U1x4*)gpapP[0]->pixels;
 
 }
@@ -517,7 +517,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 
 	(TnID+I8x2(0,i)).
 	an2str( (U1*)pDIR, (U1*)pEXP, true, true );
-	if(bSTDcout){std::cout << "FOOD:" << pPATH <<std::endl;}
+	if(bSTDcout){gpdCOUT << "FOOD:" << pPATH <<gpdENDL;}
 
 	SDL_Surface* pTMP = NULL;
 	if( gpfACE( pPATH, 4) > -1 )
@@ -527,7 +527,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 		{
 			pPET->w = 0;
 			gpmSDL_FreeSRF(pTMP);
-			if(bSTDcout){std::cout << " ERR! NoGood FILE" <<std::endl;}
+			if(bSTDcout){gpdCOUT << " ERR! NoGood FILE" <<gpdENDL;}
 			return pPET;
 		}
 
@@ -539,20 +539,47 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 			pPET->z = 0x1;	// z alive!
 			pPET->w = 2;	// w load.
 			gpmSDL_FreeSRF(pTMP);
-			if(bSTDcout){std::cout << " OK" <<std::endl;}
+			if(bSTDcout){gpdCOUT << " OK" <<gpdENDL;}
 			return pPET;
 		}
 
 		pPET->w = 0;
 		gpmSDL_FreeSRF(pTMP);
-		if(bSTDcout){std::cout << " ERR! NoGood SIZE" <<std::endl;}
+		if(bSTDcout){gpdCOUT << " ERR! NoGood SIZE" <<gpdENDL;}
 		return pPET;
 
 	}
 
-	if(bSTDcout){std::cout << " NoFnd!" <<std::endl;}
+	if(bSTDcout){gpdCOUT << " NoFnd!" <<gpdENDL;}
 	pPET->w = 0;
 	return pPET;
+}
+SDL_Surface* gpcPIC::pPICrd( char *pPATH, char *pFILE ){
+	if( !this )
+		return NULL;
+	SDL_Surface* pKILL = pSRF;
+	char	*pC = strrchr( gpmSTRCPY( sFILE, pPATH ), '/' );
+	while( pC ) {
+		gpmSTRCPY( pC+1, pFILE );
+		if( gpfACE( (char*)sFILE, 4) < 0 ) {
+			*pC = 0;
+			pC = strrchr( (char*)sFILE, '/' );
+			continue;
+		}
+		pSRF = IMG_Load( (char*)sFILE );
+		if( !pSRF ){
+			*pC = 0;
+			pC = strrchr( (char*)sFILE, '/' );
+			continue;
+		}
+		break;
+	}
+	if( pKILL == pSRF )
+		return pSRF;
+
+	gpmSDL_FreeSRF(pKILL);
+	pREF = NULL;
+	return pSRF;
 }
 
 #define gpdSPCdbgOFF if(false)
@@ -624,8 +651,8 @@ public:
 			U4 p = pSRF->pitch/sizeof(*p_s);
 			if( p_u )
 			{
-				if(bSTDcout){std::cout	<< " food.w:"	<< ptch
-							<< " pitch:"	<< p <<std::endl;}
+				if(bSTDcout){gpdCOUT	<< " food.w:"	<< ptch
+							<< " pitch:"	<< p <<gpdENDL;}
 
 				p_u[0].cpyX( p_s, gpmMIN(ptch,p), ptch*gpmMIN(0x80,pSRF->h), 1, gpmMIN(ptch,p) );
 				p_s = p_u->zyxw( p_s, ptch*0x80 );
@@ -664,8 +691,8 @@ public:
 		if( ptch != pSRF->pitch/sizeof(*p_d) )
 		{
 			ptch = pSRF->pitch/sizeof(*p_d);
-			if(bSTDcout){std::cout	<< " save.w:"	<< pSRF->w
-						<< " pitch:"	<< ptch <<std::endl;}
+			if(bSTDcout){gpdCOUT	<< " save.w:"	<< pSRF->w
+						<< " pitch:"	<< ptch <<gpdENDL;}
 		}
 		// SPaCe
 		p_d[0x00]
@@ -709,13 +736,13 @@ public:
 		gpmSTRCPY(pRAM,pDIR);
 		if( int err = rename( (char*)sRAM, (char*)sPATH ) )
 		{
-			if(bSTDcout){std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;}
+			if(bSTDcout){gpdCOUT << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<gpdENDL;}
 			gpcLZY load; U8 s = 0;
 			load.lzyRD( (char*)sRAM, s, 1 );
 			load.lzyWR( (char*)sPATH, true );
-			if(bSTDcout){std::cout << " LZYcpy: " << sRAM << " to " << sPATH <<std::endl;}
+			if(bSTDcout){gpdCOUT << " LZYcpy: " << sRAM << " to " << sPATH <<gpdENDL;}
 			remove((char*)sRAM);
-			if(bSTDcout){std::cout << " KILL:" << sRAM <<std::endl;}
+			if(bSTDcout){gpdCOUT << " KILL:" << sRAM <<gpdENDL;}
 		}
 
 		(ALFid+I8x2(0,pMAP->x))
@@ -723,7 +750,7 @@ public:
 		if( gpmACE(sRAM, 4) > -1 )
 		{
 			remove((char*)sRAM);
-			if(bSTDcout){std::cout << " KILL:" << sRAM <<std::endl;}
+			if(bSTDcout){gpdCOUT << " KILL:" << sRAM <<gpdENDL;}
 		}
 
 		return pSRF;
@@ -797,7 +824,7 @@ public:
 				pMAP->y++;
 
 		} else {
-			gpdSPCdbgCOUT if(bSTDcout){std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;}
+			gpdSPCdbgCOUT if(bSTDcout){gpdCOUT << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<gpdENDL;}
 
             // csere nem stimmel
             /// az a lényeg, ha le van nyomva az egér gomb a RNDR képet átmásolja a maskii-be
@@ -824,7 +851,7 @@ public:
 		if( !pFcpy )
 			return;
 
-		if(bSTDcout){std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;}
+		if(bSTDcout){gpdCOUT << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<gpdENDL;}
 
 
 		U1x4	fC, GD,// fP,
@@ -905,7 +932,7 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	else
 		pDIR = pFILE+gpmSTRLEN(pFILE);
 	if( gpfACE(pPATH, 4) < 0 ) {
-		if(bSTDcout){std::cout << "mkdir:"<< pPATH <<std::endl;}
+		if(bSTDcout){gpdCOUT << "mkdir:"<< pPATH <<gpdENDL;}
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
@@ -920,8 +947,8 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	aSPC[0].spcWH = *gpapP[0];
 	if( aSPC[0].spcWH.x != gpapP[0]->pitch/sizeof(*aSPC[0].pSPC) )
 	{
-		if(bSTDcout){std::cout	<< " spcWH.x:"	<< aSPC[0].spcWH.x
-					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*aSPC[0].pSPC)) <<std::endl;}
+		if(bSTDcout){gpdCOUT	<< " spcWH.x:"	<< aSPC[0].spcWH.x
+					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*aSPC[0].pSPC)) <<gpdENDL;}
 		aSPC[0].spcWH.x = gpapP[0]->pitch/sizeof(*aSPC[0].pSPC);
 	}
 
@@ -1063,7 +1090,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	else
 		pDIR = pFILE+gpmSTRLEN(pFILE);
 	if( gpfACE(pPATH, 4) < 0 ) {
-		if(bSTDcout){std::cout << "mkdir:"<< pPATH <<std::endl;}
+		if(bSTDcout){gpdCOUT << "mkdir:"<< pPATH <<gpdENDL;}
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
@@ -1078,8 +1105,8 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	SPC.spcWH = *gpapP[0];
 	if( SPC.spcWH.x != gpapP[0]->pitch/sizeof(*SPC.pSPC) )
 	{
-		if(bSTDcout){std::cout	<< " spcWH.x:"	<< SPC.spcWH.x
-					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*SPC.pSPC)) <<std::endl;}
+		if(bSTDcout){gpdCOUT	<< " spcWH.x:"	<< SPC.spcWH.x
+					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*SPC.pSPC)) <<gpdENDL;}
 		SPC.spcWH.x = gpapP[0]->pitch/sizeof(*SPC.pSPC);
 	}
 
@@ -1166,7 +1193,6 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 	//U4	frm;
 	int w = pMEM->pWgl->pPICrtx->txWH.a4x2[1].x,
 		h = pMEM->pWgl->pPICrtx->txWH.a4x2[1].y; //, acc;
-	//SDL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
 	if( pSRF ? ((pSRF->w!=w) && (pSRF->h!=h)) : false )
 		gpmSDL_FreeSRF(pSRF);
 
@@ -1288,10 +1314,10 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 		// STORE pBxx[i]
 		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
 		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
-		SDL_Surface* pStr = SDL_CreateRGBSurface( 0, Sc2, Sc2, 32, 0,0,0,0 );
-		gpmMcpyOF( (U1x4*)pStr->pixels, pCMBcr, FSn );
-		IMG_SavePNG( pStr, pPATH );
-		gpmSDL_FreeSRF(pStr);
+		SDL_Surface* pSrf = SDL_CreateRGBSurface( 0, Sc2, Sc2, 32, 0,0,0,0 );
+		gpmMcpyOF( (U1x4*)pSrf->pixels, pCMBcr, FSn );
+		IMG_SavePNG( pSrf, pPATH );
+		gpmSDL_FreeSRF(pSrf);
 	}
 
 	if( iRQ&1 ){
@@ -1299,16 +1325,16 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 		pBx[iBx] = aqRGBi;
 		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
 		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
-		SDL_Surface* pStr = IMG_Load( pPATH );
-		if( pStr ? pStr->pixels : NULL ) {
-			gpmMcpyOF( pSTRi, pStr->pixels, FSn );
+		SDL_Surface* pSrf = IMG_Load( pPATH );
+		if( pSrf ? pSrf->pixels : NULL ) {
+			gpmMcpyOF( pSTRi, pSrf->pixels, FSn );
 			for( U4 i = 0; i < FSn; i++ ){
-				pSTRi[i] = ((U1x4*)pStr->pixels)[i].swpZX().u4;
+				pSTRi[i] = ((U1x4*)pSrf->pixels)[i].swpZX().u4;
 			}
 		}
 		else
 			gpmZnOF(pSTRi,FSn);
-		gpmSDL_FreeSRF(pStr);
+		gpmSDL_FreeSRF(pSrf);
 
 
 	}
@@ -1350,197 +1376,5 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 	pBx[Fcr].x++;
 	return pMSK;
 }
-U1x4* gpcPIC::TOOLmaskAB2(	gpMEM* pMEM,
-							gpcPIC* pR, gpcPIC* pA, gpcPIC* pB,
-							char* pNAME, char *pPATH, char *pFILE ) {
-	//U4	frm;
-	int w = pMEM->pWgl->pPICrtx->txWH.a4x2[1].x,
-		h = pMEM->pWgl->pPICrtx->txWH.a4x2[1].y; //, acc;
-	//DL_QueryTexture( pR->pRTX, &frm, &acc, &w, &h );	// TRG
-	if( pSRF ? ((pSRF->w!=w) && (pSRF->h!=h)) : false )
-		gpmSDL_FreeSRF(pSRF);
-	if( !pSRF ) {
-		pSRF = SDL_CreateRGBSurface( 0, w, h, 32, 0,0,0,0 );
-		if( !pSRF )
-			return NULL;
-	}
-	gpcLZY* pALL = pMEM->pMASS->PIClzyALL.LZY( TnID );
-	if(!pALL)
-		return pSRF ? (U1x4*)pSRF->pixels : NULL;
 
-	SDL_RenderReadPixels(	pMEM->pWIN->pSDLrndr, NULL, 0,
-							pSRF->pixels,
-							pSRF->pitch );
-	SDL_Surface	*pAsrf = pA ? pA->pSRF : NULL,						// A. draw
-				*pBsrf = pB ? pB->pSRF : NULL; 						// B. cam1
-
-	int dv = 2,
-		/// B. CAM
-		Cn = pBsrf->pitch/pBsrf->w,
-		Cp = pBsrf->pitch/Cn,
-		Cw = pBsrf->w, Cw2 = Cw/2,
-		Ch = pBsrf->h, Ch2 = Ch/2,
-
-		p = pSRF->pitch/sizeof(U1x4),
-
-		Sc = 64, Sc2 = Sc*2,
-		Fw = Sc/dv, Fw2 = Fw/2,
-		Fh = Fw, Fh2 = Fh/2,
-		Fwh = Fw*Fh,
-
-		Fcl = Cw/Fw, Fc4 = Fcl/4,
-		Frw = Ch/Fh, Fr4 = Frw/4, Fc4r4 = Fc4*Fr4,
-		Fcr = Fcl*Frw,
-		FSn = Sc2*Sc2, FSnOF = FSn*sizeof(U1x4),
-		nBx = Sc+Fcr+4, pls = ((nBx*sizeof(I4x4))/FSnOF) + 1,
-		Ry,Rx,Gy,Bx,
-		cmbOF = Fh2*Sc2, iBx, Cxy;
-
-
-	I4x4 	aqRGBi,
-			*pBx = ((I4x4*)pALL->Ux( Fcr + 1 + pls, FSnOF ))-nBx,
-			*pH = pBx+Fcr+4, Fs4;
-
-	U1x4	*pMSK = pSRF ? (U1x4*)pSRF->pixels : NULL, *pM,
-			*pDRW = pAsrf ? (U1x4*)pAsrf->pixels : NULL, *pD,	// A. draw
-			*pCAM = pBsrf ? (U1x4*)pBsrf->pixels : NULL,		// B. cam1
-			*pSTRi,
-			*pCMBcr, *pCMBs,
-			*pCMBy, *pCMBd,
-			Fmsk, Fsmp;
-	U4 u4NM, iRQ;
-
-	/// DRAWot átfésüli FS - Food&Space
-	pBx[Fcr].y = pBx[Fcr].x;
-	for( pBx[Fcr].y = pBx[Fcr].x+0x10; pBx[Fcr].x < pBx[Fcr].y; pBx[Fcr].x++ ) {
-		iBx = pBx[Fcr].x%Fcr;
-		Cxy = (iBx%Fcl)*Fw
-			+ (iBx/Fcl)*Cp*Fh;
-		switch( Cn ){
-			case 3:
-				((U1x4*)(((U1*)pCAM)+(Cxy*3)))->hstXrgb( pH, Cp, Sc, Fw, Fh );
-				break;
-			case 4:
-				pCAM[Cxy].hstX( pH, Cp, Sc, Fw, Fh );
-				break;
-			default:
-				return pMSK;
-				break;
-		}
-		aqRGBi = pH->xyz_HSTaqi(Sc,(Fwh*2)/3);
-		aqRGBi >>= 2;
-		aqRGBi.w = iBx;
-		iRQ = ( pBx[iBx].xyz0() != aqRGBi.xyz0() );
-
-
-		pCMBcr = (U1x4*)pALL->Ux( Fcr, FSnOF );
-		gpmZnOF(pCMBcr,FSn);
-		pD = (pDRW?pDRW:pMSK)	+ p*Ch + Cw2
-								+ (iBx%Fcl)*Fw2 + (iBx/Fcl)*p*Fh2;
-		pCMBd = (pCMBs = pCMBcr + Sc) + Sc2*Sc;
-		for( int y = 0; y < Fh2; y++ ) {
-			pCMBy = pCMBs + Fw2 + y*Sc2;
-			gpmMcpyOF( pCMBy, 		pD + y*p, 		Fw2 );
-			gpmMcpyOF( pCMBy+cmbOF, pD + (y+Ch2)*p, Fw2 );
-			for( int x = 0; x < Fw2; x++ ){
-				Fmsk = pCMBy[x];
-				Fsmp = pCMBy[x+cmbOF];
-				if( (Fmsk.srt3().x<0xF0) | (Fsmp.srt3().x<0x1) )
-				{
-					pCMBy[x+cmbOF].u4 = pCMBy[x].u4 = 0;
-					continue;
-				}
-
-				Fs4 = Fsmp;
-				Fs4 >>= 2;
-				//Fs4 >>= 1;
-				Ry = (Rx = Fs4.r)*Sc2;
-				Gy = Fs4.g*Sc2;
-				Bx = Fs4.b;
-
-				pCMBd[Gy+Rx] = pCMBd[Gy-Bx] = pCMBd[0-Ry-Bx] = Fmsk;
-			}
-		}
-		pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
-		if( gpmMcmpOF( pSTRi, pCMBcr, FSn ) < FSn )
-			iRQ |= 2;
-
-		if(iRQ)
-			break;
-	}
-	if( pBx[Fcr].x >= pBx[Fcr].y  )
-		return pMSK;
-
-	pREF = NULL;
-	char* pF = pFILE;
-	U8 nLEN;
-	U1 nPNT = gpmVAN(pNAME,".", nLEN);
-	gpmMcpy(pF,pNAME,nPNT)[nPNT] = 0;
-	pF += nPNT;
-
-	if( iRQ>>1 ) {
-		// STORE pBxx[i]
-		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
-		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
-		SDL_Surface* pStr = SDL_CreateRGBSurface( 0, Sc2, Sc2, 32, 0,0,0,0 );
-		gpmMcpyOF( (U1x4*)pStr->pixels, pCMBcr, FSn );
-		IMG_SavePNG( pStr, pPATH );
-		gpmSDL_FreeSRF(pStr);
-	}
-
-	if( iRQ&1 ){
-		// LOAD aqRGBi
-		pBx[iBx] = aqRGBi;
-		u4NM = pBx[iBx]*I4x4(0x1,0x100,0x10000,0x0000000);
-		sprintf( pF, "MSK/i%0.8x_h0x%0.6x_%dx%d.png", iBx, u4NM, Fw, Fh );
-		SDL_Surface* pStr = IMG_Load( pPATH );
-		if( pStr ? pStr->pixels : NULL ) {
-			gpmMcpyOF( pSTRi, pStr->pixels, FSn );
-			for( U4 i = 0; i < FSn; i++ ){
-				pSTRi[i] = ((U1x4*)pStr->pixels)[i].swpZX().u4;
-			}
-		}
-		else
-			gpmZnOF(pSTRi,FSn);
-		gpmSDL_FreeSRF(pStr);
-
-
-	}
-
-	pM = pMSK	+ p*Ch + Cw2
-				+ (iBx%Fcl)*Fw2 + (iBx/Fcl)*p*Fh2;
-
-	pCMBd =
-	(pCMBs = pSTRi + Sc) + Sc2*Sc;
-	for( int y = 0; y < Fh2; y++ ) {
-		pCMBy = pCMBs + Fw2 + y*Sc2;
-		gpmMcpyOF( pM + y*p,		pCMBy,			Fw2 );
-		gpmMcpyOF( pM + (y+Ch2)*p,	pCMBy+cmbOF,	Fw2 );
-	}
-
-	gpmZnOF(pCMBcr,FSn);
-	int mw = (iBx/Fc4)%4, mh = iBx/(Fcl*Fr4);
-	for( int j = mh*(Fcl*Fr4), je = j+(Fcl*Fr4), ie; j<je; j+=Fcl )
-	for( iBx = j+mw*Fc4, ie = iBx+Fc4; iBx < ie; iBx++ ) {
-		pSTRi = (U1x4*)pALL->Ux( iBx, FSnOF );
-		for( int o = 0; o < FSn; o++ ){
-			pCMBcr[o] |= pSTRi[o];
-		}
-	}
-	/// SPACE
-	pM = pMSK + p*(Ch*2-0x100) + Cw2-0x100;
-	for( int j = 0; j < Sc; j++ )
-	for( iBx = 0; iBx < Sc; iBx++ ) {
-		pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
-	}
-	pM += p*0x100;
-	pCMBcr += Sc2*Sc;
-	for( int j = 0; j < Sc; j++ )
-	for( iBx = 0; iBx < Sc2; iBx++ ) {
-		pM[mw + iBx*4 + (mh + j*4)*p] = pCMBcr[iBx+j*Sc2];
-	}
-
-	pBx[Fcr].x++;
-	return pMSK;
-}
 

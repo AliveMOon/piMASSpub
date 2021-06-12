@@ -96,13 +96,13 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 
 	oXYZ.xyz_( (oR*tRr)/oRr + txyz );
 
-	if(bSTDcout){std::cout << "iR   " << iR.pSTR( pbuff ) << "iRr " << iRr << std::endl;}
-	if(bSTDcout){std::cout << "tR   " << tR.pSTR( pbuff ) << "tRr " << tRr << std::endl;}
-	if(bSTDcout){std::cout << "oR   " << oR.pSTR( pbuff ) << "oRr " << oRr << std::endl;}
-	if(bSTDcout){std::cout << "a    " << a.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oXYZ " << oXYZ.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tXYZ " << tXYZ.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << std::endl;}
+	if(bSTDcout){gpdCOUT << "iR   " << iR.pSTR( pbuff ) << "iRr " << iRr << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tR   " << tR.pSTR( pbuff ) << "tRr " << tRr << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oR   " << oR.pSTR( pbuff ) << "oRr " << oRr << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "a    " << a.pSTR( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oXYZ " << oXYZ.pSTR( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tXYZ " << tXYZ.pSTR( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << gpdENDL;}
 
 
 	iABC.ABC_( F4(  0, 30, 45 )*degX(1) );
@@ -117,40 +117,40 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	tMX.mxABC(tABC, degX(180.0/PI) );
 	//oMX = iMX.lerp_zyx( tMX, ab );
 
-	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << std::endl;}
+	if(bSTDcout){gpdCOUT << "iABC   " << (F4(iABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oABC   " << (F4(oABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tABC   " << (F4(tABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << gpdENDL;}
 
-	if(bSTDcout){std::cout << "iX   " << iMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "iY   " << iMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "iZ   " << iMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){gpdCOUT << "iX   " << iMX.x.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "iY   " << iMX.y.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "iZ   " << iMX.z.pSTRf4( pbuff ) << gpdENDL << gpdENDL;}
 
-	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){gpdCOUT << "oX   " << oMX.x.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oY   " << oMX.y.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oZ   " << oMX.z.pSTRf4( pbuff ) << gpdENDL << gpdENDL;}
 
-	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){gpdCOUT << "tX   " << tMX.x.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tY   " << tMX.y.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tZ   " << tMX.z.pSTRf4( pbuff ) << gpdENDL << gpdENDL;}
 
     iABC.ABC_( iMX.eulABC()*degX(180.0/PI) );
     tABC.ABC_( oMX.eulABC()*degX(180.0/PI) );
 	//tABC.ABC_( tMX.eABC()*degX(180.0/PI) );
 
-	if(bSTDcout){std::cout << "iABC   " << (F4(iABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oABC   " << (F4(oABC)/degX(1)).pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tABC   " << (F4(tABC)/degX(1)).pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){gpdCOUT << "iABC   " << (F4(iABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oABC   " << (F4(oABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tABC   " << (F4(tABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL << gpdENDL;}
 
 	tMX.mxABC(tABC, degX(180.0/PI) );
-	if(bSTDcout){std::cout << "oX   " << oMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oY   " << oMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "oZ   " << oMX.z.pSTR( pbuff ) << std::endl << std::endl;}
+	if(bSTDcout){gpdCOUT << "oX   " << oMX.x.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oY   " << oMX.y.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oZ   " << oMX.z.pSTRf4( pbuff ) << gpdENDL << gpdENDL;}
 
-	if(bSTDcout){std::cout << "tX   " << tMX.x.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tY   " << tMX.y.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << "tZ   " << tMX.z.pSTR( pbuff ) << std::endl;}
-	if(bSTDcout){std::cout << std::endl;}
+	if(bSTDcout){gpdCOUT << "tX   " << tMX.x.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tY   " << tMX.y.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "tZ   " << tMX.z.pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << gpdENDL;}
 }
 
 gpcROB& gpcROB::operator &= ( const gpcDrc& D )

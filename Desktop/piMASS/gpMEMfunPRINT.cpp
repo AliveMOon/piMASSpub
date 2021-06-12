@@ -147,8 +147,8 @@ void gpMEM::funPRINT()
 		gpmMcpy( pDST, pS, nCPY )[nCPY] = 0;
 
 	if(bSTDcout_jsr)
-	{std::cout	<< stdCYAN << "funPRINT:"
-				<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
+	{gpdCOUT	<< stdCYAN << "funPRINT:"
+				<< stdALU << (pDST?(char*)pDST:"?") << gpdENDL;}
 
 	gpmDEL(pPRNT);
 }

@@ -400,7 +400,7 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 		}
 		else if( tmp.bENTR( *this, aSP44[nSP] ) )
 		{
-			if(bSTDcout){std::cout << "[ENTER]";} // <<std::endl;};
+			if(bSTDcout){gpdCOUT << "[ENTER]";} // <<gpdENDL;};
 		}
 
 		aSP44[momLV].a4x2[1].mx(  aSP44[nSP].a4x2[0] );
@@ -525,35 +525,35 @@ extern U4	gpnCAGEbillBALL,
 gpcDrc gpCHK( gpsMNpub, I4x4( 600, 500, 500 )*mmX(1), I4x4( 600, 500, 400 )*mmX(1), I4x4( 600, 500, 0 )*mmX(1) );
 void gpfMAINchk()
 {
-	if(bSTDcout){std::cout <<std::endl;}
+	if(bSTDcout){gpdCOUT <<gpdENDL;}
 	for( U4 i = 0, e = gpmN(aSIZEOF); i < e; i++  )
 	{
-		if(bSTDcout){std::cout << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 <<std::endl;};
+		if(bSTDcout){gpdCOUT << aSIZEOF[i].sz << "\t" << aSIZEOF[i].pSTR << "\t" << aSIZEOF[i].sz/0x10 << "\t" << aSIZEOF[i].sz%0x10 <<gpdENDL;};
 	}
-    if(bSTDcout){std::cout << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<std::endl;};
-	if(bSTDcout){std::cout << 	stdRED	"\033[1;31m Megvan már?"
+    if(bSTDcout){gpdCOUT << "gpeU4x2nSTR" << "\t" << gpeU4x2nSTR <<gpdENDL;};
+	if(bSTDcout){gpdCOUT << 	stdRED	"\033[1;31m Megvan már?"
 					stdBLUE "\r\n1. A mini ha szerkesztve van _# ket is rajzolja"
 					stdBLUE "\r\nés ne használja az extra karaktereket!"
 					stdBLUE "\r\n3. rosszul azonosítja hol van a pointer"
 					stdRED	"\r\n2. F5 CPY F6 MOVE stb???"
-					stdRESET << std::endl;}
+					stdRESET << gpdENDL;}
 	I4x2 snail;
 	for( U4 i = 0; i < 100; i++ )
 	{
 		snail.snail(i);
-		if(bSTDcout){std::cout << i << "->" << snail.pSTR(gpsMNpub) <<std::endl;}
+		if(bSTDcout){gpdCOUT << i << "->" << snail.pSTR(gpsMNpub) <<gpdENDL;}
 	}
 	I4x4 j0 = I4x4( 0, 600, 1500 )*mmX(1), j1 = I4x4( 0, 0, 0 )*mmX(1), t0 = I4x4( 0, 600, 0 )*mmX(1),
 		 up0 = j0-t0, xyz;
 	for( I8 ti = 0, tn = 540*ms2sec; ti < tn; ti+=10*ms2sec )
 	{
 		xyz = j0.drop( j1, up0, mmX(100), ti, tn );
-		if(bSTDcout){std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;}
+		if(bSTDcout){gpdCOUT << ti << "\t" << xyz.pSTR( gpsMNpub ) <<gpdENDL;}
 	}
 	for( I8 ti = 0, tn = 540*ms2sec; ti < tn; ti+=10*ms2sec )
 	{
 		xyz = j1.drop( j0, up0, mmX(100), ti, tn );
-		if(bSTDcout){std::cout << ti << "\t" << xyz.pSTR( gpsMNpub ) <<std::endl;}
+		if(bSTDcout){gpdCOUT << ti << "\t" << xyz.pSTR( gpsMNpub ) <<gpdENDL;}
 	}
 
 
@@ -577,7 +577,7 @@ void gpfMAINchk()
 //		pSTR += iMX.str( pSTR, ",", "\r\n" );
 //		pSTR += tABC.str( pSTR, ",", "\r\n" );
 //		pSTR += tMX.str( pSTR, ",", "\r\n" );
-//		if(bSTDcout){std::cout << gpsMNpub <<std::endl;}
+//		if(bSTDcout){gpdCOUT << gpsMNpub <<gpdENDL;}
 //	}
 //	*gpsMNpub = 0;
 
@@ -589,8 +589,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR apA, INT nA)
 	{
 		gppEXEfile = gpfP2F(gpsEXEpath, gpsEXEname, (char*)apA, '\\' );
 
-		if(bSTDcout){std::cout << "Start in:" << gpsEXEpath << std::endl;};
-		if(bSTDcout){std::cout << "Exe is:" << gpsEXEname << std::endl;};
+		if(bSTDcout){gpdCOUT << "Start in:" << gpsEXEpath << gpdENDL;};
+		if(bSTDcout){gpdCOUT << "Exe is:" << gpsEXEname << gpdENDL;};
 		*gppMASSfile = 0;
 		nA = 1;
 	}
@@ -603,8 +603,8 @@ int main( int nA, char *apA[] )
 	{
 		gppEXEfile = gpfP2F( gpsEXEpath, gpsEXEname, (char*)(apA[0]) );
 
-		if(bSTDcout){std::cout << "Start in:" << gpsEXEpath <<std::endl;};
-		if(bSTDcout){std::cout << "Exe is:" << gpsEXEname <<std::endl;};
+		if(bSTDcout){gpdCOUT << "Start in:" << gpsEXEpath <<gpdENDL;};
+		if(bSTDcout){gpdCOUT << "Exe is:" << gpsEXEname <<gpdENDL;};
 		*gppMASSfile = 0;
 	}
 #endif
@@ -618,12 +618,12 @@ int main( int nA, char *apA[] )
 	{
 		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mmX(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mmX(1) );
-		if(bSTDcout){std::cout << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mmX(1)).pSTR( gpsMNpub ) <<std::endl;};
+		if(bSTDcout){gpdCOUT << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mmX(1)).pSTR( gpsMNpub ) <<gpdENDL;};
 		tmp = tstCAGE.tXYZ.xyz0();
 		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
-		if(bSTDcout){std::cout << "tstCAGE.tXYZball:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;};
+		if(bSTDcout){gpdCOUT << "tstCAGE.tXYZball:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<gpdENDL;};
 		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
-		if(bSTDcout){std::cout << "tstCAGE.tXYZboxx:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<std::endl;};
+		if(bSTDcout){gpdCOUT << "tstCAGE.tXYZboxx:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<gpdENDL;};
 	}
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;
 	gpfALF2STR( gpsKEYbuff, 0xFFFFffff );
@@ -631,7 +631,7 @@ int main( int nA, char *apA[] )
 	U8 dS = -1;
 	gpcLZY* pDR = ((gpcLZY*)NULL)->lzyDIR(".", dS);
 	if( pDR )
-		std::cout << (char*)pDR->p_alloc << std::endl;
+		gpdCOUT << (char*)pDR->p_alloc << gpdENDL;
 
     try
     {
@@ -644,19 +644,19 @@ int main( int nA, char *apA[] )
 			if (!(apA[i]))
 				continue;
 
-			if(bSTDcout){std::cout << (apA[i]) <<std::endl;};
+			if(bSTDcout){gpdCOUT << (apA[i]) <<gpdENDL;};
 			if( gpmSTRiSTR( (char*)(apA[i]), ".mass" ) )
 			{
 				gppMASSfile = gpfP2F( gpsMASSpath, gpsMASSname, (char*)(apA[i]) );
 
-				if(bSTDcout){std::cout << "MASS is:" << gpsMASSname <<std::endl;};
+				if(bSTDcout){gpdCOUT << "MASS is:" << gpsMASSname <<gpdENDL;};
 				continue;
 			}
 		}
 		if (gppMASSfile == gpsMASSpath)
 		{
 			#ifdef _WIN64
-				if(bSTDcout){std::cout << "\033[1;31m Meg kell szerezni a user HOME könjyvtárát?" << std::endl;}
+				if(bSTDcout){gpdCOUT << "\033[1;31m Meg kell szerezni a user HOME könjyvtárát?" << gpdENDL;}
 			#else
 
 						struct passwd *pw = getpwuid(getuid());
@@ -672,7 +672,7 @@ int main( int nA, char *apA[] )
 
 		strcpy( gppMASSfile, gpsMASSname );
 		U8 s;
-		if(bSTDcout){std::cout << "Load:"<< gpsMASSpath <<std::endl;};
+		if(bSTDcout){gpdCOUT << "Load:"<< gpsMASSpath <<gpdENDL;};
 		if( gpfACE(gpsMASSpath, 4) > -1 )
 			gpMASS.lzyRD( gpsMASSpath, s = -1 );
 
@@ -698,9 +698,9 @@ int main( int nA, char *apA[] )
     }
     catch ( const InitError & err )
     {
-        if(bSTDcout){std::cout << "Error while initializing SDL:  "
+        if(bSTDcout){gpdCOUT << "Error while initializing SDL:  "
                   << err.what()
-                  << std::endl;}
+                  << gpdENDL;}
     }
 
     return 1;
