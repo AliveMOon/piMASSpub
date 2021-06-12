@@ -62,7 +62,7 @@ gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 					} break;
 				case gpeALF_LWS: {
 						I4* p3Did = (I4*)pV;
-						*p3Did = 	pIDlst->pMEM
+						(*p3Did) = 	pIDlst->pMEM
 									? pIDlst->pMEM->pWgl->iLWS( ABbb.a8x2[0].a, pIDlst->sPATH, rd )
 									: -1;
 					} break;

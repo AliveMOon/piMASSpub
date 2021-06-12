@@ -229,7 +229,7 @@ public:
 	U4x2 aVXn[0x10];
 	F4* pV;
 
-	gpc3D		*p3D, *p3Dnull;
+	gpc3D		*p3Dobj, *p3Dnull;
 	gpc3Dlst*	p3Dlst;
 	gpcMASS*	pMASS;
 	I4 iLWS( gpeALF a, const char* pPATH, gpcLZY& rd );
@@ -498,7 +498,7 @@ public:
 		return this;
 	}
 	gpcGL* glDRW3D( U4 l, gpc3D* p, U8 msk = -1 );
-	gpcGL* glDONE(){ glUseProgram(0); p3D = NULL; return this; }
+	gpcGL* glDONE(){ glUseProgram(0); p3Dobj = NULL; return this; }
 	gpcGL* glDRW( I4x2 xy, I4x2 wh );
 	gpcGL* glDRW( U1 mode, I4x2 xy, I4x2 wh ) {
 		if( !this )

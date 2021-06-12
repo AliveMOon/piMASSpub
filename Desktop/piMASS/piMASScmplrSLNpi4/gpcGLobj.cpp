@@ -740,7 +740,7 @@ gpc3Ditm* gpc3Dgym::p3DitmADD( U4 i, U4 id ) {
 	gpc3Ditm* pITM = (gpc3Ditm*)itmLST.Ux( i, sizeof(*pITM) );
 
 	pITM->momIX = pITM->itmIX = i;
-	pITM->itmID = id;
+	pITM->momID = pITM->itmID = id;
 	return pITM;
 }
 gpc3Ditm* gpc3Dgym::p3Dii( U4 i ) {
@@ -930,12 +930,12 @@ size_t gpc3Dkey::sOUT( char* pBUFF, const char* pEND ) {
 	//char* pBi = pBUFF;
 	return sprintf( pBUFF, " %f %f %d %f %f %f %f %f %f%s", val, sec, spn, aP[0], aP[1], aP[2], aP[3], aP[4], aP[5] ,pEND );
 }
-#define gpdITMis (pBON 	? pBON 				\
-						: (pITM ? pITM 		\
-						: (pNULL ? pNULL 	\
-						: (pLIG ? pLIG 		\
-						: (pCAM ? pCAM 		\
-						:  NULL 			\
+#define gpdITMis (pBON 	?   pBON 				\
+						: ( pITM	? pITM 		\
+						: ( pNULL	? pNULL 	\
+						: ( pLIG	? pLIG 		\
+						: ( pCAM	? pCAM 		\
+						:   NULL 				\
 							)))))
 gpc3Dgym::gpc3Dgym( I4 i, const char* pP, gpeALF alf ) {
 	gpmCLR;
@@ -956,7 +956,7 @@ gpc3Dgym::gpc3Dgym( I4 i, const char* pP, gpeALF alf ) {
 gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 	if( !this )
 		return NULL;
-	if( bSTDcout_3D )  gpdCOUT << "gpc3Dgym::pLWS" << gpdENDL;
+	if( bSTDcout_3D )  gpdCOUT << "gpc3Dgym::pLWS " << sPATH << gpdENDL;
 	U8 s = lws.nLD();
 	if( !s )
 		return this;
@@ -1059,6 +1059,8 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				if( !pMOM )
 					continue;
 				pMOM->momID = momID = gpfSTR2I8( pA, &pA, NULL, true );
+				break;
+
 				while( pMOM->momID ) {
 					pMOM--;
 					if( pMOM->itmID != momID )
@@ -1115,7 +1117,86 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 
 	}
 
+	for( U4 i = 0, j, k, ni = n3Ditm(); i < ni; i++ ) {
+		pIS = p3Dii(i);
+
+		if( pIS->itmID == pIS->momID )
+			pIS->momIX = pIS->itmIX;
+		else for( j = 0; j < ni; j++ ) {
+			pMOM = p3Dii(j);
+			if( !pMOM )
+				break;
+			if( pMOM->itmID != pIS->momID )
+				continue;
+
+			/// is MOM
+			pIS->momIX = pMOM->itmIX;
+			if( pMOM->nLEV ? true : (pMOM->momID == pMOM->itmID) ) {
+				pIS->nLEV = pMOM->nLEV+1;
+				break;
+			}
+
+			pMOM->stkIX = pMOM->itmIX;
+			while( pMOM->momID != pMOM->itmID ) {
+				for( U4 k = 0; k < ni; k++ ) {
+					pROOT = p3Dii(k);
+					if( !pROOT )
+						break;
+					if( pROOT->itmID != pMOM->momID )
+						continue;
+					pROOT->stkIX = pMOM->itmIX;
+					pMOM = pROOT;
+					break;
+				}
+				if( pMOM->nLEV )
+					break;
+			}
+			while( pMOM->stkIX != pMOM->itmIX ) {
+				pROOT = p3Dii(pMOM->stkIX);
+				pROOT->nLEV = pMOM->nLEV+1;
+				pMOM = pROOT;
+			}
+
+			pIS->nLEV = pMOM->nLEV+1;
+			break;
+		}
+
+		if( (pIS->itmID&gpeLWSiTYP_TYP) == gpeLWSiTYP_BON ){
+			/// is BONE
+			pI0 = pIS-pIS->itmIX;
+			pROOT = pIS;
+			while( (pROOT->itmID&gpeLWSiTYP_TYP) == gpeLWSiTYP_BON ) {
+				pROOT = pI0+pROOT->momIX;
+			}
+			pROOT->pBONadd( pIS );
+		}
+		if( !bSTDcout_3D )
+				break;
+		gpdCOUT	<< pIS->itmIX	<< ". l:"	<< pIS->nLEV << " "
+				<< pIS->sNAME	<<  " 0x"	<<  std::hex << pIS->itmID
+								<<  " 0x"	<<  std::hex << pIS->momID
+								<< (pNULL ? "NULL":"") << gpdENDL;
+	}
 	return this;
+}
+gpc3Dgym* gpc3Dlst::p3DgymADD( gpeALF alf, const char* pP ) {
+	if( !this )
+		return NULL;
+
+	gpc3Dgym **pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( 0, sizeof(gpc3Dgym*) );//, *p3D;
+	I4 i3D = 0, e3D = lst3Dgym.nLD(sizeof(gpc3Dgym*));
+	for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+		if( !pp3Dgym[i3D] ) {
+			if( e3D > i3D )
+				e3D = i3D;
+			continue;
+		}
+		if( pp3Dgym[i3D]->id.a8x2[0].b == alf )
+			 return pp3Dgym[i3D];
+	}
+	pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( e3D, sizeof(gpc3Dgym*) );
+	pp3Dgym[0] = new gpc3Dgym( e3D, pP, alf );
+	return pp3Dgym[0];
 }
 I4 gpcGL::iLWS( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !this )
@@ -1131,13 +1212,19 @@ I4 gpcGL::iLWS( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 	if( !this )
 		return NULL;
-	U8 s;
-	if( !lwo.nLD() )
+	/*if( !lwo.nLD() )
+		return this;*/
+	I8 i8w = lwo.nSUM();
+	if( !i8w )
 		return this;
+	if( id.w == i8w )
+		return this;
+
 	if( nRDY == nBLD )
 		return this;
 	nRDY = nBLD;
-	U4* pU4 = (U4*)lwo.p_alloc, *pU4i = pU4;
+
+	U4* pU4 = lwo.pU4(), *pU4i = pU4;
 	if( *pU4i != LWO_ID_FORM )
 		return this;
 	pU4i++;
@@ -1149,16 +1236,21 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 	if( *pU4i != LWO_ID_LWO2 )
 		return this;
 	pU4i++;
-	I8 i8w = lwo.nSUM();
-	if( id.w == i8w )
-		return this;
-	char	*pU0 = (char*)lwo.p_alloc,
+
+	U8 s;
+	p_lwo = p_lwo->lzyADD( lwo.p_alloc, lwo.nLD(), s=0 );
+	nUi = pU4i-pU4;
+	pU4 = p_lwo->pU4(); pU4i = pU4+nUi;
+
+	id.w = i8w;
+
+	char	*pU0 = (char*)pU4,
 			*pUnx = (char*)pU4i,
 			*pUe = pUnx+n,
 			*pUi;
 	gpc3Dly* pLY = NULL;
 	gpc3Dmap* pMAP = NULL;
-	U4x2* pTG;
+	U4x2* pTG = NULL;
 	while( pUnx < pUe ){
 		pU4i = (U4*)pUnx;
 		chunk[0] = *pU4i; pU4i++;
@@ -1244,7 +1336,7 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 							} break;
 						case LWO_ID_TXUV: {
 								if( bSTDcout_3D )  gpdCOUT << "\tLWO_ID_TXUV:"<<  gpdENDL;
-								gpc3Dmap* pMAP = pLY->pMAPswp( pUi, pUnx-pUi );
+								pMAP = pLY->pMAPswp( pUi, pUnx-pUi );
 								if( !pMAP )
 									break;
 								if( bSTDcout_3D )  gpdCOUT << pLY->mapDCTtx.sSTRix(pMAP->id,"ERR") << " nP:" << pLY->pnt.nLD(sizeof(F4)) << " nPm:" << pMAP->pnt.nLD(sizeof(gpc3Dvx)) << gpdENDL;
@@ -1357,13 +1449,30 @@ gpc3D* gpc3D::pLWO( gpcLZY& lwo, gpcLZYdct& bnDCT ) {
 		// RESET
 
 	}
-	p_lwo = p_lwo->lzyADD( lwo.p_alloc, lwo.nLD(), s=0 );
-	id.w = i8w;
 
 
 
 
 	return this;
+}
+gpc3D* gpc3Dlst::p3DobjADD( gpeALF alf, const char* pP ) {
+	if( !this )
+		return NULL;
+
+	gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );//, *p3D;
+	I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
+	for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
+		if( !pp3D[i3D] ) {
+			if( e3D > i3D )
+				e3D = i3D;
+			continue;
+		}
+		if( pp3D[i3D]->id.a8x2[0].b == alf )
+			return pp3D[i3D];
+	}
+	pp3D = (gpc3D**)lst3D.Ux( e3D, sizeof(gpc3D*) );
+	pp3D[0] = new gpc3D( e3D, pP, alf );
+	return pp3D[0];
 }
 I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !this )
@@ -1372,7 +1481,7 @@ I4 gpcGL::iLWO( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 	if( !p3Dlst )
 		p3Dlst = new gpc3Dlst;
 
-	gpc3D* p3D = p3Dlst->p3Dl( a, pPATH )->pLWO(rd, p3Dlst->bnDCT );
+	gpc3D* p3D = p3Dlst->p3DobjADD( a, pPATH )->pLWO(rd, p3Dlst->bnDCT );
 	return p3D ? p3D->id.x : -1; //id;
 }
 char* gpc3Ditm::pNAME( char* pN ) {
@@ -1398,7 +1507,7 @@ char* gpc3Ditm::pNAME( char* pN ) {
 	alfNM = gpfSTR2ALF( (U1*)sNAME+nNAME, (U1*)sNAME+nNAME+gpmSTRLEN(sNAME+nNAME), NULL, '_' );
 	return sNAME+nNAME;
 }
-gpc3D* gpc3Ditm::p3Di( gpcGL* pGL, const char* pP, char *pF ) {
+gpc3D* gpc3Ditm::p3Dobj( gpcGL* pGL, const char* pP, char *pF ) {
 	if( !this )
 		return NULL;
 	if( p3D ? true : !pP )
@@ -1607,12 +1716,14 @@ int aglVXi4[] = {
 	6,7,8,9,0xa,0xb,0xc,0xd,0xe,0xf,
 };
 
-gpcGL* gpcGL::glDRW3D( U4 l, gpc3D* p3d, U8 msk ) {
-	if( !msk )
+gpcGL* gpcGL::glDRW3D( U4 l, gpc3D* p3D, U8 msk ) {
+	if( msk ? !p3D : true )
 		return this;
-	p3D = p3d->prt2ix( this );
-	if( !p3D )
-		return this;
+	//p3Dobj =
+	//if( !p3D )
+	//	return this;
+
+	p3D->prt2ix( this );
 	U4x4* pSRFx4;
 	gpc3Dly* pLY;
 	gpc3Dmap* pM;
@@ -1725,10 +1836,11 @@ gpdSTATICoff gpsGLSLvx3D[] = //{
 "			p	= mv*xyz.xxz + vec3( 0.0, 0.0, 1.0 ); 								\n"
 "	vec2 d = vec2( ((1.0/p.z)-0.5f)*2.0f, 1.0f ), sb = vec2(0,1.0);					\n"
 "	p = p*d.xxy*xyz.xyx - sb.xxy;													\n"
-"	gl_Position			= vec4( p*-1.0, 1.0 );										\n"
-"	fr_uv				= vec3( v_uv, p.z ); //*vec2(1,-1)+vec2(0,1), p.z );		\n"
-"	fr_up				= v_up;														\n"
-"	fr_ps				= v_ps;														\n"
+"	gl_Position		= vec4( p*-1.0, 1.0 );											\n"
+"	gl_Position.y	+= 0.5;															\n"
+"	fr_uv			= vec3( v_uv, p.z ); //*vec2(1,-1)+vec2(0,1), p.z );		\n"
+"	fr_up			= v_up;														\n"
+"	fr_ps			= v_ps;														\n"
 "}																					\n\0";
 //};
 gpdSTATICoff gpsGLSLfrg3D[] = //{
@@ -1790,7 +1902,7 @@ F4x4* gpc3Ditm::pMXl( float s ) {
 	mxW = mxL;
 	return &mxL;
 }
-F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
+F4x4* gpc3Dtrk::pGYM( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act ) {
 	if( !p3Di )
 		return pMX;
 	F4 xyz, ypr, scl(1,1,1);
@@ -1810,7 +1922,7 @@ F4x4* gpc3Dtrk::pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT a
 			sec = gpaACT_man[act].sec(ms-mSEC);
 			break;
 	}
-	if( bSTDcout_3D )  gpdCOUT << "\r\n TRK:" << sec << gpdFLUSH;
+	if( bSTDcout_3D )  gpdCOUT << "\r\n TRK: " << sec << gpdFLUSH;
 	/// mxL ez az ITEM ---------------------
 	p3Di->pMXl(sec);
 	p3Di->stkIX = p3Di->itmIX;
@@ -2040,26 +2152,33 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 
 			for( U4 i = 0, ni = p3Dg->n3Ditm(); i < ni; i++ ){
 				p3Di = p3Dg->p3Dii(i);
-				if( !p3Di )
-					break;
+				if( p3Di ? p3Di->bNULL : true )
+					continue; //break;
 				switch( p3Di->itmID&gpeLWSiTYP_TYP ){
 					case gpeLWSiTYP_OBJ: {
-
-							p3Dt->pTRK( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
-																				//gpeACT_DEF );
-							if( p3Di->bNULL )
+							if( p3Di->bNULL ) {
+								//p3Dt->pGYM( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
+								//aMX[0] = aMX[1]*uMX;
 								break;
-
+							}
+							p3Dt->pGYM( aMX+1, p3Dg, p3Di, pMEM->pWIN->mSEC.x, gpeACT_WALK );
+							/// MODELVIEW
 							glMatrixMode(GL_MODELVIEW);
 							aMX[0] = aMX[1]*uMX;
 							glLoadMatrixf((const GLfloat*)&aMX[0]);
 
-							p3D = p3Di->p3Di( this, p3Dg->sPUB, p3Dg->pPUB );
+							p3Dobj = p3Di->p3Do();
+							if( !p3Dobj ) {
+								p3Dobj = p3Di->p3Dobj( this, p3Dg->sPUB, p3Dg->pPUB );
+								if( !p3Dobj )
+									break;
+							}
+
 							GLint n3Db = p3Di->nBON();
 							if( n3Db ) {
-								n3Db = p3D->nMX();
+								n3Db = p3Dobj->nMX();
 								if( n3Db ) {
-									pRSTmx = p3D->pMX( 0 );
+									pRSTmx = p3Dobj->pMX( 0 );
 
 									if( bSTDcout_3D ) if( false )
 									for( U4 i = 1; i < n3Db; i++ ) {
@@ -2068,10 +2187,10 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 									}
 
 								} else {
-									pRSTmx = p3D->pMX( p3Di->nBON()+2 );
-									n3Db = p3D->nMX();
+									pRSTmx = p3Dobj->pMX( p3Di->nBON()+2 );
+									n3Db = p3Dobj->nMX();
 
-									p3Dt->pTRK( aMXi+1, p3Dg, p3Di, 0, gpeACT_DEF );
+									p3Dt->pGYM( aMXi+1, p3Dg, p3Di, 0, gpeACT_DEF );
 									for( U4 i = 1; i < n3Db; i++ )
 										pRSTmx[i] = aMXi[i].inv();
 									pRSTmx[0] = pRSTmx[1];
@@ -2087,9 +2206,9 @@ gpcGL* gpcGL::glSCENE( gpMEM* pMEM, char* pS ) {
 
 							if( !p3Dnull )
 							if( strstr(p3Di->sNAME, "eye" ) )
-								p3Dnull = p3D;
+								p3Dnull = p3Dobj;
 
-							glDRW3D( p3Di->layID, p3D, -1 ); //p3Di->nBON() ? 0x9 : -1 );
+							glDRW3D( p3Di->layID, p3Dobj, -1 ); //p3Di->nBON() ? 0x9 : -1 );
 						} break;
 					case gpeLWSiTYP_BON:
 						break;
