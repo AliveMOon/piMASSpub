@@ -6597,7 +6597,7 @@ public:
 	}
 	U4 i_str(void) { return pIX ? pIX->x : str.n_load; }
 	char* p_str( void ) { return (char*)str.p_alloc+pIX->x; }
-	U8 nIX(void) { return this ? (ix.n_load / sizeof(U4x4)) : 0; }
+	U8 nIX(void) { return this ? ix.nLD(sizeof(U4x4)) : 0; }
 	const char* sSTRix( U8 iX, const char* pER ) {
 		if( !this )
 			return pER;

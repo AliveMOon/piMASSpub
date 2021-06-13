@@ -267,35 +267,12 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		return aVXid[0];
 	}
-	U4x4 IBOobj( U4x4& iIXn,const GLuint* pD, U4 nD, U4 nX ) {
-		iIXn.a4x2[1] = U4x2( nX, nD );
-		if( !iIXn.a4x2[1].area() ) {
-			if( iIXn.x ) {
-				glDeleteBuffers(1,  &iIXn.x );
-				iIXn.x = -1;
-			}
-			iIXn.y = 0;
-			return iIXn;
-		}
-		if( iIXn.y )
-			return iIXn;
-		iIXn.y++;
-		GLenum e = 0;
-		if( iIXn.x )
-			glDeleteBuffers(1,  &iIXn.x );
-
-		glGenBuffers( 1, &iIXn.x );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iIXn.x );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, iIXn.a4x2[1].area()*sizeof(*pD), pD, GL_STATIC_DRAW ); (e = glGetError());
-		if( e ) gpdCOUT << std::hex << e << " glBufferData( GL_ELEMENT_ARRAY_BUFFER" <<  gpdENDL;
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-		return iIXn;
-	}
+	U4x4 IBOobj( U4x4& iIXn,const GLuint* pD, U4 nD, U4 nX );
 	U4x4 VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD );
 	GLuint viBO( U1 md, const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
 		if(aVXid[md])
-			glDeleteBuffers(1,  &aVXid[md] );
+			glDeleteBuffers(1,  aVXid+md );
 		aVXn[md] = U4x2( nX, nD );
 		glGenBuffers( 1, &aVXid[md] );
 		glBindBuffer( GL_ARRAY_BUFFER, aVXid[md] );
@@ -309,25 +286,23 @@ public:
 			return aVXid[md];
 
 		if(aIXid[md]>0)
-			glDeleteBuffers( 1, &aIXid[md] );
+			glDeleteBuffers( 1, aIXid+md );
 
 		GLuint* pKILL = pBUFF;
 		U4 i = nBUFF;
 		nBUFF = gpmPAD( aIXn[md]*2, 0x10 );
 		pBUFF = new U4[nBUFF];
-		if(i)
-		{
+		if(i) {
 			gpmMcpyOF(pBUFF,pKILL,i);
 			gpmDELary(pKILL);
 		} else {
 			*pBUFF = 0;
 			i = 1;
 		}
-		for( ; i < nBUFF; i++ )
-		{
+		for( ; i < nBUFF; i++ ) {
 			pBUFF[i] = i;
 		}
-		glGenBuffers( 1, &aIXid[md] );
+		glGenBuffers( 1, aIXid+md );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, aIXid[md] );
 		n_byte = nBUFF*sizeof(*pBUFF);
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, n_byte, pBUFF, GL_STATIC_DRAW );
@@ -383,8 +358,6 @@ public:
 		pV[0].add( F4(xyWH.a4x2[0],	I4x2(0)		), j );
 		pV[0].div( F4(trgWHpx,			I4x2(1,1)	), j );
 		viBO( md, (float*)pV, j, 4 );
-
-
 		return this;
 	}
 	gpcGL* glSETbox( I4x2 xy, const I4x2& wh ) {
