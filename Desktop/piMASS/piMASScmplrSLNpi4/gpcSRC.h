@@ -1377,7 +1377,7 @@ public:
 	U4 prt;
 	gpcLZY	p,l,t,
 			srf;
-	U4x4 aIIXN[4];
+	I4x4 aIIXN[4];
 
 	gpc3Dtri(){};
 	gpc3Dtri* null() {

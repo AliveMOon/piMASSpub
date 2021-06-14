@@ -2046,99 +2046,99 @@ public:
 
 		return avgr / n;
 	}
-	U4 median( U4 n, U4x2* p_tree, bool b_inc = false ) {
+	U4 median( U4 N, U4x2* p_tree, bool b_inc = false ) {
 		// b_inc == true - incrementált növekvő sorban leszenk
 		// b_inc == false - dekrementáslt csökkenő sorban leszenk (nem definiálod akkor ez, azaz csökenő )
-		if( !this || n < 1 )
+		if( !this || N < 1 )
 			return 0;
 
-		if( n < 2 )
+		if( N < 2 )
 			return this->y;
 
-		U4	i, j, l, r;
-		U4x2 x;
+		U4	I, J, L, R;
+		U4x2 X2;
 
-		r = n;
-		while( r >= 1 ) {
-			// az öszes elem számát "r" elosztom 2-tővel kerekítés nélkül
-			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "l" lesz a küszöb
-			l = ldiv( r, 2 ).quot;
-			while( r > 0 ) {
-				// a következő elemet berakom az x-be
-				x = this[r-1];
+		R = N;
+		while( R >= 1 ) {
+			// az öszes elem számát "R" elosztom 2-tővel kerekítés nélkül
+			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "L" lesz a küszöb
+			L = ldiv( R, 2 ).quot;
+			while( R > 0 ) {
+				// a következő elemet berakom az X2-be
+				X2 = this[R-1];
 
-				i = r;
-				if ( i*2 <= n ) {
-					// i mutatja majd azt a helyet ahonva az x et be akarnám rakni
-					while( i*2 <= n ) {
-						j = i*2;
-						// azt jelenti, hogy az i nek van ága
-						if( j+1 <= n )
-						if( p_tree[j+1].y < p_tree[j].y )
-							j++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
+				I = R;
+				if ( I*2 <= N ) {
+					// I mutatja majd azt a helyet ahonva az X2 et be akarnám rakni
+					while( I*2 <= N ) {
+						J = I*2;
+						// azt jelenti, hogy az I nek van ága
+						if( J+1 <= N )
+						if( p_tree[J+1].y < p_tree[J].y )
+							J++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
 
-						if( x.y > p_tree[j].y ) {
-							// azt jelenti hogy az x nagyobb volt mint az ág ezért lejebb rakom a tartalmát
-							p_tree[i] = p_tree[j];
+						if( X2.y > p_tree[J].y ) {
+							// azt jelenti hogy az X2 nagyobb volt mint az ág ezért lejebb rakom a tartalmát
+							p_tree[I] = p_tree[J];
 							// és következő ciklusban az ágról akarom folytatni
-							i = j;
+							I = J;
 						} else {
 							// azt jelenti, nincs ennél magasabb szám az ágakon
 							break;
 						}
 					}//while
-					p_tree[i] = x;
+					p_tree[I] = X2;
 				} else {
-					p_tree[r] = x;
+					p_tree[R] = X2;
 				}
 
-				// r-et csökkentem jöhet a következő elem
-				r--;
+				// R-et csökkentem jöhet a következő elem
+				R--;
 			}
 		}
-		l = ldiv( r, 2).quot;
-		r = n;
-		i = 1;
-		while ( r >= 1 ) {
-			x = p_tree[r];
-			p_tree[r] = p_tree[1];
-			r--;
-			l = 1;
-			while ( l <= r ) {
-				i = l*2;
-				if ( i <= r ) {
-					if( i+1 <= r )
-					if( p_tree[i+1].y < p_tree[i].y )
-						i++;
+		L = ldiv( R, 2).quot;
+		R = N;
+		I = 1;
+		while ( R >= 1 ) {
+			X2 = p_tree[R];
+			p_tree[R] = p_tree[1];
+			R--;
+			L = 1;
+			while ( L <= R ) {
+				I = L*2;
+				if ( I <= R ) {
+					if( I+1 <= R )
+					if( p_tree[I+1].y < p_tree[I].y )
+						I++;
 
-					if( x.y > p_tree[i].y ) {
-						p_tree[l] = p_tree[i];
+					if( X2.y > p_tree[I].y ) {
+						p_tree[L] = p_tree[I];
 					} else {
-						p_tree[l] = x;
+						p_tree[L] = X2;
 						break;
 					}
 				} else {
-					p_tree[l] = x;
+					p_tree[L] = X2;
 					break;
 				}
-				l = i;
+				L = I;
 			}//while
 
 		}
 
 		if( b_inc ) {
-			for( U4 i = 0; i < n; i++ )
-				this[i] = p_tree[n-i];
-			if( n < 3 )
-				return average( n );
-			return this[n/2].y;
+			for( U4 I = 0; I < N; I++ )
+				this[I] = p_tree[N-I];
+			if( N < 3 )
+				return average( N );
+			return this[N/2].y;
 		}
 
-		gpmMcpyOF( this, p_tree+1, n );
-		if( n < 3 )
-			return average( n );
+		gpmMcpyOF( this, p_tree+1, N );
+		if( N < 3 )
+			return average( N );
 
-		return this[n/2].y;
+		return this[N/2].y;
 	}
 };
 
@@ -6238,38 +6238,61 @@ szasz:
 
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
-	I8 nU4( I8 x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
-	U4*		pU4n( int i = 0, int n = 1 ) 	{ return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
-	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
-	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
-	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
-	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
-
-	char* pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
-	I1* pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
-
 	U4*		pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
+	U4*		pU4n( int i = 0, int n = 1 ) 	{ return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
+	size_t	nU4( size_t x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
+
+
+	char* 	pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
+	I1* 	pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
+
 	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
+	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
+	size_t	nU4x2( size_t x=1 ){ return x ? nLD(x*sizeof(U4x2)) : nLD(sizeof(U4x2)); }
+
 	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
+	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
+	size_t	nU4x4( size_t x=1 ){ return x ? nLD(x*sizeof(U4x4)) : nLD(sizeof(U4x4)); }
 
 	I4* 	pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
+	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),	sizeof(I4)*n,	true, sizeof(I4)); }
+	size_t	nI4( size_t x=1 ){ return x ? nLD(x*sizeof(I4)) : nLD(sizeof(I4)); }
 
 	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
-	U4		nI4x2() { return nLD(sizeof(I4x2)); };
+	I4x2* 	pI4x2n( int i = 0, int n = 1 )	{ return (I4x2*)Ux(	(i<0?nLD(sizeof(I4x2)):i),	sizeof(I4x2)*n,	true, sizeof(I4x2)); }
+	size_t	nI4x2( size_t x=1 ){ return x ? nLD(x*sizeof(I4x2)) : nLD(sizeof(I4x2)); }
 
 	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
-	U4		nI4x4() { return nLD(sizeof(I4x4)); };
+	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
+	size_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
 
-	I8x2* pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
-	I8x4* pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
-	U8x4* pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
-	float* pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
-	F2* pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
-	F4* pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
-	F4x4* pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
-	U4 nF4x4() { return nLD(sizeof(F4x4)); };
-	D4* pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
-	void** ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
+	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
+	I8x2* 	pI8x2n( int i = 0, int n = 1 )	{ return (I8x2*)Ux(	(i<0?nLD(sizeof(I8x2)):i),	sizeof(I8x2)*n,	true, sizeof(I8x2)); }
+	size_t	nI8x2( size_t x=1 ){ return x ? nLD(x*sizeof(I8x2)) : nLD(sizeof(I8x2)); }
+
+	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
+	I8x4* 	pI8x4n( int i = 0, int n = 1 )	{ return (I8x4*)Ux(	(i<0?nLD(sizeof(I8x4)):i),	sizeof(I8x4)*n,	true, sizeof(I8x4)); }
+	size_t	nI8x4( size_t x=1 ){ return x ? nLD(x*sizeof(I8x4)) : nLD(sizeof(I8x4)); }
+
+	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
+	U8x4* 	pU8x4n( int i = 0, int n = 1 )	{ return (U8x4*)Ux(	(i<0?nLD(sizeof(U8x4)):i),	sizeof(U8x4)*n,	true, sizeof(U8x4)); }
+	size_t	nU8x4( size_t x=1 ){ return x ? nLD(x*sizeof(U8x4)) : nLD(sizeof(U8x4)); }
+
+	float* 	pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
+	size_t	nF( size_t x=1 ){ return x ? nLD(x*sizeof(float)) : nLD(sizeof(float)); }
+
+	F2* 	pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
+	size_t	nF2( size_t x=1 ){ return x ? nLD(x*sizeof(F2)) : nLD(sizeof(F2)); }
+
+	F4* 	pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
+	size_t	nF4( size_t x=1 ){ return x ? nLD(x*sizeof(F4)) : nLD(sizeof(F4)); }
+
+	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
+	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
+	size_t	nF4x4( size_t x=1 ){ return x ? nLD(x*sizeof(F4x4)) : nLD(sizeof(F4x4)); }
+
+	D4* 	pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
+	void**	ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
 
 
 };

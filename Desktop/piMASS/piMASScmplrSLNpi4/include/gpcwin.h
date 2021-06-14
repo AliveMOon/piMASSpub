@@ -267,8 +267,8 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		return aVXid[0];
 	}
-	U4x4 IBOobj( U4x4& iIXn,const GLuint* pD, U4 nD, U4 nX );
-	U4x4 VBOobj( U4x4& iVXn, const gpc3Dvx* pVX, U4 nD );
+	I4x4 IBOobj( I4x4& iIXn,const GLuint* pD, U4 nD, U4 nX );
+	I4x4 VBOobj( I4x4& iVXn, const gpc3Dvx* pVX, U4 nD );
 	GLuint viBO( U1 md, const GLfloat* pD, U4 nD, U4 nX ) {
 		//Create VBO
 		if(aVXid[md])
