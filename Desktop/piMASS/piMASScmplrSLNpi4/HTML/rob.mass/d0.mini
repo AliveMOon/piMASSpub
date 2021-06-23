@@ -1,3 +1,1 @@
-
-  0x2170 mini= "wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture",
-//0x2170 "wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture",
+wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture

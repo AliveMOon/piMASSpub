@@ -4,10 +4,8 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
-{
-	switch( inst.a8x2.alf )
-	{
+U1* gpMEM::instJSR( U1* p_dst, gpINST& inst ) {
+	switch( inst.a8x2.alf ) {
 		case gpeALF_MLB: *(I4*)p_dst = pWIN->instVARmlb(); break;
 		case gpeALF_MX: *(I4*)p_dst = pWIN->instVARmx(); break;
 		case gpeALF_MY: *(I4*)p_dst = pWIN->instVARmy(); break;
@@ -28,7 +26,7 @@ U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
         case gpeALF_entry: if(pSRC) {
                 I4      *pI4 = (I4*)pUn(pA[7], sizeof(*pI4)*2); // pSRC->srcMEMiPC( pA[7], 4 );
                 gpOBJ   *pOan = pSRC->srcOBJfnd( pI4[1] ),
-						*pOa = NULL,
+						*pOhr = NULL,
 						*pOfrm = NULL;
                 gpPTR	*pPhr = NULL,
 						*pPfrm = NULL;
@@ -38,16 +36,25 @@ U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
                 U1		*pDST,	*pCPY;
 
                 if( gpcSRC  *pSfrm = pMASS->srcFND( xfnd ) )
-				if( pOa = pSRC->srcOBJfnd(pI4[0]) )
-                if( pOfrm = pSfrm->pMEM->pOBJ(pOa->AN.alf) )
-				{
-					//I4 iPhr = pA[0];
+				if( pOhr = pSRC->srcOBJfnd(pI4[0]) )
+                if( pOfrm = pSfrm->pMEM->pOBJ(pOhr->AN.alf) ) {
+					//					0x00002770 move.L A7,D7
+					//					0x00002788 move.l 0x10,-(A7)
+					//					0x000027a0 move.l 0x12,-(A7)
+					//					0x000027b8 jsr entry
+					//					0x000027d0 move.L D7,A7
+					//					0x000027e8 move.l 0x21d0,A1		; //0,
+					//					0x00002800 move.l A0,(A1)
+
+					// FROM->HERE
 					pPhr = pPTRu1(pA[0]);
 
-					/// tervek szerint a isza térési cim A0-ban lesz
+					/// tervek szerint a visza térési cim A0-ban lesz
 					pPfrm = pOfrm->pPTRu1();
 					nCPY = pOfrm->sOF();
 					pCPY = pOfrm->pU1();
+
+					pOhr->bENTRY = true;
 
 					nA = nALL(pPhr->iPC);
 					if( nA < nCPY ) {
@@ -76,6 +83,16 @@ U1* gpMEM::instJSR( U1* p_dst, gpINST& inst )
 		default:
 			*(I4*)p_dst = 0;
 			break;
+	}
+	return p_dst;
+}
+U1* gpMEM::instENTRY( U1* p_dst ) {
+	U4 n = pD[7]-pA[7];
+	U1* pALL = lzyMEM.p_alloc, *p_src;
+	int d0;
+	p_src = pALL+pA[7];
+	for( U4 i = 0; i < n; i+=4 ){
+		d0 = *(int*)(p_src+i);
 	}
 	return p_dst;
 }

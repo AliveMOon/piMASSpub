@@ -1,0 +1,19 @@
+if( nAT > 1 ) {
+    switch( aAT[1].alf ) {
+        case gpeALF_CRESET: {   //0.at3 1.creset9   2.ok14      3.rdy21     4.cpin30    5.sim35     6.pin39                         nAT:7
+        
+        case gpeALF_CPIN:   {   //0.at3 1.cpin7     2.ok17      3.cpin26    4.ready33   5.sms40     6.done45    7.pb51  8.done56    nAT:9
+            5.sms40     6.done45    
+            7.pb51      8.done56    
+                                //0.at3 1.cpin7 2.cpin16 3.ready23 4.ok29 nAT:5
+                                
+                                
+                                
+                                
+                                
+                                
+                                           
+        
+        
+        
+        

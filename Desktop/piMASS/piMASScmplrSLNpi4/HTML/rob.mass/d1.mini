@@ -1,3 +1,1 @@
-
-  0x2170 mini= "wget -O ./calib_rics/calib%s http://192.168.1.160:5000/api/camera/take_picture",
-//0x2170 "wget -O ./calib_rics/calib%s http://192.168.1.160:5000/api/camera/take_picture",
+wget -O ./calib_rics/calib%s http://192.168.1.160:5000/api/camera/take_picture

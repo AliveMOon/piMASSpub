@@ -113,7 +113,7 @@
 			<Add directory="/home/alivemoon/Asztal/userland" />
 			<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
 			<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
-			<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4/SIM7X00/Raspberry/c" />
+			<Add directory="SIM7X00/Raspberry/c" />
 		</Compiler>
 		<Linker>
 			<Add option="`sdl2-config --libs`" />

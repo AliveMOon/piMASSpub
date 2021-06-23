@@ -890,7 +890,7 @@ public:
 	gpMEM*	pMEM;
 	I4		dctID, iPTR;
 	I8x2 	AN;
-	gpeCsz 	cAN;
+	gpeCsz 	cAN; bool bENTRY;
 
 	gpOBJ(){ gpmCLR; };
 
@@ -1894,7 +1894,7 @@ public:
 		nCD++;
 		return *pI;
 	};
-	gpOBJ* pOBJ( gpeALF alf ) {
+	gpOBJ* pOBJ( gpeALF alf, bool qENT = false ) {
 		if( this ? !alf : true )
 			return NULL;
 		U4 nO = lzyOBJ.nLD(sizeof(gpOBJ)), sOF;
@@ -1908,6 +1908,12 @@ public:
 				continue;
 			if( obj.AN.alf != alf )
 				continue;
+			if( !qENT )
+				return pO0+i;
+
+			if(pO0[i].bENTRY)
+				continue;
+
 			return pO0+i;
 		}
 		return NULL;
@@ -1916,6 +1922,7 @@ public:
 	gpINST* instRDY( gpcLZY* pDBG );
 	gpINST* instALU();
 	U1*		instJSR( U1* p_dst, gpINST& inst );
+	U1*		instENTRY( U1* p_dst );
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
 	I4		instDOitSLMP( gpcGT* pGT );
 	I4		instDOitGSM( gpcGT* pGT );

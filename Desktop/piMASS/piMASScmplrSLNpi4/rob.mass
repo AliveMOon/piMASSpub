@@ -8,8 +8,9 @@
  rr = 0x10000;
  rout = rr + 3;
  rinp = rr + 2;
- bill = d0.mini;
- //john 
+ //bill
+ john
+       = d0.mini;
  	
  slmp = "192.168.1.90 10000";
  //sync = "192.168.1.99 6001";

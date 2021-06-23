@@ -287,6 +287,7 @@ I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n ) {
         abba = (b-a).qlen_xyz();
         if( dd <= abba )
 			continue;
+		b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+mmX(100) );
 		dd = abba;
 	}
 	if( dd >= dd0 )
@@ -347,18 +348,8 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 	switch( JD.w )
 	{
 		case 4:{
-			// 5->6 jelzünk hogy olvastuk a HS2i-t
-			/*nm = NMnDIF.x;
-			gpcADR A0 = gpfSTR2ALF( sNM, sNM+4 );	/// gpcADR
-			A0 = pRES;
-			if( !A0.pRM )
-				return false;
-
-			gpcALU aB = A0.pRM->ALU( A0.iA );
-			if(!aB.bSTR())
-				return false;
-			if(!alu.pDAT)
-				return false;*/
+			if( !pCLI )
+				return true;
 
 			char	*pP = pBUFF;
 
@@ -385,7 +376,7 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 }
 #define gpdXeZxY true
 #define gpdXeYxZ false
-gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
+gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 	*this = iROB;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
 		case 4: { /// 4.HS2i? // HS2o elvesz VÉGE
@@ -550,16 +541,23 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC ) {
 
 	mmABCD.A = dXYZ.abs0().mx().x;
 	if( mmABCD.A ) {
-
-		U4 i = 3;
+		U4 i  = 3; //iD0;
 		switch( NMnDIF.x )
 		{
-			case gpeZS_BILL:
-				i = 0;
-				break;
-			case gpeZS_JOHN:
-				i = 1;
-				break;
+			case gpeZS_BILL:{
+					i = 0;
+					gpcDrc* pJ = this+1;
+					I4x4	j2b = (pJ->iXYZ+pJ->tXYZ)/2,
+							*pTOOL = pBALLtool( i );
+					*pTOOL = (j2b&I4x4(-1,-1,1,0)) + I4x4( mmX(1500), 0, 0, mmX(300) );
+				} break;
+			case gpeZS_JOHN: {
+					i = 1;
+					gpcDrc* pB = this-1;
+					I4x4 	b2j = (pB->iXYZ+pB->tXYZ)/2,
+							*pTOOL = pBALLtool( i );
+					*pTOOL = (b2j&I4x4(-1,-1,1,0)) + I4x4( mmX(1500), 0, 0, mmX(300) );
+				} break;
 			default:
 				i = 3;
 				break;

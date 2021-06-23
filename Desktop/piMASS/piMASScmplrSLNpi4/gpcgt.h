@@ -173,14 +173,15 @@ public:
 			trd.join();
 		n_trd = n_join = 0;
 	}
-	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
-	I4x4 cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
-	I4x4 cageXYZ( I4 lim, U4 id );
 
-	I4x4 cageXYZ( I4x4 trg, I4 lim, U4 id );
+	I4x4*	pBALLtool( U4 i );
+	I4x4 	cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
+	I4x4 	cageXYZ( I4 lim, U4 id );
 
-	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
-	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
+	I4x4 	cageXYZ( I4x4 trg, I4 lim, U4 id );
+
+	I4x4 	cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
+	I4x4 	cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
 
 	gpcDrc( const gpcZS& zs, U4 nm = 0  );
 	gpcDrc& operator = ( const gpcZS& zs );
@@ -305,7 +306,7 @@ public:
 
 	bool jdPRGstp( U4 mSEC );
 
-	gpcDrc& judo( gpcROB& iR, U4 mSEC );
+	gpcDrc& judo( gpcROB& iR, U4 mSEC, U4 iD0 );
 	gpcDrc& JUDO( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)

@@ -67,6 +67,9 @@ U4 gpanBALL[] = {
 	gpnCAGEbillBALL,
 	gpnCAGEjohnBALL
 };
+I4x4* gpcDrc::pBALLtool( U4 i ) {
+	return gpapBALL[i]+3;
+}
 I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL )
 {
 	if( !this )

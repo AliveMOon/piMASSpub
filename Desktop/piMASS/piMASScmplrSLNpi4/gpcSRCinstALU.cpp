@@ -235,7 +235,17 @@ gpINST* gpMEM::instALU() {
 		case gpeOPid_entry:{
 				switch(ins.op) {
 					case gpeOPid_dot:
+//						0x00002770 move.L A7,D7
+//						0x00002788 move.l 0x10,-(A7)
+//						0x000027a0 move.l 0x12,-(A7)
+//						0x000027b8 jsr entry
+//						0x000027d0 move.L D7,A7
+//						0x000027e8 move.l 0x21d0,A1		; //0,
+//						0x00002800 move.l A0,(A1)
 						// find OBJ
+						//pA[0] = core.entryOBJ2A0( pM0, pALL, &scpCNST, pWIN, bSW ); //, pD[1] );
+						//pA[7] = pD[0];
+						instENTRY( pALL + pA[0] );
 						break;
 					case gpeOPid_jsr: {
 							instJSR( pALL + pA[0], ins );
