@@ -4122,7 +4122,7 @@
 	<linux/videodev2.h>
 	<sys/mman.h>
 
-1623653472 /home/alivemoon/Asztal/piMASScmplrSLNpi4/piMASS.h
+1625077149 /home/alivemoon/Asztal/piMASScmplrSLNpi4/piMASS.h
 	"mysys.h"
 	<exception>
 	<mysys.h>
@@ -4208,7 +4208,7 @@
 	<linux/videodev2.h>
 	<sys/mman.h>
 
-1623653472 /home/alivemoon/Asztal/piMASScmplrSLNpi4//piMASS.h
+1625077149 /home/alivemoon/Asztal/piMASScmplrSLNpi4//piMASS.h
 	"mysys.h"
 	<exception>
 	<mysys.h>
@@ -4381,7 +4381,7 @@
 1603951024 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcresflt.cpp
 	"gpcwin.h"
 
-1624444559 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSLMPdcr.cpp
+1624626681 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpcSLMPdcr.cpp
 	"gpcgt.h"
 	"gpcwin.h"
 
@@ -4458,7 +4458,7 @@
 	"gpcSRClnk.h"
 	"gpccrs.h"
 
-1623298476 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gppiMASScmplr.cpp
+1625077149 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gppiMASScmplr.cpp
 	"gpcSRC.h"
 	"gpcSRClnk.h"
 	"gpccrs.h"
@@ -4544,7 +4544,7 @@
 	"gpccrs.h"
 	<wiringSerial.h>
 
-1623401060 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpMEMfunFND.cpp
+1624456098 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/gpMEMfunFND.cpp
 	"gpcSRC.h"
 	"gpcSRCinst.h"
 	"gpcSRClnk.h"
@@ -5024,7 +5024,7 @@
 	<linux/videodev2.h>
 	<sys/mman.h>
 
-1623653472 /home/pi/Desktop/piMASS/piMASScmplrSLNpi4/piMASS.h
+1625077149 /home/pi/Desktop/piMASS/piMASScmplrSLNpi4/piMASS.h
 	"mysys.h"
 	<exception>
 	<mysys.h>
@@ -5110,7 +5110,7 @@
 	<linux/videodev2.h>
 	<sys/mman.h>
 
-1623653472 /home/pi/Desktop/piMASS/piMASScmplrSLNpi4//piMASS.h
+1625077149 /home/pi/Desktop/piMASS/piMASScmplrSLNpi4//piMASS.h
 	"mysys.h"
 	<exception>
 	<mysys.h>
@@ -5403,7 +5403,7 @@
 	"gpcSRC.h"
 	"gpccrs.h"
 
-1624456016 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gpMEMfunFND.cpp
+1624456098 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gpMEMfunFND.cpp
 	"gpcSRC.h"
 	"gpcSRCinst.h"
 	"gpcSRClnk.h"
@@ -5421,7 +5421,7 @@
 	"gpcSRClnk.h"
 	"gpccrs.h"
 
-1623298476 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gppiMASScmplr.cpp
+1625077149 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gppiMASScmplr.cpp
 	"gpcSRC.h"
 	"gpcSRClnk.h"
 	"gpccrs.h"
@@ -5455,8 +5455,4 @@
 	<gpsGLSL.h>
 
 1621018274 /home/pi/Desktop/piMASS/piMASScmplrSLNpi4//gpsGLSL.h
-
-1624452065 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gpcSLMPdcr.cpp
-	"gpcgt.h"
-	"gpcwin.h"
 

@@ -541,7 +541,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 
 	mmABCD.A = dXYZ.abs0().mx().x;
 	if( mmABCD.A ) {
-		U4 i  = 3; //iD0;
+		U4 i = 3; //iD0;
 		switch( NMnDIF.x )
 		{
 			case gpeZS_BILL:{
@@ -572,7 +572,8 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 		lXYZ = oXYZ - iXYZ;
 		mmABCD.B = lXYZ.abs0().mx().x;
 		if( mmABCD.A < (mmX(1)/0x10) ) {
-			mmABCD.B = mmABCD.x = 0;
+			mmABCD.B =
+			mmABCD.x = 0;
 		} else if( mmABCD.B ) {
 			if( lim <= mmABCD.B+mmX(1) ) {
 				// elérte a lim-et azaz nem érte el a ketrecet
@@ -656,7 +657,6 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 
 		if( ab < 1.0 ) {
 			if( mmABCD.A >= degX(2) ) {
-
 				mmABCD.A /= degX(1);
 				if( lim <= mmABCD.B )
 				{
@@ -668,9 +668,11 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 			}
 
 			if( mmABCD.B )
-				oABC.ABC_( ((itABCdif*mmABCD.B)/mmABCD.A)+iABC );
+				oABC.ABC_( ((itABCdif*mmABCD.B)/mmABCD.A)+iABC ); // volt mozgás
 			else if( ab > 0.0 )
 				oABC.ABC_( (F4(itABCdif)*ab)+iABC );
+			else
+				oABC.ABC_( itABCdif+iABC );
 
 
 			if( (oABC.A/degX(180)) > 1 ) {

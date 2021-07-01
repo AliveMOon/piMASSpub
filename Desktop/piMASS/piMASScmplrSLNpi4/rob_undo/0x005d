@@ -8,8 +8,9 @@
  rr = 0x10000;
  rout = rr + 3;
  rinp = rr + 2;
- bill = d0.mini;
- //john 
+ //bill
+ john
+       = d0.mini;
  	
  slmp = "192.168.1.90 10000";
  //sync = "192.168.1.99 6001";
@@ -233,8 +234,8 @@
 //0870| b3	 
  a = 10;
  b = 20;
- CÃ = a+b
-  * sin(a + b)
+ C = a+b
+  *(a + b)
   *b/a
  ,
  d = c%4;  aa3	   

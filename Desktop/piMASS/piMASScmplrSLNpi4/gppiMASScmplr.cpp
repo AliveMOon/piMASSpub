@@ -201,7 +201,7 @@ gpINST* gpMEM::instRDY( gpcLZY* pDBG ) {
 
 	gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
 	nDAT = lzyMEM.n_load;
-	if(bSTDcoutCMP)
+	if(bSTDcoutDBG)
 	for( I4 i = 0; i < nCD; i++ )
 		pINST[i].instDBG(pDBG,this,lzyMEM.p_alloc);
 
