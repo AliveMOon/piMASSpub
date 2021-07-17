@@ -642,8 +642,8 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 			oXYZ.xyz_(tXYZ);
 			oABC.ABC_(tABC);
 			oxyz.xyz_(txyz);
-			for( U4 iH = 0; iH < nH; iH++ ) {
-				if( !iH ) {
+			for( int iH = nH-1; iH>-1; iH-- ) {
+				if( iH == nH-1) {
 					oMX = 1.0;
 					oMX.mxABC(oABC, degX(180.0/PI) );
 					if( oxyz.qlen_xyz() ) {
@@ -676,7 +676,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 				}
 				hdXYZ = gpaCAGEheadBALL[iH];
 				aHDxyz[0] = (iMX.x*double(hdXYZ.x))+(iMX.y*double(hdXYZ.y))+(iMX.z*double(hdXYZ.z))+iXYZ;
-				aHDxyz[1] = (oMX.x*double(hdXYZ.x))+(oMX.y*double(hdXYZ.y))+(oMX.z*double(hdXYZ.z))+oABC;
+				aHDxyz[1] = (oMX.x*double(hdXYZ.x))+(oMX.y*double(hdXYZ.y))+(oMX.z*double(hdXYZ.z))+oXYZ;
 				aHDxyz[4] = (aHDxyz[1]-aHDxyz[0]).xyz0();
 				aHDxyz[3].A = sqrt(aHDxyz[4].qlen_xyz());
 				if( aHDxyz[3].A < (mmX(1)/16) )
@@ -691,10 +691,10 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 					oABC.ABC_(iABC);
 					break;
 				}
-				if( (aHDxyz[3].A-aHDxyz[3].B) > (mmX(1)/8) )
+				if( (aHDxyz[3].A-aHDxyz[3].B) < (mmX(1)/8) )
 					continue;
 
-				iH = 0;
+				iH = nH-1;
 				oXYZ.xyz_( (oXYZ+iXYZ)/2 );
 				oABC.ABC_( tABC );
 				if( !oxyz.qlen_xyz() )
