@@ -72,6 +72,9 @@
 #define gpdZSnWu2	(gpdZSnW/sizeof(U2))
 #define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
+
+
+
 class gpcRES;
 class gpcDrc;
 class gpcGSM;
@@ -148,12 +151,12 @@ public:
 	U4x4	oCTRL, iCTRL, JD;	// JD.z error num
 	I4x4	okXYZ, okABC, okxyz,
 			tGRP, oGRP, iGRP,
-			jdPRG,
+			jdPRG, jdPRGtool,
 
 			jd0PRG, //jd0DRPtu,
 			jd0XYZ, jd0ABC, jd0xyz,
 			jd1XYZ, jd1ABC, jd1up;
-	F4x4	jd0mx;
+	F4x4	jd0mx, jd0mxTL;
 	gpeALF	jdALF;
 	I4x4	msSMR2, msSRT3;
 	U4		n_trd,	n_join,
@@ -166,21 +169,28 @@ public:
 			return;
 		trd.join();
 	}
-	gpcDrc& operator = ( const gpcDrc& d )
-	{
+	gpcDrc& operator = ( const gpcDrc& d ) {
 		gpmMcpy( this, &d, gpmOFF(gpcDrc,n_trd) );
 		if( n_join < n_trd )
 			trd.join();
 		n_trd = n_join = 0;
 	}
-	//gpcDrc& outDrc( gpcDrc& pev, gpcDrc& inp );
-	I4x4 cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL );
-	I4x4 cageXYZ( I4 lim, U4 id );
 
-	I4x4 cageXYZ( I4x4 trg, I4 lim, U4 id );
+	/// HD ------------------------------
+	I4x4	cageXYZhd0( I4x4* pHD, I4 lim, U4 id, int rR  );
+	I4x4 	cageXYZhd( I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR );
+	I4x4 	cageBALLts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR );
+	I4x4 	cageBOXts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR );
+	/// .... ...  ..   .
 
-	I4x4 cageBALL( I4x4 T, I4x4* pCAGE, U4 n );
-	I4x4 cageBOX( I4x4 T, I4x4* pCAGE, U4 n );
+	I4x4*	pBALLtool( U4 i );
+	I4x4 	cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR );
+	I4x4 	cageXYZ( I4 lim, U4 id, int rR );
+
+	I4x4 	cageXYZ( I4x4 trg, I4 lim, U4 id, int rR );
+
+	I4x4 	cageBALL( I4x4 T, I4x4* pCAGE, U4 n, int rR );
+	I4x4 	cageBOX( I4x4 T, I4x4* pCAGE, U4 n, int rR );
 
 	gpcDrc( const gpcZS& zs, U4 nm = 0  );
 	gpcDrc& operator = ( const gpcZS& zs );
@@ -196,18 +206,13 @@ public:
 	gpcDrc& operator = ( const gpcROB& rob );
 
 
-	bool operator == ( const gpcDrc& b ) const
-	{
+	bool operator == ( const gpcDrc& b ) const {
 		if( sizeof(b) == gpmMcmp( &b, this, sizeof(b) ) )
 			return true;
 
 		return false;
 	}
-	bool operator != ( const gpcDrc& b ) const
-	{
-		return !(*this == b);
-	}
-	//bool async( char* pBUFF, gpcALU& alu, gpcRES* pRES );
+	bool operator != ( const gpcDrc& b ) const { return !(*this == b); }
 	bool asyncSYS( char* pBUFF, U1* pCLI );
 
 	gpcDrc& format( U4 nm = 0 ) {
@@ -263,17 +268,15 @@ public:
 				|(bHS2i()<<0x0c)|(bHS2o()<<0x08)
 				|(bHS3i()<<0x04)|(bHS3o());
 	}
-	int		answINFO( char*		pANS, U4 id );
-	gpcLZY* answINFO( gpcLZY* 	pANS, U4 id );
-	gpcLZY* answSTAT( gpcLZY* 	pANS, U4 id, char* pPP = "//" );
+	int		answINFO( char*		pANS, U4 id, int rR );
+	gpcLZY* answINFO( gpcLZY* 	pANS, U4 id, int rR );
+	gpcLZY* answSTAT( gpcLZY* 	pANS, U4 id, int rR, char* pPP = "//" );
 
 	int		answINFOX( char*	pANS, U4 id, I4 x );
 	gpcLZY* answINFOX( gpcLZY*	pANS, U4 id, I4 x );
 
 	bool bHS1i() const { return !!(iCTRL.y&ZShs1);	}
 	bool bHS1o() const { return !!(oCTRL.y&ZShs1);	}
-	//bool bHS1iNo() const { return bHS1i()&&bHS1o(); }
-	//bool bHS1iOo() const { return bHS1i()||bHS1o(); }
 	U4 oHS1o() {
 		iCTRL.y&=(~ZShs1);
 		return (oCTRL.y|=ZShs1);
@@ -305,7 +308,8 @@ public:
 
 	bool jdPRGstp( U4 mSEC );
 
-	gpcDrc& judo( gpcROB& iR, U4 mSEC );
+	gpcDrc& judo( gpcROB& iR, U4 mSEC, U4 iD0 );
+	gpcDrc& judo_OHNEnew( gpcROB& iR, U4 mSEC, U4 iD0 );
 	gpcDrc& JUDO( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)

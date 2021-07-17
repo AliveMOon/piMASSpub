@@ -3,8 +3,8 @@
 extern U1 gpaALFsub[];
 extern U1 gpaALFsub2[];
 extern char gpaALF_H_sub[];
-char	gps_lzy_pub1[1024*0x100];
-gpcLZY* gpcLZY::lzyADD( const void* p_void, U8 n_byte, U8& iSTRT, U1 n ) {
+static char	gps_lzy_pub1[1024*0x100*2];
+gpcLZY* gpcLZY::lzyADD( const void* p_void, size_t n_byte, U8& iSTRT, U1 n ) {
 	if( !n_byte )
 		return this;
 
@@ -41,12 +41,12 @@ gpcLZY* gpcLZY::lzyADD( const void* p_void, U8 n_byte, U8& iSTRT, U1 n ) {
 	else
 		n_load = iSTRT;
 
-	if( p_alloc ? (n_load+n_byte > n_alloc) : true ) {
+	size_t n_kill = n_alloc;
+	if( p_alloc ? ((n_load+n_byte) > n_kill) : true ) {
 		U1* p_kill = p_alloc;
 		n_alloc = gpmPAD( (n_load+n_byte*n), 0x10 );
-		p_alloc = gpmALLOC( n_alloc+0x10 ); //, 0x10 );
-		if( p_kill )
-		{
+		p_alloc = gpmALLOC( n_alloc+0x10 );
+		if( p_kill ) {
 			gpmMcpy( p_alloc, p_kill, n_load );
 			gpmFREE( p_kill );
 		} else
@@ -90,10 +90,12 @@ gpcLZY* gpcLZY::lzyFRMT( U8& iSTRT, const char* p_format, ... )
 	va_list vl;
 	va_start(vl, p_format);
 	gps_lzy_pub1[0] = 0;
-	U8 n = vsprintf( gps_lzy_pub1, p_format, vl );
+	size_t n = vsprintf( gps_lzy_pub1, p_format, vl );
 	if( n < 1 )
 		return this;
-	U8 s = -1;
+	if( n >= sizeof(gps_lzy_pub1) ){
+		gpdCOUT << "lzyFRMT" << gpdENDL;
+	}
 	return lzyADD( (U1*)gps_lzy_pub1, n, iSTRT );
 }
 static const char* gpasADDR[] = {

@@ -25,11 +25,13 @@
 //#define gpdDEBUG
 //? #define gpdNEW_CMPLR
 
-#define bSTDcout true //false //true
+#define bSTDcout true //true //false //true
 #define bSTDcout_V4l2 (bSTDcout&false) //true) // false)//
 #define bSTDcout_jsr false //(bSTDcout&true)
 #define bSTDcout_slmp (bSTDcout&true)
-#define bSTDcoutCMP true //false //true
+#define bSTDcoutCMP (bSTDcout&false) //true //false //true
+#define bSTDcoutDBG true
+#define bSTDcout_3D (bSTDcout&true)
 //#define stdON
 
 #include "mysys.h"
@@ -52,6 +54,30 @@
 #include <setjmp.h>
 #include <math.h>
 #include <thread>
+
+//#define stdOFF      0
+#define stdRESET	"\033[0m"
+
+#define stdBLACK	"\033[1;30m"
+#define stdRED		"\033[1;31m"
+#define stdGREEN	"\033[1;32m"
+#define stdYELLOW	"\033[1;33m"
+#define stdBLUE		"\033[1;34m"
+#define stdPURPLE	"\033[1;35m"
+#define stdCYAN		"\033[1;36m"
+#define stdWHITE	"\033[1;36m"
+
+#define stdALU		stdYELLOW
+#define stdMINI		stdBLUE
+#define stdRUN		stdPURPLE
+#define stdCMPLR	stdRED
+#define stdDBG		stdCYAN
+#define stdBREAK	stdGREEN
+#define stdRDY		stdCYAN
+
+#define gpdCOUT std::cout << stdCYAN
+#define gpdENDL stdRESET << std::endl
+#define gpdFLUSH stdRESET << std::flush
 
 #ifdef _WIN64
 
@@ -85,8 +111,8 @@
 	#define mkd( a, b ) ( _mkdir( a ) )
 	#define usleep Sleep
 	#define sleep Sleep
-	#define gpmALLOC( n ) ((U1*)_mm_malloc( n, 0x10 ))
-	#define gpmFREE( p ) _aligned_free( p )
+	#define gpmALLOC( n ) ((U1*)_mm_malloc( (n), 0x10 ))
+	#define gpmFREE( p ) _aligned_free( (p) )
 	//#define gpmFD_CLOSE( h ){ if( h ){ CloseHandle( h ); h = 0; } }
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
@@ -170,7 +196,7 @@
 	#define ace access
 	#define mkd( a, b ) ( mkdir( a,b ) )
 	#define gpmALLOC( n ) ((U1*)memalign( 0x10, (n) ))
-	#define gpmFREE( p ) free( p )
+	#define gpmFREE( p ) free( (p) )
 	#define gpmFD_CLOSE( h ){ if( h ){ fclose( h ); h = 0; } }
 	#define gpmFF_CLOSE( h ){ if( h ){ _findclose( h ); h = -1L; } }
 
@@ -416,6 +442,11 @@ public:
 #define gpdROBlim 100
 #define mmX(a) ((a)*100)
 #define degX(a) ((a)*100)
+
+#define gpdHEADmmX	mmX(200)
+#define gpdNECKmmX	mmX(150)
+
+
 #define zsIO 20
 #define zsIN 400
 #define zsINin (zsIN-zsIO)
@@ -440,7 +471,7 @@ GLenum inline gpfGLerr( const char* pERR = "" ) {
 	GLenum e = glGetError();
 	if( !e )
 		return 0;
-	std::cout << std::hex << e << pERR <<  std::endl;
+	if( bSTDcout_3D ) gpdCOUT << std::hex << e << pERR <<  gpdENDL;
 	return e;
 }
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
@@ -556,25 +587,7 @@ U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* 
 		)
 #endif
 
-//#define stdOFF      0
-#define stdRESET	"\033[0m"
 
-#define stdBLACK	"\033[1;30m"
-#define stdRED		"\033[1;31m"
-#define stdGREEN	"\033[1;32m"
-#define stdYELLOW	"\033[1;33m"
-#define stdBLUE		"\033[1;34m"
-#define stdPURPLE	"\033[1;35m"
-#define stdCYAN		"\033[1;36m"
-#define stdWHITE	"\033[1;36m"
-
-#define stdALU		stdYELLOW
-#define stdMINI		stdBLUE
-#define stdRUN		stdPURPLE
-#define stdCMPLR	stdRED
-#define stdDBG		stdCYAN
-#define stdBREAK	stdGREEN
-#define stdRDY		stdCYAN
 
 enum gpeCLR: U1
 {
@@ -1832,7 +1845,7 @@ public:
 		struct { U4 i,n; };
 		struct { gpeALFu4 a4; U4 n4; };
 		struct { U1x4 aU1x4[2]; };
-		struct { U2 xl,xh,prt,srf; };
+		struct { U2 xl,xh,srf,prt; };
 		struct { gpeALF var; };
 		struct { U8 u8; };
 		struct { U1* apSTR[gpeU4x2nSTR]; };
@@ -2039,99 +2052,99 @@ public:
 
 		return avgr / n;
 	}
-	U4 median( U4 n, U4x2* p_tree, bool b_inc = false ) {
+	U4 median( U4 N, U4x2* p_tree, bool b_inc = false ) {
 		// b_inc == true - incrementált növekvő sorban leszenk
 		// b_inc == false - dekrementáslt csökkenő sorban leszenk (nem definiálod akkor ez, azaz csökenő )
-		if( !this || n < 1 )
+		if( !this || N < 1 )
 			return 0;
 
-		if( n < 2 )
+		if( N < 2 )
 			return this->y;
 
-		U4	i, j, l, r;
-		U4x2 x;
+		U4	I, J, L, R;
+		U4x2 X2;
 
-		r = n;
-		while( r >= 1 ) {
-			// az öszes elem számát "r" elosztom 2-tővel kerekítés nélkül
-			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "l" lesz a küszöb
-			l = ldiv( r, 2 ).quot;
-			while( r > 0 ) {
-				// a következő elemet berakom az x-be
-				x = this[r-1];
+		R = N;
+		while( R >= 1 ) {
+			// az öszes elem számát "R" elosztom 2-tővel kerekítés nélkül
+			// ezzel tudom, hogy a soron következő szint meddig csökkenhet "L" lesz a küszöb
+			L = ldiv( R, 2 ).quot;
+			while( R > 0 ) {
+				// a következő elemet berakom az X2-be
+				X2 = this[R-1];
 
-				i = r;
-				if ( i*2 <= n ) {
-					// i mutatja majd azt a helyet ahonva az x et be akarnám rakni
-					while( i*2 <= n ) {
-						j = i*2;
-						// azt jelenti, hogy az i nek van ága
-						if( j+1 <= n )
-						if( p_tree[j+1].y < p_tree[j].y )
-							j++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
+				I = R;
+				if ( I*2 <= N ) {
+					// I mutatja majd azt a helyet ahonva az X2 et be akarnám rakni
+					while( I*2 <= N ) {
+						J = I*2;
+						// azt jelenti, hogy az I nek van ága
+						if( J+1 <= N )
+						if( p_tree[J+1].y < p_tree[J].y )
+							J++; // azt jelenti, hogy két ága is volt, és a magasabb indexün kissebb volt az érték
 
-						if( x.y > p_tree[j].y ) {
-							// azt jelenti hogy az x nagyobb volt mint az ág ezért lejebb rakom a tartalmát
-							p_tree[i] = p_tree[j];
+						if( X2.y > p_tree[J].y ) {
+							// azt jelenti hogy az X2 nagyobb volt mint az ág ezért lejebb rakom a tartalmát
+							p_tree[I] = p_tree[J];
 							// és következő ciklusban az ágról akarom folytatni
-							i = j;
+							I = J;
 						} else {
 							// azt jelenti, nincs ennél magasabb szám az ágakon
 							break;
 						}
 					}//while
-					p_tree[i] = x;
+					p_tree[I] = X2;
 				} else {
-					p_tree[r] = x;
+					p_tree[R] = X2;
 				}
 
-				// r-et csökkentem jöhet a következő elem
-				r--;
+				// R-et csökkentem jöhet a következő elem
+				R--;
 			}
 		}
-		l = ldiv( r, 2).quot;
-		r = n;
-		i = 1;
-		while ( r >= 1 ) {
-			x = p_tree[r];
-			p_tree[r] = p_tree[1];
-			r--;
-			l = 1;
-			while ( l <= r ) {
-				i = l*2;
-				if ( i <= r ) {
-					if( i+1 <= r )
-					if( p_tree[i+1].y < p_tree[i].y )
-						i++;
+		L = ldiv( R, 2).quot;
+		R = N;
+		I = 1;
+		while ( R >= 1 ) {
+			X2 = p_tree[R];
+			p_tree[R] = p_tree[1];
+			R--;
+			L = 1;
+			while ( L <= R ) {
+				I = L*2;
+				if ( I <= R ) {
+					if( I+1 <= R )
+					if( p_tree[I+1].y < p_tree[I].y )
+						I++;
 
-					if( x.y > p_tree[i].y ) {
-						p_tree[l] = p_tree[i];
+					if( X2.y > p_tree[I].y ) {
+						p_tree[L] = p_tree[I];
 					} else {
-						p_tree[l] = x;
+						p_tree[L] = X2;
 						break;
 					}
 				} else {
-					p_tree[l] = x;
+					p_tree[L] = X2;
 					break;
 				}
-				l = i;
+				L = I;
 			}//while
 
 		}
 
 		if( b_inc ) {
-			for( U4 i = 0; i < n; i++ )
-				this[i] = p_tree[n-i];
-			if( n < 3 )
-				return average( n );
-			return this[n/2].y;
+			for( U4 I = 0; I < N; I++ )
+				this[I] = p_tree[N-I];
+			if( N < 3 )
+				return average( N );
+			return this[N/2].y;
 		}
 
-		gpmMcpyOF( this, p_tree+1, n );
-		if( n < 3 )
-			return average( n );
+		gpmMcpyOF( this, p_tree+1, N );
+		if( N < 3 )
+			return average( N );
 
-		return this[n/2].y;
+		return this[N/2].y;
 	}
 };
 
@@ -2592,6 +2605,13 @@ public:
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
+    I4x2& zigzag( I4 i, U4 w ) {
+		if( !i )
+			return null();
+		y = i/w;
+		x = y&1 ? i%w : ((w-1)-(i%w));
+		return (*this -= w/2);
+	}
 	I4x2& snail( I4 i ) {
 		if( !i )
 			return null();
@@ -2606,8 +2626,6 @@ public:
 
 			i2 =sq2*sq2;
 		// i=6 sq=2 i0=4 sq2=3 i1=6 i2=9
-
-
 		if( i0&1 ) {
 			*this = sq2/2;	//i=3,2,1 xy=2/2=1
 			// páratlan
@@ -3756,10 +3774,16 @@ public:
 
 	double dropRAD(const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
 	I4x4 drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
-
-
 };
 
+//------------------------
+// HEAD
+//------------------------
+static const I4x4 gpaCAGEheadBALL[] = {
+	{ mmX(0), mmX(0), mmX(0),	mmX(130) },
+	{ mmX(0), mmX(0), mmX(200),	mmX(100) },
+	{ mmX(0), mmX(0), mmX(300),	mmX(20) },
+};
 
 class I8x2 {
 public:
@@ -4041,9 +4065,9 @@ public:
 					pAT[at].an2str( pOUT );
 					break;
 			}
-			std::cout << at <<"."<< pOUT << " ";
+			gpdCOUT << at <<"."<< pOUT << " ";
 		}
-		std::cout << "nAT:" << at << std::endl;
+		gpdCOUT << "nAT:" << at << gpdENDL;
 		return this;
 	}
 };
@@ -4483,7 +4507,7 @@ public:
     size_t str( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
 		return sprintf( pBUFF, "%8.2f%s%8.2f%s%8.2f%s%8.2f%s%s", x, pSeP, y, pSeP, z, pSeP, w, pSeP, pENT );
     }
-    char* pSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) { str( pBUFF, pSeP, pENT ); return pBUFF; }
+    char* pSTRf4( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) { str( pBUFF, pSeP, pENT ); return pBUFF; }
 
 
 	F4 sqrt() const { return F4(sqrtf(x),sqrtf(y),sqrtf(z),sqrtf(w)); }
@@ -4492,19 +4516,12 @@ public:
     double sum_xyz( void ) const	{ return x+y+z; }
     double qlen( void ) const		{ return x*x+y*y+z*z+w*w; }
     double qlen_xyz( void ) const	{ return x*x+y*y+z*z; }
+    double qlen_xz( void ) const	{ return x*x+z*z; }
+	double qlen_yz( void ) const	{ return y*y+z*z; }
 
-    F4 N3( void ) const { /// NORMALIZE
-        float l = sqrtf(qlen_xyz());
-		return F4( x/l, y/l, z/l );
-	}
+    F4 N3( void ) const;
 	float dot_xyz( F4 b ) const { return x*b.x + y*b.y + z*b.z; }
-    F4 X3( F4 b ) const {	/// CROSS PRODUCT
-		return F4(
-						y * b.z - z * b.y,
-						z * b.x - x * b.z,
-						x * b.y - y * b.x
-				);
-	}
+    F4 X3( F4 b ) const;
 	F4 xyz1() const { return F4(x,y,z,1.0);}
 
 	F4  cos() const { return F4(  cosf(x), cosf(y), cosf(z), cosf(w)); };
@@ -4533,7 +4550,7 @@ public:
 		return false;
     }
     bool operator == ( const F4& b ) { return !(*this!=b); }
-
+	F4& operator = ( const float b ) { aF2[0] = aF2[1] = b; return *this; }
     F4& operator = ( const I4x2& b ) { aF2[0] = aF2[1] = b; return *this; }
 
     F4& operator += ( const float b ) { aF2[0] += b; aF2[1] += b; return *this; }
@@ -4699,29 +4716,9 @@ public:
 	float mx() { float m = srt3().x; return m < w ? w : m; }
 	float mn() { float m = srt3().z; return m > w ? w : m; }
 
-	//I84 gr2cr_1m( void ) const
-	F4& gr2cr( const I4x2 xy, double rw ) {
-
-		double	rx = ::PI*((double(xy.x)/(rw*2)) + 0.25),
-				ry = ::PI*((double(xy.y)/(rw*2)) + 0.25),
-				ctgX = ::cos(rx)/::sin(rx),
-				ctgY = ::cos(ry)/::sin(ry),
-				ctgXY2 = ctgX*ctgX + ctgY*ctgY,
-				r0 = rw / ::sqrt(1.0+ctgXY2);
-
-		ctgX *= r0;
-		ctgY *= r0;
-		ctgXY2 = ctgX*ctgX + ctgY*ctgY;
-		r0 = ::sqrt( rw*rw - ctgXY2 );
-
-		x = ctgX;
-		y = ctgY;
-		z = r0;
-
-		w = ::sqrt(qlen_xyz());
-		return *this;
-	}
-
+	//I84 gr2core_1m( void ) constpő
+	F4& gr2core( const I4x2 xy, double rw );
+	F4& gr2cyli( const I4x2 xy, double rw );
 
 };
 
@@ -4765,7 +4762,7 @@ public:
 		gpmMcpy( this, pA, sizeof(*this) );
 	}
 
-	size_t iSTR( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
+	size_t iSTRf4x4( char* pBUFF, const char* pSeP = ", ", const char* pENT = ""  ) {
 		char* pB = pBUFF;
 		pB += x.str( pB, pSeP, pENT );
 		pB += y.str( pB, pSeP, pENT );
@@ -4773,7 +4770,7 @@ public:
 		pB += t.str( pB, pSeP, pENT );
 		return pB-pBUFF;
     }
-	F4x4& latR( F4 e, F4 c, F4 u );
+    F4x4& latR( F4 e, F4 c, F4 u );
 
 	F4x4& operator = ( float a ) {
 		gpmCLR;
@@ -4847,13 +4844,7 @@ public:
 		c.t.col4x4(&x.w);
 		return c;
 	}
-	F4x4 T3x3() {
-		F4x4 c = *this;
-		c.x.col4x3(&x.x);
-		c.y.col4x3(&x.y);
-		c.z.col4x3(&x.z);
-		return c;
-	}
+	F4x4 T3x3( float s = 1.0 );
 	F4x4 inv();
 
 	F4x4& operator *= ( const float b ) {
@@ -5865,7 +5856,7 @@ public:
 		return this;
 	}
 
-	gpcLZY* lzyADD( const void* p_void, U8 n_byte, U8& iSTRT, U1 n = 0 );
+	gpcLZY* lzyADD( const void* p_void, size_t n_byte, U8& iSTRT, U1 n = 0 );
 	void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL ) {
 		if( !this )
 			return NULL; // ha nincsen thisLZY akkor nem lehet valós pU2
@@ -5959,10 +5950,10 @@ public:
 		{
 			n_sub = n_load-iSTRT;
 		}
-		U8 src_hi = iSTRT+n_sub,
-			dst_hi = iSTRT+n_add,
-			n_hi = n_load-src_hi,
-			new_load = iSTRT + n_add + n_hi;
+		size_t	src_hi = iSTRT+n_sub,
+				dst_hi = iSTRT+n_add,
+				n_hi = n_load-src_hi,
+				new_load = iSTRT + n_add + n_hi;
 		U1* p_kill = NULL;
 
 		if( new_load > n_alloc ) {
@@ -6144,7 +6135,7 @@ szasz:
 	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN, bool bCOM = true );
-	gpcLZY* lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i = 3, char* pPP = "//" );
+	gpcLZY* lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i = 3, int rR = gpdHEADmmX, char* pPP = "//" );
 	gpcLZY* lzyZSnDstat( U8& iSTRT, gpcZSnD& zs, U1 i = 3 );
 	gpcLZY* lzy_reqCLOSE( void ) {
 		if( !this )
@@ -6237,38 +6228,61 @@ szasz:
 
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
-	I8 nU4( I8 x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
-	U4*		pU4n( int i = 0, int n = 1 ) 	{ return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
-	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
-	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
-	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
-	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
-
-	char* pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
-	I1* pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
-
 	U4*		pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
+	U4*		pU4n( int i = 0, int n = 1 ) 	{ return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
+	size_t	nU4( size_t x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
+
+
+	char* 	pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
+	I1* 	pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
+
 	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
+	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
+	size_t	nU4x2( size_t x=1 ){ return x ? nLD(x*sizeof(U4x2)) : nLD(sizeof(U4x2)); }
+
 	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
+	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
+	size_t	nU4x4( size_t x=1 ){ return x ? nLD(x*sizeof(U4x4)) : nLD(sizeof(U4x4)); }
 
 	I4* 	pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
+	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),	sizeof(I4)*n,	true, sizeof(I4)); }
+	size_t	nI4( size_t x=1 ){ return x ? nLD(x*sizeof(I4)) : nLD(sizeof(I4)); }
 
 	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
-	U4		nI4x2() { return nLD(sizeof(I4x2)); };
+	I4x2* 	pI4x2n( int i = 0, int n = 1 )	{ return (I4x2*)Ux(	(i<0?nLD(sizeof(I4x2)):i),	sizeof(I4x2)*n,	true, sizeof(I4x2)); }
+	size_t	nI4x2( size_t x=1 ){ return x ? nLD(x*sizeof(I4x2)) : nLD(sizeof(I4x2)); }
 
 	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
-	U4		nI4x4() { return nLD(sizeof(I4x4)); };
+	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
+	size_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
 
-	I8x2* pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
-	I8x4* pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
-	U8x4* pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
-	float* pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
-	F2* pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
-	F4* pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
-	F4x4* pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
-	U4 nF4x4() { return nLD(sizeof(F4x4)); };
-	D4* pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
-	void** ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
+	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
+	I8x2* 	pI8x2n( int i = 0, int n = 1 )	{ return (I8x2*)Ux(	(i<0?nLD(sizeof(I8x2)):i),	sizeof(I8x2)*n,	true, sizeof(I8x2)); }
+	size_t	nI8x2( size_t x=1 ){ return x ? nLD(x*sizeof(I8x2)) : nLD(sizeof(I8x2)); }
+
+	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
+	I8x4* 	pI8x4n( int i = 0, int n = 1 )	{ return (I8x4*)Ux(	(i<0?nLD(sizeof(I8x4)):i),	sizeof(I8x4)*n,	true, sizeof(I8x4)); }
+	size_t	nI8x4( size_t x=1 ){ return x ? nLD(x*sizeof(I8x4)) : nLD(sizeof(I8x4)); }
+
+	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
+	U8x4* 	pU8x4n( int i = 0, int n = 1 )	{ return (U8x4*)Ux(	(i<0?nLD(sizeof(U8x4)):i),	sizeof(U8x4)*n,	true, sizeof(U8x4)); }
+	size_t	nU8x4( size_t x=1 ){ return x ? nLD(x*sizeof(U8x4)) : nLD(sizeof(U8x4)); }
+
+	float* 	pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
+	size_t	nF( size_t x=1 ){ return x ? nLD(x*sizeof(float)) : nLD(sizeof(float)); }
+
+	F2* 	pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
+	size_t	nF2( size_t x=1 ){ return x ? nLD(x*sizeof(F2)) : nLD(sizeof(F2)); }
+
+	F4* 	pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
+	size_t	nF4( size_t x=1 ){ return x ? nLD(x*sizeof(F4)) : nLD(sizeof(F4)); }
+
+	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
+	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
+	size_t	nF4x4( size_t x=1 ){ return x ? nLD(x*sizeof(F4x4)) : nLD(sizeof(F4x4)); }
+
+	D4* 	pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
+	void**	ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
 
 
 };
@@ -6596,7 +6610,7 @@ public:
 	}
 	U4 i_str(void) { return pIX ? pIX->x : str.n_load; }
 	char* p_str( void ) { return (char*)str.p_alloc+pIX->x; }
-	U8 nIX(void) { return this ? (ix.n_load / sizeof(U4x4)) : 0; }
+	U8 nIX(void) { return this ? ix.nLD(sizeof(U4x4)) : 0; }
 	const char* sSTRix( U8 iX, const char* pER ) {
 		if( !this )
 			return pER;

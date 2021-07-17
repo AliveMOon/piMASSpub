@@ -22,7 +22,8 @@ extern char gpaALF_H_sub[];
 
 gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 	char *pFILE = pIDlst->pF+sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
-	gpcLZY dir, rd; U8 s, n;
+	gpcLZY dir, rd; U8 s;
+	size_t n;
 	dir.lzyDIR( pIDlst->sPATH, s = 0 );
 	if( !dir.p_alloc )
 		return this;
@@ -62,7 +63,7 @@ gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 					} break;
 				case gpeALF_LWS: {
 						I4* p3Did = (I4*)pV;
-						*p3Did = 	pIDlst->pMEM
+						(*p3Did) = 	pIDlst->pMEM
 									? pIDlst->pMEM->pWgl->iLWS( ABbb.a8x2[0].a, pIDlst->sPATH, rd )
 									: -1;
 					} break;
@@ -439,8 +440,8 @@ void gpMEM::funFND() {
 		//gpmMcpy( pDST, pS, nCPY )[nCPY] = 0;
 
 	if(bSTDcout_jsr)
-	{std::cout	<< stdCYAN << "funFND:"
-				<< stdALU << (pDST?(char*)pDST:"?") << std::endl;}
+	{gpdCOUT	<< stdCYAN << "funFND:"
+				<< stdALU << (pDST?(char*)pDST:"?") << gpdENDL;}
 
 	gpmDEL(pPRNT);
 }

@@ -890,7 +890,7 @@ public:
 	gpMEM*	pMEM;
 	I4		dctID, iPTR;
 	I8x2 	AN;
-	gpeCsz 	cAN;
+	gpeCsz 	cAN; bool bENTRY;
 
 	gpOBJ(){ gpmCLR; };
 
@@ -1377,7 +1377,7 @@ public:
 	U4 prt;
 	gpcLZY	p,l,t,
 			srf;
-	U4x4 aIIXN[4];
+	I4x4 aIIXN[4];
 
 	gpc3Dtri(){};
 	gpc3Dtri* null() {
@@ -1429,6 +1429,7 @@ public:
 	gpcLZY	*p_lwo,
 			ly3D,
 			tgIX;
+	U4 nRDY, nBLD;
 
 	~gpc3D(){
 		gpmDEL(p_lwo);
@@ -1440,6 +1441,7 @@ public:
 		id.a8x2[0].b = alf;
 		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
 		gpmSTRCPY( sPATH, pP );
+		nBLD = nRDY+1;
 	}
 	gpc3D* pLWO( gpcLZY& lwo, gpcLZYdct& dctBN );
 	U4 nLY();
@@ -1641,6 +1643,7 @@ public:
 	U4 nKEY( U1 c ) { return c > 8 ? 0 : (this ? aKEY[c].nLD(sizeof(gpc3Dkey)): 0); }
 	float valKEYs( U1 c, float s );
 	gpc3Dkey* pKEYins( U1 c, float s );
+	gpc3Dkey* pKEYinsIX( U1 c, I4 i, I4 nE, float s );
 };
 
 //#include <ctime>
@@ -1737,9 +1740,10 @@ public:
 
 
 class gpc3Ditm {
-	gpc3D*		p_3D;
+	gpc3D*		p3D;
 public:
 	char sNAME[0x100];
+	gpeALF alfNM;
 	U4	itmIX,	itmID,
 		momIX,	momID,
 		trgID,	layID,
@@ -1757,24 +1761,9 @@ public:
 
 
 	gpc3Ditm(){};
-	gpc3D* p3D( gpcGL* pGL, const char* pP, char *pF );
-	char* pNAME( char* pN = NULL ) {
-		if( !this )
-			return NULL;
-		if( !pN )
-			return sNAME+nNAME;
-		U8 s;
-		pN += gpmNINCS(pN," \t\"");
-		U4 n = gpmVAN(pN," \t\"\r\n",s);
-		gpmMcpy( sNAME, pN, n )[n] = 0;
-
-		char* pCH = strrchr(sNAME,'/');
-		nNAME = pCH ? pCH - sNAME : 0;
-		if( sNAME[nNAME] == '/' )
-			nNAME++;
-
-		return sNAME+nNAME;
-	}
+	gpc3D* p3Do() { return p3D; }
+	gpc3D* p3Dobj( gpcGL* pGL, const char* pP, char *pF );
+	char* pNAME( char* pN = NULL );
 	U4  nBON(){ return this ? bonLST.nLD(sizeof(U4)) : 0; }
 	U4* pBONadd( gpc3Ditm* pBON = NULL );
 	F4x4* pMXl( float s );
@@ -1825,61 +1814,23 @@ public:
 		gpc3D* p3D = ((gpc3D**)lst3D.Ux(i,sizeof(gpc3D*)))[0];
 		return p3D;
 	}
-	gpc3D* p3D( gpeALF alf, const char* pP ) {
-		if( !this )
-			return NULL;
+	gpc3D* p3DobjADD( gpeALF alf, const char* pP );
 
-		gpc3D	**pp3D = (gpc3D**)lst3D.Ux( 0, sizeof(gpc3D*) );//, *p3D;
-		I4 i3D = 0, e3D = lst3D.nLD(sizeof(gpc3D*));
-		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
-			if( !pp3D[i3D] ) {
-				if( e3D > i3D )
-					e3D = i3D;
-				continue;
-			}
-			if( pp3D[i3D]->id.a8x2[0].a != alf )
-				continue;
-			return pp3D[i3D];
-		}
-		pp3D = (gpc3D**)lst3D.Ux( e3D, sizeof(gpc3D*) );
-		pp3D[0] = new gpc3D( e3D, pP, alf );
-		return pp3D[0];
-	}
-
-	/// TRACK
-	gpc3Dgym* p3DgymADD( gpeALF alf, const char* pP ) {
-		if( !this )
-			return NULL;
-
-		gpc3Dgym **pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( 0, sizeof(gpc3Dgym*) );//, *p3D;
-		I4 i3D = 0, e3D = lst3Dgym.nLD(sizeof(gpc3Dgym*));
-		for( I4 n3D = e3D; i3D < n3D; i3D++ ) {
-			if( !pp3Dgym[i3D] ) {
-				if( e3D > i3D )
-					e3D = i3D;
-				continue;
-			}
-			if( pp3Dgym[i3D]->id.a8x2[0].a != alf )
-				continue;
-			return pp3Dgym[i3D];
-		}
-		pp3Dgym = (gpc3Dgym**)lst3Dgym.Ux( e3D, sizeof(gpc3Dgym*) );
-		pp3Dgym[0] = new gpc3Dgym( e3D, pP, alf );
-		return pp3Dgym[0];
-	}
 	gpc3Dgym* p3DgymIX( I4 i ) {
 		if( this ? i < 0 : true )
 			return NULL;
 		gpc3Dgym** pp3Dgym = ((gpc3Dgym**)lst3Dgym.Ux(0,sizeof(gpc3Dgym*)));
 		return pp3Dgym[i];
 	}
+	gpc3Dgym* p3DgymADD( gpeALF alf, const char* pP );
+
 };
 class gpc3Dtrk {
 public:
 	I8 mSEC; gpeACT ACT;
 
 	gpc3Dtrk(){}
-	F4x4* pTRK( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act );
+	F4x4* pGYM( F4x4* pMX, gpc3Dgym* p3Dg, gpc3Ditm* p3Di, I8 ms, gpeACT act );
 
 };
 class gpMEM {
@@ -1943,7 +1894,7 @@ public:
 		nCD++;
 		return *pI;
 	};
-	gpOBJ* pOBJ( gpeALF alf ) {
+	gpOBJ* pOBJ( gpeALF alf, bool qENT = false ) {
 		if( this ? !alf : true )
 			return NULL;
 		U4 nO = lzyOBJ.nLD(sizeof(gpOBJ)), sOF;
@@ -1957,6 +1908,12 @@ public:
 				continue;
 			if( obj.AN.alf != alf )
 				continue;
+			if( !qENT )
+				return pO0+i;
+
+			if(pO0[i].bENTRY)
+				continue;
+
 			return pO0+i;
 		}
 		return NULL;
@@ -1965,6 +1922,7 @@ public:
 	gpINST* instRDY( gpcLZY* pDBG );
 	gpINST* instALU();
 	U1*		instJSR( U1* p_dst, gpINST& inst );
+	U1*		instENTRY( U1* p_dst );
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
 	I4		instDOitSLMP( gpcGT* pGT );
 	I4		instDOitGSM( gpcGT* pGT );

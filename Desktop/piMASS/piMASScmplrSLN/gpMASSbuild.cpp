@@ -96,7 +96,7 @@ char* gpfSTRdrop( char* p_dst, char* p_str, char* p_end, const char* p_drop ) {
 	return pD;
 }
 
-gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
+gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS, char skip ) {
 	if( p_end < pS ) {
 		if( ppS )
 			*ppS = (U1*)p_end;
@@ -125,8 +125,15 @@ gpeALF gpfSTR2ALF( const U1* pS, const U1* p_end, U1** ppS ) {
 			//pS++;
 			c = 'e';
 		}
+		if( skip )
+		if( c == skip ){
+			pS++;
+			continue;
+		}
+
 		if( !gpaALFsub[c] )
 			break;
+
 		c -= gpaALFsub[c];
 
 		alf *= (U8)gpdALF;
@@ -349,8 +356,8 @@ void gpcSRC::hd( gpcMASS* pMASS, gpeALF* pTGpub ) {
 	psHD += sprintf( 	psHD, "\r\nbSW:0x%0.8x",
 						bSW );
 	if( psHD > gpsHD )
-		if(bSTDcout){std::cout << gpsHD;}
-	if(bSTDcout){std::cout << ".";}
+		if(bSTDcout){gpdCOUT << gpsHD;}
+	if(bSTDcout){gpdCOUT << ".";}
 }
 gpcLZYdct* gpcMASS::pOPER() {
 	if(!this)

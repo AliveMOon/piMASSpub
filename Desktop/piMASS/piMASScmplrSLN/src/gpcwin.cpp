@@ -125,11 +125,11 @@ void gpcWIN::WINreSZ( void )
 		apCRS[id]->stFRMwh( *this, aBEF[id].x, aBEF[id].y );
 		aAFT[id] = apCRS[id]->gtFRMwh();
 
-		if(bSTDcout){std::cout 	<< 	"\033[1;31m WINreSZ"
+		if(bSTDcout){gpdCOUT 	<< 	"\033[1;31m WINreSZ"
 					<< "frmID:" << id
 					<< " be/af W:" << aBEF[id].x << "/" << aAFT[id].x
 					<< " H:" << aBEF[id].y << "/" << aAFT[id].y
-					<< "\033[0m" << std::endl;}
+					<< "\033[0m" << gpdENDL;}
 	}
 }
 gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
@@ -180,11 +180,14 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 		gpmSDL_FreeSRF( pSRFload );
 
 	/// sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
+	/// sudo ln -s "/home/alivemoon/Asztal/Robi" /robo
 
 	/// mkdir /piMASS
 	/// sudo ln -s /home/alivemoon/Asztal/piMASScmplrSLNpi4/mini_ISO_32x32_1024x1536_3.png /piMASS/mini_char.png
 
 	/// sudo cp ~/Asztal/piMASScmplrSLNpi4/bin/Debug/piMASS /usr/sbin/pimass
+
+	/// valgrind --leak-check=yes ./bin/Debug/piMASS pimass ./zero.mass
 	gpmSTRCPY( gppMASSfile, gpsMINI_ISO );
 	pSRFiso = IMG_Load( "/piMASS/mini_char.png" ); //gpsMASSpath );
 	chrTX.x = 32; //*4;

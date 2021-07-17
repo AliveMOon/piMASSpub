@@ -320,7 +320,7 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 
 
 	gpdEXPdbgCOUT
-	if(bSTDcout){std::cout << "Explode: " << any <<std::endl;}
+	if(bSTDcout){gpdCOUT << "Explode: " << any <<gpdENDL;}
 
 
 	U4 mom = 0, nBtrd = 0;
@@ -351,18 +351,18 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			trd = i;
 			break;
 		}
-		gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: nTRD " << i <<std::endl;}
+		gpdEXPdbgCOUT if(bSTDcout){gpdCOUT << "Explode: nTRD " << i <<gpdENDL;}
 		aBUG[i].trd = std::thread( TRDexp, aBUG+i );
 		aBUG[i].n_run++;
 		trd++;
 	}
 
 	gpdEXPdbgCOUT
-	if(bSTDcout){std::cout << "Explode: nTRD " << trd <<std::endl;}
+	if(bSTDcout){gpdCOUT << "Explode: nTRD " << trd <<gpdENDL;}
 
 	aBUG[trd].loop();
 
-	gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: mainLOOP " << trd <<std::endl;}
+	gpdEXPdbgCOUT if(bSTDcout){gpdCOUT << "Explode: mainLOOP " << trd <<gpdENDL;}
 	for( U4 i = 0; i <= trd; i++ ) {
 		if( aBUG[i].n_join < aBUG[i].n_run )
 		{
@@ -481,10 +481,10 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 			gpdEXPdbgCOUT
 			if( nBOB )
 			{
-				if(bSTDcout){std::cout << "Explode: " << nB << "/" << nA <<std::endl;}
+				if(bSTDcout){gpdCOUT << "Explode: " << nB << "/" << nA <<gpdENDL;}
 				for( U4 i = 0; i < k2; i++)
 				if( pBB = ppBOB[i] )
-					if(bSTDcout){std::cout << i << "BOB:"
+					if(bSTDcout){gpdCOUT << i << "BOB:"
 								<< pBB->wCNTR.x
 								<< "x"
 								<< pBB->wCNTR.y
@@ -493,13 +493,13 @@ U1x4* gpcPIC::TOOLexplode(	gpcLZYall& MANus, gpcPIC** ppPIC,
 								<< "rnd"
 								<< pBB->nRND
 								<< "A"
-								<< pBB->nAREA <<std::endl;}
+								<< pBB->nAREA <<gpdENDL;}
 			}
 			delete[] pF;
 		} else
 			delete[] pF;
 	}
-	//gpdEXPdbgCOUT if(bSTDcout){std::cout << "Explode: " << nB << "/" << nA <<std::endl;}
+	//gpdEXPdbgCOUT if(bSTDcout){gpdCOUT << "Explode: " << nB << "/" << nA <<gpdENDL;}
 	return (U1x4*)gpapP[0]->pixels;
 
 }
@@ -517,7 +517,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 
 	(TnID+I8x2(0,i)).
 	an2str( (U1*)pDIR, (U1*)pEXP, true, true );
-	if(bSTDcout){std::cout << "FOOD:" << pPATH <<std::endl;}
+	if(bSTDcout){gpdCOUT << "FOOD:" << pPATH <<gpdENDL;}
 
 	SDL_Surface* pTMP = NULL;
 	if( gpfACE( pPATH, 4) > -1 )
@@ -527,7 +527,7 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 		{
 			pPET->w = 0;
 			gpmSDL_FreeSRF(pTMP);
-			if(bSTDcout){std::cout << " ERR! NoGood FILE" <<std::endl;}
+			if(bSTDcout){gpdCOUT << " ERR! NoGood FILE" <<gpdENDL;}
 			return pPET;
 		}
 
@@ -539,18 +539,18 @@ U1x4* gpcPIC::food( U1x4* pPET, U4 i, U4 n,
 			pPET->z = 0x1;	// z alive!
 			pPET->w = 2;	// w load.
 			gpmSDL_FreeSRF(pTMP);
-			if(bSTDcout){std::cout << " OK" <<std::endl;}
+			if(bSTDcout){gpdCOUT << " OK" <<gpdENDL;}
 			return pPET;
 		}
 
 		pPET->w = 0;
 		gpmSDL_FreeSRF(pTMP);
-		if(bSTDcout){std::cout << " ERR! NoGood SIZE" <<std::endl;}
+		if(bSTDcout){gpdCOUT << " ERR! NoGood SIZE" <<gpdENDL;}
 		return pPET;
 
 	}
 
-	if(bSTDcout){std::cout << " NoFnd!" <<std::endl;}
+	if(bSTDcout){gpdCOUT << " NoFnd!" <<gpdENDL;}
 	pPET->w = 0;
 	return pPET;
 }
@@ -558,7 +558,7 @@ SDL_Surface* gpcPIC::pPICrd( char *pPATH, char *pFILE ){
 	if( !this )
 		return NULL;
 	SDL_Surface* pKILL = pSRF;
-	char *pC = strrchr( gpmSTRCPY( sFILE, pPATH ), '/' );
+	char	*pC = strrchr( gpmSTRCPY( sFILE, pPATH ), '/' );
 	while( pC ) {
 		gpmSTRCPY( pC+1, pFILE );
 		if( gpfACE( (char*)sFILE, 4) < 0 ) {
@@ -572,7 +572,6 @@ SDL_Surface* gpcPIC::pPICrd( char *pPATH, char *pFILE ){
 			pC = strrchr( (char*)sFILE, '/' );
 			continue;
 		}
-
 		break;
 	}
 	if( pKILL == pSRF )
@@ -652,8 +651,8 @@ public:
 			U4 p = pSRF->pitch/sizeof(*p_s);
 			if( p_u )
 			{
-				if(bSTDcout){std::cout	<< " food.w:"	<< ptch
-							<< " pitch:"	<< p <<std::endl;}
+				if(bSTDcout){gpdCOUT	<< " food.w:"	<< ptch
+							<< " pitch:"	<< p <<gpdENDL;}
 
 				p_u[0].cpyX( p_s, gpmMIN(ptch,p), ptch*gpmMIN(0x80,pSRF->h), 1, gpmMIN(ptch,p) );
 				p_s = p_u->zyxw( p_s, ptch*0x80 );
@@ -692,8 +691,8 @@ public:
 		if( ptch != pSRF->pitch/sizeof(*p_d) )
 		{
 			ptch = pSRF->pitch/sizeof(*p_d);
-			if(bSTDcout){std::cout	<< " save.w:"	<< pSRF->w
-						<< " pitch:"	<< ptch <<std::endl;}
+			if(bSTDcout){gpdCOUT	<< " save.w:"	<< pSRF->w
+						<< " pitch:"	<< ptch <<gpdENDL;}
 		}
 		// SPaCe
 		p_d[0x00]
@@ -737,13 +736,13 @@ public:
 		gpmSTRCPY(pRAM,pDIR);
 		if( int err = rename( (char*)sRAM, (char*)sPATH ) )
 		{
-			if(bSTDcout){std::cout << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<std::endl;}
+			if(bSTDcout){gpdCOUT << id << ":" << (char*)sRAM << "\t" << (char*)sPATH <<gpdENDL;}
 			gpcLZY load; U8 s = 0;
 			load.lzyRD( (char*)sRAM, s, 1 );
 			load.lzyWR( (char*)sPATH, true );
-			if(bSTDcout){std::cout << " LZYcpy: " << sRAM << " to " << sPATH <<std::endl;}
+			if(bSTDcout){gpdCOUT << " LZYcpy: " << sRAM << " to " << sPATH <<gpdENDL;}
 			remove((char*)sRAM);
-			if(bSTDcout){std::cout << " KILL:" << sRAM <<std::endl;}
+			if(bSTDcout){gpdCOUT << " KILL:" << sRAM <<gpdENDL;}
 		}
 
 		(ALFid+I8x2(0,pMAP->x))
@@ -751,7 +750,7 @@ public:
 		if( gpmACE(sRAM, 4) > -1 )
 		{
 			remove((char*)sRAM);
-			if(bSTDcout){std::cout << " KILL:" << sRAM <<std::endl;}
+			if(bSTDcout){gpdCOUT << " KILL:" << sRAM <<gpdENDL;}
 		}
 
 		return pSRF;
@@ -825,7 +824,7 @@ public:
 				pMAP->y++;
 
 		} else {
-			gpdSPCdbgCOUT if(bSTDcout){std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;}
+			gpdSPCdbgCOUT if(bSTDcout){gpdCOUT << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<gpdENDL;}
 
             // csere nem stimmel
             /// az a lényeg, ha le van nyomva az egér gomb a RNDR képet átmásolja a maskii-be
@@ -852,7 +851,7 @@ public:
 		if( !pFcpy )
 			return;
 
-		if(bSTDcout){std::cout << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<std::endl;}
+		if(bSTDcout){gpdCOUT << id << ":" << (int)x05.w << "/" << (int)pMAP->x <<gpdENDL;}
 
 
 		U1x4	fC, GD,// fP,
@@ -933,7 +932,7 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	else
 		pDIR = pFILE+gpmSTRLEN(pFILE);
 	if( gpfACE(pPATH, 4) < 0 ) {
-		if(bSTDcout){std::cout << "mkdir:"<< pPATH <<std::endl;}
+		if(bSTDcout){gpdCOUT << "mkdir:"<< pPATH <<gpdENDL;}
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
@@ -948,8 +947,8 @@ U1x4* gpcPIC::TOOLspaceTRD(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	aSPC[0].spcWH = *gpapP[0];
 	if( aSPC[0].spcWH.x != gpapP[0]->pitch/sizeof(*aSPC[0].pSPC) )
 	{
-		if(bSTDcout){std::cout	<< " spcWH.x:"	<< aSPC[0].spcWH.x
-					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*aSPC[0].pSPC)) <<std::endl;}
+		if(bSTDcout){gpdCOUT	<< " spcWH.x:"	<< aSPC[0].spcWH.x
+					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*aSPC[0].pSPC)) <<gpdENDL;}
 		aSPC[0].spcWH.x = gpapP[0]->pitch/sizeof(*aSPC[0].pSPC);
 	}
 
@@ -1091,7 +1090,7 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	else
 		pDIR = pFILE+gpmSTRLEN(pFILE);
 	if( gpfACE(pPATH, 4) < 0 ) {
-		if(bSTDcout){std::cout << "mkdir:"<< pPATH <<std::endl;}
+		if(bSTDcout){gpdCOUT << "mkdir:"<< pPATH <<gpdENDL;}
 		gpfMKDR( (char*)MANus.aPUB, pPATH );
 	}
 
@@ -1106,8 +1105,8 @@ U1x4* gpcPIC::TOOLspace(	gpcLZYall& MANus, gpcPIC** ppPIC,
 	SPC.spcWH = *gpapP[0];
 	if( SPC.spcWH.x != gpapP[0]->pitch/sizeof(*SPC.pSPC) )
 	{
-		if(bSTDcout){std::cout	<< " spcWH.x:"	<< SPC.spcWH.x
-					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*SPC.pSPC)) <<std::endl;}
+		if(bSTDcout){gpdCOUT	<< " spcWH.x:"	<< SPC.spcWH.x
+					<< " pitch:"	<< (gpapP[0]->pitch/sizeof(*SPC.pSPC)) <<gpdENDL;}
 		SPC.spcWH.x = gpapP[0]->pitch/sizeof(*SPC.pSPC);
 	}
 

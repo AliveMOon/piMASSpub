@@ -194,20 +194,20 @@ gpINST* gpMEM::instRDY( gpcLZY* pDBG ) {
 		return this ? pINST : NULL;
 
 	if( !pcCPY )
-	{
 		pcCPY = gpmPAD(nDAT,0x10);
-	}
+
 	U8 s = -1;
 	pINST = (gpINST*)lzyMEM.Ux( pcCPY, lzyCODE.n_load, true, 1 );
 
 	gpmMcpy( pINST, lzyCODE.p_alloc, lzyCODE.n_load );
 	nDAT = lzyMEM.n_load;
+	if(bSTDcoutDBG)
 	for( I4 i = 0; i < nCD; i++ )
 		pINST[i].instDBG(pDBG,this,lzyMEM.p_alloc);
 
 	pc = 0;
 	aA[7] = iSTK;
-	if(bSTDcoutCMP){std::cout << stdCMPLR " CMP" stdRESET << (char*)pDBG->p_alloc  << std::endl;}
+	if(bSTDcoutCMP){gpdCOUT << stdCMPLR " CMP" stdRESET << (char*)pDBG->p_alloc  << gpdENDL;}
 
 	return pINST;
 }
@@ -226,7 +226,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 	}
 	pMEM = new gpMEM( this, pW, pSRCstk );
 #ifdef stdON
-	if(bSTDcout){std::cout << stdCMPLR " CMP" stdRESET << std::endl;}
+	if(bSTDcout){gpdCOUT << stdCMPLR " CMP" stdRESET << gpdENDL;}
 #endif
 	I8x4 *pM0 = gpmSCP.pMN(), MiN, Mnx;
 	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];

@@ -8,7 +8,7 @@ extern char gpaALF_H_sub[];
 
 
 gpINST* gpMEM::instALU() {
-	//if(bSTDcout){std::cout << stdALU "+";
+	//if(bSTDcout){gpdCOUT << stdALU "+";
 	gpINST& ins = pINST[pc];
 	pc++;
 
@@ -79,11 +79,11 @@ gpINST* gpMEM::instALU() {
 		case gpeEA_d16IAnI:
 		case gpeEA_d16IAnDnI: {
 				switch( ins.mD ) {
-					case gpeEA_IAnI: 						off = pA[ins.iD]; break;
-					case gpeEA_IAnIp: 						off = pA[ins.iD]; pA[ins.iD]+=sOF; break;
-					case gpeEA_sIAnI:						pA[ins.iD]-=sOF; off = pA[ins.iD]; break;
-					case gpeEA_d16IAnI:						off = pA[ins.iD] + ins.a8x2.y; break;
-					case gpeEA_d16IAnDnI:					off = pA[ins.iD] + pD[ins.xD] + ins.a8x2.y; break;
+					case gpeEA_IAnI: 		off = pA[ins.iD]; break;
+					case gpeEA_IAnIp: 		off = pA[ins.iD]; pA[ins.iD]+=sOF; break;
+					case gpeEA_sIAnI:		pA[ins.iD]-=sOF; off = pA[ins.iD]; break;
+					case gpeEA_d16IAnI:		off = pA[ins.iD] + ins.a8x2.y; break;
+					case gpeEA_d16IAnDnI:	off = pA[ins.iD] + pD[ins.xD] + ins.a8x2.y; break;
 					default:
 						off = -1;
 						break;
@@ -235,7 +235,17 @@ gpINST* gpMEM::instALU() {
 		case gpeOPid_entry:{
 				switch(ins.op) {
 					case gpeOPid_dot:
+//						0x00002770 move.L A7,D7
+//						0x00002788 move.l 0x10,-(A7)
+//						0x000027a0 move.l 0x12,-(A7)
+//						0x000027b8 jsr entry
+//						0x000027d0 move.L D7,A7
+//						0x000027e8 move.l 0x21d0,A1		; //0,
+//						0x00002800 move.l A0,(A1)
 						// find OBJ
+						//pA[0] = core.entryOBJ2A0( pM0, pALL, &scpCNST, pWIN, bSW ); //, pD[1] );
+						//pA[7] = pD[0];
+						instENTRY( pALL + pA[0] );
 						break;
 					case gpeOPid_jsr: {
 							instJSR( pALL + pA[0], ins );

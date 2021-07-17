@@ -91,10 +91,10 @@ public:
         if( fd > -1 )
         {
             /// 10. VIDIOC_DQBUF --------------------
-            if(bSTDcout){std::cout << "10.1 VIDIOC_DQBUF --------------------" << std::endl;}
+            if(bSTDcout){gpdCOUT << "10.1 VIDIOC_DQBUF --------------------" << gpdENDL;}
             res = ioctl(fd, VIDIOC_DQBUF, &infBUF);
             if( res >= 0)
-            if(bSTDcout){std::cout << "10.2 VIDIOC_DQBUF --------------------" << std::endl;}
+            if(bSTDcout){gpdCOUT << "10.2 VIDIOC_DQBUF --------------------" << gpdENDL;}
 
             res = ioctl(fd, VIDIOC_STREAMOFF, &type);
 
@@ -108,7 +108,7 @@ public:
     }
     ~gpcCAMubi()
     {
-        if(bSTDcout){std::cout << "~gpcCAMubi() ---------------" << std::endl;}
+        if(bSTDcout){gpdCOUT << "~gpcCAMubi() ---------------" << gpdENDL;}
         closeCAM();
     }
 };
@@ -821,7 +821,7 @@ class gpcPICall
 public:
 	U4		alfFND( void* pSTR );
 	gpcPIC*	aluFND( gpcALU& alu );
-
+	gpcPICall() { gpmCLR; }
 	gpcPIC*	PIC( U4 i ) {
 		if( pPIC ? pPIC->id == i : false )
 			return pPIC;

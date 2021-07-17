@@ -4486,7 +4486,7 @@
 1623298475 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpcPROTO.cpp
 	"gpcSRC.h"
 
-1623298475 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpcwin.cpp
+1625524995 source:/home/alivemoon/Asztal/piMASScmplrSLNpi4/src/gpcwin.cpp
 	"gpccrs.h"
 	<gpsKEYMAP.h>
 	<gpsGLSL.h>
@@ -5302,6 +5302,10 @@
 1603951024 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gpcresflt.cpp
 	"gpcwin.h"
 
+1624626681 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gpcSLMPdcr.cpp
+	"gpcgt.h"
+	"gpcwin.h"
+
 1616366298 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/gpcSRC.cpp
 	"gpcSRC.h"
 	"gpccrs.h"
@@ -5449,7 +5453,7 @@
 1623298475 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/src/gpcPROTO.cpp
 	"gpcSRC.h"
 
-1623298475 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/src/gpcwin.cpp
+1625524995 source:/home/pi/Desktop/piMASS/piMASScmplrSLNpi4/src/gpcwin.cpp
 	"gpccrs.h"
 	<gpsKEYMAP.h>
 	<gpsGLSL.h>

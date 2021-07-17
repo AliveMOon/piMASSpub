@@ -1400,6 +1400,7 @@ typedef enum gpeALF:I8
 	gpeALF_AAAAAA = gpdABCDEF('A', 'A', 'A', 'A', 'A', 'A'),
 	gpeALF_ACCEPT = gpdABCDEF('A', 'C', 'C', 'E', 'P', 'T'),
 	gpeALF_ABOARD = gpdABCDEF('A', 'B', 'O', 'A', 'R', 'D'),
+	gpeALF_BRIDGE = gpdABCDEF('B', 'R', 'I', 'D', 'G', 'E'),
 	gpeALF_BUBLER = gpdABCDEF('B', 'U', 'B', 'L', 'E', 'R'),
 	gpeALF_CONSTR = gpdABCDEF('C', 'O', 'N', 'S', 'T', 'R'),
 
@@ -1719,7 +1720,7 @@ inline U8 gpfALF2STR( void* p_out, I8 d0 )
 	return n;
 }
 
-inline gpeALF gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL );
+inline gpeALF gpfSTR2ALF( const U1* p_str, const U1* p_end, U1** pp_str = NULL, char skip = 0 );
 
 
 

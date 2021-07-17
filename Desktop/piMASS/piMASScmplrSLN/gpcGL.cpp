@@ -11,13 +11,13 @@ gpcGL::gpcGL( gpcWIN* p_win ) {
 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
 	gCntxt = SDL_GL_CreateContext( p_win->pSDLwin );
 	if( !gCntxt ) {
-		if(bSTDcout){std::cout <<std::endl << "gpcGL init error" <<std::endl;}
+		if(bSTDcout){gpdCOUT <<gpdENDL << "gpcGL init error" <<gpdENDL;}
 		return;
 	}
 	glewExperimental = GL_TRUE;
 	glewErr = glewInit();
 	if( glewErr != GLEW_OK ) {
-		if(bSTDcout){std::cout <<std::endl << "gpcGL GLEW_NOK error" <<std::endl;}
+		if(bSTDcout){gpdCOUT <<gpdENDL << "gpcGL GLEW_NOK error" <<gpdENDL;}
 		return;
 	}
 
@@ -32,15 +32,15 @@ gpcGL::gpcGL( gpcWIN* p_win ) {
 
 	pTXchar = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFchar );
 	if( pTXchar )
-		if(bSTDcout){std::cout << "char" << (void*)p_win->pSRFchar <<std::endl;}
+		if(bSTDcout){gpdCOUT << "char" << (void*)p_win->pSRFchar <<gpdENDL;}
 	else
-		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
+		if(bSTDcout){gpdCOUT << SDL_GetError() <<gpdENDL;}
 
 	pTXiso = SDL_CreateTextureFromSurface( p_win->pSDLrndr, p_win->pSRFiso );
 	if( pTXiso )
-		if(bSTDcout){std::cout << "char" << (void*)p_win->pSRFiso <<std::endl;}
+		if(bSTDcout){gpdCOUT << "char" << (void*)p_win->pSRFiso <<gpdENDL;}
 	else
-		if(bSTDcout){std::cout << SDL_GetError() <<std::endl;}
+		if(bSTDcout){gpdCOUT << SDL_GetError() <<gpdENDL;}
 
 }
 gpcGL* gpcGL::SWP( gpcWIN* pWIN ) { // SDL_Window* pWIN ) {
@@ -76,7 +76,7 @@ gpcGL* gpcGL::TRG( 	SDL_Renderer* pSDLrndr,
 						GL_UNSIGNED_BYTE,
 						pSRF->pixels );
 		pPICrtx->pREF = NULL;
-		glBindFramebuffer(GL_FRAMEBUFFER, 0 ); //pPICrtx ? pPICrtx->glRNDR.w : 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0 );
 		gpfGLerr();
 		pPICrtx = NULL;
 	} else
@@ -188,7 +188,7 @@ GLint gpcGLSL::GLSLvtx( const char* pSvrtx ) {
 		if( nLOG ) {
 			vtxLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( vrtxID, nLOG, &nLOG, (char*)vtxLOG.p_alloc );
-			std::cout << (char*)vtxLOG.p_alloc << std::endl;
+			gpdCOUT << (char*)vtxLOG.p_alloc << gpdENDL;
 		}
 		return isSUCC;
 	} else {
@@ -218,7 +218,7 @@ GLint gpcGLSL::GLSLfrg( const char* pSfrg ) {
 		if( nLOG ) {
 			frgLOG.lzyADD( NULL, nLOG, s = 0, 0 );
 			glGetShaderInfoLog( frgID, nLOG, &nLOG, (char*)(frgLOG.p_alloc) );
-			std::cout << (char*)frgLOG.p_alloc << std::endl;
+			gpdCOUT << (char*)frgLOG.p_alloc << gpdENDL;
 		}
 		return isSUCC;
 	}
@@ -269,15 +269,16 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 	glDeleteShader( vrtxID );
 	glDetachShader( PrgID, frgID );
 	glDeleteShader( frgID );
-	nU = 0;
-	aUniID[nU++] = glGetUniformLocation( PrgID, "tgPX" 	);	// 0
-	aUniID[nU++] = glGetUniformLocation( PrgID, "DIVxy" );	// 1
-	aUniID[nU++] = glGetUniformLocation( PrgID, "FRMwh" );	// 2
-	aUniID[nU++] = glGetUniformLocation( PrgID, "aTX" 	);	// 3
-	aUniID[nU++] = glGetUniformLocation( PrgID, "aCNL"	);	// 4
-	aUniID[nU++] = glGetUniformLocation( PrgID, "aMX"	);	// 5
-	aUniID[nU++] = glGetUniformLocation( PrgID, "aMXi"	);	// 6
-	//nU = 5;
+	nUniID = 0;
+	aUniID[gpeUniID_tgPX] = glGetUniformLocation( PrgID, "tgPX" 	);	// 0
+	aUniID[gpeUniID_DIVxy] = glGetUniformLocation( PrgID, "DIVxy" );	// 1
+	aUniID[gpeUniID_FRMwh] = glGetUniformLocation( PrgID, "FRMwh" );	// 2
+	aUniID[gpeUniID_aTX] = glGetUniformLocation( PrgID, "aTX" 	);	// 3
+	aUniID[gpeUniID_aCNL] = glGetUniformLocation( PrgID, "aCNL"	);	// 4
+	aUniID[gpeUniID_aMX] = glGetUniformLocation( PrgID, "aMX"	);	// 5
+	aUniID[gpeUniID_aMXi] = glGetUniformLocation( PrgID, "aMXi"	);	// 6
+	aUniID[gpeUniID_nBON] = glGetUniformLocation( PrgID, "nBON"	);	// 7
+	nUniID =  gpeUniID_iLST;//nU = 5;
 
 	if( !ppUlst )
 		return GL_TRUE;
@@ -287,10 +288,10 @@ GLint gpcGLSL::GLSLlnk( const char** ppUlst ) {
 		if( ppUlst[i] ? !*ppUlst[i] : true )
 			break;
 
-		aUniID[nU] = glGetUniformLocation( PrgID, ppUlst[i] );
-		if( aUniID[nU] < 0 )
-			continue;
-		nU++;
+		aUniID[nUniID] = glGetUniformLocation( PrgID, ppUlst[i] );
+		//if( aUniID[nUniID] < 0 )
+		//	continue;
+		nUniID++;
 	}
 
 	return GL_TRUE;

@@ -180,6 +180,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 		gpmSDL_FreeSRF( pSRFload );
 
 	/// sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
+	/// sudo ln -s "/home/alivemoon/Asztal/Robi" /robo
 
 	/// mkdir /piMASS
 	/// sudo ln -s /home/alivemoon/Asztal/piMASScmplrSLNpi4/mini_ISO_32x32_1024x1536_3.png /piMASS/mini_char.png

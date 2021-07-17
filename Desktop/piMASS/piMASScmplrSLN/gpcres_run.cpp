@@ -327,7 +327,7 @@ extern U1 gpaALFsub[];
 //		if( pS < pB )
 //		{
 //			*pB = 0;
-//			if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
+//			if(bSTDcout){gpdCOUT << (char*)pS <<gpdENDL;}; // ; //
 //			pB = pS;
 //		}
 //	}
@@ -336,7 +336,7 @@ extern U1 gpaALFsub[];
 //	if( bITT )
 //	if( pS < pB )
 //	{
-//		if(bSTDcout){std::cout << (char*)pS <<std::endl;}; // ; //
+//		if(bSTDcout){gpdCOUT << (char*)pS <<gpdENDL;}; // ; //
 //		pB = pS;
 //	}
 //

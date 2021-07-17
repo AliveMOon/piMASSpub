@@ -172,7 +172,7 @@ gpINST& gpINST::instDBG( gpcLZY* pDBG, gpMEM* pMEM, U1* pU1 ) {
 gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN ) {
 	pLZY->lzyRST();
 #ifdef stdON
-	if(bSTDcout){std::cout << stdMINI " MIN" stdRESET << std::endl;}
+	if(bSTDcout){gpdCOUT << stdMINI " MIN" stdRESET << gpdENDL;}
 #endif // stdOFF
 
 	I4 nO = 0, sOF = 0;
@@ -182,7 +182,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	pMEM->pWgl = pMEM->pWIN ? pMEM->pWIN->pGL : NULL;
 	pMEM->pMgl->nBUILD();
 	char sBUFF[0x100];
-	gpOBJ	*pOmn = pMEM->pOBJ(gpeALF_MINI),
+	gpOBJ	*pOmn = pMEM->pOBJ( gpeALF_MINI, true ),
 			*pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
 
 	U4x4* pL0 = aSCOOP[0].pLNK();
@@ -193,7 +193,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	bool bTMP;
 	U4 cID, area = 1;
 	gpPTR* pPTR = NULL;
-
+	int iDi; gpeCsz iCsz;
 	for( U4 i = 0; i < nO; i++ ) {
 		gpOBJ& obj = pO0[i];
 		if( !obj.AN.alf )
@@ -207,14 +207,18 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 			continue;
 
 		pU1 = pP->pU1(obj.pMEM);
-
+		cID = pP->cID();
+		iCsz = (gpeCsz)cID;
 		if( pOmn ) {
+			// van MINI
 			if( pOmn != &obj ) {
-				pMEM->instDOit( obj, pU1 );
+				// ez nem az
+				iDi = pMEM->instDOit( obj, pU1 );
+				iCsz = (gpeCsz)iDi;
 				continue;
 			}
-			cID = pP->cID();
-			if( pP->cID() == gpeCsz_b ){
+			/// ez MINI
+			if( cID == gpeCsz_b ){
 				pLZY = pLZY->lzyFRMT( (s=-1), "%s", pU1?(char*)pU1+1:"?" );
 				if( pLZY->nLD() ) {
 					pLZY->n_load--;
@@ -222,12 +226,12 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 				}
 			}
 			continue;
-		} else {
-			cID = pP->cID();
-			area = pP->pd2D()->area();
 		}
 
-		bTMP = obj.dctID < 0 || (obj.cAN != gpeCsz_a);
+		area = pP->pd2D()->area();
+
+
+		bTMP = ((obj.dctID < 0) || (obj.cAN != gpeCsz_a));
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPTR );
 		pUdbg = pLZY ? pLZY->p_alloc : NULL;
 
@@ -246,7 +250,9 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 		/// 			instDOit
 		///
 		/// ---------------------------------
-		int iDi = pMEM->instDOit( obj, pU1 );
+		iDi = pMEM->instDOit( obj, pU1 );
+		iCsz = (gpeCsz)iDi;
+
 //		if( iDi == gpeCsz_OFF )  // nem volot sikeres
 //            iDi = gpeCsz_L; // akkor L azaz signed int
 
@@ -301,7 +307,7 @@ bool gpcSRC::srcINSTrun() {
 		pMEM->pc = 0;
 	}
 #ifdef stdON
-	if(bSTDcout){std::cout << stdRUN " RUN" stdRESET; // << std::endl;}
+	if(bSTDcout){gpdCOUT << stdRUN " RUN" stdRESET; // << gpdENDL;}
 #endif // stdOFF
 
 	gpINST*pI;
