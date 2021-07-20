@@ -23,9 +23,11 @@ I4x4 gpaCAGEbillBALL[] = {
 // BOX
 //------------------------
 I4x4 gpaCAGEbillBOX[] = {
-	{ mmX(750), mmX(225-900), mmX(16-900), mmX(900) },		// TABLE_bill
-	{ mmX(750), mmX(1750), mmX(-210), mmX(750) },			// magazin__bill
-	{ mmX(-(1300+500)), mmX(-150), mmX(-210), mmX(1300) },  // WALLx__bill
+	{ mmX(750), mmX(225-900), mmX(16-900), mmX(900) },					// TABLE_bill
+	{ mmX(750), mmX(225-(900+430)), mmX((16+35)-900), mmX(900) },		// TABLE2_RAM
+	{ mmX(750), mmX(225-(900+880)), mmX((16+80)-900), mmX(900) },		// TABLE2_SERV
+	{ mmX(750), mmX(1750), mmX(-210), mmX(750) },						// magazin__bill
+	{ mmX(-(1300+500)), mmX(-150), mmX(-210), mmX(1300) },  			// WALLx__bill
 };
 U4	gpnCAGEbillBALL = gpmN(gpaCAGEbillBALL),
 	gpnCAGEbillBOX = gpmN(gpaCAGEbillBOX);
@@ -51,9 +53,11 @@ I4x4 gpaCAGEjohnBALL[] = {
 // BOX
 //------------------------
 I4x4 gpaCAGEjohnBOX[] = {
-	{ mmX(750), mmX(900-225), mmX(16-900), mmX(900) }, 		// TABLE__john
-	{ mmX(750), mmX(-1750), mmX(-210), mmX(750) }, 			// magazin__john
-	{ mmX(-(1300+500)), mmX(150), mmX(-210), mmX(1300) }, 	// WALLx__john
+	{ mmX(750), mmX(900-225), mmX(16-900), mmX(900) }, 					// TABLE__john
+	{ mmX(750), mmX((900+430)-225), mmX((16+35)-900), mmX(900) },		// TABLE2_RAM
+	{ mmX(750), mmX((900+880)-225), mmX((16+80)-900), mmX(900) },		// TABLE3_SERV
+	{ mmX(750), mmX(-1750), mmX(-210), mmX(750) }, 						// magazin__john
+	{ mmX(-(1300+500)), mmX(150), mmX(-210), mmX(1300) }, 				// WALLx__john
 };
 
 U4	gpnCAGEjohnBALL = gpmN(gpaCAGEjohnBALL),
@@ -80,8 +84,8 @@ I4x4* gpcDrc::pBALLtool( U4 i ) {
 }
 
 /// HD ------------------------------
-I4x4 gpcDrc::cageBALLts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR ) {
-	I4x4 a, b;
+I4x4 gpcDrc::cageBALLnts( I4x4& N, I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR ) {
+	I4x4 a, b; int iC = -1;
 	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
@@ -93,17 +97,21 @@ I4x4 gpcDrc::cageBALLts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR ) {
 			continue;
 		b = a.TSrBALL( T-pCAGE[i], pCAGE[i].w+rR );
 		dd = abba;
+		iC = i;
 	}
+	if( iC < 0 )
+		return T;
 	if( dd >= dd0 )
 		return T;
 
 	I8x4 D8 = T-S;
 	D8 *= sqrt(dd) - mmX(1);
 	D8 /= sqrt(dd0);
+	N =(S+D8)-pCAGE[iC];
 	return S+D8;
 }
-I4x4 gpcDrc::cageBOXts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR ) {
-	I4x4 a, b;
+I4x4 gpcDrc::cageBOXnts( I4x4& N, I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR ) {
+	I4x4 a, b; int iC = -1;
 	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
@@ -116,25 +124,30 @@ I4x4 gpcDrc::cageBOXts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR ) {
         if( dd <= abba )
 			continue;
 		dd = abba;
+		iC = i;
 	}
+	if( iC < 0 )
+		return T;
 	if( dd >= dd0 )
 		return T;
 
 	I8x4 D8 = T-S;
 	D8 *= sqrt(dd) - mmX(1);
 	D8 /= sqrt(dd0);
+	N = (S+D8)-pCAGE[iC];
+	N /= N.abs0().mx().x;
 	return S+D8;
 }
-I4x4 gpcDrc::cageXYZhd0( I4x4* pHD, I4 lim, U4 id, int rR ) {
+I4x4 gpcDrc::cageXYZhd0( I4x4& N, I4x4* pHD, I4 lim, U4 id, int rR ) {
 	if(id>gpmN(gpanBALL)) {
 		if( pHD[0].qlen_xyz() < mmX(250) )
 		if( pHD[1].qlen_xyz() > mmX(250) )
 			pHD[0].xyz_( okXYZ );
 		return iXYZ;
 	}
-	return cageXYZhd( pHD, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id], rR );
+	return cageXYZhd( N, pHD, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id], rR );
 }
-I4x4 gpcDrc::cageXYZhd( I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR ) {
+I4x4 gpcDrc::cageXYZhd( I4x4& N, I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR ) {
 	if( !this )
 		return I4x2(mmX(500)).xxxy();
 
@@ -143,12 +156,99 @@ I4x4 gpcDrc::cageXYZhd( I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 
 		pHD[0].xyz_( okXYZ );
 
 
-	I4x4 tmp = cageBALLts( pHD[1].xyz0(), pHD[0].xyz0(), pBALL, nBALL, rR );
-	tmp = cageBOXts( tmp, pHD[0].xyz0(), pBOX, nBOX, rR );
+	I4x4 tmp = cageBALLnts( N, pHD[gpeCGhdP1].xyz0(), pHD[gpeCGhdP0].xyz0(), pBALL, nBALL, rR );
+	tmp = cageBOXnts( N, tmp, pHD[gpeCGhdP0].xyz0(), pBOX, nBOX, rR );
 	if( lim )
 		return pHD[0].lim_mx(tmp,lim);
 
 	return tmp;
+}
+I4x4 gpcDrc::judoCAGE( I4x4& jXYZ, I4x4& jABC, I4x4& jxyz, I4x4& jN, U4 i, F4x4& iMX ) {
+	int nH = gpmN(gpaCAGEheadBALL)-1;
+	F4x4 jMX;
+	I4x4 aHDxyz[8], hdXYZ;
+	gpmZ(aHDxyz);
+	for( int iH = nH; iH > -1; iH-- ) {
+		if( iH == nH ) {
+			jMX = 1.0;
+			jMX.mxABC(jABC, degX(180.0/PI) );
+			if(jxyz.qlen_xyz()) {
+				jMX.z.xyz_( jxyz-jXYZ );
+				jMX.z /= sqrt(jMX.z.qlen_xyz());	// normalizál
+
+				switch( jdALF ) {
+					case gpeALF_BRIDGE:
+					case gpeALF_SNAIL:
+						jMX.x = jd0mxTL.y.X3(jMX.z);
+						jMX.y = jd0mxTL.z.X3(jMX.x);
+						break;
+					default:
+						jMX.x = jMX.y.X3(jMX.z);
+						jMX.y = jMX.z.X3(jMX.x);
+						break;
+				}
+
+				float	xl = jMX.x.qlen_xyz(),
+						yl = jMX.y.qlen_xyz();
+				if( xl > yl ) {
+					jMX.x /= sqrt(xl);
+					jMX.y = jMX.z.X3(jMX.x);
+				} else {
+					jMX.y /= sqrt(yl);
+					jMX.x = jMX.y.X3(jMX.z);
+				}
+				jABC.ABC_( jMX.eulABC()*degX(180.0/PI) );
+			}
+		}
+		hdXYZ = gpaCAGEheadBALL[iH];
+		aHDxyz[gpeCGhdP0] = (iMX.x*double(hdXYZ.x))+(iMX.y*double(hdXYZ.y))+(iMX.z*double(hdXYZ.z))+iXYZ;
+		aHDxyz[gpeCGhdP1] = (jMX.x*double(hdXYZ.x))+(jMX.y*double(hdXYZ.y))+(jMX.z*double(hdXYZ.z))+jXYZ;
+		aHDxyz[gpeCGhdL01] = (aHDxyz[gpeCGhdP1]-aHDxyz[gpeCGhdP0]).xyz0();
+
+		aHDxyz[gpeCGhdAB].A = aHDxyz[gpeCGhdL01].abs0().mx().x; //sqrt(aHDxyz[4].qlen_xyz());
+		if( aHDxyz[gpeCGhdAB].A < (mmX(1)/16) )
+			continue; // nem mozdult
+		/// MOZOG
+		aHDxyz[gpeCGhdPC] = cageXYZhd0( aHDxyz[gpeCGhdPN], aHDxyz, aHDxyz[gpeCGhdAB].A, i, hdXYZ.w );
+		/// OUT
+		aHDxyz[gpeCGhdAB].B = (aHDxyz[gpeCGhdPC]-aHDxyz[gpeCGhdP0]).abs0().mx().x;
+		/// TAVOLSAG = TRG-OUT
+		aHDxyz[gpeCGhdAB].D = (aHDxyz[gpeCGhdP1]-aHDxyz[gpeCGhdPC]).abs0().mx().x;
+		if( (aHDxyz[gpeCGhdAB].A-aHDxyz[gpeCGhdAB].B) < (mmX(1)/16) )
+			continue;
+
+		jN = aHDxyz[gpeCGhdPNN];
+		if( aHDxyz[gpeCGhdAB].B <= (mmX(1)/16) ) { /// nem mozdulhat
+			jXYZ.xyz_(iXYZ);
+			jABC.ABC_(iABC);
+			break;
+		}
+
+		iH = nH;
+		aHDxyz[gpeCGhdAB].B -= (mmX(1)/16);
+		aHDxyz[gpeCGhdPNN] = aHDxyz[gpeCGhdPN];
+		jXYZ.xyz_( iXYZ+(((jXYZ-iXYZ)*aHDxyz[gpeCGhdAB].B)/aHDxyz[gpeCGhdAB].A) );
+		jABC.ABC_( tABC );
+		if( !jxyz.qlen_xyz() )
+			continue;
+		jxyz.xyz_( ixyz+(((jxyz-ixyz)*aHDxyz[gpeCGhdAB].B)/aHDxyz[gpeCGhdAB].A) );
+	}
+
+	I4x4 mABCD = iABC.mmABC( jABC, degX(180.0/PI), degX(180.0/PI) );
+	if( mABCD.D >= (degX(1)/16) )
+		mABCD.C = mABCD.D;
+	else {
+		mABCD.C = 0;
+		jABC.ABC_(iABC);
+	}
+
+	mABCD.A = (tXYZ - iXYZ).abs0().mx().x;
+	mABCD.B = (jXYZ - iXYZ).abs0().mx().x;
+	if( mABCD.B < (mmX(1)/16) ){
+		mABCD.B = 0;
+		jXYZ.xyz_(iXYZ);
+	}
+	return mABCD;
 }
 /// .... ...  ..   .
 
@@ -248,9 +348,11 @@ bool gpcDrc::jdPRGstp( U4 mSEC ) {
 					jdPRG.z = jd0PRG.y*jd0PRG.y; // jd0PRG.a4x2[1].area(); // (jdPRG.w=jd0PRG.x)*jd0PRG.y;
 					jdPRGtool.a4x2[0] = jd0PRG.a4x2[1];
 					break;
+			case gpeALF_PAINT:
+					jdPRG.z = lzyROAD.nI4x4();
+					jdPRG.y = 0;
+					break;
 			case gpeALF_DROP: if( jd1XYZ.qlen_xyz()*gpmMAX(0,jd0PRG.y-jd0PRG.x) ) {
-					//I4 lag = mSEC < msSMR2.w ? 0 : mSEC-msSMR2.w;
-					//if(bSTDcout){gpdCOUT << "lag: " << lag << gpdENDL;}
 					jdPRG.y = jdPRG.w = msSRT3.x;				// w-ben örizzük az indulási időt y aktuális idő
 					jdPRG.z = jdPRG.w+jd0PRG.a4x2[0].sum();		// z-ben pedig a kívánt megérkezési időt
 					break;
@@ -282,16 +384,26 @@ bool gpcDrc::jdPRGstp( U4 mSEC ) {
 	F4 cr; float d;
 	I4x4 aVEC[2];
 	switch( jdALF ) {
-		/*case gpeALF_SHLD: {
-				// jdPRG.y=0 x=0 y=0
-				(xy = jdPRG.y).XdivRQ(jdPRG.w) += jdPRG.w;
-				xy -= jd0PRG.a4x2[1];
-				xy %= jdPRG.w;
-				cr.gr2core( xy, jdPRG.w );
-				d = cr.w/zl;
-				aVEC[0] = ((jd0mx.x*(cr.x/d)) + (jd0mx.y*(cr.y/d)) + (jd0mx.z*(cr.z/d)));
-				tXYZ.xyz_( jd0xyz - aVEC[0] );
-			} break;*/
+		case gpeALF_PAINT: {
+				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y );
+				if( !pDOT ){
+					jdPRG.y = jdPRG.z;
+					break;
+				}
+				if( pDOT->x < mmX(560) )
+					pDOT->x = mmX(560);
+				else if( pDOT->x > mmX(900) )
+					pDOT->x = mmX(900);
+
+				if( pDOT->y < mmX(-204) )
+					pDOT->y = mmX(-204);
+				else if( pDOT->y > mmX(168) )
+					pDOT->y = mmX(168);
+
+				if( pDOT->z < mmX(230) )
+					pDOT->z = mmX(230);
+				tXYZ.xyz_( *pDOT );
+			} break;
 		case gpeALF_SHLD:
 		case gpeALF_SNAIL: { 							/// jdPRG.x ACT, //.y iCNT //.z nEND //.w width
 				if( jdALF == gpeALF_SNAIL )

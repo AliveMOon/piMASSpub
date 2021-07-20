@@ -1191,6 +1191,7 @@ typedef enum gpeALF:I8
 	gpeALF_ROCK = gpdABCD('R', 'O', 'C', 'K'),
 
 	gpeALF_ROUT = gpdABCD('R', 'O', 'U', 'T'),
+	gpeALF_RPIC = gpdABCD('R', 'P', 'I', 'C'),
 
 	gpeALF_SAVE = gpdABCD('S', 'A', 'V', 'E'),
 	gpeALF_SHLD = gpdABCD('S', 'H', 'L', 'D'),
@@ -1400,6 +1401,7 @@ typedef enum gpeALF:I8
 	gpeALF_AAAAAA = gpdABCDEF('A', 'A', 'A', 'A', 'A', 'A'),
 	gpeALF_ACCEPT = gpdABCDEF('A', 'C', 'C', 'E', 'P', 'T'),
 	gpeALF_ABOARD = gpdABCDEF('A', 'B', 'O', 'A', 'R', 'D'),
+	gpeALF_BRIDGE = gpdABCDEF('B', 'R', 'I', 'D', 'G', 'E'),
 	gpeALF_BUBLER = gpdABCDEF('B', 'U', 'B', 'L', 'E', 'R'),
 	gpeALF_CONSTR = gpdABCDEF('C', 'O', 'N', 'S', 'T', 'R'),
 

@@ -442,6 +442,11 @@ public:
 #define gpdROBlim 100
 #define mmX(a) ((a)*100)
 #define degX(a) ((a)*100)
+
+#define gpdHEADmmX	mmX(200)
+#define gpdNECKmmX	mmX(150)
+
+
 #define zsIO 20
 #define zsIN 400
 #define zsINin (zsIN-zsIO)
@@ -2600,6 +2605,13 @@ public:
 		str( pBUFF, pSeP, pENT );
 		return pBUFF;
     }
+    I4x2& zigzag( I4 i, U4 w ) {
+		if( !i )
+			return null();
+		y = i/w;
+		x = y&1 ? i%w : ((w-1)-(i%w));
+		return (*this -= w/2);
+	}
 	I4x2& snail( I4 i ) {
 		if( !i )
 			return null();
@@ -2614,8 +2626,6 @@ public:
 
 			i2 =sq2*sq2;
 		// i=6 sq=2 i0=4 sq2=3 i1=6 i2=9
-
-
 		if( i0&1 ) {
 			*this = sq2/2;	//i=3,2,1 xy=2/2=1
 			// páratlan
@@ -3764,10 +3774,16 @@ public:
 
 	double dropRAD(const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
 	I4x4 drop( const I4x4 T, const I4x4 up, I8 d, I8 ti, I8 tn ) const;
-
-
 };
 
+//------------------------
+// HEAD
+//------------------------
+static const I4x4 gpaCAGEheadBALL[] = {
+	{ mmX(0), mmX(0), mmX(0),	mmX(130) },
+	{ mmX(0), mmX(0), mmX(200),	mmX(100) },
+	{ mmX(0), mmX(0), mmX(330),	mmX(30) },
+};
 
 class I8x2 {
 public:
@@ -4500,19 +4516,12 @@ public:
     double sum_xyz( void ) const	{ return x+y+z; }
     double qlen( void ) const		{ return x*x+y*y+z*z+w*w; }
     double qlen_xyz( void ) const	{ return x*x+y*y+z*z; }
+    double qlen_xz( void ) const	{ return x*x+z*z; }
+	double qlen_yz( void ) const	{ return y*y+z*z; }
 
-    F4 N3( void ) const { /// NORMALIZE
-        float l = sqrtf(qlen_xyz());
-		return F4( x/l, y/l, z/l );
-	}
+    F4 N3( void ) const;
 	float dot_xyz( F4 b ) const { return x*b.x + y*b.y + z*b.z; }
-    F4 X3( F4 b ) const {	/// CROSS PRODUCT
-		return F4(
-						y * b.z - z * b.y,
-						z * b.x - x * b.z,
-						x * b.y - y * b.x
-				);
-	}
+    F4 X3( F4 b ) const;
 	F4 xyz1() const { return F4(x,y,z,1.0);}
 
 	F4  cos() const { return F4(  cosf(x), cosf(y), cosf(z), cosf(w)); };
@@ -4707,29 +4716,9 @@ public:
 	float mx() { float m = srt3().x; return m < w ? w : m; }
 	float mn() { float m = srt3().z; return m > w ? w : m; }
 
-	//I84 gr2cr_1m( void ) const
-	F4& gr2cr( const I4x2 xy, double rw ) {
-
-		double	rx = ::PI*((double(xy.x)/(rw*2)) + 0.25),
-				ry = ::PI*((double(xy.y)/(rw*2)) + 0.25),
-				ctgX = ::cos(rx)/::sin(rx),
-				ctgY = ::cos(ry)/::sin(ry),
-				ctgXY2 = ctgX*ctgX + ctgY*ctgY,
-				r0 = rw / ::sqrt(1.0+ctgXY2);
-
-		ctgX *= r0;
-		ctgY *= r0;
-		ctgXY2 = ctgX*ctgX + ctgY*ctgY;
-		r0 = ::sqrt( rw*rw - ctgXY2 );
-
-		x = ctgX;
-		y = ctgY;
-		z = r0;
-
-		w = ::sqrt(qlen_xyz());
-		return *this;
-	}
-
+	//I84 gr2core_1m( void ) constpő
+	F4& gr2core( const I4x2 xy, double rw );
+	F4& gr2cyli( const I4x2 xy, double rw );
 
 };
 
@@ -6146,7 +6135,7 @@ szasz:
 	gpcLZY* lzyHEXb( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXw( U8& iSTRT, U1* pBIN, U4 nBIN );
 	gpcLZY* lzyHEXl( U8& iSTRT, U1* pBIN, U4 nBIN, bool bCOM = true );
-	gpcLZY* lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i = 3, char* pPP = "//" );
+	gpcLZY* lzyROBnDstat( U8& iSTRT, gpcROBnD& RnD, U1 i = 3, int rR = gpdHEADmmX, char* pPP = "//" );
 	gpcLZY* lzyZSnDstat( U8& iSTRT, gpcZSnD& zs, U1 i = 3 );
 	gpcLZY* lzy_reqCLOSE( void ) {
 		if( !this )

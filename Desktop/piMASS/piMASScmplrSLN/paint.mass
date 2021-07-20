@@ -1,0 +1,85 @@
+ a0	
+
+--------------------/PAINT/--------------------
+ b0	
+
+--------------------/ CAM /--------------------
+ c0    
+
+ d0	
+  mini = "
+wget -O /robi/first%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=SECOND&x&y&z&a&b&c&f!!
+wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=SECOND
+";
+ a1	
+  pic = "paint";
+  unsel = 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ b1	
+  pic = "cam1";
+  unsel = 1;
+ c1	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ d1	
+
+ a2	
+
+ b2	
+
+ c2    
+
+ d2	
+  cam = 1;
+
+  telnet = 6001;
+  rr = 0x10000;
+  rout = rr + 4;
+  rinp = rr + 3;
+  john
+       = d0.mini;
+  slmp = "192.168.1.90 10000";
+  paint = "paint"
+
+  again = 0x5;
+ a3	
+
+ b3	
+
+ c3    
+
+ d3	
+
+ a4	
+
+ b4	
+
+ c4    
+
+ d4	
+

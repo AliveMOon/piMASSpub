@@ -3782,7 +3782,7 @@ public:
 static const I4x4 gpaCAGEheadBALL[] = {
 	{ mmX(0), mmX(0), mmX(0),	mmX(130) },
 	{ mmX(0), mmX(0), mmX(200),	mmX(100) },
-	{ mmX(0), mmX(0), mmX(300),	mmX(30) },
+	{ mmX(0), mmX(0), mmX(330),	mmX(30) },
 };
 
 class I8x2 {

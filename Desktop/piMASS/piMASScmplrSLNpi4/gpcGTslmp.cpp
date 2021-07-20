@@ -400,6 +400,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		*pA = (U2*)&(
 						pROBnD->aROBio[iD0*2]
 						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0 )
+						//= pROBnD->aDrc[iD0].judo_OHNEnew( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0 )
 					); // pA-ban azaz új out lesz
 
 	if( JDy == JD.y )

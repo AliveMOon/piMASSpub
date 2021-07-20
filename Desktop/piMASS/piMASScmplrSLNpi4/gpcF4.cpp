@@ -1,7 +1,48 @@
 //#include "gpcSRC.h"
 #include "gpccrs.h"
 #include "gpsGLSL.h"
+F4& F4::gr2core( const I4x2 xy, double rw ) {
+	double	rx = ::PI*((double(xy.x)/(rw*2)) + 0.25),
+			ry = ::PI*((double(xy.y)/(rw*2)) + 0.25),
+			ctgX = ::cos(rx)/::sin(rx),
+			ctgY = ::cos(ry)/::sin(ry),
+			ctgXY2 = ctgX*ctgX + ctgY*ctgY,
+			r0 = rw / ::sqrt(1.0+ctgXY2);
 
+	ctgX *= r0;
+	ctgY *= r0;
+	ctgXY2 = ctgX*ctgX + ctgY*ctgY;
+	r0 = ::sqrt( rw*rw - ctgXY2 );
+
+	x = ctgX;
+	y = ctgY;
+	z = r0;
+
+	w = ::sqrt(qlen_xyz());
+	return *this;
+}
+
+F4& F4::gr2cyli( const I4x2 xy, double rw ) {
+	double	rx = ::PI*((double(xy.x)/(rw*2)) + 0.25);
+
+	x = -::cos(rx);
+	y = ((double(xy.y)*2.0/double(rw)) - 1.0)*COSSIN45;
+	z = ::sin(rx);
+
+	w = ::sqrt(qlen_xz());
+	return *this;
+}
+F4 F4::N3( void ) const { /// NORMALIZE
+	float l = sqrtf(qlen_xyz());
+	return F4( x/l, y/l, z/l );
+}
+F4 F4::X3( F4 b ) const {	/// CROSS PRODUCT
+	return F4(
+					y * b.z - z * b.y,
+					z * b.x - x * b.z,
+					x * b.y - y * b.x
+			);
+}
 F4& F4::operator *= ( const F4x4& b ) {
 	return *this = b.x*x + b.y*y + b.z*z + b.t*w;
 }

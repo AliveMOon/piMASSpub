@@ -73,7 +73,15 @@
 #define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 
-
+typedef enum gpeCGhd:U4 {
+	gpeCGhdP0,
+	gpeCGhdP1,
+	gpeCGhdL01,
+	gpeCGhdAB,
+	gpeCGhdPC,
+	gpeCGhdPN,
+	gpeCGhdPNN,
+};
 
 class gpcRES;
 class gpcDrc;
@@ -162,6 +170,7 @@ public:
 	U4		n_trd,	n_join,
 			nMS,	sMS,	AVGms, Ems,
 			MPosS,	HS1ms;
+	gpcLZY	lzyROAD;
 	std::thread trd;
 
 	~gpcDrc() {
@@ -176,12 +185,7 @@ public:
 		n_trd = n_join = 0;
 	}
 
-	/// HD ------------------------------
-	I4x4	cageXYZhd0( I4x4* pHD, I4 lim, U4 id, int rR  );
-	I4x4 	cageXYZhd( I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR );
-	I4x4 	cageBALLts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR );
-	I4x4 	cageBOXts( I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR );
-	/// .... ...  ..   .
+
 
 	I4x4*	pBALLtool( U4 i );
 	I4x4 	cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR );
@@ -307,6 +311,13 @@ public:
 	U4 xHS3o() { iCTRL.y|=ZShs3; return (oCTRL.y&=(~ZShs3)); }
 
 	bool jdPRGstp( U4 mSEC );
+	/// HD ------------------------------
+	I4x4	cageXYZhd0( I4x4& N, I4x4* pHD, I4 lim, U4 id, int rR  );
+	I4x4 	cageXYZhd( I4x4& N, I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR );
+	I4x4 	cageBALLnts( I4x4& N, I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR );
+	I4x4 	cageBOXnts( I4x4& N, I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR );
+	/// .... ...  ..   .
+	I4x4 judoCAGE( I4x4& jXYZ, I4x4& jABC, I4x4& jxyz, I4x4& jN, U4 i, F4x4& iMX );
 
 	gpcDrc& judo( gpcROB& iR, U4 mSEC, U4 iD0 );
 	gpcDrc& judo_OHNEnew( gpcROB& iR, U4 mSEC, U4 iD0 );

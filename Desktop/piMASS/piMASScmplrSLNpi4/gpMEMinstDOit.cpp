@@ -18,7 +18,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if(bSTDcout){gpdCOUT << stdALU "SLMP" << pGT->iCNT;}
 #endif
 	gpOBJ	*pOi = pOBJ(gpeALF_RINP),
-			*pOo = pOBJ(gpeALF_ROUT),
+			*pOo = pOBJ(gpeALF_ROUT), *pOpic = pOBJ(gpeALF_RPIC),
 			*apO[2];
     apO[0] = pOBJ(gpeALF_BILL),
     apO[1] = pOBJ(gpeALF_JOHN);
@@ -41,8 +41,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 		if(bSTDcout){gpdCOUT << stdALU "rINP" << gpdENDL;}
     #endif
 		pU1 = pOi->pU1(); // pSRC->srcMEMiPC( pOi->iPC, gpeCsz_l );
-		if( pU1 )
-		{
+		if( pU1 ) {
 			an.x = *(U4*)pU1;
 			an.y = an.x&0xff;
 			an.x >>= 0x10;
@@ -54,13 +53,24 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 				if( !pS2 )
                     continue;
                 pS2->pMINI = pS2->pMINI->lzyFRMT( s=0, "\r\n" ); //\r\n" );
-                pS2->pMINI = pS2->pMINI->lzyROBnDstat( s=0, *pROBnD, i, "" );
+                pS2->pMINI = pS2->pMINI->lzyROBnDstat( s=0, *pROBnD, i, gpdHEADmmX, "" );
 
                 pROBnD->aDrc[i].asyncSYS( gpsPUB, apO[i]->pU1() );
 			}
 		}
 	}
+	if( pOpic ) {
+#ifdef stdON
+	if(bSTDcout){gpdCOUT << stdALU "rPIC" << gpdENDL;}
+#endif
+		pU1 = pOpic->pU1();
+		if( pU1 ) {
+			pGT->aROBpID[0] = pOpic->bUTF8()
+							? pMASS->PIC.alfFND( (pU1+=gpmNINCS(pU1," \t\"")) )
+							: *(I4*)pU1;
 
+		}
+	}
 	if( !pOo )
 		return pGT->iCNT;
 #ifdef stdON
@@ -157,22 +167,21 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				if( pMgl ) pMgl->nCNL = nCNL;
 			}
 		}
-
-
 		return cID;
 	}
 	/// GLSL Target COPY -------------------------------------------------------
 	if((obj.AN.alf == gpeALF_TRGCP)||(obj.AN.alf >= gpeALF_TRGCPA && obj.AN.alf <= gpeALF_TRGCPZ)) {
 		cID = gpeCsz_L; if( bCID )
 							return cID;
-		U4 iPIC = (obj.AN.alf==gpeALF_TRGCP ) ? 0 : obj.AN.alf-gpeALF_TRGCPA+1;
+		U4 iP = (obj.AN.alf==gpeALF_TRGCP ) ? 0 : obj.AN.alf-gpeALF_TRGCPA+1;
 		int trig = *(I4*)pU1;
 		if( trig != 1 )
 			return cID;
 
 		if( !gpdGLpTRG )
 			return cID;
-		SDL_Surface* pSRF = gpdGLapPIC[iPIC]->pPICrtxSRF(); //pSRF;
+		SDL_Surface	*pTRG = gpdGLpTRG->pPICrtxSRF(),
+					*pSRF = gpdGLapPIC[iP]->pPICrtxSRF(); //pSRF;
 		if( !pSRF )
 			return cID;
 
@@ -181,7 +190,8 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				GL_BGRA,
 				GL_UNSIGNED_BYTE,
 				pSRF->pixels );
-		gpdGLapPIC[iPIC]->pREF = NULL;
+		//gpdGLpTRG->pREF = NULL;
+		gpdGLapPIC[iP]->pREF = NULL;
 		return cID;
 	}
 	/// GLSL SET TETURE -------------------------------------------------------
@@ -189,7 +199,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		cID = gpeCsz_L; if( bCID )
 							return cID;
 
-		U4 iPIC = (obj.AN.alf==gpeALF_PIC ) ? 0 : obj.AN.alf-gpeALF_PICA+1;
+		U4 iP = (obj.AN.alf==gpeALF_PIC ) ? 0 : obj.AN.alf-gpeALF_PICA+1;
 		U1* pS = pU1;
 		I4 picID 	= obj.bUTF8()
 					? pMASS->PIC.alfFND( (pS+=gpmNINCS(pS," \t\"")) )
@@ -197,12 +207,12 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		gpcPIC* pPIC = pMASS->PIC.PIC( picID );
 		if( pPIC )
 		{
-			gpdGLapPIC[iPIC] = pMASS->PIC.PIC( picID );
-			if( !gpdGLapPIC[iPIC] )
+			gpdGLapPIC[iP] = pMASS->PIC.PIC( picID );
+			if( !gpdGLapPIC[iP] )
 				return cID;
 
-			gpdGLmskPIC |= 1<<iPIC;
-			gpdGLaPICid[iPIC] = picID+1;
+			gpdGLmskPIC |= 1<<iP;
+			gpdGLaPICid[iP] = picID+1;
 			return cID;
 		}
 		if( !*pS )
@@ -212,7 +222,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 
 		alfN = pS;
 		alfN.num = gpfSTR2U8( pS+alfN.num, &pS );
-		gpdGLapPIC[iPIC] = pMASS->PIC.PIC( alfN );
+		gpdGLapPIC[iP] = pMASS->PIC.PIC( alfN );
 
 		return cID;
 	}
