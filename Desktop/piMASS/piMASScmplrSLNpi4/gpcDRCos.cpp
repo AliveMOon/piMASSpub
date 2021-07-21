@@ -390,18 +390,18 @@ bool gpcDrc::jdPRGstp( U4 mSEC ) {
 					jdPRG.y = jdPRG.z;
 					break;
 				}
-				if( pDOT->x < mmX(560) )
-					pDOT->x = mmX(560);
-				else if( pDOT->x > mmX(900) )
-					pDOT->x = mmX(900);
+				if( pDOT->x < gpdPAINTlfX )
+					pDOT->x = gpdPAINTlfX;
+				else if( pDOT->x > gpdPAINTrgX )
+					pDOT->x = gpdPAINTrgX;
 
-				if( pDOT->y < mmX(-204) )
-					pDOT->y = mmX(-204);
-				else if( pDOT->y > mmX(168) )
-					pDOT->y = mmX(168);
+				if( pDOT->x < gpdPAINTbtX )
+					pDOT->x = gpdPAINTbtX;
+				else if( pDOT->y > gpdPAINTtpX )
+					pDOT->y = gpdPAINTtpX;
 
-				if( pDOT->z < mmX(230) )
-					pDOT->z = mmX(230);
+				if( pDOT->z < gpdPAINTdwX )
+					pDOT->z = gpdPAINTdwX;
 				tXYZ.xyz_( *pDOT );
 			} break;
 		case gpeALF_SHLD:
@@ -567,7 +567,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			switch( an.alf ) {
 
 				case gpeALF_STOP:
-					aROBpID[0] = aROBpID[1] = -1;
+					aROBpID[1] = -1;
 					//RnD.aDrc[1]->picID =
 					iNUM = gpeDRCos_NONS;
 					break;
@@ -779,7 +779,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case gpeDRCos_ABCa:
 			case gpeDRCos_ABCb:
 			case gpeDRCos_ABCc:
-				aROBpID[1] = aROBpID[0] = -1;
+				aROBpID[1] = -1;
 				pD->okxyz.xyz_(pD->txyz.xyz_(0));
 				pD->tABC.aXYZW[(iNUM-gpeDRCos_ABCa)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
 				break;

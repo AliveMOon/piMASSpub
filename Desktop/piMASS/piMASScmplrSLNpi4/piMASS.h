@@ -446,6 +446,19 @@ public:
 #define gpdHEADmmX	mmX(200)
 #define gpdNECKmmX	mmX(150)
 
+#define gpdPAINTlfX mmX(560)
+#define gpdPAINTrgX mmX(900)
+
+#define gpdPAINTbtX mmX(-204)
+#define gpdPAINTtpX mmX(168)
+
+#define gpdPAINTwX  (gpdPAINTrgX-gpdPAINTlfX)
+#define gpdPAINThX  (gpdPAINTtpX-gpdPAINTbtX)
+
+#define gpdPAINTupX mmX(300)
+#define gpdPAINTdwX mmX(230)
+
+
 
 #define zsIO 20
 #define zsIN 400

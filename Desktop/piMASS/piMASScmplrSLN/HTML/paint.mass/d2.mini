@@ -1,0 +1,15 @@
+
+  0x2100 cam= 0x01,
+  0x2160 telnet= 0x1771,
+  0x21c0 rr= 0x00010000,
+  0x2220 rout= 0x00010004,
+  0x22b0 rinp= 0x00010003,
+  0x2340 rpic= "draw",
+  0x2390 john= "
+wget -O /robi/first%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=SECOND&x&y&z&a&b&c&f!!
+wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=SECOND
+",
+  0x2410 slmp= "192.168.1.90 10000",
+  0x2470 f= 12,
+  0x2490 fps= 12,
+  0x24c0 again= 0x05,

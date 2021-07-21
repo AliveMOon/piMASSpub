@@ -1,0 +1,3 @@
+
+wget -O /robi/first%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=SECOND&x&y&z&a&b&c&f!!
+wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=SECOND

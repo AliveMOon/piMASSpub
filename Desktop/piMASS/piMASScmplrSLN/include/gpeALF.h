@@ -1191,6 +1191,7 @@ typedef enum gpeALF:I8
 	gpeALF_ROCK = gpdABCD('R', 'O', 'C', 'K'),
 
 	gpeALF_ROUT = gpdABCD('R', 'O', 'U', 'T'),
+	gpeALF_RPIC = gpdABCD('R', 'P', 'I', 'C'),
 
 	gpeALF_SAVE = gpdABCD('S', 'A', 'V', 'E'),
 	gpeALF_SHLD = gpdABCD('S', 'H', 'L', 'D'),

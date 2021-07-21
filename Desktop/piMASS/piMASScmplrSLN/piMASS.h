@@ -446,6 +446,19 @@ public:
 #define gpdHEADmmX	mmX(200)
 #define gpdNECKmmX	mmX(150)
 
+#define gpdPAINTlfX mmX(560)
+#define gpdPAINTrgX mmX(900)
+
+#define gpdPAINTbtX mmX(-204)
+#define gpdPAINTtpX mmX(168)
+
+#define gpdPAINTwX  (gpdPAINTrgX-gpdPAINTlfX)
+#define gpdPAINThX  (gpdPAINTtpX-gpdPAINTbtX)
+
+#define gpdPAINTupX mmX(300)
+#define gpdPAINTdwX mmX(230)
+
+
 
 #define zsIO 20
 #define zsIN 400
@@ -3779,12 +3792,17 @@ public:
 //------------------------
 // HEAD
 //------------------------
-static const I4x4 gpaCAGEheadBALL[] = {
+static const I4x4 gpaCAGEheadBALLhand[] = {
 	{ mmX(0), mmX(0), mmX(0),	mmX(130) },
 	{ mmX(0), mmX(0), mmX(200),	mmX(100) },
 	{ mmX(0), mmX(0), mmX(330),	mmX(30) },
 };
-
+static const I4x4 gpaCAGEheadBALLpaint[] = {
+	{ mmX(0), mmX(0), mmX(0),	mmX(130) },
+	{ mmX(0), mmX(0), mmX(100),	mmX(100) },
+	{ mmX(0), mmX(0), mmX(180),	mmX(20) },
+};
+#define gpaCAGEheadBALL gpaCAGEheadBALLhand //paint
 class I8x2 {
 public:
 	union{

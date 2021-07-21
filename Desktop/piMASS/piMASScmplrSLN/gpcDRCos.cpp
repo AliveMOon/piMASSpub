@@ -296,7 +296,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id, int rR ) {
 }
 
 static char gpsJDprgPUB[0x100];
-bool gpcDrc::jdPRGstp( U4 mSEC ) {
+bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
 	// ha létre jött mozgá hagyja végre hajtani
 	if( oCTRL.z )
 		return false;
@@ -308,21 +308,33 @@ bool gpcDrc::jdPRGstp( U4 mSEC ) {
 		if( jdPRG.y >= jdPRG.z ) {
 			/// END --------------------------
 			// de pont befejezte
-			if( jd0XYZ.qlen_xyz() )
-			switch( jdALF ) {
+			if( !jd0XYZ.qlen_xyz() )
+				jdALF = gpeALF_null;
+			else switch( jdALF ) {
+				case gpeALF_PAINT:
+					if( pGT ? !pGT->robROAD.nI4x4() : true ) {
+						jdALF = gpeALF_null;
+						break;
+					}
+					jdPRG.y = 0;
+					break;
 				case gpeALF_null:
 				case gpeALF_DROP:
 				case gpeALF_CALIB:
+					jdALF = gpeALF_null;
 					break;
 				default:
+					jdALF = gpeALF_null;
 					tXYZ.xyz_(jd0XYZ);
 					tABC.ABC_(jd0ABC);
 					break;
 			}
-			jdALF = gpeALF_null;
-			jdPRG.null();
-			MPosS = 0;
-			return true;
+			if( !jdALF ) {
+				jdALF = gpeALF_null;
+				jdPRG.null();
+				MPosS = 0;
+				return true;
+			}
 		}
 	} else
 		return true;	// nem akor pihi
@@ -349,6 +361,12 @@ bool gpcDrc::jdPRGstp( U4 mSEC ) {
 					jdPRGtool.a4x2[0] = jd0PRG.a4x2[1];
 					break;
 			case gpeALF_PAINT:
+					if( pGT ? pGT->robROAD.nI4x4() : false ){
+						lzyROAD.lzyRST();
+						lzyROAD = pGT->robROAD;
+						pGT->robROAD.lzyRST();
+					}
+
 					jdPRG.z = lzyROAD.nI4x4();
 					jdPRG.y = 0;
 					break;
@@ -386,23 +404,34 @@ bool gpcDrc::jdPRGstp( U4 mSEC ) {
 	switch( jdALF ) {
 		case gpeALF_PAINT: {
 				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y );
+				U4 i = 1, n = jdPRG.z-jdPRG.y;
+				for(;i<n;i++){
+					if( sqrt((*pDOT-pDOT[i]).qlen_xyz()) < mmX(10) )
+						continue;
+					jdPRG.y += i;
+					pDOT = lzyROAD.pI4x4( jdPRG.y );
+					break;
+				}
 				if( !pDOT ){
 					jdPRG.y = jdPRG.z;
 					break;
 				}
-				if( pDOT->x < mmX(560) )
-					pDOT->x = mmX(560);
-				else if( pDOT->x > mmX(900) )
-					pDOT->x = mmX(900);
+				if( pDOT->x < gpdPAINTlfX )
+					pDOT->x = gpdPAINTlfX;
+				else if( pDOT->x > gpdPAINTrgX )
+					pDOT->x = gpdPAINTrgX;
 
-				if( pDOT->y < mmX(-204) )
-					pDOT->y = mmX(-204);
-				else if( pDOT->y > mmX(168) )
-					pDOT->y = mmX(168);
+				if( pDOT->x < gpdPAINTbtX )
+					pDOT->x = gpdPAINTbtX;
+				else if( pDOT->y > gpdPAINTtpX )
+					pDOT->y = gpdPAINTtpX;
 
-				if( pDOT->z < mmX(230) )
-					pDOT->z = mmX(230);
+				if( pDOT->z < gpdPAINTdwX )
+					pDOT->z = gpdPAINTdwX;
 				tXYZ.xyz_( *pDOT );
+				I4x4 dot = *pDOT;
+				dot.z-=mmX(500);
+				txyz.xyz_( dot );
 			} break;
 		case gpeALF_SHLD:
 		case gpeALF_SNAIL: { 							/// jdPRG.x ACT, //.y iCNT //.z nEND //.w width
@@ -565,18 +594,26 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			comA = *(U4*)pCOM;
 			iNUM = gpeDRCos_NONS;
 			switch( an.alf ) {
+
+				case gpeALF_STOP:
+					aROBpID[1] = -1;
+					//RnD.aDrc[1]->picID =
+					iNUM = gpeDRCos_NONS;
+					break;
+
 				case gpeALF_BILL:
-						iD = 0;
-						if( RnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_BILL )
-							break;
-						RnD.aDrc[iD].format( gpeZS_BILL );
+					iD = 0;
+					if( RnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_BILL )
 						break;
+					RnD.aDrc[iD].format( gpeZS_BILL );
+					break;
 				case gpeALF_JOHN:
-						iD = 1;
-						if( RnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_JOHN )
-							break;
-						RnD.aDrc[iD].format( gpeZS_JOHN );
-					 break;
+					iD = 1;
+					if( RnD.aDrc[iD].NMnDIF.au4x2[0].x == gpeZS_JOHN )
+						break;
+					RnD.aDrc[iD].format( gpeZS_JOHN );
+					break;
+
 				case gpeALF_OK:{
 						if(iD >= nD ) {
 							iNUM = gpeDRCos_NONS;
@@ -651,6 +688,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 						nNUM = 4;
 					} break;
 
+				case gpeALF_PAINT:
 				case gpeALF_SHLD:
 				case gpeALF_SNAIL:
 				case gpeALF_BRIDGE: {
@@ -704,7 +742,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 
 					pANS = RnD.aDrc[iD].answINFOX( pANS, iD, 100 );
 					continue;
-				case gpeALF_STOP:
+
 				default:
 					break;
 			}
@@ -757,8 +795,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case gpeDRCos_posx:
 			case gpeDRCos_posy:
 			case gpeDRCos_posz:
-				if( pD->jdPRG.x )
-				{
+				if( pD->jdPRG.x ) {
 					U4 i = (iNUM-gpeDRCos_posx)%nNUM;
 					pD->jd1up.aXYZW[i] = pD->jd1XYZ.aXYZW[i] - ((d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1)));
 					break;
@@ -771,6 +808,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case gpeDRCos_ABCa:
 			case gpeDRCos_ABCb:
 			case gpeDRCos_ABCc:
+				aROBpID[1] = -1;
 				pD->okxyz.xyz_(pD->txyz.xyz_(0));
 				pD->tABC.aXYZW[(iNUM-gpeDRCos_ABCa)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
 				break;
@@ -795,7 +833,10 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 								pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = mmX(200);
 							else if( pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] < mmX(-200) )
 								pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = mmX(-200);
-							break;
+						} break;
+					case gpeALF_PAINT:
+						if( iNUM >= gpeDRCos_prgC ) {
+							aROBpID[1] = aROBpID[0];
 						}
 					default:
 						pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;
@@ -805,7 +846,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 					break;
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );
-				pD->jdPRGstp( mSEC );
+				pD->jdPRGstp( mSEC, this );
 				alf = gpeALF_null;
 				break;
 			case gpeDRCos_drpUP:
@@ -819,14 +860,15 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 				if(iNUM<gpeDRCos_drpT) {
 					pD->jd1XYZ.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num*mmX(1) : (I4)(d8*mmX(1));
 					break;
-				} else {
+				}
+				else {
 					pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num*ms2sec : (I4)(d8*ms2sec);
 					if(iNUM<gpeDRCos_drpW)
 						break;
 				}
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );
-				pD->jdPRGstp( mSEC );
+				pD->jdPRGstp( mSEC, this );
 				alf = gpeALF_null;
 				break;
 			/// -----------------------------------------------

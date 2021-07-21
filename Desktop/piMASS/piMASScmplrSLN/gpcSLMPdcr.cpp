@@ -443,7 +443,7 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 #define gpdXeZxY true
 #define gpdXeYxZ false
 
-gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
+gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT ) {
 	*this = iROB;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
 		case 4: { /// 4.HS2i? // HS2o elvesz VÉGE
@@ -785,7 +785,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 		}
 	}
 
-	if( jdPRGstp( mSEC ) )
+	if( jdPRGstp( mSEC, pGT ) )
 		return *this;
 
 	if( mmABCD.A > mmABCD.B ) {
@@ -1189,7 +1189,7 @@ gpcDrc& gpcDrc::judo_OHNEnew( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 		oCTRL.z |= 2;
 	}
 
-	if( jdPRGstp( mSEC ) )
+	if( jdPRGstp( mSEC, NULL ) )
 		return *this;
 
 
@@ -1397,8 +1397,7 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 	if( mmABCD.x ) {
 
 		U4 i = 3;
-		switch( NMnDIF.x )
-		{
+		switch( NMnDIF.x ) {
 			case gpeZS_BILL:
 				i = 0;
 				break;
@@ -1413,8 +1412,7 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 		// egyenlőre felfele kerekítjük,
 		// azaz ha nem tudja legalább 2-re felosztani a távot
 		// megprobálja egyszerre
-		switch( jdALF )
-		{
+		switch( jdALF ) {
 			case gpeALF_DROP:
 				lim = mmABCD.x;
 				break;
@@ -1488,7 +1486,8 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 
 	if( itD.w < (degX(1)/2) ) {	// kb: 50
 		tABC.ABC_(oABC.ABC_(iABC));
-	} else {
+	}
+	else {
 
 		k = ((K*float(itD.w))/degX(180.0));
 		if( k > 0.0 ) {
@@ -1584,7 +1583,7 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 		oCTRL.z |= 2;
 	}
 
-	if( jdPRGstp( mSEC ) )
+	if( jdPRGstp( mSEC, NULL ) )
 		return *this;
 
 

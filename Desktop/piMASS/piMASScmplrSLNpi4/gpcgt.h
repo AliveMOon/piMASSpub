@@ -782,6 +782,9 @@ class gpcGT {
 		I8x2		TnID, gt_ip;
 		I4			port, iCNT, nOSin,
 					aROBpID[2];
+		SDL_Surface	*pROBsrf, *pROBdif;
+		U4			*pRM;
+		gpcLZY		lzyRD, robROAD;
 
 		SOCKET		socket, sockAT, sockCNCT;
 		SOCKADDR	sockAddr;
@@ -870,7 +873,12 @@ class gpcGT {
 								);
 			return pOUT;
 		}
-		~gpcGT() { GTclose(); };
+		~gpcGT() {
+			gpmSDL_FreeSRF(pROBsrf);
+			gpmSDL_FreeSRF(pROBdif);
+			gpmDELary(pRM);
+			GTclose();
+		};
 		gpcGT( I8x2 id, I4 prt, SOCKET sock = INVALID_SOCKET ) {
 			gpmCLR;
 			TnID = id;
