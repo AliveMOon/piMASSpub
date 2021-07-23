@@ -73,6 +73,23 @@
 #define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 
+
+
+//------------------------
+// 			HEAD
+//------------------------
+static const I4x4 gpaCAGEheadBALLhand[] = {
+	{ mmX(0), mmX(0), mmX(0),	mmX(130) },
+	{ mmX(0), mmX(0), mmX(200),	mmX(100) },
+	{ mmX(0), mmX(0), mmX(330),	mmX(30) },
+};
+static const I4x4 gpaCAGEheadBALLpaint[] = {
+	{ mmX(0), mmX(0), mmX(0),	mmX(130) },
+	{ mmX(0), mmX(0), mmX(100),	mmX(100) },
+	{ mmX(0), mmX(0), mmX(180),	mmX(20) },
+};
+#define gpaCAGEheadBALL gpaCAGEheadBALLpaint //hand //paint
+
 typedef enum gpeCGhd:U4 {
 	gpeCGhdP0,
 	gpeCGhdP1,

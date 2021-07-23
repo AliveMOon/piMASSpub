@@ -24,7 +24,7 @@ I4x4 gpaCAGEbillBALL[] = {
 //------------------------
 I4x4 gpaCAGEbillBOX[] = {
 	{ mmX(750), mmX(225-900), mmX(16-900), mmX(900) },					// TABLE_bill
-	{ mmX(750), mmX(225-(900+430)), mmX((16+35)-900), mmX(900) },		// TABLE2_RAM
+	{ mmX(750), mmX(225-(900+520)), mmX((16+35)-900), mmX(900) },		// TABLE2_RAM
 	{ mmX(750), mmX(225-(900+880)), mmX((16+80)-900), mmX(900) },		// TABLE2_SERV
 	{ mmX(750), mmX(1750), mmX(-210), mmX(750) },						// magazin__bill
 	{ mmX(-(1300+500)), mmX(-150), mmX(-210), mmX(1300) },  			// WALLx__bill
@@ -54,7 +54,7 @@ I4x4 gpaCAGEjohnBALL[] = {
 //------------------------
 I4x4 gpaCAGEjohnBOX[] = {
 	{ mmX(750), mmX(900-225), mmX(16-900), mmX(900) }, 					// TABLE__john
-	{ mmX(750), mmX((900+430)-225), mmX((16+35)-900), mmX(900) },		// TABLE2_RAM
+	{ mmX(750), mmX((900+520)-225), mmX((16+35)-900), mmX(900) },		// TABLE2_RAM
 	{ mmX(750), mmX((900+880)-225), mmX((16+80)-900), mmX(900) },		// TABLE3_SERV
 	{ mmX(750), mmX(-1750), mmX(-210), mmX(750) }, 						// magazin__john
 	{ mmX(-(1300+500)), mmX(150), mmX(-210), mmX(1300) }, 				// WALLx__john
@@ -405,13 +405,6 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
 		case gpeALF_PAINT: {
 				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y );
 				U4 i = 1, n = jdPRG.z-jdPRG.y;
-				for(;i<n;i++){
-					if( sqrt((*pDOT-pDOT[i]).qlen_xyz()) < mmX(10) )
-						continue;
-					jdPRG.y += i;
-					pDOT = lzyROAD.pI4x4( jdPRG.y );
-					break;
-				}
 				if( !pDOT ){
 					jdPRG.y = jdPRG.z;
 					break;
@@ -421,8 +414,8 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
 				else if( pDOT->x > gpdPAINTrgX )
 					pDOT->x = gpdPAINTrgX;
 
-				if( pDOT->x < gpdPAINTbtX )
-					pDOT->x = gpdPAINTbtX;
+				if( pDOT->y < gpdPAINTbtX )
+					pDOT->y = gpdPAINTbtX;
 				else if( pDOT->y > gpdPAINTtpX )
 					pDOT->y = gpdPAINTtpX;
 
@@ -825,6 +818,12 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case gpeDRCos_prgC:
 			case gpeDRCos_prgD:
 				switch( alf ) {
+					case gpeALF_PAINT:
+						if( iNUM == gpeDRCos_prgC ) {
+							aROBpID[1] = aROBpID[0];
+						}
+						pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;
+						break;
 					case gpeALF_BRIDGE:
 					case gpeALF_SNAIL:
 						if( iNUM >= gpeDRCos_prgC ) {
@@ -833,10 +832,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 								pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = mmX(200);
 							else if( pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] < mmX(-200) )
 								pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = mmX(-200);
-						} break;
-					case gpeALF_PAINT:
-						if( iNUM >= gpeDRCos_prgC ) {
-							aROBpID[1] = aROBpID[0];
+							break;
 						}
 					default:
 						pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;

@@ -63,8 +63,8 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 		}
 	}
 
-	if( !gpdROBrd.nLD() )
-	if( pOpic ) {
+	if( pOpic )
+	if( !gpdROBrd.nLD() ) {
 
 		pU1 = pOpic->pU1();
 		if( pU1 ) {
@@ -105,48 +105,36 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 							gpdRM = new U4[n];
 						gpdRM;
 						gpmZnOF( gpdRM, n );
-						I1	dir = 1;
+						I1		dir = 1;
 						I4 		w = pSRF->w, h = pSRF->h,
 								aR[] = {-w, 0,w, 0},
 								aD[] = {-w,+1,w,-1},
 								bx, by, //rg = aD[2]/2,
 								b,s;
 
-						I4x2	*pRi, xy;
+						I4x2	*pRi, xy, xyB, xyA, xAB, x0B, x0A;
 						U4		in = 0xffffffff, n_stp = 0,
 								i = w+1, nn = n-i;
 						bool b_pre = true, bIN;
 
 
 						for( ; i < nn; i++ ) {
-							if( gpdRM[i] ) continue;
-							if( apU4[2][i]!=in ) continue;
+							if( gpdRM[i] || (apU4[2][i]!=in) ) continue;
 
-							for( ; i < nn; i++ ) {
-								if( apU4[2][i]==in ) continue;
+							for( ; i < nn; i++ )
+							if( apU4[2][i]==in ) continue;
+							else break;
 
-
-								break;
-							}
 							if( i >= nn )
 								break;
 
-
 							gpdRD.lzyRST();
 							dir = 1;
-							s = b = i;
-							gpdRM[s] = s;
-
+							gpdRM[s] = s = b = i;
 							b++;
 							by = s-s%w;
 							b_pre = true;
-
-							/*if( rg < 1 )
-								rg = w;
-							else if( rg > w )
-								rg = w;*/
-
-							while( s == b ? dir != 2 : true ) {
+							while( s != b ) { //s == b ? dir != 2 : true ) {
 								bIN = false;
 								bx=b-by;
 
@@ -163,15 +151,12 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 								if( dir&1 )
 								if( bIN != b_pre ) {
 									pRi = gpdRD.pI4x2n(-1);
-									pRi->x = gpdRD.nI4x2()-1;
-									pRi->y = b;
+									*pRi = I4x2( gpdRD.nI4x2()-1, b );
 								}
 
-								if( bIN )
-								{
+								if( bIN ) {
 									if( bIN != b_pre )
 										n_stp++;
-
 									dir--;
 									if(dir<0)
 										dir = 3;
@@ -184,53 +169,75 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 								b	+= aD[dir];
 								by	+= aR[dir];
 							}
-							I4	nR = gpdRD.nI4x2(),
-								nRD = 0;
+							/// ROAD
+							I4	nR = gpdRD.nI4x2(), nRD = 0, base, alt;
 							pRi = gpdRD.pI4x2n( nR, nR+1);
-							// koordináták kipakol
 							I4x4* pRD;
-							for( I4 r = -nR; r < 0; r++ ) {
-								xy = pRi[r];
-								xy.YdivRQ(w);
-								xy.x = ((xy.x*gpdPAINTwX)/w) + gpdPAINTlfX;
-								xy.y = ((xy.y*gpdPAINThX)/h) + gpdPAINTbtX;
-								if( !i ) {
-									pRD = gpdROBrd.pI4x4n(-1);
-									pRD->a4x2[0] = xy;
-									pRD->z = gpdPAINTupX;
-									pRD->w = 0;
+							//if( false )
+							{
+								bool bFRT = true;
+								for( I4 r = -nR, ir; r < 0; r++ ) {
+									xy = pRi[r];
+									xy.YdivRQ(w);
+									xy.x = ((xy.x*gpdPAINTwX)/w) + gpdPAINTlfX;
+									xy.y = gpdPAINTtpX - ((xy.y*gpdPAINThX)/h);
+									if( bFRT ) {
+										bFRT = false;
+										(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTupX; pRD->w = 0;
+										nRD++;
+									}
+									(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTdwX; pRD->w = 0;
+									nRD++;
+									xyB = xy;
+									base = alt = 0;
+									for( ir = r+1; ir < 0; ir++ ) {
+										xyA = pRi[ir];
+										xyA.YdivRQ(w);
+										xyA.x = ((xyA.x*gpdPAINTwX)/w) + gpdPAINTlfX;
+										xyA.y = gpdPAINTtpX - ((xyA.y*gpdPAINThX)/h);
+										if( !base ) {
+											x0B = xyA-xy;
+											if( x0B.abs().mx() < mmX(3) )
+												continue;
+											r = ir;
+											base = x0B.abs().mx();
+											continue;
+										}
+										x0A = xyA-xy;
+										xAB = (x0B*(x0A*x0B));
+										xAB /= (base*base);
+										x0A -= xAB;
+										alt = x0A.abs().mx();
+										if( alt < mmX(3) )
+											continue;
+
+
+										(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xyA; pRD->z = gpdPAINTdwX; pRD->w = 0;
+										nRD++;
+										r = ir;
+										break;
+									}
+								}
+								if( nRD ) {
+									xy = pRi[-nR];
+									xy.YdivRQ(w);
+									xy.x = ((xy.x*gpdPAINTwX)/w) + gpdPAINTlfX;
+									xy.y = gpdPAINTtpX - ((xy.y*gpdPAINThX)/h);
+
+									(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTdwX; pRD->w = 0;
+									nRD++;
+									(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTupX; pRD->w = 0;
 									nRD++;
 								}
-								pRD = gpdROBrd.pI4x4n(-1);
-								pRD->a4x2[0] = xy;
-								pRD->z = gpdPAINTdwX;
-								pRD->w = 0;
-								nRD++;
 							}
-							if( nRD ) {
-								pRD = gpdROBrd.pI4x4n(-1);
-								pRD->a4x2[0] = xy;
-								pRD->z = gpdPAINTupX;
-								pRD->w = 0;
-								nRD++;
-							}
-
-
-							// pRM
+							/// FILL
 							pRi[-nR].median(nR, pRi, true );
 							for( I4 r = -nR; r < 0; r += 2 ) {
-								gpfMset( gpdRM+pRi[r].y, pRi[r+1].y-pRi[r].y, &i, sizeof(i) );
+								gpfMset( gpdRM+pRi[r].y, pRi[r+1].y-pRi[r].y, &s, sizeof(s) );
 							}
 						}
 					}
 				}
-
-				/*for( U1 i = 0; i < 2; i++ ) {
-					if( pROBnD->aDrc[i].jdALF != gpeALF_PAINT )
-						continue;
-
-
-				}*/
 			}
 		}
 		#ifdef stdON
