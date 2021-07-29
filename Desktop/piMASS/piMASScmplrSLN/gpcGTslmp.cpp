@@ -153,24 +153,7 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	if(bSTDcout){gpdCOUT << gpdENDL;}
 }
 
-gpcROB& gpcROB::operator &= ( const gpcDrc& D )
-{
-	null();
-	HS = COM = -1;
-	return *this;
-}
-gpcROB& gpcROB::operator = ( const gpcDrc& D )
-{
-	null();
-	gpmMcpyOF( aXYZ,	&D.oXYZ.x, 3 );
-	gpmMcpyOF( aABC,	&D.oABC.A, 3 );
-	HS = D.oCTRL.y;
-	if( D.bHS1o() )
-		COM = D.oCTRL.z;
 
-	msS = D.MPosS;
-	return *this;
-}
 
 gpcROB::gpcROB( const gpcDrc& D ) {
 	gpmCLR;
@@ -399,7 +382,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 					), // pB-ben a JUDO elötti
 		*pA = (U2*)&(
 						pROBnD->aROBio[iD0*2]
-						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0, this )
+						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0, this, pROBnD )
 						//= pROBnD->aDrc[iD0].judo_OHNEnew( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0 )
 					); // pA-ban azaz új out lesz
 

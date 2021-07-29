@@ -458,8 +458,8 @@ public:
 #define gpdPAINTwX  (gpdPAINTrgX-gpdPAINTlfX)
 #define gpdPAINThX  (gpdPAINTtpX-gpdPAINTbtX)
 
-#define gpdPAINTupX mmX(300)
-#define gpdPAINTdwX mmX(230)
+#define gpdPAINTupX mmX(440)
+#define gpdPAINTdwX mmX(425)
 
 
 
@@ -6261,7 +6261,14 @@ szasz:
 
 	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
 	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
-	size_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
+	I4x4* 	pI4x4nINS( int i = 0, int n = 1 ) {
+		if(i<0)
+			return (I4x4*)Ux( nLD(sizeof(I4x4)), sizeof(I4x4)*n, true, sizeof(I4x4) );
+		U8 s = sizeof(I4x4)*i;
+		lzyINS( NULL, sizeof(I4x4)*n, s, 0 );
+		return (I4x4*)Ux( i, sizeof(I4x4)*n, true, sizeof(I4x4) );
+	}
+	ssize_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
 
 	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
 	I8x2* 	pI8x2n( int i = 0, int n = 1 )	{ return (I8x2*)Ux(	(i<0?nLD(sizeof(I8x2)):i),	sizeof(I8x2)*n,	true, sizeof(I8x2)); }

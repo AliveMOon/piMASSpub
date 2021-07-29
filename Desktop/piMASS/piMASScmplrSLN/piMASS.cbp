@@ -159,6 +159,7 @@
 		<Unit filename="gpcLAZY.cpp" />
 		<Unit filename="gpcOPCD.cpp" />
 		<Unit filename="gpcSLMPdcr.cpp" />
+		<Unit filename="gpcSLMPdrcJUDO.cpp" />
 		<Unit filename="gpcSRC.cpp" />
 		<Unit filename="gpcSRC.h" />
 		<Unit filename="gpcSRCbreak.cpp" />

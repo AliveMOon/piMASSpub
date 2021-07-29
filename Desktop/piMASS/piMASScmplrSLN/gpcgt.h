@@ -88,7 +88,8 @@ static const I4x4 gpaCAGEheadBALLpaint[] = {
 	{ mmX(0), mmX(0), mmX(100),	mmX(100) },
 	{ mmX(0), mmX(0), mmX(180),	mmX(20) },
 };
-#define gpaCAGEheadBALL gpaCAGEheadBALLpaint //hand //paint
+#define gpaCAGEheadBALL gpaCAGEheadBALLhand //paint
+static char gpsJDpub[0x100];
 
 typedef enum gpeCGhd:U4 {
 	gpeCGhdP0,
@@ -111,10 +112,10 @@ public:
 	I4		aXYZ[3],		// b192 b224 b256
 			aABC[3];		// b288 b320 b352
 	U4		msS,			// b384
-			HS, 			// b416
-			PIX, COM,		// b448 b480
+			iARY, nARY,		// b416 b448
+			COM, HS,		// b480 b512
 			/// b480 idáig küldjük
-			msSLV,msMST, msR2D,	pad,// b512 b544 b576 b608
+			msSLV, msMST, msR2D, pad,// b544 b576 b608
 			/// B640 idáig pullingol
 			iW, nW, nWu2,
 			nR, nRu2;
@@ -176,12 +177,14 @@ public:
 			tabc, oabc, iabc,
 			aoAX1to6[2], aiAX1to6[2],
 			aoax1to6[2], aiax1to6[2];
+	U4x2	iADRin,
+			oADRin;
 	U4x4	oCTRL, iCTRL, JD;	// JD.z error num
 	I4x4	okXYZ, okABC, okxyz,
 			tGRP, oGRP, iGRP,
 			jdPRG, jdPRGtool,
 
-			jd0PRG, //jd0DRPtu,
+			jd0PRG,
 			jd0XYZ, jd0ABC, jd0xyz,
 			jd1XYZ, jd1ABC, jd1up;
 	F4x4	jd0mx, jd0mxTL;
@@ -191,7 +194,7 @@ public:
 			nMS,	sMS,	AVGms, Ems,
 			MPosS,	HS1ms;
 	std::thread trd;
-	gpcLZY	lzyROAD;
+	gpcLZY	lzyROAD, lstSTP;
 
 	~gpcDrc() {
 		if( n_join >= n_trd )
@@ -330,7 +333,7 @@ public:
 	U4 oHS3o() { iCTRL.y&=(~ZShs3); return (oCTRL.y|=ZShs3); }
 	U4 xHS3o() { iCTRL.y|=ZShs3; return (oCTRL.y&=(~ZShs3)); }
 
-	bool jdPRGstp( U4 mSEC, gpcGT* pGT );
+	bool jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD );
 	/// HD ------------------------------
 	I4x4	cageXYZhd0( I4x4& N, I4x4* pHD, I4 lim, U4 id, int rR  );
 	I4x4 	cageXYZhd( I4x4& N, I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBALL, int rR );
@@ -338,22 +341,47 @@ public:
 	I4x4 	cageBOXnts( I4x4& N, I4x4 T, I4x4 S, I4x4* pCAGE, U4 n, int rR );
 	/// .... ...  ..   .
 	I4x4 judoCAGE( I4x4& jXYZ, I4x4& jABC, I4x4& jxyz, I4x4& jN, U4 i, F4x4& iMX );
+	I4x4 judoCAGEin( 	I4x4& jXYZ, I4x4& jABC, I4x4& jxyz,
+						I4x4& iiXYZ, I4x4& iiABC, I4x4& iixyz,
+						I4x4& jN, U4 i, F4x4& iMX );
 
-	gpcDrc& judo( gpcROB& iR, U4 mSEC, U4 iD0, gpcGT* pGT );
+	gpcDrc& judo2( gpcROB& iR, U4 mSEC, U4 iD0, gpcGT* pGT );
+	gpcDrc& judo( gpcROB& iR, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBnD );
 	gpcDrc& judo_OHNEnew( gpcROB& iR, U4 mSEC, U4 iD0 );
 	gpcDrc& JUDO( gpcROB& iR, U4 mSEC );
 };
 #define gpdROBnDnull ((gpcROBnD*)NULL)
+#define gpdID pROBnD->aROBpID
+#define gpdRD pROBnD->lzyRD
+#define gpdRM pROBnD->pRM
+#define gpdROBrd pROBnD->robROAD
+#define gpdSRF pROBnD->pROBsrf
+#define gpdDIF pROBnD->pROBdif
+
 class gpcROBnD {
 	public:
 		U4x4	pc,
 				ioSW;
 		gpcROB 	aROBio[6];
 		gpcDrc	aDrc[2];
-		gpcROBnD() { gpmCLR; };
 
-		gpcROBnD* format()
-		{
+		/// ----------------------------
+		///			rPIC
+		/// ----------------------------
+		I4		aROBpID[2];
+		SDL_Surface	*pROBsrf, *pROBdif;
+		U4			*pRM;
+		gpcLZY		lzyRD, robROAD;
+		/// ----------------------------
+
+		gpcROBnD() { gpmCLR; };
+		~gpcROBnD() {
+			gpmSDL_FreeSRF(pROBsrf);
+			gpmSDL_FreeSRF(pROBdif);
+			gpmDELary(pRM);
+		};
+
+		gpcROBnD* format() {
 			if( !this )
 				return NULL;
 			// OUT -------------
@@ -367,8 +395,7 @@ class gpcROBnD {
 			aROBio[5].null();
 			return this;
 		}
-		gpcROBnD* reset( U1 iBILL )
-		{
+		gpcROBnD* reset( U1 iBILL ) {
 			if( !this )
 				return NULL;
 			gpmCLR;
@@ -380,34 +407,29 @@ class gpcROBnD {
 			ioSW.w = iBILL;
 			return format();
 		}
-		U4 stpPULL()
-		{
+		U4 stpPULL() {
 			ioSW.y += 2;
 			return ioSW.y;
 		}
-		U4 stpPUSH( bool bSW )
-		{
+		U4 stpPUSH( bool bSW ) {
 			/// bSW ? true BnJ : false only Bill
 			ioSW.w -= bSW ? 2 : 4;
 			ioSW.z = ioSW.w+4;
 			ioSW.y = ioSW.w+1;
 			return !!(ioSW.w&2);
 		}
-		bool bWAIT()
-		{
+		bool bWAIT() {
 			if( !this )
 				return true;	// akkor is várni kell ha !this azaz nincs semi
 			// ha ioSW.w >= ioSW.y igaz, még nem jött válasz
 			pc.x++;
 			return ioSW.w >= ioSW.y;
 		}
-		bool bNEXT()
-		{
+		bool bNEXT() {
 			// ha ioSW.y >= ioSW.z igaz már vége a körnek
 			return ioSW.y >= ioSW.z;
 		}
-		bool bPULL()
-		{
+		bool bPULL() {
 			if( bWAIT() )
 				return false;
 			// ioSW.w < ioSW.y
@@ -422,47 +444,40 @@ class gpcROBnD {
 		}
 
 		U1 iDrc( bool bPULL = false );
-		U1 iWR()
-		{
+		U1 iWR() {
 			// 0 Write
 			// 1 Read
 			return ioSW.y&1;
 		}
 
-		U2* pROBioU2()
-		{
+		U2* pROBioU2() {
 			if( !this )
 				return NULL;
 			return (U2*)&(aROBio[ioSW.y&3]);
 		}
-		gpcROB& ioROB()
-		{
+		gpcROB& ioROB() {
 			return aROBio[ioSW.y&3];
 		}
 		gpcLZY* pull( gpcLZY* pOUT, U4x4* pZSrw );
 
-		gpcDrc* pDrc()
-		{
+		gpcDrc* pDrc() {
 			if( !this )
 				return NULL;
 			return &aDrc[ioSW.y&3];
 		}
-		U2* pU2cr()
-		{
+		U2* pU2cr() {
 			if( !this )
 				return NULL;
 
 			return (U2*)pDrc();
 		}
 
-		U2* pU2out()
-		{
+		U2* pU2out() {
 			if( !this )
 				return NULL;
 			return (U2*)&(aROBio[(ioSW.y&2)+0]);
 		}
-		U2* pU2inp()
-		{
+		U2* pU2inp() {
 			if( !this )
 				return NULL;
 			return (U2*)&(aROBio[(ioSW.y&2)+1]);
@@ -799,11 +814,7 @@ public:
 class gpcGT {
 	public:
 		I8x2		TnID, gt_ip;
-		I4			port, iCNT, nOSin,
-					aROBpID[2];
-		SDL_Surface	*pROBsrf, *pROBdif;
-		U4			*pRM;
-		gpcLZY		lzyRD, robROAD;
+		I4			port, iCNT, nOSin;
 
 		SOCKET		socket, sockAT, sockCNCT;
 		SOCKADDR	sockAddr;
@@ -893,9 +904,6 @@ class gpcGT {
 			return pOUT;
 		}
 		~gpcGT() {
-			gpmSDL_FreeSRF(pROBsrf);
-			gpmSDL_FreeSRF(pROBdif);
-			gpmDELary(pRM);
 			GTclose();
 		};
 		gpcGT( I8x2 id, I4 prt, SOCKET sock = INVALID_SOCKET ) {

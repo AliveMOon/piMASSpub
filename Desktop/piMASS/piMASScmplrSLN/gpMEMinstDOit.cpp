@@ -5,9 +5,8 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 extern char gpsPUB[0x1000];
-#define gpdRD pGT->lzyRD
-#define gpdRM pGT->pRM
-#define gpdROBrd pGT->robROAD
+
+
 I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
@@ -39,6 +38,9 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( !pROBnD )
 		return pGT->iCNT;
 	int iASY = -1;
+	/// ----------------------------------------
+	///					rINP
+	/// ----------------------------------------
 	if( pOi ) {
 	#ifdef stdON
 		if(bSTDcout){gpdCOUT << stdALU "rINP" << gpdENDL;}
@@ -64,33 +66,33 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	}
 
 	if( pOpic )
+	/// ----------------------------------------
+	///					rPIC
+	/// ----------------------------------------
 	if( !gpdROBrd.nLD() ) {
-
 		pU1 = pOpic->pU1();
 		if( pU1 ) {
-			pGT->aROBpID[0] = pOpic->bUTF8()
+			gpdID[0] = pOpic->bUTF8()
 							? pMASS->PIC.alfFND( (pU1+=gpmNINCS(pU1," \t\"")) )
 							: *(I4*)pU1;
-			gpcPIC* pPIC = pMASS->PIC.PIC( pGT->aROBpID[0] );
+			gpcPIC* pPIC = pMASS->PIC.PIC( gpdID[0] );
 			SDL_Surface* pSRF = pPIC->pPICrtxSRF();
 			if( !pSRF )
-				pGT->aROBpID[0] = -1;
+				gpdID[0] = -1;
 			else {
-
-				if( pGT->pROBsrf )
-				if( pGT->pROBsrf->w != pSRF->w  || pGT->pROBsrf->h != pSRF->h ) {
-					gpmSDL_FreeSRF(pGT->pROBsrf);
-					gpmSDL_FreeSRF(pGT->pROBdif);
+				if( gpdSRF ? (gpdSRF->w != pSRF->w  || gpdSRF->h != pSRF->h ) : false ) {
+					gpmSDL_FreeSRF(gpdSRF);
+					gpmSDL_FreeSRF(gpdDIF);
 					gpmDELary( gpdRM );
 				}
 
-				if( !pGT->pROBsrf ) {
-					pGT->pROBsrf = SDL_CreateRGBSurface( 0, pSRF->w, pSRF->h, 32, 0,0,0,0 );
-					pGT->pROBdif = SDL_CreateRGBSurface( 0, pSRF->w, pSRF->h, 32, 0,0,0,0 );
+				if( !gpdSRF ) {
+					gpdSRF = SDL_CreateRGBSurface( 0, pSRF->w, pSRF->h, 32, 0,0,0,0 );
+					gpdDIF = SDL_CreateRGBSurface( 0, pSRF->w, pSRF->h, 32, 0,0,0,0 );
 				}
-				if( pGT->pROBsrf ) {
-					U4	*apU4[3] = { (U4*)pSRF->pixels, (U4*)pGT->pROBsrf->pixels, (U4*)pGT->pROBdif->pixels },
-						n = pSRF->w*pGT->pROBsrf->h, i, nD = 0;
+				if( gpdSRF ) {
+					U4	*apU4[3] = { (U4*)pSRF->pixels, (U4*)gpdSRF->pixels, (U4*)gpdDIF->pixels },
+						n = pSRF->w*pSRF->h, i, nD = 0;
 
 					for( U4 i = 0; i < n; i++ ) {
 						if( apU4[1][i] == apU4[0][i] ) {
@@ -208,7 +210,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 										xAB /= (base*base);
 										x0A -= xAB;
 										alt = x0A.abs().mx();
-										if( alt < mmX(3) )
+										if( alt < mmX(2) )
 											continue;
 
 
@@ -224,9 +226,11 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 									xy.x = ((xy.x*gpdPAINTwX)/w) + gpdPAINTlfX;
 									xy.y = gpdPAINTtpX - ((xy.y*gpdPAINThX)/h);
 
-									(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTdwX; pRD->w = 0;
+									(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy;
+									pRD->z = gpdPAINTdwX; pRD->w = 0;
 									nRD++;
-									(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTupX; pRD->w = 0;
+									(pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy;
+									pRD->z = gpdPAINTupX; pRD->w = 0;
 									nRD++;
 								}
 							}
@@ -244,8 +248,13 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 			if(bSTDcout){gpdCOUT << stdALU "rPIC " << gpdROBrd.nLD() <<gpdENDL;}
 		#endif
 	}
+
 	if( !pOo )
 		return pGT->iCNT;
+	/// ----------------------------------------
+	///					rOUT
+	/// ----------------------------------------
+
 #ifdef stdON
 	if(bSTDcout){gpdCOUT << stdALU "rOUT" << gpdENDL;}
 #endif

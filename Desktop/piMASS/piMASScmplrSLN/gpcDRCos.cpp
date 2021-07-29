@@ -163,6 +163,8 @@ I4x4 gpcDrc::cageXYZhd( I4x4& N, I4x4* pHD, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* p
 
 	return tmp;
 }
+
+
 I4x4 gpcDrc::judoCAGE( I4x4& jXYZ, I4x4& jABC, I4x4& jxyz, I4x4& jN, U4 i, F4x4& iMX ) {
 	int nH = gpmN(gpaCAGEheadBALL)-1;
 	F4x4 jMX;
@@ -296,7 +298,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id, int rR ) {
 }
 
 static char gpsJDprgPUB[0x100];
-bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
+bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 	// ha létre jött mozgá hagyja végre hajtani
 	if( oCTRL.z )
 		return false;
@@ -306,13 +308,15 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
 	if( jdPRG.x ) {
 		// igen
 		if( jdPRG.y >= jdPRG.z ) {
-			/// END --------------------------
+			/// --------------------------
+			/// 		END
+			/// --------------------------
 			// de pont befejezte
 			if( !jd0XYZ.qlen_xyz() )
 				jdALF = gpeALF_null;
 			else switch( jdALF ) {
 				case gpeALF_PAINT:
-					if( pGT ? !pGT->robROAD.nI4x4() : true ) {
+					if( pGT ? !gpdROBrd.nI4x4() : true ) {
 						jdALF = gpeALF_null;
 						break;
 					}
@@ -341,7 +345,9 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
 
 	// na nézzük a programot
 	if( !jdPRG.y ) {
-		/// START ----------------------------
+		/// ----------------------------
+		///   		START
+		/// ----------------------------
 		if( !txyz.qlen_xyz() ) {
 			// ha nincsen target kinyirjuk a programot
 			jdPRG.null();
@@ -361,10 +367,10 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
 					jdPRGtool.a4x2[0] = jd0PRG.a4x2[1];
 					break;
 			case gpeALF_PAINT:
-					if( pGT ? pGT->robROAD.nI4x4() : false ){
+					if( pGT ? gpdROBrd.nI4x4() : false ){
 						lzyROAD.lzyRST();
-						lzyROAD = pGT->robROAD;
-						pGT->robROAD.lzyRST();
+						lzyROAD = gpdROBrd;
+						gpdROBrd.lzyRST();
 					}
 
 					jdPRG.z = lzyROAD.nI4x4();
@@ -401,30 +407,60 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT ) {
 	F4x4 mxTMP = jd0mxTL;
 	F4 cr; float d;
 	I4x4 aVEC[2];
+	/// ----------------------------
+	///   		STEP
+	/// ----------------------------
 	switch( jdALF ) {
 		case gpeALF_PAINT: {
-				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y );
-				U4 i = 1, n = jdPRG.z-jdPRG.y;
+				if( oADRin.n )
+					return true;
+				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y ), *pSTP;
+				U4 i = 0, n = jdPRG.z-jdPRG.y;
 				if( !pDOT ){
 					jdPRG.y = jdPRG.z;
 					break;
 				}
-				if( pDOT->x < gpdPAINTlfX )
-					pDOT->x = gpdPAINTlfX;
-				else if( pDOT->x > gpdPAINTrgX )
-					pDOT->x = gpdPAINTrgX;
 
-				if( pDOT->y < gpdPAINTbtX )
-					pDOT->y = gpdPAINTbtX;
-				else if( pDOT->y > gpdPAINTtpX )
-					pDOT->y = gpdPAINTtpX;
+				lstSTP.lzyRST();
+				for( ; i < n; i++ ) {
+					pDOT = lzyROAD.pI4x4( jdPRG.y+i );
+					/// X ------------------- LEFT->RIGHT
+					if( pDOT->x < gpdPAINTlfX )
+						pDOT->x = gpdPAINTlfX;
+					else if( pDOT->x > gpdPAINTrgX )
+						pDOT->x = gpdPAINTrgX;
+					/// Y ------------------- BOTTOM->TOP
+					if( pDOT->y < gpdPAINTbtX )
+						pDOT->y = gpdPAINTbtX;
+					else if( pDOT->y > gpdPAINTtpX )
+						pDOT->y = gpdPAINTtpX;
+					/// Z ------------------- DOWN
+					if( pDOT->z < gpdPAINTdwX )
+						pDOT->z = gpdPAINTdwX;
 
-				if( pDOT->z < gpdPAINTdwX )
-					pDOT->z = gpdPAINTdwX;
-				tXYZ.xyz_( *pDOT );
-				I4x4 dot = *pDOT;
-				dot.z-=mmX(500);
-				txyz.xyz_( dot );
+					pSTP = lstSTP.pI4x4n( i*3, 1*3 );
+					if( !pSTP )
+						break;
+
+					pSTP[2] = pSTP[0] = *pDOT;
+					pSTP[1] = tABC;
+
+					pSTP[2].z -= mmX(500);
+					oADRin.n = i;
+					if( !i ) {
+						tXYZ.xyz_( pSTP[0] );
+						tABC.xyz_( pSTP[1] );
+						txyz.xyz_( pSTP[2] );
+						continue;
+					}
+
+					if( tXYZ.z <= pSTP[0].z )
+						break;
+				}
+				oADRin.i = 0;
+				if( !oADRin.n )
+					break;
+				jdPRG.y += oADRin.n;
 			} break;
 		case gpeALF_SHLD:
 		case gpeALF_SNAIL: { 							/// jdPRG.x ACT, //.y iCNT //.z nEND //.w width
@@ -589,7 +625,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			switch( an.alf ) {
 
 				case gpeALF_STOP:
-					aROBpID[1] = -1;
+					gpdID[1] = -1;
 					//RnD.aDrc[1]->picID =
 					iNUM = gpeDRCos_NONS;
 					break;
@@ -801,7 +837,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case gpeDRCos_ABCa:
 			case gpeDRCos_ABCb:
 			case gpeDRCos_ABCc:
-				aROBpID[1] = -1;
+				gpdID[1] = -1;
 				pD->okxyz.xyz_(pD->txyz.xyz_(0));
 				pD->tABC.aXYZW[(iNUM-gpeDRCos_ABCa)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
 				break;
@@ -820,7 +856,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 				switch( alf ) {
 					case gpeALF_PAINT:
 						if( iNUM == gpeDRCos_prgC ) {
-							aROBpID[1] = aROBpID[0];
+							gpdID[1] = gpdID[0];
 						}
 						pD->jd0PRG.aXYZW[(iNUM-gpeDRCos_prgA)%nNUM] = (d8 == 0.0) ? (I4)an.num : (I4)d8;
 						break;
@@ -842,7 +878,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 					break;
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );
-				pD->jdPRGstp( mSEC, this );
+				pD->jdPRGstp( mSEC, this, pROBnD );
 				alf = gpeALF_null;
 				break;
 			case gpeDRCos_drpUP:
@@ -864,7 +900,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 				}
 				pD->jdALF = alf;
 				pD->jdPRG = I4x4( 1, 0, 1 );
-				pD->jdPRGstp( mSEC, this );
+				pD->jdPRGstp( mSEC, this, pROBnD );
 				alf = gpeALF_null;
 				break;
 			/// -----------------------------------------------
