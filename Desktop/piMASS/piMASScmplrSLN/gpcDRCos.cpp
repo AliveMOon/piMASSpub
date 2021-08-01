@@ -305,43 +305,44 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 
 	// ha megált  megnézi
 	// program végrehajtásával foglalkozik?
-	if( jdPRG.x ) {
-		// igen
-		if( jdPRG.y >= jdPRG.z ) {
-			/// --------------------------
-			/// 		END
-			/// --------------------------
-			// de pont befejezte
-			if( !jd0XYZ.qlen_xyz() )
-				jdALF = gpeALF_null;
-			else switch( jdALF ) {
-				case gpeALF_PAINT:
-					if( pGT ? !gpdROBrd.nI4x4() : true ) {
-						jdALF = gpeALF_null;
-						break;
-					}
-					jdPRG.y = 0;
-					break;
-				case gpeALF_null:
-				case gpeALF_DROP:
-				case gpeALF_CALIB:
-					jdALF = gpeALF_null;
-					break;
-				default:
-					jdALF = gpeALF_null;
-					tXYZ.xyz_(jd0XYZ);
-					tABC.ABC_(jd0ABC);
-					break;
-			}
-			if( !jdALF ) {
-				jdALF = gpeALF_null;
-				jdPRG.null();
-				MPosS = 0;
-				return true;
-			}
-		}
-	} else
+	if( !jdPRG.x )
 		return true;	// nem akor pihi
+
+	// igen
+	if( jdPRG.y >= jdPRG.z ) {
+		/// --------------------------
+		/// 		END
+		/// --------------------------
+		// de pont befejezte
+		if( !jd0XYZ.qlen_xyz() )
+			jdALF = gpeALF_null;
+		else switch( jdALF ) {
+			case gpeALF_PAINT:
+				if( pGT ? !gpdROBrd.nI4x4() : true ) {
+					jdALF = gpeALF_null;
+					break;
+				}
+				jdPRG.y = 0;
+				break;
+			case gpeALF_null:
+			case gpeALF_DROP:
+			case gpeALF_CALIB:
+				jdALF = gpeALF_null;
+				break;
+			default:
+				jdALF = gpeALF_null;
+				tXYZ.xyz_(jd0XYZ);
+				tABC.ABC_(jd0ABC);
+				break;
+		}
+		if( !jdALF ) {
+			jdALF = gpeALF_null;
+			jdPRG.null();
+			MPosS = 0;
+			return true;
+		}
+	}
+
 
 	// na nézzük a programot
 	if( !jdPRG.y ) {

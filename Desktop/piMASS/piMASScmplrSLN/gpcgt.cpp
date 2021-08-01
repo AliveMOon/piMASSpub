@@ -752,10 +752,8 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 	bool bNEWip = (*s_ip == '!');
 	U8 s;
-	if( bNEWip || bGTdie() ) //socket == INVALID_SOCKET )
-	{
-        switch( msGTdie )
-        {
+	if( bNEWip || bGTdie() ) {
+        switch( msGTdie ) {
 			case 1:
 				gpfSOC_CLOSE( socket );
 				msGTdie = (pWIN->mSEC.x+1500)|1;
@@ -776,8 +774,7 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 		gpmDEL(pMISi);
 		nSYN = 0;
 
-		if( bNEWip )
-		{
+		if( bNEWip ) {
 			sprintf( s_ip, "%s", s_ip+1 );
 			gpfSOC_CLOSE( sockCNCT );
 		}
@@ -836,26 +833,24 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 		// BIND
 		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
-		//if(bSTDcout){gpdCOUT << p_print <<gpdENDL;}
 		p_print = p_err;
 
 		fd_set cnct_w;
 		FD_ZERO( &cnct_w );
 		FD_SET( socket, &cnct_w );
-		int rc = select( socket+1,
-							NULL, &cnct_w, NULL, &tv );
-		if( rc > 0 && FD_ISSET( socket, &cnct_w ) )
-		{
+		int rc = select( socket+1, NULL, &cnct_w, NULL, &tv );
+		if( rc > 0 && FD_ISSET( socket, &cnct_w ) ) {
 			sockCNCT = INVALID_SOCKET;
-		} else {
+		}
+		else {
 			// még nem sikerült eldugjuk ne szabadítsák fel
 			sockCNCT = socket;
 			socket = INVALID_SOCKET;
 			msGTdie = (pWIN->mSEC.x+1500)|1;
 			return 0;
 		}
-		switch( TnID.alf )
-		{
+
+		switch( TnID.alf ) {
 			case gpeALF_SLMP:{
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
@@ -885,14 +880,12 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 	char	*p_err = (char*)pWIN->sGTpub;
 			*pWIN->sGTpub = 0;
 
-	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
-	{
+	if( aGTfd[gpeFDrcv].isFD( socket ) ) {
 		p_err = GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 		if( *p_err )
-			if(bSTDcout){gpdCOUT << p_err <<gpdENDL;}
+		if(bSTDcout) { gpdCOUT << p_err <<gpdENDL; }
 
-		switch( TnID.alf )
-		{
+		switch( TnID.alf ) {
 			case gpeALF_SLMP:
 			case gpeALF_SLMPo:
 				break;
@@ -903,13 +896,10 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 				GTos( *this, pWIN );
 				break;
 		}
-
 	}
 	else if( !pOUT )
-	if( pINP ? pINP->n_load : false )
-	{
-		switch( TnID.alf )
-		{
+	if( pINP ? pINP->n_load : false ) {
+		switch( TnID.alf ) {
 			case gpeALF_SLMP:
 			case gpeALF_SLMPo:
 				break;
@@ -922,8 +912,7 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 		}
 	}
 
-	switch( TnID.alf )
-	{
+	switch( TnID.alf ) {
 		case gpeALF_SLMP:
 			GTslmpDrcRob( *this, pWIN, pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL );
 			break;
@@ -966,15 +955,11 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 	aGTfd[gpeFDrcv].setFD( socket );
 	aGTfd[gpeFDsnd].setFD( socket );
-
-
-
 	int nS = select(
 					aGTfd[gpeFDrcv].maxSCK+1,
 					&aGTfd[gpeFDrcv].fdS,
 					(aGTfd[gpeFDsnd].nFD ? &aGTfd[gpeFDsnd].fdS : NULL),
-					NULL, //(aGTfd[gpeFDexcp].fd_count ? &aGTfd[gpeFDexcp] : NULL),
-					&tv
+					NULL, &tv
 				);
 
 	return nS;

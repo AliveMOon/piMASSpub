@@ -164,10 +164,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	if( nOUT )
 		return;
 
-	/*if( sGTent[2] == 's' && sGTent[0] == 'b' )
-		return GTslmpBINref( mom, pWIN, pALL );*/
-
-	//, nPAD = gpdZSpad, nPADu2 = nPAD/sizeof(U2);
 	gpcMASS	*pMASS = pWIN->piMASS;
 	gpcGT	*pGTusr = NULL;
 	gpcLZY	*pLZYinp = pMASS->GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
@@ -196,7 +192,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		I4 nSUB = pD0-pSTR;
 		if( pINP->n_load < 18+nSUB )
 		{
-			// nincsen elég adat még
+			/// nincsen elég adat még
 			// az nLEN megállapításához sem
 			pINP = pINP->lzySUB( s = 0, nSUB );
 			return;
@@ -225,8 +221,10 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 
 		nD0 = gpfSTR2U8( gpmMcpy(pL,pD0,6)-2, NULL );
 		pD0 += 6;
-		if( pINP->n_load < 18+nD0+nSUB )
+		if( pINP->n_load < 18+nD0+nSUB ) {
+
 			return; // még nem jött le az egész
+		}
 
 		iCNT++;
 
@@ -287,9 +285,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 						}
 					}
 				}
-
-
-
 				pROBnD->stpPULL();
 				if( pROBnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pROBnD->pull( pOUT, gpaROBwr );

@@ -347,6 +347,7 @@ public:
 
 	gpcDrc& judo2( gpcROB& iR, U4 mSEC, U4 iD0, gpcGT* pGT );
 	gpcDrc& judo( gpcROB& iR, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBnD );
+	gpcDrc& judo2( gpcROB& iR, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBnD );
 	gpcDrc& judo_OHNEnew( gpcROB& iR, U4 mSEC, U4 iD0 );
 	gpcDrc& JUDO( gpcROB& iR, U4 mSEC );
 };
@@ -941,9 +942,7 @@ class gpcGT {
 			return this;
 		}
 		gpcGSM*	GTgsm( gpcWIN* pWIN );
-		/*I8		GTgsm3( gpcWIN* pWIN );
-		I8		GTgsm2( gpcWIN* pWIN );*/
-		I8		GTcnct( gpcWIN* pWIN ); //, gpcGTall& acpt );
+		I8		GTcnct( gpcWIN* pWIN );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );
 		U1		GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff );
