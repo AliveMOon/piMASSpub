@@ -24,7 +24,7 @@
     b1	   a2	 
     b2	                                                             a3	 
  
-   cam = 1; //1; //mlb;
+   cam =  1; //1; //mlb;
    unsel = 1;
    pic = "penna";
    again = 64;

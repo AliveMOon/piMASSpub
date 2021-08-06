@@ -1,0 +1,22 @@
+
+
+ JOHN HS123:000000 E:144ms AVG:734ms
+ POS:  n:0
+	iXYZ  562.53mm,  -48.49mm,  313.22mm 
+	cXYZ  562.53mm,  -48.49mm,  313.22mm 
+	oXYZ  562.53mm,  -48.49mm,  313.22mm 
+	tXYZ  562.53mm,  -48.49mm,  313.22mm 
+	SMR2   8506.61s,   68388.46s,   8506.60s,    407.28s;
+	DIFF  59881.85s,       0.00s,  59881.86s,  67981.18s;
+ DIR:  n:0
+	iABC  180.00dg,    0.00dg, -134.80dg 
+	oABC  180.00dg,    0.00dg, -134.80dg 
+	tABC  180.00dg,    0.00dg, -134.80dg;
+ pos:
+	ixyz  562.53mm,  -48.49mm,    0.00mm 
+	oxyz    0.00mm,    0.00mm,    0.00mm 
+	txyz    0.00mm,    0.00mm,    0.00mm;
+ ok:
+	okXYZ  562.53mm,  -48.49mm,  313.22mm 
+	okabc  180.00dg,    0.00dg, -134.80dg 
+	okxyz    0.00mm,    0.00mm,    0.00mm;

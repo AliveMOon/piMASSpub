@@ -2,7 +2,7 @@
 #include "gpcSRCinst.h"
 #include "gpcSRClnk.h"
 #include "gpccrs.h"
-#include <wiringSerial.h>
+
 /*
 -lraspicam
 -lvcos
@@ -916,7 +916,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 	if( socket == INVALID_SOCKET ) {
 		sprintf( sGO, sSER, s_ip );
-		if( (socket=(SOCKET)serialOpen( sGO, baud )) < 0 ) {
+		if( (socket=(SOCKET)open( sGO, baud )) < 0 ) {
 			if(bSTDcout){gpdCOUT << stdALU "GSM ERR:" << strerror(errno) << gpdENDL;}
 			msGTdie = pWIN->mSEC.x + 3000;
 			return pGSM;
@@ -980,7 +980,8 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	char	*pS, *pSi, *pSe,
 			// *pSat = NULL,
 			*pCLR, *pALL = (char*)pOUT->p_alloc;
-	int	nR = serialDataAvail(socket), nINP = pINP->nLD(),
+	int	nR = 0, // serialDataAvail(socket),
+        nINP = pINP->nLD(),
 		nAT = 0, aSUB[2], iA, iA2,
 		aN[0x10],
 		aP[2], iOK, iCLIP, nCM,
@@ -1294,7 +1295,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 		if( aSUB[1] > aSUB[0] ) {
 			aSUB[1] += gpmNINCS( pS+aSUB[1], " \r\n\t" );
-			nR = serialDataAvail(socket);
+			nR = 0; //serialDataAvail(socket);
 			if( nR > 0 ) {
 				nR = read( socket, pANSW, nR );
 				if( nR > 0 )

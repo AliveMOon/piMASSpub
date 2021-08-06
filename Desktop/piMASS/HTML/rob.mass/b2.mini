@@ -1,22 +1,22 @@
 
 
- JOHN HS123:000000 E:208ms AVG:1119ms
+ JOHN HS123:000000 E:80ms AVG:652ms
  POS:  n:0
-	iXYZ   -1.52mm,  986.12mm,  429.29mm 
-	cXYZ   -1.52mm,  986.12mm,  429.29mm 
-	oXYZ   -1.52mm,  986.12mm,  429.29mm 
-	tXYZ   -1.52mm,  986.12mm,  429.29mm 
-	SMR2  20124.77s,  219642.69s,  20124.77s,    174.97s;
-	DIFF 199517.92s,       0.00s, 199517.92s, 219467.71s;
+	iXYZ -503.33mm, -787.11mm,  543.52mm 
+	cXYZ -503.33mm, -787.11mm,  543.52mm 
+	oXYZ -503.33mm, -787.11mm,  543.52mm 
+	tXYZ -503.33mm, -787.11mm,  543.52mm 
+	SMR2      0.00s,  123816.22s,      0.00s,     29.27s;
+	DIFF 123816.22s,       0.00s, 123816.22s, 123786.95s;
  DIR:  n:0
-	iABC  180.00dg,    4.63dg,  -89.91dg 
-	oABC  180.00dg,    4.63dg,  -89.91dg 
-	tABC  180.00dg,    4.63dg,  -89.91dg;
+	iABC -139.06dg,  -25.06dg,  172.30dg 
+	oABC -139.06dg,  -25.06dg,  172.30dg 
+	tABC -139.06dg,  -25.06dg,  172.30dg;
  pos:
-	ixyz   -1.57mm, 1020.88mm,    0.00mm 
+	ixyz -584.30mm, -908.40mm,  406.67mm 
 	oxyz    0.00mm,    0.00mm,    0.00mm 
 	txyz    0.00mm,    0.00mm,    0.00mm;
  ok:
-	okXYZ   -1.52mm,  986.12mm,  429.29mm 
-	okabc  180.00dg,    4.63dg,  -89.91dg 
+	okXYZ -503.33mm, -787.11mm,  543.52mm 
+	okabc -139.06dg,  -25.06dg,  172.30dg 
 	okxyz    0.00mm,    0.00mm,    0.00mm;

@@ -22,7 +22,8 @@ extern char gpaALF_H_sub[];
 
 gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 	char *pFILE = pIDlst->pF+sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
-	gpcLZY dir, rd; U8 s, n;
+	gpcLZY dir, rd; U8 s;
+	size_t n;
 	dir.lzyDIR( pIDlst->sPATH, s = 0 );
 	if( !dir.p_alloc )
 		return this;

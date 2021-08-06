@@ -1,15 +1,16 @@
  a0	 
  
  R# o# b# i#                                            	
-  R# o# b# i#                                            	 b0	 b0  d0	  																							
- mini = "wget -O /robo/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture", 
+  R# o# b# i#                                            	 b0	  																			 d0	  																							
+ mini = "wget -O /robi/cpu%s.txt http://192.168.1.160:5000/api/camera/take_and_save_picture", 
   e0	 										 f0	 											 g0	  																	 a1	  
  telnet = 6001;
  rr = 0x10000;
  rout = rr + 3;
  rinp = rr + 2;
- bill = d0.mini;
- //john 
+ //bill
+ john
+       = d1.mini;
  	
  slmp = "192.168.1.90 10000";
  //sync = "192.168.1.99 6001";
@@ -50,7 +51,12 @@
  
  
   d1	 
-  mini = "wget -O ./calib_rics/calib%s http://192.168.1.160:5000/api/camera/take_picture";
+  mini = "
+wget -O /robi/frt%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=B5MP&x&y&z&a&b&c&f!!
+wget -O /robi/frt%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=B5MP
+wget -O /robi/sec%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=B12MP&x&y&z&a&b&c&f!!
+wget -O /robi/sec%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=B12MP
+";
  
  a2	 
 // BILL HS123:000000 E:88ms AVG:444ms

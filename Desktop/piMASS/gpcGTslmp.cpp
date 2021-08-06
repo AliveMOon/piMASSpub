@@ -70,55 +70,49 @@ U4x4 gpaROBwr[] = {
 	{ 	0x40A,  refROB.nWu2,	20000, refROB.nRu2	},
 };
 
-/*gpcDrc::gpcDrc( const gpcZS& zs, U4 nm )
-{
-	if( nm != NMnDIF.au4x2[0].x )
-		format( nm );
-	*this = zs;
-}*/
 gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	/// DEBUG célból készült nem igazán használható másra
 	gpmCLR;
-	iXYZ.xyz_(a);
+	aiXYZ[0].xyz_(a);
 	tXYZ.xyz_(b);
 
-	oXYZ.xyz_( (tXYZ+iXYZ)/2 );
+	aoXYZ[0].xyz_( (tXYZ+aiXYZ[0])/2 );
 
 	txyz.xyz_(c);
 
-	I4x4	iR = (iXYZ-txyz).xyz0(),
+	I4x4	iR = (aiXYZ[0]-txyz).xyz0(),
 			tR = (tXYZ-txyz).xyz0(),
-			oR = (oXYZ-txyz).xyz0();
+			oR = (aoXYZ[0]-txyz).xyz0();
 
 	I4	iRr = sqrt(iR.qlen_xyz())/0x100,
 		oRr = sqrt(oR.qlen_xyz())/0x100,
 		tRr = sqrt(tR.qlen_xyz())/0x100;
 
-	oXYZ.xyz_( (oR*tRr)/oRr + txyz );
+	aoXYZ[0].xyz_( (oR*tRr)/oRr + txyz );
 
 	if(bSTDcout){gpdCOUT << "iR   " << iR.pSTR( pbuff ) << "iRr " << iRr << gpdENDL;}
 	if(bSTDcout){gpdCOUT << "tR   " << tR.pSTR( pbuff ) << "tRr " << tRr << gpdENDL;}
 	if(bSTDcout){gpdCOUT << "oR   " << oR.pSTR( pbuff ) << "oRr " << oRr << gpdENDL;}
 	if(bSTDcout){gpdCOUT << "a    " << a.pSTR( pbuff ) << gpdENDL;}
-	if(bSTDcout){gpdCOUT << "oXYZ " << oXYZ.pSTR( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oXYZ " << aoXYZ[0].pSTR( pbuff ) << gpdENDL;}
 	if(bSTDcout){gpdCOUT << "tXYZ " << tXYZ.pSTR( pbuff ) << gpdENDL;}
 	if(bSTDcout){gpdCOUT << gpdENDL;}
 
 
-	iABC.ABC_( F4(  0, 30, 45 )*degX(1) );
+	aiABC[0].ABC_( F4(  0, 30, 45 )*degX(1) );
 	tABC.ABC_( F4( 90, 90, 90 )*degX(1) );
 
-	oABC.ABC_( iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) )/2 + iABC );
+	aoABC[0].ABC_( aiABC[0].mmABC( tABC, degX(180.0/PI), degX(180.0/PI) )/2 + aiABC[0] );
 
 	F4x4	iMX, tMX, oMX;
 	float ab = 0.5;
-	iMX.mxABC(iABC, degX(180.0/PI) );
-	oMX.mxABC(oABC, degX(180.0/PI) );
+	iMX.mxABC(aiABC[0], degX(180.0/PI) );
+	oMX.mxABC(aoABC[0], degX(180.0/PI) );
 	tMX.mxABC(tABC, degX(180.0/PI) );
 	//oMX = iMX.lerp_zyx( tMX, ab );
 
-	if(bSTDcout){gpdCOUT << "iABC   " << (F4(iABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
-	if(bSTDcout){gpdCOUT << "oABC   " << (F4(oABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "iABC   " << (F4(aiABC[0])/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oABC   " << (F4(aoABC[0])/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
 	if(bSTDcout){gpdCOUT << "tABC   " << (F4(tABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
 	if(bSTDcout){gpdCOUT << gpdENDL;}
 
@@ -134,12 +128,12 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	if(bSTDcout){gpdCOUT << "tY   " << tMX.y.pSTRf4( pbuff ) << gpdENDL;}
 	if(bSTDcout){gpdCOUT << "tZ   " << tMX.z.pSTRf4( pbuff ) << gpdENDL << gpdENDL;}
 
-    iABC.ABC_( iMX.eulABC()*degX(180.0/PI) );
+    aiABC[0].ABC_( iMX.eulABC()*degX(180.0/PI) );
     tABC.ABC_( oMX.eulABC()*degX(180.0/PI) );
 	//tABC.ABC_( tMX.eABC()*degX(180.0/PI) );
 
-	if(bSTDcout){gpdCOUT << "iABC   " << (F4(iABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
-	if(bSTDcout){gpdCOUT << "oABC   " << (F4(oABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "iABC   " << (F4(aiABC[0])/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
+	if(bSTDcout){gpdCOUT << "oABC   " << (F4(aoABC[0])/degX(1)).pSTRf4( pbuff ) << gpdENDL;}
 	if(bSTDcout){gpdCOUT << "tABC   " << (F4(tABC)/degX(1)).pSTRf4( pbuff ) << gpdENDL << gpdENDL;}
 
 	tMX.mxABC(tABC, degX(180.0/PI) );
@@ -153,24 +147,7 @@ gpcDrc::gpcDrc( char* pbuff, I4x4 a, I4x4 b, I4x4 c ) {
 	if(bSTDcout){gpdCOUT << gpdENDL;}
 }
 
-gpcROB& gpcROB::operator &= ( const gpcDrc& D )
-{
-	null();
-	HS = COM = -1;
-	return *this;
-}
-gpcROB& gpcROB::operator = ( const gpcDrc& D )
-{
-	null();
-	gpmMcpyOF( aXYZ,	&D.oXYZ.x, 3 );
-	gpmMcpyOF( aABC,	&D.oABC.A, 3 );
-	HS = D.oCTRL.y;
-	if( D.bHS1o() )
-		COM = D.oCTRL.z;
 
-	msS = D.MPosS;
-	return *this;
-}
 
 gpcROB::gpcROB( const gpcDrc& D ) {
 	gpmCLR;
@@ -181,10 +158,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	if( nOUT )
 		return;
 
-	/*if( sGTent[2] == 's' && sGTent[0] == 'b' )
-		return GTslmpBINref( mom, pWIN, pALL );*/
-
-	//, nPAD = gpdZSpad, nPADu2 = nPAD/sizeof(U2);
 	gpcMASS	*pMASS = pWIN->piMASS;
 	gpcGT	*pGTusr = NULL;
 	gpcLZY	*pLZYinp = pMASS->GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
@@ -213,7 +186,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		I4 nSUB = pD0-pSTR;
 		if( pINP->n_load < 18+nSUB )
 		{
-			// nincsen elég adat még
+			/// nincsen elég adat még
 			// az nLEN megállapításához sem
 			pINP = pINP->lzySUB( s = 0, nSUB );
 			return;
@@ -242,8 +215,10 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 
 		nD0 = gpfSTR2U8( gpmMcpy(pL,pD0,6)-2, NULL );
 		pD0 += 6;
-		if( pINP->n_load < 18+nD0+nSUB )
+		if( pINP->n_load < 18+nD0+nSUB ) {
+
 			return; // még nem jött le az egész
+		}
 
 		iCNT++;
 
@@ -272,16 +247,16 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 
 			if( iD0 > 4 ) {
 				iDRC = pROBnD->iDrc();
-				I4x4	befPOS = pROBnD->aDrc[iDRC].iXYZ,
-						befABC = pROBnD->aDrc[iDRC].iABC;
+				I4x4	befPOS = pROBnD->aDrc[iDRC].aiXYZ[0],
+						befABC = pROBnD->aDrc[iDRC].aiABC[0];
 
 				// nem fecsegés, hanem adat
 				pROBnD->aDrc[iDRC] = pROBnD->ioROB();
 				pROBnD->aDrc[iDRC].msSMR2.w = pWIN->mSEC.x;
 
 
-				I4	dPOS = (pROBnD->aDrc[iDRC].iXYZ-befPOS).qlen_xyz(),
-					dABC = befABC.mmABC( pROBnD->aDrc[iDRC].iABC, degX(180.0/PI), degX(180.0/PI) ).w;
+				I4	dPOS = (pROBnD->aDrc[iDRC].aiXYZ[0]-befPOS).qlen_xyz(),
+					dABC = befABC.mmABC( pROBnD->aDrc[iDRC].aiABC[0], degX(180.0/PI), degX(180.0/PI) ).w;
 				if( dPOS+(dABC>=(degX(1)/2)) ) {
 					pANSW += pROBnD->aDrc[iDRC].answINFOX( pANSW, iDRC, 100 );
 					if( sANSW < pANSW ) {
@@ -304,9 +279,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 						}
 					}
 				}
-
-
-
 				pROBnD->stpPULL();
 				if( pROBnD->bPULL() ) // másikat is lehuzzuk
 					pOUT = pROBnD->pull( pOUT, gpaROBwr );
@@ -387,8 +359,8 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	/// Drc judo filter
 	/// ---------------------------------
 	iD0 = pROBnD->stpPUSH( true );
-	I4x4	befPOS = pROBnD->aDrc[iD0].iXYZ,
-			befABC = pROBnD->aDrc[iD0].iABC;
+	I4x4	befPOS = pROBnD->aDrc[iD0].aiXYZ[0],
+			befABC = pROBnD->aDrc[iD0].aiABC[0];
 
 
 	U4x4& JD = pROBnD->aDrc[iD0].JD;
@@ -399,12 +371,11 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 					), // pB-ben a JUDO elötti
 		*pA = (U2*)&(
 						pROBnD->aROBio[iD0*2]
-						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x )
+						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0, this, pROBnD )
+						//= pROBnD->aDrc[iD0].judo_OHNEnew( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0 )
 					); // pA-ban azaz új out lesz
 
-	if( JDy == JD.y )
-	{
-
+	if( JDy == JD.y ) {
 		pOUT = pROBnD->pull( pOUT, gpaROBwr );
 		return;
 	}
@@ -431,7 +402,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	}
 	if( sANSW == pANSW ) {
 
-		I4x4 iXYZ = pROBnD->aDrc[iD0].iXYZ;
+		I4x4 iXYZ = pROBnD->aDrc[iD0].aiXYZ[0];
 		switch( msg )
 		{
 			case 0x04:

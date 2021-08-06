@@ -180,6 +180,7 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 		gpmSDL_FreeSRF( pSRFload );
 
 	/// sudo ln -s "/media/alivemoon/UUI/rob_dir/" /robo
+	/// sudo ln -s "/home/alivemoon/Asztal/Robi" /robo
 
 	/// mkdir /piMASS
 	/// sudo ln -s /home/alivemoon/Asztal/piMASScmplrSLNpi4/mini_ISO_32x32_1024x1536_3.png /piMASS/mini_char.png
@@ -210,9 +211,6 @@ gpcWIN::gpcWIN( char* pPATH, char* pFILE, char* sNAME, gpcMASS* piM )  {
 }
 
 #include <gpsGLSL.h>
-
-//extern const char gpsGLSLfrgREF[];
-//extern const char gpsGLSLfrgLINE[];
 void gpcWIN::winRUN( const char* pWELLCOME ) {
 	U4 scan, bug = 0, nBUG = 0;
 	U1 aXY[] = "00", c = 0;
@@ -246,10 +244,8 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 			|| ((mSEC.x-nJDOIT.z) > gpdJDOIT_tOUT)
 		) {
 
-			for( U1 i = 0; i < 4; i++ )
-			{
-				if( apT[i] )
-				{
+			for( U1 i = 0; i < 4; i++ ) {
+				if( apT[i] ) {
 					aT[i].join();
 					apT[i] = NULL;
 				}
@@ -263,8 +259,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 				pGL->TRG( pSDLrndr, 0, winSIZ.a4x2[0], mSEC.x );
 				gpcPIC* pP; gpcBOB* pB;
 
-				for( U1 i = 0, n; i < 4; i++ )
-				{
+				for( U1 i = 0, n; i < 4; i++ ) {
 					if( i ? !(bSW&(1<<i)) : false )
 						continue;
 
@@ -572,13 +567,10 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 		do { /// EVENTS --------------------------------------------------
 			tout = 0;
 			gpnEVENT++;
-			switch( ev.type )
-			{
+			switch( ev.type ) {
 				case SDL_MOUSEWHEEL: {
-						if( bCTRL )
-						{
-							if( ev.wheel.y )
-							{
+						if( bCTRL ) {
+							if( ev.wheel.y ) {
 								//------------------------------
 								//
 								// 		WHEEL ZOOM
@@ -588,8 +580,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 								apCRS[onDIV.x]->stFRMwh( *this, mag, 0 );
 								nIRQ++;
 								break;
-							}
-							break;
+							} break;
 						}
 						//------------------------------
 						//
@@ -657,16 +648,12 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 			if( c == 'x' )
 				continue;
 
-			if( c )
-			{
+			if( c ) {
 				char *pUTF8 = NULL;
-				switch( c )
-				{
+				switch( c ) {
 					case ' ': {
-							if( bCTRL )
-							{
-								switch( aXY[1] )
-								{
+							if( bCTRL ) {
+								switch( aXY[1] ) {
 									case 'v':
 									case 'V':
 										// paste
@@ -693,9 +680,8 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 										piMASS->SRCsave( (U1*)gpsMASSpath, (U1*)gppMASSfile );
 										*gppKEYbuff = aXY[1] = 0;
 										break;
-									case 'S':
+									case 'S': {
 										// na mencsük ki ami van
-										{
 											char* pFILE = gppMASSfile+sprintf( gppMASSfile, "HTML/" );
 											abALT[0] = 1&aKT[SDL_SCANCODE_LALT];
 											abALT[1] = 1&aKT[SDL_SCANCODE_RALT];
@@ -717,8 +703,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 						} break;
 					// enter tab izé bizé
 					case '/': {
-							switch( aXY[1] )
-							{
+							switch( aXY[1] ) {
 								case 'e':
 								case 'E':
 									*gppKEYbuff = '\v';
@@ -747,8 +732,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 						} break;
 					// cursor nyilak
 					case '_': {
-							switch( aXY[1] )
-							{
+							switch( aXY[1] ) {
 								case 'l':
 								case 'L':
 									*gppKEYbuff = 2;
@@ -851,8 +835,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 						} break;
 					case '=': {
 							// € EURO izé
-							switch( aXY[1] )
-							{
+							switch( aXY[1] ) {
 								case 'C':
 								case 'c':
 										pUTF8 = (char*)"\u20AC";
@@ -872,20 +855,16 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 							nF = aXY[1] >= 'a' ?	((aXY[1]-'a')+10) :
 													aXY[1]-'0';
 							U1 div = nF-1, msk = (0x1<<(div));
-							if( div < 4 )
-							{
-								if( !div )
-								{
+							if( div < 4 ) {
+								if( !div ) {
 									//onDIV.x = 0;
 
-									if( bSHIFT )
-									{
+									if( bSHIFT ) {
 										dstDIV = srcDIV = 0;
 										bSW = 1;
 										div = 4;
 									} else {
-										if( !srcDIV )
-										{
+										if( !srcDIV ) {
 											srcDIV = dstDIV;
 											dstDIV = 0;
 										} else {
@@ -894,27 +873,21 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 										}
 									}
 								}
-								else if( div < 4 )
-								{
-									if( bSHIFT )
-									{
-										if( srcDIV == div )
-										{
+								else if( div < 4 ) {
+									if( bSHIFT ) {
+										if( srcDIV == div ) {
 											srcDIV = dstDIV;
 											dstDIV = 0;
 										}
-										else if( dstDIV == div )
-										{
+										else if( dstDIV == div ) {
 											dstDIV = 0;
 										}
 									}
-									else if( srcDIV == div )
-									{
+									else if( srcDIV == div ) {
 										srcDIV = dstDIV;
 										dstDIV = div;
 									} else {
-										if( bSW&msk)
-										{
+										if( bSW&msk) {
 											dstDIV = srcDIV;
 											srcDIV = div;
 										} else
@@ -924,26 +897,23 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 
 									//U1 msk = (0x1<<(div));
 
-									if( bSW&msk )
-									{
-										if( bSHIFT )
-										{
+									if( bSW&msk ) {
+										if( bSHIFT ) {
 											div = 4;
 											bSW = (bSW&(~msk));
 										}
-									} else {
+									}
+									else {
 										bSW |= msk;
 									}
 								}
 
 								bSW |= 1;
-								if( div < 4 )
-								{
+								if( div < 4 ) {
 									if( !apCRS[div] )
 											apCRS[div] = new gpcCRS( *this, div );
 								}
-								for( U1 i = 0, sw = bSW; i < 4; i++, sw >>= 1 )
-								{
+								for( U1 i = 0, sw = bSW; i < 4; i++, sw >>= 1 ) {
 									if( !(sw&1) )
 										continue;
 
@@ -957,8 +927,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 
 
 
-							switch( nF )
-							{
+							switch( nF ) {
 								case 5:{	/// F5 ----- COPY
 								} break;
 								case 6:{	/// F6 ----- MOVE
@@ -978,9 +947,6 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 								} break;
 
 							}
-
-
-
 						} break;
 					default:
 						gppKEYbuff += sprintf( (char*)gppKEYbuff, "%s", aXY );
@@ -990,11 +956,7 @@ void gpcWIN::winRUN( const char* pWELLCOME ) {
 			}
 		}
 		while( SDL_WaitEventTimeout( &ev, tout ) );
-		//while( SDL_PollEvent( &ev ) );
-
-
 	}
-
 }
 
 

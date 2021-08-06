@@ -616,13 +616,13 @@ int main( int nA, char *apA[] )
 	I4x4 tmp;
 	for( U4 i = 0, e = gpmN(gpaCAGEtst); i < e; i += 2 )
 	{
-		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mmX(1) );
+		tstCAGE.aiXYZ[0].xyz_( gpaCAGEtst[i]*mmX(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mmX(1) );
 		if(bSTDcout){gpdCOUT << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mmX(1)).pSTR( gpsMNpub ) <<gpdENDL;};
 		tmp = tstCAGE.tXYZ.xyz0();
-		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL );
+		tmp = tstCAGE.cageBALL( tmp, gpaCAGEbillBALL, gpnCAGEbillBALL, gpdHEADmmX );
 		if(bSTDcout){gpdCOUT << "tstCAGE.tXYZball:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<gpdENDL;};
-		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX );
+		tmp = tstCAGE.cageBOX( tmp, gpaCAGEbillBOX, gpnCAGEbillBOX, gpdHEADmmX );
 		if(bSTDcout){gpdCOUT << "tstCAGE.tXYZboxx:" << (tmp/mmX(1)).pSTR( gpsMNpub ) <<gpdENDL;};
 	}
 	gpeALF alfFFFFffff = (gpeALF)0xFFFFffff;

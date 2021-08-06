@@ -399,7 +399,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							if( pGT ? pGT->TnID.alf == gpeALF_SLMP : false )
 							{
 								if( pWIN ? pWIN->piMASS : NULL )
-									pOUT = pGT->GTdrcOSrob( pOUT, pA, *(pWIN->piMASS), socket, pWIN->mSEC.x );
+									pOUT = pGT->GTdrcOSrob( pOUT, pA, pWIN->piMASS, socket, pWIN->mSEC.x );
 							} else {
 								pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
 								for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
@@ -410,24 +410,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 								}
 							}
 						} break;
-					/*case gpeALF_SLMPo:{
-							U1* pA;
-							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
-							gpcGT* pGT = pALL->GT( sockSLMP );
-							if( pGT ? pGT->TnID.alf == gpeALF_SLMP : false )
-							{
-								if( pWIN ? pWIN->piMASS : NULL )
-									pOUT = pGT->GTdrcOSzs( pOUT, pA, *(pWIN->piMASS), socket, pWIN->mSEC.x );
-							} else {
-								pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
-								for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
-								{
-									if( !pALL->ppGTalloc[i] )
-										continue;
-									pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
-								}
-							}
-						} break;*/
+
 					case gpeALF_ACCOUNT:
 						// én vagyok a KLIENS,
 						// a SERVER megkér, hogy azonosítsam magam

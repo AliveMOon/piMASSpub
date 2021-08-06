@@ -1,0 +1,22 @@
+
+
+ BILL HS123:000000 E:152ms AVG:735ms
+ POS:  n:0
+	iXYZ  -18.19mm, -449.07mm,  318.42mm 
+	cXYZ  -18.19mm, -449.07mm,  318.42mm 
+	oXYZ  -18.19mm, -449.07mm,  318.42mm 
+	tXYZ  -18.19mm, -449.07mm,  318.42mm 
+	SMR2   8517.45s,   68387.70s,   8517.44s,    406.44s;
+	DIFF  59870.25s,       0.00s,  59870.25s,  67981.26s;
+ DIR:  n:0
+	iABC -177.13dg,   -2.72dg,   32.50dg 
+	oABC -177.13dg,   -2.72dg,   32.50dg 
+	tABC -177.13dg,   -2.72dg,   32.50dg;
+ pos:
+	ixyz  -14.02mm, -427.47mm,    0.00mm 
+	oxyz    0.00mm,    0.00mm,    0.00mm 
+	txyz    0.00mm,    0.00mm,    0.00mm;
+ ok:
+	okXYZ  -18.19mm, -449.07mm,  318.42mm 
+	okabc -177.13dg,   -2.72dg,   32.50dg 
+	okxyz    0.00mm,    0.00mm,    0.00mm;
