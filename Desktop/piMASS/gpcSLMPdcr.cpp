@@ -154,7 +154,7 @@ gpcROB& gpcROB::operator = ( const gpcDrc& D ) {
 	aXYZ11[0] = D.aoXYZ[2].x; aXYZ11[1] = D.aoXYZ[2].y; aXYZ11[2] = D.aoXYZ[2].z;
 	aABC11[0] = D.aoABC[2].A; aABC11[1] = D.aoABC[2].B; aABC11[2] = D.aoABC[2].C;
 
-	inARY = D.oADRin.u4;
+	inARY = D.oARY.u4;
 
 	*pHS() = D.oCTRL.y;
 	if( D.bHS1o() )
@@ -178,7 +178,7 @@ gpcDrc& gpcDrc::operator = ( gpcROB& rob ) {
 	aiXYZ[1].x = rob.aXYZ00[1]; aiXYZ[1].y = rob.aXYZ00[1]; aiXYZ[1].z = rob.aXYZ00[2];
 	aiABC[1].A = rob.aABC00[1]; aiABC[1].B = rob.aABC00[1]; aiABC[1].C = rob.aABC00[2];
 
-	iADRin.u4 = rob.inARY;
+	iARY.u4 = rob.inARY;
 
 	iCTRL.y = (U4)*(rob.pHS());
 	iCTRL.z = (U4)*(rob.pCOM());

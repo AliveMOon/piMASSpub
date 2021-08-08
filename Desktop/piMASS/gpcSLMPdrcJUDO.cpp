@@ -23,7 +23,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 				if( bHS2i() ) {
 					/// PULLING még nem vette az adást
 					oHS2o();
-					oADRin = 0;
+					//oARY = 0;
 					JD.y = 4;
 					return *this;
 				}
@@ -51,7 +51,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 							okXYZ.xyz_(aoXYZ[0]);
 							okABC.ABC_(aoABC[0]);
 							okxyz.xyz_(txyz);
-							oADRin = 0;
+							oARY = 0;
 							break;
 						case 9115:	// a J5 túl erös akart lenni
 							JD.z = 0;
@@ -91,11 +91,13 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 				JD.y = 3;
 			} return *this;
 		case 2: { /// 2.HS1o elvesz
-				if( oADRin.i < oADRin.n ) {
+				if( oARY.i < oARY.n ) {
 					if( !bHS1i() ) {
 						/// ROBi HS1dw
 						/// STEP
-						oADRin.i+=4;
+						oARY.i+=4;
+						if( oARY.i == iARY.i )
+							oARY.i = iARY.i; /// ez nsdsyem komoly csak DEBUG
 						JD.y = 1;
 						/// PI HS1up
 						oHS1o();
@@ -104,11 +106,11 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 						JD.y = 2;
 						xHS1o();
 					}
-					if( oADRin.n )
+					if( oARY.n )
 					for( U2 stp = 0; stp <= 3; stp++ ) {
-						pSTP = lstSTP.pI4x4( (oADRin.i+stp)*3 );
+						pSTP = lstSTP.pI4x4( (oARY.i+stp)*3 );
 						if( !pSTP ) {
-							oADRin.n = oADRin.i+(stp-1);
+							oARY.n = oARY.i+(stp-1);
 							break;
 						}
 						aoXYZ[stp].xyz_(pSTP[0]);
@@ -122,7 +124,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 			} return *this;
 		case 1: { /// 1.HS1o kintvan // HS1i?
 				/// 0 már benne van a aXYZ-ben
-				if( !oADRin.n ) {
+				if( !oARY.n ) {
 					if( bHS1i() ) {
 						/// ROBi HS1up
 						/// END
@@ -131,12 +133,14 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 						return *this;
 					}
 				}
-				else if( oADRin.i < oADRin.n ) {
+				else if( oARY.i < oARY.n ) {
 					/// csomagolt küldés
 					if( bHS1i() ) {
 						/// ROBi HS1up
 						/// STEP
-						oADRin.i+=4;
+						oARY.i+=4;
+						if( oARY.i == iARY.i )
+							oARY.i = iARY.i; /// ez nem komoly csak DEBUG
 						JD.y = 2;
 						/// PI HS1dw
 						xHS1o();
@@ -145,11 +149,11 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 						JD.y = 1;
 						oHS1o();
 					}
-					if( oADRin.n )
+					if( oARY.n )
 					for( U2 stp = 0; stp <= 3; stp++ ) {
-						pSTP = lstSTP.pI4x4( (oADRin.i+stp)*3 );
+						pSTP = lstSTP.pI4x4( (oARY.i+stp)*3 );
 						if( !pSTP ) {
-							oADRin.n = oADRin.i+(stp-1);
+							oARY.n = oARY.i+(stp-1);
 							break;
 						}
 						aoXYZ[stp].xyz_(pSTP[0]);
@@ -267,19 +271,19 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 		///		lstSTP TRG1
 		/// --------------------------
 		pSTP = lstSTP.pI4x4n( 0 );
-		if( !oADRin.n ) {
+		if( !oARY.n ) {
 			pSTP[0] = tXYZ;
 			pSTP[1] = tABC;
 			pSTP[2] = txyz;
 		}
 
-		for( U2 stp = 0; stp <= oADRin.n; stp++ ) {
+		for( U2 stp = 0; stp <= oARY.n; stp++ ) {
 			/// --------------------------
 			///		lstSTP START
 			/// --------------------------
 			pSTP = lstSTP.pI4x4( stp*3 );
 			if( !pSTP ) {
-				oADRin.n = stp-1;
+				oARY.n = stp-1;
 				break;
 			}
 			cXYZ.xyz_(pSTP[0]);
@@ -318,7 +322,7 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 			/// --------------------------
 			///		lstSTP mandiner		+1
 			/// --------------------------
-			oADRin.n++;
+			oARY.n++;
 			stp++;
 
 			pSTP = lstSTP.pI4x4nINS( stp*3, 1*3 );
@@ -357,10 +361,10 @@ gpcDrc& gpcDrc::judo( gpcROB& iROB, U4 mSEC, U4 iD0, gpcGT* pGT, gpcROBnD *pROBn
 	/// --------------------------
 	pSTP = lstSTP.pI4x4( 0 );
 	if( pSTP )
-	for( U2 stp = 0, n = gpmMIN(stp+3, oADRin.n); stp <= oADRin.n; stp++ ) {
+	for( U2 stp = 0, n = gpmMIN(3, oARY.n); stp <= n; stp++ ) {
 		pSTP = lstSTP.pI4x4( stp*3 );
 		if( !pSTP ) {
-			oADRin.n = stp-1;
+			oARY.n = stp-1;
 			break;
 		}
 

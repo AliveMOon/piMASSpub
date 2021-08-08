@@ -185,8 +185,8 @@ public:
 			tabc, oabc, iabc;
 			//aoAX1to6[2], aiAX1to6[2],
 			//aoax1to6[2], aiax1to6[2];
-	I2x2	iADRin,
-			oADRin;
+	I2x2	iARY,
+			oARY;
 	U4x4	oCTRL, iCTRL, JD;	// JD.z error num
 	I4x4	okXYZ, okABC, okxyz,
 			tGRP, oGRP, iGRP,

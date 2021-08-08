@@ -413,7 +413,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 	/// ----------------------------
 	switch( jdALF ) {
 		case gpeALF_PAINT: {
-				if( oADRin.n )
+				if( oARY.n > oARY.i )
 					return true;
 				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y ), *pSTP;
 				U4 i = 0, n = jdPRG.z-jdPRG.y;
@@ -447,7 +447,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 					pSTP[1] = tABC;
 
 					pSTP[2].z -= mmX(500);
-					oADRin.n = i;
+					oARY.n = i;
 					if( !i ) {
 						tXYZ.xyz_( pSTP[0] );
 						tABC.xyz_( pSTP[1] );
@@ -458,10 +458,10 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 					if( tXYZ.z <= pSTP[0].z )
 						break;
 				}
-				oADRin.i = 0;
-				if( !oADRin.n )
+				oARY.i = 0;
+				if( !oARY.n )
 					break;
-				jdPRG.y += oADRin.n;
+				jdPRG.y += oARY.n;
 			} break;
 		case gpeALF_SHLD:
 		case gpeALF_SNAIL: { 							/// jdPRG.x ACT, //.y iCNT //.z nEND //.w width
