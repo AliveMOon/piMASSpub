@@ -752,6 +752,9 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 	bool bNEWip = (*s_ip == '!');
 	U8 s;
+	///---------------------------------
+	///			CONNECT?
+	///---------------------------------
 	if( bNEWip || bGTdie() ) {
         switch( msGTdie ) {
 			case 1:
@@ -880,6 +883,9 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 	char	*p_err = (char*)pWIN->sGTpub;
 			*pWIN->sGTpub = 0;
 
+	///---------------------------------
+	///			RECEIVE
+	///---------------------------------
 	if( aGTfd[gpeFDrcv].isFD( socket ) ) {
 		p_err = GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 		if( *p_err )
@@ -912,6 +918,9 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 		}
 	}
 
+	///---------------------------------
+	///			DRCrob
+	///---------------------------------
 	switch( TnID.alf ) {
 		case gpeALF_SLMP:
 			GTslmpDrcRob( *this, pWIN, pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL );

@@ -30,13 +30,14 @@ gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pT
 
 	return p_out;
 }
-U8 gpcGT::GTout( gpcWIN* pWIN )
+size_t gpcGT::GTout( gpcWIN* pWIN )
 {
 	if( !this )
 		return 0;
-
-	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
-	if( nOUT || TnID.alf == gpeALF_SLMP )
+	size_t nOUT = pOUT->nLD();
+	U8	//nOUT = pOUT ? pOUT->n_load : 0,
+		s; //, nC = 0;
+	if( nOUT || (TnID.alf == gpeALF_SLMP) )
 		return nOUT;
 
 	// üres a pOUT töltsünk bele valamit
@@ -47,7 +48,7 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 	{
 		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
 		msSYNwin = pWIN->msSYN;
-		nOUT = pOUT ? pOUT->n_load : 0;
+		nOUT = pOUT->nLD(); //pOUT ? pOUT->n_load : 0;
 		if( nOUT )
 			nMISo = gpdHUDn;
 	}
@@ -73,10 +74,10 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 			pMISo->lzyINS( NULL, 0, s = 0, nMISo );
 		}
 	}
-	if( gpmLZYload(pOUT, U1) )
-		return pOUT ? pOUT->n_load : 0;
+	if( nOUT = pOUT->nLD() ) //gpmLZYload(pOUT, U1) )
+		return nOUT; //pOUT ? pOUT->n_load : 0;
 
-	if( !gpmLZYload(pPUBgt, U1) )
+	if( !pPUBgt->nLD() ) // gpmLZYload(pPUBgt, U1) )
 		return 0;
 
 	gpmDEL( pOUT );
@@ -87,7 +88,7 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 		if( pINP )
 			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 	}
-	return pOUT ? pOUT->n_load : 0;
+	return pOUT->nLD(); //pOUT ? pOUT->n_load : 0;
 }
 void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 {

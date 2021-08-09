@@ -965,7 +965,7 @@ class gpcGT {
 		void	GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );
 
-		U8 GTout( gpcWIN* pWIN );
+		size_t GTout( gpcWIN* pWIN );
 
 	protected:
 

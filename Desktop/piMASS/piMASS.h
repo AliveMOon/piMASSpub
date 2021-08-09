@@ -6721,6 +6721,8 @@ szasz:
 		U8 s=-1;
 		return pLZY->lzyADD( aU, nU, s );
 	}
+
+	U1* pU1() { return this ? (n_load ? p_alloc : NULL) : NULL; }
 	U1* pU1n( int i = 0, int n = 1 ) {
 		if( !this )
 			return NULL;

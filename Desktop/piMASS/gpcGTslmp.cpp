@@ -154,10 +154,11 @@ gpcROB::gpcROB( const gpcDrc& D ) {
 	*this = D;
 }
 void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
-	U8 nOUT = GTout( pWIN ), s;
+	size_t nOUT = GTout( pWIN );
 	if( nOUT )
 		return;
 
+	U8 s;
 	gpcMASS	*pMASS = pWIN->piMASS;
 	gpcGT	*pGTusr = NULL;
 	gpcLZY	*pLZYinp = pMASS->GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ),
@@ -172,20 +173,17 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	char sANSW[0x100], *pANSW = sANSW, sCOM[] = "ABCD";
 
 	U4 nSOCK, nD0 = 0, iD0 = 0, eD0, iDRC;
-	U1* pSTR = pINP ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
-	if( pSTR )
-	{
+	U1* pSTR = pINP->pU1(); // ? ( pINP->n_load ? pINP->p_alloc : NULL ) : NULL;
+	if( pSTR ) {
 		U1	*pD0 = (U1*)gpmSTRiSTR( (char*)pSTR, "d000" );
-		if( pD0 < pSTR )
-		{
+		if( pD0 < pSTR ) {
 			// nincs D000
 			// valami zöldségnek kell lenie
 			gpmDEL(pINP);
 			return;
 		}
 		I4 nSUB = pD0-pSTR;
-		if( pINP->n_load < 18+nSUB )
-		{
+		if( pINP->n_load < 18+nSUB ) {
 			/// nincsen elég adat még
 			// az nLEN megállapításához sem
 			pINP = pINP->lzySUB( s = 0, nSUB );
@@ -215,19 +213,16 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 
 		nD0 = gpfSTR2U8( gpmMcpy(pL,pD0,6)-2, NULL );
 		pD0 += 6;
-		if( pINP->n_load < 18+nD0+nSUB ) {
-
+		if( pINP->nLD() < 18+nD0+nSUB ) {
 			return; // még nem jött le az egész
 		}
 
 		iCNT++;
 
-		if( !pU2inp )
-		{
+		if( !pU2inp ) {
 			pLZYinp->lzyINS( NULL, sizeof(gpcROBnD), s=0, sizeof(gpcROBnD) );
 			pROBnD = gpmLZYvali( gpcROBnD, pLZYinp );
 			pROBnD->reset( 0 );
-
 			pU2inp = pROBnD->pU2inp();
 		}
 
@@ -253,7 +248,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 				// nem fecsegés, hanem adat
 				pROBnD->aDrc[iDRC] = pROBnD->ioROB();
 				pROBnD->aDrc[iDRC].msSMR2.w = pWIN->mSEC.x;
-
 
 				I4	dPOS = (pROBnD->aDrc[iDRC].aiXYZ[0]-befPOS).qlen_xyz(),
 					dABC = befABC.mmABC( pROBnD->aDrc[iDRC].aiABC[0], degX(180.0/PI), degX(180.0/PI) ).w;
@@ -290,15 +284,13 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			if( pALL ) {
 				/// üzenet a felhasználóknak
 				pSOCK = gpmLZYvali( SOCKET, pLZYusr );
-				if( !pSOCK )
-				{
+				if( !pSOCK ) {
 					pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 					pSOCK = gpmLZYvali( SOCKET, pLZYusr );
 					nSOCK = gpmLZYload( pLZYusr, SOCKET );
 				}
 
-				for( U4 iS = 0; iS < nSOCK; iS++ )
-				{
+				for( U4 iS = 0; iS < nSOCK; iS++ ) {
 					pGTusr = pALL->GT( pSOCK[iS] );
 					if( pGTusr->bGTdie() )
 						continue;
@@ -307,8 +299,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 				}
 			}
 
-			switch( pROBnD->ioSW.aU2[0] )
-			{
+			switch( pROBnD->ioSW.aU2[0] ) {
 				case 0x4031:
 					// nyugta?
 					pOUT = pROBnD->pull( pOUT, gpaROBwr );
@@ -339,16 +330,15 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		pU2inp = pROBnD->pU2inp();
 	}
 
-	if( pROBnD->bWAIT() )
-	{
+	if( pROBnD->bWAIT() ) {
 		if( pROBnD ? pROBnD->pc.x > 10 : false )
 			pOUT = pROBnD->pull( pOUT, gpaROBwr );
 		return;
 	}
 
 	iCNT++;
-	if( pROBnD->bPULL() ) // lekérdeztünk mindenkit?
-	{
+	if( pROBnD->bPULL() ) {
+		// lekérdeztünk mindenkit?
 		nSYNsum = nSYNdo;
 		pOUT = pROBnD->pull( pOUT, gpaROBwr );
 		return;
@@ -362,7 +352,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 	I4x4	befPOS = pROBnD->aDrc[iD0].aiXYZ[0],
 			befABC = pROBnD->aDrc[iD0].aiABC[0];
 
-
 	U4x4& JD = pROBnD->aDrc[iD0].JD;
 	U4 JDy = JD.y;
 	U2	*pB = (U2*)&(
@@ -372,7 +361,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		*pA = (U2*)&(
 						pROBnD->aROBio[iD0*2]
 						= pROBnD->aDrc[iD0].judo( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0, this, pROBnD )
-						//= pROBnD->aDrc[iD0].judo_OHNEnew( pROBnD->aROBio[iD0*2+1], pWIN->mSEC.x, iD0 )
 					); // pA-ban azaz új out lesz
 
 	if( JDy == JD.y ) {
@@ -380,11 +368,9 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		return;
 	}
 
-
 	U4& comA = *(U4*)sCOM, msg = JDy+JD.y*0x10;
 	comA = pROBnD->aDrc[iD0].NMnDIF.au4x2[0].x;
-	switch( msg )
-	{
+	switch( msg ) {
 		case 0x04:
 		case 0x10:
 		case 0x11:
@@ -397,14 +383,11 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			pANSW += pROBnD->aDrc[iD0].answINFOX( pANSW, iD0, 100 );
 			break;
 		default:
-
 			break;
 	}
 	if( sANSW == pANSW ) {
-
 		I4x4 iXYZ = pROBnD->aDrc[iD0].aiXYZ[0];
-		switch( msg )
-		{
+		switch( msg ) {
 			case 0x04:
 				pANSW += sprintf( pANSW, "%s %0.2x END HS2i off! HS2o off!", sCOM, msg  );
 				break;
@@ -438,7 +421,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			case 0x44:
 				pANSW += sprintf( pANSW, "%s %0.2x Wait! HS2i off?", sCOM, msg  );
 				break;
-
 		}
 	}
 
@@ -467,22 +449,18 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		nU2 = gpaROBwr[0].y,
 		offU2= gpaROBwr[iD0].x-gpaROBwr[0].x; //iD0].y;
 	iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2 );
-	if( iU2 >= nU2 )
-	{
+	if( iU2 >= nU2 ) {
 		// nem volt különbség
 		pOUT = pROBnD->pull( pOUT, gpaROBwr );
 		return;
 	}
-
-
 
 	// talált különbséget
 	// beállítjuk a pROBnD->ioSW,
 	// hogy ezt kérdezze legközelebb
 	U4 i_cpy = iU2, n_cpy, nGD;
 	if( i_cpy ) {
-		if( n_cpy = nU2-i_cpy )
-		{
+		if( n_cpy = nU2-i_cpy ) {
 			// \n send dadogjon
 
 			//		               +------- Len: 0x28 = 32+8 = 40 --------+
@@ -504,8 +482,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		if( iU2 > nU2 )
 			iU2 = nU2;
 		else {
-			while( iU2 < nU2 )
-			{
+			while( iU2 < nU2 ) {
 				nGD = gpmMcmpOF( pB+iU2, pA+iU2, nU2-iU2 );
 				if( nGD > 8 )
 					break;
@@ -515,8 +492,7 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 				iU2 = nU2;
 		}
 
-		if( n_cpy = iU2-i_cpy )
-		{
+		if( n_cpy = iU2-i_cpy ) {
 			//iU2 += n_cpy;
 			if( iU2 > nU2 )
 				iU2 = nU2;
@@ -534,16 +510,13 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 			pOUT->lzyINS( NULL, 4*n_cpy, s = -1, -1 );
 			for(  ; i_cpy < iU2; i_cpy++ )
 				s += sprintf( (char*)pOUT->p_alloc+s, "%0.4X", pA[i_cpy] );
-			//break;
 			if( iU2 >= nU2 )
 				break;
 		}
-
 		iU2 += gpmMcmpOF( pB+iU2, pA+iU2, nU2-iU2);
 	}
 
-	if( !pOUT->nLD() )
-	{
+	if( !pOUT->nLD() ) {
 		pOUT = pROBnD->pull( pOUT, gpaROBwr );
 		return;
 	}
@@ -554,9 +527,6 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 		return;
 
 	pROBnD->ioSW.y |= 1;
-	//sGTent[2] = 's';
-	//sGTent[0] = '\n';
-	return;
 }
 
 

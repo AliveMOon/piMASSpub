@@ -333,6 +333,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 				jdALF = gpeALF_null;
 				tXYZ.xyz_(jd0XYZ);
 				tABC.ABC_(jd0ABC);
+				txyz.xyz_(jd0xyz);
 				break;
 		}
 		if( !jdALF ) {
