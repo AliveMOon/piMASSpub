@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/idMAIN"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!--android:background="@drawable/grandpacelogoland"-->
+
+
+
+    <ImageView
+        android:id="@+id/idIV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/ize" />
+
+
+    <EditText
+        android:id="@+id/inIPport"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/inIPadr"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="-2dp"
+        android:layout_marginEnd="20dp"
+        android:layout_toEndOf="@+id/inIPadr"
+        android:ems="10"
+        android:inputType="number"
+        android:text="6001" />
+
+    <EditText
+        android:id="@+id/inIPadr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/idLeftEye"
+        android:ems="10"
+        android:hint="Enter address"
+        android:inputType="textShortMessage"
+        android:text="192.168.137.1" />
+
+    <EditText
+        android:id="@+id/edt_send_message"
+        android:layout_width="259dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toStartOf="@+id/btn_send"
+        android:layout_toEndOf="@+id/idLeftEye"
+        android:layout_weight="0"
+        android:hint="Enter message"
+        android:inputType="textShortMessage"
+        android:text="@string/app_eye"
+        android:textColor="@android:color/background_dark"
+
+        />
+
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="2dp"
+            android:text="Send" />
+
+    <TextView
+        android:id="@+id/tv_reply_from_server"
+        android:layout_width="355dp"
+        android:layout_height="220dp"
+        android:layout_above="@+id/btn_send"
+        android:layout_below="@+id/inIPadr"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="-2dp"
+        android:layout_toEndOf="@+id/idLeftEye"
+        android:text="TextView"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="10sp" />
+
+
+
+    <LinearLayout
+        android:id="@+id/idLeftEye"
+        android:layout_width="325dp"
+        android:layout_height="match_parent"
+        android:gravity="top"
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+
+</RelativeLayout>

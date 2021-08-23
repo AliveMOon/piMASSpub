@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/idMAIN"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/grandpacelogo">
+
+    <ImageView
+        android:id="@+id/idIV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/grandpacelogoland" />
+
+    <TableRow
+        android:id="@+id/tr_send_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/inIPadr"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/edt_send_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/tr_send_message"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:hint="Enter message"
+            android:inputType="text"
+            android:text="gatelist"
+            android:textColor="@android:color/background_dark" />
+
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="Send" />
+    </TableRow>
+
+    <TextView
+        android:id="@+id/tv_reply_from_server"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tr_send_message"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="78dp"
+        android:text="TextView"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="10sp" />
+
+
+    <EditText
+        android:id="@+id/inIPadr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="textShortMessage"
+        android:text="192.168.0.157" />
+
+    <EditText
+        android:id="@+id/inIPport"
+        android:layout_width="87dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/inIPadr"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="53dp"
+        android:layout_toEndOf="@+id/inIPadr"
+        android:ems="10"
+        android:inputType="number"
+        android:text="6000" />
+
+
+
+
+</RelativeLayout>

@@ -95,7 +95,7 @@ wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?came
   john
        = d0.mini;
 
-  slmp = "192.168.1.90 10000";
+//  slmp = "192.168.1.90 10000";
   f = fps;
   again = 0x5;
 
