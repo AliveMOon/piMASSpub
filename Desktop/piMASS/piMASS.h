@@ -6525,7 +6525,7 @@ public:
 		return this;
 	}
 
-	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub, U1 n = 0 ) {
+	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub = 0, U1 n = 0 ) {
 		if( !this )
 			return lzyADD( p_u1, n_u1, iSTRT, n );
 		lzy_exp( iSTRT, n_sub,  n_u1, n );

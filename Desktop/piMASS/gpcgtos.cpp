@@ -485,13 +485,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					case gpeALF_HELP:
 						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", gpmGTent );
 						break;
-					case gpeALF_EYE: {
-							isEVNT.null();
-							isEVNT.id = gpeNET4_0EYE;
-							isEVNT.n = TnID.num;
-							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzyFRMT(s = -1, "%s event", gpmGTent ); //(sGTent[0]?(char*)sGTent:"\r\n") );
-						} break;
+
 
 
 
@@ -549,9 +543,82 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							sprintf( s_atrib, "0x%x>", iCNT );
 							pMISo = pWIN->putDBG( pMISo, gpeNET4_0LST, an, s_atrib );
 						} break;
+					/*case gpeALF_EYE: {
+							isEVNT.null();
+							isEVNT.id = gpeNET4_0EYE;
+							isEVNT.n = TnID.num;
+							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
+							pOUT = pOUT->lzyFRMT(s = -1, "%s event", gpmGTent ); //(sGTent[0]?(char*)sGTent:"\r\n") );
+						} break;*/
+					case gpeALF_EYE: {
+							U4 	nO = pOUT ? pOUT->n_load : 0,
+								iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
+
+							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC ) )
+                            if( pMISo ? (pMISo->n_load < pPIC->nPKavg) : true )
+							{
+								if( !pPIC->pPACK ) {
+									SDL_Surface *pSRF = NULL;
+									if( !pPIC->pSRF ) {
+										pPIC->pSRF = pPIC->pPICrtxSRF();
+
+									}
+									if( pSRF = pPIC->pSRF ) {
+										if( pPIC->pFILE < pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE;
+										if( !*pPIC->pFILE ) {
+											if( pPIC->pFILE <= pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE+sprintf( (char*)pPIC->sFILE, "/mnt/ram/" );
+											pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
+										}
+
+										if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
+											IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
+
+										//gpmDEL( pPIC->pPACK );
+
+										U8 strt = -1;
+										pPIC->pPACK = pPIC->pPACK->lzyRD( "/mnt/ram/tmp.tmp", strt = -1 );
+										U4x2 hd( gpeNET4_0EYE, pPIC->pPACK->nLD() );
+										pPIC->pPACK = pPIC->pPACK->lzyINS( (U1*)&hd, sizeof(hd), strt );
+
+										pPIC->nPKavg += pPIC->pPACK->nLD();
+										pPIC->nPKavg /= 2;
+										//SDL_FreeSurface(pSURF);
+										if( gpfACE( (char*)pPIC->sFILE, 4) > -1 )
+											rename( (char*)pPIC->sFILE, "/mnt/ram/bg.kill" );
+
+										rename( "/mnt/ram/tmp.tmp", (char*)pPIC->sFILE );
+
+										if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+											remove( "/mnt/ram/bg.kill" );
+
+									}
+								}
+
+								if( pPIC->pPACK ) {
+									pOUT = pOUT->lzyPLUS( pPIC->pPACK, s = -1 );
+									gpmDEL(pPIC->pPACK);
+								}
+								/*if( pPIC->pPACK->n_load > 0x400 )
+									pMISo = pMISo->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+								else
+									pOUT = pOUT->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+								*/
+							}
+
+							if( nO < (pOUT ? pOUT->n_load : 0) )
+								nOUT = pOUT->n_load;
+
+							nSKIP = p_next-p_row;
+							if( nSKIP )
+							{
+								((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+								pSKIP = (U1*)s_atrib;
+							}
+
+						} break;
 					case gpeALF_PIC: {
-
-
 							U4 	nO = pOUT ? pOUT->n_load : 0,
 								iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
 
@@ -559,35 +626,32 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC-1 ) )
                             if( pMISo ? (pMISo->n_load < pPIC->nPKavg) : true )
 							{
-								if( !pPIC->pPACK )
-								if( SDL_Surface *pSRF = pPIC->pSRF )
-								{
-									if( pPIC->pFILE < pPIC->sFILE )
-											pPIC->pFILE = pPIC->sFILE;
-									if( !*pPIC->pFILE )
-									{
-										if( pPIC->pFILE <= pPIC->sFILE )
-											pPIC->pFILE = pPIC->sFILE+sprintf( (char*)pPIC->sFILE, "/mnt/ram/" );
-										pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
-									}
+								if( !pPIC->pPACK ) {
 
-									if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
-										IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
+									if( SDL_Surface *pSRF = pPIC->pSRF ) {
+										if( pPIC->pFILE < pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE;
+										if( !*pPIC->pFILE ) {
+											if( pPIC->pFILE <= pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE+sprintf( (char*)pPIC->sFILE, "/mnt/ram/" );
+											pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
+										}
 
-									//gpmDEL( pPIC->pPACK );
-									pPIC->pPACK = ((gpcLZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
-									pPIC->nPKavg += pPIC->pPACK->n_load;
-									pPIC->nPKavg /= 2;
-									//SDL_FreeSurface(pSURF);
-									if( gpfACE( (char*)pPIC->sFILE, 4) > -1 )
-									{
-										rename( (char*)pPIC->sFILE, "/mnt/ram/bg.kill" );
-									}
-									rename( "/mnt/ram/tmp.tmp", (char*)pPIC->sFILE );
+										if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
+											IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
 
-									if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
-									{
-										remove( "/mnt/ram/bg.kill" );
+										//gpmDEL( pPIC->pPACK );
+										pPIC->pPACK = ((gpcLZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
+										pPIC->nPKavg += pPIC->pPACK->n_load;
+										pPIC->nPKavg /= 2;
+										//SDL_FreeSurface(pSURF);
+										if( gpfACE( (char*)pPIC->sFILE, 4) > -1 )
+											rename( (char*)pPIC->sFILE, "/mnt/ram/bg.kill" );
+
+										rename( "/mnt/ram/tmp.tmp", (char*)pPIC->sFILE );
+
+										if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+											remove( "/mnt/ram/bg.kill" );
 
 									}
 								}

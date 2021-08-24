@@ -415,12 +415,14 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		case gpeALF_TELNET: {								cID = gpeCsz_L; if( bCID ) break;
 			I4 port = *(U4*)pU1;
 			if( port < 1 ) break;
+
 			pGT = pMASS->GTacpt.GT( obj.AN.alf, port );
 			if( !pGT ) break;
 			#ifdef stdON
 			if(bSTDcout){gpdCOUT << stdALU " TNET" << gpdENDL;}
 			#endif
-			pGT->GTlst( pWIN, pMASS->GTcnct );
+			for( U1 i = 0; i < 4; i++ )
+				pGT->GTlst( pWIN, pMASS->GTcnct );
 		} break;
 		case gpeALF_GSM: {									cID = gpeCsz_b; if( bCID ) break;
             pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
