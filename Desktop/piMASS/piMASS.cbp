@@ -246,6 +246,7 @@
 		<Unit filename="gpcGL.cpp" />
 		<Unit filename="gpcGLobj.cpp" />
 		<Unit filename="gpcGSM.cpp" />
+		<Unit filename="gpcGThtml.cpp" />
 		<Unit filename="gpcGTslmp.cpp" />
 		<Unit filename="gpcI4x2.cpp" />
 		<Unit filename="gpcI4x4.cpp" />

@@ -73,7 +73,21 @@
 #define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 
+#define gpdFRMThtml_D 	"<!DOCTYPE html>\r\n"\
+						"<html>\r\n"\
+						"<head></head>\r\n"\
+						"<body>\r\n"\
+						"<h1>%d</h1>\r\n"\
+						"</body>\r\n"\
+						"</html>\r\n\r\n\0"
 
+#define gpdFRMThtml_S 	"<!DOCTYPE html>\r\n"\
+						"<html>\r\n"\
+						"<head></head>\r\n"\
+						"<body>\r\n"\
+						"<h1>%s</h1>\r\n"\
+						"</body>\r\n"\
+						"</html>\r\n\r\n"
 
 //------------------------
 // 			HEAD
@@ -847,7 +861,7 @@ class gpcGT {
 		char	s_ip[0x400],
 				s_telnet[80*25+4];
 
-		U1		sGTent[4],
+		U1		sGTent[8],
 				sHOST[0x100],
 				sUSER[0x100],
 				sFILE[0x100],
@@ -876,7 +890,8 @@ class gpcGT {
         bool GTprmpt( bool bENT = true  ) {
 			if( this ? sGTent[0] : true )
 				return false;
-
+			if( pOUT ? pOUT->qCLOSE() : false )
+				return false;
 			U8 s = -1;
 			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
 			return true;
@@ -966,6 +981,8 @@ class gpcGT {
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );
 
 		size_t GTout( gpcWIN* pWIN );
+
+		gpcLZY*	GThtmlOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, char* pGET, char* pHOST );
 
 	protected:
 
