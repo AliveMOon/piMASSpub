@@ -982,7 +982,7 @@ class gpcGT {
 
 		size_t GTout( gpcWIN* pWIN );
 
-		gpcLZY*	GThtmlOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, char* pGET, char* pHOST );
+		gpcLZY*	GThtmlOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, void* pGET, void* pHOST );
 
 	protected:
 
