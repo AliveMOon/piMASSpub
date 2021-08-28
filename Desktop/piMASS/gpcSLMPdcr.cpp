@@ -446,10 +446,11 @@ void drc_trd( char* pBUFF ) {
 		return;
 	char	sBUFF[0x100], *pB = pBUFF;
 	pB += gpmNINCS(pB, "\" \t");
-	U8 nLEN, n;
+	U8 //nLEN,
+		n;
 	while( *pB ) {
 		pB += gpmNINCS(pB, "\r\n");
-		n = gpmVAN(pB, "\r\n", nLEN );
+		n = gpmVAN(pB, "\r\n", NULL ); //, nLEN );
 		gpmMcpy( sBUFF, pB, n )[n] = 0;
 		pB += n;
 		int o = system( sBUFF );
@@ -492,7 +493,7 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 
 			pP = pB = pXS;
 			while( *pC ) {
-				n = gpmVAN( pC, "%&!", nLEN );
+				n = gpmVAN( pC, "%&!", NULL ); //, nLEN );
 				gpmMcpy( pB, pC, n );
 				pC += n;
 				pB += n;

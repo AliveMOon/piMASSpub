@@ -316,7 +316,8 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		// 1 0x0003 29 xyr: 131, 471, 30
 		I4 ix, dist, nCNL = 0, i; I8 id;
 		if( obj.bUTF8() ) {
-			U1* pS = pU1+1, *pSe = pS+gpmVAN( pS, "\"", nLEN ), *pSx;
+			U1	*pS = pU1+1, *pSe = pS+gpmVAN( pS, "\"", NULL), //, nLEN ),
+				*pSx;
 			for( pS += gpmNINCS(pS," \t\r\n"); pS < pSe; pS += gpmNINCS(pS," \t\r\n") ) {
 				ix = gpfSTR2I8(pS,&pS);
 				id = gpfSTR2I8(pS,&pS);
@@ -328,12 +329,12 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 
 				pS += gpmNINCS(pS," \t");
 				pSx = pS;
-				pS = pSx+gpmVAN(pS,": \t\r\n", nLEN);
+				pS = pSx+gpmVAN(pS,": \t\r\n", NULL ); //, nLEN);
 
 				shuffle = 0;
 				gpmMcpy(sSHF,pSx, gpmMIN(4,pS-pSx) );
 				pSx = pS;
-				pS += gpmVAN(pS,"\r\n", nLEN);
+				pS += gpmVAN(pS,"\r\n", NULL ); //, nLEN);
 				float* pF = gpmGLaCNL(nCNL);
 				for( pSx += gpmNINCS(pSx,": \t\r\n"), i=0; pSx < pS; pSx += gpmNINCS(pSx,", \t\r\n") ) {
 					pF[i] = gpfSTR2I8(pSx, &pSx);

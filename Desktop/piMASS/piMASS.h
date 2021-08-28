@@ -425,7 +425,7 @@ public:
 			)
 
 #define gpmSTRLEN( s ) ((s)? ( *(char*)s ? strlen((char*)(s)) : 0 ) : 0)
-#define gpmVAN( d, v, l ) gpfVAN( (U1*)(d), (U1*)v, l )
+ #define gpmVAN( d, v, l ) gpfVAN( (U1*)(d), (U1*)v, l )
 
 #define gpmDEL( p ){ if( (p) ){ delete (p); (p) = NULL; } }
 #define gpmDELary( p ){ if( (p) ){ delete[] (p); (p) = NULL; } }
@@ -544,9 +544,11 @@ U8 inline gpfABCvan( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFs
 	return pS-p_str;
 }
 
-U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaALFsub ) {
+U8 inline gpfABCnincs( const U1* p_str, const U1* pE, size_t* pUTF8, const U1* gpaALFsub ) {
 	/// a viszatérési érték nBYTE, nLEN az UTF(
-	nUTF8 = 0;
+	if(pUTF8)
+		*pUTF8 = 0;
+
 	if( (p_str < pE) ? !*p_str : true )
 		return 0;
 
@@ -556,14 +558,16 @@ U8 inline gpfABCnincs( const U1* p_str, const U1* pE, U8& nUTF8, const U1* gpaAL
 		if( (*pS)&0x80 )
 		{
 			if( (*pS)&0x40 )	// UTF8-nál az első kódnál van 0x110yYYYY a többi már 0x10xxXXXX
-				nUTF8++;
+			if(pUTF8)
+				*pUTF8++;
 			pS++;
 			continue;
 		}
 		if( !gpaALFsub[*pS] )
 			break;
 
-		nUTF8++;
+		if(pUTF8)
+			*pUTF8++;
 		pS++;
 	}
 	return pS-p_str;

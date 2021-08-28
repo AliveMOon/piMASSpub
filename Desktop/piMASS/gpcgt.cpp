@@ -189,7 +189,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	int port = 80, nCMP = nIPA, p;
 	U8 nLEN;
 	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n!\"" ),
-		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;\"", nLEN );
+		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;\"", NULL ); //, nLEN );
 
 	nCMP = pE-pS;
 	//gpmMcpyOF( sPUB, pS, nCMP );

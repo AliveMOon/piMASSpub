@@ -1305,8 +1305,8 @@ U1x4* gpcPIC::TOOLmaskAB(	gpMEM* pMEM,
 
 	pREF = NULL;
 	char* pF = pFILE;
-	U8 nLEN;
-	U1 nPNT = gpmVAN(pNAME,".", nLEN);
+	//U8 nLEN;
+	U1 nPNT = gpmVAN(pNAME,".", NULL ); //, nLEN);
 	gpmMcpy(pF,pNAME,nPNT)[nPNT] = 0;
 	pF += nPNT;
 

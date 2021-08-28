@@ -217,13 +217,12 @@ void gpcCRS::CRSstpED(
 
 				}
 				break;
-			case 5:
+			case 5: {
 				// lefele egy sorral
-				{
 					U1* pLFT = gpfUTF8left( pOA, pRIG, '\n', '\a' );
 					U4 x = gpfUTF8rig( pLFT, pRIG );
-					U8 nLEN = 0;
-					pRIG += gpfVAN( pRIG, (U1*)"\n", nLEN );
+					//U8 nLEN = 0;
+					pRIG += gpfVAN( pRIG, (U1*)"\n", NULL ); //, nLEN );
 
 					if( *pRIG == '\n')
 						pRIG++;

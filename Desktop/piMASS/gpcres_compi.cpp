@@ -26,7 +26,8 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM ) {
 	U1 	d, *pBEG = NULL,
 		*pSTR = pS, *pXe;
 
-	U8 nUTF8, nLAB = 0, nSTR, u8ALF = gpeALF_A;
+	size_t nUTF8;
+	U8	nLAB = 0, nSTR, u8ALF = gpeALF_A;
 
 	I8x4 lab = 0;
 	I8x2 an;
@@ -98,7 +99,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM ) {
 				iTRG = resISA_trg( iTRG, xyWH.a4x2[0] );
 
 			/// a stingől itt lesz ALF --------------
-			an.num = gpfABCnincs( pS, pE, nUTF8, gpaALFsub );
+			an.num = gpfABCnincs( pS, pE, &nUTF8, gpaALFsub );
 			an = pS;
 			pS += an.num;	// majd átlépjük
 
@@ -338,7 +339,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM ) {
 							break;
 
 						case '/':
-							pS += gpmVAN( pS, "\n", nUTF8 );
+							pS += gpmVAN( pS, "\n", &nUTF8 );
 							break;
 						default: // OSZTÁS hányados
 							aOP[0].y--;
@@ -399,7 +400,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM ) {
 						pXe += gpmNINCS( pXe, " \t\r\n" );
 						if( XML != gpfSTR2ALF( pXe, pE, &pXe ) )
 							continue;
-						pS = pXe+gpmVAN( pXe, ">", nUTF8 );
+						pS = pXe+gpmVAN( pXe, ">", &nUTF8 );
 						break;
 					}
 					if( !pXe )
@@ -427,7 +428,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM ) {
 
 			case '\"': {
 					pSTR = pS;
-					pS += gpmVAN( pS, "\"", nUTF8 );
+					pS += gpmVAN( pS, "\"", &nUTF8 );
 					U8 s = -1;
 					str.lzyINS( pSTR, pS-pSTR, s, -1 );
 
@@ -439,7 +440,7 @@ gpcRES* gpcRES::compiEASY( U1* pS, U1* pE, U1** ppE, gpcRES* pM ) {
 					pS = pE;
 				} break;
 			case '\'': {
-					pS += gpmVAN( pS, "\'", nUTF8 );
+					pS += gpmVAN( pS, "\'", &nUTF8 );
 
 					pUD8 = pI ? pI : resISA();
 					pI = NULL;

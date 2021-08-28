@@ -221,101 +221,164 @@ inline U4 gpfUTF8( const U1* pS, U1** ppS ) {
 	return utf8;
 }
 
-inline U8 gpfVAN( const U1* pU, const U1* pVAN, U8& nLEN, bool bDBG = false ) {
+inline size_t gpfVAN( const U1* pU, const U1* pVAN, size_t* pUTF = NULL, bool bDBG = false ) {
 	// return nBYTE
 	// nLEN = nCODE
-	nLEN = 0;
+	if( pUTF ) *pUTF = 0;
+
 	if( pU ? !*pU : true )
 		return 0;
 
-	U1 *pS = (U1*)pU;
-	if( !pVAN )
-	{
-		// gpmSTRLEN!!
-		while( *pS )
-		{
-			if( (*pS&0xc0) != 0x80 )
-				nLEN++;	// csak a 0x80 asokat nem számoljuk bele mert azok tötike karakterek
-			pS++;
+	U1 *pS = (U1*)pU, *pSS;
+	if( !pVAN ) {
+		/// gpmSTRLEN!! --------------------------------------------------------
+		if( pUTF ) {
+			while( *pS ) {
+				if( (*pS&0xc0) != 0x80 )
+					(*pUTF)++;	// csak a 0x80 azokat nem számoljuk bele mert azok tötike karakterek
+				pS++;
+			}
 		}
+		else while( *pS )
+			pS++;
+
 		return pS-pU;
 	}
-	U8 nVAN = gpfVAN( pVAN, NULL, nLEN ); // utf8len
+
+	size_t	nUTF,
+			nVAN = gpfVAN( pVAN, NULL, &nUTF ); // utfLEN
 	bool abVAN[0x80];
 	gpmZ( abVAN );
-	*abVAN = true;
-	gpcLZY* pTREE = NULL;
+	abVAN[0] = true;
+
 	U4 u4, nT = 0;
 
-	if( nVAN == nLEN )
-	{
-		//van-ban nincsen UTF8 akkor turbó
+	if( nVAN == nUTF ) {
+		///pVAN-ban nincsen UTF8 akkor turbó
 		abVAN[pVAN[0]] = true;
-		for( U8 v = 1; v < nLEN; v++ )
-		{
+		for( U8 v = 1; v < nVAN; v++ )
 			abVAN[pVAN[v]] = true;
-		}
 
-		while( *pS )
-		{
+		while( *pS ) {
 			if( *pS >= 0x80 )
-				break;
-			if( abVAN[*pS] )
-				return nLEN = pS-pU;
+				break;	// valami UTF
 
-			pS++;
-		}
-
-		nLEN = pS-pU;
-		if( !*pS )
-			return nLEN;
-
-		if( bDBG )
-			nLEN = pS-pU;
-
-	} else {
-		U1	*pV = (U1*)pVAN,
-			*pE = pV+nVAN;
-		while( pV < pE )
-		{
-			u4 = gpfUTF8( pV, &pV );
-			if( u4 < 0x80 )
-			{
-				abVAN[u4] = true;
+			if( !abVAN[*pS] ) {
+				pS++;
 				continue;
 			}
 
-			pTREE = pTREE->tree_add( u4, nT );
+			/// NEM UTF8 kissebb
+			if( !pUTF )
+				return pS-pU;
+
+			return ((*pUTF) = pS-pU);
 		}
 
-		nLEN = 0;
-	}
-	U1* pSS;
-	while( *pS )
-	{
-		u4 = gpfUTF8( pS, &pSS );
-		if( u4 < 0x80 )
-		{
-			if( abVAN[u4] )
-				break;
+		nUTF = pS-pU;
+		if( !*pS ) {
+			if( !pUTF )
+				return nUTF;
+
+			return ((*pUTF) = nUTF);
+		}
+
+		if( pUTF )
+		if( bDBG )
+			(*pUTF) = pS-pU;
+
+		while( *pS ) {
+			u4 = gpfUTF8( pS, &pSS );
+			if( u4 >= 0x80 ) {
+				pS = pSS;
+				nUTF++;
+				continue;
+			}
+
 			pS++;
-			nLEN++;
+			nUTF++;
+		}
+
+		if( !pUTF )
+			return pS-pU;
+
+		(*pUTF) = nUTF;
+		return pS-pU;
+	}
+
+	///pVAN-ban igen van UTF8
+	gpcLZY* pTREE = NULL;
+	U1	*pV = (U1*)pVAN,
+		*pE = pV+nVAN;
+	while( pV < pE ) {
+		if( (u4 = gpfUTF8( pV, &pV )) >= 0x80 ) {
+			pTREE = pTREE->tree_add( u4, nT );
+			continue;
+		}
+		abVAN[u4] = true;
+	}
+
+	/// de még mindig van olyan konstelláció, hogy a str-ben nincs UTF
+	while( *pS ) {
+		if( *pS >= 0x80 )
+			break;	// valami UTF
+
+		if( !abVAN[*pS] ) {
+			pS++;
 			continue;
 		}
 
-		if( pTREE->tree_fnd(u4, nT) < nT )
-			break;
+		gpmDEL(pTREE);
+		/// NEM UTF8 kissebb
+		if( !pUTF )
+			return pS-pU;
 
-		pS = pSS;
-		nLEN++;
+		return ((*pUTF) = pS-pU);
 	}
 
+	if( !*pS ) {
+		gpmDEL(pTREE);
+		if( !pUTF )
+			return pS-pU;
+
+		return ((*pUTF) = pS-pU);
+	}
+
+	nUTF = pS-pU;
+	while( *pS ) {
+		if( (u4=gpfUTF8( pS, &pSS )) >= 0x80 ) {
+			if( pTREE->tree_fnd(u4, nT) < nT )
+				break;
+			pS = pSS;
+			nUTF++;
+			continue;
+		}
+
+		if( !abVAN[*pS] ) {
+			pS++;
+			nUTF++;
+			continue;
+		}
+
+		gpmDEL(pTREE);
+		if( !pUTF )
+			return pS-pU;
+
+		(*pUTF) = nUTF;
+		return pS-pU;
+	}
+
+	gpmDEL(pTREE);
+	if( !pUTF )
+		return pS-pU;
+
+	(*pUTF) = nUTF;
 	return pS-pU;
 }
 inline U8 gpfVANnNINCS( const U1* pSTR, const U1* pVAN ) {
-	U8 nLEN;
+	//U8 nLEN;
 	U1* pS = (U1*)pSTR;
-	pS += gpfVAN( pS, pVAN, nLEN );
+	pS += gpfVAN( pS, pVAN ); //, nLEN );
 	pS += gpmNINCS( pS, pVAN );
 	return pS-pSTR;
 }
@@ -353,8 +416,8 @@ inline U4x2 lenMILL( U4x2 pos, U4x4&crn, U1* pUi, U1* pUie ) {
 	}
 	return pos;
 }
-inline U8 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL ) {
-	U8 nLEN = 0, nBYTE, nUTF8 = 0;
+inline size_t gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL ) {
+	size_t nLEN = 0, nBYTE, nUTF8 = 0;
 	if( !pVAN )
 		pVAN = (U1*)"\t\r\n\a";
 	col = row = 0;
@@ -363,7 +426,7 @@ inline U8 gpfUTFlen( U1* pU, U1* pUe, U4& col, U4& row, U1* pVAN = NULL ) {
 	U4 xx = 0, n;
     while( *pU ? pU < pUe : false )
     {
-		nBYTE = gpfVAN( pU, pVAN, nLEN );
+		nBYTE = gpfVAN( pU, pVAN, &nLEN );
 		nUTF8 += nLEN;
 		xx += nLEN;
 		if( col < xx )
@@ -549,10 +612,11 @@ I8 inline gpfSTR2I8( void* pV, void* ppV = NULL, const void* pSTOP = NULL, bool 
 		return 0;
 
 	char *p_str = (char*)pV;
-	U8 nLEN;
-	int n0 = gpmVAN(p_str, (bHEX ? "+-0123456789aAbBcCdDeEfF": "+-0123456789xXbBdD"), nLEN ), n1;
+	//U8 nLEN;
+	int n0 = gpmVAN( p_str, (bHEX?"+-0123456789aAbBcCdDeEfF":"+-0123456789xXbBdD"), NULL ),
+		n1; //, nLEN ), n1;
 	if( pSTOP ) {
-		n1 = gpmVAN(p_str, (char*)pSTOP, nLEN );
+		n1 = gpmVAN(p_str, (char*)pSTOP, NULL); //, nLEN );
 		if(n0>n1)
 			n0=n1;
 	}
@@ -1215,9 +1279,10 @@ public:
 	char* VTX( char* pVX ) {
 		if( pVX ? !*pVX : true )
 			return pVTX;
-		U8 nLEN, s = 0;
+		//U8 nLEN;
+		U8 s = 0;
 		pVX += gpmNINCS( pVX, "\"");
-		U4 nVX = gpmVAN(pVX,"\"",nLEN);
+		U4 nVX = gpmVAN(pVX,"\"", NULL ); //,nLEN);
 		lzyVTX.lzyADD( pVX, nVX, s = 0 );
 
 		return pVTX = (char*)lzyVTX.p_alloc;
@@ -1226,9 +1291,10 @@ public:
 	char* PIX( char* pPX ) {
 		if( pPX ? !*pPX : true )
 			return pPIX;
-		U8 nLEN, s = 0;
+		//U8 nLEN,
+		U8 s = 0;
 		pPX += gpmNINCS( pPX, "\"");
-		U4 nPX = gpmVAN(pPX,"\"",nLEN);
+		U4 nPX = gpmVAN(pPX,"\"", NULL ); //,nLEN);
 		lzyPIX.lzyADD( pPX, nPX, s = 0 );
 
 		return pPIX = (char*)lzyPIX.p_alloc;
@@ -1436,10 +1502,10 @@ public:
 	}
 	gpc3D( I4 i, const char* pP, gpeALF alf ) {
 		gpmCLR;
-		U8 nLEN;
+		//U8 nLEN;
 		id.x = i;
 		id.a8x2[0].b = alf;
-		id.z = pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
+		id.z = gpmVAN(pP," \t\r\n\"\a",NULL); // pP ? gpmVAN(pP," \t\r\n\"\a",nLEN) : 0;
 		gpmSTRCPY( sPATH, pP );
 		nBLD = nRDY+1;
 	}
@@ -1586,25 +1652,25 @@ static const char gp_s_lws[] =
 		"EndPlugin\n"
 		;
 
-typedef enum GPE_LWS_COM:int {
-		GPE_LWS_COM_LoadObjectLayer,
-		GPE_LWS_COM_AddBone,
-		GPE_LWS_COM_AddNullObject,
-		GPE_LWS_COM_AddLight,
-		GPE_LWS_COM_AddCamera,
-		GPE_LWS_COM_NumChannels,
-		GPE_LWS_COM_Channel,
-		GPE_LWS_COM_C_open,
-		GPE_LWS_COM_Envelope,
-		GPE_LWS_COM_Key,
-		GPE_LWS_COM_C_close	,
-		GPE_LWS_COM_ParentItem,
-		GPE_LWS_COM_BoneName,
-		GPE_LWS_COM_BoneRestPosition,
-		GPE_LWS_COM_BoneRestDirection,
-		GPE_LWS_COM_BoneRestLength,
-		GPE_LWS_COM_Plugin,
-		GPE_LWS_COM_EndPlugin,
+typedef enum gpeLWScom:int {
+		gpeLWScom_LoadObjectLayer,
+		gpeLWScom_AddBone,
+		gpeLWScom_AddNullObject,
+		gpeLWScom_AddLight,
+		gpeLWScom_AddCamera,
+		gpeLWScom_NumChannels,
+		gpeLWScom_Channel,
+		gpeLWScom_C_open,
+		gpeLWScom_Envelope,
+		gpeLWScom_Key,
+		gpeLWScom_C_close	,
+		gpeLWScom_ParentItem,
+		gpeLWScom_BoneName,
+		gpeLWScom_BoneRestPosition,
+		gpeLWScom_BoneRestDirection,
+		gpeLWScom_BoneRestLength,
+		gpeLWScom_Plugin,
+		gpeLWScom_EndPlugin,
 } GPT_LWS_COM;
 typedef enum GPE_LWS_iTYP:U4 {
 	gpeLWSiTYP_OBJ = 0x10000000,
@@ -2073,8 +2139,8 @@ public:
 	}
 
 	U4 srcUPDT( SOCKET ig = INVALID_SOCKET ) {
-		U8 nLEN = 0;
-		pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
+		//U8 nLEN = 0;
+		pB = pA + gpfVAN( pA, (U1*)"\a", NULL ); //nLEN );
 		nVERr = nHD+1;
 		iGT = ig;
 
@@ -2393,8 +2459,8 @@ public:
 			return i;	// ez a fasza
 
 		// még van esély keressük meg, hátha há
-		U8 nLEN;
-		i = gpfVAN( pA, (U1*)"\a", nLEN );
+		//U8 nLEN;
+		i = gpfVAN( pA, (U1*)"\a"); //, nLEN );
 		if( i )
 		if( i >= n_ld_add() )
 		{
