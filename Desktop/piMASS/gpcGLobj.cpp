@@ -875,27 +875,175 @@ gpc3Dkey* gpc3Dcnl::pKEYins( U1 c, float s ){
 	return NULL;
 }
 gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
-	//U8 nL;
-	char* pE = (char*)pS + gpmVAN(pS,"\r\n}", NULL ); //, nL );
-	int i = 0;
-	while( pS < pE ) {
+	int i = -1;
+	register double dd;
+	register U8 ss;
+	pS += gpmNINCS(pS, " \t" );
+	while( i < 3 ) { //}pS < pE ) {
+		ss = *(U8*)pS;
+		if( ss == 0x2030203020302030 ) {
+			pS += 8;
+			i+=4;
+			continue;
+		}
+		ss &= 0xffffffff;
+		if( ss == 0x20302030 ) {
+			pS += 4;
+			i+=2;
+			continue;
+		}
+
+		i++;
+		ss &= 0xffff;
+		if( ss == 0x2030 ) {
+			pS += 2;
+			continue;
+		}
+
+		dd = gpmSTR2D( pS );
 		pS += gpmNINCS(pS, " \t" );
+
+		if( abs(dd) < 0.001 )
+			continue;
+
 		switch( i ) {
 			case 0:
-				val = gpmSTR2D( pS );
+				val = dd;
 				break;
 			case 1:
-				sec = gpmSTR2D( pS );
+				sec = dd;
 				break;
 			case 2:
-				spn = gpmSTR2D( pS ); break;
+				spn = dd;
+				break;
 			default:
-				aP[(i-3)%6] = gpmSTR2D( pS ); break;
+				aP[i-3] = dd;
+				break;
+		}
+	}
+	return *this;
+}
+
+/*gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
+	char* pE = (char*)pS + gpmVAN(pS,"\r\n}", NULL );
+	int i = -1;
+	double dd;
+	pS += gpmNINCS(pS, " \t" );
+	while( pS < pE ) {
+		if( *(U8*)pS == 0x2030203020302030 ) {
+			pS += 8;
+			i+=4;
+			continue;
+		}
+		if( (*(U4*)pS) == 0x20302030 ) {
+			pS += 4;
+			i+=2;
+			continue;
+		}
+
+		i++;
+		if( (*(U2*)pS) == 0x2030 ) {
+			pS += 2;
+			continue;
+		}
+
+		dd = gpmSTR2D( pS );
+		pS += gpmNINCS(pS, " \t" );
+
+		if( abs(dd) < 0.001 )
+			continue;
+
+		switch( i ) {
+			case 0:
+				val = dd;
+				break;
+			case 1:
+				sec = dd;
+				break;
+			case 2:
+				spn = dd;
+				break;
+			default:
+				aP[(i-3)%6] = dd;
+				break;
+		}
+	}
+	return *this;
+}*/
+
+/*gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
+	//U8 nL;
+	char* pE = (char*)pS + gpmVAN(pS,"\r\n}", NULL ), *pSe; //, nL );
+	bool bM;
+	int i = 0;
+	double D, d, m;
+	gpmCLR;
+	while( pS < pE ) {
+		pS += gpmNINCS(pS, " \t" );
+		pSe =  (char*)pS + gpmVAN(pS, "eE \t",NULL );
+		D = d = 0.0;
+
+		if( (*pSe) == 'e' || (*pSe) == 'E' ) {
+			D = gpmSTR2D( pS );
+			if( abs(D) < 0.001 ) {
+				i++;
+				continue;
+			}
+		}
+		else {
+
+			bM = ((*pS) == '-');
+			if( bM ) {
+				pS++;
+				pS += gpmNINCS(pS, " \t" );
+			}
+
+			while( ((*pS) >= '0') && ((*pS) <= '9') ) {
+				D *= 10.0;
+				D += (*pS-'0');
+				pS++;
+			}
+
+			if( (*pS) == '.' ) {
+				pS++;
+				m = 1.0;
+				while( ((*pS) >= '0') && ((*pS) <= '9') ) {
+					m *= 10.0;
+					d *= 10.0;
+					d += (*pS-'0');
+					pS++;
+				}
+				D += d/m;
+			}
+
+			if( D == 0.0 ) {
+				i++;
+				continue;
+			}
+
+			if( bM )
+				D *= -1.0;
+		}
+
+		switch( i ) {
+			case 0:
+				val = D;
+				break;
+			case 1:
+				sec = D;
+				break;
+			case 2:
+				spn = D;
+				break;
+			default:
+				aP[(i-3)%6] = D;
+				break;
 		}
 		i++;
 	}
 	return *this;
-}
+}*/
+
 size_t sLWOfloat( char* pBUFF, float f ) {
 	char* pBi = pBUFF;
 	int d = f, dd = 0;
@@ -966,6 +1114,7 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 	U4 nD, iD, nS, nL, iCNL = 0, nENV = 0, iENV, nA;
 	olcb = I4x4(-1,-1,-1,-1);	/// obj liht cam bone
 	gpc3Dkey* pKEY, key;
+	gpmZ(key);
 	gpc3Ditm	*pITM = NULL, *pNULL = NULL,	// 0x10000000
 				*pLIG = NULL,					// 0x20000000
 				*pCAM = NULL,					// 0x30000000
@@ -973,6 +1122,9 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				*pMOM = NULL, *pIS = NULL,
 				*pROOT = NULL, *pI0 = NULL;
 	I8 momID;
+	int aMS[gpeLWScom_N+2], keyA,keyB;
+	gpmZ(aMS);
+	aMS[gpeLWScom_msA] = SDL_GetTicks();
 	for( pS += gpmNINCS( pS, " \t\r\n" ); pS < pSe; pS += gpmNINCS( pS, " \t\r\n" ) ) {
 		si = (gpeLWScom)lwsDCT.dctFND( pDC=pS, nS = pSe-pS, nD );
 		pU4x4 = lwsDCT.pIXi((U4)si);
@@ -986,7 +1138,9 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 		pS = pA + gpmVAN( pA, "\r\n", NULL ); //, s );
 		if( !nA )
 			continue;
-
+		aMS[gpeLWScom_msB] = aMS[gpeLWScom_msA];
+		aMS[gpeLWScom_msA] = SDL_GetTicks();
+		aMS[si] += aMS[gpeLWScom_msA]-aMS[gpeLWScom_msB];
 		switch( si ) {
 			case gpeLWScom_LoadObjectLayer:{
 				pNULL = pBON = NULL;
@@ -1034,18 +1188,43 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				nENV = gpfSTR2I8(pA, &pA);
 				pS = pA + gpmVAN( pA, "\r\n", NULL ); //, s );
 				iENV = 0;
-			} break;
-			case gpeLWScom_Key:{
 				pIS = gpdITMis;
+			} break;
+			case gpeLWScom_Key: {
+				//pIS = gpdITMis;
 				if( !pIS )
 					break;
 
-				key = pA;
-				pKEY = pIS->cnl.pKEYinsIX(iCNL, iENV, nENV, key.sec );
+				if( true ) {
+					key = pA; /// str->key
+					pKEY = pIS->cnl.pKEYinsIX(iCNL, iENV, nENV, key.sec ); /// key.sec
+					iENV++;
+					if( pKEY )
+						*pKEY = key;
+					gpmZ(key);
+					break;
+				}
+				aMS[gpeLWScom_keyN]++;
+
+				keyA = SDL_GetTicks();
+
+				key = pA; /// str->key
+
+				keyB = keyA;
+				keyA = SDL_GetTicks();
+				//if( keyA>keyB )
+				//	key = pA;
+				aMS[gpeLWScom_keyA] += (keyA-keyB)+1;
+
+				pKEY = pIS->cnl.pKEYinsIX(iCNL, iENV, nENV, key.sec ); /// key.sec
 				iENV++;
-				//pKEY = pIS->cnl.pKEYins(iCNL, key.sec );	/// key.sec>=33.5 && key.sec<=33.6 && iCNL == 3
 				if( pKEY )
 					*pKEY = key;
+				gpmZ(key);
+
+				keyB = keyA;
+				keyA = SDL_GetTicks();
+				aMS[gpeLWScom_keyB] += (keyA-keyB)+1;
 			} break;
 			case gpeLWScom_C_close: {
 				break;
@@ -1115,7 +1294,17 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 		}
 
 	}
-
+	if( bSTDcout_3D ) {
+		gpdCOUT << gpeLWScom_keyA 	<< " "	<< float(aMS[gpeLWScom_keyA])-float(aMS[gpeLWScom_keyN]) << "msKEYA "
+											<< float(aMS[gpeLWScom_keyB])-float(aMS[gpeLWScom_keyN]) << "msKEYB "
+											<< float(aMS[gpeLWScom_keyN]) << "nKEY"
+											<<  gpdENDL;
+		for( U4 i = 0; i < gpeLWScom_msA; i++ ) {
+			gpdCOUT << i << " "	<< float(aMS[i]) << "ms "
+								<< lwsDCT.sSTRix(i, "ERR") //gp_s_lws+i
+								<<  gpdENDL;
+		}
+	}
 	for( U4 i = 0, j, k, ni = n3Ditm(); i < ni; i++ ) {
 		pIS = p3Dii(i);
 
@@ -1203,8 +1392,9 @@ I4 gpcGL::iLWS( gpeALF a, const char* pPATH, gpcLZY& rd ) {
 
 	if( !p3Dlst )
 		p3Dlst = new gpc3Dlst;
-
+	int ms = SDL_GetTicks();
 	gpc3Dgym* p3Dgym = p3Dlst->p3DgymADD( a, pPATH )->pLWS(rd, p3Dlst->lwsDCT, p3Dlst->bnDCT );
+	gpdCOUT	<< "pLWS:" << float(SDL_GetTicks()-ms)/1000.0 << "ms" << gpdENDL;
 	return p3Dgym ? p3Dgym->id.x : -1;
 }
 

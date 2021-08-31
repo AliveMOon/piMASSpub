@@ -2390,8 +2390,7 @@ public:
 
 class U8x4 {
 public:
-    union
-    {
+    union {
         struct { U8 x,y,z,w; };
         struct { U8 aXYZW[4]; };
         struct { gpeALF labe; U8 mom, up, nx; };
@@ -6859,7 +6858,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -6893,7 +6892,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -6950,7 +6949,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -7004,7 +7003,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -7061,7 +7060,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -7111,7 +7110,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -7187,7 +7186,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // U4x4 *p_ix0 = ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();
@@ -7218,7 +7217,7 @@ public:
 
 		ix.lzyADD( NULL, sizeof(U4x4), aSTRT[1] = -1 );
 		U4 nIX = (aSTRT[1]/sizeof(U4x4));
-		U4x4	*p_ix0 = ((U4x4*)ix.p_alloc);
+		U4x4 *p_ix0 = ix.pU4x4(); // ((U4x4*)ix.p_alloc);
 
 		pIX = p_ix0 + nIX;
 		pIX->null();

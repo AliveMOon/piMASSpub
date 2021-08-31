@@ -1661,6 +1661,7 @@ typedef enum gpeLWScom:int {
 		gpeLWScom_NumChannels,
 		gpeLWScom_Channel,
 		gpeLWScom_C_open,
+
 		gpeLWScom_Envelope,
 		gpeLWScom_Key,
 		gpeLWScom_C_close	,
@@ -1669,8 +1670,14 @@ typedef enum gpeLWScom:int {
 		gpeLWScom_BoneRestPosition,
 		gpeLWScom_BoneRestDirection,
 		gpeLWScom_BoneRestLength,
+
 		gpeLWScom_Plugin,
 		gpeLWScom_EndPlugin,
+		gpeLWScom_msA,
+		gpeLWScom_msB,
+		gpeLWScom_keyA,gpeLWScom_keyN,
+		gpeLWScom_keyB,
+		gpeLWScom_N,
 } GPT_LWS_COM;
 typedef enum GPE_LWS_iTYP:U4 {
 	gpeLWSiTYP_OBJ = 0x10000000,
