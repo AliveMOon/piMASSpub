@@ -461,7 +461,7 @@ public:
 
 #define gpdPAINTupX mmX(440)
 #define gpdPAINTdwX mmX(425)
-
+#define stristr strcasestr
 
 
 #define zsIO 20

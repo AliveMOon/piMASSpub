@@ -879,7 +879,10 @@ gpc3Dkey& gpc3Dkey::operator = ( const char* pS ) {
 	register double dd;
 	register U8 ss;
 	pS += gpmNINCS(pS, " \t" );
-	while( i < 3 ) { //}pS < pE ) {
+	//sscanf( pS, "%f %f %d", &val, &sec, &spn );
+	//return *this;
+
+	while( i < 9 ) { //}pS < pE ) {
 		ss = *(U8*)pS;
 		if( ss == 0x2030203020302030 ) {
 			pS += 8;
@@ -1109,7 +1112,7 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 		return this;
 	U4x4* pU4x4;
 	char	*pS = (char*)lws.p_alloc, *pSe = pS+s, *pA, *pCH, *pDC,
-			sDBG[0x100];
+			sDBG[0x100], *pCLOSE, *pK;
 	gpeLWScom si;
 	U4 nD, iD, nS, nL, iCNL = 0, nENV = 0, iENV, nA;
 	olcb = I4x4(-1,-1,-1,-1);	/// obj liht cam bone
@@ -1182,6 +1185,7 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 			} break;
 			case gpeLWScom_C_open:{
 				pS = pA;
+				pCLOSE = pS+gpmVAN( pS, "}", NULL );
 			} break;
 			case gpeLWScom_Envelope:{
 				pA += gpmNINCS(pA," \t\"\r\n");
@@ -1195,43 +1199,34 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 				if( !pIS )
 					break;
 
-				if( true ) {
-					key = pA; /// str->key
-					pKEY = pIS->cnl.pKEYinsIX(iCNL, iENV, nENV, key.sec ); /// key.sec
-					iENV++;
-					if( pKEY )
-						*pKEY = key;
-					gpmZ(key);
-					break;
-				}
-				aMS[gpeLWScom_keyN]++;
-
-				keyA = SDL_GetTicks();
-
-				key = pA; /// str->key
-
-				keyB = keyA;
-				keyA = SDL_GetTicks();
-				//if( keyA>keyB )
-				//	key = pA;
-				aMS[gpeLWScom_keyA] += (keyA-keyB)+1;
-
+				key = pA;
 				pKEY = pIS->cnl.pKEYinsIX(iCNL, iENV, nENV, key.sec ); /// key.sec
 				iENV++;
 				if( pKEY )
 					*pKEY = key;
 				gpmZ(key);
-
-				keyB = keyA;
-				keyA = SDL_GetTicks();
-				aMS[gpeLWScom_keyB] += (keyA-keyB)+1;
+				pK = stristr(pA,"key ");
+				while( pK ) {
+					pK += 4;
+					key = pK;
+					pKEY = pIS->cnl.pKEYinsIX(iCNL, iENV, nENV, key.sec ); /// key.sec
+					iENV++;
+					if( pKEY )
+						*pKEY = key;
+					gpmZ(key);
+					pK = stristr(pK,"key ");
+					if( pK < pCLOSE )
+						continue;
+					pS = pK;
+					break;
+				}
+				pS = pCLOSE;
 			} break;
 			case gpeLWScom_C_close: {
 				break;
 				pIS = gpdITMis;
 				if( pIS )
 				if( bSTDcout_3D )  gpdCOUT << " " << nENV << "/" << pIS->cnl.nKEY(iCNL) << " c:" << iCNL << gpdFLUSH;
-
 			} break;
 			case gpeLWScom_ParentItem: {
 				if( !pMOM )
