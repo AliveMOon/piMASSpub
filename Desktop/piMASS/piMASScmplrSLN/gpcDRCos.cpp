@@ -143,7 +143,7 @@ I4x4 gpcDrc::cageXYZhd0( I4x4& N, I4x4* pHD, I4 lim, U4 id, int rR ) {
 		if( pHD[0].qlen_xyz() < mmX(250) )
 		if( pHD[1].qlen_xyz() > mmX(250) )
 			pHD[0].xyz_( okXYZ );
-		return iXYZ;
+		return aiXYZ[0];
 	}
 	return cageXYZhd( N, pHD, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id], rR );
 }
@@ -203,7 +203,7 @@ I4x4 gpcDrc::judoCAGE( I4x4& jXYZ, I4x4& jABC, I4x4& jxyz, I4x4& jN, U4 i, F4x4&
 			}
 		}
 		hdXYZ = gpaCAGEheadBALL[iH];
-		aHDxyz[gpeCGhdP0] = (iMX.x*double(hdXYZ.x))+(iMX.y*double(hdXYZ.y))+(iMX.z*double(hdXYZ.z))+iXYZ;
+		aHDxyz[gpeCGhdP0] = (iMX.x*double(hdXYZ.x))+(iMX.y*double(hdXYZ.y))+(iMX.z*double(hdXYZ.z))+aiXYZ[0];
 		aHDxyz[gpeCGhdP1] = (jMX.x*double(hdXYZ.x))+(jMX.y*double(hdXYZ.y))+(jMX.z*double(hdXYZ.z))+jXYZ;
 		aHDxyz[gpeCGhdL01] = (aHDxyz[gpeCGhdP1]-aHDxyz[gpeCGhdP0]).xyz0();
 
@@ -221,34 +221,34 @@ I4x4 gpcDrc::judoCAGE( I4x4& jXYZ, I4x4& jABC, I4x4& jxyz, I4x4& jN, U4 i, F4x4&
 
 		jN = aHDxyz[gpeCGhdPNN];
 		if( aHDxyz[gpeCGhdAB].B <= (mmX(1)/16) ) { /// nem mozdulhat
-			jXYZ.xyz_(iXYZ);
-			jABC.ABC_(iABC);
+			jXYZ.xyz_(aiXYZ[0]);
+			jABC.ABC_(aiABC[0]);
 			break;
 		}
 
 		iH = nH;
 		aHDxyz[gpeCGhdAB].B -= (mmX(1)/16);
 		aHDxyz[gpeCGhdPNN] = aHDxyz[gpeCGhdPN];
-		jXYZ.xyz_( iXYZ+(((jXYZ-iXYZ)*aHDxyz[gpeCGhdAB].B)/aHDxyz[gpeCGhdAB].A) );
+		jXYZ.xyz_( aiXYZ[0]+(((jXYZ-aiXYZ[0])*aHDxyz[gpeCGhdAB].B)/aHDxyz[gpeCGhdAB].A) );
 		jABC.ABC_( tABC );
 		if( !jxyz.qlen_xyz() )
 			continue;
 		jxyz.xyz_( ixyz+(((jxyz-ixyz)*aHDxyz[gpeCGhdAB].B)/aHDxyz[gpeCGhdAB].A) );
 	}
 
-	I4x4 mABCD = iABC.mmABC( jABC, degX(180.0/PI), degX(180.0/PI) );
+	I4x4 mABCD = aiABC[0].mmABC( jABC, degX(180.0/PI), degX(180.0/PI) );
 	if( mABCD.D >= (degX(1)/16) )
 		mABCD.C = mABCD.D;
 	else {
 		mABCD.C = 0;
-		jABC.ABC_(iABC);
+		jABC.ABC_(aiABC[0]);
 	}
 
-	mABCD.A = (tXYZ - iXYZ).abs0().mx().x;
-	mABCD.B = (jXYZ - iXYZ).abs0().mx().x;
+	mABCD.A = (tXYZ - aiXYZ[0]).abs0().mx().x;
+	mABCD.B = (jXYZ - aiXYZ[0]).abs0().mx().x;
 	if( mABCD.B < (mmX(1)/16) ){
 		mABCD.B = 0;
-		jXYZ.xyz_(iXYZ);
+		jXYZ.xyz_(aiXYZ[0]);
 	}
 	return mABCD;
 }
@@ -259,26 +259,26 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, I4x4* pBOX, U4 nBOX, I4x4* pBALL, U4 nBA
 	if( !this )
 		return I4x2(mmX(500)).xxxy();
 
-	if( iXYZ.qlen_xyz() < mmX(250) )
+	if( aiXYZ[0].qlen_xyz() < mmX(250) )
 	if( okXYZ.qlen_xyz() > mmX(250) ) {
-		iXYZ.xyz_( okXYZ );
+		aiXYZ[0].xyz_( okXYZ );
 	}
 
 	I4x4 tmp = cageBALL( trg.xyz0(), pBALL, nBALL, rR );
 	tmp = cageBOX( tmp, pBOX, nBOX, rR );
 	if( lim )
-		return iXYZ.lim_mx(tmp,lim);
+		return aiXYZ[0].lim_mx(tmp,lim);
 
 	return tmp;
 }
 I4x4 gpcDrc::cageXYZ( I4 lim, U4 id, int rR  ) {
 	if( id > gpmN(gpanBALL) ) {
-		if( iXYZ.qlen_xyz() < mmX(250) )
+		if( aiXYZ[0].qlen_xyz() < mmX(250) )
 		if( okXYZ.qlen_xyz() > mmX(250) )
 		{
-			iXYZ.xyz_( okXYZ );
+			aiXYZ[0].xyz_( okXYZ );
 		}
-		return iXYZ;
+		return aiXYZ[0];
 	}
 
 	return cageXYZ( tXYZ, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id], rR );
@@ -286,12 +286,12 @@ I4x4 gpcDrc::cageXYZ( I4 lim, U4 id, int rR  ) {
 I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id, int rR ) {
 	if( id > gpmN(gpanBALL) )
 	{
-		if( iXYZ.qlen_xyz() < mmX(250) )
+		if( aiXYZ[0].qlen_xyz() < mmX(250) )
 		if( okXYZ.qlen_xyz() > mmX(250) )
 		{
-			iXYZ.xyz_( okXYZ );
+			aiXYZ[0].xyz_( okXYZ );
 		}
-		return iXYZ;
+		return aiXYZ[0];
 	}
 
 	return cageXYZ( trg, lim, gpapBOX[id], gpanBOX[id], gpapBALL[id], gpanBALL[id], rR );
@@ -333,6 +333,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 				jdALF = gpeALF_null;
 				tXYZ.xyz_(jd0XYZ);
 				tABC.ABC_(jd0ABC);
+				txyz.xyz_(jd0xyz);
 				break;
 		}
 		if( !jdALF ) {
@@ -413,7 +414,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 	/// ----------------------------
 	switch( jdALF ) {
 		case gpeALF_PAINT: {
-				if( oADRin.n )
+				if( oARY.n > oARY.i )
 					return true;
 				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y ), *pSTP;
 				U4 i = 0, n = jdPRG.z-jdPRG.y;
@@ -447,7 +448,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 					pSTP[1] = tABC;
 
 					pSTP[2].z -= mmX(500);
-					oADRin.n = i;
+					oARY.n = i;
 					if( !i ) {
 						tXYZ.xyz_( pSTP[0] );
 						tABC.xyz_( pSTP[1] );
@@ -458,10 +459,10 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 					if( tXYZ.z <= pSTP[0].z )
 						break;
 				}
-				oADRin.i = 0;
-				if( !oADRin.n )
+				oARY.i = 0;
+				if( !oARY.n )
 					break;
-				jdPRG.y += oADRin.n;
+				jdPRG.y += oARY.n;
 			} break;
 		case gpeALF_SHLD:
 		case gpeALF_SNAIL: { 							/// jdPRG.x ACT, //.y iCNT //.z nEND //.w width
@@ -568,15 +569,15 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 	jdPRG.y++;
 	return true;
 }
-gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC ) {
+gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC ) {
 	U8 s = -1, nLEN;
 	U4 n = gpmSTRLEN( pSTR );
 	if( this ? !n : true )
 		return pANS->lzyFRMT( s = -1, "nonsens" );
 
-	gpcROBnD	*pROBnD = gpmLZYvali( gpcROBnD, mass.GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ) );
+	gpcROBnD	*pROBnD = gpmLZYvali( gpcROBnD, pMASS->GTlzyALL.LZY( gpdGTlzyIDinp(TnID) ) );
 	gpcLZY		*pLZYout = NULL,
-				*pLZYusr = mass.GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+				*pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 	///-----------------------------
 	/// UJ felhasználó?
 	///-----------------------------
@@ -667,7 +668,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 								if( RnD.aDrc[iD].okXYZ.qlen_xyz() )
 									RnD.aDrc[iD].tXYZ.xyz_( RnD.aDrc[iD].okXYZ );
 								else
-									RnD.aDrc[iD].tXYZ.xyz_( RnD.aDrc[iD].iXYZ );
+									RnD.aDrc[iD].tXYZ.xyz_( RnD.aDrc[iD].aiXYZ[0] );
 								break;
 							default:
 								iNUM = gpeDRCos_posx;
@@ -690,7 +691,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 								if( RnD.aDrc[iD].okXYZ.qlen_xyz() )
 									RnD.aDrc[iD].tABC.ABC_( RnD.aDrc[iD].okABC );
 								else
-									RnD.aDrc[iD].tabc.xyz_( RnD.aDrc[iD].iABC );
+									RnD.aDrc[iD].tabc.xyz_( RnD.aDrc[iD].aiABC[0] );
 								break;
 							default:
 								iNUM = gpeDRCos_abcA;
@@ -914,7 +915,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case 10:
 			case 11:
 				// AXIS
-				pD->aoAX1to6[((iNUM-6)%6)/3].aXYZW[(iNUM-6)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
+				//pD->aoAX1to6[((iNUM-6)%6)/3].aXYZW[(iNUM-6)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
 				break;
 
 				// OFFSET - eltolás
@@ -932,7 +933,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR
 			case 22:
 			case 23:
 				// AXIS
-				pD->aoax1to6[((iNUM-18)%6)/3].aXYZW[(iNUM-18)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
+				//pD->aoax1to6[((iNUM-18)%6)/3].aXYZW[(iNUM-18)%nNUM] = (d8 == 0.0) ? (I4)an.num*degX(1) : (I4)(d8*degX(1));
 				break;
 
 

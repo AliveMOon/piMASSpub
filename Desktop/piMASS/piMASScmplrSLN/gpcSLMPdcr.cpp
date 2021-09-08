@@ -136,42 +136,53 @@ gpcLZY* gpcROBnD::pull( gpcLZY* pOUT, U4x4* pROBrw ) {
 }
 gpcROB& gpcROB::operator &= ( const gpcDrc& D ) {
 	null();
-	iARY = nARY = HS = COM = -1;
+	inARY = COMnHS = -1;
 	return *this;
 }
 gpcROB& gpcROB::operator = ( const gpcDrc& D ) {
+	/// --------------------- Dcr -> OUT --------------------------------
 	null();
-	gpmMcpyOF( aXYZ,	&D.oXYZ.x, 3 );
-	gpmMcpyOF( aABC,	&D.oABC.A, 3 );
-	HS = D.oCTRL.y;
-	*(U4x2*)&iARY = D.oADRin;
+	aXYZ00[0] = D.aoXYZ[0].x; aXYZ00[1] = D.aoXYZ[0].y; aXYZ00[2] = D.aoXYZ[0].z;
+	aABC00[0] = D.aoABC[0].A; aABC00[1] = D.aoABC[0].B; aABC00[2] = D.aoABC[0].C;
 
+	aXYZ01[0] = D.aoXYZ[1].x; aXYZ01[1] = D.aoXYZ[1].y; aXYZ01[2] = D.aoXYZ[1].z;
+	aABC01[0] = D.aoABC[1].A; aABC01[1] = D.aoABC[1].B; aABC01[2] = D.aoABC[1].C;
+
+	aXYZ10[0] = D.aoXYZ[2].x; aXYZ10[1] = D.aoXYZ[2].y; aXYZ10[2] = D.aoXYZ[2].z;
+	aABC10[0] = D.aoABC[2].A; aABC10[1] = D.aoABC[2].B; aABC10[2] = D.aoABC[2].C;
+
+	aXYZ11[0] = D.aoXYZ[2].x; aXYZ11[1] = D.aoXYZ[2].y; aXYZ11[2] = D.aoXYZ[2].z;
+	aABC11[0] = D.aoABC[2].A; aABC11[1] = D.aoABC[2].B; aABC11[2] = D.aoABC[2].C;
+
+	inARY = D.oARY.u4;
+
+	*pHS() = D.oCTRL.y;
 	if( D.bHS1o() )
-		COM = D.oCTRL.z;
+		*pCOM() = D.oCTRL.z;
 
 	msS = D.MPosS;
 	return *this;
 }
-gpcDrc& gpcDrc::operator = ( const gpcROB& rob ) {
-	if( rob.name != NMnDIF.x )
-	{
+gpcDrc& gpcDrc::operator = ( gpcROB& rob ) {
+	/// --------------------- rob -> INP --------------------------------
+	if( rob.name != NMnDIF.x ) {
 		if(bSTDcout){gpdCOUT << "\033[1;31mIlegal W rob!\033[0m" << gpdENDL;}
 		return *this;
 	}
+	aiXYZ[0].x = rob.aXYZ00[0]; aiXYZ[0].y = rob.aXYZ00[1]; aiXYZ[0].z = rob.aXYZ00[2];
+	aiABC[0].A = rob.aABC00[0]; aiABC[0].B = rob.aABC00[1]; aiABC[0].C = rob.aABC00[2];
+	if( aiXYZ[0].qlen_xyz() < mmX(300) )
+		aiXYZ[0].x = aiXYZ[0].y = aiXYZ[0].z = mmX(600);
+	ixyz.xyz_(aiXYZ[0].ABC2xyz( txyz, aiABC[0] ) );
 
-	gpmMcpyOF( &iXYZ.x, &rob.aXYZ, 3 );
-	if( iXYZ.qlen_xyz() < mmX(300) )
-		iXYZ.x = iXYZ.y = iXYZ.z = mmX(600);
+	aiXYZ[1].x = rob.aXYZ00[1]; aiXYZ[1].y = rob.aXYZ00[1]; aiXYZ[1].z = rob.aXYZ00[2];
+	aiABC[1].A = rob.aABC00[1]; aiABC[1].B = rob.aABC00[1]; aiABC[1].C = rob.aABC00[2];
 
-	gpmMcpyOF( &iABC.A, &rob.aABC, 3 );
-	ixyz.xyz_(iXYZ.ABC2xyz( txyz, iABC ) );
+	iARY.u4 = rob.inARY;
 
-	iADRin = *(U4x2*)&rob.iARY;
-
-	iCTRL.y = rob.HS;
-	iCTRL.z = rob.COM;
-	//iCTRL.w = rob.PIX;
-
+	iCTRL.y = (U4)*(rob.pHS());
+	iCTRL.z = (U4)*(rob.pCOM());
+	/// ms SLAVE, MASTER, R2D2
 	gpmMcpyOF( &msSMR2.x, &rob.msSLV, 3 );
 
 	U4 msX = msSRT3.x;
@@ -184,8 +195,8 @@ gpcDrc& gpcDrc::operator = ( const gpcROB& rob ) {
 		nMS++;
 		AVGms = (msSRT3.x-sMS)/nMS;
 
-		okXYZ.xyz_(iXYZ);
-		okABC.ABC_(iABC);
+		okXYZ.xyz_(aiXYZ[0]);
+		okABC.ABC_(aiABC[0]);
 	}
 	return *this;
 }
@@ -208,8 +219,8 @@ int gpcDrc::answINFOX( char* pANS, U4 id, I4 x ) {
 							"HS 0x%0.4x ",
 							(char*)sCOM, JD.z, msSRT3.x, x,
 
-							(iXYZ.x*x)/mmX(1), (iXYZ.y*x)/mmX(1), (iXYZ.z*x)/mmX(1),
-							(iABC.A*x)/degX(1), (iABC.B*x)/degX(1), (iABC.C*x)/degX(1),
+							(aiXYZ[0].x*x)/mmX(1), (aiXYZ[0].y*x)/mmX(1), (aiXYZ[0].z*x)/mmX(1),
+							(aiABC[0].A*x)/degX(1), (aiABC[0].B*x)/degX(1), (aiABC[0].C*x)/degX(1),
 							(ixyz.x*x)/mmX(1), (ixyz.y*x)/mmX(1), (ixyz.z*x)/mmX(1),
 
 							hs123()
@@ -245,8 +256,8 @@ int gpcDrc::answINFO( char* pANS, U4 id, int rR ) {
 							"HS 0x%0.4x ",
 							sCOM, JD.z, msSRT3.x, 1.0,
 
-							double(iXYZ.x)/mmX(1),	double(iXYZ.y)/mmX(1),	double(iXYZ.z)/mmX(1),
-							double(iABC.A)/degX(1),	double(iABC.B)/degX(1),	double(iABC.C)/degX(1),
+							double(aiXYZ[0].x)/mmX(1),	double(aiXYZ[0].y)/mmX(1),	double(aiXYZ[0].z)/mmX(1),
+							double(aiABC[0].A)/degX(1),	double(aiABC[0].B)/degX(1),	double(aiABC[0].C)/degX(1),
 							double(txyz.x)/mmX(1),	double(txyz.y)/mmX(1),	double(txyz.z)/mmX(1),
 
 							hs123()
@@ -283,12 +294,12 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id, int rR, char* pPP ) {
 										"\r\n%s\ttXYZ %7.2fmm, %7.2fmm, %7.2fmm "
 										"\r\n%s\tSMR2 %9.2fs,  %9.2fs, %9.2fs, %9.2fs;"
 										"\r\n%s\tDIFF %9.2fs,  %9.2fs, %9.2fs, %9.2fs;",
-										pPP, (U4)(sqrt((tXYZ-iXYZ).qlen_xyz())/mmX(1)),
+										pPP, (U4)(sqrt((tXYZ-aiXYZ[0]).qlen_xyz())/mmX(1)),
 
 										pPP,
-										double(iXYZ.x)/mmX(1),
-										double(iXYZ.y)/mmX(1),
-										double(iXYZ.z)/mmX(1),
+										double(aiXYZ[0].x)/mmX(1),
+										double(aiXYZ[0].y)/mmX(1),
+										double(aiXYZ[0].z)/mmX(1),
 
 										pPP,
 										double(cXYZ.x)/mmX(1),
@@ -296,9 +307,9 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id, int rR, char* pPP ) {
 										double(cXYZ.z)/mmX(1),
 
 										pPP,
-										double(oXYZ.x)/mmX(1),
-										double(oXYZ.y)/mmX(1),
-										double(oXYZ.z)/mmX(1),
+										double(aoXYZ[0].x)/mmX(1),
+										double(aoXYZ[0].y)/mmX(1),
+										double(aoXYZ[0].z)/mmX(1),
 
 										pPP,
 										double(tXYZ.x)/mmX(1),
@@ -322,16 +333,16 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id, int rR, char* pPP ) {
 										"\r\n%s\tiABC %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n%s\toABC %7.2fdg, %7.2fdg, %7.2fdg "
 										"\r\n%s\ttABC %7.2fdg, %7.2fdg, %7.2fdg;",
-										pPP, (U4)(sqrt((tABC-iABC).qlen_xyz())/degX(1)),
+										pPP, (U4)(sqrt((tABC-aiABC[0]).qlen_xyz())/degX(1)),
 										pPP,
-										double(iABC.A)/degX(1),
-										double(iABC.B)/degX(1),
-										double(iABC.C)/degX(1),
+										double(aiABC[0].A)/degX(1),
+										double(aiABC[0].B)/degX(1),
+										double(aiABC[0].C)/degX(1),
 
 										pPP,
-										double(oABC.A)/degX(1),
-										double(oABC.B)/degX(1),
-										double(oABC.C)/degX(1),
+										double(aoABC[0].A)/degX(1),
+										double(aoABC[0].B)/degX(1),
+										double(aoABC[0].C)/degX(1),
 
 										pPP,
 										double(tABC.A)/degX(1),
@@ -385,7 +396,7 @@ gpcLZY* gpcDrc::answSTAT( gpcLZY* pANS, U4 id, int rR, char* pPP ) {
 	}
 
 I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n, int rR ) {
-	I4x4 S = iXYZ.xyz0(), a, b;
+	I4x4 S = aiXYZ[0].xyz0(), a, b;
 	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
@@ -407,7 +418,7 @@ I4x4 gpcDrc::cageBALL( I4x4 T, I4x4* pCAGE, U4 n, int rR ) {
 	return S+D8;
 }
 I4x4 gpcDrc::cageBOX( I4x4 T, I4x4* pCAGE, U4 n, int rR ) {
-	I4x4 S = iXYZ.xyz0(), a, b;
+	I4x4 S = aiXYZ[0].xyz0(), a, b;
 	I8 dd0 = (T-S).qlen_xyz(), dd = dd0, d = sqrt(dd), abba, ab;
 	for( U4 i = 0; i < n; i++ )
 	{
@@ -435,10 +446,11 @@ void drc_trd( char* pBUFF ) {
 		return;
 	char	sBUFF[0x100], *pB = pBUFF;
 	pB += gpmNINCS(pB, "\" \t");
-	U8 nLEN, n;
+	U8 //nLEN,
+		n;
 	while( *pB ) {
 		pB += gpmNINCS(pB, "\r\n");
-		n = gpmVAN(pB, "\r\n", nLEN );
+		n = gpmVAN(pB, "\r\n", NULL ); //, nLEN );
 		gpmMcpy( sBUFF, pB, n )[n] = 0;
 		pB += n;
 		int o = system( sBUFF );
@@ -481,7 +493,7 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 
 			pP = pB = pXS;
 			while( *pC ) {
-				n = gpmVAN( pC, "%&!", nLEN );
+				n = gpmVAN( pC, "%&!", NULL ); //, nLEN );
 				gpmMcpy( pB, pC, n );
 				pC += n;
 				pB += n;
@@ -944,7 +956,7 @@ bool gpcDrc::asyncSYS( char* pBUFF, U1* pCLI ) {
 //
 //}
 */
-gpcDrc& gpcDrc::judo_OHNEnew( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
+/*gpcDrc& gpcDrc::judo_OHNEnew( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 	*this = iROB;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
 		case 4: { /// 4.HS2i? // HS2o elvesz VÉGE
@@ -979,8 +991,8 @@ gpcDrc& gpcDrc::judo_OHNEnew( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 					{
 						case 0:
 							/// XYZABCxyz 2. OK ------------- JD.z = 0
-							okXYZ.xyz_(oXYZ);
-							okABC.ABC_(oABC);
+							okXYZ.xyz_(aoXYZ[0]);
+							okABC.ABC_(aoABC[0]);
 							okxyz.xyz_(txyz);
 							break;
 						case 9115:	// a J5 túl erös akart lenni
@@ -991,12 +1003,12 @@ gpcDrc& gpcDrc::judo_OHNEnew( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 							// ne is akarjon tovább menni
 							/// XYZABCxyz 3. NOK ------------- JD.z = ERR
 							if( okXYZ.qlen_xyz() ){
-								tXYZ.xyz_( oXYZ.xyz_(okXYZ) );
-								tABC.ABC_( oABC.ABC_(okABC) );
+								tXYZ.xyz_( aoXYZ[0].xyz_(okXYZ) );
+								tABC.ABC_( aoABC[0].ABC_(okABC) );
 								if(bSTDcout){gpdCOUT << "9115tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							} else {
-								tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-								tABC.ABC_( oABC.ABC_(iABC) );
+								tXYZ.xyz_( aoXYZ[0].xyz_(aiXYZ[0]) );
+								tABC.ABC_( aoABC[0].ABC_(aiABC[0]) );
 								if(bSTDcout){gpdCOUT << "Err tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							}
 							break;
@@ -1064,7 +1076,7 @@ gpcDrc& gpcDrc::judo_OHNEnew( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 	if( !NMnDIF.x )
 		return *this;
 
-	I8x4 mmABCD( sqrt(iXYZ.qlen_xyz()) );
+	I8x4 mmABCD( sqrt(aiXYZ[0].qlen_xyz()) );
 	if( mmABCD.x < mmX(250) )
 		return *this;		// nem fut a R2D task
 
@@ -1335,7 +1347,7 @@ gpcDrc& gpcDrc::judo_OHNEnew( gpcROB& iROB, U4 mSEC, U4 iD0 ) {
 	}
 	return *this;
 
-}
+}*/
 gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 	*this = iROB;	/// XYZABCxyz 1. ixyz = iXYZ.ABC2xyz( txyz, iABC );
 	switch( JD.y ) {
@@ -1371,8 +1383,8 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 					{
 						case 0:
 							/// XYZABCxyz 2. OK ------------- JD.z = 0
-							okXYZ.xyz_(oXYZ);
-							okABC.ABC_(oABC);
+							okXYZ.xyz_(aoXYZ[0]);
+							okABC.ABC_(aoABC[0]);
 							okxyz.xyz_(txyz);
 							break;
 						case 9115:	// a J5 túl erös akart lenni
@@ -1383,12 +1395,12 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 							// ne is akarjon tovább menni
 							/// XYZABCxyz 3. NOK ------------- JD.z = ERR
 							if( okXYZ.qlen_xyz() ){
-								tXYZ.xyz_( oXYZ.xyz_(okXYZ) );
-								tABC.ABC_( oABC.ABC_(okABC) );
+								tXYZ.xyz_( aoXYZ[0].xyz_(okXYZ) );
+								tABC.ABC_( aoABC[0].ABC_(okABC) );
 								if(bSTDcout){gpdCOUT << "9115tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							} else {
-								tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-								tABC.ABC_( oABC.ABC_(iABC) );
+								tXYZ.xyz_( aoXYZ[0].xyz_(aiXYZ[0]) );
+								tABC.ABC_( aoABC[0].ABC_(aiABC[0]) );
 								if(bSTDcout){gpdCOUT << "Err tXYZ: " << tXYZ.pSTR( gpsJDpub ) << gpdENDL;}
 							}
 							break;
@@ -1457,7 +1469,7 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 	if( !NMnDIF.x )
 		return *this;
 
-	I8x4 mmABCD( sqrt(iXYZ.qlen_xyz()) );
+	I8x4 mmABCD( sqrt(aiXYZ[0].qlen_xyz()) );
 	if( mmABCD.x < mmX(250) )
 		return *this;		// nem fut a R2D task
 
@@ -1466,8 +1478,8 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 		oCTRL.w = 0;
 		oCTRL.z = 1;
 		JD.y = 0;
-		tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-		tABC.ABC_( oABC.ABC_(iABC) );
+		tXYZ.xyz_( aoXYZ[0].xyz_(aiXYZ[0]) );
+		tABC.ABC_( aoABC[0].ABC_(aiABC[0]) );
 		if( txyz.qlen_xyz() )
 			txyz.xyz_( oxyz.xyz_(ixyz) );
 		JD.x = 1;
@@ -1481,21 +1493,21 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 	if( sqrt(okXYZ.qlen_xyz()) > mmX(200) ){
 		// ezt kaptuk a robitol
 		// ha netán akkor sem mozdul
-		oXYZ.xyz_(iXYZ);
-		oABC.ABC_(iABC);
+		aoXYZ[0].xyz_(aiXYZ[0]);
+		aoABC[0].ABC_(aiABC[0]);
 	}
 
 	F4x4 tMX = 1.0, iMX;
-	iMX.mxABC( iABC, degX(180.0/PI) );
+	iMX.mxABC( aiABC[0], degX(180.0/PI) );
 	// itt kell le ellenőrizni mondjuk az ütközésre
 	//
 	float ab = 1.0, k;
 	static const float K = (100.0*PI2);
 
 	I4 lim = 0;
-	I4x4 	itD = iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) ),
+	I4x4 	itD = aiABC[0].mmABC( tABC, degX(180.0/PI), degX(180.0/PI) ),
 			tmp,
-			dXYZ = tXYZ - iXYZ, lXYZ,
+			dXYZ = tXYZ - aiXYZ[0], lXYZ,
 			dGRP = tGRP - iGRP;
 
 	//nD.z
@@ -1529,9 +1541,9 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 				break;
 		}
 
-		oXYZ.xyz_( cageXYZ( lim, i, gpaCAGEheadBALL[0].w ) );
+		aoXYZ[0].xyz_( cageXYZ( lim, i, gpaCAGEheadBALL[0].w ) );
 
-		lXYZ = oXYZ - iXYZ;
+		lXYZ = aoXYZ[0] - aiXYZ[0];
 		mmABCD.y = lXYZ.abs0().mx().x;
 		if( mmABCD.x < (mmX(1)/0x10) )
 		{
@@ -1547,7 +1559,7 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 				// kisebb let mint amit elvártunk a ketrec nem engedte
 				lXYZ *= (I4)(mmABCD.y/mmX(1))-10;
 				lXYZ /= (I4)(mmABCD.y/mmX(1));
-				oXYZ.xyz_(lXYZ+iXYZ);
+				aoXYZ[0].xyz_(lXYZ+aiXYZ[0]);
 				//mmABCD.y = sqrt(lXYZ.qlen_xyz());
 				/// na majd pattanjon le
 			} else {
@@ -1560,7 +1572,7 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 			oCTRL.z |= 1;
 			ab = float(mmABCD.y)/float(mmABCD.x);
 		} else {
-			oXYZ.xyz_(iXYZ);
+			aoXYZ[0].xyz_(aiXYZ[0]);
 			dXYZ.null();
 			ab = 0.0;
 		}
@@ -1588,12 +1600,12 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 				tMX.x = tMX.y.X3(tMX.z);
 			}
 			tABC.ABC_( tMX.eulABC()*degX(180.0/PI) );
-			itD = iABC.mmABC( tABC, degX(180.0/PI), degX(180.0/PI) );
+			itD = aiABC[0].mmABC( tABC, degX(180.0/PI), degX(180.0/PI) );
 		}
 	}
 
 	if( itD.w < (degX(1)/2) ) {	// kb: 50
-		tABC.ABC_(oABC.ABC_(iABC));
+		tABC.ABC_(aoABC[0].ABC_(aiABC[0]));
 	}
 	else {
 
@@ -1609,7 +1621,7 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 			{
 				ab = lpk;
 				I8 l = (mmABCD.y*gpdROBlim)/k;
-				oXYZ.xyz_( iXYZ.lim_xyz(oXYZ,l) );
+				aoXYZ[0].xyz_( aiXYZ[0].lim_xyz(aoXYZ[0],l) );
 				if( lim == mmABCD.y )
 					lim = mmABCD.y = l; // nem a CAGE fogta meg hanem csak nem tekerhet gyorsabban
 			}
@@ -1617,7 +1629,6 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 
 			if( ab < 1.0 ) {
 				if( mmABCD.x >= degX(2) ) {
-
 					mmABCD.x /= degX(1);
 					if( lim <= mmABCD.y )
 					{
@@ -1629,63 +1640,63 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 				}
 
 				if( mmABCD.y )
-					oABC.ABC_( ((itD*mmABCD.y)/mmABCD.x)+iABC );
+					aoABC[0].ABC_( ((itD*mmABCD.y)/mmABCD.x)+aiABC[0] );
 				else if( ab > 0.0 )
-					oABC.ABC_( (F4(itD)*ab)+iABC );
+					aoABC[0].ABC_( (F4(itD)*ab)+aiABC[0] );
 
 
-				if( (oABC.A/degX(180)) > 1 ) {
-					I4x2 rq = oABC.A;
+				if( (aoABC[0].A/degX(180)) > 1 ) {
+					I4x2 rq = aoABC[0].A;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
 					{
-						oABC.A = rq.x-degX(180);
+						aoABC[0].A = rq.x-degX(180);
 					}
 				}
-				else if( (oABC.A/degX(180)) < -1 ) {
-					I4x2 rq = -oABC.A;
+				else if( (aoABC[0].A/degX(180)) < -1 ) {
+					I4x2 rq = -aoABC[0].A;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
 					{
-						oABC.A = (rq.x-degX(180))*-1;
-					}
-				}
-
-				if( (oABC.B/degX(180)) > 1 ) {
-					I4x2 rq = oABC.B;
-					rq.XdivRQ( degX(180) );
-					if( rq.y&1 )
-					{
-						oABC.B = rq.x-degX(180);
-					}
-				}
-				else if( (oABC.B/degX(180)) < -1 ) {
-					I4x2 rq = -oABC.B;
-					rq.XdivRQ( degX(180) );
-					if( rq.y&1 )
-					{
-						oABC.B = (rq.x-degX(180))*-1;
+						aoABC[0].A = (rq.x-degX(180))*-1;
 					}
 				}
 
-				if( (oABC.C/degX(180)) > 1 ) {
-					I4x2 rq = oABC.C;
+				if( (aoABC[0].B/degX(180)) > 1 ) {
+					I4x2 rq = aoABC[0].B;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
 					{
-						oABC.C = rq.x-degX(180);
+						aoABC[0].B = rq.x-degX(180);
 					}
 				}
-				else if( (oABC.C/degX(180)) < -1 ) {
-					I4x2 rq = -oABC.C;
+				else if( (aoABC[0].B/degX(180)) < -1 ) {
+					I4x2 rq = -aoABC[0].B;
 					rq.XdivRQ( degX(180) );
 					if( rq.y&1 )
 					{
-						oABC.C = (rq.x-degX(180))*-1;
+						aoABC[0].B = (rq.x-degX(180))*-1;
+					}
+				}
+
+				if( (aoABC[0].C/degX(180)) > 1 ) {
+					I4x2 rq = aoABC[0].C;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						aoABC[0].C = rq.x-degX(180);
+					}
+				}
+				else if( (aoABC[0].C/degX(180)) < -1 ) {
+					I4x2 rq = -aoABC[0].C;
+					rq.XdivRQ( degX(180) );
+					if( rq.y&1 )
+					{
+						aoABC[0].C = (rq.x-degX(180))*-1;
 					}
 				}
 			} else {
-				oABC.ABC_( tABC );
+				aoABC[0].ABC_( tABC );
 			}
 		}
 		oCTRL.z |= 2;
@@ -1699,11 +1710,11 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 	{
 		// ketrec gátolta
         // o-kat berakjuk a t-be
-        tXYZ.xyz_( oXYZ );
-		tABC.ABC_( oABC );
+        tXYZ.xyz_( aoXYZ[0] );
+		tABC.ABC_( aoABC[0] );
 		if(bSTDcout){gpdCOUT << "CAGE tXYZ: " << tXYZ.pSTR( gpsJDpub ) <<gpdENDL;}
 	} else
-		if(bSTDcout){gpdCOUT << "oXYZ: " << oXYZ.pSTR( gpsJDpub ) << "\r\ntXYZ: " << tXYZ.pSTR( gpsJDpub ) <<gpdENDL;}
+		if(bSTDcout){gpdCOUT << "oXYZ: " << aoXYZ[0].pSTR( gpsJDpub ) << "\r\ntXYZ: " << tXYZ.pSTR( gpsJDpub ) <<gpdENDL;}
 
 	JD.y = 0;
 	switch( JD.x )
@@ -1712,8 +1723,8 @@ gpcDrc& gpcDrc::JUDO( gpcROB& iROB, U4 mSEC ) {
 			oCTRL.w = 0;
 			oCTRL.z = 1;
 			JD.y = 0;
-			tXYZ.xyz_( oXYZ.xyz_(iXYZ) );
-			tABC.ABC_( oABC.ABC_(iABC) );
+			tXYZ.xyz_( aoXYZ[0].xyz_(aiXYZ[0]) );
+			tABC.ABC_( aoABC[0].ABC_(aiABC[0]) );
 			JD.x = 1;
 			break;
 		case 1: // ALAPH ready!

@@ -71,15 +71,15 @@ F2& F2::swpXYflpY( const void* pV ) {
 	return *this;
 }
 F2& F2::sXY( const char* p_str, char** pp_str ) {
-	U8 nLEN;
+	//U8 nLEN;
 	gpmCLR;
 	const char* pPAT = "+-0123456789.,";
-	p_str += gpmVAN( p_str, pPAT, nLEN );
+	p_str += gpmVAN( p_str, pPAT, NULL ); //, nLEN );
 	x = gpmSTR2D(p_str);
 	if( *p_str == ',' )
 		p_str++;
 
-	p_str += gpmVAN( p_str, pPAT, nLEN );
+	p_str += gpmVAN( p_str, pPAT, NULL ); //, nLEN );
 	y = gpmSTR2D(p_str);
 	if( *p_str == ',' )
 		p_str++;
@@ -96,25 +96,25 @@ F4& F4::swpXYZ0( const void* pV ) {
 }
 
 F4& F4::sXYZW( const char* p_str, char** pp_str ) {
-	U8 nLEN;
+	//U8 nLEN;
 	gpmCLR;
 	const char* pPAT = "+-0123456789.,";
-	p_str += gpmVAN( p_str, pPAT, nLEN );
+	p_str += gpmVAN( p_str, pPAT, NULL ); //, nLEN );
 	x = gpmSTR2D(p_str);
 	if( *p_str == ',' )
 		p_str++;
 
-	p_str += gpmVAN( p_str, pPAT, nLEN );
+	p_str += gpmVAN( p_str, pPAT, NULL ); //, nLEN );
 	y = gpmSTR2D(p_str);
 	if( *p_str == ',' )
 		p_str++;
 
-	p_str += gpmVAN( p_str, pPAT, nLEN );
+	p_str += gpmVAN( p_str, pPAT, NULL ); //, nLEN );
 	z = gpmSTR2D(p_str);
 	if( *p_str == ',' )
 		p_str++;
 
-	p_str += gpmVAN( p_str, pPAT, nLEN );
+	p_str += gpmVAN( p_str, pPAT, NULL ); //, nLEN );
 	w = gpmSTR2D(p_str);
 	if( *p_str == ',' )
 		p_str++;

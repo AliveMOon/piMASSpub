@@ -73,7 +73,21 @@
 #define gpdZSnR		sizeof(gpcZS) //gpdZSnW+sizeof(I4x4)
 #define gpdZSnRu2	(gpdZSnR/sizeof(U2))
 
+#define gpdFRMThtml_D 	"<!DOCTYPE html>\r\n"\
+						"<html>\r\n"\
+						"<head></head>\r\n"\
+						"<body>\r\n"\
+						"<h1>%d</h1>\r\n"\
+						"</body>\r\n"\
+						"</html>\r\n\r\n\0"
 
+#define gpdFRMThtml_S 	"<!DOCTYPE html>\r\n"\
+						"<html>\r\n"\
+						"<head></head>\r\n"\
+						"<body>\r\n"\
+						"<h1>%s</h1>\r\n"\
+						"</body>\r\n"\
+						"</html>\r\n\r\n"
 
 //------------------------
 // 			HEAD
@@ -104,18 +118,20 @@ typedef enum gpeCGhd:U4 {
 class gpcRES;
 class gpcDrc;
 class gpcGSM;
+class gpcWIRE;
 
 class gpcROB {
 public:
-	U4x4	DEDI;			// b000	b032 b064  b096
-	U4		dedi, name;		// b128 b160
-	I4		aXYZ[3],		// b192 b224 b256
-			aABC[3];		// b288 b320 b352
-	U4		msS,			// b384
-			iARY, nARY,		// b416 b448
-			COM, HS,		// b480 b512
+	U4x4	DEDI;					// b000	b032 b064  b096
+	U4		dedi, name;				// b128 b160
+	I2		aXYZ00[3], aABC00[3],	// b192 b208 b224	// b240 b256 b272
+			aXYZ01[3], aABC01[3],	// b288 b304 b320	// b336 b352 b368
+			aXYZ10[3], aABC10[3],	// b384 b400 b416	// b432 b448 b464
+			aXYZ11[3], aABC11[3];	// b480 b496 b512	// b528 b544 b560
+	U4		msS, inARY, COMnHS,		// b576 b608 b640
 			/// b480 idáig küldjük
-			msSLV, msMST, msR2D, pad,// b544 b576 b608
+			msSLV, msMST, msR2D,	// b672 b704 b736
+			pad,
 			/// B640 idáig pullingol
 			iW, nW, nWu2,
 			nR, nRu2;
@@ -137,7 +153,14 @@ public:
 	gpcROB& operator = ( const gpcDrc& D );
 	gpcROB& operator &= ( const gpcDrc& D );
 	gpcROB( const gpcDrc& D );
-
+	U2* piARY() { return ((U2*)&inARY); }
+	U2* pnARY() { return ((U2*)&inARY)+1; }
+	U2* pCOM()	{ return ((U2*)&COMnHS); }
+	U2* pHS()	{ return ((U2*)&COMnHS)+1; }
+	/*U2 ciARY() { return ((U2*)&inARY)[0]; }
+	U2 cnARY() { return ((U2*)&inARY)[1]; }
+	U2 cCOM() { return ((U2*)&COMnHS)[0]; }
+	U2 cHS() { return ((U2*)&COMnHS)[1]; }*/
 };
 
 class gpcZS {
@@ -171,14 +194,14 @@ class gpcGT;
 class gpcDrc {
 public:
 	I4x4 	NMnDIF,
-			tXYZ, oXYZ, iXYZ,
-			tABC, oABC, iABC,
+			tXYZ, aoXYZ[4], aiXYZ[2],
+			tABC, aoABC[4], aiABC[2],
 			txyz, oxyz, ixyz,
-			tabc, oabc, iabc,
-			aoAX1to6[2], aiAX1to6[2],
-			aoax1to6[2], aiax1to6[2];
-	U4x2	iADRin,
-			oADRin;
+			tabc, oabc, iabc;
+			//aoAX1to6[2], aiAX1to6[2],
+			//aoax1to6[2], aiax1to6[2];
+	I2x2	iARY,
+			oARY;
 	U4x4	oCTRL, iCTRL, JD;	// JD.z error num
 	I4x4	okXYZ, okABC, okxyz,
 			tGRP, oGRP, iGRP,
@@ -190,11 +213,11 @@ public:
 	F4x4	jd0mx, jd0mxTL;
 	gpeALF	jdALF;
 	I4x4	msSMR2, msSRT3;
-	U4		n_trd,	n_join,
-			nMS,	sMS,	AVGms, Ems,
-			MPosS,	HS1ms;
-	std::thread trd;
 	gpcLZY	lzyROAD, lstSTP;
+	U4		nMS,	sMS,	AVGms, Ems,
+			MPosS,	HS1ms,	n_trd, n_join;
+	/// gpmZn ----------------------
+	std::thread trd;
 
 	~gpcDrc() {
 		if( n_join >= n_trd )
@@ -230,7 +253,7 @@ public:
 			format( nm );
 		*this = rob;
 	}
-	gpcDrc& operator = ( const gpcROB& rob );
+	gpcDrc& operator = ( gpcROB& rob );
 
 
 	bool operator == ( const gpcDrc& b ) const {
@@ -251,14 +274,11 @@ public:
 			return *this;
 
 		NMnDIF.x = nm;
-		iXYZ = oXYZ = tXYZ = I4x4( 400,  0,	300+400,	gpeZS_POS0)&I4x2(mmX(1),1).xxxy();
-		iABC = oABC = tABC = I4x4( 180,  0, 90,			gpeZS_DIR0)&I4x2(degX(1),1).xxxy();
-		iXYZ.w = gpeZS_iPOS;
-		iABC.w = gpeZS_iDIR;
-		oXYZ.w = gpeZS_oPOS;
-		oABC.w = gpeZS_oDIR;
-		tXYZ.w = gpeZS_tPOS;
-		tABC.w = gpeZS_tDIR;
+		aiXYZ[0] = aoXYZ[0] = tXYZ = I4x4( 400,  0,	300+400,	gpeZS_POS0)&I4x2(mmX(1),1).xxxy();
+		aiABC[0] = aoABC[0] = tABC = I4x4( 180,  0, 0,			gpeZS_DIR0)&I4x2(degX(1),1).xxxy();
+		aiXYZ[0].w = gpeZS_iPOS; 	aiABC[0].w = gpeZS_iDIR;
+		aoXYZ[0].w = gpeZS_oPOS; 	aoABC[0].w = gpeZS_oDIR;
+		tXYZ.w = gpeZS_tPOS; 		tABC.w = gpeZS_tDIR;
 		// OFFSET - eltolás
 		oxyz.w = gpeZS_opos;
 		ixyz.w = gpeZS_ipos;
@@ -266,17 +286,6 @@ public:
 		oabc.w = gpeZS_odir;
 		iabc.w = gpeZS_idir;
 		txyz.w = gpeZS_tpos;
-
-		// TENGELY
-		aoAX1to6[0].w = gpeZS_oA13;
-		aoAX1to6[1].w = gpeZS_oA46;
-		aiAX1to6[0].w = gpeZS_iA13;
-		aiAX1to6[1].w = gpeZS_iA46;
-
-		aoax1to6[0].w = gpeZS_oa13;
-		aoax1to6[1].w = gpeZS_oa46;
-		aiax1to6[0].w = gpeZS_ia13;
-		aiax1to6[1].w = gpeZS_ia46;
 
 		oCTRL.x = gpeZS_oCTR;
 		iCTRL.x = gpeZS_iCTR;
@@ -853,7 +862,7 @@ class gpcGT {
 		char	s_ip[0x400],
 				s_telnet[80*25+4];
 
-		U1		sGTent[4],
+		U1		sGTent[8],
 				sHOST[0x100],
 				sUSER[0x100],
 				sFILE[0x100],
@@ -882,7 +891,8 @@ class gpcGT {
         bool GTprmpt( bool bENT = true  ) {
 			if( this ? sGTent[0] : true )
 				return false;
-
+			if( pOUT ? pOUT->qCLOSE() : false )
+				return false;
 			U8 s = -1;
 			pOUT = pOUT->lzyFRMT( s, "%s%x>", bENT?"\r\n":"    \r",iCNT );
 			return true;
@@ -941,6 +951,7 @@ class gpcGT {
 			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
+		gpcWIRE*	GTwire( gpcWIN* pWIN );
 		gpcGSM*	GTgsm( gpcWIN* pWIN );
 		I8		GTcnct( gpcWIN* pWIN );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
@@ -949,10 +960,11 @@ class gpcGT {
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );
 		char*	GTsnd( char* p_err, char* s_buff, U4 n_buff );
 
+        gpcLZY*	GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC );
 		gpcLZY*	GTgsmOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC );
 
 
-		gpcLZY* GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC );
+		gpcLZY* GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC );
 		void	GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL );
 
 		gpcLZY* GTdrcOSzs( gpcLZY* pANS, U1* pSTR, gpcMASS& mass, SOCKET sockUSR, U4 mSEC );
@@ -971,7 +983,10 @@ class gpcGT {
 		void	GTos( gpcGT& mom, gpcWIN* pWIN = NULL, gpcGTall* pALL = NULL );
 		gpcLZY*	GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB );
 
-		U8 GTout( gpcWIN* pWIN );
+		size_t GTout( gpcWIN* pWIN );
+
+		gpcLZY*	GThtmlOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, void* pGET, void* pHOST );
+		//gpcLZY*	GTwireOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, void* pGET, void* pHOST );
 
 	protected:
 

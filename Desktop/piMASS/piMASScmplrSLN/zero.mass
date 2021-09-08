@@ -12,7 +12,7 @@
  again = 10;
  mini = print( "%s %d",mii,fps );
   b0	 
- telnet = 80;
+ telnet = 6000;
  ginp = 0x10002;
  gout = 0x10002;
  gsm = "ttyS0";

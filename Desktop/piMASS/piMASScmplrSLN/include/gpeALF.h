@@ -1226,6 +1226,7 @@ typedef enum gpeALF:I8
 	gpeALF_WAIT = gpdABCD('W', 'A', 'I', 'T'),
 	gpeALF_WALK = gpdABCD('W', 'A', 'L', 'K'),
 	gpeALF_WHAM = gpdABCD('W', 'H', 'A', 'M'),
+	gpeALF_WIRE = gpdABCD('W', 'I', 'R', 'E'),
 
 	gpeALF_xorM = gpdABCD('X', 'O', 'R', 'M'),
 

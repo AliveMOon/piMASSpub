@@ -22,7 +22,8 @@ extern char gpaALF_H_sub[];
 
 gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 	char *pFILE = pIDlst->pF+sprintf( pIDlst->pF, "0x%0.16llx_dir/", ID );
-	gpcLZY dir, rd; U8 s;
+	gpcLZY dir, rd;
+	U8 s;
 	size_t n;
 	dir.lzyDIR( pIDlst->sPATH, s = 0 );
 	if( !dir.p_alloc )
@@ -33,8 +34,8 @@ gpDBitm* gpDBitm::read( gpDBlst *pIDlst ) {
 	I4x4* pXYZW;
 	I8x4 ABbb;
 	while( pSi < pSn ) {
-		pSt = (pMNe = pSi + gpmVAN(pSi,   "\t", s ))+1;
-		pSe = pSt + gpmVAN(pSt, "\r\n", s );
+		pSt = (pMNe = pSi + gpmVAN(pSi, "\t", NULL ))+1; //, s ))+1;
+		pSe = pSt + gpmVAN(pSt, "\r\n", NULL ); //, s );
 		ABbb.a8x2[0].num = pSt-pSi;
 		ABbb.a8x2[0] = pSi;
 		ABbb.a8x2[1].num = pSt-pSi - ABbb.a8x2[0].num;
@@ -159,8 +160,8 @@ gpDBlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
 	if(!nDB) { dctDB.dctADD( " ", 1 ); nDB = dctDB.nIX(); }
 
 	pU1 += gpmNINCS(pU1,"\" \t\r\n,");
-	nU0 = pU1 ? gpmVAN( pU1, "\" \t\r\n,", nLEN ) : 0;
-	nU1 = pU1 ? gpmVAN( pU1, "\"", nLEN ) : 0;
+	nU0 = gpmVAN( pU1, "\" \t\r\n,", NULL ); //, nLEN ) : 0;
+	nU1 = gpmVAN( pU1, "\"", NULL ); //, nLEN ) : 0;
 	if( nU0 )
 		ixDB = dctDB.dctFND( pU1, nU0, nDB );
 
@@ -190,8 +191,8 @@ gpDBlst* gpcMASS::iDBu( gpMEM* pMEM, char *pU1, char* sPATH, char* pFILE ) {
 				*pSi = pS, *pSn = pSi + dir.nLD(),
 				*pSt, *pSe;
 		while( pSi < pSn ) {
-			pSt = pSi + gpmVAN(pSi,   "\t", nLEN )+1;
-			pSe = pSt + gpmVAN(pSt, "\r\n", nLEN );
+			pSt = pSi + gpmVAN(pSi,   "\t", NULL )+1; //, nLEN )+1;
+			pSe = pSt + gpmVAN(pSt, "\r\n", NULL ); //, nLEN );
 			int oo = gpmMcmp(pSi,"0x",2);
 			if( oo == 2 )
 			if( ((*pSt)=='d') || ((*pSt)=='D') ) {
@@ -264,7 +265,7 @@ void gpMEM::funFND() {
 		ixTYP = 0;
 		if(pPi->bUTF8()) {
 			pS = (char*)pPi->pU1(this)+1;
-			nS = (pS ? gpmVAN( pS, "\"", nLEN ) : 0);
+			nS = gpmVAN( pS, "\"", NULL );
 			nAT = AT.nAT( pS, nS );
 			pAT = (I8x2*)AT.p_alloc;
 		}

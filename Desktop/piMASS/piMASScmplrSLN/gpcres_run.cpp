@@ -1234,7 +1234,8 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 														pGT->pHUD->id = gpeNET4_0EYE;
 														pJPGsnd->lzyRST();
 														//gpmDEL(pLZY);
-													} else {
+													}
+													else {
 														gpmDEL(pJPGsnd);
 														if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSURF, 57 ) )
 															IMG_SavePNG( pSURF, "/mnt/ram/tmp.tmp" );

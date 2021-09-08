@@ -47,3 +47,5 @@ sudo cp sys/include/mysys.h /usr/include
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install raspi-config rpi-update
+
+sudo apt-get install libjpeg-dev

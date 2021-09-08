@@ -1300,7 +1300,7 @@ gpc3Dgym* gpc3Dgym::pLWS( gpcLZY& lws, gpcLZYdct& lwsDCT, gpcLZYdct& bnDCT ) {
 								<<  gpdENDL;
 		}
 	}
-	for( U4 i = 0, j, k, ni = n3Ditm(); i < ni; i++ ) {
+ 	for( U4 i = 0, j, k, ni = n3Ditm(); i < ni; i++ ) {
 		pIS = p3Dii(i);
 
 		if( pIS->itmID == pIS->momID )

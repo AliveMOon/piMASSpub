@@ -145,7 +145,8 @@ sudo apt-get install libxcursor-dev
 sudo apt-get install libxinerama-dev
  sudo apt-get install libxi-dev
 
-sudo apt-get install libglew-dev 	// ilyenkor mar aszondja a legfrissebb -------------
+sudo apt-get install libglew-dev 	
+// ilyenkor mar aszondja a legfrissebb -------------
 
 
 --------------- TUTORIAL -----------------

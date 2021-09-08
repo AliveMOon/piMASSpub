@@ -17,8 +17,7 @@ gpcOPCD::gpcOPCD( const gpcOPCD* pTHIS, const char* pS, char a, char m, I8 i, U8
 
 
 	nSTR = gpmVAN( pSTR,
-					gpdPRGsep, //gpsPRG,
-					nLEN );
+					gpdPRGsep, NULL ); //, nLEN );
 
 	//return;
 

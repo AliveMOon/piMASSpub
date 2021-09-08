@@ -2,8 +2,7 @@
 #include "gpcwin.h"
 extern U1 gpaALFsub[];
 extern char gpsTAB[], *gppTAB;
-gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB )
-{
+gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pTAB ) {
 	if( !this )
 		return p_out;
 
@@ -30,13 +29,13 @@ gpcLZY* gpcGT::GTos_GATELIST( gpcLZY *p_out, const char* p_enter, const char* pT
 
 	return p_out;
 }
-U8 gpcGT::GTout( gpcWIN* pWIN )
-{
+size_t gpcGT::GTout( gpcWIN* pWIN ) {
 	if( !this )
 		return 0;
-
-	U8 nOUT = pOUT ? pOUT->n_load : 0, s, nC = 0;
-	if( nOUT || TnID.alf == gpeALF_SLMP )
+	size_t nOUT = pOUT->nLD();
+	U8	//nOUT = pOUT ? pOUT->n_load : 0,
+		s; //, nC = 0;
+	if( nOUT || (TnID.alf == gpeALF_SLMP) )
 		return nOUT;
 
 	// üres a pOUT töltsünk bele valamit
@@ -47,7 +46,7 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 	{
 		pOUT = pWIN->pSYNwin->putSYN( pOUT, msSYNwin, socket, bSW );
 		msSYNwin = pWIN->msSYN;
-		nOUT = pOUT ? pOUT->n_load : 0;
+		nOUT = pOUT->nLD(); //pOUT ? pOUT->n_load : 0;
 		if( nOUT )
 			nMISo = gpdHUDn;
 	}
@@ -73,10 +72,10 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 			pMISo->lzyINS( NULL, 0, s = 0, nMISo );
 		}
 	}
-	if( gpmLZYload(pOUT, U1) )
-		return pOUT ? pOUT->n_load : 0;
+	if( nOUT = pOUT->nLD() ) //gpmLZYload(pOUT, U1) )
+		return nOUT; //pOUT ? pOUT->n_load : 0;
 
-	if( !gpmLZYload(pPUBgt, U1) )
+	if( !pPUBgt->nLD() ) // gpmLZYload(pPUBgt, U1) )
 		return 0;
 
 	gpmDEL( pOUT );
@@ -87,10 +86,9 @@ U8 gpcGT::GTout( gpcWIN* pWIN )
 		if( pINP )
 			pOUT = pOUT->lzyFRMT( s = -1, "%s", pINP->p_alloc ? (char*)pINP->p_alloc : "" );
 	}
-	return pOUT ? pOUT->n_load : 0;
+	return pOUT->nLD(); //pOUT ? pOUT->n_load : 0;
 }
-void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
-{
+void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 	if( !this )
 		return;
 	switch( sGTent[2] )
@@ -124,8 +122,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	if( nSYN ? pINP->n_load < nSYN : false )
 			return;
 
-	while( nSYN )
-	{
+	while( nSYN ) {
 		sGTent[0] = ';';
 
 		U1* pDAT = p_str+sizeof(gpcSYNC);
@@ -236,8 +233,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		}
 	}
 
-	if( pSYNgt ? pSYNgt->n_load : false )
-	{
+	if( pSYNgt ? pSYNgt->n_load : false ) {
 		nSYNdo += pSYNgt->n_load/sizeof(gpcSYNC);
 		for( U4 i = 0, ie = pSYNgt->n_load/sizeof(gpcSYNC); i < ie; i++ )
 		{
@@ -263,8 +259,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		gpmDEL(pSYNgt);
 	}
 
-
-
 	if( !p_str )
 		return;
 
@@ -274,8 +268,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 	U1 *p_back = p_str + gpdVAN( (char*)p_str, "\b" );
 	bool b_back = false;
-	while( *p_back == '\b' )
-	{
+	while( *p_back == '\b' ) {
 		b_back = !sGTent[0];
 		I8	n_sub = p_sub-pINP->p_alloc,
 			n_back = gpmNINCS( p_back, "\b" ),
@@ -325,11 +318,11 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 
 	I8x2 cAN( gpeALF_NONSENSE );
 	U1* pSKIP = NULL; U4 nSKIP = 0;
-	if( p_str < p_null )
-	{
+	if( p_str < p_null ) {
 		U1	*p_row = p_str+gpmNINCS( p_str, " \t;>\r\n" ),
 			*p_row_end = p_row+gpdVAN( (char*)p_row, ";\r\n" ),
 			*p_next = p_row_end+gpmNINCS( p_row_end, ";\r\n" ),
+
 			*p_answ = s_answ,
 			*p_com = s_com;
 
@@ -372,62 +365,57 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					*s_atrib = 0;
 
 
-				switch( cAN.alf )
-				{
-					case gpeALF_GSM:{
+				switch( cAN.alf ) {
+                    case gpeALF_WIRE: {
+							U1* pA;
+							SOCKET sockWIRE = gpfSTR2U8( (U1*)s_atrib, &pA );
+							gpcGT* pGT = pALL->GT( sockWIRE );
+							if( pGT ? pGT->TnID.alf == gpeALF_WIRE : false ) {
+								if( pWIN ? pWIN->piMASS : NULL )
+									pOUT = pGT->GTwireOS( pOUT, pA, pWIN->piMASS, socket, pWIN->mSEC.x );
+								break;
+							}
+							pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
+							for( U4 i = 0, e = pALL->nGTld; i < e; i++ ) {
+								if( !pALL->ppGTalloc[i] )
+									continue;
+								pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
+							}
+						} break;
+					case gpeALF_GSM: {
 							U1* pA;
 							SOCKET sockGSM = gpfSTR2U8( (U1*)s_atrib, &pA );
 							gpcGT* pGT = pALL->GT( sockGSM );
-							if( pGT ? pGT->TnID.alf == gpeALF_GSM : false )
-							{
+							if( pGT ? pGT->TnID.alf == gpeALF_GSM : false ) {
 								if( pWIN ? pWIN->piMASS : NULL )
 									pOUT = pGT->GTgsmOS( pOUT, pA, pWIN->piMASS, socket, pWIN->mSEC.x );
-							} else {
-								pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
-								for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
-								{
-									if( !pALL->ppGTalloc[i] )
-										continue;
-									pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
-								}
+								break;
+							}
+							pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
+							for( U4 i = 0, e = pALL->nGTld; i < e; i++ ) {
+								if( !pALL->ppGTalloc[i] )
+									continue;
+								pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
 							}
 						} break;
-					case gpeALF_SLMP:{
+					case gpeALF_SLMP: {
 							U1* pA;
 							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
 							gpcGT* pGT = pALL->GT( sockSLMP );
-							if( pGT ? pGT->TnID.alf == gpeALF_SLMP : false )
-							{
+							if( pGT ? pGT->TnID.alf == gpeALF_SLMP : false ) {
 								if( pWIN ? pWIN->piMASS : NULL )
-									pOUT = pGT->GTdrcOSrob( pOUT, pA, *(pWIN->piMASS), socket, pWIN->mSEC.x );
-							} else {
-								pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
-								for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
-								{
-									if( !pALL->ppGTalloc[i] )
-										continue;
-									pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
-								}
+									pOUT = pGT->GTdrcOSrob( pOUT, pA, pWIN->piMASS, socket, pWIN->mSEC.x );
+								break;
+							}
+
+							pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
+							for( U4 i = 0, e = pALL->nGTld; i < e; i++ ) {
+								if( !pALL->ppGTalloc[i] )
+									continue;
+								pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
 							}
 						} break;
-					/*case gpeALF_SLMPo:{
-							U1* pA;
-							SOCKET sockSLMP = gpfSTR2U8( (U1*)s_atrib, &pA );
-							gpcGT* pGT = pALL->GT( sockSLMP );
-							if( pGT ? pGT->TnID.alf == gpeALF_SLMP : false )
-							{
-								if( pWIN ? pWIN->piMASS : NULL )
-									pOUT = pGT->GTdrcOSzs( pOUT, pA, *(pWIN->piMASS), socket, pWIN->mSEC.x );
-							} else {
-								pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
-								for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
-								{
-									if( !pALL->ppGTalloc[i] )
-										continue;
-									pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
-								}
-							}
-						} break;*/
+
 					case gpeALF_ACCOUNT:
 						// én vagyok a KLIENS,
 						// a SERVER megkér, hogy azonosítsam magam
@@ -471,46 +459,31 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 					case gpeALF_SOCK: {
 							mSEC.z = gpfSTR2U8( (U1*)s_atrib, NULL );
 							if( gpcGT* pGT = pALL->GT( (SOCKET)mSEC.z ) ) //GTacc.GT( (SOCKET)mSEC.z ) )
-							if( pGT->sockAT == socket )
-							{
+							if( pGT->sockAT == socket ) {
 								mSEC.y = pGT->mSEC.y;
 								bSW |= 2;
 								pGT->bSW |= 2;
 							}
-
 						} break;
 					case gpeALF_MSEC: {
 							mSEC.x = gpfSTR2U8( (U1*)s_atrib, NULL );
 						} break;
-
-
-					case gpeALF_GATELIST:
-						pOUT = mom.GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB ); //gpsTAB );
-						if( !pALL )
-							break;
-						for( U4 i = 0, e = pALL->nGTld; i < e; i++ )
-						{
-							if( !pALL->ppGTalloc[i] )
-								continue;
-							pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, gpmGTent, gppTAB );
-						}
-						break;
+					case gpeALF_GATELIST: {
+							pOUT = mom.GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB ); //gpsTAB );
+							if( !pALL )
+								break;
+							for( U4 i = 0, e = pALL->nGTld; i < e; i++ ) {
+								if( !pALL->ppGTalloc[i] )
+									continue;
+								pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, gpmGTent, gppTAB );
+							}
+						} break;
 					case gpeALF_MSG:{
 							mom.pOUT = mom.pOUT->lzyFRMT( s = -1, "msg 0x%0.8x: %s%s", (U4)socket, (sGTent[0]?(char*)sGTent:"\r\n"), s_atrib );
 						} break;
-					case gpeALF_HELP:
-						pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", gpmGTent );
-						break;
-					case gpeALF_EYE: {
-							isEVNT.null();
-							isEVNT.id = gpeNET4_0EYE;
-							isEVNT.n = TnID.num;
-							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzyFRMT(s = -1, "%s event", gpmGTent ); //(sGTent[0]?(char*)sGTent:"\r\n") );
+					case gpeALF_HELP: {
+							pOUT = pOUT->lzyFRMT( s = -1, "%sHELP?", gpmGTent );
 						} break;
-
-
-
 					case gpeALF_LIST: {
 							U1* pS = (U1*)s_atrib;
 							I8x4 an = 0;
@@ -565,45 +538,132 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 							sprintf( s_atrib, "0x%x>", iCNT );
 							pMISo = pWIN->putDBG( pMISo, gpeNET4_0LST, an, s_atrib );
 						} break;
+					case gpeALF_GET: {
+							// HTML
+							/// sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 6000
+							U1	*pGEThttp = (U1*)strstr( (char*)p_row, "\r\n\r\n" ),
+								*pGEThost, *pGETlink = (U1*)strstr( (char*)p_row, " /" );
+							if( pGEThttp ) {
+								pOUT = pOUT->lzyRST();
+
+								p_row_end = pGEThttp;
+								p_next = p_row_end+gpmNINCS( p_row_end, ";\r\n" ),
+								pGEThttp = (U1*)strstr( (char*)p_row, " HTTP" );
+								if( pGEThttp ) {
+									pGEThost = (U1*)strstr( (char*)pGEThttp, "\r\nHost" );
+									if( pGEThost )
+										pOUT = GThtmlOS(pOUT, mom, pWIN, pGETlink+2, pGEThost+8 );
+									else
+										pOUT = pOUT->lzyFRMT( s = -1, gpdFRMThtml_S, pGEThttp  );
+								}
+								else
+									pOUT = pOUT->lzyFRMT( s = -1, gpdFRMThtml_D, socket  );
+								pOUT = pOUT->lzy_reqCLOSE();//
+								//sGTent[0] = 'h';
+								break;
+							}
+							if(bSTDcout){gpdCOUT << "gpeALF_GET:" << s_atrib <<gpdENDL;};
+
+
+						} break;
+					case gpeALF_EYE: {
+							U4 	nO = pOUT ? pOUT->n_load : 0,
+								iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
+
+							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC ) )
+                            if( pMISo ? (pMISo->n_load < pPIC->nPKavg) : true ) {
+								if( !pPIC->pPACK ) {
+									SDL_Surface *pSRF = NULL;
+									if( !pPIC->pSRF ) {
+										pPIC->pSRF = pPIC->pPICrtxSRF();
+
+									}
+									if( pSRF = pPIC->pSRF ) {
+										if( pPIC->pFILE < pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE;
+										if( !*pPIC->pFILE ) {
+											if( pPIC->pFILE <= pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE+sprintf( (char*)pPIC->sFILE, "/mnt/ram/" );
+											pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
+										}
+
+										if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
+											IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
+
+										//gpmDEL( pPIC->pPACK );
+
+										U8 strt = -1;
+										pPIC->pPACK = pPIC->pPACK->lzyRD( "/mnt/ram/tmp.tmp", strt = -1 );
+										U4x2 hd( gpeNET4_0EYE, pPIC->pPACK->nLD() );
+										pPIC->pPACK = pPIC->pPACK->lzyINS( (U1*)&hd, sizeof(hd), strt );
+
+										pPIC->nPKavg += pPIC->pPACK->nLD();
+										pPIC->nPKavg /= 2;
+										//SDL_FreeSurface(pSURF);
+										if( gpfACE( (char*)pPIC->sFILE, 4) > -1 )
+											rename( (char*)pPIC->sFILE, "/mnt/ram/bg.kill" );
+
+										rename( "/mnt/ram/tmp.tmp", (char*)pPIC->sFILE );
+
+										if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+											remove( "/mnt/ram/bg.kill" );
+
+									}
+								}
+
+								if( pPIC->pPACK ) {
+									pOUT = pOUT->lzyPLUS( pPIC->pPACK, s = -1 );
+									gpmDEL(pPIC->pPACK);
+								}
+								/*if( pPIC->pPACK->n_load > 0x400 )
+									pMISo = pMISo->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+								else
+									pOUT = pOUT->putPIC( pPIC->pPACK->p_alloc, pPIC->pPACK->n_load, pPIC->pFILE, pWIN->mSEC.x );
+								*/
+							}
+
+							if( nO < (pOUT ? pOUT->n_load : 0) )
+								nOUT = pOUT->n_load;
+
+							nSKIP = p_next-p_row;
+							if( !nSKIP ) break;
+
+							((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+							pSKIP = (U1*)s_atrib;
+						} break;
 					case gpeALF_PIC: {
-
-
 							U4 	nO = pOUT ? pOUT->n_load : 0,
 								iPIC = gpfSTR2U8( (U1*)s_atrib, NULL );
 
 							if( iPIC )
 							if( gpcPIC* pPIC = pWIN->piMASS->PIC.PIC( iPIC-1 ) )
-                            if( pMISo ? (pMISo->n_load < pPIC->nPKavg) : true )
-							{
-								if( !pPIC->pPACK )
-								if( SDL_Surface *pSRF = pPIC->pSRF )
-								{
-									if( pPIC->pFILE < pPIC->sFILE )
-											pPIC->pFILE = pPIC->sFILE;
-									if( !*pPIC->pFILE )
-									{
-										if( pPIC->pFILE <= pPIC->sFILE )
-											pPIC->pFILE = pPIC->sFILE+sprintf( (char*)pPIC->sFILE, "/mnt/ram/" );
-										pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
-									}
+                            if( pMISo ? (pMISo->n_load < pPIC->nPKavg) : true ) {
+								if( !pPIC->pPACK ) {
 
-									if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
-										IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
+									if( SDL_Surface *pSRF = pPIC->pSRF ) {
+										if( pPIC->pFILE < pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE;
+										if( !*pPIC->pFILE ) {
+											if( pPIC->pFILE <= pPIC->sFILE )
+												pPIC->pFILE = pPIC->sFILE+sprintf( (char*)pPIC->sFILE, "/mnt/ram/" );
+											pPIC->TnID.an2str( pPIC->pFILE, (U1*)".jpg", true );
+										}
 
-									//gpmDEL( pPIC->pPACK );
-									pPIC->pPACK = ((gpcLZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
-									pPIC->nPKavg += pPIC->pPACK->n_load;
-									pPIC->nPKavg /= 2;
-									//SDL_FreeSurface(pSURF);
-									if( gpfACE( (char*)pPIC->sFILE, 4) > -1 )
-									{
-										rename( (char*)pPIC->sFILE, "/mnt/ram/bg.kill" );
-									}
-									rename( "/mnt/ram/tmp.tmp", (char*)pPIC->sFILE );
+										if( !gpfSRFjpgSAVE( (U1*)"/mnt/ram/tmp.tmp", pSRF, 57 ) )
+											IMG_SavePNG( pSRF, "/mnt/ram/tmp.tmp" );
 
-									if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
-									{
-										remove( "/mnt/ram/bg.kill" );
+										//gpmDEL( pPIC->pPACK );
+										pPIC->pPACK = ((gpcLZY*)NULL)->lzyRD( "/mnt/ram/tmp.tmp", s = -1 );
+										pPIC->nPKavg += pPIC->pPACK->n_load;
+										pPIC->nPKavg /= 2;
+										//SDL_FreeSurface(pSURF);
+										if( gpfACE( (char*)pPIC->sFILE, 4) > -1 )
+											rename( (char*)pPIC->sFILE, "/mnt/ram/bg.kill" );
+
+										rename( "/mnt/ram/tmp.tmp", (char*)pPIC->sFILE );
+
+										if( gpfACE("/mnt/ram/bg.kill", 4) > -1 )
+											remove( "/mnt/ram/bg.kill" );
 
 									}
 								}
@@ -620,12 +680,10 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 								nOUT = pOUT->n_load;
 
 							nSKIP = p_next-p_row;
-							if( nSKIP )
-							{
-								((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
-								pSKIP = (U1*)s_atrib;
-							}
+							if( !nSKIP ) break;
 
+							((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+							pSKIP = (U1*)s_atrib;
 						} break;
 					case gpeALF_SRC: {
 							if( pWIN ? !pWIN->mZ : true )
@@ -655,23 +713,21 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 								nOUT = pOUT->n_load;
 
 							nSKIP = p_next-p_row;
-							if( nSKIP )
-							{
-								((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
-								pSKIP = (U1*)s_atrib;
-							}
+							if( !nSKIP ) break;
 
+							((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+							pSKIP = (U1*)s_atrib;
 						} break;
 					case gpeALF_OK:
 					case gpeALF_NONSENS:
-					case gpeALF_NONSENSE:
+					case gpeALF_NONSENSE: {
 							nSKIP = p_next-p_row;
-							if( nSKIP )
-							{
-								((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
-								pSKIP = (U1*)s_atrib;
-							}
-						break;
+							if( !nSKIP )
+								break;
+
+							((U1*)gpmMcpyOF( s_atrib, p_row, nSKIP ))[nSKIP] = 0;
+							pSKIP = (U1*)s_atrib;
+						} break;
 					/*case gpeALF_PREV:
 						isEVNT.null();
 						isEVNT.id = gpeNET4_PREV;
@@ -696,12 +752,10 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		}*/
 	}
 
-	if( pINP ? (p_sub > pINP->p_alloc) : false )
-	{
+	if( pINP ? (p_sub > pINP->p_alloc) : false ) {
 		U8 s = 0, n_str;
 		pINP->lzyINS( NULL, 0, s, p_sub-pINP->p_alloc );
-		if( nSKIP )
-		{
+		if( nSKIP ) {
 			n_str = gpmSTRLEN( pINP->p_alloc );
 			while( nSKIP < n_str )
 			{
@@ -718,10 +772,10 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 		}
 		if( pOUT )
 		if( nOUT < pOUT->n_load )
-		if( sGTent[0] )
-		{
+		if( sGTent[0] ) {
 			pOUT = pOUT->lzyFRMT( s = -1, (char*)sGTent );
-		} else {
+		}
+		else {
 			GTprmpt();
 			//pOUT = pOUT->lzyFRMT( s = -1, "\b\r\n0x%x>", iCNT );
 		}
@@ -729,8 +783,7 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  )
 	}
 
 
-	if( pINP ? !pINP->n_load : true )
-	{
+	if( pINP ? !pINP->n_load : true ) {
 		gpmDEL(pINP);
 		return;
 	}

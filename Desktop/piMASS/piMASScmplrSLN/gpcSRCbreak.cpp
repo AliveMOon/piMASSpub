@@ -37,7 +37,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 		return dim;
 	}
 	gpeOPid opID;
-	U8 nU;
+	size_t nU;
 	U4 nS, nA, nN, nO, nX, u8, nSTP, nOx;
 	I8 nSTR;
 	double d8;
@@ -79,7 +79,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 
 		if( bABC = gpmbABC(*pS, gpaALF_H_sub) )
 		{
-			nA = gpmVAN( pS, gpsNoWord, nU );
+			nA = gpmVAN( pS, gpsNoWord, &nU );
 			gpmSCP.DCTadd(pos,pS,nA,clrABC);
 			pos.x += nU;
 			dim.z += nU;
@@ -112,7 +112,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 				pUj = pS+1;
 				while( pUj < pUe )
 				{
-					pUj += gpmVAN( pUj, sIZE, nU );
+					pUj += gpmVAN( pUj, sIZE, &nU );
 					if( pUj >= pUe ? true : (*pUj!=*sIZE) )
 						break;
 
@@ -120,7 +120,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 					if( pUj[-2] != '\\' )
 						break;
 
-					pUj += gpmVAN( pUj, sIZE, nU );
+					pUj += gpmVAN( pUj, sIZE, &nU );
 				}
 				nSTR = pUj-pS;
 				gpmSCP.STRadd(pos,pS,nSTR,clrSTR);
@@ -148,7 +148,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 								pUj += nSTR+2;
 							break;
 						case '/':
-							pUj += gpmVAN( pS, "\a\r\n", nU );
+							pUj += gpmVAN( pS, "\a\r\n", &nU );
 							break;
 						default:
 							pUj = pS;
