@@ -93,7 +93,7 @@ wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?came
        = d0.mini;
 
   //slmp = "192.168.1.90 10000";
-  wire = "DRV8825.D5.S6.M12.13.14";
+  wire = "D0S1M2M3M4C200R150.15D5S6M7M8M9C200R150.15";
   f = fps;
   again = 0x5;
 

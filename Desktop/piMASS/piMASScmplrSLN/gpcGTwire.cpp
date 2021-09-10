@@ -6,12 +6,14 @@ extern char gpsTAB[], *gppTAB;
 class gpcDRV8825{
 public:
     char sNAME[0x100];
-    U1 iDIR, iSTP, iSLP, iRST, aiM[3], iEN;
+    U1  iDIR, iSTP,     iSLP, iRST,
+        aiM[3],         iEN;
     gpcDRV8825(){ gpmCLR; };
 };
 U1  aIOonPCB[] = { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
     aIObcm[] = { 5,6,12,13,16,17,18,19,20,21,22,23,24,25,26,27, },
     aIOfree[] = { 21,22,26,23,27,0,1,24,28,29,3,4,5,6,25,2, };
+
 class gpcWIRE {
 public:
     U4 aIO[0x28],aIOd[0x28], cnt;
@@ -20,6 +22,16 @@ public:
         aPOSout[0x8];
     I8x2 aAN[0x28];
     I8  aCNT[0x28];
+    U1  aMAP[0x28],
+        sIP[0x100],
+        aDIR[0x4], nD,
+        aSTP[0x4],
+        aMx[0x10];
+
+    U4      aC[0x4];
+    float   aR[0x4];
+
+    I4x2 nLEN;
     gpcWIRE(){ gpmCLR; };
 };
 
@@ -42,6 +54,7 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN ) {
         wiringPiSetup();		// Setup the library
         pWR->aIOm[0] = -1;
         gpmMsetOF( pWR->aIOm+1, gpmN(pWR->aIOm)-1, pWR->aIOm );
+
         for( U4 i = 0, n = gpmN(aIOfree); i < n; i++ ) {
             if( pWR->aIOm[aIOfree[i]] != OUTPUT ) {
                pinMode(aIOfree[i], OUTPUT);
@@ -49,37 +62,101 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN ) {
             }
             digitalWrite(aIOfree[i], 0 );
         }
+
         //pinMode(0, OUTPUT);		// Configure GPIO0 as an output
         //pinMode(1, INPUT);		// Configure GPIO1 as an input
 	}
-    U4 reg = pWR->cnt, bI, ms = pWIN->mSEC.x&0xfffffffe;
+	// wire = "D0S1M2M3M4C200R150";
+	pWR->nLEN.y = gpmSTRLEN(s_ip);
 
+	if( pWR->nLEN.x == pWR->nLEN.y )
+        pWR->nLEN.x = gpmMcmp( pWR->sIP, s_ip, pWR->nLEN.x );
+    if( pWR->nLEN.x != pWR->nLEN.y ){
+        pWR->nLEN.x = pWR->nLEN.y;
+        gpmMcpy( pWR->sIP, s_ip, pWR->nLEN.x )[pWR->nLEN.x] = 0;
+        pWR->nD = 0;
+        gpmZn(pWR->aMAP,sizeof(pWR->aMAP));
+        for( U1 i = 0, d = 0, m, c; i < pWR->nLEN.x; i++ ){
+            switch( c = pWR->sIP[i] ){
+                case 'D':
+                case 'd':
+                    i++;
+                    m = gpfSTR2I8(pWR->sIP+i);
+                    d = pWR->nD++;
 
+                    pWR->aDIR[d] = m;
+                    pWR->aMx[d*4]=0;
+                    break;
+                case 'S':
+                case 's':
+                    i++;
+                    m = gpfSTR2I8(pWR->sIP+i);
+                    pWR->aSTP[d] = m;
+                    break;
+                case 'M':
+                case 'm':
+                    i++;
+                    if( pWR->aMx[d*4]>=3 )
+                        continue;
+                    m = gpfSTR2I8(pWR->sIP+i);
 
-    for( U4 i = 0, n = gpmN(aIOfree); i < n; i++ ) {
-        if( !pWR->aAN[i].alf )
-            continue;
-        if( pWR->aCNT[i] == pWR->aAN[i].num )
-            continue;
-        int dif = pWR->aAN[i].num - pWR->aCNT[i];
-        if( dif < 0 )
-            pWR->aCNT[i]--;
-        else
-            pWR->aCNT[i]++;
+                    pWR->aMx[d*4]++;
+                    pWR->aMx[d*4+pWR->aMx[d*4]] = m;
+                    break;
+                case 'C':
+                case 'c':
+                    i++;
+                    m = gpfSTR2I8(pWR->sIP+i);
+                    pWR->aC[d] = m;
+                    continue;
+                case 'R':
+                case 'r':
+                    i++;
+                    pWR->aR[d] = strtod((char*)pWR->sIP+i, NULL);
+                    continue;
 
-        if( pWR->aIOm[i] != OUTPUT ) {
-           pinMode(aIOfree[i], OUTPUT);
-           pWR->aIOm[i] = OUTPUT;
+                default:
+                    continue;
+            }
+            pWR->aMAP[m] = c;
         }
-        bI = pWR->aCNT[i]&1;
-        if( pWR->aIO[i]&1 == bI )
-            continue;
-        pWR->aIOd[i] = ms-pWR->aIO[i];
-        pWR->aIO[i] = ms|bI;
-        digitalWrite(aIOfree[i], bI );
     }
 
+    U4 reg = pWR->cnt, bK, ms = pWIN->mSEC.x&0xfffffffe;
+    int d, bB;
+    for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
+        if( pWR->aAN[iD].num == pWR->aCNT[iD] )
+            continue;
+        d = pWR->aAN[iD].num - pWR->aCNT[iD]; /// TRG-NOW
+        /// DIR ------------------------------------------
+        w = pWR->aDIR[iD];
+        if( pWR->aIOm[w] != OUTPUT ) {
+           pinMode(aIOfree[w], OUTPUT);
+           pWR->aIOm[w] = OUTPUT;
+        }
+        bB = (d>-1);
+        if( (pWR->aIO[w]&1) != bB ) {
+           digitalWrite(aIOfree[w], bB );
+           pWR->aIO[w] = bB|ms;
+        }
+        /// STEP ------------------------------------------
+        w = pWR->aSTP[iD];
+        if( pWR->aIOm[w] != OUTPUT ) {
+            pinMode(aIOfree[w], OUTPUT);
+            pWR->aIOm[w] = OUTPUT;
+        }
+        if( bB ) {
+            pWR->aCNT[iD]++;
+        } else {
+            pWR->aCNT[iD]--;
+        }
+        bB = pWR->aCNT[iD]&1;
+        if( (pWR->aIO[w]&1) != bB ) {
+           digitalWrite(aIOfree[w], bB );
+           pWR->aIO[w] = bB|ms;
+        }
 
+    }
     pWR->cnt++;
 
     return pWR;
