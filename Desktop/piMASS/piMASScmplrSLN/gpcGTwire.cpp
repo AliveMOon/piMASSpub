@@ -28,13 +28,58 @@ public:
         aSTP[0x4],
         aMx[0x10];
 
-    U4      aC[0x4];
+    U4      aC[0x4], msJOIN;
     float   aR[0x4];
 
     I4x2 nLEN;
+    std::thread trd;
+
     gpcWIRE(){ gpmCLR; };
 };
+void gpfWIREtrd( gpcWIRE* pWR ) {
 
+    int cnt = pWR->cnt, d, bB;
+    U4 ms;
+    while( (ms=SDL_GetTicks()) < pWR->msJOIN ) {
+        ms &= ~1;
+        for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
+            if( pWR->aAN[iD].num == pWR->aCNT[iD] )
+                continue;
+            d = pWR->aAN[iD].num - pWR->aCNT[iD]; /// TRG-NOW
+            /// DIR ------------------------------------------
+            w = pWR->aDIR[iD];
+            if( pWR->aIOm[w] != OUTPUT ) {
+               pinMode(aIOfree[w], OUTPUT);
+               pWR->aIOm[w] = OUTPUT;
+            }
+            bB = (d>-1);
+            if( (pWR->aIO[w]&1) != bB ) {
+               digitalWrite(aIOfree[w], bB );
+               pWR->aIO[w] = bB|ms;
+            }
+            /// STEP ------------------------------------------
+            w = pWR->aSTP[iD];
+            if( pWR->aIOm[w] != OUTPUT ) {
+                pinMode(aIOfree[w], OUTPUT);
+                pWR->aIOm[w] = OUTPUT;
+            }
+            if( bB ) {
+                pWR->aCNT[iD]++;
+            } else {
+                pWR->aCNT[iD]--;
+            }
+            bB = pWR->aCNT[iD]&1;
+            if( (pWR->aIO[w]&1) != bB ) {
+               digitalWrite(aIOfree[w], bB );
+               pWR->aIO[w] = bB|ms;
+            }
+
+        }
+        usleep(1250);//00);
+        pWR->cnt++;
+
+    }
+}
 gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN ) {
 
     gpcLZY *pLZYinp = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(TnID));
@@ -121,6 +166,11 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN ) {
             pWR->aMAP[m] = c;
         }
     }
+    if( pWR->msJOIN )
+        pWR->trd.join();
+    pWR->msJOIN = pWIN->mSEC.x+2000;
+    pWR->trd = std::thread( gpfWIREtrd, pWR );
+    return pWR;
 
     U4 reg = pWR->cnt, bK, ms = pWIN->mSEC.x&0xfffffffe;
     int d, bB;
