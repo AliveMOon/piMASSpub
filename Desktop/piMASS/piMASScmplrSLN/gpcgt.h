@@ -951,7 +951,7 @@ class gpcGT {
 			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
-		gpcWIRE*	GTwire( gpcWIN* pWIN );
+		gpcWIRE*	GTwire( gpcWIN* pWIN, int msRUN );
 		gpcGSM*	GTgsm( gpcWIN* pWIN );
 		I8		GTcnct( gpcWIN* pWIN );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );

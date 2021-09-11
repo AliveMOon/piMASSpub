@@ -12,7 +12,39 @@ public:
 };
 U1  aIOonPCB[] = { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
     aIObcm[] = { 5,6,12,13,16,17,18,19,20,21,22,23,24,25,26,27, },
-    aIOfree[] = { 21,22,26,23,27,0,1,24,28,29,3,4,5,6,25,2, };
+    aIOfree[] = { 21,22,26,23,27,0,1,24,28,29,3,4,5,6,25,2, },
+
+    aIOm2w[] = {    00,01,
+                    02,//
+                    03,04,
+                       05,
+                    // //
+                       06,
+                    // //
+                    // //
+                    // //
+                    21,//
+                    22,26,
+                    23,//
+                    24,27,
+                    25,28,
+                       29, },
+
+    aIOm2p[] = {    11,12,
+                    13,//
+                    15,16,
+                       18,
+                    // //
+                       22,
+                    // //
+                    // //
+                    // //
+                    29,//
+                    31,32,
+                    33,//
+                    35,36,
+                    37,38,
+                       39, };
 
 class gpcWIRE {
 public:
@@ -40,7 +72,7 @@ void gpfWIREtrd( gpcWIRE* pWR ) {
 
     int cnt = pWR->cnt, d, bB;
     U4 ms;
-    while( (ms=SDL_GetTicks()) < pWR->msJOIN ) {
+    while( (ms=SDL_GetTicks()) <= pWR->msJOIN ) {
         ms &= ~1;
         for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
             if( pWR->aAN[iD].num == pWR->aCNT[iD] )
@@ -49,18 +81,18 @@ void gpfWIREtrd( gpcWIRE* pWR ) {
             /// DIR ------------------------------------------
             w = pWR->aDIR[iD];
             if( pWR->aIOm[w] != OUTPUT ) {
-               pinMode(aIOfree[w], OUTPUT);
+               pinMode(aIOm2w[w], OUTPUT);
                pWR->aIOm[w] = OUTPUT;
             }
             bB = (d>-1);
             if( (pWR->aIO[w]&1) != bB ) {
-               digitalWrite(aIOfree[w], bB );
+               digitalWrite(aIOm2w[w], bB );
                pWR->aIO[w] = bB|ms;
             }
             /// STEP ------------------------------------------
             w = pWR->aSTP[iD];
             if( pWR->aIOm[w] != OUTPUT ) {
-                pinMode(aIOfree[w], OUTPUT);
+                pinMode(aIOm2w[w], OUTPUT);
                 pWR->aIOm[w] = OUTPUT;
             }
             if( bB ) {
@@ -70,17 +102,17 @@ void gpfWIREtrd( gpcWIRE* pWR ) {
             }
             bB = pWR->aCNT[iD]&1;
             if( (pWR->aIO[w]&1) != bB ) {
-               digitalWrite(aIOfree[w], bB );
+               digitalWrite(aIOm2w[w], bB );
                pWR->aIO[w] = bB|ms;
             }
 
         }
-        usleep(1250);//00);
+        usleep(625*2);//00);
         pWR->cnt++;
 
     }
 }
-gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN ) {
+gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
 
     gpcLZY *pLZYinp = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(TnID));
 	if( !pLZYinp )
@@ -100,12 +132,12 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN ) {
         pWR->aIOm[0] = -1;
         gpmMsetOF( pWR->aIOm+1, gpmN(pWR->aIOm)-1, pWR->aIOm );
 
-        for( U4 i = 0, n = gpmN(aIOfree); i < n; i++ ) {
-            if( pWR->aIOm[aIOfree[i]] != OUTPUT ) {
-               pinMode(aIOfree[i], OUTPUT);
-               pWR->aIOm[aIOfree[i]] = OUTPUT;
+        for( U4 i = 0, n = gpmN(aIOm2w); i < n; i++ ) {
+            if( pWR->aIOm[aIOm2w[i]] != OUTPUT ) {
+               pinMode(aIOm2w[i], OUTPUT);
+               pWR->aIOm[aIOm2w[i]] = OUTPUT;
             }
-            digitalWrite(aIOfree[i], 0 );
+            digitalWrite(aIOm2w[i], 0 );
         }
 
         //pinMode(0, OUTPUT);		// Configure GPIO0 as an output
@@ -168,48 +200,11 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN ) {
     }
     if( pWR->msJOIN )
         pWR->trd.join();
-    pWR->msJOIN = pWIN->mSEC.x+2000;
+    pWR->msJOIN = pWIN->mSEC.x + (msRUN ? (pWIN->mSEC.x-msRUN):125);
     pWR->trd = std::thread( gpfWIREtrd, pWR );
     return pWR;
 
-    U4 reg = pWR->cnt, bK, ms = pWIN->mSEC.x&0xfffffffe;
-    int d, bB;
-    for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
-        if( pWR->aAN[iD].num == pWR->aCNT[iD] )
-            continue;
-        d = pWR->aAN[iD].num - pWR->aCNT[iD]; /// TRG-NOW
-        /// DIR ------------------------------------------
-        w = pWR->aDIR[iD];
-        if( pWR->aIOm[w] != OUTPUT ) {
-           pinMode(aIOfree[w], OUTPUT);
-           pWR->aIOm[w] = OUTPUT;
-        }
-        bB = (d>-1);
-        if( (pWR->aIO[w]&1) != bB ) {
-           digitalWrite(aIOfree[w], bB );
-           pWR->aIO[w] = bB|ms;
-        }
-        /// STEP ------------------------------------------
-        w = pWR->aSTP[iD];
-        if( pWR->aIOm[w] != OUTPUT ) {
-            pinMode(aIOfree[w], OUTPUT);
-            pWR->aIOm[w] = OUTPUT;
-        }
-        if( bB ) {
-            pWR->aCNT[iD]++;
-        } else {
-            pWR->aCNT[iD]--;
-        }
-        bB = pWR->aCNT[iD]&1;
-        if( (pWR->aIO[w]&1) != bB ) {
-           digitalWrite(aIOfree[w], bB );
-           pWR->aIO[w] = bB|ms;
-        }
 
-    }
-    pWR->cnt++;
-
-    return pWR;
 }
 gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC ) {
 	U8 s = -1, nLEN;
@@ -284,7 +279,7 @@ I4 gpMEM::instDOitWIRE( gpcGT* pGT ) {
 		return -1;
 
 	I4 cnt = pGT->iCNT;
-	gpcWIRE	*pWIRE = pGT->GTwire( pWIN );
+	gpcWIRE	*pWIRE = pGT->GTwire( pWIN, msRUN );
 	if( cnt == pGT->iCNT )
 		return cnt;
 
