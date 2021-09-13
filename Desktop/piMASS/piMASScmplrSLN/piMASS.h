@@ -492,8 +492,7 @@ GLenum inline gpfGLerr( const char* pERR = "" ) {
 	return e;
 }
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
-SOCKET inline gpfSOC_CLOSE( SOCKET& h )
-{
+SOCKET inline gpfSOC_CLOSE( SOCKET& h ) {
 	if( h == INVALID_SOCKET )
 		return INVALID_SOCKET;
 
@@ -4528,7 +4527,7 @@ public:
 		p_buff += gpfALF2STR( p_buff, b );
 		return p_buff-p_begin;
 	}
-	size_t an2str( void* p_b, const U1* p_p = NULL, bool b_hex = false, bool b0x0 = false ) {
+	size_t an2str( void* p_b, const void* p_p = NULL, bool b_hex = false, bool b0x0 = false ) {
 		if( !p_b )
 			return 0;
 		char	*p_buff = (char*)p_b,
@@ -6446,12 +6445,9 @@ public:
 	}
 	gpcLZY* lzy_exp( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 ) {
 		if( !this )
-		{
-			return lzyADD( NULL, n_add, iSTRT, n );
-		}
+            return lzyADD( NULL, n_add, iSTRT, n );
 
-		if( !n )
-		{
+		if( !n ) {
 			if( !aSET[gpeLZYxN] )
 				aSET[gpeLZYxN] = 4;
 
@@ -6460,13 +6456,11 @@ public:
 		else if( !aSET[gpeLZYxN] )
 				aSET[gpeLZYxN] = n;
 
-		if( iSTRT > n_load )
-		{
+		if( iSTRT > n_load ) {
 			iSTRT = n_load;
 			n_sub = 0;
 		}
-		else if( iSTRT+n_sub >= n_load )
-		{
+		else if( iSTRT+n_sub >= n_load ) {
 			n_sub = n_load-iSTRT;
 		}
 		size_t	src_hi = iSTRT+n_sub,
@@ -6492,12 +6486,10 @@ public:
 			// nincsen átfedésben mehet sima kopival
 			memcpy( p_alloc+dst_hi, (p_kill?p_kill:p_alloc)+src_hi, n_hi );
 		}
-		else if( dst_hi < src_hi )
-		{
+		else if( dst_hi < src_hi ) {
 			memcpy( p_alloc + dst_hi, p_alloc + src_hi, n_hi );
 		}
-		else if( dst_hi > src_hi )
-		{
+		else if( dst_hi > src_hi ) {
 			// dst_hi == src_hi akkor a memcpy úgy sem másolna
 			U8 a_buff[32];
 			U8 n_stp = sizeof(a_buff), i = n_hi;
@@ -6505,15 +6497,13 @@ public:
 				*p_d = p_alloc+dst_hi;
 			if( n_stp > n_hi )
 				n_stp = n_hi;
-			while( i >= n_stp )
-			{
+			while( i >= n_stp ) {
 				i -= n_stp;
 				memcpy( a_buff, p_s+i, n_stp );
 				memcpy( p_d+i, a_buff, n_stp );
 			}
 
-			if( i )
-			{
+			if( i ) {
 				memcpy( a_buff, p_s, i );
 				memcpy( p_d, a_buff, i );
 			}

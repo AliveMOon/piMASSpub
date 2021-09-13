@@ -71,12 +71,13 @@ public:
 void gpfWIREtrd( gpcWIRE* pWR ) {
 
     int cnt = pWR->cnt, d, bB;
-    U4 ms;
-    while( (ms=SDL_GetTicks()) <= pWR->msJOIN ) {
-        ms &= ~1;
-        for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
+    U4 ms, iD, w, nD = pWR->nD, nCNT = 1;
+    while( nCNT ) { //(ms=) <= pWR->msJOIN ) {
+        ms = SDL_GetTicks()&(~1);
+        for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
             if( pWR->aAN[iD].num == pWR->aCNT[iD] )
                 continue;
+            nCNT++,
             d = pWR->aAN[iD].num - pWR->aCNT[iD]; /// TRG-NOW
             /// DIR ------------------------------------------
             w = pWR->aDIR[iD];
@@ -107,14 +108,17 @@ void gpfWIREtrd( gpcWIRE* pWR ) {
             }
 
         }
-        usleep(625*2);//00);
+        usleep(1250);
         pWR->cnt++;
-
+        if( pWR->msJOIN <= ms )
+            break;
     }
 }
 gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
 
-    gpcLZY *pLZYinp = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(TnID));
+    gpcLZY  *pLZYinp = pWIN->piMASS->GTlzyALL.LZY(gpdGTlzyIDinp(TnID)),
+            *pLZYusr = NULL;
+
 	if( !pLZYinp )
 		return NULL;
     U8 s;
@@ -198,10 +202,45 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
             pWR->aMAP[m] = c;
         }
     }
-    if( pWR->msJOIN )
+    if( pWR->msJOIN ) {
         pWR->trd.join();
-    pWR->msJOIN = pWIN->mSEC.x + (msRUN ? (pWIN->mSEC.x-msRUN):125);
+        iCNT++;
+        if( gpcGTall* pALL = pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL ) {
+            char sANSW[0x100], *pANSW = sANSW;
+            for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
+                if( !pWR->aAN[iD].alf )
+                    continue;
+                if( pWR->aAN[iD].num == pWR->aCNT[iD] )
+                    continue;
+                pANSW += pWR->aAN[iD].an2str( pANSW );
+                pANSW += sprintf( pANSW, ":%lld",pWR->aCNT[iD] );
+
+            }
+            if( pANSW > sANSW ) {
+                gpcGT *pGTusr = NULL;
+                U4 nSOCK = 0;
+                SOCKET	*pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+                if( !pSOCK ) {
+                    pLZYusr = pWIN->piMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+                    pSOCK = gpmLZYvali( SOCKET, pLZYusr );
+                }
+                nSOCK = gpmLZYload( pLZYusr, SOCKET );
+
+                for( U4 iS = 0; iS < nSOCK; iS++ ) {
+                    pGTusr = pALL->GT( pSOCK[iS] );
+                    if( pGTusr->bGTdie() )
+                        continue;
+                    pGTusr->pOUT = pGTusr->pOUT->lzyFRMT( s = -1, "\r\n %d.%s", pGTusr->iCNT, sANSW );
+                    pGTusr->GTback();
+                }
+            }
+        }
+    }
+    int add = msRUN ? pWIN->mSEC.x-msRUN : 125;
+    pWR->msJOIN = SDL_GetTicks() // pWIN->mSEC.x
+                    + add;
     pWR->trd = std::thread( gpfWIREtrd, pWR );
+
     return pWR;
 
 
@@ -219,9 +258,34 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
     gpcWIRE* pWR = gpmLZYvali( gpcWIRE, pLZYinp );
 	if( !pWR )
 		return pANS->lzyFRMT( s = -1, "nonsens" );
-   U1 	sCOM[] = "ABCD",
+    U1 	sCOM[] = "ABCD",
 		*pCOM, *pEND = pSTR+n, *pNUM;
-	U4& comA = *(U4*)sCOM, iNUM = 0, nNUM, iE = 2;
+	U4  &comA = *(U4*)sCOM, // nagy/kisbetut lehet megvizslatni
+        iNUM = 0, nNUM, iE = 2;
+
+	///-----------------------------
+	/// UJ felhasználó?
+	///-----------------------------
+	gpcLZY		//*pLZYout = NULL,
+				*pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
+    U4 iSOCK = 0, nSOCK = 0;
+    if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) ) {
+        nSOCK = gpmLZYload(pLZYusr,sockUSR);
+        for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ ) {
+            if( pSOCK[iSOCK] != sockUSR )
+                continue;
+            // nem új bent van a listában
+            break;
+        }
+    }
+    if( iSOCK >= nSOCK ) {
+        // új felhasználó!
+        pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
+        iSOCK = nSOCK;
+        nSOCK = gpmLZYload(pLZYusr,sockUSR);
+    }
+	///-----------------------------
+
 	I8x2 an, anC;
 	double d8;
 	gpeALF alf = gpeALF_null;
@@ -231,10 +295,12 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
 			*pSTR;
 			 pSTR += gpmNINCS( pSTR, " \t\a\r\n;," )
 		) {
+
 		an.num = pEND-(pCOM = pSTR);
 		an = pCOM;
 		pSTR += an.num;
-		//pNUM = NULL;
+        pNUM = pSTR;
+        anC.num = gpfSTR2I8( pNUM, &pSTR );
 		if( an.alf ) {
 			comA = *(U4*)pCOM;
 			iNUM = gpeDRCos_NONS;
@@ -243,46 +309,59 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
 					bSTAT = true;
 					break;
 				case gpeALF_POS:
-					pNUM = pSTR;
 					iNUM = 0;
-					anC = an;
+					anC.alf = an.alf;
 					bSTAT = true;
 					break;
-				/*case gpeALF_HUP:
-					pNUM = NULL;
-					pWR->aNUM[1] = 0;
-					iNUM = 0;
-					bSTAT = true;
-					break;*/
 				default:
-					break;
+                    break;
 
 			}
 		}
-		if( !pNUM )
+		if( !anC.alf )
 			continue;
 
-        pNUM = pSTR;
         pWR->aAN[iNUM] = anC;
-        pWR->aAN[iNUM].num = gpfSTR2I8( pNUM, &pSTR );
-		iNUM++;
+        iNUM++;
 		if( iNUM >= gpmN(pWR->aAN) )
             break;
 		//break;
 	}
-	//if(bSTAT)
-	//	return pGSM->answSTAT( pANS );
-	return pANS->lzyFRMT( s = -1, "nonsens" );
+
+	if(!bSTAT)
+        return pANS->lzyFRMT( s = -1, "nonsens" );
+
+    char sAN[0x80];
+    for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
+        if( !pWR->aAN[iD].alf )
+            continue;
+        pANS = pANS->lzyFRMT( s = -1,   "%s:%lld ",
+                                        pWR->aAN[iD].an2str(sAN) ? sAN : "",
+                                        pWR->aCNT[iD] );
+    }
+    return pANS->lzyFRMT( s = -1, "nonsens" );
 }
 I4 gpMEM::instDOitWIRE( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
 
 	I4 cnt = pGT->iCNT;
-	gpcWIRE	*pWIRE = pGT->GTwire( pWIN, msRUN );
+	gpcWIRE	*pWR = pGT->GTwire( pWIN, msRUN );
 	if( cnt == pGT->iCNT )
 		return cnt;
 
+    if( !pGT->pGTm )
+        return cnt;
 
+//    gpcGT* pLST = pGT->pGTm;
+//    char sAN[0x20], n = 0; U8 s;
+//    for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
+//        if( !pWR->aAN[iD].alf )
+//            continue;
+//        pLST->pGTout()->lzyFRMT( s = -1, "%s:%d ", pWR->aAN[iD].an2str(sAN)?sAN:"", pWR->aCNT[iD] );
+//        n++;
+//    }
+//    if( n )
+//        pLST->pGTout()->lzyFRMT( s = -1, "\r\n" );
     return pGT->iCNT;
 }

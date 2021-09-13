@@ -371,6 +371,8 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 							SOCKET sockWIRE = gpfSTR2U8( (U1*)s_atrib, &pA );
 							gpcGT* pGT = pALL->GT( sockWIRE );
 							if( pGT ? pGT->TnID.alf == gpeALF_WIRE : false ) {
+                                if( pGT->pGTm != &mom )
+                                    pGT->pGTm = &mom;
 								if( pWIN ? pWIN->piMASS : NULL )
 									pOUT = pGT->GTwireOS( pOUT, pA, pWIN->piMASS, socket, pWIN->mSEC.x );
 								break;
@@ -777,7 +779,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 		}
 		else {
 			GTprmpt();
-			//pOUT = pOUT->lzyFRMT( s = -1, "\b\r\n0x%x>", iCNT );
 		}
 
 	}

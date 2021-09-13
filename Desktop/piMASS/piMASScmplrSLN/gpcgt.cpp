@@ -606,8 +606,7 @@ char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff ) {
 	// egyébként bele ír valamit akkor nem
 	p_err[0] = 0;
 	U8 s;
-	if( !pOUT )
-	{
+	if( !pOUT ) {
 		if( !pPUBgt )
 			return p_err;
 
@@ -932,8 +931,6 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 				GTprmpt();
 				//break;
 			}
-
-
 			if( pDWN ) {
 				pOUT = pDWN->join( pOUT, *this );
 				if( !pOUT )
@@ -1045,7 +1042,8 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 
 		if( (acpt_soc = accept( socket, (struct sockaddr *)&clientaddr, &n_clientaddr )) == INVALID_SOCKET  ) {
 			p_err += GTerr( p_err, &p_err );
-		} else {
+		}
+		else {
 
 			gt_ip.num++;
 			I8x2 gt_an_ip(gpeALF_null);
@@ -1209,13 +1207,13 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 			}
 		}
 	}
+
 	gpcGT* p_gt;
 	for( ; nFDs < nFDe; nFDs++ ) {
 		p_gt = GTacc.iGT(nFDs);
 		if( p_gt->bGTdie() )
 			continue;
-
-		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) { // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
+        if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) { // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 			p_err = p_gt->GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 			if( *p_err )
 				if(bSTDcout){gpdCOUT << p_err <<gpdENDL;}

@@ -831,7 +831,7 @@ class gpcGT {
 		addrinfo	*p_ainf;
 		SOCKADDR_IN	*p_ai, addr_in;
 		gpcGTall	GTacc;
-
+        gpcGT       *pGTm;
 		gpcLZY		*pPUBgt,
 					*pINP, *pMISi,
 					*pEVENT,
@@ -952,7 +952,7 @@ class gpcGT {
 			return this;
 		}
 		gpcWIRE*	GTwire( gpcWIN* pWIN, int msRUN );
-		gpcGSM*	GTgsm( gpcWIN* pWIN );
+		gpcGSM*     GTgsm( gpcWIN* pWIN );
 		I8		GTcnct( gpcWIN* pWIN );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );
@@ -987,7 +987,13 @@ class gpcGT {
 
 		gpcLZY*	GThtmlOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, void* pGET, void* pHOST );
 		//gpcLZY*	GTwireOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, void* pGET, void* pHOST );
-
+        gpcLZY* pGTout() {
+            if( !this )
+                return NULL;
+            if( pOUT )
+                return pOUT;
+            return (pOUT = new gpcLZY());
+        }
 	protected:
 
 	private:
