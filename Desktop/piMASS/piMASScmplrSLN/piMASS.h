@@ -4951,6 +4951,8 @@ public:
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
+	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m );
+    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float turn );
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }

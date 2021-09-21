@@ -46,14 +46,21 @@ U1  aIOonPCB[] = { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
                     37,38,
                        39, };
 
+#define gpdWRuSLP (1250*4)
+#define gpdWRmSLP(n) ((gpdWRuSLP*n)/1000)
+
 class gpcWIRE {
 public:
     U4 aIO[0x28],aIOd[0x28], cnt;
     int aIOm[0x28],
         aPOSin[0x8],
         aPOSout[0x8];
-    I8x2 aAN[0x28];
-    I8  aCNT[0x28];
+    F2  aPOT[0x28];
+
+    gpeALF  aA[0x28];
+    I8      nZ[0x28];
+    I8x4    aCNT[0x28];
+
     U1  aMAP[0x28],
         sIP[0x100],
         aDIR[0x4], nD,
@@ -61,7 +68,7 @@ public:
         aMx[0x10];
 
     U4      aC[0x4], msJOIN;
-    float   aR[0x4];
+    float   aR[0x4], aW[0x4];
 
     I4x2 nLEN;
     std::thread trd;
@@ -71,44 +78,51 @@ public:
 void gpfWIREtrd( gpcWIRE* pWR ) {
 
     int cnt = pWR->cnt, d, bB;
-    U4 ms, iD, w, nD = pWR->nD, nCNT = 1;
-    while( nCNT ) { //(ms=) <= pWR->msJOIN ) {
+    U4 ms, iD, w, nD = pWR->nD, nCNT = 1, two;
+    while( nCNT ) {
         ms = SDL_GetTicks()&(~1);
-        for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
-            if( pWR->aAN[iD].num == pWR->aCNT[iD] )
-                continue;
-            nCNT++,
-            d = pWR->aAN[iD].num - pWR->aCNT[iD]; /// TRG-NOW
-            /// DIR ------------------------------------------
-            w = pWR->aDIR[iD];
-            if( pWR->aIOm[w] != OUTPUT ) {
-               pinMode(aIOm2w[w], OUTPUT);
-               pWR->aIOm[w] = OUTPUT;
-            }
-            bB = (d>-1);
-            if( (pWR->aIO[w]&1) != bB ) {
-               digitalWrite(aIOm2w[w], bB );
-               pWR->aIO[w] = bB|ms;
-            }
-            /// STEP ------------------------------------------
-            w = pWR->aSTP[iD];
-            if( pWR->aIOm[w] != OUTPUT ) {
-                pinMode(aIOm2w[w], OUTPUT);
-                pWR->aIOm[w] = OUTPUT;
-            }
-            if( bB ) {
-                pWR->aCNT[iD]++;
-            } else {
-                pWR->aCNT[iD]--;
-            }
-            bB = pWR->aCNT[iD]&1;
-            if( (pWR->aIO[w]&1) != bB ) {
-               digitalWrite(aIOm2w[w], bB );
-               pWR->aIO[w] = bB|ms;
-            }
+        for( two = 0; two < 2; two++ ){
+            for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
+                if( pWR->aCNT[iD].y == pWR->aCNT[iD].x )
+                    continue;
+                nCNT++,
+                d = pWR->aCNT[iD].y - pWR->aCNT[iD].x; /// TRG-NOW
+                /// DIR ------------------------------------------
+                w = pWR->aDIR[iD];
+                if( pWR->aIOm[w] != OUTPUT ) {
+                   pinMode(aIOm2w[w], OUTPUT);
+                   pWR->aIOm[w] = OUTPUT;
+                }
+                bB = (d>-1);
+                if( (pWR->aIO[w]&1) != bB ) {
+                   digitalWrite(aIOm2w[w], bB );
+                   pWR->aIO[w] = bB|ms;
+                }
 
+                /// STEP ------------------------------------------
+                w = pWR->aSTP[iD];
+                if( pWR->aIOm[w] != OUTPUT ) {
+                    pinMode(aIOm2w[w], OUTPUT);
+                    pWR->aIOm[w] = OUTPUT;
+                }
+
+                if( pWR->aCNT[iD].z < pWR->nZ[iD] ){
+                    pWR->aCNT[iD].x = ((pWR->aCNT[iD].y-pWR->aCNT[iD].w)*pWR->aCNT[iD].z)/pWR->nZ[iD];
+                    pWR->aCNT[iD].x += pWR->aCNT[iD].w;
+                    pWR->aCNT[iD].z++;
+                }
+                else {
+                    pWR->aCNT[iD].z = pWR->nZ[iD];
+                    pWR->aCNT[iD].x = pWR->aCNT[iD].y;
+                }
+                bB = !(pWR->aCNT[iD].x&1);
+                if( (pWR->aIO[w]&1) != bB ) {
+                   digitalWrite(aIOm2w[w], bB );
+                   pWR->aIO[w] = bB|ms;
+                }
+            }
+            usleep(gpdWRuSLP);
         }
-        usleep(1250);
         pWR->cnt++;
         if( pWR->msJOIN <= ms )
             break;
@@ -195,6 +209,11 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
                     i++;
                     pWR->aR[d] = strtod((char*)pWR->sIP+i, NULL);
                     continue;
+                case 'W':
+                case 'w':
+                    i++;
+                    pWR->aW[d] = strtod((char*)pWR->sIP+i, NULL);
+                    continue;
 
                 default:
                     continue;
@@ -208,13 +227,12 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
         if( gpcGTall* pALL = pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL ) {
             char sANSW[0x100], *pANSW = sANSW;
             for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
-                if( !pWR->aAN[iD].alf )
+                if( !pWR->aA[iD] )
                     continue;
-                if( pWR->aAN[iD].num == pWR->aCNT[iD] )
+                if( pWR->aCNT[iD].y == pWR->aCNT[iD].x )
                     continue;
-                pANSW += pWR->aAN[iD].an2str( pANSW );
-                pANSW += sprintf( pANSW, ":%lld",pWR->aCNT[iD] );
-
+                //pANSW += pWR->aAN[iD].an2str( pANSW );
+                pANSW += sprintf( pANSW, "%lld<%lld ",pWR->aCNT[iD].y, pWR->aCNT[iD].x );
             }
             if( pANSW > sANSW ) {
                 gpcGT *pGTusr = NULL;
@@ -236,7 +254,7 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
             }
         }
     }
-    int add = msRUN ? pWIN->mSEC.x-msRUN : 125;
+    int add = msRUN ? pWIN->mSEC.x-msRUN : gpdWRmSLP(100);
     pWR->msJOIN = SDL_GetTicks() // pWIN->mSEC.x
                     + add;
     pWR->trd = std::thread( gpfWIREtrd, pWR );
@@ -313,17 +331,53 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
 					anC.alf = an.alf;
 					bSTAT = true;
 					break;
+                case gpeALF_POT:
+					iNUM = 0;
+					anC.alf = an.alf;
+					bSTAT = true;
+					break;
 				default:
                     break;
 
 			}
 		}
-		if( !anC.alf )
-			continue;
 
-        pWR->aAN[iNUM] = anC;
+		switch( anC.alf ) {
+            case gpeALF_null:
+                continue;
+            case gpeALF_POT: {
+                    pWR->aA[iNUM] = anC.alf;
+                    pWR->aCNT[iNUM].z = 0;
+                    pWR->aCNT[iNUM].w = pWR->aCNT[iNUM].x;
+                    if(iNUM&1) {
+                        pWR->aPOT[1].y = float(anC.num)/10.0;
+                        pWR->aPOT[1].pot2cnt(   pWR->aCNT[iNUM-1].y, pWR->aCNT[iNUM].y,
+                                                pWR->aW[0], pWR->aR[0], pWR->aC[0], 64, PIp2 ); // *(9.0/10.0) );
+                        pWR->nZ[iNUM-1] =  abs(pWR->aCNT[iNUM-1].y-pWR->aCNT[iNUM-1].w);
+                        pWR->nZ[iNUM  ] =  abs(pWR->aCNT[iNUM  ].y-pWR->aCNT[iNUM  ].w);
+                        if( pWR->nZ[iNUM-1] < pWR->nZ[iNUM  ] )
+                            pWR->nZ[iNUM-1] = pWR->nZ[iNUM  ];
+                        else
+                            pWR->nZ[iNUM  ] = pWR->nZ[iNUM-1];
+                        break;
+                    }
+                    pWR->aPOT[0].cnt2pot(   pWR->aCNT[0].x, pWR->aCNT[1].x,
+                                            pWR->aW[0], pWR->aR[0], pWR->aC[0], 64 );
+                    pWR->aPOT[1].x = float(anC.num)/10.0;
+                } break;
+            default:
+                pWR->aA[iNUM] = anC.alf;
+                pWR->aCNT[iNUM].z = 0;
+                pWR->aCNT[iNUM].w = pWR->aCNT[iNUM].x;
+
+                pWR->aCNT[iNUM].y = anC.num;
+                pWR->nZ[iNUM] = abs(pWR->aCNT[iNUM].y-pWR->aCNT[iNUM].w);
+                break;
+		}
+
+
         iNUM++;
-		if( iNUM >= gpmN(pWR->aAN) )
+		if( iNUM >= gpmN(pWR->aA) )
             break;
 		//break;
 	}
@@ -333,11 +387,12 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
 
     char sAN[0x80];
     for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
-        if( !pWR->aAN[iD].alf )
+        if( !pWR->aA[iD] )
             continue;
+        gpfALF2STR( sAN, pWR->aA[iD] );
         pANS = pANS->lzyFRMT( s = -1,   "%s:%lld ",
-                                        pWR->aAN[iD].an2str(sAN) ? sAN : "",
-                                        pWR->aCNT[iD] );
+                                        sAN,
+                                        pWR->aCNT[iD].x );
     }
     return pANS->lzyFRMT( s = -1, "nonsens" );
 }
