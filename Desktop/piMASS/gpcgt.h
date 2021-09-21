@@ -118,6 +118,7 @@ typedef enum gpeCGhd:U4 {
 class gpcRES;
 class gpcDrc;
 class gpcGSM;
+class gpcWIRE;
 
 class gpcROB {
 public:
@@ -830,7 +831,7 @@ class gpcGT {
 		addrinfo	*p_ainf;
 		SOCKADDR_IN	*p_ai, addr_in;
 		gpcGTall	GTacc;
-
+        gpcGT       *pGTm;
 		gpcLZY		*pPUBgt,
 					*pINP, *pMISi,
 					*pEVENT,
@@ -950,7 +951,8 @@ class gpcGT {
 			gpfSOC_CLOSE( sockCNCT );
 			return this;
 		}
-		gpcGSM*	GTgsm( gpcWIN* pWIN );
+		gpcWIRE*	GTwire( gpcWIN* pWIN, int msRUN );
+		gpcGSM*     GTgsm( gpcWIN* pWIN );
 		I8		GTcnct( gpcWIN* pWIN );
 		I8		GTlst( gpcWIN* pWIN, gpcGTall& );
 		int		GTerr( char* p_err, char** pp_err );
@@ -958,6 +960,7 @@ class gpcGT {
 		char*	GTrcv( char* p_err, char* s_buff, U4 n_buff );
 		char*	GTsnd( char* p_err, char* s_buff, U4 n_buff );
 
+        gpcLZY*	GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC );
 		gpcLZY*	GTgsmOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR, U4 mSEC );
 
 
@@ -983,7 +986,14 @@ class gpcGT {
 		size_t GTout( gpcWIN* pWIN );
 
 		gpcLZY*	GThtmlOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, void* pGET, void* pHOST );
-
+		//gpcLZY*	GTwireOS( gpcLZY* pOUT, gpcGT& mom, gpcWIN* pWIN, void* pGET, void* pHOST );
+        gpcLZY* pGTout() {
+            if( !this )
+                return NULL;
+            if( pOUT )
+                return pOUT;
+            return (pOUT = new gpcLZY());
+        }
 	protected:
 
 	private:

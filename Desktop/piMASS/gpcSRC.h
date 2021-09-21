@@ -1999,6 +1999,7 @@ public:
 	I4		instDOit( gpOBJ& obj, U1* pU1 );
 	I4		instDOitSLMP( gpcGT* pGT );
 	I4		instDOitGSM( gpcGT* pGT );
+	I4		instDOitWIRE( gpcGT* pGT );
 
 	gpcLZY* memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 );
 	void	funPRINT();

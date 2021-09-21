@@ -73,13 +73,13 @@ F2& F2::cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m ) {
 }
 F2& F2::pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float trn ) {
     w /= 2.0; // motor távolság fele
+    trn += PIp2;
     F2  ARMxy = (*this - w)/2.0,
         Ay = ARMxy,
         Ax;
     float Aql = ARMxy.qlen();
     Ay += ARMxy.right()*//sqrt(r*r-Aql)/sqrt(Aql)
-            sqrt((r*r-Aql)/Aql)
-            ;
+            sqrt((r*r-Aql)/Aql);
 
     Ax = ARMxy = (*this - F2(-w,w))/2.0,
     Aql = ARMxy.qlen();
@@ -89,8 +89,8 @@ F2& F2::pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float trn ) {
             ;
     float   RADy = trn-acos(Ay.y/r),
             RADx = trn-acos(Ax.x/r);
-    Cx = float(c*m)*RADx/PI2;
-    Cy = float(c*m)*RADy/PI2;
+    Cx = float(c*m)*RADx/PI4;
+    Cy = float(c*m)*RADy/PI4;
     return *this;
 }
 F2& F2::swpXY( const void* pV ) {

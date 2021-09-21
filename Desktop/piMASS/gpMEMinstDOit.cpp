@@ -5,8 +5,6 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 extern char gpsPUB[0x1000];
-
-
 I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
@@ -65,16 +63,16 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 		}
 	}
 
-	if( pOpic )
 	/// ----------------------------------------
 	///					rPIC
 	/// ----------------------------------------
+	if( pOpic )
 	if( !gpdROBrd.nLD() ) {
 		pU1 = pOpic->pU1();
 		if( pU1 ) {
-			gpdID[0] = pOpic->bUTF8()
-							? pMASS->PIC.alfFND( (pU1+=gpmNINCS(pU1," \t\"")) )
-							: *(I4*)pU1;
+			gpdID[0]    = pOpic->bUTF8()
+                        ? pMASS->PIC.alfFND( (pU1+=gpmNINCS(pU1," \t\"")) )
+                        : *(I4*)pU1;
 			gpcPIC* pPIC = pMASS->PIC.PIC( gpdID[0] );
 			SDL_Surface* pSRF = pPIC->pPICrtxSRF();
 			if( !pSRF )
@@ -428,6 +426,10 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 		case gpeALF_GSM: {									cID = gpeCsz_b; if( bCID ) break;
             pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
             instDOitGSM( pGT );
+        } break;
+        case gpeALF_WIRE: {									cID = gpeCsz_b; if( bCID ) break;
+            pGT = pMASS->GTcnct.GT( obj.AN.alf, pU1, 0 );
+            instDOitWIRE( pGT );
         } break;
 		/// --------------------------------------------------------------------------
 		/// CONNECT

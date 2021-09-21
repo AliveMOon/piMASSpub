@@ -581,22 +581,22 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUS
 	///-----------------------------
 	/// UJ felhasználó?
 	///-----------------------------
-		U4 iSOCK = 0, nSOCK = 0;
-		if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) ) {
-			nSOCK = gpmLZYload(pLZYusr,sockUSR);
-			for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ ) {
-				if( pSOCK[iSOCK] != sockUSR )
-					continue;
-				// nem új bent van a listában
-				break;
-			}
-		}
-		if( iSOCK >= nSOCK ) {
-			// új felhasználó!
-			pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
-			iSOCK = nSOCK;
-			nSOCK = gpmLZYload(pLZYusr,sockUSR);
-		}
+    U4 iSOCK = 0, nSOCK = 0;
+    if( SOCKET* pSOCK = gpmLZYvali( SOCKET, pLZYusr) ) {
+        nSOCK = gpmLZYload(pLZYusr,sockUSR);
+        for( iSOCK = 0; iSOCK < nSOCK; iSOCK++ ) {
+            if( pSOCK[iSOCK] != sockUSR )
+                continue;
+            // nem új bent van a listában
+            break;
+        }
+    }
+    if( iSOCK >= nSOCK ) {
+        // új felhasználó!
+        pLZYusr->lzyADD( &sockUSR, sizeof(sockUSR), s = -1 );
+        iSOCK = nSOCK;
+        nSOCK = gpmLZYload(pLZYusr,sockUSR);
+    }
 	///-----------------------------
 
 	if( !pROBnD )
@@ -628,7 +628,6 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUS
 
 				case gpeALF_STOP:
 					gpdID[1] = -1;
-					//RnD.aDrc[1]->picID =
 					iNUM = gpeDRCos_NONS;
 					break;
 

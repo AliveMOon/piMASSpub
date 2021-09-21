@@ -1,0 +1,22 @@
+wire0x16 pot 800 800
+wire0x16 pot 800 -800
+wire0x16 pot -800 -800
+wire0x16 pot -800 800
+
+wire0x16 pot 400 400
+wire0x16 pot 400 -400
+wire0x16 pot -400 -400
+wire0x16 pot -400 400
+
+wire0x16 pot 300 300
+wire0x16 pot 300 -300
+wire0x16 pot -300 -300
+wire0x16 pot -300 300
+
+
+
+wire0x16 pot 0 0
+wire0x16 pot 0 400
+wire0x16 pot 400 0
+wire0x16 pot 0 -400
+wire0x16 pot -400 0

@@ -3,8 +3,7 @@
 extern U1 gpaALFsub[];
 extern char gpsTAB[], *gppTAB;
 
-gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 )
-{
+gpcLZY* gpcGT::gpcGTslmpSTAT( gpcLZY* pANS, U2* pU2 ) {
 	U1 	sCOM[] = "ABCD";
 	U4 &comA = *(U4*)sCOM;
 
@@ -258,8 +257,8 @@ void gpcGT::GTslmpDrcRob( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL ) {
 						if( !pSOCK ) {
 							pLZYusr = pMASS->GTlzyALL.LZY( gpdGTlzyIDusr(TnID) );
 							pSOCK = gpmLZYvali( SOCKET, pLZYusr );
-							nSOCK = gpmLZYload( pLZYusr, SOCKET );
 						}
+                        nSOCK = gpmLZYload( pLZYusr, SOCKET );
 
 						for( U4 iS = 0; iS < nSOCK; iS++ ) {
 							pGTusr = pALL->GT( pSOCK[iS] );

@@ -366,6 +366,24 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 
 
 				switch( cAN.alf ) {
+                    case gpeALF_WIRE: {
+							U1* pA;
+							SOCKET sockWIRE = gpfSTR2U8( (U1*)s_atrib, &pA );
+							gpcGT* pGT = pALL->GT( sockWIRE );
+							if( pGT ? pGT->TnID.alf == gpeALF_WIRE : false ) {
+                                if( pGT->pGTm != &mom )
+                                    pGT->pGTm = &mom;
+								if( pWIN ? pWIN->piMASS : NULL )
+									pOUT = pGT->GTwireOS( pOUT, pA, pWIN->piMASS, socket, pWIN->mSEC.x );
+								break;
+							}
+							pOUT = pOUT->lzyFRMT( s = -1, "Which?\r\n" );
+							for( U4 i = 0, e = pALL->nGTld; i < e; i++ ) {
+								if( !pALL->ppGTalloc[i] )
+									continue;
+								pOUT = pALL->ppGTalloc[i]->GTos_GATELIST( pOUT, (sGTent[0]?(char*)sGTent:"\r\n"), gppTAB );
+							}
+						} break;
 					case gpeALF_GSM: {
 							U1* pA;
 							SOCKET sockGSM = gpfSTR2U8( (U1*)s_atrib, &pA );
@@ -522,13 +540,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 							sprintf( s_atrib, "0x%x>", iCNT );
 							pMISo = pWIN->putDBG( pMISo, gpeNET4_0LST, an, s_atrib );
 						} break;
-					/*case gpeALF_EYE: {
-							isEVNT.null();
-							isEVNT.id = gpeNET4_0EYE;
-							isEVNT.n = TnID.num;
-							mom.pEVENT = mom.pEVENT->lzyADD( &isEVNT, sizeof(isEVNT), s = -1 );
-							pOUT = pOUT->lzyFRMT(s = -1, "%s event", gpmGTent ); //(sGTent[0]?(char*)sGTent:"\r\n") );
-						} break;*/
 					case gpeALF_GET: {
 							// HTML
 							/// sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 6000
@@ -768,7 +779,6 @@ void gpcGT::GTos( gpcGT& mom, gpcWIN* pWIN, gpcGTall* pALL  ) {
 		}
 		else {
 			GTprmpt();
-			//pOUT = pOUT->lzyFRMT( s = -1, "\b\r\n0x%x>", iCNT );
 		}
 
 	}

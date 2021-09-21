@@ -368,6 +368,7 @@ public:
 #define i80PI (180.0/PI)
 #define PIp2 (PI/2.0)
 #define PI2 (PI*2.0)
+#define PI4 (PI*4.0)
 #define COS5 0.99619469809174553229501040247389
 #define SIN5 0.08715574274765817355806427083747
 #define SIN1 0.0174524064373
@@ -4952,7 +4953,7 @@ public:
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
 	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m );
-    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float turn );
+    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 64, float turn  = 0);
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }

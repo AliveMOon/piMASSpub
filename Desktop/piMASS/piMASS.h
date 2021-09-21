@@ -34,7 +34,7 @@
 #define bSTDcout_3D (bSTDcout&true)
 //#define stdON
 
-#include "mysys.h"
+//#include "mysys.h"
 #define piMASS_DEBUG 1
 #include <exception>
 #include <mysys.h>
@@ -368,6 +368,7 @@ public:
 #define i80PI (180.0/PI)
 #define PIp2 (PI/2.0)
 #define PI2 (PI*2.0)
+#define PI4 (PI*4.0)
 #define COS5 0.99619469809174553229501040247389
 #define SIN5 0.08715574274765817355806427083747
 #define SIN1 0.0174524064373
@@ -492,8 +493,7 @@ GLenum inline gpfGLerr( const char* pERR = "" ) {
 	return e;
 }
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
-SOCKET inline gpfSOC_CLOSE( SOCKET& h )
-{
+SOCKET inline gpfSOC_CLOSE( SOCKET& h ) {
 	if( h == INVALID_SOCKET )
 		return INVALID_SOCKET;
 
@@ -4528,7 +4528,7 @@ public:
 		p_buff += gpfALF2STR( p_buff, b );
 		return p_buff-p_begin;
 	}
-	size_t an2str( void* p_b, const U1* p_p = NULL, bool b_hex = false, bool b0x0 = false ) {
+	size_t an2str( void* p_b, const void* p_p = NULL, bool b_hex = false, bool b0x0 = false ) {
 		if( !p_b )
 			return 0;
 		char	*p_buff = (char*)p_b,
@@ -4952,6 +4952,8 @@ public:
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
+	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m );
+    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 64, float turn  = 0);
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }
@@ -6446,12 +6448,9 @@ public:
 	}
 	gpcLZY* lzy_exp( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 ) {
 		if( !this )
-		{
-			return lzyADD( NULL, n_add, iSTRT, n );
-		}
+            return lzyADD( NULL, n_add, iSTRT, n );
 
-		if( !n )
-		{
+		if( !n ) {
 			if( !aSET[gpeLZYxN] )
 				aSET[gpeLZYxN] = 4;
 
@@ -6460,13 +6459,11 @@ public:
 		else if( !aSET[gpeLZYxN] )
 				aSET[gpeLZYxN] = n;
 
-		if( iSTRT > n_load )
-		{
+		if( iSTRT > n_load ) {
 			iSTRT = n_load;
 			n_sub = 0;
 		}
-		else if( iSTRT+n_sub >= n_load )
-		{
+		else if( iSTRT+n_sub >= n_load ) {
 			n_sub = n_load-iSTRT;
 		}
 		size_t	src_hi = iSTRT+n_sub,
@@ -6492,12 +6489,10 @@ public:
 			// nincsen átfedésben mehet sima kopival
 			memcpy( p_alloc+dst_hi, (p_kill?p_kill:p_alloc)+src_hi, n_hi );
 		}
-		else if( dst_hi < src_hi )
-		{
+		else if( dst_hi < src_hi ) {
 			memcpy( p_alloc + dst_hi, p_alloc + src_hi, n_hi );
 		}
-		else if( dst_hi > src_hi )
-		{
+		else if( dst_hi > src_hi ) {
 			// dst_hi == src_hi akkor a memcpy úgy sem másolna
 			U8 a_buff[32];
 			U8 n_stp = sizeof(a_buff), i = n_hi;
@@ -6505,15 +6500,13 @@ public:
 				*p_d = p_alloc+dst_hi;
 			if( n_stp > n_hi )
 				n_stp = n_hi;
-			while( i >= n_stp )
-			{
+			while( i >= n_stp ) {
 				i -= n_stp;
 				memcpy( a_buff, p_s+i, n_stp );
 				memcpy( p_d+i, a_buff, n_stp );
 			}
 
-			if( i )
-			{
+			if( i ) {
 				memcpy( a_buff, p_s, i );
 				memcpy( p_d, a_buff, i );
 			}

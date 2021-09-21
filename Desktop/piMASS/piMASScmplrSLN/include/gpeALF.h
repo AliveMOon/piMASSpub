@@ -900,7 +900,8 @@ typedef enum gpeALF:I8
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
 	gpeALF_PNT = gpdABC('P', 'N', 'T'),
 
-	gpeALF_POS = gpdABC('P', 'O', 'S'),
+	gpeALF_POS = gpdABC('P', 'O', 'S'), gpeALF_POT, gpeALF_POU, gpeALF_POV,
+	gpeALF_POW, gpeALF_POX, gpeALF_POY, gpeALF_POZ,
 
 	gpeALF_PRG = gpdABC('P', 'R', 'G'),
 

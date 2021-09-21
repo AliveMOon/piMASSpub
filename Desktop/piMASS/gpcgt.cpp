@@ -167,8 +167,7 @@ void gpcGTall::clr()
 	gpmCLR;
 }
 
-gpcGT* gpcGTall::GT( SOCKET sock )
-{
+gpcGT* gpcGTall::GT( SOCKET sock ) {
 	if( !this )
 		return NULL;
 	for( U4 g = 0; g < nGTld; g++ )
@@ -184,8 +183,7 @@ gpcGT* gpcGTall::GT( SOCKET sock )
 	}
 	return NULL;
 }
-gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
-{
+gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA ) {
 	int port = 80, nCMP = nIPA, p;
 	U8 nLEN;
 	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n!\"" ),
@@ -274,8 +272,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	}*/
 	return ppGTalloc[iGTfr] = pGT;
 }
-gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
-{
+gpcGT* gpcGTall::GT( gpeALF alf, I4 port ) {
 	if( pGT )
 	if( pGT->port == port )
 	if( pGT->TnID.alf == alf )
@@ -321,8 +318,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
 
 	return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2(alf), port );
 }
-gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
-{
+gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port ) {
 	gpcGT *pACC = NULL, *p_a;
 	if( iGTfr < nGTld )
 	if( pACC = ppGTalloc[iGTfr] )
@@ -401,8 +397,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 }
 
 
-int gpcGT::GTerr( char* p_error, char** pp_error )
-{
+int gpcGT::GTerr( char* p_error, char** pp_error ) {
 	*p_error = 0;
 	int	out = true;
 	switch ( errno )
@@ -461,8 +456,7 @@ int gpcGT::GTerr( char* p_error, char** pp_error )
 	return out;
 }
 
-U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
-{
+U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff ) {
 	*p_error = 0;
 	p_error += sprintf( p_error, "\n\t\t-= SOCKET_OPT =-" );
 
@@ -572,8 +566,7 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 }
 
 
-char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
-{
+char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff ) {
 	if( bGTdie() )
 		return p_err;
 	// ha nincsen hiba p_err[0] == 0
@@ -606,16 +599,14 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 	sprintf( p_err, "\nERROR: recv n == 0 DIE" );
 	return p_err;
 }
-char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
-{
+char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff ) {
 	if( bGTdie() )
 		return p_err;
 	// ha nincsen hiba p_err[0] == 0
 	// egyébként bele ír valamit akkor nem
 	p_err[0] = 0;
 	U8 s;
-	if( !pOUT )
-	{
+	if( !pOUT ) {
 		if( !pPUBgt )
 			return p_err;
 
@@ -940,8 +931,6 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 				GTprmpt();
 				//break;
 			}
-
-
 			if( pDWN ) {
 				pOUT = pDWN->join( pOUT, *this );
 				if( !pOUT )
@@ -1053,7 +1042,8 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 
 		if( (acpt_soc = accept( socket, (struct sockaddr *)&clientaddr, &n_clientaddr )) == INVALID_SOCKET  ) {
 			p_err += GTerr( p_err, &p_err );
-		} else {
+		}
+		else {
 
 			gt_ip.num++;
 			I8x2 gt_an_ip(gpeALF_null);
@@ -1217,13 +1207,13 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 			}
 		}
 	}
+
 	gpcGT* p_gt;
 	for( ; nFDs < nFDe; nFDs++ ) {
 		p_gt = GTacc.iGT(nFDs);
 		if( p_gt->bGTdie() )
 			continue;
-
-		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) { // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
+        if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) { // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 			p_err = p_gt->GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 			if( *p_err )
 				if(bSTDcout){gpdCOUT << p_err <<gpdENDL;}

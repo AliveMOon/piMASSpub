@@ -1468,7 +1468,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	return pGSM;
 }
 
-I4 gpMEM::instDOitGSM( gpcGT* pGT ) {
+I4   gpMEM::instDOitGSM( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
 
