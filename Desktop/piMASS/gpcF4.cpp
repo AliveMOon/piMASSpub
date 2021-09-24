@@ -61,14 +61,14 @@ F4 F4::operator / ( const F4x4& b ) const {
 	return F4( *this*b.x, *this*b.y, *this*b.z, w ) - b.t;
 }
 F2& F2::cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m ) {
-    float   RADx = (float(Cx)/float(c*m))*PI2,
-            RADy = (float(Cy)/float(c*m))*PI2;
+    float   RADx = (float(Cx)/float(c*m))*PI,
+            RADy = (float(Cy)/float(c*m))*PI;
     w /= 2.0;
-    F2  p0x=F2(sin(RADx),-cos(RADx))*r + F2(-w,w),
-        p0y=F2(cos(RADy),sin(RADy))*r - w,
-        p0xy = (p0x-p0y)/2.0;
-    float l2 = p0xy.qlen();
-    *this = p0xy.right()*sqrt(r*r-l2)/sqrt(l2)+p0xy+p0y;
+    F2  Ax=F2(sin(RADx),-cos(RADx))*r + F2(-w,w),
+        Ay=F2(cos(RADy),sin(RADy))*r - w,
+        AxyH = (Ax-Ay)/2.0;
+    float AxyQL = AxyH.qlen();
+    *this = AxyH.right()*sqrt((r*r-AxyQL)/AxyQL)+AxyH+Ay;
     return *this;
 }
 F2& F2::pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float trn ) {
@@ -78,19 +78,18 @@ F2& F2::pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float trn ) {
         Ay = ARMxy,
         Ax;
     float Aql = ARMxy.qlen();
-    Ay += ARMxy.right()*//sqrt(r*r-Aql)/sqrt(Aql)
-            sqrt((r*r-Aql)/Aql);
+    Ay += ARMxy.right()
+        * sqrt((r*r-Aql)/Aql);
 
-    Ax = ARMxy = (*this - F2(-w,w))/2.0,
+    Ax  = ARMxy = (*this - F2(-w,w))/2.0,
     Aql = ARMxy.qlen();
-    Ax += ARMxy.right()*
-            //sqrt(r*r-Aql)/sqrt(Aql)
-            sqrt((r*r-Aql)/Aql)
-            ;
+
+    Ax += ARMxy.right()
+        * sqrt((r*r-Aql)/Aql);
     float   RADy = trn-acos(Ay.y/r),
             RADx = trn-acos(Ax.x/r);
-    Cx = float(c*m)*RADx/PI4;
-    Cy = float(c*m)*RADy/PI4;
+    Cx = float(c*m)*RADx/PI;
+    Cy = float(c*m)*RADy/PI;
     return *this;
 }
 F2& F2::swpXY( const void* pV ) {

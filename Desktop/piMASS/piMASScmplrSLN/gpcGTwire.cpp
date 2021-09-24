@@ -48,7 +48,79 @@ U1  aIOonPCB[] = { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
 
 #define gpdWRuSLP (1250*4)
 #define gpdWRmSLP(n) ((gpdWRuSLP*n)/1000)
+bool gpcARMprg::bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT ) {
+    if( bCTRL() ) // mozog?
+        return false; // igen mozog
 
+    // ha megált  megnézi
+	// program végrehajtásával foglalkozik?
+    if( !jdPRG.x )
+		return true;	// nem akor pihi
+
+	// igen
+    /// --------------------------
+    /// 		END
+    /// --------------------------
+	if( jdPRG.y >= jdPRG.z ) {
+        // de pont befejezte
+        switch( jdALF ) {
+			case gpeALF_PAINT:
+				if( pGT ? !pDAT->nI4x4() : true ) {
+					jdALF = gpeALF_null;
+					break;
+				}
+                // paint addig megy mig van utánpotlás
+                jdPRG.y = 0;    // azaz írány a start
+				break;
+            default: {
+                    jdALF = gpeALF_null;
+                } break;
+        }
+        if( !jdALF ) {
+			jdALF = gpeALF_null;
+			jdPRG.null();
+			return true;
+		}
+    }
+
+	// na nézzük a programot
+	if( !jdPRG.y ) {
+		/// ----------------------------
+		///   		START
+		/// ----------------------------
+		switch( jdALF ) {
+            case gpeALF_PAINT:
+                if( pGT ? pDAT->nI4x4() : false ){
+                    lzyROAD.lzyRST();
+                    lzyROAD = *pDAT;
+                    pDAT->lzyRST();
+                }
+                jdPRG.z = lzyROAD.nI4x4();
+                jdPRG.y = 0;
+                break;
+            default:
+				jdPRG.null();
+				return true;
+				break;
+		}
+		gpmMcpyOF( &stXYZ, &gdXYZ, 3 );
+    }
+    /// ----------------------------
+	///   		STEP
+	/// ----------------------------
+	switch( jdALF ) {
+		case gpeALF_PAINT: {
+            /// paint21sep22 - 3./ STEP bRUN{ sw( jdALF )
+
+		} break;
+		default:
+            jdPRG.null();
+			return true;
+			break;
+    }
+    jdPRG.y++;
+	return true;
+}
 class gpcWIRE {
 public:
     U4 aIO[0x28],aIOd[0x28], cnt;
@@ -71,9 +143,15 @@ public:
     float   aR[0x4], aW[0x4];
 
     I4x2 nLEN;
+    /// paint21sep22 - class gpcWIRE
+    gpcARMprg   prg;
+
     std::thread trd;
 
     gpcWIRE(){ gpmCLR; };
+    U4 setCTRL( U1 iD ){ return this ? prg.setCTRL(iD) : 0; }
+    U4 rstCTRL() { return this ? prg.rstCTRL() : 0; }
+    bool bCTRL() { return this ? prg.bCTRL() : false; }
 };
 void gpfWIREtrd( gpcWIRE* pWR ) {
 
@@ -226,12 +304,14 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
         iCNT++;
         if( gpcGTall* pALL = pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL ) {
             char sANSW[0x100], *pANSW = sANSW;
+            pWR->rstCTRL();
             for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
                 if( !pWR->aA[iD] )
                     continue;
                 if( pWR->aCNT[iD].y == pWR->aCNT[iD].x )
                     continue;
-                //pANSW += pWR->aAN[iD].an2str( pANSW );
+                pWR->setCTRL(iD);
+                //pWR->iCTRL.z |= 1<<iD;
                 pANSW += sprintf( pANSW, "%lld<%lld ",pWR->aCNT[iD].y, pWR->aCNT[iD].x );
             }
             if( pANSW > sANSW ) {
@@ -365,6 +445,10 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
                                             pWR->aW[0], pWR->aR[0], pWR->aC[0], 64 );
                     pWR->aPOT[1].x = float(anC.num)/10.0;
                 } break;
+            case gpeALF_PAINT:{
+                /// paint21sep22 - 1./ GTwireOS sw( anC.alf ) PAINT:
+
+                } break;
             default:
                 pWR->aA[iNUM] = anC.alf;
                 pWR->aCNT[iNUM].z = 0;
@@ -407,7 +491,10 @@ I4 gpMEM::instDOitWIRE( gpcGT* pGT ) {
 
     if( !pGT->pGTm )
         return cnt;
-
+    /// ----------------------------------------
+	///					rPIC
+	/// ----------------------------------------
+	/// paint21sep22 - 2./ instDOitWIRE rPIC
 //    gpcGT* pLST = pGT->pGTm;
 //    char sAN[0x20], n = 0; U8 s;
 //    for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {

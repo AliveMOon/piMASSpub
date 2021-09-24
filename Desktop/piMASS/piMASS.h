@@ -474,8 +474,7 @@ public:
 
 
 #define gpfVnN( d, v ) gpfVANnNINCS( (U1*)(d), (U1*)(v))
-double inline gpfRAMADZSAN( double a, double b )
-{
+double inline gpfRAMADZSAN( double a, double b ) {
 	if(a==0.0)
 		return 4*b;
 	if(b==0.0)
@@ -610,24 +609,21 @@ U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* 
 
 
 
-enum gpeCLR: U1
-{
+enum gpeCLR: U1 {
 	gpeCLR_black,	gpeCLR_red, 	gpeCLR_green,	gpeCLR_blue,
 	gpeCLR_violet,	gpeCLR_red2, 	gpeCLR_green2,	gpeCLR_blue2,
 	gpeCLR_brown,	gpeCLR_orange,	gpeCLR_yellow,  gpeCLR_cyan,
 	gpeCLR_gray,	gpeCLR_gray2,	gpeCLR_grey3,	gpeCLR_white,
 
 };
-enum gpeLZYset : U1
-{
+enum gpeLZYset : U1 {
 	gpeLZYoff,
 	gpeLZYwipSTK,
 	gpeLZYwip,
 	gpeLZYxN,
 	gpeLZYxSOF,
 };
-enum gpeWIP : U1
-{
+enum gpeWIP : U1 {
 	gpeWIP_init,
 	gpeWIP_busy,
 	gpeWIP_done,
@@ -4952,8 +4948,8 @@ public:
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
-	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m );
-    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 64, float turn  = 0);
+	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m = 16 );
+    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 16, float turn  = 0);
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }
@@ -5979,12 +5975,7 @@ public:
 };
 
 #define gpdLZYallGT 4
-//#define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
-#define gpmLZYvaliPAD( a, b, n ) ((a*)( (b) ? ((b)->p_alloc ? (b)->p_alloc+(n) : NULL ) : NULL ))
-#define gpmLZYvali( a, b ) gpmLZYvaliPAD( a, (b), 0 )
 
-#define gpmLZYloadPAD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
-#define gpmLZYload( p, t ) gpmLZYloadPAD( (p), t, (U8)0 )
 
 class gpcROBnD;
 class gpcZSnD;
@@ -6718,7 +6709,10 @@ szasz:
 		return pLZY->lzyADD( aU, nU, s );
 	}
 
-	U1* pU1() { return this ? (n_load ? p_alloc : NULL) : NULL; }
+
+	U1* pU1() {
+        return this ? (n_load ? p_alloc : NULL) : NULL;
+    }
 	U1* pU1n( int i = 0, int n = 1 ) {
 		if( !this )
 			return NULL;
@@ -6805,9 +6799,18 @@ szasz:
 	D4* 	pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
 	void**	ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
 
+    U1* pVALI( size_t nB = 0, size_t nP = 0  ) { return this ? ((n_load>=(nB+nP)) ? p_alloc : NULL) : NULL;  }
 
 };
 
+
+#define gpmLZYvaliPAD( a, b, p ) ((a*)( (b)->pVALI(sizeof(a))+p ))
+#define gpmLZYvali( a, b ) ((a*)( (b)->pVALI( sizeof(a) ) ))
+//#define gpmLZYvaliPAD( a, b, n ) ((a*)( (b) ? ((b)->p_alloc ? (b)->p_alloc+(n) : NULL ) : NULL ))
+//#define gpmLZYvali( a, b ) gpmLZYvaliPAD( a, (b), 0 )
+
+#define gpmLZYloadPAD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
+#define gpmLZYload( p, t ) gpmLZYloadPAD( (p), t, (U8)0 )
 
 class gpcLZYdct {
 	U4x4*		pIX; /// BEST!!!

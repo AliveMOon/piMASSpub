@@ -298,6 +298,7 @@ I4x4 gpcDrc::cageXYZ( I4x4 trg, I4 lim, U4 id, int rR ) {
 }
 
 static char gpsJDprgPUB[0x100];
+/// paint21sep22 - jdPRGstp
 bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 	// ha létre jött mozgá hagyja végre hajtani
 	if( oCTRL.z )
@@ -309,10 +310,10 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 		return true;	// nem akor pihi
 
 	// igen
+    /// --------------------------
+    /// 		END
+    /// --------------------------
 	if( jdPRG.y >= jdPRG.z ) {
-		/// --------------------------
-		/// 		END
-		/// --------------------------
 		// de pont befejezte
 		if( !jd0XYZ.qlen_xyz() )
 			jdALF = gpeALF_null;
@@ -346,10 +347,10 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 
 
 	// na nézzük a programot
+    /// ----------------------------
+    ///   		START
+    /// ----------------------------
 	if( !jdPRG.y ) {
-		/// ----------------------------
-		///   		START
-		/// ----------------------------
 		if( !txyz.qlen_xyz() ) {
 			// ha nincsen target kinyirjuk a programot
 			jdPRG.null();
@@ -414,6 +415,7 @@ bool gpcDrc::jdPRGstp( U4 mSEC, gpcGT* pGT, gpcROBnD *pROBnD ) {
 	/// ----------------------------
 	switch( jdALF ) {
 		case gpeALF_PAINT: {
+                /// paint21sep22 - STEP jdPRGstp{ sw( jdALF )
 				if( oARY.n > oARY.i )
 					return true;
 				I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y ), *pSTP;
@@ -717,7 +719,7 @@ gpcLZY* gpcGT::GTdrcOSrob( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUS
 						iNUM = gpeDRCos_drpX;
 						nNUM = 4;
 					} break;
-
+                /// paint21sep22 - GTdrcOSrob
 				case gpeALF_PAINT:
 				case gpeALF_SHLD:
 				case gpeALF_SNAIL:

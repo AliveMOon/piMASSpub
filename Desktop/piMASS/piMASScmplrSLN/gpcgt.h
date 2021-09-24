@@ -191,6 +191,41 @@ public:
 class gpcWIN;
 class gpcGT;
 
+/// paint21sep22 - class gpcARMprg
+class gpcARMprg {
+public:
+    gpeALF  jdALF;
+    gpcLZY  lzyROAD, lstSTP;
+    I4x4    tgXYZ, tgABC, tgxyz,    /// target
+            ouXYZ, ouABC, ouxyz,    /// OUT éppen hova megy
+                                     // lehet köztes pos a TRG
+            gdXYZ, gdABC, gdxyz,    /// GOOD = az utolso
+                                     // balesetmentes pos
+                                     // visza lehessen iszkolni
+            inXYZ, inABC, inxyz,    /// mondjuk ENCODER adata
+            stXYZ, stABC, stxyz,     // START = indultáskori GOOD
+            jdPRG;
+    U4x4    oCTRL; //, iCTRL;
+    I2x2	iARY, oARY;
+    gpcARMprg(){};
+    bool bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT );
+    U4 rstCTRL() {
+        if( !this )
+            return 0;
+        oCTRL.w = oCTRL.z;
+        oCTRL.z = 0;
+        return oCTRL.w;
+    };
+    U4 setCTRL( U1 iD ) {
+        if( !this )
+            return 0;
+        oCTRL.w = oCTRL.z;
+        oCTRL.z |= 1<<iD;
+        return oCTRL.w;
+    };
+    bool bCTRL() { return this ? oCTRL.z : false; }
+};
+
 class gpcDrc {
 public:
 	I4x4 	NMnDIF,
@@ -198,22 +233,24 @@ public:
 			tABC, aoABC[4], aiABC[2],
 			txyz, oxyz, ixyz,
 			tabc, oabc, iabc;
-			//aoAX1to6[2], aiAX1to6[2],
-			//aoax1to6[2], aiax1to6[2];
-	I2x2	iARY,
-			oARY;
+
+
 	U4x4	oCTRL, iCTRL, JD;	// JD.z error num
 	I4x4	okXYZ, okABC, okxyz,
 			tGRP, oGRP, iGRP,
-			jdPRG, jdPRGtool,
+			jdPRGtool,
 
 			jd0PRG,
 			jd0XYZ, jd0ABC, jd0xyz,
 			jd1XYZ, jd1ABC, jd1up;
 	F4x4	jd0mx, jd0mxTL;
-	gpeALF	jdALF;
 	I4x4	msSMR2, msSRT3;
+	/// gpcARMprg -------------------
+	gpeALF	jdALF;
 	gpcLZY	lzyROAD, lstSTP;
+	I4x4    jdPRG;
+	I2x2	iARY, oARY;
+
 	U4		nMS,	sMS,	AVGms, Ems,
 			MPosS,	HS1ms,	n_trd, n_join;
 	/// gpmZn ----------------------

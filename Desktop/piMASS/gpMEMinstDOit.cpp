@@ -66,6 +66,7 @@ I4 gpMEM::instDOitSLMP( gpcGT* pGT ) {
 	/// ----------------------------------------
 	///					rPIC
 	/// ----------------------------------------
+	/// paint21sep22 - instDOitSLMP rPIC
 	if( pOpic )
 	if( !gpdROBrd.nLD() ) {
 		pU1 = pOpic->pU1();
