@@ -560,7 +560,7 @@ public:
 	U4				id, iSRC, aiQC[2],
 					nPIXall, nPIX,
 					nBOBall, nBOB,
-					tC,tD,
+					tC,tD, nCPY,
 
 					bppS, nPKavg;
 	U4x4			glRNDR;

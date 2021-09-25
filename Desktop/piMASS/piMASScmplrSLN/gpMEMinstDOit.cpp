@@ -374,6 +374,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 				pSRF->pixels );
 		//gpdGLpTRG->pREF = NULL;
 		gpdGLapPIC[iP]->pREF = NULL;
+		gpdGLapPIC[iP]->nCPY++;
 		return cID;
 	}
 	/// GLSL SET TETURE -------------------------------------------------------

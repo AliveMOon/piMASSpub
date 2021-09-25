@@ -10,26 +10,32 @@ public:
         aiM[3],         iEN;
     gpcDRV8825(){ gpmCLR; };
 };
-U1  aIOonPCB[] = { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
-    aIObcm[] = { 5,6,12,13,16,17,18,19,20,21,22,23,24,25,26,27, },
-    aIOfree[] = { 21,22,26,23,27,0,1,24,28,29,3,4,5,6,25,2, },
+U1  aIOonPCB[] =    { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
+    aIObcm[] =      {  5, 6,12,13,16,17,18,19,20,21,22,23,24,25,26,27, },
+    aIOfree[] =     { 21,22,26,23,27, 0, 1,24,28,29, 3, 4, 5, 6,25, 2, },
 
-    aIOm2w[] = {    00,01,
-                    02,//
-                    03,04,
-                       05,
-                    // //
-                       06,
-                    // //
-                    // //
-                    // //
-                    21,//
-                    22,26,
-                    23,//
-                    24,27,
-                    25,28,
-                       29, },
-
+    aIOm2w[] = {
+                    // //       //  3v3  + + 5v0
+                    // //       //  SDA1 + + 5v0
+                    // //       //  SCL1 + + GND
+                    // //       //  1-Wir+ + TxD
+                    // //       //  GND  + + RxD
+                    00,01,      //  io00 + + io01
+                    02,//       //  io02 + + GND
+                    03,04,      //  io03 + + io04
+                       05,      //  3V3  + + io05
+                    // //       //  MOSI + + GND
+                       06,      //  MISO + + io06
+                    // //       //  Sclk + + CE0
+                    // //       //  GND  + + CE1
+                                //  SDA0 + + SCL0
+                    21,//       //  io21 + + GND
+                    22,26,      //  io22 + + io26
+                    23,//       //  io21 + + GND
+                    24,27,      //  io24 + + io27
+                    25,28,      //  io25 + + io28
+                       29,      //  GND  + + io29
+            },
     aIOm2p[] = {    11,12,
                     13,//
                     15,16,
@@ -48,7 +54,8 @@ U1  aIOonPCB[] = { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
 
 #define gpdWRuSLP (1250*4)
 #define gpdWRmSLP(n) ((gpdWRuSLP*n)/1000)
-bool gpcARMprg::bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT ) {
+bool gpcPRGarm::bRUN( U4 mSEC, gpcGT* pGT, U4 nV ) {
+
     if( bCTRL() ) // mozog?
         return false; // igen mozog
 
@@ -65,7 +72,9 @@ bool gpcARMprg::bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT ) {
         // de pont befejezte
         switch( jdALF ) {
 			case gpeALF_PAINT:
-				if( pGT ? !pDAT->nI4x4() : true ) {
+				if( pGT ? !robROAD.nI4x4() : true ) {
+                    if( nVER != nV ) // pl. pSRF ha új készül elvileg más lesz
+                        return false;
 					jdALF = gpeALF_null;
 					break;
 				}
@@ -76,6 +85,7 @@ bool gpcARMprg::bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT ) {
                     jdALF = gpeALF_null;
                 } break;
         }
+
         if( !jdALF ) {
 			jdALF = gpeALF_null;
 			jdPRG.null();
@@ -88,12 +98,13 @@ bool gpcARMprg::bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT ) {
 		/// ----------------------------
 		///   		START
 		/// ----------------------------
+		nVER = nV;
 		switch( jdALF ) {
             case gpeALF_PAINT:
-                if( pGT ? pDAT->nI4x4() : false ){
+                if( pGT ? robROAD.nI4x4() : false ){
                     lzyROAD.lzyRST();
-                    lzyROAD = *pDAT;
-                    pDAT->lzyRST();
+                    lzyROAD = robROAD;
+                    robROAD.lzyRST();
                 }
                 jdPRG.z = lzyROAD.nI4x4();
                 jdPRG.y = 0;
@@ -111,8 +122,13 @@ bool gpcARMprg::bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT ) {
 	switch( jdALF ) {
 		case gpeALF_PAINT: {
             /// paint21sep22 - 3./ STEP bRUN{ sw( jdALF )
-
-		} break;
+            I4x4* pDOT = lzyROAD.pI4x4( jdPRG.y );
+            if( !pDOT ){
+                jdPRG.y = jdPRG.z;
+                break;
+            }
+            tgXYZ = *pDOT;
+        } break;
 		default:
             jdPRG.null();
 			return true;
@@ -144,7 +160,7 @@ public:
 
     I4x2 nLEN;
     /// paint21sep22 - class gpcWIRE
-    gpcARMprg   prg;
+    gpcPRGarm   prg;
 
     std::thread trd;
 
@@ -304,6 +320,11 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
         iCNT++;
         if( gpcGTall* pALL = pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL ) {
             char sANSW[0x100], *pANSW = sANSW;
+            if( pWR->bCTRL() )
+            //if( pWR->prg.jdPRG.x )
+            if( pWR->aPOT[1] != pWR->aPOT[0] )
+                pANSW += sprintf( pANSW, "%0.1f,%0.1f < %0.1f,%0.1f", pWR->aPOT[1].x, pWR->aPOT[1].y, pWR->aPOT[0].x, pWR->aPOT[0].y );
+
             pWR->rstCTRL();
             for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
                 if( !pWR->aA[iD] )
@@ -312,7 +333,7 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
                     continue;
                 pWR->setCTRL(iD);
                 //pWR->iCTRL.z |= 1<<iD;
-                pANSW += sprintf( pANSW, "%lld<%lld ",pWR->aCNT[iD].y, pWR->aCNT[iD].x );
+                pANSW += sprintf( pANSW, "%lld<%lld %0.1f<%0.1f",pWR->aCNT[iD].y, pWR->aCNT[iD].x );
             }
             if( pANSW > sANSW ) {
                 gpcGT *pGTusr = NULL;
@@ -406,6 +427,9 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
 				case gpeALF_STAT:
 					bSTAT = true;
 					break;
+                case gpeALF_STOP:
+					pWR->prg.jdPRG.x = 0;
+					break;
 				case gpeALF_POS:
 					iNUM = 0;
 					anC.alf = an.alf;
@@ -416,13 +440,24 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
 					anC.alf = an.alf;
 					bSTAT = true;
 					break;
+                case gpeALF_PAINT:
+                    iNUM = 0x10;
+                    bSTAT = true;
+                    /// pain 01. OS  // pWR->prg.jdPRG.x = 1; jdALF = an.alf;
+                    pWR->prg.jdPRG.x = 1;
+                    pWR->prg.jdALF = an.alf;
+                    break;
 				default:
                     break;
 
 			}
 		}
 
-		switch( anC.alf ) {
+        if( iNUM >= 0x10 ) {
+            /// pain 02. OS  // pWR->prg.jdPRGtool
+            pWR->prg.jdPRGtool.aXYZW[iNUM&0x3] = anC.num;
+        }
+		else switch( anC.alf ) {
             case gpeALF_null:
                 continue;
             case gpeALF_POT: {
@@ -432,7 +467,7 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
                     if(iNUM&1) {
                         pWR->aPOT[1].y = float(anC.num)/10.0;
                         pWR->aPOT[1].pot2cnt(   pWR->aCNT[iNUM-1].y, pWR->aCNT[iNUM].y,
-                                                pWR->aW[0], pWR->aR[0], pWR->aC[0], 64); //, PIp2*(22.0/20.0) );
+                                                pWR->aW[0], pWR->aR[0], pWR->aC[0]); //, PIp2*(22.0/20.0) );
                         pWR->nZ[iNUM-1] =  abs(pWR->aCNT[iNUM-1].y-pWR->aCNT[iNUM-1].w);
                         pWR->nZ[iNUM  ] =  abs(pWR->aCNT[iNUM  ].y-pWR->aCNT[iNUM  ].w);
                         if( pWR->nZ[iNUM-1] < pWR->nZ[iNUM  ] )
@@ -442,11 +477,11 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
                         break;
                     }
                     pWR->aPOT[0].cnt2pot(   pWR->aCNT[0].x, pWR->aCNT[1].x,
-                                            pWR->aW[0], pWR->aR[0], pWR->aC[0], 64 );
+                                            pWR->aW[0], pWR->aR[0], pWR->aC[0] );
                     pWR->aPOT[1].x = float(anC.num)/10.0;
                 } break;
             case gpeALF_PAINT:{
-                /// paint21sep22 - 1./ GTwireOS sw( anC.alf ) PAINT:
+                    /// paint21sep22 - 1./ GTwireOS sw( anC.alf ) PAINT:
 
                 } break;
             default:
@@ -480,6 +515,13 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
     }
     return pANS->lzyFRMT( s = -1, "nonsens" );
 }
+
+#define gpdID pWR->prg.aROBpID
+#define gpdRD pWR->prg.lzyRD
+#define gpdRM pWR->prg.pRM
+#define gpdROBrd pWR->prg.robROAD
+#define gpdSRF pWR->prg.pROBsrf
+#define gpdDIF pWR->prg.pROBdif
 I4 gpMEM::instDOitWIRE( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
@@ -495,15 +537,214 @@ I4 gpMEM::instDOitWIRE( gpcGT* pGT ) {
 	///					rPIC
 	/// ----------------------------------------
 	/// paint21sep22 - 2./ instDOitWIRE rPIC
-//    gpcGT* pLST = pGT->pGTm;
-//    char sAN[0x20], n = 0; U8 s;
-//    for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
-//        if( !pWR->aAN[iD].alf )
-//            continue;
-//        pLST->pGTout()->lzyFRMT( s = -1, "%s:%d ", pWR->aAN[iD].an2str(sAN)?sAN:"", pWR->aCNT[iD] );
-//        n++;
-//    }
-//    if( n )
-//        pLST->pGTout()->lzyFRMT( s = -1, "\r\n" );
+	/// pain 03. // instDOitWIRE pGT->pGTm?
+	gpOBJ *pOpic = pOBJ(gpeALF_RPIC);
+    U1* pU1 = pOpic->pU1();
+    if( !pU1 )
+        return pGT->iCNT;
+
+    gpdID[0]    = pOpic->bUTF8()
+                ? pMASS->PIC.alfFND( (pU1+=gpmNINCS(pU1," \t\"")) )
+                : *(I4*)pU1;
+    gpcPIC* pPIC = pMASS->PIC.PIC( gpdID[0] );
+    SDL_Surface* pSRF = pPIC->pPICrtxSRF();
+
+	if( pWR->prg.bRUN( pWIN->mSEC.x, pGT, pPIC ? pPIC->nCPY : 0 ) ) {
+        if( pWR->prg.ouXYZ != pWR->prg.tgXYZ ) {
+            pWR->prg.ouXYZ = pWR->prg.tgXYZ;
+            for( U1 iNUM = 0; iNUM < 2; iNUM++ ) {
+                pWR->aA[iNUM] = gpeALF_POT;
+                pWR->aCNT[iNUM].z = 0;
+                pWR->aCNT[iNUM].w = pWR->aCNT[iNUM].x;
+                if(iNUM&1) {
+                    pWR->aPOT[1].y = float(pWR->prg.ouXYZ.y)/100.0;
+                    pWR->aPOT[1].pot2cnt(   pWR->aCNT[iNUM-1].y, pWR->aCNT[iNUM].y,
+                                            pWR->aW[0], pWR->aR[0], pWR->aC[0]); //, PIp2*(22.0/20.0) );
+                    pWR->nZ[iNUM-1] =  abs(pWR->aCNT[iNUM-1].y-pWR->aCNT[iNUM-1].w);
+                    pWR->nZ[iNUM  ] =  abs(pWR->aCNT[iNUM  ].y-pWR->aCNT[iNUM  ].w);
+                    if( pWR->nZ[iNUM-1] < pWR->nZ[iNUM  ] )
+                        pWR->nZ[iNUM-1] = pWR->nZ[iNUM  ];
+                    else
+                        pWR->nZ[iNUM  ] = pWR->nZ[iNUM-1];
+                    break;
+                }
+
+                pWR->aPOT[0].cnt2pot(   pWR->aCNT[0].x, pWR->aCNT[1].x,
+                                        pWR->aW[0], pWR->aR[0], pWR->aC[0] );
+                pWR->prg.inXYZ.a4x2[0] = pWR->aPOT[0]*100.0;
+                pWR->aPOT[1].x = float(pWR->prg.ouXYZ.x)/100.0;
+            }
+        }
+        return cnt;
+	}
+
+    if( !pSRF )
+        gpdID[0] = -1;
+    else {
+        if( gpdSRF ? (gpdSRF->w != pSRF->w  || gpdSRF->h != pSRF->h ) : false ) {
+            gpmSDL_FreeSRF(gpdSRF);
+            gpmSDL_FreeSRF(gpdDIF);
+            gpmDELary( gpdRM );
+        }
+
+        if( !gpdSRF ) {
+            gpdSRF = SDL_CreateRGBSurface( 0, pSRF->w, pSRF->h, 32, 0,0,0,0 );
+            gpdDIF = SDL_CreateRGBSurface( 0, pSRF->w, pSRF->h, 32, 0,0,0,0 );
+        }
+        if( gpdSRF ) {
+            U4	*apU4[3] = { (U4*)pSRF->pixels, (U4*)gpdSRF->pixels, (U4*)gpdDIF->pixels },
+                n = pSRF->w*pSRF->h, i, nD = 0;
+
+            for( U4 i = 0; i < n; i++ ) {
+                if( apU4[1][i] == apU4[0][i] ) {
+                    apU4[2][i] = 0 ;
+                    continue;
+                }
+                apU4[2][i] = (apU4[1][i] = apU4[0][i]);
+                nD++;
+            }
+            if( nD ) {
+                if( !gpdRM )
+                    gpdRM = new U4[n];
+                gpdRM;
+                gpmZnOF( gpdRM, n );
+                I1		dir = 1;
+                I4 		w = pSRF->w, h = pSRF->h,
+                        aR[] = {-w, 0,w, 0},
+                        aD[] = {-w,+1,w,-1},
+                        bx, by, //rg = aD[2]/2,
+                        b,s;
+
+                I4x2	*pRi, xy, xyB, xyA, xAB, x0B, x0A;
+                U4		in = 0xffffffff, n_stp = 0,
+                        i = w+1, nn = n-i;
+                bool b_pre = true, bIN;
+
+
+                for( ; i < nn; i++ ) {
+                    if( gpdRM[i] || (apU4[2][i]!=in) ) continue;
+
+                    for( ; i < nn; i++ )
+                    if( apU4[2][i]==in ) continue;
+                    else break;
+
+                    if( i >= nn )
+                        break;
+
+                    gpdRD.lzyRST();
+                    dir = 1;
+                    gpdRM[s] = s = b = i;
+                    b++;
+                    by = s-s%w;
+                    b_pre = true;
+                    while( s != b ) { //s == b ? dir != 2 : true ) {
+                        bIN = false;
+                        bx=b-by;
+
+                        if(bx>=0)
+                        if(bx<w) 			// balra van
+                        if(b>=0)			// lent van
+                        if(b>=by)			// jobra van
+                        if(b<n)				// fent van
+                        if( (!gpdRM[b]) || (gpdRM[b]==s) )
+                        if( bIN = (apU4[2][b]==in) )
+                                gpdRM[b]=s;
+
+
+                        if( dir&1 )
+                        if( bIN != b_pre ) {
+                            pRi = gpdRD.pI4x2n(-1);
+                            *pRi = I4x2( gpdRD.nI4x2()-1, b );
+                        }
+
+                        if( bIN ) {
+                            if( bIN != b_pre )
+                                n_stp++;
+                            dir--;
+                            if(dir<0)
+                                dir = 3;
+                        } else {
+                            dir++;
+                            dir %= 4;
+                        }
+
+                        b_pre=bIN;
+                        b	+= aD[dir];
+                        by	+= aR[dir];
+                    }
+                    /// ROAD
+                    I4	nR = gpdRD.nI4x2(), nRD = 0, base, alt;
+                    pRi = gpdRD.pI4x2n( nR, nR+1);
+                    I4x4* pRD;
+                    //if( false )
+                    {
+                        bool bFRT = true;
+                        for( I4 r = -nR, ir; r < 0; r++ ) {
+                            xy = pRi[r];
+                            xy.YdivRQ(w);
+                            xy.x = ((xy.x*gpdPAINTwX)/w) + gpdPAINTlfX;
+                            xy.y = gpdPAINTtpX - ((xy.y*gpdPAINThX)/h);
+                            if( bFRT ) {
+                                bFRT = false;
+                                (pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTupX; pRD->w = 0;
+                                nRD++;
+                            }
+                            (pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy; pRD->z = gpdPAINTdwX; pRD->w = 0;
+                            nRD++;
+                            xyB = xy;
+                            base = alt = 0;
+                            for( ir = r+1; ir < 0; ir++ ) {
+                                xyA = pRi[ir];
+                                xyA.YdivRQ(w);
+                                xyA.x = ((xyA.x*gpdPAINTwX)/w) + gpdPAINTlfX;
+                                xyA.y = gpdPAINTtpX - ((xyA.y*gpdPAINThX)/h);
+                                if( !base ) {
+                                    x0B = xyA-xy;
+                                    if( x0B.abs().mx() < mmX(3) )
+                                        continue;
+                                    r = ir;
+                                    base = x0B.abs().mx();
+                                    continue;
+                                }
+                                x0A = xyA-xy;
+                                xAB = (x0B*(x0A*x0B));
+                                xAB /= (base*base);
+                                x0A -= xAB;
+                                alt = x0A.abs().mx();
+                                if( alt < mmX(2) )
+                                    continue;
+
+
+                                (pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xyA; pRD->z = gpdPAINTdwX; pRD->w = 0;
+                                nRD++;
+                                r = ir;
+                                break;
+                            }
+                        }
+                        if( nRD ) {
+                            xy = pRi[-nR];
+                            xy.YdivRQ(w);
+                            xy.x = ((xy.x*gpdPAINTwX)/w) + gpdPAINTlfX;
+                            xy.y = gpdPAINTtpX - ((xy.y*gpdPAINThX)/h);
+
+                            (pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy;
+                            pRD->z = gpdPAINTdwX; pRD->w = 0;
+                            nRD++;
+                            (pRD = gpdROBrd.pI4x4n(-1))->a4x2[0] = xy;
+                            pRD->z = gpdPAINTupX; pRD->w = 0;
+                            nRD++;
+                        }
+                    }
+                    /// FILL
+                    pRi[-nR].median(nR, pRi, true );
+                    for( I4 r = -nR; r < 0; r += 2 ) {
+                        gpfMset( gpdRM+pRi[r].y, pRi[r+1].y-pRi[r].y, &s, sizeof(s) );
+                    }
+                }
+            }
+        }
+    }
+
+
     return pGT->iCNT;
 }

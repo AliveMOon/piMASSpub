@@ -451,11 +451,11 @@ public:
 #define gpdHEADmmX	mmX(200)
 #define gpdNECKmmX	mmX(150)
 
-#define gpdPAINTlfX mmX(560)
-#define gpdPAINTrgX mmX(900)
+#define gpdPAINTlfX mmX(-700)
+#define gpdPAINTrgX mmX(700)
 
-#define gpdPAINTbtX mmX(-204)
-#define gpdPAINTtpX mmX(168)
+#define gpdPAINTbtX mmX(-400)
+#define gpdPAINTtpX mmX(400)
 
 #define gpdPAINTwX  (gpdPAINTrgX-gpdPAINTlfX)
 #define gpdPAINThX  (gpdPAINTtpX-gpdPAINTbtX)
@@ -474,8 +474,7 @@ public:
 
 
 #define gpfVnN( d, v ) gpfVANnNINCS( (U1*)(d), (U1*)(v))
-double inline gpfRAMADZSAN( double a, double b )
-{
+double inline gpfRAMADZSAN( double a, double b ) {
 	if(a==0.0)
 		return 4*b;
 	if(b==0.0)
@@ -610,24 +609,21 @@ U8 inline gpfABC_H_nincs( const U1* p_str, const U1* pE, U8& nUTF8, const char* 
 
 
 
-enum gpeCLR: U1
-{
+enum gpeCLR: U1 {
 	gpeCLR_black,	gpeCLR_red, 	gpeCLR_green,	gpeCLR_blue,
 	gpeCLR_violet,	gpeCLR_red2, 	gpeCLR_green2,	gpeCLR_blue2,
 	gpeCLR_brown,	gpeCLR_orange,	gpeCLR_yellow,  gpeCLR_cyan,
 	gpeCLR_gray,	gpeCLR_gray2,	gpeCLR_grey3,	gpeCLR_white,
 
 };
-enum gpeLZYset : U1
-{
+enum gpeLZYset : U1 {
 	gpeLZYoff,
 	gpeLZYwipSTK,
 	gpeLZYwip,
 	gpeLZYxN,
 	gpeLZYxSOF,
 };
-enum gpeWIP : U1
-{
+enum gpeWIP : U1 {
 	gpeWIP_init,
 	gpeWIP_busy,
 	gpeWIP_done,
@@ -2935,6 +2931,7 @@ public:
 
 	I2x2& operator = ( const U8x2& b );
 	I2x2& operator = ( const I8x2& b );
+    I4x2& operator = ( const F2& b );
 
 	I2x2 abs( void ) const { return I2x2( x<0?-x:x, y<0?-y:y ); }
 
@@ -3115,6 +3112,16 @@ public:
 		y = srf.h;
 		return *this;
 	}
+	I4x2& operator = ( const U4x2& b ) {
+		x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
+		y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
+		return *this;
+	}
+
+	I4x2& operator = ( const U8x2& b );
+	I4x2& operator = ( const I8x2& b );
+    I4x2& operator = ( const F2& b );
+
     I4x2( U8x2 b );
     I4x2( I8x2 b );
     I4x2( int* pI ) {
@@ -3446,14 +3453,7 @@ public:
 		return pBUFF + strALF4N( pBUFF );
     }
 
-	I4x2& operator = ( const U4x2& b ) {
-		x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
-		y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
-		return *this;
-	}
 
-	I4x2& operator = ( const U8x2& b );
-	I4x2& operator = ( const I8x2& b );
 
 	I4x2 abs( void ) const { return I4x2( x<0?-x:x, y<0?-y:y ); }
 
@@ -4952,8 +4952,8 @@ public:
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
-	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m );
-    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 64, float turn  = 0);
+	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m = 16 );
+    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 16, float turn  = 0);
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }
@@ -5979,12 +5979,7 @@ public:
 };
 
 #define gpdLZYallGT 4
-//#define gpmLZYvali( a, b ) ((a*)( (b) ? (b)->p_alloc : NULL ))
-#define gpmLZYvaliPAD( a, b, n ) ((a*)( (b) ? ((b)->p_alloc ? (b)->p_alloc+(n) : NULL ) : NULL ))
-#define gpmLZYvali( a, b ) gpmLZYvaliPAD( a, (b), 0 )
 
-#define gpmLZYloadPAD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
-#define gpmLZYload( p, t ) gpmLZYloadPAD( (p), t, (U8)0 )
 
 class gpcROBnD;
 class gpcZSnD;
@@ -6378,26 +6373,7 @@ public:
 	}
 
 	gpcLZY* lzyADD( const void* p_void, size_t n_byte, U8& iSTRT, U1 n = 0 );
-	void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL ) {
-		if( !this )
-			return NULL; // ha nincsen thisLZY akkor nem lehet valós pU2
 
-		if( pTHIS != (void*)p_alloc )
-			pTHIS = NULL;
-		else if( pLZY->n_load > n_load )
-			pTHIS = NULL;	// pLZY nagyobb akkor sem jó pLZY-ben több az adat
-
-		if( pTHIS )
-			return (void*)p_alloc; // tehát ha nem lett NULL akor VALID
-
-		if( pLZY->n_load <= n_load )
-			return (void*)p_alloc;
-
-		/// pLZY töltve lett, a fölét a IDE(this) is feltöltjük
-		U8 STRT = -1;
-		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
-		return (void*)p_alloc;
-	}
 
 	gpcLZY* lzyPLUS(  const gpcLZY* p_b, U8& iSTRT ) {
 		return lzyADD( p_b->p_alloc, p_b->n_load, iSTRT, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
@@ -6718,7 +6694,10 @@ szasz:
 		return pLZY->lzyADD( aU, nU, s );
 	}
 
-	U1* pU1() { return this ? (n_load ? p_alloc : NULL) : NULL; }
+
+	U1* pU1() {
+        return this ? (n_load ? p_alloc : NULL) : NULL;
+    }
 	U1* pU1n( int i = 0, int n = 1 ) {
 		if( !this )
 			return NULL;
@@ -6805,9 +6784,37 @@ szasz:
 	D4* 	pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
 	void**	ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
 
+    U1* pVALI( size_t nB = 0, size_t nP = 0  ) { return this ? ((n_load>=(nB+nP)) ? p_alloc : NULL) : NULL;  }
+    void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL ) {
+		if( !this )
+			return NULL; // ha nincsen thisLZY akkor nem lehet valós pU2
 
+		if( pTHIS != (void*)p_alloc )
+			pTHIS = NULL;
+		else if( pLZY->n_load > n_load )
+			pTHIS = NULL;	// pLZY nagyobb akkor sem jó pLZY-ben több az adat
+
+		if( pTHIS )
+			return (void*)p_alloc; // tehát ha nem lett NULL akor VALID
+
+		if( pLZY->n_load <= n_load )
+			return (void*)p_alloc;
+
+		/// pLZY töltve lett, a fölét a IDE(this) is feltöltjük
+		U8 STRT = -1;
+		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
+		return (void*)p_alloc;
+	}
 };
 
+
+#define gpmLZYvaliPAD( a, b, p ) ((a*)( (b)->pVALI(sizeof(a))+p ))
+#define gpmLZYvali( a, b ) ((a*)( (b)->pVALI( sizeof(a) ) ))
+//#define gpmLZYvaliPAD( a, b, n ) ((a*)( (b) ? ((b)->p_alloc ? (b)->p_alloc+(n) : NULL ) : NULL ))
+//#define gpmLZYvali( a, b ) gpmLZYvaliPAD( a, (b), 0 )
+
+#define gpmLZYloadPAD( p, t, n ) ((p) ? ((p->n_load) ? (((p->n_load)-(n))/sizeof(t)) : 0 ) : 0 )
+#define gpmLZYload( p, t ) gpmLZYloadPAD( (p), t, (U8)0 )
 
 class gpcLZYdct {
 	U4x4*		pIX; /// BEST!!!
