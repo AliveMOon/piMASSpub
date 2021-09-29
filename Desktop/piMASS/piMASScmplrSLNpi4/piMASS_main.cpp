@@ -87,12 +87,6 @@ gpcSRC* gpcMASS::SRCnew( gpcSRC& tmp, U1* pS, I4x2 an, I4 ig, U4 nS )
 
 
 
-
-
-
-
-
-
 U1	gpsRENMbf[0x1000],
 	gpsSAVEbf[0x1000],
 	gpsSVadr[0x100];
@@ -120,8 +114,7 @@ bool gpcMASS::HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT ) {
 					);
 
 	bool bTR = false, bTD = false;
-	for( U4 i = 0, ie = pC-pM; i < ie; i++ )
-	{
+	for( U4 i = 0, ie = pC-pM; i < ie; i++ ) {
 		if( !(i%z) )
 		{
 			buff.lzyFRMT( nS = -1, "%s<TR>", bTR ? "</TD></TR>\r\n":"" );
@@ -616,7 +609,7 @@ int main( int nA, char *apA[] )
 	I4x4 tmp;
 	for( U4 i = 0, e = gpmN(gpaCAGEtst); i < e; i += 2 )
 	{
-		tstCAGE.iXYZ.xyz_( gpaCAGEtst[i]*mmX(1) );
+		tstCAGE.aiXYZ[0].xyz_( gpaCAGEtst[i]*mmX(1) );
 		tstCAGE.tXYZ.xyz_( gpaCAGEtst[i+1]*mmX(1) );
 		if(bSTDcout){gpdCOUT << "tstCAGE.tXYZ0000:" << (tstCAGE.tXYZ/mmX(1)).pSTR( gpsMNpub ) <<gpdENDL;};
 		tmp = tstCAGE.tXYZ.xyz0();

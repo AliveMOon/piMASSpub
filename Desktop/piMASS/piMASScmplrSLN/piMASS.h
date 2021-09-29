@@ -442,6 +442,8 @@ public:
 
 #define ms2sec 1000
 #define gpdROBlim 100
+#define wr2(a) ((a)*2)
+#define wrX(a) ((a)*10)
 #define mmX(a) ((a)*16)
 #define degX(a) ((a)*128)
 
@@ -2031,10 +2033,15 @@ public:
 	U8 area() const 	{ return (!this?0:(U8)x*y); }
 	U8 are_sum() const 	{ return area()+sum(); }
 	U8 qlen() const 	{ return (!this?0:(U8)x*x+(U8)y*y); }
-	U4 mn() const 		{ return (!this?0:(x<y?x:y)); }
-	U4 mx() const 		{ return (!this?0:(x>y?x:y)); }
+	//U4x2 abs( void ) const { return U4x2( x<0?-x:x, y<0?-y:y ); }
 
-	U4x2 abs( void ) const { return U4x2( x<0?-x:x, y<0?-y:y ); }
+	U4 mn() const { return this ? (x<y?x:y) : 0; }
+	U4 mx() const { return this ? (x>y?x:y) : 0; }
+	U4x2 HL() const { return  this ? U4x2( mx(), mn() ) : U4x2(0); }
+	U4x2 LH() const { return  this ? U4x2( mn(), mx() ) : U4x2(0); }
+	U4x2 MX( const U4x2 b ) const { return  this ? U4x2( x>b.x?x:b.x, y>b.y?y:b.y ) : U4x2(0); }
+	U4x2 MN( const U4x2 b ) const { return  this ? U4x2( x<b.x?x:b.x, y<b.y?y:b.y ) : U4x2(0); }
+
 	U4x2& mx( U4x2 b ) {
 		if( x < b.x )
 			x = b.x;
@@ -3465,12 +3472,15 @@ public:
 
 	I8 qlen (void ) const { return x*x + y*y; }
 
-	I4 mn() { return x < y ? x:y; }
-	I4 mx() { return x > y ? x:y; }
-
-
+	//I4 mn() const { return x < y ? x:y; }
+	//I4 mx() const { return x > y ? x:y; }
+	I4 mn() const { return this ? (x<y?x:y) : 0; }
+	I4 mx() const { return this ? (x>y?x:y) : 0; }
+	I4x2 HL() const { return  this ? I4x2( mx(), mn() ) : I4x2(0); }
+	I4x2 LH() const { return  this ? I4x2( mn(), mx() ) : I4x2(0); }
 	I4x2 MX( const I4x2 b ) const { return  this ? I4x2( x>b.x?x:b.x, y>b.y?y:b.y ) : I4x2(0); }
 	I4x2 MN( const I4x2 b ) const { return  this ? I4x2( x<b.x?x:b.x, y<b.y?y:b.y ) : I4x2(0); }
+
 	I4x2& mx( const I4x2 b ) {
 		if( x < b.x )
 			x = b.x;
@@ -4501,10 +4511,16 @@ public:
 	I8 sum() const	{ return !this ? 0 : x+y; }
 	I8 area() const	{ return !this ? 0 : x*y; }
 	I8 qlen() const	{ return !this ? 0 : (x*x + y*y); }
-	I8 mn() const	{ return !this ? 0 : (x<y ? x:y); }
-	I8 mx() const	{ return !this ? 0 : (x>y ? x:y); }
+	//I8 mn()	const	{ return !this ? 0 : (x<y ? x:y); }
+	//I8 mx()	const	{ return !this ? 0 : (x>y ? x:y); }
 
 	I8x2 abs( void ) const { return I8x2( x<0?-x:x, y<0?-y:y ); }
+	I8 mn() const { return this ? (x<y?x:y) : 0; }
+	I8 mx() const { return this ? (x>y?x:y) : 0; }
+	I8x2 HL() const { return  this ? I8x2( mx(), mn() ) : I8x2(0); }
+	I8x2 LH() const { return  this ? I8x2( mn(), mx() ) : I8x2(0); }
+	I8x2 MX( const I8x2 b ) const { return  this ? I8x2( x>b.x?x:b.x, y>b.y?y:b.y ) : I8x2(0); }
+	I8x2 MN( const I8x2 b ) const { return  this ? I8x2( x<b.x?x:b.x, y<b.y?y:b.y ) : I8x2(0); }
 
 	gpeTYP cdrMILLnum( const char* pS, U4 nS );
 	gpeTYP cdrMILLalf( const char* pS, U4 nS );
@@ -4952,8 +4968,8 @@ public:
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
-	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m = 16 );
-    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 16, float turn  = 0);
+	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m = 32 );
+    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 32, float turn  = 0);
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }

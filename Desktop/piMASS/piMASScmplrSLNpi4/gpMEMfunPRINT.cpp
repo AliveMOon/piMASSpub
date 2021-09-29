@@ -6,7 +6,8 @@ extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 {
-	U8 nLEN, s;
+	U8 //nLEN,
+	 s;
 	I4x2 AB;
 	gpeCsz cAB;
 	I4 i = nI4-1, nCPY, nSKIP = 0;
@@ -18,7 +19,7 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 
 
 
-	nCPY = gpmVAN( pSe, "%\\", nLEN );
+	nCPY = gpmVAN( pSe, "%\\", NULL ); //, nLEN );
 	while(nCPY) {
 		s = -1;
 		pPRNT = pPRNT->lzyADD( pSe+nSKIP, nCPY-nSKIP, s );
@@ -48,7 +49,7 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 					}
 					sFRMT[1] = 0;
 					pPRNT = pPRNT->lzyFRMT( (s=-1), sFRMT );
-					nCPY = gpmVAN( pSe, "%\\", nLEN );
+					nCPY = gpmVAN( pSe, "%\\", NULL ); //, nLEN );
 					if(!nCPY)
 						continue;
 					nSKIP = 1;
@@ -62,7 +63,7 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 		nCPY = gpmNINCS( pSe, "%" );
 		if( !(nCPY&1) ) {
 			// páros
-			nCPY += gpmVAN( pSe+nCPY, "%\\", nLEN );
+			nCPY += gpmVAN( pSe+nCPY, "%\\", NULL ); //, nLEN );
 			continue;
 		}
 		pSe += nCPY;
@@ -73,7 +74,7 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 		}
 
 		pSe++;
-		nCPY = gpmVAN( pSe, "%\\", nLEN );
+		nCPY = gpmVAN( pSe, "%\\", NULL ); //, nLEN );
 
 		i--;
 		if( i < 0 )
@@ -95,7 +96,13 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 					pPRNT = pPRNT->lzyADD( pU1+1, l, (s=-1) );
 				} break;
 			default: {
-				if( AB.area() )
+                if( pPi->cID() == gpeCsz_Q ) {
+                    if( AB.area() )
+                        sFRMT[0] = sprintf( sFRMT+1, "%%%d.%dlld", (int)AB.x, (int)AB.y, pSe[-1] );
+                    else
+                        sFRMT[0] = sprintf( sFRMT+1, "%%lld" );
+                }
+				else if( AB.area() )
 					sFRMT[0] = sprintf( sFRMT+1, "%%%d.%d%c", (int)AB.x, (int)AB.y, pSe[-1] );
 				else
 					sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );
@@ -120,8 +127,7 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 
 	return pPRNT;
 }
-void gpMEM::funPRINT()
-{
+void gpMEM::funPRINT() {
 	I4	nI4 = pD[7]-pA[7],
 		*pI4 = (I4*)pUn(pA[7], nI4 ); //, nCPY;
 	nI4 /= gpaCsz[gpeCsz_l];

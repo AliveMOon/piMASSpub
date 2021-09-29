@@ -900,7 +900,8 @@ typedef enum gpeALF:I8
 	gpeALF_PNG = gpdABC('P', 'N', 'G'),
 	gpeALF_PNT = gpdABC('P', 'N', 'T'),
 
-	gpeALF_POS = gpdABC('P', 'O', 'S'),
+	gpeALF_POS = gpdABC('P', 'O', 'S'), gpeALF_POT, gpeALF_POU, gpeALF_POV,
+	gpeALF_POW, gpeALF_POX, gpeALF_POY, gpeALF_POZ,
 
 	gpeALF_PRG = gpdABC('P', 'R', 'G'),
 
@@ -1226,6 +1227,7 @@ typedef enum gpeALF:I8
 	gpeALF_WAIT = gpdABCD('W', 'A', 'I', 'T'),
 	gpeALF_WALK = gpdABCD('W', 'A', 'L', 'K'),
 	gpeALF_WHAM = gpdABCD('W', 'H', 'A', 'M'),
+	gpeALF_WIRE = gpdABCD('W', 'I', 'R', 'E'),
 
 	gpeALF_xorM = gpdABCD('X', 'O', 'R', 'M'),
 

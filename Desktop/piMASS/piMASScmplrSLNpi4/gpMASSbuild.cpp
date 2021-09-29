@@ -85,7 +85,7 @@ char* gpfSTRdrop( char* p_dst, char* p_str, char* p_end, const char* p_drop ) {
 	char* pD = (char*)p_dst;
 	p_str += gpmMIN( p_end-p_str, gpmNINCS(p_str,p_drop) );
 	while( p_str < p_end ) {
-		n = gpmMIN( p_end-p_str, gpmVAN(p_str,p_drop,nL) );
+		n = gpmMIN( p_end-p_str, gpmVAN(p_str,p_drop, NULL )); //,nL) );
 
 		gpmSTRnCPY( p_dst, p_str, n );
 		p_dst += n;

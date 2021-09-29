@@ -309,8 +309,8 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
 		nA = gpmPAD( n_ld_add()+2, 0x10 );
 		pA = new U1[nA];
 	}
-	U8 nLEN;
-	U4 iA = gpfVAN( pS, (U1*)"\a", nLEN );
+	//U8 nLEN;
+	U4 iA = gpfVAN( pS, (U1*)"\a", NULL ); //, nLEN );
 	if( iA >= n_ld_add() )
 	{
 		iA = sizeof(" \a");
@@ -323,7 +323,7 @@ gpcSRC& gpcSRC::SRCcpy( U1* pS, U1* pSe ) {
 	//n_ld += iA;
 	pA[n_ld_add(iA)] = 0;
 
-	pB = pA + gpfVAN( pA, (U1*)"\a", nLEN );
+	pB = pA + gpfVAN( pA, (U1*)"\a", NULL ); //, nLEN );
 	if( *pB == '\a' )
 		pB++;
 
@@ -342,25 +342,25 @@ gpcSRC& gpcSRC::reset( U1* pS, U1* pSe, U1** ppS, U4x4& _spcZN, U4 iADD ) {
 		*ppS = pS;
 		return *this;
 	}
-	U8 anLEN[4];
+	size_t anLEN[4];
 	//pS += gpfVAN( pS, (U1*)"\a", anLEN[0] );
 	pA = pS;
 	if( *pA == '\a' )									//...A\a
 		pA++;											//...\aA
-	pS = (pB = pA + gpfVAN( pA, (U1*)"\a", anLEN[0] ));	//...\aA..B
+	pS = (pB = pA + gpfVAN( pA, (U1*)"\a", anLEN+0 ));	//...\aA..B
 	if( *pB == '\a' )
 		pS++;											//...\aA..B\aS
-	n_ld(gpfVAN( pS, (U1*)"\a", anLEN[1] ));
+	n_ld(gpfVAN( pS, (U1*)"\a", anLEN+1 ));
 	if( pS+n_ld_add() >= pSe )
 	{
 		n_ld(pSe-pS);
 		pS = pSe;
 	} else if( !pS[n_ld_add()] )
-		pS+=n_ld_add();											//...\aA..B\a... . .   . . ...S0
+		pS+=n_ld_add();									//...\aA..B\a... . .   . . ...S0
 	else if( pS[n_ld_add()] != '\a' )
-		pS += gpfVAN( pS, (U1*)"\a", anLEN[1], true );	//...\aA..B\a... . .   . . ...S?
+		pS += gpfVAN( pS, (U1*)"\a", anLEN+1, true );	//...\aA..B\a... . .   . . ...S?
 	else
-		pS+=n_ld_add();											//...\aA..B\a... . .   . . ...S\a
+		pS+=n_ld_add();									//...\aA..B\a... . .   . . ...S\a
 
 
 	n_ld(pS-pA);

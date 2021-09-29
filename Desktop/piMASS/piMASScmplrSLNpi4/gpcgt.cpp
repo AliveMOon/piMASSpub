@@ -167,8 +167,7 @@ void gpcGTall::clr()
 	gpmCLR;
 }
 
-gpcGT* gpcGTall::GT( SOCKET sock )
-{
+gpcGT* gpcGTall::GT( SOCKET sock ) {
 	if( !this )
 		return NULL;
 	for( U4 g = 0; g < nGTld; g++ )
@@ -184,12 +183,11 @@ gpcGT* gpcGTall::GT( SOCKET sock )
 	}
 	return NULL;
 }
-gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
-{
+gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA ) {
 	int port = 80, nCMP = nIPA, p;
 	U8 nLEN;
 	U1	*pS = pIPA+gpmNINCS( pIPA, " \t\r\n!\"" ),
-		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;\"", nLEN );
+		*pE = pS+gpmVAN( pS, " \a\t\r\n,:;\"", NULL ); //, nLEN );
 
 	nCMP = pE-pS;
 	//gpmMcpyOF( sPUB, pS, nCMP );
@@ -274,8 +272,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, U1* pIPA, U4 nIPA )
 	}*/
 	return ppGTalloc[iGTfr] = pGT;
 }
-gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
-{
+gpcGT* gpcGTall::GT( gpeALF alf, I4 port ) {
 	if( pGT )
 	if( pGT->port == port )
 	if( pGT->TnID.alf == alf )
@@ -321,8 +318,7 @@ gpcGT* gpcGTall::GT( gpeALF alf, I4 port )
 
 	return ppGTalloc[iGTfr] = pGT = new gpcGT( I8x2(alf), port );
 }
-gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
-{
+gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port ) {
 	gpcGT *pACC = NULL, *p_a;
 	if( iGTfr < nGTld )
 	if( pACC = ppGTalloc[iGTfr] )
@@ -401,8 +397,7 @@ gpcGT* gpcGTall::GTacc( SOCKET sock, I4 port )
 }
 
 
-int gpcGT::GTerr( char* p_error, char** pp_error )
-{
+int gpcGT::GTerr( char* p_error, char** pp_error ) {
 	*p_error = 0;
 	int	out = true;
 	switch ( errno )
@@ -461,8 +456,7 @@ int gpcGT::GTerr( char* p_error, char** pp_error )
 	return out;
 }
 
-U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
-{
+U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff ) {
 	*p_error = 0;
 	p_error += sprintf( p_error, "\n\t\t-= SOCKET_OPT =-" );
 
@@ -572,8 +566,7 @@ U1 gpcGT::GTopt( char* p_error, char** pp_error, int no_daley, U4 n_buff )
 }
 
 
-char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
-{
+char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff ) {
 	if( bGTdie() )
 		return p_err;
 	// ha nincsen hiba p_err[0] == 0
@@ -606,16 +599,14 @@ char* gpcGT::GTrcv( char* p_err, char* s_buff, U4 n_buff )
 	sprintf( p_err, "\nERROR: recv n == 0 DIE" );
 	return p_err;
 }
-char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff )
-{
+char* gpcGT::GTsnd( char* p_err, char* s_buff, U4 n_buff ) {
 	if( bGTdie() )
 		return p_err;
 	// ha nincsen hiba p_err[0] == 0
 	// egyébként bele ír valamit akkor nem
 	p_err[0] = 0;
 	U8 s;
-	if( !pOUT )
-	{
+	if( !pOUT ) {
 		if( !pPUBgt )
 			return p_err;
 
@@ -752,10 +743,11 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 	bool bNEWip = (*s_ip == '!');
 	U8 s;
-	if( bNEWip || bGTdie() ) //socket == INVALID_SOCKET )
-	{
-        switch( msGTdie )
-        {
+	///---------------------------------
+	///			CONNECT?
+	///---------------------------------
+	if( bNEWip || bGTdie() ) {
+        switch( msGTdie ) {
 			case 1:
 				gpfSOC_CLOSE( socket );
 				msGTdie = (pWIN->mSEC.x+1500)|1;
@@ -776,8 +768,7 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 		gpmDEL(pMISi);
 		nSYN = 0;
 
-		if( bNEWip )
-		{
+		if( bNEWip ) {
 			sprintf( s_ip, "%s", s_ip+1 );
 			gpfSOC_CLOSE( sockCNCT );
 		}
@@ -836,26 +827,24 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 		// BIND
 		p_err += sprintf( p_err, "\n\t\t - try CNCT - %d", msGTdie );
-		//if(bSTDcout){gpdCOUT << p_print <<gpdENDL;}
 		p_print = p_err;
 
 		fd_set cnct_w;
 		FD_ZERO( &cnct_w );
 		FD_SET( socket, &cnct_w );
-		int rc = select( socket+1,
-							NULL, &cnct_w, NULL, &tv );
-		if( rc > 0 && FD_ISSET( socket, &cnct_w ) )
-		{
+		int rc = select( socket+1, NULL, &cnct_w, NULL, &tv );
+		if( rc > 0 && FD_ISSET( socket, &cnct_w ) ) {
 			sockCNCT = INVALID_SOCKET;
-		} else {
+		}
+		else {
 			// még nem sikerült eldugjuk ne szabadítsák fel
 			sockCNCT = socket;
 			socket = INVALID_SOCKET;
 			msGTdie = (pWIN->mSEC.x+1500)|1;
 			return 0;
 		}
-		switch( TnID.alf )
-		{
+
+		switch( TnID.alf ) {
 			case gpeALF_SLMP:{
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
@@ -863,7 +852,7 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 				break;
 			}
 			case gpeALF_SLMPo:
-			break; // OFF
+			break; /// OFF gpeALF_SLMPo
 			{
 				sGTent[1] = 's';
 				sGTent[0] = '\n'; // háha ASCII
@@ -876,7 +865,6 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 				pOUT = pOUT->lzyFRMT( s = 0, gp_sHELLO_acc, socket, iCNT );
 				iCNT++;
-				//aGTcrs[0] = 'a';
 				break;
 		}
 		msGTdie = 0;
@@ -885,14 +873,15 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 	char	*p_err = (char*)pWIN->sGTpub;
 			*pWIN->sGTpub = 0;
 
-	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
-	{
+	///---------------------------------
+	///			RECEIVE
+	///---------------------------------
+	if( aGTfd[gpeFDrcv].isFD( socket ) ) {
 		p_err = GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 		if( *p_err )
-			if(bSTDcout){gpdCOUT << p_err <<gpdENDL;}
+		if(bSTDcout) { gpdCOUT << p_err <<gpdENDL; }
 
-		switch( TnID.alf )
-		{
+		switch( TnID.alf ) {
 			case gpeALF_SLMP:
 			case gpeALF_SLMPo:
 				break;
@@ -903,13 +892,10 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 				GTos( *this, pWIN );
 				break;
 		}
-
 	}
 	else if( !pOUT )
-	if( pINP ? pINP->n_load : false )
-	{
-		switch( TnID.alf )
-		{
+	if( pINP ? pINP->n_load : false ) {
+		switch( TnID.alf ) {
 			case gpeALF_SLMP:
 			case gpeALF_SLMPo:
 				break;
@@ -922,8 +908,10 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 		}
 	}
 
-	switch( TnID.alf )
-	{
+	///---------------------------------
+	///			DRCrob
+	///---------------------------------
+	switch( TnID.alf ) {
 		case gpeALF_SLMP:
 			GTslmpDrcRob( *this, pWIN, pWIN->piMASS ? &pWIN->piMASS->GTacpt : NULL );
 			break;
@@ -931,13 +919,10 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 			break;
 	}
 
-	if( aGTfd[gpeFDsnd].isFD(socket) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
-	{
+	if( aGTfd[gpeFDsnd].isFD(socket) ) { // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 		U8 s, nOUT = GTout( pWIN );
-		if( nOUT <= (gpdHUDn*2) )
-		{
-			if(pHUD ? pHUD->p_alloc : NULL )
-			{
+		if( nOUT <= (gpdHUDn*2) ) {
+			if(pHUD ? pHUD->p_alloc : NULL ) {
 				pOUT = pOUT->lzyFRMT( s = -1, " hud" );
 
 				pOUT = pOUT->lzyADD(pHUD, 8, s = -1);
@@ -946,14 +931,10 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 				GTprmpt();
 				//break;
 			}
-
-
-			if( pDWN )
-			{
+			if( pDWN ) {
 				pOUT = pDWN->join( pOUT, *this );
 				if( !pOUT )
-				if( pDWN->dw_i >=  pDWN->dw_il )
-				{
+				if( pDWN->dw_i >=  pDWN->dw_il ) {
 					gpmDEL(pDWN);
 				}
 			}
@@ -966,15 +947,11 @@ I8 gpcGT::GTcnct( gpcWIN* pWIN ) {
 
 	aGTfd[gpeFDrcv].setFD( socket );
 	aGTfd[gpeFDsnd].setFD( socket );
-
-
-
 	int nS = select(
 					aGTfd[gpeFDrcv].maxSCK+1,
 					&aGTfd[gpeFDrcv].fdS,
 					(aGTfd[gpeFDsnd].nFD ? &aGTfd[gpeFDsnd].fdS : NULL),
-					NULL, //(aGTfd[gpeFDexcp].fd_count ? &aGTfd[gpeFDexcp] : NULL),
-					&tv
+					NULL, &tv
 				);
 
 	return nS;
@@ -984,11 +961,8 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 	if( this ? msGTdie > pWIN->mSEC.x : true )
 		return 0;
 
-	if( socket == INVALID_SOCKET )
-	{
-
-		switch( msGTdie )
-        {
+	if( socket == INVALID_SOCKET ) {
+		switch( msGTdie ) {
 			case 1:
 				gpfSOC_CLOSE( socket );
 				msGTdie = (pWIN->mSEC.x+1500)|1;
@@ -1059,33 +1033,30 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 	//SOCKET acpt_soc;
 	char *p_err = (char*)pWIN->sGTpub;
 	*pWIN->sGTpub = 0;
-	if( aGTfd[gpeFDrcv].isFD( socket ) ) // FD_ISSET( socket, &a_fdset[gpeFDrcv]) )
-	{
+	if( aGTfd[gpeFDrcv].isFD( socket ) ) { // FD_ISSET( socket, &a_fdset[gpeFDrcv]) )
 		// LISTENER
 		//struct sockaddr_in
 		sockaddr_in clientaddr;
 		socklen_t n_clientaddr = sizeof(clientaddr);
 		SOCKET	acpt_soc = INVALID_SOCKET;
 
-		if( (acpt_soc = accept( socket, (struct sockaddr *)&clientaddr, &n_clientaddr )) == INVALID_SOCKET  )
-		{
+		if( (acpt_soc = accept( socket, (struct sockaddr *)&clientaddr, &n_clientaddr )) == INVALID_SOCKET  ) {
 			p_err += GTerr( p_err, &p_err );
-		} else {
+		}
+		else {
 
 			gt_ip.num++;
 			I8x2 gt_an_ip(gpeALF_null);
 
 			// localhost-ot külön kell ellenőrizni (sajnos)
 			const U4 localhost_ip = 0x0100007f;
-			if( localhost_ip == addr_in.sin_addr.s_addr ) //.S_un.S_addr )
-			{
+			if( localhost_ip == addr_in.sin_addr.s_addr ) {
 				gt_an_ip.alf = gpeALF_LOCAL; // gpeGATE_NET_TYPE_LOCALHOST;
 			}
 
 			if( p_host_ips && (gt_an_ip.alf == gpeALF_null) ) {
-				#ifdef _WIN64
-				if( !p_IPTable )
-				{
+#ifdef _WIN64
+				if( !p_IPTable ) {
 					DWORD dwSizeReq = 0;
 					DWORD dwRet = GetIpAddrTable( p_IPTable, &dwSizeReq, TRUE );
 					if( dwRet == ERROR_INSUFFICIENT_BUFFER )
@@ -1094,7 +1065,7 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 						dwRet = GetIpAddrTable( p_IPTable, &dwSizeReq, TRUE );
 					}
 				}
-				#endif
+#endif
 				int i, j, idx;
 				gt_an_ip.alf = gpeALF_INTERNET;
 
@@ -1119,9 +1090,8 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 				//	free( p_tmphstbuf );
 				//
 				//}
-				#ifdef _WIN64
-				for( i = 0; p_host_ips->h_addr_list[i]; i++ )
-				{
+#ifdef _WIN64
+				for( i = 0; p_host_ips->h_addr_list[i]; i++ ) {
 					idx = -1;
 					for( j = 0; j < p_IPTable->dwNumEntries; j++ )
 					{
@@ -1146,34 +1116,39 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 						}
 					}
 				}
-				#endif
+#endif
 			}
 			else
-			if( !p_host_ips  ) //|| !p_IPTable )
-			{
+			if( !p_host_ips  ) {
 				gt_an_ip.alf = gpeALF_UNDEF;
 			}
 
 			gpcGT *pACC = GTacc.GTacc( acpt_soc, port );
 
-			if( pACC )
-			{
+			if( pACC ) {
 				pACC->addr_in = clientaddr;
 				pACC->GTclr();
 				U8 iSTRT = -1;
-				//else
-				switch( pACC->port )
-				{
+				switch( pACC->port ) {
+					case 80:
+						// update-rc.d apache2 diasble
+						// update-rc.d apache2 enable
+						/// sudo service apache2 stop
+						/// sudo fuser 80/tcp
+						/// iptables	-t nat -I PREROUTING --src 0/0 --dst <serverIP> \
+						///				-p tcp --dport 80 -j REDIRECT --to-ports 6001
+
+						/// iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 6001
 					case 23: // telnet
 						pACC->pOUT = pACC->pOUT->lzyFRMT( iSTRT,  gp_sHELLO, pACC->iCNT );
 						pACC->sGTent[2] = 'a';
 						pACC->GTos( *this );
 						break;
-					case 80: // http
+					//case 80: // http
 						pACC->sGTent[2] = 'h';
 						break;
 					default:
-						if( pACC->port & 1 ) { // telnetek
+						if( pACC->port&1 ) { // telnetek
 							pACC->pOUT = pACC->pOUT->lzyFRMT(iSTRT, gp_sHELLO_acc, pACC->socket, pACC->iCNT );
 							pACC->iCNT++;
 							pACC->sGTent[2] = 'a';
@@ -1201,13 +1176,11 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 				char* s_buff = (char*)pWIN->sGTpub,
 					* pB = s_buff + gpdRECVn / 2, *pBi = pB;
 				void* pIFtmp = NULL;
-				for (pIFa = pIFadr; pIFa != NULL; pIFa = pIFa->ifa_next)
-				{
+				for( pIFa = pIFadr; pIFa != NULL; pIFa = pIFa->ifa_next ) {
 					if (!pIFa->ifa_addr)
 						continue;
 
-					if (pIFa->ifa_addr->sa_family == AF_INET)
-					{ // check it is IP4
+					if( pIFa->ifa_addr->sa_family == AF_INET ) { // check it is IP4
 						// is a valid IP4 Address
 						pIFtmp = &((struct sockaddr_in*)pIFa->ifa_addr)->sin_addr;
 						inet_ntop(AF_INET, pIFtmp, s_buff, INET_ADDRSTRLEN);
@@ -1234,21 +1207,18 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 			}
 		}
 	}
+
 	gpcGT* p_gt;
-	for( ; nFDs < nFDe; nFDs++ )
-	{
+	for( ; nFDs < nFDe; nFDs++ ) {
 		p_gt = GTacc.iGT(nFDs);
 		if( p_gt->bGTdie() )
 			continue;
-
-		if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
-		{
+        if( aGTfd[gpeFDrcv].isFD( p_gt->socket ) ) { // FD_ISSET( p_gt->socket, &a_fdset[gpeFDrcv] ) )
 			p_err = p_gt->GTrcv( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
 			if( *p_err )
 				if(bSTDcout){gpdCOUT << p_err <<gpdENDL;}
 
-			if( p_gt )
-			{
+			if( p_gt ) {
 				if( p_gt->sGTent[2] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
@@ -1256,8 +1226,7 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
-			for( U8 p = 0, s = -1; p < GTacc.nGTld; p++ )
-			{
+			for( U8 p = 0, s = -1; p < GTacc.nGTld; p++ ) {
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
@@ -1265,10 +1234,8 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 			}
 			gpmDEL(pOUT);
 		}
-		else if( p_gt->pINP ? !p_gt->pOUT : false )
-		{
-            if( p_gt )
-			{
+		else if( p_gt->pINP ? !p_gt->pOUT : false ) {
+            if( p_gt ) {
 				if( p_gt->sGTent[2] == 'h' )
 					p_gt += 0; //->gtOS_html( *this );
 				else
@@ -1276,8 +1243,7 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 			}
 
 			if( pOUT ) /// a mami kapott választ azaz mindenkinek leadjuk a drotot
-			for( U8 p = 0, s = -1; p < GTacc.nGTld; p++ )
-			{
+			for( U8 p = 0, s = -1; p < GTacc.nGTld; p++ ) {
 				p_gt = GTacc.iGT(p);
 				if( p_gt->bGTdie() )
 					continue;
@@ -1287,11 +1253,9 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 		}
 
 
-		if( aGTfd[gpeFDsnd].isFD( p_gt->socket ) ) // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
-		{
+		if( aGTfd[gpeFDsnd].isFD( p_gt->socket ) ) { // FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] ) )
 			U8 s, nOUT = p_gt->GTout( pWIN );
-			if( nOUT <= (gpdHUDn*2) ) //if( nOUT < 0x400 )
-			{
+			if( nOUT <= (gpdHUDn*2) ) {
 				if(p_gt->pHUD ? p_gt->pHUD->p_alloc : NULL )
 				{
 					p_gt->pOUT = p_gt->pOUT->lzyFRMT( s = -1, " hud" );
@@ -1303,9 +1267,7 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 					//break;
 				}
 
-
-				if( p_gt->pDWN )
-				{
+				if( p_gt->pDWN ) {
 					p_gt->pOUT = p_gt->pDWN->join( p_gt->pOUT, *this );
 					if( !p_gt->pOUT )
 					if( p_gt->pDWN->dw_i >=  p_gt->pDWN->dw_il )
@@ -1313,8 +1275,6 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 						gpmDEL(p_gt->pDWN);
 					}
 				}
-
-
 			}
 
 			p_err = p_gt->GTsnd( p_err, (char*)pWIN->sGTbuff, sizeof(pWIN->sGTbuff) );
@@ -1329,15 +1289,13 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 	else
 		nFDs = nFDe;
 
-	for( nFDe = nFDs; nFDe < GTacc.nGTld; nFDe++ )
-	{
+	for( nFDe = nFDs; nFDe < GTacc.nGTld; nFDe++ ) {
 		p_gt = GTacc.iGT(nFDe);
 		if( p_gt->bGTdie() ) {
 			if(
 					aGTfd[gpeFDsnd].isFD( p_gt->socket ) //FD_ISSET( p_gt->socket, &a_fdset[gpeFDsnd] )
 				|| 	aGTfd[gpeFDrcv].isFD( p_gt->socket )
-			)
-			{
+			) {
 				if(bSTDcout){gpdCOUT << "miért?" <<gpdENDL;}
 			} else
 				gpfSOC_CLOSE( p_gt->socket );
@@ -1360,8 +1318,7 @@ I8 gpcGT::GTlst( gpcWIN* pWIN, gpcGTall& cnct )
 
 	aGTfd[gpeFDrcv].setFD( socket );
 	U8 n_soc = aGTfd[gpeFDrcv].nFD+aGTfd[gpeFDsnd].nFD;
-	if( !n_soc )
-	{
+	if( !n_soc ) {
 		usleep( gpdGT_LIST_tOUT );
 		return 0;
 	}

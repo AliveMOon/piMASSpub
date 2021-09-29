@@ -17,7 +17,15 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
+				<Linker>
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/piMASS" prefix_auto="1" extension_auto="1" />
@@ -30,9 +38,15 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
 				<Linker>
 					<Add option="-O3" />
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
 				</Linker>
 			</Target>
 			<Target title="Robi_Debug">
@@ -46,7 +60,15 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
+				<Linker>
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
+				</Linker>
 			</Target>
 			<Target title="Rob_Debug">
 				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
@@ -59,7 +81,15 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
+				<Linker>
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
+				</Linker>
 			</Target>
 			<Target title="OX_Rob_Debug">
 				<Option output="bin/OX/piMASS" prefix_auto="1" extension_auto="1" />
@@ -72,9 +102,15 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
 				<Linker>
 					<Add option="-O3" />
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
 				</Linker>
 			</Target>
 			<Target title="zero_Debug">
@@ -88,7 +124,15 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
+				<Linker>
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
+				</Linker>
 			</Target>
 			<Target title="SMS_dbg">
 				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
@@ -101,7 +145,15 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
+				<Linker>
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
+				</Linker>
 			</Target>
 			<Target title="Paint_Debug">
 				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
@@ -114,7 +166,55 @@
 					<Add directory="./" />
 					<Add directory="include" />
 					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
+				<Linker>
+					<Add option="-lwiringPi" />
+					<Add option="-lcrypt" />
+				</Linker>
+			</Target>
+			<Target title="x64_Rob_Debug">
+				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="rob.mass" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
+				</Compiler>
+				<Linker>
+					<Add option="-lcrypt" />
+				</Linker>
+			</Target>
+			<Target title="x64_Paint_Debug">
+				<Option output="bin/Debug/piMASS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="paint.mass " />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="./" />
+					<Add directory="include" />
+					<Add directory="../piMASS" />
+					<Add directory="/home/alivemoon/Asztal/userland" />
+					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+					<Add directory="SIM7X00/Raspberry/c" />
+				</Compiler>
+				<Linker>
+					<Add option="-lcrypt" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
@@ -123,18 +223,12 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add option="`sdl2-config --cflags`" />
-			<Add directory="/home/alivemoon/Asztal/userland" />
-			<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
-			<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
-			<Add directory="SIM7X00/Raspberry/c" />
 		</Compiler>
 		<Linker>
 			<Add option="`sdl2-config --libs`" />
 			<Add option="-pthread" />
 			<Add option="-lSDL2 -lSDL2_mixer" />
 			<Add option="-lSDL2_image -lSDL2_ttf" />
-			<Add option="-lwiringPi" />
-			<Add option="-lcrypt" />
 			<Add library="GL" />
 			<Add library="GLEW" />
 			<Add library="SDL2" />
@@ -152,13 +246,16 @@
 		<Unit filename="gpcGL.cpp" />
 		<Unit filename="gpcGLobj.cpp" />
 		<Unit filename="gpcGSM.cpp" />
+		<Unit filename="gpcGThtml.cpp" />
 		<Unit filename="gpcGTslmp.cpp" />
+		<Unit filename="gpcGTwire.cpp" />
 		<Unit filename="gpcI4x2.cpp" />
 		<Unit filename="gpcI4x4.cpp" />
 		<Unit filename="gpcI8x2.cpp" />
 		<Unit filename="gpcLAZY.cpp" />
 		<Unit filename="gpcOPCD.cpp" />
 		<Unit filename="gpcSLMPdcr.cpp" />
+		<Unit filename="gpcSLMPdrcJUDO.cpp" />
 		<Unit filename="gpcSRC.cpp" />
 		<Unit filename="gpcSRC.h" />
 		<Unit filename="gpcSRCbreak.cpp" />
@@ -211,6 +308,9 @@
 		<Unit filename="src/gpccrs.cpp" />
 		<Unit filename="src/gpccrs_rdy.cpp" />
 		<Unit filename="src/gpcwin.cpp" />
-		<Extensions />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

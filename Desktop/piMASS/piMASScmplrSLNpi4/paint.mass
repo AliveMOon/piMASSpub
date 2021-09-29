@@ -3,7 +3,7 @@
 -----------------------------------------/PAINT/-----------------------------------------
  b0	 
 
------------------------------------------/ CAM /-----------------------------------------
+-----------------------------------------/ CAM /----------------------------------------------------
  c0	 
 
  d0	 
@@ -33,16 +33,11 @@ wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?came
   unsel = 1;
   again = 100;
  c1	 
-
-
-
-
-
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
  
  
  
@@ -72,19 +67,21 @@ wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?came
  
 
  
-
-
-
-
- d1	 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  d1	 
 
  a2	 
 
  b2	 
 
- c2	 
-
- d2	 
+ c2	   d2	 
   cam = 1;
 
   telnet = 6001;
@@ -92,10 +89,11 @@ wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?came
   rout = rr + 4;
   rinp = rr + 3;
   rpic = "draw";
-  john
+  jjohn
        = d0.mini;
 
-//  slmp = "192.168.1.90 10000";
+  //slmp = "192.168.1.90 10000";
+  wire = "D1S2M3M4M5C200R260.0W520.0D6S7M8M9M10C200R260.0W520.0D11S12M13M14M15C200R150.15";
   f = fps;
   again = 0x5;
 
@@ -115,7 +113,7 @@ wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?came
   picA = "draw";
   picB = "cam1";
   cnl = print( "0 0x0 0 xyr: %d, %d, %d, %d \r\n ",
- 				px, py, rr, 8
+ 				px, py, rr, 16
  		 );
   gpu = "penna";
   trgcpA = rr;

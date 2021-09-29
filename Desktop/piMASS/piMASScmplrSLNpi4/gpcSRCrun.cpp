@@ -55,10 +55,9 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 			core.pc++
 		)
 	{
-		if( b_dbg )
-		{
-			U8 nLEN;
-			pDIS += gpmVAN( pDIS, "\r\n", nLEN );
+		if( b_dbg ) {
+			//U8 nLEN;
+			pDIS += gpmVAN( pDIS, "\r\n", NULL ); //, nLEN );
 			pDIS += gpmNINCS( pDIS, "\r\n" );
 		}
 

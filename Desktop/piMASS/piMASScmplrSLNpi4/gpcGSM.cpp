@@ -2,7 +2,7 @@
 #include "gpcSRCinst.h"
 #include "gpcSRClnk.h"
 #include "gpccrs.h"
-#include <wiringSerial.h>
+
 /*
 -lraspicam
 -lvcos
@@ -196,13 +196,13 @@ public:
 	gpcCLIP(){};
 	gpcCLIP& operator = ( char* pSat ) {
 		U4 i = 0, n;
-		U8 nLEN;
+		//U8 nLEN;
 		gpmCLR;
 		for( pSat += gpmNINCS(pSat," \r\n\t:+"); *pSat; pSat += gpmNINCS(pSat," \r\n\t:+") ) {
 			pSat++;
 			switch(pSat[-1]){
 				case '\"':
-					n = gpmVAN(pSat,"\"",nLEN);
+					n = gpmVAN(pSat,"\"", NULL ); //,nLEN);
 					aI[i] = gpfSTR2I8(gpmMcpy( sSTR+i*0x20, pSat, n ));
 					pSat += n+1;
 					break;
@@ -241,8 +241,8 @@ public:
 	gpcCREG(){};
 	gpcCREG& operator = ( char* pSat ) {
 		gpmCLR;
-		U8 nLEN;
-		U4 nCOM = 0, nS = gpmVAN(pSat, "\r\n", nLEN );
+		//U8 nLEN;
+		U4 nCOM = 0, nS = gpmVAN(pSat, "\r\n", NULL ); //, nLEN );
 		for( U4 i = 0; i < nS; i++ )
 			if( pSat[i] == ',' ) nCOM++;
 		stat = gpfSTR2I8(pSat, &pSat );
@@ -762,8 +762,10 @@ public:
 		s0 = lzyPUB.nLD();
 		for( int i = 0, n = gpmN(aiPN); i<n; i+=2 ) {
 			if( i == 2 )
-				lzyPUB.lzyADD( pS+pAT[aiPN[i]].y, pAT[aiPN[i+1]].y-pAT[aiPN[i]].y-1, s= -1 );
-			else for( char *pSi = pS+pAT[aiPN[i]].y+gpmVAN(pS+pAT[aiPN[i]].y,"0123456789aAbBcCdDeEfF",s), *pSe = pS+pAT[aiPN[i+1]].y-1; pSi < pSe; pSi+=4 )
+				lzyPUB.lzyADD( pS+pAT[aiPN[i]].y, pAT[aiPN[i+1]].y-pAT[aiPN[i]].y-1, s=-1 );
+			else for( char	*pSi =	pS+pAT[aiPN[i]].y
+									+ gpmVAN(pS+pAT[aiPN[i]].y,"0123456789aAbBcCdDeEfF", NULL ), //,s),
+							*pSe =	pS+pAT[aiPN[i+1]].y-1; pSi < pSe; pSi+=4 )
 				lzyPUB.utf8(gpfSTR2I8( gpmMcpy(sUCS2+2,pSi,4)-2 ));
 
 			if( pWIN )
@@ -910,13 +912,14 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	if( this ? msGTdie > pWIN->mSEC.x : true )
 		return this ? pGSM : 0;
 
-	U8 nLEN, s;
+	U8 //nLEN,
+		s;
 	int baud = 115200, pin = 2028;
 	char	*pANSW = NULL, sGO[0x100];
 
 	if( socket == INVALID_SOCKET ) {
 		sprintf( sGO, sSER, s_ip );
-		if( (socket=(SOCKET)serialOpen( sGO, baud )) < 0 ) {
+		if( (socket=(SOCKET)open( sGO, baud )) < 0 ) {
 			if(bSTDcout){gpdCOUT << stdALU "GSM ERR:" << strerror(errno) << gpdENDL;}
 			msGTdie = pWIN->mSEC.x + 3000;
 			return pGSM;
@@ -980,7 +983,8 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	char	*pS, *pSi, *pSe,
 			// *pSat = NULL,
 			*pCLR, *pALL = (char*)pOUT->p_alloc;
-	int	nR = serialDataAvail(socket), nINP = pINP->nLD(),
+	int	nR = 0, // serialDataAvail(socket),
+        nINP = pINP->nLD(),
 		nAT = 0, aSUB[2], iA, iA2,
 		aN[0x10],
 		aP[2], iOK, iCLIP, nCM,
@@ -1294,7 +1298,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 		if( aSUB[1] > aSUB[0] ) {
 			aSUB[1] += gpmNINCS( pS+aSUB[1], " \r\n\t" );
-			nR = serialDataAvail(socket);
+			nR = 0; //serialDataAvail(socket);
 			if( nR > 0 ) {
 				nR = read( socket, pANSW, nR );
 				if( nR > 0 )
@@ -1329,7 +1333,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 		pCLR = stdYELLOW;
 		pS = pALL+iCNT;
 	}
-	pSe = pS + gpmVAN( pS, "\r\n", nLEN );
+	pSe = pS + gpmVAN( pS, "\r\n", NULL ); //, nLEN );
 	if( pSe-pS < 1 )
 		return pGSM;
 	pSe+=2;
@@ -1339,11 +1343,11 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 		switch( *pS ) {
 			case 'w':
 			case 'W': {
-				pSi = pS+gpmVAN(pS," \t\r\n+-0123456789",nLEN);
+				pSi = pS+gpmVAN(pS," \t\r\n+-0123456789", NULL ); //,nLEN);
 				gpmZ(aN);
 				if( pSi < pSe ) {
 					aN[0] = gpfSTR2I8(pSi, &pSi);
-					pSi = pSi+gpmVAN(pSi," \t\r\n+-0123456789",nLEN);
+					pSi = pSi+gpmVAN(pSi," \t\r\n+-0123456789", NULL ); //,nLEN);
 					if( pSi < pSe )
 						aN[1] = gpfSTR2I8(pSi, &pSi);
 				}
@@ -1424,7 +1428,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 		}
 	}
 	if( OiCNT != iCNT ){
-		pSe = pS + gpmVAN( pS, "\r\n", nLEN );
+		pSe = pS + gpmVAN( pS, "\r\n", NULL ); //, nLEN );
 		if( *pSe )
 			pSe+=2;
 	}
@@ -1442,16 +1446,16 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 	if(bSTDcout) {
 		gpdCOUT	<< stdBREAK << "ACT:"	<< pGSM->iACTION
-					<< stdCMPLR << "CLIP:"	<< pGSM->iCLIP << "/" << pGSM->nCLIP
-					<< stdRUN	<< "CMTI:"	<< pGSM->iCMTI << "/" << pGSM->nCMTI
-					<< pCLR << pANSW <<gpdENDL;
+				<< stdCMPLR << "CLIP:"	<< pGSM->iCLIP << "/" << pGSM->nCLIP
+				<< stdRUN	<< "CMTI:"	<< pGSM->iCMTI << "/" << pGSM->nCMTI
+				<< pCLR << pANSW <<gpdENDL;
 	}
 
 	if( pGSM->iW )
 	if(bSTDcout){
 			gpdCOUT	<<gpdENDL
-						<< stdRED << "WAIT:" << pGSM->iW-(int)pWIN->mSEC.x << "ms"
-						<<gpdENDL;
+					<< stdRED << "WAIT:" << pGSM->iW-(int)pWIN->mSEC.x << "ms"
+					<<gpdENDL;
 	}
 
 	int nW = 0;
@@ -1464,7 +1468,7 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	return pGSM;
 }
 
-I4 gpMEM::instDOitGSM( gpcGT* pGT ) {
+I4   gpMEM::instDOitGSM( gpcGT* pGT ) {
 	if( this ? !pGT : true )
 		return -1;
 

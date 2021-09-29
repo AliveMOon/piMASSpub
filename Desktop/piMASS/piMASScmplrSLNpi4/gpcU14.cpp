@@ -34,9 +34,8 @@ U1x4& U1x4::str2time( U1* p_str, U1* p_end, U1** pp_str )
 	gpmCLR;
 	U1 i = 0;
 	U8 nLEN;
-	while( p_str < p_end )
-	{
-		p_str += gpfVAN( p_str, (U1*)"0123456789",nLEN );
+	while( p_str < p_end ) {
+ 		p_str += gpfVAN( p_str, (U1*)"0123456789", NULL );
 		aXYZW[i%4] = gpfSTR2I8( p_str, &p_str );
 		i++;
 	}
@@ -70,15 +69,12 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 
 	cr.mn(whp.a4x2[0]) -= 1;
 	if( flg&5 )
-    for( I4 e = cr.x, u = 0, d = cr.y*whp.z; u <= e; u++, d++ )
-	{
-		if( flg&1 )
-		{
+    for( I4 e = cr.x, u = 0, d = cr.y*whp.z; u <= e; u++, d++ ) {
+		if( flg&1 ) {
 			this[u].z = clr;
 			this[u].w |= 0x1;
 		}
-		if( flg&4 )
-		{
+		if( flg&4 ) {
 			this[d].z = clr;
 			this[d].w |= 0x4;
 		}
@@ -88,15 +84,12 @@ U1x4* U1x4::frmBRDR( I4x2 cr, gpeCLR clr, U1 flg, I4x4 whp  )
 		return this;
 
 	if( flg&0xa )
-    for( I4 l = 0, r = cr.x, e = whp.z*cr.y; l <= e; l += whp.z, r += whp.z )
-	{
-		if( flg&8 )
-		{
+    for( I4 l = 0, r = cr.x, e = whp.z*cr.y; l <= e; l += whp.z, r += whp.z ) {
+		if( flg&8 ) {
 			this[l].z = clr;
 			this[l].w |= 0x8;
 		}
-		if( flg&2 )
-		{
+		if( flg&2 ) {
 			this[r].z = clr;
 			this[r].w |= 0x2;
 		}

@@ -52,8 +52,10 @@
  
   d1	 
   mini = "
-wget -O /robi/first%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=SECOND&x&y&z&a&b&c&f!!
-wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=SECOND
+wget -O /robi/frt%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=B5MP&x&y&z&a&b&c&f!!
+wget -O /robi/frt%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=B5MP
+wget -O /robi/sec%s.txt !!http://192.168.1.160:5000/api/camera/take_calibration_image?camera=B12MP&x&y&z&a&b&c&f!!
+wget -O /robi/sec%s.png http://192.168.1.160:5000/api/camera/take_picture?camera=B12MP
 ";
  
  a2	 
