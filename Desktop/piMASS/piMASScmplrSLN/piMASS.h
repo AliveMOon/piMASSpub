@@ -3467,7 +3467,7 @@ public:
 	I8 sum( void ) const { return (I8)x+y; }
 	I8 area( void ) const { return x*y; }
 	U8 are_sum( void ) const { return abs().area()+abs().sum(); }
-
+	I4x2 yx() const { return this ? I4x2(y,x):I4x2(0); }
 	I4x4 xxxy() const;
 
 	I8 qlen (void ) const { return x*x + y*y; }
@@ -3488,7 +3488,6 @@ public:
 			y = b.y;
 		return *this;
 	}
-
 	I4x2& mn( const I4x2 b ) {
 		if( x > b.x )
 			x = b.x;
@@ -6662,7 +6661,7 @@ szasz:
 
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 );
+	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 );	// !stp ? step=n
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
 	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_OFF,
 						gpeEA s0 = gpeEA_OFF, 	U1 sn = 0,	U1 si = 0,
@@ -6714,7 +6713,7 @@ szasz:
 	U1* pU1() {
         return this ? (n_load ? p_alloc : NULL) : NULL;
     }
-	U1* pU1n( int i = 0, int n = 1 ) {
+	U1* pU1i( int i = 0, int n = 1 ) {
 		if( !this )
 			return NULL;
 		if( !i )
@@ -6726,6 +6725,7 @@ szasz:
 
 		return p_alloc+i;
 	}
+	U1*		pU1n( int i = 0, int n = 1 ) { return Ux( (i<0?nLD():i), n,	true ); }
 
 	U1x4* pU1x4( U4x4& m, U4 nX ) {
 		if( !this )
@@ -6737,31 +6737,33 @@ szasz:
 
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
-	U4*		pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
-	U4*		pU4n( int i = 0, int n = 1 ) 	{ return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
+	U4*		pU4( int i = 0 ) { return (U4*)pU1i(i,sizeof(U4)); }
+	U4*		pU4n( int i = 0, int n = 1 ) { return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i),
+																sizeof(U4)*n,	true, sizeof(U4)); }
 	size_t	nU4( size_t x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
 
 
-	char* 	pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
-	I1* 	pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
+	char* 	pCHAR( int i = 0 ) { return (char*)pU1i(i,sizeof(char)); }
+	I1* 	pI1( int i = 0 ) { return (I1*)pU1i(i,sizeof(I1)); }
 
-	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
+	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1i(i,sizeof(U4x2)); }
 	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
 	size_t	nU4x2( size_t x=1 ){ return x ? nLD(x*sizeof(U4x2)) : nLD(sizeof(U4x2)); }
 
-	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
+	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1i(i,sizeof(U4x4)); }
 	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
 	size_t	nU4x4( size_t x=1 ){ return x ? nLD(x*sizeof(U4x4)) : nLD(sizeof(U4x4)); }
 
-	I4* 	pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
-	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),	sizeof(I4)*n,	true, sizeof(I4)); }
+	I4* 	pI4( int i = 0 ) { return (I4*)pU1i(i,sizeof(I4)); }
+	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),
+																sizeof(I4)*n,	true, sizeof(I4)); }
 	size_t	nI4( size_t x=1 ){ return x ? nLD(x*sizeof(I4)) : nLD(sizeof(I4)); }
 
-	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
+	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1i(i,sizeof(I4x2)); }
 	I4x2* 	pI4x2n( int i = 0, int n = 1 )	{ return (I4x2*)Ux(	(i<0?nLD(sizeof(I4x2)):i),	sizeof(I4x2)*n,	true, sizeof(I4x2)); }
 	size_t	nI4x2( size_t x=1 ){ return x ? nLD(x*sizeof(I4x2)) : nLD(sizeof(I4x2)); }
 
-	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
+	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1i(i,sizeof(I4x4)); }
 	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
 	I4x4* 	pI4x4nINS( int i = 0, int n = 1 ) {
 		if(i<0)
@@ -6772,33 +6774,33 @@ szasz:
 	}
 	ssize_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
 
-	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
+	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1i(i,sizeof(I8x2)); }
 	I8x2* 	pI8x2n( int i = 0, int n = 1 )	{ return (I8x2*)Ux(	(i<0?nLD(sizeof(I8x2)):i),	sizeof(I8x2)*n,	true, sizeof(I8x2)); }
 	size_t	nI8x2( size_t x=1 ){ return x ? nLD(x*sizeof(I8x2)) : nLD(sizeof(I8x2)); }
 
-	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
+	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1i(i,sizeof(I8x4)); }
 	I8x4* 	pI8x4n( int i = 0, int n = 1 )	{ return (I8x4*)Ux(	(i<0?nLD(sizeof(I8x4)):i),	sizeof(I8x4)*n,	true, sizeof(I8x4)); }
 	size_t	nI8x4( size_t x=1 ){ return x ? nLD(x*sizeof(I8x4)) : nLD(sizeof(I8x4)); }
 
-	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
+	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1i(i,sizeof(U8x4)); }
 	U8x4* 	pU8x4n( int i = 0, int n = 1 )	{ return (U8x4*)Ux(	(i<0?nLD(sizeof(U8x4)):i),	sizeof(U8x4)*n,	true, sizeof(U8x4)); }
 	size_t	nU8x4( size_t x=1 ){ return x ? nLD(x*sizeof(U8x4)) : nLD(sizeof(U8x4)); }
 
-	float* 	pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
+	float* 	pF( int i = 0 ) { return (float*)pU1i(i,sizeof(float)); }
 	size_t	nF( size_t x=1 ){ return x ? nLD(x*sizeof(float)) : nLD(sizeof(float)); }
 
-	F2* 	pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
+	F2* 	pF2( int i = 0 ) { return (F2*)pU1i(i,sizeof(F2)); }
 	size_t	nF2( size_t x=1 ){ return x ? nLD(x*sizeof(F2)) : nLD(sizeof(F2)); }
 
-	F4* 	pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
+	F4* 	pF4( int i = 0 ) { return (F4*)pU1i(i,sizeof(F4)); }
 	size_t	nF4( size_t x=1 ){ return x ? nLD(x*sizeof(F4)) : nLD(sizeof(F4)); }
 
-	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
+	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1i(i,sizeof(F4x4)); }
 	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
 	size_t	nF4x4( size_t x=1 ){ return x ? nLD(x*sizeof(F4x4)) : nLD(sizeof(F4x4)); }
 
-	D4* 	pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
-	void**	ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
+	D4* 	pD4( int i = 0 ) { return (D4*)pU1i(i,sizeof(D4)); }
+	void**	ppVOID( int i = 0 ) { return (void**)pU1i(i,sizeof(U1*)); }
 
     U1* pVALI( size_t nB = 0, size_t nP = 0  ) { return this ? ((n_load>=(nB+nP)) ? p_alloc : NULL) : NULL;  }
     void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL ) {
