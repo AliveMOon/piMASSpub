@@ -6823,6 +6823,7 @@ szasz:
 		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
 		return (void*)p_alloc;
 	}
+	gpcLZY& lzySTPscl( int xA, gpcLZY& B, int xB );
 };
 
 

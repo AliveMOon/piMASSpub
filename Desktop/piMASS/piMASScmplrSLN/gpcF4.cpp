@@ -61,9 +61,7 @@ F4 F4::operator / ( const F4x4& b ) const {
 	return F4( *this*b.x, *this*b.y, *this*b.z, w ) - b.t;
 }
 F2& F2::cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m ) {
-    float   //RADx = (float(Cx/2)/float(c*m))*PI2,
-            //RADy = (float(Cy/2)/float(c*m))*PI2;
-            RADx = (float(Cx)/float(c*m))*PI2,
+    float   RADx = (float(Cx)/float(c*m))*PI2,
             RADy = (float(Cy)/float(c*m))*PI2;
     w /= 2.0;
     F2  Ay=F2(cos(RADy),sin(RADy))*r - w, // +F2(-w,-w)

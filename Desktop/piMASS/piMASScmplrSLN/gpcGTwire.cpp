@@ -137,12 +137,33 @@ bool gpcPRGarm::bRUN( U4 mSEC, gpcGT* pGT, U4 nV ) {
     jdPRG.y++;
 	return true;
 }
+static const U1 gpaXstp[] = {
+//	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
+	0x00,0x01,0x02,0x02,0x04,0x04,0x04,0x04,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,
+//  0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
+	0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,
+};
+gpcLZY& gpcLZY::lzySTPscl( int wA, gpcLZY& B, int wB ) {
+	lzyRST();
+	if( wA < 0 )
+		wA *=-1;
+	if( wB < 0 )
+		wB *=-1;
+
+	U1	*pB = B.pU1();
+	int	nB = B.nLD(), iB = 0, bA = 0, xA, xB = 0;
+	for( ;iB < nB; bA += xA, iB++ ) {
+		xB += pB[iB];
+		xA = ((wA*xB)/wB)-bA;
+		xA = (xA >= 0x20) ? 0x20 : gpaXstp[xA];
+		(*pU1n(iB)) = xA;
+	}
+	return *this;
+}
 class gpcWIRE {
 public:
     U4 aIO[0x28],aIOd[0x28], cnt;
-    int aIOm[0x28],
-        aPOSin[0x8],
-        aPOSout[0x8]; //, aADD[0x28];
+    int aIOm[0x28], aPOSin[0x8], aPOSout[0x8];
     F2  aPOT[0x28], aALT[0x14], aHLF[0x14];
     float aqALT[0x14];
 
@@ -180,7 +201,7 @@ public:
 		aCNT[c0].y = pAN->num;
 		nTO[c0].x =
 		nTO[c0].y =	aCNT[c0].y-(aCNT[c0].w=aCNT[c0].x);
-		nLH[c0].x = ( anDIV[c0] = I4x2(nLZYstp(c0)) ).x;
+		nLH[c0].x = ( anDIV[c0] = I4x2(nLZYstpX(c0)) ).x;
 		nLH[c0].y = nLH[c0].x*nLH[c0].x;
 		return aCNT[c0].w;
 	}
@@ -195,7 +216,7 @@ public:
 		aPOT[1] /= wrX(1.0);
 		return pot2to( p, pP2in(p-1,c0,c1), c0, c1 );
     }
-    int nLZYstp( U1 c0 ) {
+    int nLZYstpX( U1 c0 ) {
 		// lépés lista össze állítása
 		U4x2 a8[8];
 		gpmZ(a8);
@@ -231,6 +252,21 @@ public:
 		}
 		return aLZYstp[c0].nLD();
     }
+    I4x2 nLZYstpXY( U1 c0, U1 c1 ) {
+		U4x2 a8[8];
+		gpmZ(a8);
+		U1	*p0, *p1;
+		if( abs(nTO[c0].x) > abs(nTO[c1].x) ) {
+			nLZYstpX( c0 );
+			aLZYstp[c1].lzySTPscl( nTO[c1].x, aLZYstp[c0], nTO[c0].x );
+			return I4x2( aLZYstp[c0].nLD(), aLZYstp[c1].nLD() );
+		}
+
+		nLZYstpX( c1 );
+		aLZYstp[c0].lzySTPscl( nTO[c0].x, aLZYstp[c1], nTO[c1].x );
+		return I4x2( aLZYstp[c0].nLD(), aLZYstp[c1].nLD() );
+
+    }
     F2& pot2to( U1 p = 1, F2* pP0 = NULL, U1 c0 = 0, U1 c1 = 1 ) {
 
         aA[c0] = aA[c1] = gpeALF_POT;
@@ -245,8 +281,10 @@ public:
 		nTO[c0].x =	aCNT[c0].y-aCNT[c0].w;
 		nTO[c0].y =	aCNT[c1].y-aCNT[c1].w;
 		nTO[c1] = nTO[c0].yx();
-		nLH[c0].x = ( anDIV[c1] = I4x2(nLZYstp(c0)) ).x;
-		nLH[c0].y = ( anDIV[c0] = I4x2(nLZYstp(c1)) ).x;
+		I4x2 tmp = nLZYstpXY(c0,c1);
+
+		nLH[c0].x = ( anDIV[c1] = I4x2(tmp.x) ).x;
+		nLH[c0].y = ( anDIV[c0] = I4x2(tmp.y) ).x;
 
 		nLH[c1] = nLH[c0].LH();
 		nLH[c1].y *= nLH[c1].x; // kisebbel a nagyobbat y-ba
@@ -336,7 +374,6 @@ public:
 		}
 
 		/// CALC
-		//aADD[c0] = 1;
 		add = pU1 ? pU1[nSTP-1] : 1;
 		switch( add ) {
 			case 0x2:
@@ -408,6 +445,7 @@ static const U4 gpaSTP[] = {
 	1,  // 6
 	1,  // 7
 };
+
 void gpfWIREtrd_o( gpcWIRE* pWR ) {
 
     int cnt = pWR->cnt, d, bD, bB2, iQ;
@@ -527,15 +565,11 @@ void gpfWIREtrd( gpcWIRE* pWR ) {
     bool bQ;
     while( nCNT ) {
         ms = SDL_GetTicks()&(~1);
-        //bQ = true;
         nCNT = 0;
-        //for( two = 0; two < 2; two++ ) {
-		for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
+        for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
 			nCNT += pWR->STEP(iD, ms );
 		}
-		//bQ = false;
-        //}
-        pWR->cnt++;
+		pWR->cnt++;
         if( pWR->msJOIN <= ms )
             break;
 		usleep(gpdWRuSLP*64);
