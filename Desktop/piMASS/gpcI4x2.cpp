@@ -13,6 +13,11 @@ I4x2& I4x2::operator = ( const I8x2& b )
 	y = b.y;
 	return *this;
 }
+I4x2& I4x2::operator = ( const F2& b ) {
+	x = b.x;
+	y = b.y;
+	return *this;
+}
 I8x2 I4x2::operator * ( int b ) const {
 	if( !b )
 		return 0;

@@ -113,7 +113,7 @@ wget -O /robi/first%s.png http://192.168.1.160:5000/api/camera/take_picture?came
   picA = "draw";
   picB = "cam1";
   cnl = print( "0 0x0 0 xyr: %d, %d, %d, %d \r\n ",
- 				px, py, rr, 8
+ 				px, py, rr, 16
  		 );
   gpu = "penna";
   trgcpA = rr;

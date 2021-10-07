@@ -191,9 +191,17 @@ public:
 class gpcWIN;
 class gpcGT;
 
-/// paint21sep22 - class gpcARMprg
-class gpcARMprg {
+/// paint21sep22 - class gpcPRGarm
+class gpcPRGarm {
 public:
+    /// ----------------------------
+    ///			rPIC
+    /// ----------------------------
+    I4		aROBpID[2];
+    SDL_Surface	*pROBsrf, *pROBdif;
+    U4			*pRM;
+    gpcLZY		lzyRD, robROAD;
+    /// ---------------------------
     gpeALF  jdALF;
     gpcLZY  lzyROAD, lstSTP;
     I4x4    tgXYZ, tgABC, tgxyz,    /// target
@@ -205,10 +213,15 @@ public:
             inXYZ, inABC, inxyz,    /// mondjuk ENCODER adata
             stXYZ, stABC, stxyz,     // START = indultáskori GOOD
             jdPRG, jdPRGtool;       /// jDPRG számláló, TOOL paraméterek
-    U4x4    oCTRL; //, iCTRL;
+    U4x4    oCTRL;
     I2x2	iARY, oARY;             /// ha csomagokban lehet küldeni adatokat
-    gpcARMprg(){};
-    bool bRUN( U4 mSEC, gpcGT* pGT, gpcLZY* pDAT );
+    U4      nVER;
+
+    gpcPRGarm(){};
+    ~gpcPRGarm(){
+        gpmDELary(pRM);
+    };
+    bool bRUN( U4 mSEC, gpcGT* pGT, U4 nV );
     U4 rstCTRL() {
         if( !this )
             return 0;
@@ -244,7 +257,7 @@ public:
 			jd1XYZ, jd1ABC, jd1up;
 	F4x4	jd0mx, jd0mxTL;
 	I4x4	msSMR2, msSRT3;
-	/// gpcARMprg -------------------
+	/// gpcPRGarm -------------------
 	gpeALF	jdALF;
 	gpcLZY	lzyROAD, lstSTP;
 	I4x4    jdPRG, jdPRGtool;

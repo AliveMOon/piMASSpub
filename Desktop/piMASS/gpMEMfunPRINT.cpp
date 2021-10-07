@@ -96,7 +96,13 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 					pPRNT = pPRNT->lzyADD( pU1+1, l, (s=-1) );
 				} break;
 			default: {
-				if( AB.area() )
+                if( pPi->cID() == gpeCsz_Q ) {
+                    if( AB.area() )
+                        sFRMT[0] = sprintf( sFRMT+1, "%%%d.%dlld", (int)AB.x, (int)AB.y, pSe[-1] );
+                    else
+                        sFRMT[0] = sprintf( sFRMT+1, "%%lld" );
+                }
+				else if( AB.area() )
 					sFRMT[0] = sprintf( sFRMT+1, "%%%d.%d%c", (int)AB.x, (int)AB.y, pSe[-1] );
 				else
 					sFRMT[0] = sprintf( sFRMT+1, "%%%c", pSe[-1] );
@@ -121,8 +127,7 @@ gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
 
 	return pPRNT;
 }
-void gpMEM::funPRINT()
-{
+void gpMEM::funPRINT() {
 	I4	nI4 = pD[7]-pA[7],
 		*pI4 = (I4*)pUn(pA[7], nI4 ); //, nCPY;
 	nI4 /= gpaCsz[gpeCsz_l];

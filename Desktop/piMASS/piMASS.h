@@ -360,8 +360,8 @@ public:
 	D& operator -= ( const D& b ) { d-=b.d; return *this; }
 };
 
-
-
+#define bSGN( a ) ( a<0 )
+#define iSGN( a ) ( bSGN( a ) ? -1 : 1 )
 #define gpmMAX( a, b ) ( ((a)>(b)) ? (a):(b) )
 #define gpmMIN( a, b ) ( ((a)<(b)) ? (a):(b) )
 #define PI acos(-1.0)
@@ -442,6 +442,8 @@ public:
 
 #define ms2sec 1000
 #define gpdROBlim 100
+#define wr2(a) ((a)*2)
+#define wrX(a) ((a)*10)
 #define mmX(a) ((a)*16)
 #define degX(a) ((a)*128)
 
@@ -451,11 +453,11 @@ public:
 #define gpdHEADmmX	mmX(200)
 #define gpdNECKmmX	mmX(150)
 
-#define gpdPAINTlfX mmX(560)
-#define gpdPAINTrgX mmX(900)
+#define gpdPAINTlfX mmX(-700)
+#define gpdPAINTrgX mmX(700)
 
-#define gpdPAINTbtX mmX(-204)
-#define gpdPAINTtpX mmX(168)
+#define gpdPAINTbtX mmX(-400)
+#define gpdPAINTtpX mmX(400)
 
 #define gpdPAINTwX  (gpdPAINTrgX-gpdPAINTlfX)
 #define gpdPAINThX  (gpdPAINTtpX-gpdPAINTbtX)
@@ -2031,10 +2033,15 @@ public:
 	U8 area() const 	{ return (!this?0:(U8)x*y); }
 	U8 are_sum() const 	{ return area()+sum(); }
 	U8 qlen() const 	{ return (!this?0:(U8)x*x+(U8)y*y); }
-	U4 mn() const 		{ return (!this?0:(x<y?x:y)); }
-	U4 mx() const 		{ return (!this?0:(x>y?x:y)); }
+	//U4x2 abs( void ) const { return U4x2( x<0?-x:x, y<0?-y:y ); }
 
-	U4x2 abs( void ) const { return U4x2( x<0?-x:x, y<0?-y:y ); }
+	U4 mn() const { return this ? (x<y?x:y) : 0; }
+	U4 mx() const { return this ? (x>y?x:y) : 0; }
+	U4x2 HL() const { return  this ? U4x2( mx(), mn() ) : U4x2(0); }
+	U4x2 LH() const { return  this ? U4x2( mn(), mx() ) : U4x2(0); }
+	U4x2 MX( const U4x2 b ) const { return  this ? U4x2( x>b.x?x:b.x, y>b.y?y:b.y ) : U4x2(0); }
+	U4x2 MN( const U4x2 b ) const { return  this ? U4x2( x<b.x?x:b.x, y<b.y?y:b.y ) : U4x2(0); }
+
 	U4x2& mx( U4x2 b ) {
 		if( x < b.x )
 			x = b.x;
@@ -2931,6 +2938,7 @@ public:
 
 	I2x2& operator = ( const U8x2& b );
 	I2x2& operator = ( const I8x2& b );
+    I4x2& operator = ( const F2& b );
 
 	I2x2 abs( void ) const { return I2x2( x<0?-x:x, y<0?-y:y ); }
 
@@ -3111,6 +3119,16 @@ public:
 		y = srf.h;
 		return *this;
 	}
+	I4x2& operator = ( const U4x2& b ) {
+		x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
+		y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
+		return *this;
+	}
+
+	I4x2& operator = ( const U8x2& b );
+	I4x2& operator = ( const I8x2& b );
+    I4x2& operator = ( const F2& b );
+
     I4x2( U8x2 b );
     I4x2( I8x2 b );
     I4x2( int* pI ) {
@@ -3442,31 +3460,27 @@ public:
 		return pBUFF + strALF4N( pBUFF );
     }
 
-	I4x2& operator = ( const U4x2& b ) {
-		x = b.x > 0x7fffFFFF ? 0x7fffFFFF : b.x;
-		y = b.y > 0x7fffFFFF ? 0x7fffFFFF : b.y;
-		return *this;
-	}
 
-	I4x2& operator = ( const U8x2& b );
-	I4x2& operator = ( const I8x2& b );
 
 	I4x2 abs( void ) const { return I4x2( x<0?-x:x, y<0?-y:y ); }
 
 	I8 sum( void ) const { return (I8)x+y; }
 	I8 area( void ) const { return x*y; }
 	U8 are_sum( void ) const { return abs().area()+abs().sum(); }
-
+	I4x2 yx() const { return this ? I4x2(y,x):I4x2(0); }
 	I4x4 xxxy() const;
 
 	I8 qlen (void ) const { return x*x + y*y; }
 
-	I4 mn() { return x < y ? x:y; }
-	I4 mx() { return x > y ? x:y; }
-
-
+	//I4 mn() const { return x < y ? x:y; }
+	//I4 mx() const { return x > y ? x:y; }
+	I4 mn() const { return this ? (x<y?x:y) : 0; }
+	I4 mx() const { return this ? (x>y?x:y) : 0; }
+	I4x2 HL() const { return  this ? I4x2( mx(), mn() ) : I4x2(0); }
+	I4x2 LH() const { return  this ? I4x2( mn(), mx() ) : I4x2(0); }
 	I4x2 MX( const I4x2 b ) const { return  this ? I4x2( x>b.x?x:b.x, y>b.y?y:b.y ) : I4x2(0); }
 	I4x2 MN( const I4x2 b ) const { return  this ? I4x2( x<b.x?x:b.x, y<b.y?y:b.y ) : I4x2(0); }
+
 	I4x2& mx( const I4x2 b ) {
 		if( x < b.x )
 			x = b.x;
@@ -3474,7 +3488,6 @@ public:
 			y = b.y;
 		return *this;
 	}
-
 	I4x2& mn( const I4x2 b ) {
 		if( x > b.x )
 			x = b.x;
@@ -4497,10 +4510,16 @@ public:
 	I8 sum() const	{ return !this ? 0 : x+y; }
 	I8 area() const	{ return !this ? 0 : x*y; }
 	I8 qlen() const	{ return !this ? 0 : (x*x + y*y); }
-	I8 mn() const	{ return !this ? 0 : (x<y ? x:y); }
-	I8 mx() const	{ return !this ? 0 : (x>y ? x:y); }
+	//I8 mn()	const	{ return !this ? 0 : (x<y ? x:y); }
+	//I8 mx()	const	{ return !this ? 0 : (x>y ? x:y); }
 
 	I8x2 abs( void ) const { return I8x2( x<0?-x:x, y<0?-y:y ); }
+	I8 mn() const { return this ? (x<y?x:y) : 0; }
+	I8 mx() const { return this ? (x>y?x:y) : 0; }
+	I8x2 HL() const { return  this ? I8x2( mx(), mn() ) : I8x2(0); }
+	I8x2 LH() const { return  this ? I8x2( mn(), mx() ) : I8x2(0); }
+	I8x2 MX( const I8x2 b ) const { return  this ? I8x2( x>b.x?x:b.x, y>b.y?y:b.y ) : I8x2(0); }
+	I8x2 MN( const I8x2 b ) const { return  this ? I8x2( x<b.x?x:b.x, y<b.y?y:b.y ) : I8x2(0); }
 
 	gpeTYP cdrMILLnum( const char* pS, U4 nS );
 	gpeTYP cdrMILLalf( const char* pS, U4 nS );
@@ -4948,8 +4967,8 @@ public:
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
-	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m = 16 );
-    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 16, float turn  = 0);
+	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m = 32 );
+    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 32, float turn  = 0);
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }
@@ -6369,26 +6388,7 @@ public:
 	}
 
 	gpcLZY* lzyADD( const void* p_void, size_t n_byte, U8& iSTRT, U1 n = 0 );
-	void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL ) {
-		if( !this )
-			return NULL; // ha nincsen thisLZY akkor nem lehet valós pU2
 
-		if( pTHIS != (void*)p_alloc )
-			pTHIS = NULL;
-		else if( pLZY->n_load > n_load )
-			pTHIS = NULL;	// pLZY nagyobb akkor sem jó pLZY-ben több az adat
-
-		if( pTHIS )
-			return (void*)p_alloc; // tehát ha nem lett NULL akor VALID
-
-		if( pLZY->n_load <= n_load )
-			return (void*)p_alloc;
-
-		/// pLZY töltve lett, a fölét a IDE(this) is feltöltjük
-		U8 STRT = -1;
-		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
-		return (void*)p_alloc;
-	}
 
 	gpcLZY* lzyPLUS(  const gpcLZY* p_b, U8& iSTRT ) {
 		return lzyADD( p_b->p_alloc, p_b->n_load, iSTRT, ( (p_b->n_load<=0x40) ? 0xf : 0x3 ) );
@@ -6661,7 +6661,7 @@ szasz:
 
 	gpcCMPL* pPC( U4 pc, U1* pS = NULL );
 	gpcCMPL* pSPARE( U4 pc, gpeALF sw = gpeALF_null , U1* pS = NULL );
-	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 );
+	U1* Ux( I8 iPC, U4 n, bool bZ = true, U4 stp = 0 );	// !stp ? step=n
 	I4x4* pINST( U4 pc ) { return (I4x4*)Ux( pc, sizeof(I4x4) ); }
 	I4x4& INST( U4 pc,	gpeOPid op = gpeOPid_nop, gpeCsz iC = gpeCsz_OFF,
 						gpeEA s0 = gpeEA_OFF, 	U1 sn = 0,	U1 si = 0,
@@ -6713,7 +6713,7 @@ szasz:
 	U1* pU1() {
         return this ? (n_load ? p_alloc : NULL) : NULL;
     }
-	U1* pU1n( int i = 0, int n = 1 ) {
+	U1* pU1i( int i = 0, int n = 1 ) {
 		if( !this )
 			return NULL;
 		if( !i )
@@ -6725,6 +6725,7 @@ szasz:
 
 		return p_alloc+i;
 	}
+	U1*		pU1n( int i = 0, int n = 1 ) { return Ux( (i<0?nLD():i), n,	true ); }
 
 	U1x4* pU1x4( U4x4& m, U4 nX ) {
 		if( !this )
@@ -6736,31 +6737,33 @@ szasz:
 
 		return ((U1x4*)(p_alloc + sizeof(U4x4)*nX))+m.w*nX;
 	}
-	U4*		pU4( int i = 0 ) { return (U4*)pU1n(i,sizeof(U4)); }
-	U4*		pU4n( int i = 0, int n = 1 ) 	{ return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i), 	sizeof(U4)*n,	true, sizeof(U4)); }
+	U4*		pU4( int i = 0 ) { return (U4*)pU1i(i,sizeof(U4)); }
+	U4*		pU4n( int i = 0, int n = 1 ) { return   (U4*)Ux(	(i<0?nLD(sizeof(U4)):i),
+																sizeof(U4)*n,	true, sizeof(U4)); }
 	size_t	nU4( size_t x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
 
 
-	char* 	pCHAR( int i = 0 ) { return (char*)pU1n(i,sizeof(char)); }
-	I1* 	pI1( int i = 0 ) { return (I1*)pU1n(i,sizeof(I1)); }
+	char* 	pCHAR( int i = 0 ) { return (char*)pU1i(i,sizeof(char)); }
+	I1* 	pI1( int i = 0 ) { return (I1*)pU1i(i,sizeof(I1)); }
 
-	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1n(i,sizeof(U4x2)); }
+	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1i(i,sizeof(U4x2)); }
 	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
 	size_t	nU4x2( size_t x=1 ){ return x ? nLD(x*sizeof(U4x2)) : nLD(sizeof(U4x2)); }
 
-	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1n(i,sizeof(U4x4)); }
+	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1i(i,sizeof(U4x4)); }
 	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
 	size_t	nU4x4( size_t x=1 ){ return x ? nLD(x*sizeof(U4x4)) : nLD(sizeof(U4x4)); }
 
-	I4* 	pI4( int i = 0 ) { return (I4*)pU1n(i,sizeof(I4)); }
-	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),	sizeof(I4)*n,	true, sizeof(I4)); }
+	I4* 	pI4( int i = 0 ) { return (I4*)pU1i(i,sizeof(I4)); }
+	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),
+																sizeof(I4)*n,	true, sizeof(I4)); }
 	size_t	nI4( size_t x=1 ){ return x ? nLD(x*sizeof(I4)) : nLD(sizeof(I4)); }
 
-	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1n(i,sizeof(I4x2)); }
+	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1i(i,sizeof(I4x2)); }
 	I4x2* 	pI4x2n( int i = 0, int n = 1 )	{ return (I4x2*)Ux(	(i<0?nLD(sizeof(I4x2)):i),	sizeof(I4x2)*n,	true, sizeof(I4x2)); }
 	size_t	nI4x2( size_t x=1 ){ return x ? nLD(x*sizeof(I4x2)) : nLD(sizeof(I4x2)); }
 
-	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1n(i,sizeof(I4x4)); }
+	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1i(i,sizeof(I4x4)); }
 	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
 	I4x4* 	pI4x4nINS( int i = 0, int n = 1 ) {
 		if(i<0)
@@ -6771,35 +6774,56 @@ szasz:
 	}
 	ssize_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
 
-	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1n(i,sizeof(I8x2)); }
+	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1i(i,sizeof(I8x2)); }
 	I8x2* 	pI8x2n( int i = 0, int n = 1 )	{ return (I8x2*)Ux(	(i<0?nLD(sizeof(I8x2)):i),	sizeof(I8x2)*n,	true, sizeof(I8x2)); }
 	size_t	nI8x2( size_t x=1 ){ return x ? nLD(x*sizeof(I8x2)) : nLD(sizeof(I8x2)); }
 
-	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1n(i,sizeof(I8x4)); }
+	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1i(i,sizeof(I8x4)); }
 	I8x4* 	pI8x4n( int i = 0, int n = 1 )	{ return (I8x4*)Ux(	(i<0?nLD(sizeof(I8x4)):i),	sizeof(I8x4)*n,	true, sizeof(I8x4)); }
 	size_t	nI8x4( size_t x=1 ){ return x ? nLD(x*sizeof(I8x4)) : nLD(sizeof(I8x4)); }
 
-	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1n(i,sizeof(U8x4)); }
+	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1i(i,sizeof(U8x4)); }
 	U8x4* 	pU8x4n( int i = 0, int n = 1 )	{ return (U8x4*)Ux(	(i<0?nLD(sizeof(U8x4)):i),	sizeof(U8x4)*n,	true, sizeof(U8x4)); }
 	size_t	nU8x4( size_t x=1 ){ return x ? nLD(x*sizeof(U8x4)) : nLD(sizeof(U8x4)); }
 
-	float* 	pF( int i = 0 ) { return (float*)pU1n(i,sizeof(float)); }
+	float* 	pF( int i = 0 ) { return (float*)pU1i(i,sizeof(float)); }
 	size_t	nF( size_t x=1 ){ return x ? nLD(x*sizeof(float)) : nLD(sizeof(float)); }
 
-	F2* 	pF2( int i = 0 ) { return (F2*)pU1n(i,sizeof(F2)); }
+	F2* 	pF2( int i = 0 ) { return (F2*)pU1i(i,sizeof(F2)); }
 	size_t	nF2( size_t x=1 ){ return x ? nLD(x*sizeof(F2)) : nLD(sizeof(F2)); }
 
-	F4* 	pF4( int i = 0 ) { return (F4*)pU1n(i,sizeof(F4)); }
+	F4* 	pF4( int i = 0 ) { return (F4*)pU1i(i,sizeof(F4)); }
 	size_t	nF4( size_t x=1 ){ return x ? nLD(x*sizeof(F4)) : nLD(sizeof(F4)); }
 
-	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1n(i,sizeof(F4x4)); }
+	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1i(i,sizeof(F4x4)); }
 	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
 	size_t	nF4x4( size_t x=1 ){ return x ? nLD(x*sizeof(F4x4)) : nLD(sizeof(F4x4)); }
 
-	D4* 	pD4( int i = 0 ) { return (D4*)pU1n(i,sizeof(D4)); }
-	void**	ppVOID( int i = 0 ) { return (void**)pU1n(i,sizeof(U1*)); }
+	D4* 	pD4( int i = 0 ) { return (D4*)pU1i(i,sizeof(D4)); }
+	void**	ppVOID( int i = 0 ) { return (void**)pU1i(i,sizeof(U1*)); }
 
     U1* pVALI( size_t nB = 0, size_t nP = 0  ) { return this ? ((n_load>=(nB+nP)) ? p_alloc : NULL) : NULL;  }
+    void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL ) {
+		if( !this )
+			return NULL; // ha nincsen thisLZY akkor nem lehet valós pU2
+
+		if( pTHIS != (void*)p_alloc )
+			pTHIS = NULL;
+		else if( pLZY->n_load > n_load )
+			pTHIS = NULL;	// pLZY nagyobb akkor sem jó pLZY-ben több az adat
+
+		if( pTHIS )
+			return (void*)p_alloc; // tehát ha nem lett NULL akor VALID
+
+		if( pLZY->n_load <= n_load )
+			return (void*)p_alloc;
+
+		/// pLZY töltve lett, a fölét a IDE(this) is feltöltjük
+		U8 STRT = -1;
+		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
+		return (void*)p_alloc;
+	}
+	gpcLZY& lzySTPsclREL( int xA, gpcLZY& B, int xB );
 
 };
 
