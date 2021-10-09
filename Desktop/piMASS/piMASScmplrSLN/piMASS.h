@@ -360,8 +360,8 @@ public:
 	D& operator -= ( const D& b ) { d-=b.d; return *this; }
 };
 
-
-
+#define bSGN( a ) ( a<0 )
+#define iSGN( a ) ( bSGN( a ) ? -1 : 1 )
 #define gpmMAX( a, b ) ( ((a)>(b)) ? (a):(b) )
 #define gpmMIN( a, b ) ( ((a)<(b)) ? (a):(b) )
 #define PI acos(-1.0)
@@ -4967,8 +4967,8 @@ public:
     F2& operator /= ( const F2& xy ) { x /= xy.x; y /= xy.y; return *this; }
 
 	F2& sXY( const char* p_str, char** pp_str ); /// gpcGLobj.cpp
-	F2& cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m = 32 );
-    F2& pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m = 32, float turn  = 0);
+	F2& cnt2pot( I4 Cx, I4 Cy, float w, float r, U4 c, U4 m = 32 );
+    F2& pot2cnt( I4& Cx, I4& Cy, float w, float r, U4 c, U4 m = 32, float turn  = 0);
 	F2& swpXY( const void* pV );
 	F2& swpXYflpY( const void* pV );
     double sum( void ) const { return x+y; }
@@ -6426,18 +6426,18 @@ public:
 			p_alloc[n_load] = 0;
 		return this;
 	}
-	gpcLZY* lzy_exp_rand( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 ) {
+	gpcLZY* lzyEXP_rand( U8& iSTRT, size_t n_sub, size_t n_add, U1 n = 0 ) {
 		if( iSTRT <= (this ? n_load : 0) )
-			return lzy_exp( iSTRT, n_sub,n_add, n );
+			return lzyEXP( iSTRT, n_sub,n_add, n );
 
-		U8 pls = iSTRT-n_load;
+		size_t pls = iSTRT-n_load;
 		iSTRT = n_load;
 		if( !this )
 			return lzyADD( NULL, n_add + pls, iSTRT, n );
 
-		return lzy_exp( iSTRT, n_sub, n_add + pls, n );
+		return lzyEXP( iSTRT, n_sub, n_add + pls, n );
 	}
-	gpcLZY* lzy_exp( U8& iSTRT, U8 n_sub, U8 n_add, U1 n = 0 ) {
+	gpcLZY* lzyEXP( U8& iSTRT, size_t n_sub, size_t n_add, U1 n = 0 ) {
 		if( !this )
             return lzyADD( NULL, n_add, iSTRT, n );
 
@@ -6512,10 +6512,11 @@ public:
 		return this;
 	}
 
-	gpcLZY* lzyINS( const U1* p_u1, U8 n_u1, U8& iSTRT, U8 n_sub = 0, U1 n = 0 ) {
+	gpcLZY* lzyINS( const U1* p_u1, size_t n_u1, U8& iSTRT,
+					size_t n_sub = 0, U1 n = 0 				) {
 		if( !this )
 			return lzyADD( p_u1, n_u1, iSTRT, n );
-		lzy_exp( iSTRT, n_sub,  n_u1, n );
+		lzyEXP( iSTRT, n_sub,  n_u1, n );
 		gpmMcpyOF( p_alloc+iSTRT, p_u1, n_u1 );
 		return this;
 	}
@@ -6524,9 +6525,9 @@ public:
 		lzyINS( b.p_alloc, b.nLD(), s, -1 );
 		return *this;
 	}
-	gpcLZY* operator += ( const gpcLZY& plus ) {
+	gpcLZY* operator += ( const gpcLZY& b ) {
 		U8 s = -1;
-		return lzyADD( plus.p_alloc, plus.nLD(), s );
+		return lzyADD( b.p_alloc, b.nLD(), s );
 	}
 	gpcLZY* lzyDIR( const char* p_file, U8& iSTRT );
 	gpcLZY* lzyRD( const char* p_file, U8& iSTRT, U1 n = 0 ) {
@@ -6725,7 +6726,7 @@ szasz:
 
 		return p_alloc+i;
 	}
-	U1*		pU1n( int i = 0, int n = 1 ) { return Ux( (i<0?nLD():i), n,	true ); }
+	U1* pU1n( int i = 0, int n = 1 ) { return Ux( (i<0?nLD():i), n,	true ); }
 
 	U1x4* pU1x4( U4x4& m, U4 nX ) {
 		if( !this )
@@ -6823,7 +6824,8 @@ szasz:
 		lzyADD( pLZY->p_alloc+n_load, pLZY->n_load-n_load, STRT );
 		return (void*)p_alloc;
 	}
-	gpcLZY& lzySTPscl( int xA, gpcLZY& B, int xB );
+	gpcLZY& lzySTPsclREL( int xA, gpcLZY& B, int xB );
+
 };
 
 
@@ -7305,7 +7307,7 @@ class gpcLZYall {
 	I8x2& wrAN( U4 i )
 	{
 		U8 s = i*sizeof(iAN);
-		lzyID.lzy_exp_rand( s, sizeof(iAN), sizeof(iAN) );
+		lzyID.lzyEXP_rand( s, sizeof(iAN), sizeof(iAN) );
 		return ((I8x2*)lzyID.p_alloc)[i];
 	}
 public:

@@ -54,6 +54,7 @@ U1  aIOonPCB[] =    { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
 
 #define gpdWRuSLP 512 //(1250*2) /// DVR8825 250kHz
 #define gpdWRmSLP(n) ((gpdWRuSLP*n)/1000)
+
 bool gpcPRGarm::bRUN( U4 mSEC, gpcGT* pGT, U4 nV ) {
 
     if( bCTRL() ) // mozog?
@@ -143,23 +144,10 @@ static const U1 gpaXstp[] = {
 //  0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
 	0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,
 };
-gpcLZY& gpcLZY::lzySTPscl( int wA, gpcLZY& B, int wB ) {
-	lzyRST();
-	if( wA < 0 )
-		wA *=-1;
-	if( wB < 0 )
-		wB *=-1;
+#define gpdSTPnSEC 0x400 // 768ns round 1us
+#define gpdSTPnSECdw (gpdSTPnSEC*3) // 768ns*3 2.304 us
+#define gpdSTPnSECup (gpdSTPnSEC*3) // 768ns*3 2.304 us
 
-	U1	*pB = B.pU1();
-	int	nB = B.nLD(), iB = 0, bA = 0, xA, xB = 0;
-	for( ;iB < nB; bA += xA, iB++ ) {
-		xB += pB[iB];
-		xA = ((wA*xB)/wB)-bA;
-		xA = (xA >= 0x20) ? 0x20 : gpaXstp[xA];
-		(*pU1n(iB)) = xA;
-	}
-	return *this;
-}
 class gpcWIRE {
 public:
     U4 aIO[0x28],aIOd[0x28], cnt;
@@ -168,9 +156,10 @@ public:
     float aqALT[0x14];
 
     gpeALF  aA[0x28];
-    I8x4    aCNT[0x28];
-    I4x2    nLH[0x28], nTO[0x28], anDIV[0x28];
+    I4x4    aCNT[0x28];
+    I4x2    nTO[0x28];
 	gpcLZY	aLZYstp[0x28];
+	U4		aiS[0x28], aSTPnSEC[0x28];
 
 	U1  aMAP[0x28],
         sIP[0x100],
@@ -200,9 +189,7 @@ public:
 		aA[c0] = pAN->alf;
 		aCNT[c0].y = pAN->num;
 		nTO[c0].x =
-		nTO[c0].y =	aCNT[c0].y-(aCNT[c0].w=aCNT[c0].x);
-		nLH[c0].x = ( anDIV[c0] = I4x2(nLZYstpX(c0)) ).x;
-		nLH[c0].y = nLH[c0].x*nLH[c0].x;
+		nTO[c0].y =	aCNT[c0].y-aCNT[c0].w;
 		return aCNT[c0].w;
 	}
     F2* pP2in( U1 p = 1, U1 c0 = 0, U1 c1 = 1 ) {
@@ -216,57 +203,68 @@ public:
 		aPOT[1] /= wrX(1.0);
 		return pot2to( p, pP2in(p-1,c0,c1), c0, c1 );
     }
-    int nLZYstpX( U1 c0 ) {
-		// lépés lista össze állítása
-		U4x2 a8[8];
-		gpmZ(a8);
-		I4x2 stp(0, abs(nTO[c0].x));
-		I4 n = 0, nN = 0, nM = 0;
-		for( I4 x = 0x20; x > 1; x>>=1, n++ ) {
-			a8[n].y = stp.YdivQR(x).x;
-			if( !a8[n].y )
-				continue;
-			a8[n].x = x;
-			nN += a8[n].y;
-			nM = n+1;
-		}
-		if( stp.y ) {
-			a8[n].y = stp.y;
-			a8[n].x = 1;
-			nN += a8[n].y;
-			nM = n+1;
-		}
-		U1* pU1;
-		I4 i,j;
-		for( j = 0; j < nM; j++ ) {
-			for( i = 0, j; i < nN; i++ ) {
-				if( !a8[j].x )
-					continue;
-				pU1 = aLZYstp[c0].pU1n(-1);
-				(*pU1) = a8[j].x; // pU1i(-1) inkrementál
-				a8[j].y--;
-				if( a8[j].y )
-					continue;
-				a8[j].x = 0;
+    size_t nLZYstpX( U1 iW ) {
+		aLZYstp[iW].lzyRST();
+		aiS[iW] = 0;
+		aSTPnSEC[iW] = 0;
+		if( aCNT[iW].y == aCNT[iW].w )
+			return 0;
+		I4	iD = aCNT[iW].y-aCNT[iW].w,
+			s = iSGN(iD), aD = iD*s,
+			w = aCNT[iW].w, z;
+		I4x2* pI4x2;
+		U4 x, aZ;
+		while( w != aCNT[iW].y ) {
+			for( x = 0x20; x; x>>= 1 ) {
+				z = (s+(w/x))*x;
+				aZ = abs(z-aCNT[iW].w);
+				if( aZ <= aD )
+					break;
 			}
-		}
-		return aLZYstp[c0].nLD();
-    }
-    I4x2 nLZYstpXY( U1 c0, U1 c1 ) {
-		U4x2 a8[8];
-		gpmZ(a8);
-		U1	*p0, *p1;
-		if( abs(nTO[c0].x) > abs(nTO[c1].x) ) {
-			nLZYstpX( c0 );
-			aLZYstp[c1].lzySTPscl( nTO[c1].x, aLZYstp[c0], nTO[c0].x );
-			return I4x2( aLZYstp[c0].nLD(), aLZYstp[c1].nLD() );
+			*(pI4x2 = aLZYstp[iW].pI4x2n(-1)) = I4x2( x, z-w );
+			w=z;
 		}
 
-		nLZYstpX( c1 );
-		aLZYstp[c0].lzySTPscl( nTO[c0].x, aLZYstp[c1], nTO[c1].x );
-		return I4x2( aLZYstp[c0].nLD(), aLZYstp[c1].nLD() );
-
+		return aLZYstp[iW].nI4x2();
     }
+	size_t nLZYstpSCL( U1 c0, size_t nC1 ) {
+		size_t nC0 = aLZYstp[c0].nI4x2();
+		if(!nC0)
+			return nC1;
+		if(nC1 <= aLZYstp[c0].nI4x2())
+			return aLZYstp[c0].nI4x2();
+
+
+		size_t nADD = nC1-nC0, nP = nC1/nC0, nP2;
+		if(nP<2)
+			nP = 2;
+		nP2 = nP/2;
+		U8 s;
+		I4x2 *pI4x2 = aLZYstp[c0].lzyEXP( s=0, 0, nADD*sizeof(*pI4x2) )->pI4x2();
+		gpmZnOF( pI4x2, nADD );
+		for( size_t i = nADD, j = nP/2; j < nADD; i++, j+=nP ) {
+			pI4x2[j] = pI4x2[i];
+			pI4x2[i].null();
+			continue;
+
+			if( abs(pI4x2[j].y)<4 )
+				continue;
+
+			pI4x2[j-nP2].x = pI4x2[j].x/2;
+			pI4x2[j-nP2].y = pI4x2[j].y-(pI4x2[j].y/2);
+			pI4x2[j].y -= pI4x2[j-nP2].y;
+
+		}
+		nC0 = aLZYstp[c0].nI4x2();
+		return nC0;
+	}
+    size_t nLZYstpXY( U1 c0, U1 c1 ) {
+		I4x2 c01( nLZYstpX( c0 ), nLZYstpX( c1 ) );
+		return (c01.x > c01.y)	? nLZYstpSCL( c1, c01.x )
+								: nLZYstpSCL( c0, c01.y );
+    }
+
+
     F2& pot2to( U1 p = 1, F2* pP0 = NULL, U1 c0 = 0, U1 c1 = 1 ) {
 
         aA[c0] = aA[c1] = gpeALF_POT;
@@ -281,14 +279,7 @@ public:
 		nTO[c0].x =	aCNT[c0].y-aCNT[c0].w;
 		nTO[c0].y =	aCNT[c1].y-aCNT[c1].w;
 		nTO[c1] = nTO[c0].yx();
-		I4x2 tmp = nLZYstpXY(c0,c1);
-
-		nLH[c0].x = ( anDIV[c1] = I4x2(tmp.x) ).x;
-		nLH[c0].y = ( anDIV[c0] = I4x2(tmp.y) ).x;
-
-		nLH[c1] = nLH[c0].LH();
-		nLH[c1].y *= nLH[c1].x; // kisebbel a nagyobbat y-ba
-		nLH[c0] = nLH[c1]; // megoszt
+		nLZYstpXY(c0,c1);
 
 		if( !pP0 )
 			return aPOT[p];
@@ -301,81 +292,69 @@ public:
 
 		return aPOT[p];
     }
-	U4 STEP( U1 c0, U4 ms ) {
-		if( !anDIV[c0].x )
-			return 0;
 
-		if(aCNT[c0].x==aCNT[c0].y) {
-			aLZYstp[c0].lzyRST();
-			return 0;
-		}
-
+	U4 nsSTEP( U1 c0, U4 ms, U4 nSEC ) {
+		U1 wSTP = aSTP[c0];
 		ms &= ~1;
-		U1* pU1 = aLZYstp[c0].pU1();
-		if( aIO[aSTP[c0]]&1 ) {
-			// kint kéne tartani valameddig
-			if( aLZYstp[c0].nLD() ) {
-				aLZYstp[c0].n_load--;
-				aCNT[c0].x += pU1[aLZYstp[c0].nLD()] * ((aIO[aDIR[c0]]&1) ? 1 : -1);
-				digitalWrite(aIOm2w[aSTP[c0]],0);
-				aIO[aSTP[c0]] = ms;
-				return 0;
+		size_t nSTP = aLZYstp[c0].nI4x2();
+		int uSTP = nSTP ? aLZYstp[c0].pI4x2()[aiS[c0]].y:0;
+		if( nSEC ) {
+			if( aIO[wSTP]&1 ) {
+				// STEP riseDW
+				digitalWrite(aIOm2w[wSTP],0);
+				aIO[wSTP] = ms;
+				return gpdSTPnSECdw*abs(uSTP); // 2048ns 2.048us
 			}
-
-			aCNT[c0].x = aCNT[c0].y;
-			digitalWrite(aIOm2w[aSTP[c0]],0);
-			aIO[aSTP[c0]] = ms;
+			if( nSEC&1 ) {
+				// STEP riseUP
+				digitalWrite(aIOm2w[wSTP], 1 );
+				aIO[wSTP] = 1|ms;
+				return gpdSTPnSECup|2;
+			}
+			if( nSTP )
+				aCNT[c0].x += aLZYstp[c0].pI4x2()[aiS[c0]].y;
+			aiS[c0]++;
+		}
+		if( nSTP ? (aiS[c0]>=nSTP): true )
 			return 0;
-		}
 
-		U4 c41 = c0*4 + 1, d, w = aDIR[c0], w2, nSTP = aLZYstp[c0].nLD(), bB, mul, add; /// TRG-NOW
-		if( !nSTP ) {
+		U4	c41 = c0*4 + 1, d, w, bB,
+			mul; /// TRG-NOW
+		U1 wDIR = aDIR[c0];
+		if( !aiS[c0] ) {
 			// egy kis cCFG // megnézi OUTPUTok rendben
-			w = aDIR[c0];
-			if( aIOm[w] != OUTPUT ) {
-			   pinMode(aIOm2w[w], OUTPUT);
-			   aIOm[w] = OUTPUT;
+			if( aIOm[wDIR] != OUTPUT ) {
+			   pinMode(aIOm2w[wDIR],OUTPUT);
+			   aIOm[wDIR] = OUTPUT;
 			}
-			w = aSTP[c0];
-			if( aIOm[w] != OUTPUT ) {
-				pinMode(aIOm2w[w], OUTPUT);
-				aIOm[w] = OUTPUT;
-				w2 = aMx[c41];
-				if( aIOm[w2] != OUTPUT ) {
-					pinMode(aIOm2w[w2], OUTPUT);
-					aIOm[w2] = OUTPUT;
+			if( aIOm[wSTP] != OUTPUT ) {
+				pinMode(aIOm2w[wSTP], OUTPUT);
+				aIOm[wSTP] = OUTPUT;
+
+				w = aMx[c41];
+				if( aIOm[w] != OUTPUT ) {
+					pinMode(aIOm2w[w], OUTPUT);
+					aIOm[w] = OUTPUT;
 				}
-				w2 = aMx[c41+1];
-				if( aIOm[w2] != OUTPUT ) {
-					pinMode(aIOm2w[w2], OUTPUT);
-					aIOm[w2] = OUTPUT;
+				w = aMx[c41+1];
+				if( aIOm[w] != OUTPUT ) {
+					pinMode(aIOm2w[w], OUTPUT);
+					aIOm[w] = OUTPUT;
 				}
-				w2 = aMx[c41+2];
-				if( aIOm[w2] != OUTPUT ) {
-					pinMode(aIOm2w[w2], OUTPUT);
-					aIOm[w2] = OUTPUT;
+				w = aMx[c41+2];
+				if( aIOm[w] != OUTPUT ) {
+					pinMode(aIOm2w[w], OUTPUT);
+					aIOm[w] = OUTPUT;
 				}
 			}
 		}
-		// NEW?
-		aCNT[c0].z += nLH[c0].x;
-		if( anDIV[c0].y == (aCNT[c0].z/anDIV[c0].x) )
-			return 1;
 
-		anDIV[c0].y = aCNT[c0].z/anDIV[c0].x;
 
-		pU1 = aLZYstp[c0].pU1();
-		/// DIR ------------------------------------------
-		w = aDIR[c0];
-		d = (nTO[c0].x>-1);
-		if( (aIO[w]&1) != d ) {
-		   digitalWrite(aIOm2w[w], d );
-		   aIO[w] = d|ms;
-		}
-
+		I4x2* pI4x2 = aLZYstp[c0].pI4x2();
 		/// CALC
-		add = pU1 ? pU1[nSTP-1] : 1;
-		switch( add ) {
+		switch( pI4x2 ? pI4x2[aiS[c0]].x : 0 ) {
+			case 0:
+				return gpdSTPnSEC;
 			case 0x2:
 				mul = 4;
 				break;
@@ -392,337 +371,69 @@ public:
 				mul = 0;
 				break;
 			default:
-				mul = 0x5;
+				mul = 5;
 				break;
 		}
-
+		U1 nSET = 0;
+		/// DIR ------------------------------------------
+		d = !bSGN(pI4x2[aiS[c0]].y);
+		if( (aIO[wDIR]&1) != d ) {
+		   digitalWrite(aIOm2w[wDIR], d );
+		   aIO[wDIR] = d|ms;
+		   nSET++;
+		}
 		/// MULL ------------------------------------------
 		bB = mul&1;
-		w2 = aMx[c41];			// 0
-		if( (aIO[w2]&1) != bB ) {
-			digitalWrite(aIOm2w[w2], bB );
-			aIO[w2] = bB|ms;
+		w = aMx[c41];			// 0
+		if( (aIO[w]&1) != bB ) {
+			digitalWrite(aIOm2w[w], bB );
+			aIO[w] = bB|ms;
+			nSET++;
 		}
 
 		bB = (mul>>1)&1;
-		w2 = aMx[c41+1];		// 1
-		if( (aIO[w2]&1) != bB ) {
-			digitalWrite(aIOm2w[w2], bB );
-			aIO[w2] = bB|ms;
+		w = aMx[c41+1];		// 1
+		if( (aIO[w]&1) != bB ) {
+			digitalWrite(aIOm2w[w], bB );
+			aIO[w] = bB|ms;
+			nSET++;
 		}
 		bB = (mul>>2)&1;
-		w2 = aMx[c41+2];		// 2
-		if( (aIO[w2]&1) != bB ) {
-			digitalWrite(aIOm2w[w2], bB );
-			aIO[w2] = bB|ms;
+		w = aMx[c41+2];		// 2
+		if( (aIO[w]&1) != bB ) {
+			digitalWrite(aIOm2w[w], bB );
+			aIO[w] = bB|ms;
+			nSET++;
 		}
 
-		/// STEP ---------------------------------------------
-		w = aSTP[c0];
-		digitalWrite(aIOm2w[w], 1 );
-		aIO[w] = 1|ms;
-
-		return 1;
+		return (nSET ? gpdSTPnSEC : 0)|1; // 768
 	}
-
-};
-static const U1 gpaMUL[] = {
-													7, //  0                               // végtelen hiba /32 belassul
-													0, //  1                               / 1
-													1, //  2                                   / 2
-	2,												2, //  3  4                                    / 4
-	3, 3, 3,										3, //  5  6  7  8                                  / 8
-	4, 4, 4, 4, 4, 4, 4,							4, //  9 10 11 12 13 14 15 16                          /16
-	5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6,	6, // 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32      /32
-};
-static const U4 gpaSTP[] = {
-	32, // 0
-	16, // 1
-	8,  // 2
-	4,  // 3
-	2,  // 4
-	1,  // 5
-	1,  // 6
-	1,  // 7
 };
 
-void gpfWIREtrd_o( gpcWIRE* pWR ) {
-
-    int cnt = pWR->cnt, d, bD, bB2, iQ;
-    I4x2 hlQR;
-    U4 ms, iD, iD4, w, w2, nD = pWR->nD, nCNT = 1, two, aMULL[0x28], aADD[0x28];
-    bool bQ;
+void gpfWRtrd( gpcWIRE* pWR ) {
+	U4 ms, iW, nW = pWR->nD, nCNT = 1;
+    U4 nxs;
+    int nI;
     while( nCNT ) {
         ms = SDL_GetTicks()&(~1);
-        bQ = true;
-        for( two = 0; two < 2; two++ ) {
-			for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
-                if( pWR->aCNT[iD].y == pWR->aCNT[iD].x )
-                    continue;
-
-                nCNT++,
-                d = pWR->aCNT[iD].y - pWR->aCNT[iD].x; /// TRG-NOW
-                /// DIR ------------------------------------------
-                w = pWR->aDIR[iD];
-                if( pWR->aIOm[w] != OUTPUT ) {
-                   pinMode(aIOm2w[w], OUTPUT);
-                   pWR->aIOm[w] = OUTPUT;
-                }
-                bD = (d>-1);
-                if( (pWR->aIO[w]&1) != bD ) {
-                   digitalWrite(aIOm2w[w], bD );
-                   pWR->aIO[w] = bD|ms;
-                }
-
-                /// STEP set OUT------------------------------------------
-                w = pWR->aSTP[iD];
-                if( pWR->aIOm[w] != OUTPUT ) {
-                    pinMode(aIOm2w[w], OUTPUT);
-                    pWR->aIOm[w] = OUTPUT;
-                    iD4 = 1+iD*4;
-                    w2 = pWR->aMx[iD4];
-					if( pWR->aIOm[w2] != OUTPUT ) {
-						pinMode(aIOm2w[w], OUTPUT);
-						pWR->aIOm[w2] = OUTPUT;
-					}
-					w2 = pWR->aMx[iD4+1];
-					if( pWR->aIOm[w2] != OUTPUT ) {
-						pinMode(aIOm2w[w], OUTPUT);
-						pWR->aIOm[w2] = OUTPUT;
-					}
-					w2 = pWR->aMx[iD4+2];
-					if( pWR->aIOm[w2] != OUTPUT ) {
-						pinMode(aIOm2w[w], OUTPUT);
-						pWR->aIOm[w2] = OUTPUT;
-					}
-                }
-
-                if( bQ ) {
-                    aMULL[iD] = 0x7;    // M2M1M0
-                    aADD[iD] = 1;
-                }
-
-                if( pWR->aCNT[iD].z >= pWR->nLH[iD].y ) {
-					pWR->aCNT[iD].z = pWR->nLH[iD].y;
-					pWR->aCNT[iD].x = pWR->aCNT[iD].y;
-					continue;
-                }
-                else {
-					if( pWR->aCNT[iD].z < pWR->nLH[iD].y ) {
-						pWR->aCNT[iD].x = ((pWR->aCNT[iD].y-pWR->aCNT[iD].w)*pWR->aCNT[iD].z)/pWR->nLH[iD].y;
-						pWR->aCNT[iD].x += pWR->aCNT[iD].w;
-						pWR->aCNT[iD].z++;
-					}
-					else {
-						pWR->aCNT[iD].z = pWR->nLH[iD].y;
-						pWR->aCNT[iD].x = pWR->aCNT[iD].y;
-					}
-                }
-				iQ = pWR->aCNT[iD].x&0x1;
-				if( (pWR->aIO[w]&1) != iQ ) {
-                    /// MULL ------------------------------------------
-                    iD4 = 1+iD*4;
-
-                    w2 = pWR->aMx[iD4];
-                    bB2 = aMULL[iD]&1;
-                    if( (pWR->aIO[w2]&1) != bB2 ) {
-                        digitalWrite(aIOm2w[w2], bB2 );
-                        pWR->aIO[w2] = bB2|ms;
-                    }
-
-                    w2 = pWR->aMx[iD4+1];
-                    bB2 = (aMULL[iD]>>1)&1;
-                    if( (pWR->aIO[w2]&1) != bB2 ) {
-                        digitalWrite(aIOm2w[w2], bB2 );
-                        pWR->aIO[w2] = bB2|ms;
-                    }
-
-                    w2 = pWR->aMx[iD4+2];
-                    bB2 = (aMULL[iD]>>2)&1;
-                    if( (pWR->aIO[w2]&1) != bB2 ) {
-                        digitalWrite(aIOm2w[w2], bB2 );
-                        pWR->aIO[w2] = bB2|ms;
-                    }
-
-                    /// STEP ---------------------------------------------
-                    digitalWrite(aIOm2w[w], iQ );
-                    pWR->aIO[w] = iQ|ms;
-                }
-            }
-            usleep(gpdWRuSLP*4);
-            bQ = false;
+        nI = 1;
+        for( iW = 0, nCNT = 0; iW < nW; iW++ ) {
+			pWR->aSTPnSEC[iW] = pWR->nsSTEP(iW, ms, pWR->aSTPnSEC[iW] );
+			if(!pWR->aSTPnSEC[iW])
+				continue;
+			if( nI < pWR->aSTPnSEC[iW] )
+				nI = pWR->aSTPnSEC[iW];
+			nCNT++;
         }
-        pWR->cnt++;
-        if( pWR->msJOIN <= ms )
-            break;
-    }
-}
-void gpfWIREtrd( gpcWIRE* pWR ) {
-
-    int cnt = pWR->cnt, d, bD, bB2, iQ;
-    I4x2 hlQR;
-    U4 ms, iD, iD4, w, w2, nD = pWR->nD, nCNT = 1, two, aMULL[0x28], aADD[0x28];
-    bool bQ;
-    while( nCNT ) {
-        ms = SDL_GetTicks()&(~1);
-        nCNT = 0;
-        for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
-			nCNT += pWR->STEP(iD, ms );
-		}
+		usleep((gpdWRuSLP*nI)/gpdSTPnSEC);
 		pWR->cnt++;
-        if( pWR->msJOIN <= ms )
-            break;
-		usleep(gpdWRuSLP*64);
-    }
-}
-
-void gpfWIREtrd_oo( gpcWIRE* pWR ) {
-
-    int cnt = pWR->cnt, d, bD, bB2, iQ;
-    I4x2 hlQR;
-    U4 ms, iD, iD4, w, w2, nD = pWR->nD, nCNT = 1, two, aMULL[0x28], aADD[0x28];
-    bool bQ;
-    while( nCNT ) {
-        ms = SDL_GetTicks()&(~1);
-        bQ = true;
-        for( two = 0; two < 2; two++ ) {
-			for( iD = 0, nCNT = 0; iD < nD; iD++ ) {
-                if( pWR->aCNT[iD].y == pWR->aCNT[iD].x )
-                    continue;
-
-                nCNT++,
-                d = pWR->aCNT[iD].y - pWR->aCNT[iD].x; /// TRG-NOW
-                /// DIR ------------------------------------------
-                w = pWR->aDIR[iD];
-                if( pWR->aIOm[w] != OUTPUT ) {
-                   pinMode(aIOm2w[w], OUTPUT);
-                   pWR->aIOm[w] = OUTPUT;
-                }
-                bD = (d>-1);
-                if( (pWR->aIO[w]&1) != bD ) {
-                   digitalWrite(aIOm2w[w], bD );
-                   pWR->aIO[w] = bD|ms;
-                }
-
-                /// STEP set OUT------------------------------------------
-                w = pWR->aSTP[iD];
-                if( pWR->aIOm[w] != OUTPUT ) {
-                    pinMode(aIOm2w[w], OUTPUT);
-                    pWR->aIOm[w] = OUTPUT;
-                    iD4 = 1+iD*4;
-                    w2 = pWR->aMx[iD4];
-					if( pWR->aIOm[w2] != OUTPUT ) {
-						pinMode(aIOm2w[w], OUTPUT);
-						pWR->aIOm[w2] = OUTPUT;
-					}
-					w2 = pWR->aMx[iD4+1];
-					if( pWR->aIOm[w2] != OUTPUT ) {
-						pinMode(aIOm2w[w], OUTPUT);
-						pWR->aIOm[w2] = OUTPUT;
-					}
-					w2 = pWR->aMx[iD4+2];
-					if( pWR->aIOm[w2] != OUTPUT ) {
-						pinMode(aIOm2w[w], OUTPUT);
-						pWR->aIOm[w2] = OUTPUT;
-					}
-                }
-
-                if( bQ ) {
-                    aMULL[iD] = 0x7;    // M2M1M0
-                    aADD[iD] = 1;
-                }
-
-                //if( pWR->aCNT[iD].z < pWR->nLH[iD].y ) {
-				if( abs(pWR->aCNT[iD].y-pWR->aCNT[iD].w) < abs(pWR->aCNT[iD].x-pWR->aCNT[iD].w) ) {
-					pWR->aCNT[iD].z = pWR->nLH[iD].y;
-					pWR->aCNT[iD].x = pWR->aCNT[iD].y;
-					continue;
-				} else {
-					if( bQ ) {
-						I8	H = abs(d),
-							hh = H/8;
-						if( hh >= 1 ) {
-							if( hh >= 2 ) {
-								if( hh >= 4 ) {
-									// 32
-									aADD[iD] = 32;
-									aMULL[iD] = 0;
-								} else {
-									// 16
-									aADD[iD] = 16;
-									aMULL[iD] = 1;
-								}
-							} else {
-								// 8
-								aADD[iD] = 8;
-								aMULL[iD] = 2;
-							}
-						} else {
-							hh = H/2;
-							if( hh >= 1 ) {
-								if( hh >= 2 ) {
-									// 4
-									aADD[iD] = 4;
-									aMULL[iD] = 3;
-								} else {
-									// 2
-									aADD[iD] = 2;
-									aMULL[iD] = 4;
-								}
-							} else {
-								// 1
-								aADD[iD] = 1;
-								aMULL[iD] = 6;
-							}
-						}
-
-					}
-					else if( bD )
-						pWR->aCNT[iD].x += aADD[iD];
-					else
-						pWR->aCNT[iD].x -= aADD[iD];
-
-                }
-
-                iQ = bQ; //!(pWR->aCNT[iD].x&1);
-                if( (pWR->aIO[w]&1) != iQ ) {
-                    /// MULL ------------------------------------------
-                    iD4 = 1+iD*4;
-
-                    w2 = pWR->aMx[iD4];
-                    bB2 = aMULL[iD]&1;
-                    if( (pWR->aIO[w2]&1) != bB2 ) {
-                        digitalWrite(aIOm2w[w2], bB2 );
-                        pWR->aIO[w2] = bB2|ms;
-                    }
-
-                    w2 = pWR->aMx[iD4+1];
-                    bB2 = (aMULL[iD]>>1)&1;
-                    if( (pWR->aIO[w2]&1) != bB2 ) {
-                        digitalWrite(aIOm2w[w2], bB2 );
-                        pWR->aIO[w2] = bB2|ms;
-                    }
-
-                    w2 = pWR->aMx[iD4+2];
-                    bB2 = (aMULL[iD]>>2)&1;
-                    if( (pWR->aIO[w2]&1) != bB2 ) {
-                        digitalWrite(aIOm2w[w2], bB2 );
-                        pWR->aIO[w2] = bB2|ms;
-                    }
-
-                    /// STEP ---------------------------------------------
-                    digitalWrite(aIOm2w[w], iQ );
-                    pWR->aIO[w] = iQ|ms;
-                }
-            }
-            usleep(gpdWRuSLP);
-            bQ = false;
-        }
-        pWR->cnt++;
-        if( pWR->msJOIN <= ms )
+		if( nI&2 )
+			continue;
+		if( pWR->msJOIN <= ms )
             break;
     }
 }
+
 static char gpsANSW[0x1000];
 gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
 
@@ -734,6 +445,11 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
     U8 s;
     gpcWIRE* pWR = gpmLZYvali( gpcWIRE, pLZYinp );
 	if( !pWR ) {
+	///------------------------------------------
+    ///
+    ///				NEW WR
+    ///
+    ///------------------------------------------
         pLZYinp->lzyINS( NULL, sizeof(gpcWIRE), s=0, sizeof(gpcWIRE) );
         pWR = gpmLZYvali( gpcWIRE, pLZYinp );
         if( !pWR )
@@ -747,9 +463,9 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
         gpmMsetOF( pWR->aIOm+1, gpmN(pWR->aIOm)-1, pWR->aIOm );
 
         for( U4 i = 0, n = gpmN(aIOm2w); i < n; i++ ) {
-            if( pWR->aIOm[aIOm2w[i]] != OUTPUT ) {
+            if( pWR->aIOm[i] != OUTPUT ) {
                pinMode(aIOm2w[i], OUTPUT);
-               pWR->aIOm[aIOm2w[i]] = OUTPUT;
+               pWR->aIOm[i] = OUTPUT;
             }
             digitalWrite(aIOm2w[i], 0 );
         }
@@ -826,14 +542,14 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
                 pANSW += sprintf( pANSW, "%0.1f,%0.1f < %0.1f,%0.1f", pWR->aPOT[1].x, pWR->aPOT[1].y, pWR->aPOT[0].x, pWR->aPOT[0].y );
 
             pWR->rstCTRL();
-            for( U4 iD = 0, w; iD < pWR->nD; iD++ ) {
-                if( !pWR->aA[iD] )
+            for( U4 iW = 0, w; iW < pWR->nD; iW++ ) {
+                if( !pWR->aA[iW] )
                     continue;
-                if( pWR->aCNT[iD].y == pWR->aCNT[iD].x )
+                if( pWR->aCNT[iW].x == pWR->aCNT[iW].y )
                     continue;
-                pWR->setCTRL(iD);
-                //pWR->iCTRL.z |= 1<<iD;
-                pANSW += sprintf( pANSW, "%lld<%lld %0.1f<%0.1f",pWR->aCNT[iD].y, pWR->aCNT[iD].x );
+                pWR->setCTRL(iW);
+                //pWR->iCTRL.z |= 1<<iW;
+                pANSW += sprintf( pANSW, "%d<%d %0.1f<%0.1f",pWR->aCNT[iW].y, pWR->aCNT[iW].x );
             }
             if( pANSW > gpsANSW ) {
                 gpcGT *pGTusr = NULL;
@@ -857,8 +573,8 @@ gpcWIRE* gpcGT::GTwire( gpcWIN* pWIN, int msRUN ) {
     }
     int add = msRUN ? pWIN->mSEC.x-msRUN : gpdWRmSLP(100);
     pWR->msJOIN = SDL_GetTicks() // pWIN->mSEC.x
-                    + add;
-    pWR->trd = std::thread( gpfWIREtrd, pWR );
+                    + add*2;
+    pWR->trd = std::thread( gpfWRtrd, pWR );
 
     return pWR;
 
@@ -962,19 +678,9 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
                 continue;
             case gpeALF_POT: {
 					pWR->to( iNUM, NULL );
-                    /*pWR->aA[iNUM] = anC.alf;
-                    pWR->aCNT[iNUM].z = 0;
-                    pWR->aCNT[iNUM].w = pWR->aCNT[iNUM].x;*/
                     if(iNUM&1) {
 						pWR->aPOT[iNUM].y = float(anC.num)/wrX(1.0);
 						pWR->pot2to( iNUM, pWR->aPOT+iNUM-1, iNUM-1, iNUM );
-                        /*
-                        pWR->aPOT[1].pot2cnt(   pWR->aCNT[iNUM-1].y, pWR->aCNT[iNUM].y,
-                                                pWR->aW[0], pWR->aR[0], pWR->aC[0]);
-						pWR->nZ01[iNUM/2].x =  abs(pWR->aCNT[iNUM-1].y-pWR->aCNT[iNUM-1].w);
-                        pWR->nZ01[iNUM/2].y =  abs(pWR->aCNT[iNUM  ].y-pWR->aCNT[iNUM  ].w);
-                        pWR->nLH[iNUM  ] =
-                        pWR->nLH[iNUM-1] = pWR->nZ01[iNUM/2].LH();*/
                         break;
                     }
                     pWR->pP2in(iNUM,iNUM,iNUM+1);
@@ -986,13 +692,6 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
                 } break;
             default:
 				pWR->to(iNUM, &anC );
-				/*pWR->aA[iNUM] = anC.alf;
-				pWR->aCNT[iNUM].z = 0;
-				pWR->aCNT[iNUM].w = pWR->aCNT[iNUM].x;
-
-				pWR->nLH[iNUM].x =
-				pWR->nLH[iNUM].y = abs(pWR->aCNT[iNUM].y-pWR->aCNT[iNUM].w);
-				pWR->aCNT[iNUM].y = anC.num;*/
 				break;
 		}
 
