@@ -218,9 +218,9 @@
 #endif
 
 
-#define gpdSYNmSEC		333
+#define gpdSYNmSEC	333
 #define gpdRECVn 		(0x30000/0x4) 	//0x4000*4	//	(0x30000/0x10)
-#define gpdHUDn			(gpdRECVn/0x4)
+#define gpdHUDn		(gpdRECVn/0x4)
 
 #define gpdWIN_WIDTH	480	//(sdlDM.w*4)/8			//480	//(sdlDM.w*4)/8			//
 #define gpdWIN_HEIGHT	800	//(winSIZ.x*6)/8			//800	//(winSIZ.x*6)/8		//

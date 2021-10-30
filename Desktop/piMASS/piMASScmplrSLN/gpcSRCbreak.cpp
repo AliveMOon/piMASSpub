@@ -4,22 +4,6 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
-/*I8x4* gpcSCOOP::pM0() {
-	if( nMINI )
-		return (I8x4*)mini.p_alloc;
-
-	return nMN() ? (I8x4*)mini.p_alloc : NULL;
-}*/
-
-//static char gpsNoWord[] = {
-//							"\\ \t\a\r\n*&/%+-|~^?!=$.,:;\'\"{}[]()"
-//						};
-//static char gpsOPERA[] = {
-//							"\\*&/%+-|~^?!=$.,:;{}[]()"
-//						};
-//
-//#define gpmSCP aSCOOP[iMN]
-
 /// 1. srcBREAK scp.MN scp.DCT scp.LNK
 U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 						bool bNoMini, U1 selID, const char* pVAN ) {

@@ -362,8 +362,7 @@ I4 gpMEM::instDOit( gpOBJ& obj, U1* pU1 ) {
 
 		if( !gpdGLpTRG )
 			return cID;
-		SDL_Surface	//*pTRG = gpdGLpTRG->pPICrtxSRF(),
-					*pSRF = gpdGLapPIC[iP]->pPICrtxSRF(); //pSRF;
+		SDL_Surface	*pSRF = gpdGLapPIC[iP]->pPICrtxSRF();
 		if( !pSRF )
 			return cID;
 

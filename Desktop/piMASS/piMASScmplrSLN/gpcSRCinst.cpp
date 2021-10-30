@@ -204,7 +204,7 @@ gpMEM::gpMEM( gpcSRC* pS, gpcWIN* pW, gpcLZY* pSRCstk, I4 i ) {
 	pD = (I8*)(aA+8);
 	pA[7] = iSTK = nDAT = i;
 	nDAT += 0x100;
-	nDCTscp = pSRC->aSCOOP[0].nDCT;
+	nDCTscp = pSRC->aSCP[0].nDCT;
 
 	pLZYsrcXFND = pSRCstk;
 	if( !pLZYsrcXFND )

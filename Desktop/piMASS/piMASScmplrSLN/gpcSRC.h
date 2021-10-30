@@ -791,7 +791,7 @@ static char gpsOPERA[] = {
 							"\\*&/%+-|~^?!=$.,:;{}[]()"
 						};
 
-#define gpmSCP aSCOOP[iSCP]
+// #define gpmSCP aSCP[iSCP]
 
 class gpcSCOOP {
 	gpcLZY 		lzyMiN;		I8x4 rMN;	U4 nMiN;
@@ -2028,7 +2028,7 @@ public:
 
 	gpcMAP	*pMAP;
 
-	gpcSCOOP 	aSCOOP[3];
+	gpcSCOOP 	aSCP[3];
 	gpCORE		*pCORE;
 
 	gpcLZYblk	lzyBLOCK;
@@ -2161,11 +2161,24 @@ public:
 		//nVERr = gpmMAX( nHD, nBLD ); //+1;
 		return false; // mi kérjük elösször
     }
-    U4 rdyBLD( void ) {
+    U4 rdyBLD( U4 ms ) {
+		if( nVERr == nBLD )
+			return nVERr;
+
 		nBLD = nVERr;
+		msBLD = ms+msBLTdly;
 		return nVERr;
     }
+	/*void aSRCpic( int* pID ) {
+		if( this ? !pID : true )
+			return;
 
+		if(pID[0])
+			picID = pID[0];
+		if(pID[0xf])
+			bobID = pID[0xf];
+		return;
+	}*/
 	U4 nCLR(void) { return gpmOFF( gpcSRC, nVERr )-gpmOFF( gpcSRC, pALFtg ); }
 	U1* pSRCalloc( bool bNoMini, U1 selID ) {
 		bool	bHD = false,
@@ -2337,45 +2350,35 @@ public:
 					);
 	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
 	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ); //gpcMASS* pMS );
-	U1 	srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ); //
-	gpCORE* srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
+	U1		srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ); //
 	gpcLZY* srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM = NULL );
 
 	bool bSUB( gpcMASS& mass ) {
 		if( !this )
 			return false;
-
 		hd( &mass );
-
 		// beljebb lép
 		return bSW&gpeMASSsubMSK;
     }
     bool bRET( gpcMASS& mass ) {
 		if( !this )
 			return false;
-
 		hd( &mass );
-
 		// kijebb lép
 		return bSW&gpeMASSretMSK;
     }
     bool bENTR( gpcMASS& mass, U4x4& _spc, U4 x = 0 ) {
 		if( !this )
 			return false;
-
-
 		hd( &mass );
-
 		// új sort kezd a táblázatban
-		if( bSW&gpeMASSznMSK )
-		{
+		if( bSW&gpeMASSznMSK ) {
 			_spc = spcZN;
 			_spc.x++;
 			return false;
 		}
 		if( !(bSW&gpeMASSentrMSK) )
 			return false;
-
 		spcZN.x = x;
 		spcZN.y++;
 		_spc = spcZN;
@@ -2386,9 +2389,7 @@ public:
     bool bUNsel( gpcMASS& mass ) {
 		if( !this )
 			return false;
-
 		hd( &mass );
-
 		// pointerrel ne lehessen kijelölni
 		// pl. rajzolásnál hasznos, meg gombnál
 		return bSW&gpeMASSunselMSK;
@@ -2397,41 +2398,28 @@ public:
 	bool bIN( gpcMASS& mass ) {
 		if( !this )
 			return false;
-
 		// input rublika
 		hd( &mass );
-
 		return bSW&gpeMASSinpMSK;
     }
 
     bool bPASS( gpcMASS& mass ) {
 		if( !this )
 			return false;
-
 		hd( &mass );
-
 		// csillagokat kell írni a betű helyett?
-
 		return bSW&gpeMASSpassMSK;
     }
     bool bALERT( void ) {
 		if( !this )
 			return false;
-
 		return bSW&gpeMASSalertMSK;
     }
     bool bMAIN( gpcMASS& mass, bool bDBG = false ) {
 		if( !this )
 			return false;
 		hd( &mass );
-
-		bool bM = bSW&gpeMASSmainMSK;
-		if( !bM )
-			return false;
-
-		//cmpi( mass, bDBG );
-
-		return true;
+		return bSW&gpeMASSmainMSK;
     }
     void hd( gpcMASS *pMASS, gpeALF* pTGpub = NULL );
     void cmpi( gpcMASS& mass, bool bDBG );
@@ -2819,7 +2807,7 @@ public:
 
 	bool HTMLsave( U1* pPATH, U1* pFILE, U1* pNAME, bool bALT );
 	bool SRCsave( U1* pPATH, U1* pFILE );
-	U1* justDOit( gpcWIN* pWIN ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
+	U1* jstDOit( gpcWIN* pWIN ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
 	U1* justDOitOLD( gpcWIN* pWIN ); //U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin );
 
 
@@ -2839,6 +2827,9 @@ public:
 		return ppS ? ppS[i] : NULL;
 	}
 	gpcSRC* srcFND( U4 xfnd ) {
+		if(!xfnd)
+			return NULL;
+
 		if(!this)
 			return NULL;
 

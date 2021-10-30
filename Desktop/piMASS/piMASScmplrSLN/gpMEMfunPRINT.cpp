@@ -4,8 +4,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 )
-{
+gpcLZY* gpMEM::memPRINT( gpcLZY* pPRNT, I4 *pI4, I4 nI4 ) {
 	U8 //nLEN,
 	 s;
 	I4x2 AB;

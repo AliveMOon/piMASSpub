@@ -1,0 +1,206 @@
+------ szimbolikus elérési út ----------
+sudo ln -s "/media/pi/DEBIAN 10_2/robout" /robo
+
+
+
+
+
+/etc/fstab :
+
+# creat RAMDISK and mount it to /mnt/ram
+# none /mnt/ram 
+tmpfs /mnt/ram tmpfs nodev,nosuid,size=32M 0 0
+
+-------------------------------------------------------------
+
+pi@GP-PI:~ $ cd Desktop/piMASS
+pi@GP-PI:~/Desktop/piMASS $ sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+pi@GP-PI:~/Desktop/piMASS $ git add .
+pi@GP-PI:~/Desktop/piMASS $ git commit -m "OpenGL 02.003 "
+pi@GP-PI:~/Desktop/piMASS $ git push origin master
+------------------------------------
+dezso@GP-HP:~/Dokumentumok/piMASSpub/Desktop/piMASS$ git config --global user.email "alivemoongp@gmail.com"
+dezso@GP-HP:~/Dokumentumok/piMASSpub/Desktop/piMASS$ git config --global user.name "AliveMOon"
+dezso@GP-HP:~/Dokumentumok/piMASSpub/Desktop/piMASS$ git add .
+dezso@GP-HP:~/Dokumentumok/piMASSpub/Desktop/piMASS$ git commit -m "scoop.knead 01"
+dezso@GP-HP:~/Dokumentumok/piMASSpub/Desktop/piMASS$ git push origin master
+------------------------------------
+
+sudo chmod -R 777 .
+
+-------------------------------------------------------------
+
+/etc/service:
+
+pimass	23/tcp		// ez szerintem nem müködik, még utánna kéne nézni
+
+-------------------------------------------------------------
+
+pi@GP-PI:~/Desktop/piMASS $ git add .
+
+pi@GP-PI:~/Desktop/piMASS $ git commit -m "gpcOPCD [](){} sOP() 05-stupid :) to doc"
+[master a05f887] gpcOPCD [](){} sOP() 05-stupid :) to doc
+ 5 files changed, 44 insertions(+), 45 deletions(-)
+ create mode 100644 Desktop/piMASS/doc/install_list.txt
+
+pi@GP-PI:~/Desktop/piMASS $ git push origin master
+Username for 'https://github.com': AliveMOon
+Password for 'https://AliveMOon@github.com': 
+Counting objects: 14, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (9/9), done.
+Writing objects: 100% (14/14), 1.77 KiB | 0 bytes/s, done.
+Total 14 (delta 6), reused 0 (delta 0)
+remote: Resolving deltas: 100% (6/6), completed with 6 local objects.
+To https://github.com/AliveMOon/piMASSpub.git
+   4fe9836..a05f887  master -> master
+pi@GP-PI:~/Desktop/piMASS $ 
+
+code:block asztal piMASS
+-------------------------------------------------------------
+sudo apt install libsdl2-dev libsdl2-2.0-0 -y
+sudo apt install libjpeg9-dev libwebp-dev libtiff5-dev libsdl2-image-dev libsdl2-image-2.0-0 -y
+sudo apt install libmikmod-dev libfishsound1-dev libsmpeg-dev liboggz2-dev libflac-dev libfluidsynth-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 -y
+sudo apt install libfreetype6-dev libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y
+
+
+Other compiler options:
+`sdl2-config --libs` -pthread -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf
+`sdl2-config --cflags`
+----------------------------------------
+Linker settings:
+Link Libraries
+GP
+GLEW
+SDL2
+
+Other linker options:
+`sdl2-config --libs`
+-----------------------------
+Search directories
+Compiler
+./
+include
+
+---------------------------------------- OpenGL Shader?
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo apt-get install raspi-gpio
+
+sudo apt-get install xcompmgr libgl1-mesa-dri
+
+sudo apt-get install mesa-utils
+
+glxinfo | grep -v "None"
+
+sudo raspi-config
+
+------------------------ SAMBA--------------------- /etc/samba/smb.conf
+
+
+[PIGL]
+   comment = pigl Directories
+   path = /home/pi/Desktop/openGl/2
+   browseable = yes
+   writeable = yes
+   only guest = no
+   create mask = 0777
+   directory mask = 0777
+   public = yes
+   guest ok = yes
+
+cli/shell> sudo smbpasswd -a [user]/n
+New SMB password: ****
+Retype new SMB password: ****
+Added user [user].
+cli/shell>_ 	
+
+sudo service smbd start
+
+sudo service smbd stop
+sudo service smbd restart
+
+
+------------------- GDB ----------------------------
+
+https://dontpressthat.wordpress.com/2017/11/15/using-eclipse-to-write-c-c-programs-for-the-raspberrypi/
+
+sudo apt-get install gdb-multiarch
+
+sudo apt-get install gdbserver
+
+WIN:
+https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download
+
+
+------------------ GL ------------------------------------
+sudo apt-get install libx11-dev
+sudo apt-get install libxi-dev
+sudo apt-get install libgl1-mesa-dev
+sudo apt-get install libglu1-mesa-dev 
+
+sudo apt-get install libxrandr-dev
+sudo apt-get install libxext-dev
+sudo apt-get install libxcursor-dev
+sudo apt-get install libxinerama-dev
+ sudo apt-get install libxi-dev
+
+sudo apt-get install libglew-dev 	
+// ilyenkor mar aszondja a legfrissebb -------------
+
+
+--------------- TUTORIAL -----------------
+
+sudo apt-get install libsdl2-dev
+sudo apt-get install libglew-dev
+sudo apt-get install libglm-dev
+
+C::B
+ProjBldOpt:
+	LinkerSettings
+	LinkLib:
+		GL
+		GLEW
+		SDL2
+		
+		OK
+		
+#include <GL/glew.h>
+
+
+// GP_HP pc -------------------------------
+sudo apt-get install libglfw3 libglfw3-dev
+#include <GLFW/glfw3.h>
+
+valgrind --leak-check=yes ./piMASS cam.mass
+
+cout << "\033[1;31mbold red text\033[0m\n";
+
+        foreground background
+black        30         40
+red          31         41
+green        32         42
+yellow       33         43
+blue         34         44
+magenta      35         45
+cyan         36         46
+white        37         47
+
+sudo /etc/init.d/dphys-swapfile stop
+sudo /etc/init.d/dphys-swapfile start
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

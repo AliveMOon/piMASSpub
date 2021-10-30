@@ -71,6 +71,7 @@ gpcLZY::gpcLZY( const gpcLZY& b ) {
 	U8 s = 0;
 	lzyADD( b.p_alloc, b.nLD(), s, 2 );
 }
+
 gpcLZY 	gpLZYvar( gpVAR, gpmN(gpVAR) ),
 		gpLZYfun( gpFUN, gpmN(gpFUN) );
 
@@ -211,6 +212,7 @@ gpINST* gpMEM::instRDY( gpcLZY* pDBG ) {
 
 	return pINST;
 }
+/// 4 main.win.res.bldcmplr.instRUN.instALU
 void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 	if( !this )
 		return;
@@ -228,21 +230,21 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 #ifdef stdON
 	if(bSTDcout){gpdCOUT << stdCMPLR " CMP" stdRESET << gpdENDL;}
 #endif
-	I8x4 *pM0 = gpmSCP.pMN(), MiN, Mnx;
-	U4x4 *pL0 = gpmSCP.pLNK(); //, aLNK[0x10];
+	I8x4 *pM0 = aSCP[iSCP].pMN(), MiN, Mnx;
+	U4x4 *pL0 = aSCP[iSCP].pLNK(); //, aLNK[0x10];
 	gpeCLR clr;
-	char		*pS = (char*)gpmSCP.p_str;
+	char		*pS = (char*)aSCP[iSCP].p_str;
 	const char	*psDCT;
 	I4 nS, nsDCT;
 	gpBLK* pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1, 0 );
 	I8x2 AN; gpeCsz cID = gpeCsz_OFF;
 	gpeOPid opID;
-	for( U4 nM = gpmSCP.nMN(), mnID = 0, l; mnID < nM; mnID++ ) {
+	for( U4 nM = aSCP[iSCP].nMN(), mnID = 0, l; mnID < nM; mnID++ ) {
 		if( pM0[mnID].MNclr() == gpeCLR_red2 )
 			continue;
 
 		MiN = pM0[mnID];
-		pS = (nS=MiN.nS) ? (char*)gpmSCP.p_str+MiN.iS : NULL;
+		pS = (nS=MiN.nS) ? (char*)aSCP[iSCP].p_str+MiN.iS : NULL;
 		if( MiN.MNtyp() == gpeTYP_STR )
 		{
 			if( MiN.MNclr() != gpeCLR_violet )
@@ -256,10 +258,10 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 		U4x4& lnk = pL0[MiN.dctID];
 		if( !lnk.y )
 		{
-			psDCT = gpmSCP.lzyDCT.sSTRix(MiN.dctID, NULL);
+			psDCT = aSCP[iSCP].lzyDCT.sSTRix(MiN.dctID, NULL);
 			if( !psDCT )
 				continue;
-			nsDCT = gpmSCP.lzyDCT.nSTRix(MiN.dctID);
+			nsDCT = aSCP[iSCP].lzyDCT.nSTRix(MiN.dctID);
 			if( !nsDCT )
 				continue;
 		}

@@ -4,9 +4,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-
-
-
+/// 6 main.win.res.bldcmplr.instRUN.instALU
 gpINST* gpMEM::instALU() {
 	//if(bSTDcout){gpdCOUT << stdALU "+";
 	gpINST& ins = pINST[pc];

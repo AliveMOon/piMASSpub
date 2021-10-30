@@ -181,18 +181,14 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 
 	pMEM->pWgl = pMEM->pWIN ? pMEM->pWIN->pGL : NULL;
 	pMEM->pMgl->nBUILD();
-	char sBUFF[0x100];
 	gpOBJ	*pOmn = pMEM->pOBJ( gpeALF_MINI, true ),
 			*pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
 
-	U4x4* pL0 = aSCOOP[0].pLNK();
-	I8x4* pMN0 = aSCOOP[0].pMN();
-	U1* pU1, *pSRC = aSCOOP[0].p_str, *pUdbg = NULL;
+	U1* pU1, *pSRC = aSCP[0].p_str, *pUdbg = NULL;
 	const char *pS;
 	U8 s = -1, nS;
 	bool bTMP;
 	U4 cID, area = 1;
-	gpPTR* pPTR = NULL;
 	int iDi; gpeCsz iCsz;
 	for( U4 i = 0; i < nO; i++ ) {
 		gpOBJ& obj = pO0[i];
@@ -230,18 +226,15 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 
 		area = pP->pd2D()->area();
 
-
 		bTMP = ((obj.dctID < 0) || (obj.cAN != gpeCsz_a));
 		pLZY = pLZY->lzyFRMT( (s=-1), "\r\n%s0x%x ", bTMP?"//":"  ",obj.iPTR );
-		pUdbg = pLZY ? pLZY->p_alloc : NULL;
+		//pUdbg = pLZY ? pLZY->p_alloc : NULL;
 
-
-        nS = aSCOOP[0].lzyDCT.nSTRix(obj.dctID);
+        nS = aSCP[0].lzyDCT.nSTRix(obj.dctID);
         if( !nS )
 			continue;
 
-		//cID = pP->cID();
-		pS = aSCOOP[0].lzyDCT.sSTRix(obj.dctID, NULL);
+		pS = aSCP[0].lzyDCT.sSTRix(obj.dctID, NULL);
 		pLZY = pLZY->lzyADD( pS, nS, (s=-1) );
 		pLZY = pLZY->lzyFRMT( (s=-1), "=" );
 
@@ -252,11 +245,6 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 		/// ---------------------------------
 		iDi = pMEM->instDOit( obj, pU1 );
 		iCsz = (gpeCsz)iDi;
-
-//		if( iDi == gpeCsz_OFF )  // nem volot sikeres
-//            iDi = gpeCsz_L; // akkor L azaz signed int
-
-
 		(s=-1);
 		switch( cID ) {
             case gpeCsz_ptr:
@@ -292,28 +280,27 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 
 		}
 	}
-	pUdbg = pLZY ? pLZY->p_alloc : NULL;
 	return pLZY;
 }
-
+/// 5 main.win.res.bldcmplr.instRUN.instALU
 bool gpcSRC::srcINSTrun() {
 	if( pMEM ? !pMEM->nCD : true )
 		return false;
 	I4 nPC = pMEM->nCD;
-	if( pMEM->pc >= nPC )
-	{
+	if( pMEM->pc >= nPC ) {
 		if( pMEM->msRUN ? pMEM->msRUN >= pMEM->pWIN->mSEC.x : true )
 			return false;
-		pMEM->pc = 0;
+		pMEM->pc = 0;		// azaz újra futtat
 	}
 #ifdef stdON
 	if(bSTDcout){gpdCOUT << stdRUN " RUN" stdRESET; // << gpdENDL;}
 #endif // stdOFF
 
 	gpINST*pI;
-	while( pMEM->pc < nPC )
-	{
-		pI = pMEM->instALU();
+	while( pMEM->pc < nPC ) {
+		if( !(pI = pMEM->instALU()) )
+			continue;
+
 	}
 
 

@@ -144,7 +144,7 @@ static const U1 gpaXstp[] = {
 //  0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
 	0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,
 };
-#define gpdSTPnSEC 0x400 // 768ns round 1us
+#define gpdSTPnSEC 0x4 // 768ns round 1us
 #define gpdSTPnSECdw (gpdSTPnSEC*3) // 768ns*3 2.304 us
 #define gpdSTPnSECup (gpdSTPnSEC*3) // 768ns*3 2.304 us
 
@@ -297,7 +297,9 @@ public:
 		U1 wSTP = aSTP[c0];
 		ms &= ~1;
 		size_t nSTP = aLZYstp[c0].nI4x2();
-		int uSTP = nSTP ? aLZYstp[c0].pI4x2()[aiS[c0]].y:0;
+		int uSTP = nSTP ? aLZYstp[c0].pI4x2()[aiS[c0]].y/2:0;
+		if(!uSTP )
+			uSTP = 1;
 		if( nSEC ) {
 			if( aIO[wSTP]&1 ) {
 				// STEP riseDW
@@ -410,7 +412,7 @@ public:
 	}
 };
 
-void gpfWRtrd( gpcWIRE* pWR ) {
+void gpfWRtrd ( gpcWIRE* pWR ) {
 	U4 ms, iW, nW = pWR->nD, nCNT = 1;
     U4 nxs;
     int nI;

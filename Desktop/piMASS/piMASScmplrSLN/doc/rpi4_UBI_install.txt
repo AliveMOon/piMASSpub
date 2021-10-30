@@ -1,0 +1,51 @@
+///------------------------------------------------
+///
+///					UBUNTUmateRPI4
+///
+///-----------------------------------------------
+
+sudo apt install codeblocks
+
+code:block asztal piMASS
+-------------------------------------------------------------
+sudo apt install libsdl2-dev libsdl2-2.0-0 -y
+
+---------------------------------------- OpenGL Shader?
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo apt-get install raspi-gpio
+
+sudo apt-get install xcompmgr libgl1-mesa-dri
+
+glxinfo | grep -v "None" ---------------------- ERROR
+sudo apt-get install mesa-utils
+glxinfo | grep -v "None" ------ good
+
+sudo raspi-config ---------------ERROR: command not found
+
+------------------ GL ------------------------------------
+sudo apt-get install libx11-dev
+sudo apt-get install libxi-dev
+sudo apt-get install libgl1-mesa-dev
+sudo apt-get install libglu1-mesa-dev
+
+sudo apt-get install libxrandr-dev
+sudo apt-get install libxext-dev
+sudo apt-get install libxcursor-dev
+sudo apt-get install libxinerama-dev
+ sudo apt-get install libxi-dev
+
+sudo apt-get install libglew-dev
+
+sudo apt install build-essential
+
+cd Asztal/piMASS/piMASScmplrSLN
+
+sudo cp sys/include/mysys.h /usr/include
+
+// RPIcam -----------------------------------------------------------------
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install raspi-config rpi-update
+
+sudo apt-get install libjpeg-dev

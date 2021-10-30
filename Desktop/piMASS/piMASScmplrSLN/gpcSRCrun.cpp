@@ -3,7 +3,7 @@
 #include "gpccrs.h"
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
-
+/*
 gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	if( !this )
 		return NULL;
@@ -14,17 +14,13 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 
 	static const U1 iSCP=0;
 	static const bool b_dbg = true;
-	//#ifndef newCMPI
-		return NULL;
-	//#endif // newCMPI
+	return NULL;
 
 	I8x4 *pM0 = (I8x4*)gpmSCP.pMN();
 	I4		nSTR, a, n = gpmSCP.nMN();
-	char	*pALL = (char*)gpmSCP.p_str,
-			*pSTR,
-			sBF[0x100],
-			*pDIS = (char*)pDBG->p_alloc, *pBF = NULL;
-	pBF = sBF+1;
+	char	sBF[0x100],
+			*pALL = (char*)gpmSCP.p_str, *pSTR,
+			*pDIS = (char*)pDBG->p_alloc, *pBF = sBF+1;
 	if( pBF ) *sBF = ' ';
 
 	gpCORE& core = *pCORE;
@@ -257,5 +253,6 @@ gpCORE* gpcSRC::srcRUN( gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMOM ) {
 	return pCORE;
 
 }
+*/
 
 

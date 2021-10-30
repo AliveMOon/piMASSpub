@@ -359,12 +359,10 @@ gpcMASS& gpcMASS::null()
 }
 
 
-gpcMASS& gpcMASS::operator = ( const gpcMASS& b )
-{
+gpcMASS& gpcMASS::operator = ( const gpcMASS& b ) {
 	return null();
 }
-gpcMASS::gpcMASS( const U1* pU, U8 nU )
-{
+gpcMASS::gpcMASS( const U1* pU, U8 nU ) {
 	gpmCLR;
 	xADD = 1;
 	if(!nU)
@@ -379,29 +377,26 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 	U4 is, n, id, momLV = 0, mCR, *pMAP;
 	nSP = 1;
 	U4x4 mpZN;
-	while( pS < pSe ? *pS : false )
-	{
+	while( pS < pSe ? *pS : false ) {
 		tmp.reset( pS, pSe, &pS, aSP44[nSP] );
 		if(!tmp.n_ld_add())
 			continue;
+
 		tmp.IX = nLST;
-		if( tmp.bSUB( *this ) )
-		{
+		if( tmp.bSUB( *this ) ) {
 			momLV = nSP;
             nSP++;
             aSP44[nSP].null();
 		}
-		else if( tmp.bENTR( *this, aSP44[nSP] ) )
-		{
-			if(bSTDcout){gpdCOUT << "[ENTER]";} // <<gpdENDL;};
+		else if(tmp.bENTR(*this, aSP44[nSP])) {
+			if( bSTDcout ) gpdCOUT << "[ENTER]";
 		}
 
-		aSP44[momLV].a4x2[1].mx(  aSP44[nSP].a4x2[0] );
+		aSP44[momLV].a4x2[1].mx( aSP44[nSP].a4x2[0] );
         apSP[nSP] = SRCadd( &tmp, xADD, aSPix[nSP], n );
 
         gpcSRC &spREF = *apSP[nSP];
-        if( apSP[momLV] )
-        {
+        if( apSP[momLV] ) {
 			if( !apSP[momLV]->pMAP )
 				apSP[momLV]->pMAP = new gpcMAP;
 			pMAP = apSP[momLV]->pMAP->MAPalloc( spREF.spcZN.a4x2[0], mpZN ); //, false );
@@ -411,23 +406,18 @@ gpcMASS::gpcMASS( const U1* pU, U8 nU )
 
 		spREF.bMAIN( *this, true );
 
-		if( pMAP )
-		{
+		if( pMAP ) {
 			mCR = spREF.spcZN.x + spREF.spcZN.y*mpZN.z;
-			pMAP[mCR] = xADD; //aSPix[nSP];
+			pMAP[mCR] = xADD;
 		}
 
-		while( apSP[nSP]->bRET( *this ) )
-		{
+		while( apSP[nSP]->bRET( *this ) ) {
 			//apSP[mom]->space = aSP44[mom];
 			apSP[momLV]->retIX = aSPix[nSP];
 			momLV--;
 			nSP--;
 		}
-
-
 		xADD++;
-
 	}
 }
 
@@ -646,23 +636,18 @@ int main( int nA, char *apA[] )
 				continue;
 			}
 		}
-		if (gppMASSfile == gpsMASSpath)
+		if(gppMASSfile == gpsMASSpath)
 		{
 			#ifdef _WIN64
 				if(bSTDcout){gpdCOUT << "\033[1;31m Meg kell szerezni a user HOME könjyvtárát?" << gpdENDL;}
 			#else
-
-						struct passwd *pw = getpwuid(getuid());
-						const char *pHOME = pw->pw_dir;
-						gppMASSfile = gpsMASSpath + sprintf( gpsMASSpath, "./" ); //, pHOME );
-
+				struct passwd *pw = getpwuid(getuid());
+				const char *pHOME = pw->pw_dir;
+				gppMASSfile = gpsMASSpath + sprintf( gpsMASSpath, "./" );
 			#endif
 		}
 		if( !*gpsMASSname )
 			strcpy( gpsMASSname, "pi.mass" );
-
-
-
 		strcpy( gppMASSfile, gpsMASSname );
 		U8 s;
 		if(bSTDcout){gpdCOUT << "Load:"<< gpsMASSpath <<gpdENDL;};
@@ -672,10 +657,10 @@ int main( int nA, char *apA[] )
 		gpcMASS* piMASS = new gpcMASS( gpMASS.p_alloc, gpMASS.n_load );
 		if( piMASS )
 		if( char* pUND = gpmSTRiSTR( gpsMASSname, ".undo0x" ) )
-		{
 			*pUND = 0;
-		}
-
+		/// ctrl+shift+f: main.win.res.bldcmplr.instRUN.instALU
+		/// LIST stack
+		/// 0 main.win.res.bldcmplr.instRUN.instALU
 		strcpy( gppMASSfile, gpsMINI_ISO ); //gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
 		gpcWIN win( gpsMASSpath, gppMASSfile, gpsMASSname, piMASS );
 		gpcCRS main_crs( win, 0 );
