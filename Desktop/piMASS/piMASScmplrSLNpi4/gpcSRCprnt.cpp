@@ -15,9 +15,9 @@ gpcLZY* gpcSRC::srcMINI( gpcLZY* pLZY, gpcMASS* pMASS, gpcWIN* pWIN, gpCORE* pMO
 		return pLZY;
 	char sBUFF[0x100];
 	gpmMcpy( sBUFF, "A:", 3 );
-	U8 s = gpmSCP.nMN();
+	U8 s = aSCP[iSCP].nMN();
 	gpcLZY	&mLST = core.mLST;
-	gpCNST* pLNK = gpmLZYvali( gpCNST, &scpCNST ); // (gpCNST*)gpmSCP.obj.p_alloc;
+	gpCNST* pLNK = gpmLZYvali( gpCNST, &scpCNST ); // (gpCNST*)aSCP[iSCP].obj.p_alloc;
 	I8	*pO, *pC;
 	for( U4 o = 0, n = core.oLST.nLD(sizeof(gpO)); o < n; o++ )
 	{

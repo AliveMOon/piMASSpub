@@ -60,9 +60,9 @@ F4& F4::operator /= ( const F4x4& b ) {
 F4 F4::operator / ( const F4x4& b ) const {
 	return F4( *this*b.x, *this*b.y, *this*b.z, w ) - b.t;
 }
-F2& F2::cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m ) {
-    float   RADx = (float(Cx/2)/float(c*m))*PI2,
-            RADy = (float(Cy/2)/float(c*m))*PI2;
+F2& F2::cnt2pot( I4 Cx, I4 Cy, float w, float r, U4 c, U4 m ) {
+    float   RADx = (float(Cx)/float(c*m))*PI2,
+            RADy = (float(Cy)/float(c*m))*PI2;
     w /= 2.0;
     F2  Ay=F2(cos(RADy),sin(RADy))*r - w, // +F2(-w,-w)
         Ax=F2(sin(RADx),-cos(RADx))*r + F2(-w,w),
@@ -71,7 +71,7 @@ F2& F2::cnt2pot( I8 Cx, I8 Cy, float w, float r, U4 c, U4 m ) {
     *this = AxyH.right()*sqrt((r*r-AxyQL)/AxyQL)+AxyH+Ay;
     return *this;
 }
-F2& F2::pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float trn ) {
+F2& F2::pot2cnt( I4& Cx, I4& Cy, float w, float r, U4 c, U4 m, float trn ) {
     w /= 2.0; // motor távolság fele
     trn += PIp2;
     // -- > +
@@ -92,8 +92,8 @@ F2& F2::pot2cnt( I8& Cx, I8& Cy, float w, float r, U4 c, U4 m, float trn ) {
     Cx = float(c*m)*RADx/PI2;
     Cy = float(c*m)*RADy/PI2;
     // kétszer anyit számolok 0-fent 1-lent
-    Cx*=2;
-    Cy*=2;
+    //Cx*=2;
+    //Cy*=2;
     return *this;
 }
 F2& F2::swpXY( const void* pV ) {

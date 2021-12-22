@@ -23,7 +23,7 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP ) {
 	if( !this )
 		return;
 	pDBG->lzyRST();
-	if( !gpmSCP.nASM() )
+	if( !aSCP[iSCP].nASM() )
 		return;
 	//U4 iOPe = dOP.nIX();
 #ifdef stdON
@@ -38,15 +38,15 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP ) {
 			*pC, *pCe;
 	//gpeEAsz aSZ[2];
 
-	I8x4 *pM0 = gpmSCP.pMN();
-	U4x4 *pL0 = gpmSCP.pLNK(); //lzyLNK.p_alloc;
-	char *pALL = (char*)gpmSCP.p_str;
+	I8x4 *pM0 = aSCP[iSCP].pMN();
+	U4x4 *pL0 = aSCP[iSCP].pLNK(); //lzyLNK.p_alloc;
+	char *pALL = (char*)aSCP[iSCP].p_str;
 	U4 iR = -1;
 	I4 pc = 0, aPC[0x10];
 	//I8 i8 = 0;
-	for( U4 i = 0, n = gpmSCP.nASM(); i < n; i++ )
+	for( U4 i = 0, n = aSCP[iSCP].nASM(); i < n; i++ )
 	{
-		I4x4& ins = gpmSCP.lzyASM.pINST(i)[0];
+		I4x4& ins = aSCP[iSCP].lzyASM.pINST(i)[0];
 		pDe = pS = (pD = (pCe=pC=gpsDBGpub)+0x400)+0x400;
 		*pDe = *pD = *pC = 0;
 		gpeEA ADRmod;

@@ -4,22 +4,6 @@
 extern U1 gpaALFsub[];
 extern char gpaALF_H_sub[];
 
-/*I8x4* gpcSCOOP::pM0() {
-	if( nMINI )
-		return (I8x4*)mini.p_alloc;
-
-	return nMN() ? (I8x4*)mini.p_alloc : NULL;
-}*/
-
-//static char gpsNoWord[] = {
-//							"\\ \t\a\r\n*&/%+-|~^?!=$.,:;\'\"{}[]()"
-//						};
-//static char gpsOPERA[] = {
-//							"\\*&/%+-|~^?!=$.,:;{}[]()"
-//						};
-//
-//#define gpmSCP aSCOOP[iMN]
-
 /// 1. srcBREAK scp.MN scp.DCT scp.LNK
 U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 						bool bNoMini, U1 selID, const char* pVAN ) {
@@ -46,12 +30,12 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 	if( pDBG ? pDBG->p_alloc == pALL : false )
 		iSCP = 2;
 
-	if( gpmSCP.bGD( pALL, &pUe ) )
-		return dim = gpmSCP.dim;
+	if( aSCP[iSCP].bGD( pALL, &pUe ) )
+		return dim = aSCP[iSCP].dim;
 #ifdef stdON
 	if(bSTDcout){gpdCOUT << stdBREAK "BRK" << (int)iSCP << stdRESET << gpdENDL;}
 #endif
-	gpmSCP.rst( pALL );
+	aSCP[iSCP].rst( pALL );
 	dim.xyz_( 0 );
 	U4x2 pos(0);
 	U4	clrABC = U1x4(0,0,gpeCLR_blue2).u4,
@@ -61,7 +45,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 		clrNOTE = U1x4(0,0,gpeCLR_green).u4,
 		clrBREAK = U1x4(0,0,gpeCLR_red2).u4;
 	/// berakjuk a 0-t gyökérnek
-	gpmSCP.DCTadd(pos,pUe,1,clrABC);
+	aSCP[iSCP].DCTadd(pos,pUe,1,clrABC);
 
 	for( nS = gpmNINCS( pS, pVAN ); pS < pUe; nS = gpmNINCS( pS, " \t\r\n" ) )
 	{
@@ -69,7 +53,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 		if( nS )
 		{
 			// elrakjuk kell
-			gpmSCP.DCTadd(pos,pS,nS,clrBREAK);
+			aSCP[iSCP].DCTadd(pos,pS,nS,clrBREAK);
 			/// ebben van a " \t\r\n"
 			pos = lenMILL(pos,dim,pS,pS+nS);
 			pS += nS;
@@ -80,7 +64,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 		if( bABC = gpmbABC(*pS, gpaALF_H_sub) )
 		{
 			nA = gpmVAN( pS, gpsNoWord, &nU );
-			gpmSCP.DCTadd(pos,pS,nA,clrABC);
+			aSCP[iSCP].DCTadd(pos,pS,nA,clrABC);
 			pos.x += nU;
 			dim.z += nU;
 			dim.a4x2[0].mx( pos );
@@ -98,7 +82,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 				d8 += gpmSTR2D( pUj );
 			}
 			nN = pUj-pS;
-			gpmSCP.DCTadd(pos,pS,nN,clrNUM);
+			aSCP[iSCP].DCTadd(pos,pS,nN,clrNUM);
 			pos.x += nN;
 			dim.z += nN;
 			dim.a4x2[0].mx( pos );
@@ -123,7 +107,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 					pUj += gpmVAN( pUj, sIZE, &nU );
 				}
 				nSTR = pUj-pS;
-				gpmSCP.STRadd(pos,pS,nSTR,clrSTR);
+				aSCP[iSCP].STRadd(pos,pS,nSTR,clrSTR);
 				pos = lenMILL(pos,dim,pS,pUj);
 				pS = pUj;
 				continue;
@@ -158,7 +142,7 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 				nSTR = pUj-pS;
 				if( !nSTR )
 					break;
-				gpmSCP.NOTEadd(pos,pS,nSTR,clrNOTE);
+				aSCP[iSCP].NOTEadd(pos,pS,nSTR,clrNOTE);
 				pos = lenMILL(pos,dim,pS,pUj);
 				pS = pUj;
 				continue;
@@ -179,14 +163,14 @@ U4x4 gpcSRC::srcBRK( 	gpcLZYdct& dOP, //U1 iSCP,
 		if( nO > nSTP )
 			nO = nSTP;
 
-		gpmSCP.DCTadd(pos,pS,nO,clrOPERA);
+		aSCP[iSCP].DCTadd(pos,pS,nO,clrOPERA);
 		pos.x += nO;
 		dim.a4x2[0].mx( pos );
 		dim.z += nU;
 		pS += nO;
 	}
 	dim.a4x2[0]+=1;
-	gpmSCP.dim = dim;
+	aSCP[iSCP].dim = dim;
 #ifdef stdON
 	if(bSTDcout){gpdCOUT << stdBREAK "oBRK" << (int)iSCP << stdRESET << gpdENDL;}
 #endif
@@ -214,9 +198,9 @@ U1 gpcSRC::srcSCN( gpcCRS& crs, bool bNoMini, U1 selID ) {
 	if( pDBG ? pDBG->p_alloc == pALL : false )
 		iSCP = 2;
 
-	I8x4 *pM0 = gpmSCP.pMN();
+	I8x4 *pM0 = aSCP[iSCP].pMN();
 	U4 tSTR = U1x4(0x10,1,1).typ().u4;
-	for( U4 nM = gpmSCP.nMN(), m = 0; m < nM; m++ )
+	for( U4 nM = aSCP[iSCP].nMN(), m = 0; m < nM; m++ )
 	{
 		cxy = pM0[m].rMNpos;
 		i = pM0[m].iMNindt.x;
@@ -356,12 +340,12 @@ I4x2 gpcSRC::srcRDY(
 	if( pDBG ? pDBG->p_alloc == pALL : false )
 		iSCP = 2;
 
-	I8x4	*pM0 = gpmSCP.pMN();
+	I8x4	*pM0 = aSCP[iSCP].pMN();
 
 	U4 clr, tSTR = U1x4(0x10,1,1).typ().u4, cn;
 	U1x4 c = 0;
 
-	for( U4 nM = gpmSCP.nMN(), m = 0; m < nM; m++ )
+	for( U4 nM = aSCP[iSCP].nMN(), m = 0; m < nM; m++ )
 	{
 		cxy = xy+pM0[m].rMNpos;
 		if(cxy.y>=fWH.y)

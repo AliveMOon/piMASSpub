@@ -4,16 +4,16 @@
 
 
 /// gpCNST
-#define scpCNST gpmSCP.lzyCNST
+#define scpCNST aSCP[iSCP].lzyCNST
 /// gpCNST
 #ifdef piMASS_DEBUG
 	#define scpOBJget (pCNSTi=(gpCNST*)scpCNST.Ux( (mCD0.lnk-gpeOPid_jsr), sizeof(gpCNST)))[0]
-	#define scpOBJadd (pCNSTn=(gpCNST*)scpCNST.Ux( gpmSCP.nCNST, sizeof(gpCNST)))[0]
+	#define scpOBJadd (pCNSTn=(gpCNST*)scpCNST.Ux( aSCP[iSCP].nCNST, sizeof(gpCNST)))[0]
 #else
 	#define scpOBJget ((gpCNST*)scpCNST.Ux( (mCD0.obj-gpeOPid_jsr), sizeof(gpCNST)))[0]
-	#define scpOBJadd ((gpCNST*)scpCNST.Ux( gpmSCP.nCNST, sizeof(gpCNST)))[0]
+	#define scpOBJadd ((gpCNST*)scpCNST.Ux( aSCP[iSCP].nCNST, sizeof(gpCNST)))[0]
 #endif
-//#define scpLNK gpmSCP.lnk
+//#define scpLNK aSCP[iSCP].lnk
 
 //static const char* gpasTYPsz[] = {
 //

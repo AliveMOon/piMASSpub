@@ -407,18 +407,18 @@ gpcLZYdct* gpcMASS::pOPER() {
 
 	return &OPER;
 }
-
+/// 3 main.win.res.bldcmplr.instRUN.instALU
 U1 gpcSRC::srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ) {
 	if( !this )
 		return 0;
 	if( msBLD ? msBLD > pW->mSEC.x : true )
-		return 2;
+		return 2; // még várjon az építéssel
 
 	msBLD = 0;
-	U1 iSCP = 0;
-	if( !gpmSCP.nLNK() )
+	if( !(*aSCP).nLNK() )
 		return 0;
 
+	U1 iSCP = 0;
 	srcCMPLR( *pW->piMASS->pOPER(), iSCP, pW, pSRCstk );
 	return 1;
 }

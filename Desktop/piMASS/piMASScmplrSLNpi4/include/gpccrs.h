@@ -164,11 +164,12 @@ class gpcCRS
 
 				if( iSTR.x < nSTRT )
 					iSTR.x = nSTRT;
-				if( !bED )
-				{
-					iSTR.y = pSRC->n_ld_add();
-				}
-				else if( iSTR.y < iSTR.x )
+				//if( !bED )
+				//{
+				//	iSTR.y = pSRC->n_ld_add();
+				//}
+				//else
+				if( iSTR.y < iSTR.x )
 					iSTR.y = iSTR.x;
 
 				I4	nSUB = iSTR.y - iSTR.x,

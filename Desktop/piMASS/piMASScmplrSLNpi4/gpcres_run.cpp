@@ -395,81 +395,49 @@ U4 gpcMASS::jDOitREF( gpcWIN* pWIN, U4 i, U4& ie, U4 **ppM, U4 **ppC, U4 **ppR, 
 	return in*pWIN->mZ+iz;
 }
 char gpsPUB[0x1000];
-U1* gpcMASS::justDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
+/// 2 main.win.res.bldcmplr.instRUN.instALU
+U1* gpcMASS::jstDOit( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* pKT, I4x4& SRCxycr, I4x4& SRCin )
 
-	pWIN->nJDOIT.w++;
+	pWIN->nJDOIT.w++; // cnt.w winRUN x N
 	pWIN->nJDOIT.y = pWIN->nJDOIT.x;
-	U1* pKEYbuff = pWIN->gpsKEYbuff;
-	gpcSRC	tmp, *pSRC = NULL, *pS2;
-	U4 xFND, x_fnd;
-	//int aGLpic[0] = 0;
-	I4x4 sprt[2] = {0}, trgWH = 0;
 	pWIN->mZ = mapCR.mapZN44.z;
 	pWIN->mN = mapCR.mapZN44.w;
 	pWIN->mZN = mapCR.mapZN44.a4x2[1].area();
-	I8x4 anRio;
-	gpcLZY hex; U8 s;
-	gpcGL *pGL = pWIN->pGL;
-	char* pVTX = NULL;
-	gpcPIC	*aGLpPIC[0x10],
-			*aGLpBOB[0x10];
-	SDL_Texture* apTX[0x10];
 
 	U4	*pM,*pC,*pR,
-		ie,z;
-	jDOitREF( pWIN, 0, ie, &pM, &pC, &pR, &z );
+		iE,z;
+	jDOitREF( pWIN, 0, iE, &pM, &pC, &pR, &z );
 
-	for( U4 i = 0; i < ie; i++ ) {
-		if( pSRC  ) {
-			if( aGLpic[0] )
-				pSRC->picID = aGLpic[0];
-			if( aGLpic[0xf] )
-				pSRC->bobID = aGLpic[0xf];
-
-			aGLpic[0xf] = 0;
-		}
-
-		if( !pM[i] )
-			continue;
-
-		xFND = pM[i];
-		pSRC = srcFND( xFND );
-		if( !pSRC )
-			continue;
-
-		aGLpic[0] = pSRC->picID = 0;
-		//gpmDEL( pSRC->apOUT[0] );
-		if( pSRC->qBLD() ) {
-			pSRC->msBLD = pWIN->mSEC.x + pSRC->msBLTdly;
-			pSRC->rdyBLD();
-		}
-
+	U1* pKEYbuff = pWIN->gpsKEYbuff;
+	gpcSRC	*pSRC = NULL;
+	for( U4 iS = 0; iS < iE; iS++ )
+	if(pSRC=srcFND(pM[iS])) {
+		// ha újra és újra frissítés történik emeli az jta építés idejét
+		pSRC->rdyBLD(pWIN->mSEC.x);
 		if( pSRC->srcBLD( pWIN, NULL ) == 1 ) {
-
-			//gpmDEL( pSRC->pEXE0 );
-
+			// == 1 sikerült az építés ozáadjuk a listához ha valaki édeklődik SYNC
 			if( !pSRC->msBLTdly )
 				pSRC->msBLTdly = gpdSYNmSEC;
 			else
 				pWIN->pSYNwin =
 				pWIN->pSYNwin->syncADD(
-											gpcSYNC(
-														gpeNET4_0SRC,
-														(i%pWIN->mZ)+((i/pWIN->mZ)<<16),
-														pWIN->mSEC.y, pSRC->iGT, 0
-													),
-											pWIN->msSYN
-										);
+										gpcSYNC(
+													gpeNET4_0SRC,
+													(iS%pWIN->mZ)+((iS/pWIN->mZ)<<16),
+													pWIN->mSEC.y, pSRC->iGT, 0
+												),
+										pWIN->msSYN
+									);
 			pSRC->msBLD = 0;
 		}
-
 
 		if( !pSRC->srcINSTrun() )
 			continue;
 
-		pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI); //,this,pWIN);
-		pWIN->nJDOIT.x++;
-	}
+		pSRC->pMINI = pSRC->srcINSTmini(pSRC->pMINI);
+		pWIN->nJDOIT.x++;	// cnt.x instRUN x N
+	} else
+		continue;// for(iS)
 
 	return pKEYbuff;
 }
@@ -517,10 +485,9 @@ U1* gpcMASS::justDOitOLD( gpcWIN* pWIN ) { // U1* sKEYbuff, I4x4& mouseXY, U4* p
 
 		aGLpic[0] = pSRC->picID = 0;
 		//gpmDEL( pSRC->apOUT[0] );
-		if( pSRC->qBLD() ) {
-			pSRC->msBLD = pWIN->mSEC.x + pSRC->msBLTdly;
-			pSRC->rdyBLD();
-		}
+		if( pSRC->qBLD() )
+			pSRC->rdyBLD( pWIN->mSEC.x );
+
 
 		if( pSRC->msBLD ? pSRC->msBLD <= pWIN->mSEC.x : false ) {
 
