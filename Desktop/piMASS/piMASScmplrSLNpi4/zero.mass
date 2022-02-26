@@ -122,8 +122,9 @@
  
   a4	 
  
- name = "penna";
- pix = "
+ name = "penna"; // abcdefg
+ 
+ pix = " 
  #version 120
  varying vec2 fr_uv;
  uniform sampler2D	tex0,	//
@@ -246,7 +247,7 @@
           }
       }
 
-
+ 
 
       if( r < aCNL[0].w )
           gl_FragColor = pen;
@@ -338,7 +339,7 @@
  t=ms;
  again=1000;
 
- c4	na a5	 
+ c4	 na a5	 
  
   trgw = 640;
   trgh = 960;

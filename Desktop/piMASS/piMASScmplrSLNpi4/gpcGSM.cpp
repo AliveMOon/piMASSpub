@@ -2,6 +2,7 @@
 #include "gpcSRCinst.h"
 #include "gpcSRClnk.h"
 #include "gpccrs.h"
+#include <wiringSerial.h>
 
 /*
 -lraspicam
@@ -520,7 +521,7 @@ public:
 								nAT = 0;
 							} break;
 						case gpeALF_PIN: {
-								sprintf( pANSW, "AT+CPIN=%d\r\n", pin );
+								sprintf( pANSW, "AT+CPIN=%04d\r\n", pin );
 								//pSUB[1] = pAT[nAT].y;
 								nAT = 0;
 							} break;
@@ -545,7 +546,7 @@ public:
 							bPINrdy = true;
 							break;
 						case gpeALF_PIN:
-							sprintf( pANSW, "AT+CPIN=%d\r\n", pin );
+							sprintf( pANSW, "AT+CPIN=%0.4d\r\n", pin );
 							break;
 						default: break;
 					}
@@ -794,7 +795,7 @@ public:
 							bPINrdy = true; //pSUB[1] = pAT[nAT].y;
 							break;
 						case gpeALF_PIN:
-							sprintf( pANSW, "AT+CPIN=%d\r\n", pin );
+							sprintf( pANSW, "AT+CPIN=%04d\r\n", pin );
 							break;
 						default: break;
 					}
@@ -914,12 +915,14 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 
 	U8 //nLEN,
 		s;
-	int baud = 115200, pin = 2028;
+	int baud = 115200, pin = 735;
 	char	*pANSW = NULL, sGO[0x100];
 
 	if( socket == INVALID_SOCKET ) {
 		sprintf( sGO, sSER, s_ip );
-		if( (socket=(SOCKET)open( sGO, baud )) < 0 ) {
+		//if( (socket=(SOCKET)open( sGO, O_RDWR|O_NOCTTY|O_NDELAY )) < 0 ) {
+		if( (socket=(SOCKET)serialOpen( sGO, baud 					)) < 0 ) {
+			/// ?  sudo chmod 777 /dev/ttyS0
 			if(bSTDcout){gpdCOUT << stdALU "GSM ERR:" << strerror(errno) << gpdENDL;}
 			msGTdie = pWIN->mSEC.x + 3000;
 			return pGSM;
@@ -983,7 +986,8 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	char	*pS, *pSi, *pSe,
 			// *pSat = NULL,
 			*pCLR, *pALL = (char*)pOUT->p_alloc;
-	int	nR = 0, // serialDataAvail(socket),
+	int	nR = //0, //
+				serialDataAvail(socket),
         nINP = pINP->nLD(),
 		nAT = 0, aSUB[2], iA, iA2,
 		aN[0x10],
@@ -994,6 +998,8 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 		nR = read( socket, pANSW, nR );
 		if( nR > 0 )
 			pINP = pINP->lzyADD( pANSW, nR, s=-1 );
+		else 	if( nR < 0 )
+				if(bSTDcout){gpdCOUT << stdALU "GSM nR ERR:" << strerror(errno) << gpdENDL;}
 		nINP = pINP->nLD();
 	}
 
@@ -1293,16 +1299,18 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 				iA += pAT[iA].aALFvan( aALFok, nAT-iA, gpmN(aALFok) );
 				aSUB[1] = pAT[iA].y;
 				break;
-
 		}
 
 		if( aSUB[1] > aSUB[0] ) {
 			aSUB[1] += gpmNINCS( pS+aSUB[1], " \r\n\t" );
-			nR = 0; //serialDataAvail(socket);
+			nR = //0;
+				 serialDataAvail(socket);
 			if( nR > 0 ) {
 				nR = read( socket, pANSW, nR );
 				if( nR > 0 )
 					pINP = pINP->lzyADD( pANSW, nR, s=-1 );
+				else 	if( nR < 0 )
+						if(bSTDcout){gpdCOUT << stdALU "GSM nR2 ERR:" << strerror(errno) << gpdENDL;}
 				//nINP = pINP->nLD();
 			}
 			s = aSUB[0];
@@ -1462,7 +1470,12 @@ gpcGSM* gpcGT::GTgsm( gpcWIN* pWIN ) {
 	pSi = pS;
 	while( pSi < pSe ) {
 		nW = write(socket,pSi,pSe-pSi);
-		pSi += nW;
+		if(nW > 0)
+			pSi += nW;
+		else 	if( nW < 0 ) {
+				if(bSTDcout){ gpdCOUT << stdALU "GSM nW ERR:" << strerror(errno) << gpdENDL; }
+				break;
+			}
 	}
 	// *pANSW = 0;
 	return pGSM;

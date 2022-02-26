@@ -23,7 +23,7 @@
 //~ SOFTWARE.
 
 //#define gpdDEBUG
-//? #define gpdNEW_CMPLR
+//? #define gpd     NEW_CMPLR
 
 #define bSTDcout true //true //false //true
 #define bSTDcout_V4l2 (bSTDcout&false) //true) // false)//
@@ -31,13 +31,16 @@
 #define bSTDcout_slmp (bSTDcout&true)
 #define bSTDcoutCMP (bSTDcout&false) //true //false //true
 #define bSTDcoutDBG true
-#define bSTDcout_3D (bSTDcout&true)
+#define bSTDcout_3D (bSTDcout&true) //&false) //&true)
+#define bSTDcout_3Df (bSTDcout&false)
 //#define stdON
 
 //#include "mysys.h"
 #define piMASS_DEBUG 1
 #include <exception>
-#include <mysys.h>
+
+#define gpdSYSubi //#define gpdSYSpi //#include <mysys.h>
+
 #include <errno.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -142,7 +145,8 @@
 
 	#define GLEW_STATIC
     #include <GL/glew.h>
-	#ifdef gpdSYSpi
+
+	#ifdef gpdSYSpi								/// if gpdSYSpi
 		#include <raspicam/raspicam.h>
 		//#include <raspicam/raspicam_cv.h>
 		//#include <wiringPi.h>
@@ -151,7 +155,7 @@
         #define gpdGT_LIST_tOUT 3
         #define GL_GLES_PROTOTYPES 0
         #include <wiringSerial.h>
-	#else
+	#else 										/// else gpdSYSubi
         //#include <GLFW/glfw3.h>
 	    #define GL_GLES_PROTOTYPES 0
 		#define gpdU4x2nSTR 1
@@ -160,7 +164,7 @@
         #define gpdCAMu gpcCAMubi
 
         #define gpdGT_LIST_tOUT 7
-	#endif // gpdSYSpi
+	#endif 										/// end gpdSYSpi/gpdSYSubi
 
 	#include <unistd.h> // for usleep()
 
@@ -274,8 +278,8 @@
 
 enum gpeLX:U8
 {
-    gpeZERO,
-    gpeU4x2nSTR = sizeof(U8)/sizeof(void*),
+	gpeZERO,
+	gpeU4x2nSTR = sizeof(U8)/sizeof(void*),
    // gpeMXPATH = gpmPAD( gpdMAX_PATH, 0x10 ) , //0x10*0x11,
 
     //gpeSYNmsec = 333,
@@ -490,7 +494,7 @@ GLenum inline gpfGLerr( const char* pERR = "" ) {
 	GLenum e = glGetError();
 	if( !e )
 		return 0;
-	if( bSTDcout_3D ) gpdCOUT << std::hex << e << pERR <<  gpdENDL;
+	if( bSTDcout_3Df ) gpdCOUT << std::hex << e << pERR <<  gpdENDL;
 	return e;
 }
 //#define gpmbABC( c ) (c < 0x80 ? gpaALFsub[c] : true)
@@ -951,26 +955,20 @@ enum gpeISA : I1 {
 char* gpfSTRdrop( char* p_dst, char* p_str, char* p_end, const char* p_drop );
 class U1x4 {
 public:
-    union
-    {
-        struct
-        {
+    union {
+        struct {
             U1 x,y,z,w;
         };
-         struct
-        {
+		struct {
             U1 R,G,B,A;
         };
-        struct
-        {
+        struct {
             U1 aXYZW[4];
         };
-        struct
-        {
+        struct {
             gpeISA aISA[4];
         };
-        struct
-        {
+        struct {
             U4 u4;
         };
     };
@@ -3645,8 +3643,6 @@ public:
 	I4x2 SCRrig()	{ return left();		}
 };
 
-
-
 class I4x4 {
 public:
 	union {
@@ -4606,7 +4602,6 @@ public:
 	}
 };
 
-
 class I8x4 {
 public:
     union {
@@ -4624,7 +4619,8 @@ public:
 		///
 		///-----------------------------------------
          /// src/mn/dct
-        struct { I4 iS,nS,dctID,typ,px,py, clr,res; };
+        struct { I4	iS,nS,dctID,typ,
+					px,py, clr,res; };
     };
 	///-----------------------------------------
 	///
@@ -5998,6 +5994,9 @@ public:
 
 class gpcROBnD;
 class gpcZSnD;
+#ifndef gpcSCOOP
+class gpcSCOOP;
+#endif // gpcSCOOP
 
 typedef enum gpeAT:U4{
 	gpeAT_no,
@@ -6082,6 +6081,13 @@ typedef enum gpeAT:U4{
 
 	gpeAT_N,
 } gpeAT;
+
+enum gpe_NET8:U8{
+	gpeNET8_SCP		= mkID8( 'S', 'C', 'P', ' ', ' ', ' ', ' ', 0 ),
+	gpeNET8_pSCP	= mkID8( 'p', 'S', 'C', 'P', ' ', ' ', ' ', 0 ),
+	gpeNET8_ppSCP	= mkID8( 'p', 'p', 'S', 'C', 'P', ' ', ' ', 0 ),
+	gpeNET8_LZY		= mkID8( 'L', 'Z', 'Y', ' ', ' ', ' ', ' ', 0 ),
+};
 class gpcLZY {
 public:
 	union {
@@ -6090,6 +6096,7 @@ public:
 
 			U8 //size_t // ha x32 CPU-n size_t 20 byte lesz és nem 32 azaz nem 16B aligned
 				n_load, n_alloc;
+			//gpe_NET8 netID,
 		};
 		struct{
 			U8		*p_a8;
@@ -6097,6 +6104,8 @@ public:
 							/// yz[ dimXY ] 	, nBYTE = 1<<(x&0xf)
 			gpeWIP	aWIP[4];
 			U8		n_l8, n_a8;
+			//U8		nID8;
+
 		};
 	};
 	gpcLZY* null(){
@@ -6712,7 +6721,7 @@ szasz:
 
 
 	U1* pU1() {
-        return this ? (n_load ? p_alloc : NULL) : NULL;
+        return ( this ? (n_load ? p_alloc : NULL) : NULL );
     }
 	U1* pU1i( int i = 0, int n = 1 ) {
 		if( !this )
@@ -6744,27 +6753,26 @@ szasz:
 	size_t	nU4( size_t x=1 ){ return x ? nLD(x*sizeof(U4)) : nLD(sizeof(U4)); }
 
 
-	char* 	pCHAR( int i = 0 ) { return (char*)pU1i(i,sizeof(char)); }
-	I1* 	pI1( int i = 0 ) { return (I1*)pU1i(i,sizeof(I1)); }
+	char* 	pCHAR( int i = 0 ) { return (char*)pU1i(i,sizeof(char)); }	// NULL - ha nincs elég
+	I1* 	pI1( int i = 0 ) { return (I1*)pU1i(i,sizeof(I1)); } 		// NULL - ha nincs elég
 
-	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1i(i,sizeof(U4x2)); }
+	U4x2*	pU4x2( int i = 0 ) { return (U4x2*)pU1i(i,sizeof(U4x2)); } 	// NULL - ha nincs elég
 	U4x2* 	pU4x2n( int i = 0, int n = 1 )	{ return (U4x2*)Ux(	(i<0?nLD(sizeof(U4x2)):i),	sizeof(U4x2)*n,	true, sizeof(U4x2)); }
 	size_t	nU4x2( size_t x=1 ){ return x ? nLD(x*sizeof(U4x2)) : nLD(sizeof(U4x2)); }
 
-	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1i(i,sizeof(U4x4)); }
+	U4x4*	pU4x4( int i = 0 ) { return (U4x4*)pU1i(i,sizeof(U4x4)); } 	// NULL - ha nincs elég
 	U4x4* 	pU4x4n( int i = 0, int n = 1 )	{ return (U4x4*)Ux(	(i<0?nLD(sizeof(U4x4)):i),	sizeof(U4x4)*n,	true, sizeof(U4x4)); }
 	size_t	nU4x4( size_t x=1 ){ return x ? nLD(x*sizeof(U4x4)) : nLD(sizeof(U4x4)); }
 
-	I4* 	pI4( int i = 0 ) { return (I4*)pU1i(i,sizeof(I4)); }
-	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),
-																sizeof(I4)*n,	true, sizeof(I4)); }
+	I4* 	pI4( int i = 0 ) { return (I4*)pU1i(i,sizeof(I4)); } 		// NULL - ha nincs elég
+	I4* 	pI4n( int i = 0, int n = 1 )	{ return (I4*)Ux(	(i<0?nLD(sizeof(I4)):i),	sizeof(I4)*n,	true, sizeof(I4)); }
 	size_t	nI4( size_t x=1 ){ return x ? nLD(x*sizeof(I4)) : nLD(sizeof(I4)); }
 
-	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1i(i,sizeof(I4x2)); }
+	I4x2*	pI4x2( int i = 0 ) { return (I4x2*)pU1i(i,sizeof(I4x2)); }	// NULL - ha nincs elég
 	I4x2* 	pI4x2n( int i = 0, int n = 1 )	{ return (I4x2*)Ux(	(i<0?nLD(sizeof(I4x2)):i),	sizeof(I4x2)*n,	true, sizeof(I4x2)); }
 	size_t	nI4x2( size_t x=1 ){ return x ? nLD(x*sizeof(I4x2)) : nLD(sizeof(I4x2)); }
 
-	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1i(i,sizeof(I4x4)); }
+	I4x4*	pI4x4( int i = 0 ) { return (I4x4*)pU1i(i,sizeof(I4x4)); }	// NULL - ha nincs elég
 	I4x4* 	pI4x4n( int i = 0, int n = 1 )	{ return (I4x4*)Ux(	(i<0?nLD(sizeof(I4x4)):i),	sizeof(I4x4)*n,	true, sizeof(I4x4)); }
 	I4x4* 	pI4x4nINS( int i = 0, int n = 1 ) {
 		if(i<0)
@@ -6773,35 +6781,47 @@ szasz:
 		lzyINS( NULL, sizeof(I4x4)*n, s, 0 );
 		return (I4x4*)Ux( i, sizeof(I4x4)*n, true, sizeof(I4x4) );
 	}
-	ssize_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
+	size_t	nI4x4( size_t x=1 ){ return x ? nLD(x*sizeof(I4x4)) : nLD(sizeof(I4x4)); }
 
-	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1i(i,sizeof(I8x2)); }
+	I8x2* 	pI8x2( int i = 0 ) { return (I8x2*)pU1i(i,sizeof(I8x2)); }	// NULL - ha nincs elég
 	I8x2* 	pI8x2n( int i = 0, int n = 1 )	{ return (I8x2*)Ux(	(i<0?nLD(sizeof(I8x2)):i),	sizeof(I8x2)*n,	true, sizeof(I8x2)); }
 	size_t	nI8x2( size_t x=1 ){ return x ? nLD(x*sizeof(I8x2)) : nLD(sizeof(I8x2)); }
 
-	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1i(i,sizeof(I8x4)); }
+	I8x4* 	pI8x4( int i = 0 ) { return (I8x4*)pU1i(i,sizeof(I8x4)); }	// NULL - ha nincs elég
 	I8x4* 	pI8x4n( int i = 0, int n = 1 )	{ return (I8x4*)Ux(	(i<0?nLD(sizeof(I8x4)):i),	sizeof(I8x4)*n,	true, sizeof(I8x4)); }
 	size_t	nI8x4( size_t x=1 ){ return x ? nLD(x*sizeof(I8x4)) : nLD(sizeof(I8x4)); }
 
-	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1i(i,sizeof(U8x4)); }
+	U8x4* 	pU8x4( int i = 0 ) { return (U8x4*)pU1i(i,sizeof(U8x4)); }	// NULL - ha nincs elég
 	U8x4* 	pU8x4n( int i = 0, int n = 1 )	{ return (U8x4*)Ux(	(i<0?nLD(sizeof(U8x4)):i),	sizeof(U8x4)*n,	true, sizeof(U8x4)); }
 	size_t	nU8x4( size_t x=1 ){ return x ? nLD(x*sizeof(U8x4)) : nLD(sizeof(U8x4)); }
 
-	float* 	pF( int i = 0 ) { return (float*)pU1i(i,sizeof(float)); }
+	float* 	pF( int i = 0 ) { return (float*)pU1i(i,sizeof(float)); }	// NULL - ha nincs elég
 	size_t	nF( size_t x=1 ){ return x ? nLD(x*sizeof(float)) : nLD(sizeof(float)); }
 
-	F2* 	pF2( int i = 0 ) { return (F2*)pU1i(i,sizeof(F2)); }
+	F2* 	pF2( int i = 0 ) { return (F2*)pU1i(i,sizeof(F2)); }		// NULL - ha nincs elég
 	size_t	nF2( size_t x=1 ){ return x ? nLD(x*sizeof(F2)) : nLD(sizeof(F2)); }
 
-	F4* 	pF4( int i = 0 ) { return (F4*)pU1i(i,sizeof(F4)); }
+	F4* 	pF4( int i = 0 ) { return (F4*)pU1i(i,sizeof(F4)); }		// NULL - ha nincs elég
 	size_t	nF4( size_t x=1 ){ return x ? nLD(x*sizeof(F4)) : nLD(sizeof(F4)); }
 
-	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1i(i,sizeof(F4x4)); }
+	F4x4* 	pF4x4( int i = 0 ) { return (F4x4*)pU1i(i,sizeof(F4x4)); }	// NULL - ha nincs elég
 	F4x4* 	pF4x4n( int i = 0, int n = 1 )	{ return (F4x4*)Ux(	(i<0?nLD(sizeof(F4x4)):i),	sizeof(F4x4)*n,	true, sizeof(F4x4)); }
 	size_t	nF4x4( size_t x=1 ){ return x ? nLD(x*sizeof(F4x4)) : nLD(sizeof(F4x4)); }
 
-	D4* 	pD4( int i = 0 ) { return (D4*)pU1i(i,sizeof(D4)); }
+	D4* 	pD4( int i = 0 ) { return (D4*)pU1i(i,sizeof(D4)); }	 	// NULL - ha nincs elég
 	void**	ppVOID( int i = 0 ) { return (void**)pU1i(i,sizeof(U1*)); }
+	void**	ppVOIDn( int i = 0, int n = 1 )	{	// i < 0  újat ad a végéről
+		return (void**)Ux(
+							(i<0?nLD(sizeof(U1*)):i),
+							sizeof(U1*)*n,
+							true, sizeof(U1*)
+						);
+	}
+	size_t	npVOID( size_t x=1 ){ return x ? nLD(x*sizeof(U1*)) : nLD(sizeof(U1*)); }
+
+	gpcSCOOP**	ppSCP( int i = 0 );
+	gpcSCOOP**	ppSCPn( int i = 0, int n = 1 );
+	size_t		npSCP( size_t x=1 );
 
     U1* pVALI( size_t nB = 0, size_t nP = 0  ) { return this ? ((n_load>=(nB+nP)) ? p_alloc : NULL) : NULL;  }
     void* pVALID( gpcLZY* pLZY, void* pTHIS = NULL ) {
@@ -6845,12 +6865,10 @@ public:
 	U8			ver;
 
 	gpcLZYdct(){};
-	gpcLZYdct(U8 v)
-	{
+	gpcLZYdct(U8 v) {
 		gpmCLR;
 	}
-	void rst()
-	{
+	void rst() {
 		if(!this)
 			return;
 		pIX = NULL;
@@ -7298,14 +7316,12 @@ class gpcLZYall {
 	I8x2	iAN;
 	U4		nLZYall, iLZYfr, nLZYld, iLZY;
 
-	I8x2 rdAN( U4 i )
-	{
+	I8x2 rdAN( U4 i ) {
 		if( i >= nLZYld )
 			return I8x2(0,0);
 		return ((I8x2*)lzyID.p_alloc)[i];
 	}
-	I8x2& wrAN( U4 i )
-	{
+	I8x2& wrAN( U4 i ) {
 		U8 s = i*sizeof(iAN);
 		lzyID.lzyEXP_rand( s, sizeof(iAN), sizeof(iAN) );
 		return ((I8x2*)lzyID.p_alloc)[i];
@@ -7343,10 +7359,8 @@ public:
 		else if( ppLZY[iLZYfr] )
 			iLZYfr = nLZYld;
 
-		for( U4 p = 0; p < nLZYld; p++ )
-		{
-			if( !ppLZY[p] )
-			{
+		for( U4 p = 0; p < nLZYld; p++ ) {
+			if( !ppLZY[p] ) {
 				if( iLZYfr > p )
 					iLZYfr = p;
 				continue;
@@ -7358,11 +7372,9 @@ public:
 			pLZY = ppLZY[p];
 			return pLZY;
 		}
-		if( iLZYfr >= nLZYld )
-		{
+		if( iLZYfr >= nLZYld ) {
 			nLZYld++;
-			if( nLZYld >= nLZYall )
-			{
+			if( nLZYld >= nLZYall ) {
 				nLZYall += 0x10;
 				gpcLZY	**ppKILL = ppLZY;
 				ppLZY = new gpcLZY*[nLZYall];

@@ -217,13 +217,12 @@ void gpcCRS::CRSstpED(
 
 				}
 				break;
-			case 5:
+			case 5: {
 				// lefele egy sorral
-				{
 					U1* pLFT = gpfUTF8left( pOA, pRIG, '\n', '\a' );
 					U4 x = gpfUTF8rig( pLFT, pRIG );
-					U8 nLEN = 0;
-					pRIG += gpfVAN( pRIG, (U1*)"\n", nLEN );
+					//U8 nLEN = 0;
+					pRIG += gpfVAN( pRIG, (U1*)"\n", NULL ); //, nLEN );
 
 					if( *pRIG == '\n')
 						pRIG++;
@@ -2012,10 +2011,13 @@ void gpcCRS::miniRDYsdl( gpcWIN& win, U1 iDIV, gpcMASS& mass, U1* pE, U1* pB, gp
 				}
 
 
-				pSRC->SRCmini(
+				pSRC->srcRDYmn(
 									pMINI, //NULL, //aCRS,
 									miniALL.a4x2[0],
-									gpmMIN(CRSfrm.z, miniALL.x+(int)pC[c]), gpmMIN(CRSfrm.w, miniALL.y+(int)pR[r]),
+									I4x2(
+											gpmMIN(CRSfrm.z, miniALL.x+(int)pC[c]),
+											gpmMIN(CRSfrm.w, miniALL.y+(int)pR[r])
+										),
 									CRSfrm.z, CRSfrm.z,
 									//gpaC64,
 									*this,

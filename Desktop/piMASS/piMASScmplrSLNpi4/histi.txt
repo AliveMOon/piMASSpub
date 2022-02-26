@@ -1,0 +1,1000 @@
+ 1195  read only = no 
+ 1196  list = True 
+ 1197  uid = pi 
+ 1198  " > /var/tmp/94cd9101-bf3b-4a61-8149-bc493ddc08ea/rsyncd.conf
+ 1199  rsync --daemon --port=4444 --config=/var/tmp/94cd9101-bf3b-4a61-8149-bc493ddc08ea/rsyncd.conf
+ 1200  kill -9 5840; echo $?
+ 1201  mkdir /var/tmp/91073322-af68-42e1-8267-c6c84c2aa0e8/
+ 1202  echo -e "pid file = /var/tmp/91073322-af68-42e1-8267-c6c84c2aa0e8/rsyncd.pid 
+ 1203  lock file = /var/tmp/91073322-af68-42e1-8267-c6c84c2aa0e8/rsyncd.lock 
+ 1204  log file = /var/tmp/91073322-af68-42e1-8267-c6c84c2aa0e8/rsyncd.log 
+ 1205  port = 4444 
+ 1206  use chroot = False 
+ 1207  address = 127.0.0.1
+ 1208  [temp] 
+ 1209  path = /usr/include 
+ 1210  comment =  
+ 1211  read only = no 
+ 1212  list = True 
+ 1213  uid = pi 
+ 1214  " > /var/tmp/91073322-af68-42e1-8267-c6c84c2aa0e8/rsyncd.conf
+ 1215  rsync --daemon --port=4444 --config=/var/tmp/91073322-af68-42e1-8267-c6c84c2aa0e8/rsyncd.conf
+ 1216  kill -9 5957; echo $?
+ 1217  rm -rf /var/tmp/91073322-af68-42e1-8267-c6c84c2aa0e8/
+ 1218  mkdir /var/tmp/083fee7c-90f2-477b-bc1f-b2feaa784373/
+ 1219  echo -e "pid file = /var/tmp/083fee7c-90f2-477b-bc1f-b2feaa784373/rsyncd.pid 
+ 1220  lock file = /var/tmp/083fee7c-90f2-477b-bc1f-b2feaa784373/rsyncd.lock 
+ 1221  log file = /var/tmp/083fee7c-90f2-477b-bc1f-b2feaa784373/rsyncd.log 
+ 1222  port = 4445 
+ 1223  use chroot = False 
+ 1224  address = 127.0.0.1
+ 1225  [temp] 
+ 1226  path = /usr/include/c++/6 
+ 1227  comment =  
+ 1228  read only = no 
+ 1229  list = True 
+ 1230  uid = pi 
+ 1231  " > /var/tmp/083fee7c-90f2-477b-bc1f-b2feaa784373/rsyncd.conf
+ 1232  rsync --daemon --port=4445 --config=/var/tmp/083fee7c-90f2-477b-bc1f-b2feaa784373/rsyncd.conf
+ 1233  kill -9 6075; echo $?
+ 1234  rm -rf /var/tmp/083fee7c-90f2-477b-bc1f-b2feaa784373/
+ 1235  mkdir /var/tmp/af22547c-0c93-4ceb-8cf2-134e73e1a079/
+ 1236  echo -e "pid file = /var/tmp/af22547c-0c93-4ceb-8cf2-134e73e1a079/rsyncd.pid 
+ 1237  lock file = /var/tmp/af22547c-0c93-4ceb-8cf2-134e73e1a079/rsyncd.lock 
+ 1238  log file = /var/tmp/af22547c-0c93-4ceb-8cf2-134e73e1a079/rsyncd.log 
+ 1239  port = 4445 
+ 1240  use chroot = False 
+ 1241  address = 127.0.0.1
+ 1242  [temp] 
+ 1243  path = /usr/include/arm-linux-gnueabihf/c++/6 
+ 1244  comment =  
+ 1245  read only = no 
+ 1246  list = True 
+ 1247  uid = pi 
+ 1248  " > /var/tmp/af22547c-0c93-4ceb-8cf2-134e73e1a079/rsyncd.conf
+ 1249  rsync --daemon --port=4445 --config=/var/tmp/af22547c-0c93-4ceb-8cf2-134e73e1a079/rsyncd.conf
+ 1250  kill -9 6201; echo $?
+ 1251  mkdir /var/tmp/cfa1880a-c0c5-4a67-8e97-d6eda6cdd23e/
+ 1252  echo -e "pid file = /var/tmp/cfa1880a-c0c5-4a67-8e97-d6eda6cdd23e/rsyncd.pid 
+ 1253  lock file = /var/tmp/cfa1880a-c0c5-4a67-8e97-d6eda6cdd23e/rsyncd.lock 
+ 1254  log file = /var/tmp/cfa1880a-c0c5-4a67-8e97-d6eda6cdd23e/rsyncd.log 
+ 1255  port = 4445 
+ 1256  use chroot = False 
+ 1257  address = 127.0.0.1
+ 1258  [temp] 
+ 1259  path = /usr/include/c++/6/backward 
+ 1260  comment =  
+ 1261  read only = no 
+ 1262  list = True 
+ 1263  uid = pi 
+ 1264  " > /var/tmp/cfa1880a-c0c5-4a67-8e97-d6eda6cdd23e/rsyncd.conf
+ 1265  rsync --daemon --port=4445 --config=/var/tmp/cfa1880a-c0c5-4a67-8e97-d6eda6cdd23e/rsyncd.conf
+ 1266  kill -9 6317; echo $?
+ 1267  rm -rf /var/tmp/cfa1880a-c0c5-4a67-8e97-d6eda6cdd23e/
+ 1268  cd ~/Desktop/piMASS
+ 1269  sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+ 1270  git add .
+ 1271  git commit -m "DRC drop 10  "
+ 1272  git push origin master
+ 1273  cd Desktop/piMASS
+ 1274  git add .
+ 1275  git -m commit "drop 111 01"
+ 1276  git commit -m  "drop 111 01"
+ 1277  git add .
+ 1278  git commit -m  "drop 111 01"
+ 1279  git push origin master
+ 1280  dir
+ 1281  cd bin
+ 1282  dir
+ 1283  cd debug
+ 1284  cd Debug/
+ 1285  dir
+ 1286  sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+ 1287  dir
+ 1288  cd Desktop/piMASS
+ 1289  dir
+ 1290  git add .
+ 1291  git commit -m "drop many "
+ 1292  git push origin master
+ 1293  cd ~/Desktop/piMASS
+ 1294  ./to_exe
+ 1295  git add .
+ 1296  git commit -m "DRC drop 09  rob answer||bash ./to_exe"
+ 1297  git push origin master
+ 1298  git pull
+ 1299  git pull origin master
+ 1300  git push origin master
+ 1301  git add .
+ 1302  git commit -m "DRC drop 09  rob answer||bash ./to_exe"
+ 1303  git push origin master
+ 1304  cd ~/Desktop/piMASS
+ 1305  git add .
+ 1306  git commit -m "mini ISO fix 02"
+ 1307  git push origin master
+ 1308  cd ~/Desktop/piMASS
+ 1309  git add .
+ 1310  git commit -m "mini glsl fix01"
+ 1311  git push origin master
+ 1312  sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+ 1313  git add .
+ 1314  git push origin master
+ 1315  sudo cp ~/Desktop/piMASS/bin/Debug/piMASS /usr/sbin/pimass
+ 1316  git add .
+ 1317  git commit -m "mini glsl fix02"
+ 1318  git push origin master
+ 1319  cd ..
+ 1320  ls
+ 1321  mkdir piMASSstep
+ 1322  cd piMASSstep/
+ 1323  ls
+ 1324  git clone origin step-file
+ 1325  git clone step-file
+ 1326  git init
+ 1327  git clone --single-branch step-file
+ 1328  git clone --single-branch --branch step-file 
+ 1329  git clone -b step-file https://github.com/AliveMOon/piMASSpub.git 
+ 1330  sudo git clone -b step-file https://github.com/AliveMOon/piMASSpub.git 
+ 1331  cd ~/Desktop/piMASS
+ 1332  git add .
+ 1333  git push origin master
+ 1334  git pull origin master
+ 1335  git add .
+ 1336  git commit -m "mini glsl fix03 WINreSZ"
+ 1337  git pull origin master
+ 1338  git push origin master
+ 1339  git add .
+ 1340  git commit -m "mini glsl fix03 WINreSZ brTSTmast"
+ 1341  git push origin master
+ 1342  git status
+ 1343  git status .
+ 1344  git branch
+ 1345  dir
+ 1346  sysconfig
+ 1347  dir
+ 1348  rspi-config
+ 1349  raspi-config
+ 1350  sudo raspi-config
+ 1351  reboot
+ 1352  sudo reboot
+ 1353  sudo raspi-config
+ 1354  dir
+ 1355  cd Desktop/
+ 1356  dir
+ 1357  delete piMASSstep
+ 1358  sudo delete piMASSstep
+ 1359  sudo rm piMASSstep
+ 1360  sudo rm ?
+ 1361  sudo rm piMASSstep/*.*
+ 1362  sudo rm piMASSstep/*
+ 1363  rm ?
+ 1364  sudo rmdir piMASSstep/
+ 1365  sudo rm -d piMASSstep/
+ 1366  sudo rm -i -rf piMASSstep/
+ 1367  dir
+ 1368  du /
+ 1369  cd ~/Desktop/piMASS
+ 1370  git add .
+ 1371  git commit -m "mini glsl fix04 gpdSIZ2CR 4x6"
+ 1372  git push origin master
+ 1373  git add .
+ 1374  git commit -m "mini glsl fix05 scnZN fix ix,iy, iw,ih gpdSIZ2CR 4x6 "
+ 1375  git push origin master
+ 1376  git add .
+ 1377  git commit -m "mini glsl fix06 scnZN fix ix,iy, iw,ih gpdSIZ2CR 4x6 "
+ 1378  git push origin master
+ 1379  df -h
+ 1380  raspi-config
+ 1381  sudo raspi-config
+ 1382  df -h
+ 1383  sudo rpi-update
+ 1384  reboot
+ 1385  rpi-config
+ 1386  sudo rpi-config
+ 1387  sudo raspi-config
+ 1388  sudo apt-get update
+ 1389  sudo apt-get dist-upgrade
+ 1390  sudo leafpad
+ 1391  cd ~/Desktop/piMASS
+ 1392  git add .
+ 1393  git commit -m "sd card 16->64G "
+ 1394  git push origin master
+ 1395  sudo leafpad
+ 1396  sudo /etc/init.d/dphys-swapfile stop
+ 1397  sudo /etc/init.d/dphys-swapfile start
+ 1398  git add .
+ 1399  git commit -m "mini _# bON break; "
+ 1400  cd ~/Desktop/piMASS
+ 1401  git add .
+ 1402  git commit -m "mini _# bON break{ SRCmill gpcSCOOP }; "
+ 1403  git push origin master
+ 1404  git add .
+ 1405  git commit -m "SRCmill 01 "
+ 1406  git push origin master
+ 1407  cd robo
+ 1408  cd robo/
+ 1409  cd /robo
+ 1410  sudo ln -s /media/pi/DEBIAN 10_22/robout /robo
+ 1411  sudo ln -s "/media/pi/DEBIAN 10_22/robout" /robo2
+ 1412  cd ~/Desktop/piMASS
+ 1413  rob.mass
+ 1414  pimass rob.mass
+ 1415  cd ~/Desktop/piMASS
+ 1416  git commit -m "SRCmill 03 fix cxy.y>=fH continue "
+ 1417  git add .
+ 1418  git commit -m "SRCmill 03 fix cxy.y>=fH continue "
+ 1419  pimass rob.mass
+ 1420  git push origin master
+ 1421  git add .
+ 1422  git commit -m "SRCmill 04 fix cxy.y>=fH continue SRCmnMILLscn 01 "
+ 1423  git push origin master
+ 1424  cd ~/Desktop/piMASS
+ 1425  git add .
+ 1426  git commit -m "VisualC++ piMASS.sln"
+ 1427  git push origin master
+ 1428  git add .
+ 1429  git commit -m "gpcCRS::miniRDYmap"
+ 1430  git push origin master
+ 1431  git add .
+ 1432  git commit -m "gpcCRS::miniRDYmap 02"
+ 1433  git push origin master
+ 1434  git add .
+ 1435  git commit -m "gpcCRS::miniRDYmap 03"
+ 1436  git push origin master
+ 1437  git add .
+ 1438  git commit -m "gpcCRS::miniRDYmap 04"
+ 1439  git push origin master
+ 1440  git add .
+ 1441  git commit -m "gpcCRS::miniRDYmap 05"
+ 1442  git push origin master
+ 1443  git add .
+ 1444  cd ~/Desktop/piMASS
+ 1445  git add .
+ 1446  git commit -m "gpcCRS::miniRDYmap 06 end"
+ 1447  git push origin master
+ 1448  reboot
+ 1449  sudo reboot
+ 1450  df -h
+ 1451  cd ~/Desktop/piMASS
+ 1452  git add .
+ 1453  git commit -m "gpcSRClnk 01"
+ 1454  git push origin master
+ 1455  reboot
+ 1456  sudo reboot
+ 1457  cd ~/Desktop/piMASS
+ 1458  git commit -m "gpcSRClnk 02"
+ 1459  git add .
+ 1460  git commit -m "gpcSRClnk 02"
+ 1461  git push origin master
+ 1462  git add .
+ 1463  git commit -m "gpcSRClnk 03"
+ 1464  git push origin master
+ 1465  sudo apt full-upgrade
+ 1466  sudo apt update
+ 1467  sudo apt full-upgrade
+ 1468  reboot
+ 1469  df -h
+ 1470  cd ~/Desktop/piMASS
+ 1471  git add .
+ 1472  git commit -m "gpcSRClnk 04"
+ 1473  git push origin master
+ 1474  git add .
+ 1475  git commit -m "gpcSRClnk 05"
+ 1476  git push origin master
+ 1477  xrandr
+ 1478  xrandr ?
+ 1479  xrandr --help
+ 1480  xrandr --on
+ 1481  sudo doublecmd
+ 1482  shootdown
+ 1483  shotdown
+ 1484  cd ~/Desktop/piMASS
+ 1485  git add .
+ 1486  git commit -m "gpcSRClnk 06"
+ 1487  git push origin master
+ 1488  git add .
+ 1489  git commit -m "gpcSRClnk 07"
+ 1490  git push origin master
+ 1491  cd ~/Desktop/piMASS
+ 1492  git add .
+ 1493  git commit -m "gpcSRClnk 08"
+ 1494  git push origin master
+ 1495  git add .
+ 1496  git commit -m "gpcSRClnk 09"
+ 1497  git push origin master
+ 1498  git add .
+ 1499  git commit -m "gpcSRClnk 10"
+ 1500  git push origin master
+ 1501  reboot
+ 1502  shutdown
+ 1503  sudo shutdown
+ 1504  sudo shutdown -c
+ 1505  sudo shutdown
+ 1506  shutdown -c
+ 1507  shutdown -a
+ 1508  shutdown ?
+ 1509  shutdown --help
+ 1510  shutdown -P
+ 1511  sudo shutdown -P
+ 1512  sudo shutdown -P -C
+ 1513  sudo shutdown -P
+ 1514  reboot
+ 1515  sudo doublecmd
+ 1516  numlockx on
+ 1517  sudo apt-get install numlockx
+ 1518  numlockx on
+ 1519  reboot
+ 1520  sudo apt-get install -reinstall raspberrypi-bootloader raspberrypi-kernel
+ 1521  sudo apt-get install --reinstall raspberrypi-bootloader raspberrypi-kernel
+ 1522  reboot
+ 1523  cd ~/Desktop/piMASS
+ 1524  git add .
+ 1525  git commit -m "gpcSRClnk 10_1"
+ 1526  git add .
+ 1527  git push origin master
+ 1528  cd ~/Desktop/piMASS
+ 1529  git add .
+ 1530  git commit -m "gpcSRClnk 11"
+ 1531  git push origin master
+ 1532  git add .
+ 1533  git commit -m "gpcSRClnk 12"
+ 1534  git push origin master
+ 1535  git add .
+ 1536  git commit -m "gpcSRClnk 13"
+ 1537  git push origin master
+ 1538  git add .
+ 1539  git commit -m "gpcSRClnk+dbg 14"
+ 1540  git push origin master
+ 1541  git add .
+ 1542  git commit -m "gpcSRClnk+dbg 15"
+ 1543  git push origin master
+ 1544  git add .
+ 1545  git commit -m "gpcSRClnk+dbg 16"
+ 1546  git push origin master
+ 1547  git add .
+ 1548  git commit -m "gpcSRClnk+dbg 17"
+ 1549  git push origin master
+ 1550  git add .
+ 1551  git commit -m "gpcSRClnk+dbg 18"
+ 1552  git push origin master
+ 1553  git add .
+ 1554  git commit -m "gpcSRClnk+dbg 19"
+ 1555  git push origin master
+ 1556  cd ~/Desktop/piMASS
+ 1557  git add .
+ 1558  git commit -m "gpcSRClnk+dbg 20"
+ 1559  git push origin master
+ 1560  git add .
+ 1561  git commit -m "gpcSRClnk+dbg 21"
+ 1562  git push origin master
+ 1563  cd ~/Desktop/piMASS
+ 1564  git add .
+ 1565  git commit -m "gpcSRClnk+dbg 22 fake68k"
+ 1566  git push origin master
+ 1567  cd ~/Desktop/piMASS
+ 1568  git add .
+ 1569  git commit -m "gpcSRClnk+dbg 23 fake68k"
+ 1570  git push origin master
+ 1571  git add .
+ 1572  git commit -m "gpcSRClnk+dbg 24 fake68k"
+ 1573  git push origin master
+ 1574  git add .
+ 1575  git commit -m "gpcSRClnk+dbg 25 fake68k"
+ 1576  git push origin master
+ 1577  git add .
+ 1578  git commit -m "gpcSRClnk+dbg 25 fake68k level 1"
+ 1579  git push origin master
+ 1580  git add .
+ 1581  git commit -m "gpcSRClnk+dbg 25 fake68k level 02"
+ 1582  git push origin master
+ 1583  cd ~/Desktop/piMASS
+ 1584  git commit -m "gpcSRClnk+dbg 25 fake68k nkead 01"
+ 1585  git add .
+ 1586  git commit -m "gpcSRClnk+dbg 25 fake68k knead 01"
+ 1587  git push origin master
+ 1588  git add .
+ 1589  git commit -m "gpcSRClnk+dbg 25 fake68k knead 02"
+ 1590  git push origin master
+ 1591  git add .
+ 1592  git commit -m "gpcSRClnk+dbg 25 fake68k knead 03"
+ 1593  git push origin master
+ 1594  git add .
+ 1595  git commit -m "gpcSRClnk+dbg 25 fake68k knead 04"
+ 1596  git push origin master
+ 1597  git add .
+ 1598  git commit -m "gpcSRClnk+dbg 25 fake68k knead 05"
+ 1599  git push origin master
+ 1600  git add .
+ 1601  git commit -m "gpcSRClnk+dbg 25 fake68k knead 06"
+ 1602  git push origin master
+ 1603  git add .
+ 1604  git commit -m "gpcSRClnk+dbg 25 fake68k knead 07"
+ 1605  git push origin master
+ 1606  cd ~/Desktop/piMASS
+ 1607  git add .
+ 1608  git commit -m "gpcSRClnk+dbg 25 fake68k knead 08"
+ 1609  git push origin master
+ 1610  git push --help
+ 1611  git push -f origin master
+ 1612  cd Desktop/piMASS
+ 1613  cd piMASScmpi
+ 1614  ls
+ 1615  git add .
+ 1616  git commit -m "gpcSRClnk+dbg+run 01 fake68k knead 08"
+ 1617  git push origin master
+ 1618  git add .
+ 1619  git commit -m "gpcSRClnk+dbg+run 02 fake68k knead 08"
+ 1620  git push origin master
+ 1621  cd Desktop/piMASS
+ 1622  git add .
+ 1623  git commit -m "gpcSRClnk+dbg+run 03 fake68k knead 09"
+ 1624  git push origin master
+ 1625  cd Desktop/piMASS
+ 1626  git add .
+ 1627  git commit -m "gpcSRClnk+dbg+run 04 fake68k knead 09"
+ 1628  git push origin master
+ 1629  git add .
+ 1630  git commit -m "gpcSRClnk+dbg+run 05 fake68k knead 09"
+ 1631  git push origin master
+ 1632  cd Desktop/piMASS
+ 1633  git commit -m "gpcSRClnk+dbg+run 06 fake68k knead 09"
+ 1634  git add .
+ 1635  git commit -m "gpcSRClnk+dbg+run 06 fake68k knead 09"
+ 1636  git push origin master
+ 1637  git add .
+ 1638  git commit -m "gpcSRClnk+dbg+run 07 fake68k knead 09"
+ 1639  git push origin master
+ 1640  cd Desktop/piMASS
+ 1641  git add .
+ 1642  git commit -m "gpcSRClnk+dbg+run 08 fake68k knead 09"
+ 1643  git push origin master
+ 1644  cd Desktop/piMASS
+ 1645  git add .
+ 1646  git commit -m "gpcSRClnk+dbg+run 09 fake68k knead 09"
+ 1647  git push origin master
+ 1648  cd Desktop/piMASS
+ 1649  git add .
+ 1650  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 01"
+ 1651  git push origin master
+ 1652  git add .
+ 1653  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 02"
+ 1654  git push origin master
+ 1655  git add .
+ 1656  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 03"
+ 1657  git push origin master
+ 1658  git add .
+ 1659  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 04"
+ 1660  git push origin master
+ 1661  git add .
+ 1662  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 05"
+ 1663  git push origin master
+ 1664  cd Desktop/piMASS
+ 1665  git add .
+ 1666  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 06"
+ 1667  git push origin master
+ 1668  git add .
+ 1669  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 07"
+ 1670  git add .
+ 1671  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 08"
+ 1672  git push origin master
+ 1673  cd Desktop/piMASS
+ 1674  git add .
+ 1675  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 09"
+ 1676  git push origin master
+ 1677  cd Desktop/piMASS
+ 1678  git push origin master
+ 1679  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 09 + LabView Torpedo"
+ 1680  git add .
+ 1681  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 09 + LabView Torpedo"
+ 1682  git push origin master
+ 1683  git add .
+ 1684  git commit -m "mnRDY_srcBRK jDOit_srcBLD_srcCMPLR_coreLNK srcRUN_srcMINI 01"
+ 1685  git push origin master
+ 1686  git add .
+ 1687  git commit -m "mnRDY_srcBRK jDOit_srcBLD_srcCMPLR_coreLNK srcRUN_srcMINI 02"
+ 1688  git push origin master
+ 1689  cd Desktop/piMASS
+ 1690  git add .
+ 1691  git commit -m "gpcSRClnk+dbg+run 10 fake68k knead core 10"
+ 1692  git push origin master
+ 1693  git add .
+ 1694  git commit -m "gpcSRClnk+dbg+run 11 fake68k knead core 10"
+ 1695  git push origin master
+ 1696  git add .
+ 1697  git commit -m "gpcSRClnk+dbg+run 11 fake68k knead core 10"
+ 1698  git commit -m "gpcSRClnk+dbg+run 11 fake68k knead core 11"
+ 1699  git add .
+ 1700  git commit -m "gpcSRClnk+dbg+run 11 fake68k knead core 11"
+ 1701  git push origin master
+ 1702  git add .
+ 1703  git commit -m "gpcSRClnk+dbg+run 11 fake68k knead core 12"
+ 1704  git push origin master
+ 1705  git add .
+ 1706  git commit -m "gpcSRClnk+dbg+run 12 fake68k knead core 12"
+ 1707  git push origin master
+ 1708  git add .
+ 1709  git commit -m "gpcSRClnk+dbg+run 13 fake68k knead core 12"
+ 1710  git push origin master
+ 1711  cd Desktop/piMASS
+ 1712  git add .
+ 1713  git commit -m "I suffer :( Please feel sorry :) 01"
+ 1714  git push origin master
+ 1715  git add .
+ 1716  git commit -m "piMASScmplr 01"
+ 1717  git push origin master
+ 1718  git add .
+ 1719  git commit -m "piMASScmplrVisualC++sln 01"
+ 1720  git push origin master
+ 1721  cd Desktop/piMASS
+ 1722  git commit -m "piMASScmplrVisualC++sln 02 scpPC scpIST"
+ 1723  git add .
+ 1724  git commit -m "piMASScmplrVisualC++sln 02 scpPC scpIST"
+ 1725  git push origin master
+ 1726  cd Desktop/piMASS
+ 1727  git add .
+ 1728  git commit -m "piMASScmplrVisualC++sln 03 lzyMiN lzyDCT lzyLiNK lzyCNST lzyASM"
+ 1729  git push origin master
+ 1730  git add .
+ 1731  git commit -m "piMASScmplrVisualC++sln 03 lzyMiN lzyDCT lzyLiNK lzyCNST lzyASM design"
+ 1732  git push origin master
+ 1733  cd Desktop/piMASS
+ 1734  git add .
+ 1735  git commit -m "piMASScmplrVisualC++sln 03 design gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.01 gpROW.01 "
+ 1736  git push origin master
+ 1737  git add .
+ 1738  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.01 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.01 gpROW.01 "
+ 1739  git push origin master
+ 1740  git add .
+ 1741  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.02 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.02 gpROW.01 "
+ 1742  git push origin master
+ 1743  git add .
+ 1744  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.03 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.03 gpROW.01 "
+ 1745  git push origin master
+ 1746  git add .
+ 1747  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.03 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.04 gpROW.01 "
+ 1748  git push origin master
+ 1749  cd Desktop/piMASS
+ 1750  git add .
+ 1751  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.03 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.05 gpROW.01 "
+ 1752  git push origin master
+ 1753  git add .
+ 1754  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.03 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.06 gpROW.01 "
+ 1755  git push origin master
+ 1756  git add .
+ 1757  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.04 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.06 gpROW.01 "
+ 1758  git push origin master
+ 1759  git add .
+ 1760  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.05 gpMEM.01 gpOBJ.01 gpCLASS.00 gpBLOCK.06 gpROW.01 "
+ 1761  git push origin master
+ 1762  git add .
+ 1763  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.05 gpMEM.01 gpOBJ.02 gpCLASS.00 gpBLOCK.06 gpROW.02 "
+ 1764  git push origin master
+ 1765  git add .
+ 1766  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.06 gpMEM.01 gpOBJ.02 gpCLASS.00 gpBLOCK.06 gpROW.02 "
+ 1767  git push origin master
+ 1768  telnet 192.168.1.90 502
+ 1769  ping 192.168.1.90
+ 1770  telnet 192.168.1.90 502
+ 1771  git add .
+ 1772  cd Desktop/piMASS
+ 1773  git add .
+ 1774  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.06 gpMEM.01 gpOBJ.02 gpCLASS.00 gpBLOCK.07 gpROW.02 "
+ 1775  git push origin master
+ 1776  git add .
+ 1777  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.06 gpMEM.01 gpOBJ.02 gpCLASS.00 gpBLOCK.08.stk01 gpROW.02 "
+ 1778  git push origin master
+ 1779  git add .
+ 1780  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.06 gpMEM.01 gpOBJ.02 gpCLASS.00 gpBLOCK.08.stk02 gpROW.02 "
+ 1781  git add .
+ 1782  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.06 gpMEM.01 gpOBJ.02 gpCLASS.00 gpBLOCK.08.stk03 gpROW.02 "
+ 1783  git push origin master
+ 1784  git add .
+ 1785  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.06 gpMEM.01 gpOBJ.02 gpCLASS.00 gpBLOCK.09.stk03 gpROW.02 "
+ 1786  git push origin master
+ 1787  cd Desktop/piMASS
+ 1788  git add .
+ 1789  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.06 gpMEM.01 gpINST.03 gpOBJ.02 gpCLASS.00 gpBLOCK.0A.stk03 gpROW.02 "
+ 1790  cd Desktop/piMASS
+ 1791  git push origin master
+ 1792  git push origin master --force
+ 1793  git add .
+ 1794  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.02 gpINST.04 gpOBJ.02 gpCLASS.00 gpBLOCK.0A.stk03 gpROW.02 "
+ 1795  git push origin master --force
+ 1796  git push origin master
+ 1797  git add .
+ 1798  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.02 gpINST.05 gpOBJ.02 gpCLASS.00 gpBLOCK.0A.stk03 gpROW.02 "
+ 1799  git push origin master
+ 1800  cd Desktop/piMASS
+ 1801  git add .
+ 1802  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 "
+ 1803  git push origin master
+ 1804  git add .
+ 1805  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info "
+ 1806  git push origin master
+ 1807  cd Desktop/piMASS
+ 1808  git add .
+ 1809  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.01 "
+ 1810  git push origin master
+ 1811  git add .
+ 1812  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 "
+ 1813  git push origin master
+ 1814  git add .
+ 1815  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 jOHN.02 "
+ 1816  git push origin master
+ 1817  cd Desktop/piMASS
+ 1818  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 jOHN.03 "
+ 1819  git add .
+ 1820  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 jOHN.03 "
+ 1821  git push origin master
+ 1822  cd Desktop/piMASS
+ 1823  git add .
+ 1824  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 jOHN.04 "
+ 1825  git push origin master
+ 1826  git add .
+ 1827  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 "[A
+ 1828  git push origin master
+ 1829  git add .
+ 1830  cd Desktop/piMASS
+ 1831  git add .
+ 1832  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.06 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1833  git push origin master
+ 1834  cd Desktop/piMASS
+ 1835  git add .
+ 1836  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.07 gpOBJ.02 gpCLASS.00 gpBLOCK.0B.stk03 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1837  git push origin master
+ 1838  git add .
+ 1839  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.07 gpMEM.03 gpINST.08 gpOBJ.03 gpCLASS.00 gpBLOCK.0C.mov01 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1840  git push origin master
+ 1841  git add .
+ 1842  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.08 gpMEM.03 gpINST.09 gpOBJ.03 gpCLASS.00 gpBLOCK.0C.mov01 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1843  git push origin master
+ 1844  cd Desktop/piMASS
+ 1845  git add .
+ 1846  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.08 gpMEM.03 gpINST.0A gpOBJ.03 gpCLASS.00 gpBLOCK.0C.mov01 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1847  git push origin master
+ 1848  alivemoon
+ 1849  0nlyAM19A#
+ 1850  git push origin master
+ 1851  git add .
+ 1852  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.08 gpMEM.03 gpINST.0B gpOBJ.03 gpCLASS.00 gpBLOCK.0C.mov01 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1853  git push origin master
+ 1854  git add .
+ 1855  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.08 gpMEM.03 gpINST.0C gpOBJ.03 gpCLASS.00 gpBLOCK.0D.mov02.mul01 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1856  git push origin master
+ 1857  git add .
+ 1858  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.08 gpMEM.03 gpINST.0C gpOBJ.03 gpCLASS.00 gpBLOCK.0D.mov03.mul02 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1859  git push origin master
+ 1860  git add .
+ 1861  git commit -m "piMASScmplrVisualC++sln 03 design gppiMASScmplr.08 gpMEM.03 gpINST.0D gpOBJ.03 gpCLASS.00 gpBLOCK.0D.mov04.mul03.add01 gpROW.03 DRCos.info robDRC.infox.02 jOHN.05 RobDBG "
+ 1862  git push origin master
+ 1863  git add .
+ 1864  git commit -m "debug INST.mov.01 "
+ 1865  git push origin master
+ 1866  git add .
+ 1867  git commit -m "debug INST.mov.02 "
+ 1868  git push origin master
+ 1869  cd /rob2/
+ 1870  cd /rob2
+ 1871  ls
+ 1872  cd Desktop/piMASS
+ 1873  git commit -m "debug INST.mov.02 gpcSRCbrk{ DCTadd( 0,1 } "
+ 1874  git add .
+ 1875  git commit -m "debug INST.mov.02 gpcSRCbrk.DCTadd( 0,1  "
+ 1876  git add .
+ 1877  git commit -m "debug INST.mov.02 gpcSRCbrk.DCTadd( 0,1  "
+ 1878  git push origin master
+ 1879  cd Desktop/piMASS
+ 1880  git add .
+ 1881  git commit -m "debug INST.mov.03 gpcSRCbrk.DCTadd( 0,1  "
+ 1882  git push origin master
+ 1883  git add .
+ 1884  git commit -m "INST.mov.04.var.01.FPS  "
+ 1885  git push origin master
+ 1886  git add .
+ 1887  git commit -m "INST.mov.04.var.02.FPS mini.01.AGAIN  "
+ 1888  git push origin master
+ 1889  git add .
+ 1890  git commit -m "INST.mov.04.var.02.FPS mini.02.AGAIN  "
+ 1891  git push origin master
+ 1892  git add .
+ 1893  git commit -m "INST.mov.04.var.02.FPS mini.02.AGAIN.telnet01.slmp01  "
+ 1894  git push origin master
+ 1895  git add .
+ 1896  git commit -m "INST.mov.04.var.02.FPS mini.03.AGAIN.telnet01.slmp02  "
+ 1897  git push origin master
+ 1898  git commit -m "INST.mov.04.var.02.FPS mini.03.AGAIN.telnet01.slmp03  "
+ 1899  git add .
+ 1900  git commit -m "INST.mov.04.var.02.FPS mini.03.AGAIN.telnet01.slmp03  "
+ 1901  git push origin master
+ 1902  git add .
+ 1903  git commit -m "INST.mov.04.var.02.FPS mini.03.AGAIN.telnet01.slmp03.cam01 "
+ 1904  git push origin master
+ 1905  git add .
+ 1906  git commit -m "INST.mov.04.var.02.FPS mini.03.AGAIN.telnet01.slmp03.cam01.pic01 "
+ 1907  git push origin master
+ 1908  cd Desktop/piMASS
+ 1909  git add .
+ 1910  git commit -m "INST.mov.04.var.02.FPS mini.03.AGAIN.telnet01.slmp03.cam01.pic01.entry01 "
+ 1911  git push origin master
+ 1912  git add .
+ 1913  git commit -m "rpi4_install.txt 01"
+ 1914  git push origin master
+ 1915  sudo leafpad
+ 1916  git add .
+ 1917  cd Desktop/piMASS
+ 1918  git add .
+ 1919  git commit -m "rpi4 raspicam->v4l2git add ."
+ 1920  git push origin master
+ 1921  cd Desktop/piMASS
+ 1922  git add .
+ 1923  git commit -m "rpi4 v4l2 YUYV01"
+ 1924  git push origin master
+ 1925  git add .
+ 1926  git commit -m "rpi4 v4l2 YUYV01 AN01.ize"
+ 1927  git push origin master
+ 1928  cd Desktop/piMASS
+ 1929  git add .
+ 1930  git commit -m "rpi4 gpPTR01"
+ 1931  git push origin master
+ 1932  cd Desktop/piMASS
+ 1933  git add .
+ 1934  git commit -m "rpi4 gpPTR02 funPRINT"
+ 1935  git push origin master
+ 1936  git add .
+ 1937  git commit -m "rpi4 gpPTR03 funPRINT"
+ 1938  git push origin master
+ 1939  git commit -m "rpi4 gpPTR04 funPRINT"
+ 1940  git add .
+ 1941  git commit -m "rpi4 gpPTR04 funPRINT"
+ 1942  git push origin master
+ 1943  git add .
+ 1944  git commit -m "rpi4 gpPTR05 funPRINT02"
+ 1945  git push origin master
+ 1946  git add .
+ 1947  git commit -m "rpi4 gpPTR06cID() funPRINT02"
+ 1948  git push origin master
+ 1949  git add .
+ 1950  git commit -m "rpi4 gpPTR06cID() funPRINT03%s"
+ 1951  git push origin master
+ 1952  git add .
+ 1953  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03"
+ 1954  git push origin master
+ 1955  ls -l /dev
+ 1956  git add .
+ 1957  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01"
+ 1958  git push origin master
+ 1959  ls
+ 1960  history > histi.txt
+ 1961  ifconfig
+ 1962  cd Desktop/piMASS
+ 1963  git add .
+ 1964  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 gpcGSM"
+ 1965  git push origin master
+ 1966  mc
+ 1967  sudo apt instal midnightcmd
+ 1968  sudo apt instal mc
+ 1969  sudo apt install mc
+ 1970  mc
+ 1971  cd Desktop/piMASS
+ 1972  git add .
+ 1973  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ..."
+ 1974  git push origin master
+ 1975  git add .
+ 1976  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 02"
+ 1977  git push origin master
+ 1978  git add .
+ 1979  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 03"
+ 1980  git push origin master
+ 1981  git add .
+ 1982  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 04"
+ 1983  git push origin master
+ 1984  git add .
+ 1985  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 05"
+ 1986  git push origin master
+ 1987  git add .
+ 1988  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 06"
+ 1989  git push origin master
+ 1990  git add .
+ 1991  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 07"
+ 1992  git push origin master
+ 1993  git add .
+ 1994  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 08"
+ 1995  git push origin master
+ 1996  git add .
+ 1997  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 09"
+ 1998  git push origin master
+ 1999  git add .
+ 2000  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 10"
+ 2001  git push origin master
+ 2002  git add .
+ 2003  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 11"
+ 2004  git push origin master
+ 2005  git add .
+ 2006  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 12"
+ 2007  git push origin master
+ 2008  git add .
+ 2009  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 13"
+ 2010  git push origin master
+ 2011  git add .
+ 2012  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 14"
+ 2013  git push origin master
+ 2014  git add .
+ 2015  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 15"
+ 2016  git push origin master
+ 2017  git add .
+ 2018  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 16"
+ 2019  git push origin master
+ 2020  git add .
+ 2021  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 17"
+ 2022  git push origin master
+ 2023  git add .
+ 2024  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 18"
+ 2025  git push origin master
+ 2026  git add .
+ 2027  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 19"
+ 2028  git push origin master
+ 2029  git add .
+ 2030  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 20"
+ 2031  git push origin master
+ 2032  git add .
+ 2033  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 21"
+ 2034  git push origin master
+ 2035  git add .
+ 2036  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 22"
+ 2037  git push origin master
+ 2038  git add .
+ 2039  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 23"
+ 2040  git push origin master
+ 2041  git add .
+ 2042  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 24"
+ 2043  git push origin master
+ 2044  git add .
+ 2045  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 25"
+ 2046  git push origin master
+ 2047  git add .
+ 2048  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 26"
+ 2049  git push origin master
+ 2050  git add .
+ 2051  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 27"
+ 2052  git push origin master
+ 2053  git add . 
+ 2054  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 28"
+ 2055  git push origin master
+ 2056  git add . 
+ 2057  git commit -m "rpi4 gpPTR06cID() funPRINT03%s minichar03 sim7x00_01 pAT: gpeALF_MRK gpeALF_CM gpeALF_CRLF ... 29"
+ 2058  git push origin master
+ 2059  git commit -m "rpi4 GLobj iLWO 01"
+ 2060  git add . 
+ 2061  git commit -m "rpi4 GLobj iLWO 01"
+ 2062  git push origin master
+ 2063  git add . 
+ 2064  git commit -m "rpi4 GLobj iLWO 02"
+ 2065  git push origin master
+ 2066  git add . 
+ 2067  git commit -m "rpi4 GLobj iLWO 03"
+ 2068  git push origin master
+ 2069  git add . 
+ 2070  git commit -m "rpi4 GLobj iLWO 04"
+ 2071  git push origin master
+ 2072  git add . 
+ 2073  git commit -m "rpi4 GLobj iLWO 05"
+ 2074  git push origin master
+ 2075  git add . 
+ 2076  git commit -m "rpi4 GLobj iLWO 06"
+ 2077  git push origin master
+ 2078  git add . 
+ 2079  git commit -m "rpi4 GLobj iLWO 07"
+ 2080  git push origin master
+ 2081  git add . 
+ 2082  git commit -m "rpi4 GLobj iLWO 08"
+ 2083  git push origin master
+ 2084  git add . 
+ 2085  git commit -m "rpi4 GLobj iLWO 08"
+ 2086  git push origin master
+ 2087  git add . 
+ 2088  git commit -m "rpi4 GLobj iLWO 09"
+ 2089  git push origin master
+ 2090  n V                                                                                                                                                                                                                                                                                                                               
+ 2091  git add . 
+ 2092  git commit -m "rpi4 GLobj iLWO 10"
+ 2093  git push origin master
+ 2094  git add . 
+ 2095  git commit -m "rpi4 GLobj iLWO 11"
+ 2096  git push origin master
+ 2097  git add . 
+ 2098  git commit -m "rpi4 GLobj iLWO 12"
+ 2099  git push origin master
+ 2100  git add . 
+ 2101  git commit -m "rpi4 GLobj iLWO 13"
+ 2102  git push origin master
+ 2103  git add . 
+ 2104  git commit -m "rpi4 GLobj iLWO 14"
+ 2105  git push origin master
+ 2106  git add . 
+ 2107  git commit -m "rpi4 GLobj iLWO 15"
+ 2108  git push origin master
+ 2109  git add . 
+ 2110  git commit -m "rpi4 GLobj iLWO 16"
+ 2111  git add . 
+ 2112  git commit -m "rpi4 GLobj iLWO 16"
+ 2113  git push origin master
+ 2114  git add . 
+ 2115  git commit -m "rpi4 GLobj iLWO 16"
+ 2116  git add . 
+ 2117  git commit -m "rpi4 GLobj iLWO 16"
+ 2118  git push origin master
+ 2119  git add . 
+ 2120  git commit -m "rpi4 GLobj iLWO 17"
+ 2121  git push origin master
+ 2122  git add . 
+ 2123  git commit -m "rpi4 GLobj iLWO 18"
+ 2124  git push origin master
+ 2125  git add . 
+ 2126  git commit -m "rpi4 GLobj iLWO 19"
+ 2127  git push origin master
+ 2128  git add . 
+ 2129  git commit -m "rpi4 GLobj iLWO 20"
+ 2130  git push origin master
+ 2131  git add . 
+ 2132  git commit -m "rpi4 GLobj iLWO 21"
+ 2133  git push origin master
+ 2134  git add . 
+ 2135  git commit -m "rpi4 GLobj iLWO 22"
+ 2136  git push origin master
+ 2137  git add . 
+ 2138  git commit -m "rpi4 GLobj iLWO 23"
+ 2139  git push origin master
+ 2140  git add . 
+ 2141  git commit -m "rpi4 GLobj iLWO 24"
+ 2142  git push origin master
+ 2143  í                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+ 2144  git add .
+ 2145  git commit -m "rpi4 GLobj iLWO 25"
+ 2146  git push origin master
+ 2147  git add .
+ 2148  git commit -m "rpi4 GLobj iLWO 26"
+ 2149  git push origin master
+ 2150  git add .
+ 2151  git commit -m "rpi4 GLobj iLWO 26 pLWS 01"
+ 2152  git push origin master
+ 2153  git add .
+ 2154  git commit -m "rpi4 GLobj iLWO 26 pLWS 02"
+ 2155  git push origin master
+ 2156  git add .
+ 2157  git commit -m "rpi4 GLobj iLWO 26 pLWS 03"
+ 2158  git push origin master
+ 2159  git add .
+ 2160  git commit -m "rpi4 GLobj iLWO 26 pLWS 04"
+ 2161  git push origin master
+ 2162  git add .
+ 2163  git commit -m "rpi4 GLobj iLWO 26 pLWS 05"
+ 2164  git push origin master
+ 2165  git add .
+ 2166  git commit -m "rpi4 GLobj iLWO 26 pLWS 06"
+ 2167  git push origin master
+ 2168  git add .
+ 2169  git commit -m "rpi4 GLobj iLWO 26 pLWS 07"
+ 2170  git push origin master
+ 2171  git add .
+ 2172  git commit -m "rpi4 GLobj iLWO 26 pLWS 08"
+ 2173  git push origin master
+ 2174  git add .
+ 2175  git commit -m "rpi4 GLobj iLWO 26 pLWS 09"
+ 2176  git push origin master
+ 2177  git add .
+ 2178  git commit -m "rpi4 GLobj iLWO 26 pLWS 10"
+ 2179  git push origin master
+ 2180  git add .
+ 2181  git commit -m "rpi4 GLobj iLWO 26 pLWS 11"
+ 2182  git push origin master
+ 2183  git add .
+ 2184  git commit -m "rpi4 GLobj iLWO 26 pLWS 12"
+ 2185  git push origin master
+ 2186  git add .
+ 2187  git commit -m "rpi4 GLobj iLWO 26 pLWS 13"
+ 2188  git push origin master
+ 2189  git pull
+ 2190  git pull origin master
+ 2191  git add .
+ 2192  git commit -m "rpi4 GLobj iLWO 26 pLWS 14"
+ 2193  git push origin master
+ 2194  history >histi.txt

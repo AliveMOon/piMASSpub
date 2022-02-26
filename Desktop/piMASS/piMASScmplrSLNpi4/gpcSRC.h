@@ -795,23 +795,35 @@ static char gpsOPERA[] = {
 
 class gpcSCOOP {
 	gpcLZY 		lzyMiN;		I8x4 rMN;	U4 nMiN;
+	gpcLZY		lzySCP;
 public:
 	gpcLZYdct	lzyDCT;					U4 nDCT;
 	gpcLZY		lzyLiNK; 	U4x4 rLNK;	U4 nLiNK;
 	gpcLZY		lzyCNST;				U4 nCNST;
 	gpcLZY		lzyASM;		I4x4 rINS;	U4 nINS;
 
-	U1	*p_str;
+	U1	*pALL;
 	U8	hsSTR;
 	U4x4 dim;
 
 	gpcSCOOP(){ gpmCLR; };
+	~gpcSCOOP();
 
-	bool bGD( U1* pUTF, U1** ppUe ) {
+	gpcSCOOP* pSCP( size_t i ) { // NULL - ha nincs elég
+		if( !this )
+			return NULL;
+		gpcSCOOP** ppSCP = lzySCP.ppSCP(i);
+		if( !ppSCP )
+			return NULL;
+
+		return *ppSCP;
+
+	}
+
+	bool bGDhs( U1* pUTF, U1** ppUe ) {
 		U8	hs2 = 0;
 		U4	i = 0;
-		while( pUTF[i] )
-		{
+		while( pUTF[i] ) {
 			hs2 += i + (U8)pUTF[i];
 			i++;
 		}
@@ -824,17 +836,7 @@ public:
 		return false;
 	}
 
-	void rst( U1* pUTF ) {
-		lzyMiN.lzyRST();
-
-		lzyDCT.rst();
-		lzyLiNK.lzyRST();
-		lzyCNST.lzyRST();
-		lzyASM.lzyRST();
-
-		nDCT = nLiNK = nCNST = nMiN = nINS = 0;
-		p_str = pUTF;	// ezt a gpcSRC::srcBRK adja
-	}
+	void rst( U1* pUTF );
 	//I8x4* pMN();
 
 	U4 nMN() {
@@ -871,7 +873,7 @@ public:
 		return 	nINS = lzyASM.nLD(sizeof(rINS));
 	}
 
-	U4 DCTadd( U4x2 pos, U1* pUi, U8 nU, U4 color, U4 typ = 0xff ) {
+	U4 DCTadd( U4x2 pos, U1* pS, U8 nU, U4 color, U4 typ = 0xff ) {
 		if( !this )
 			return 0;
 
@@ -879,7 +881,7 @@ public:
 			return nMN();
 
  		U8 nS = nU, nI;
- 		U4 iDCT = lzyDCT.dctMILLfndnS( pUi, nS, nDCT );
+ 		U4 iDCT = lzyDCT.dctMILLfndnS( pS, nS, nDCT );
  		if( iDCT < nDCT )
 		if( (nI=lzyDCT.nSTRix(iDCT)) != nS )
 			iDCT = nDCT;
@@ -888,7 +890,7 @@ public:
 		{
 			// nem volt a SZóTáRBAN
 			iDCT = nDCT; // a végére kerül ha hozzá adjuk
-			lzyDCT.dctMILLaddS( pUi, nU );
+			lzyDCT.dctMILLaddS( pS, nU );
 			nDCT++;
 		}
 		// typ U4x4.w:
@@ -896,7 +898,7 @@ public:
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		rLNK = U4x4(nMN());
 
-		rMN.iMNindt = U4x4( pUi-p_str, nU, iDCT, typ );
+		rMN.iMNindt = U4x4( pS-pALL, nU, iDCT, typ );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
@@ -904,7 +906,9 @@ public:
 		lzyLiNK.lzyADD( &rLNK, sizeof(rLNK), nU = -1 );
 		return nMN();
 	}
-	U4 STRadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
+	U4 STRadd(	U4x2 pos, U1* pUi, size_t nU, U4 color, //U4 iSTR,
+				gpcSRC* pSRC, gpcLZYdct& dOP, bool bNoMini, U1 selID, const char* pVAN );
+	U4 NOTEadd( U4x2 pos, U1* pS, U8 nU, U4 color ) {
 		if( !nU )
 			return 0;
 
@@ -915,30 +919,15 @@ public:
 		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
 		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
 		//U1x4 typ(0x10,1,1,0);
-		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
-		rMN.rMNpos = pos;
-		rMN.rMNclr = color;
-		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
-		return nMN();
-	}
-	U4 NOTEadd( U4x2 pos, U1* pUi, U8 nU, U4 color ) {
-		if( !nU )
-			return 0;
-
-		if( !nU )
-			return nMN();
-
-		// typ U4x4.w:
-		/// x[7s,6f,5r,4str : 3-0 nBYTE = 1<<(x&0xf) ]
-		/// yz[ dimXY ] 	, w nBYTE //= 1<<(x&0xf)
-		//U1x4 typ(0x10,1,1,0);
-		rMN.iMNindt = U4x4( pUi-p_str, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
+		rMN.iMNindt = U4x4( pS-pALL, nU, -1, gpeTYP_STR ); //typ.typ().u4 );
 		rMN.rMNpos = pos;
 		rMN.rMNclr = color;
 		lzyMiN.lzyADD( &rMN, sizeof(rMN), nU = -1 );
 		return nMN();
 	}
 };
+
+
 
 class gpCLASS {
 public:
@@ -1604,7 +1593,7 @@ static const   gpc3Dact gpaACT_man[] = {
 	gpc3Dact(	 69.0,	74.0,	69.0,	73.9,	0.5,	0.1,		74.0	),	//GPE_ACTION_ERECT,
 };
 
-static const char gp_man_lws[] =
+static const char gp_man_lws[] = {
 	"manus\n"
 	"bone_mother\n"
 	"bone_groin\n"
@@ -1628,10 +1617,11 @@ static const char gp_man_lws[] =
 	"bone_r.feet\n"
 
 	"bone_neck\n"
-	"bone_head\n\0";
+	"bone_head\n\0"
+	};
 
 
-static const char gp_s_lws[] =
+static const char gp_s_lws[] = {
 		"LoadObjectLayer\n"
 		"AddBone\n"
 		"AddNullObject\n"
@@ -1650,7 +1640,7 @@ static const char gp_s_lws[] =
 		"BoneRestLength\n"
 		"Plugin\n"
 		"EndPlugin\n"
-		;
+		};
 
 typedef enum gpeLWScom:int {
 		gpeLWScom_LoadObjectLayer,
@@ -2008,6 +1998,15 @@ public:
 	void	funNEW();
 };
 
+class gpcMiNshr {
+	public:
+		bool	bON, bONpre, bSEL, bSTR,
+				bONorSTR;
+		U1 b01;
+		I4 sub;
+	gpcMiNshr( U1 b ) { gpmCLR; b01 = b; }
+};
+
 class gpcSRC {
 public:
     U1  	*pA, *pB;			// pA - alloc *pB - tartalom
@@ -2200,14 +2199,13 @@ public:
 	}
 	U1* pSRCstart( bool bNoMini, U1 selID ) {
 		// bHD akkor igaz, ha szerkesztés alatt van a rublika
-		// és ráadásul a \a elöt6t van a cursor
+		// és ráadásul a \a elött van a cursor
 		bool	bHD = false,
 				bMINI = bHD	? false : ( bNoMini ? false : !!pMINI );
 
 		U1	*pC = bMINI ? pMINI->p_alloc : pA;
 		dim.w = bMINI ? pMINI->nLD() : n_ld_add();
-		if( bMINI )
-		{
+		if( bMINI ) {
 			if( pDBG->nLD() ? selID != gpdDBG :true )
 				return pC;
 
@@ -2218,7 +2216,7 @@ public:
 		if( bHD )
 			return pC;
 
-		pC += iPUB(); //iB()+1;
+		pC += iPUB();
 		dim.w -= (pC-pA);
 		return pC;
 	}
@@ -2317,7 +2315,7 @@ public:
 		return pC - pSRCalloc(bNoMini, selID);
 	}
 	gpcSRC* SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ); //, I4 fz );
-	I4x2 SRCmini(
+	I4x2 SRCminiO(
 					U1x4* pO, I4x2 xy,
 					I4 fx,
 					I4 fy,
@@ -2325,10 +2323,23 @@ public:
 					I4 fz, I4 zz,
 
 					gpcCRS& crs,
-					gpeCLR bg, //gpeCLR fr,
+					gpeCLR bg,
 					gpeCLR ch,
 					bool bNoMini, U1 selID
 				);
+
+	I4x2 srcRDYmn(
+						U1x4* pO,
+
+						I4x2 xy, I4x2 fWH,
+
+						I4 fz, I4 zz,
+
+						gpcCRS& crs,
+						gpeCLR bg,
+						gpeCLR ch,
+						bool bNoMini, U1 selID
+					);
 
 	U4x4 CRSdim( bool bNoMini, U1 selID ) {
 		if( !this )
@@ -2339,8 +2350,15 @@ public:
 		return dim;
 	}
 	U4x4	srcBRK( gpcLZYdct& dOP, //U1 iSCP,
-					bool bNoMini, U1 selID, const char* pVAN = NULL );
+					bool bNoMini, U1 selID, const char* pVAN = NULL,
+					U4x2 pos = U4x2(0), U1* pUi = NULL, size_t nUi = 0, gpcSCOOP* pSCP = NULL );
 	U1		srcSCN( gpcCRS& crs, bool bNoMini, U1 selID );
+	I4x2	srcFORm(	U1x4* pO,
+						U1 *pALL,
+						I4x2 cxy, I4x2 trafo,
+						I4x2 xy, I4x2 fWH,
+						I4 i, I4 n, U4 clr,
+						gpcMiNshr& bSHR, gpcCRS& crs );
 	I4x2	srcRDY(
 						U1x4* pO,
 						I4x2 xy, I4x2 fWH,
@@ -2348,6 +2366,7 @@ public:
 						gpcCRS& crs,
 						bool bNoMini, U1 selID
 					);
+
 	void 	srcDBG( gpcLZYdct& dOP, U1 iSCP );
 	void 	srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ); //gpcMASS* pMS );
 	U1		srcBLD( gpcWIN* pW, gpcLZY* pSRCstk ); //

@@ -184,7 +184,7 @@ gpcLZY* gpcSRC::srcINSTmini( gpcLZY* pLZY ) { //, gpcMASS* pMASS, gpcWIN* pWIN )
 	gpOBJ	*pOmn = pMEM->pOBJ( gpeALF_MINI, true ),
 			*pO0 = gpmLZYvali( gpOBJ, &pMEM->lzyOBJ ); //(gpOBJ*)pMEM->lzyOBJ.Ux( 0, sizeof(*pO0) );
 
-	U1* pU1, *pSRC = aSCP[0].p_str, *pUdbg = NULL;
+	U1* pU1, *pSRC = aSCP[0].pALL, *pUdbg = NULL;
 	const char *pS;
 	U8 s = -1, nS;
 	bool bTMP;

@@ -40,7 +40,7 @@ void gpcSRC::srcDBG( gpcLZYdct& dOP, U1 iSCP ) {
 
 	I8x4 *pM0 = aSCP[iSCP].pMN();
 	U4x4 *pL0 = aSCP[iSCP].pLNK(); //lzyLNK.p_alloc;
-	char *pALL = (char*)aSCP[iSCP].p_str;
+	char *pALL = (char*)aSCP[iSCP].pALL;
 	U4 iR = -1;
 	I4 pc = 0, aPC[0x10];
 	//I8 i8 = 0;

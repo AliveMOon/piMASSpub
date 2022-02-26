@@ -174,8 +174,8 @@ F4& F4::abLOAD( char* pS, U4 nS, gpeALF alfV, U1** ppV, size_t* pVn ) {
 			a = ppV[1] ? *(I4x4*)ppV[1] : I4x4(0);
 			b = ppV[0] ? *(I4x4*)ppV[0] : I4x4(0);
 			d = a-b;
-			gpdCOUT	<< a.x << " " << a.y << " "<< a.z << "\n"
-						<< b.x << " " << b.y << " "<< b.z << gpdENDL;
+			if(bSTDcout_3Df) gpdCOUT	<< a.x << " " << a.y << " "<< a.z << "\n"
+										<< b.x << " " << b.y << " "<< b.z << gpdENDL;
 			d.w = 0.0;
 			pSRC = "xyr";
 			break;

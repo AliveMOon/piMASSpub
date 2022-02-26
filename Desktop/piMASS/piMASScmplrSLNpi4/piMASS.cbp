@@ -121,13 +121,6 @@
 				<Option parameters="zero.mass" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="./" />
-					<Add directory="include" />
-					<Add directory="../piMASS" />
-					<Add directory="/home/alivemoon/Asztal/userland" />
-					<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
-					<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
-					<Add directory="SIM7X00/Raspberry/c" />
 				</Compiler>
 				<Linker>
 					<Add option="-lwiringPi" />
@@ -223,6 +216,13 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add option="`sdl2-config --cflags`" />
+			<Add directory="./" />
+			<Add directory="include" />
+			<Add directory="../piMASS" />
+			<Add directory="/home/alivemoon/Asztal/userland" />
+			<Add directory="/home/alivemoon/Asztal/firmware/opt/vc/include" />
+			<Add directory="/home/alivemoon/Asztal/piMASScmplrSLNpi4_1/sys" />
+			<Add directory="SIM7X00/Raspberry/c" />
 		</Compiler>
 		<Linker>
 			<Add option="`sdl2-config --libs`" />
@@ -309,7 +309,10 @@
 		<Unit filename="src/gpccrs_rdy.cpp" />
 		<Unit filename="src/gpcwin.cpp" />
 		<Extensions>
-			<code_completion />
+			<code_completion>
+				<search_path add="/home/pi/Desktop/piMASS/" />
+				<search_path add="include" />
+			</code_completion>
 			<debugger />
 		</Extensions>
 	</Project>

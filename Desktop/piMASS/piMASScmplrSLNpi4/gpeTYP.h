@@ -31,6 +31,11 @@
 	| ((U4)a)					\
 )
 
+#define mkID8( a,b,c,d, e,f,g,h )	\
+(										\
+	  (((U8)MAKE_ID(e,f,g,h))<<32)		\
+	|  ((U8)MAKE_ID(a,b,c,d))			\
+)
 
 typedef enum gpeOPid:U1{
 	gpeOPid_nop,

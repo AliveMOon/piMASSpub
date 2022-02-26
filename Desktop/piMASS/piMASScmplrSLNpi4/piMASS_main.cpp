@@ -661,6 +661,7 @@ int main( int nA, char *apA[] ) {
 		strcpy( gppMASSfile, gpsMINI_ISO ); //gpsMINI_CHAR ); // "mini_char_12x16.png" ); //bmp" );0
 		gpcWIN win( gpsMASSpath, gppMASSfile, gpsMASSname, piMASS );
 		gpcCRS main_crs( win, 0 );
+		/// 1. srcBREAK scp.MN scp.DCT scp.LNK
 		win.winRUN( 	"                                        "
 						"     **** GRANDPACE piMASS V0.1 ****    "
 						"                                        "

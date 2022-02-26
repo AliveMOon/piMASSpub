@@ -22,7 +22,7 @@ U1  aIOonPCB[] =    { 29,31,32,33,36,11,12,35,38,40,15,16,18,22,37,13, },
                     // //       //  GND  + + RxD
                     00,01,      //  io00 + + io01	Cd   0- -1  Da
                     02,//       //  io02 + + GND	Sa   2- -
-                    03,04,      //  io03 + + io04	Ma  13- -4  Ma2
+                    03,04,      //  io03 + + io04	Ma1  3- -4  Ma2
                        05,      //  3V3  + + io05		  - -5  Ma3
                     // //       //  MOSI + + GND		  - -
                        06,      //  MISO + + io06		  - -6  Db
@@ -190,6 +190,10 @@ public:
 		aCNT[c0].y = pAN->num;
 		nTO[c0].x =
 		nTO[c0].y =	aCNT[c0].y-aCNT[c0].w;
+		if(!nTO[c0].y)
+			return aCNT[c0].w;
+		if( nD <= c0)
+			nD = c0+1;
 		return aCNT[c0].w;
 	}
     F2* pP2in( U1 p = 1, U1 c0 = 0, U1 c1 = 1 ) {
@@ -670,6 +674,7 @@ gpcLZY* gpcGT::GTwireOS( gpcLZY* pANS, U1* pSTR, gpcMASS* pMASS, SOCKET sockUSR,
 					pWR->prg.jdPRG.x = 0;
 					break;
 				case gpeALF_POS:
+				/// wire0x16 pos 10000  0 0 0 0 0  0 0 0 0 0  1 100000
 					iNUM = 0;
 					anC.alf = an.alf;
 					bSTAT = true;
@@ -799,7 +804,7 @@ I4 gpMEM::instDOitWIRE( gpcGT* pGT ) {
                 n = pSRF->w*pSRF->h, i, nD = 0;
 
             for( U4 i = 0; i < n; i++ ) {
-                if( apU4[1][i] == apU4[0][i] ) {
+                 if( apU4[1][i] == apU4[0][i] ) {
                     apU4[2][i] = 0 ;
                     continue;
                 }

@@ -506,7 +506,118 @@ gpcSRC* gpcSRC::SRCfrm(	U1x4* p1, const I4x4& xy, gpeCLR fr, const I4x4& fxyz ) 
 
 	return this;
 }
-I4x2 gpcSRC::SRCmini(
+I4x2 gpcSRC::srcRDYmn(
+						U1x4* pO,
+
+						I4x2 xy, I4x2 fWH,
+
+						I4 fz, I4 zz,
+
+						gpcCRS& crs,
+						gpeCLR bg,
+						gpeCLR ch,
+						bool bNoMini, U1 selID
+					) {
+	if( !this )
+		return xy;
+	if( (fWH.mn()<=0) || (xy.x>=fWH.x) || (xy.y>=fWH.y) )
+		return xy;
+	I4 cr, i, j, n, sub = 0;
+	I4x2	cxy = xy, Cxy, trafo(1,zz), lxy;
+	U1	cC, NX,
+		*pALL	= pSRCalloc( bNoMini, selID ),
+		*pSTRT	= pSRCstart( bNoMini, selID );
+
+	gpcMiNshr bSHR(
+					  (((U1)(this==crs.apSRC[0]))<<1)
+					| ((U1)(this==crs.apSRC[1]))
+				);
+
+	U1 iSCP = pMINI ? (pMINI->p_alloc == pALL) : false;
+	if( pDBG ? pDBG->p_alloc == pALL : false )
+		iSCP = 2;
+
+	I8x4	*pM0 = aSCP[iSCP].pMN(), *pMs0;
+
+	U4 clr, tSTR = U1x4(0x10,1,1).typ().u4, cn;
+	U1x4 chr = 0;
+	size_t iSTR = -1;
+	gpcSCOOP* pSCP;
+
+	for( U4 nM = aSCP[iSCP].nMN(), nMs, m = 0; m < nM; m++ ) {
+		cxy = xy+pM0[m].rMNpos;
+		if(cxy.y>=fWH.y)
+			break;
+
+		i = pM0[m].iS; //iS;
+		n = pM0[m].nS;
+		bSHR.bSTR =
+			(tSTR == pM0[m].iMNindt.w);
+		chr = pM0[m].rMNclr;
+		if( bSHR.bSTR ) {
+
+			iSTR++;
+
+			if( pSCP = aSCP[iSCP].pSCP(iSTR) )
+			if( (nMs = pSCP->nMN()) > 1 )
+			if( pMs0 = pSCP->pMN() ) {
+				if( (cxy.mn()>=0) && (cxy.x<fWH.x) && (cxy.y<fWH.y) ) {
+					if( bSHR.bON ) {
+						if( crs.iSTR.y == crs.iSTR.x )
+							bSHR.bON = !((bSHR.b01&1)&&(i>crs.iSTR.y));
+						else
+							bSHR.bON = !((bSHR.b01&1)&&(i>=crs.iSTR.y));
+
+						if( bSHR.bON )
+							chr.z |= 0x10;
+					}
+					cr = cxy*trafo;
+					pO[cr] = chr;
+					pO[cr].w = '\"'-' ';
+				}
+
+				for( U4 m = 0; m < nMs; m++ ) {
+					cxy = xy+pMs0[m].rMNpos;
+					if(cxy.y>=fWH.y)
+						break;
+
+					i = pMs0[m].iS;
+					n = pMs0[m].nS;
+					bSHR.bSTR =
+						(tSTR == pMs0[m].iMNindt.w);
+					chr = pMs0[m].rMNclr;
+					chr.z = (chr.z&0xf0)|((chr.z+1)%0x10);
+					cxy = srcFORm( 	pO,
+									pALL, cxy, trafo,
+									xy, fWH,
+									i, n, chr.u4, bSHR, crs );
+				}
+
+				if( (cxy.mn()>=0) && (cxy.x<fWH.x) && (cxy.y<fWH.y) ) {
+					if( bSHR.bON ) {
+						if( crs.iSTR.y == crs.iSTR.x )
+							bSHR.bON = !((bSHR.b01&1)&&(i>crs.iSTR.y));
+						else
+							bSHR.bON = !((bSHR.b01&1)&&(i>=crs.iSTR.y));
+
+						if( bSHR.bON )
+							chr.z |= 0x10;
+					}
+					cr = cxy*trafo;
+					pO[cr] = pM0[m].rMNclr;
+					pO[cr].w = '\"'-' ';
+				}
+				continue;
+			}
+		}
+		srcFORm( 	pO,
+					pALL, cxy, trafo,
+					xy, fWH,
+					i, n, pM0[m].rMNclr, bSHR, crs );
+	}
+	return xy;
+}
+I4x2 gpcSRC::SRCminiO(
 						U1x4* pO,  I4x2 xy,
 
 						I4 fx,

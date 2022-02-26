@@ -233,7 +233,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 	I8x4 *pM0 = aSCP[iSCP].pMN(), MiN, Mnx;
 	U4x4 *pL0 = aSCP[iSCP].pLNK(); //, aLNK[0x10];
 	gpeCLR clr;
-	char		*pS = (char*)aSCP[iSCP].p_str;
+	char		*pS = (char*)aSCP[iSCP].pALL;
 	const char	*psDCT;
 	I4 nS, nsDCT;
 	gpBLK* pBLK = srcBLKnew( pS, gpeOPid_stk, NULL, -1, -1, 0 );
@@ -244,7 +244,7 @@ void gpcSRC::srcCMPLR( gpcLZYdct& dOP, U1 iSCP, gpcWIN* pW, gpcLZY* pSRCstk ) {
 			continue;
 
 		MiN = pM0[mnID];
-		pS = (nS=MiN.nS) ? (char*)aSCP[iSCP].p_str+MiN.iS : NULL;
+		pS = (nS=MiN.nS) ? (char*)aSCP[iSCP].pALL+MiN.iS : NULL;
 		if( MiN.MNtyp() == gpeTYP_STR )
 		{
 			if( MiN.MNclr() != gpeCLR_violet )

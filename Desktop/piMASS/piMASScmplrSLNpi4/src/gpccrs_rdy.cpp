@@ -62,6 +62,7 @@ bool gpcCRS::miniRDYesc( gpcWIN* pWIN, gpcPIC* pPIC ) {
 
 	return false;
 }
+/// 4. srcBREAK scp.MN scp.DCT scp.LNK
 U4 gpcCRS::miniRDYmap(
 						gpcWIN* pWIN, I4x4& lurdAN,
 						U4* &pM,	U4* &pC,	U4* &pR,
@@ -154,6 +155,7 @@ U4 gpcCRS::miniRDYmap(
 ///
 ///------------------------------
 static U1 gpsTITLE[0x100];
+/// 3. srcBREAK scp.MN scp.DCT scp.LNK
 void gpcCRS::miniRDY(	gpcWIN* pWIN,
 						gpcPIC* pPIC, SDL_Renderer* pRNDR,
 						bool bSHFT, bool bMOV ) {
@@ -179,8 +181,7 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 	aCRSonPG[3].a4x2[0] = 	aCRSonPG[1].a4x2[0]
 							+I4x2(psCp[CR.x],psRp[CR.y]);
 	if( bMOV )
-	if( aCRSonPG[3].a4x2[1] != aCRSonPG[3].a4x2[0] )
-	{
+	if( aCRSonPG[3].a4x2[1] != aCRSonPG[3].a4x2[0] ) {
 		I4x2 &wh = CRSfrm.a4x2[1];
 		I4	x = aCRSonPG[3].a4x2[0].x+CRSfrm.x,
 			y = aCRSonPG[3].a4x2[0].y+CRSfrm.y;
@@ -209,13 +210,11 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 	I4x2 onAN = scnZN.a4x2[0]+I4x2(1,0);
 	U8 s;
 	if( lurdAN.x )
-	for( U4 r = lurdAN.y, c, ce; r <= lurdAN.w; r++ )
-	{
+	for( U4 r = lurdAN.y, c, ce; r <= lurdAN.w; r++ ) {
 		if( r < mZN.y )
 			xyCR.y = psRp[r];
 		else
 			xyCR.y = psRp[mZN.y]+((r-mZN.w)*gpdSRC_ROWw);
-
 
 		for( c = lurdAN.x-1; c < lurdAN.z; c++ ) {
 			if( c < mZN.x )
@@ -246,8 +245,7 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 	}
 
 	U1* pTITLE = gpsTITLE;
-	for( U4 r = 0,a; r < mZN.y; r++ )
-	{
+	for( U4 r = 0,a; r < mZN.y; r++ ) {
 		xyCR.y = psRp[r]+CRSfrm.y;
 		if( xyCR.y >= CRSfrm.w )
 			break;
@@ -260,8 +258,7 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 
 		i = r*z;
 		fxyz.y = gpmMIN( CRSfrm.w, (xyCR.y + xyCR.w) );
-		for( U4 c = 0; c < mZN.x; c++ )
-		{
+		for( U4 c = 0; c < mZN.x; c++ ) {
 			xyCR.x = psCp[c]+CRSfrm.x;
 			if( xyCR.x >= CRSfrm.z )
 				break;
@@ -298,24 +295,19 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 			pTITLE = gpsTITLE;
 			if( pSRC = pWIN->piMASS->srcFND(pM[i+c]) ) {
 				//gpcRES* pRES = pSRC->apOUT[3];
-				if( pSRC->pMEM  )
-				{
-					if( pSRC->pMEM->pCTRL )
-					{
+				if( pSRC->pMEM  ) {
+					if( pSRC->pMEM->pCTRL ) {
 						if( *(pSRC->pMEM->pCTRL->sNAME) )
 							pTITLE += sprintf( (char*)pTITLE, "%s", (pSRC->pMEM->pCTRL->sNAME) );
 					}
-					if( pSRC->pMEM->pMgl )
-					{
-						if( pSRC->pMEM->pMgl->aPICid[0] )
-						{
+					if( pSRC->pMEM->pMgl ) {
+						if( pSRC->pMEM->pMgl->aPICid[0] ) {
 							/// CELL PICTURES BACK GROUND -------------------
 							//xyWH azonos a xyPIC[0]-val!
 							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pMgl->aPICid[0]-1;
 							picBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
 						}
-						if( pSRC->pMEM->pMgl->aBOBid[0] )
-						{
+						if( pSRC->pMEM->pMgl->aBOBid[0] ) {
 							aXYuvPC[2].a4x2[1].x = pSRC->pMEM->pMgl->aBOBid[0]-1;
 							bobBG.lzyADD( &aXYuvPC, sizeof(aXYuvPC), s = -1 );
 						}
@@ -369,16 +361,14 @@ void gpcCRS::miniRDY(	gpcWIN* pWIN,
 			}
 
 			bNoMini = ((a >= lurdAN.x) && (a <= lurdAN.z ));
-			if( bNoMini )
-			{
+			if( bNoMini ) {
 				c16fr = bED ? gpeCLR_green2 : gpeCLR_cyan;
 				c16ch = bED ? gpeCLR_cyan : gpeCLR_blue2;
 			} else
 				c16fr = c16ch = gpeCLR_blue2;
 
 			if( bON )
-			if( iON == i+c )
-			{
+			if( iON == i+c ) {
 				c16fr = gpeCLR_white;
 			}
 
